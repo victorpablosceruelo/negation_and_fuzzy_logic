@@ -1,0 +1,9 @@
+:- module(ball,_,[rfuzzy, clpr]).
+:- use_module(library(write),[write/1]).
+
+valid_angle(X) :- X .>=. 0, X .=<. 181.
+
+:- set_prop selected_angle/1 => valid_angle/1.
+:- default(selected_angle/1,0).
+
+best_angle :# ([(0,0),(50,0),(71,1),(100,0)]).
