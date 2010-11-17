@@ -1,0 +1,27 @@
+?- intersect([1,2,3],[2,3,4],X).
+
+X = [2,3] ? ;
+
+no
+?- not_intersect([1,2,3],[2,3,4],X).
+
+attach_attribute(X,formula(X,[[X/[2,3]]])) ? 
+
+yes
+?- intersect([1,2,3],[2,3],[1,2]).
+
+no
+?- not_intersect([1,2,3],[2,3],[1,2]).
+
+yes
+?- intersect([1,2,3],[2,3],[2,X]).
+
+X = 3 ? ;
+
+no
+?- not_intersect([1,2,3],[2,3],[2,X]).
+
+attach_attribute(X,formula(X,[[X/3]])) ? 
+
+yes
+?- 

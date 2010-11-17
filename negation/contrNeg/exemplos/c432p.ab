@@ -1,0 +1,2330 @@
+abds([ab/1]).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Testbits are taken from Hinz (t25).
+% Diagnoses are
+%  not c131gat
+%  nor c187gat
+%  xor c233gat
+%  nand c270gat
+%  and c296gat
+%  not c329gat
+%
+% Hinz needs 240 msec.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+obs(out(inpt0, c1gat), 0).
+obs(out(inpt0, c4gat), 0).
+obs(out(inpt0, c8gat), 0).
+obs(out(inpt0, c11gat), 1).
+obs(out(inpt0, c14gat), 0).
+obs(out(inpt0, c17gat), 0).
+obs(out(inpt0, c21gat), 0).
+obs(out(inpt0, c24gat), 0).
+obs(out(inpt0, c27gat), 1).
+obs(out(inpt0, c30gat), 0).
+obs(out(inpt0, c34gat), 0).
+obs(out(inpt0, c37gat), 0).
+obs(out(inpt0, c40gat), 0).
+obs(out(inpt0, c43gat), 1).
+obs(out(inpt0, c47gat), 0).
+obs(out(inpt0, c50gat), 1).
+obs(out(inpt0, c53gat), 1).
+obs(out(inpt0, c56gat), 0).
+obs(out(inpt0, c60gat), 0).
+obs(out(inpt0, c63gat), 0).
+obs(out(inpt0, c66gat), 1).
+obs(out(inpt0, c69gat), 0).
+obs(out(inpt0, c73gat), 0).
+obs(out(inpt0, c76gat), 0).
+obs(out(inpt0, c79gat), 1).
+obs(out(inpt0, c82gat), 0).
+obs(out(inpt0, c86gat), 1).
+obs(out(inpt0, c89gat), 1).
+obs(out(inpt0, c92gat), 1).
+obs(out(inpt0, c95gat), 1).
+obs(out(inpt0, c99gat), 1).
+obs(out(inpt0, c102gat), 0).
+obs(out(inpt0, c105gat), 0).
+obs(out(inpt0, c108gat), 0).
+obs(out(inpt0, c112gat), 0).
+obs(out(inpt0, c115gat), 0).
+
+
+<- not val(out(not1,c329gat), 0).
+<- not val(out(not1,c370gat), 0).
+<- not val(out(nand4,c431gat), 0).
+
+<- not val(out(not1,c223gat), 1).
+<- not val(out(nor2,c421gat), 1).
+<- not val(out(nand4,c430gat), 1).
+<- not val(out(nand4,c432gat), 1).
+
+
+
+%
+% Propagation of values thru connections
+%
+val( in(Type,Name,Nr), V ) <-
+  conn( in(Type,Name,Nr), out(Type2,Name2) ),
+  val( out(Type2,Name2), V ).
+
+%
+% input observations
+%
+val(out(inpt0,Name), V ) <- obs( out(inpt0, Name), V ).
+
+
+%
+% computation of a component's output value
+%
+val( out(not1,Name), V ) <-
+  not ab(Name),
+  val( in(not1,Name,1), W),
+  not1_table(W,V).
+val( out(not1,Name), V ) <-
+  ab(Name),
+  val( in(not1,Name,1), W),
+  id1_table(W,V).
+
+val( out(xor2,Name), V ) <-
+  not ab(Name),
+  val( in(xor2,Name,1), W1),
+  val( in(xor2,Name,2), W2),
+  xor2_table(W1,W2,V).
+val( out(xor2,Name), V ) <-
+  ab(Name),
+  val( in(xor2,Name,1), W1),
+  val( in(xor2,Name,2), W2),
+  eq2_table(W1,W2,V).
+
+val( out(nor2,Name), V ) <-
+  not ab(Name),
+  val( in(nor2,Name,1), W1),
+  val( in(nor2,Name,2), W2),
+  nor2_table(W1,W2,V).
+val( out(nor2,Name), V ) <-
+  ab(Name),
+  val( in(nor2,Name,1), W1),
+  val( in(nor2,Name,2), W2),
+  or2_table(W1,W2,V).
+
+val( out(nand2,Name), V ) <-
+  not ab(Name),
+  val( in(nand2,Name,1), W1),
+  val( in(nand2,Name,2), W2),
+  nand2_table(W1,W2,V).
+val( out(nand2,Name), V ) <-
+  ab(Name),
+  val( in(nand2,Name,1), W1),
+  val( in(nand2,Name,2), W2),
+  and2_table(W1,W2,V).
+
+val( out(nand3,Name), V ) <-
+  not ab(Name),
+  val( in(nand3,Name,1), W1),
+  val( in(nand3,Name,2), W2),
+  val( in(nand3,Name,3), W3),
+  nand3_table(W1,W2,W3,V).
+val( out(nand3,Name), V ) <-
+  ab(Name),
+  val( in(nand3,Name,1), W1),
+  val( in(nand3,Name,2), W2),
+  val( in(nand3,Name,3), W3),
+  and3_table(W1,W2,W3,V).
+
+val( out(nand4,Name), V ) <-
+  not ab(Name),
+  val( in(nand4,Name,1), W1),
+  val( in(nand4,Name,2), W2),
+  val( in(nand4,Name,3), W3),
+  val( in(nand4,Name,4), W4),
+  nand4_table(W1,W2,W3,W4,V).
+val( out(nand4,Name), V ) <-
+  ab(Name),
+  val( in(nand4,Name,1), W1),
+  val( in(nand4,Name,2), W2),
+  val( in(nand4,Name,3), W3),
+  val( in(nand4,Name,4), W4),
+  and4_table(W1,W2,W3,W4,V).
+
+
+val( out(and8,Name), V ) <-
+  not ab(Name),
+  val( in(and8,Name,1), W1),
+  val( in(and8,Name,2), W2),
+  val( in(and8,Name,3), W3),
+  val( in(and8,Name,4), W4),
+  val( in(and8,Name,5), W5),
+  val( in(and8,Name,6), W6),
+  val( in(and8,Name,7), W7),
+  val( in(and8,Name,8), W8),
+  and8_table(W1,W2,W3,W4,W5,W6,W7,W8,V).
+val( out(and8,Name), V ) <-
+  ab(Name),
+  val( in(and8,Name,1), W1),
+  val( in(and8,Name,2), W2),
+  val( in(and8,Name,3), W3),
+  val( in(and8,Name,4), W4),
+  val( in(and8,Name,5), W5),
+  val( in(and8,Name,6), W6),
+  val( in(and8,Name,7), W7),
+  val( in(and8,Name,8), W8),
+  nand8_table(W1,W2,W3,W4,W5,W6,W7,W8,V).
+
+val( out(and9,Name), V ) <-
+  not ab(Name),
+  val( in(and9,Name,1), W1),
+  val( in(and9,Name,2), W2),
+  val( in(and9,Name,3), W3),
+  val( in(and9,Name,4), W4),
+  val( in(and9,Name,5), W5),
+  val( in(and9,Name,6), W6),
+  val( in(and9,Name,7), W7),
+  val( in(and9,Name,8), W8),
+  val( in(and9,Name,9), W9),
+  and9_table(W1,W2,W3,W4,W5,W6,W7,W8,W9,V).
+val( out(and9,Name), V ) <-
+  ab(Name),
+  val( in(and9,Name,1), W1),
+  val( in(and9,Name,2), W2),
+  val( in(and9,Name,3), W3),
+  val( in(and9,Name,4), W4),
+  val( in(and9,Name,5), W5),
+  val( in(and9,Name,6), W6),
+  val( in(and9,Name,7), W7),
+  val( in(and9,Name,8), W8),
+  val( in(and9,Name,9), W9),
+  nand9_table(W1,W2,W3,W4,W5,W6,W7,W8,W9,V).
+
+/*
+
+not1_table(0,1).
+not1_table(1,0).
+
+id1_table(0,0).
+id1_table(1,1).
+
+xor2_table(0,0,0).
+xor2_table(0,1,1).
+xor2_table(1,0,1).
+xor2_table(1,1,0).
+
+eq2_table(0,0,1).
+eq2_table(0,1,0).
+eq2_table(1,0,0).
+eq2_table(1,1,1).
+
+nor2_table(0,0,1).
+nor2_table(0,1,0).
+nor2_table(1,0,0).
+nor2_table(1,1,0).
+
+or2_table(0,0,0).
+or2_table(0,1,1).
+or2_table(1,0,1).
+or2_table(1,1,1).
+
+nand2_table(0,0,1).
+nand2_table(0,1,1).
+nand2_table(1,0,1).
+nand2_table(1,1,0).
+
+and2_table(0,0,0).
+and2_table(0,1,0).
+and2_table(1,0,0).
+and2_table(1,1,1).
+
+nand3_table(0,0,0,1).
+nand3_table(0,0,1,1).
+nand3_table(0,1,0,1).
+nand3_table(0,1,1,1).
+nand3_table(1,0,0,1).
+nand3_table(1,0,1,1).
+nand3_table(1,1,0,1).
+nand3_table(1,1,1,0).
+
+and3_table(0,0,0,0).
+and3_table(0,0,1,0).
+and3_table(0,1,0,0).
+and3_table(0,1,1,0).
+and3_table(1,0,0,0).
+and3_table(1,0,1,0).
+and3_table(1,1,0,0).
+and3_table(1,1,1,1).
+
+nand4_table(0,0,0,0,1).
+nand4_table(0,0,0,1,1).
+nand4_table(0,0,1,0,1).
+nand4_table(0,0,1,1,1).
+nand4_table(0,1,0,0,1).
+nand4_table(0,1,0,1,1).
+nand4_table(0,1,1,0,1).
+nand4_table(0,1,1,1,1).
+nand4_table(1,0,0,0,1).
+nand4_table(1,0,0,1,1).
+nand4_table(1,0,1,0,1).
+nand4_table(1,0,1,1,1).
+nand4_table(1,1,0,0,1).
+nand4_table(1,1,0,1,1).
+nand4_table(1,1,1,0,1).
+nand4_table(1,1,1,1,0).
+
+and4_table(0,0,0,0,0).
+and4_table(0,0,0,1,0).
+and4_table(0,0,1,0,0).
+and4_table(0,0,1,1,0).
+and4_table(0,1,0,0,0).
+and4_table(0,1,0,1,0).
+and4_table(0,1,1,0,0).
+and4_table(0,1,1,1,0).
+and4_table(1,0,0,0,0).
+and4_table(1,0,0,1,0).
+and4_table(1,0,1,0,0).
+and4_table(1,0,1,1,0).
+and4_table(1,1,0,0,0).
+and4_table(1,1,0,1,0).
+and4_table(1,1,1,0,0).
+and4_table(1,1,1,1,1).
+
+and8_table(0, 0, 0, 0, 0, 0, 0, 0, 0).
+and8_table(0, 0, 0, 0, 0, 0, 0, 1, 0).
+and8_table(0, 0, 0, 0, 0, 0, 1, 0, 0).
+and8_table(0, 0, 0, 0, 0, 0, 1, 1, 0).
+and8_table(0, 0, 0, 0, 0, 1, 0, 0, 0).
+and8_table(0, 0, 0, 0, 0, 1, 0, 1, 0).
+and8_table(0, 0, 0, 0, 0, 1, 1, 0, 0).
+and8_table(0, 0, 0, 0, 0, 1, 1, 1, 0).
+and8_table(0, 0, 0, 0, 1, 0, 0, 0, 0).
+and8_table(0, 0, 0, 0, 1, 0, 0, 1, 0).
+and8_table(0, 0, 0, 0, 1, 0, 1, 0, 0).
+and8_table(0, 0, 0, 0, 1, 0, 1, 1, 0).
+and8_table(0, 0, 0, 0, 1, 1, 0, 0, 0).
+and8_table(0, 0, 0, 0, 1, 1, 0, 1, 0).
+and8_table(0, 0, 0, 0, 1, 1, 1, 0, 0).
+and8_table(0, 0, 0, 0, 1, 1, 1, 1, 0).
+and8_table(0, 0, 0, 1, 0, 0, 0, 0, 0).
+and8_table(0, 0, 0, 1, 0, 0, 0, 1, 0).
+and8_table(0, 0, 0, 1, 0, 0, 1, 0, 0).
+and8_table(0, 0, 0, 1, 0, 0, 1, 1, 0).
+and8_table(0, 0, 0, 1, 0, 1, 0, 0, 0).
+and8_table(0, 0, 0, 1, 0, 1, 0, 1, 0).
+and8_table(0, 0, 0, 1, 0, 1, 1, 0, 0).
+and8_table(0, 0, 0, 1, 0, 1, 1, 1, 0).
+and8_table(0, 0, 0, 1, 1, 0, 0, 0, 0).
+and8_table(0, 0, 0, 1, 1, 0, 0, 1, 0).
+and8_table(0, 0, 0, 1, 1, 0, 1, 0, 0).
+and8_table(0, 0, 0, 1, 1, 0, 1, 1, 0).
+and8_table(0, 0, 0, 1, 1, 1, 0, 0, 0).
+and8_table(0, 0, 0, 1, 1, 1, 0, 1, 0).
+and8_table(0, 0, 0, 1, 1, 1, 1, 0, 0).
+and8_table(0, 0, 0, 1, 1, 1, 1, 1, 0).
+and8_table(0, 0, 1, 0, 0, 0, 0, 0, 0).
+and8_table(0, 0, 1, 0, 0, 0, 0, 1, 0).
+and8_table(0, 0, 1, 0, 0, 0, 1, 0, 0).
+and8_table(0, 0, 1, 0, 0, 0, 1, 1, 0).
+and8_table(0, 0, 1, 0, 0, 1, 0, 0, 0).
+and8_table(0, 0, 1, 0, 0, 1, 0, 1, 0).
+and8_table(0, 0, 1, 0, 0, 1, 1, 0, 0).
+and8_table(0, 0, 1, 0, 0, 1, 1, 1, 0).
+and8_table(0, 0, 1, 0, 1, 0, 0, 0, 0).
+and8_table(0, 0, 1, 0, 1, 0, 0, 1, 0).
+and8_table(0, 0, 1, 0, 1, 0, 1, 0, 0).
+and8_table(0, 0, 1, 0, 1, 0, 1, 1, 0).
+and8_table(0, 0, 1, 0, 1, 1, 0, 0, 0).
+and8_table(0, 0, 1, 0, 1, 1, 0, 1, 0).
+and8_table(0, 0, 1, 0, 1, 1, 1, 0, 0).
+and8_table(0, 0, 1, 0, 1, 1, 1, 1, 0).
+and8_table(0, 0, 1, 1, 0, 0, 0, 0, 0).
+and8_table(0, 0, 1, 1, 0, 0, 0, 1, 0).
+and8_table(0, 0, 1, 1, 0, 0, 1, 0, 0).
+and8_table(0, 0, 1, 1, 0, 0, 1, 1, 0).
+and8_table(0, 0, 1, 1, 0, 1, 0, 0, 0).
+and8_table(0, 0, 1, 1, 0, 1, 0, 1, 0).
+and8_table(0, 0, 1, 1, 0, 1, 1, 0, 0).
+and8_table(0, 0, 1, 1, 0, 1, 1, 1, 0).
+and8_table(0, 0, 1, 1, 1, 0, 0, 0, 0).
+and8_table(0, 0, 1, 1, 1, 0, 0, 1, 0).
+and8_table(0, 0, 1, 1, 1, 0, 1, 0, 0).
+and8_table(0, 0, 1, 1, 1, 0, 1, 1, 0).
+and8_table(0, 0, 1, 1, 1, 1, 0, 0, 0).
+and8_table(0, 0, 1, 1, 1, 1, 0, 1, 0).
+and8_table(0, 0, 1, 1, 1, 1, 1, 0, 0).
+and8_table(0, 0, 1, 1, 1, 1, 1, 1, 0).
+and8_table(0, 1, 0, 0, 0, 0, 0, 0, 0).
+and8_table(0, 1, 0, 0, 0, 0, 0, 1, 0).
+and8_table(0, 1, 0, 0, 0, 0, 1, 0, 0).
+and8_table(0, 1, 0, 0, 0, 0, 1, 1, 0).
+and8_table(0, 1, 0, 0, 0, 1, 0, 0, 0).
+and8_table(0, 1, 0, 0, 0, 1, 0, 1, 0).
+and8_table(0, 1, 0, 0, 0, 1, 1, 0, 0).
+and8_table(0, 1, 0, 0, 0, 1, 1, 1, 0).
+and8_table(0, 1, 0, 0, 1, 0, 0, 0, 0).
+and8_table(0, 1, 0, 0, 1, 0, 0, 1, 0).
+and8_table(0, 1, 0, 0, 1, 0, 1, 0, 0).
+and8_table(0, 1, 0, 0, 1, 0, 1, 1, 0).
+and8_table(0, 1, 0, 0, 1, 1, 0, 0, 0).
+and8_table(0, 1, 0, 0, 1, 1, 0, 1, 0).
+and8_table(0, 1, 0, 0, 1, 1, 1, 0, 0).
+and8_table(0, 1, 0, 0, 1, 1, 1, 1, 0).
+and8_table(0, 1, 0, 1, 0, 0, 0, 0, 0).
+and8_table(0, 1, 0, 1, 0, 0, 0, 1, 0).
+and8_table(0, 1, 0, 1, 0, 0, 1, 0, 0).
+and8_table(0, 1, 0, 1, 0, 0, 1, 1, 0).
+and8_table(0, 1, 0, 1, 0, 1, 0, 0, 0).
+and8_table(0, 1, 0, 1, 0, 1, 0, 1, 0).
+and8_table(0, 1, 0, 1, 0, 1, 1, 0, 0).
+and8_table(0, 1, 0, 1, 0, 1, 1, 1, 0).
+and8_table(0, 1, 0, 1, 1, 0, 0, 0, 0).
+and8_table(0, 1, 0, 1, 1, 0, 0, 1, 0).
+and8_table(0, 1, 0, 1, 1, 0, 1, 0, 0).
+and8_table(0, 1, 0, 1, 1, 0, 1, 1, 0).
+and8_table(0, 1, 0, 1, 1, 1, 0, 0, 0).
+and8_table(0, 1, 0, 1, 1, 1, 0, 1, 0).
+and8_table(0, 1, 0, 1, 1, 1, 1, 0, 0).
+and8_table(0, 1, 0, 1, 1, 1, 1, 1, 0).
+and8_table(0, 1, 1, 0, 0, 0, 0, 0, 0).
+and8_table(0, 1, 1, 0, 0, 0, 0, 1, 0).
+and8_table(0, 1, 1, 0, 0, 0, 1, 0, 0).
+and8_table(0, 1, 1, 0, 0, 0, 1, 1, 0).
+and8_table(0, 1, 1, 0, 0, 1, 0, 0, 0).
+and8_table(0, 1, 1, 0, 0, 1, 0, 1, 0).
+and8_table(0, 1, 1, 0, 0, 1, 1, 0, 0).
+and8_table(0, 1, 1, 0, 0, 1, 1, 1, 0).
+and8_table(0, 1, 1, 0, 1, 0, 0, 0, 0).
+and8_table(0, 1, 1, 0, 1, 0, 0, 1, 0).
+and8_table(0, 1, 1, 0, 1, 0, 1, 0, 0).
+and8_table(0, 1, 1, 0, 1, 0, 1, 1, 0).
+and8_table(0, 1, 1, 0, 1, 1, 0, 0, 0).
+and8_table(0, 1, 1, 0, 1, 1, 0, 1, 0).
+and8_table(0, 1, 1, 0, 1, 1, 1, 0, 0).
+and8_table(0, 1, 1, 0, 1, 1, 1, 1, 0).
+and8_table(0, 1, 1, 1, 0, 0, 0, 0, 0).
+and8_table(0, 1, 1, 1, 0, 0, 0, 1, 0).
+and8_table(0, 1, 1, 1, 0, 0, 1, 0, 0).
+and8_table(0, 1, 1, 1, 0, 0, 1, 1, 0).
+and8_table(0, 1, 1, 1, 0, 1, 0, 0, 0).
+and8_table(0, 1, 1, 1, 0, 1, 0, 1, 0).
+and8_table(0, 1, 1, 1, 0, 1, 1, 0, 0).
+and8_table(0, 1, 1, 1, 0, 1, 1, 1, 0).
+and8_table(0, 1, 1, 1, 1, 0, 0, 0, 0).
+and8_table(0, 1, 1, 1, 1, 0, 0, 1, 0).
+and8_table(0, 1, 1, 1, 1, 0, 1, 0, 0).
+and8_table(0, 1, 1, 1, 1, 0, 1, 1, 0).
+and8_table(0, 1, 1, 1, 1, 1, 0, 0, 0).
+and8_table(0, 1, 1, 1, 1, 1, 0, 1, 0).
+and8_table(0, 1, 1, 1, 1, 1, 1, 0, 0).
+and8_table(0, 1, 1, 1, 1, 1, 1, 1, 0).
+and8_table(1, 0, 0, 0, 0, 0, 0, 0, 0).
+and8_table(1, 0, 0, 0, 0, 0, 0, 1, 0).
+and8_table(1, 0, 0, 0, 0, 0, 1, 0, 0).
+and8_table(1, 0, 0, 0, 0, 0, 1, 1, 0).
+and8_table(1, 0, 0, 0, 0, 1, 0, 0, 0).
+and8_table(1, 0, 0, 0, 0, 1, 0, 1, 0).
+and8_table(1, 0, 0, 0, 0, 1, 1, 0, 0).
+and8_table(1, 0, 0, 0, 0, 1, 1, 1, 0).
+and8_table(1, 0, 0, 0, 1, 0, 0, 0, 0).
+and8_table(1, 0, 0, 0, 1, 0, 0, 1, 0).
+and8_table(1, 0, 0, 0, 1, 0, 1, 0, 0).
+and8_table(1, 0, 0, 0, 1, 0, 1, 1, 0).
+and8_table(1, 0, 0, 0, 1, 1, 0, 0, 0).
+and8_table(1, 0, 0, 0, 1, 1, 0, 1, 0).
+and8_table(1, 0, 0, 0, 1, 1, 1, 0, 0).
+and8_table(1, 0, 0, 0, 1, 1, 1, 1, 0).
+and8_table(1, 0, 0, 1, 0, 0, 0, 0, 0).
+and8_table(1, 0, 0, 1, 0, 0, 0, 1, 0).
+and8_table(1, 0, 0, 1, 0, 0, 1, 0, 0).
+and8_table(1, 0, 0, 1, 0, 0, 1, 1, 0).
+and8_table(1, 0, 0, 1, 0, 1, 0, 0, 0).
+and8_table(1, 0, 0, 1, 0, 1, 0, 1, 0).
+and8_table(1, 0, 0, 1, 0, 1, 1, 0, 0).
+and8_table(1, 0, 0, 1, 0, 1, 1, 1, 0).
+and8_table(1, 0, 0, 1, 1, 0, 0, 0, 0).
+and8_table(1, 0, 0, 1, 1, 0, 0, 1, 0).
+and8_table(1, 0, 0, 1, 1, 0, 1, 0, 0).
+and8_table(1, 0, 0, 1, 1, 0, 1, 1, 0).
+and8_table(1, 0, 0, 1, 1, 1, 0, 0, 0).
+and8_table(1, 0, 0, 1, 1, 1, 0, 1, 0).
+and8_table(1, 0, 0, 1, 1, 1, 1, 0, 0).
+and8_table(1, 0, 0, 1, 1, 1, 1, 1, 0).
+and8_table(1, 0, 1, 0, 0, 0, 0, 0, 0).
+and8_table(1, 0, 1, 0, 0, 0, 0, 1, 0).
+and8_table(1, 0, 1, 0, 0, 0, 1, 0, 0).
+and8_table(1, 0, 1, 0, 0, 0, 1, 1, 0).
+and8_table(1, 0, 1, 0, 0, 1, 0, 0, 0).
+and8_table(1, 0, 1, 0, 0, 1, 0, 1, 0).
+and8_table(1, 0, 1, 0, 0, 1, 1, 0, 0).
+and8_table(1, 0, 1, 0, 0, 1, 1, 1, 0).
+and8_table(1, 0, 1, 0, 1, 0, 0, 0, 0).
+and8_table(1, 0, 1, 0, 1, 0, 0, 1, 0).
+and8_table(1, 0, 1, 0, 1, 0, 1, 0, 0).
+and8_table(1, 0, 1, 0, 1, 0, 1, 1, 0).
+and8_table(1, 0, 1, 0, 1, 1, 0, 0, 0).
+and8_table(1, 0, 1, 0, 1, 1, 0, 1, 0).
+and8_table(1, 0, 1, 0, 1, 1, 1, 0, 0).
+and8_table(1, 0, 1, 0, 1, 1, 1, 1, 0).
+and8_table(1, 0, 1, 1, 0, 0, 0, 0, 0).
+and8_table(1, 0, 1, 1, 0, 0, 0, 1, 0).
+and8_table(1, 0, 1, 1, 0, 0, 1, 0, 0).
+and8_table(1, 0, 1, 1, 0, 0, 1, 1, 0).
+and8_table(1, 0, 1, 1, 0, 1, 0, 0, 0).
+and8_table(1, 0, 1, 1, 0, 1, 0, 1, 0).
+and8_table(1, 0, 1, 1, 0, 1, 1, 0, 0).
+and8_table(1, 0, 1, 1, 0, 1, 1, 1, 0).
+and8_table(1, 0, 1, 1, 1, 0, 0, 0, 0).
+and8_table(1, 0, 1, 1, 1, 0, 0, 1, 0).
+and8_table(1, 0, 1, 1, 1, 0, 1, 0, 0).
+and8_table(1, 0, 1, 1, 1, 0, 1, 1, 0).
+and8_table(1, 0, 1, 1, 1, 1, 0, 0, 0).
+and8_table(1, 0, 1, 1, 1, 1, 0, 1, 0).
+and8_table(1, 0, 1, 1, 1, 1, 1, 0, 0).
+and8_table(1, 0, 1, 1, 1, 1, 1, 1, 0).
+and8_table(1, 1, 0, 0, 0, 0, 0, 0, 0).
+and8_table(1, 1, 0, 0, 0, 0, 0, 1, 0).
+and8_table(1, 1, 0, 0, 0, 0, 1, 0, 0).
+and8_table(1, 1, 0, 0, 0, 0, 1, 1, 0).
+and8_table(1, 1, 0, 0, 0, 1, 0, 0, 0).
+and8_table(1, 1, 0, 0, 0, 1, 0, 1, 0).
+and8_table(1, 1, 0, 0, 0, 1, 1, 0, 0).
+and8_table(1, 1, 0, 0, 0, 1, 1, 1, 0).
+and8_table(1, 1, 0, 0, 1, 0, 0, 0, 0).
+and8_table(1, 1, 0, 0, 1, 0, 0, 1, 0).
+and8_table(1, 1, 0, 0, 1, 0, 1, 0, 0).
+and8_table(1, 1, 0, 0, 1, 0, 1, 1, 0).
+and8_table(1, 1, 0, 0, 1, 1, 0, 0, 0).
+and8_table(1, 1, 0, 0, 1, 1, 0, 1, 0).
+and8_table(1, 1, 0, 0, 1, 1, 1, 0, 0).
+and8_table(1, 1, 0, 0, 1, 1, 1, 1, 0).
+and8_table(1, 1, 0, 1, 0, 0, 0, 0, 0).
+and8_table(1, 1, 0, 1, 0, 0, 0, 1, 0).
+and8_table(1, 1, 0, 1, 0, 0, 1, 0, 0).
+and8_table(1, 1, 0, 1, 0, 0, 1, 1, 0).
+and8_table(1, 1, 0, 1, 0, 1, 0, 0, 0).
+and8_table(1, 1, 0, 1, 0, 1, 0, 1, 0).
+and8_table(1, 1, 0, 1, 0, 1, 1, 0, 0).
+and8_table(1, 1, 0, 1, 0, 1, 1, 1, 0).
+and8_table(1, 1, 0, 1, 1, 0, 0, 0, 0).
+and8_table(1, 1, 0, 1, 1, 0, 0, 1, 0).
+and8_table(1, 1, 0, 1, 1, 0, 1, 0, 0).
+and8_table(1, 1, 0, 1, 1, 0, 1, 1, 0).
+and8_table(1, 1, 0, 1, 1, 1, 0, 0, 0).
+and8_table(1, 1, 0, 1, 1, 1, 0, 1, 0).
+and8_table(1, 1, 0, 1, 1, 1, 1, 0, 0).
+and8_table(1, 1, 0, 1, 1, 1, 1, 1, 0).
+and8_table(1, 1, 1, 0, 0, 0, 0, 0, 0).
+and8_table(1, 1, 1, 0, 0, 0, 0, 1, 0).
+and8_table(1, 1, 1, 0, 0, 0, 1, 0, 0).
+and8_table(1, 1, 1, 0, 0, 0, 1, 1, 0).
+and8_table(1, 1, 1, 0, 0, 1, 0, 0, 0).
+and8_table(1, 1, 1, 0, 0, 1, 0, 1, 0).
+and8_table(1, 1, 1, 0, 0, 1, 1, 0, 0).
+and8_table(1, 1, 1, 0, 0, 1, 1, 1, 0).
+and8_table(1, 1, 1, 0, 1, 0, 0, 0, 0).
+and8_table(1, 1, 1, 0, 1, 0, 0, 1, 0).
+and8_table(1, 1, 1, 0, 1, 0, 1, 0, 0).
+and8_table(1, 1, 1, 0, 1, 0, 1, 1, 0).
+and8_table(1, 1, 1, 0, 1, 1, 0, 0, 0).
+and8_table(1, 1, 1, 0, 1, 1, 0, 1, 0).
+and8_table(1, 1, 1, 0, 1, 1, 1, 0, 0).
+and8_table(1, 1, 1, 0, 1, 1, 1, 1, 0).
+and8_table(1, 1, 1, 1, 0, 0, 0, 0, 0).
+and8_table(1, 1, 1, 1, 0, 0, 0, 1, 0).
+and8_table(1, 1, 1, 1, 0, 0, 1, 0, 0).
+and8_table(1, 1, 1, 1, 0, 0, 1, 1, 0).
+and8_table(1, 1, 1, 1, 0, 1, 0, 0, 0).
+and8_table(1, 1, 1, 1, 0, 1, 0, 1, 0).
+and8_table(1, 1, 1, 1, 0, 1, 1, 0, 0).
+and8_table(1, 1, 1, 1, 0, 1, 1, 1, 0).
+and8_table(1, 1, 1, 1, 1, 0, 0, 0, 0).
+and8_table(1, 1, 1, 1, 1, 0, 0, 1, 0).
+and8_table(1, 1, 1, 1, 1, 0, 1, 0, 0).
+and8_table(1, 1, 1, 1, 1, 0, 1, 1, 0).
+and8_table(1, 1, 1, 1, 1, 1, 0, 0, 0).
+and8_table(1, 1, 1, 1, 1, 1, 0, 1, 0).
+and8_table(1, 1, 1, 1, 1, 1, 1, 0, 0).
+and8_table(1, 1, 1, 1, 1, 1, 1, 1, 1).
+
+
+nand8_table(0, 0, 0, 0, 0, 0, 0, 0, 1).
+nand8_table(0, 0, 0, 0, 0, 0, 0, 1, 1).
+nand8_table(0, 0, 0, 0, 0, 0, 1, 0, 1).
+nand8_table(0, 0, 0, 0, 0, 0, 1, 1, 1).
+nand8_table(0, 0, 0, 0, 0, 1, 0, 0, 1).
+nand8_table(0, 0, 0, 0, 0, 1, 0, 1, 1).
+nand8_table(0, 0, 0, 0, 0, 1, 1, 0, 1).
+nand8_table(0, 0, 0, 0, 0, 1, 1, 1, 1).
+nand8_table(0, 0, 0, 0, 1, 0, 0, 0, 1).
+nand8_table(0, 0, 0, 0, 1, 0, 0, 1, 1).
+nand8_table(0, 0, 0, 0, 1, 0, 1, 0, 1).
+nand8_table(0, 0, 0, 0, 1, 0, 1, 1, 1).
+nand8_table(0, 0, 0, 0, 1, 1, 0, 0, 1).
+nand8_table(0, 0, 0, 0, 1, 1, 0, 1, 1).
+nand8_table(0, 0, 0, 0, 1, 1, 1, 0, 1).
+nand8_table(0, 0, 0, 0, 1, 1, 1, 1, 1).
+nand8_table(0, 0, 0, 1, 0, 0, 0, 0, 1).
+nand8_table(0, 0, 0, 1, 0, 0, 0, 1, 1).
+nand8_table(0, 0, 0, 1, 0, 0, 1, 0, 1).
+nand8_table(0, 0, 0, 1, 0, 0, 1, 1, 1).
+nand8_table(0, 0, 0, 1, 0, 1, 0, 0, 1).
+nand8_table(0, 0, 0, 1, 0, 1, 0, 1, 1).
+nand8_table(0, 0, 0, 1, 0, 1, 1, 0, 1).
+nand8_table(0, 0, 0, 1, 0, 1, 1, 1, 1).
+nand8_table(0, 0, 0, 1, 1, 0, 0, 0, 1).
+nand8_table(0, 0, 0, 1, 1, 0, 0, 1, 1).
+nand8_table(0, 0, 0, 1, 1, 0, 1, 0, 1).
+nand8_table(0, 0, 0, 1, 1, 0, 1, 1, 1).
+nand8_table(0, 0, 0, 1, 1, 1, 0, 0, 1).
+nand8_table(0, 0, 0, 1, 1, 1, 0, 1, 1).
+nand8_table(0, 0, 0, 1, 1, 1, 1, 0, 1).
+nand8_table(0, 0, 0, 1, 1, 1, 1, 1, 1).
+nand8_table(0, 0, 1, 0, 0, 0, 0, 0, 1).
+nand8_table(0, 0, 1, 0, 0, 0, 0, 1, 1).
+nand8_table(0, 0, 1, 0, 0, 0, 1, 0, 1).
+nand8_table(0, 0, 1, 0, 0, 0, 1, 1, 1).
+nand8_table(0, 0, 1, 0, 0, 1, 0, 0, 1).
+nand8_table(0, 0, 1, 0, 0, 1, 0, 1, 1).
+nand8_table(0, 0, 1, 0, 0, 1, 1, 0, 1).
+nand8_table(0, 0, 1, 0, 0, 1, 1, 1, 1).
+nand8_table(0, 0, 1, 0, 1, 0, 0, 0, 1).
+nand8_table(0, 0, 1, 0, 1, 0, 0, 1, 1).
+nand8_table(0, 0, 1, 0, 1, 0, 1, 0, 1).
+nand8_table(0, 0, 1, 0, 1, 0, 1, 1, 1).
+nand8_table(0, 0, 1, 0, 1, 1, 0, 0, 1).
+nand8_table(0, 0, 1, 0, 1, 1, 0, 1, 1).
+nand8_table(0, 0, 1, 0, 1, 1, 1, 0, 1).
+nand8_table(0, 0, 1, 0, 1, 1, 1, 1, 1).
+nand8_table(0, 0, 1, 1, 0, 0, 0, 0, 1).
+nand8_table(0, 0, 1, 1, 0, 0, 0, 1, 1).
+nand8_table(0, 0, 1, 1, 0, 0, 1, 0, 1).
+nand8_table(0, 0, 1, 1, 0, 0, 1, 1, 1).
+nand8_table(0, 0, 1, 1, 0, 1, 0, 0, 1).
+nand8_table(0, 0, 1, 1, 0, 1, 0, 1, 1).
+nand8_table(0, 0, 1, 1, 0, 1, 1, 0, 1).
+nand8_table(0, 0, 1, 1, 0, 1, 1, 1, 1).
+nand8_table(0, 0, 1, 1, 1, 0, 0, 0, 1).
+nand8_table(0, 0, 1, 1, 1, 0, 0, 1, 1).
+nand8_table(0, 0, 1, 1, 1, 0, 1, 0, 1).
+nand8_table(0, 0, 1, 1, 1, 0, 1, 1, 1).
+nand8_table(0, 0, 1, 1, 1, 1, 0, 0, 1).
+nand8_table(0, 0, 1, 1, 1, 1, 0, 1, 1).
+nand8_table(0, 0, 1, 1, 1, 1, 1, 0, 1).
+nand8_table(0, 0, 1, 1, 1, 1, 1, 1, 1).
+nand8_table(0, 1, 0, 0, 0, 0, 0, 0, 1).
+nand8_table(0, 1, 0, 0, 0, 0, 0, 1, 1).
+nand8_table(0, 1, 0, 0, 0, 0, 1, 0, 1).
+nand8_table(0, 1, 0, 0, 0, 0, 1, 1, 1).
+nand8_table(0, 1, 0, 0, 0, 1, 0, 0, 1).
+nand8_table(0, 1, 0, 0, 0, 1, 0, 1, 1).
+nand8_table(0, 1, 0, 0, 0, 1, 1, 0, 1).
+nand8_table(0, 1, 0, 0, 0, 1, 1, 1, 1).
+nand8_table(0, 1, 0, 0, 1, 0, 0, 0, 1).
+nand8_table(0, 1, 0, 0, 1, 0, 0, 1, 1).
+nand8_table(0, 1, 0, 0, 1, 0, 1, 0, 1).
+nand8_table(0, 1, 0, 0, 1, 0, 1, 1, 1).
+nand8_table(0, 1, 0, 0, 1, 1, 0, 0, 1).
+nand8_table(0, 1, 0, 0, 1, 1, 0, 1, 1).
+nand8_table(0, 1, 0, 0, 1, 1, 1, 0, 1).
+nand8_table(0, 1, 0, 0, 1, 1, 1, 1, 1).
+nand8_table(0, 1, 0, 1, 0, 0, 0, 0, 1).
+nand8_table(0, 1, 0, 1, 0, 0, 0, 1, 1).
+nand8_table(0, 1, 0, 1, 0, 0, 1, 0, 1).
+nand8_table(0, 1, 0, 1, 0, 0, 1, 1, 1).
+nand8_table(0, 1, 0, 1, 0, 1, 0, 0, 1).
+nand8_table(0, 1, 0, 1, 0, 1, 0, 1, 1).
+nand8_table(0, 1, 0, 1, 0, 1, 1, 0, 1).
+nand8_table(0, 1, 0, 1, 0, 1, 1, 1, 1).
+nand8_table(0, 1, 0, 1, 1, 0, 0, 0, 1).
+nand8_table(0, 1, 0, 1, 1, 0, 0, 1, 1).
+nand8_table(0, 1, 0, 1, 1, 0, 1, 0, 1).
+nand8_table(0, 1, 0, 1, 1, 0, 1, 1, 1).
+nand8_table(0, 1, 0, 1, 1, 1, 0, 0, 1).
+nand8_table(0, 1, 0, 1, 1, 1, 0, 1, 1).
+nand8_table(0, 1, 0, 1, 1, 1, 1, 0, 1).
+nand8_table(0, 1, 0, 1, 1, 1, 1, 1, 1).
+nand8_table(0, 1, 1, 0, 0, 0, 0, 0, 1).
+nand8_table(0, 1, 1, 0, 0, 0, 0, 1, 1).
+nand8_table(0, 1, 1, 0, 0, 0, 1, 0, 1).
+nand8_table(0, 1, 1, 0, 0, 0, 1, 1, 1).
+nand8_table(0, 1, 1, 0, 0, 1, 0, 0, 1).
+nand8_table(0, 1, 1, 0, 0, 1, 0, 1, 1).
+nand8_table(0, 1, 1, 0, 0, 1, 1, 0, 1).
+nand8_table(0, 1, 1, 0, 0, 1, 1, 1, 1).
+nand8_table(0, 1, 1, 0, 1, 0, 0, 0, 1).
+nand8_table(0, 1, 1, 0, 1, 0, 0, 1, 1).
+nand8_table(0, 1, 1, 0, 1, 0, 1, 0, 1).
+nand8_table(0, 1, 1, 0, 1, 0, 1, 1, 1).
+nand8_table(0, 1, 1, 0, 1, 1, 0, 0, 1).
+nand8_table(0, 1, 1, 0, 1, 1, 0, 1, 1).
+nand8_table(0, 1, 1, 0, 1, 1, 1, 0, 1).
+nand8_table(0, 1, 1, 0, 1, 1, 1, 1, 1).
+nand8_table(0, 1, 1, 1, 0, 0, 0, 0, 1).
+nand8_table(0, 1, 1, 1, 0, 0, 0, 1, 1).
+nand8_table(0, 1, 1, 1, 0, 0, 1, 0, 1).
+nand8_table(0, 1, 1, 1, 0, 0, 1, 1, 1).
+nand8_table(0, 1, 1, 1, 0, 1, 0, 0, 1).
+nand8_table(0, 1, 1, 1, 0, 1, 0, 1, 1).
+nand8_table(0, 1, 1, 1, 0, 1, 1, 0, 1).
+nand8_table(0, 1, 1, 1, 0, 1, 1, 1, 1).
+nand8_table(0, 1, 1, 1, 1, 0, 0, 0, 1).
+nand8_table(0, 1, 1, 1, 1, 0, 0, 1, 1).
+nand8_table(0, 1, 1, 1, 1, 0, 1, 0, 1).
+nand8_table(0, 1, 1, 1, 1, 0, 1, 1, 1).
+nand8_table(0, 1, 1, 1, 1, 1, 0, 0, 1).
+nand8_table(0, 1, 1, 1, 1, 1, 0, 1, 1).
+nand8_table(0, 1, 1, 1, 1, 1, 1, 0, 1).
+nand8_table(0, 1, 1, 1, 1, 1, 1, 1, 1).
+nand8_table(1, 0, 0, 0, 0, 0, 0, 0, 1).
+nand8_table(1, 0, 0, 0, 0, 0, 0, 1, 1).
+nand8_table(1, 0, 0, 0, 0, 0, 1, 0, 1).
+nand8_table(1, 0, 0, 0, 0, 0, 1, 1, 1).
+nand8_table(1, 0, 0, 0, 0, 1, 0, 0, 1).
+nand8_table(1, 0, 0, 0, 0, 1, 0, 1, 1).
+nand8_table(1, 0, 0, 0, 0, 1, 1, 0, 1).
+nand8_table(1, 0, 0, 0, 0, 1, 1, 1, 1).
+nand8_table(1, 0, 0, 0, 1, 0, 0, 0, 1).
+nand8_table(1, 0, 0, 0, 1, 0, 0, 1, 1).
+nand8_table(1, 0, 0, 0, 1, 0, 1, 0, 1).
+nand8_table(1, 0, 0, 0, 1, 0, 1, 1, 1).
+nand8_table(1, 0, 0, 0, 1, 1, 0, 0, 1).
+nand8_table(1, 0, 0, 0, 1, 1, 0, 1, 1).
+nand8_table(1, 0, 0, 0, 1, 1, 1, 0, 1).
+nand8_table(1, 0, 0, 0, 1, 1, 1, 1, 1).
+nand8_table(1, 0, 0, 1, 0, 0, 0, 0, 1).
+nand8_table(1, 0, 0, 1, 0, 0, 0, 1, 1).
+nand8_table(1, 0, 0, 1, 0, 0, 1, 0, 1).
+nand8_table(1, 0, 0, 1, 0, 0, 1, 1, 1).
+nand8_table(1, 0, 0, 1, 0, 1, 0, 0, 1).
+nand8_table(1, 0, 0, 1, 0, 1, 0, 1, 1).
+nand8_table(1, 0, 0, 1, 0, 1, 1, 0, 1).
+nand8_table(1, 0, 0, 1, 0, 1, 1, 1, 1).
+nand8_table(1, 0, 0, 1, 1, 0, 0, 0, 1).
+nand8_table(1, 0, 0, 1, 1, 0, 0, 1, 1).
+nand8_table(1, 0, 0, 1, 1, 0, 1, 0, 1).
+nand8_table(1, 0, 0, 1, 1, 0, 1, 1, 1).
+nand8_table(1, 0, 0, 1, 1, 1, 0, 0, 1).
+nand8_table(1, 0, 0, 1, 1, 1, 0, 1, 1).
+nand8_table(1, 0, 0, 1, 1, 1, 1, 0, 1).
+nand8_table(1, 0, 0, 1, 1, 1, 1, 1, 1).
+nand8_table(1, 0, 1, 0, 0, 0, 0, 0, 1).
+nand8_table(1, 0, 1, 0, 0, 0, 0, 1, 1).
+nand8_table(1, 0, 1, 0, 0, 0, 1, 0, 1).
+nand8_table(1, 0, 1, 0, 0, 0, 1, 1, 1).
+nand8_table(1, 0, 1, 0, 0, 1, 0, 0, 1).
+nand8_table(1, 0, 1, 0, 0, 1, 0, 1, 1).
+nand8_table(1, 0, 1, 0, 0, 1, 1, 0, 1).
+nand8_table(1, 0, 1, 0, 0, 1, 1, 1, 1).
+nand8_table(1, 0, 1, 0, 1, 0, 0, 0, 1).
+nand8_table(1, 0, 1, 0, 1, 0, 0, 1, 1).
+nand8_table(1, 0, 1, 0, 1, 0, 1, 0, 1).
+nand8_table(1, 0, 1, 0, 1, 0, 1, 1, 1).
+nand8_table(1, 0, 1, 0, 1, 1, 0, 0, 1).
+nand8_table(1, 0, 1, 0, 1, 1, 0, 1, 1).
+nand8_table(1, 0, 1, 0, 1, 1, 1, 0, 1).
+nand8_table(1, 0, 1, 0, 1, 1, 1, 1, 1).
+nand8_table(1, 0, 1, 1, 0, 0, 0, 0, 1).
+nand8_table(1, 0, 1, 1, 0, 0, 0, 1, 1).
+nand8_table(1, 0, 1, 1, 0, 0, 1, 0, 1).
+nand8_table(1, 0, 1, 1, 0, 0, 1, 1, 1).
+nand8_table(1, 0, 1, 1, 0, 1, 0, 0, 1).
+nand8_table(1, 0, 1, 1, 0, 1, 0, 1, 1).
+nand8_table(1, 0, 1, 1, 0, 1, 1, 0, 1).
+nand8_table(1, 0, 1, 1, 0, 1, 1, 1, 1).
+nand8_table(1, 0, 1, 1, 1, 0, 0, 0, 1).
+nand8_table(1, 0, 1, 1, 1, 0, 0, 1, 1).
+nand8_table(1, 0, 1, 1, 1, 0, 1, 0, 1).
+nand8_table(1, 0, 1, 1, 1, 0, 1, 1, 1).
+nand8_table(1, 0, 1, 1, 1, 1, 0, 0, 1).
+nand8_table(1, 0, 1, 1, 1, 1, 0, 1, 1).
+nand8_table(1, 0, 1, 1, 1, 1, 1, 0, 1).
+nand8_table(1, 0, 1, 1, 1, 1, 1, 1, 1).
+nand8_table(1, 1, 0, 0, 0, 0, 0, 0, 1).
+nand8_table(1, 1, 0, 0, 0, 0, 0, 1, 1).
+nand8_table(1, 1, 0, 0, 0, 0, 1, 0, 1).
+nand8_table(1, 1, 0, 0, 0, 0, 1, 1, 1).
+nand8_table(1, 1, 0, 0, 0, 1, 0, 0, 1).
+nand8_table(1, 1, 0, 0, 0, 1, 0, 1, 1).
+nand8_table(1, 1, 0, 0, 0, 1, 1, 0, 1).
+nand8_table(1, 1, 0, 0, 0, 1, 1, 1, 1).
+nand8_table(1, 1, 0, 0, 1, 0, 0, 0, 1).
+nand8_table(1, 1, 0, 0, 1, 0, 0, 1, 1).
+nand8_table(1, 1, 0, 0, 1, 0, 1, 0, 1).
+nand8_table(1, 1, 0, 0, 1, 0, 1, 1, 1).
+nand8_table(1, 1, 0, 0, 1, 1, 0, 0, 1).
+nand8_table(1, 1, 0, 0, 1, 1, 0, 1, 1).
+nand8_table(1, 1, 0, 0, 1, 1, 1, 0, 1).
+nand8_table(1, 1, 0, 0, 1, 1, 1, 1, 1).
+nand8_table(1, 1, 0, 1, 0, 0, 0, 0, 1).
+nand8_table(1, 1, 0, 1, 0, 0, 0, 1, 1).
+nand8_table(1, 1, 0, 1, 0, 0, 1, 0, 1).
+nand8_table(1, 1, 0, 1, 0, 0, 1, 1, 1).
+nand8_table(1, 1, 0, 1, 0, 1, 0, 0, 1).
+nand8_table(1, 1, 0, 1, 0, 1, 0, 1, 1).
+nand8_table(1, 1, 0, 1, 0, 1, 1, 0, 1).
+nand8_table(1, 1, 0, 1, 0, 1, 1, 1, 1).
+nand8_table(1, 1, 0, 1, 1, 0, 0, 0, 1).
+nand8_table(1, 1, 0, 1, 1, 0, 0, 1, 1).
+nand8_table(1, 1, 0, 1, 1, 0, 1, 0, 1).
+nand8_table(1, 1, 0, 1, 1, 0, 1, 1, 1).
+nand8_table(1, 1, 0, 1, 1, 1, 0, 0, 1).
+nand8_table(1, 1, 0, 1, 1, 1, 0, 1, 1).
+nand8_table(1, 1, 0, 1, 1, 1, 1, 0, 1).
+nand8_table(1, 1, 0, 1, 1, 1, 1, 1, 1).
+nand8_table(1, 1, 1, 0, 0, 0, 0, 0, 1).
+nand8_table(1, 1, 1, 0, 0, 0, 0, 1, 1).
+nand8_table(1, 1, 1, 0, 0, 0, 1, 0, 1).
+nand8_table(1, 1, 1, 0, 0, 0, 1, 1, 1).
+nand8_table(1, 1, 1, 0, 0, 1, 0, 0, 1).
+nand8_table(1, 1, 1, 0, 0, 1, 0, 1, 1).
+nand8_table(1, 1, 1, 0, 0, 1, 1, 0, 1).
+nand8_table(1, 1, 1, 0, 0, 1, 1, 1, 1).
+nand8_table(1, 1, 1, 0, 1, 0, 0, 0, 1).
+nand8_table(1, 1, 1, 0, 1, 0, 0, 1, 1).
+nand8_table(1, 1, 1, 0, 1, 0, 1, 0, 1).
+nand8_table(1, 1, 1, 0, 1, 0, 1, 1, 1).
+nand8_table(1, 1, 1, 0, 1, 1, 0, 0, 1).
+nand8_table(1, 1, 1, 0, 1, 1, 0, 1, 1).
+nand8_table(1, 1, 1, 0, 1, 1, 1, 0, 1).
+nand8_table(1, 1, 1, 0, 1, 1, 1, 1, 1).
+nand8_table(1, 1, 1, 1, 0, 0, 0, 0, 1).
+nand8_table(1, 1, 1, 1, 0, 0, 0, 1, 1).
+nand8_table(1, 1, 1, 1, 0, 0, 1, 0, 1).
+nand8_table(1, 1, 1, 1, 0, 0, 1, 1, 1).
+nand8_table(1, 1, 1, 1, 0, 1, 0, 0, 1).
+nand8_table(1, 1, 1, 1, 0, 1, 0, 1, 1).
+nand8_table(1, 1, 1, 1, 0, 1, 1, 0, 1).
+nand8_table(1, 1, 1, 1, 0, 1, 1, 1, 1).
+nand8_table(1, 1, 1, 1, 1, 0, 0, 0, 1).
+nand8_table(1, 1, 1, 1, 1, 0, 0, 1, 1).
+nand8_table(1, 1, 1, 1, 1, 0, 1, 0, 1).
+nand8_table(1, 1, 1, 1, 1, 0, 1, 1, 1).
+nand8_table(1, 1, 1, 1, 1, 1, 0, 0, 1).
+nand8_table(1, 1, 1, 1, 1, 1, 0, 1, 1).
+nand8_table(1, 1, 1, 1, 1, 1, 1, 0, 1).
+nand8_table(1, 1, 1, 1, 1, 1, 1, 1, 0).
+
+and9_table(0, 0, 0, 0, 0, 0, 0, 0, 0, 0).
+and9_table(0, 0, 0, 0, 0, 0, 0, 0, 1, 0).
+and9_table(0, 0, 0, 0, 0, 0, 0, 1, 0, 0).
+and9_table(0, 0, 0, 0, 0, 0, 0, 1, 1, 0).
+and9_table(0, 0, 0, 0, 0, 0, 1, 0, 0, 0).
+and9_table(0, 0, 0, 0, 0, 0, 1, 0, 1, 0).
+and9_table(0, 0, 0, 0, 0, 0, 1, 1, 0, 0).
+and9_table(0, 0, 0, 0, 0, 0, 1, 1, 1, 0).
+and9_table(0, 0, 0, 0, 0, 1, 0, 0, 0, 0).
+and9_table(0, 0, 0, 0, 0, 1, 0, 0, 1, 0).
+and9_table(0, 0, 0, 0, 0, 1, 0, 1, 0, 0).
+and9_table(0, 0, 0, 0, 0, 1, 0, 1, 1, 0).
+and9_table(0, 0, 0, 0, 0, 1, 1, 0, 0, 0).
+and9_table(0, 0, 0, 0, 0, 1, 1, 0, 1, 0).
+and9_table(0, 0, 0, 0, 0, 1, 1, 1, 0, 0).
+and9_table(0, 0, 0, 0, 0, 1, 1, 1, 1, 0).
+and9_table(0, 0, 0, 0, 1, 0, 0, 0, 0, 0).
+and9_table(0, 0, 0, 0, 1, 0, 0, 0, 1, 0).
+and9_table(0, 0, 0, 0, 1, 0, 0, 1, 0, 0).
+and9_table(0, 0, 0, 0, 1, 0, 0, 1, 1, 0).
+and9_table(0, 0, 0, 0, 1, 0, 1, 0, 0, 0).
+and9_table(0, 0, 0, 0, 1, 0, 1, 0, 1, 0).
+and9_table(0, 0, 0, 0, 1, 0, 1, 1, 0, 0).
+and9_table(0, 0, 0, 0, 1, 0, 1, 1, 1, 0).
+and9_table(0, 0, 0, 0, 1, 1, 0, 0, 0, 0).
+and9_table(0, 0, 0, 0, 1, 1, 0, 0, 1, 0).
+and9_table(0, 0, 0, 0, 1, 1, 0, 1, 0, 0).
+and9_table(0, 0, 0, 0, 1, 1, 0, 1, 1, 0).
+and9_table(0, 0, 0, 0, 1, 1, 1, 0, 0, 0).
+and9_table(0, 0, 0, 0, 1, 1, 1, 0, 1, 0).
+and9_table(0, 0, 0, 0, 1, 1, 1, 1, 0, 0).
+and9_table(0, 0, 0, 0, 1, 1, 1, 1, 1, 0).
+and9_table(0, 0, 0, 1, 0, 0, 0, 0, 0, 0).
+and9_table(0, 0, 0, 1, 0, 0, 0, 0, 1, 0).
+and9_table(0, 0, 0, 1, 0, 0, 0, 1, 0, 0).
+and9_table(0, 0, 0, 1, 0, 0, 0, 1, 1, 0).
+and9_table(0, 0, 0, 1, 0, 0, 1, 0, 0, 0).
+and9_table(0, 0, 0, 1, 0, 0, 1, 0, 1, 0).
+and9_table(0, 0, 0, 1, 0, 0, 1, 1, 0, 0).
+and9_table(0, 0, 0, 1, 0, 0, 1, 1, 1, 0).
+and9_table(0, 0, 0, 1, 0, 1, 0, 0, 0, 0).
+and9_table(0, 0, 0, 1, 0, 1, 0, 0, 1, 0).
+and9_table(0, 0, 0, 1, 0, 1, 0, 1, 0, 0).
+and9_table(0, 0, 0, 1, 0, 1, 0, 1, 1, 0).
+and9_table(0, 0, 0, 1, 0, 1, 1, 0, 0, 0).
+and9_table(0, 0, 0, 1, 0, 1, 1, 0, 1, 0).
+and9_table(0, 0, 0, 1, 0, 1, 1, 1, 0, 0).
+and9_table(0, 0, 0, 1, 0, 1, 1, 1, 1, 0).
+and9_table(0, 0, 0, 1, 1, 0, 0, 0, 0, 0).
+and9_table(0, 0, 0, 1, 1, 0, 0, 0, 1, 0).
+and9_table(0, 0, 0, 1, 1, 0, 0, 1, 0, 0).
+and9_table(0, 0, 0, 1, 1, 0, 0, 1, 1, 0).
+and9_table(0, 0, 0, 1, 1, 0, 1, 0, 0, 0).
+and9_table(0, 0, 0, 1, 1, 0, 1, 0, 1, 0).
+and9_table(0, 0, 0, 1, 1, 0, 1, 1, 0, 0).
+and9_table(0, 0, 0, 1, 1, 0, 1, 1, 1, 0).
+and9_table(0, 0, 0, 1, 1, 1, 0, 0, 0, 0).
+and9_table(0, 0, 0, 1, 1, 1, 0, 0, 1, 0).
+and9_table(0, 0, 0, 1, 1, 1, 0, 1, 0, 0).
+and9_table(0, 0, 0, 1, 1, 1, 0, 1, 1, 0).
+and9_table(0, 0, 0, 1, 1, 1, 1, 0, 0, 0).
+and9_table(0, 0, 0, 1, 1, 1, 1, 0, 1, 0).
+and9_table(0, 0, 0, 1, 1, 1, 1, 1, 0, 0).
+and9_table(0, 0, 0, 1, 1, 1, 1, 1, 1, 0).
+and9_table(0, 0, 1, 0, 0, 0, 0, 0, 0, 0).
+and9_table(0, 0, 1, 0, 0, 0, 0, 0, 1, 0).
+and9_table(0, 0, 1, 0, 0, 0, 0, 1, 0, 0).
+and9_table(0, 0, 1, 0, 0, 0, 0, 1, 1, 0).
+and9_table(0, 0, 1, 0, 0, 0, 1, 0, 0, 0).
+and9_table(0, 0, 1, 0, 0, 0, 1, 0, 1, 0).
+and9_table(0, 0, 1, 0, 0, 0, 1, 1, 0, 0).
+and9_table(0, 0, 1, 0, 0, 0, 1, 1, 1, 0).
+and9_table(0, 0, 1, 0, 0, 1, 0, 0, 0, 0).
+and9_table(0, 0, 1, 0, 0, 1, 0, 0, 1, 0).
+and9_table(0, 0, 1, 0, 0, 1, 0, 1, 0, 0).
+and9_table(0, 0, 1, 0, 0, 1, 0, 1, 1, 0).
+and9_table(0, 0, 1, 0, 0, 1, 1, 0, 0, 0).
+and9_table(0, 0, 1, 0, 0, 1, 1, 0, 1, 0).
+and9_table(0, 0, 1, 0, 0, 1, 1, 1, 0, 0).
+and9_table(0, 0, 1, 0, 0, 1, 1, 1, 1, 0).
+and9_table(0, 0, 1, 0, 1, 0, 0, 0, 0, 0).
+and9_table(0, 0, 1, 0, 1, 0, 0, 0, 1, 0).
+and9_table(0, 0, 1, 0, 1, 0, 0, 1, 0, 0).
+and9_table(0, 0, 1, 0, 1, 0, 0, 1, 1, 0).
+and9_table(0, 0, 1, 0, 1, 0, 1, 0, 0, 0).
+and9_table(0, 0, 1, 0, 1, 0, 1, 0, 1, 0).
+and9_table(0, 0, 1, 0, 1, 0, 1, 1, 0, 0).
+and9_table(0, 0, 1, 0, 1, 0, 1, 1, 1, 0).
+and9_table(0, 0, 1, 0, 1, 1, 0, 0, 0, 0).
+and9_table(0, 0, 1, 0, 1, 1, 0, 0, 1, 0).
+and9_table(0, 0, 1, 0, 1, 1, 0, 1, 0, 0).
+and9_table(0, 0, 1, 0, 1, 1, 0, 1, 1, 0).
+and9_table(0, 0, 1, 0, 1, 1, 1, 0, 0, 0).
+and9_table(0, 0, 1, 0, 1, 1, 1, 0, 1, 0).
+and9_table(0, 0, 1, 0, 1, 1, 1, 1, 0, 0).
+and9_table(0, 0, 1, 0, 1, 1, 1, 1, 1, 0).
+and9_table(0, 0, 1, 1, 0, 0, 0, 0, 0, 0).
+and9_table(0, 0, 1, 1, 0, 0, 0, 0, 1, 0).
+and9_table(0, 0, 1, 1, 0, 0, 0, 1, 0, 0).
+and9_table(0, 0, 1, 1, 0, 0, 0, 1, 1, 0).
+and9_table(0, 0, 1, 1, 0, 0, 1, 0, 0, 0).
+and9_table(0, 0, 1, 1, 0, 0, 1, 0, 1, 0).
+and9_table(0, 0, 1, 1, 0, 0, 1, 1, 0, 0).
+and9_table(0, 0, 1, 1, 0, 0, 1, 1, 1, 0).
+and9_table(0, 0, 1, 1, 0, 1, 0, 0, 0, 0).
+and9_table(0, 0, 1, 1, 0, 1, 0, 0, 1, 0).
+and9_table(0, 0, 1, 1, 0, 1, 0, 1, 0, 0).
+and9_table(0, 0, 1, 1, 0, 1, 0, 1, 1, 0).
+and9_table(0, 0, 1, 1, 0, 1, 1, 0, 0, 0).
+and9_table(0, 0, 1, 1, 0, 1, 1, 0, 1, 0).
+and9_table(0, 0, 1, 1, 0, 1, 1, 1, 0, 0).
+and9_table(0, 0, 1, 1, 0, 1, 1, 1, 1, 0).
+and9_table(0, 0, 1, 1, 1, 0, 0, 0, 0, 0).
+and9_table(0, 0, 1, 1, 1, 0, 0, 0, 1, 0).
+and9_table(0, 0, 1, 1, 1, 0, 0, 1, 0, 0).
+and9_table(0, 0, 1, 1, 1, 0, 0, 1, 1, 0).
+and9_table(0, 0, 1, 1, 1, 0, 1, 0, 0, 0).
+and9_table(0, 0, 1, 1, 1, 0, 1, 0, 1, 0).
+and9_table(0, 0, 1, 1, 1, 0, 1, 1, 0, 0).
+and9_table(0, 0, 1, 1, 1, 0, 1, 1, 1, 0).
+and9_table(0, 0, 1, 1, 1, 1, 0, 0, 0, 0).
+and9_table(0, 0, 1, 1, 1, 1, 0, 0, 1, 0).
+and9_table(0, 0, 1, 1, 1, 1, 0, 1, 0, 0).
+and9_table(0, 0, 1, 1, 1, 1, 0, 1, 1, 0).
+and9_table(0, 0, 1, 1, 1, 1, 1, 0, 0, 0).
+and9_table(0, 0, 1, 1, 1, 1, 1, 0, 1, 0).
+and9_table(0, 0, 1, 1, 1, 1, 1, 1, 0, 0).
+and9_table(0, 0, 1, 1, 1, 1, 1, 1, 1, 0).
+and9_table(0, 1, 0, 0, 0, 0, 0, 0, 0, 0).
+and9_table(0, 1, 0, 0, 0, 0, 0, 0, 1, 0).
+and9_table(0, 1, 0, 0, 0, 0, 0, 1, 0, 0).
+and9_table(0, 1, 0, 0, 0, 0, 0, 1, 1, 0).
+and9_table(0, 1, 0, 0, 0, 0, 1, 0, 0, 0).
+and9_table(0, 1, 0, 0, 0, 0, 1, 0, 1, 0).
+and9_table(0, 1, 0, 0, 0, 0, 1, 1, 0, 0).
+and9_table(0, 1, 0, 0, 0, 0, 1, 1, 1, 0).
+and9_table(0, 1, 0, 0, 0, 1, 0, 0, 0, 0).
+and9_table(0, 1, 0, 0, 0, 1, 0, 0, 1, 0).
+and9_table(0, 1, 0, 0, 0, 1, 0, 1, 0, 0).
+and9_table(0, 1, 0, 0, 0, 1, 0, 1, 1, 0).
+and9_table(0, 1, 0, 0, 0, 1, 1, 0, 0, 0).
+and9_table(0, 1, 0, 0, 0, 1, 1, 0, 1, 0).
+and9_table(0, 1, 0, 0, 0, 1, 1, 1, 0, 0).
+and9_table(0, 1, 0, 0, 0, 1, 1, 1, 1, 0).
+and9_table(0, 1, 0, 0, 1, 0, 0, 0, 0, 0).
+and9_table(0, 1, 0, 0, 1, 0, 0, 0, 1, 0).
+and9_table(0, 1, 0, 0, 1, 0, 0, 1, 0, 0).
+and9_table(0, 1, 0, 0, 1, 0, 0, 1, 1, 0).
+and9_table(0, 1, 0, 0, 1, 0, 1, 0, 0, 0).
+and9_table(0, 1, 0, 0, 1, 0, 1, 0, 1, 0).
+and9_table(0, 1, 0, 0, 1, 0, 1, 1, 0, 0).
+and9_table(0, 1, 0, 0, 1, 0, 1, 1, 1, 0).
+and9_table(0, 1, 0, 0, 1, 1, 0, 0, 0, 0).
+and9_table(0, 1, 0, 0, 1, 1, 0, 0, 1, 0).
+and9_table(0, 1, 0, 0, 1, 1, 0, 1, 0, 0).
+and9_table(0, 1, 0, 0, 1, 1, 0, 1, 1, 0).
+and9_table(0, 1, 0, 0, 1, 1, 1, 0, 0, 0).
+and9_table(0, 1, 0, 0, 1, 1, 1, 0, 1, 0).
+and9_table(0, 1, 0, 0, 1, 1, 1, 1, 0, 0).
+and9_table(0, 1, 0, 0, 1, 1, 1, 1, 1, 0).
+and9_table(0, 1, 0, 1, 0, 0, 0, 0, 0, 0).
+and9_table(0, 1, 0, 1, 0, 0, 0, 0, 1, 0).
+and9_table(0, 1, 0, 1, 0, 0, 0, 1, 0, 0).
+and9_table(0, 1, 0, 1, 0, 0, 0, 1, 1, 0).
+and9_table(0, 1, 0, 1, 0, 0, 1, 0, 0, 0).
+and9_table(0, 1, 0, 1, 0, 0, 1, 0, 1, 0).
+and9_table(0, 1, 0, 1, 0, 0, 1, 1, 0, 0).
+and9_table(0, 1, 0, 1, 0, 0, 1, 1, 1, 0).
+and9_table(0, 1, 0, 1, 0, 1, 0, 0, 0, 0).
+and9_table(0, 1, 0, 1, 0, 1, 0, 0, 1, 0).
+and9_table(0, 1, 0, 1, 0, 1, 0, 1, 0, 0).
+and9_table(0, 1, 0, 1, 0, 1, 0, 1, 1, 0).
+and9_table(0, 1, 0, 1, 0, 1, 1, 0, 0, 0).
+and9_table(0, 1, 0, 1, 0, 1, 1, 0, 1, 0).
+and9_table(0, 1, 0, 1, 0, 1, 1, 1, 0, 0).
+and9_table(0, 1, 0, 1, 0, 1, 1, 1, 1, 0).
+and9_table(0, 1, 0, 1, 1, 0, 0, 0, 0, 0).
+and9_table(0, 1, 0, 1, 1, 0, 0, 0, 1, 0).
+and9_table(0, 1, 0, 1, 1, 0, 0, 1, 0, 0).
+and9_table(0, 1, 0, 1, 1, 0, 0, 1, 1, 0).
+and9_table(0, 1, 0, 1, 1, 0, 1, 0, 0, 0).
+and9_table(0, 1, 0, 1, 1, 0, 1, 0, 1, 0).
+and9_table(0, 1, 0, 1, 1, 0, 1, 1, 0, 0).
+and9_table(0, 1, 0, 1, 1, 0, 1, 1, 1, 0).
+and9_table(0, 1, 0, 1, 1, 1, 0, 0, 0, 0).
+and9_table(0, 1, 0, 1, 1, 1, 0, 0, 1, 0).
+and9_table(0, 1, 0, 1, 1, 1, 0, 1, 0, 0).
+and9_table(0, 1, 0, 1, 1, 1, 0, 1, 1, 0).
+and9_table(0, 1, 0, 1, 1, 1, 1, 0, 0, 0).
+and9_table(0, 1, 0, 1, 1, 1, 1, 0, 1, 0).
+and9_table(0, 1, 0, 1, 1, 1, 1, 1, 0, 0).
+and9_table(0, 1, 0, 1, 1, 1, 1, 1, 1, 0).
+and9_table(0, 1, 1, 0, 0, 0, 0, 0, 0, 0).
+and9_table(0, 1, 1, 0, 0, 0, 0, 0, 1, 0).
+and9_table(0, 1, 1, 0, 0, 0, 0, 1, 0, 0).
+and9_table(0, 1, 1, 0, 0, 0, 0, 1, 1, 0).
+and9_table(0, 1, 1, 0, 0, 0, 1, 0, 0, 0).
+and9_table(0, 1, 1, 0, 0, 0, 1, 0, 1, 0).
+and9_table(0, 1, 1, 0, 0, 0, 1, 1, 0, 0).
+and9_table(0, 1, 1, 0, 0, 0, 1, 1, 1, 0).
+and9_table(0, 1, 1, 0, 0, 1, 0, 0, 0, 0).
+and9_table(0, 1, 1, 0, 0, 1, 0, 0, 1, 0).
+and9_table(0, 1, 1, 0, 0, 1, 0, 1, 0, 0).
+and9_table(0, 1, 1, 0, 0, 1, 0, 1, 1, 0).
+and9_table(0, 1, 1, 0, 0, 1, 1, 0, 0, 0).
+and9_table(0, 1, 1, 0, 0, 1, 1, 0, 1, 0).
+and9_table(0, 1, 1, 0, 0, 1, 1, 1, 0, 0).
+and9_table(0, 1, 1, 0, 0, 1, 1, 1, 1, 0).
+and9_table(0, 1, 1, 0, 1, 0, 0, 0, 0, 0).
+and9_table(0, 1, 1, 0, 1, 0, 0, 0, 1, 0).
+and9_table(0, 1, 1, 0, 1, 0, 0, 1, 0, 0).
+and9_table(0, 1, 1, 0, 1, 0, 0, 1, 1, 0).
+and9_table(0, 1, 1, 0, 1, 0, 1, 0, 0, 0).
+and9_table(0, 1, 1, 0, 1, 0, 1, 0, 1, 0).
+and9_table(0, 1, 1, 0, 1, 0, 1, 1, 0, 0).
+and9_table(0, 1, 1, 0, 1, 0, 1, 1, 1, 0).
+and9_table(0, 1, 1, 0, 1, 1, 0, 0, 0, 0).
+and9_table(0, 1, 1, 0, 1, 1, 0, 0, 1, 0).
+and9_table(0, 1, 1, 0, 1, 1, 0, 1, 0, 0).
+and9_table(0, 1, 1, 0, 1, 1, 0, 1, 1, 0).
+and9_table(0, 1, 1, 0, 1, 1, 1, 0, 0, 0).
+and9_table(0, 1, 1, 0, 1, 1, 1, 0, 1, 0).
+and9_table(0, 1, 1, 0, 1, 1, 1, 1, 0, 0).
+and9_table(0, 1, 1, 0, 1, 1, 1, 1, 1, 0).
+and9_table(0, 1, 1, 1, 0, 0, 0, 0, 0, 0).
+and9_table(0, 1, 1, 1, 0, 0, 0, 0, 1, 0).
+and9_table(0, 1, 1, 1, 0, 0, 0, 1, 0, 0).
+and9_table(0, 1, 1, 1, 0, 0, 0, 1, 1, 0).
+and9_table(0, 1, 1, 1, 0, 0, 1, 0, 0, 0).
+and9_table(0, 1, 1, 1, 0, 0, 1, 0, 1, 0).
+and9_table(0, 1, 1, 1, 0, 0, 1, 1, 0, 0).
+and9_table(0, 1, 1, 1, 0, 0, 1, 1, 1, 0).
+and9_table(0, 1, 1, 1, 0, 1, 0, 0, 0, 0).
+and9_table(0, 1, 1, 1, 0, 1, 0, 0, 1, 0).
+and9_table(0, 1, 1, 1, 0, 1, 0, 1, 0, 0).
+and9_table(0, 1, 1, 1, 0, 1, 0, 1, 1, 0).
+and9_table(0, 1, 1, 1, 0, 1, 1, 0, 0, 0).
+and9_table(0, 1, 1, 1, 0, 1, 1, 0, 1, 0).
+and9_table(0, 1, 1, 1, 0, 1, 1, 1, 0, 0).
+and9_table(0, 1, 1, 1, 0, 1, 1, 1, 1, 0).
+and9_table(0, 1, 1, 1, 1, 0, 0, 0, 0, 0).
+and9_table(0, 1, 1, 1, 1, 0, 0, 0, 1, 0).
+and9_table(0, 1, 1, 1, 1, 0, 0, 1, 0, 0).
+and9_table(0, 1, 1, 1, 1, 0, 0, 1, 1, 0).
+and9_table(0, 1, 1, 1, 1, 0, 1, 0, 0, 0).
+and9_table(0, 1, 1, 1, 1, 0, 1, 0, 1, 0).
+and9_table(0, 1, 1, 1, 1, 0, 1, 1, 0, 0).
+and9_table(0, 1, 1, 1, 1, 0, 1, 1, 1, 0).
+and9_table(0, 1, 1, 1, 1, 1, 0, 0, 0, 0).
+and9_table(0, 1, 1, 1, 1, 1, 0, 0, 1, 0).
+and9_table(0, 1, 1, 1, 1, 1, 0, 1, 0, 0).
+and9_table(0, 1, 1, 1, 1, 1, 0, 1, 1, 0).
+and9_table(0, 1, 1, 1, 1, 1, 1, 0, 0, 0).
+and9_table(0, 1, 1, 1, 1, 1, 1, 0, 1, 0).
+and9_table(0, 1, 1, 1, 1, 1, 1, 1, 0, 0).
+and9_table(0, 1, 1, 1, 1, 1, 1, 1, 1, 0).
+and9_table(1, 0, 0, 0, 0, 0, 0, 0, 0, 0).
+and9_table(1, 0, 0, 0, 0, 0, 0, 0, 1, 0).
+and9_table(1, 0, 0, 0, 0, 0, 0, 1, 0, 0).
+and9_table(1, 0, 0, 0, 0, 0, 0, 1, 1, 0).
+and9_table(1, 0, 0, 0, 0, 0, 1, 0, 0, 0).
+and9_table(1, 0, 0, 0, 0, 0, 1, 0, 1, 0).
+and9_table(1, 0, 0, 0, 0, 0, 1, 1, 0, 0).
+and9_table(1, 0, 0, 0, 0, 0, 1, 1, 1, 0).
+and9_table(1, 0, 0, 0, 0, 1, 0, 0, 0, 0).
+and9_table(1, 0, 0, 0, 0, 1, 0, 0, 1, 0).
+and9_table(1, 0, 0, 0, 0, 1, 0, 1, 0, 0).
+and9_table(1, 0, 0, 0, 0, 1, 0, 1, 1, 0).
+and9_table(1, 0, 0, 0, 0, 1, 1, 0, 0, 0).
+and9_table(1, 0, 0, 0, 0, 1, 1, 0, 1, 0).
+and9_table(1, 0, 0, 0, 0, 1, 1, 1, 0, 0).
+and9_table(1, 0, 0, 0, 0, 1, 1, 1, 1, 0).
+and9_table(1, 0, 0, 0, 1, 0, 0, 0, 0, 0).
+and9_table(1, 0, 0, 0, 1, 0, 0, 0, 1, 0).
+and9_table(1, 0, 0, 0, 1, 0, 0, 1, 0, 0).
+and9_table(1, 0, 0, 0, 1, 0, 0, 1, 1, 0).
+and9_table(1, 0, 0, 0, 1, 0, 1, 0, 0, 0).
+and9_table(1, 0, 0, 0, 1, 0, 1, 0, 1, 0).
+and9_table(1, 0, 0, 0, 1, 0, 1, 1, 0, 0).
+and9_table(1, 0, 0, 0, 1, 0, 1, 1, 1, 0).
+and9_table(1, 0, 0, 0, 1, 1, 0, 0, 0, 0).
+and9_table(1, 0, 0, 0, 1, 1, 0, 0, 1, 0).
+and9_table(1, 0, 0, 0, 1, 1, 0, 1, 0, 0).
+and9_table(1, 0, 0, 0, 1, 1, 0, 1, 1, 0).
+and9_table(1, 0, 0, 0, 1, 1, 1, 0, 0, 0).
+and9_table(1, 0, 0, 0, 1, 1, 1, 0, 1, 0).
+and9_table(1, 0, 0, 0, 1, 1, 1, 1, 0, 0).
+and9_table(1, 0, 0, 0, 1, 1, 1, 1, 1, 0).
+and9_table(1, 0, 0, 1, 0, 0, 0, 0, 0, 0).
+and9_table(1, 0, 0, 1, 0, 0, 0, 0, 1, 0).
+and9_table(1, 0, 0, 1, 0, 0, 0, 1, 0, 0).
+and9_table(1, 0, 0, 1, 0, 0, 0, 1, 1, 0).
+and9_table(1, 0, 0, 1, 0, 0, 1, 0, 0, 0).
+and9_table(1, 0, 0, 1, 0, 0, 1, 0, 1, 0).
+and9_table(1, 0, 0, 1, 0, 0, 1, 1, 0, 0).
+and9_table(1, 0, 0, 1, 0, 0, 1, 1, 1, 0).
+and9_table(1, 0, 0, 1, 0, 1, 0, 0, 0, 0).
+and9_table(1, 0, 0, 1, 0, 1, 0, 0, 1, 0).
+and9_table(1, 0, 0, 1, 0, 1, 0, 1, 0, 0).
+and9_table(1, 0, 0, 1, 0, 1, 0, 1, 1, 0).
+and9_table(1, 0, 0, 1, 0, 1, 1, 0, 0, 0).
+and9_table(1, 0, 0, 1, 0, 1, 1, 0, 1, 0).
+and9_table(1, 0, 0, 1, 0, 1, 1, 1, 0, 0).
+and9_table(1, 0, 0, 1, 0, 1, 1, 1, 1, 0).
+and9_table(1, 0, 0, 1, 1, 0, 0, 0, 0, 0).
+and9_table(1, 0, 0, 1, 1, 0, 0, 0, 1, 0).
+and9_table(1, 0, 0, 1, 1, 0, 0, 1, 0, 0).
+and9_table(1, 0, 0, 1, 1, 0, 0, 1, 1, 0).
+and9_table(1, 0, 0, 1, 1, 0, 1, 0, 0, 0).
+and9_table(1, 0, 0, 1, 1, 0, 1, 0, 1, 0).
+and9_table(1, 0, 0, 1, 1, 0, 1, 1, 0, 0).
+and9_table(1, 0, 0, 1, 1, 0, 1, 1, 1, 0).
+and9_table(1, 0, 0, 1, 1, 1, 0, 0, 0, 0).
+and9_table(1, 0, 0, 1, 1, 1, 0, 0, 1, 0).
+and9_table(1, 0, 0, 1, 1, 1, 0, 1, 0, 0).
+and9_table(1, 0, 0, 1, 1, 1, 0, 1, 1, 0).
+and9_table(1, 0, 0, 1, 1, 1, 1, 0, 0, 0).
+and9_table(1, 0, 0, 1, 1, 1, 1, 0, 1, 0).
+and9_table(1, 0, 0, 1, 1, 1, 1, 1, 0, 0).
+and9_table(1, 0, 0, 1, 1, 1, 1, 1, 1, 0).
+and9_table(1, 0, 1, 0, 0, 0, 0, 0, 0, 0).
+and9_table(1, 0, 1, 0, 0, 0, 0, 0, 1, 0).
+and9_table(1, 0, 1, 0, 0, 0, 0, 1, 0, 0).
+and9_table(1, 0, 1, 0, 0, 0, 0, 1, 1, 0).
+and9_table(1, 0, 1, 0, 0, 0, 1, 0, 0, 0).
+and9_table(1, 0, 1, 0, 0, 0, 1, 0, 1, 0).
+and9_table(1, 0, 1, 0, 0, 0, 1, 1, 0, 0).
+and9_table(1, 0, 1, 0, 0, 0, 1, 1, 1, 0).
+and9_table(1, 0, 1, 0, 0, 1, 0, 0, 0, 0).
+and9_table(1, 0, 1, 0, 0, 1, 0, 0, 1, 0).
+and9_table(1, 0, 1, 0, 0, 1, 0, 1, 0, 0).
+and9_table(1, 0, 1, 0, 0, 1, 0, 1, 1, 0).
+and9_table(1, 0, 1, 0, 0, 1, 1, 0, 0, 0).
+and9_table(1, 0, 1, 0, 0, 1, 1, 0, 1, 0).
+and9_table(1, 0, 1, 0, 0, 1, 1, 1, 0, 0).
+and9_table(1, 0, 1, 0, 0, 1, 1, 1, 1, 0).
+and9_table(1, 0, 1, 0, 1, 0, 0, 0, 0, 0).
+and9_table(1, 0, 1, 0, 1, 0, 0, 0, 1, 0).
+and9_table(1, 0, 1, 0, 1, 0, 0, 1, 0, 0).
+and9_table(1, 0, 1, 0, 1, 0, 0, 1, 1, 0).
+and9_table(1, 0, 1, 0, 1, 0, 1, 0, 0, 0).
+and9_table(1, 0, 1, 0, 1, 0, 1, 0, 1, 0).
+and9_table(1, 0, 1, 0, 1, 0, 1, 1, 0, 0).
+and9_table(1, 0, 1, 0, 1, 0, 1, 1, 1, 0).
+and9_table(1, 0, 1, 0, 1, 1, 0, 0, 0, 0).
+and9_table(1, 0, 1, 0, 1, 1, 0, 0, 1, 0).
+and9_table(1, 0, 1, 0, 1, 1, 0, 1, 0, 0).
+and9_table(1, 0, 1, 0, 1, 1, 0, 1, 1, 0).
+and9_table(1, 0, 1, 0, 1, 1, 1, 0, 0, 0).
+and9_table(1, 0, 1, 0, 1, 1, 1, 0, 1, 0).
+and9_table(1, 0, 1, 0, 1, 1, 1, 1, 0, 0).
+and9_table(1, 0, 1, 0, 1, 1, 1, 1, 1, 0).
+and9_table(1, 0, 1, 1, 0, 0, 0, 0, 0, 0).
+and9_table(1, 0, 1, 1, 0, 0, 0, 0, 1, 0).
+and9_table(1, 0, 1, 1, 0, 0, 0, 1, 0, 0).
+and9_table(1, 0, 1, 1, 0, 0, 0, 1, 1, 0).
+and9_table(1, 0, 1, 1, 0, 0, 1, 0, 0, 0).
+and9_table(1, 0, 1, 1, 0, 0, 1, 0, 1, 0).
+and9_table(1, 0, 1, 1, 0, 0, 1, 1, 0, 0).
+and9_table(1, 0, 1, 1, 0, 0, 1, 1, 1, 0).
+and9_table(1, 0, 1, 1, 0, 1, 0, 0, 0, 0).
+and9_table(1, 0, 1, 1, 0, 1, 0, 0, 1, 0).
+and9_table(1, 0, 1, 1, 0, 1, 0, 1, 0, 0).
+and9_table(1, 0, 1, 1, 0, 1, 0, 1, 1, 0).
+and9_table(1, 0, 1, 1, 0, 1, 1, 0, 0, 0).
+and9_table(1, 0, 1, 1, 0, 1, 1, 0, 1, 0).
+and9_table(1, 0, 1, 1, 0, 1, 1, 1, 0, 0).
+and9_table(1, 0, 1, 1, 0, 1, 1, 1, 1, 0).
+and9_table(1, 0, 1, 1, 1, 0, 0, 0, 0, 0).
+and9_table(1, 0, 1, 1, 1, 0, 0, 0, 1, 0).
+and9_table(1, 0, 1, 1, 1, 0, 0, 1, 0, 0).
+and9_table(1, 0, 1, 1, 1, 0, 0, 1, 1, 0).
+and9_table(1, 0, 1, 1, 1, 0, 1, 0, 0, 0).
+and9_table(1, 0, 1, 1, 1, 0, 1, 0, 1, 0).
+and9_table(1, 0, 1, 1, 1, 0, 1, 1, 0, 0).
+and9_table(1, 0, 1, 1, 1, 0, 1, 1, 1, 0).
+and9_table(1, 0, 1, 1, 1, 1, 0, 0, 0, 0).
+and9_table(1, 0, 1, 1, 1, 1, 0, 0, 1, 0).
+and9_table(1, 0, 1, 1, 1, 1, 0, 1, 0, 0).
+and9_table(1, 0, 1, 1, 1, 1, 0, 1, 1, 0).
+and9_table(1, 0, 1, 1, 1, 1, 1, 0, 0, 0).
+and9_table(1, 0, 1, 1, 1, 1, 1, 0, 1, 0).
+and9_table(1, 0, 1, 1, 1, 1, 1, 1, 0, 0).
+and9_table(1, 0, 1, 1, 1, 1, 1, 1, 1, 0).
+and9_table(1, 1, 0, 0, 0, 0, 0, 0, 0, 0).
+and9_table(1, 1, 0, 0, 0, 0, 0, 0, 1, 0).
+and9_table(1, 1, 0, 0, 0, 0, 0, 1, 0, 0).
+and9_table(1, 1, 0, 0, 0, 0, 0, 1, 1, 0).
+and9_table(1, 1, 0, 0, 0, 0, 1, 0, 0, 0).
+and9_table(1, 1, 0, 0, 0, 0, 1, 0, 1, 0).
+and9_table(1, 1, 0, 0, 0, 0, 1, 1, 0, 0).
+and9_table(1, 1, 0, 0, 0, 0, 1, 1, 1, 0).
+and9_table(1, 1, 0, 0, 0, 1, 0, 0, 0, 0).
+and9_table(1, 1, 0, 0, 0, 1, 0, 0, 1, 0).
+and9_table(1, 1, 0, 0, 0, 1, 0, 1, 0, 0).
+and9_table(1, 1, 0, 0, 0, 1, 0, 1, 1, 0).
+and9_table(1, 1, 0, 0, 0, 1, 1, 0, 0, 0).
+and9_table(1, 1, 0, 0, 0, 1, 1, 0, 1, 0).
+and9_table(1, 1, 0, 0, 0, 1, 1, 1, 0, 0).
+and9_table(1, 1, 0, 0, 0, 1, 1, 1, 1, 0).
+and9_table(1, 1, 0, 0, 1, 0, 0, 0, 0, 0).
+and9_table(1, 1, 0, 0, 1, 0, 0, 0, 1, 0).
+and9_table(1, 1, 0, 0, 1, 0, 0, 1, 0, 0).
+and9_table(1, 1, 0, 0, 1, 0, 0, 1, 1, 0).
+and9_table(1, 1, 0, 0, 1, 0, 1, 0, 0, 0).
+and9_table(1, 1, 0, 0, 1, 0, 1, 0, 1, 0).
+and9_table(1, 1, 0, 0, 1, 0, 1, 1, 0, 0).
+and9_table(1, 1, 0, 0, 1, 0, 1, 1, 1, 0).
+and9_table(1, 1, 0, 0, 1, 1, 0, 0, 0, 0).
+and9_table(1, 1, 0, 0, 1, 1, 0, 0, 1, 0).
+and9_table(1, 1, 0, 0, 1, 1, 0, 1, 0, 0).
+and9_table(1, 1, 0, 0, 1, 1, 0, 1, 1, 0).
+and9_table(1, 1, 0, 0, 1, 1, 1, 0, 0, 0).
+and9_table(1, 1, 0, 0, 1, 1, 1, 0, 1, 0).
+and9_table(1, 1, 0, 0, 1, 1, 1, 1, 0, 0).
+and9_table(1, 1, 0, 0, 1, 1, 1, 1, 1, 0).
+and9_table(1, 1, 0, 1, 0, 0, 0, 0, 0, 0).
+and9_table(1, 1, 0, 1, 0, 0, 0, 0, 1, 0).
+and9_table(1, 1, 0, 1, 0, 0, 0, 1, 0, 0).
+and9_table(1, 1, 0, 1, 0, 0, 0, 1, 1, 0).
+and9_table(1, 1, 0, 1, 0, 0, 1, 0, 0, 0).
+and9_table(1, 1, 0, 1, 0, 0, 1, 0, 1, 0).
+and9_table(1, 1, 0, 1, 0, 0, 1, 1, 0, 0).
+and9_table(1, 1, 0, 1, 0, 0, 1, 1, 1, 0).
+and9_table(1, 1, 0, 1, 0, 1, 0, 0, 0, 0).
+and9_table(1, 1, 0, 1, 0, 1, 0, 0, 1, 0).
+and9_table(1, 1, 0, 1, 0, 1, 0, 1, 0, 0).
+and9_table(1, 1, 0, 1, 0, 1, 0, 1, 1, 0).
+and9_table(1, 1, 0, 1, 0, 1, 1, 0, 0, 0).
+and9_table(1, 1, 0, 1, 0, 1, 1, 0, 1, 0).
+and9_table(1, 1, 0, 1, 0, 1, 1, 1, 0, 0).
+and9_table(1, 1, 0, 1, 0, 1, 1, 1, 1, 0).
+and9_table(1, 1, 0, 1, 1, 0, 0, 0, 0, 0).
+and9_table(1, 1, 0, 1, 1, 0, 0, 0, 1, 0).
+and9_table(1, 1, 0, 1, 1, 0, 0, 1, 0, 0).
+and9_table(1, 1, 0, 1, 1, 0, 0, 1, 1, 0).
+and9_table(1, 1, 0, 1, 1, 0, 1, 0, 0, 0).
+and9_table(1, 1, 0, 1, 1, 0, 1, 0, 1, 0).
+and9_table(1, 1, 0, 1, 1, 0, 1, 1, 0, 0).
+and9_table(1, 1, 0, 1, 1, 0, 1, 1, 1, 0).
+and9_table(1, 1, 0, 1, 1, 1, 0, 0, 0, 0).
+and9_table(1, 1, 0, 1, 1, 1, 0, 0, 1, 0).
+and9_table(1, 1, 0, 1, 1, 1, 0, 1, 0, 0).
+and9_table(1, 1, 0, 1, 1, 1, 0, 1, 1, 0).
+and9_table(1, 1, 0, 1, 1, 1, 1, 0, 0, 0).
+and9_table(1, 1, 0, 1, 1, 1, 1, 0, 1, 0).
+and9_table(1, 1, 0, 1, 1, 1, 1, 1, 0, 0).
+and9_table(1, 1, 0, 1, 1, 1, 1, 1, 1, 0).
+and9_table(1, 1, 1, 0, 0, 0, 0, 0, 0, 0).
+and9_table(1, 1, 1, 0, 0, 0, 0, 0, 1, 0).
+and9_table(1, 1, 1, 0, 0, 0, 0, 1, 0, 0).
+and9_table(1, 1, 1, 0, 0, 0, 0, 1, 1, 0).
+and9_table(1, 1, 1, 0, 0, 0, 1, 0, 0, 0).
+and9_table(1, 1, 1, 0, 0, 0, 1, 0, 1, 0).
+and9_table(1, 1, 1, 0, 0, 0, 1, 1, 0, 0).
+and9_table(1, 1, 1, 0, 0, 0, 1, 1, 1, 0).
+and9_table(1, 1, 1, 0, 0, 1, 0, 0, 0, 0).
+and9_table(1, 1, 1, 0, 0, 1, 0, 0, 1, 0).
+and9_table(1, 1, 1, 0, 0, 1, 0, 1, 0, 0).
+and9_table(1, 1, 1, 0, 0, 1, 0, 1, 1, 0).
+and9_table(1, 1, 1, 0, 0, 1, 1, 0, 0, 0).
+and9_table(1, 1, 1, 0, 0, 1, 1, 0, 1, 0).
+and9_table(1, 1, 1, 0, 0, 1, 1, 1, 0, 0).
+and9_table(1, 1, 1, 0, 0, 1, 1, 1, 1, 0).
+and9_table(1, 1, 1, 0, 1, 0, 0, 0, 0, 0).
+and9_table(1, 1, 1, 0, 1, 0, 0, 0, 1, 0).
+and9_table(1, 1, 1, 0, 1, 0, 0, 1, 0, 0).
+and9_table(1, 1, 1, 0, 1, 0, 0, 1, 1, 0).
+and9_table(1, 1, 1, 0, 1, 0, 1, 0, 0, 0).
+and9_table(1, 1, 1, 0, 1, 0, 1, 0, 1, 0).
+and9_table(1, 1, 1, 0, 1, 0, 1, 1, 0, 0).
+and9_table(1, 1, 1, 0, 1, 0, 1, 1, 1, 0).
+and9_table(1, 1, 1, 0, 1, 1, 0, 0, 0, 0).
+and9_table(1, 1, 1, 0, 1, 1, 0, 0, 1, 0).
+and9_table(1, 1, 1, 0, 1, 1, 0, 1, 0, 0).
+and9_table(1, 1, 1, 0, 1, 1, 0, 1, 1, 0).
+and9_table(1, 1, 1, 0, 1, 1, 1, 0, 0, 0).
+and9_table(1, 1, 1, 0, 1, 1, 1, 0, 1, 0).
+and9_table(1, 1, 1, 0, 1, 1, 1, 1, 0, 0).
+and9_table(1, 1, 1, 0, 1, 1, 1, 1, 1, 0).
+and9_table(1, 1, 1, 1, 0, 0, 0, 0, 0, 0).
+and9_table(1, 1, 1, 1, 0, 0, 0, 0, 1, 0).
+and9_table(1, 1, 1, 1, 0, 0, 0, 1, 0, 0).
+and9_table(1, 1, 1, 1, 0, 0, 0, 1, 1, 0).
+and9_table(1, 1, 1, 1, 0, 0, 1, 0, 0, 0).
+and9_table(1, 1, 1, 1, 0, 0, 1, 0, 1, 0).
+and9_table(1, 1, 1, 1, 0, 0, 1, 1, 0, 0).
+and9_table(1, 1, 1, 1, 0, 0, 1, 1, 1, 0).
+and9_table(1, 1, 1, 1, 0, 1, 0, 0, 0, 0).
+and9_table(1, 1, 1, 1, 0, 1, 0, 0, 1, 0).
+and9_table(1, 1, 1, 1, 0, 1, 0, 1, 0, 0).
+and9_table(1, 1, 1, 1, 0, 1, 0, 1, 1, 0).
+and9_table(1, 1, 1, 1, 0, 1, 1, 0, 0, 0).
+and9_table(1, 1, 1, 1, 0, 1, 1, 0, 1, 0).
+and9_table(1, 1, 1, 1, 0, 1, 1, 1, 0, 0).
+and9_table(1, 1, 1, 1, 0, 1, 1, 1, 1, 0).
+and9_table(1, 1, 1, 1, 1, 0, 0, 0, 0, 0).
+and9_table(1, 1, 1, 1, 1, 0, 0, 0, 1, 0).
+and9_table(1, 1, 1, 1, 1, 0, 0, 1, 0, 0).
+and9_table(1, 1, 1, 1, 1, 0, 0, 1, 1, 0).
+and9_table(1, 1, 1, 1, 1, 0, 1, 0, 0, 0).
+and9_table(1, 1, 1, 1, 1, 0, 1, 0, 1, 0).
+and9_table(1, 1, 1, 1, 1, 0, 1, 1, 0, 0).
+and9_table(1, 1, 1, 1, 1, 0, 1, 1, 1, 0).
+and9_table(1, 1, 1, 1, 1, 1, 0, 0, 0, 0).
+and9_table(1, 1, 1, 1, 1, 1, 0, 0, 1, 0).
+and9_table(1, 1, 1, 1, 1, 1, 0, 1, 0, 0).
+and9_table(1, 1, 1, 1, 1, 1, 0, 1, 1, 0).
+and9_table(1, 1, 1, 1, 1, 1, 1, 0, 0, 0).
+and9_table(1, 1, 1, 1, 1, 1, 1, 0, 1, 0).
+and9_table(1, 1, 1, 1, 1, 1, 1, 1, 0, 0).
+and9_table(1, 1, 1, 1, 1, 1, 1, 1, 1, 1).
+
+
+nand9_table(0, 0, 0, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 0, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 0, 1, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 0, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(0, 1, 1, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 0, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 0, 1, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 0, 1, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 0, 1, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 0, 1, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 0, 1, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 0, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 0, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 0, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 0, 1, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 1, 0, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 1, 0, 1, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 1, 1, 0, 1).
+nand9_table(1, 1, 1, 1, 1, 1, 1, 1, 1, 0).
+
+
+conn(in(not1, c118gat, 1), out(inpt0, c1gat)).
+
+conn(in(not1, c119gat, 1), out(inpt0, c4gat)).
+
+conn(in(not1, c122gat, 1), out(inpt0, c11gat)).
+
+conn(in(not1, c123gat, 1), out(inpt0, c17gat)).
+
+conn(in(not1, c126gat, 1), out(inpt0, c24gat)).
+
+conn(in(not1, c127gat, 1), out(inpt0, c30gat)).
+
+conn(in(not1, c130gat, 1), out(inpt0, c37gat)).
+
+conn(in(not1, c131gat, 1), out(inpt0, c43gat)).
+
+conn(in(not1, c134gat, 1), out(inpt0, c50gat)).
+
+conn(in(not1, c135gat, 1), out(inpt0, c56gat)).
+
+conn(in(not1, c138gat, 1), out(inpt0, c63gat)).
+
+conn(in(not1, c139gat, 1), out(inpt0, c69gat)).
+
+conn(in(not1, c142gat, 1), out(inpt0, c76gat)).
+
+conn(in(not1, c143gat, 1), out(inpt0, c82gat)).
+
+conn(in(not1, c146gat, 1), out(inpt0, c89gat)).
+
+conn(in(not1, c147gat, 1), out(inpt0, c95gat)).
+
+conn(in(not1, c150gat, 1), out(inpt0, c102gat)).
+
+conn(in(not1, c151gat, 1), out(inpt0, c108gat)).
+
+conn(in(nand2, c154gat, 1), out(not1, c118gat)).
+conn(in(nand2, c154gat, 2), out(inpt0, c4gat)).
+
+conn(in(nor2, c157gat, 1), out(inpt0, c8gat)).
+conn(in(nor2, c157gat, 2), out(not1, c119gat)).
+
+conn(in(nor2, c158gat, 1), out(inpt0, c14gat)).
+conn(in(nor2, c158gat, 2), out(not1, c119gat)).
+
+conn(in(nand2, c159gat, 1), out(not1, c122gat)).
+conn(in(nand2, c159gat, 2), out(inpt0, c17gat)).
+
+conn(in(nand2, c162gat, 1), out(not1, c126gat)).
+conn(in(nand2, c162gat, 2), out(inpt0, c30gat)).
+
+conn(in(nand2, c165gat, 1), out(not1, c130gat)).
+conn(in(nand2, c165gat, 2), out(inpt0, c43gat)).
+
+conn(in(nand2, c168gat, 1), out(not1, c134gat)).
+conn(in(nand2, c168gat, 2), out(inpt0, c56gat)).
+
+conn(in(nand2, c171gat, 1), out(not1, c138gat)).
+conn(in(nand2, c171gat, 2), out(inpt0, c69gat)).
+
+conn(in(nand2, c174gat, 1), out(not1, c142gat)).
+conn(in(nand2, c174gat, 2), out(inpt0, c82gat)).
+
+conn(in(nand2, c177gat, 1), out(not1, c146gat)).
+conn(in(nand2, c177gat, 2), out(inpt0, c95gat)).
+
+conn(in(nand2, c180gat, 1), out(not1, c150gat)).
+conn(in(nand2, c180gat, 2), out(inpt0, c108gat)).
+
+conn(in(nor2, c183gat, 1), out(inpt0, c21gat)).
+conn(in(nor2, c183gat, 2), out(not1, c123gat)).
+
+conn(in(nor2, c184gat, 1), out(inpt0, c27gat)).
+conn(in(nor2, c184gat, 2), out(not1, c123gat)).
+
+conn(in(nor2, c185gat, 1), out(inpt0, c34gat)).
+conn(in(nor2, c185gat, 2), out(not1, c127gat)).
+
+conn(in(nor2, c186gat, 1), out(inpt0, c40gat)).
+conn(in(nor2, c186gat, 2), out(not1, c127gat)).
+
+conn(in(nor2, c187gat, 1), out(inpt0, c47gat)).
+conn(in(nor2, c187gat, 2), out(not1, c131gat)).
+
+conn(in(nor2, c188gat, 1), out(inpt0, c53gat)).
+conn(in(nor2, c188gat, 2), out(not1, c131gat)).
+
+conn(in(nor2, c189gat, 1), out(inpt0, c60gat)).
+conn(in(nor2, c189gat, 2), out(not1, c135gat)).
+
+conn(in(nor2, c190gat, 1), out(inpt0, c66gat)).
+conn(in(nor2, c190gat, 2), out(not1, c135gat)).
+
+conn(in(nor2, c191gat, 1), out(inpt0, c73gat)).
+conn(in(nor2, c191gat, 2), out(not1, c139gat)).
+
+conn(in(nor2, c192gat, 1), out(inpt0, c79gat)).
+conn(in(nor2, c192gat, 2), out(not1, c139gat)).
+
+conn(in(nor2, c193gat, 1), out(inpt0, c86gat)).
+conn(in(nor2, c193gat, 2), out(not1, c143gat)).
+
+conn(in(nor2, c194gat, 1), out(inpt0, c92gat)).
+conn(in(nor2, c194gat, 2), out(not1, c143gat)).
+
+conn(in(nor2, c195gat, 1), out(inpt0, c99gat)).
+conn(in(nor2, c195gat, 2), out(not1, c147gat)).
+
+conn(in(nor2, c196gat, 1), out(inpt0, c105gat)).
+conn(in(nor2, c196gat, 2), out(not1, c147gat)).
+
+conn(in(nor2, c197gat, 1), out(inpt0, c112gat)).
+conn(in(nor2, c197gat, 2), out(not1, c151gat)).
+
+conn(in(nor2, c198gat, 1), out(inpt0, c115gat)).
+conn(in(nor2, c198gat, 2), out(not1, c151gat)).
+
+conn(in(and9, c199gat, 1), out(nand2, c154gat)).
+conn(in(and9, c199gat, 2), out(nand2, c159gat)).
+conn(in(and9, c199gat, 3), out(nand2, c162gat)).
+conn(in(and9, c199gat, 4), out(nand2, c165gat)).
+conn(in(and9, c199gat, 5), out(nand2, c168gat)).
+conn(in(and9, c199gat, 6), out(nand2, c171gat)).
+conn(in(and9, c199gat, 7), out(nand2, c174gat)).
+conn(in(and9, c199gat, 8), out(nand2, c177gat)).
+conn(in(and9, c199gat, 9), out(nand2, c180gat)).
+
+conn(in(not1, c203gat, 1), out(and9, c199gat)).
+
+conn(in(not1, c213gat, 1), out(and9, c199gat)).
+
+conn(in(not1, c223gat, 1), out(and9, c199gat)).
+
+conn(in(xor2, c224gat, 1), out(not1, c203gat)).
+conn(in(xor2, c224gat, 2), out(nand2, c154gat)).
+
+conn(in(xor2, c227gat, 1), out(not1, c203gat)).
+conn(in(xor2, c227gat, 2), out(nand2, c159gat)).
+
+conn(in(xor2, c230gat, 1), out(not1, c203gat)).
+conn(in(xor2, c230gat, 2), out(nand2, c162gat)).
+
+conn(in(xor2, c233gat, 1), out(not1, c203gat)).
+conn(in(xor2, c233gat, 2), out(nand2, c165gat)).
+
+conn(in(xor2, c236gat, 1), out(not1, c203gat)).
+conn(in(xor2, c236gat, 2), out(nand2, c168gat)).
+
+conn(in(xor2, c239gat, 1), out(not1, c203gat)).
+conn(in(xor2, c239gat, 2), out(nand2, c171gat)).
+
+conn(in(nand2, c242gat, 1), out(inpt0, c1gat)).
+conn(in(nand2, c242gat, 2), out(not1, c213gat)).
+
+conn(in(xor2, c243gat, 1), out(not1, c203gat)).
+conn(in(xor2, c243gat, 2), out(nand2, c174gat)).
+
+conn(in(nand2, c246gat, 1), out(not1, c213gat)).
+conn(in(nand2, c246gat, 2), out(inpt0, c11gat)).
+
+conn(in(xor2, c247gat, 1), out(not1, c203gat)).
+conn(in(xor2, c247gat, 2), out(nand2, c177gat)).
+
+conn(in(nand2, c250gat, 1), out(not1, c213gat)).
+conn(in(nand2, c250gat, 2), out(inpt0, c24gat)).
+
+conn(in(xor2, c251gat, 1), out(not1, c203gat)).
+conn(in(xor2, c251gat, 2), out(nand2, c180gat)).
+
+conn(in(nand2, c254gat, 1), out(not1, c213gat)).
+conn(in(nand2, c254gat, 2), out(inpt0, c37gat)).
+
+conn(in(nand2, c255gat, 1), out(not1, c213gat)).
+conn(in(nand2, c255gat, 2), out(inpt0, c50gat)).
+
+conn(in(nand2, c256gat, 1), out(not1, c213gat)).
+conn(in(nand2, c256gat, 2), out(inpt0, c63gat)).
+
+conn(in(nand2, c257gat, 1), out(not1, c213gat)).
+conn(in(nand2, c257gat, 2), out(inpt0, c76gat)).
+
+conn(in(nand2, c258gat, 1), out(not1, c213gat)).
+conn(in(nand2, c258gat, 2), out(inpt0, c89gat)).
+
+conn(in(nand2, c259gat, 1), out(not1, c213gat)).
+conn(in(nand2, c259gat, 2), out(inpt0, c102gat)).
+
+conn(in(nand2, c260gat, 1), out(xor2, c224gat)).
+conn(in(nand2, c260gat, 2), out(nor2, c157gat)).
+
+conn(in(nand2, c263gat, 1), out(xor2, c224gat)).
+conn(in(nand2, c263gat, 2), out(nor2, c158gat)).
+
+conn(in(nand2, c264gat, 1), out(xor2, c227gat)).
+conn(in(nand2, c264gat, 2), out(nor2, c183gat)).
+
+conn(in(nand2, c267gat, 1), out(xor2, c230gat)).
+conn(in(nand2, c267gat, 2), out(nor2, c185gat)).
+
+conn(in(nand2, c270gat, 1), out(xor2, c233gat)).
+conn(in(nand2, c270gat, 2), out(nor2, c187gat)).
+
+conn(in(nand2, c273gat, 1), out(xor2, c236gat)).
+conn(in(nand2, c273gat, 2), out(nor2, c189gat)).
+
+conn(in(nand2, c276gat, 1), out(xor2, c239gat)).
+conn(in(nand2, c276gat, 2), out(nor2, c191gat)).
+
+conn(in(nand2, c279gat, 1), out(xor2, c243gat)).
+conn(in(nand2, c279gat, 2), out(nor2, c193gat)).
+
+conn(in(nand2, c282gat, 1), out(xor2, c247gat)).
+conn(in(nand2, c282gat, 2), out(nor2, c195gat)).
+
+conn(in(nand2, c285gat, 1), out(xor2, c251gat)).
+conn(in(nand2, c285gat, 2), out(nor2, c197gat)).
+
+conn(in(nand2, c288gat, 1), out(xor2, c227gat)).
+conn(in(nand2, c288gat, 2), out(nor2, c184gat)).
+
+conn(in(nand2, c289gat, 1), out(xor2, c230gat)).
+conn(in(nand2, c289gat, 2), out(nor2, c186gat)).
+
+conn(in(nand2, c290gat, 1), out(xor2, c233gat)).
+conn(in(nand2, c290gat, 2), out(nor2, c188gat)).
+
+conn(in(nand2, c291gat, 1), out(xor2, c236gat)).
+conn(in(nand2, c291gat, 2), out(nor2, c190gat)).
+
+conn(in(nand2, c292gat, 1), out(xor2, c239gat)).
+conn(in(nand2, c292gat, 2), out(nor2, c192gat)).
+
+conn(in(nand2, c293gat, 1), out(xor2, c243gat)).
+conn(in(nand2, c293gat, 2), out(nor2, c194gat)).
+
+conn(in(nand2, c294gat, 1), out(xor2, c247gat)).
+conn(in(nand2, c294gat, 2), out(nor2, c196gat)).
+
+conn(in(nand2, c295gat, 1), out(xor2, c251gat)).
+conn(in(nand2, c295gat, 2), out(nor2, c198gat)).
+
+conn(in(and9, c296gat, 1), out(nand2, c260gat)).
+conn(in(and9, c296gat, 2), out(nand2, c264gat)).
+conn(in(and9, c296gat, 3), out(nand2, c267gat)).
+conn(in(and9, c296gat, 4), out(nand2, c270gat)).
+conn(in(and9, c296gat, 5), out(nand2, c273gat)).
+conn(in(and9, c296gat, 6), out(nand2, c276gat)).
+conn(in(and9, c296gat, 7), out(nand2, c279gat)).
+conn(in(and9, c296gat, 8), out(nand2, c282gat)).
+conn(in(and9, c296gat, 9), out(nand2, c285gat)).
+
+conn(in(not1, c300gat, 1), out(nand2, c263gat)).
+
+conn(in(not1, c301gat, 1), out(nand2, c288gat)).
+
+conn(in(not1, c302gat, 1), out(nand2, c289gat)).
+
+conn(in(not1, c303gat, 1), out(nand2, c290gat)).
+
+conn(in(not1, c304gat, 1), out(nand2, c291gat)).
+
+conn(in(not1, c305gat, 1), out(nand2, c292gat)).
+
+conn(in(not1, c306gat, 1), out(nand2, c293gat)).
+
+conn(in(not1, c307gat, 1), out(nand2, c294gat)).
+
+conn(in(not1, c308gat, 1), out(nand2, c295gat)).
+
+conn(in(not1, c309gat, 1), out(and9, c296gat)).
+
+conn(in(not1, c319gat, 1), out(and9, c296gat)).
+
+conn(in(not1, c329gat, 1), out(and9, c296gat)).
+
+conn(in(xor2, c330gat, 1), out(not1, c309gat)).
+conn(in(xor2, c330gat, 2), out(nand2, c260gat)).
+
+conn(in(xor2, c331gat, 1), out(not1, c309gat)).
+conn(in(xor2, c331gat, 2), out(nand2, c264gat)).
+
+conn(in(xor2, c332gat, 1), out(not1, c309gat)).
+conn(in(xor2, c332gat, 2), out(nand2, c267gat)).
+
+conn(in(xor2, c333gat, 1), out(not1, c309gat)).
+conn(in(xor2, c333gat, 2), out(nand2, c270gat)).
+
+conn(in(nand2, c334gat, 1), out(inpt0, c8gat)).
+conn(in(nand2, c334gat, 2), out(not1, c319gat)).
+
+conn(in(xor2, c335gat, 1), out(not1, c309gat)).
+conn(in(xor2, c335gat, 2), out(nand2, c273gat)).
+
+conn(in(nand2, c336gat, 1), out(not1, c319gat)).
+conn(in(nand2, c336gat, 2), out(inpt0, c21gat)).
+
+conn(in(xor2, c337gat, 1), out(not1, c309gat)).
+conn(in(xor2, c337gat, 2), out(nand2, c276gat)).
+
+conn(in(nand2, c338gat, 1), out(not1, c319gat)).
+conn(in(nand2, c338gat, 2), out(inpt0, c34gat)).
+
+conn(in(xor2, c339gat, 1), out(not1, c309gat)).
+conn(in(xor2, c339gat, 2), out(nand2, c279gat)).
+
+conn(in(nand2, c340gat, 1), out(not1, c319gat)).
+conn(in(nand2, c340gat, 2), out(inpt0, c47gat)).
+
+conn(in(xor2, c341gat, 1), out(not1, c309gat)).
+conn(in(xor2, c341gat, 2), out(nand2, c282gat)).
+
+conn(in(nand2, c342gat, 1), out(not1, c319gat)).
+conn(in(nand2, c342gat, 2), out(inpt0, c60gat)).
+
+conn(in(xor2, c343gat, 1), out(not1, c309gat)).
+conn(in(xor2, c343gat, 2), out(nand2, c285gat)).
+
+conn(in(nand2, c344gat, 1), out(not1, c319gat)).
+conn(in(nand2, c344gat, 2), out(inpt0, c73gat)).
+
+conn(in(nand2, c345gat, 1), out(not1, c319gat)).
+conn(in(nand2, c345gat, 2), out(inpt0, c86gat)).
+
+conn(in(nand2, c346gat, 1), out(not1, c319gat)).
+conn(in(nand2, c346gat, 2), out(inpt0, c99gat)).
+
+conn(in(nand2, c347gat, 1), out(not1, c319gat)).
+conn(in(nand2, c347gat, 2), out(inpt0, c112gat)).
+
+conn(in(nand2, c348gat, 1), out(xor2, c330gat)).
+conn(in(nand2, c348gat, 2), out(not1, c300gat)).
+
+conn(in(nand2, c349gat, 1), out(xor2, c331gat)).
+conn(in(nand2, c349gat, 2), out(not1, c301gat)).
+
+conn(in(nand2, c350gat, 1), out(xor2, c332gat)).
+conn(in(nand2, c350gat, 2), out(not1, c302gat)).
+
+conn(in(nand2, c351gat, 1), out(xor2, c333gat)).
+conn(in(nand2, c351gat, 2), out(not1, c303gat)).
+
+conn(in(nand2, c352gat, 1), out(xor2, c335gat)).
+conn(in(nand2, c352gat, 2), out(not1, c304gat)).
+
+conn(in(nand2, c353gat, 1), out(xor2, c337gat)).
+conn(in(nand2, c353gat, 2), out(not1, c305gat)).
+
+conn(in(nand2, c354gat, 1), out(xor2, c339gat)).
+conn(in(nand2, c354gat, 2), out(not1, c306gat)).
+
+conn(in(nand2, c355gat, 1), out(xor2, c341gat)).
+conn(in(nand2, c355gat, 2), out(not1, c307gat)).
+
+conn(in(nand2, c356gat, 1), out(xor2, c343gat)).
+conn(in(nand2, c356gat, 2), out(not1, c308gat)).
+
+conn(in(and9, c357gat, 1), out(nand2, c348gat)).
+conn(in(and9, c357gat, 2), out(nand2, c349gat)).
+conn(in(and9, c357gat, 3), out(nand2, c350gat)).
+conn(in(and9, c357gat, 4), out(nand2, c351gat)).
+conn(in(and9, c357gat, 5), out(nand2, c352gat)).
+conn(in(and9, c357gat, 6), out(nand2, c353gat)).
+conn(in(and9, c357gat, 7), out(nand2, c354gat)).
+conn(in(and9, c357gat, 8), out(nand2, c355gat)).
+conn(in(and9, c357gat, 9), out(nand2, c356gat)).
+
+conn(in(not1, c360gat, 1), out(and9, c357gat)).
+
+conn(in(not1, c370gat, 1), out(and9, c357gat)).
+
+conn(in(nand2, c371gat, 1), out(inpt0, c14gat)).
+conn(in(nand2, c371gat, 2), out(not1, c360gat)).
+
+conn(in(nand2, c372gat, 1), out(not1, c360gat)).
+conn(in(nand2, c372gat, 2), out(inpt0, c27gat)).
+
+conn(in(nand2, c373gat, 1), out(not1, c360gat)).
+conn(in(nand2, c373gat, 2), out(inpt0, c40gat)).
+
+conn(in(nand2, c374gat, 1), out(not1, c360gat)).
+conn(in(nand2, c374gat, 2), out(inpt0, c53gat)).
+
+conn(in(nand2, c375gat, 1), out(not1, c360gat)).
+conn(in(nand2, c375gat, 2), out(inpt0, c66gat)).
+
+conn(in(nand2, c376gat, 1), out(not1, c360gat)).
+conn(in(nand2, c376gat, 2), out(inpt0, c79gat)).
+
+conn(in(nand2, c377gat, 1), out(not1, c360gat)).
+conn(in(nand2, c377gat, 2), out(inpt0, c92gat)).
+
+conn(in(nand2, c378gat, 1), out(not1, c360gat)).
+conn(in(nand2, c378gat, 2), out(inpt0, c105gat)).
+
+conn(in(nand2, c379gat, 1), out(not1, c360gat)).
+conn(in(nand2, c379gat, 2), out(inpt0, c115gat)).
+
+conn(in(nand4, c380gat, 1), out(inpt0, c4gat)).
+conn(in(nand4, c380gat, 2), out(nand2, c242gat)).
+conn(in(nand4, c380gat, 3), out(nand2, c334gat)).
+conn(in(nand4, c380gat, 4), out(nand2, c371gat)).
+
+conn(in(nand4, c381gat, 1), out(nand2, c246gat)).
+conn(in(nand4, c381gat, 2), out(nand2, c336gat)).
+conn(in(nand4, c381gat, 3), out(nand2, c372gat)).
+conn(in(nand4, c381gat, 4), out(inpt0, c17gat)).
+
+conn(in(nand4, c386gat, 1), out(nand2, c250gat)).
+conn(in(nand4, c386gat, 2), out(nand2, c338gat)).
+conn(in(nand4, c386gat, 3), out(nand2, c373gat)).
+conn(in(nand4, c386gat, 4), out(inpt0, c30gat)).
+
+conn(in(nand4, c393gat, 1), out(nand2, c254gat)).
+conn(in(nand4, c393gat, 2), out(nand2, c340gat)).
+conn(in(nand4, c393gat, 3), out(nand2, c374gat)).
+conn(in(nand4, c393gat, 4), out(inpt0, c43gat)).
+
+conn(in(nand4, c399gat, 1), out(nand2, c255gat)).
+conn(in(nand4, c399gat, 2), out(nand2, c342gat)).
+conn(in(nand4, c399gat, 3), out(nand2, c375gat)).
+conn(in(nand4, c399gat, 4), out(inpt0, c56gat)).
+
+conn(in(nand4, c404gat, 1), out(nand2, c256gat)).
+conn(in(nand4, c404gat, 2), out(nand2, c344gat)).
+conn(in(nand4, c404gat, 3), out(nand2, c376gat)).
+conn(in(nand4, c404gat, 4), out(inpt0, c69gat)).
+
+conn(in(nand4, c407gat, 1), out(nand2, c257gat)).
+conn(in(nand4, c407gat, 2), out(nand2, c345gat)).
+conn(in(nand4, c407gat, 3), out(nand2, c377gat)).
+conn(in(nand4, c407gat, 4), out(inpt0, c82gat)).
+
+conn(in(nand4, c411gat, 1), out(nand2, c258gat)).
+conn(in(nand4, c411gat, 2), out(nand2, c346gat)).
+conn(in(nand4, c411gat, 3), out(nand2, c378gat)).
+conn(in(nand4, c411gat, 4), out(inpt0, c95gat)).
+
+conn(in(nand4, c414gat, 1), out(nand2, c259gat)).
+conn(in(nand4, c414gat, 2), out(nand2, c347gat)).
+conn(in(nand4, c414gat, 3), out(nand2, c379gat)).
+conn(in(nand4, c414gat, 4), out(inpt0, c108gat)).
+
+conn(in(not1, c415gat, 1), out(nand4, c380gat)).
+
+conn(in(and8, c416gat, 1), out(nand4, c381gat)).
+conn(in(and8, c416gat, 2), out(nand4, c386gat)).
+conn(in(and8, c416gat, 3), out(nand4, c393gat)).
+conn(in(and8, c416gat, 4), out(nand4, c399gat)).
+conn(in(and8, c416gat, 5), out(nand4, c404gat)).
+conn(in(and8, c416gat, 6), out(nand4, c407gat)).
+conn(in(and8, c416gat, 7), out(nand4, c411gat)).
+conn(in(and8, c416gat, 8), out(nand4, c414gat)).
+
+conn(in(not1, c417gat, 1), out(nand4, c393gat)).
+
+conn(in(not1, c418gat, 1), out(nand4, c404gat)).
+
+conn(in(not1, c419gat, 1), out(nand4, c407gat)).
+
+conn(in(not1, c420gat, 1), out(nand4, c411gat)).
+
+conn(in(nor2, c421gat, 1), out(not1, c415gat)).
+conn(in(nor2, c421gat, 2), out(and8, c416gat)).
+
+conn(in(nand2, c422gat, 1), out(nand4, c386gat)).
+conn(in(nand2, c422gat, 2), out(not1, c417gat)).
+
+conn(in(nand4, c425gat, 1), out(nand4, c386gat)).
+conn(in(nand4, c425gat, 2), out(nand4, c393gat)).
+conn(in(nand4, c425gat, 3), out(not1, c418gat)).
+conn(in(nand4, c425gat, 4), out(nand4, c399gat)).
+
+conn(in(nand3, c428gat, 1), out(nand4, c399gat)).
+conn(in(nand3, c428gat, 2), out(nand4, c393gat)).
+conn(in(nand3, c428gat, 3), out(not1, c419gat)).
+
+conn(in(nand4, c429gat, 1), out(nand4, c386gat)).
+conn(in(nand4, c429gat, 2), out(nand4, c393gat)).
+conn(in(nand4, c429gat, 3), out(nand4, c407gat)).
+conn(in(nand4, c429gat, 4), out(not1, c420gat)).
+
+conn(in(nand4, c430gat, 1), out(nand4, c381gat)).
+conn(in(nand4, c430gat, 2), out(nand4, c386gat)).
+conn(in(nand4, c430gat, 3), out(nand2, c422gat)).
+conn(in(nand4, c430gat, 4), out(nand4, c399gat)).
+
+conn(in(nand4, c431gat, 1), out(nand4, c381gat)).
+conn(in(nand4, c431gat, 2), out(nand4, c386gat)).
+conn(in(nand4, c431gat, 3), out(nand4, c425gat)).
+conn(in(nand4, c431gat, 4), out(nand3, c428gat)).
+
+conn(in(nand4, c432gat, 1), out(nand4, c381gat)).
+conn(in(nand4, c432gat, 2), out(nand2, c422gat)).
+conn(in(nand4, c432gat, 3), out(nand4, c425gat)).
+conn(in(nand4, c432gat, 4), out(nand4, c429gat)).
+
+*/

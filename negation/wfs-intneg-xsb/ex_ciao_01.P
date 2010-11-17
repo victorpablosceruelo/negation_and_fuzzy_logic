@@ -1,0 +1,11 @@
+:-module(ex_ciao_01, _, []).
+:- use_module(library(write),[write/1]).
+
+:- multifile portray_attribute/2. 
+
+portray_attribute(formula(_Var,Formula), Var) :-
+	write(Formula), write(' --- '), write(Var).
+
+p(X) :- attach_attribute(X, formula(X, [X/0, X/fA(_Y)])).
+p(s(X)) :- p(X).
+

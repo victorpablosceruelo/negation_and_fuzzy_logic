@@ -1,0 +1,4 @@
+
+:- load_compilation_module(library('cneg/cneg_tr')).
+:- add_sentence_trans(flat_pred/3).
+

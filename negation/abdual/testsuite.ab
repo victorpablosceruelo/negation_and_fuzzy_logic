@@ -1,0 +1,130 @@
+abds([a/0,b/0,c/0]).
+
+%%%%%%%%%%%%%%
+% p0 <- a ; b	 | not p0 <- not a, not b.
+
+p0 <- q0.
+p0 <- a.
+q0 <- p0.
+q0 <- b.
+
+%%%%%%%%%%%%%%
+% not p1	| q1
+
+p1 <- not q1, r1.
+r1 <- not q1, p1.
+
+q1 <- not p1.
+
+%%%%%%%%%%%%%%
+% not p2
+
+p2 <- q2.
+q2 <- r2.
+r2 <- p2.
+
+%%%%%%%%%%%%%%
+% all undefined
+
+p3 <- q3.
+q3 <- not r3.
+r3 <- p3.
+
+%%%%%%%%%%%%%%
+% p4 <- not a, not b |  not p4 <- a ; b ; a,b
+
+p4 <- q4.
+q4 <- p4.
+q4 <- not a,not b.
+
+%%%%%%%%%%%%%%
+% all undefined.
+
+p5 <- q5.
+q5 <- not r5.
+r5 <- not s5.
+s5 <- p5.
+
+%%%%%%%%%%%%%%
+% all undefined.
+
+p6 <- not q6.
+q6 <- r6.
+r6 <- s6.
+s6 <- not p6.
+
+%%%%%%%%%%%%%%
+
+p7 <- not q7, r7,a.
+r7 <- not q7, p7,b.
+
+q7 <- not p7,not r7.
+
+%%%%%%%%%%%%%%
+% q8 <- b ; not a | not p8 <- not a ; b.
+
+p8 <-  not q8, a.
+q8 <-  not p8. 
+q8 <-  b.
+
+%%%%%%%%%%%%%%
+% p10 <- not a | q10 <- not a.
+
+p10 <-  not q10,a.
+q10 <-  p10,a.
+
+%%%%%%%%%%%%%
+% p11 <- a | not p11 <- not a | not q11 <- a 
+
+p11 <-  not q11, a.
+q11 <-  p11,not a.
+
+%%%%%%%%%%%%%
+% p12 <- a | not p12 <- not a | not q12 <- a 
+
+p12 <-  a,not q12.
+q12 <-  not a,p12.
+
+%%%%%%%%%%%%%
+% q13 <- a, not b , not c | not q13 <- not a ; a,b ; c
+
+q13 <- a, not p13.
+p13 <- a, b.
+p13 <- c.
+%%%%%%%%%%%%%
+
+
+p14 <- q14.
+p14 <- r14.
+p14 <- s14.
+
+q14 <- r14.
+q14 <- p14.
+q14 <- s14.
+
+r14 <- p14.
+r14 <- q14.
+r14 <- s14.
+
+s14 <- p14.
+s14 <- q14.
+s14 <- r14.
+
+%%%%%%%%%%%%%
+p15 <- q15.
+
+q15 <- r15.
+q15 <- not r15.
+
+r15<- p15.
+
+
+%%%%%%%%%%%%%
+p16 <- q16.
+
+q16 <- r16.
+q16 <- s16.
+
+r16<- p16.
+
+s16 <- true.

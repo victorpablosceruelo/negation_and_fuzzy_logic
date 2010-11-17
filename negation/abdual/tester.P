@@ -1,0 +1,53 @@
+test:-
+	test(p0,[[a],[b]]),
+	test(not p0,[[not a,not b]]),
+	test(not p1,[[]]),
+	test(q1,[[]]),
+	test(p2,[]),
+	test(not p2,[[]]),
+	test(p3,[]),
+	test(not p3,[]),
+	test(p4,[[not a,not b]]),
+	test(not p4,[[a],[a,b],[b]]),
+	test(p5,[]),
+	test(not p5,[]),
+	test(p6,[]),
+	test(not p6,[]),
+	test(p7,[]),
+	test(not p7,[[],[not a],[not a,not b],[not b]]),
+	test(q8,[[b],[not a]]),
+	test(not p8,[[b],[not a]]),
+	test(p10,[]),
+	test(not p10,[[not a]]),
+	test(p11,[[a]]),
+	test(not p11,[[not a]]),
+	test(not q11,[[a],[not a]]),
+	test(p12,[[a]]),
+	test(not p12,[[not a]]),
+	test(not q12,[[a],[not a]]),
+	test(q13,[[a,not b, not c]]).
+
+test_wfs:-
+	test(not p1,[[]]),
+	test(q1,[[]]),
+	test(p2,[]),
+	test(not p2,[[]]),
+	test(p3,[]),
+	test(not p3,[]),
+	test(p5,[]),
+	test(not p5,[]),
+	test(p6,[]),
+	test(not p6,[]).
+
+test(Call,Solution):-
+	findall(C,ab(Call,C),Clist),
+	test_1(Clist,Clist_1),
+	sort(Clist_1,Clist_2),
+	(Clist_2 = Solution -> true ; writeln(failing(Call,Solution)),abort).
+
+test_1([],[]).
+test_1([P*N|T],[Os|T1]):-
+	append(P,N,O),
+	sort(O,Os),
+	test_1(T,T1).
+

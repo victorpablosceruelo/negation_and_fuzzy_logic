@@ -1,0 +1,393 @@
+This is TeX, Version 3.14159 (Web2C 7.3.1) (format=latex 2002.8.29)  26 AUG 2003 12:14
+**poster_cneg_2pages
+(poster_cneg_2pages.tex
+LaTeX2e <2000/06/01>
+Babel <v3.7h> and hyphenation patterns for american, french, german, ngerman, i
+talian, nohyphenation, loaded.
+(llncs.cls
+Document Class: llncs 2002/01/28 v2.13 
+ LaTeX document class for Lecture Notes in Computer Science
+(/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 2000/05/19 v1.4b Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 2000/05/19 v1.4b Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf/tex/latex/tools/multicol.sty
+Package: multicol 2000/07/10 v1.5z multicolumn formatting (FMi)
+\c@tracingmulticols=\count87
+\mult@box=\box26
+\multicol@leftmargin=\dimen103
+\c@unbalance=\count88
+\c@collectmore=\count89
+\doublecol@number=\count90
+\multicoltolerance=\count91
+\multicolpretolerance=\count92
+\full@width=\dimen104
+\page@free=\dimen105
+\premulticols=\dimen106
+\postmulticols=\dimen107
+\multicolsep=\skip43
+\multicolbaselineskip=\skip44
+\partial@page=\box27
+\last@line=\box28
+\mult@rightbox=\box29
+\mult@grightbox=\box30
+\mult@gfirstbox=\box31
+\mult@firstbox=\box32
+\@tempa=\box33
+\@tempa=\box34
+\@tempa=\box35
+\@tempa=\box36
+\@tempa=\box37
+\@tempa=\box38
+\@tempa=\box39
+\@tempa=\box40
+\@tempa=\box41
+\@tempa=\box42
+\@tempa=\box43
+\@tempa=\box44
+\@tempa=\box45
+\@tempa=\box46
+\@tempa=\box47
+\@tempa=\box48
+\@tempa=\box49
+\c@columnbadness=\count93
+\c@finalcolumnbadness=\count94
+\last@try=\dimen108
+\multicolovershoot=\dimen109
+\multicolundershoot=\dimen110
+\mult@nat@firstbox=\box50
+\colbreak@box=\box51
+)
+\c@chapter=\count95
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 360.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 361.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 362.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 363.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 364.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 365.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 366.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 367.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 368.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 369.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 370.
+\tocchpnum=\dimen111
+\tocsecnum=\dimen112
+\tocsectotal=\dimen113
+\tocsubsecnum=\dimen114
+\tocsubsectotal=\dimen115
+\tocsubsubsecnum=\dimen116
+\tocsubsubsectotal=\dimen117
+\tocparanum=\dimen118
+\tocparatotal=\dimen119
+\tocsubparanum=\dimen120
+\@tempcntc=\count96
+\fnindent=\dimen121
+\c@@inst=\count97
+\c@@auth=\count98
+\c@auco=\count99
+\instindent=\dimen122
+\authrun=\box52
+\authorrunning=\toks14
+\tocauthor=\toks15
+\titrun=\box53
+\titlerunning=\toks16
+\toctitle=\toks17
+\c@theorem=\count100
+\c@case=\count101
+\c@conjecture=\count102
+\c@corollary=\count103
+\c@definition=\count104
+\c@example=\count105
+\c@exercise=\count106
+\c@lemma=\count107
+\c@note=\count108
+\c@problem=\count109
+\c@property=\count110
+\c@proposition=\count111
+\c@question=\count112
+\c@solution=\count113
+\c@remark=\count114
+\headlineindent=\dimen123
+)
+(/usr/share/texmf/tex/generic/pstricks/pst-node.sty
+Package: pst-node 1997/03/25 package wrapper for PSTricks pst-node.tex
+
+(/usr/share/texmf/tex/generic/pstricks/pst-node.tex  v97 patch 9, 1999/04/14
+(/usr/share/texmf/tex/generic/pstricks/pstricks.tex
+`PSTricks' v97 patch 10  <1999/03/24> (tvz)
+\pst@dima=\dimen124
+\pst@dimb=\dimen125
+\pst@dimc=\dimen126
+\pst@dimd=\dimen127
+\pst@dimg=\dimen128
+\pst@dimh=\dimen129
+\pst@hbox=\box54
+\pst@boxg=\box55
+\pst@cnta=\count115
+\pst@cntb=\count116
+\pst@cntc=\count117
+\pst@cntd=\count118
+\pst@cntg=\count119
+\pst@cnth=\count120
+\pst@toks=\toks18
+(/usr/share/texmf/tex/generic/pstricks/pstricks.con)
+\psunit=\dimen130
+\psxunit=\dimen131
+\psyunit=\dimen132
+\pslinewidth=\dimen133
+\pst@customdefs=\toks19
+\pslinearc=\dimen134
+\everypsbox=\toks20
+\psframesep=\dimen135
+\pslabelsep=\dimen136
+\theoverlaybox=\box56
+)
+\psrow=\count121
+\pscol=\count122
+\psmatrixcnt=\count123
+\psrowsep=\skip45
+\pscolsep=\skip46
+))
+(/usr/share/texmf/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2000/07/18 v2.13 AMS math features
+\@mathmargin=\skip47
+
+For additional information on amsmath, use the `?' option.
+(/usr/share/texmf/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01
+
+(/usr/share/texmf/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks21
+\ex@=\dimen137
+))
+(/usr/share/texmf/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d
+\pmbraise@=\dimen138
+)
+(/usr/share/texmf/tex/latex/amsmath/amsopn.sty
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count124
+LaTeX Info: Redefining \frac on input line 211.
+\uproot@=\count125
+\leftroot@=\count126
+LaTeX Info: Redefining \overline on input line 307.
+\classnum@=\count127
+\DOTSCASE@=\count128
+LaTeX Info: Redefining \ldots on input line 379.
+LaTeX Info: Redefining \dots on input line 382.
+LaTeX Info: Redefining \cdots on input line 467.
+\Mathstrutbox@=\box57
+\strutbox@=\box58
+\big@size=\dimen139
+LaTeX Font Info:    Redeclaring font encoding OML on input line 567.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
+
+
+Package amsmath Warning: Unable to redefine math accent \vec.
+
+\macc@depth=\count129
+\c@MaxMatrixCols=\count130
+\dotsspace@=\muskip10
+\c@parentequation=\count131
+\dspbrk@lvl=\count132
+\tag@help=\toks22
+\row@=\count133
+\column@=\count134
+\maxfields@=\count135
+\andhelp@=\toks23
+\eqnshift@=\dimen140
+\alignsep@=\dimen141
+\tagshift@=\dimen142
+\tagwidth@=\dimen143
+\totwidth@=\dimen144
+\lineht@=\dimen145
+\@envbody=\toks24
+\multlinegap=\skip48
+\multlinetaggap=\skip49
+\mathdisplay@stack=\toks25
+LaTeX Info: Redefining \[ on input line 2666.
+LaTeX Info: Redefining \] on input line 2667.
+) (/usr/share/texmf/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 1996/11/03 v2.2b
+
+(/usr/share/texmf/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 1997/09/17 v2.2e
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 133.
+))
+(/usr/share/texmf/tex/latex/base/latexsym.sty
+Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup6
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 42.
+)
+(/usr/share/texmf/tex/latex/psnfss/times.sty
+Package: times 2000/01/12 PSNFSS-v8.1 Times font as default roman (SPQR) 
+)
+(/usr/share/texmf/tex/latex/psnfss/mathptmx.sty
+Package: mathptmx 2000/01/12 PSNFSS-v8.1 Times + math package, improved (SPQR) 
+
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/ztmcm/m/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ztmcm/m/n on input line 28.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/ztmcm/m/it on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/ztmcm/m/it on input line 29.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/ztmcm/m/n on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/ztmcm/m/n on input line 30.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/ztmcm/m/n on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/ztmcm/m/n on input line 31.
+\symbold=\mathgroup7
+\symitalic=\mathgroup8
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/ptm/m/it on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 35.
+)
+(/usr/share/texmf/tex/latex/tools/theorem.sty
+Package: theorem 1995/11/23 v2.2c Theorem extension package (FMi)
+\theorem@style=\toks26
+\theorem@bodyfont=\toks27
+\theorempreskipamount=\skip50
+\theorempostskipamount=\skip51
+
+(/usr/share/texmf/tex/latex/tools/thp.sty
+File: thp.sty 1995/11/23 v2.2c Theorem extension package (FMi)
+)) (poster_cneg_2pages.aux)
+! I can't write on file `poster_cneg_2pages.aux'.
+\document ...ate \openout \@mainaux \jobname .aux 
+                                                  \immediate \write \@mainau...
+l.16 \begin{document}
+                     
+Please type another output file name: 
+\openout1 = `.tex'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 16.
+(/usr/share/texmf/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2000/01/12 PSNFSS-v8.1 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 35.
+
+
+Package mathptmx Warning: There are no bold math fonts on input line 35.
+
+LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 35
+.
+(/usr/share/texmf/tex/latex/psnfss/ot1ztmcm.fd
+File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OML+ztmcm on input line 35
+.
+
+(/usr/share/texmf/tex/latex/psnfss/omlztmcm.fd
+File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OMS+ztmcm on input line 35
+.
+
+(/usr/share/texmf/tex/latex/psnfss/omsztmcm.fd
+File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OMX+ztmcm on input line 35
+.
+
+(/usr/share/texmf/tex/latex/psnfss/omxztmcm.fd
+File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for U+msa on input line 35.
+
+(/usr/share/texmf/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 1995/01/05 v2.2e AMS font definitions
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 35.
+
+(/usr/share/texmf/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 1995/01/05 v2.2e AMS font definitions
+)
+LaTeX Font Info:    Try loading font information for U+lasy on input line 35.
+
+(/usr/share/texmf/tex/latex/base/ulasy.fd
+File: ulasy.fd 1998/08/17 v2.2eLaTeX symbol font definitions
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 35.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 35.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 35.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 41.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 96.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 96.
+ [1
+! I can't write on file `poster_cneg_2pages.dvi'.
+Please type another file name for output: 
+
+]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 152.
+
+ (/usr/share/texmf/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2000/01/12 PSNFSS-v8.1 font definitions for OT1/pcr.
+) [2] (poster_cneg_2pages.bbl
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1.
+)
+[3] (poster_cneg_2pages.aux) ) 
+Here is how much of TeX's memory you used:
+ 2842 strings out of 20887
+ 30645 string characters out of 196241
+ 97852 words of memory out of 350001
+ 5776 multiletter control sequences out of 10000+15000
+ 26807 words of font info for 74 fonts, out of 400000 for 1000
+ 14 hyphenation exceptions out of 10000
+ 31i,12n,24p,567b,354s stack positions out of 3000i,100n,1500p,50000b,4000s
+
+Output written on .dvi (3 pages, 14204 bytes).

@@ -1,0 +1,19 @@
+:-(module(ex_forall_01, _)).
+
+:- import intneg_dist/2, intneg_forall_aux/2 from intneg_dist.
+:- import intneg_forall/2, mbr2/2 from ex_intneg_4_intneg.
+
+f1(X) :- mbr2(X, [1,2,3]).
+f1(X) :- intneg(mbr2(X, [1,2,3])).
+
+f2(X) :- mbr2(X, [1,2,3]).
+f2(X) :- intneg(mbr2(X, [4,5,6])).
+
+g1(X, Y) :- f1(X), f1(Y).
+g2(X, Y) :- f2(X), f2(Y).
+
+test_forall_ok_1 :- intneg_forall([X], f1(X)).
+test_forall_ok_2 :- intneg_forall([X, Y], g1(X, Y)).
+
+test_forall_fail_1 :- intneg_forall([X], f2(X)).
+test_forall_fail_2 :- intneg_forall([X, Y], g2(X, Y)).

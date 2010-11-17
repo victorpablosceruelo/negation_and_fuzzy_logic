@@ -1,0 +1,963 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementation of Constructive Negation for Prolog 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{llncs}
+
+%% \newenvironment{mytabbing}
+%%    {\vspace{0.3em}\begin{small}\begin{tabbing}}
+%%    {\end{tabbing}\end{small}\vspace{0.3em}}
+
+%%\newenvironment{mytabbing}
+%%   {\begin{tabbing}}
+%%   {\end{tabbing}}
+
+\usepackage{pst-node}
+
+\newcommand{\naf}{{\em naf}}\newcommand{\viejo}[1]{}
+\newcommand{\ciao}{Ciao}
+
+
+\newcommand{\tab}{\hspace{2em}}
+\newcommand{\ra}{$\rightarrow~$}
+\newcommand{\Ra}{\Rightarrow~}
+\newcommand{\HINT}{{\cal H\!-\!INT}}
+%\newcommand{\cts}{\mid}
+\newcommand{\cts}{~[\!]~}
+\newcommand{\N}{I\!\!N}
+
+\newcommand{\ToDo}[1]{
+  \begin{center}
+      \begin{minipage}{0.75\textwidth}
+        \hrule
+        \textbf{To do:}\\
+        {\em #1}
+        \hrule
+      \end{minipage}\\
+  \end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Constructive Negation for Prolog:}
+\subtitle{A Real Implementation}
+
+\author{~~Susana Mu\~{n}oz~~ \and ~~ Juan Jos\'{e} Moreno \\
+         \email{susana@fi.upm.es}~~~~~~~~~~ \email{jjmoreno@fi.upm.es}}
+
+\institute{ 
+Departamento de Lenguajes, Sistemas de la Informaci\'{o}n \\
+e Ingenier\'{i}a del Software \\
+Facultad de Inform\'{a}tica \\
+Universidad Polit\'{e}cnica de  Madrid \\ 
+Campus de Montegancedo \\
+28660 Madrid, Spain \\
+ }
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{abstract}
+While negation has been a very active area of research in logic
+programming, comparatively few papers have been devoted to
+implementation issues. Furthermore, the negation-related capabilities
+of current Prolog systems are limited. In this paper, we propose some
+extensions to the method of constructive negation, we provide the
+complete theoretical algorithm, we talk about implementation issues
+and we provide an implementation.
+\end{abstract}
+
+\paragraph{\bf Keywords}
+Constructive Negation, Negation in Logic Programming, Constraint Logic
+Programming, Implementations of Logic Programming.
+
+\label{introduction}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% INTRODUCTION %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+\label{introduction}
+
+% The need for negation
+The fundamental idea behind Logic Programming is to use a
+computable subset of logic as a programming language. Probably,
+negation is the most significant aspect of logic that was not included
+from the outset. This is due to the fact that dealing with negation
+involves significant additional complexity. However, negation has an
+important role, for example in knowledge representation, where many of
+its uses cannot be simulated by positive programs. Declarative
+modeling of problem specifications typically also include negative as
+well as positive characteristics of the domain of the problem.
+Negation is also useful in the management of databases, program
+composition, manipulation and transformation, and default reasoning,
+etc.
+
+% Work done in negation
+The perceived importance of negation has resulted in significant
+research and the proposal of many alternative ways to understand and
+incorporate negation into Logic Programing. The problems involved
+start already at the semantic level and the different proposals
+(negation as failure (\naf), stable models, well founded semantics, explicit
+negation, etc.)  differ not only in expressiveness but also in
+semantics.  Presumably as a result of this, implementation aspects
+have received comparatively little attention.  A search on the {T}he
+{C}ollection of {C}omputer {S}cience {B}ibliographies \cite{JBbib}
+with the keyword ``negation'' yields nearly 60 papers, but only 2
+include implementation in the keywords, and fewer than 10 treat
+implementation issues at all.
+
+% Lack of implementations
+Perhaps because of this, the negation techniques supported by current
+Prolog compilers are rather limited:
+%%%\vspace{-8pt}
+
+\begin{itemize} %%%\addtolength{\itemsep}{-8pt}
+  
+\item Negation as failure (sound only under some circumstances) is a
+built-in or library in most Prolog compilers (Quintus, SICStus, Ciao,
+BinProlog, etc.).
+  
+\item The ``delay technique'' (applying negation as failure only
+\emph{when} the variables of the negated goal become ground, which is
+sound but incomplete due to the possibility of floundering) is present
+in Nu-Prolog, G\"odel, and Prolog systems which implement delays (most
+of those above).
+  
+\item Constructive negation was announced in early versions of
+Eclipse, but appears to have been removed from more recent releases.
+
+\end{itemize}
+
+% Our proposal
+
+Constructive negation is considered sound and complete but its
+implementation is extremly complicated. In this paper we are going to
+provide the constructive negation algorithm from the operational point
+of view. We offer also a real implementation that will be included in
+a Prolog compiler.
+
+% Goal of the paper
+One problem that we face up is the lack of a good collection of
+benchmarks using negation to be used in the tests. One of the reasons
+has been discussed before: there are few papers about the
+implementation of negation. Another fact is that negation is typically
+used in small parts of programs and is not one of their main
+components. 
+%We have however collected a number of examples using
+%negation from logic programming textbooks, research papers, and our
+%own experience teaching Prolog.
+
+% Organization   !!!!!!!!!!!!!!!!!! Rehacer esto de las secciones
+
+The rest of the paper is organized as follows. Section
+\ref{constructive} describe in detail the constructive negation
+algorithm. It tells how to obtain the $frontier$ of a goal (Section
+\ref{frontier}), how to prepare it to be negated (Section
+\ref{preparation}) and finally how to negate it (Section
+\ref{negation}). Section \ref{implementation} talks about
+implementation issues: the code expansion (Section \ref{expansion}),
+the disequality constraints (Section \ref{disequality}) that are
+needed, optimizations (Section \ref{optimization}), examples (Section
+\ref{examples}) and some experimental results (Section \ref{results}).
+Finally we conclude and talk about future works in Section
+\ref{conclusion}.
+ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%   CONSTRUCTIVE NEGATION   %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Constructive Negation}
+\label{constructive}
+
+
+While there are several papers treating theoretical aspects of
+constructive negation, we have not found papers dealing with a sound
+implementation of it. The original papers by Chan gave some hints
+about a possible implementation based on coroutining, but the
+technique was just sketched. When we have tried to reconstruct it we
+have found several problems including floundering (in fact it seems to
+be the reason why constructive negation has been removed from recent
+Eclipse versions). Thus, we decided to design an implementation from
+scratch.  Up to now, we have achieved only a very simple
+implementation that certainly needs to be improved and optimized.
+Recall that we want to use a standard Prolog implementation, so we
+will avoid implementation-level manipulations.
+
+In order to compute $\neg G$ we start an SLD computation for the goal
+$G$.
+
+To obtain the negation of $G$ is enough to negate the frontier
+formula. This is done by negating each component of the disjunction of
+all implied clauses (that form the frontier) and combining the
+results.
+
+% Esto habrá que ponerlo de otra manera poniendo primero lo de la finita
+% en realidad creo que ni siquiera es cierto.
+%We already have some code
+%to negate a substitution (that must be reformulated to include
+%predicate calls that can appear in each $G_i$), and code to combine
+%the negated solutions.
+
+What is missing is a method to generate the frontier.  Up to now we
+are using the simplest frontier possible: the frontier of depth 1
+obtained by doing all possible single steps of SLD resolution. Simple
+inspection of the applicable clauses can do this.  Nevertheless, we
+plan to improve it by using abstract interpretation and
+detecting the degree of evaluation of a term that the execution will
+generate.
+
+Using these ideas we have implemented a predicate \texttt{cneg/1} for
+full constructive negation.  Built-in based goals have a special
+treatment (moving conjunctions into disjunctions, disjunctions into
+conjunction, eliminating double negations, etc.)
+
+
+%%%%%%%%% FRONTIER  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Frontier}
+\label{frontier}
+
+We are going to describe the running of $cneg(G)$ to present the
+algorithm that negates a goal in a constructive way. To define the
+frontier of a goal we have to consider three kinds of goals:
+
+    \begin{itemize} 
+
+\item If $G \equiv (G_1;G_2) $ then $Frontier(G) \equiv$
+$Frontier(G_1) \vee Frontier(G_2)$.
+
+    \item If $G \equiv (G_1,G_2) $ then $Frontier(G) \equiv$
+$Frontier(G_1) \wedge Frontier(G_2)$ and then we have to apply
+DeMorgan to keep the disjunction of conjunctions format.
+
+    \item If we have that $G \equiv p( \overline{X}) $ and that the simple
+predicate $p/n$ is defined by N clauses:
+
+$
+~~~~~~~~~~p( \overline{X}^1):- C_1'. \\
+~~~~~~~~~~p( \overline{X}^2):- C_2'. \\
+~~~~~~~~~~\ldots \\
+~~~~~~~~~~p( \overline{X}^3):- C_N'. \\
+$
+
+We can say that the frontier of the goal has the format:
+$Frontier(G) \equiv \{C_1 \vee C_2 \vee \ldots \vee C_N\}$ which
+will be a dis junction of N conjunctions. Where each $C_i$ is the join
+of the conjunction of subgoals $C_i'$ plus the equalities that are
+needed to get the unification between the variables of $\overline{X}$
+and the corresponding terms of $\overline{X}^i$.
+
+    \end{itemize}
+
+The solutions of $cneg(G)$ are the solutions of the combination
+(conjunction) of one solution of each of the N conjunctions
+$C_i$. From now we are going to explain how to negate a single
+conjunction $C_i$.
+
+
+
+%%%%%%%% PREPARATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Preparation}
+\label{preparation}
+
+Before negating a conjunction obtained from the frontier we have to
+simplify, organize and normalize it:
+
+\begin{itemize}
+
+\item {\bf Simplification of the conjunction}. If one of the terms of
+$C_i$ is $true$ (e.g. $X=X$) we can eliminate it from $C_i$, and if
+one of the terms is $fail$ (e.g. $X \neq X$) we can simplify $C_i
+\equiv fail$. This simplification will be done during all the process
+of generation of terms of the frontier of these conjunction
+recursively.
+
+\item {\bf Organization of the conjunction}. We make three groups with
+the components of $C_i$ to divide them in equalities, disequalities
+and the rest of subgoals. Then we obtain $C_i \equiv \overline{I}
+\wedge \overline{D} \wedge \overline{R}$ where $\overline{I}$ is the
+set of equalities, $\overline{D}$ is the set of disequalities (that
+appear explicitly in $C_i'$ and $\overline{R}$ is the rest of subgoals.
+  
+\item {\bf Normalization of the conjunction}. The set of variables of the
+goal is called $GoalVars$. The set of free variables of $\overline{R}$
+is called $RelVars$.
+
+    \begin{itemize}
+
+
+       \item {\bf Elimination of redundant variables and
+       equalities}. If $I_i \equiv X = Y$ where $Y \not\in GoalVars$
+       then we have now the formula $ ( I_1 \wedge \ldots \wedge
+       I_{i-1} \wedge I_{i+1} \wedge \ldots \wedge I_{NI} \wedge
+       \overline{D} \wedge \overline{R}~) \sigma $ where $ \sigma = \{
+       Y / X \}$. I.e. the variable $Y$ is substituted by $X$ in the
+       entire formula. Afterward repeated equalities have to be
+       eliminated and the conjunction must be simplified again.
+
+       \item {\bf Elimination of irrelevant disequalities}. The set of
+       variables of $GoalVars$ and the variables that appear in
+       $\overline{I}$ are called jointly $ImpVars$. The disequalities
+       $D_i$ which contain any variable that wasn't in $ImpVars$
+       neither $RelVars$ are irrelevant and must be eliminated.
+
+    \end{itemize}
+
+ \end{itemize}
+
+ 
+
+%%%%%%%% NEGATION OF THE FORMULA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Negation of the formula}
+\label{negation}
+
+To obtain all solutions of $C_i$ and to negate them is not possible
+because $C_i$ can have an infinite number of solutions. So we have to
+use the general constructive negation algorithm.  
+
+We consider that $ExpVars$ is the set of variables of $\overline{R}$
+that aren't in $ImpVars$, i.e. $RelVars$ except the variables of
+$\overline{I}$ of the normalized formula.
+
+The first step is the {\bf Division of the formula}. We have to divide
+$C_i$ in its sub-parts:
+
+\[C_i \equiv \overline{I} \wedge
+        \overline{D}_{imp} \wedge \overline{R}_{imp} \wedge
+        \overline{D}_{exp} \wedge \overline{R}_{exp} \]
+
+where $\overline{D}_{exp}$ are the disequalities of $\overline{D}$
+with variables of $ExpVars$ and $\overline{D}_{imp}$ are the rest of
+disequalities, $\overline{R}_{exp}$ are the goals of $\overline{R}$
+with variables of $ExpVars$ and $\overline{R}_{imp}$ are the rest of
+goals, and $\overline{I}$ are the equalities.
+
+Therefore the constructive negation of the divided formula will be: \\
+
+$~~~~~~~~~~~~~~~~~~~~\neg~C_i \equiv \neg~\overline{I} \vee $ \\
+$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(\overline{I} \wedge \neg~\overline{D}_{imp}) \vee  $ \\
+$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(\overline{I} \wedge \overline{D}_{imp} \neg~\overline{R}_{imp}) \vee $ \\
+$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~( \overline{I} \wedge \overline{D}_{imp} \wedge \overline{R}_{imp} \wedge \neg~(\overline{D}_{exp} \wedge \overline{R}_{exp})) $ \\
+
+The reason why it is not possible to separate $\overline{D}_{exp}$ and
+$\overline{R}_{exp}$ it is because they contain free variables and
+their negation cannot be done separately. The answers of the negations
+will be the answers of the negation of the equalities, the answers of
+the negation of the disequalities without free variables, the answers
+of the negation of the subgoals without free variables and the answers
+of the negation of the rest of subgoals of the conjunctions (the ones
+with free variables). Each of them will be obtained as follow:
+
+        \begin{itemize}
+
+           \item {\bf Negation of $\overline{I}$}. We have $\overline{I}
+           \equiv I_1 \wedge \ldots \wedge I_{NI} \equiv$ \[ \exists~
+           \overline{Z}_1~ X_1 = t_1 \wedge \ldots \wedge \exists~
+           \overline{Z}_{NI}~ X_{NI} = t_{NI} \] where
+           $\overline{Z}_i$ are the variables of the equality $I_i$ that
+           aren't included in $GoalVars$ (i.e. that aren't quantified
+           and therefore are free variables). There aren't universally
+           quantified variables in an equality. When we negate this
+           conjunction of equalities we obtain the constraint 
+                \[
+           \underbrace{\forall~ \overline{Z}_1~ X_1 \neq t_1} _{\neg~
+           I_1} \vee \ldots \vee \underbrace{\forall~
+           \overline{Z}_{NI}~ X_{NI} \neq t_{NI} } _{\neg~ I_{NI}}
+           \equiv \] 
+                \[ \bigvee_{i=1}^{NI} \forall~ \overline{Z}_i X_i
+           \neq t_i \] 
+           This constraint is the first answer of the
+           negation of $C_i$ that contains $NI$ solutions.
+
+           \item {\bf Negation of $\overline{D}_{imp}$}. If we have
+           $N_{D_{imp}}$ disequalities $\overline{D}_{imp} \equiv D_1
+           \wedge \ldots \wedge D_{N_{D_{imp}}}$ where $ D_i \equiv
+           \forall~ \overline{W}_i ~ \exists~ \overline{Z}_i ~ Y_i
+           \neq s_i$ where $Y_i$ is a variable of $ImpVars$, $s_i$ is
+           a term without variables of $ExpVars$, $\overline{W}_i$ are
+           universally quantified variables that aren't in the
+           equalities \footnote{of course, there are no universally
+           quantified variables into an equality}, nor in the rest of
+           the goals of $\overline{R}$ because then it will be a
+           disequality of $\overline{D}_{exp}$. Then we will get
+           $N_{D_{imp}}$ new solutions with the format: \\
+
+           $\overline{I} \wedge \neg~ D_1 $ \\ 
+           $\overline{I} \wedge
+           D_1 \wedge \neg~ D_2 $ \\ 
+           $\ldots $ \\ 
+           $\overline{I} \wedge
+           D_1 \wedge \ldots \wedge D_{N_{D_{imp}}-1} \wedge \neg~
+           D_{N_{D_{imp}}}$ \\ 
+
+           Where $ \neg~ D_i \equiv \exists~
+           \overline{W}_i~ Y_i = s_i$. The negation of an universally
+           quantification turns on existentially quantification and
+           the quantification of free variables of $\overline{Z}_i$
+           get lost because they are unified with the evaluation of
+           the equalities of $\overline{I}$. Then we will get
+           $N_{D_{imp}}$ new answers.
+
+
+           \item {\bf Negation of $\overline{R}_{imp}$}. If we have
+           $N_{R_{imp}}$ subgoals $\overline{R}_{imp} \equiv R_1
+           \wedge \ldots \wedge R_{N_{R_{imp}}}$. Then we will get
+           new answers from each of the conjunctions: \\
+
+           $\overline{I} \wedge \overline{D}_{imp} \wedge \neg~ R_1 $ \\ 
+           $\overline{I} \wedge \overline{D}_{imp} \wedge
+           R_1 \wedge \neg~ R_2 $ \\ 
+           $\ldots $ \\ 
+           $\overline{I} \wedge \overline{D}_{imp} \wedge
+           R_1 \wedge \ldots \wedge R_{N_{R_{imp}}-1} \wedge \neg~
+           R_{N_{R_{imp}}}$ \\ 
+
+           Where $ \neg~ R_i \equiv cneg(R_i)$. It is again the
+           constructive negation that is applied over $R_i$
+           recursively.
+
+
+           \item {\bf Negation of $\overline{D}_{exp} \wedge
+           \overline{R}_{exp}$}. This conjunction can't be disclosed
+           because the negation of $ \exists~ \overline{V}_{exp}~
+           \overline{D}_{exp} \wedge \overline{R}_{exp}$, where
+           $\overline{V}_{exp}$, gives universal quantifications:
+           $\forall~ \overline{V}_{exp}~ cneg(\overline{D}_{exp}
+           \wedge \overline{R}_{exp})$. And now the complete algorithm
+           of constructive negation must be applied again. The set
+           $GoalVars$ that we are going to consider therefore is the
+           former set $ImpVars$. Variables of $\overline{V}_{exp}$ are
+           considered as free variables. When solutions of
+           $cneg(\overline{D}_{exp} \wedge \overline{R}_{exp})$ will
+           be obtained, then we will reject solutions with equalities
+           with variables of $\overline{V}_{exp}$. When there will be
+           a disequality with any of these variables, e.g. $V$, the
+           variable will be universally quantified in the disequality. This is the treatment to negate the negation of a goal but there is a detail that wasn't consider in former approaches and that is necessary to obtain a sound implementation, it is the existence of universally quantified variables in $\overline{D}_{exp} \wedge
+           \overline{R}_{exp}$. It is the result of the recursive calls. So, what we are really negating is a subgoal of the form: $ \exists~ \overline{V}_{exp}~
+           \overline{D}_{exp} \wedge \overline{R}_{exp}$. 
+           Here we will provide the last group of answers that come
+           from: \\
+
+           $\overline{I} \wedge \overline{D}_{imp}
+           \wedge \overline{R}_{imp} \wedge \forall~
+           \overline{V}_{exp}~ \neg~(\overline{D}_{exp} \wedge
+           \overline{R}_{exp})$ \\
+
+         \end{itemize}
+
+
+    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%  IMPLEMENTATION ISSUES  %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Implementation Issues}
+\label{implementation}
+
+
+%%%%%%%% CODE EXPANSION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Code Expansion}
+\label{expansion}
+
+The first thing we have to do to implement this technique is obtaining
+the frontier of a goal. For this purpose is necessary that the code of
+the implied predicates is available during execution to construct the
+frontier. It is possible to handle the code of clauses during the
+execution thanks to the package system of Ciao
+\cite{ciao-modules-cl2000} that let us to expand the code at run time.
+Therefore we have been able to evaluate and execute predicates and
+provide their code at the same time to calculate their $Frontiers$ at
+any step of the algorithm.
+
+A simple example would be the module $mod1.pl$: 
+\begin{verbatim}
+:- module(mod1,[odd/1,not_odd_number/1],[cneg]).
+
+odd(s(0)).
+odd(s(s(X))) :- 
+        odd(X).
+
+not_odd_number(X) :- 
+        cneg(odd(X)).
+\end{verbatim}
+It loads the package $cneg.pl$ and the result at execution time is
+that the compiler work with a expanded code that besides the before
+code has too the additional code:
+\begin{verbatim}
+stored_clause(odd(s(0)),[]).
+stored_clause(odd(s(s(X))),[odd(X)]).
+\end{verbatim}
+where information about structure of code is stored to be used by the
+negation algorithm. Continuing with this example, to compute $\neg odd(Y)$ we have to obtain its frontier that in this case will be calculated using the expanded information:
+\[Frontier(odd(Y)) = \{ ( Y=s(0) ) \vee ( Y=s(s(X)) \wedge odd(X) ) \} \] 
+
+% The cuestion is how to expand this to the code imported from diferent 
+% modules.This is an extension: ``Modular Constructive Negation'' 
+
+%%%%%%%% DISEQUALITY CONSTRAINTS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Disequality constraints}
+\label{disequality}
+¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ Mas de las variables con atributos
+
+
+
+
+
+
+
+
+
+
+An instrumental step in order to manage negation in a more advanced
+way is to be able to handle disequalities between terms such as $t_1
+\neq t_2$.  Prolog implementations typically include only the built-in
+predicate {\tt /== /2} % es \ pero no me funciona
+ which can only work with disequalities if both
+terms are ground and simply succeeds in the presence of free variables.
+A ``constructive'' behavior must allow the ``binding'' of a variable
+with a disequality. On the other hand, the
+negation of an equation $X = t(\overline{Y})$ produces the universal
+quantification of the free variables in the equation, unless a more
+external quantification affects them. The negation of such an equation
+is $\forall~ \overline{Y}~X \neq t(\overline{Y})$.
+% He borrado la referencia a Carlsson
+
+We have defined a predicate {\tt =/= /2} \cite{SusanaPADL2000}, used
+to check disequalities, in a similar way to explicit unification ({\tt
+  =}). The main difference is that it incorporates negative normal
+form constraints instead of bindings and the decomposition step can
+produce disjunctions. Each constraint is a disjunction of conjunctions
+of disequalities that are implemented as a list of lists of terms as
+$T_1/T_2$ (that represents the disequality $T_1 \neq T_2$). When a
+universal quantification is used in a disequality (e.g., $\forall Y~ X
+\neq c(Y)$) the new constructor {\tt fA}$/1$ is used (e.g., {\tt X /
+  c(fA(Y)))}.
+
+
+
+
+
+
+
+Using some normalization rules we can obtain a normal form
+formula from any initial formula. It is easy to redefine
+the unification algorithm to manage constrained variables.
+
+This very compact way to represent a normal form was firstly presented in
+\cite{Moreno1} and differs from Chan's representation where
+only disjunctions are used\footnote{Chan treats the disjunctions
+by means of backtracking. The main advantage of our normal form is
+that the search space is drastically reduced.}.
+
+Therefore, in order to include disequalities into a Prolog compiler we
+need to reprogram unification. It is possible if the Prolog version
+allows attributed variables \cite{Carlsson} (e.g. in Sicstus Prolog,
+or in Eclipse where they are called meta-structures). These variables
+let us keep associated information with each variable during the
+unification what can be used to dynamically control the constraints.
+
+Attributed variables are variables with an associated attribute, which
+is a term. We will associate to each variable a data structure
+containing a normal form constraint. Basically, a list of list of
+pairs (variable, term) is used. They behave like ordinary variables,
+except that the programmer can supply code for unification, printing
+facilities and memory management.  In our case, the printing facility
+is used to show constrained answers. The main task is to provide a new
+unification code.
+
+Once the unification of a variable $X$ with a term $t$ is
+triggered, there are three possible cases (up to
+commutativity):
+
+%\vspace{-5pt}
+\begin{enumerate}
+%\addtolength{\itemsep}{-8pt}
+\item if $X$ is a free variable and $t$ is not a variable with a negative
+constraint, $X$ is just bound to $t$,
+\item if $X$ is a free variable or bound to a term $t'$ and
+$t$ is a variable $Y$ with a negative constraint, we need to check
+if $X$ (or, equivalently, $t'$) satisfies the constraint associated with $Y$.
+A conveniently defined predicate {\tt satisfy} is used for this purpose,
+\item if $X$ is bound to a term $t'$ and $t$ is a term (or a variable
+bound to a term), the classical unification algorithm can be used.
+\end{enumerate}
+%\vspace{-5pt}
+
+The predicate {\tt =/=}, to check disequalities, is defined in
+a similar way than unification. The main difference is that it
+incorporates negative constraints instead of bindings and the
+decomposition step can produce disjunctions.
+
+As an example, let us show the constraints produced in certain
+situations. The attribute/ constraint of a variable is
+represented as a list of list of pairs (variable, term) using
+a constructor {\tt /}, i.e. the disequality $X \neq 1$ is
+represented as {\tt X / 1}.
+When an universal quantification is used in a disequality
+(e.g. $\forall Y~ X \neq c (Y)$) the new constructor
+{\tt fA}$/2$ is used (the previous constraint is represented
+as {\tt fA (Y, X =/= c (Y))}.
+The first list is used to represent disjunctions while
+the inside list represents the conjunction of disequalities.
+We focus on the variable $X$.
+
+%\hspace{-0.5cm}
+\begin{center}
+\begin{small}
+\begin{tabular}{lll}
+SUBGOAL & ATTRIBUTE & CONSTRAINT \\
+\hline\hline
+\ \\
+{\tt not\_member (X,[1,2,3])} &  $[[X/1,X/2,X/3]]$ &
+                  $X \neq 1 \wedge X \neq 2 \wedge X \neq 3$\\
+%{\tt member (X,[1,2,3]), X=/=2} &  $[[X/1,X/3]]$ &
+%                  $X \neq 1 \wedge X \neq 3$\\
+{\tt member (X,[1]), X=/=1} &  {\tt fail} & $false$ \\
+{\tt X =/= 4} & $[[X/4]]$ & $X \neq 4$ \\
+{\tt X =/= 4; X=/=5}  & $[[X/4], [X/5]]$ & $X \neq 4 \vee X \neq 5$ \\
+{\tt X =/= 5; (X=/=6, X=/=Y)}  & $[[X/4],[X/6, X/Y]]$ &
+$X \neq 4 \vee (X \neq 6 \wedge X \neq Y)$\\
+{\tt member (X,[0,s(0),s(s(0))]),} & & \\
+{\tt fA (Y, X =/= s (Y))} & $0$ & $X = 0$
+\end{tabular}
+\end{small}
+\end{center}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%% OPTIMIZATION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Optimization}
+\label{optimization}
+
+We have decided to represent negative information in a compact way
+providing less solutions from the negation of $\overline{I}$. The
+advantage of this is that if we ask for all solutions using
+backtracking we are cutting the search tree by offering all the
+solutions together in one only answer. For example we offer a simple
+answer 
+\begin{verbatim}
+?- p(X,Y,Z,W).
+
+[[X/0, Y/s(Z)], [X/Y], [X/Z], [X/W], [X/s(0)], [Z/0]] ? ;
+
+no
+\end{verbatim}
+
+that is equivalent to $ (X \neq0 \wedge Y\neq s(Z)) \vee X \neq Y
+\vee X \neq Z \vee X \neq W \vee X \neq s(0) \vee Z \neq 0$
+instead of returning six answers:
+\begin{verbatim}
+?- p(X,Y,Z,W).
+
+[X/0, Y/s(Z)] ? ;
+
+[X/Y] ? ;
+
+[X/Z] ? ;
+
+[X/W] ? ;
+
+[X/s(0)] ? ;
+
+[Z/0] ? ;
+
+no
+\end{verbatim}
+
+
+We have cut the search tree of the generation of the
+frontiers with a double action over the ground subgoals: removing soon
+the subgoals whose failure we are able to detect, and simplifying the
+subgoals that we can reduce to true.
+
+%In figure \ref{tree} we can see the pruning of the generation process of the frontier of a goal.
+¡¡¡¡¡¡¡¡¡¡¡¡¡¡ figura de un arbol podado por la simplificacion
+
+
+Other optimization is about the simplification of the constraints. During all the process of negating a goal the variables of the        
+ 
+!!!!!!!!!!111 Descripcion de la simplificación de skolem
+
+
+%%%%%%%% EXAMPLES  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Examples}
+\label{examples}
+
+The interesting side of this implementation is that it returns
+constructive results from a negative question. We can see it in a
+simple example with $boole/1$.
+
+\begin{minipage}{2in}
+\begin{verbatim}
+boole(0).
+boole(1).
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{2in}
+%\rnode{A}{}
+\begin{verbatim} 
+    ?- cneg(boole(X)).
+
+    [[X/1,X/0]] ? ;
+
+    no
+\end{verbatim} 
+%\rnode{B}{}
+%\ncline{A}{B}
+\end{minipage}\\
+
+But the remarkable examples are those that have an infinite number of
+solutions because they are equally solved.
+
+\begin{minipage}{2in}
+\begin{verbatim}
+positive(0). 
+positive(s(X)):-
+        positive(X).  
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{2in}
+%\rnode{A}{}
+\begin{verbatim} 
+    ?- cneg(positive(X)).
+
+    [[X/s(fA(_A)),X/0]] ? ;
+
+    X = s(_A),
+    [[_A/s(fA(_B)),_A/0]] ? ;
+
+    X = s(s(_A)),
+    [[_A/s(fA(_B)),_A/0]] ? ;
+
+    X = s(s(s(_A))),
+    [[_A/s(fA(_B)),_A/0]] ? 
+
+    yes
+\end{verbatim} 
+%\rnode{B}{}
+%\ncline{A}{B}
+\end{minipage}
+
+\begin{minipage}{2in}
+\begin{verbatim}
+number(0).
+number(s(X)):-
+        number(X).
+
+greater(s(X),0):-
+        number(X).
+greater(s(X),s(Y)):-
+        greater(X,Y).
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{2in}
+%\rnode{A}{}
+\begin{verbatim} 
+    ?- cneg(greater(X,Y)).
+
+    [[Y/0,Y/s(fA(_A))]] ? ;
+
+    [[Y/s(fA(_A))]],
+    [[X/s(fA(_B))]] ? ;
+
+    X = s(_A),
+    Y = 0,
+    [[_A/s(fA(_B)),_A/0]] ? ;
+
+    X = s(s(_A)),
+    Y = 0,
+    [[_A/s(fA(_B)),_A/0]] ? ;
+
+    X = s(s(s(_A))),
+    Y = 0,
+    [[_A/s(fA(_B)),_A/0]] ? ;
+
+    X = s(s(s(s(_A)))),
+    Y = 0,
+    [[_A/s(fA(_B)),_A/0]] ? 
+
+    yes
+\end{verbatim} 
+%\rnode{B}{}
+%\ncline{A}{B}
+\end{minipage}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%% RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Experimental results}
+\label{results}
+
+We have first measured the execution times in milliseconds for the
+previous examples when using negation as failure ($naf/1$) and
+constructive negation ($cneg/1$). A `-' in a cell means that the
+negation as failure is not applicable. All measurements were made
+using \ciao\ Prolog\footnote{The negation system is coded as a library
+  module (``package'' \cite{ciao-modules-cl2000}), which includes the
+  corresponding syntactic and semantic extensions (i.e. Ciao's
+  attributed variables). Such extensions apply locally within each
+  module which uses this negation library.} 1.5 on a Pentium II at 350
+Mhz. The results are shown in Table~\ref{table}. We have added a first
+column with the runtime of the evaluation of the goal that is negated
+in the other colums and a last column with the ratio that measures the
+speedup of the \naf technique w.r.t. the constructive negation.
+
+Using {\bf naf} instead of {\bf cneg} results in slight speed-ups near
+1.06 in average. So the possible slow-down from the constructive 
+negation is not so high as we could expect. Futhermore the results are
+rather similar. However there are, of course, many goals that cannot
+be negated using the \naf technique and that are resolved using
+constructive negation. The examples are very simple and with other
+predicates more complicated the efficiency decreases.
+
+\input{table} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% CONCLUSIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Conclusion and Future Work}
+\label{conclusion}
+ 
+After a first implementation of the technique, we realized that the
+algorithm is so inefficient that is quite important to take care of
+possible optimizations and we are working to improve the efficiency of
+the algorithm.
+
+Apart from the optimizations in which we are working on, the
+constructive negation algorithm is very inefficient by itself. That is
+the reason why we do not intend to use it neither for all cases of
+negation nor for negating goals directly.
+
+Our objective is to design and implement a practical negation and
+incorporate it into a Prolog compiler.
+In~\cite{SusanaPADL2000,SusanaPRODE00} we studied systematically what
+we understood to be the most interesting existing proposals: negation
+as failure (\naf) \cite{Clark}, use of delays to apply \naf\ in a
+secure way~\cite{naish:lncs}, intensional
+negation~\cite{Barbuti1,Barbuti2}, and constructive negation
+\cite{Chan1,Chan2,Drabent,Stuckey,Stuckey95}. We could not find a
+single technique that offered both completeness and an efficient
+implementation. The only technique that is sound and complete is the
+constructuve negation that is the less efficient. However, we proposed
+to use a combination of these techniques and the information from a
+static analysis of the program could be used to reduce the cost of
+selecting among techniques. So we avoid the inefficiency of the
+constructive negation including it into a selection strategy where
+this technique is very important because although it is the slowest
+one, it is the only one that is sound for all possible goals.
+
+We are testing the implementation trying to improve the code and our
+intention is to include it in the next distribution of Ciao Prolog
+\footnote{http://www.clip.dia.fi.upm.es/Software}.
+
+\subsection*{Acknowledgments}
+This work was funded in part by CICYT project EDIPIA (TIC99-1151).  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \begin{small}
+
+% \linespread{0.80}
+    \bibliographystyle{plain} 
+    \bibliography{negacion}
+
+% \end{small}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
+
+$\neg p(\overline{X})$ 
+$\overline{\texttt{X}}$
+$\overline{\texttt{X}}$
+$t_1 \neq t_2$
+$X \neq t$
+${\cal H}$
+$X \neq b \vee Y \neq a$
+$X = t(\overline{Y})$ 
+$\forall~ \overline{Y}~X \neq t(\overline{Y})$
+\[ \underbrace{\bigwedge_i (X_i = t_i)}_{\mbox{positive information}} \wedge  \]
+\[ \underbrace{\bigvee_j \forall~ \overline{Z}_j^1~(Y_j^1 \neq s_j^1)
+\wedge \ldots \wedge \bigvee_l \forall~ \overline{Z_l}^n~(Y_l^n
+\neq s_l^n)}_{\mbox{negative information}} \]
+$X_i$ 
+$X_i = t_i$
+$s_k^r$
+$Y_k^r$
+$t'$ 
+$\forall Y~ X \neq c(Y)$
+$ Q \equiv S_1 \vee S_2 \vee ... \vee S_n $
+$ S_i \equiv S_i^1 \wedge S_i^2 \wedge \ldots \wedge S_i^{m_i} $
+$\neg Q \equiv$
+   $\neg (S_1 \vee S_2 \vee \ldots \vee S_n)$  $\equiv$ \\
+   $\neg S_1 \wedge \neg S_2 \wedge \ldots \wedge \neg S_n$  $\equiv$ \\
+   $\neg (S_1^1 \wedge \ldots \wedge S_1^{m_1}) \wedge  \ldots$  \\
+   $   \ldots\wedge
+    \neg (S_n^1 \wedge \ldots \wedge S_n^{m_n})$  $\equiv$ \\
+   $(\neg S_1^1 \vee \ldots \vee \neg S_1^{m_1}) \wedge  \ldots$ \\
+   $ \ldots \wedge
+    (\neg S_n^1 \vee \ldots \vee \neg S_n^{m_n})$  \\
+
+$S_i^j$
+$\forall~ X,Y,Z ~ p(X,Y,Z)$
+$S_1 = [(Sk(1),Sk(2),Sk(3))]$ \\
+$S_2 = [\underline{(0,Sk(1),Sk(2))}, \underline{(s(Sk(1)),Sk(2),Sk(3))}]$ \\
+$S_3 = [\underline{(0,0,Sk(1))}, \underline{(0,s(Sk(1)),Sk(2))},
+        (s(Sk(1)),Sk(2),Sk(3))]$ \\
+$S_4 = [\underline{(0,0,0)}, \underline{(0,0,s(Sk(1)))},
+        (0,s(Sk(1)),Sk(2)),(s(Sk(1)),$ \\
+~~~~~~~~$        (s(Sk(1)),Sk(2),Sk(3))]$ \\
+$S_5 = [(0,0,0), \underline{(0,0,s(0))}, \underline{(0,0,s(s(Sk(1))))},
+        (0,s(Sk(1)),Sk(2)),$ \\
+~~~~~~~~$        (s(Sk(1)),Sk(2),Sk(3))]$\\
+$S_6 = \ldots$
+$P(\overline{\texttt{X}})$
+\texttt{call\_not($G(\overline{X})$, S)}
+\noindent
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%  THE END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

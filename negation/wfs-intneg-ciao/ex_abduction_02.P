@@ -1,0 +1,97 @@
+
+%% Tests for Abduction over Constructive Intensional Negation in WFS.
+
+:- abds([f/1, g/1, h/2]).
+% Non-abducibles predicates: p_**, q_**, r_**
+
+query_01 :- f(X), intneg(f(2)).
+
+% ?- query_01.
+% Abduced results: [f(X) /\ X=\=2, not f(2)]
+% ?- not query_01.
+% Abduced results: [forall(X, [], not f(X))];
+%                  [f(2)]
+
+query_02 :- intneg(f(X)), f(2).
+
+% ?- query_02.
+% Abduced results: [not f(X) /\ X=\=2, f(2)]
+% ?- not query_02.
+% Abduced results: [forall(X, [], f(X))];
+%                  [intneg(f(2))]
+
+query_03 :- intneg(p_03), f(2).
+p_03 :- f(Y).
+
+% ?- query_03.
+% Abduced results: [forall(Y, [], not f(Y)), f(2)] => Fail
+% ?- not query_03.
+% Abduced results: [f(Y)];
+%                  [not f(2)]
+
+query_06(X) :- intneg(q_06(X)), f(2).
+q_06(X) :- r_06(Y).
+r_06(Y) :- f(Y), g(Y).
+
+% ?- query_06.
+% Abduced results: [forall(X, [], not f(X)), f(2)] => Fail
+%                  [forall(Y, [], not g(Y)), f(2)]
+% ?- not query_06.
+% Abduced results: [f(Y), g(Y)];
+%                  [not f(2)]
+
+query_07 :- f(X), intneg(f(X)).
+
+% ?- query_07.
+% Abduced results: [f(X), not f(X)] => Fail
+% ?- not query_07.
+% Abduced results: [forall(X, not f(X))];
+%                  [forall(X, f(X))]
+
+query_08 :- q_08(Y), r_08(Z).
+q_08(W) :- f(W).
+r_08(Z) :- g(Z).
+
+% ?- query_08.
+% Abduced results: [f(Y), f(Z)] => [f(Y)]
+% ?- not query_08.
+% Abduced results: [forall(X, not f(X))];
+%                  [forall(X, not g(X))]
+
+
+query_09 :- q_09(Y), q_09(Z).
+q_09(W) :- f(W), intneg(f(W)).
+
+% ?- query_09.
+% Abduced results: [f(W), intneg(f(W))] => Fail
+% ?- not query_09.
+% Abduced results: [forall(Y, not f(Y))];
+%                  [forall(Y, f(Y))];
+%                  [forall(Z, not f(Z))];
+%                  [forall(Z, f(Z))]
+
+query_10 :- q_10(X), r_10(X,Y), h(X, Y).
+q_10(X) :- t_10(X), f(X).
+r_10(X,Y) :- intneg(t_10(X)), g(X, Y).
+t_10(0).
+
+% ?- query_10(X).
+% Abduced results: [] => Fail
+% ?- not query_10(X).
+% Abduced results: [forall(Y, not f(Y))];
+%                  [forall(Z, not f(Z))];
+
+query_11 :- q_11(X).
+q_11(X) :- t_11(X), f(X).
+t_11(0).
+
+% ?- query_11(X).
+% Abduced results: [] => Fail
+% ?- not query_11(X).
+% Abduced results: 
+
+query_12 :- intneg(q_12(X)), r_12(X,Y).
+q_12(X) :- s_12(X), f(X).
+r_12(X, Y) :- s_12(X).
+r_12(X, Y) :- h(X,Y).
+s_12(0).

@@ -1,0 +1,40 @@
+
+He hecho lo que hablamos.  
+Te lo resumo: 
+
+Yo tengo un programa opt_cnegf.pl que recibe una lista de ficheros
+como argumento de su función principal (lo voy a usar solo con un
+único fichero). Por ejemplo: 
+
+opt_neg qsort1
+ 
+es decir:   
+
+main([qsort1])
+
+En opt_neg.pl lo que hago es pasarle dos veces el preprocesador con
+las opciones que me dijo Pedro y despues llamo a un predicado
+assert_finite/0 que aserta por backtracking por cada predicado que
+verifique tener un número finito de soluciones un hecho de la forma:
+
+finite(Functor,Aridad).
+
+El tema es que para poder hacer esto tengo que poder obtener todos los
+predicados del fichero (en este caso de qsort1) y esto lo hago
+asertando un hecho:
+
+predicado(Functor,Aridad).
+
+por cada predicado del fichero.
+
+Esto lo hago durante la expansion del paquete cnegf.pl que utiliza el
+fichero.  El tema es que no filtro las asserciones y por tanto lo haré
+muchas veces para cada predicado pero ahora me da igual.
+
+Algo pasa porque me sale Segmentation violation.
+
+Te paso todos los ficheros para ver si le puedes echar un vistazo.
+Gracias.
+
+   Susana
+

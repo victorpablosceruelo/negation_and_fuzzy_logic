@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99c (Web2C 7.3.1)
+The top-level auxiliary file: bombay.aux
+The style file: plain.bst
+Database file #1: bibliography.bib
+Repeated entry---line 2612 of file bibliography.bib
+ : @article{nai
+ :             ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "ECLiPSe"
+Warning--I didn't find a database entry for "dovierpontellirossi2000"
+You've used 14 entries,
+            2118 wiz_defined-function locations,
+            606 strings with 6102 characters,
+and the built_in function-call counts, 5539 in all, are:
+= -- 573
+> -- 204
+< -- 12
++ -- 82
+- -- 64
+* -- 356
+:= -- 853
+add.period$ -- 49
+call.type$ -- 14
+change.case$ -- 69
+chr.to.int$ -- 0
+cite$ -- 14
+duplicate$ -- 248
+empty$ -- 464
+format.name$ -- 64
+if$ -- 1234
+int.to.chr$ -- 0
+int.to.str$ -- 14
+missing$ -- 14
+newline$ -- 72
+num.names$ -- 36
+pop$ -- 85
+preamble$ -- 1
+purify$ -- 57
+quote$ -- 0
+skip$ -- 184
+stack$ -- 0
+substring$ -- 374
+swap$ -- 92
+text.length$ -- 12
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 54
+warning$ -- 0
+while$ -- 61
+width$ -- 16
+write$ -- 167
+(There was 1 error message)

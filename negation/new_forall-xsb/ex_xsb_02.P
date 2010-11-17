@@ -1,0 +1,7 @@
+
+% mbr2(X, [X]).
+% mbr2(X, [X, Y]).
+% mbr2(X, [Y, X]).
+% mbr2(X, [X|_L]).
+test1(X, [Y,Z]) :- write(Z).
+test2(X, [Y|Z]) :- write(Z).

@@ -1,0 +1,272 @@
+This is TeX, Version 3.14159 (Web2C 7.3.1) (format=latex 2001.3.27)  14 JAN 2002 21:30
+**cneg1.tex
+(cneg1.tex
+LaTeX2e <1999/12/01> patch level 1
+Babel <v3.6Z> and hyphenation patterns for american, french, german, ngerman, i
+talian, portuges, russian, spanish, nohyphenation, loaded.
+(llncs.cls
+Document Class: llncs 2000/05/16 v2.8 
+LaTeX document class for Lecture Notes in Computer Science
+(/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 1999/09/10 v1.4a Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 1999/09/10 v1.4a Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf/tex/latex/tools/multicol.sty
+Package: multicol 1999/10/21 v1.5w multicolumn formatting (FMi)
+\c@tracingmulticols=\count87
+\mult@box=\box26
+\multicol@leftmargin=\dimen103
+\c@unbalance=\count88
+\c@collectmore=\count89
+\doublecol@number=\count90
+\multicoltolerance=\count91
+\multicolpretolerance=\count92
+\full@width=\dimen104
+\page@free=\dimen105
+\premulticols=\dimen106
+\postmulticols=\dimen107
+\multicolsep=\skip43
+\multicolbaselineskip=\skip44
+\partial@page=\box27
+\last@line=\box28
+\mult@rightbox=\box29
+\mult@grightbox=\box30
+\mult@gfirstbox=\box31
+\mult@firstbox=\box32
+\@tempa=\box33
+\@tempa=\box34
+\@tempa=\box35
+\@tempa=\box36
+\@tempa=\box37
+\@tempa=\box38
+\@tempa=\box39
+\@tempa=\box40
+\@tempa=\box41
+\@tempa=\box42
+\@tempa=\box43
+\@tempa=\box44
+\@tempa=\box45
+\@tempa=\box46
+\@tempa=\box47
+\@tempa=\box48
+\@tempa=\box49
+\c@columnbadness=\count93
+\c@finalcolumnbadness=\count94
+\last@try=\dimen108
+\multicolovershoot=\dimen109
+\multicolundershoot=\dimen110
+\mult@nat@firstbox=\box50
+\colbreak@box=\box51
+)
+\c@chapter=\count95
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 199.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 200.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 201.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 202.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 203.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 204.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 205.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 206.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 207.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 208.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 209.
+\tocchpnum=\dimen111
+\tocsecnum=\dimen112
+\tocsectotal=\dimen113
+\tocsubsecnum=\dimen114
+\tocsubsectotal=\dimen115
+\tocsubsubsecnum=\dimen116
+\tocsubsubsectotal=\dimen117
+\tocparanum=\dimen118
+\tocparatotal=\dimen119
+\tocsubparanum=\dimen120
+\@tempcntc=\count96
+\fnindent=\dimen121
+\c@@inst=\count97
+\c@@auth=\count98
+\c@auco=\count99
+\instindent=\dimen122
+\authrun=\box52
+\authorrunning=\toks14
+\tocauthor=\toks15
+\titrun=\box53
+\titlerunning=\toks16
+\toctitle=\toks17
+\c@theorem=\count100
+\c@case=\count101
+\c@conjecture=\count102
+\c@corollary=\count103
+\c@definition=\count104
+\c@example=\count105
+\c@exercise=\count106
+\c@lemma=\count107
+\c@note=\count108
+\c@problem=\count109
+\c@property=\count110
+\c@proposition=\count111
+\c@question=\count112
+\c@solution=\count113
+\c@remark=\count114
+\headlineindent=\dimen123
+)
+No file cneg1.aux.
+\openout1 = `cneg1.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 58.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 58.
+
+LaTeX Warning: Citation `SusanaPADL2000' on page 1 undefined on input line 69.
+
+
+LaTeX Warning: Citation `JBbib' on page 1 undefined on input line 114.
+
+[1
+
+]
+
+LaTeX Warning: Citation `SusanaPADL2000' on page 2 undefined on input line 143.
+
+
+
+LaTeX Warning: Citation `Clark' on page 2 undefined on input line 145.
+
+
+LaTeX Warning: Citation `naish:lncs' on page 2 undefined on input line 146.
+
+
+LaTeX Warning: Citation `Barbuti1' on page 2 undefined on input line 147.
+
+
+LaTeX Warning: Citation `Barbuti2' on page 2 undefined on input line 147.
+
+
+LaTeX Warning: Citation `Chan1' on page 2 undefined on input line 148.
+
+
+LaTeX Warning: Citation `Chan2' on page 2 undefined on input line 148.
+
+
+LaTeX Warning: Reference `algorithm' on page 2 undefined on input line 164.
+
+
+LaTeX Warning: Reference `implementation' on page 2 undefined on input line 167
+.
+
+
+LaTeX Warning: Reference `results' on page 2 undefined on input line 169.
+
+
+LaTeX Warning: Reference `conclusion' on page 2 undefined on input line 171.
+
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 249--255
+
+ []
+
+[3]
+Overfull \hbox (15.43535pt too wide) in paragraph at lines 298--303
+[]\OT1/cmr/bx/n/10 Elimination of ir-rel-e-vant dis-e-qual-i-ties\OT1/cmr/m/n/1
+0 . The set of vari-ables of $\OML/cmm/m/it/10 GoalVars$
+ []
+
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 330.
+
+(/usr/share/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 330.
+
+Underfull \hbox (badness 10000) in paragraph at lines 349--361
+
+ []
+
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 362--369
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 379--383
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 384--391
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--416
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 417--421
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [5]
+Underfull \hbox (badness 10000) in paragraph at lines 440--458
+
+ []
+
+[6]
+
+LaTeX Warning: Citation `SusanaPADL2000' on page 7 undefined on input line 531.
+
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 550--555
+
+ []
+
+No file cneg1.bbl.
+[7] (cneg1.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 596 strings out of 20863
+ 6175 string characters out of 196073
+ 60528 words of memory out of 350001
+ 3591 multiletter control sequences out of 10000+15000
+ 6279 words of font info for 23 fonts, out of 400000 for 1000
+ 26 hyphenation exceptions out of 10000
+ 29i,8n,21p,303b,399s stack positions out of 3000i,100n,1500p,50000b,4000s
+
+Output written on cneg1.dvi (7 pages, 26892 bytes).

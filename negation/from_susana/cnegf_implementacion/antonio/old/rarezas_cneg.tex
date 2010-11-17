@@ -1,0 +1,65 @@
+p2(X,Y):- 
+	dist(q(X,Y),q(Y,2)),  
+	dist(X,3).    
+no_p2(X,Y):- cneg(p2(X,Y)).
+
+p22(X,Y):- 
+	dist(X,3),    
+	dist(q(X,Y),q(1,2)).  
+no_p22(X,Y):- cneg(p22(X,Y)).
+
+p3(X,Y,Z):-
+	dist(Z,6),
+	dist(q(X,Y),q(Z,5)).
+no_p3(X,Y,Z):- cneg(p3(X,Y,Z)).
+
+
+
+
+
+Lo que te comentaba del cneg. Estos dos predicados por ejemplo, sus negaciones estan bien??
+
+
+?- p3(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/Z],[Y/5]])),
+attach_attribute(Y,formula(Y,[[X/Z],[Y/5]])),
+attach_attribute(Z,formula(Z,[[X/Z,Z/6],[Y/5,Z/6]])) ? .
+
+no
+?- no_p3(X,Y,Z).
+
+Z = 6 ? .
+
+Z = X,
+attach_attribute(X,formula(X,[[X/6]])) ? .
+
+Z = 6 ? .
+
+Y = 5,
+attach_attribute(Z,formula(Z,[[Z/6]])) ? .
+
+no
+?-
+
+
+-------------------------------------------------------------------------------------------
+?- p2(X,Y).
+
+attach_attribute(Y,formula(Y,[[X/Y],[Y/2]])),
+attach_attribute(X,formula(X,[[X/3,X/Y],[X/3,Y/2]])) ? .
+
+no
+?- no_p2(X,Y).
+
+Y = X ? .
+
+X = 3,
+attach_attribute(Y,formula(Y,[[Y/3]])) ? .
+
+Y = 2 ? .
+
+X = 3,
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+no

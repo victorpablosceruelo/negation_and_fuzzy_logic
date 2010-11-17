@@ -1,0 +1,97 @@
+\begin{thebibliography}{10}
+
+\bibitem{Shoenfield}
+{\em Mathematical Logic}.
+\newblock Association for Symbolic Logic, 1967.
+
+\bibitem{Barbuti1}
+R.~Barbuti, D.~Mancarella, D.~Pedreschi, and F.~Turini.
+\newblock Intensional negation of logic programs.
+\newblock {\em Lecture notes on Computer Science}, 250:96--110, 1987.
+
+\bibitem{Barbuti2}
+R.~Barbuti, D.~Mancarella, D.~Pedreschi, and F.~Turini.
+\newblock A transformational approach to negation in logic programming.
+\newblock {\em JLP}, 8(3):201--228, 1990.
+
+\bibitem{ciao-modules-cl2000}
+D.~Cabeza and M.~Hermenegildo.
+\newblock {A} {N}ew {M}odule {S}ystem for {P}rolog.
+\newblock In {\em International Conference on Computational Logic, CL2000},
+  LNCS. Springer-Verlag, July 2000.
+
+\bibitem{Carlsson}
+M.~Carlsson.
+\newblock Freeze, indexing, and other implementation issues in the wam.
+\newblock In {\em ICLP}, pages 40--58. The MIT Press, 1987.
+
+\bibitem{Chan1}
+D.~Chan.
+\newblock Constructive negation based on the complete database.
+\newblock In {\em Proc. Int. Conference on LP'88}, pages 111--125. The MIT
+  Press, 1988.
+
+\bibitem{Chan2}
+D.~Chan.
+\newblock An extension of constructive negation and its application in
+  coroutining.
+\newblock In {\em Proc. NACLP'89}, pages 477--493. The MIT Press, 1989.
+
+\bibitem{Clark}
+K.~L. Clark.
+\newblock Negation as failure.
+\newblock In H.~Gallaire and J.~Minker, editors, {\em Logic and Data Bases},
+  pages 293--322, New York, NY, 1978. Plenum Press.
+
+\bibitem{Drabent}
+W.~Drabent.
+\newblock What is a failure? {A}n approach to constructive negation.
+\newblock {\em Acta Informatica.}, 33:27--59, 1995.
+
+\bibitem{Kunen}
+K.~Kunen.
+\newblock Negation in logic programming.
+\newblock {\em Journal in Logic Programming}, 4:289--308, 1987.
+
+\bibitem{Moreno1}
+J.J. Moreno-Navarro.
+\newblock Default rules: An extension of constructive negation for
+  narrowing-based languages.
+\newblock In {\em Proc. ICLP'94}, pages 535--549. The MIT Press, 1994.
+
+\bibitem{Moreno2}
+J.J. Moreno-Navarro.
+\newblock Extending constructive negation for partial functions in lazy
+  narrowing-based languages.
+\newblock 1996.
+
+\bibitem{SusanaPADL2000}
+S.~Mu{\~n}oz and J.J. Moreno.
+\newblock How to incorporate negation in a prolog compiler.
+\newblock In V.~Santos~Costa E.~Pontelli, editor, {\em 2nd International
+  Workshop PADL'2000}, volume 1753 of {\em LNCS}, pages 124--140, Boston, MA
+  (USA), 2000. Springer.
+
+\bibitem{SusanaLPAR01}
+S.~Mu{\~n}oz, J.J. Moreno, and M.~Hermenegildo.
+\newblock Efficient negation using abstract interpretation.
+\newblock In R.Nieuwenhuis and A.~Voronkov, editors, {\em Logic for
+  Programming, Artificial Intelligence and Reasoning}, La Habana (Cuba), 2001.
+
+\bibitem{naish:lncs}
+L.~Naish.
+\newblock {N}egation and {C}ontrol in {P}rolog.
+\newblock In {\em LNCS}, number 238. Springer-Verlag, 1985.
+
+\bibitem{Stuckey}
+P.~Stuckey.
+\newblock Constructive negation for constraint logic programming.
+\newblock In {\em Proc. IEEE Symp. on Logic in Computer Science}, volume 660.
+  IEEE Comp. Soc. Press, 1991.
+
+\bibitem{Stuckey95}
+P.~Stuckey.
+\newblock Negation and constraint logic programming.
+\newblock In {\em Information and Computation}, volume 118, pages 12--33, 1995.
+
+\end{thebibliography}

@@ -1,0 +1,13 @@
+a(2).
+a(X) <- not b(X).
+b(2).
+
+c(X) <- not a(X).
+
+d <- not c(X).
+
+e <- not d.
+
+p <- q(X).
+q(2).
+

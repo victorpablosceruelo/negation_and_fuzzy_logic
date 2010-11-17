@@ -1,0 +1,174 @@
+:- import append/3,memberchk/2 from basics.
+:- import get_residual/2 from tables.
+
+test:-
+	test(p0,[[a],[b]]),
+	test(not p0,[[not a,not b]]),
+	test(not p1,[[]]),
+	test(q1,[[]]),
+	test(p2,[]),
+	test(not p2,[[]]),
+	test(p3,[]),
+	test(not p3,[]),
+	test(p4,[[not a,not b]]),
+	test(not p4,[[a],[a,b],[b]]),
+	test(p5,[]),
+	test(not p5,[]),
+	test(p6,[]),
+	test(not p6,[]),
+	test(p7,[]),
+	test(not p7,[[],[not a],[not a,not b],[not b]]),
+	test(q8,[[b],[not a]]),
+	test(not p8,[[b],[not a]]),
+	test(p10,[]),
+	test(not p10,[[not a]]),
+	test(p11,[[a]]),
+	test(not p11,[[not a]]),
+	test(not q11,[[a],[not a]]),
+	test(p12,[[a]]),
+	test(not p12,[[not a]]),
+	test(not q12,[[a],[not a]]),
+	test(q13,[[a,not b, not c]]).
+
+test_wfs:-
+	test(not p1,[[]]),
+	test(q1,[[]]),
+	test(p2,[]),
+	test(not p2,[[]]),
+	test(p3,[]),
+	test(not p3,[]),
+	test(p5,[]),
+	test(not p5,[]),
+	test(p6,[]),
+	test(not p6,[]).
+
+test(Call,Solution):-
+	findall(C,ab(Call,C),Clist),
+	test_1(Clist,Clist_1),
+	sort(Clist_1,Clist_2),
+	(Clist_2 = Solution -> true ; writeln(failing(Call,Solution)),abort).
+
+test_1([],[]).
+test_1([P*N|T],[Os|T1]):-
+	append(P,N,O),
+	sort(O,Os),
+	test_1(T,T1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- dynamic answer_key/2, simplified/3,gensym_1/1.
+
+ab(G,Ab) :- 
+	retractall(gensym_1(_)),
+	assert(gensym_1(1)),
+	retractall(answer_key(_,_)),
+	retractall(simplified(_,_,_)),
+	ab(G,[]*[]+[],Ab).
+
+revise(Rev) :-
+	meta_table(not(false([]*[]+[],Rev+[]))).
+
+ab(not(G),I,Ab) :- !,
+	meta_table(not(false(I,Rev+[]))),
+	lastVars(G,[Rev+[],Ab+[]],NG), meta_table(not(NG)).
+ab(G,I,Ab) :-
+	meta_table(not(false(I,Rev+[]))),
+	lastVars(G,[Rev+[],Ab+[]],NG), meta_table(NG).
+
+
+meta(true,_) :- !.
+meta((A,B),Root) :- !, meta(A,Root), meta(B,Root).
+meta((A;B),Root) :- !, (meta(A,Root); meta(B,Root)).
+meta(prolog(G),_) :- !, G.
+meta(A,_) :- \+ (A = not(_)), 
+	meta_table(A).
+meta(not(A),R) :-
+        lastVars(N,[Iab+Icwa,Oab+Ocwa],A),
+        lastVars(N,[Iab+Icwa,Oab+OOcwa],AA),
+        meta_table(not(AA)),
+        (R = not(RR) -> lastVars(NR,[_,_],RR),
+%                        delete_if_there(not(NR),OOcwa,Ocwa)
+			 Ocwa = []
+	  ;
+           	        OOcwa = [], Ocwa = []).
+
+meta(not(A),not(_)) :- 
+	lastVars(N,[I,Ab+O],A), 
+	\+ abducible(A),
+	insertCWA(not(N),I,Ab+O).
+
+maintain_answers(TR):-
+	lastVars(R,[_,Abs+Ocwa],TR),
+	lastVars(R,[[]*[]+[],Abs+_],TR1),
+	\+ cwa_subsumed(TR1,Ocwa).
+
+cwa_subsumed(TR1,Ocwa):- 
+	get_residual(meta_table_2(TR1),[]),	
+	lastVars(_,[[]*[]+[],_+Cwa],TR1),
+	Cwa \== Ocwa,
+	subset(Cwa,Ocwa).
+
+subset([],_).
+subset([H|T],List):-
+	memberchk(H,List),
+	subset(T,List).
+	
+
+meta_table(A):-
+        lastVars(N,[IP*IN+Icwa,OP*ON+Ocwa],A),
+        lastVars(N,[[]*[]+[],MP*MN+Mcwa],AA),
+	meta_table_1(AA),
+        delete_if_there(not(N),Icwa,Tcwa),
+	append(Tcwa,Mcwa,Ocwa_1),
+	sort(Ocwa_1,Ocwa),
+	combine_list(MP,IP*IN+Ocwa,OP*IN+Ocwa),
+	combine_list(MN,OP*IN+Ocwa,OP*ON+Ocwa).
+%        lastVars(N,[[]*[]+[],OP*ON+Ocwa],AA1),
+%	maintain_answers(AA1,Ocwa).
+%	tab(4),writeln(solution(A)).
+
+:- table meta_table_1/1.
+meta_table_1(A) :- 
+	writeln(calling(A)),
+	meta_table_2(A),
+	writeln(solution(A)).
+
+:- table meta_table_2/1.
+meta_table_2(A) :- 
+	(A <- B), meta(B,A),
+	maintain_answers(A).
+
+simplest_form(R,X,X):- \+ simplified(R,X,_).
+simplest_form(R,X,Z):- simplified(R,X,Y),
+		       simplest_form(R,Y,Z).
+
+combine_list([],L,L).
+combine_list([H|T],L_in,L_out):-
+	insert(H,L_in,L_mid),
+	combine_list(T,L_mid,L_out).
+
+insert(not(A),P*_+_,_) :-
+	memberOrd(A,P), !, fail.
+insert(not(A),P*N+C,P*NewN+C) :- !, insertElem(not(A),N,NewN).
+insert(A,_*N+_,_) :- memberOrd(not(A),N), !, fail.
+insert(A,P*N+C,NewP*N+C) :- insertElem(A,P,NewP).
+
+insertCWA(not(A),Ab+C,Ab+NewC) :-
+	insertElem(not(A),C,NewC).
+
+memberOrd(X,L) :- insertElem(X,_,L).
+
+delete_if_there(not(E),C,NewC) :- insertElem(not(E),NewC,C), !.
+delete_if_there(_,L,L).
+
+insertElem(E,[],[E]).
+insertElem(E,[X|T],[E,X|T]) :- E @< X, !.
+insertElem(E,[E|T],[E|T]) :- !.
+insertElem(E,[X|T],[X|NT]) :- insertElem(E,T,NT).
+
+gensym(X):-
+	retract(gensym_1(X)),
+	X1 is X + 1,
+	assert(gensym_1(X1)).
+
+call_assert(A):- call(A),!.
+call_assert(A):- assert(A),!.

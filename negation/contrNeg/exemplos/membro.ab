@@ -1,0 +1,5 @@
+membro(X,[X|_]).
+membro(X,[_|T]) <- membro(X,T).
+
+p(X) <- not membro(X,[f(1),f(Y),g(a,b),g(c,Y)]).
+

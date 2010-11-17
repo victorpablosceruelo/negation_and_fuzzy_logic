@@ -1,0 +1,57 @@
+?- merge([1,2,3],[4,5,6],X).
+
+X = [1,2,3,4,5,6] ? ;
+
+no
+?- not_merge([1,2,3],[4,5,6],X).
+
+attach_attribute(X,formula(X,[[X/[1,2,3,4,5,6]]])) ?	<--------------- Correcto
+
+yes
+?- not_merge([1,X,3],[4,5,6],[1,2,3,4,5,6]).
+
+attach_attribute(X,formula(X,[[X/2]])) ? 
+
+yes
+?- not_merge([1,X,3],[4,Y,Z],[1,2,3,4,5,6]).
+
+attach_attribute(X,formula(X,[[X/2]])) ? 
+
+yes
+?- not_merge([1,X,3],[4,Y,Z],[1,2,3,4,5,6]).
+
+attach_attribute(X,formula(X,[[X/2]])) ? ;
+
+attach_attribute(Y,formula(Y,[[Y/5]])) ? ;
+
+attach_attribute(Z,formula(Z,[[Z/6]])) ? ;		<--------------- Correcto
+
+no
+
+
+La version clp tambien funciona incluso con soluciones generativas:
+
+ 
+?- merge1([1,4,65,324],[2,78,3245],X).
+
+X = [1,2,4,65,78,324,3245] ? ;
+
+no
+?- not_merge1([1,4,65,324],[2,78,3245],X).
+
+attach_attribute(X,formula(X,[[X/[1,2,4,65,78,324,3245]]])) ? <--------------- Correcto 
+
+yes
+?- merge1(X,[2,78,3245],[1,2,4,65,78,324,3245]).
+
+X = [1,4,65,324] ? 
+
+yes
+?- not_merge1(X,[2,78,3245],[1,2,4,65,78,324,3245]).
+
+attach_attribute(X,formula(X,[[X/[1,4,65,324]]])) ?           <--------------- Correcto 
+
+yes
+?- 
+
+

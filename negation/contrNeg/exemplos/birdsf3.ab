@@ -1,0 +1,57 @@
+abds([bird_ab/1,penguin_ab/1,flying_p_ab/1]).
+%abds([penguin_ab/1]).
+
+flies(X) <- bird(X), not ab1(X), not -flies(X).
+-flies(X) <- penguin(X), not ab2(X), not flies(X).
+flies(X) <- flying_p(X), not ab3(X), not -flies(X).
+
+ab1(X) <- penguin(X), not ab2(X).
+ab2(X) <- flying_p(X), not ab3(X).
+
+bird(X) <- bird_ab(X).
+penguin(X) <- penguin_ab(X).
+flying_p(X) <- flying_p_ab(X).
+
+bird(X) <- penguin(X).
+penguin(X) <- flying_p(X).
+
+bird(a).
+penguin(b).
+flying_p(c).
+
+bird(d).
+-flies(d).
+
+/* Answers (simplified)
+
+| ?- ab(flies(X),L).
+
+X = a
+L = [] * [not flying_p_ab(a),not penguin_ab(a)] + [];
+
+X = c
+L = [] * [] + [];
+
+X = _h40
+L = [flying_p_ab(_h40)] * [] + [_h40 \= d];
+
+X = _h40
+L = [bird_ab(_h40)] * [not flying_p_ab(_h40),not penguin_ab(_h40)] + [_h40 \= b,
+_h40 \= c,_h40 \= d];
+
+no
+
+| ?- ab(-flies(X),L).
+
+X = b
+L = [] * [not flying_p_ab(b)] + [];
+
+X = _h44
+L = [penguin_ab(_h44)] * [not flying_p_ab(_h44)] + [_h44 \= c];
+
+X = d
+L = [] * [] + [];
+
+no
+
+*/

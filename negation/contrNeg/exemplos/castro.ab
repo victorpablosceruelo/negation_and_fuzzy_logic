@@ -1,0 +1,9 @@
+abds([f0/2]).
+
+f(c,T) <- f(X,T),f(a,T).
+
+f(a,T) <- f0(m,T), f(b,Tb).
+
+f(b,T) <- f0(n,T), f(a,Ta).
+
+f(b,1).

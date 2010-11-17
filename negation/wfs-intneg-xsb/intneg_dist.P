@@ -1,0 +1,650 @@
+:- module(intneg_dist, [intneg_dist/2, intneg_forall_aux/4,
+			portray_attributes_in_term/1,
+			var_info_var/2, var_info_ovar/2,
+			var_info_status/2, var_info_attribute/2,
+			var_info_index/2,
+			pred_info_index/2, pred_info_forall_vars/2,
+			pred_info_expl/2,
+			get_attribute/2,
+			ineq_form_debug/2]).
+
+:- import put_attr/3, get_attr/3, del_attr/2,
+	install_verify_attribute_handler/4,
+%	install_attribute_portray_hook/3 % -- Do not use !!!
+	install_constraint_portray_hook/4
+	from machine.
+:- import append/3 from basics.
+
+:- import clause_head/4, remove_repeated_terms/2,
+	var_is_in_term/2, term_vars/2,
+	debug_formatted_cls/2, % debug_separation/0,
+	memberchk/2,
+	term_is_forall/1, term_is_not_forall/1 from intneg_aux.
+%	clause_head/4, 
+
+
+% Dynamic predicates.
+:- dynamic formulae/2.
+
+% Porting predicates to XSB.
+detach_attribute(Var) :- del_attr(Var, dist).
+get_attribute(Var, Value) :-
+	get_attr(Var, dist, Value).
+%	write(get_attr(Var, dist, Value)), nl.
+put_attribute(Var, Value) :-
+%	write(put_attribute(Var, Value)),nl,
+	put_attr(Var, dist, Value).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% CONSTRAINT PORTRAY %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- install_constraint_portray_hook(dist,Contents,Vars,portray_constraints(Vars, Contents)).
+
+portray_constraints(Vars, Contents) :-
+%	nl, write('% DBG: Vars: '), write(Vars), 
+%	write(' Attributed vars: '), write(Contents),
+%	write(' (Not attributed vars are not shown)' ), nl,
+	portray_constraints_build_list(Vars, Contents, [], List),
+	nl_if_not_empty_list(List),
+	portray_constraints_show_list(List).
+
+portray_constraints_build_list([], [], List, List) :- !.
+portray_constraints_build_list([Var1|Vars], [Term1|Terms], List_In, List_Out) :- !,
+	get_vars_with_attributes(Term1, Term1_Vars),
+	portray_constraints_build_list_aux(Var1, Term1, Term1_Vars, List_In, List_Aux),
+	portray_constraints_build_list(Vars, Terms, List_Aux, List_Out).
+
+portray_constraints_build_list_aux(_Var1, _Term1, [], List_In, List_In) :- !.
+portray_constraints_build_list_aux(Var1, Term1, Term1_Vars, List_In,
+				   [(Var1, Term1, Term1_Vars)|List_In]) :- !.
+
+get_vars_with_attributes(Term, [var_attrib(Term, Attribute)]) :-
+	var(Term), 
+	get_attr(Term, dist, Attribute), !.
+get_vars_with_attributes(Term, []) :-
+	var(Term), !.
+
+get_vars_with_attributes(Term, Vars) :-
+	clause_head(Term, _Name, _Arity, Args), !,
+	get_vars_with_attributes_list(Args, Vars).
+
+get_vars_with_attributes_list([], []) :- !.
+get_vars_with_attributes_list([X|L], Vars) :- !,
+	get_vars_with_attributes(X, Vars1),
+	get_vars_with_attributes_list(L, Vars2),
+	append(Vars2, Vars1, Vars).
+
+portray_constraints_show_list([]).
+portray_constraints_show_list([(Var1, Term1, Term1_Vars)|Others]) :-
+	portray_attributes(Var1, Term1, Term1_Vars), nl,
+	portray_constraints_show_list(Others).
+
+nl_if_not_empty_list([]) :- !.
+nl_if_not_empty_list(_Any) :- !, nl.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% PORTRAY ATTRIBUTES IN TERM %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+portray_attributes_in_term(Term) :-
+%	nl, write(Term), write(' has not attributes.'), nl, 
+	get_vars_with_attributes(Term, []), !.
+portray_attributes_in_term(Term) :-
+%	nl, write(Term), write(' has attributes.'), nl,
+	get_vars_with_attributes(Term, Term_Vars),
+	Term_Vars \== [], 
+	write(' -AND- [ '), !,
+	portray_attributes_aux_1(Term_Vars),
+	write(']'), !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% PORTRAY ATTRIBUTE %%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% :- install attribute portray hook(Module,Attribute,Handler)
+% :- install_attribute_portray_hook(dist,Attribute,portray_attribute(Attribute)).
+
+
+
+portray_attributes(_Var, _Term, Attributes) :-
+%	write(Var), write(' = '),
+%	write(Term), write(' : '), nl,
+	portray_attributes_aux_1(Attributes).
+
+portray_attributes_aux_1([]) :- !.
+portray_attributes_aux_1([Attr1]) :- !,
+	portray_attributes_aux_2(Attr1).
+portray_attributes_aux_1([Attr1|Attrs]) :- !,
+	portray_attributes_aux_2(Attr1), nl,
+	portray_attributes_aux_1(Attrs).
+
+portray_attributes_aux_2(var_attrib(Var, formulae(_VarX, Formulae))) :-
+	write(Var), write(': '),
+	write('[ '),
+	portray_attributes_aux_3(Formulae),
+	write(' ] ').
+
+portray_attributes_aux_3([]):- !.
+portray_attributes_aux_3([Formulae]) :- !,
+	portray_attributes_aux_4(Formulae).
+portray_attributes_aux_3([Formulae|Others]) :- !,
+	portray_attributes_aux_4(Formulae),
+	write(' AND '),
+	portray_attributes_aux_3(Others).
+
+portray_attributes_aux_4(Expr1/Expr2) :- !,
+	write(Expr1),
+	write(' =/= '),
+	write(Expr2).
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% :- install verify attribute handler(+Mod, −AttrValue, −Target, +Handler).
+:- install_verify_attribute_handler(dist, AttrValue, Target, verify_attribute(AttrValue, Target)).
+
+verify_attribute(AttrValue,Target):-
+%	write(verify_attribute(AttrValue,Target)), nl,
+	verify_attribute_aux(AttrValue, Target, Inequalities),
+	update_var_attributes(Inequalities).
+
+verify_attribute_aux(formulae(Target, Inequalities), Target, Inequalities).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% An~ade la formula al atributo de las variables implicadas
+% Por q tendriamos q tener en cuenta otros atributos?
+% Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
+
+update_var_attributes(Formulae):-
+%	write(update_var_attributes(Formulae)), nl, 
+	term_vars_formulae(Formulae, Variables), !,
+%	write(update_var_attributes_1(Variables, Formulae)),nl,
+        update_var_attributes_1(Variables, Formulae), !.
+
+term_vars_formulae([], []) :- !.
+term_vars_formulae([Conj|Others], Variables) :-
+	term_vars(Conj, Vars_1),
+	term_vars_formulae(Others, Vars_2),
+	append(Vars_1, Vars_2, Vars),
+	remove_repeated_terms(Vars, Variables).
+
+
+update_var_attributes_1([], New_Formulas) :- !,
+	joint_and_simplify_formulas(New_Formulas, [], _Result).
+update_var_attributes_1(Variables, New_Formulas) :-
+	Variables \== [], !,
+	update_var_attributes_2(Variables, Vars_Formulas), !,
+	update_var_attributes_4(Variables, New_Formulas, Vars_Formulas).
+
+update_var_attributes_2([], []) :- !. % Loop over vars list.
+update_var_attributes_2([Var|Others], Vars_Formulas):- 
+	var(Var), % It can be other things ...
+	get_attribute(Var, formulae(Var, ThisVar_Formulas)), 
+	detach_attribute(Var), !,
+        update_var_attributes_2(Others, Other_Formulas),
+	append(ThisVar_Formulas, Other_Formulas, Vars_Formulas).
+update_var_attributes_2([_Var|Others], Formulas):- 
+        update_var_attributes_2(Others, Formulas).
+
+% Need old vars to play with them too.
+update_var_attributes_4(Variables_1, New_Formulas, Vars_Formulas) :-
+%	write(joint_and_simplify_formulas(New_Formulas, Vars_Formulas, unknown)), nl,
+	joint_and_simplify_formulas(New_Formulas, Vars_Formulas, Joint_Formulas),
+	term_vars_formulae(Joint_Formulas, Variables_2), !,
+	append(Variables_1, Variables_2, Vars),
+	remove_repeated_terms(Vars, Variables),
+%	write(update_var_attributes_5(Variables, Joint_Formulas)), nl,
+	update_var_attributes_5(Variables, Joint_Formulas).
+
+update_var_attributes_5(_Vars, []) :- !. % No formulae.
+update_var_attributes_5(Vars, Joint_Formulae) :-
+	update_var_attributes_6(Vars, Joint_Formulae).
+
+update_var_attributes_6([], _Joint_Formulae) :- !. % Finish
+update_var_attributes_6([Var|Others], Joint_Formulae) :- !,
+	update_var_attributes_7(Var, Joint_Formulae, Var_Formulae),
+	update_var_attributes_8(Var, Var_Formulae),
+	update_var_attributes_6(Others, Joint_Formulae).
+
+update_var_attributes_7(_Var, [], []) :- !. % Empty formulae.
+update_var_attributes_7(Var, [Conj|Others1], [Conj|Others2]) :-
+	var_is_in_term(Var, Conj), !,
+	update_var_attributes_7(Var, Others1, Others2).
+update_var_attributes_7(Var, [_Conj|Others1], Others2) :- !,
+	update_var_attributes_7(Var, Others1, Others2).
+
+update_var_attributes_8(_Var, []):- !. % Is ok.
+
+update_var_attributes_8(Var, Formulae) :- !,
+	Formulae \== [],
+	var(Var),
+	put_attribute(Var, formulae(Var, Formulae)).
+
+update_var_attributes_8(Var, Formulae) :- !,
+	Formulae \== [],
+	nl, % Write error to output.
+	write('ERROR: Formulae of no variable: Variable: '),
+	write(Var), write(' formulae: '),
+	write(Formulae), nl.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% joint_and_simplify_formulas(New_Formulae, Old_Formulae, Formulae).
+joint_and_simplify_formulas(F1, F2, Formulae) :-
+	joint_formulas(F1, F2, Joint_Formulae),
+%	ineq_form_debug('joint_and_simplify_formulas: Joint_Formulae: ', Joint_Formulae),
+	simplify_formulas(Joint_Formulae, Formulae).
+%	ineq_form_debug('joint_and_simplify_formulas: Simplified Formulae: ', Formulae).
+
+joint_formulas(L1, L2, L4) :-
+	append(L1, L2, L3),
+	remove_repeated_terms(L3, L4).
+
+simplify_formulas([], []) :- !.
+simplify_formulas([F1|Others], Formulae) :- !,
+	simplify_1_formulae(F1, Simplified_F1),
+%	write(simplify_1_formulae(F1, Simplified_F1)), nl,
+	simplify_formulas(Others, Simplified_Others),
+	joint_formulas(Simplified_F1, Simplified_Others, Formulae).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+simplify_1_formulae(Term1/Term2, Ineq) :-
+%	ineq_form_debug('simplify_1_formulae: Formulae: ', Term1/Term2),
+	ineq_builder(Term1/Term2, Ineq_1), !,
+	extract_1_inequality(Ineq_1, Ineq).
+%	ineq_form_debug('simplify_1_formulae: Inequality: ', Ineq).
+
+extract_1_inequality([], []) :- !, fail.
+extract_1_inequality([Ineq_In], Ineq_Out) :- !,
+	extract_1_inequality_aux(Ineq_In, Ineq_Out).
+extract_1_inequality([Ineq_In|_Others], Ineq_Out) :-
+	extract_1_inequality_aux(Ineq_In, Ineq_Out).
+extract_1_inequality([_Ineq|Others], [OthersIneq]) :-
+	extract_1_inequality(Others, [OthersIneq]).
+
+extract_1_inequality_aux(Term1/Term2, [Term1/Term2]) :- !.
+extract_1_inequality_aux(true, []) :- !. % True is empty constraints.
+extract_1_inequality_aux(fail, []) :- !, fail.
+
+ineq_builder(true, []) :- !. % True is empty constraints.
+ineq_builder(fail, []) :- !, fail.
+ineq_builder(Term1/Term2, Ineq_Out) :-
+	ineq_builder_aux(Term1/Term2, [], Ineq_Out), !.
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):- % Same var.
+        var(Term1),                                     
+        var(Term2),
+        Term1==Term2, !,
+	add_to_ineq_list(fail, Ineq_In, Ineq_Out).
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):- % Different vars.
+        var(Term1),
+        var(Term2),
+	ineq_builder_aux_history(Term1/Term2, Ineq_In, Ineq_Out).
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):- % Term2=fA(_Var),
+        var(Term1),
+	term_is_forall(Term2), !,
+	add_to_ineq_list(fail, Ineq_In, Ineq_Out).
+
+ineq_builder_aux(Term1/Term2, Ineq, [Term1/Term2|Ineq]):- 
+        var(Term1),
+        functor(Term2, _Name, _Arity), !.
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):-
+        var(Term2),
+	functor(Term1, _Name, _Arity), 
+	ineq_builder_aux_history(Term1/Term2, Ineq_In, Ineq_Out).
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):-  % Term=fA(_Var),
+ 	(   (term_is_forall(Term1)) ;
+	    (term_is_forall(Term2))), !,
+	add_to_ineq_list(fail, Ineq_In, Ineq_Out).
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):-  % Functors that unify.
+ 	clause_head(Term1, Name, Arity, Args1),
+	clause_head(Term2, Name, Arity, Args2),
+	term_is_not_forall(Term1),
+	term_is_not_forall(Term2), !,
+        ineq_builder_aux_lists(Args1, Args2, Ineq_In, Ineq_Out).
+
+ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out):-  % Functors that do not unify.
+	clause_head(Term1, Name1, Arity1, _Args1),
+	clause_head(Term2, Name2, Arity2, _Args2),
+	term_is_not_forall(Term1),
+	term_is_not_forall(Term2),
+	((Name1 \== Name2) ; (Arity1 \== Arity2)), !,
+	add_to_ineq_list(true, Ineq_In, Ineq_Out).
+
+% ineq_builder_aux_lists(Args1, Args2, Ineq).
+ineq_builder_aux_lists([], [], Ineq, Ineq).
+ineq_builder_aux_lists([Term1], [Term2], Ineq_In, Ineq_Out) :- !,
+	ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Out).
+ineq_builder_aux_lists([Term1|Others1], [Term2|Others2], Ineq_In, Ineq_Out) :- !,
+	ineq_builder_aux(Term1/Term2, Ineq_In, Ineq_Aux),
+	ineq_builder_aux_lists(Others1, Others2, Ineq_Aux, Ineq_Out).
+
+
+ineq_builder_aux_history(Term1/Term2, Ineq_In, Ineq_Out) :-
+	var(Term2), 
+%	write(memberchk(Term2, For_Later)), nl,
+	memberchk_Ineq(Term2, Ineq_In, History), !, % Recover unification.
+	
+	add_to_ineq_list(Term1/Term2, Ineq_In, Ineq_Aux),
+	ineq_builder_aux_history_aux(History, Term1, Ineq_Aux, Ineq_Out).
+
+ineq_builder_aux_history_aux([], _Term1, Ineq, Ineq) :- !.
+ineq_builder_aux_history_aux([Term3/_Term2|Others], Term1, Ineq_In, Ineq_Out) :- !,
+	ineq_builder_aux(Term1/Term3, [], Ineq_Aux_1),
+	append(Ineq_Aux_1, Ineq_In, Ineq_Aux_2),
+	ineq_builder_aux_history_aux(Others, Term1, Ineq_Aux_2, Ineq_Out).
+
+memberchk_Ineq(_Term2, [], []) :- !.
+memberchk_Ineq(Term2, [Term3/Term2|Others], [Term3/Term2|History]) :- !,
+	memberchk_Ineq(Term2, Others, History).
+memberchk_Ineq(Term2, [_Term4/_Term5|Others], History) :-
+	memberchk_Ineq(Term2, Others, History).
+
+add_to_ineq_list(true, _Any,   [true]) :- !.
+add_to_ineq_list(_Any, [true], [true]) :- !.
+add_to_ineq_list(fail, Any,    Any) :- !.
+add_to_ineq_list(T1/T2,  List,   [T1/T2|List]).
+
+ineq_form_debug(Msg1, Msg2) :-
+	write('% DBG %  '),
+	write(Msg1), write(Msg2), nl.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     PREDICADO   DISTINTO                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Predicado que implementa mediante variables con atributo
+% la desigualdad entre terminos y como expresarlo a
+% traves de disyuncion de conjunciones de desigualdades
+% entre terminos que debe satisfacer cada variable.
+% Esta implementacion sirve para variables con dominios
+% de valores finitos.
+
+% Incluye una desigualdad en las formulas de las 
+% variables implicadas
+
+intneg_dist(T1,T2):- 
+%	nl, write(intneg_dist(T1,T2)), nl,
+        update_var_attributes([T1/T2]), !.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     PREDICADO   FORALL                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+intneg_forall_aux(OVars_ForAll, OVars_Exist, Preds_Infos_In, Explanation) :-
+%	write('forall: OVars_ForAll: '), write(OVars_ForAll), nl,
+%	write('forall: OVars_Exist: '), write(OVars_Exist), nl,
+%	debug_formatted_cls('intneg_forall_aux: Preds_Infos_In: ', Preds_Infos_In),
+	forall_prepare_forall_info(Preds_Infos_In, 0, OVars_ForAll, Preds_Infos_Out), !,
+%	debug_formatted_cls('intneg_forall_aux: Preds_Infos_Out: ', Preds_Infos_Out),
+	forall_check(Preds_Infos_Out, Index_Explanation),
+%	debug_formatted_cls('forall: Index_Explanation: ', Index_Explanation),
+	tranform_index_expl_in_expl(Index_Explanation, Preds_Infos_Out, Explanation),
+%	debug_formatted_cls('forall: Expl: ', Explanation),
+	forall_recover_existential_results(OVars_Exist, Explanation),
+	debug_formatted_cls('forall: Expl: ', Explanation).
+
+forall_prepare_forall_info([], _Pred_Index, _Original_Vars, []) :- !.
+forall_prepare_forall_info([(ForAll_Vars, Not_ForAll_Vars, Expl)|Preds_Infos_In],
+			   Pred_Index, Original_Vars,
+			   [Pred_Info|Preds_Infos_Out]) :- !,
+	forall_prepare_forall_info_vars(ForAll_Vars, Original_Vars, 0, Vars_Infos),
+	pred_info_index(Pred_Info, Pred_Index),
+	pred_info_forall_vars(Pred_Info, Vars_Infos),
+	pred_info_exist_vars(Pred_Info, Not_ForAll_Vars),
+	pred_info_expl(Pred_Info, Expl),
+
+	New_Pred_Index is Pred_Index + 1,
+	forall_prepare_forall_info(Preds_Infos_In, New_Pred_Index, Original_Vars, Preds_Infos_Out).
+
+forall_prepare_forall_info_vars([], [], _Var_Index, []) :- !.
+forall_prepare_forall_info_vars([Var|Vars], [OVar|OVars], Var_Index, [Var_Info|Vars_Info]) :-
+	forall_prepare_forall_info_1_var(Var, OVar, Var_Index, Var_Info), 
+	forall_prepare_forall_info_vars(Vars, OVars, Var_Index, Vars_Info).
+	
+forall_prepare_forall_info_1_var(Var, OVar, Var_Index, Var_Info) :-
+	var_info_var(Var_Info, Var),
+	var_info_ovar(Var_Info, OVar),
+	var_info_index(Var_Info, Var_Index), 
+	forall_prepare_forall_info_1_var_aux(Var, Var_Info).
+
+forall_check_vars_are_the_same(Var, NewVar) :-
+	var(Var), var(NewVar),
+	Var == NewVar, !.
+forall_check_vars_are_the_same(Var, NewVar) :-
+	write('ERROR: Attribute is not for the variable. Var: '), write(Var),
+	write(' Var in attribute: '), write(NewVar), nl, !.
+
+forall_prepare_forall_info_1_var_aux(Var, Var_Info) :-
+	var(Var), 
+	get_attribute(Var, formulae(NewVar, Attr)),
+	forall_check_vars_are_the_same(Var, NewVar),
+	detach_attribute(Var), !,
+	var_info_status(Var_Info, 'attributed'),
+	var_info_attribute(Var_Info, Attr).
+
+forall_prepare_forall_info_1_var_aux(Var, Var_Info) :-
+	var(Var), !,
+	var_info_status(Var_Info, 'var').
+
+forall_prepare_forall_info_1_var_aux(_Var, Var_Info) :-
+	var_info_status(Var_Info, 'const').
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+var_info_var(       forall_var_info(  Var, _OVar, _Status, _Attr, _Var_Index), Var).
+var_info_ovar(      forall_var_info( _Var,  OVar, _Status, _Attr, _Var_Index), OVar).
+var_info_status(    forall_var_info( _Var, _OVar,  Status, _Attr, _Var_Index), Status).
+var_info_attribute( forall_var_info( _Var, _OVar, _Status,  Attr, _Var_Index), Attr).
+var_info_index(     forall_var_info( _Var, _OVar, _Status, _Attr,  Var_Index), Var_Index).
+
+pred_info_index(       ( Pred_Index, _Vars_Infos, _Exist_Vars, _Expl), Pred_Index).
+pred_info_forall_vars( (_Pred_Index,  Vars_Infos, _Exist_Vars, _Expl), Vars_Infos).
+pred_info_exist_vars(  (_Pred_Index, _Vars_Infos,  Exist_Vars, _Expl), Exist_Vars).
+pred_info_expl(        (_Pred_Index, _Vars_Infos, _Exist_Vars,  Expl), Expl).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+forall_check([Pred_Info|Preds_Infos], Expl) :-
+	pred_info_index(Pred_Info, Pred_Index),
+	pred_info_forall_vars(Pred_Info, Vars_Infos),
+	forall_check_var_list(Vars_Infos, 0, Preds_Infos, Pred_Index, Expl).
+
+forall_check([_Pred_Info|Preds_Infos], Explanation) :-
+	forall_check(Preds_Infos, Explanation).
+
+forall_check_var_list([], _Var_Index, _Preds_Infos, _Pred_Index, []) :- !.
+forall_check_var_list([Var_Info|Vars_Infos], Var_Index, Preds_Infos, Pred_Index, Expl) :-
+	forall_check_1_var(Var_Info, Var_Index, Preds_Infos, Expl_1),
+	New_Var_Index is Var_Index + 1, !,
+	forall_check_var_list(Vars_Infos, New_Var_Index, Preds_Infos, Pred_Index, Expl_2),
+	append([[Pred_Index|Expl_1]], Expl_2, Expl).
+
+forall_check_1_var(Var_Info, Var_Index, Preds_Infos, Expl) :-
+	var_info_status(Var_Info, 'const'), !,
+	var_info_var(Var_Info, Const),
+	forall_cancel_const(Const, Var_Index, Preds_Infos, Expl_1, Attr),
+	%write('forall_check_1_var: Attr_Still_There: '), write(Attr), nl,
+	forall_cancel_attr(Attr, Var_Index, Preds_Infos, Expl_2),
+	append(Expl_1, Expl_2, Expl).
+
+forall_check_1_var(Var_Info, _Var_Index, _Preds_Infos, []) :-
+	var_info_status(Var_Info, 'var'), !.
+
+forall_check_1_var(Var_Info, Var_Index, Preds_Infos, Expl) :-
+	var_info_status(Var_Info, 'attributed'), !,
+	var_info_attribute(Var_Info, Attr),
+	forall_cancel_attr(Attr, Var_Index, Preds_Infos, Expl).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+forall_cancel_const(Const, Var_Index, [Pred_Info|_Preds_Infos], Expl, Attr) :-
+	forall_cancel_const_aux(Const, Var_Index, Pred_Info, Expl, Attr).
+
+forall_cancel_const(Const, Var_Index, [_Pred_Info|Preds_Infos], Expl, Attr) :-
+	forall_cancel_const(Const, Var_Index, Preds_Infos, Expl, Attr).
+
+forall_cancel_const_aux(Const, Var_Index, Pred_Info, [Pred_Info_Index], Attr_Still_There) :-
+	pred_info_forall_vars(Pred_Info, Vars_Infos),
+	get_indexed_var_info(Vars_Infos, Var_Index, Var_Info),
+%	write('forall_cancel_const_aux using var_info: '), write(Var_Info), nl,
+	var_info_status(Var_Info, 'attributed'), % Only cancelled by attrs.
+	var_info_attribute(Var_Info, Attr),
+%	write(forall_cancel_const_with_attr(Const, Attr)), nl,
+	forall_cancel_const_with_attr(Const, Attr, Attr_Still_There),
+%	write('Attr_Still_There: '), write(Attr_Still_There), nl,
+	pred_info_index(Pred_Info, Pred_Info_Index).
+
+forall_cancel_const_with_attr(Const, [Conj|Attr], Attr) :-
+	forall_cancel_const_with_conj(Const, Conj), !.
+forall_cancel_const_with_attr(Const, [Conj|Attr], [Conj|Attr_Still_There]) :-
+	forall_cancel_const_with_attr(Const, Attr, Attr_Still_There).
+
+forall_cancel_const_with_conj(Const, Term1/Const) :- var(Term1). % var is 1st.
+forall_cancel_const_with_conj(Const, Const/Term2) :- var(Term2). % var is 2nd.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+forall_cancel_attr([], _Var_Index, _Preds_Infos, []) :- !.
+forall_cancel_attr([Conj1|Conjs], Var_Index, Preds_Infos, [Expl_1|Expl_2]) :-
+	forall_cancel_conj(Conj1, Var_Index, Preds_Infos, Expl_1),
+	forall_cancel_attr(Conjs, Var_Index, Preds_Infos, Expl_2).
+
+forall_cancel_conj(Conj, Var_Index, [Pred_Info|_Preds_Infos], Pred_Index) :-
+	pred_info_forall_vars(Pred_Info, Vars_Infos),
+	get_indexed_var_info(Vars_Infos, Var_Index, Var_Info),
+	forall_cancel_conj_aux(Conj, Var_Info),
+	pred_info_index(Pred_Info, Pred_Index).
+
+forall_cancel_conj(Conj, Var_Index, [_Pred_Info|Preds_Infos], Expl) :-
+	forall_cancel_conj(Conj, Var_Index, Preds_Infos, Expl).
+
+forall_cancel_conj_aux(Conj, Var_Info) :-
+	var_info_status(Var_Info, 'const'), !,
+	var_info_var(Var_Info, Const),
+	forall_cancel_const_with_conj(Const, Conj).
+
+forall_cancel_conj_aux(Conj, Var_Info) :-
+	var_info_status(Var_Info, 'attributed'), 
+	var_info_attribute(Var_Info, Attr),
+	forall_cancel_conj_with_attr(Conj, Attr).
+
+forall_cancel_conj_with_attr(_Conj_1, []) :- !.
+forall_cancel_conj_with_attr(Conj_1, [Conj_2|Attr]) :-
+	forall_cancel_conj_with_conj(Conj_1, Conj_2),
+	forall_cancel_conj_with_attr(Conj_1, Attr).
+
+forall_cancel_conj_with_conj(Term_1/Term_2, Term_3/Term_2) :- var(Term_1), var(Term_3).
+forall_cancel_conj_with_conj(Term_1/Term_2, Term_2/Term_4) :- var(Term_1), var(Term_4).
+forall_cancel_conj_with_conj(Term_1/Term_2, Term_3/Term_1) :- var(Term_2), var(Term_3).
+forall_cancel_conj_with_conj(Term_1/Term_2, Term_1/Term_4) :- var(Term_2), var(Term_4).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_indexed_var_info([Var_Info|_Vars_Infos], 0, Var_Info) :- !.
+get_indexed_var_info([_Other_Var_Info|Vars_Infos], Var_Index, Var_Info) :-
+	New_Var_Index is Var_Index - 1,
+	get_indexed_var_info(Vars_Infos, New_Var_Index, Var_Info).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+tranform_index_expl_in_expl(Index_Explanation, Preds_Infos, Explanation) :-
+	list_of_indexes_used_plain(Index_Explanation, [], Index_Explanation_Plain),
+	select_preds_by_index(Index_Explanation_Plain, Preds_Infos, Explanation).
+
+list_of_indexes_used_plain([], L_In, L_In) :- !.
+list_of_indexes_used_plain([Indexes_First|Indexes_Others], L_In, L_Out) :- !,
+	list_of_indexes_used_plain_aux(Indexes_First, L_In, L_Aux),
+	list_of_indexes_used_plain(Indexes_Others, L_Aux, L_Out).
+
+list_of_indexes_used_plain_aux([], L_In, L_In) :- !.
+list_of_indexes_used_plain_aux([Index|Indexes], L_In, L_Out) :-
+	memberchk(Index, L_In), !,
+	list_of_indexes_used_plain_aux(Indexes, L_In, L_Out).
+list_of_indexes_used_plain_aux([Index|Indexes], L_In, L_Out) :- !,
+	list_of_indexes_used_plain_aux(Indexes, [Index|L_In], L_Out).
+
+select_preds_by_index([], _Combined, []) :- !.
+select_preds_by_index([Index|Indexes], Combined, [Pred|Preds]) :-
+	select_preds_by_index_aux(Index, Combined, Pred),
+	select_preds_by_index(Indexes, Combined, Preds).
+
+select_preds_by_index_aux(Index, [Pred_Info|_Combined], Pred_Info) :-
+	pred_info_index(Pred_Info, Index), !.
+select_preds_by_index_aux(Index, [_First|Combined], Pred_Info) :-
+	select_preds_by_index_aux(Index, Combined, Pred_Info), !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%forall_recover_existential_results(OVars_Exist, Explanation) :-
+%	write('Ovars_Exist: '), write(OVars_Exist), nl,
+%	debug_formatted_cls('Explanation: ', Explanation),	
+%	fail.
+
+forall_recover_existential_results(OVars_Exist, Explanation) :-
+	forall_unify_preds_with_ovars(Explanation, OVars_Exist), !.
+
+forall_unify_preds_with_ovars([], _OVars_Exist) :- !.
+forall_unify_preds_with_ovars([E1|Expl], OVars_Exist) :-
+	pred_info_exist_vars(E1, E1_Vars_Exist),
+	forall_unify_preds_with_ovars_aux(E1_Vars_Exist, OVars_Exist),
+	forall_unify_preds_with_ovars(Expl, OVars_Exist).
+
+forall_unify_preds_with_ovars_aux([], []) :- !.
+forall_unify_preds_with_ovars_aux([V1|L1], [V2|L2]) :-
+	forall_unify_exist_vars(V1, V2),
+	forall_unify_preds_with_ovars_aux(L1, L2).
+
+forall_unify_exist_vars(V1, V2) :-
+	var(V1),
+	var(V2), !,
+	V2 = V1.
+forall_unify_exist_vars(V1, V2) :-
+	var(V1), !,
+	V1 = V2.
+forall_unify_exist_vars(V1, V2) :-
+	var(V2), !,
+	V2 = V1.
+forall_unify_exist_vars(V1, V2) :-
+	(var(V1); var(V2)), % No more vars.
+	!, fail.
+forall_unify_exist_vars(Var, Var) :- !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

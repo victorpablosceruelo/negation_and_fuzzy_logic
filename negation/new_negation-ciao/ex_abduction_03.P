@@ -1,0 +1,5 @@
+
+:- abds([penguin/1, bird/1]).
+
+fly(X) :- not(penguin(X)), bird(X).
+false :- penguin(X), bird(X).

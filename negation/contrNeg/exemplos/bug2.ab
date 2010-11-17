@@ -1,0 +1,14 @@
+f(X) <- not d(X,Y).
+g(X) <- e(X,Y).
+
+e(X,Y) <- not d(X,Y).
+d(X,Y) <- not a(X), equal(X,Y).
+a(X) <- b(X), c(X).
+
+equal(X,X).
+
+a.
+b(1) <- a.
+b(2).
+c(2).
+c(3).

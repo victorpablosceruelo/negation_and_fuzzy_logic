@@ -1,0 +1,133 @@
+:- module(ex_intneg_05, _, [.(intneg)]). 
+% use [.(intneg)] for local calls.
+% :- module('ex_intneg_05', _).
+
+% Loops (WFS has to take care of it).
+a :- a.
+b :- intneg(b).
+
+c :- d.
+d :- c.
+
+e :- intneg(f).
+f :- intneg(e).
+
+% Trivial example.
+g :- h, i.
+h :- i.
+i.
+
+% Another trivial example.
+
+
+p1(X) :- p1(X).
+p2(X) :- intneg(p2(X)).
+
+p3(X) :- p4(X).
+p4(X) :- p3(X).
+
+p5(X) :- intneg(p6(X)).
+p6(X) :- intneg(p5(X)).
+
+% Loop with values to get results.
+p7(X) :- intneg(q7(X)).
+q7(X) :- intneg(p7(X)).
+
+p7(1).
+q7(2).
+
+% WFS has to be used by forall.
+j :- p8(X).
+p8(X) :- j.
+
+k :- p9(X).
+p9(1).
+
+l :- p9(X), intneg(p9(X)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Peano numbers.
+peano(0).
+peano(s(X)) :- peano(X).
+
+% Member function.
+mbr_f(X, [X|L]).
+mbr_f(X, [Y|L]) :- mbr_f(X, L).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+test_fail_01 :- a.
+test_fail_02 :- b.
+test_fail_02 :- intneg(b).
+test_fail_03 :- c.
+test_fail_04 :- e.
+test_fail_05 :- intneg(e).
+
+test_fail_11 :- p1(X).
+test_fail_12 :- p2(X).
+test_fail_13 :- intneg(p2(X)).
+test_fail_14 :- p3(X).
+test_fail_15 :- p5(X).
+test_fail_16 :- intneg(p5(X)).
+
+test_fail_21 :- j.
+test_fail_22 :- intneg(k).
+test_fail_22 :- l.
+
+test_ok_01 :- intneg(a).
+test_ok_02 :- intneg(c).
+
+test_ok_11 :- intneg(p1(X)).
+test_ok_12 :- intneg(p3(X)).
+test_ok_13(X) :- p7(X). % X = 1
+test_ok_14(X) :- intneg(p7(X)). % X = 2
+
+% Try to fire the bug of not having history in forall for wfs.
+test_ok_21(X) :- intneg(j).
+test_ok_22 :- k.
+test_ok_23 :- intneg(l).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% This one should return X = 0.
+test_wn_01_ok(X) :- intneg(r_01(X, Y)).
+
+r_01(0, 0).
+r_01(0, Y) :- intneg(s_01(Y)).
+s_01(0).
+
+% This one should return X = 0 and X = 1.
+test_wn_02_ok(X) :- intneg(r_02(X, Y)).
+
+r_02(0, 0).
+r_02(0, Y) :- intneg(s_02(Y)).
+r_02(1, 0).
+r_02(1, 1).
+s_02(0).
+
+% This one should fail.
+test_wn_03_fail(X) :- intneg(r_03(X, Y)).
+r_03(X, 0) :- intneg(s_03(X)).
+r_03(X, Y) :- intneg(s_03(Y)).
+s_03(0).
+
+% this one should return X = 1.
+test_wn_04_ok(X) :- intneg(r_04(X, Y)).
+r_04(X, 0) :- intneg(s_04(X)).
+r_04(1, Y) :- intneg(s_04(Y)).
+s_04(0).
+
+% This one should return X =/= 0 /\ X =/= 1.
+query_05(X) :- intneg(r_05(X, Y)).
+r_05(X, 0) :- intneg(s_05(X)).
+r_05(X, Y) :- intneg(s_05(Y)), intneg(t_05(X)).
+s_05(0).
+t_05(1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

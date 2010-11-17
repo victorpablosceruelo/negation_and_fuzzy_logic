@@ -1,0 +1,13 @@
+
+
+p(0).
+p(s(X)) :- p(X).
+
+even(0).
+even(s(s(X))) :- even(X).
+
+odd(s(X)).
+odd(s(s(X))) :- odd(X).
+
+q(X) :- p(s(s(X))).
+r(Y) :- p(s(s(Y))).

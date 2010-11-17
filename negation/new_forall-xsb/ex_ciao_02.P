@@ -1,0 +1,18 @@
+
+:- module(ex_ciao_02,_,[intneg]).
+
+p(0).
+p(s(X)) :- p(X).
+
+q(X) :- p(X) ; p(s(X)).
+r(X) :- p(X) , q(s(X)).
+
+s(X,Y) :- p(X), q(Y).
+
+% Exists -> Universal
+t(X) :- s(X,Z). 
+
+% Overlapping clauses.
+u(0, X) :- p(X).
+u(X, 0) :- p(X).
+u(X, Y) :- p(X), p(Y).

@@ -1,0 +1,24 @@
+abds([a/0,b/0,a/1]).
+
+
+p(1) <- a.
+q(1) <- b.
+q(2) <- b.
+p(X) <- q(X).
+q(X) <- p(X).
+
+r(1) <- r(X).
+
+rr <- r(X).
+rr <- rrr.
+rrr <- not a(X).
+
+
+c(1) <- not a(X).
+c(X) <- a(X).
+
+<- not a(2).
+<- a(1).
+
+b(X) <- a(X).
+

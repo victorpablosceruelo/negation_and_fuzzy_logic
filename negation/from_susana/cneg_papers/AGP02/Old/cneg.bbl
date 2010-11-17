@@ -1,0 +1,48 @@
+\begin{thebibliography}{1}
+
+\bibitem{Barbuti1}
+R.~Barbuti, D.~Mancarella, D.~Pedreschi, and F.~Turini.
+\newblock Intensional negation of logic programs.
+\newblock {\em Lecture notes on Computer Science}, 250:96--110, 1987.
+
+\bibitem{Barbuti2}
+R.~Barbuti, D.~Mancarella, D.~Pedreschi, and F.~Turini.
+\newblock A transformational approach to negation in logic programming.
+\newblock {\em JLP}, 8(3):201--228, 1990.
+
+\bibitem{Chan1}
+D.~Chan.
+\newblock Constructive negation based on the complete database.
+\newblock In {\em Proc. Int. Conference on LP'88}, pages 111--125. The MIT
+  Press, 1988.
+
+\bibitem{Chan2}
+D.~Chan.
+\newblock An extension of constructive negation and its application in
+  coroutining.
+\newblock In {\em Proc. NACLP'89}, pages 477--493. The MIT Press, 1989.
+
+\bibitem{Clark}
+K.~L. Clark.
+\newblock Negation as failure.
+\newblock In J.~Minker H.~Gallaire, editor, {\em Logic and Data Bases}, pages
+  293--322, New York, NY, 1978.
+
+\bibitem{JBbib}
+{T}he {C}ollection of {C}omputer {S}cience {B}ibliographies.
+\newblock \\\texttt{http://liinwww.ira.uka.de/bibliography/ \\
+  LogicProgramming/index.html}.
+
+\bibitem{naish:lncs}
+L.~Naish.
+\newblock {N}egation and {C}ontrol in {P}rolog.
+\newblock In {\em LNCS}, number 238. Springer-Verlag, 1985.
+
+\bibitem{SusanaPADL2000}
+J.J.~Moreno S.~Mu\~noz.
+\newblock How to incorporate negation in a prolog compiler.
+\newblock In V.~Santos~Costa E.~Pontelli, editor, {\em 2nd International
+  Workshop PADL'2000}, volume 1753 of {\em LNCS}, pages 124--140, Boston, MA
+  (USA), 2000. Springer.
+
+\end{thebibliography}

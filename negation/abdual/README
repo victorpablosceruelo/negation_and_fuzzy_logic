@@ -1,0 +1,70 @@
+% Preprocessor for abduction interpreter
+%
+% 24/9/98
+%
+
+
+/*
+ Syntax:
+ 
+ Rules are of the form:
+        Head <- Body.
+ where Head is an atom and Body a conjunction of literals separated by ,
+ A literal is either an atom A, or a default literal not A.
+
+Integrity constraints are of the form:
+	<- Body.
+ or rules where the head is the special (reserved) atom 'false'.
+
+Abducibles are declared by facts:
+	abds(ListOfAbds)
+where ListOfAbds is the list of predicateName/arity which are abducible. Abducible predicates CANNOT appear in the head of rules.
+
+If several declarations exists in the same file, their union is considered.
+*/
+ 
+/*
+ Usage:
+
+ generateP(FileName) -> preproprocesses FileName.ab into the file FileName.P.
+				FileName is a string.
+ 
+ abdSol(G,Ab) -> returns in Ab an abductive solutions for G.
+*/
+
+/*
+Abduction meta-interpreter 6-9
+
+The intended semantics of this meta-interpreter are based on the
+3-valued abductive frameworks of Luis and Carlos' 1995 LPNMR paper,
+with the following provisos/addenda.
+
+1) Restricted to normal programs with an empty set of integrity
+constraints (for right now).
+
+2) There may well be better ways to compute this than the lists that I
+am using right now.
+
+Most of this file is examples.  I've included our favorites: please
+try to break it!
+
+Example:
+
+| ?- compile(ameta,[spec_off]).
+[Compiling ./ameta]
+[ameta compiled, cpu time used: 0.5180 seconds]
+
+yes
+| ?- [ameta].
+[ameta loaded]
+
+yes
+| ?- m(q3,D).
+
+D = [neg(r)];
+
+D = [r];
+
+no
+
+*/

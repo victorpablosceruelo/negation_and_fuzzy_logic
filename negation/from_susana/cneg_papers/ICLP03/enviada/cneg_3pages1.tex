@@ -1,0 +1,318 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementation of Constructive Negation for Prolog 
+% (con el ingles corregido)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{llncs}
+
+
+\usepackage{pst-node}
+
+\usepackage{amsmath} %% for functions defined using different parts
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{times}
+\usepackage{mathptmx}
+\usepackage{theorem}
+
+
+\newcommand{\naf}{{\em naf}}\newcommand{\viejo}[1]{}
+\newcommand{\ciao}{Ciao}
+
+
+\newcommand{\tab}{\hspace{2em}}
+\newcommand{\ra}{$\rightarrow~$}
+\newcommand{\Ra}{\Rightarrow~}
+\newcommand{\HINT}{{\cal H\!-\!INT}}
+%\newcommand{\cts}{\mid}
+\newcommand{\cts}{~[\!]~}
+\newcommand{\N}{I\!\!N}
+
+\newcommand{\ToDo}[1]{
+  \begin{center}
+      \begin{minipage}{0.75\textwidth}
+        \hrule
+        \textbf{To do:}\\
+        {\em #1}
+        \hrule
+      \end{minipage}\\
+  \end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{A Real Implementation for \\
+       Constructive Negation}
+
+%\author{~~Susana Mu\~{n}oz~~~~~~~~~ Juan Jos\'{e} Moreno-Navarro \\
+%         \email{susana@fi.upm.es}~~~~~~~~~~ \email{jjmoreno@fi.upm.es}}
+\author{~~~~~~~~~~~~ Susana Mu\~{n}oz ~~~~ Juan Jos\'{e} Moreno-Navarro \\
+ \email{susana@fi.upm.es}~~~~~ \email{jjmoreno@fi.upm.es}}
+
+\institute{ 
+LSIIS, Facultad de Inform\'{a}tica \\
+Universidad Polit\'{e}cnica de  Madrid \\ 
+Campus de Montegancedo s/n Boadilla del Monte\\
+28660 Madrid, Spain \footnote{This work was partly supported by the
+Spanish MCYT project TIC2000-1632.} \\
+ }
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{-12pt}
+
+%
+
+
+
+\begin{abstract}
+  Logic Programming has been advocated as a language for system
+  specification, especially for those involving logical behaviours,
+  rules and knowledge. However, modelling problems involving negation,
+  which is quite natural in many cases, is somewhat limitated if
+  Prolog is used as the specification / implementation language. These
+  restrictions are not related to theory viewpoint, where users can
+  find many different models with their respective semantics; they
+  concern practical implementation issues.  The negation capabilities
+  supported by current Prolog systems are rather limited, and there is
+  no correct and complete implementation.  In this paper, we refine
+  and propose some extensions to the method of constructive negation,
+  providing the complete theoretical algorithm. Furthermore, we also
+  discuss implementation issues providing a preliminary
+  implementation.
+\end{abstract}
+
+\paragraph{\bf Keywords}
+Constructive Negation, Negation in Logic Programming, Constraint Logic
+Programming, Implementations of Logic Programming.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% INTRODUCTION %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Introduction}
+\label{introduction}
+Of all the proposals, constructive negation \cite{Chan1,Chan2} is
+probably the most promising because it has been proven to be sound and
+complete, and its semantics is fully compatible with
+Prolog's. Constructive negation was, in fact, announced in early
+versions of the Eclipse Prolog compiler, but was removed from the
+latest releases.  The reasons seem to be related to some technical
+problems with the use of coroutining (risk of floundering) and the
+management of constrained solutions.
+
+
+%The  goal of this paper 
+Our goal is to give an algorithmic description of
+constructive negation, i.e. explicitly stating the details needed for
+an implementation. We also intend to discuss the pragmatic ideas
+needed to provide a concrete and real implementation. Early results
+for a concrete implementation extending the \ciao\ Prolog compiler are
+presented.  We assume some familiarity with constructive negation
+techniques and Chan's papers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%   CONSTRUCTIVE NEGATION   %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Constructive Negation}
+\label{constructive}
+
+When we tried to reconstruct this
+implementation we came across several problems, including the
+management of constrained answers and floundering (which appears to be
+the main reason why constructive negation was removed from recent
+versions of Eclipse). It is our befief that this problems cannot be
+easily and efficiently overcome. Therefore, we decided to design an
+implementation from scratch.  One of our additional requirements is
+that we want to use a standard Prolog implementation (to be able to
+reuse thousands of existing Prolog lines and maintain their
+efficiency), so we will avoid implementation-level manipulations.
+
+Intuitively, the constructive negation of a goal, $cneg(G)$, is the
+negation of the the frontier $Frontier(G) \equiv C_1 \vee ... \vee
+C_N$ (formal definition in \cite{Stuckey95}) of the goal $G$.
+
+The solutions of $cneg(G)$ are the solutions of the combination
+(conjunction) of one solution of each of the N conjunctions
+$C_i$ of the frontier. 
+%Now we are going to explain how to negate 
+The negation of a single conjunction $C_i$ is done in two phases:
+\emph{Preparation} and \emph{Negation of the formula}. We describe in
+detail both phases including unclear steps of the algorithm. 
+ 
+We provide an additional step of{\bf Simplification of the
+conjunction}. If one of the terms of $C_i$ is trivially equivalent to
+$true$ (e.g. $X=X$, $\forall X. s(X) \neq 0$), we can eliminate this
+term from $C_i$. Symmetrically,if one of the terms is trivially
+$fail$ing (e.g. $X \neq X$, $\forall X. X \neq Y$, $\forall X. X \neq
+Y$, $\forall X. X = Y$), we can simplify $C_i \equiv fail$. The
+simplification phase can be carried out during the generation of
+frontier terms. We should take into account terms with universally
+quantified variables (that did not take into account in
+\cite{Chan1,Chan2}) because without simplifying them it is impossible
+to obtain results.
+
+
+We also provide a variant in the {\bf Negation of $\overline{D}_{exp}
+           \wedge \overline{R}_{exp}$} that is the step where the
+           disequalities with free variables, $\overline{D}_{exp}$ and
+           the rest of terms of $C_i$ with free variables,
+           $\overline{R}_{exp}$ are negated. This conjunction cannot
+           be disclosed because of the negation of $ \exists~
+           \overline{V}_{exp}~ \overline{D}_{exp} \wedge
+           \overline{R}_{exp}$, where $\overline{V}_{exp}$ gives
+           universal quantifications: $\forall~ \overline{V}_{exp}~
+           cneg(\overline{D}_{exp} \wedge \overline{R}_{exp})$. The
+           entire constructive negation algorithm must be applied
+           again. Note that the new set $GoalVars$ is the former set
+           $ImpVars$. Variables of $\overline{V}_{exp}$ are considered
+           as free variables. When solutions of
+           $cneg(\overline{D}_{exp} \wedge \overline{R}_{exp})$ are
+           obtained some can be rejected: solutions with equalities
+           with variables in $\overline{V}_{exp}$. If there is a
+           disequality with any of these variables, e.g. $V$, the
+           variable will be universally quantified in the disequality.
+           This is the way to negate the negation of a goal, but there
+           is a detail that was not considered in former approaches
+           and that is necessary to get a sound implementation: the
+           existence of universally quantified variables in
+           $\overline{D}_{exp} \wedge \overline{R}_{exp}$ by the
+           iterative application of the method.  So, what we are
+           really negating is a subgoal of the form: $ \exists~
+           \overline{V}_{exp}~ \overline{D}_{exp} \wedge
+           \overline{R}_{exp}$. Its negation is $\forall~
+           \overline{V}_{exp}~ \neg~(\overline{D}_{exp} \wedge
+           \overline{R}_{exp})$
+
+An instrumental step for managing negation is to be able to handle
+disequalities between terms such as $t_1 \neq t_2$.  The typical
+Prolog resources for handling these disequalities are limited to the
+built-in predicate {\tt /== /2}, which needs both terms to be ground
+because it always succeeds in the presence of free variables.  It is
+clear that a variable needs to be bound with a disequality to achieve
+a ``constructive'' behaviour.  Moreover, when an equation $X =
+t(\overline{Y})$ is negated, the free variables in the equation must
+be universaly quantified, unless affected by a more external
+quantification, i.e. $\forall~ \overline{Y}~X \neq t(\overline{Y})$ is
+the correct negation.  As we explained in \cite{SusanaPADL2000}, the
+inclusion of disequalities and constrained answers has a very low
+cost.
+
+
+%%%%%%%% OPTIMIZATION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Optimizing the algorithm and the implementation}
+\label{optimization}
+
+Our constructive negation algorithm and the implementation techniques
+admit some additional optimizations that can improve the runtime
+behaviour of the system. Basically, the optimizations rely on the
+compact representation of information, as well as the early detection
+of successful or failing branches.
+
+\noindent
+- {\bf Compact information}. In our system, negative information is
+represented quite compactly, providing fewer solutions from the
+negation of $\overline{I}$. The advantage is twofold. On the one hand
+constraints contain more information and failing branches can be
+detected earlier (i.e. the search space could be smaller). On the
+other hand, if we ask for all solutions using backtracking, we are
+cutting the search tree by offering all the solutions together in a
+single answer.
+
+\noindent
+- {\bf Pruning subgoals}. The frontiers generation search tree can be
+cut with a double action over the ground subgoals: removing the
+subgoals whose failure we are able to detect early on, and simplifying the
+subgoals that can be reduced to true.
+
+\noindent
+- {\bf Constraint simplification}. During the whole process for negating
+a goal,the frontier variables are constrained. In cases where the
+constraints are satisfiable, they can be eliminated and where the
+constraints can be reduced to fail, the evaluation can be stopped with
+result \emph{true}.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%% RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Experimental results}
+\label{results}
+We have firstly measured the execution times in milliseconds for the
+above examples when using negation as failure ($naf/1$) and
+constructive negation ($cneg/1$). A `-' in a cell means that negation
+as failure is not applicable. All measurements were made using \ciao\
+Prolog. We have added a first
+column with the runtime of the evaluation of the positive goal that is
+negated in the other columns and a last column with the ratio that
+measures the speedup of the \naf\ technique w.r.t. constructive
+negation.
+
+Using {\bf naf} instead of {\bf cneg} results in small ratios around
+1.06 on average for ground calls with few recursive calls. So, the
+possible slow-down for constructive negation is not so high as we
+might expect for these examples. Furthermore, the results are rather
+similar. But the same goals with data that involve many recursive
+calls yield ratios near 14.69 on average w.r.t {\bf naf},
+increasing exponentially with the number of recursive calls. There
+are, of course, many goals that cannot be negated using the \naf\
+technique and that are solved using constructive negation.
+
+\input{table} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% CONCLUSIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{-1em}
+\subsubsection{Conclusion and Future Work}
+\label{conclusion}
+\vspace{-1em}
+After running some preliminary experiments with the constructive 
+negation technique  following Chan's description, we realized that the
+algorithm needed some additional explanations and modifications.
+
+Having given a detailed specification of algorithm in a detailed way
+we proceed to provide a real, complete and consistent
+implementation. The result, we have reported are very encouraging,
+because we have proved that it is possible to extend Prolog with a
+constructive negation module relatively inexpensively. 
+Nevertheless, we are
+working to improve the efficiency of the implementation. These include
+a more accurate selection of the frontier based on the demanded form.
+Other future work is to
+incorporate our algorithm at the WAM machine level.
+
+We are testing the implementation and trying to improve the code, and
+our intention is to include it in the next version of Ciao Prolog
+\footnote{http://www.clip.dia.fi.upm.es/Software}.
+  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ \begin{small}
+
+% \linespread{0.80}
+    \bibliographystyle{plain} 
+    \bibliography{bibliography}
+
+ \end{small}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%  THE END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

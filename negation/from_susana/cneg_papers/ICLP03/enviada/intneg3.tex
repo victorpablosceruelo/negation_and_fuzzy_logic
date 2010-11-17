@@ -1,0 +1,1924 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTENSIONAL NEGATION. ICLP 2003
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[9pt]{llncs}
+
+\usepackage{isolatin1}
+\usepackage{amsmath} %% for functions defined using different parts
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{times}
+\usepackage{mathptmx}
+\renewcommand{\ttdefault}{cmtt}
+\usepackage{theorem}
+\newtheorem{Def}{Definition}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Theo}{Theorem}
+\theoremstyle{change}
+
+
+%\newcommand{\tab}{\hspace{2em}}
+%\newcommand{\N}{I\!\!N}
+\newcommand{\N}{\Bbb{N}}
+\newcommand{\neck}{\leftarrow}
+\newcommand{\where}{[\!]} %% OJO!!
+\newcommand{\df}{\mathit{def}}
+\newcommand{\cdf}{\mathit{cdef}}
+\newcommand{\FS}{\mathit{FS}}
+\newcommand{\PS}{\mathit{PS}}
+\newcommand{\n}{\mathit{neg}}
+\newcommand{\Term}{\mathit{Term}}
+\newcommand{\comp}{\mathit{Comp}}
+\newcommand{\entails}{\models}
+\newcommand{\vecx}{\overline{x}}
+\newcommand{\vecy}{\overline{y}}
+\newcommand{\vecz}{\overline{z}}
+\newcommand{\vecb}{\overline{b}}
+\newcommand{\vecB}{\overline{B}}
+\newcommand{\true}{\underline{\mathrm{t}}}
+\newcommand{\false}{\underline{\mathrm{f}}}
+\newcommand{\CET}{\mathit{CET}}
+\newcommand{\even}{\mathit{even}}
+\newcommand{\then}{\rightarrow}
+\newcommand{\els}{;}
+\newcommand{\onlythen}{\twoheadrightarrow}
+\newcommand{\parels}{\parallel}
+\newcommand{\CD}{\mathit{CD}}
+\newcommand{\NNF}{\mathit{NNF}}
+\newcommand{\negp}{\mathit{neg\_p}}
+\newcommand{\vect}{\overline{t}}
+\newcommand{\negrhs}{\mathit{negate\_rhs}}
+\newcommand{\paratodo}{\mathit{forall}}
+
+%% TITULO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \title{Constructive Intensional Negation: \\ 
+%%       Program Transformation to obtain Logic Negation} 
+
+%% Provisional 
+%%\title{A Practical Implementation of Intensional Negation}
+
+\author{Susana Muñoz \and Julio Mariño \and Juan José Moreno-Navarro}
+\title{Constructive Intensional Negation:
+       a Practical Implementation \\
+       (Extended abstract} 
+
+\institute{Universidad Politécnica de Madrid
+\thanks{Dpto.\ LSIIS -- Facultad de Informática.
+        Campus de Montegancedo s/n,
+        28660, Madrid, SPAIN.
+        email:\texttt{\{susana,jmarino,jjmoreno\}@fi.upm.es},
+        voice: +34-91-336-7455, fax: +34-91-336-6595. This
+                research was partly supported by the Spanish MCYT project 
+                TIC2000-1632.
+    }
+}
+
+
+\newenvironment{mytabbing}
+   {\vspace{0.4em}\begin{small}\begin{tabbing}}
+   {\end{tabbing}\end{small}\vspace{0.4em}}
+
+\newenvironment{prolog}
+   {\vspace{0.4em}\begin{small}\begin{tt}\begin{tabbing}}
+   {\end{tabbing}\end{tt}\end{small}\vspace{0.4em}}
+
+%\theoremstyle{change}
+
+\begin{document}
+%\pagestyle{empty}
+
+\maketitle
+
+%% ABSTRACT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+  Negation is arguably the most important feature of first order logic
+  not present in Logic Programming (LP).  While the integration of
+  negation into LP has been actively studied from a semantic
+  perspective, the negation capabilities in actual Prolog compilers
+  are rather limited.  One of the most promising techniques in the
+  literature is intensional negation, following a transformational
+  approach: for each positive predicate $p$ its negative counterpart
+  $intneg(p)$ is generated.  However, from the practical point of view
+  intensional negation cannot be considered a successful approach
+  because no implementation is given. The reason is that neither
+  universally quantified goals can be computed nor many practical
+  issues are addressed.  In this paper, we describe our variant of the
+  transformation of the intensional negation, called
+  \emph{Constructive Intensional Negation}
+%% ¿de dónde sale este palabro?
+  providing some formal results as well as discussing a concrete
+  implementation.
+
+\noindent
+
+{\bf Keywords:} Negation, Constraint Logic Programming, Program
+Transformation, Logic Programming Implementation, Constructive
+Negation.
+
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%% INTRODUCTION %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+Kowalski and Colmerauer's decision on the elements of first order logic
+supported in LP was based on efficiency considerations.
+% the logical components that can be implemented ``efficiently''. 
+Among those important aspects not included from the beginning we can
+mention \emph{evaluable functions}, \emph{negation} and \emph{higher
+order features}.  All of them have revealed themselves as important
+for the expressiveness of Prolog as a programming language, but, while
+in the case of evaluable functions and higher order features
+considerable effort has been invested both in the semantic
+characterization and its efficient implementation we cannot say the
+same of negation.  Many research papers do propose semantics to
+understand and incorporate negation into logic programming, but only a
+small subset of these ideas have their corresponding implementation
+counterpart.
+%%, forgetting that for
+%%LP "inventors" it was a pre-requisite for inclusion.  
+In fact, the negation capabilities incorporated by current Prolog
+compilers are rather limited, namely: the (unsound) negation as
+failure rule, and the sound (but incomplete) delay technique of the
+language G\"odel \cite{Goedel}, or Nu-Prolog \cite{Naish} (having the
+risk of floundering.) The constructive negation of Eclipse, which was
+announced in earlier versions has been removed from recent releases
+due to implementation errors.
+
+The authors have been involved in a project
+\cite{SusanaPADL2000,SusanaLPAR01} to incorporate negation in a real
+Prolog system (Ciao, \cite{CIAO}.)  This allows us to keep the very
+advanced Prolog current implementations based on WAM technology as
+well as to reuse thousands of Prolog code lines.  The basis of our
+work is to combine existing techniques to make them useful for
+practical application. Furthermore, we try to use the simplest
+technique as possible in any particular case.  To help on this
+distinction, we need to use some tests to characterize the situation
+for efficiency reasons.  To avoid the execution of dynamic tests, we
+suggest to use the results of a global analysis of the source code.
+For instance, the primary technique is the built-in \emph{negation as
+failure} that can be used if a groundness analysis tells that every
+negative literal will be ground at call time \cite{SusanaPRODE00}.
+%% Esto puede ir en otra parte a menos que quede clara la relación
+%% entre delays y negación por fallo
+%% Other program analyses includes elimination of delays, and the
+%% determination of the finiteness of the number of solutions.
+
+In order to handle non-ground literals, a number of alternatives to
+the negation-as-failure rule have been proposed under the generic name
+of \emph{constructive negation}: Chan's \emph{constructive negation}%
+~\cite{Chan1,Chan2}, \emph{intensional negation}%
+~\cite{Barbuti1,Barbuti2,Bruscoli},  
+fail substitutions, fail answers, etc. 
+From a theoretical viewpoint Chan's approach is enough
+%% esto no está nada claro
+%% (the only with completeness results) 
+but it is quite difficult to implement and expensive in terms of 
+execution resources.
+On the other hand, intensional negation
+%% Esto no es verdad
+%% , that precludes completeness
+%% because the use of universally quantified goals, 
+uses a transformational approach, so most of the work is performed at
+compile time and then a variant of the standard SLD resolution is used
+to execute the resulting program, so a significant gain in efficiency
+is expected.  There are, however, some problems when transforming
+certain classes of programs.
+
+In this paper we concentrate on the study of the efficient
+implementation of intensional negation.  As it is formulated in the
+original papers, it is not possible to derive an efficient
+transformation. On one hand, universally quantified goals are
+generated hard to be managed. On the other hand the operational
+behavior of the original program is modified computing infinitely many
+answers instead of compact results. Furthermore, many significant
+details were missing. We propose a way of implementing the universal
+quantification. It is based on the properties of the domain instead of
+the code of the program as in \cite{Bruscoli}.
+
+%% Esto no lo proponemos nosotros
+%% In fact we propose to reformulate the technique in terms of Constraint
+%% LP to handle the first problem. The idea is also present in the
+%% so-called {\em Compilative Constructive Negation} \cite{Bruscoli}
+%% which solves some of the problems and provide interesting formal
+%% results. However, it is again not formulated thinking on a concrete
+%% implementation (important implementation issues are not present nor
+%% can be easily derived) and universal quantification remains in the
+%% resulting code.
+
+%% Esto no debe ir aquí
+%% The main ideas of our {\em Constructive Intensional Negation}
+%% transformational approach were presented in the seminal paper
+%% \cite{SusanaPADL2000}.  The paper is devoted to supply some practical
+%% details needed for the complete implementation as well as to present
+%% some formal results proving the correctness of our approach. In
+%% particular, the complete transformation is fully specified
+%% algorithmically, ready to be included in a compiler. In fact, it has
+%% been done in Ciao Prolog and we include some experimental executions
+%% and results.
+
+The rest of the paper is organized as follows. 
+% We first present (Section
+% \ref{previous}) the
+% Related Work we base on: Intensional Negation and Compilative
+% Constructive Negation. 
+Section \ref{preliminaries} introduces basic syntactic and
+semantic concepts needed to understand our method.
+Section
+\ref{techniquecin} presents more details on the Constructive
+Intensional Negation technique to transform programs. Section
+\ref{transformation} formally presents the transformation algorithm
+while some formal results are established (Section \ref{formal}). The
+implementation issues are studied in Section \ref{implementation}.
+Then we show some execution examples (Section \ref{examples}).
+Finally, we conclude and discuss some future work (Section
+\ref{strategy}).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%  INTENSIONAL NEGATION TECHNIQUE  %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \section{Previous Work}
+% \label{previous}
+
+% \subsection{Intensional Negation}
+% \label{intensional}
+
+% In Intensional negation \cite{Barbuti1,Barbuti2} a program
+% transformation technique is used to add new predicates to the program
+% in order to express the negative information.  Informally, the {\em
+%   complement} of head terms of the positive clauses are computed and
+% they are used later as the head of the negated predicate. Instead of
+% generating so many negated predicates as predicates we want to negate,
+% we will use a predicate $intneg/1$ that, in fact, is the negation
+% whose implementation is explicit for any particular predicate that was
+% going to be negated.
+
+% For example, the transformation of a program (from \cite{Barbuti1}):
+% %
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\= even(0) \\
+%     \> even(s(s(X))) $\leftarrow$ even (X)
+% \end{mytabbing}
+% \end{tt}
+% %
+% yields a set of new clauses for the predicate $intneg/1$ that succeeds
+% when its argument is a goal with $even$ that fails and vice versa
+% (i.e.\ it is the logical negation $\neg$).
+% %
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\= intneg(even(s(0))) \\
+%     \> intneg(even(s(s(X)))) $\leftarrow$ intneg(even(X))
+% \end{mytabbing}
+% \end{tt}
+% %
+% Our transformation approach basically follows the ideas of
+% \cite{Barbuti2}, but differs in some significant points.  For the
+% detailed description of the transformation, Barbuti and his co-authors
+% apply the transformation to a restricted class of programs. Then they
+% show that any program can be translated into a program of that class.
+% Despite the elegance and simplicity of the presentation, this
+% description does not help too much for practical implementation.
+
+% There are two problems with this technique. The first one is that in
+% the presence of logical variables in the right hand side (rhs) of a
+% clause, the new program needs to handle some kind of universal
+% quantification construct. The second trouble affects the outcomes of
+% the program: while the new program is semantically equivalent to the
+% completed program, the operational behavior can differ. In the
+% presence of logical variables, the new predicate can generate all the
+% possible values one by one, even when a more general answer can be
+% given. The predicate $p/2$ defined by the single clause $p(X, X)$ is
+% negated by:
+% %
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\= intneg(p(X, Y)) $\leftarrow$ intneg(eq(X, Y)) \\
+% \\
+% ~~~~\= intneg(eq(0, s(Y))) \\
+%     \> intneg(eq(s(X), 0)) \\
+%     \> intneg(eq(s(X), s(Y))) $\leftarrow$ intneg(eq(X, Y))
+% \end{mytabbing}
+% \end{tt}
+% %
+% \noindent
+% if the program only works with natural numbers constructed with $0$
+% and $succ/1$.  The query $intneg(p(X,Y))$ will generate infinitely
+% many answers, instead of the more general constraint $X \neq Y$. An
+% answer like $X \neq Y$ can only be replaced by an infinite number of
+% equalities.
+
+
+% \subsection{Compilative Constructive Negation}
+% \label{techniquein}
+
+% In order to cope with the second trouble it is possible to use
+% explicitly the formulas in the program completion as rewrite rules
+% with a suitable constraint extraction procedure. It forces us to
+% understand the transformed program into a Constraint LP framework,
+% working with equality and disequality constraints over the Herbrand
+% domain.  The {\em Compilative Constructive Negation} of
+% \cite{Bruscoli} follows the ideas of constructive negation but
+% introducing constraints for predicate left hand side (lhs) and
+% therefore for its negation. The description of the program
+% transformation is in the following definition.
+
+% \begin{definition} [Negation Predicate]
+
+% Given a predicate $p/n$ defined by $m$ clauses:
+
+% %\vspace{-15pt}
+% \begin{mytabbing}
+% ~~~~\=C$_1$:~~\=$p(\overline{t_1})$~ \=$ \leftarrow $ \=$A_1, B_1$. \\
+%     \>~~~\ldots \\
+%     \>C$_m$:  \>$p(\overline{t_m})$  \>$ \leftarrow $\> $A_m, B_m$. 
+% \end{mytabbing}
+% %\vspace{-12pt}
+
+% \noindent
+% where each $B_j = G'_{j,1}, \ldots, G'_{j, r_j}$ is a collection of
+% literals and $A_j = G_{j,1}, \ldots, G_{j, k_j}$ is a collection of
+% literals such that has no free variables (i.e. $var (A_j) \in var
+% (\overline{t_j})$), its \emph{Negated Predicate} is
+% \[\neg~p(\overline{X}) ~~\leftrightarrow~~ (\forall~\overline{Y_1}.(\neg c_1~
+% \vee ~ \neg A_1 ~\vee~ \neg B_1) ~\wedge~ \ldots ~ \wedge~
+% (\forall~\overline{Y_m}.(\neg c_m~ \vee ~ \neg A_m ~\vee~ \neg B_m) )
+% \]
+% %
+% where $\overline{Y_j} = \mbox{\it free\_var (C$_j$)}$ and $c_j$ is the
+% constraint resulting of unificating $\overline{X}$ with $\overline{t_j}$ (see below for details).
+% \end{definition}
+
+
+% As for each $j$ we have 
+% $~~~F'_j = \forall~\overline{Y_j}.(\neg c_j~ \vee ~ \neg A_j ~\vee~ \neg B_j) ~~\equiv~~$ \\
+
+% $ \forall~\overline{Y_j}.(\neg c_j~ \vee ~ \neg B_j) ~\vee~ \neg A_j ~~\equiv~~ \forall~\overline{Y_j}.(\neg c_j~) \vee ~ \forall~\overline{Y_j}.(\neg c_j~ \vee ~ \neg B_j)  ~\vee~ \neg A_j ~~\equiv~~$ \\
+
+% $\forall~\overline{Y_j}.(\neg c_j) ~
+% \vee ~ \forall~\overline{Y_j}.(\neg c_j ~ \vee ~\neg G'_{j,1} ~ \vee ~
+% \ldots ~ \vee ~\neg G'_{j, r_j}) ~ \vee ~\neg G_{j,1} ~ \vee ~ \ldots ~ \vee ~\neg
+% G_{j, k_j} $\\
+
+% \noindent
+% then we compute the disjunctive normal form $(F_1 ~ \vee ~ \ldots ~
+% \vee ~ F_h)$ equivalent to the formula $(F'_1 ~ \wedge ~ \ldots ~ \wedge ~ F'_m)$
+% and replace in $F_i$ the occurrences of $\neg q(\overline{s})$ by {\it
+%   compneg} $(q(\overline{s}))$, obtaining $F^*_i$.
+
+% The new program {\it CompNeg (P)} is:
+
+% %\vspace{-15pt}
+% \begin{mytabbing}
+% ~~~~\=$compneg(p(\overline{X}))$~ \=$ \leftarrow $ \=$F*_1$. \\
+%     \>~~~\ldots \\
+%     \>$compneg(p(\overline{X}))$  \>$ \leftarrow $\> $F*_m$. 
+% \end{mytabbing}
+% %\vspace{-12pt}
+
+% Again, the resulting program should contain universally quantified
+% goals. The authors provide denotational semantics in terms of fixpoint
+% of adequate immediate consequences operators as well as a description
+% of the operational semantics, called {\sc sld$^{\forall}$}. All these
+% semantics are proved to be correct and the correctness and
+% completeness w.r.t.\ three-valued logic is established.
+
+% Just to complete the presentation let us show the transformed program
+% for our running example.
+% %
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\= compneg(even(X)) $\leftarrow$ X $\neq$ 0 $\wedge$ $\forall$~ Y. X $\neq$ s(s(Y))) \\
+%     \> compneg(even(X)) $\leftarrow$ X $\neq$ 0 $\wedge$ 
+%                                      $\forall$~ Y.(X $\neq$ s(s(Y)) 
+%                                                $\vee$ compneg(even(Y)))
+% \end{mytabbing}
+% \end{tt}
+% %
+% Although the paper contains many interesting ideas, it does not deal
+% with universal quantification in a practical manner because it is
+% evaluated at ru-rime in terms of satisfacibylity but not in a
+% constructive way. Furthermore, the paper does not address the
+% efficient management of constraints.
+
+% As the authors are mainly concerned with formal semantics, the
+% resulting program may contain useless clauses and by no means is
+% optimal neither in the size of the program nor in the number of
+% solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Preliminaries}
+\label{preliminaries}
+In this section the syntax of (constraint) logic programs and the
+intended notion of correctness are introduced. Programs will be
+constructed from a signature $\Sigma = \langle \FS_\Sigma, \PS_\Sigma
+\rangle$ of function and predicate symbols. Provided a numerable set
+of variables $V$ the set $\Term(\FS_\Sigma,V)$ of terms is constructed
+in the usual way.
+
+A \emph{constraint} is a first order formula whose atoms are taken
+from $\Term(\FS_\Sigma,V)$ and where the only predicate symbol is the
+binary equality operator $=_{/2}$. A formula $\neg(t_1 = t_2)$ will be
+abbreviated $t_1 \neq t_2$. The constants $\true$ and $\false$ will
+denote the neutral elements of conjunction and disjunction,
+respectively. A tuple $(x_1,\ldots,x_n)$ will be abbreviated $\vecx$.
+The concatenation of tuples $\vecx$ and $\vecy$ is denoted $\vecx
+\cdot \vecy$.
+
+A (constrained) Horn clause is a formula $h(\vecx) \neck
+b_1(\vecy\cdot\vecz),\ldots,b_n(\vecy\cdot\vecz) \where c(\vecx \cdot
+\vecy)$ where $\vecx$, $\vecy$ and $\vecz$ are tuples from disjoint
+sets of variables. The variables in $\vecz$ are called the \emph{free}
+variables in the clause. The symbols ``$,$'' and ``$\where$'' act here
+as aliases of logical conjunction. The atom to the left of the symbol
+``$\neck$'' is called the \emph{head} or \emph{left hand side} of the
+clause.
+
+\emph{Generalized} Horn clauses of the form $h(\vecx) \neck
+B(\vecy\cdot\vecz)\where c(\vecx \cdot \vecy)$ where the body $B$ can
+have arbitrary disjunctions, denoted by ``;'', and conjunctions of
+atoms will be allowed as they can be easily translated into
+``traditional'' ones.
+
+A Prolog program (in $\Sigma$) is a set of clauses indexed by $p \in
+\PS_\Sigma$:
+%
+\[\begin{array}{c}
+p(\vecx) \neck B_1(\vecy_1\cdot\vecz_1) \where c_1(\vecx \cdot \vecy_1)\\
+\vdots\\
+p(\vecx) \neck B_m(\vecy_m\cdot\vecz_m) \where c_m(\vecx \cdot \vecy_m)\\
+  \end{array}\]
+%
+The set of defining clauses for predicate symbol $p$ in program $P$ is
+denoted $\df_P(p)$.
+Without loss of generality we have assumed that the left hand sides in
+$\df_P(p)$ share a single tuple of variables. 
+Actual Prolog programs, however, will be written using a more
+traditional syntax.
+
+Assuming the normal form, let
+$\df_P(p)=\{p(\vecx) \neck B_i(\vecy_i\cdot\vecz_i) 
+                     \where c_i(\vecx \cdot \vecy_i) 
+             | i \in 1 \ldots m\}$.
+The \emph{completed definition} of $p$, $\cdf_P(p)$ is defined as the formula
+%
+\[ \forall \overline{x}.
+   [p(\overline{x}) \iff \bigvee_{i=1}^m 
+   \exists \vecy_i.\,~ c_i(\vecx \cdot \vecy_i) \wedge
+                        \exists \vecz_i.B_i(\vecy_i\cdot\vecz_i)]
+\]
+%
+The \emph{Clark's completion} of the program is the conjunction of the
+completed definitions for all the predicate symbols in the program
+along with the formulas that establish the standard interpretation for
+the equality symbol, the so called \emph{Clark's Equality Theory} or
+$\CET$. The completion of program $P$ will be denoted $\comp(P)$.
+Throughout the paper, the standard meaning of logic programs will be
+given by the three-valued interpretation of their completion -- i.e.\
+its minimum 3-valued model.  
+These 3 values will be denoted $\true$ (or \texttt{success}, or $\Box$),
+$\false$ (or \texttt{fail}, or $\circleddash$) and
+$\underline{\mathrm{u}}$ (or \texttt{unknown}, or $\bot$).
+
+\begin{example}
+Our sample program can be expressed as a set of normalized Horn
+clauses in the following way:
+%
+\begin{tt} 
+\begin{mytabbing}
+even(X) $\neck$ $\where$ X=0.\\
+even(X) $\neck$ even(N) $\where$ X=s(s(N)).
+\end{mytabbing}
+\end{tt}
+%
+Its completion is
+%
+\( \CET \wedge \forall x.\, [\even(x) \iff x=0 
+   \vee \exists n.\, x=s(s(n)) \wedge even(n)]\,. \)
+\end{example}
+
+
+We are now able to specify intensional negation formally. 
+Given a signature 
+$\Sigma=\langle \FS_\Sigma, \PS_\Sigma \rangle$, let 
+$\PS'_\Sigma \supset \PS_\Sigma$ be
+such that for every $p \in \PS_\Sigma$ there exists a symbol 
+$\n(p) \in \PS'_\Sigma \setminus \PS_\Sigma$. 
+Let $\Sigma'= \langle \FS_\Sigma, \PS'_\Sigma \rangle$.
+%
+Given a program $P_\Sigma$, its intensional negation is a program
+$P'_{\Sigma'}$ such that for every $p$ in $\PS_\Sigma$
+the following holds:
+%
+\[ \forall \overline{x}. \comp(P) \entails_3 p(\vecx) \iff
+                         \comp(P') \entails_3 \neg(\n(p)(\vecx)) \]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Towards a Better Transformation}
+\label{techniquecin}
+Some of the problems with the previous methods are due to the
+syntactical complexity of the negated program. 
+A simplified translation can be obtained by taking into account some
+properties that are often satisfied by the source program. 
+For instance, it is usually the case that the clauses for a given
+predicate are mutually exclusive.
+The following definition formalizes this idea:
+
+\begin{definition} A pair of constraints $c_1$ and $c_2$ is
+  said to be \emph{incompatible} iff their conjunction $c_1 \wedge
+  c_2$ is unsatisfiable. A set of constraints $\{c_i\}$ is
+  \emph{exhaustive} iff $\bigvee_i c_i = \true$. A predicate
+  definition
+%
+\(\df_P(p)=\{p(\vecx) \neck B_i(\vecy_i\cdot\vecz_i) 
+                     \where c_i(\vecx \cdot \vecy_i) 
+             | i \in 1 \ldots m\}
+\)
+%
+is \emph{nonoverlapping} iff $\forall i,j \in 1\ldots m$ the
+constraints $\exists \vecy_i.\, c_i(\vecx \cdot \vecy_i)$ and $\exists
+\vecy_j.\, c_j(\vecx \cdot \vecy_j)$ are incompatible and it is
+exhaustive if the set of constraints $\{\exists \vecy_i.\, c_i(\vecx
+\cdot \vecy_i)\}$ is exhaustive.
+\end{definition}
+
+In the following, the symbols ``$\onlythen$'' and ``$\parels$'' will be
+used as syntactic sugar for ``$\wedge$'' and ``$\vee$'' respectively, when
+writing completed definitions from nonoverlapping and exhaustive sets
+of clauses.
+%
+A nonoverlapping set of clauses can be made into a nonoverlapping and
+exhaustive one by adding an extra ``default'' case:
+
+\begin{lemma}\label{completion}
+Let $p$ be such that its definition 
+%
+\(\df_P(p)=\{p(\vecx) \neck B_i(\vecy_i \cdot \vecz_i) 
+                     \where c_i(\vecx \cdot \vecy_i) 
+             | i \in 1 \ldots m\}
+\)
+is nonoverlapping. Then its completed definition is logically equivalent to
+%
+\[\begin{array}{rl}
+
+\cdf_P(p) \equiv \forall \overline{x}.
+   [p(\overline{x}) \iff &  
+   \exists \vecy_1.\,~c_1(\vecx \cdot \vecy_1) 
+     \onlythen \exists\vecz_1.B_1(\vecy_1\cdot\vecz_1) \parels \\
+%   & \exists \vecy_2.\,~c_2(\vecx\cdot\vecy_2)
+%     \onlythen \exists\vecz_2.B_2(\vecy_2\cdot\vecz_2) \parels \\
+   & \vdots \\ 
+   & \exists \vecy_m.\,~c_m(\vecx\cdot\vecy_m)
+     \onlythen \exists\vecz_m.B_m(\vecy_m\cdot\vecz_m) \parels\\
+   & \bigwedge_{i=1}^m 
+     \neg\exists \vecy_i,\vecz_i.\,~c_i(\vecx\cdot\vecy_i)
+     \onlythen \false \,]
+  \end{array}\]
+\end{lemma}
+
+%% The completed definition of a predicate whose clauses are
+%% nonoverlapping 
+%% can be cast in a canonical, \emph{implicative}, form.
+%% In the following, let $A \then B \els C$ be a shorthand for 
+%% $(A \wedge B) \vee (\neg A \wedge C)$, and
+%% $A \then B \els C \then D \els E$ a shorthand for 
+%% $A \then B \els (C \then D \els E)$.
+
+The interesting fact about this kind of definitions is captured by the
+following lemma: 
+
+\begin{lemma}\label{implicative-form2}
+Given first order formulas $\{C_i\}$ and $\{B_i\}$ the
+following holds: 
+\[
+\neg[\exists \vecy_1(C_1 \onlythen B_1) \parels \ldots \parels 
+     \exists \vecy_n(C_n \onlythen B_n)]
+\iff
+\exists \vecy_1(C_1 \onlythen \neg B_1) \parels \ldots \parels 
+\exists \vecy_n(C_n \onlythen \neg B_n)
+\]
+\end{lemma}
+
+This means that the overall structure of the formula is preserved
+after negation, which seems rather promising for our purposes. 
+
+
+
+% \newcommand{\neglesser}{\mathit{neg\_lesser}}
+% \begin{example}
+% The following two completion formulas are logically equivalent:
+% \[\begin{array}{rll}
+%   \CET&\wedge~\cdf_P(lesser) \\
+%       &\wedge \forall n,m.\, \neglesser(n,m) \iff
+%       &\exists y. n=0 \wedge m=s(y) \onlythen \false \parels\\
+%      &&\exists x,y. n=s(x) \wedge m=s(y) \onlythen \neg\lesser(x,y) \parels\\ 
+%      &&m=0 \onlythen \true
+%    \end{array}
+% \]
+% and
+% \[\begin{array}{rll}
+%   \CET&\wedge~\cdf_P(lesser) \\
+%       &\wedge \forall n,m.\, \neglesser(n,m) \iff
+%       &\exists y. n=0 \wedge m=s(y) \onlythen \false \parels\\
+%      &&\exists x,y. n=s(x) \wedge m=s(y) \onlythen \neglesser(x,y) \parels\\ 
+%      &&m=0 \onlythen \true
+%    \end{array}
+% \]
+% \end{example}
+
+
+%% Our approach to overcome these limitation is to formally define and
+%% efficient transformational algorithm {\it CIntNeg} $(P)$, and to
+%% provide effective and efficient implementation support either for
+%% Herbrand constraints and universal quantification computations.
+
+%% Before we specify the transformation let us show intuitively how our
+%% technique works in the previous examples:
+
+%% %\vspace{-5pt}
+%% \begin{tt}
+%% \begin{mytabbing}
+%% ~~~~\= cintneg(p(X, Y)) $\leftarrow$ X $\neq$ Y \\
+%%     \> cintneg(even(X)) $\leftarrow$ X $\neq$ 0 $\wedge$ $\forall$~ Y. X $\neq$ s(s(Y))) \\
+%%     \> cintneg(even(s(s(X)))) $\leftarrow$ cintneg(even(X)) 
+%% \end{mytabbing}
+%% \end{tt}
+%% %\vspace{-5pt}
+
+%% Note that if the program domain only contains natural numbers, the first
+%% clause is equivalent to {\tt cintneg(even(s(0)))}.
+
+%% In Section \ref{implementation} we will treat implementation issues
+%% related with the disequality constraints and the universal
+%% quantification.
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%% PROGRAM TRANSFORMATION  %%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \subsection{Program Transformation Description}
+%% \label{transformation}
+
+%% In order to formally obtain the intensional negation of a goal {\tt G}
+%% ({\tt cintneg(G)}) we proceed step by step. We firstly need to define
+%% of the complement of a term $t$.  We will use constraints for this
+%% purpose what provides a more compact representation.  Without the help
+%% of constrained formulas the only way to represent the complement of a
+%% term is a set of terms.
+
+%% \begin{definition}
+%% The {\tt Complement of a Term} $t$ (not using the variable $X$)
+%% on the variable $X$ (in symbols $Comp(X,t)$) is a constraint
+%% value for $X$, defined inductively as follows:
+%% %\vspace{-5pt}
+%% \begin{itemize}
+%% %\addtolength{\itemsep}{-8pt}
+%% \item $Comp (X,Y) = fail$
+%% \item $Comp (X,c) = (X \neq c)$, with $c$  constant.
+%% \item $Comp (X,c (t_1, \ldots, t_n)) =
+%%          \forall~ \overline{Z} (X \neq c (t_1, \ldots, t_n))$,
+%%          with $c$ a constructor and $\overline{Z}$ the variables
+%%          of $t_1, \ldots, t_n$.
+%% \end{itemize}
+%% \end{definition}
+
+%% \begin{definition}
+%% The {\tt Complement of a Tuple} of terms $\overline{t}$ on the tuple of
+%% variables $\overline{X}$ ( both n-tuples) is the following constraint:
+
+%% \[ Comp(\overline{X},\overline{t}) = Comp(X_1,t_1) \vee ... \vee Comp(X_n,t_n)\]
+
+%% Therefore, without loss of generality we can consider that all the
+%% predicates has one argument, taking the tuple construction as a
+%% constructor.
+%% \end{definition}
+
+%% \begin{definition}
+%% Given a predicate $p/n$ defined by $m$ clauses:
+
+%% %\vspace{-15pt}
+%% \begin{mytabbing}
+%% ~~~~\=C$_1$:~ \=$p(t^1)$~ \=$ \leftarrow $ \=$G_1 $. \\
+%%     \>~~~\ldots \\
+%%     \>C$_m$: \>$p(t^m)$ \>$ \leftarrow $\> $G_m $. 
+%% \end{mytabbing}
+%% %\vspace{-12pt}
+
+%% \noindent
+%% where $G^i$ is a conjunction of subgoals (with $i \in [1..m]$), we say
+%% that $t$ is a {\tt Critical Value} of the predicate $p/n$ in a subset of its
+%% clauses ($\{l_1, \ldots, l_r\} \subseteq \{1, \ldots, m\}$) if
+%% %\vspace{-5pt}
+%% $m.g.u. (t^{l_1}, \ldots, t^{l_r}) = \sigma \mbox{ and }
+%% t = t^{l_j}\sigma, ~~~\forall~ j \in \{1, \ldots,r\}$
+%% %\vspace{-15pt}$p/n$
+%% \end{definition}
+
+%% The definition is well known in Term Rewriting and, intuitively,
+%% detects those terms for which there are more than one 
+%% applicable clause. More formally:
+
+%% \begin{Prop}
+%%   For every critical value $t$ Let $p (s)$ be a goal and $t$ a
+%%   critical value of $p$ in $\{l_1, \ldots, l_r\}$ such that $t$ and
+%%   $s$ are unifiable.  Then for each $i=1..r$ there exists a
+%%   SLD-derivation $~~p (s) ~\rightarrow_{C_{l_i}, \sigma_i} ~ G_i $ and
+%%   for each SLD-derivation $~~p (s) ~\rightarrow_{C_j, \sigma} ~ G $
+%%   then $j \in \{l_1, \ldots, l_r\}$
+
+%% \end{Prop}
+
+
+%% Notice that in case of the presence of critical pairs, all the $rhs$s
+%% of the applicable clauses must be negated together.
+
+%% \begin{definition}
+%% Given a program $P$, and a predicate $p/n$ with $m$ clauses in $P$
+%% with heads $p(t^1), \ldots, p(t^m)$, we define the {\tt Complement of
+%%   a Predicate} $p/n$, {\tt cintneg(p(X))}, as the following set of
+%% clauses:
+
+%% \begin{enumerate}
+%%         \item A clause of the form:
+
+%% \[ cintneg(p(X)) \leftarrow Comp(X,t^1) \wedge ...  \wedge Comp(X,t^m)   \] 
+
+%% assuming, by adequate renamings, that the terms do not share variables
+%% (i.e. $var(t^i) \cap var(t^j) = \emptyset$ for $i \neq j$).  This
+%% clause covers the cases where there is no definition for the predicate
+%% in the original program, and it must be included in the new program. 
+%% We will call it \emph{Complement Clause}.
+
+%%         \item For each critical value $t$ of $p/n$, when $G_{l_1}, ... ,
+%%         G_{l_r}$ are the bodies of the clauses whose head unifies with the
+%%         critical value, a clause of the form:
+%% \[ cintneg(p(t)) \leftarrow negate\_rhs(free\_var(G_{l_1} \vee ... \vee G_{l_r}), G_{l_1} \vee ... \vee G_{l_r})) \]
+
+%% \noindent
+%% where $free\_var(G)$ are the free variables of $G$ (variables
+%% different from the ones in the head of the clause).
+
+%%         \item For each clause $p(t^i) \leftarrow G_i$, where $G_i$ is not
+%%   empty and $t^i$ does not unify with any critical value of $p/n$, a
+%%   clause of the form:
+%% \[ cintneg(p(t^i)) \leftarrow negate\_rhs(free\_var(G_i), G_i) \]
+
+%%         \item For each clause $p(t^i) \leftarrow G_i$, where $G_i$ is not
+%%   empty and $t^i$ unifies with a critical value $t$ of $p/n$ but they
+%%   are not strictly identical terms, a clause of the form:
+%% \[ cintneg(p(t^i)) \leftarrow t^i \neq t \wedge negate\_rhs(free\_var(G_i), G_i) \]
+%% A clause can be implied in several critical values and we will add an
+%% additional clause of the above form for each of them.
+
+%% \end{enumerate}
+%% \end{definition}
+
+%% The effect of $negate\_rhs$ is easy to explain. It just
+%% negates the rhs and introduces universal quantifications when
+%% they are needed:
+
+%% $$ 
+%% negate\_rhs (\overline{V}, G) = 
+%%   \begin{cases}
+%%     cintneg(G)                        & \text{if $\overline{V} = \emptyset$} \\ 
+%%     \forall~ \overline{V} .~ cintneg(G) & \mbox{otherwise} 
+%%   \end{cases} 
+%% $$
+
+%% % %\vspace{-5pt}
+%% % \begin{tabular}{lll}
+%% % $\bullet$ &  $negate\_rhs (\overline{V}, G) = cintneg(G)$ & if $ \overline{V} = \emptyset $ \\
+%% % $\bullet$ &  $negate\_rhs (\overline{V}, G) = \forall \overline{V}. cintneg(G)$ &  otherwise \\   
+%% % \end{tabular}
+%% % %\vspace{-5pt}
+
+%% In Section \ref{strategy} we will discuss the advantages of defining
+%% the function $negate\_rhs$ with a general negation $neg/1$ instead of
+%% the intensional negation $cintneg/1$ as above.
+
+%% It is possible to simplify the resulting expressions by extracting
+%% outside the quantified formula the subgoals that have no free
+%% variables. In a universally quantified expression $\forall
+%% \overline{V}.~ cintneg(G_1 \vee ...\vee G_i \vee ... \vee G_n)$ if a
+%% subgoal $G_i$ does not contain any free variable of $\overline{V}$
+%% then the expression is equivalent to $cintneg(G_i) \wedge~ \forall
+%% \overline{V}. cintneg(G_1 \vee ....\vee G_{i-1} \vee G_{i+1} \vee...
+%% \vee G_n)$.
+
+%% The transformation has some similarities with the transformation
+%% proposed in \cite{Bruscoli}, but there are still some differences. The
+%% transformation of \cite{Bruscoli} has a much more simple formulation
+%% and some optimization covered by our detection of critical values are
+%% not taken into account. The result is that much more universally
+%% quantified goals are generated and the programs contain a lot of
+%% trivial constraints (i.e. they are trivially true or false, as $X = a
+%% ~\wedge~ X \neq a$, $X = a ~\vee~ X \neq a$).
+
+\subsection{The Transformation}
+
+
+The idea of the transformation to be defined below is to obtain a
+program whose completion corresponds to the negation of the original
+program, in particular to a representation of the completion where
+negative literals have been eliminated. This can be formalized as the
+successive application of several transformation steps:
+
+\begin{enumerate}
+
+\item For every completed definition of a predicate $p$ in
+      $\PS_\Sigma$, $\forall \vecx.\, [p(\vecx) \iff D]$, add the
+      completed definition of its negated predicate, 
+      $\forall \vecx.\, [\negp(\vecx) \iff \neg D]$.
+
+\item Move negations to the right of ``$\onlythen$'' using lemma
+      \ref{implicative-form2}. 
+
+\item If negation is applied to a existential quantification, replace 
+      $\neg\exists\vecz. C$ by $\forall\vecz.\neg C$.
+
+\item Replace $\neg C$ by its \emph{negated normal form} 
+      $\NNF(\neg C)$.
+
+\item Replace $\neg \true$ by $\false$, $\neg \false$ by $\true$ and,
+      for every predicate symbol $p$, $\neg p(\vect)$ by
+      $\negp(\vect)$.
+
+\end{enumerate}
+
+
+\begin{definition}The syntactic transformation $\negrhs$ is defined as
+      follows:
+\begin{align*}
+\negrhs(P;Q) &= \negrhs(P),\negrhs(Q)\\
+\negrhs(P,Q) &= \negrhs(P);\negrhs(Q)\\
+\negrhs(\true) &= \false\\
+\negrhs(\false) &= \true\\
+\negrhs(p(\vect)) &= \negp(\vect)
+\end{align*}
+\end{definition}
+
+\begin{definition}[Constructive Intensional Negation]
+  For every predicate $p$ in the original program, assuming
+  $\df_P(p)=\{p(\vecx) \neck B_i(\vecy_i\cdot\vecz_i) \where c_i(\vecx
+  \cdot \vecy_i) | i \in 1 \ldots m\}$, the following clauses will be
+  added to the negated program:
+\begin{itemize}
+\item If the set of constraints
+$\{\exists\vecy_i.c_i(\vecx.\vecy_i)\}$ is not exhaustive, a clause
+\[ \negp(\vecx) \neck \where \bigwedge_1^m \neg\exists\vecy_i.c_i(\vecx.\vecy_i)\]
+
+\item If $\vecz_j$ is empty, the clause
+\[ \negp(\vecx) \neck \negrhs(B_j(\vecy_j)) \where \exists\vecy_j.c_j(\vecx.\vecy_j)\]
+
+\item If $\vecz_j$ is not empty, the clauses
+\[ \negp(\vecx) \neck \paratodo([\vecz_j],p\_j(\vecy_j\cdot\vecz_j))
+   \where \exists\vecy_j.c_j(\vecx.\vecy_j)\]
+\[ p\_j(\vecy_j\cdot\vecz_j) \neck \negrhs(B_j(\vecy_j\cdot\vecz_j)) \]
+\end{itemize}
+\end{definition}
+
+
+\subsection{Overlapping Definitions}
+When the definition of some predicate has overlapping clauses the
+simplicity of the transformation above is lost. Rather than defining a
+different scheme for overlapping rules we will give a
+translation of general sets of clauses into nonoverlapping ones:
+
+\begin{lemma}\label{overlapping}Let $p$ be such that
+\[\df_P(p)=\{p(\vecx) \neck B_i(\vecy_i\cdot\vecz_i) 
+                     \where c_i(\vecx \cdot \vecy_i) 
+             | i \in 1 \ldots m\}
+\]
+and there exist $j,k \in 1 \ldots m$ such that 
+$\exists \vecy_j.\, c_j(\vecx\cdot\vecy_j)$ and 
+$\exists \vecy_k.\, c_k(\vecx\cdot\vecy_k)$ are compatible.
+Then the $j$-th and $k$-th clauses can be replaced by the clause
+%
+\[ p(\vecx) \neck B_j(\vecy_j\cdot\vecz_j);B_k(\vecy_k\cdot\vecz_k)
+   \where c_j(\vecx \cdot \vecy_j) \wedge c_k(\vecx \cdot \vecy_k) \]
+%
+   and the following additional clauses in case their constraints were
+   not equivalent to $\false$
+\[ p(\vecx) \neck B_j(\vecy_j\cdot\vecz_j)
+   \where c_j(\vecx \cdot \vecy_j) \wedge \neg c_k(\vecx \cdot \vecy_k) \]
+and
+\[ p(\vecx) \neck B_k(\vecy_k\cdot\vecz_k)
+\where \neg c_j(\vecx \cdot \vecy_j) \wedge c_k(\vecx \cdot \vecy_k)
+\] without changing the standard meaning of the program. The process
+can be repeated a finite number of times if there are more than two
+overlapping clauses.
+\end{lemma}
+
+
+\subsection{Examples}
+
+
+Let us show some motivating examples:
+
+\newcommand{\lesser}{\mathit{lesser}}
+
+\begin{example}
+The predicate \texttt{lesser/2} can be defined by the following
+nonoverlapping set of clauses
+%
+\begin{prolog}
+lesser(0,s(Y))\\
+lesser(s(X),s(Y)) $\neck$ lesser(X,Y)
+\end{prolog}
+%
+or, normalizing,
+%
+\begin{prolog}
+lesser(N,M) $\neck$ $\where$ N=0, M=s(Y)\\
+lesser(N,M) $\neck$ lesser(X,Y) $\where$ N=s(X), M=s(Y)
+\end{prolog}
+%
+By lemma~\ref{completion}, the completed definition of \texttt{lesser}
+is
+%
+\[\begin{array}{rl} 
+   \cdf_P(lesser) \equiv \forall n,m.\, \lesser(n,m) \iff
+   &\exists y. n=0 \wedge m=s(y) \onlythen \true \parels\\
+   &\exists x,y. n=s(x) \wedge m=s(y) \onlythen \lesser(x,y) \parels\\ 
+   &m=0 \onlythen \false
+  \end{array}
+\]
+%
+We have assumed that the constraint $\neg(\exists y. n=0 \wedge
+m=s(y)) \wedge \neg(\exists x,y. n=s(x) \wedge m=s(y))$ has been
+simplified to $m=0$ (if the only symbols are $0$ and $s/1$).
+
+The constructive intensional negation of \texttt{lesser} is
+%
+\[\begin{array}{ll} 
+   \cdf_P(neg\_lesser) \equiv \\
+                      \forall n,m.\, \mathit{neg\_lesser}(n,m) \iff 
+    &\exists y. n=0 \wedge m=s(y) \onlythen \false \parels\\ 
+    &\exists x,y. n=s(x) \wedge m=s(y) \onlythen \mathit{neg\_lesser}(x,y) \parels\\ 
+    &m=0 \onlythen \true
+  \end{array}
+\]
+%
+And the generated Prolog program is:
+\begin{prolog}
+neg\_lesser(N,M) $\neck$ $\where$ N=0, M=s(Y)\\
+neg\_lesser(N,M) $\neck$ lesser(X,Y) $\where$ N=s(X), M=s(Y)
+\end{prolog}
+
+\end{example}
+
+\newcommand{\ancestor}{\mathit{ancestor}}
+
+\begin{example}
+
+
+The second example, {\em family}, is also well known, and includes free
+variables in the rhs of the definition of the predicate \texttt{ancestor/2}:
+
+\vspace{-3pt}
+\begin{tt}
+\begin{mytabbing}
+~~~~\=parent(john, mary) ~~~~\= ancestor(X, Y) $\leftarrow$ parent(X, Y) \\
+    \>parent(john, peter) \> ancestor(X, Y) $\leftarrow$ \= parent(Z, Y) $\wedge$ \\ 
+    \>parent(mary, joe)   \>                    \> ancestor(X, Z) \\
+    \>parent(peter, susan) 
+\end{mytabbing}
+\end{tt}
+\vspace{-3pt}
+\noindent
+%% The transformation of the predicate \emph{ancestor} has no complement
+%% clause. The first and the second clause have an obvious critical
+%% value $(X, Y)$. The associated clause is:
+
+%% \vspace{-3pt}
+%% \begin{tt}
+%% \begin{mytabbing}
+%% ~~~~\=cintneg(ancestor(X,Y)) $\leftarrow$ \=  $\forall$ Z.~(\= cintneg(parent(Z,Y) $\wedge$ ancestor(X,Z))) $\wedge$\\
+%%     \>                          \> cintneg(parent(X,Y))
+%% \end{mytabbing}
+%% \end{tt}
+%% \vspace{-3pt}
+
+
+% In principle, we need to transform each of the clauses of the
+% predicate, including
+% the constraint $(X, Y) \neq(X, Y)$ in their bodies, but it
+% is trivially unsatisfiable and we can omit the clauses.
+
+%
+or, normalizing,
+%
+\begin{prolog}
+ancestor(N,M) $\neck$ parent(X,Y) $\where$ N=X, M=Y\\
+ancestor(N,M) $\neck$ parent(Z,Y), ancestor(Y,X) $\where$ N=X, M=Y
+\end{prolog}
+%
+By lemma~\ref{completion} we obtain a completed definition of
+\texttt{ancestor} that we have replaced by lemma~\ref{overlapping}
+obtaining
+%
+\[\begin{array}{ll} 
+   \cdf_P(neg\_ancestor) \equiv \\
+   \forall n,m.\, \mathit{neg\_ancestor}(n,m) \iff
+   &\exists x,y. n=x \wedge m=y \onlythen \\ 
+   &\mathit{neg\_parent}(n,m),forall([z],\ancestor-1(x,y,z))
+  \end{array}
+\]
+%
+%
+\[\begin{array}{ll} 
+   \cdf_P(ancestor-1) \equiv \\
+   \forall n,m,r.\, \ancestor-1(n,m,r) \iff
+   &\exists x,y,z. n=x \wedge m=y \wedge r=z\onlythen\\ 
+                                                &    \mathit{neg\_parent}(z,y);
+                                                    \mathit{neg\_ancestor}(x,z)
+  \end{array}
+\]
+
+\end{example}
+
+
+% Let us discuss the application of the method in a couple of
+% examples. Consider the fragment of the program:
+
+% %\vspace{-5pt}
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\=less(0, s(Y)) \\
+%     \>less(s(X), s(Y)) $\leftarrow$ less(X, Y)
+% \end{mytabbing}
+% \end{tt}
+% %\vspace{-5pt}
+
+% First of all, we need to compute the complements of the terms in
+% the lhs of the clauses, with respect to the variable pair
+% $(W, Z)$. We have: 
+% $$Comp((W, Z), (0, s(Y))) = Comp(W, 0) \vee Comp(Z, s(Y)) = $$
+% $$(W \neq 0) ~ \vee ~ (\forall~ Y. ~Z \neq s(Y))$$
+% $$Comp((W, Z), (s(X), s(Y))) = Comp(W, s(X)) \vee Comp(Z, s(Y)) = $$
+% $$(\forall~ X.~ W \neq s(X))~ \vee~ ( \forall~ Y.~ Z \neq s(Y))$$
+% %\begin{itemize}
+% %\item $Comp (0, s(Y)) = (W \neq 0, \forall~ Y (Z \neq s(Y)))$
+% %\item $Comp (s(X), s(Y)) = (\forall~ X (W \neq s(X)),
+% %                              \forall~ Y (Z \neq s(Y)))$
+% %\end{itemize}
+% %
+% %\begin{eqnarray*}
+% % Comp(0, s(Y)) & = & (W \neq 0, \forall~ Y (Z \neq s(Y))) \\
+% % Comp (s(X), s(Y)) & = & (\forall~ X (W \neq s(X)),
+% % \forall~ Y (Z \neq s(Y)))   
+% %\end{eqnarray*}
+% The complement clause is:
+% \vspace{-3pt}
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\=cintneg(less(W, Z),true) $\leftarrow$ \= $\forall$ J .~( (W, Z)  $\neq$ (0, s(fA(J))) ) $\wedge$ \\
+%     \>                           \> $\forall$ X,Y .~( (W, Z)  $\neq$ (s(fA(X)), s(fA(Y))) ) \\
+% \end{mytabbing}
+% \end{tt}
+% \vspace{-3pt}
+% \noindent
+% It can be simplified. There are no critical values and the first
+% clause has no rhs, so the only transformed clause is for the second
+% clause:
+
+% \vspace{-3pt}
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\=cintneg(less(s(X), s(Y))) $\leftarrow$ cintneg(less(X, Y))
+% \end{mytabbing}
+% \end{tt}
+% \vspace{-3pt}
+
+\noindent
+
+\subsection{Formal results}
+\label{formal}
+
+In order to establish the correctness of our transformation we can rely
+on the formal properties of \cite{Bruscoli}. The main result is that our
+transformation is essentially equivalent (although more efficient) that
+\cite{Bruscoli} one.
+
+\begin{Theo}
+  Under the three-valued logic the program completion of {\it
+    CompNeg$(P)$} and {\it CIntNeg$(P)$} are equivalent logic
+  formulas.
+\end{Theo}
+
+This allows to apply the fixpoint semantics to our programs. Let us
+now discuss how to handle Herbrand constraints and universally
+quantified goals. We will show that our implementation computes the
+same answers that {\sc sld$^\forall$}.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%  IMPLEMENTATION ISSUES %%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \section{Implementation Issues}
+% \label{implementation}
+
+% We introduce some implementation issues that we will use in the
+% negated predicates: the disequality constraints and the universal
+% quantification. Later we will talk about the implementation of the
+% transformation of the input program.
+
+% %%%%%%%% MANAGMENT OF DISEQUALITY CONSTRAINTS   %%%%%%%%%%%%%%%%%
+
+% \subsection{Management of Disequality Constraints}
+% \label{disequality}
+
+% An instrumental step in order to manage negation in a more advanced
+% way is to be able to handle disequalities between terms such as $t_1
+% \neq t_2$.  Prolog implementations typically include only the built-in
+% predicate $\backslash ~== ~/2$ % es \ pero no me funciona
+%  which can only work with disequalities if both
+% terms are ground and simply succeeds in the presence of free variables.
+% A ``constructive'' behavior must allow the ``binding'' of a variable
+% with a disequality. On the other hand, the
+% negation of an equation $X = t(\overline{Y})$ produces the universal
+% quantification of the free variables in the equation, unless a more
+% external quantification affects them. The negation of such an equation
+% is $\forall~ \overline{Y}.~X \neq t(\overline{Y})$.
+% % He borrado la referencia a Carlsson
+% As we explained in \cite{SusanaPADL2000}, the inclusion of
+% disequalities and constrained answers has a very low cost. It
+% incorporates negative normal form constraints instead of bindings and
+% the decomposition step can produce disjunctions. More precisely, the
+% normal form of constraints is:
+
+% %\vspace{-20pt}
+% \[ \underbrace{\bigwedge_i (X_i = t_i)}_{\mbox{positive information}} \wedge~~~~ (
+% \underbrace{\bigwedge_j \forall~ \overline{Z}_j^1 . ~(Y_j^1 \neq s_j^1)
+% \vee \ldots \vee \bigwedge_l \forall~ \overline{Z_l}^n . ~(Y_l^n
+% \neq s_l^n) )}_{\mbox{negative information}} \]
+% %\vspace{-20pt}
+
+% \noindent
+% where each $X_i$ appears only in $X_i = t_i$, none $s_k^r$ is $Y_k^r$
+% and the universal quantification could be
+% empty (leaving a simple disequality).
+
+% Using some normalization rules we can obtain a normal form
+% formula from any initial formula. It is easy to redefine
+% the unification algorithm to manage constrained variables.
+
+% This very compact way to represent a normal form was firstly presented in
+% \cite{Moreno1} and differs from Chan's representation where
+% only disjunctions are used\footnote{Chan treats the disjunctions
+% by means of backtracking. The main advantage of our normal form is
+% that the search space is drastically reduced.}.
+
+% Therefore, in order to include disequalities into a Prolog compiler we
+% need to reprogram unification. It is possible if the Prolog version
+% allows attributed variables \cite{Carlsson} (e.g. in Sicstus Prolog,
+% or in Eclipse where they are called meta-structures). These variables
+% let us keep associated information with each variable during the
+% unification what can be used to dynamically control the constraints.
+
+% Attributed variables are variables with an associated attribute, which
+% is a term. We will associate to each variable a data structure
+% containing a normal form constraint. Basically, a list of list of
+% pairs (variable, term) is used. They behave like ordinary variables,
+% except that the programmer can supply code for unification, printing
+% facilities and memory management.  In our case, the printing facility
+% is used to show constrained answers. The main task is to provide a new
+% unification code.
+
+% Once the unification of a variable $X$ with a term $t$ is
+% triggered, there are three possible cases (up to
+% commutativity):
+
+% %\vspace{-5pt}
+% \begin{enumerate}
+% %\addtolength{\itemsep}{-8pt}
+% \item if $X$ is a free variable and $t$ is not a variable with a negative
+% constraint, $X$ is just bound to $t$,
+% \item if $X$ is a free variable or bound to a term $t'$ and
+% $t$ is a variable $Y$ with a negative constraint, we need to check
+% if $X$ (or, equivalently, $t'$) satisfies the constraint associated with $Y$.
+% A conveniently defined predicate \emph{satisfy} is used for this purpose,
+% \item if $X$ is bound to a term $t'$ and $t$ is a term (or a variable
+% bound to a term), the classical unification algorithm can be used.
+% \end{enumerate}
+% %\vspace{-5pt}
+
+% We have defined a predicate $=/=~ /2$ \cite{SusanaPADL2000}, used to
+% check disequalities, in a similar way to explicit unification ($=$).
+% Each constraint is a disjunction of conjunctions of disequalities that
+% are implemented as a list of lists of terms as $T_1/T_2$ (that
+% represents the disequality $T_1 \neq T_2$). When a universal
+% quantification is used in a disequality (e.g., $\forall Y.~X \neq
+% c(Y)$) the new constructor $fA/1$ is used (e.g., $X/c(fA(Y))$).
+
+% The main list is used to represent disjunctions while the inside list
+% represents the conjunction of disequalities.  We focus on the variable
+% $X$ and we show in the Table \ref{tab:table2} an example of
+% correspondence between constraints over X and the attributes that we
+% manage. The predicate $forall/2$ is a the implementation of the
+% universal quantification that we will see in the next section.
+
+% \begin{table}[h]
+% %\hspace{-0.5cm}
+% \begin{center}
+% \begin{tabular}{lll}
+% SUBGOAL & ATTRIBUTE & CONSTRAINT \\
+% \hline\hline
+% \ \\
+% {\tt cintneg(member(X,[1,2,3]))}   &  $[[X/1,X/2,X/3]]$  & $X \neq 1 \wedge X \neq 2 \wedge X \neq 3$\\
+% {\tt member(X,[1,2,3]), X=/=2} &  $[[X/1,X/3]]$       & $X \neq 1 \wedge X \neq 3$\\
+% {\tt member(X,[1]), X=/=1}     &  {\tt fail}          & $false$ \\
+% {\tt X =/= 4}                   & $[[X/4]]$            & $X \neq 4$ \\
+% {\tt X =/= 4; X=/=5}            & $[[X/4], [X/5]]$     & $X \neq 4 \vee X \neq 5$ \\
+% {\tt X =/= 5; (X=/=6, X=/=Y)}   & $[[X/4],[X/6, X/Y]]$ & $X \neq 4 \vee (X \neq 6 \wedge X \neq Y)$\\
+% {\tt forall(Y, X =/= s(Y)))}     & $[[X/s(fA(Y)]]$  & $\forall Y. X \neq s(Y)$ \\
+% {\tt cintneg(natural(X))}     & $[[X/0,X/s(fA(Y)]]$            & $X \neq 0 \wedge \forall Y. X \neq s(Y)$
+
+% \end{tabular}
+% \vspace*{3mm}
+% \caption{Attribute representation of constraints}
+% \label{tab:table2}
+% %\end{small}
+% \end{center}
+% \hspace{-2cm}
+% \end{table}
+
+% %%%%%%%% IMPLEMENTATION OF UNIVERSAL QUANTIFICATION %%%%%%%%%%%%%
+
+\section{Universal Quantification}
+\label{quantification}
+
+The efficient implementation of universally quantified goals is not an
+easy task. In fact, it is considered as an undecidable
+problem. However, we were not interested in a complete implementation
+but a implementation powerful enough to resolve the quantifications
+that we obtain from the program transformation of the intensional
+negation.
+
+Our implementation is based on two ideas:
+%\vspace{-5pt}
+\begin{enumerate}
+%\addtolength{\itemsep}{-8pt}
+\item A universal quantification of the goal $Q$ over a
+variable $X$ succeeds when $Q$ succeeds without
+binding (or constraining) $X$.
+\item A universal quantification of $Q$ over $X$ is true
+if $Q$ is true for all possible values for the variable $X$.
+\end{enumerate}
+
+Instead of generating all possible values (which is not possible in
+the presence of a constructor of arity greater than 0) we can generate
+all the possible skeletons of values, using new variables.  The
+simplest possibility is to include all the constants and all the
+constructors applied to fresh variables. Now, the universal
+quantification is tested for all this terms, using the new variables
+in the quantification. Formally we can express this in the formula:
+\[ \forall X.~Q(X) \equiv Q(Sk) \vee 
+                 [ \forall \overline{X_1}.~Q(c_1(\overline{X_1})) 
+                   \wedge ... \wedge
+                   \forall \overline{X_n}.~Q(c_n(\overline{X_n})) ] 
+\]
+where $Sk$ is a constant of Skolem, that is a constant different from
+any symbol of the Herbrand Universe of the problem and $c_1,...,c_n$
+are the constructors of the domain (each of them with its
+corresponding arity).
+
+The second argument of the disjunction can be combined with the first
+one in order to get an implementation. The first case will be true
+when $Q$ succeeds without unifying $X$ to any nonvar term. The second
+case evaluate all the posible unifications of $X$ with any of the $n$
+constructors.
+
+
+In order to formalize this concept, we need the notion of {\bf
+covering}.
+
+\begin{definition} [Covering]
+A \emph{Covering of the Herbrand Universe} is any sequence of terms 
+$\{t_1, \ldots, t_n\}$ such that:
+%\vspace{-5pt}
+\begin{itemize}
+%\addtolength{\itemsep}{-8pt}
+\item For every $i, j$ with $i \neq j$, $t_i$ and $t_j$ do
+not superpose, i.e. there is no ground substitution $\sigma$
+with $t_i\sigma = t_j\sigma$.
+\item For all ground term $s$ of the Herbrand Universe there
+exists $i$ and a ground substitution $\sigma$ with
+$s = t_i\sigma$.
+\end{itemize}
+\end{definition}
+
+The simplest covering is a variable $C_1=\{X\}$. If the program
+uses only natural numbers, the following sets of terms are
+coverings:
+%\vspace{-5pt}
+\begin{itemize}
+%\addtolength{\itemsep}{-8pt}
+\item $C_2=\{0, s(X)\}$
+\item $C_3=\{0, s(0), s(s(X))\}$
+\item $C_4=\{0, s(0), s(s(0)), s(s(s(X)))\}$
+\end{itemize}
+
+The example also gives us the hint about how to
+incrementally generate coverings. We start from the simplest
+covering $X$. From one covering we generate the next one
+choosing one term and one variable of this term. The term is
+removed and then we add all the terms obtained replacing the
+variable by all the possible instances of that element. 
+
+In order to fix a strategy to select the term and the variable we use
+a Cantor's diagonalization\footnote{This is the method to enumerate
+$\N^m$. It ensures that all elements are visited in a finite number of
+steps.} to explore the domain of a set of variables. It is a breadth
+first strategy to cover every element of the domain. The previous
+concepts extend trivially in the case of tuple of elements of the
+Herbrand Universe, i.e. several variables.
+
+A covering $C_i=\{ \overline{t_1}, ..., \overline{t_m}\}$ can be
+evaluated for the goal $Q(\overline{X})$. This means that for each
+element $\overline{t_j}$ in the covering $(j \in \{1..m\})$ we execute
+$Q(\overline{t_j})$. For simplicity we will make the following
+definitions for one only varible because it can be extended for a
+tuple. Therefore we will evaluate the goal $Q(X)$ for any of the
+possible values of $X$ that are all the values of a covering.
+
+\begin{definition}[Next Covering]
+  Let a covering $C=\{ t_1, ..., t_m \}$, the \emph{next covering}
+  to $C$ over the variable $X$, $Next(C,X)=\{ t_1,...,t_{j-1},
+  t_{j+1},..., t_m, {t_j}_1,...,{t_j}_n \}$ where ${t_j}_k=t_j
+  \sigma_k, ~ j \in \{1..m\},~ k \in \{1..n\}$ and the sustitution
+  $\sigma_k=\{X \rightarrow c_k(\overline{X_k}\}$ if $c_1,...,c_n$ are the
+  constructors of the domain (each of them with its corresponding
+  arity, the number of variables of $\overline{X_k}$). The $j$ is
+  chosen following a Cantor's diagonalization to obtain a fair
+  selection rule.
+\end{definition}
+
+\begin{definition}[Sequence of Coverings]
+  $\mathcal{C}$ is a \emph{sequence of coverings} if $\mathcal{C}=
+  \{C_1,...,C_n\}$ where for each $C_i$ with $i \in \{1..n-1\}$,
+  $C_{i+1}=Next(C_i,X_i)$, and $X_i$ is the first variable that we
+  find if we examine the terms of $C_i$ from the left to the right.
+
+%  If there is no variables in $C_i$ then $C_{i+1}=C_i$
+\end{definition}
+
+\begin{definition}[Evaluation of a Covering]
+The \emph{evaluation of a covering} $C$ for the goal $Q(X)$ is the
+conjunction of the results of evaluate the goal $Q(X)$ with all the
+possible values of $X$ that are the elements of a covering $C$. That
+is
+\[ \xi(C,Q(X)) = Q(t_1) \wedge ... \wedge Q(t_m)\]
+where $C=\{ t_1, ..., t_m\}$
+\end{definition}
+
+\begin{definition}[Meaning of the Evaluation of a Covering]
+  The \emph{meaning of the evaluation of a covering} $C_i=\{ t_1, ...,
+  t_m\}$ of a sequence of coverings $\mathcal{C}$ for a goal $Q(X)$
+  over the variable $X$ is one of these cases:
+%\vspace{-5pt}
+\begin{enumerate}
+%\addtolength{\itemsep}{-8pt}
+
+    \item if $Q(t_i)= \true$ for all $i \in \{1..m\}$
+without any bind of the variables introduced by the covering, then the
+meaning of the evaluation of the covering
+succeeds. \[ \|\xi(C_i,Q(X))\| = \true \]
+
+    \item otherwise if $Q(t_i)= \false~$ for any $i \in
+\{1..m\}$ such that $t_i$ is ground, then the meaning of the
+evaluation of the covering fails. \[ \|\xi(C_i,Q(X))\| =
+\false~ \]
+
+\item otherwise if $Q(t_i)= \false~$ for any $i \in \{1..m\}$ such
+  that $t_i$ is not ground. In this case we have tried to unify one of
+  the variables of $t_i$ and to obtain the meaning of the evaluation
+  of the covering we must obtain the meaning of the evaluation of the
+  next covering of $\mathcal{C}$.
+\[ \|\xi(C_i,Q(X))\| = \|\xi(C_{i+1},Q(X))\|~ \]
+
+    \item otherwise if $Q(t_i)= \underline{\mathrm{u}}~$ for any $i \in
+  \{1..m\}$ such that $t_i$ is ground, then the meaning of the
+  evaluation of the covering is unknown. \[ \|\xi(C_i,Q(X))\| =
+  \underline{\mathrm{u}}~ \]
+
+\end{enumerate}
+The selection of the elements $t_i$ of the covering for its evaluation
+$Q(t_i)$ is made using a fair selection rule that assures us that if
+for any ot the terms of the covering $Q(t_i)$ fails, then that term
+will be selected in a finite time.
+\end{definition}
+
+\begin{lemma}
+  If the meaning of an evaluation of a covering $C_i$ in the sequence
+  $\mathcal{C}$ is unknown for the goal $Q(X)$ then the meaning of the
+  evaluation of the following covering $Next(C_i,X)=C_{i+1}$ for the
+  same goal is also unknown.
+\[ \|\xi(C_i,Q(X))\| = \underline{\mathrm{u}} ~ \rightarrow ~
+   \|\xi(C_{i+1},Q(X))\|= \underline{\mathrm{u}} \]
+\end{lemma}
+
+\begin{proof}
+  When it is chosen a term of the covering such that $Q(t_i)$ is
+  unknown it is because for any other term $t_j$ of the covering
+  $Q(t_j)$ fails due to the use of a fair selection rule it would have
+  been selected before.
+
+  If the meaning of the evaluation of a covering is unknown, it is
+  because it is unknown for at least one of the terms of the covering
+  and true or unknown for the rest of them.  
+  
+  For a universe with n different constructors $c_1,...,c_n$, we can
+  obtain the next covering expanding one term $t$ over the variable
+  $X$ in $t_1,...,t_n$ such that $t_k=t \sigma_k, ~ k \in \{1..m\}$
+  and the unification $\sigma_k=\{X \rightarrow c_k(\overline{X_k}\}$. 
+  
+  $$\|Q(t)\|= \underline{\mathrm{u}} \rightarrow 
+  \forall k \in {1..m}.~
+  \|Q(t_k)\|= \underline{\mathrm{u}} $$
+  
+  $$\|Q(t)\|= \true \rightarrow 
+  \forall k \in {1..m}.~
+  \|Q(t_k)\|= \true $$
+
+  When we the next covering $C_{i+1}$ is generated from a covering
+  $C_i$ such that its meaning is unknown, the meaning of the obtained
+  covering will be unknown for the definition of the selection rule.
+  Formally
+
+$$ (\|\xi(C_i,Q(X))\| = \underline{\mathrm{u}} ~ \equiv $$
+$$   \forall t_j \in C_i.~ (\|Q(t_i)\|= \underline{\mathrm{u}} \vee 
+                         \|Q(t_i)\|= \true) \wedge
+   \exists t_k \in C_i.~ \|Q(t_k)\|= \underline{\mathrm{u}}) \rightarrow ~ $$
+$$   \|\xi(C_{i+1},Q(X))\|= \underline{\mathrm{u}} $$
+
+\end{proof}
+
+
+\subsection{Implementation Issues}
+\subsubsection{Disequality Constraints}
+\subsubsection{Implementation of Universal Quantification}
+
+We implement the universal quantification by means of the predicate%\linebreak 
+$forall([X1,\ldots,Xn],~ Q)$, where $X1,\ldots,Xn$ are the
+universal quantified variables and $Q$ is the goal to quantify. We
+start with the initial covering $\{(X_1,\ldots,X_n)\}$ of depth 1.
+
+There are two important details that optimize the execution.
+The first one is that in order to check if there are bindings
+in the covering variables, it is better to replace them by
+new constants that do not appear in the program. In other words,
+we are using ``Skolem constants''.
+
+The second optimization is much more useful. Notice that the
+coverings grow up incrementally, so we only need to check the
+most recently included terms. The other ones have been checked
+before and there is no reason to do it again.
+
+As an example, consider a program which uses only natural
+numbers: the sequence of coverings for the
+goal $\forall~ X,Y,Z. ~ p(X,Y,Z)$ will be the following
+ (where $Sk(i)$, with $i$ a number, represents the ith
+Skolem constant).
+%\vspace{-3pt}
+\begin{small}
+\begin{mytabbing}
+$C_1 = [(Sk(1),Sk(2),Sk(3))]$ \\
+$C_2 = [\underline{(0,Sk(1),Sk(2))}, \underline{(s(Sk(1)),Sk(2),Sk(3))}]$ \\
+$C_3 = [\underline{(0,0,Sk(1))}, \underline{(0,s(Sk(1)),Sk(2))},
+        (s(Sk(1)),Sk(2),Sk(3))]$ \\
+$C_4 = [\underline{(0,0,0)}, \underline{(0,0,s(Sk(1)))},
+        (0,s(Sk(1)),Sk(2)),(s(Sk(1)),Sk(2),Sk(3))]$ \\
+$C_5 = [(0,0,0), \underline{(0,0,s(0))}, \underline{(0,0,s(s(Sk(1))))},
+        (0,s(Sk(1)),Sk(2)),$ \\
+~~~~~~~~$        (s(Sk(1)),Sk(2),Sk(3))]$\\
+$C_6 = \ldots$
+\end{mytabbing}
+\end{small}
+%\vspace{-3pt}
+
+In each step, only two elements need to be checked, those that appear
+underlined. The rest are part of the previous covering and they
+do not need to be checked again. 
+%Again, the authors can supply
+%details of the code (or see \cite{SusanaTFC}).
+
+Let us show some examples of the use of the \emph{forall} predicate,
+indicating the covering found to get the solution. We are still
+working only with natural numbers:
+% and we are going to consider a
+%maximal depth of 5:
+
+%\vspace{-8pt}
+\begin{tt}
+\begin{mytabbing}
+~~~~\=$|$ ?- \= forall([X], even(X)). \\
+    \>       \> no 
+\end{mytabbing}
+\end{tt}
+%\vspace{-8pt}
+
+\noindent
+with the covering of depth 3 $\{0, \underline{s(0)}, s(s(Sk(1))\}$.
+
+%\vspace{-8pt}
+\begin{tt}
+\begin{mytabbing}
+~~~~\=$|$ ?- \= forall([X], X =/= a). \\
+    \>       \> yes
+\end{mytabbing}
+\end{tt}
+%\vspace{-8pt}
+
+\noindent
+with the covering of depth 1 $\{Sk(1)\}$.
+
+%\vspace{-8pt}
+\begin{tt}
+\begin{mytabbing}
+~~~~\=$|$ ?- \=forall([X], less(0, X) -$>$ less(X, Y)). \\
+    \>       \>Y = s(s(\_A))
+\end{mytabbing}
+\end{tt}
+%\vspace{-8pt}
+
+\noindent
+with the covering of depth 2 $\{0, s(Sk(1))\}$.
+%\bigskip
+%\vspace{-8pt}
+\begin{tt}
+\begin{mytabbing}
+~~~~\=$|$ ?- \=forall([X], (Y=X ; lesser(Y, X))). \\
+    \>       \>Y = 0
+\end{mytabbing}
+\end{tt}
+%\vspace{-8pt}
+
+\noindent
+with the covering of depth 2 $\{0, s(Sk(1))\}$.
+%\bigskip
+
+
+% The general solution does not guarantee completeness of the query
+% evaluation process. There are some cases when the generation of
+% coverings does not find one which is correct or incorrect.
+% Nevertheless, this solution fails to work properly in very particular
+% cases.  Remember that we are not interested in giving the user an
+% universal quantification operator, but just to implement the code
+% coming from the transformation of a negated predicate. In order to
+% have a practical use of the method, we restrict the depth of the
+% coverings to some (user defined) constant $d$. If the {\em forall/4}
+% predicate is not able to achieve a solution at this covering
+% generation depth, the predicate informs that it is not possible to
+% know the result of the computation at that depth $d$ ({\tt S =
+%   unknown}).
+
+% We can formally prove that in those cases when a result is obtained
+% with the {\em forall/4} predicate it is equivalent to the one obtained
+% by {\sc sld$^{\forall}$} (i.e. {\sc sld} with universal quantification).
+
+% \begin{Theo}
+% For any universally quantified goal in a program $P$ such that 
+
+% \[ \mbox{\em forall} ([X_1, \ldots, X_n], p (t), n, V) ~\leadsto_{P, \sigma} ~ \Box \]
+
+% \noindent
+% for any $n$, if $\sigma(V) =$ {\tt success}, we have $~\forall X_1,
+% \ldots, X_n. p (s) \sigma ~ \leadsto^{\forall}_{P} ~ \Box~ $; and if
+% $\sigma(V) =$ {\tt fail}, we have that the goal $\forall X_1, \ldots,
+% X_n. p (s)\sigma$ has no successful {\sc sld$^{\forall}$}
+% derivations.
+% \end{Theo}
+
+As we have seen in the definition of the quantifier, this
+implementation is correct and if we use a fair selection rule to chose
+the order in which the terms of the covering are visited then it is
+also complete. We can implement this because in Ciao Prolog is posible
+to ensures AND-fairness by goal shuffling \cite{CIAO}. 
+
+If we implement this in a Prolog compiler using depth first
+SLD-resolution, the selection will make the process incomplete. When
+we are evaluating a covering $C=\{ t_1, ..., t_m \}$ for a goal $Q(X)$
+if we use the depth first strategy from the left to the right, we can
+find that the evaluation of a $Q(t_j)$ is unknown and is there exists
+one $k > j$ such that $t_k$ is ground and $Q(t_k)$ fails, then we
+would obtain that $forall([X],Q(X))$ is unknown when indeed it is
+false.
+
+
+% %%%%%%%%%%%%%%%% RESULTING IMPLEMENTATION   %%%%%%%%%%%%%%%%%%%%%
+
+% \subsection{Resulting Implementation}
+% \label{resulting}
+
+
+% We have implemented a transformation of the input program that adds
+% explicit negation. It is possible to expand the code during the
+% execution thanks to the packages system of Ciao
+% \cite{ciao-modules-cl2000}. If a Prolog Program with explicit
+% negations loads the package $intneg.pl$ the initial program will be
+% enlarged with a new predicate $cintneg/2$ that is the implementation
+% of the complement of the code of every predicate of the input program
+% that can be negated at runtime.
+
+% % So, a call to $cintneg(p(X,Y),S)$ is
+% % equivalent to the call $cintneg(p(X,Y))$ but with an additional
+% % argument that serves to return $true$ if the negation has a solution
+% % (and the solution will be obtained too, of course), $fail$ if the
+% % negation fails and $unknown$ if there is a universal quantification
+% % in the execution of the negation and it does not finish the generation
+% % of coverings in a finite number or steps.
+
+% % With this simple mechanism we can use intensional negation to negate
+% % any goal and the worst case would be that the result would be
+% % $unknown$ and we would have to continue negating with another
+% % technique (constructive negation). Due to the inefficiency of the
+% % constructive negation for general goals and the efficiency of
+% % intensional negation , the overhead of this useless execution 
+% % is worthy.
+
+% \begin{table}[h]
+% %\begin{small} 
+% \begin{center}
+% \begin{tabular}{||c|c|c|c||}
+% \hline %------------------------------------------------------------------
+% \hline %-------------------------------------------------------------------
+% {\bf $\neg G_1$} &~~ {\bf $\neg G_2$} ~~& ~~{\bf $\neg G_1 \vee \neg G_2$}~~ &~~ {\bf $\neg G_1 \wedge \neg G_2$}~~ \\ 
+
+% \hline %--------------------------------------------------------------
+% T & T & T & T \\
+% F & F & F & F \\
+% U & U & U & U \\
+% T & F & T & F \\
+% T & F & T & F \\
+% T & U & T & U \\
+% U & T & T & U \\
+% F & U & U & F \\
+% U & F & U & F \\
+
+% \hline %------------------------------------------------------------
+% \hline %------------------------------------------------------------
+
+% \end{tabular}
+% \vspace*{3mm}
+% \caption{Three-valued connectives}
+% \label{tab:table1}
+% %\end{small}
+% \end{center}
+% \end{table}
+
+% To combine the results of negated goals three-valued logic connectives
+% must be used as presented in table \ref{tab:table1}.  Obviously, these
+% equivalences are satisfied:
+
+% $$ \neg (G_1 \wedge G_2) \equiv \neg  G_1 \vee \neg G_2 $$
+% $$ \neg (G_1 \vee G_2) \equiv \neg  G_1 \wedge \neg G_2 $$
+% $$ \neg \neg G_1 \equiv G_1 $$
+
+\subsubsection{Efficiency Evaluation}
+
+\input{table} %% tab:table3
+
+Let us show some experimental results very encouraging.  We present
+three set of examples.  The first one collects some examples where it
+is slightly worst or a little better to use intensional negation
+instead of negation as failure. That is for implementation reasons for
+sample goals.  They correspond to cases where the general strategy
+will prefer negation as failure to execute the goal.
+
+The second set contains examples in which negation as
+failure cannot be used. Intensional negation is very efficient in the sense
+that the execution time is similar as the time needed to execute 
+the positive goal. 
+
+% We have included an example of a goal that
+% cannot be negated using intensional negation (constructive negation will
+% be used instead in the general strategy).
+
+The third set of examples is the most interesting because contains
+more complex goals where negation as failure cannot be used and the
+speed-up of intensional negation over constructive negation is over 5
+times better.
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%  EXAMPLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \section{Examples}
+% \label{examples}
+
+% The code that is generated for the examples of the above section is:
+
+% \begin{tt}
+% \begin{mytabbing}
+% ~~~~\=cintneg(even(X),true) :- X =/= 0, X =/= s(s(fA(Y))). \\
+%     \> cintneg(even(s(s(X))),S) :- cintneg(even(X),S). \\
+% \\
+% ~~~~\=cintneg(less(W, Z),true) :- \= ( (W, Z)  =/= (0, s(fA(J))) ), \\
+%     \>                           \> ( (W, Z)  =/= (s(fA(X)), s(fA(Y))) ). \\
+% ~~~~\=cintneg(less(s(X), s(Y)),S) :- cintneg(less(X, Y),S). \\
+% \\
+% ~~~~\=cintneg(ancestor(X,Y),S) :- \= cintneg(parent(X,Y),S1), \\
+%     \>                          \> forall([Z],cintneg((parent(Z,Y),ancestor(X,Z)),S2). \\
+%     \>                          \> and(S1,S2,S).
+% \end{mytabbing}
+% \end{tt}
+
+% Note that the $and/3$ is the three-valued version of conjunction
+% (see Table \ref{tab:table1}). Next we have some examples coming from a
+% running session that show the behavior at runtime:
+
+% \begin{small}
+% \begin{tt}
+% \begin{minipage}[h]{10cm}
+% \begin{mytabbing}
+% \=$|$?- \=cintneg(even(s(s(0)))). \\
+%     \>      \>no \\
+% \>$|$?- cintneg(even(s(s(s(0))))). \\
+%     \>      \>yes \\
+% \>$|$?- cintneg(even(X)). \\
+%     \>      \>X =/= 0,X=/=s(s(fA(\_A))) ?;\\
+%     \>      \>X=s(s(Y)),Y=/=0, \\
+%     \>      \>Y=/=s(s(fA(\_A))) ?; \\
+%     \>      \> \dots \\ %\vdots \\
+% \>$|$?- cintneg(less(0, s(X))). \\
+%     \>      \>no \\
+% \>$|$?- cintneg(less(s(X), 0)). \\
+%     \>      \>yes 
+% \end{mytabbing}
+% \end{minipage}
+% \begin{minipage}[h]{7.3cm}
+% \begin{mytabbing}
+% \=$|$?- \=cintneg(less(s(X),X)). \\
+%     \>      \>... \\
+% \>$|$?- \>cintneg(ancestor(mary,peter)).\\
+%     \>      \>yes \\
+% \>$|$?- cintneg(ancestor(john,X), S). \\
+%     \>      \>S = true, X = john \\
+% \>$|$?- cintneg(ancestor(peter,X), S). \\
+%     \>      \>S = true, X =/= susan ? ; \\
+%     \>      \>S = fail, X = susan  \\
+% \>$|$?- cintneg((parent(X,mary), \\
+%     \>      \>~~~~~~~parent(X,peter)), S). \\
+%     \>      \>S = true, X =/= john ? ; \\
+%     \>      \>S = fail, X = john 
+% \end{mytabbing}
+% \end{minipage}
+% \end{tt}
+% \end{small}
+
+% %\smallskip
+% The divergence of the goal $cintneg(less(s(X), X))$ is of the same
+% nature of the divergence of $less(X, s(X))$ and is related to the
+% incompleteness of Prolog implementations. Furtheremore, our
+% implementation provides only sound results.
+
+% % although
+% % there are cases where we cannot provide any result.
+
+% % In order to provide some heuristics to guide the computation
+% % of the negation process we will use some information provided
+% % by a global analysis of the source program.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% INTENSIONAL NEGATION IN THE COMPILER STRATEGY %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Conclusion and Future Work}
+\label{strategy}
+
+Intensional Negation is just a part of a more general project to
+implement negation where several other approaches are used: negation
+as failure possibly combined with dynamical goal reordering,
+intensional negation, and constructive negation. The decision of what
+approach can be used is fixed by the information of different program
+analyses: naf in case of groundness of statically detected goal
+reordering, finite constructive negation in case of finiteness of the
+number of solutions, etc.  See \cite{SusanaLPAR01} for details.
+Notice that the strategy also ensures the soundness of the method: if
+the analysis is correct, the precondition to apply a technique is
+ensured, so the results are sound.  
+
+% Given a (sub)goal of the form
+% $\neg G(\overline{X})$ the compiler produces one of the following
+% codes: \emph{naf} ($G (\overline{X})$), \emph{cintneg} ($G
+% (\overline{X}))$, \emph{cnegf} ($G (\overline{X}))$ or \emph{cneg} ($G
+% (\overline{X}))$ in this preference order. Completeness is ensured by
+% the completeness of constructive negation, the last technique to be
+% used.  
+
+When the transformation of our intensional negation will be
+integrated into the general strategy we would optimize the
+implementation by introducing in the negation of the rhs of the
+predicates the general negation $neg/1$ or any other of the techniques
+(for example $naf/1$ if the analysis recommends it).  We come back to
+the family example at the end of the Section \ref{transformation}. In
+case the analysis recommend constructive negation considering that
+$parent(X,Y)$ has a finite number of solutions. The optimized code
+will be:
+
+
+\begin{tt}
+\begin{mytabbing}
+~~~~\=cintneg(ancestor(X,Y),S) :- \= cnegf(parent(X,Y)), \\
+    \>                      \> forall([Z],(\= cnegf(parent(Z,Y)); \\
+    \>                      \>             \> cintneg(ancestor(X,Z),S2)),S2), \\
+    \>                      \> and(S1,S2,S).
+\end{mytabbing}
+\end{tt}
+
+In the case we can infer that a call to $\neg parent(Z, Y)$ is ground,
+and \emph{naf} can be used instead of \emph{cnegf}. The transformed
+predicate ($cintneg(G (\overline(X))$) will be used in case of
+recursive calls.
+
+% We have to find a sufficient condition over the goal $G
+% (\overline(X))$ that ensures the success of $cintneg(G
+% (\overline(X)))$. While we are working on static analyses to answer
+% the question we are using a dynamic approach.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%  FUTURE WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Prolog can be more widely used for knowledge representation based
+applications if negated goals can be included in programs.  We have
+presented a collection of techniques \cite{SusanaPADL2000}, more or
+less well known in logic programming, that can be used together in
+order to produce a system that can handle negation efficiently.  In
+our approach, intensional negation plays a significant role and a
+deeper study of it have been presented.  To our knowledge it is one of
+the first serious attempts to include such proposals as implmentations
+into a Prolog compiler.
+
+The main novelties of our constructive intensional negation approach is:
+\begin{itemize}
+\item The formulation in terms of disequality constraints, solving
+  some of the problems of intensional negation \cite{Barbuti2} in a
+  more efficient way than \cite{Bruscoli}.
+\item The computation of universally quantified goals, that was
+  sketched in \cite{Barbuti2}, and now we have discuss its soundness
+  and completeness in this paper.
+\end{itemize}
+
+As a future work, we plan to include this implementation into a
+compiler in order to produce a version of Ciao Prolog with negation.
+It will give us a real measure of what important is the information of
+the analyzers to help our strategy. 
+
+% On the other hand, there are still
+% some unsolved problems. The most important is the detection of the
+% cases where the universal quantification does not work in order to
+% avoid the overhead of the \emph{forall} predicate when it cannot find
+% a solution.  
+
+Another field of work is the optimization of the implementation of the
+\emph{forall} using different search techniques and more specialized
+ways of generating the coverings of the Herbrand Universe of our
+negation subsystem.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{small}
+
+%\linespread{0.9}
+  \bibliographystyle{plain} \bibliography{bibliography}
+
+\end{small}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%  THE END  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+

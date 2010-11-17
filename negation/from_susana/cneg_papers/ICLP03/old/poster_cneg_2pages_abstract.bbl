@@ -1,0 +1,26 @@
+\begin{thebibliography}{1}
+
+\bibitem{Chan1}
+D.~Chan.
+\newblock Constructive negation based on the complete database.
+\newblock In {\em ICLP'88}, pages 111--125. The MIT Press, 1988.
+
+\bibitem{Chan2}
+D.~Chan.
+\newblock An extension of constructive negation and its application in
+  coroutining.
+\newblock In {\em Proc. NACLP'89}, pages 477--493. The MIT Press, 1989.
+
+\bibitem{SusanaPADL2000}
+S.~Mu{\~n}oz and J.~J. Moreno-Navarro.
+\newblock How to incorporate negation in a prolog compiler.
+\newblock In E.~Pontelli and V.~Santos Costa, editors, {\em PADL'2000}, volume
+  1753 of {\em LNCS}, pages 124--140, Boston, MA (USA), 2000. Springer-Verlag.
+
+\bibitem{Stuckey95}
+P.~Stuckey.
+\newblock Negation and constraint logic programming.
+\newblock In {\em Information and Computation}, volume 118(1), pages 12--33,
+  1995.
+
+\end{thebibliography}

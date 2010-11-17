@@ -1,0 +1,74 @@
+:-module(ex_xsb_03, _).
+
+:- import put_attr/3, get_attr/3, del_attr/2,
+	install_verify_attribute_handler/4,
+	install_constraint_portray_hook/4
+	from machine.
+
+:- dynamic formula/2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% CONSTRAINT PORTRAY %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- install_constraint_portray_hook(dist,Contents,Vars,portray_constraint(Vars, Contents)).
+
+portray_constraint(Vars, Contents) :-
+	nl, write('Vars: '), write(Vars), 
+	write(' Attributed vars: '), write(Contents), nl,
+	write_attributes_in_vars(Vars, Contents).
+
+write_attributes_in_vars([], []) :- !.
+write_attributes_in_vars([V1], [C1]) :- !, 
+	write_attributes_in_var(V1, C1).
+write_attributes_in_vars([V1|OV], [C1|OC]) :- !, 
+	write_attributes_in_var(V1, C1),
+	write_attributes_in_vars(OV, OC).
+
+
+write_attributes_in_var(V1, C1) :-
+	var(C1), !, 
+	write_attributes_in_var_aux(V1, C1),
+	nl. % Each var in 1 line.
+
+write_attributes_in_var(V1, C1) :-
+	clause_head(C1, _Name, _Arity, Args), !,
+	write_attributes_in_vars_list(V1, Args).
+
+write_attributes_in_vars_list(_V1, []) :- !.
+write_attributes_in_vars_list(V1, [X]) :- !,
+	write_attributes_in_var(V1, X).
+write_attributes_in_vars_list(V1, [X:R]) :- !,
+	write_attributes_in_var(V1, X),
+	write_attributes_in_vars_list(V1, R).
+
+
+write_attributes_in_var_aux(V1, C1) :-
+	get_attr(C1, ex_xsb_3, Attr), !,
+	write(C1), write(' in '),
+	write(V1), write(': '),
+	write(Attr).
+write_attributes_in_var_aux(V1, C1) :-
+	write(C1), write(' in '),
+	write(V1), write(': '),
+	write('Not an attributed variable').
+
+clause_head(Head, Name, Arity, Args) :-
+	functor(Head, Name, Arity),
+	Arity > 0, !,
+	Head=..[Name|Args].
+
+clause_head(Head, Name, Arity, []) :-
+	functor(Head, Name, Arity),
+	Arity == 0.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% EXAMPLE %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+:- table(p/1).
+
+p(X) :- put_attr(X, ex_xsb_3, formula(X, [X/0, X/fA(_Y)])).
+
+test(X, Y) :- p(Y), get_calls(p(X), Ent, Ret), get_returns(Ent, Ret).

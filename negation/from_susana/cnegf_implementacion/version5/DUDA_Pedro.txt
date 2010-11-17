@@ -1,0 +1,67 @@
+He hecho una prueba sencilla de análisis de no fallo (typesfd,shfr,nf)
+con el fichero:
+
+
+:- module(_proof2,_,[assertions]).
+
+:- entry no_falla(A) : (ground(A)).
+:- entry no_sabemos(A,L) : (ground(A)).
+
+% falla(_X):- fail.
+no_falla(_X).
+no_sabemos(X,L):- mi_member(X,L).
+
+mi_member(X,[X|_L]):- !.
+mi_member(X,[_Y|L]):- 
+ 	mi_member(X,L).
+
+Y va bien para el que no falla y para el que no se sabe.
+Pero el análisis devuelve "no" si incluyo el predicado falla/1 y no devuelve
+fichero de salida.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Por otro lado me sale este resultado al ejecutar optneg:
+
+?- main([qsort1]).
+{Precompiling /home/susana/tesis/micodigo/cnegf/version2/qsort1.pl
+{preprocessed in 3 msec.}
+{mode analysis in 5 msec.}
+{analysis prepared in 3 msec.}
+{type analysis in 85 msec.}
+{types simplified in 17 msec.}
+{information stored in 1 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 357 msec.}
+{predicates: total=4 non-failing=3 covered=4}
+{completed in 484 msec.}
+{predicates=4, clauses=8, literals=12, max_variables=7, mean_variables=4.8}
+{written file /home/susana/tesis/micodigo/cnegf/version2/qsort1_typesfd_shfr_nf_co.pl}
+}
+{Precompiling /home/susana/tesis/micodigo/cnegf/version2/qsort1.pl
+{preprocessed in 3 msec.}
+{mode analysis in 7 msec.}
+{analysis prepared in 3 msec.}
+{type analysis in 87 msec.}
+{types simplified in 15 msec.}
+{information stored in 0 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 359 msec.}
+{predicates: total=4 non-failing=3 covered=4}
+{cost analysis in 27 msec.}
+{cost information stored in 1 msec.}
+{completed in 507 msec.}
+{predicates=4, clauses=8, literals=12, max_variables=7, mean_variables=4.8}
+{written file /home/susana/tesis/micodigo/cnegf/version2/qsort1_typesfd_shfr_upper_nf_co.pl}
+}
+{Precompiling /home/susana/tesis/micodigo/cnegf/version2/qsort1.pl
+{completed in 7 msec.}
+{predicates=4, clauses=8, literals=12, max_variables=7, mean_variables=4.8}
+{written file /home/susana/tesis/micodigo/cnegf/version2/qsort1_co.pl}
+}
+
+yes
+
+	Susana

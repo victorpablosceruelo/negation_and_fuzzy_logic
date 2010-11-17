@@ -1,0 +1,323 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Alferes, Dam\'{a}sio, and Pereira}{Alferes
+  et~al\mbox{.}}{1995}]{Alferes95}
+{\sc Alferes, J.~J.}, {\sc Dam\'{a}sio, C.~V.}, {\sc and} {\sc Pereira, L.~M.}
+  1995.
+\newblock A logic programming system for non-monotonic reasoning.
+\newblock In {\em Journal of Automated Reasoning}. Vol. 14(1). 93--147.
+
+\bibitem[\protect\citeauthoryear{Alvez, Lucio, Orejas, Pasarella, and
+  Pino}{Alvez et~al\mbox{.}}{2004}]{BNC-cneg}
+{\sc Alvez, J.}, {\sc Lucio, P.}, {\sc Orejas, F.}, {\sc Pasarella, E.}, {\sc
+  and} {\sc Pino, E.} 2004.
+\newblock Constructive negation by bottom-up computation of literal answers,.
+\newblock In {\em Proceedings of the 2004 ACM Symposium on Applied Computing}.
+  ACM, vol.~2. Nicosia (Cyprus), 1468--1475.
+
+\bibitem[\protect\citeauthoryear{Apt}{Apt}{1990}]{Apt}
+{\sc Apt, K.~R.} 1990.
+\newblock Logic programming.
+\newblock In {\em Handbook of Theoretical Computer Science}, {J.~van Leeuwen},
+  Ed. Vol.~3. Elsevier, New York, 493--574.
+
+\bibitem[\protect\citeauthoryear{Barbuti, Mancarella, Pedreschi, and
+  Turini}{Barbuti et~al\mbox{.}}{1987}]{Barbuti1}
+{\sc Barbuti, R.}, {\sc Mancarella, D.}, {\sc Pedreschi, D.}, {\sc and} {\sc
+  Turini, F.} 1987.
+\newblock Intensional negation of logic programs.
+\newblock {\em LNCS\/}~{\em 250}, 96--110.
+
+\bibitem[\protect\citeauthoryear{Barbuti, Mancarella, Pedreschi, and
+  Turini}{Barbuti et~al\mbox{.}}{1990}]{Barbuti2}
+{\sc Barbuti, R.}, {\sc Mancarella, D.}, {\sc Pedreschi, D.}, {\sc and} {\sc
+  Turini, F.} 1990.
+\newblock A transformational approach to negation in logic programming.
+\newblock {\em JLP\/}~{\em 8,\/}~3, 201--228.
+
+\bibitem[\protect\citeauthoryear{Bart{\'a}k}{Bart{\'a}k}{1998}]{Bartak}
+{\sc Bart{\'a}k, R.} 1998.
+\newblock Constructive negation in clp(h).
+\newblock Tech. Report 98/6, Department of Theoretical Computer Science,
+  Charles University, Prague. July.
+
+\bibitem[\protect\citeauthoryear{Bol and Degerstedt}{Bol and
+  Degerstedt}{1993}]{Bol}
+{\sc Bol, R.} {\sc and} {\sc Degerstedt, L.} 1993.
+\newblock Tabulated resolution for well founded semantics.
+\newblock In {\em Proc. International Logic Programming Symposium}. MIT Press,
+  Cambridge, Massachuset.
+
+\bibitem[\protect\citeauthoryear{Bossu and Siegel}{Bossu and
+  Siegel}{1985}]{Bossu}
+{\sc Bossu, G.} {\sc and} {\sc Siegel, P.} 1985.
+\newblock Saturation, nonmonotonic reasoning and the closed world assumption.
+\newblock {\em Artificial Intellicence\/}~{\em 25,\/}~1, 13--63.
+
+\bibitem[\protect\citeauthoryear{Bruscoli, Levi, Levi, and Meo}{Bruscoli
+  et~al\mbox{.}}{1994}]{Bruscoli}
+{\sc Bruscoli, P.}, {\sc Levi, F.}, {\sc Levi, G.}, {\sc and} {\sc Meo, M.~C.}
+  1994.
+\newblock {C}ompilative {C}onstructive {N}egation in {C}onstraint {L}ogic
+  {P}rograms.
+\newblock In {\em Proc. of the Nineteenth International Colloquium on Trees in
+  Algebra and Programming, CAAP '94}, {S.~Tyson}, Ed. LNCS, vol. 787.
+  Springer-Verlag, Berlin, 52--67.
+
+\bibitem[\protect\citeauthoryear{Cabeza and Hermenegildo}{Cabeza and
+  Hermenegildo}{2000}]{ciao-modules-cl2000}
+{\sc Cabeza, D.} {\sc and} {\sc Hermenegildo, M.} 2000.
+\newblock {A} {N}ew {M}odule {S}ystem for {P}rolog.
+\newblock In {\em CL2000}. Number 1861 in LNAI. Springer-Verlag, 131--148.
+
+\bibitem[\protect\citeauthoryear{Chan}{Chan}{1988}]{Chan1}
+{\sc Chan, D.} 1988.
+\newblock Constructive negation based on the complete database.
+\newblock In {\em Proc. Int. Conference on LP'88}. The MIT Press, 111--125.
+
+\bibitem[\protect\citeauthoryear{Chan}{Chan}{1989}]{Chan2}
+{\sc Chan, D.} 1989.
+\newblock An extension of constructive negation and its application in
+  coroutining.
+\newblock In {\em Proc. NACLP'89}. The MIT Press, 477--493.
+
+\bibitem[\protect\citeauthoryear{Chen and Warren}{Chen and Warren}{1996}]{Chen}
+{\sc Chen, W.} {\sc and} {\sc Warren, D.~S.} 1996.
+\newblock Tabled evaluation with delaying for general logic programs.
+\newblock {\em Journal of ACM\/}~{\em 43,\/}~1, 20--74.
+
+\bibitem[\protect\citeauthoryear{Clark}{Clark}{1978}]{Clark}
+{\sc Clark, K.~L.} 1978.
+\newblock Negation as failure.
+\newblock In Logic and Data Bases, {H.~Gallaire} {and} {J.~Minker}, Eds.
+  293--322.
+
+\bibitem[\protect\citeauthoryear{Dam\'{a}sio}{Dam\'{a}sio}{1996}]{Damasio}
+{\sc Dam\'{a}sio, C.} 1996.
+\newblock Paraconsistent extended logic programming with constraints.
+\newblock Ph.D. thesis, Dept. de Inform\'{a}tica, Universidade Nova de Lisboa.
+
+\bibitem[\protect\citeauthoryear{Dix, Pereira, and Przymusinski}{Dix
+  et~al\mbox{.}}{1997}]{Dix97}
+{\sc Dix, J.}, {\sc Pereira, L.~M.}, {\sc and} {\sc Przymusinski, T.~C.} 1997.
+\newblock Prolegomena to logic programming and non-monotinic reasoning.
+\newblock In {\em Non-Monotonic Extensions of Logic Programming, Selected
+  papers from NMELP'96}, {J.~Dix}, {L.~Pereira}, {and} {T.~C. Przymusinski},
+  Eds. Lecture Notes in Artificial Intelligence, vol. 1216. Springer-Verlag,
+  1--36.
+
+\bibitem[\protect\citeauthoryear{Drabent}{Drabent}{1995}]{Drabent}
+{\sc Drabent, W.} 1995.
+\newblock What is a failure? {A}n approach to constructive negation.
+\newblock {\em Acta Informatica.\/}~{\em 33}, 27--59.
+
+\bibitem[\protect\citeauthoryear{Fages}{Fages}{1997}]{Fages}
+{\sc Fages, F.} 1997.
+\newblock Constructive negation by prunning.
+\newblock {\em Journal of Logic Programming\/}~{\em 32,\/}~2, 85--118.
+
+\bibitem[\protect\citeauthoryear{Foo, Rao, Taylor, and Walker}{Foo
+  et~al\mbox{.}}{1988}]{Foo}
+{\sc Foo, N.}, {\sc Rao, A.}, {\sc Taylor, A.}, {\sc and} {\sc Walker, A.}
+  1988.
+\newblock Deduced relevant types and constructive negation.
+\newblock In {\em 5th. International Conference and Symposium on Logic
+  Programming}. 126--139.
+
+\bibitem[\protect\citeauthoryear{Hermenegildo, Bueno, Puebla, and
+  L\'{o}pez-Garc\'{\i}a}{Hermenegildo et~al\mbox{.}}{1999}]{ciaopp-iclp99-tut}
+{\sc Hermenegildo, M.}, {\sc Bueno, F.}, {\sc Puebla, G.}, {\sc and} {\sc
+  L\'{o}pez-Garc\'{\i}a, P.} 1999.
+\newblock {P}rogram {A}nalysis, {De}bugging and {O}ptimization {U}sing the
+  {C}iao {S}ystem {P}reprocessor.
+\newblock In {\em 1999 ICLP}. MIT Press, Cambridge, MA, 52--66.
+
+\bibitem[\protect\citeauthoryear{Khabaza}{Khabaza}{1984}]{Khabaza}
+{\sc Khabaza, T.} 1984.
+\newblock Negation as failure and parallelism.
+\newblock In {\em Symposium on Logic Programming}. IEEE, 70--75.
+
+\bibitem[\protect\citeauthoryear{Kunen}{Kunen}{1987}]{Kunen}
+{\sc Kunen, K.} 1987.
+\newblock Negation in logic programming.
+\newblock {\em Journal of Logic Programming\/}~{\em 4}, 289--308.
+
+\bibitem[\protect\citeauthoryear{Lassez and Marriot}{Lassez and
+  Marriot}{1987}]{Lassez}
+{\sc Lassez, J.~L.} {\sc and} {\sc Marriot, K.} 1987.
+\newblock Explicit representation of terms defined by counter examples.
+\newblock {\em Journal of Automated Reasoning\/}~{\em 3}.
+
+\bibitem[\protect\citeauthoryear{Liu, Adams, and Chen}{Liu
+  et~al\mbox{.}}{1999}]{Liu99}
+{\sc Liu, J.~Y.}, {\sc Adams, L.}, {\sc and} {\sc Chen, W.} 1999.
+\newblock Constructive negation under the well-founded semantics.
+\newblock {\em Journal of Logic Programming\/}~{\em 38,\/}~3, 295--330.
+
+\bibitem[\protect\citeauthoryear{Lloyd}{Lloyd}{1987}]{Lloyd}
+{\sc Lloyd, J.~W.} 1987.
+\newblock {\em Foundations of Logic Programing}.
+\newblock Springer-Verlag, Berlin, Germany.
+\newblock 2nd edition.
+
+\bibitem[\protect\citeauthoryear{L\'opez-Garc\'{\i}a, Hermenegildo, Debray, and
+  Lin}{L\'opez-Garc\'{\i}a et~al\mbox{.}}{1997}]{Lopez2}
+{\sc L\'opez-Garc\'{\i}a, P.}, {\sc Hermenegildo, M.}, {\sc Debray, S.}, {\sc
+  and} {\sc Lin, N.~W.} 1997.
+\newblock Lower bound cost estimation for logic programs.
+\newblock In {\em 1997 International Logic Programming Symposium}. MIT Press.
+
+\bibitem[\protect\citeauthoryear{Maher}{Maher}{1988}]{Maher}
+{\sc Maher, M.~J.} 1988.
+\newblock Complete axiomatizations of the algebras of finite, rational and
+  infinite trees.
+\newblock In {\em Proceeding os the 3rd IEEE Symp. on Logic in Computer
+  Science}. 348--357.
+
+\bibitem[\protect\citeauthoryear{Maluszy'ski and N\"{a}lund}{Maluszy'ski and
+  N\"{a}lund}{1989}]{Malus}
+{\sc Maluszy'ski, J.} {\sc and} {\sc N\"{a}lund, T.} 1989.
+\newblock Fail substitutions for negation as failure.
+\newblock In {\em North American Conference on Logic Programming}, {E.~L. Lusk}
+  {and} {R.~A. Overbeek}, Eds. 461--476.
+
+\bibitem[\protect\citeauthoryear{Moreno-Navarro}{Moreno-Navarro}{1996}]{Moreno%
+2}
+{\sc Moreno-Navarro, J.~J.} 1996.
+\newblock Extending constructive negation for partial functions in lazy
+  narrowing-based languages.
+\newblock {\em ELP\/}.
+
+\bibitem[\protect\citeauthoryear{Mu{\~n}oz, Mari{\~n}o, and
+  Moreno-Navarro}{Mu{\~n}oz et~al\mbox{.}}{2004}]{SusanaFLOPS04}
+{\sc Mu{\~n}oz, S.}, {\sc Mari{\~n}o, J.}, {\sc and} {\sc Moreno-Navarro,
+  J.~J.} 2004.
+\newblock Constructive intensional negation.
+\newblock In {\em Proceedings of the 7th International Symposiun in Functional
+  and Logic Programming, FLOPS'04}. Number 2998 in LNCS. Nara, Japan, 39--54.
+
+\bibitem[\protect\citeauthoryear{Mu{\~n}oz and Moreno-Navarro}{Mu{\~n}oz and
+  Moreno-Navarro}{2000}]{SusanaPADL2000}
+{\sc Mu{\~n}oz, S.} {\sc and} {\sc Moreno-Navarro, J.~J.} 2000.
+\newblock How to incorporate negation in a prolog compiler.
+\newblock In {\em 2nd International Workshop PADL'2000}, {E.~Pontelli} {and}
+  {V.~S. Costa}, Eds. LNCS, vol. 1753. Springer-Verlag, Boston, MA (USA),
+  124--140.
+
+\bibitem[\protect\citeauthoryear{Mu{\~n}oz, Moreno-Navarro, and
+  Hermenegildo}{Mu{\~n}oz et~al\mbox{.}}{2001}]{SusanaLPAR01}
+{\sc Mu{\~n}oz, S.}, {\sc Moreno-Navarro, J.~J.}, {\sc and} {\sc Hermenegildo,
+  M.} 2001.
+\newblock Efficient negation using abstract interpretation.
+\newblock In {\em Logic for Programming, Artificial Intelligence and
+  Reasoning}, {R.~Nieuwenhuis} {and} {A.~Voronkov}, Eds. Number 2250 in LNAI.
+  LPAR 2001, La Habana (Cuba), 485--494.
+
+\bibitem[\protect\citeauthoryear{Naish}{Naish}{1986}]{naish:lncs}
+{\sc Naish, L.} 1986.
+\newblock {\em Negation and control in {Prolog}}.
+\newblock Number 238 in Lecture Notes in Computer Science. Springer-Verlag, New
+  York.
+
+\bibitem[\protect\citeauthoryear{Naughton and Ramakrishnan}{Naughton and
+  Ramakrishnan}{1991}]{Naughton}
+{\sc Naughton, J.~F.} {\sc and} {\sc Ramakrishnan, R.} 1991.
+\newblock Bottom-up evaluation of logic programs.
+\newblock In {\em Computational Logic: Essays in Honor of Alan Robinson},
+  {J.-L. Lassez} {and} {G.~Plotkin}, Eds. MIT Press, Cambridge, MA, 640--700.
+
+\bibitem[\protect\citeauthoryear{Pierro and Drabent}{Pierro and
+  Drabent}{1996}]{DiPierro}
+{\sc Pierro, A.~D.} {\sc and} {\sc Drabent, W.} 1996.
+\newblock On negation as instantiation.
+\newblock {\em Proceedings of The Fifth International Conference on Algebraic
+  and Logic Programming ALP'96\/}.
+
+\bibitem[\protect\citeauthoryear{Przymusinski}{Przymusinski}{1989a}]{Przymusin%
+ski1}
+{\sc Przymusinski, T.~C.} 1989a.
+\newblock Every logic program has a natural stratification an d an iterated
+  least fixed point model.
+\newblock In {\em Symposium on Principles of Database-Systems}. ACM
+  SIGACT-SIGMOD-SIGART, 11--21.
+
+\bibitem[\protect\citeauthoryear{Przymusinski}{Przymusinski}{1989b}]{Przymusin%
+ski2}
+{\sc Przymusinski, T.~C.} 1989b.
+\newblock On constructive negation in logic programming.
+\newblock In {\em North American Conference on Logic Programming}.
+
+\bibitem[\protect\citeauthoryear{Przymusinski and Warren}{Przymusinski and
+  Warren}{1992}]{Przymusinski3}
+{\sc Przymusinski, T.~C.} {\sc and} {\sc Warren, D.~S.} 1992.
+\newblock Well founded semantics: Theory and implementation.
+\newblock Draft.
+
+\bibitem[\protect\citeauthoryear{Reiter}{Reiter}{1978}]{Reiter}
+{\sc Reiter, R.} 1978.
+\newblock On close world data bases.
+\newblock {\em Logic and Databases\/}, 55--76.
+
+\bibitem[\protect\citeauthoryear{Ross}{Ross}{1992}]{Ross}
+{\sc Ross, K.~A.} 1992.
+\newblock A procedural semantics for well founded negation in logic programs.
+\newblock {\em Journal of Logic Programming\/}~{\em 13,\/}~1, 1--22.
+
+\bibitem[\protect\citeauthoryear{Sato and Motoyoshi}{Sato and
+  Motoyoshi}{1991}]{Sato91}
+{\sc Sato, T.} {\sc and} {\sc Motoyoshi, F.} 1991.
+\newblock A complete top-down interpreter for first order programs.
+\newblock In {\em International Logic Programming Symposium}. 35--53.
+
+\bibitem[\protect\citeauthoryear{Shoenfield}{Shoenfield}{1967}]{Shoenfield}
+{\sc Shoenfield, J.~R.} 1967.
+\newblock {\em Mathematical Logic}.
+\newblock Association for Symbolic Logic.
+
+\bibitem[\protect\citeauthoryear{Sterling and Shapiro}{Sterling and
+  Shapiro}{1987}]{Art}
+{\sc Sterling, L.} {\sc and} {\sc Shapiro, E.} 1987.
+\newblock {\em The Art of Prolog}.
+\newblock The MIT Press.
+
+\bibitem[\protect\citeauthoryear{Stuckey}{Stuckey}{1991}]{Stuckey}
+{\sc Stuckey, P.} 1991.
+\newblock Constructive negation for constraint logic programming.
+\newblock In Proc. IEEE Symp. on Logic in Computer Science. ~{\em 660}.
+
+\bibitem[\protect\citeauthoryear{Stuckey}{Stuckey}{1995}]{Stuckey95}
+{\sc Stuckey, P.} 1995.
+\newblock Negation and constraint logic programming.
+\newblock In Information and Computation. ~{\em 118(1)}, 12--33.
+
+\bibitem[\protect\citeauthoryear{Stuckey and Sudarshan}{Stuckey and
+  Sudarshan}{1993}]{Stuckey93}
+{\sc Stuckey, P.} {\sc and} {\sc Sudarshan, S.} 1993.
+\newblock Well-founded ordered search.
+\newblock In {\em Proceedings of the 13th Conference on Foundations of Software
+  Technology and Theoretical Computer Science}. Vol. 761. LNCS.
+
+\bibitem[\protect\citeauthoryear{van Emden and Kowalski}{van Emden and
+  Kowalski}{1976}]{Emden}
+{\sc van Emden, M.~H.} {\sc and} {\sc Kowalski, R.~A.} 1976.
+\newblock The semantics of predicate logic as a programmig language.
+\newblock {\em Journal of the ACM\/}~{\em 23,\/}~4, 733--742.
+
+\bibitem[\protect\citeauthoryear{van Gelder, Ross, and Schlipf}{van Gelder
+  et~al\mbox{.}}{1991}]{VGelder}
+{\sc van Gelder, A.}, {\sc Ross, K.~A.}, {\sc and} {\sc Schlipf, J.~S.} 1991.
+\newblock The well-founded semantics for general logic programs.
+\newblock {\em Journal of the ACM\/}~{\em 38,\/}~3, 620--650.
+
+\bibitem[\protect\citeauthoryear{Wallace}{Wallace}{1987}]{Wallace}
+{\sc Wallace, M.} 1987.
+\newblock Negation by constraints: A sound and efficient implementation of
+  negation in deductive databases.
+\newblock In {\em IEEE Symposium on Logic Programming}. 253--263.
+
+\bibitem[\protect\citeauthoryear{Warren}{Warren}{1992}]{Warren92}
+{\sc Warren, D.~S.} 1992.
+\newblock {\em The XOLDT System}.
+\newblock SUNY, Stoney Brook.
+
+\end{thebibliography}
