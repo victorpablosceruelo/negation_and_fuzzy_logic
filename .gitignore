@@ -1,0 +1,14 @@
+*.pl~
+*.P~
+*.xwam
+*.po
+*.itf
+*_co.pl
+*.ast
+*_shfr_co.pl 
+*_co.pl 
+*_shfr_co* 
+*~
+\#*.*\#
+packed/*
+
