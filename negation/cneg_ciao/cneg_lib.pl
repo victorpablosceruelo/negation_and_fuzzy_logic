@@ -123,7 +123,7 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 % Now go for the functors for equality and disequality.
 frontier(Goal, [(cneg_diseq(X, Y, FreeVars),[cneg_diseq(X, Y, FreeVars)])], cneg_diseq(X, Y, FreeVars)):- 
 	goal_is_disequality(Goal, X, Y, FreeVars), !.
-frontier(Goal, [(X = Y),[(X = Y)])], (X = Y)):- 
+frontier(Goal, [((X = Y),[(X = Y)])], (X = Y)):- 
 	goal_is_equality(Goal, X, Y), !.
 
 %frontier((X=_Y), [(X=X,[])], (X=_Y)):- !.
