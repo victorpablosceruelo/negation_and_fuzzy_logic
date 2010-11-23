@@ -123,7 +123,7 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 % Now go for the functors for equality and disequality.
 frontier(Goal, [(cneg_diseq(X, Y, FreeVars),[cneg_diseq(X, Y, FreeVars)])], cneg_diseq(X, Y, FreeVars)):- 
 	goal_is_disequality(Goal, X, Y, FreeVars), !.
-frontier(Goal, [(cneg_eq(X,Y),[cneg_eq(X,Y)])], cneg_eq(X,Y)):- 
+frontier(Goal, [(X = Y),[(X = Y)])], (X = Y)):- 
 	goal_is_equality(Goal, X, Y), !.
 
 %frontier((X=_Y), [(X=X,[])], (X=_Y)):- !.
@@ -132,10 +132,11 @@ frontier(Goal, [(cneg_eq(X,Y),[cneg_eq(X,Y)])], cneg_eq(X,Y)):-
 
 % Now go for other functors stored in our database.
 frontier(Goal, Front, Goal):-
+	debug('frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Front_Tmp),
-	%debug(frontier(Goal), Front_Tmp),
+	debug('frontier :: Frontier', Front_Tmp),
 	simplify_frontier(Front_Tmp, Goal, Front),
-%	debug('frontier :: Front_3 (simplified cls)', Front), 
+	debug('frontier :: F_simplified', Front), 
 	!. % Frontier is uniquely determine if this clause is used.
 
 % And at last report an error if it was impossible to found a valid entry.
