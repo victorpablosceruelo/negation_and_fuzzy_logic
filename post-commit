@@ -44,7 +44,7 @@ popd
 
 
 # Mail log.
-$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -s "neg&fl commit" vpablos@babel.ls.fi.upm.es
+$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -s "[neg&fl] commit" vpablos@babel.ls.fi.upm.es
 
 #./commit-email.pl "$REPOS" "$REV" -h -m .
 #log-commit.py --repository "$REPOS" --revision "$REV"
