@@ -311,38 +311,15 @@ split_body_into_I_D_R([SubGoal|SubGoal_L], I, D, R) :- !,
 	cneg_aux:append(R_1, R_2, R).
 
 % split_subgoal_into_I_D_R(SubGoal, I, D, R) :-
-split_subgoal_into_I_D_R(Subgoal, I, [], []) :- 
+split_subgoal_into_I_D_R(Subgoal, NewSubgoal, [], []) :- 
 	goal_is_equality(Subgoal, Term1, Term2), !,
-	get_equalities_from_unifying_terms(Term1, Term2, I).
-split_subgoal_into_I_D_R(cneg_diseq(T1, T2, FreeVars), [], [cneg_diseq(T1, T2, FreeVars)], []) :- !.
+	cneg_eq(NewSubgoal, (Term1 = Term2)).
+
+split_subgoal_into_I_D_R(Subgoal, [], [NewSubgoal], []) :- 
+	goal_is_disequality(Subgoal, Term1, Term2, FreeVars), !,
+	cneg_eq(NewSubgoal, cneg_diseq(Term1, Term2, FreeVars)).
+
 split_subgoal_into_I_D_R(SubGoal, [], [], [SubGoal]) :- !.
-
-% get_equalities_from_head(Term1, Term2, Head_I) 
-get_equalities_from_unifying_terms(Term1, Term2, [Term1 = Term2]) :-
-	var(Term1),
-	var(Term2), !.
-
-get_equalities_from_unifying_terms(Term1, Term2, [Term1 = Term2]) :-
-	var(Term1), !.
-
-get_equalities_from_unifying_terms(Term1, Term2, [Term2  = Term1]) :-
-	var(Term2), !.
-
-get_equalities_from_unifying_terms(Term1, Term2, I) :-
-	functor(Term1, Name, Arity), 
-	functor(Term2, Name, Arity), 
-	Term1=..[Name|Args_Term1],
-	Term2=..[Name|Args_Term2], !,
-	get_equalities_from_unifying_terms_args(Args_Term1, Args_Term2, I).
-
-get_equalities_from_unifying_terms_args([], [], []) :- !.
-get_equalities_from_unifying_terms_args([Term1], [Term2], I) :- !,
-	get_equalities_from_unifying_terms(Term1, Term2, I).
-get_equalities_from_unifying_terms_args([Term1|Term1_L], [Term2|Term2_L], I) :- !,
-	get_equalities_from_unifying_terms(Term1, Term2, I_1),
-	get_equalities_from_unifying_terms_args(Term1_L, Term2_L, I_2),
-	!, % Background not allowed.
-	cneg_aux:append(I_1, I_2, I).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
