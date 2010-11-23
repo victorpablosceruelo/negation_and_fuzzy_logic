@@ -174,19 +174,43 @@ verify_attribute(Attribute, Target):-
 verify_attribute(Attribute, NewTarget):-
 %	debug('Only for Ciao Prolog: '),
 %	debug(verify_attribute(Attribute, NewTarget)), 
-	attribute_contents(Attribute, OldTarget, _Is_UnivVar, Disequalities), !,
-	substitution_contents(Subst, OldTarget, NewTarget),
-	update_var_attributes(Disequalities, [Subst]).
+	attribute_contents(Attribute, OldTarget, Is_UnivVar, Disequalities), !,
+	(
+	    (
+		Is_UnivVar == true, % An universally quantified variable
+		fail                          % is not unifiable.
+	    )
+	;
+	    (
+		Is_UnivVar == false, 
+		substitution_contents(Subst, OldTarget, NewTarget),
+		update_var_attributes(Disequalities, [Subst])
+	    )
+	).
 
 substitution_contents(substitute(Var, T), Var, T).
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	debug('combine_attributes(Attr_Var1, Attr_Var2)', (Attribute_Var_1, Attribute_Var_2)),
-	attribute_contents(Attribute_Var_1, OldTarget_Var_1, _Is_UnivVar, Disequalities_Var_1), !,
-	attribute_contents(Attribute_Var_2, OldTarget_Var_2, _Is_UnivVar, Disequalities_Var_2), !,
-	cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
-	substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
-	update_var_attributes(Disequalities, [Subst]).
+	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Is_UnivVar_Var_1, Disequalities_Var_1), !,
+	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Is_UnivVar_Var_2, Disequalities_Var_2), !,
+	(
+	    (
+		(
+		    Is_UnivVar_Var_1 == true ;  % Universally quantified variables can not be unified.
+		    Is_UnivVar_Var_2 == true
+		),
+		fail
+	    )
+	;
+	    (
+		Is_UnivVar_Var_1 == false, 
+		Is_UnivVar_Var_2 == false, 
+		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
+		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
+		update_var_attributes(Disequalities, [Subst])
+	    )
+	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -211,7 +235,7 @@ retrieve_affected_disequalities([], _Vars_Examined, Diseq_Acc, Diseq_Acc) :- !. 
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, Diseq_Acc_In, Diseq_Acc_Out):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
-	attribute_contents(Attribute, Var, _Is_UnivVar, ThisVar_Disequalities), 
+PPP	attribute_contents(Attribute, Var, Is_UnivVar, ThisVar_Disequalities), 
 	remove_attribute_local(Var), 
 	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
 	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Tmp),
