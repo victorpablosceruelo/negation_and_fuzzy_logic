@@ -134,9 +134,10 @@ frontier(Goal, [((X = Y),[(X = Y)])], (X = Y)):-
 frontier(Goal, Front, Goal):-
 	debug('frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Front_Tmp),
-	debug('frontier :: Frontier', Front_Tmp),
+	debug('frontier :: format', '(Head, Body, FrontierTest)'),
+	debug_list('frontier_IN', Front_Tmp),
 	simplify_frontier(Front_Tmp, Goal, Front),
-	debug('frontier :: F_simplified', Front), 
+	debug('frontier_OUT', Front), 
 	!. % Frontier is uniquely determine if this clause is used.
 
 % And at last report an error if it was impossible to found a valid entry.
@@ -146,19 +147,20 @@ frontier(Goal, [], Goal) :-
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier([], _G, []) :- !.
-simplify_frontier([(Head, Body, FrontierTest)|Frontier_In], G, [(Head, Body)|Frontier_Out]):-
+simplify_frontier([(Head, Body, FrontierTest)|Frontier_In], G, [(Head, Body, FrontierTest)|Frontier_Out]):-
 	test_frontier_is_valid(Head, FrontierTest, G), !,
 	simplify_frontier(Frontier_In, G, Frontier_Out).
-simplify_frontier([(_Head, _Body)|Frontier_In], G, Frontier_Out):-
+simplify_frontier([(_Head, _Body, _FrontierTest)|Frontier_In], G, Frontier_Out):-
 	simplify_frontier(Frontier_In, G, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Head, FrontierTest, Goal):-
-        copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
+	debug('test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
+        copy_term((Head, FrontierTest), (H_Tmp, _FrontierTest_Tmp)), 
         copy_term(Goal, G_Tmp),
         cneg_eq(H_Tmp, G_Tmp), 
-	call_combined_solutions(FrontierTest_Tmp), 
+	% call_combined_solutions(FrontierTest_Tmp), 
 	!.
 
 % lists_distributive_conjunction(F1,F2,F3) returns F3 that is the lists_distributive_conjunction of the list 
@@ -199,9 +201,9 @@ negate_frontier(Frontier, Goal, GoalVars, Solutions) :-
 %	debug('negate_frontier :: Solutions', Solutions).
 
 negate_frontier_aux([], _Goal, _GoalVars, true) :- !.
-negate_frontier_aux([Subfr|Frontier], Goal, GoalVars, Sol):-
-	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', (Subfr, Goal, GoalVars)),
-	negate_subfrontier(Subfr, Goal, GoalVars, Sol_Subfr),
+negate_frontier_aux([(Head, Body, _FrontierTest)|Frontier], Goal, GoalVars, Sol):-
+	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
+	negate_subfrontier((Head, Body), Goal, GoalVars, Sol_Subfr),
 	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
 	!, % Reduce the stack's memory.
 	negate_frontier_aux(Frontier, Goal, GoalVars, Sol_More_Subfr),
