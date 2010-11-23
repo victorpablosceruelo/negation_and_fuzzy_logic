@@ -1,6 +1,6 @@
 :- use_package(rfuzzy).
 :- use_package(clpr).
-:- use_module(library(hiord_rt)).
+:- use_module(engine(hiord_rt)).
 :- use_module(library(aggregates)).
 %----------------------------------------------------------
 % CRISP FUNCTIONS:

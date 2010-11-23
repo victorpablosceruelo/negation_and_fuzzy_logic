@@ -1,8 +1,8 @@
 %:- module(housesQuery,_,[rfuzzy,clpr,expsearch,housesDBN]).
 :- use_package(rfuzzy).
 :- use_package(clpr).
-:- use_package(qualifiersPack).
-:- use_module(library(hiord_rt)).
+:- use_package(.(qualifiersPack)).
+:- use_module(engine(hiord_rt)).
 :- use_module(library(lists)).
 
 %GENERAL QUERIES

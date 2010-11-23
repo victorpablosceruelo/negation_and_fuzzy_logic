@@ -1,5 +1,5 @@
-:- module(housesDBModule,_,[rfuzzy,clpr,qualifiersPack,generalQueryPack]).
-:- use_module(library(hiord_rt)).
+:- module(housesDBModule,_,[rfuzzy,clpr,.(qualifiersPack),.(generalQueryPack),debugger_pkg]).
+:- use_module(engine(hiord_rt)).
 
 % TYPE DECLARATION
 
