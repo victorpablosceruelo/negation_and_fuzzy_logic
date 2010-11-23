@@ -20,13 +20,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_lib_aux(Goal, [], Result) :- 
-	debug_clause('cneg :: using cneg_static for', Goal), 
-	cneg_static(Goal, Result).
+%cneg_lib_aux(Goal, [], Result) :- 
+%	debug('cneg_lib :: using cneg_static for', Goal), 
+%	cneg_static(Goal, Result).
 
 cneg_lib_aux(Goal, UnivVars, Result):-
-	UnivVars \== [],
-	debug_clause('cneg :: using cneg_dynamic for', Goal), 
+%	UnivVars \== [],
+	debug('cneg_lib :: using cneg_dynamic for', Goal), 
 	cneg_dynamic(Goal, UnivVars, Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,18 +36,18 @@ cneg_lib_aux(Goal, UnivVars, Result):-
 % Be carefull: the following code produces random errors.
 %cneg_static(_Goal) :-
 %	cneg_static_pred(Goal, SourceFileName, Occurences), 
-%	debug_clause('cneg_static_pred', (Goal, SourceFileName, Occurences)),
+%	debug('cneg_static_pred', (Goal, SourceFileName, Occurences)),
 %	fail.
 
 cneg_static(Goal, (Result_G1, Result_G2)) :-
 	goal_is_conjunction(Goal, G1, G2), !,
-%	debug_clause('cneg_static', goal_is_conjunction(Goal, G1, G2)),
+%	debug('cneg_static', goal_is_conjunction(Goal, G1, G2)),
 	cneg_static(G1, Result_G1),
 	cneg_static(G2, Result_G2).
 
 cneg_static(Goal, Result) :-
 	goal_clean_up(Goal, NewGoal), !,
-%	debug_clause('cneg_static', goal_clean_up(Goal, NewGoal)),
+%	debug('cneg_static', goal_clean_up(Goal, NewGoal)),
 	cneg_static(NewGoal, Result).
 
 cneg_static(Goal, cneg_diseq(X, Y, FreeVars)) :-
@@ -69,25 +69,25 @@ cneg_static(Goal, cneg_static_predicate_call(Goal, SourceFileName, Occurences)) 
 % of the goal and UnivVars the universal quantified variable of it.
 
 cneg_dynamic(Goal, UnivVars, Solution) :-
-%	debug_clause('cneg_dynamic :: Goal', Goal),
+%	debug('cneg_dynamic :: Goal', Goal),
 	cneg_dynamic_aux(Goal, UnivVars, Solution),
-	debug_clause('cneg_dynamic :: Goal', Goal),
-	debug_clause('cneg_dynamic :: Solution', Solution),
+	debug('cneg_dynamic :: Goal', Goal),
+	debug('cneg_dynamic :: Solution', Solution),
 	!. % No backtracking allowed
 
 cneg_dynamic_aux(Goal, UnivVars, Solution) :-
 %	remove_and_save_attributes_and_fA(Goal, GoalVars_And_UnivVars, Attributes, Forall_Vars),
 	varsbag_local(Goal, UnivVars, [], GoalVars),
 	frontier(Goal, Frontier, Goal_Not_Qualified), 
-%	debug_clauses('cneg_dynamic :: Frontier (list)', Frontier),
-%	debug_clause('cneg_dynamic :: (GoalVars, UnivVars)', (GoalVars, UnivVars)), 
+	debug_list('cneg_dynamic :: Frontier (list)', Frontier),
+%	debug('cneg_dynamic :: (GoalVars, UnivVars)', (GoalVars, UnivVars)), 
 	copy_term((Goal_Not_Qualified, GoalVars), (Goal_Copy, GoalVars_Copy)),
 	%copy_term((Goal_Not_Qualified, GoalVars, UnivVars), (Goal_Copy, GoalVars_Copy, UnivVars_Copy)),
 	!, % No backtracking allowed
 	negate_frontier(Frontier, Goal_Copy, GoalVars_Copy, Solution),
 	!, % No backtracking allowed
 	% Unify NewGoal with the Head of the Clause we are playing with ...
-	% debug_clause('cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
+	% debug('cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
 	unify_terms(Goal_Not_Qualified, Goal_Copy),
 %	restore_attributes_and_fA(Goal, Attributes, Forall_Vars),
 	!. % No backtracking allowed
@@ -134,7 +134,7 @@ put_universal([_Value|UnivVars]):- % the variable has change its quantification
 
 % First remove $ and qualification from the goal's name.
 frontier(Goal, Frontier, NewGoal) :-
-	goal_clean_up(Goal, Tmp_Goal), 
+	goal_clean_up(Goal, Tmp_Goal), !,
 	frontier(Tmp_Goal, Frontier, NewGoal).
 
 % Now go for the disjunctions.
@@ -166,14 +166,14 @@ frontier(Goal, [(cneg_eq(X,Y),[cneg_eq(X,Y)])], cneg_eq(X,Y)):-
 % Now go for other functors stored in our database.
 frontier(Goal, Front, Goal):-
 	look_for_the_relevant_clauses(Goal, Front_Tmp),
-	%debug_clause(frontier(Goal), Front_Tmp),
+	%debug(frontier(Goal), Front_Tmp),
 	simplify_frontier(Front_Tmp, Goal, Front),
-%	debug_clause('frontier :: Front_3 (simplified cls)', Front), 
+%	debug('frontier :: Front_3 (simplified cls)', Front), 
 	!. % Frontier is uniquely determine if this clause is used.
 
 % And at last report an error if it was impossible to found a valid entry.
 frontier(Goal, [], Goal) :-
-	debug_clause('ERROR: frontier can not be evaluated for', Goal), 
+	debug('ERROR: frontier can not be evaluated for', Goal), 
 	nl, nl, !, fail.
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
@@ -223,18 +223,18 @@ lists_distributive_conjunction_aux_2((H1,B1),(H2,B2),((H1,H2),B3)):-
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
 negate_frontier(Frontier, Goal, GoalVars, Solutions) :-
-	debug_clauses('negate_frontier :: Frontier (list)', Frontier), 
-	debug_clause('negate_frontier :: (Goal, GoalVars)', (Goal, GoalVars)), 
+	debug_list('negate_frontier :: Frontier (list)', Frontier), 
+	debug('negate_frontier :: (Goal, GoalVars)', (Goal, GoalVars)), 
 	!,
 	negate_frontier_aux(Frontier, Goal, GoalVars, Solutions),
 	!.
-%	debug_clause('negate_frontier :: Solutions', Solutions).
+%	debug('negate_frontier :: Solutions', Solutions).
 
 negate_frontier_aux([], _Goal, _GoalVars, true) :- !.
 negate_frontier_aux([Subfr|Frontier], Goal, GoalVars, Sol):-
-	debug_clause('negate_frontier_aux: (Subfr, Goal, GoalVars)', (Subfr, Goal, GoalVars)),
+	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', (Subfr, Goal, GoalVars)),
 	negate_subfrontier(Subfr, Goal, GoalVars, Sol_Subfr),
-	debug_clause('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
+	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
 	!, % Reduce the stack's memory.
 	negate_frontier_aux(Frontier, Goal, GoalVars, Sol_More_Subfr),
 	combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, Sol), !.
@@ -254,34 +254,34 @@ combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Sub
 % It fails if the negation of the conjunction has no solutions
 negate_subfrontier((_Head, [fail]), _G, _GoalVars, true):- !.
 negate_subfrontier(C, Goal, GoalVars, SolC):-
-%	debug_clause('negate_subfrontier :: (Head, Body)', (C)),
+%	debug('negate_subfrontier :: (Head, Body)', (C)),
 	split_subfrontier_into_I_D_R(C, Goal, I, D, R),
 	!, % Reduce the stack's memory.
-%	debug_clause('negate_subfrontier', split_subfrontier_into_I_D_R(C,Goal,GoalVars,I,D,R)),
+%	debug('negate_subfrontier', split_subfrontier_into_I_D_R(C,Goal,GoalVars,I,D,R)),
 	negate_subfrontier_aux(GoalVars, I, D, R, SolC),
-%	debug_clause('negate_subfrontier :: ((Head, Body), SolC)', ((C), SolC)),
+%	debug('negate_subfrontier :: ((Head, Body), SolC)', ((C), SolC)),
 	!.
 
 % negate_subfrontier_aux(C, G, GoalVars, I, D, R, SolC)
 %negate_subfrontier_aux(_C, _Goal, _GoalVars, [fail], _D, _R, []) :-
-%	debug_clause('negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
+%	debug('negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
 %	!. % Backtracking is not allowed.
 negate_subfrontier_aux(_GoalVars, [], [], [], fail) :-
-	debug_clause('negate_subfrontier_aux', 'I, D and R are empty lists'),
+	debug('negate_subfrontier_aux', 'I, D and R are empty lists'),
 	!. % Backtracking is not allowed.
 negate_subfrontier_aux(GoalVars, I_In, D_In, R_In, SolC) :-
-%	debug_clause('negate_subfrontier_aux :: (GoalVars)', (GoalVars)),
+%	debug('negate_subfrontier_aux :: (GoalVars)', (GoalVars)),
 	normalize_I_D_R(I_In, D_In, R_In, GoalVars, I_Tmp, D_Tmp, R_Tmp, ImpVars, ExpVars), 
-%	debug_clause('negate_subfrontier_aux :: (I_Tmp, D_Tmp, R_Tmp)', (I_Tmp, D_Tmp, R_Tmp)),
-%	debug_clause('negate_subfrontier_aux :: ImpVars (vars(I) + GoalVars)', ImpVars),
-%	debug_clause('negate_subfrontier_aux :: ExpVars (vars(R) - ImpVars)', ExpVars),
+%	debug('negate_subfrontier_aux :: (I_Tmp, D_Tmp, R_Tmp)', (I_Tmp, D_Tmp, R_Tmp)),
+%	debug('negate_subfrontier_aux :: ImpVars (vars(I) + GoalVars)', ImpVars),
+%	debug('negate_subfrontier_aux :: ExpVars (vars(R) - ImpVars)', ExpVars),
 	split_D_R_into_imp_and_exp(D_Tmp, R_Tmp, ImpVars, ExpVars, Dimp, Rimp, DRexp),
 	!,
 
 	% Final process
-%	debug_clause('negate_subfrontier_aux :: (I, Dimp, Rimp, DRexp)', (I_Tmp, Dimp, Rimp, DRexp)), 
+%	debug('negate_subfrontier_aux :: (I, Dimp, Rimp, DRexp)', (I_Tmp, Dimp, Rimp, DRexp)), 
 	negate_formulae(GoalVars, ExpVars, I_Tmp, Dimp, Rimp, DRexp, SolC),
-%	debug_clause('negate_subfrontier_aux :: SolC', SolC),
+%	debug('negate_subfrontier_aux :: SolC', SolC),
 	!.
 
 % split_subfrontier_into_I_D_R(C,Goal,I,D,R) 
@@ -436,9 +436,9 @@ remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,[Diseq|D1]):-
 % I, D and R (equalities, disequalities and rest of subgoals).
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 split_D_R_into_imp_and_exp(D, R, ImpVars, ExpVars, Dimp, Rimp, DRexp):-
-%	debug_clause('split_D_R_into_imp_and_exp :: ExpVars', ExpVars),
-%	debug_clause('split_D_R_into_imp_and_exp :: D', D),
-%	debug_clause('split_D_R_into_imp_and_exp :: R', R),
+%	debug('split_D_R_into_imp_and_exp :: ExpVars', ExpVars),
+%	debug('split_D_R_into_imp_and_exp :: D', D),
+%	debug('split_D_R_into_imp_and_exp :: R', R),
 	split_formula_between_imp_and_exp(D, ImpVars, ExpVars, [], Dimp, [], Dexp),
 	split_formula_between_imp_and_exp(R, ImpVars, ExpVars, [], Rimp, Dexp, DRexp).
 
@@ -452,7 +452,7 @@ split_D_R_into_imp_and_exp(D, R, ImpVars, ExpVars, Dimp, Rimp, DRexp):-
 split_formula_between_imp_and_exp([], _ImpVars, _ExpVars, Fimp, Fimp, Fexp, Fexp) :- !.
 split_formula_between_imp_and_exp([Term|F], ImpVars, ExpVars, Fimp_In, Fimp_Out, Fexp_In, Fexp_Out):-
 	varsbag_local(Term, ImpVars, [], Vars), % Retrieve only vars not in ImpVars.
-%	debug_clause('split_formula_between_imp_and_exp :: Vars', Vars),
+%	debug('split_formula_between_imp_and_exp :: Vars', Vars),
 	retrieve_element_from_list(Vars, V),
 	memberchk_local(V, ExpVars),!,
 	split_formula_between_imp_and_exp(F, ImpVars, ExpVars, Fimp_In, Fimp_Out, [Term|Fexp_In], Fexp_Out).
@@ -465,13 +465,13 @@ split_formula_between_imp_and_exp([Term|F], ImpVars, ExpVars, Fimp_In, Fimp_Out,
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 negate_formulae(GoalVars, ExpVars, I, Dimp, Rimp, DRexp, Sol):-
 	negate_Dexp_Rexp(DRexp, ExpVars, fail, Tmp_Sol_1), 
-%	debug_clause('negate_formulae', negate_Dexp_Rexp(DRexp, ExpVars, fail, Tmp_Sol_1)), 
+%	debug('negate_formulae', negate_Dexp_Rexp(DRexp, ExpVars, fail, Tmp_Sol_1)), 
 	negate_Rimp(Rimp, Tmp_Sol_1, Tmp_Sol_2),
-%	debug_clause('negate_formulae', negate_Rimp(Rimp, Tmp_Sol_1, Tmp_Sol_2)),
+%	debug('negate_formulae', negate_Rimp(Rimp, Tmp_Sol_1, Tmp_Sol_2)),
 	negate_Dimp(Dimp, Tmp_Sol_2, Tmp_Sol_3),
-%	debug_clause('negate_formulae', negate_Dimp(Dimp, Tmp_Sol_2, Tmp_Sol_3)),
+%	debug('negate_formulae', negate_Dimp(Dimp, Tmp_Sol_2, Tmp_Sol_3)),
 	negate_I(I, GoalVars, Tmp_Sol_3, Sol), 
-%	debug_clause('negate_formulae', negate_I(I, GoalVars, Tmp_Sol_3, Sol)), 
+%	debug('negate_formulae', negate_I(I, GoalVars, Tmp_Sol_3, Sol)), 
 	!.
 
 % 'fail' is just our terminator, so we remove it (if possible).
@@ -527,11 +527,11 @@ get_conjunction([X|L],(X,C)):-
 % solution of the negation of the main Goal. The rest of solutions will
 % be obtained by backtracking.
 call_combined_solutions(X) :-
-%	debug_clause('call_combined_solutions', X),
+%	debug('call_combined_solutions', X),
 	call_combined_solutions_conjunction(X).
 
 %call_combined_solutions_conjunction(Any) :-
-%	debug_clause('call_combined_solutions_conjunction', Any),
+%	debug('call_combined_solutions_conjunction', Any),
 %	fail.
 call_combined_solutions_conjunction([]) :- !.
 call_combined_solutions_conjunction([Sol]) :- !,
@@ -560,7 +560,7 @@ perform_a_call_to(Goal) :-
 
 % Qualify the predicate as needed.
 perform_a_call_to(Goal) :-
-	debug_clause('perform_a_call_to(Goal)', Goal),
+	debug('perform_a_call_to(Goal)', Goal),
 	functor_local(Goal, Goal_Name, Arity, Arguments),
 	cneg_processed_pred(Goal_Name, Arity, SourceFileName, _Occurences),
 	name(SourceFileName, SourceFileName_String),
@@ -575,7 +575,7 @@ perform_a_call_to(Goal) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(X, Y) :- debug_clause('cneg_lib', cneg_eq(X, Y)), fail.
+cneg_eq(X, Y) :- debug('cneg_lib', cneg_eq(X, Y)), fail.
 cneg_eq(X, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

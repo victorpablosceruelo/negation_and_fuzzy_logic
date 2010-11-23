@@ -32,27 +32,27 @@
 % Local predicates used to easy migration between 
 % prologs. 
 remove_attribute_local(Var) :- 
-%	debug_clause('remove_attribute_local :: Var', Var),
+%	debug('remove_attribute_local :: Var', Var),
 	detach_attribute(Var).
 % XSB:	del_attr(Var, dist).
 get_attribute_local(Var, Attribute) :-
 	get_attribute(Var, Attribute).
 % XSB:	get_attr(Var, dist, Attribute),
-%	debug_clause('get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
+%	debug('get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
 put_attribute_local(Var, Attribute) :-
-%	debug_clause('put_attribute_local :: (Var, Attribute)', (Var, Attribute)),
+%	debug('put_attribute_local :: (Var, Attribute)', (Var, Attribute)),
 %	get_attribute_if_any(Var), !,
 	attach_attribute(Var, Attribute).
 %	put_attr(Var, dist, Attribute).
 
 %get_attribute_if_any(Var) :-
-%	debug_clause('Testing if var has any attribute. Var: '),
-%	debug_clause(Var),
+%	debug('Testing if var has any attribute. Var: '),
+%	debug(Var),
 %	get_attribute_local(Var, _Attribute), !.
 %get_attribute_if_any(Var) :-
-%	debug_clause('Testing if var has any attribute. Var: '),
-%	debug_clause(Var),
-%	debug_clause(' has NO attribute').
+%	debug('Testing if var has any attribute. Var: '),
+%	debug(Var),
+%	debug(' has NO attribute').
 
 	
 
@@ -102,7 +102,7 @@ portray(Anything) :-
 
 portray_attributes_in_term(T) :-
 	varsbag_local(T, [], [], Variables),
-	debug_clause('Attributes for the variables in term', T),
+	debug('Attributes for the variables in term', T),
 	portray_attributes_in_variables(Variables).
 
 portray_attributes_in_variables([]) :- !.
@@ -158,15 +158,15 @@ portray_disequalities_aux_2([FreeVar | FreeVars]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 verify_attribute(Attribute, Target):-
-%	debug_clause(verify_attribute(Attribute, Target)), 
+%	debug(verify_attribute(Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, Disequalities), 
 	terms_are_equal(Target, NewTarget), !,
 	update_var_attributes(Disequalities, []).
 
 % Only for Ciao prolog 
 verify_attribute(Attribute, NewTarget):-
-%	debug_clause('Only for Ciao Prolog: '),
-%	debug_clause(verify_attribute(Attribute, NewTarget)), 
+%	debug('Only for Ciao Prolog: '),
+%	debug(verify_attribute(Attribute, NewTarget)), 
 	attribute_contents(Attribute, OldTarget, Disequalities), !,
 	substitution_contents(Subst, OldTarget, NewTarget),
 	update_var_attributes(Disequalities, [Subst]).
@@ -174,7 +174,7 @@ verify_attribute(Attribute, NewTarget):-
 substitution_contents(substitute(Var, T), Var, T).
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
-	debug_clause('combine_attributes(Attr_Var1, Attr_Var2)', (Attribute_Var_1, Attribute_Var_2)),
+	debug('combine_attributes(Attr_Var1, Attr_Var2)', (Attribute_Var_1, Attribute_Var_2)),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2), !,
 	cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
@@ -190,14 +190,14 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
 update_var_attributes(New_Disequalities, Substitutions):-
-	debug_clause('update_var_attributes(New_Disequalities, Substitutions)', (New_Disequalities, Substitutions)), 
+	debug('update_var_attributes(New_Disequalities, Substitutions)', (New_Disequalities, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
 	retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp), !,
-%	debug_clause(retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp)),
+%	debug(retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp)),
 	perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities), !,
-%	debug_clause(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
+%	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 	simplify_disequations(Disequalities, [], Simplified_Disequalities),
-	debug_clause('update_var_attributes(Affected_Diseq, Simpl_Diseq)', (Disequalities, Simplified_Disequalities)),
+	debug('update_var_attributes(Affected_Diseq, Simpl_Diseq)', (Disequalities, Simplified_Disequalities)),
 	restore_disequalities(Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, Diseq_Acc, Diseq_Acc) :- !. % Loop over vars list.
@@ -284,8 +284,8 @@ simplify_disequations([Diseq|Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, _Answer) :-
-%	debug_clause('', ''),
-	debug_clause('(Diseq, More_Diseq, No_FreeVars)', (Diseq, More_Diseq, No_FreeVars)), 
+%	debug('', ''),
+	debug('(Diseq, More_Diseq, No_FreeVars)', (Diseq, More_Diseq, No_FreeVars)), 
 	fail.
 		
 simplify_1_diseq(fail, [], _No_FreeVars, _Answer) :- !, fail.
@@ -478,7 +478,7 @@ cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], FreeVars, [Dis
 % variables implicadas
 
 cneg_diseq(T1,T2, FreeVars):- 
-	debug_clause('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
+	debug('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
 	disequality_contents(Disequality, T1, T2, FreeVars),
         update_var_attributes([Disequality], []).
 

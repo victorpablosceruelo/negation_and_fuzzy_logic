@@ -1,6 +1,6 @@
 
 :- module(cneg_aux,
-	[findall/4, debug_clause/2, debug_clauses/2, msg/2, msg_aux/2, msg_nl/0,
+	[findall/4, debug/2, debug_list/2, debug_nl/0, msg/2, msg_aux/2, msg_nl/0,
 	 first/2, second/2, unify_terms/2, functor_local/4,
 	 memberchk_local/2, retrieve_element_from_list/2, term_to_meta/2,
 	 setof_local/3, varsbag_local/4, varset_local/2, 
@@ -33,7 +33,7 @@ debug_is_on('yes').
 % debug_is_on('no').
 
 %%% Debug (by VPC).
-debug_clause(Msg, Clause) :-
+debug(Msg, Clause) :-
 	debug_is_on('yes'), 
 	!, % No backtracking allowed.
 	write('% DBG % '),
@@ -41,18 +41,25 @@ debug_clause(Msg, Clause) :-
 	write(' :: '),
 	write(Clause), nl, 
 	!. % No backtracking allowed.
-debug_clause(_Msg, _Clause) :- 
+debug(_Msg, _Clause) :- 
 	debug_is_on('no').
 
-debug_clauses(_Msg, []) :-
+debug_nl :-
+	debug_is_on('yes'),
+	!, nl.
+debug_nl :- 
+	debug_is_on('no'), !.
+
+
+debug_list(_Msg, []) :-
 	!. % No backtracking allowed.
-debug_clauses(Msg, [Cl]) :-
+debug_list(Msg, [Cl]) :-
 	!, % No backtracking allowed.
-	debug_clause(Msg, Cl).
-debug_clauses(Msg, [Cl|Cls]) :- 
+	debug(Msg, Cl).
+debug_list(Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
-	debug_clause(Msg, Cl),
-	debug_clauses(Msg, Cls).
+	debug(Msg, Cl),
+	debug_list(Msg, Cls).
 
 msg(Msg1, Msg2) :-
 	msg_aux(Msg1, ' :: '),
@@ -284,9 +291,9 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	!.
 
 qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	debug_clause('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	debug_clause('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	debug_clause('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
+	debug('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
+	debug('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
+	debug('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
 	!.
 
 %	name(Name, NameString),
@@ -299,7 +306,7 @@ name_has_semicolon(Any) :-
 	string(Any), !, 
 	name_has_semicolon_aux(Any).
 name_has_semicolon(Any) :-
-	debug_clause('name_has_semicolon :: NOT a string', Any), fail.
+	debug('name_has_semicolon :: NOT a string', Any), fail.
 
 name_has_semicolon_aux([]) :- !, fail.
 name_has_semicolon_aux([A]) :- 
