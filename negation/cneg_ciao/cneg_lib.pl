@@ -110,6 +110,7 @@ frontier(Goal, Frontier, (NewG1; NewG2)):-
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
 	cneg_aux:append(F1, F2, Front),
+	debug('frontier :: disjunction', Front),
 	simplify_frontier(Front, (NewG1;NewG2), Frontier).
 
 % Now go for the conjunctions.
@@ -117,7 +118,9 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 	goal_is_conjunction(Goal, G1, G2), !,
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
+% Creo q esta fallando aqui ...
 	lists_distributive_conjunction(F1, F2, Front),
+	debug('frontier :: conjunction', Front),
 	simplify_frontier(Front, (NewG1,NewG2), Frontier).
 
 % Now go for the functors for equality and disequality.
@@ -146,21 +149,30 @@ frontier(Goal, [], Goal) :-
 	nl, nl, !, fail.
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
-simplify_frontier([], _G, []) :- !.
-simplify_frontier([(Head, Body, FrontierTest)|Frontier_In], G, [(Head, Body, FrontierTest)|Frontier_Out]):-
+simplify_frontier(Front_In, G, Front_Out) :-
+	debug_nl,
+	debug('simplify_frontier :: Front_In', Front_In),
+	debug('simplify_frontier :: Goal', G),
+	simplify_frontier_aux(Front_In, G, Front_Out),
+	debug('simplify_frontier :: Front_Out', Front_Out),
+	debug_nl.
+
+simplify_frontier_aux([], _G, []) :- !.
+simplify_frontier_aux([(Head, Body, FrontierTest)|Frontier_In], G, [(Head, Body, FrontierTest)|Frontier_Out]):-
 	test_frontier_is_valid(Head, FrontierTest, G), !,
 	simplify_frontier(Frontier_In, G, Frontier_Out).
-simplify_frontier([(_Head, _Body, _FrontierTest)|Frontier_In], G, Frontier_Out):-
+simplify_frontier_aux([_Any|Frontier_In], G, Frontier_Out):-
 	simplify_frontier(Frontier_In, G, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Head, FrontierTest, Goal):-
 	debug('test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
-        copy_term((Head, FrontierTest), (H_Tmp, _FrontierTest_Tmp)), 
+        copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
         copy_term(Goal, G_Tmp),
         cneg_eq(H_Tmp, G_Tmp), 
-	% call_combined_solutions(FrontierTest_Tmp), 
+	call_combined_solutions(FrontierTest_Tmp), 
+	debug('test_frontier_is_valid', 'YES'),
 	!.
 
 % lists_distributive_conjunction(F1,F2,F3) returns F3 that is the lists_distributive_conjunction of the list 
@@ -262,8 +274,8 @@ negate_subfrontier_aux(GoalVars, I_In, D_In, R_In, SolC) :-
 split_subfrontier_into_I_D_R((Head, BodyList), Goal_Copy, I, D, R):-
 	copy_term((Head, BodyList), (Head_Copy, BodyList_Copy)),
 	unify_goal_structure_into_head(Goal_Copy, Head_Copy),
-	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R),
-	debug('split_body_into_I_D_R', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
+	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R).
+%	debug('split_body_into_I_D_R', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
 
 % unify_goal_structure_into_head(Goal_Copy, Head_Copy)
 unify_goal_structure_into_head(Goal_Copy, Head_Copy) :-
