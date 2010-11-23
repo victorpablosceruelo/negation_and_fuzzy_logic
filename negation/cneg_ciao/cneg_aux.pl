@@ -8,7 +8,7 @@
 	 goal_clean_up/2,
 	 goal_is_conjunction/3, goal_is_disjunction/3, 
 	 goal_is_disequality/4, goal_is_equality/3,
-	 look_for_the_relevant_clauses/2,
+	 look_for_the_relevant_clauses/2, frontier_contents/4,
 	 qualify_string_name/3, remove_qualification/2, term_name_is_qualified/1,
 	 replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
 	 replace_in_term_variables_by_values/4,
@@ -392,7 +392,10 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	!, % Backtracking forbiden.
 	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
 %	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
-	setof_local((Head, Body, FrontierTest), cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
+	setof_local(frontier(Head, Body, FrontierTest), 
+	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
+
+frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

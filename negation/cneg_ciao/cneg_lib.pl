@@ -119,15 +119,21 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
 % Creo q esta fallando aqui ...
-	lists_distributive_conjunction(F1, F2, Front),
+	combine_frontiers(F1, F2, Front),
 	debug('frontier :: conjunction', Front),
 	simplify_frontier(Front, (NewG1,NewG2), Frontier).
 
 % Now go for the functors for equality and disequality.
-frontier(Goal, [(cneg_diseq(X, Y, FreeVars),[cneg_diseq(X, Y, FreeVars)])], cneg_diseq(X, Y, FreeVars)):- 
-	goal_is_disequality(Goal, X, Y, FreeVars), !.
-frontier(Goal, [((X = Y),[(X = Y)])], (X = Y)):- 
-	goal_is_equality(Goal, X, Y), !.
+frontier(Goal, [Frontier], NewGoal):- 
+	goal_is_disequality(Goal, X, Y, FreeVars), !,
+	cneg_eq(NewGoal, (cneg_diseq(X, Y, FreeVars))),
+	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
+
+frontier(Goal, [Frontier], NewGoal):- 
+	goal_is_equality(Goal, X, Y), !,
+	cneg_eq(NewGoal, (X = Y)),
+	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
+
 
 %frontier((X=_Y), [(X=X,[])], (X=_Y)):- !.
 %frontier((X==Y),[(X==Y,[X==Y])]):- !.
@@ -158,15 +164,16 @@ simplify_frontier(Front_In, G, Front_Out) :-
 	debug_nl.
 
 simplify_frontier_aux([], _G, []) :- !.
-simplify_frontier_aux([(Head, Body, FrontierTest)|Frontier_In], G, [(Head, Body, FrontierTest)|Frontier_Out]):-
-	test_frontier_is_valid(Head, FrontierTest, G), !,
-	simplify_frontier(Frontier_In, G, Frontier_Out).
-simplify_frontier_aux([_Any|Frontier_In], G, Frontier_Out):-
-	simplify_frontier(Frontier_In, G, Frontier_Out).
+simplify_frontier_aux([Frontier | More_Frontier_In], G, [Frontier | More_Frontier_Out]):-
+	test_frontier_is_valid(Frontier, G), !,
+	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
+simplify_frontier_aux([_Frontier|More_Frontier_In], G, More_Frontier_Out):-
+	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
-test_frontier_is_valid(Head, FrontierTest, Goal):-
+test_frontier_is_valid(Frontier, Goal):-
+	frontier_contents(Frontier, Head, _Body, FrontierTest),
 	debug('test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
         copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
         copy_term(Goal, G_Tmp),
@@ -175,26 +182,31 @@ test_frontier_is_valid(Head, FrontierTest, Goal):-
 	debug('test_frontier_is_valid', 'YES'),
 	!.
 
-% lists_distributive_conjunction(F1,F2,F3) returns F3 that is the lists_distributive_conjunction of the list 
+% combine_frontiers(F1,F2,F3) returns F3 that is the combined frontier of the list 
 % of lists F1 and F2 after using the distributive rule
-lists_distributive_conjunction([],_F2,[]):-!.
-lists_distributive_conjunction([Conj|F1],F2,F5):-
-        lists_distributive_conjunction_aux_1(F2,Conj,F3),
-        lists_distributive_conjunction(F1,F2,F4),
-        cneg_aux:append(F3,F4,F5).
+combine_frontiers([],_F2,[]):-!.
+combine_frontiers([F1_1|More_F1],F2,F3):-
+        combine_frontier_with_frontiers(F1_1,F2,F_Aux_1),
+        combine_frontiers(More_F1,F2,F_Aux_2),
+        cneg_aux:append(F_Aux_1,F_Aux_2,F3).
 
-% lists_distributive_conjunction_aux_1(L1,E,L2) returns L2 that is 
+% combine_frontiers_aux_1(L1,E,L2) returns L2 that is 
 % the list obtained after using the distributive rule to 
 % the list of list L1 with respect the list E. 
 % L1 and L2 are disjunction of conjunctions and E is a conjunction.
-lists_distributive_conjunction_aux_1([],_Conj,[]).
-lists_distributive_conjunction_aux_1([Conj2|L],Conj1,[Conj3|L3]):-
-        lists_distributive_conjunction_aux_2(Conj1,Conj2,Conj3),
-        lists_distributive_conjunction_aux_1(L,Conj1,L3).
+combine_frontier_with_frontiers(_F1_1, [], []).
+combine_frontier_with_frontiers(F1_1, [F2_1|More_F2], [F3_1|More_F3]):-
+        combine_2_simple_frontiers(F1_1, F2_1, F3_1),
+        combine_frontier_with_frontiers(F1_1, More_F2, More_F3).
 
-% lists_distributive_conjunction_aux_2(C1,C2,C3) joins in C3 clauses C1 and C2
-lists_distributive_conjunction_aux_2((H1,B1),(H2,B2),((H1,H2),B3)):-
-	cneg_aux:append(B1,B2,B3).
+% combine_frontiers_aux_2(C1,C2,C3) joins in C3 clauses C1 and C2
+combine_2_simple_frontiers(F1_1, F2_1, F3_1) :-
+	frontier_contents(F1_1, H_F11, B_F11, FTest_F11),
+	frontier_contents(F2_1, H_F21, B_F21, FTest_F21),
+	cneg_aux:append(B_F11, B_F21, B_F31),
+	cneg_aux:append(FTest_F11, FTest_F21, FTest_F31),
+	frontier_contents(F3_1, (H_F11, H_F21), B_F31, FTest_F31),
+	!.
  
 % negate_frontier(Frontier,Goal,LSolutions) returns in LSolutions
 % a list with the same number of elements of the list Frontier.
@@ -213,12 +225,13 @@ negate_frontier(Frontier, Goal, GoalVars, Solutions) :-
 %	debug('negate_frontier :: Solutions', Solutions).
 
 negate_frontier_aux([], _Goal, _GoalVars, true) :- !.
-negate_frontier_aux([(Head, Body, _FrontierTest)|Frontier], Goal, GoalVars, Sol):-
+negate_frontier_aux([Frontier | More_Frontier], Goal, GoalVars, Sol):-
+	frontier_contents(Frontier, Head, Body, _FrontierTest),
 	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
 	negate_subfrontier((Head, Body), Goal, GoalVars, Sol_Subfr),
 	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
 	!, % Reduce the stack's memory.
-	negate_frontier_aux(Frontier, Goal, GoalVars, Sol_More_Subfr),
+	negate_frontier_aux(More_Frontier, Goal, GoalVars, Sol_More_Subfr),
 	combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, Sol), !.
 	
 
