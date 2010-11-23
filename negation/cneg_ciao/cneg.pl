@@ -17,7 +17,7 @@
 :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).  
 % NO:  :- include(cneg_lib).  
-:- use_module(cneg_diseq,[cneg_diseq/3]).
+:- use_module(cneg_diseq, _).
 :- use_module(library(write), [write/1]).
 :- use_module(library(system), [getenvstr/2]).
 

@@ -249,12 +249,12 @@ combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Sub
 % It fails if the negation of the conjunction has no solutions
 negate_subfrontier((_Head, [fail]), _G, _GoalVars, true):- !.
 negate_subfrontier(SubFrontier, Goal, GoalVars, NegatedFrontier):-
-%	debug('negate_subfrontier :: (Head, Body)', (C)),
+	debug('negate_subfrontier :: SubFrontier', SubFrontier),
 	split_subfrontier_into_Ci_Bi(SubFrontier, Goal, Ci, Bi),
 	!, % Reduce the stack's memory.
-%	debug('negate_subfrontier', split_subfrontier_into_Ci_Bi(C,Goal,GoalVars,I,D,R)),
+	debug('negate_subfrontier :: split_subfrontier_into_Ci_Bi', (Ci, Bi)),
 	negate_subfrontier_aux(GoalVars, Ci, Bi, NegatedFrontier),
-%	debug('negate_subfrontier :: ((Head, Body), SolC)', ((C), SolC)),
+	debug('negate_subfrontier :: NegatedFrontier', NegatedFrontier),
 	!.
 
 % negate_subfrontier_aux(C, G, GoalVars, I, D, R, SolC)
@@ -265,8 +265,9 @@ negate_subfrontier_aux(_GoalVars, [], [], fail) :-
 	debug('negate_subfrontier_aux', 'Ci adn Bi are empty lists'),
 	!. % Backtracking is not allowed.
 
-negate_subfrontier_aux(GoalVars, [], Bi_In, cneg_aux(Bi_In, UnivVars)) :- !,
-	varsbag_local(Bi_In, GoalVars, [], UnivVars).
+negate_subfrontier_aux(GoalVars, [], Bi_In, cneg_aux(Bi_Conj, UnivVars)) :- !,
+	varsbag_local(Bi_In, GoalVars, [], UnivVars),
+	list_to_conj(Bi_In, Bi_Conj).
 
 negate_subfrontier_aux(GoalVars, Ci_In, [], Answer) :- !,
 	negate_Ci(Ci_In, GoalVars, Answer).
@@ -274,7 +275,14 @@ negate_subfrontier_aux(GoalVars, Ci_In, [], Answer) :- !,
 negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	negate_Ci(Ci_In, GoalVars, Ci_Negated),
 	varsbag_local(Ci_In, [], [], UnivVars),
-	cneg_eq(Answer, (Ci_Negated ; (remove_univ_quant(UnivVars), Ci_In, cneg_aux(Bi_In, [])))).
+	list_to_conj(Ci_In, Ci_Conj),
+	list_to_conj(Bi_In, Bi_Conj),
+	cneg_eq(Answer, (Ci_Negated ; (remove_universal_quantification(UnivVars), Ci_Conj, cneg_aux(Bi_Conj, [])))).
+
+list_to_conj([], []) :- fail.
+list_to_conj([Ci_In], Ci_In) :- !.
+list_to_conj([Ci_In | More_Ci_In], (Ci_In, More_Ci_Conj)) :- !,
+	list_to_conj(More_Ci_In, More_Ci_Conj).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

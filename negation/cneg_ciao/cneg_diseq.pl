@@ -1,5 +1,7 @@
 :- module(cneg_diseq, [cneg_diseq/3,
-			portray_attributes_in_term/1]).
+			portray_attributes_in_term/1, 
+			put_universal_quantification/1,
+			remove_universal_quantification/1]).
 
 :- use_module(cneg_aux,_).
 
@@ -54,7 +56,12 @@ put_attribute_local(Var, Attribute) :-
 %	debug(Var),
 %	debug(' has NO attribute').
 
-	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+put_universal_quantification(_X).
+remove_universal_quantification(_X).	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

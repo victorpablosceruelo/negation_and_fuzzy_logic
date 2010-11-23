@@ -1,5 +1,5 @@
-% :- module(examples_cneg,_,[.(cneg), .(debugger_pkg)]).
-:- module(cneg_examples,_,[.(cneg)]).
+:- module(cneg_examples,_,[.(cneg), .(debugger_pkg)]).
+% :- module(cneg_examples,_,[.(cneg)]).
 
 %:- use_module(cneg_lib, [cneg/1]).  
 %:- use_module(dist,[dist/2]).  
