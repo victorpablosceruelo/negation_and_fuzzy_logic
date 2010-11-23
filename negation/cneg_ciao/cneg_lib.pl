@@ -76,7 +76,6 @@ cneg_dynamic(Goal, UnivVars, Solution) :-
 	!. % No backtracking allowed
 
 cneg_dynamic_aux(Goal, UnivVars, Solution) :-
-%	remove_and_save_attributes_and_fA(Goal, GoalVars_And_UnivVars, Attributes, Forall_Vars),
 	varsbag_local(Goal, UnivVars, [], GoalVars),
 	frontier(Goal, Frontier, Goal_Not_Qualified), 
 	debug_list('cneg_dynamic :: Frontier (list)', Frontier),
@@ -89,44 +88,12 @@ cneg_dynamic_aux(Goal, UnivVars, Solution) :-
 	% Unify NewGoal with the Head of the Clause we are playing with ...
 	% debug('cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
 	unify_terms(Goal_Not_Qualified, Goal_Copy),
-%	restore_attributes_and_fA(Goal, Attributes, Forall_Vars),
 	!. % No backtracking allowed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% remove_and_save_attributes_and_fA(Goal, GoalVars_And_UnivVars, Attributes, Forall_Vars)
-remove_and_save_attributes_and_fA(_Goal, _GoalVars_And_UnivVars, _Attributes, _Forall_Vars).
-
-% restore_attributes_and_fA(Goal, Attributes, Forall_Vars).
-restore_attributes_and_fA(_Goal, _Attributes, _Forall_Vars).
-
-% rm_cons_fA(UnivVars,Univs) removes the constructor fA from the args
-% of UnivVars and fails if there is something different than a variable
-% of a fA variable
-rm_cons_fA([],[]).
-rm_cons_fA([V|Vars],[V|Vars1]):-
-	var(V),!,
-	rm_cons_fA(Vars,Vars1).
-rm_cons_fA([fA(V)|Vars],[V|Vars1]):-
-	!,
-	rm_cons_fA(Vars,Vars1).
-
-% put_universal(UnivVars) substitutes variables of UnivVars by 
-% universal quantified variables fA(_)
-put_universal([]).
-put_universal([Var|UnivVars]):-
-	var(Var),!, % the cuantification keeps
-	Var=fA(_NewVar),
-	put_universal(UnivVars).
-put_universal([_Value|UnivVars]):- % the variable has change its quantification
-	put_universal(UnivVars).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
 % frontier(Goal,Frontier) 
 % obtains in Frontier the frontier of the  goal Goal.
 % It is a list of list that represent the disjunction of its
@@ -292,7 +259,8 @@ negate_subfrontier_aux(GoalVars, I_In, D_In, R_In, SolC) :-
 split_subfrontier_into_I_D_R((Head, BodyList), Goal_Copy, I, D, R):-
 	copy_term((Head, BodyList), (Head_Copy, BodyList_Copy)),
 	unify_goal_structure_into_head(Goal_Copy, Head_Copy),
-	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R).
+	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R),
+	debug('split_body_into_I_D_R', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
 
 % unify_goal_structure_into_head(Goal_Copy, Head_Copy)
 unify_goal_structure_into_head(Goal_Copy, Head_Copy) :-
