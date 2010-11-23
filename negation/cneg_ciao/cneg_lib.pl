@@ -287,7 +287,7 @@ negate_subfrontier_aux(GoalVars, I_In, D_In, R_In, SolC) :-
 split_subfrontier_into_I_D_R((Head, BodyList), Goal_Copy, I, D, R):-
 	copy_term((Head, BodyList), (Head_Copy, BodyList_Copy)),
 	unify_goal_structure_into_head(Goal_Copy, Head_Copy),
-	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R).
+	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], [], [], [], I, D, R).
 %	debug('split_body_into_I_D_R', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
 
 % unify_goal_structure_into_head(Goal_Copy, Head_Copy)
@@ -300,26 +300,23 @@ unify_goal_structure_into_head_aux(X, X).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-split_body_into_I_D_R([], [], [], []) :- !.
-split_body_into_I_D_R([SubGoal], I, D, R) :- !,
-	split_subgoal_into_I_D_R(SubGoal, I, D, R).
-split_body_into_I_D_R([SubGoal|SubGoal_L], I, D, R) :- !,
-	split_subgoal_into_I_D_R(SubGoal, I_1, D_1, R_1),
-	split_body_into_I_D_R(SubGoal_L, I_2, D_2, R_2), !,
-	cneg_aux:append(I_1, I_2, I), 
-	cneg_aux:append(D_1, D_2, D),
-	cneg_aux:append(R_1, R_2, R).
+split_body_into_I_D_R([], I, D, R, I, D, R) :- !.
+split_body_into_I_D_R([SubGoal], I_In, D_In, R_In, I_Out, D_Out, R_Out) :- !,
+	split_subgoal_into_I_D_R(SubGoal, I_In, D_In, R_In, I_Out, D_Out, R_Out).
+split_body_into_I_D_R([SubGoal|SubGoal_L], I_In, D_In, R_In, I_Out, D_Out, R_Out) :- !,
+	split_subgoal_into_I_D_R(SubGoal, I_In, D_In, R_In, I_Aux, D_Aux, R_Aux), !,
+	split_body_into_I_D_R(SubGoal_L, I_Aux, D_Aux, R_Aux, I_Out, D_Out, R_Out), !.
 
 % split_subgoal_into_I_D_R(SubGoal, I, D, R) :-
-split_subgoal_into_I_D_R(Subgoal, NewSubgoal, [], []) :- 
+split_subgoal_into_I_D_R(Subgoal, I, D, R, [NewSubgoal | I], D, R) :- 
 	goal_is_equality(Subgoal, Term1, Term2), !,
 	cneg_eq(NewSubgoal, (Term1 = Term2)).
 
-split_subgoal_into_I_D_R(Subgoal, [], [NewSubgoal], []) :- 
+split_subgoal_into_I_D_R(Subgoal, I, D, R, I, [NewSubgoal | D], R) :- 
 	goal_is_disequality(Subgoal, Term1, Term2, FreeVars), !,
 	cneg_eq(NewSubgoal, cneg_diseq(Term1, Term2, FreeVars)).
 
-split_subgoal_into_I_D_R(SubGoal, [], [], [SubGoal]) :- !.
+split_subgoal_into_I_D_R(SubGoal, I, D, R, I, D, [SubGoal | R]) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
