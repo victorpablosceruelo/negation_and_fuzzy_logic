@@ -70,7 +70,7 @@ remove_universal_quantification(_X).
 %%% Attributes contents are encapsulated via the following structure.
 
 %:- dynamic var_attribute/2.
-attribute_contents(var_attribute(Target, Disequalities), Target, Disequalities).
+attribute_contents(var_attribute(Target, Is_UnivVar, Disequalities), Target, Is_UnivVar, Disequalities).
 disequality_contents(disequality(Diseq_1, Diseq_2, FreeVars), Diseq_1, Diseq_2, FreeVars).
 equality_contents(equality(T1, T2), T1, T2).
 
@@ -97,7 +97,7 @@ portray_attribute(Attr, Var) :-
 	msg('portray_attribute :: (Attr, Var)', (Attr, Var)).
 
 portray(Attribute) :-
-	attribute_contents(Attribute, _Target, Disequalities), !,
+	attribute_contents(Attribute, _Target, _Is_UnivVar, Disequalities), !,
 	portray_disequalities(Disequalities).
 
 portray(Anything) :- 
@@ -166,7 +166,7 @@ portray_disequalities_aux_2([FreeVar | FreeVars]) :-
 
 verify_attribute(Attribute, Target):-
 %	debug(verify_attribute(Attribute, Target)), 
-	attribute_contents(Attribute, NewTarget, Disequalities), 
+	attribute_contents(Attribute, NewTarget, _Is_UnivVar, Disequalities), 
 	terms_are_equal(Target, NewTarget), !,
 	update_var_attributes(Disequalities, []).
 
@@ -174,7 +174,7 @@ verify_attribute(Attribute, Target):-
 verify_attribute(Attribute, NewTarget):-
 %	debug('Only for Ciao Prolog: '),
 %	debug(verify_attribute(Attribute, NewTarget)), 
-	attribute_contents(Attribute, OldTarget, Disequalities), !,
+	attribute_contents(Attribute, OldTarget, _Is_UnivVar, Disequalities), !,
 	substitution_contents(Subst, OldTarget, NewTarget),
 	update_var_attributes(Disequalities, [Subst]).
 
@@ -182,8 +182,8 @@ substitution_contents(substitute(Var, T), Var, T).
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	debug('combine_attributes(Attr_Var1, Attr_Var2)', (Attribute_Var_1, Attribute_Var_2)),
-	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1), !,
-	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2), !,
+	attribute_contents(Attribute_Var_1, OldTarget_Var_1, _Is_UnivVar, Disequalities_Var_1), !,
+	attribute_contents(Attribute_Var_2, OldTarget_Var_2, _Is_UnivVar, Disequalities_Var_2), !,
 	cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 	substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
 	update_var_attributes(Disequalities, [Subst]).
@@ -211,7 +211,7 @@ retrieve_affected_disequalities([], _Vars_Examined, Diseq_Acc, Diseq_Acc) :- !. 
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, Diseq_Acc_In, Diseq_Acc_Out):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
-	attribute_contents(Attribute, Var, ThisVar_Disequalities), 
+	attribute_contents(Attribute, Var, _Is_UnivVar, ThisVar_Disequalities), 
 	remove_attribute_local(Var), 
 	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
 	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Tmp),
@@ -253,13 +253,13 @@ restore_disequality_var(Var, Diseq) :-
 	var(Var),
 	get_attribute_local(Var, Old_Attribute), !,
 	remove_attribute_local(Var),
-	attribute_contents(Old_Attribute, Var, Old_Diseq),
-	attribute_contents(New_Attribute, Var, [Diseq|Old_Diseq]),
+	attribute_contents(Old_Attribute, Var, _Is_UnivVar, Old_Diseq),
+	attribute_contents(New_Attribute, Var, _Is_UnivVar, [Diseq|Old_Diseq]),
 	put_attribute_local(Var, New_Attribute).
 
 restore_disequality_var(Var, Diseq) :-
 	var(Var),
-	attribute_contents(New_Attribute, Var, [Diseq]),
+	attribute_contents(New_Attribute, Var, _Is_UnivVar, [Diseq]),
 	put_attribute_local(Var, New_Attribute).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
