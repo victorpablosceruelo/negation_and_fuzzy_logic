@@ -223,25 +223,31 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 update_var_attributes(New_Disequalities, Substitutions):-
 	debug('update_var_attributes(New_Disequalities, Substitutions)', (New_Disequalities, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
-	retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp), !,
+	accumulator(Affected_Diseq_Acc, New_Disequalities, Disequalities_Tmp),
+	retrieve_affected_disequalities(Vars, [], Affected_Diseq_Acc), !,
 %	debug(retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp)),
 	perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
-	simplify_disequations(Disequalities, [], Simplified_Disequalities),
+
+	accumulator(Diseq_Acc, [], Simplified_Disequalities),
+	simplify_disequations(Disequalities, Diseq_Acc),
 	debug('update_var_attributes(Affected_Diseq, Simpl_Diseq)', (Disequalities, Simplified_Disequalities)),
 	restore_disequalities(Simplified_Disequalities).
 
-retrieve_affected_disequalities([], _Vars_Examined, Diseq_Acc, Diseq_Acc) :- !. % Loop over vars list.
-retrieve_affected_disequalities([Var|Vars], Vars_Examined, Diseq_Acc_In, Diseq_Acc_Out):- 
+retrieve_affected_disequalities([], _Vars_Examined, Diseq_Acc) :- !, % Loop over vars list.
+	return_accumulator(Diseq_Acc).	
+retrieve_affected_disequalities([Var|Vars], Vars_Examined, Diseq_Acc):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
-PPP	attribute_contents(Attribute, Var, Is_UnivVar, ThisVar_Disequalities), 
+	attribute_contents(Attribute, Var, _Is_UnivVar, ThisVar_Disequalities), 
+	debug('', 'Problem here'),
 	remove_attribute_local(Var), 
 	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
-	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Tmp),
-        retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], Diseq_Acc_Tmp, Diseq_Acc_Out).
-retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, Diseq_Acc_In, Diseq_Acc_Out):- 
-        retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], Diseq_Acc_In, Diseq_Acc_Out).
+	generate_intermediate_accumulator(Diseq_Acc, Tmp_Diseq_Acc, New_Diseq_Acc),
+	accumulate_disequations(ThisVar_Disequalities, Tmp_Diseq_Acc),
+        retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], New_Diseq_Acc).
+retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, Diseq_Acc):- 
+        retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], Diseq_Acc).
 
 perform_substitutions([], Disequalities_Out, Disequalities_Out) :- !.
 perform_substitutions([Subst | MoreSubst], Disequalities_In, Disequalities_Out) :-
@@ -290,25 +296,41 @@ restore_disequality_var(Var, Diseq) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-accumulate_disequations([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+accumulator(accumulator_structure(Acc_In, Acc_Out), Acc_In, Acc_Out).
+return_accumulator(Acc) :-
+	accumulator(Acc, Acc_Out, Acc_Out).
+add_to_accumulator(Element, Acc, New_Acc) :-
+	accumulator(Acc, Acc_In, Acc_Out),
+	accumulator(New_Acc, [Element | Acc_In], Acc_Out).
+generate_intermediate_accumulator(Acc, Tmp_Acc, New_Acc) :-
+	accumulator(Acc, Acc_In, Acc_Out),
+	accumulator(Tmp_Acc, Acc_In, Acc_Aux),
+	accumulator(New_Acc, Acc_Aux, Acc_Out).
+
+accumulate_disequations([], Diseq_Acc_In, Diseq_Acc_In) :- !.
+accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In) :-
+	accumulator(Diseq_Acc, Diseq_Acc_In, _Diseq_Acc_Out),
 	memberchk_local(Diseq, Diseq_Acc_In), !, % It is there.
-	accumulate_disequations(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+	accumulate_disequations(Diseq_List, Diseq_Acc).
+accumulate_disequations([Diseq | Diseq_List], Diseq_Acc) :-
 	disequality_contents(Diseq, T1, T2, FreeVars),
 	disequality_contents(Diseq_Aux, T2, T1, FreeVars), % Order inversion.
+	accumulator(Diseq_Acc, Diseq_Acc_In, _Diseq_Acc_Out),
 	memberchk_local(Diseq_Aux, Diseq_Acc_In), !, % It is there.
-	accumulate_disequations(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
-	accumulate_disequations(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
+	accumulate_disequations(Diseq_List, Diseq_Acc).
+accumulate_disequations([Diseq | Diseq_List], Diseq_Acc) :-
+	add_to_accumulator(Diseq, Diseq_Acc, New_Diseq_Acc),
+	accumulate_disequations(Diseq_List, New_Diseq_Acc).
 
-simplify_disequations([], Diseq_Acc, Diseq_Acc) :- !.
-simplify_disequations([Diseq|Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :- !,
+simplify_disequations([], Diseq_Acc) :- !,
+	return_accumulator(Diseq_Acc).
+simplify_disequations([Diseq|Diseq_List], Diseq_Acc) :- !,
 	disequality_contents(Diseq, T1, T2, FreeVars),
 	varsbag_local((T1, T2), FreeVars, [], No_FreeVars),
 	simplify_1_diseq(Diseq, [], No_FreeVars, Simplified_Diseq),
-	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Tmp),
-	simplify_disequations(Diseq_List, Diseq_Acc_Tmp, Diseq_Acc_Out).
+	generate_intermediate_accumulator(Diseq_Acc, Tmp_Diseq_Acc, New_Diseq_Acc),
+	accumulate_disequations(Simplified_Diseq, Tmp_Diseq_Acc),
+	simplify_disequations(Diseq_List, New_Diseq_Acc).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
