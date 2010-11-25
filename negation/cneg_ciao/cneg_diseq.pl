@@ -33,8 +33,7 @@
 
 % Local predicates used to easy migration between 
 % prologs. 
-remove_attribute_local(_Var, false).
-remove_attribute_local(Var, true) :- 
+remove_attribute_local(Var) :- 
 %	debug('remove_attribute_local :: Var', Var),
 	detach_attribute(Var).
 
@@ -72,12 +71,9 @@ remove_universal_quantification(_X).
 %%% Attributes contents are encapsulated via the following structure.
 
 %:- dynamic var_attribute/2.
-attribute_contents(var_attribute(Target, Is_UnivVar, Disequalities), Target, Is_UnivVar, Disequalities).
+attribute_contents(var_attribute(Target, Disequalities, UnivVars), Target, Disequalities, UnivVars).
 disequality_contents(disequality(Diseq_1, Diseq_2), Diseq_1, Diseq_2).
 equality_contents(equality(T1, T2), T1, T2).
-
-is_not_an_universal_variable(false).
-is_an_universal_variable(true).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,8 +98,8 @@ portray_attribute(Attr, Var) :-
 	msg('portray_attribute :: (Attr, Var)', (Attr, Var)).
 
 portray(Attribute) :-
-	attribute_contents(Attribute, _Target, _Is_UnivVar, Disequalities), !,
-	portray_disequalities(Disequalities).
+	attribute_contents(Attribute, _Target, Disequalities, UnivVars), !,
+	portray_disequalities(Disequalities, UnivVars).
 
 portray(Anything) :- 
 	msg_aux('', Anything).
@@ -133,8 +129,9 @@ portray_attributes_in_variable(Var) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-portray_disequalities(Disequalities) :-
-	portray_disequalities_aux_1(Disequalities).
+portray_disequalities(Disequalities, UnivVars) :-
+	portray_disequalities_aux_1(Disequalities), 
+	portray_disequalities_aux_3(UnivVars).
 
 portray_disequalities_aux_1([]) :- !.
 portray_disequalities_aux_1([Diseq_1]) :- !,
@@ -145,29 +142,22 @@ portray_disequalities_aux_1([Diseq_1|Diseqs]) :- !,
 	portray_disequalities_aux_1(Diseqs).
 
 portray_disequalities_aux_2(Diseq) :-
-	varsbag_local(Diseq, [], [], Vars),
-	retrieve_affected_disequalities(Vars, [], [], UnivVars, [], _Diseq_Acc_Out, false),
-	portray_disequalities_aux_3(Diseq, UnivVars).
-
-portray_disequalities_aux_3(Diseq, []) :-
 	disequality_contents(Diseq, Diseq_1, Diseq_2),
 	msg_aux('[ ', Diseq_1),
 	msg_aux(' =/= ', Diseq_2),
 	msg_aux('', ' ]').
 
-portray_disequalities_aux_3(Diseq, UnivVars) :-
+portray_disequalities_aux_3([]).
+portray_disequalities_aux_3(UnivVars) :-
 	UnivVars \== [], !,
-	disequality_contents(Diseq, Diseq_1, Diseq_2),
-	msg_aux('[ ', Diseq_1),
-	msg_aux(' =/= ', Diseq_2),
-	msg_aux(', Universally quantified:', ''), 
+	msg_aux(', Universally quantified: [', ''), 
 	portray_disequalities_aux_4(UnivVars),
 	msg_aux('', ' ]').
 
 portray_disequalities_aux_4([]) :- !.
 portray_disequalities_aux_4([FreeVar | FreeVars]) :-
 	msg_aux(' ', FreeVar),
-	portray_disequalities_aux_2(FreeVars).
+	portray_disequalities_aux_4(FreeVars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
@@ -232,31 +222,31 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 update_var_attributes(New_Disequalities, UV_In, Substitutions):-
 	debug('update_var_attributes(New_Disequalities, UV_In, Substitutions)', (New_Disequalities, UV_In, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
-	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp, true), !,
+	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp), !,
 %	debug(retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp)),
 	perform_substitutions(Substitutions, UV_Out, Disequalities_Tmp, Disequalities), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 
 	varsbag_local(Disequalities, UV_Out, [], No_FV_In),
 	simplify_disequations(Disequalities, No_FV_In, No_FV_Out, [], Simplified_Disequalities),
-	debug('update_var_attributes(Affected_Diseq, Simpl_Diseq)', (Disequalities, Simplified_Disequalities)),
+	debug('update_var_attributes(Simplified_Disequalities, No_FV_Out)', (Simplified_Disequalities, No_FV_Out)),
 	restore_attributes(Simplified_Disequalities, No_FV_Out).
 
-retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out, _Remove_Attrs) :- !. % Loop over vars list.
-retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out, Remove_Attrs):- 
+retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
+retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
 	attribute_contents(Attribute, Var, Is_UnivVar, ThisVar_Disequalities), 
-	remove_attribute_local(Var, Remove_Attrs), 
+	remove_attribute_local(Var), 
 
 	% Store info.
 	add_to_univvars_if_it_is(Var, Is_UnivVar, UV_In, UV_Aux),
 	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
 	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
-        retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], UV_Aux, UV_Out, Diseq_Acc_Aux, Diseq_Acc_Out, Remove_Attrs).
+        retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], UV_Aux, UV_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
-retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out, Remove_Attrs) :- 
-        retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out, Remove_Attrs).
+retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- 
+        retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out).
 
 add_to_univvars_if_it_is(Var, true, UnivVars, [Var | UnivVars]).
 add_to_univvars_if_it_is(_Var, false, UnivVars, UnivVars).
@@ -304,38 +294,31 @@ restore_attributes_aux([Var|Vars], Affected_FreeVars, Diseq) :-
 restore_attributes_var(Var, Affected_FreeVars, Diseq) :-
 	var(Var),
 	get_attribute_local(Var, Old_Attribute), !,
-	remove_attribute_local(Var, true),
+	remove_attribute_local(Var),
 	generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute),
 	put_attribute_local(Var, New_Attribute).
 
 restore_attributes_var(Var, Affected_FreeVars, Diseq) :-
 	var(Var),
-	is_not_an_universal_variable(Old_Is_UnivVar),
-	attribute_contents(Old_Attribute, Var, Old_Is_UnivVar, []),
+	attribute_contents(Old_Attribute, Var, [], []),
 	generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute),
 	put_attribute_local(Var, New_Attribute).
 
 generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute) :-
-	attribute_contents(Old_Attribute, Var, Old_Is_UnivVar, Old_Diseq),
+	attribute_contents(Old_Attribute, Var, Old_Diseq, Old_UnivVars),
 	(
 	    (
 		memberchk_local(Var, Affected_FreeVars), !, 
-		is_an_universal_variable(New_Is_UnivVar),
+		New_UnivVars = [Var],
 		New_Diseq = []
 	    )
 	;
 	    (
-		is_an_universal_variable(Old_Is_UnivVar), !,
-		is_an_universal_variable(New_Is_UnivVar),
-		New_Diseq = []
-	    )
-	;
-	    (
-		Old_Is_UnivVar = New_Is_UnivVar,
+		varsbag_local(Old_UnivVars, [], Affected_FreeVars, New_UnivVars),
 		New_Diseq = [Diseq | Old_Diseq]
 	    )
 	),
-	attribute_contents(New_Attribute, Var, New_Is_UnivVar, New_Diseq).
+	attribute_contents(New_Attribute, Var, New_Diseq, New_UnivVars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -407,6 +390,7 @@ simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :- % Different 
 	    )
 	;
 	    (   % T1 and T2 are NOT free vars. 2 solutions. First: T1 =/= T2.
+		No_FV_In = No_FV_Out,
 		diseq_eq(Answer, [Diseq])
 	    )
 	;
@@ -502,9 +486,10 @@ simplify_1_diseq_var_nonvar(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer):-
 		)
 	    ;
 		(   % Keep the functor but diseq between the arguments.
+		    varsbag_local(No_FV_In, [T1], [], No_FV_Aux_1),
 		    functor_local(T1, Name, Arity, Args_T1), % Answer is T1 = functor and more.
-		    cneg_aux:append(Args_T1, No_FV_In, New_No_FV_In), % Optimization
-		    simplify_1_diseq(Diseq, More_Diseq, New_No_FV_In, No_FV_Out, Answer)
+		    varsbag_local(Args_T1, [T1], No_FV_Aux_1, No_FV_Aux_2),
+		    simplify_1_diseq(Diseq, More_Diseq, No_FV_Aux_2, No_FV_Out, Answer)
 		)
 	    )
 	).
@@ -519,8 +504,8 @@ simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, A
 	    (   % T1 is going to be processed (appears in More_Diseq).
 		varsbag_local(More_Diseq, No_FV_In, [], More_Diseq_FreeVars),
 		memberchk_local(T1, More_Diseq_FreeVars), !,
-		diseq_eq(T1, T2), % Answer is T1 = T2 and more
-		simplify_1_diseq(fail, More_Diseq, [T1 | No_FV_In], No_FV_Out, Answer)
+		diseq_eq(T1, T2), % Answer is T1 = T2 and more. T1 is NO more a variable.
+		simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	;
 	    (   % T1 appears only once, so it is not different from T2. Just fail.
