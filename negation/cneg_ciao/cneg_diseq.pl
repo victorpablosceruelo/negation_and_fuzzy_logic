@@ -33,9 +33,11 @@
 
 % Local predicates used to easy migration between 
 % prologs. 
-remove_attribute_local(Var) :- 
+remove_attribute_local(_Var, false).
+remove_attribute_local(Var, true) :- 
 %	debug('remove_attribute_local :: Var', Var),
 	detach_attribute(Var).
+
 % XSB:	del_attr(Var, dist).
 get_attribute_local(Var, Attribute) :-
 	get_attribute(Var, Attribute).
@@ -71,8 +73,11 @@ remove_universal_quantification(_X).
 
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Is_UnivVar, Disequalities), Target, Is_UnivVar, Disequalities).
-disequality_contents(disequality(Diseq_1, Diseq_2, FreeVars), Diseq_1, Diseq_2, FreeVars).
+disequality_contents(disequality(Diseq_1, Diseq_2), Diseq_1, Diseq_2).
 equality_contents(equality(T1, T2), T1, T2).
+
+is_not_an_universal_variable(false).
+is_an_universal_variable(true).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,23 +145,27 @@ portray_disequalities_aux_1([Diseq_1|Diseqs]) :- !,
 	portray_disequalities_aux_1(Diseqs).
 
 portray_disequalities_aux_2(Diseq) :-
-	disequality_contents(Diseq, Diseq_1, Diseq_2, FreeVars),
-	FreeVars == [], !,
+	varsbag_local(Diseq, [], [], Vars),
+	retrieve_affected_disequalities(Vars, [], [], UnivVars, [], _Diseq_Acc_Out, false),
+	portray_disequalities_aux_3(Diseq, UnivVars).
+
+portray_disequalities_aux_3(Diseq, []) :-
+	disequality_contents(Diseq, Diseq_1, Diseq_2),
 	msg_aux('[ ', Diseq_1),
 	msg_aux(' =/= ', Diseq_2),
 	msg_aux('', ' ]').
 
-portray_disequalities_aux_2(Diseq) :-
-	disequality_contents(Diseq, Diseq_1, Diseq_2, FreeVars),
-	FreeVars \== [], !,
+portray_disequalities_aux_3(Diseq, UnivVars) :-
+	UnivVars \== [], !,
+	disequality_contents(Diseq, Diseq_1, Diseq_2),
 	msg_aux('[ ', Diseq_1),
 	msg_aux(' =/= ', Diseq_2),
 	msg_aux(', Universally quantified:', ''), 
-	portray_disequalities_aux_2(FreeVars),
+	portray_disequalities_aux_4(UnivVars),
 	msg_aux('', ' ]').
 
-portray_disequalities_aux_2([]) :- !.
-portray_disequalities_aux_2([FreeVar | FreeVars]) :-
+portray_disequalities_aux_4([]) :- !.
+portray_disequalities_aux_4([FreeVar | FreeVars]) :-
 	msg_aux(' ', FreeVar),
 	portray_disequalities_aux_2(FreeVars).
 
@@ -168,7 +177,7 @@ verify_attribute(Attribute, Target):-
 %	debug(verify_attribute(Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, _Is_UnivVar, Disequalities), 
 	terms_are_equal(Target, NewTarget), !,
-	update_var_attributes(Disequalities, []).
+	update_var_attributes(Disequalities, [], []).
 
 % Only for Ciao prolog 
 verify_attribute(Attribute, NewTarget):-
@@ -184,7 +193,7 @@ verify_attribute(Attribute, NewTarget):-
 	    (
 		Is_UnivVar == false, 
 		substitution_contents(Subst, OldTarget, NewTarget),
-		update_var_attributes(Disequalities, [Subst])
+		update_var_attributes(Disequalities, [], [Subst])
 	    )
 	).
 
@@ -208,7 +217,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 		Is_UnivVar_Var_2 == false, 
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
-		update_var_attributes(Disequalities, [Subst])
+		update_var_attributes(Disequalities, [], [Subst])
 	    )
 	).
 
@@ -220,42 +229,56 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-update_var_attributes(New_Disequalities, Substitutions):-
-	debug('update_var_attributes(New_Disequalities, Substitutions)', (New_Disequalities, Substitutions)), 
+update_var_attributes(New_Disequalities, UV_In, Substitutions):-
+	debug('update_var_attributes(New_Disequalities, UV_In, Substitutions)', (New_Disequalities, UV_In, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
-	accumulator(Affected_Diseq_Acc, New_Disequalities, Disequalities_Tmp),
-	retrieve_affected_disequalities(Vars, [], Affected_Diseq_Acc), !,
+	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp, true), !,
 %	debug(retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp)),
-	perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities), !,
+	perform_substitutions(Substitutions, UV_Out, Disequalities_Tmp, Disequalities), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 
-	accumulator(Diseq_Acc, [], Simplified_Disequalities),
-	simplify_disequations(Disequalities, Diseq_Acc),
+	varsbag_local(Disequalities, UV_Out, [], No_FV_In),
+	simplify_disequations(Disequalities, No_FV_In, No_FV_Out, [], Simplified_Disequalities),
 	debug('update_var_attributes(Affected_Diseq, Simpl_Diseq)', (Disequalities, Simplified_Disequalities)),
-	restore_disequalities(Simplified_Disequalities).
+	restore_attributes(Simplified_Disequalities, No_FV_Out).
 
-retrieve_affected_disequalities([], _Vars_Examined, Diseq_Acc) :- !, % Loop over vars list.
-	return_accumulator(Diseq_Acc).	
-retrieve_affected_disequalities([Var|Vars], Vars_Examined, Diseq_Acc):- 
+retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out, _Remove_Attrs) :- !. % Loop over vars list.
+retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out, Remove_Attrs):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
-	attribute_contents(Attribute, Var, _Is_UnivVar, ThisVar_Disequalities), 
-	debug('', 'Problem here'),
-	remove_attribute_local(Var), 
-	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
-	generate_intermediate_accumulator(Diseq_Acc, Tmp_Diseq_Acc, New_Diseq_Acc),
-	accumulate_disequations(ThisVar_Disequalities, Tmp_Diseq_Acc),
-        retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], New_Diseq_Acc).
-retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, Diseq_Acc):- 
-        retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], Diseq_Acc).
+	attribute_contents(Attribute, Var, Is_UnivVar, ThisVar_Disequalities), 
+	remove_attribute_local(Var, Remove_Attrs), 
 
-perform_substitutions([], Disequalities_Out, Disequalities_Out) :- !.
-perform_substitutions([Subst | MoreSubst], Disequalities_In, Disequalities_Out) :-
+	% Store info.
+	add_to_univvars_if_it_is(Var, Is_UnivVar, UV_In, UV_Aux),
+	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
+	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
+        retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], UV_Aux, UV_Out, Diseq_Acc_Aux, Diseq_Acc_Out, Remove_Attrs).
+
+retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out, Remove_Attrs) :- 
+        retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out, Remove_Attrs).
+
+add_to_univvars_if_it_is(Var, true, UnivVars, [Var | UnivVars]).
+add_to_univvars_if_it_is(_Var, false, UnivVars, UnivVars).
+
+perform_substitutions([], _UnivVars, Disequalities_Out, Disequalities_Out) :- !.
+perform_substitutions([Subst | MoreSubst], UnivVars, Disequalities_In, Disequalities_Out) :-
 	substitution_contents(Subst, OldTarget, NewTarget),
-	diseq_eq(OldTarget, NewTarget), !,
-	perform_substitutions(MoreSubst, Disequalities_In, Disequalities_Out).
-%	replace_in_term_var_by_value(Disequalities_In, OldTarget, NewTarget, Disequalities_Tmp), !,
-%	perform_substitutions(MoreSubst, Disequalities_Tmp, Disequalities_Out).
+	(
+	    (
+		(
+		    memberchk_local(OldTarget, UnivVars);
+		    memberchk_local(NewTarget, UnivVars)
+		),
+		msg('perform_substitutions', 'cannot substitute a universaly quantified variable.'),
+		!, fail
+	    )
+	;
+	    (
+		diseq_eq(OldTarget, NewTarget), !,
+		perform_substitutions(MoreSubst, UnivVars, Disequalities_In, Disequalities_Out)
+	    )
+	).
 
 % diseq_eq(X,Y) unify X and Y
 diseq_eq(X, X).
@@ -264,118 +287,123 @@ diseq_eq(X, X).
 
 
 % Need old vars to play with them too.
-restore_disequalities([]) :- !.
-restore_disequalities([Diseq | Diseq_List]) :-
-	disequality_contents(Diseq, T_1, T_2, FreeVars),
-	varsbag_local((T_1, T_2), FreeVars, [], NonFreeVars), !,
-	varsbag_local((T_1, T_2), NonFreeVars, [], AffectedFreeVars),
-	disequality_contents(Simplified_Diseq, T_1, T_2, AffectedFreeVars),
+restore_attributes([], _No_FV) :- !.
+restore_attributes([Diseq | Diseq_List], No_FV) :-
+	disequality_contents(Diseq, T_1, T_2),
+	varsbag_local((T_1, T_2), No_FV, [], Affected_FreeVars),
+	varsbag_local((T_1, T_2), [], [], Affected_Vars),
 	!,
-	restore_disequality(NonFreeVars, Simplified_Diseq),
-	restore_disequalities(Diseq_List).
+	restore_attributes_aux(Affected_Vars, Affected_FreeVars, Diseq),
+	restore_attributes(Diseq_List, No_FV).
 
-restore_disequality([], _Diseq) :- !.
-restore_disequality([Var|Vars], Diseq) :-
-	restore_disequality_var(Var, Diseq),
-	restore_disequality(Vars, Diseq).
+restore_attributes_aux([], _Affected_FreeVars, _Diseq) :- !.
+restore_attributes_aux([Var|Vars], Affected_FreeVars, Diseq) :-
+	restore_attributes_var(Var, Affected_FreeVars, Diseq),
+	restore_attributes_aux(Vars, Affected_FreeVars, Diseq).
 
-restore_disequality_var(Var, Diseq) :-
+restore_attributes_var(Var, Affected_FreeVars, Diseq) :-
 	var(Var),
 	get_attribute_local(Var, Old_Attribute), !,
-	remove_attribute_local(Var),
-	attribute_contents(Old_Attribute, Var, _Is_UnivVar, Old_Diseq),
-	attribute_contents(New_Attribute, Var, _Is_UnivVar, [Diseq|Old_Diseq]),
+	remove_attribute_local(Var, true),
+	generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute),
 	put_attribute_local(Var, New_Attribute).
 
-restore_disequality_var(Var, Diseq) :-
+restore_attributes_var(Var, Affected_FreeVars, Diseq) :-
 	var(Var),
-	attribute_contents(New_Attribute, Var, _Is_UnivVar, [Diseq]),
+	is_not_an_universal_variable(Old_Is_UnivVar),
+	attribute_contents(Old_Attribute, Var, Old_Is_UnivVar, []),
+	generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute),
 	put_attribute_local(Var, New_Attribute).
 
+generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute) :-
+	attribute_contents(Old_Attribute, Var, Old_Is_UnivVar, Old_Diseq),
+	(
+	    (
+		memberchk_local(Var, Affected_FreeVars), !, 
+		is_an_universal_variable(New_Is_UnivVar),
+		New_Diseq = []
+	    )
+	;
+	    (
+		is_an_universal_variable(Old_Is_UnivVar), !,
+		is_an_universal_variable(New_Is_UnivVar),
+		New_Diseq = []
+	    )
+	;
+	    (
+		Old_Is_UnivVar = New_Is_UnivVar,
+		New_Diseq = [Diseq | Old_Diseq]
+	    )
+	),
+	attribute_contents(New_Attribute, Var, New_Is_UnivVar, New_Diseq).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-accumulator(accumulator_structure(Acc_In, Acc_Out), Acc_In, Acc_Out).
-return_accumulator(Acc) :-
-	accumulator(Acc, Acc_Out, Acc_Out).
-add_to_accumulator(Element, Acc, New_Acc) :-
-	accumulator(Acc, Acc_In, Acc_Out),
-	accumulator(New_Acc, [Element | Acc_In], Acc_Out).
-generate_intermediate_accumulator(Acc, Tmp_Acc, New_Acc) :-
-	accumulator(Acc, Acc_In, Acc_Out),
-	accumulator(Tmp_Acc, Acc_In, Acc_Aux),
-	accumulator(New_Acc, Acc_Aux, Acc_Out).
-
-accumulate_disequations([], Diseq_Acc_In, Diseq_Acc_In) :- !.
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In) :-
-	accumulator(Diseq_Acc, Diseq_Acc_In, _Diseq_Acc_Out),
+accumulate_disequations([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
+accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	memberchk_local(Diseq, Diseq_Acc_In), !, % It is there.
-	accumulate_disequations(Diseq_List, Diseq_Acc).
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc) :-
-	disequality_contents(Diseq, T1, T2, FreeVars),
-	disequality_contents(Diseq_Aux, T2, T1, FreeVars), % Order inversion.
-	accumulator(Diseq_Acc, Diseq_Acc_In, _Diseq_Acc_Out),
+	accumulate_disequations(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
+accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+	disequality_contents(Diseq, T1, T2),
+	disequality_contents(Diseq_Aux, T2, T1), % Order inversion.
 	memberchk_local(Diseq_Aux, Diseq_Acc_In), !, % It is there.
-	accumulate_disequations(Diseq_List, Diseq_Acc).
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc) :-
-	add_to_accumulator(Diseq, Diseq_Acc, New_Diseq_Acc),
-	accumulate_disequations(Diseq_List, New_Diseq_Acc).
+	accumulate_disequations(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
+accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+	accumulate_disequations(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
 
-simplify_disequations([], Diseq_Acc) :- !,
-	return_accumulator(Diseq_Acc).
-simplify_disequations([Diseq|Diseq_List], Diseq_Acc) :- !,
-	disequality_contents(Diseq, T1, T2, FreeVars),
-	varsbag_local((T1, T2), FreeVars, [], No_FreeVars),
-	simplify_1_diseq(Diseq, [], No_FreeVars, Simplified_Diseq),
-	generate_intermediate_accumulator(Diseq_Acc, Tmp_Diseq_Acc, New_Diseq_Acc),
-	accumulate_disequations(Simplified_Diseq, Tmp_Diseq_Acc),
-	simplify_disequations(Diseq_List, New_Diseq_Acc).
+simplify_disequations([], No_FV_Out, No_FV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !.
+simplify_disequations([Diseq|Diseq_List], No_FV_In, No_FV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- !,
+	simplify_1_diseq(Diseq, [], No_FV_In, No_FV_Aux, Simplified_Diseq),
+	debug('simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
+	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
+	simplify_disequations(Diseq_List, No_FV_Aux, No_FV_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, _Answer) :-
+simplify_1_diseq(Diseq, More_Diseq, No_FV_In, _No_FV_Out, _Answer) :-
 %	debug('', ''),
-	debug('(Diseq, More_Diseq, No_FreeVars)', (Diseq, More_Diseq, No_FreeVars)), 
+	debug('simplify_1_diseq :: (Diseq, More_Diseq, No_FV_In)', (Diseq, More_Diseq, No_FV_In)), 
 	fail.
 		
-simplify_1_diseq(fail, [], _No_FreeVars, _Answer) :- !, fail.
-simplify_1_diseq(fail, [First_Diseq | More_Diseq], No_FreeVars, Answer) :- !,
-	simplify_1_diseq(First_Diseq, More_Diseq, No_FreeVars, Answer).
+simplify_1_diseq(fail, [], _No_FV_In, _No_FV_Out, _Answer) :- !, fail.
+simplify_1_diseq(fail, [First_Diseq | More_Diseq], No_FV_In, No_FV_Out, Answer) :- !,
+	simplify_1_diseq(First_Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer).
 
-simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, Answer) :- % Same var.
-	disequality_contents(Diseq, T1, T2, _FreeVars),
+simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :- % Same var.
+	disequality_contents(Diseq, T1, T2),
         var(T1),      
         var(T2), % Both are variables.
         T1==T2, !,
-	simplify_1_diseq(fail, More_Diseq, No_FreeVars, Answer).
+	simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer).
 
-simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, Answer) :- % Different vars.
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :- % Different vars.
+	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), % Both are variables.
-	varsbag_local(FreeVars, No_FreeVars, [], Real_FreeVars),
+	varsbag_local(Diseq, No_FV_In, [], Real_FreeVars),
 	memberchk_local(T1, Real_FreeVars), % Both are free vars.
 	memberchk_local(T2, Real_FreeVars), !,
-	simplify_1_diseq(fail, More_Diseq, No_FreeVars, Answer).
+	simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer).
 
-simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, Answer) :- % Different vars.
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :- % Different vars.
+	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), !, % Both are variables.
-	varsbag_local(FreeVars, No_FreeVars, [], Real_FreeVars),
+	varsbag_local(Diseq, No_FV_In, [], Real_FreeVars),
 	(
 	    (   % T1 is a free var, T2 is not a free var.
 		memberchk_local(T1, Real_FreeVars), !,
-		simplify_1_diseq_freevar_t1_var_t2(Diseq, More_Diseq, No_FreeVars, Answer)
+		simplify_1_diseq_freevar_t1_var_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	;
 	    (   % T2 is a free var, T1 is not a free var.
 		memberchk_local(T2, Real_FreeVars), !,
-		disequality_contents(Diseq_Aux, T2, T1, Real_FreeVars),
-		simplify_1_diseq_freevar_t1_var_t2(Diseq_Aux, More_Diseq, No_FreeVars, Answer)
+		disequality_contents(Diseq_Aux, T2, T1),
+		simplify_1_diseq_freevar_t1_var_t2(Diseq_Aux, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	;
 	    (   % T1 and T2 are NOT free vars. 2 solutions. First: T1 =/= T2.
@@ -384,36 +412,35 @@ simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, Answer) :- % Different vars.
 	;
 	    (   % Answer is T1 = T2 but needs more information.
 		diseq_eq(T1, T2), % Answer is T1 = T2 and more
-		simplify_1_diseq(fail, More_Diseq, No_FreeVars, Answer)
+		simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )	
 	).
 
-simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, Answer) :- % var and nonvar.
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :- % var and nonvar.
+	disequality_contents(Diseq, T1, T2),
 	(
 	    (
 		var(T1), !,
-		simplify_1_diseq_var_nonvar(Diseq, More_Diseq, No_FreeVars, Answer)
+		simplify_1_diseq_var_nonvar(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	;
 	    (
 		var(T2), !,
-		disequality_contents(Diseq_Aux, T2, T1, FreeVars),
-		simplify_1_diseq_var_nonvar(Diseq_Aux, More_Diseq, No_FreeVars, Answer)
+		disequality_contents(Diseq_Aux, T2, T1),
+		simplify_1_diseq_var_nonvar(Diseq_Aux, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	).
 
-simplify_1_diseq(Diseq, More_Diseq, No_FreeVars, Answer):-  % Functors that unify.
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer):-  % Functors that unify.
+	disequality_contents(Diseq, T1, T2),
  	functor_local(T1, Name, Arity, Args_1),
 	functor_local(T2, Name, Arity, Args_2), !,
-	varsbag_local(FreeVars, No_FreeVars, [], Real_FreeVars), % Optimization.
-	cartesian_product_between_arguments(Args_1, Args_2, Real_FreeVars, Diseq_List),
+	cartesian_product_between_arguments(Args_1, Args_2, Diseq_List),
 	cneg_aux:append(Diseq_List, More_Diseq, New_More_Diseq),
-	simplify_1_diseq(fail, New_More_Diseq, No_FreeVars, Answer).
+	simplify_1_diseq(fail, New_More_Diseq, No_FV_In, No_FV_Out, Answer).
 
-simplify_1_diseq(Diseq, _More_Diseq, _No_FreeVars, Answer):-  % Functors that do not unify.
-	disequality_contents(Diseq, T1, T2, _FreeVars),
+simplify_1_diseq(Diseq, _More_Diseq, No_FV_Out, No_FV_Out, Answer):-  % Functors that do not unify.
+	disequality_contents(Diseq, T1, T2),
 	functor_local(T1, Name1, Arity1, _Args1),
 	functor_local(T2, Name2, Arity2, _Args2),
 	(
@@ -427,22 +454,22 @@ simplify_1_diseq(Diseq, _More_Diseq, _No_FreeVars, Answer):-  % Functors that do
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_1_diseq_freevar_t1_var_t2(Diseq, More_Diseq, No_FreeVars, Answer) :-
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq_freevar_t1_var_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :-
+	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), 
-	varsbag_local(FreeVars, No_FreeVars, [], Real_FreeVars),
+	varsbag_local(Diseq, No_FV_In, [], Real_FreeVars),
 	memberchk_local(T1, Real_FreeVars), !, % T1 is a free var, T2 is not a freevar.
 	(
 	    (   % T1 is going to be processed hereafter (appears in More_Diseq).
-		varsbag_local(More_Diseq, No_FreeVars, [], More_Diseq_Vars),
+		varsbag_local(More_Diseq, No_FV_In, [], More_Diseq_Vars),
 		memberchk_local(T1, More_Diseq_Vars), !,
 		diseq_eq(T1, T2), % Answer is T1 = T2 and more
-		simplify_1_diseq(fail, More_Diseq, [T1 | No_FreeVars], Answer)
+		simplify_1_diseq(fail, More_Diseq, [T1 | No_FV_In], No_FV_Out, Answer)
 	    )
 	;
 	    (   % T1 appears only once, so it is not different from T2. Just fail.
-		simplify_1_diseq(fail, More_Diseq, No_FreeVars, Answer)
+		simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	).
 
@@ -450,52 +477,54 @@ simplify_1_diseq_freevar_t1_var_t2(Diseq, More_Diseq, No_FreeVars, Answer) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_1_diseq_var_nonvar(Diseq, More_Diseq, No_FreeVars, Answer):- 
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq_var_nonvar(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer):- 
+	disequality_contents(Diseq, T1, T2),
         var(T1),
         functor_local(T2, Name, Arity, _Args_T2), 
-	varsbag_local(FreeVars, No_FreeVars, [], Real_FreeVars),
+	varsbag_local(Diseq, No_FV_In, [], Real_FreeVars),
 	(
 	    (
 		(
 		    varsbag_local(T2, [], [], Vars_T2),
 		    memberchk_local(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
+		    No_FV_In = No_FV_Out,
 		    diseq_eq(Answer, []) % Answer is True.
 		)
 	    ;
 		(   % T1 is a free var.
 		    memberchk_local(T1, Real_FreeVars), !,
-		    simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FreeVars, Answer)
+		    simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer)
 		)
 	    ;
 		(   % Not possible to solve it yet. 2 solutions.
+		    No_FV_In = No_FV_Out,
 		    diseq_eq(Answer, [Diseq]) % Answer is Diseq.
 		)
 	    ;
 		(   % Keep the functor but diseq between the arguments.
 		    functor_local(T1, Name, Arity, Args_T1), % Answer is T1 = functor and more.
-		    cneg_aux:append(Args_T1, No_FreeVars, New_No_FreeVars), % Optimization
-		    simplify_1_diseq(Diseq, More_Diseq, New_No_FreeVars, Answer)
+		    cneg_aux:append(Args_T1, No_FV_In, New_No_FV_In), % Optimization
+		    simplify_1_diseq(Diseq, More_Diseq, New_No_FV_In, No_FV_Out, Answer)
 		)
 	    )
 	).
 
-simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FreeVars, Answer) :-
-	disequality_contents(Diseq, T1, T2, FreeVars),
+simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :-
+	disequality_contents(Diseq, T1, T2),
         var(T1),
-	varsbag_local(FreeVars, No_FreeVars, [], Real_FreeVars),
+	varsbag_local(Diseq, No_FV_In, [], Real_FreeVars),
 	memberchk_local(T1, Real_FreeVars), 
         functor_local(T2, _Name, _Arity, _Args_T2), !,
 	(
 	    (   % T1 is going to be processed (appears in More_Diseq).
-		varsbag_local(More_Diseq, No_FreeVars, [], More_Diseq_FreeVars),
+		varsbag_local(More_Diseq, No_FV_In, [], More_Diseq_FreeVars),
 		memberchk_local(T1, More_Diseq_FreeVars), !,
 		diseq_eq(T1, T2), % Answer is T1 = T2 and more
-		simplify_1_diseq(fail, More_Diseq, [T1 | No_FreeVars], Answer)
+		simplify_1_diseq(fail, More_Diseq, [T1 | No_FV_In], No_FV_Out, Answer)
 	    )
 	;
 	    (   % T1 appears only once, so it is not different from T2. Just fail.
-		simplify_1_diseq(fail, More_Diseq, No_FreeVars, Answer)
+		simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	).
 	
@@ -504,12 +533,12 @@ simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FreeVars, Answer) :
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-cartesian_product_between_arguments([], [], _FreeVars, []) :- !.
-cartesian_product_between_arguments([T1], [T2], FreeVars, [Diseq]) :- !,
-	 disequality_contents(Diseq, T1, T2, FreeVars).
-cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], FreeVars, [Diseq | Args]) :- !,
-	disequality_contents(Diseq, T1, T2, FreeVars),
-	cartesian_product_between_arguments(Args_1, Args_2, FreeVars, Args).
+cartesian_product_between_arguments([], [], []) :- !.
+cartesian_product_between_arguments([T1], [T2], [Diseq]) :- !,
+	 disequality_contents(Diseq, T1, T2).
+cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :- !,
+	disequality_contents(Diseq, T1, T2),
+	cartesian_product_between_arguments(Args_1, Args_2, Args).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -532,8 +561,8 @@ cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], FreeVars, [Dis
 
 cneg_diseq(T1,T2, FreeVars):- 
 	debug('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
-	disequality_contents(Disequality, T1, T2, FreeVars),
-        update_var_attributes([Disequality], []).
+	disequality_contents(Disequality, T1, T2),
+        update_var_attributes([Disequality], FreeVars, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
