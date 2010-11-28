@@ -62,11 +62,9 @@ debug_nl :-
 	debug_is_on('no'), !.
 
 
-debug_list(_Msg, []) :-
+debug_list(Msg, []) :-
+	debug(Msg, []),
 	!. % No backtracking allowed.
-debug_list(Msg, [Cl]) :-
-	!, % No backtracking allowed.
-	debug(Msg, Cl).
 debug_list(Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
 	debug(Msg, Cl),

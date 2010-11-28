@@ -3,7 +3,7 @@
 	    cneg_diseq/3,
 	    portray_attributes_in_term/1, 
 	    put_universal_quantification/1,
-	    remove_universal_quantification/1
+	    remove_universal_quantification/2
 	], 
 	[assertions]).
 
@@ -87,21 +87,29 @@ put_universal_quantification_var(Var) :-
 put_universal_quantification_var(Var) :-
 	var(Var),
 	restore_attributes_var(Var, [Var], []).
-	
-remove_universal_quantification([]) :- !.
-remove_universal_quantification([Var|Vars]) :-
-	remove_universal_quantification_var(Var),
-	remove_universal_quantification(Vars).
 
-remove_universal_quantification_var(Var) :-
+remove_universal_quantification(Vars, UnivQuantified) :-
+	remove_universal_quantification_aux(Vars, [], UnivQuantified).
+
+remove_universal_quantification_aux([], UnivQuantified, UnivQuantified) :- !.
+remove_universal_quantification_aux([Var|Vars], UnivQuantified_In, UnivQuantified_Out) :-
+	remove_universal_quantification_var(Var, UnivQuantified_In, UnivQuantified_Aux),
+	remove_universal_quantification_aux(Vars, UnivQuantified_Aux, UnivQuantified_Out).
+
+remove_universal_quantification_var(Var, UnivQuantified_In, UnivQuantified_Out) :-
 	var(Var),
 	get_attribute_local(Var, Old_Attribute), !,
 	remove_attribute_local(Var),
 	attribute_contents(Old_Attribute, Var, Disequalities, UnivVars),
+	determine_if_universally_quantified(Var, UnivVars, UnivQuantified_In, UnivQuantified_Out),
 	update_var_attributes(Disequalities, UnivVars, [], [Var]).
 
-remove_universal_quantification_var(Var) :-
+remove_universal_quantification_var(Var, UnivQuantified, UnivQuantified) :-
 	var(Var).
+
+determine_if_universally_quantified(Var, UnivVars, UnivQuantified, [Var | UnivQuantified]) :-
+	memberchk_local(Var, UnivVars), !.
+determine_if_universally_quantified(_Var, _UnivVars, UnivQuantified, UnivQuantified).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -583,10 +591,11 @@ cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], [Diseq | Args]
 % Incluye una desigualdad en las formulas de las 
 % variables implicadas
 
-cneg_diseq(T1,T2, FreeVars):- 
+cneg_diseq(T1,T2, UnivVars):- 
 	debug('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
+	debug('cneg_diseq :: UnivVars', UnivVars),
 	disequality_contents(Disequality, T1, T2),
-        update_var_attributes([Disequality], FreeVars, [], []).
+        update_var_attributes([Disequality], UnivVars, [], []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

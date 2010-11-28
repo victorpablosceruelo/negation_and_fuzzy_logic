@@ -13,7 +13,11 @@
 :- multifile cneg_static_cl/3.
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq,[cneg_diseq/3]).
+:- use_module(cneg_diseq,[
+	cneg_diseq/3, 
+	remove_universal_quantification/2, 
+	put_universal_quantification/1
+			 ]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
 
@@ -30,11 +34,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %cneg_lib_aux(Goal, [], Result) :- 
+%	debug_nl,
 %	debug('cneg_lib :: using cneg_static for', Goal), 
 %	cneg_static(Goal, Result).
 
 cneg_lib_aux(Goal, UnivVars, Result):-
 %	UnivVars \== [],
+	debug_nl,
 	debug('cneg_lib :: using cneg_dynamic for', Goal), 
 	cneg_dynamic(Goal, UnivVars, Result).
 
@@ -85,18 +91,16 @@ cneg_dynamic(Goal, UnivVars, Solution) :-
 	!. % No backtracking allowed
 
 cneg_dynamic_aux(Goal, UnivVars, Solution) :-
-	varsbag_local(Goal, UnivVars, [], GoalVars),
+	varsbag_local(Goal, [], [], GoalVars),
+	remove_universal_quantification(GoalVars, Universally_Quantified),
+
 	frontier(Goal, Frontier, Goal_Not_Qualified), 
-	debug_list('cneg_dynamic :: Frontier (list)', Frontier),
-%	debug('cneg_dynamic :: (GoalVars, UnivVars)', (GoalVars, UnivVars)), 
-	copy_term((Goal_Not_Qualified, GoalVars), (Goal_Copy, GoalVars_Copy)),
-	%copy_term((Goal_Not_Qualified, GoalVars, UnivVars), (Goal_Copy, GoalVars_Copy, UnivVars_Copy)),
 	!, % No backtracking allowed
-	negate_frontier(Frontier, Goal_Copy, GoalVars_Copy, Solution),
+	negate_frontier(Frontier, Goal_Not_Qualified, Solution),
 	!, % No backtracking allowed
-	% Unify NewGoal with the Head of the Clause we are playing with ...
-	% debug('cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
-	unify_terms(Goal_Not_Qualified, Goal_Copy),
+
+	varsbag_local(UnivVars, [], Universally_Quantified, To_Restore_Universal_Quantification),
+	put_universal_quantification(To_Restore_Universal_Quantification),
 	!. % No backtracking allowed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,13 +112,21 @@ cneg_dynamic_aux(Goal, UnivVars, Solution) :-
 % It is a list of list that represent the disjunction of its
 % elements where each element is a conjunction of subgoals.
 
-% First remove $ and qualification from the goal's name.
 frontier(Goal, Frontier, NewGoal) :-
+	debug_nl,
+	debug('frontier :: Goal (IN)', Goal),
+	frontier_aux(Goal, Frontier, NewGoal),
+	debug('frontier :: Goal', Goal),
+	debug('frontier :: Frontier', Frontier),
+	debug('frontier :: NewGoal', NewGoal).
+
+% First remove $ and qualification from the goal's name.
+frontier_aux(Goal, Frontier, NewGoal) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
 	frontier(Tmp_Goal, Frontier, NewGoal).
 
 % Now go for the disjunctions.
-frontier(Goal, Frontier, (NewG1; NewG2)):- 
+frontier_aux(Goal, Frontier, (NewG1; NewG2)):- 
 	goal_is_disjunction(Goal, G1, G2), !,
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
@@ -123,7 +135,7 @@ frontier(Goal, Frontier, (NewG1; NewG2)):-
 	simplify_frontier(Front, (NewG1;NewG2), Frontier).
 
 % Now go for the conjunctions.
-frontier(Goal, Frontier, (NewG1, NewG2)):- 
+frontier_aux(Goal, Frontier, (NewG1, NewG2)):- 
 	goal_is_conjunction(Goal, G1, G2), !,
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
@@ -133,62 +145,55 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 	simplify_frontier(Front, (NewG1,NewG2), Frontier).
 
 % Now go for the functors for equality and disequality.
-frontier(Goal, [Frontier], NewGoal):- 
+frontier_aux(Goal, [Frontier], NewGoal):- 
 	goal_is_disequality(Goal, X, Y, FreeVars), !,
 	cneg_eq(NewGoal, (cneg_diseq(X, Y, FreeVars))),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
-frontier(Goal, [Frontier], NewGoal):- 
+frontier_aux(Goal, [Frontier], NewGoal):- 
 	goal_is_equality(Goal, X, Y), !,
-	cneg_eq(NewGoal, (X = Y)),
+	cneg_eq(NewGoal, (cneg_eq(X, Y))),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
 
-%frontier((X=_Y), [(X=X,[])], (X=_Y)):- !.
-%frontier((X==Y),[(X==Y,[X==Y])]):- !.
-%frontier((X\==Y),[(X\==Y,[X\==Y])]):- !.
+%frontier_aux((X=_Y), [(X=X,[])], (X=_Y)):- !.
+%frontier_aux((X==Y),[(X==Y,[X==Y])]):- !.
+%frontier_aux((X\==Y),[(X\==Y,[X\==Y])]):- !.
 
 % Now go for other functors stored in our database.
-frontier(Goal, Front, Goal):-
-	debug('frontier :: Goal', Goal),
+frontier_aux(Goal, Front, Goal):-
 	look_for_the_relevant_clauses(Goal, Front_Tmp),
-	debug('frontier :: format', '(Head, Body, FrontierTest)'),
-	debug_list('frontier_IN', Front_Tmp),
 	simplify_frontier(Front_Tmp, Goal, Front),
-	debug('frontier_OUT', Front), 
 	!. % Frontier is uniquely determine if this clause is used.
 
 % And at last report an error if it was impossible to found a valid entry.
-frontier(Goal, [], Goal) :-
+frontier_aux(Goal, [], Goal) :-
 	debug('ERROR: frontier can not be evaluated for', Goal), 
-	nl, nl, !, fail.
+	debug_nl, debug_nl, !, fail.
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, G, Front_Out) :-
-	debug_nl,
-	debug('simplify_frontier :: Front_In', Front_In),
-	debug('simplify_frontier :: Goal', G),
+	debug_list('simplify_frontier :: Front_In (list)', Front_In),
 	simplify_frontier_aux(Front_In, G, Front_Out),
-	debug('simplify_frontier :: Front_Out', Front_Out),
-	debug_nl.
+	debug_list('simplify_frontier :: Front_Out (list)', Front_Out).
 
 simplify_frontier_aux([], _G, []) :- !.
-simplify_frontier_aux([Frontier | More_Frontier_In], G, [Frontier | More_Frontier_Out]):-
-	test_frontier_is_valid(Frontier, G), !,
-	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
-simplify_frontier_aux([_Frontier|More_Frontier_In], G, More_Frontier_Out):-
-	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
+simplify_frontier_aux([SubFrontier | Frontier_In], G, [SubFrontier | Frontier_Out]):-
+	test_subfrontier_is_valid(SubFrontier, G), !,
+	debug('simplify_frontier_aux (ok)', SubFrontier),
+	simplify_frontier_aux(Frontier_In, G, Frontier_Out).
+simplify_frontier_aux([SubFrontier | Frontier_In], G, Frontier_Out):-
+	debug('simplify_frontier_aux (no)', SubFrontier),
+	simplify_frontier_aux(Frontier_In, G, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
-test_frontier_is_valid(Frontier, Goal):-
-	frontier_contents(Frontier, Head, _Body, FrontierTest),
-	debug('test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
+test_subfrontier_is_valid(SubFrontier, Goal):-
+	frontier_contents(SubFrontier, Head, _Body, FrontierTest),
         copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
         copy_term(Goal, G_Tmp),
         cneg_eq(H_Tmp, G_Tmp), 
 	call_combined_solutions(FrontierTest_Tmp), 
-	debug('test_frontier_is_valid', 'YES'),
 	!.
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the combined frontier of the list 
@@ -225,10 +230,11 @@ combine_2_simple_frontiers(F1_1, F2_1, F3_1) :-
 % Frontier (each conjunction) is the negation.
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
-negate_frontier(Frontier, Goal, GoalVars, Solutions) :-
+negate_frontier(Frontier, Goal, Solutions) :-
 	debug_list('negate_frontier :: Frontier (list)', Frontier), 
-	debug('negate_frontier :: (Goal, GoalVars)', (Goal, GoalVars)), 
+	debug('negate_frontier :: Goal', Goal), 
 	!,
+	varsbag_local(Goal, [], [], GoalVars),
 	negate_frontier_aux(Frontier, Goal, GoalVars, Solutions),
 	!.
 %	debug('negate_frontier :: Solutions', Solutions).
@@ -287,6 +293,7 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	varsbag_local(Bi_In, Ci_Vars, [], UnivVars),
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
+Ci_Conj needs a remove_universally_quantified variables.
 	cneg_eq(Answer, (Ci_Negated ; (Ci_Conj, cneg_aux(Bi_Conj, [UnivVars])))).
 
 list_to_conj([], []) :- fail.
@@ -301,7 +308,7 @@ list_to_conj([Ci_In | More_Ci_In], (Ci_In, More_Ci_Conj)) :- !,
 split_subfrontier_into_Ci_Bi((Head, BodyList), Goal_Copy, Ci, Bi):-
 	copy_term((Head, BodyList), (Head_Copy, BodyList_Copy)),
 	unify_goal_structure_into_head(Goal_Copy, Head_Copy),
-	split_body_into_ci_Bi([Goal_Copy = Head_Copy | BodyList_Copy], [], [], Ci, Bi).
+	split_body_into_ci_Bi([cneg_eq(Goal_Copy, Head_Copy) | BodyList_Copy], [], [], Ci, Bi).
 %	debug('split_body_into_ci_Bi', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
 
 % unify_goal_structure_into_head(Goal_Copy, Head_Copy)
@@ -321,7 +328,7 @@ split_body_into_ci_Bi([SubGoal|SubGoal_L], Ci_In, B_In, Ci_Out, B_Out) :- !,
 % split_subgoal_into_ci_Bi(SubGoal, Ci, B) :-
 split_subgoal_into_ci_Bi(Subgoal, Ci, B, [NewSubgoal | Ci], B) :- 
 	goal_is_equality(Subgoal, Term1, Term2), !,
-	cneg_eq(NewSubgoal, (Term1 = Term2)).
+	cneg_eq(NewSubgoal, cneg_eq(Term1, Term2)).
 
 split_subgoal_into_ci_Bi(Subgoal, Ci, B, [NewSubgoal | Ci], B) :- 
 	goal_is_disequality(Subgoal, Term1, Term2, FreeVars), !,
@@ -402,7 +409,7 @@ perform_a_call_to(Goal) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(X, Y) :- debug('cneg_lib', cneg_eq(X, Y)), fail.
+%cneg_eq(X, Y) :- debug('cneg_lib', cneg_eq(X, Y)), fail.
 cneg_eq(X, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
