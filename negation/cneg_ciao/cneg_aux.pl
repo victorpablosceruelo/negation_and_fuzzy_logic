@@ -1,20 +1,22 @@
 
 :- module(cneg_aux,
-	[findall/4, debug/2, debug_list/2, debug_nl/0, msg/2, msg_aux/2, msg_nl/0,
-	 first/2, second/2, unify_terms/2, functor_local/4,
-	 memberchk_local/2, retrieve_element_from_list/2, term_to_meta/2,
-	 setof_local/3, varsbag_local/4, varset_local/2, 
-%	 remove_duplicates/3,
-	 goal_clean_up/2,
-	 goal_is_conjunction/3, goal_is_disjunction/3, 
-	 goal_is_disequality/4, goal_is_equality/3,
-	 look_for_the_relevant_clauses/2, frontier_contents/4,
-	 qualify_string_name/3, remove_qualification/2, term_name_is_qualified/1,
-	 replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
-	 replace_in_term_variables_by_values/4,
-	 add_to_list_if_not_there/3, append/3,
-	 var_is_in_formulae/2, 
-	 terms_are_equal/2 ],[]).
+	[
+	    findall/4, append/3,
+	    debug/2, debug_list/2, debug_nl/0, 
+	    msg/2, msg_aux/2, msg_nl/0,
+	    first/2, second/2, unify_terms/2, functor_local/4,
+	    memberchk_local/2, term_to_meta/2,
+	    setof_local/3, varsbag_local/4,  
+	    goal_clean_up/2,
+	    goal_is_conjunction/3, goal_is_disjunction/3, 
+	    goal_is_disequality/4, goal_is_equality/3,
+	    look_for_the_relevant_clauses/2, frontier_contents/4,
+	    qualify_string_name/3, remove_qualification/2, 
+	    % term_name_is_qualified/1,
+	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
+	    % replace_in_term_variables_by_values/4,
+	    %add_to_list_if_not_there/3, 
+	    terms_are_equal/2 ],[assertions]).
 
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(write), _).
@@ -174,14 +176,6 @@ memberchk_local(T1, [T2|_L]) :-
 	terms_are_equal(T1,T2).
 memberchk_local(T1, [_T2|L]) :- 
         memberchk_local(T1, L).
-
-retrieve_element_from_list([Element|_List], Element).
-retrieve_element_from_list([_Other_Element|List], Element) :-
-	retrieve_element_from_list(List, Element).
-
-var_is_in_formulae(Var, Formulae) :-
-	varsbag_local(Formulae, [], [], Vars_Set), !,
-	retrieve_element_from_list(Vars_Set, Var).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,14 +397,6 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
 
 frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-varset_local(X,Xs) :- 
-        varsbag_local(X,[],[], Xs).
-%        sort(Xs_uns,Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

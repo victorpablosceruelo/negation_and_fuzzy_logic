@@ -1,7 +1,11 @@
-:- module(cneg_diseq, [cneg_diseq/3,
-			portray_attributes_in_term/1, 
-			put_universal_quantification/1,
-			remove_universal_quantification/1]).
+:- module(cneg_diseq, 
+	[
+	    cneg_diseq/3,
+	    portray_attributes_in_term/1, 
+	    put_universal_quantification/1,
+	    remove_universal_quantification/1
+	], 
+	[assertions]).
 
 :- use_module(cneg_aux,_).
 
