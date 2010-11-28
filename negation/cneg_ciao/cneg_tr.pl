@@ -12,6 +12,13 @@
 :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).
 
+:- comment(title, "Code Contructive Negation Transformation").
+
+:- comment(author, "V@'{i}ctor Pablos Ceruelo").
+
+:- comment(summary, "This module does de transformation needed to evaluate 
+	the constructive negation of any predicate in the original file.").
+
 
 % dynamic predicate(s) 
 :- data cneg_processed_predicates/1.

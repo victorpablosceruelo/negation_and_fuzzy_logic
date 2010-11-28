@@ -19,6 +19,13 @@
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(write), _).
 
+:- comment(title, "Auxiliary predicates for Constructive Negation").
+
+:- comment(author, "V@'{i}ctor Pablos Ceruelo").
+
+:- comment(summary, "This module offers some predicates needed both by Constructive Negation
+	Transformation Program, by Constructive Negation Library and by Disequalities Management.").
+
 % To access predicates from anywhere.
 :- multifile cneg_processed_pred/4.
 :- multifile cneg_dynamic_cl/6.
