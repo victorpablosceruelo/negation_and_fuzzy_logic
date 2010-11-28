@@ -177,23 +177,23 @@ portray_disequalities_aux_4([FreeVar | FreeVars]) :-
 
 verify_attribute(Attribute, Target):-
 %	debug(verify_attribute(Attribute, Target)), 
-	attribute_contents(Attribute, NewTarget, _Is_UnivVar, Disequalities), 
+	attribute_contents(Attribute, NewTarget, Disequalities, UnivVars), 
 	terms_are_equal(Target, NewTarget), !,
-	update_var_attributes(Disequalities, [], []).
+	update_var_attributes(Disequalities, UnivVars, []).
 
 % Only for Ciao prolog 
 verify_attribute(Attribute, NewTarget):-
 %	debug('Only for Ciao Prolog: '),
 %	debug(verify_attribute(Attribute, NewTarget)), 
-	attribute_contents(Attribute, OldTarget, Is_UnivVar, Disequalities), !,
+	attribute_contents(Attribute, OldTarget, Disequalities, UnivVars), !,
 	(
 	    (
-		Is_UnivVar == true, % An universally quantified variable
-		fail                          % is not unifiable.
+		var(OldTarget),
+		memberchk_local(OldTarget, UnivVars), !, 
+		fail % An universally quantified variable is not unifiable.
 	    )
 	;
 	    (
-		Is_UnivVar == false, 
 		substitution_contents(Subst, OldTarget, NewTarget),
 		update_var_attributes(Disequalities, [], [Subst])
 	    )
@@ -203,23 +203,26 @@ substitution_contents(substitute(Var, T), Var, T).
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	debug('combine_attributes(Attr_Var1, Attr_Var2)', (Attribute_Var_1, Attribute_Var_2)),
-	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Is_UnivVar_Var_1, Disequalities_Var_1), !,
-	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Is_UnivVar_Var_2, Disequalities_Var_2), !,
+	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, UnivVars_Var_1), !,
+	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, UnivVars_Var_2), !,
 	(
 	    (
-		(
-		    Is_UnivVar_Var_1 == true ;  % Universally quantified variables can not be unified.
-		    Is_UnivVar_Var_2 == true
-		),
-		fail
+		var(OldTarget_Var_1),
+		memberchk_local(OldTarget_Var_1, UnivVars_Var_1),
+		!, fail % Universally quantified variables can not be unified.
 	    )
 	;
 	    (
-		Is_UnivVar_Var_1 == false, 
-		Is_UnivVar_Var_2 == false, 
+		var(OldTarget_Var_2),
+		memberchk_local(OldTarget_Var_2, UnivVars_Var_2), 
+		!, fail % Universally quantified variables can not be unified.
+	    )
+	;	    
+	    (
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
+		cneg_aux:append(UnivVars_Var_1, UnivVars_Var_2, UnivVars),
 		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
-		update_var_attributes(Disequalities, [], [Subst])
+		update_var_attributes(Disequalities, [UnivVars], [Subst])
 	    )
 	).
 
@@ -235,7 +238,7 @@ update_var_attributes(New_Disequalities, UV_In, Substitutions):-
 	debug('update_var_attributes(New_Disequalities, UV_In, Substitutions)', (New_Disequalities, UV_In, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
 	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp), !,
-%	debug(retrieve_affected_disequalities(Vars, [], New_Disequalities, Disequalities_Tmp)),
+	debug(retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp)),
 	perform_substitutions(Substitutions, UV_Out, Disequalities_Tmp, Disequalities), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 
@@ -248,20 +251,17 @@ retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Ou
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
-	attribute_contents(Attribute, Var, Is_UnivVar, ThisVar_Disequalities), 
+	attribute_contents(Attribute, Var, ThisVar_Disequalities, UnivVars), 
 	remove_attribute_local(Var), 
 
 	% Store info.
-	add_to_univvars_if_it_is(Var, Is_UnivVar, UV_In, UV_Aux),
+	varsbag_local(UnivVars, [], UV_In, UV_Aux),
 	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
 	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
         retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], UV_Aux, UV_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
 retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- 
         retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out).
-
-add_to_univvars_if_it_is(Var, true, UnivVars, [Var | UnivVars]).
-add_to_univvars_if_it_is(_Var, false, UnivVars, UnivVars).
 
 perform_substitutions([], _UnivVars, Disequalities_Out, Disequalities_Out) :- !.
 perform_substitutions([Subst | MoreSubst], UnivVars, Disequalities_In, Disequalities_Out) :-
