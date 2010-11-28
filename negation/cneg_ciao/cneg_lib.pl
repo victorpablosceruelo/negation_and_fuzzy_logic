@@ -293,8 +293,10 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	varsbag_local(Bi_In, Ci_Vars, [], UnivVars),
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
-Ci_Conj needs a remove_universally_quantified variables.
-	cneg_eq(Answer, (Ci_Negated ; (Ci_Conj, cneg_aux(Bi_Conj, [UnivVars])))).
+	% Ci_Conj needs a remove_universally_quantified variables.
+	varsbag_local(Ci_Conj, [], [], Vars_Ci_Conj),
+	cneg_eq(Answer, (Ci_Negated 
+			; (remove_universal_quantification(Vars_Ci_Conj, _Any), Ci_Conj, cneg_aux(Bi_Conj, [UnivVars])))).
 
 list_to_conj([], []) :- fail.
 list_to_conj([Ci_In], Ci_In) :- !.
