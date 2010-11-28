@@ -43,19 +43,19 @@
 % :- install_attribute_portray_hook(dist,Attribute,portray_attribute(Attribute)).
 
 
-% Local predicates used to easy migration between 
-% prologs. 
+% Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
 %	debug('remove_attribute_local :: Var', Var),
 	detach_attribute(Var).
-
 % XSB:	del_attr(Var, dist).
+
 get_attribute_local(Var, Attribute) :-
 	get_attribute(Var, Attribute).
 % XSB:	get_attr(Var, dist, Attribute),
 %	debug('get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
+
 put_attribute_local(Var, Attribute) :-
-%	debug('put_attribute_local :: (Var, Attribute)', (Var, Attribute)),
+	debug('put_attribute_local :: (Var, Attribute)', (Var, Attribute)),
 %	get_attribute_if_any(Var), !,
 	attach_attribute(Var, Attribute).
 %	put_attr(Var, dist, Attribute).
@@ -73,8 +73,35 @@ put_attribute_local(Var, Attribute) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-put_universal_quantification(_X).
-remove_universal_quantification(_X).	
+put_universal_quantification([]) :- !.
+put_universal_quantification([Var|Vars]) :-
+	put_universal_quantification_var(Var),
+	put_universal_quantification(Vars).
+
+put_universal_quantification_var(Var) :-
+	var(Var),
+	get_attribute_local(Var, Old_Attribute), !,
+	remove_attribute_local(Var),
+	attribute_contents(Old_Attribute, Var, Disequalities, UnivVars),
+	update_var_attributes(Disequalities, [Var | UnivVars], [], []).
+put_universal_quantification_var(Var) :-
+	var(Var),
+	restore_attributes_var(Var, [Var], []).
+	
+remove_universal_quantification([]) :- !.
+remove_universal_quantification([Var|Vars]) :-
+	remove_universal_quantification_var(Var),
+	remove_universal_quantification(Vars).
+
+remove_universal_quantification_var(Var) :-
+	var(Var),
+	get_attribute_local(Var, Old_Attribute), !,
+	remove_attribute_local(Var),
+	attribute_contents(Old_Attribute, Var, Disequalities, UnivVars),
+	update_var_attributes(Disequalities, UnivVars, [], [Var]).
+
+remove_universal_quantification_var(Var) :-
+	var(Var).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,7 +206,7 @@ verify_attribute(Attribute, Target):-
 %	debug(verify_attribute(Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, Disequalities, UnivVars), 
 	terms_are_equal(Target, NewTarget), !,
-	update_var_attributes(Disequalities, UnivVars, []).
+	update_var_attributes(Disequalities, UnivVars, [], []).
 
 % Only for Ciao prolog 
 verify_attribute(Attribute, NewTarget):-
@@ -195,7 +222,7 @@ verify_attribute(Attribute, NewTarget):-
 	;
 	    (
 		substitution_contents(Subst, OldTarget, NewTarget),
-		update_var_attributes(Disequalities, [], [Subst])
+		update_var_attributes(Disequalities, [], [Subst], [])
 	    )
 	).
 
@@ -222,7 +249,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 		cneg_aux:append(UnivVars_Var_1, UnivVars_Var_2, UnivVars),
 		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
-		update_var_attributes(Disequalities, [UnivVars], [Subst])
+		update_var_attributes(Disequalities, [UnivVars], [Subst], [])
 	    )
 	).
 
@@ -234,7 +261,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-update_var_attributes(New_Disequalities, UV_In, Substitutions):-
+update_var_attributes(New_Disequalities, UV_In, Substitutions, NO_FV_In):-
 	debug('update_var_attributes(New_Disequalities, UV_In, Substitutions)', (New_Disequalities, UV_In, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
 	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp), !,
@@ -242,8 +269,8 @@ update_var_attributes(New_Disequalities, UV_In, Substitutions):-
 	perform_substitutions(Substitutions, UV_Out, Disequalities_Tmp, Disequalities), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 
-	varsbag_local(Disequalities, UV_Out, [], No_FV_In),
-	simplify_disequations(Disequalities, No_FV_In, No_FV_Out, [], Simplified_Disequalities),
+	varsbag_local(Disequalities, UV_Out, NO_FV_In, No_FV_Aux),
+	simplify_disequations(Disequalities, No_FV_Aux, No_FV_Out, [], Simplified_Disequalities),
 	debug('update_var_attributes(Simplified_Disequalities, No_FV_Out)', (Simplified_Disequalities, No_FV_Out)),
 	restore_attributes(Simplified_Disequalities, No_FV_Out).
 
@@ -559,7 +586,7 @@ cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], [Diseq | Args]
 cneg_diseq(T1,T2, FreeVars):- 
 	debug('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
 	disequality_contents(Disequality, T1, T2),
-        update_var_attributes([Disequality], FreeVars, []).
+        update_var_attributes([Disequality], FreeVars, [], []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
