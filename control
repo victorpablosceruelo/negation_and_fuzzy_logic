@@ -1,0 +1,65 @@
+Source: ciao-prolog
+Priority: optional
+Maintainer: Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>
+Build-Depends: build-essential, debhelper (>= 5.0.0), texinfo, texi2html, texlive-latex-base | tetex-bin, texlive-latex-extra | tetex-extra, dvi2ps, dvi2dvi, gs-gpl | gs, gs-common, subversion, emacs22-nox | emacsen, imagemagick, gcc-multilib [amd64], libgsl0-dev [i386]
+Standards-Version: 3.7.2
+Section: devel
+
+Package: ciao-prolog
+Section: devel
+Architecture: i386 amd64 powerpc
+Depends: ${shlibs:Depends}, ${misc:Depends}, ciao-prolog-libs, emacs21 | emacsen
+Recommends: ciao-prolog-doc, ciao-prolog-el
+Description: The Ciao Prolog Development Environment
+ Ciao is an Open Source, next generation, multi-paradigm
+ programming environment with a unique set of features:
+ .
+  - Ciao offers a complete Prolog system, supporting _ISO-Prolog_,
+    but its novel modular design allows both _restricting_ and
+    _extending_ the language.
+  - Ciao also supports programming with functions, higher-order
+    constraints, objects, as well as feature terms (records),
+    persistence, several control rules (breadth-first search,
+    iterative deepening, ...), concurrency (threads/engines), a good
+    base for distributed execution (agents), and parallel execution.
+    Libraries also support WWW programming, sockets, external
+    interfaces (C, Java, TclTk, relational databases, etc.), etc.
+  - Ciao produces small executables (including only those builtins used
+    by the program) and support for writing scripts in Prolog.
+  - The Ciao programming environment includes a classical
+    top-level and a rich emacs interface with an embeddable
+    source-level debugger and a number of execution visualization
+    tools.
+
+Package: ciao-prolog-libs
+Section: devel
+Architecture: i386 amd64 powerpc
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Ciao Prolog Development Environment
+ Ciao is an Open Source, next generation, multi-paradigm
+ programming environment with a unique set of features.
+ .
+ This package includes the full set of libraries.
+
+Package: ciao-prolog-doc
+Section: devel
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: ciao-prolog, info-browser
+Description: The Ciao Prolog Development Environment
+ Ciao is an Open Source, next generation, multi-paradigm
+ programming environment with a unique set of features.
+ .
+ This package includes the full ciao-prolog reference manual.
+
+Package: ciao-prolog-el
+Section: devel
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ciao-prolog, ciao-prolog-doc, emacs21 | emacsen
+Description: The Ciao Prolog Development Environment
+ Ciao is an Open Source, next generation, multi-paradigm
+ programming environment with a unique set of features.
+ .
+ This packages includes the Ciao emacs mode, a full featured
+ development enviroment for Ciao Prolog
+

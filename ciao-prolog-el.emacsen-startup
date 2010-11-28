@@ -1,0 +1,43 @@
+;; -*- mode: emacs-lisp; -*-
+;; Ciao/Prolog mode initialization
+;; -------------------------------
+;; (can normally be used with other Prolog modes and the default prolog.el)
+
+;;
+(setq load-path (cons "/usr/share/emacs/site-lisp/ciao-prolog-el"
+                      load-path))
+
+;; Disabled ATM
+;; (setq load-path (cons (concat "/usr/share/"
+;;                               (symbol-name flavor)
+;; 			      "/site-lisp/css-mode")
+;;                       load-path))
+
+
+;; Adapted for Debian
+(autoload 'run-ciao-toplevel "ciao"
+          "Start a Ciao/Prolog top-level sub-process." t)
+(autoload 'ciao-startup "ciao"
+          "The Ciao/Prolog program development system startup screens." t)
+(autoload 'ciao "ciao"
+          "Start a Ciao/Prolog top-level sub-process." t)
+(autoload 'prolog "ciao"
+          "Start a Ciao/Prolog top-level sub-process." t)
+(autoload 'run-ciao-preprocessor "ciao"
+          "Start a Ciao/Prolog preprocessor sub-process." t)
+(autoload 'ciaopp "ciao"
+          "Start a Ciao/Prolog preprocessor sub-process." t)
+(autoload 'ciao-mode "ciao"
+          "Major mode for editing and running Ciao/Prolog" t)
+(autoload 'ciao-inferior-mode "ciao"
+          "Major mode for running Ciao/Prolog, CiaoPP, LPdoc, etc." t)
+
+;; Conflicts with perl files.
+(setq auto-mode-alist (cons '("\\.pl$" . ciao-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.pls$" . ciao-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.lpdoc$" . ciao-mode) auto-mode-alist))
+
+;;
+(setq completion-ignored-extensions
+      (append '(".dep" ".itf" ".po" ".asr" ".cpx")
+              completion-ignored-extensions))

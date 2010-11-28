@@ -1,0 +1,155 @@
+ciao-prolog (1.13+svn20091021-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Tue, 21 Oct 2009 18:25:22 +0200
+
+ciao-prolog (1.13+svn20090527-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 27 May 2009 16:00:09 +0200
+
+ciao-prolog (1.13+svn20080125-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Fri, 25 Jan 2008 17:23:09 +0100
+
+ciao-prolog (1.13+svn20071024-2) unstable; urgency=low
+
+  * Update to work with texlive.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 24 Oct 2007 20:06:57 +0200
+
+ciao-prolog (1.13+svn20071024-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 24 Oct 2007 18:03:40 +0200
+
+ciao-prolog (1.13+svn20070820-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Mon, 20 Aug 2007 17:58:18 +0200
+
+ciao-prolog (1.13+svn20070328-3) unstable; urgency=low
+
+  * Build depend on dvi2dvi, tetex-extra and dvi2ps, as the font issues weren't fixed.
+  * Include LPDOC lib in ciao-prolog-libs, hoping that this will make the tool usable.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Thu, 29 Mar 2007 20:55:41 +0200
+
+ciao-prolog (1.13+svn20070328-2) unstable; urgency=low
+
+  * Build depend on texi2html and gs, to correct documentation building issues.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 28 Mar 2007 20:07:13 +0200
+
+ciao-prolog (1.13+svn20070328-1) unstable; urgency=low
+
+  * New upstream release.
+  * Lots of improvements.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 28 Mar 2007 14:15:00 +0200
+
+ciao-prolog (1.13+svn20070110-2) unstable; urgency=low
+
+  * Fix minor nickpicks (REVISION not in orig.tar.gz).
+  * Build with pbuilder.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 10 Jan 2007 20:06:45 +0100
+
+ciao-prolog (1.13+svn20070110-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 10 Jan 2007 02:23:27 +0100
+
+ciao-prolog (1.13+svn20061006-1) unstable; urgency=low
+
+  * New upstream:
+    * Big ciao-mode improvments.
+    * Various bugfixes.
+    * Regression suite is working.
+    * New version code (Thanks to Edison!)
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Fri,  6 Oct 2006 14:17:12 +0200
+
+ciao-prolog (1.13+svn20060921-1) unstable; urgency=low
+
+  * New upstream source.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Thu, 21 Sep 2006 18:04:40 +0200
+
+ciao-prolog (1.13+svn20060920-4) unstable; urgency=low
+
+  * Add gs-common to build-depends.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 21:41:59 +0200
+
+ciao-prolog (1.13+svn20060920-3) unstable; urgency=low
+
+  * Add tetex-bin(bibtex) to build depends.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 20:40:53 +0200
+
+ciao-prolog (1.13+svn20060920-2) unstable; urgency=low
+
+  * Use emacs21-nox instead emacs21 as build-depends.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 20:16:11 +0200
+
+ciao-prolog (1.13+svn20060920-1) unstable; urgency=low
+
+  * New upstream checkout.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 20:09:57 +0200
+
+ciao-prolog (1.13+svn20060919-6) unstable; urgency=low
+
+  * Complete control and copyright. First release for ciao people.
+  * Add emacs21 to build depends.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 17:31:36 +0200
+
+ciao-prolog (1.13+svn20060919-5) unstable; urgency=low
+
+  * Include ciaopp libs. That should make ciao start happy. :)
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 03:52:34 +0200
+
+ciao-prolog (1.13+svn20060919-4) unstable; urgency=low
+
+  * Fix ciao info in emacs mode.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 03:10:43 +0200
+
+ciao-prolog (1.13+svn20060919-3) unstable; urgency=low
+
+  * Provide info for all binaries.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 02:56:18 +0200
+
+ciao-prolog (1.13+svn20060919-2) unstable; urgency=low
+
+  * Include emacs mode patch.
+  * Fix man pages name.
+  * Fix info's.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Wed, 20 Sep 2006 02:12:30 +0200
+
+ciao-prolog (1.13+svn20060919-1) unstable; urgency=low
+
+  * Kill all NODISTRIB in Ciao source.
+  * Install all info and man pages in the right place.
+  * Emacs mode should work OOTB.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Tue, 19 Sep 2006 16:49:46 +0200
+
+ciao-prolog (1.13+svn20060912-1) unstable; urgency=low
+
+  * Initial test release.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>  Tue, 12 Sep 2006 20:43:26 +0200

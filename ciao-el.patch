@@ -1,0 +1,46 @@
+--- ciao.el.orig	2009-10-20 21:08:01.921116289 +0000
++++ ciao.el	2009-10-20 21:12:52.961117884 +0000
+@@ -228,26 +228,13 @@
+ 
+ ;; These two are rewritten during installation:
+ (defvar ciao-real-lib-dir "/usr/lib/ciao/ciao-1.13"
+-  "Where the actual Ciao lib directory is (and, thus, e.g., the image files).")
++  "Where the actual Ciao lib directory is.")
+ 
+ (defvar ciao-info-dir "/usr/share/doc/ciao-prolog/"
+   "Where the actual Ciao (LPdoc) info directory is.")
+ 
+-;(if (boundp 'xemacs-logo)
+-    (progn
+-      (load-library "info")             ; Info creates Info-directory-list
+-      ;; (require 'info)
+-      (if (null Info-directory-list)    ; but it is not initialized there
+-          (setq Info-default-directory-list ; Will be initialized from here
+-                (cons ciao-info-dir Info-default-directory-list))
+-        (setq Info-directory-list (cons ciao-info-dir Info-directory-list))
+-        )
+-      ) 
+-;  )
+-
+-;; This is so that the other .el files (word-help, etc.) in the Ciao
+-;; lib are found (this path is updated automatically during installation):
+-(setq load-path (cons ciao-real-lib-dir load-path))
++(defvar ciao-emacs-icons-dir "/usr/share/emacs/site-lisp/ciao-prolog-el"
++   "Where the icons for emacs are.")
+ 
+ ;; This is to avoid warnigns in fsf from xemacs vars and functions.
+ (eval-when-compile
+@@ -3087,12 +3074,7 @@
+ 
+ (defun ciao-find-icon (icon)
+   "Icon with absolute path (for xemacs)"
+-  (cond
+-   ((file-exists-p (expand-file-name icon ciao-real-lib-dir))
+-    (expand-file-name icon ciao-real-lib-dir))
+-   ((file-exists-p (expand-file-name icon 
+-				     (concat ciao-real-lib-dir "/emacs-mode/")))
+-    (expand-file-name icon (concat ciao-real-lib-dir "/emacs-mode/")))))
++   (expand-file-name icon ciao-emacs-icons-dir))
+ 
+ ;; Portable tool-bar-add-item-from-menu function, adds to accumulators.
+ (defun ciao-tool-bar-local-item-from-menu 

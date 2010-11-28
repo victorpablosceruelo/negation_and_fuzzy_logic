@@ -1,0 +1,9 @@
+debian/tmp/usr/lib/ciao/ciao-1.13/lib      
+debian/tmp/usr/lib/ciao/ciao-1.13/library  
+debian/tmp/usr/lib/ciao/ciao-1.13/contrib  
+#These are for ciaopp. They must be splitted.
+debian/tmp/usr/lib/ciaopp
+#These are for lpdoc. They must be splitted.
+debian/tmp/usr/lib/lpdoc
+#debian/tmp/usr/lib/ciao/ciao-1.13/examples usr/lib/ciao/ciao-1.13/examples
+

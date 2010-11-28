@@ -1,0 +1,219 @@
+#!/usr/bin/make -f
+#
+# Original license:
+# Sample debian/rules that uses debhelper. 
+# This file is public domain software, originally written by Joey Hess.
+#
+# This version is for a hypothetical package that builds an
+# architecture-dependant package, as well as an architecture-independent
+# package.
+# 
+# Adapted for Ciao-Prolog packages by Emilio Jesús Gallego Arias
+# License GPL2+
+
+# Uncomment this to turn on verbose mode. 
+export DH_VERBOSE=1
+
+# global debhelper options
+# export DH_OPTIONS=
+
+CIAOSETUP=ciaosetup
+
+ciao-config: ciao-config-stamp
+ciao-config-stamp:
+	dh_testdir
+
+	# This is now done at source export time.
+	# echo "debian" > ./REVISION
+
+	./$(CIAOSETUP) configure \
+	    --sysavail=all \
+	    --instype=ins \
+	    --prefix=/usr \
+	    --optimizing_compiler=yes \
+	    --update_bashrc=no \
+	    --update_cshrc=no \
+	    --install_emacs_support=yes \
+            --use_threads=yes \
+            --optim_level=optimized \
+	    --update_emacs=no \
+	    --docdir=/usr/share/doc/ciao-prolog \
+	    --mandir=/usr/share/man \
+	    --infodir=/usr/share/info \
+	    --web_images_path=/usr/share/doc/ciao-prolog/html \
+	    --htmldir=/usr/share/doc/ciao-prolog/html \
+	    --install_prolog_name=no --execmode=755 --datamode=644 \
+	    --installgroup=root --stop-if-error=no --with_mysql=no
+
+	touch ciao-config-stamp
+
+CIAOLOCALENG=./ciao/bin/LINUXi86/ciaoengine 
+CIAOLOCALCOMP=-C -b ./bin/ciaoc-1.13
+
+build: ciao-config build-stamp
+build-stamp:
+	dh_testdir
+
+	# Add here commands to compile the package.
+	#$(MAKE)
+	RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) build 
+	RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) docs
+
+	# Recompile the files which doesn't ship itfs.
+	# This is not working.
+#	$(CIAOLOCALENG) -c ciao/library/clpq.pl $(CIAOLOCALCOMP)
+	#	$(CIAOLOCAL) -c 
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp ciao-config-stamp
+
+	# Add here commands to clean up after the build process.
+	#-$(MAKE) clean
+	#-$(MAKE) distclean
+	./$(CIAOSETUP) realclean
+
+	rm -f ciao/library/javall/CiaoJava/PLAtom.class
+	rm -f ciao/library/javall/CiaoJava/PLTerm.class
+	rm -f ciao/library/javall/CiaoJava/PLInterpreter.class
+	rm -f ciao/library/javall/CiaoJava/PLConnection.class
+	rm -f ciao/library/javall/CiaoJava/PLGoalException.class
+	rm -f ciao/library/javall/CiaoJava/PLException.class
+	rm -f ciao/library/javall/CiaoJava/PLEventListener.class
+	rm -f ciao/library/javall/CiaoJava/PLStructure.class
+	rm -f ciao/library/javall/CiaoJava/PLSocketReader.class
+	rm -f ciao/library/javall/CiaoJava/PLSocketWriter.class
+	rm -f ciao/library/javall/CiaoJava/PLMultithreadSocketReader.class
+	rm -f ciao/library/javall/CiaoJava/PLJavaObjServer.class
+	rm -f ciao/library/javall/CiaoJava/PLGoal.class
+	rm -f ciao/library/javall/CiaoJava/PLEvents.class
+	rm -f ciao/library/javall/CiaoJava/PLGoals.class
+	rm -f ciao/library/javall/CiaoJava/PLFloat.class
+	rm -f ciao/library/javall/CiaoJava/PLInteger.class
+	rm -f ciao/library/javall/CiaoJava/PLJavaServer.class
+	rm -f ciao/library/javall/CiaoJava/PLList.class
+	rm -f ciao/library/javall/CiaoJava/PLString.class
+	rm -f ciao/library/javall/CiaoJava/PLServerSocket.class
+	rm -f ciao/library/javall/CiaoJava/PLVariable.class
+	rm -f ciao/library/javall/examples/java2pl/example0.class
+	rm -f ciao/library/javall/examples/java2pl/example1$btnExitAction.class
+	rm -f ciao/library/javall/examples/java2pl/example1.class
+	rm -f ciao/library/javall/examples/java2pl/queens$btnOkAction.class
+	rm -f ciao/library/javall/examples/java2pl/queens$btnNextAction.class
+	rm -f ciao/library/javall/examples/java2pl/queens$btnExitAction.class
+	rm -f ciao/library/javall/examples/java2pl/queens$Square.class
+	rm -f ciao/library/javall/examples/java2pl/queens.class
+	rm -f ciao/library/javall/examples/pl2java/calculator
+	rm -f ciao/library/javall/plserver
+	rm -f ciao/library/persdb_mysql/mysql_use_client
+	# F*cking $ in paths/filenames.
+	rm -f 'ciao/library/javall/examples/java2pl/example1$$btnExitAction.class'
+	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnOkAction.class'
+	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnNextAction.class'
+	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnExitAction.class'
+	rm -f 'ciao/library/javall/examples/java2pl/queens$$Square.class'
+
+#	rm -f ./REVISION
+
+	dh_clean
+
+#install:
+install: build
+
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	# Add here commands to install the package into debian/tmp.
+	BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) install
+
+	# Those are based on bfulgam's old rule file. Anyways I think they should be fixed upstream.
+
+	# Patch the emacs mode.
+	patch $(CURDIR)/debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el ./debian/ciao-el.patch
+#       We have returned to versioned names.
+#	patch $(CURDIR)/debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el ./debian/ciao-el.patch2
+
+	# Fix the manual pages.
+	mv $(CURDIR)/debian/tmp/usr/share/man/ciao-1.13.0.manl $(CURDIR)/debian/tmp/usr/share/man/ciao.1
+	mv $(CURDIR)/debian/tmp/usr/share/man/lpdoc-2.0.38.manl $(CURDIR)/debian/tmp/usr/share/man/lpdoc.1
+	mv $(CURDIR)/debian/tmp/usr/share/man/ciaopp-1.2.0.manl $(CURDIR)/debian/tmp/usr/share/man/ciaopp.1
+
+# 	sed -e "s/^\.TH ciao l \(.*\)$$/\.TH ciao 1 \1/" `pwd`/doc/reference/ciao.manl > $(TARGET)/usr/share/man/man1/ciao.1
+
+# This is already fixed upstream:
+# 	Create meaningful Info files
+#	echo "INFO-DIR-SECTION Software development" > ./debian/tmp/usr/share/info/ciao.info
+#	echo "START-INFO-DIR-ENTRY" >> ./debian/tmp/usr/share/info/ciao.info
+#	cat ./debian/tmp/usr/share/doc/ciao-prolog/ciao-1.13.0.infoindex >> ./debian/tmp/usr/share/info/ciao.info
+#	echo "END-INFO-DIR-ENTRY" >> ./debian/tmp/usr/share/info/ciao.info
+#	cat ./debian/tmp/usr/share/info/ciao-1.13.0.info >> ./debian/tmp/usr/share/info/ciao.info
+#	mv ./debian/tmp/usr/share/info/ciao.info ./debian/tmp/usr/share/info/ciao-1.13.0.info
+
+#	echo "INFO-DIR-SECTION Software development" > ./debian/tmp/usr/share/info/lpdoc.info
+#       echo "START-INFO-DIR-ENTRY" >> ./debian/tmp/usr/share/info/lpdoc.info
+#       cat ./debian/tmp/usr/share/doc/ciao-prolog/lpdoc-2.0.38.infoindex >> ./debian/tmp/usr/share/info/lpdoc.info
+#	echo "END-INFO-DIR-ENTRY" >> ./debian/tmp/usr/share/info/lpdoc.info
+#	cat ./debian/tmp/usr/share/info/lpdoc-2.0.38.info >> ./debian/tmp/usr/share/info/lpdoc.info
+#	mv ./debian/tmp/usr/share/info/lpdoc.info ./debian/tmp/usr/share/info/lpdoc-2.0.38.info
+
+#	echo "INFO-DIR-SECTION Software development" > ./debian/tmp/usr/share/info/ciaopp.info
+#	echo "START-INFO-DIR-ENTRY" >> ./debian/tmp/usr/share/info/ciaopp.info
+#	cat ./debian/tmp/usr/share/doc/ciao-prolog/ciaopp-1.2.0.infoindex >> ./debian/tmp/usr/share/info/ciaopp.info
+#	echo "END-INFO-DIR-ENTRY" >> ./debian/tmp/usr/share/info/ciaopp.info
+#	cat ./debian/tmp/usr/share/info/ciaopp-1.2.0.info >> ./debian/tmp/usr/share/info/ciaopp.info
+#	mv ./debian/tmp/usr/share/info/ciaopp.info ./debian/tmp/usr/share/info/ciaopp-1.2.0.info
+
+	dh_install --list-missing
+#	dh_install
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir -i
+	dh_testroot -i
+	dh_installchangelogs -i
+	dh_installdocs -i
+	dh_installexamples -i
+#	dh_installmenu -i
+#	dh_installdebconf -i
+	dh_installemacsen -i
+	dh_installinfo -i
+	dh_installman -i
+	dh_link -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir -a
+	dh_testroot -a
+	dh_installchangelogs -a
+	dh_installdocs -a
+#	dh_installexamples -a
+#	dh_installmenu -a
+#	dh_installdebconf -a
+#	dh_installemacsen -a
+	dh_installinfo -a
+	dh_installman -a
+	dh_strip -a
+	dh_link -a
+	dh_compress -a
+	dh_fixperms -a
+#	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+#binary: binary-indep binary-arch
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install ciao-config

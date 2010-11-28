@@ -1,0 +1,40 @@
+This package was debianized by Emilio Jesús Gallego Arias on 20 sep
+2006, 17:31.
+
+We have full upstream support in order to package Ciao for Debian
+
+It was downloaded from the ciao svn repository at clip.dia.fi.upm.es
+
+Upstream Authors: Francisco Bueno, Daniel Cabeza, Manuel Carro,
+                  Manuel Hermenegildo, Pedro Lopez, and German Puebla
+                  and a lot of small contributors.
+
+Some files are missing copyright headers, upstream is working on it.
+
+contrib/ directory has some packages with different licences.
+
+Copyright: GNU Lesser General Public License (LGPL)
+========================================================================
+(C) Copyright Francisco Bueno, Daniel Cabeza, Manuel Carro, 
+              Manuel Hermenegildo, Pedro Lopez, and German Puebla.
+
+Laboratorio   CLIP,   Dpto.   Inteligencia   Artificial,   Universidad
+Politecnica de  Madrid, Campus de  Montegancedo - 28660,  Boadilla del
+Monte - Madrid, Spain.  E-mail: ciao@clip.dia.fi.upm.es
+
+All files included in the  Ciao distribution are affected by the above
+copyright notice, except those which explicitely state otherwise.
+
+Ciao is  currently distributed under  the GNU General  Public License,
+version 2,  as published  by the Free  Software Foundation,  Inc., 59 Temple
+Place, Suite 330, Boston, MA  02111-1307  USA.
+
+We  are considering  distributing it  under the  Artistic  license, if
+sufficient people think that this would be a useful thing.
+
+Ciao is  distributed in the hope  that it will be  useful, but WITHOUT
+ANY WARRANTY; without even  the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.   See the GNU General Public License
+for more details.
+
+A copy of the license is included in file COPYING.
