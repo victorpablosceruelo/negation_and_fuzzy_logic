@@ -33,7 +33,7 @@ pushd ~/tmp
 rm -fv $BUILD_TGZ $BUILD_DSC $BUILD_DIFF $BUILD_DIFF_GZ
 
 # Ensure folder exists.
-# rm -fR $FOLDER_NAME
+rm -fR $FOLDER_NAME
 mkdir -p $FOLDER_NAME
 pushd $FOLDER_NAME
 
@@ -55,15 +55,15 @@ mkdir -p $FOLDER_NAME/debian
 pushd $FOLDER_NAME/debian
 
 echo " "
-# if [ -d .svn ]; then
-if [ -d .git ]; then
+if [ -d .svn ]; then
+# if [ -d .git ]; then
 	echo "updating $REPOS_2 to last revision "
-	# svn update
-	git svn rebase
+	svn update
+	# git svn rebase
 else
 	echo "checking out $REPOS_2 to last revision."
-	# svn co $REPOS_2 . 
-	git svn clone $REPOS_2 .
+	svn co $REPOS_2 . 
+	# git svn clone $REPOS_2 .
 fi
 popd
 echo " "
