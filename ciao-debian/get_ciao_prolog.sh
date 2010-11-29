@@ -11,6 +11,11 @@ else
 	REVISION="$1"
 fi;
 
+# Repositories urls.
+REPOS_1=svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk
+REPOS_2=https://babel.ls.fi.upm.es/svn/negation_and_fuzzy_logic/ciao-debian/
+# SVNREPO_2=svn+ssh://clip.dia.fi.upm.es/home/egallego/clip/repos/ciao-debian/
+
 DATE=`date +%Y%m%d`
 # REVISION=11293
 VERSION=1.13+r$REVISION
@@ -21,11 +26,6 @@ BUILD_DSC=$FILE_NAME.dsc
 BUILD_DIFF=$FILE_NAME.diff
 BUILD_DIFF_GZ=$FILE_NAME.diff.gz
 
-# Repository url.
-SVNREPO_1=svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk
-# SVNREPO_2=svn+ssh://clip.dia.fi.upm.es/home/egallego/clip/repos/ciao-debian/
-SVNREPO_2=https://babel.ls.fi.upm.es/svn/negation_and_fuzzy_logic/ciao-debian/
-
 # Where to put everything.
 pushd ~/tmp
 
@@ -35,33 +35,38 @@ rm -fv $BUILD_TGZ $BUILD_DSC $BUILD_DIFF $BUILD_DIFF_GZ
 # Ensure folder exists.
 # rm -fR $FOLDER_NAME
 mkdir -p $FOLDER_NAME
+pushd $FOLDER_NAME
 
 # Update and export the Ciao's repository
-pushd $FOLDER_NAME
+echo " "
 if [ -d .svn ]; then
-	echo "Running: svn update -r $REVISION"
-	svn update -r $REVISION
+	echo "updating $REPOS_1 to revision $REVISION"
+	svn update --revision $REVISION
 else
-	echo "Running: svn co $SVNREPO_1 . -r $REVISION"
-	svn co $SVNREPO_1 . -r $REVISION
+	echo "checking out $REPOS_1 to revision $REVISION"
+	svn co $SVNREPOS_1 . --revision $REVISION
 fi
 popd
+echo " "
 
 # Ensure folder exists.
 # rm -fR $FOLDER_NAME/debian
 mkdir -p $FOLDER_NAME/debian
 pushd $FOLDER_NAME/debian
+
+echo " "
 # if [ -d .svn ]; then
 if [ -d .git ]; then
-	echo "Running: svn update "
+	echo "updating $REPOS_2 to last revision "
 	# svn update
 	git svn rebase
 else
-	echo "Running: svn co $SVNREPO_2 ."
+	echo "checking out $REPOS_2 to last revision."
 	# svn co $SVNREPO_2 . 
 	git svn clone $SVNREPO_2 .
 fi
 popd
+echo " "
 
 # Create .orig tarball
 tar cvfz $BUILD_TGZ $FOLDER_NAME
