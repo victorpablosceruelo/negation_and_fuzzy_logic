@@ -43,7 +43,8 @@ ciao-config-stamp:
 	    --web_images_path=/usr/share/doc/ciao-prolog/html \
 	    --htmldir=/usr/share/doc/ciao-prolog/html \
 	    --install_prolog_name=no --execmode=755 --datamode=644 \
-	    --installgroup=root --stop-if-error=no --with_mysql=no
+	    --installgroup=root --stop-if-error=no 
+#	    --with_mysql=yes --mysql_client_directory=
 
 	touch ciao-config-stamp
 
@@ -76,45 +77,45 @@ clean:
 	#-$(MAKE) distclean
 	./$(CIAOSETUP) realclean
 
-	rm -f ciao/library/javall/CiaoJava/PLAtom.class
-	rm -f ciao/library/javall/CiaoJava/PLTerm.class
-	rm -f ciao/library/javall/CiaoJava/PLInterpreter.class
-	rm -f ciao/library/javall/CiaoJava/PLConnection.class
-	rm -f ciao/library/javall/CiaoJava/PLGoalException.class
-	rm -f ciao/library/javall/CiaoJava/PLException.class
-	rm -f ciao/library/javall/CiaoJava/PLEventListener.class
-	rm -f ciao/library/javall/CiaoJava/PLStructure.class
-	rm -f ciao/library/javall/CiaoJava/PLSocketReader.class
-	rm -f ciao/library/javall/CiaoJava/PLSocketWriter.class
-	rm -f ciao/library/javall/CiaoJava/PLMultithreadSocketReader.class
-	rm -f ciao/library/javall/CiaoJava/PLJavaObjServer.class
-	rm -f ciao/library/javall/CiaoJava/PLGoal.class
-	rm -f ciao/library/javall/CiaoJava/PLEvents.class
-	rm -f ciao/library/javall/CiaoJava/PLGoals.class
-	rm -f ciao/library/javall/CiaoJava/PLFloat.class
-	rm -f ciao/library/javall/CiaoJava/PLInteger.class
-	rm -f ciao/library/javall/CiaoJava/PLJavaServer.class
-	rm -f ciao/library/javall/CiaoJava/PLList.class
-	rm -f ciao/library/javall/CiaoJava/PLString.class
-	rm -f ciao/library/javall/CiaoJava/PLServerSocket.class
-	rm -f ciao/library/javall/CiaoJava/PLVariable.class
-	rm -f ciao/library/javall/examples/java2pl/example0.class
-	rm -f ciao/library/javall/examples/java2pl/example1$btnExitAction.class
-	rm -f ciao/library/javall/examples/java2pl/example1.class
-	rm -f ciao/library/javall/examples/java2pl/queens$btnOkAction.class
-	rm -f ciao/library/javall/examples/java2pl/queens$btnNextAction.class
-	rm -f ciao/library/javall/examples/java2pl/queens$btnExitAction.class
-	rm -f ciao/library/javall/examples/java2pl/queens$Square.class
-	rm -f ciao/library/javall/examples/java2pl/queens.class
-	rm -f ciao/library/javall/examples/pl2java/calculator
-	rm -f ciao/library/javall/plserver
-	rm -f ciao/library/persdb_mysql/mysql_use_client
+#	rm -f ciao/library/javall/CiaoJava/PLAtom.class
+#	rm -f ciao/library/javall/CiaoJava/PLTerm.class
+#	rm -f ciao/library/javall/CiaoJava/PLInterpreter.class
+#	rm -f ciao/library/javall/CiaoJava/PLConnection.class
+#	rm -f ciao/library/javall/CiaoJava/PLGoalException.class
+#	rm -f ciao/library/javall/CiaoJava/PLException.class
+#	rm -f ciao/library/javall/CiaoJava/PLEventListener.class
+#	rm -f ciao/library/javall/CiaoJava/PLStructure.class
+#	rm -f ciao/library/javall/CiaoJava/PLSocketReader.class
+#	rm -f ciao/library/javall/CiaoJava/PLSocketWriter.class
+#	rm -f ciao/library/javall/CiaoJava/PLMultithreadSocketReader.class
+#	rm -f ciao/library/javall/CiaoJava/PLJavaObjServer.class
+#	rm -f ciao/library/javall/CiaoJava/PLGoal.class
+#	rm -f ciao/library/javall/CiaoJava/PLEvents.class
+#	rm -f ciao/library/javall/CiaoJava/PLGoals.class
+#	rm -f ciao/library/javall/CiaoJava/PLFloat.class
+#	rm -f ciao/library/javall/CiaoJava/PLInteger.class
+#	rm -f ciao/library/javall/CiaoJava/PLJavaServer.class
+#	rm -f ciao/library/javall/CiaoJava/PLList.class
+#	rm -f ciao/library/javall/CiaoJava/PLString.class
+#	rm -f ciao/library/javall/CiaoJava/PLServerSocket.class
+#	rm -f ciao/library/javall/CiaoJava/PLVariable.class
+#	rm -f ciao/library/javall/examples/java2pl/example0.class
+#	rm -f ciao/library/javall/examples/java2pl/example1$btnExitAction.class
+#	rm -f ciao/library/javall/examples/java2pl/example1.class
+#	rm -f ciao/library/javall/examples/java2pl/queens$btnOkAction.class
+#	rm -f ciao/library/javall/examples/java2pl/queens$btnNextAction.class
+#	rm -f ciao/library/javall/examples/java2pl/queens$btnExitAction.class
+#	rm -f ciao/library/javall/examples/java2pl/queens$Square.class
+#	rm -f ciao/library/javall/examples/java2pl/queens.class
+#	rm -f ciao/library/javall/examples/pl2java/calculator
+#	rm -f ciao/library/javall/plserver
+#	rm -f ciao/library/persdb_mysql/mysql_use_client
 	# F*cking $ in paths/filenames.
-	rm -f 'ciao/library/javall/examples/java2pl/example1$$btnExitAction.class'
-	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnOkAction.class'
-	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnNextAction.class'
-	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnExitAction.class'
-	rm -f 'ciao/library/javall/examples/java2pl/queens$$Square.class'
+#	rm -f 'ciao/library/javall/examples/java2pl/example1$$btnExitAction.class'
+#	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnOkAction.class'
+#	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnNextAction.class'
+#	rm -f 'ciao/library/javall/examples/java2pl/queens$$btnExitAction.class'
+#	rm -f 'ciao/library/javall/examples/java2pl/queens$$Square.class'
 
 #	rm -f ./REVISION
 
