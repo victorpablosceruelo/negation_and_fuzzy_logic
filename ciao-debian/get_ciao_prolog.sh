@@ -44,7 +44,7 @@ if [ -d .svn ]; then
 	svn update --revision $REVISION
 else
 	echo "checking out $REPOS_1 to revision $REVISION"
-	svn co $SVNREPOS_1 . --revision $REVISION
+	svn co $REPOS_1 . --revision $REVISION
 fi
 popd
 echo " "
@@ -62,8 +62,8 @@ if [ -d .git ]; then
 	git svn rebase
 else
 	echo "checking out $REPOS_2 to last revision."
-	# svn co $SVNREPO_2 . 
-	git svn clone $SVNREPO_2 .
+	# svn co $REPOS_2 . 
+	git svn clone $REPOS_2 .
 fi
 popd
 echo " "
