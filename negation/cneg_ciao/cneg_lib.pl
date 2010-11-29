@@ -190,9 +190,9 @@ simplify_frontier_aux([SubFrontier | Frontier_In], G, Frontier_Out):-
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_subfrontier_is_valid(SubFrontier, Goal):-
 	frontier_contents(SubFrontier, Head, _Body, FrontierTest),
-        copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
-        copy_term(Goal, G_Tmp),
-        cneg_eq(H_Tmp, G_Tmp), 
+        copy_term((Head, FrontierTest), (Head_Tmp, FrontierTest_Tmp)), 
+        copy_term(Goal, Goal_Tmp),
+        cneg_eq(Head_Tmp, Goal_Tmp), 
 	call_combined_solutions(FrontierTest_Tmp), 
 	!.
 
