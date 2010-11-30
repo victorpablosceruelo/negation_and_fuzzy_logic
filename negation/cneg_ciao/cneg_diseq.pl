@@ -277,9 +277,11 @@ update_var_attributes(New_Disequalities, UV_In, Substitutions, NO_FV_In):-
 	perform_substitutions(Substitutions, UV_Out), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 
-	varsbag_local(Disequalities, UV_Out, NO_FV_In, No_FV_Aux), % Only for removing universal quantification.
+	varsbag_difference(UV_Out, NO_FV_In, UV_Aux), % To after copy restore universal quantification.
+	varsbag_local(Disequalities, UV_Aux, [], No_FV_Aux), % Only for removing universal quantification.
 	copy_term((Disequalities, No_FV_Aux), (Disequalities_Aux, No_FV_Aux_Copy)),
 	diseq_eq(No_FV_Aux, No_FV_Aux_Copy),
+	put_universal_quantification(UV_Aux),
 
 	simplify_disequations(Disequalities_Aux, No_FV_Aux, No_FV_Out, [], Simplified_Disequalities),
 	debug('update_var_attributes(Simplified_Disequalities, No_FV_Out)', (Simplified_Disequalities, No_FV_Out)),

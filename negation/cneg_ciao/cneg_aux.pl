@@ -6,7 +6,7 @@
 	    msg/2, msg_aux/2, msg_nl/0,
 	    first/2, second/2, unify_terms/2, functor_local/4,
 	    memberchk_local/2, term_to_meta/2,
-	    setof_local/3, varsbag_local/4,  
+	    setof_local/3, varsbag_local/4, varsbag_difference/3, 
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/4, goal_is_equality/3,
@@ -397,6 +397,17 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
 
 frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+varsbag_difference([], _VarsBag, []) :- !.
+varsbag_difference([Var | Vars_In], VarsBag, Vars_Out) :-
+	memberchk_local(Var, VarsBag), !,
+	varsbag_difference(Vars_In, VarsBag, Vars_Out).
+varsbag_difference([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
+	varsbag_difference(Vars_In, VarsBag, Vars_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
