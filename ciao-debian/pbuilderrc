@@ -8,7 +8,7 @@ BASETGZ=/var/cache/pbuilder/base.tgz
 BUILDPLACE=/var/cache/pbuilder/build/
 #export DEBIAN_BUILDARCH=athlon
 #EXTRAPACKAGES=gcc3.0-athlon-builder
-EXTRAPACKAGES=cowdancer whiptail dialog 
+EXTRAPACKAGES="cowdancer whiptail dialog"
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
 # MIRRORSITE=http://ftp.de.debian.org/debian
@@ -28,8 +28,8 @@ APTCACHEHARDLINK="yes"
 
 # Hooks and pkgs not needed.
 REMOVEPACKAGES="lilo grub"
-#HOOKDIR="/usr/lib/pbuilder/hooks"
-HOOKDIR=""
+# HOOKDIR="/usr/lib/pbuilder/hooks"
+# HOOKDIR=""
 
 # pbuilder opts.
 USEPROC=yes
@@ -56,8 +56,8 @@ PBUILDERROOTCMD="sudo"
 PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimental"
 
 #default is to build everything. Passed on to dpkg-buildpackage
-#DEBBUILDOPTS="-b"
-DEBBUILDOPTS=""
+# DEBBUILDOPTS="-b"
+# DEBBUILDOPTS=""
 
 # the username and ID used by pbuilder, inside chroot. Needs fakeroot, really
 BUILDUSERID=0
