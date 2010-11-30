@@ -43,7 +43,8 @@ ciao-config-stamp:
 	    --web_images_path=/usr/share/doc/ciao-prolog/html \
 	    --htmldir=/usr/share/doc/ciao-prolog/html \
 	    --install_prolog_name=no --execmode=755 --datamode=644 \
-	    --installgroup=root --stop-if-error=no 
+	    --installgroup=root --stop-if-error=no \
+	    --with_gsl=no --with_ppl=no
 #	    --with_mysql=yes --mysql_client_directory=
 
 	touch ciao-config-stamp
