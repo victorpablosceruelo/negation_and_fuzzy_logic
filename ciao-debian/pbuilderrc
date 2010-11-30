@@ -23,7 +23,7 @@ DISTRIBUTION=squeeze
 # APT configuration files directory
 APTCONFDIR="/etc/apt/"
 # APTCONFDIR=/etc/apt
-APTCACHE="/var/cache/pbuilder/aptcache/"
+APTCACHE="/home/pbuilder-aptcache/"
 APTCACHEHARDLINK="yes"
 
 # Hooks and pkgs not needed.
@@ -60,8 +60,10 @@ PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimenta
 DEBBUILDOPTS=""
 
 # the username and ID used by pbuilder, inside chroot. Needs fakeroot, really
-BUILDUSERID=1234
-BUILDUSERNAME=pbuilder
+BUILDUSERID=0
+# 1234
+BUILDUSERNAME=root
+# pbuilder
 
 # BINDMOUNTS is a space separated list of things to mount
 # inside the chroot.
