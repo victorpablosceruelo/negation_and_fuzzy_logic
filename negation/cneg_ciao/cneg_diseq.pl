@@ -272,13 +272,16 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 update_var_attributes(New_Disequalities, UV_In, Substitutions, NO_FV_In):-
 	debug('update_var_attributes(New_Disequalities, UV_In, Substitutions)', (New_Disequalities, UV_In, Substitutions)), 
 	varsbag_local(New_Disequalities, [], [], Vars), !,
-	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp), !,
-	debug(retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities_Tmp)),
-	perform_substitutions(Substitutions, UV_Out, Disequalities_Tmp, Disequalities), !,
+	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities), !,
+	debug(retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities)),
+	perform_substitutions(Substitutions, UV_Out), !,
 %	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
 
-	varsbag_local(Disequalities, UV_Out, NO_FV_In, No_FV_Aux),
-	simplify_disequations(Disequalities, No_FV_Aux, No_FV_Out, [], Simplified_Disequalities),
+	varsbag_local(Disequalities, UV_Out, NO_FV_In, No_FV_Aux), % Only for removing universal quantification.
+	copy_term((Disequalities, No_FV_Aux), (Disequalities_Aux, No_FV_Aux_Copy)),
+	diseq_eq(No_FV_Aux, No_FV_Aux_Copy),
+
+	simplify_disequations(Disequalities_Aux, No_FV_Aux, No_FV_Out, [], Simplified_Disequalities),
 	debug('update_var_attributes(Simplified_Disequalities, No_FV_Out)', (Simplified_Disequalities, No_FV_Out)),
 	restore_attributes(Simplified_Disequalities, No_FV_Out).
 
@@ -298,8 +301,8 @@ retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_
 retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- 
         retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out).
 
-perform_substitutions([], _UnivVars, Disequalities_Out, Disequalities_Out) :- !.
-perform_substitutions([Subst | MoreSubst], UnivVars, Disequalities_In, Disequalities_Out) :-
+perform_substitutions([], _UnivVars) :- !.
+perform_substitutions([Subst | MoreSubst], UnivVars) :-
 	substitution_contents(Subst, OldTarget, NewTarget),
 	(
 	    (
@@ -313,7 +316,7 @@ perform_substitutions([Subst | MoreSubst], UnivVars, Disequalities_In, Disequali
 	;
 	    (
 		diseq_eq(OldTarget, NewTarget), !,
-		perform_substitutions(MoreSubst, UnivVars, Disequalities_In, Disequalities_Out)
+		perform_substitutions(MoreSubst, UnivVars)
 	    )
 	).
 
