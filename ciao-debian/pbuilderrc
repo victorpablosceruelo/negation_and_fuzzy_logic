@@ -23,7 +23,7 @@ DISTRIBUTION=squeeze
 # APT configuration files directory
 APTCONFDIR="/etc/apt/"
 # APTCONFDIR=/etc/apt
-APTCACHE="/home/pbuilder-aptcache/"
+APTCACHE="/var/cache/pbuilder/aptcache/"
 APTCACHEHARDLINK="yes"
 
 # Hooks and pkgs not needed.
