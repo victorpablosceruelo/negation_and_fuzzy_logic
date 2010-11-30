@@ -8,7 +8,7 @@ BASETGZ=/var/cache/pbuilder/base.tgz
 BUILDPLACE=/var/cache/pbuilder/build/
 #export DEBIAN_BUILDARCH=athlon
 #EXTRAPACKAGES=gcc3.0-athlon-builder
-EXTRAPACKAGES=whiptail dialog
+EXTRAPACKAGES=cowdancer whiptail dialog 
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
 # MIRRORSITE=http://ftp.de.debian.org/debian
@@ -39,8 +39,8 @@ BUILDRESULT=/var/cache/pbuilder/result/
 
 # make debconf not interact with user
 # export DEBIAN_FRONTEND=noninteractive
-# export DEBIAN_FRONTEND="readline"
-export DEBIAN_FRONTEND="dialog"
+export DEBIAN_FRONTEND="readline"
+# export DEBIAN_FRONTEND="dialog"
 
 DEBEMAIL=""
 
