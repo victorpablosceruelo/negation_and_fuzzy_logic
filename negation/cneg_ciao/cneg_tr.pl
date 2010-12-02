@@ -5,19 +5,12 @@
 % technique for the constructive negation of the goals.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- module(cneg_tr,[trans_sent/3],[assertions]).
+:- module(cneg_tr,[trans_sent/3],[]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(cneg_diseq,[cneg_diseq/3]).
 :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).
-
-:- comment(title, "Contructive Negation Transformation").
-
-:- comment(author, "V@'{i}ctor Pablos Ceruelo").
-
-:- comment(summary, "This module does de transformation needed to evaluate 
-	the constructive negation of any predicate in the original file.").
 
 
 % dynamic predicate(s) 

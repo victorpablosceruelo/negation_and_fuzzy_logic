@@ -17,30 +17,14 @@
 :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).  
 % NO:  :- include(cneg_lib).  
-:- use_module(cneg_diseq, 
-	[
-	    cneg_diseq/3,
-	    put_universal_quantification/1,
-	    remove_universal_quantification/2,
-	    keep_universal_quantification/1
-	]).
+:- use_module(cneg_diseq,[cneg_diseq/3]).
 :- use_module(library(write), [write/1]).
 :- use_module(library(system), [getenvstr/2]).
 
 % Re-export predicates to use them in console.
-:- reexport(cneg_diseq,
-	[
-	    cneg_diseq/3, 
-	    put_universal_quantification/1,
-	    remove_universal_quantification/2,
-	    keep_universal_quantification/1
-	]).   
-:- reexport(cneg_lib,
-	[
-	    cneg_lib_aux/3, 
-	    cneg_eq/2
-	]).   
-%:- export([main/0, main/1]).
+:- reexport(cneg_diseq,[cneg_diseq/3]).   
+:- reexport(cneg_lib,[cneg_lib_aux/3, cneg_eq/2]).   
+:- export([main/0, main/1]).
 
 % To access predicates from anywhere.
 :- multifile cneg_processed_pred/4.

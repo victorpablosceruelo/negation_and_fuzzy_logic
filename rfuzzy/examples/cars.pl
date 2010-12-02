@@ -33,7 +33,11 @@ expensive_car(ferrari) value 1.0.
 
 :- set_prop garage_taxes/1 => car/1.
 :- default(garage_taxes/1, 0.1).
+<<<<<<< HEAD
 garage_taxes(Car) :~ prod((expensive_car(Car), expensive_parts(Car), expensive_manpower(Car))).
+=======
+garage_taxes(Car) :~ prod expensive_car(Car), expensive_parts(Car), expensive_manpower(Car).
+>>>>>>> parent of 8120ebb... Included src code info.
 garage_taxes(ferrari) value 0.9 .
 
 :- default(car_life_is_10_years/1, 1).
