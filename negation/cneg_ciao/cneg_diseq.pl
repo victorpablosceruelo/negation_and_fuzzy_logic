@@ -3,7 +3,8 @@
 	    cneg_diseq/3,
 	    portray_attributes_in_term/1, 
 	    put_universal_quantification/1,
-	    remove_universal_quantification/2
+	    remove_universal_quantification/2,
+	    keep_universal_quantification/1
 	], 
 	[assertions]).
 
@@ -73,10 +74,14 @@ put_attribute_local(Var, Attribute) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-put_universal_quantification([]) :- !.
-put_universal_quantification([Var|Vars]) :-
+put_universal_quantification(Vars) :-
+	debug('put_universal_quantification(Vars)', Vars),
+	put_universal_quantification_vars(Vars).
+
+put_universal_quantification_vars([]) :- !.
+put_universal_quantification_vars([Var|Vars]) :-
 	put_universal_quantification_var(Var),
-	put_universal_quantification(Vars).
+	put_universal_quantification_vars(Vars).
 
 put_universal_quantification_var(Var) :-
 	var(Var),
@@ -85,10 +90,12 @@ put_universal_quantification_var(Var) :-
 	attribute_contents(Old_Attribute, Var, Disequalities, UnivVars),
 	update_var_attributes(Disequalities, [Var | UnivVars], [], []).
 put_universal_quantification_var(Var) :-
-	var(Var),
+	var(Var), !,
 	restore_attributes_var(Var, [Var], []).
+put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
+	debug('remove_universal_quantification(Vars, UnivQuantified)', (Vars, UnivQuantified)),
 	remove_universal_quantification_aux(Vars, [], UnivQuantified).
 
 remove_universal_quantification_aux([], UnivQuantified, UnivQuantified) :- !.
@@ -110,6 +117,22 @@ remove_universal_quantification_var(Var, UnivQuantified, UnivQuantified) :-
 determine_if_universally_quantified(Var, UnivVars, UnivQuantified, [Var | UnivQuantified]) :-
 	memberchk_local(Var, UnivVars), !.
 determine_if_universally_quantified(_Var, _UnivVars, UnivQuantified, UnivQuantified).
+
+keep_universal_quantification([]) :- !.
+keep_universal_quantification([Var | Vars]) :-
+	var(Var), !,
+	keep_universal_quantification_var(Var),
+	keep_universal_quantification([Vars]).
+keep_universal_quantification([_Var | Vars]) :-
+	keep_universal_quantification([Vars]).
+
+keep_universal_quantification_var(Var) :-
+	var(Var), 
+	get_attribute_local(Var, _Old_Attribute), !.
+keep_universal_quantification_var(Var) :-
+	var(Var), !,
+	put_universal_quantification_var(Var).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -241,18 +264,19 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, UnivVars_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, UnivVars_Var_2), !,
 	(
-	    (
-		var(OldTarget_Var_1),
-		memberchk_local(OldTarget_Var_1, UnivVars_Var_1),
-		!, fail % Universally quantified variables can not be unified.
-	    )
-	;
-	    (
-		var(OldTarget_Var_2),
-		memberchk_local(OldTarget_Var_2, UnivVars_Var_2), 
-		!, fail % Universally quantified variables can not be unified.
-	    )
-	;	    
+% --NO--
+%	    (
+%		var(OldTarget_Var_1),
+%		memberchk_local(OldTarget_Var_1, UnivVars_Var_1),
+%		!, fail % Universally quantified variables can not be unified.
+%	    )
+%	;
+%	    (
+%		var(OldTarget_Var_2),
+%		memberchk_local(OldTarget_Var_2, UnivVars_Var_2), 
+%		!, fail % Universally quantified variables can not be unified.
+%	    )
+%	;	    
 	    (
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 		cneg_aux:append(UnivVars_Var_1, UnivVars_Var_2, UnivVars),

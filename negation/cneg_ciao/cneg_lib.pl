@@ -91,16 +91,17 @@ cneg_dynamic(Goal, UnivVars, Solution) :-
 	!. % No backtracking allowed
 
 cneg_dynamic_aux(Goal, UnivVars, Solution) :-
-	varsbag_local(Goal, [], [], GoalVars),
-	remove_universal_quantification(GoalVars, Universally_Quantified),
+	put_universal_quantification(UnivVars),
 
-	frontier(Goal, Frontier, Goal_Not_Qualified), 
+	varsbag_local(Goal, [], [], GoalVars),
+	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
+	remove_universal_quantification(GoalVars_Copy, _Universally_Quantified),
+
+	frontier(Goal_Copy, Frontier, Goal_Not_Qualified), 
 	!, % No backtracking allowed
 	negate_frontier(Frontier, Goal_Not_Qualified, Solution),
 	!, % No backtracking allowed
-
-	varsbag_local(UnivVars, [], Universally_Quantified, To_Restore_Universal_Quantification),
-	put_universal_quantification(To_Restore_Universal_Quantification),
+	cneg_eq(GoalVars, GoalVars_Copy),
 	!. % No backtracking allowed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,11 +115,11 @@ cneg_dynamic_aux(Goal, UnivVars, Solution) :-
 
 frontier(Goal, Frontier, NewGoal) :-
 	debug_nl,
-	debug('frontier :: Goal (IN)', Goal),
-	frontier_aux(Goal, Frontier, NewGoal),
-	debug('frontier :: Goal', Goal),
-	debug('frontier :: Frontier', Frontier),
-	debug('frontier :: NewGoal', NewGoal).
+%	debug('frontier :: Goal (IN)', Goal),
+	frontier_aux(Goal, Frontier, NewGoal).
+%	debug('frontier :: Goal', Goal),
+%	debug('frontier :: Frontier', Frontier),
+%	debug('frontier :: NewGoal', NewGoal).
 
 % First remove $ and qualification from the goal's name.
 frontier_aux(Goal, Frontier, NewGoal) :-
@@ -131,7 +132,7 @@ frontier_aux(Goal, Frontier, (NewG1; NewG2)):-
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
 	cneg_aux:append(F1, F2, Front),
-	debug('frontier :: disjunction', Front),
+%	debug('frontier :: disjunction', Front),
 	simplify_frontier(Front, (NewG1;NewG2), Frontier).
 
 % Now go for the conjunctions.
@@ -139,9 +140,8 @@ frontier_aux(Goal, Frontier, (NewG1, NewG2)):-
 	goal_is_conjunction(Goal, G1, G2), !,
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
-% Creo q esta fallando aqui ...
 	combine_frontiers(F1, F2, Front),
-	debug('frontier :: conjunction', Front),
+%	debug('frontier :: conjunction', Front),
 	simplify_frontier(Front, (NewG1,NewG2), Frontier).
 
 % Now go for the functors for equality and disequality.
@@ -173,9 +173,10 @@ frontier_aux(Goal, [], Goal) :-
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, G, Front_Out) :-
+	debug_nl,
 	debug_list('simplify_frontier :: Front_In (list)', Front_In),
-	simplify_frontier_aux(Front_In, G, Front_Out),
-	debug_list('simplify_frontier :: Front_Out (list)', Front_Out).
+	simplify_frontier_aux(Front_In, G, Front_Out).
+%	debug_list('simplify_frontier :: Front_Out (list)', Front_Out).
 
 simplify_frontier_aux([], _G, []) :- !.
 simplify_frontier_aux([SubFrontier | Frontier_In], G, [SubFrontier | Frontier_Out]):-
@@ -235,6 +236,7 @@ negate_frontier(Frontier, Goal, Solutions) :-
 	debug('negate_frontier :: Goal', Goal), 
 	!,
 	varsbag_local(Goal, [], [], GoalVars),
+	debug('negate_frontier :: GoalVars', GoalVars), 
 	negate_frontier_aux(Frontier, Goal, GoalVars, Solutions),
 	!.
 %	debug('negate_frontier :: Solutions', Solutions).
@@ -242,9 +244,9 @@ negate_frontier(Frontier, Goal, Solutions) :-
 negate_frontier_aux([], _Goal, _GoalVars, true) :- !.
 negate_frontier_aux([Frontier | More_Frontier], Goal, GoalVars, Sol):-
 	frontier_contents(Frontier, Head, Body, _FrontierTest),
-	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
+%	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
 	negate_subfrontier((Head, Body), Goal, GoalVars, Sol_Subfr),
-	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
+%	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
 	!, % Reduce the stack's memory.
 	negate_frontier_aux(More_Frontier, Goal, GoalVars, Sol_More_Subfr),
 	combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, Sol), !.
@@ -264,12 +266,12 @@ combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Sub
 % It fails if the negation of the conjunction has no solutions
 negate_subfrontier((_Head, [fail]), _G, _GoalVars, true):- !.
 negate_subfrontier(SubFrontier, Goal, GoalVars, NegatedFrontier):-
-	debug('negate_subfrontier :: SubFrontier', SubFrontier),
+%	debug('negate_subfrontier :: SubFrontier', SubFrontier),
 	split_subfrontier_into_Ci_Bi(SubFrontier, Goal, Ci, Bi),
 	!, % Reduce the stack's memory.
-	debug('negate_subfrontier :: split_subfrontier_into_Ci_Bi', (Ci, Bi)),
+%	debug('negate_subfrontier :: split_subfrontier_into_Ci_Bi', (Ci, Bi)),
 	negate_subfrontier_aux(GoalVars, Ci, Bi, NegatedFrontier),
-	debug('negate_subfrontier :: NegatedFrontier', NegatedFrontier),
+%	debug('negate_subfrontier :: NegatedFrontier', NegatedFrontier),
 	!.
 
 % negate_subfrontier_aux(C, G, GoalVars, I, D, R, SolC)
@@ -277,7 +279,7 @@ negate_subfrontier(SubFrontier, Goal, GoalVars, NegatedFrontier):-
 %	debug('negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
 %	!. % Backtracking is not allowed.
 negate_subfrontier_aux(_GoalVars, [], [], fail) :-
-	debug('negate_subfrontier_aux', 'Ci adn Bi are empty lists'),
+%	debug('negate_subfrontier_aux', 'Ci adn Bi are empty lists'),
 	!. % Backtracking is not allowed.
 
 negate_subfrontier_aux(GoalVars, [], Bi_In, cneg_aux(Bi_Conj, UnivVars)) :- !,
@@ -296,7 +298,11 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
 	cneg_eq(Answer, (Ci_Negated 
-			; (remove_universal_quantification(Ci_Vars, _Any), Ci_Conj, cneg_aux(Bi_Conj, [UnivVars])))).
+			; (
+			      remove_universal_quantification(Ci_Vars, Any_UQ), 
+			      Ci_Conj, 
+			      keep_universal_quantification(Any_UQ),
+			      cneg_aux(Bi_Conj, [UnivVars])))).
 
 list_to_conj([], []) :- fail.
 list_to_conj([Ci_In], Ci_In) :- !.
