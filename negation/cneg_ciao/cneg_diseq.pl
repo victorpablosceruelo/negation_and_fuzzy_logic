@@ -95,8 +95,9 @@ put_universal_quantification_var(Var) :-
 put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
-	debug('remove_universal_quantification(Vars, UnivQuantified)', (Vars, UnivQuantified)),
-	remove_universal_quantification_aux(Vars, [], UnivQuantified).
+	debug('remove_universal_quantification :: Vars', Vars),
+	remove_universal_quantification_aux(Vars, [], UnivQuantified),
+	debug('remove_universal_quantification :: UnivQuantified', UnivQuantified).
 
 remove_universal_quantification_aux([], UnivQuantified, UnivQuantified) :- !.
 remove_universal_quantification_aux([Var|Vars], UnivQuantified_In, UnivQuantified_Out) :-
@@ -118,13 +119,17 @@ determine_if_universally_quantified(Var, UnivVars, UnivQuantified, [Var | UnivQu
 	memberchk_local(Var, UnivVars), !.
 determine_if_universally_quantified(_Var, _UnivVars, UnivQuantified, UnivQuantified).
 
-keep_universal_quantification([]) :- !.
-keep_universal_quantification([Var | Vars]) :-
+keep_universal_quantification(Vars) :-
+	debug('keep_universal_quantification(Vars)', Vars),
+	keep_universal_quantification_vars(Vars).
+
+keep_universal_quantification_vars([]) :- !.
+keep_universal_quantification_vars([Var | Vars]) :-
 	var(Var), !,
 	keep_universal_quantification_var(Var),
-	keep_universal_quantification([Vars]).
-keep_universal_quantification([_Var | Vars]) :-
-	keep_universal_quantification([Vars]).
+	keep_universal_quantification_vars([Vars]).
+keep_universal_quantification_vars([_Var | Vars]) :-
+	keep_universal_quantification_vars([Vars]).
 
 keep_universal_quantification_var(Var) :-
 	var(Var), 
@@ -293,9 +298,14 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-update_var_attributes(New_Disequalities, UV_In, Substitutions, NO_FV_In):-
-	debug('update_var_attributes(New_Disequalities, UV_In, Substitutions)', (New_Disequalities, UV_In, Substitutions)), 
-	varsbag_local(New_Disequalities, [], [], Vars), !,
+update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities) :-
+	debug('update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities)', (UV_In, NO_UV_In, Substitutions, New_Disequalities)), 
+	
+	varsbag_difference(UV_In, NO_UV_In, UV_Aux),
+	varsbag_difference(NO_UV_In, UV_In, NO_UV_Aux),
+
+	varsbag_local(New_Disequalities, [], [], Vars_New_Diseq), !,
+
 	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities), !,
 	debug(retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities)),
 	perform_substitutions(Substitutions, UV_Out), !,

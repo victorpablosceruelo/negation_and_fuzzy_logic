@@ -302,7 +302,7 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 			      remove_universal_quantification(Ci_Vars, Any_UQ), 
 			      Ci_Conj, 
 			      keep_universal_quantification(Any_UQ),
-			      cneg_aux(Bi_Conj, [UnivVars])))).
+			      cneg_aux(Bi_Conj, UnivVars)))).
 
 list_to_conj([], []) :- fail.
 list_to_conj([Ci_In], Ci_In) :- !.
