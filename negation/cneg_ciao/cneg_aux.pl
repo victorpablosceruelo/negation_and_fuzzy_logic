@@ -14,7 +14,15 @@
 	 replace_in_term_variables_by_values/4,
 	 add_to_list_if_not_there/3, append/3,
 	 var_is_in_formulae/2, 
-	 terms_are_equal/2 ],[]).
+	 terms_are_equal/2 ],[assertions]).
+
+:- comment(title, "Auxiliary predicates for Constructive Negation").
+
+:- comment(author, "V@'{i}ctor Pablos Ceruelo").
+
+:- comment(summary, "This module offers some predicates needed both by Constructive Negation
+	Transformation Program, by Constructive Negation Library and by Disequalities Management.").
+
 
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(write), _).

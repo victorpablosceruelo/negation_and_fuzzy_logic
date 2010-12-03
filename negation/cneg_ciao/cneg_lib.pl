@@ -1,7 +1,7 @@
 %
 % From Susana modified by VPC (started 29/06/2010)
 %
-:- module(cneg_lib, [cneg_lib_aux/3, cneg_eq/2,	negate_subfrontier/4]).
+:- module(cneg_lib, [cneg_lib_aux/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
@@ -15,6 +15,14 @@
 :- use_module(cneg_diseq,[cneg_diseq/3]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
+
+:- comment(title, "Contructive Negation Library").
+
+:- comment(author, "V@'{i}ctor Pablos Ceruelo").
+
+:- comment(summary, "This module calls the predicates generated during the 
+	program transformation.").
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
