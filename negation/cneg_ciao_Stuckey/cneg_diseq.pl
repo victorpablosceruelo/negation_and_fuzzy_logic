@@ -84,40 +84,28 @@ put_universal_quantification_vars([Var|Vars]) :-
 	put_universal_quantification_vars(Vars).
 
 put_universal_quantification_var(Var) :-
-	var(Var),
-	get_attribute_local(Var, Old_Attribute), !,
-	remove_attribute_local(Var),
-	attribute_contents(Old_Attribute, Var, Disequalities, UnivVars),
-	update_var_attributes(Disequalities, [Var | UnivVars], [], []).
-put_universal_quantification_var(Var) :-
 	var(Var), !,
-	restore_attributes_var(Var, [Var], []).
+	update_vars_attributes([Var], [], [], []).
 put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
 	debug('remove_universal_quantification :: Vars', Vars),
-	remove_universal_quantification_aux(Vars, [], UnivQuantified),
+	remove_universal_quantification_aux(Vars, UnivQuantified),
 	debug('remove_universal_quantification :: UnivQuantified', UnivQuantified).
 
-remove_universal_quantification_aux([], UnivQuantified, UnivQuantified) :- !.
-remove_universal_quantification_aux([Var|Vars], UnivQuantified_In, UnivQuantified_Out) :-
-	remove_universal_quantification_var(Var, UnivQuantified_In, UnivQuantified_Aux),
-	remove_universal_quantification_aux(Vars, UnivQuantified_Aux, UnivQuantified_Out).
+remove_universal_quantification_aux([], []) :- !.
+remove_universal_quantification_aux([Var|Vars], [Var | MoreUnivQuantified]) :-
+	remove_universal_quantification_var(Var), !,
+	remove_universal_quantification_aux(Vars, MoreUnivQuantified).
+remove_universal_quantification_aux([_Var|Vars], MoreUnivQuantified) :-
+	remove_universal_quantification_aux(Vars, MoreUnivQuantified).
 
-remove_universal_quantification_var(Var, UnivQuantified_In, UnivQuantified_Out) :-
-	var(Var),
-	get_attribute_local(Var, Old_Attribute), !,
-	remove_attribute_local(Var),
-	attribute_contents(Old_Attribute, Var, Disequalities, UnivVars),
-	determine_if_universally_quantified(Var, UnivVars, UnivQuantified_In, UnivQuantified_Out),
-	update_var_attributes(Disequalities, UnivVars, [], [Var]).
-
-remove_universal_quantification_var(Var, UnivQuantified, UnivQuantified) :-
-	var(Var).
-
-determine_if_universally_quantified(Var, UnivVars, UnivQuantified, [Var | UnivQuantified]) :-
-	memberchk_local(Var, UnivVars), !.
-determine_if_universally_quantified(_Var, _UnivVars, UnivQuantified, UnivQuantified).
+remove_universal_quantification_var(Var) :-
+	var(Var), 
+	get_attribute_local(Var, Old_Attribute), 
+	attribute_contents(Old_Attribute, Var, _Disequalities, UnivVars),
+	memberchk_local(Var, UnivVars), !,
+	update_vars_attributes([], [Var], [], []).
 
 keep_universal_quantification(Vars) :-
 	debug('keep_universal_quantification(Vars)', Vars),
@@ -242,7 +230,8 @@ verify_attribute(Attribute, Target):-
 %	debug(verify_attribute(Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, Disequalities, UnivVars), 
 	terms_are_equal(Target, NewTarget), !,
-	update_var_attributes(Disequalities, UnivVars, [], []).
+	update_vars_attributes(UnivVars, [], [], Disequalities).
+
 
 % Only for Ciao prolog 
 verify_attribute(Attribute, NewTarget):-
@@ -258,35 +247,29 @@ verify_attribute(Attribute, NewTarget):-
 	;
 	    (
 		substitution_contents(Subst, OldTarget, NewTarget),
-		update_var_attributes(Disequalities, [], [Subst], [])
+		update_vars_attributes(UnivVars, [], [Subst], Disequalities)
 	    )
 	).
 
 substitution_contents(substitute(Var, T), Var, T).
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
-	debug('combine_attributes(Attr_Var1, Attr_Var2)', (Attribute_Var_1, Attribute_Var_2)),
+	debug('combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UV)', Attribute_Var_1),
+	debug('combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UV)', Attribute_Var_2),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, UnivVars_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, UnivVars_Var_2), !,
 	(
-% --NO--
-%	    (
-%		var(OldTarget_Var_1),
-%		memberchk_local(OldTarget_Var_1, UnivVars_Var_1),
-%		!, fail % Universally quantified variables can not be unified.
-%	    )
-%	;
-%	    (
-%		var(OldTarget_Var_2),
-%		memberchk_local(OldTarget_Var_2, UnivVars_Var_2), 
-%		!, fail % Universally quantified variables can not be unified.
-%	    )
-%	;	    
 	    (
+		var(OldTarget_Var_1), var(OldTarget_Var_1), !,
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 		cneg_aux:append(UnivVars_Var_1, UnivVars_Var_2, UnivVars),
 		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
-		update_var_attributes(Disequalities, [UnivVars], [Subst], [])
+		update_vars_attributes(UnivVars, [], [Subst], Disequalities)
+	    )
+	;
+	    (
+		msg('combine_attributes', 'they should be variables but they are not. FAIL.'),
+		!, fail
 	    )
 	).
 
@@ -300,26 +283,20 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 
 update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities) :-
 	debug('update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities)', (UV_In, NO_UV_In, Substitutions, New_Disequalities)), 
-	
-	varsbag_difference(UV_In, NO_UV_In, UV_Aux),
-	varsbag_difference(NO_UV_In, UV_In, NO_UV_Aux),
 
-	varsbag_local(New_Disequalities, [], [], Vars_New_Diseq), !,
+	append(UV_In, NO_UV_In, Vars_In_Aux),
+	varsbag_local(New_Disequalities, [], Vars_In_Aux, Vars_In), !,
+	retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities), !,
+	debug(retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities)),
 
-	retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities), !,
-	debug(retrieve_affected_disequalities(Vars, [], UV_In, UV_Out, New_Disequalities, Disequalities)),
-	perform_substitutions(Substitutions, UV_Out), !,
-%	debug(perform_substitutions(Substitutions, Disequalities_Tmp, Disequalities)),
+	varsbag_addition(UV_In, UV_Diseqs, UV_Tmp), % Temporaly marked as universally quantified.
+	varsbag_difference(UV_Tmp, NO_UV_In, UV_Aux), % Really marked as universally quantified.
+	perform_substitutions(Substitutions, UV_Aux, UV_Out), !,
+	varsbag_local(Disequalities, UV_Out, [], NO_UV_Aux), % Not universally quantified.
 
-	varsbag_difference(UV_Out, NO_FV_In, UV_Aux), % To after copy restore universal quantification.
-	varsbag_local(Disequalities, UV_Aux, [], No_FV_Aux), % Only for removing universal quantification.
-	copy_term((Disequalities, No_FV_Aux), (Disequalities_Aux, No_FV_Aux_Copy)),
-	diseq_eq(No_FV_Aux, No_FV_Aux_Copy),
-	put_universal_quantification(UV_Aux),
-
-	simplify_disequations(Disequalities_Aux, No_FV_Aux, No_FV_Out, [], Simplified_Disequalities),
-	debug('update_var_attributes(Simplified_Disequalities, No_FV_Out)', (Simplified_Disequalities, No_FV_Out)),
-	restore_attributes(Simplified_Disequalities, No_FV_Out).
+	simplify_disequations(Disequalities, NO_UV_Aux, NO_UV_Out, [], Simplified_Disequalities),
+	debug('update_vars_attributes(Simplified_Disequalities, NO_UV_Out)', (Simplified_Disequalities, NO_UV_Out)),
+	restore_attributes(Simplified_Disequalities, NO_UV_Out).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
@@ -337,22 +314,37 @@ retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_
 retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- 
         retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out).
 
-perform_substitutions([], _UnivVars) :- !.
-perform_substitutions([Subst | MoreSubst], UnivVars) :-
+perform_substitutions([], UV_In, UV_In) :- !.
+perform_substitutions([Subst | MoreSubst], UV_In, UV_Out) :-
 	substitution_contents(Subst, OldTarget, NewTarget),
 	(
 	    (
+		var(OldTarget),
+		var(NewTarget), % Be sure both are vars.
+		!,
 		(
-		    memberchk_local(OldTarget, UnivVars);
-		    memberchk_local(NewTarget, UnivVars)
+		    (
+			(
+			    memberchk_local(OldTarget, UV_In),
+			    memberchk_local(NewTarget, UV_In), % Both are universally quantified.
+			    ! % Keep universal quantification.
+			)
+		    ;
+			(
+			    varsbag_remove_var(OldTarget, UV_In, UV_Tmp),
+			    varsbag_remove_var(OldTarget, UV_Tmp, UV_Aux)
+			)
+		    )
 		),
-		msg('perform_substitutions', 'cannot substitute a universaly quantified variable.'),
-		!, fail
+		(
+		    diseq_eq(OldTarget, NewTarget), !,
+		    perform_substitutions(MoreSubst, UV_Aux, UV_Out)
+		)
 	    )
 	;
 	    (
-		diseq_eq(OldTarget, NewTarget), !,
-		perform_substitutions(MoreSubst, UnivVars)
+		msg('perform_substitutions', 'cannot substitute if it is not a variable.'),
+		!, fail
 	    )
 	).
 
@@ -634,7 +626,7 @@ cneg_diseq(T1,T2, UnivVars):-
 	debug('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
 	debug('cneg_diseq :: UnivVars', UnivVars),
 	disequality_contents(Disequality, T1, T2),
-        update_var_attributes([Disequality], UnivVars, [], []).
+        update_vars_attributes(UnivVars, [], [], [Disequality]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

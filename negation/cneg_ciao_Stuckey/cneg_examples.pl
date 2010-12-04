@@ -120,7 +120,10 @@ subst(X,X,0).
  
 % TEST
 
-no_queens2(Q):- cneg(queens(s(s(0)),Q)).
+no_queens1(Q):- cneg(queens(s(0),Q)). % Q =/= [s(0)]
+no_queens2(Q):- cneg(queens(s(s(0)),Q)). % True always
+no_queens3(Q):- cneg(queens(s(s(s(0))),Q)). % True always
+no_queens4(Q):- cneg(queens(s(s(s(0))),Q)). % 10^4 sols.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
