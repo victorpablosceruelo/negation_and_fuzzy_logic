@@ -1,20 +1,27 @@
 
 :- module(cneg_aux,
-	[findall/4, debug/2, debug_list/2, debug_nl/0, msg/2, msg_aux/2, msg_nl/0,
-	 first/2, second/2, unify_terms/2, functor_local/4,
-	 memberchk_local/2, retrieve_element_from_list/2, term_to_meta/2,
-	 setof_local/3, varsbag_local/4, varset_local/2, 
-%	 remove_duplicates/3,
-	 goal_clean_up/2,
-	 goal_is_conjunction/3, goal_is_disjunction/3, 
-	 goal_is_disequality/4, goal_is_equality/3,
-	 look_for_the_relevant_clauses/2, frontier_contents/4,
-	 qualify_string_name/3, remove_qualification/2, term_name_is_qualified/1,
-	 replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
-	 replace_in_term_variables_by_values/4,
-	 add_to_list_if_not_there/3, append/3,
-	 var_is_in_formulae/2, 
-	 terms_are_equal/2 ],[assertions]).
+	[
+	    findall/4, append/3,
+	    debug/2, debug_list/2, debug_nl/0, 
+	    msg/2, msg_aux/2, msg_nl/0,
+	    first/2, second/2, unify_terms/2, functor_local/4,
+	    memberchk_local/2, term_to_meta/2,
+	    setof_local/3, varsbag_local/4, varsbag_difference/3, 
+	    goal_clean_up/2,
+	    goal_is_conjunction/3, goal_is_disjunction/3, 
+	    goal_is_disequality/4, goal_is_equality/3,
+	    look_for_the_relevant_clauses/2, frontier_contents/4,
+	    qualify_string_name/3, remove_qualification/2, 
+	    % term_name_is_qualified/1,
+	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
+	    % replace_in_term_variables_by_values/4,
+	    % add_to_list_if_not_there/3, 
+	    terms_are_equal/2 
+	],
+	[assertions]).
+
+:- use_module(library(aggregates),[setof/3]).
+:- use_module(library(write), _).
 
 :- comment(title, "Auxiliary predicates for Constructive Negation").
 
@@ -22,10 +29,6 @@
 
 :- comment(summary, "This module offers some predicates needed both by Constructive Negation
 	Transformation Program, by Constructive Negation Library and by Disequalities Management.").
-
-
-:- use_module(library(aggregates),[setof/3]).
-:- use_module(library(write), _).
 
 % To access predicates from anywhere.
 :- multifile cneg_processed_pred/4.
@@ -59,11 +62,9 @@ debug_nl :-
 	debug_is_on('no'), !.
 
 
-debug_list(_Msg, []) :-
+debug_list(Msg, []) :-
+	debug(Msg, []),
 	!. % No backtracking allowed.
-debug_list(Msg, [Cl]) :-
-	!, % No backtracking allowed.
-	debug(Msg, Cl).
 debug_list(Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
 	debug(Msg, Cl),
@@ -175,14 +176,6 @@ memberchk_local(T1, [T2|_L]) :-
 	terms_are_equal(T1,T2).
 memberchk_local(T1, [_T2|L]) :- 
         memberchk_local(T1, L).
-
-retrieve_element_from_list([Element|_List], Element).
-retrieve_element_from_list([_Other_Element|List], Element) :-
-	retrieve_element_from_list(List, Element).
-
-var_is_in_formulae(Var, Formulae) :-
-	varsbag_local(Formulae, [], [], Vars_Set), !,
-	retrieve_element_from_list(Vars_Set, Var).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -409,9 +402,12 @@ frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-varset_local(X,Xs) :- 
-        varsbag_local(X,[],[], Xs).
-%        sort(Xs_uns,Xs).
+varsbag_difference([], _VarsBag, []) :- !.
+varsbag_difference([Var | Vars_In], VarsBag, Vars_Out) :-
+	memberchk_local(Var, VarsBag), !,
+	varsbag_difference(Vars_In, VarsBag, Vars_Out).
+varsbag_difference([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
+	varsbag_difference(Vars_In, VarsBag, Vars_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
