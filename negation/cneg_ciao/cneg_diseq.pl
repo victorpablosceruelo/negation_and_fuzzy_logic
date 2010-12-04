@@ -487,7 +487,8 @@ cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], FreeVars, [Dis
 % variables implicadas
 
 cneg_diseq(T1,T2, FreeVars):- 
-	debug('cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
+	debug('cneg_diseq :: =/=(T1, T2)', =/=(T1,T2)), 
+	debug('cneg_diseq :: FreeVars', FreeVars), 
 	disequality_contents(Disequality, T1, T2, FreeVars),
         update_var_attributes([Disequality], []).
 
