@@ -289,14 +289,15 @@ update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities) :-
 	retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities), !,
 	debug(retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities)),
 
-	varsbag_addition(UV_In, UV_Diseqs, UV_Tmp), % Temporaly marked as universally quantified.
-	varsbag_difference(UV_Tmp, NO_UV_In, UV_Aux), % Really marked as universally quantified.
-	perform_substitutions(Substitutions, UV_Aux, UV_Out), !,
-	varsbag_local(Disequalities, UV_Out, [], NO_UV_Aux), % Not universally quantified.
+	varsbag_addition(UV_In, UV_Diseqs, UV_Aux_1), % Temporaly marked as universally quantified.
+	varsbag_difference(UV_Aux_1, NO_UV_In, UV_Aux_2), % Really marked as universally quantified.
+	perform_substitutions(Substitutions, UV_Aux_2, UV_Aux_3), !,
+	varsbag_local(Disequalities, UV_Aux_3, [], NO_UV_Aux), % Not universally quantified.
 
 	simplify_disequations(Disequalities, NO_UV_Aux, NO_UV_Out, [], Simplified_Disequalities),
 	debug('update_vars_attributes(Simplified_Disequalities, NO_UV_Out)', (Simplified_Disequalities, NO_UV_Out)),
-	restore_attributes(Simplified_Disequalities, NO_UV_Out).
+	varsbag_difference(UV_Aux_3, NO_UV_Out, UV_Out),
+	restore_attributes(NO_UV_Out, UV_Out, Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
@@ -355,48 +356,33 @@ diseq_eq(X, X).
 
 
 % Need old vars to play with them too.
-restore_attributes([], _No_FV) :- !.
-restore_attributes([Diseq | Diseq_List], No_FV) :-
-	disequality_contents(Diseq, T_1, T_2),
-	varsbag_local((T_1, T_2), No_FV, [], Affected_FreeVars),
-	varsbag_local((T_1, T_2), [], [], Affected_Vars),
-	!,
-	restore_attributes_aux(Affected_Vars, Affected_FreeVars, Diseq),
-	restore_attributes(Diseq_List, No_FV).
+restore_attributes(NO_UV_In, UV_In, Diseqs) :- 
+	cneg_aux:append(NO_UV_In, UV_In, Affected_Vars),
+	restore_attributes_vars(Affected_Vars, UV_In, Diseqs).
 
-restore_attributes_aux([], _Affected_FreeVars, _Diseq) :- !.
-restore_attributes_aux([Var|Vars], Affected_FreeVars, Diseq) :-
-	restore_attributes_var(Var, Affected_FreeVars, Diseq),
-	restore_attributes_aux(Vars, Affected_FreeVars, Diseq).
+restore_attributes_vars([Var | Affected_Vars], UV_In, Diseqs) :-
+	affected_diseqs(Var, Diseqs, Affected_Diseqs),
+	restore_attributes_var(Var, UV_In, Affected_Diseqs),
+	restore_attributes_vars(Affected_Vars, UV_In, Diseqs).
 
-restore_attributes_var(Var, Affected_FreeVars, Diseq) :-
+restore_attributes_var(Var, _UV_In, _Affected_Diseqs) :-
 	var(Var),
-	get_attribute_local(Var, Old_Attribute), !,
-	remove_attribute_local(Var),
-	generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute),
-	put_attribute_local(Var, New_Attribute).
+	get_attribute_local(Var, Attribute), !,
+	debug('ERROR: var has an attribute. Attribute: ', Attribute),
+	fail.
 
-restore_attributes_var(Var, Affected_FreeVars, Diseq) :-
+restore_attributes_var(Var, UV_In, Affected_Diseqs) :-
 	var(Var),
-	attribute_contents(Old_Attribute, Var, [], []),
-	generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute),
-	put_attribute_local(Var, New_Attribute).
+	attribute_contents(Attribute, Var, Affected_Diseqs, UV_In),
+	put_attribute_local(Var, Attribute).
 
-generate_new_attribute(Var, Affected_FreeVars, Diseq, Old_Attribute, New_Attribute) :-
-	attribute_contents(Old_Attribute, Var, Old_Diseq, Old_UnivVars),
-	(
-	    (
-		memberchk_local(Var, Affected_FreeVars), !, 
-		New_UnivVars = [Var],
-		New_Diseq = []
-	    )
-	;
-	    (
-		varsbag_local(Old_UnivVars, [], Affected_FreeVars, New_UnivVars),
-		New_Diseq = [Diseq | Old_Diseq]
-	    )
-	),
-	attribute_contents(New_Attribute, Var, New_Diseq, New_UnivVars).
+affected_diseqs(_Var, [], []) :- !.
+affected_diseqs(Var, [Diseq | Diseqs], [Diseq | Affected_Diseqs]) :-
+	varsbag_local(Diseq, [], [], Diseq_Vars),
+	memberchk_local(Var, Diseq_Vars),
+	affected_diseqs(Var, Diseqs, Affected_Diseqs).
+affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs) :-
+	affected_diseqs(Var, Diseqs, Affected_Diseqs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
