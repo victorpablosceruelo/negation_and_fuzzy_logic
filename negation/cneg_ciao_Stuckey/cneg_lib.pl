@@ -95,6 +95,7 @@ cneg_dynamic_aux(Goal, UnivVars, Solution) :-
 
 	varsbag_local(Goal, [], [], GoalVars),
 	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
+	debug('copy_term(GoalVars, GoalVars_Copy)', (GoalVars, GoalVars_Copy)), 
 	remove_universal_quantification(GoalVars_Copy, _Universally_Quantified),
 
 	frontier(Goal_Copy, Frontier, Goal_Not_Qualified), 

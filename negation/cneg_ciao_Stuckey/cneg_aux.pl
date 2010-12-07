@@ -404,6 +404,16 @@ frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+filter_out_nonvars([Var | Vars_In], [Var | Vars_Out]) :-
+	var(Var), !,
+	filter_out_nonvars(Vars_In, Vars_Out).
+filter_out_nonvars([_Var | Vars_In], Vars_Out) :-
+	filter_out_nonvars(Vars_In, Vars_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 varsbag_remove_var(_Var_In, [], []) :- !.
 varsbag_remove_var(Var_In, [Var | VarsBag_In], VarsBag_Out) :-
 	var(Var_In), var(Var),

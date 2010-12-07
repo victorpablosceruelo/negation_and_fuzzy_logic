@@ -115,9 +115,9 @@ keep_universal_quantification_vars([]) :- !.
 keep_universal_quantification_vars([Var | Vars]) :-
 	var(Var), !,
 	keep_universal_quantification_var(Var),
-	keep_universal_quantification_vars([Vars]).
+	keep_universal_quantification_vars(Vars).
 keep_universal_quantification_vars([_Var | Vars]) :-
-	keep_universal_quantification_vars([Vars]).
+	keep_universal_quantification_vars(Vars).
 
 keep_universal_quantification_var(Var) :-
 	var(Var), 
@@ -284,7 +284,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities) :-
 	debug('update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities)', (UV_In, NO_UV_In, Substitutions, New_Disequalities)), 
 
-	append(UV_In, NO_UV_In, Vars_In_Aux),
+	varsbag_addition(UV_In, NO_UV_In, Vars_In_Aux),
 	varsbag_local(New_Disequalities, [], Vars_In_Aux, Vars_In), !,
 	retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities), !,
 	debug(retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities)),
@@ -303,17 +303,19 @@ retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Ou
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
 	var(Var), % It cannot be other things ...
 	get_attribute_local(Var, Attribute), !,
-	attribute_contents(Attribute, Var, ThisVar_Disequalities, UnivVars), 
+	attribute_contents(Attribute, Var, ThisVar_Disequalities, Attribute_UnivVars), 
 	remove_attribute_local(Var), 
 
 	% Store info.
-	varsbag_local(UnivVars, [], UV_In, UV_Aux),
-	varsbag_local(ThisVar_Disequalities, [Var|Vars_Examined], Vars, New_Vars), !,
+	retrieve_universally_quantified_vars(Attribute_UnivVars, UnivVars),
+	varsbag_addition(UnivVars, UV_In, UV_Aux),
+	varsbag_local((ThisVar_Disequalities, Attribute_UnivVars), [Var|Vars_Examined], Vars, New_Vars), !,
 	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
         retrieve_affected_disequalities(New_Vars, [Var|Vars_Examined], UV_Aux, UV_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
 retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- 
         retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out).
+
 
 perform_substitutions([], UV_In, UV_In) :- !.
 perform_substitutions([Subst | MoreSubst], UV_In, UV_Out) :-
@@ -328,12 +330,12 @@ perform_substitutions([Subst | MoreSubst], UV_In, UV_Out) :-
 			(
 			    memberchk_local(OldTarget, UV_In),
 			    memberchk_local(NewTarget, UV_In), % Both are universally quantified.
-			    ! % Keep universal quantification.
+			    diseq_eq(UV_Aux, UV_In), ! % Keep universal quantification.
 			)
 		    ;
 			(
 			    varsbag_remove_var(OldTarget, UV_In, UV_Tmp),
-			    varsbag_remove_var(OldTarget, UV_Tmp, UV_Aux)
+			    varsbag_remove_var(NewTarget, UV_Tmp, UV_Aux)
 			)
 		    )
 		),
@@ -357,9 +359,11 @@ diseq_eq(X, X).
 
 % Need old vars to play with them too.
 restore_attributes(NO_UV_In, UV_In, Diseqs) :- 
-	cneg_aux:append(NO_UV_In, UV_In, Affected_Vars),
+	varsbag_addition(NO_UV_In, UV_In, Affected_Vars),
+	debug('restore_attributes_vars(Affected_Vars, UV_In, Diseqs)', (Affected_Vars, UV_In, Diseqs)),
 	restore_attributes_vars(Affected_Vars, UV_In, Diseqs).
 
+restore_attributes_vars([], _UV_In, _Diseqs) :- !.
 restore_attributes_vars([Var | Affected_Vars], UV_In, Diseqs) :-
 	affected_diseqs(Var, Diseqs, Affected_Diseqs),
 	restore_attributes_var(Var, UV_In, Affected_Diseqs),
@@ -368,7 +372,9 @@ restore_attributes_vars([Var | Affected_Vars], UV_In, Diseqs) :-
 restore_attributes_var(Var, _UV_In, _Affected_Diseqs) :-
 	var(Var),
 	get_attribute_local(Var, Attribute), !,
+	debug_nl,
 	debug('ERROR: var has an attribute. Attribute: ', Attribute),
+	debug_nl,
 	fail.
 
 restore_attributes_var(Var, UV_In, Affected_Diseqs) :-
