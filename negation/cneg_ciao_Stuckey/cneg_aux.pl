@@ -6,7 +6,7 @@
 	    msg/2, msg_aux/2, msg_nl/0,
 	    first/2, second/2, unify_terms/2, functor_local/4,
 	    memberchk_local/2, term_to_meta/2,
-	    setof_local/3, 
+	    setof_local/3, filter_out_nonvars/2,
 	    varsbag_local/4, varsbag_difference/3, 
 	    varsbag_addition/3, varsbag_remove_var/3,
 	    goal_clean_up/2,
@@ -404,6 +404,7 @@ frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+filter_out_nonvars([], []) :- !.
 filter_out_nonvars([Var | Vars_In], [Var | Vars_Out]) :-
 	var(Var), !,
 	filter_out_nonvars(Vars_In, Vars_Out).
@@ -414,28 +415,46 @@ filter_out_nonvars([_Var | Vars_In], Vars_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-varsbag_remove_var(_Var_In, [], []) :- !.
-varsbag_remove_var(Var_In, [Var | VarsBag_In], VarsBag_Out) :-
+varsbag_remove_var(Var, VarsBag_In, VarsBag_Out) :-
+	var(Var), !,
+	filter_out_nonvars(VarsBag_In, VarsBag_Aux),
+	varsbag_remove_var_aux(Var, VarsBag_Aux, VarsBag_Out).
+varsbag_remove_var(_Var, VarsBag_In, VarsBag_Out) :-
+	filter_out_nonvars(VarsBag_In, VarsBag_Out).
+
+varsbag_remove_var_aux(_Var_In, [], []) :- !.
+varsbag_remove_var_aux(Var_In, [Var | VarsBag_In], VarsBag_Out) :-
 	var(Var_In), var(Var),
 	Var_In == Var, !,
-	varsbag_remove_var(Var_In, VarsBag_In, VarsBag_Out).
-varsbag_remove_var(Var_In, [Var | VarsBag_In], [Var | VarsBag_Out]) :-
-	varsbag_remove_var(Var_In, VarsBag_In, VarsBag_Out).
+	varsbag_remove_var_aux(Var_In, VarsBag_In, VarsBag_Out).
+varsbag_remove_var_aux(Var_In, [Var | VarsBag_In], [Var | VarsBag_Out]) :-
+	var(Var_In), var(Var), !,
+	varsbag_remove_var_aux(Var_In, VarsBag_In, VarsBag_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-varsbag_addition(VarsBag_1, VarsBag_2, VarsBag_Out) :-
-	cneg_aux:append(VarsBag_1, VarsBag_2, VarsBag_In),
+varsbag_addition(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
+	filter_out_nonvars(VarsBag_1_In, VarsBag_1_Aux),
+	filter_out_nonvars(VarsBag_2_In, VarsBag_2_Aux),
+	cneg_aux:append(VarsBag_1_Aux, VarsBag_2_Aux, VarsBag_In),
 	varsbag_local(VarsBag_In, [], [], VarsBag_Out).
 
-varsbag_difference([], _VarsBag, []) :- !.
-varsbag_difference([Var | Vars_In], VarsBag, Vars_Out) :-
+varsbag_difference(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
+%	debug('varsbag_difference(VarsBag_1_In, VarsBag_2_In)', (VarsBag_1_In, VarsBag_2_In)),
+	filter_out_nonvars(VarsBag_1_In, VarsBag_1_Aux),
+	filter_out_nonvars(VarsBag_2_In, VarsBag_2_Aux),
+%	debug('varsbag_difference(VarsBag_1_Aux, VarsBag_2_Aux)', (VarsBag_1_Aux, VarsBag_2_Aux)),
+	varsbag_difference_aux(VarsBag_1_Aux, VarsBag_2_Aux, VarsBag_Out).
+%	debug('varsbag_difference :: VarsBag_Out', VarsBag_Out).
+
+varsbag_difference_aux([], _VarsBag, []) :- !.
+varsbag_difference_aux([Var | Vars_In], VarsBag, Vars_Out) :-
 	memberchk_local(Var, VarsBag), !,
-	varsbag_difference(Vars_In, VarsBag, Vars_Out).
-varsbag_difference([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
-	varsbag_difference(Vars_In, VarsBag, Vars_Out).
+	varsbag_difference_aux(Vars_In, VarsBag, Vars_Out).
+varsbag_difference_aux([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
+	varsbag_difference_aux(Vars_In, VarsBag, Vars_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

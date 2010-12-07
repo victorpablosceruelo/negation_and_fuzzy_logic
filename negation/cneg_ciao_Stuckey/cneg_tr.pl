@@ -292,6 +292,7 @@ cneg_static_negation(PP_Info, Head, ListBody) :-
 	varsbag_local(Args, [], [], GoalVars),
 %	debug('cneg_static_negation IN', negate_subfrontier((Head, ListBody), Goal, GoalVars)),
 	negate_subfrontier((Head, ListBody), Goal, GoalVars, Sol),
+%	debug('cneg_static_negation OUT', Sol),
 	functor_local(Cneg_Cl, ':-', 2, _Arguments_Cneg_Cl),
 	arg(1, Cneg_Cl, cneg_static_cl(Goal, SourceFileName, Index)),
 	arg(2, Cneg_Cl, Sol),

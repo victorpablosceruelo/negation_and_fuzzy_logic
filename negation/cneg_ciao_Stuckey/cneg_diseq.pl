@@ -307,7 +307,7 @@ retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_
 	remove_attribute_local(Var), 
 
 	% Store info.
-	retrieve_universally_quantified_vars(Attribute_UnivVars, UnivVars),
+	filter_out_nonvars(Attribute_UnivVars, UnivVars),
 	varsbag_addition(UnivVars, UV_In, UV_Aux),
 	varsbag_local((ThisVar_Disequalities, Attribute_UnivVars), [Var|Vars_Examined], Vars, New_Vars), !,
 	accumulate_disequations(ThisVar_Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),

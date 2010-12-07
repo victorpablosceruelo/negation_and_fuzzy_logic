@@ -294,7 +294,9 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	negate_Ci(Ci_In, GoalVars, Ci_Negated),
 	varsbag_local(Ci_In, [], [], Ci_Vars),
 	varsbag_local(Bi_In, GoalVars, [], Bi_FreeVars),
+%	debug('negate_subfrontier_aux :: Bi_FreeVars', Bi_FreeVars),
 	varsbag_difference(Bi_FreeVars, Ci_Vars, UnivVars),
+%	debug('negate_subfrontier_aux :: UnivVars', UnivVars),
 
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
@@ -304,6 +306,22 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 			      Ci_Conj, 
 			      keep_universal_quantification(Any_UQ),
 			      cneg_aux(Bi_Conj, UnivVars)))).
+
+negate_Ci([], _GoalVars, fail) :- !.
+negate_Ci([Ci], GoalVars, Answer):-
+	negate_Ci_aux(Ci, GoalVars, Answer).
+negate_Ci([Ci|More_Ci], GoalVars, (Answer ; More_Answer)):-
+	negate_Ci_aux(Ci, GoalVars, Answer),
+	negate_Ci(More_Ci, GoalVars, More_Answer).
+
+negate_Ci_aux(Ci, GoalVars, Answer) :-
+	goal_is_equality(Ci, T1, T2),
+ 	varsbag_local(cneg_eq(T1,T2), GoalVars, [], FreeVars),
+	cneg_eq(Answer, cneg_diseq(T1,T2, FreeVars)).
+
+negate_Ci_aux(Ci, _GoalVars, Answer) :-
+	goal_is_disequality(Ci, T1, T2, _FreeVars),
+	cneg_eq(Answer, cneg_eq(T1,T2)).
 
 list_to_conj([], []) :- fail.
 list_to_conj([Ci_In], Ci_In) :- !.
@@ -348,22 +366,6 @@ split_subgoal_into_ci_Bi(SubGoal, Ci, B, Ci, [SubGoal | B]) :- !.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-negate_Ci([], _GoalVars, fail) :- !.
-
-negate_Ci([Ci|More_Ci], GoalVars, (Answer ; More_Answer)):-
-	goal_is_equality(Ci, T1, T2),
- 	varsbag_local(cneg_eq(T1,T2), GoalVars, [], FreeVars),
-	cneg_eq(Answer, cneg_diseq(T1,T2, FreeVars)),
-	negate_Ci(More_Ci, GoalVars, More_Answer).
-
-negate_Ci([Ci|More_Ci], GoalVars, (Answer ; More_Answer)):-
-	goal_is_disequality(Ci, T1, T2, _FreeVars),
-	cneg_eq(Answer, cneg_eq(T1,T2)),
-	negate_Ci(More_Ci, GoalVars, More_Answer).
-
-
 
 % call_combined_solutions(LSolutions) combines all its elements that are the solutions
 % of the negation of the conjunctions of the Frontier to obtain a 
