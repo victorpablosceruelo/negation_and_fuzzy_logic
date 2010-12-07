@@ -1,6 +1,6 @@
 :- module(cneg_diseq, 
 	[
-	    cneg_diseq/3,
+	    cneg_diseq/3, cneg_eq/2,
 	    portray_attributes_in_term/1, 
 	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
@@ -90,22 +90,22 @@ put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
 	debug('remove_universal_quantification :: Vars', Vars),
-	remove_universal_quantification_aux(Vars, UnivQuantified),
-	debug('remove_universal_quantification :: UnivQuantified', UnivQuantified).
+	vars_subset_universally_quantified(Vars, UnivQuantified),
+	debug('remove_universal_quantification :: UnivQuantified', UnivQuantified),
+	update_vars_attributes([], UnivQuantified, [], []).
 
-remove_universal_quantification_aux([], []) :- !.
-remove_universal_quantification_aux([Var|Vars], [Var | MoreUnivQuantified]) :-
-	remove_universal_quantification_var(Var), !,
-	remove_universal_quantification_aux(Vars, MoreUnivQuantified).
-remove_universal_quantification_aux([_Var|Vars], MoreUnivQuantified) :-
-	remove_universal_quantification_aux(Vars, MoreUnivQuantified).
+vars_subset_universally_quantified([], []) :- !.
+vars_subset_universally_quantified([Var|Vars], [Var | MoreUnivQuantified]) :-
+	var_is_universally_quantified(Var), !,
+	vars_subset_universally_quantified(Vars, MoreUnivQuantified).
+vars_subset_universally_quantified([_Var|Vars], MoreUnivQuantified) :-
+	vars_subset_universally_quantified(Vars, MoreUnivQuantified).
 
-remove_universal_quantification_var(Var) :-
+var_is_universally_quantified(Var) :-
 	var(Var), 
 	get_attribute_local(Var, Old_Attribute), 
 	attribute_contents(Old_Attribute, Var, _Disequalities, UnivVars),
-	memberchk_local(Var, UnivVars), !,
-	update_vars_attributes([], [Var], [], []).
+	memberchk_local(Var, UnivVars), !.
 
 keep_universal_quantification(Vars) :-
 	debug('keep_universal_quantification(Vars)', Vars),
@@ -624,3 +624,10 @@ cneg_diseq(T1,T2, UnivVars):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+cneg_eq(X, Y) :- debug('cneg_diseq :: cneg_eq', cneg_eq(X, Y)), fail.
+cneg_eq(X, X).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

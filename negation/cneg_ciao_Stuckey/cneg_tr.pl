@@ -8,7 +8,7 @@
 :- module(cneg_tr,[trans_sent/3],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
-:- use_module(cneg_diseq,[cneg_diseq/3]).
+:- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
 :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).
 

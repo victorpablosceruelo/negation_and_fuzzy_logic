@@ -2,7 +2,7 @@
 % From Susana modified by VPC (started 29/06/2010)
 %
 
-:- module(cneg_lib, [cneg_lib_aux/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
+:- module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
@@ -41,8 +41,12 @@
 cneg_lib_aux(Goal, UnivVars, Result):-
 %	UnivVars \== [],
 	debug_nl,
-	debug('cneg_lib :: using cneg_dynamic for', Goal), 
-	cneg_dynamic(Goal, UnivVars, Result).
+	debug('cneg_lib :: cneg_dynamic :: Goal', Goal), 
+	cneg_dynamic(Goal, UnivVars, Result),
+	debug('cneg_lib :: cneg_dynamic :: Goal', Goal),
+	debug('cneg_lib :: cneg_dynamic :: Result', Result),
+	!. % No backtracking allowed
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,25 +88,20 @@ cneg_static(Goal, cneg_static_predicate_call(Goal, SourceFileName, Occurences)) 
 % of the goal and UnivVars the universal quantified variable of it.
 
 cneg_dynamic(Goal, UnivVars, Solution) :-
-%	debug('cneg_dynamic :: Goal', Goal),
-	cneg_dynamic_aux(Goal, UnivVars, Solution),
-	debug('cneg_dynamic :: Goal', Goal),
-	debug('cneg_dynamic :: Solution', Solution),
-	!. % No backtracking allowed
-
-cneg_dynamic_aux(Goal, UnivVars, Solution) :-
+	varsbag_local(Goal, [], [], GoalVars),
+	debug('cneg_dynamic :: varsbag_local', (Goal, GoalVars)),
 	put_universal_quantification(UnivVars),
 
-	varsbag_local(Goal, [], [], GoalVars),
+	debug('cneg_dynamic :: copy_term :: Original (Goal, GoalVars)', (Goal, GoalVars)),
 	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
-	debug('copy_term(GoalVars, GoalVars_Copy)', (GoalVars, GoalVars_Copy)), 
+	debug('cneg_dynamic :: copy_term :: Copy     (Goal, GoalVars)', (Goal_Copy, GoalVars_Copy)), 
 	remove_universal_quantification(GoalVars_Copy, _Universally_Quantified),
 
 	frontier(Goal_Copy, Frontier, Goal_Not_Qualified), 
 	!, % No backtracking allowed
 	negate_frontier(Frontier, Goal_Not_Qualified, Solution),
 	!, % No backtracking allowed
-	cneg_eq(GoalVars, GoalVars_Copy),
+	cneg_aux_equality(GoalVars, GoalVars_Copy),
 	!. % No backtracking allowed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,12 +147,12 @@ frontier_aux(Goal, Frontier, (NewG1, NewG2)):-
 % Now go for the functors for equality and disequality.
 frontier_aux(Goal, [Frontier], NewGoal):- 
 	goal_is_disequality(Goal, X, Y, FreeVars), !,
-	cneg_eq(NewGoal, (cneg_diseq(X, Y, FreeVars))),
+	cneg_aux_equality(NewGoal, (cneg_diseq(X, Y, FreeVars))),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
 frontier_aux(Goal, [Frontier], NewGoal):- 
 	goal_is_equality(Goal, X, Y), !,
-	cneg_eq(NewGoal, (cneg_eq(X, Y))),
+	cneg_aux_equality(NewGoal, (cneg_eq(X, Y))),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
 
@@ -194,7 +193,7 @@ test_subfrontier_is_valid(SubFrontier, Goal):-
 	frontier_contents(SubFrontier, Head, _Body, FrontierTest),
         copy_term((Head, FrontierTest), (Head_Tmp, FrontierTest_Tmp)), 
         copy_term(Goal, Goal_Tmp),
-        cneg_eq(Head_Tmp, Goal_Tmp), 
+        cneg_aux_equality(Head_Tmp, Goal_Tmp), 
 	call_combined_solutions(FrontierTest_Tmp), 
 	!.
 
@@ -300,7 +299,7 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
-	cneg_eq(Answer, (Ci_Negated 
+	cneg_aux_equality(Answer, (Ci_Negated 
 			; (
 			      remove_universal_quantification(Ci_Vars, Any_UQ), 
 			      Ci_Conj, 
@@ -317,11 +316,11 @@ negate_Ci([Ci|More_Ci], GoalVars, (Answer ; More_Answer)):-
 negate_Ci_aux(Ci, GoalVars, Answer) :-
 	goal_is_equality(Ci, T1, T2),
  	varsbag_local(cneg_eq(T1,T2), GoalVars, [], FreeVars),
-	cneg_eq(Answer, cneg_diseq(T1,T2, FreeVars)).
+	cneg_aux_equality(Answer, cneg_diseq(T1,T2, FreeVars)).
 
 negate_Ci_aux(Ci, _GoalVars, Answer) :-
 	goal_is_disequality(Ci, T1, T2, _FreeVars),
-	cneg_eq(Answer, cneg_eq(T1,T2)).
+	cneg_aux_equality(Answer, cneg_eq(T1,T2)).
 
 list_to_conj([], []) :- fail.
 list_to_conj([Ci_In], Ci_In) :- !.
@@ -355,11 +354,11 @@ split_body_into_ci_Bi([SubGoal|SubGoal_L], Ci_In, B_In, Ci_Out, B_Out) :- !,
 % split_subgoal_into_ci_Bi(SubGoal, Ci, B) :-
 split_subgoal_into_ci_Bi(Subgoal, Ci, B, [NewSubgoal | Ci], B) :- 
 	goal_is_equality(Subgoal, Term1, Term2), !,
-	cneg_eq(NewSubgoal, cneg_eq(Term1, Term2)).
+	cneg_aux_equality(NewSubgoal, cneg_eq(Term1, Term2)).
 
 split_subgoal_into_ci_Bi(Subgoal, Ci, B, [NewSubgoal | Ci], B) :- 
 	goal_is_disequality(Subgoal, Term1, Term2, FreeVars), !,
-	cneg_eq(NewSubgoal, cneg_diseq(Term1, Term2, FreeVars)).
+	cneg_aux_equality(NewSubgoal, cneg_diseq(Term1, Term2, FreeVars)).
 
 split_subgoal_into_ci_Bi(SubGoal, Ci, B, Ci, [SubGoal | B]) :- !.
 
@@ -401,7 +400,7 @@ perform_a_call_to(Goal) :-
 
 perform_a_call_to(Goal) :-
 	goal_is_equality(Goal, X, Y), !,
-	cneg_eq(X, Y).
+	cneg_aux_equality(X, Y).
 
 % Qualify the predicate as needed.
 perform_a_call_to(Goal) :-
@@ -415,13 +414,6 @@ perform_a_call_to(Goal) :-
 	functor_local(NewGoal, NewGoal_Name, Arity, Arguments),
 	term_to_meta(NewGoal, NewGoal_Meta),
 	call(NewGoal_Meta).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%cneg_eq(X, Y) :- debug('cneg_lib', cneg_eq(X, Y)), fail.
-cneg_eq(X, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
