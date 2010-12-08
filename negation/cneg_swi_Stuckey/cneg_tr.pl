@@ -5,36 +5,32 @@
 % technique for the constructive negation of the goals.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- module(cneg_tr,[trans_sent/3],[assertions]).
+:- module(cneg_tr,[trans_sent/3, trans_goal/3]).
 
-:- use_module(library(engine(data_facts)),[retract_fact/1]).
+%:- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
-:- use_module(cneg_lib, _).
-:- use_module(cneg_aux, _).
-
-:- comment(title, "Contructive Negation Transformation").
-
-:- comment(author, "V@'{i}ctor Pablos Ceruelo").
-
-:- comment(summary, "This module does de transformation needed to evaluate 
-	the constructive negation of any predicate in the original file.").
-
+:- use_module(cneg_lib).
+:- use_module(cneg_aux).
 
 % dynamic predicate(s) 
-:- data cneg_processed_predicates/1.
-:- data cneg_dynamic_cls/1.
-:- data cneg_static_cls/1.
+:- dynamic cneg_processed_predicates/1.
+:- dynamic cneg_dynamic_cls/1.
+:- dynamic cneg_static_cls/1.
 
 trans_clause(Whatever, Whatever, _) :-
 	debug('trans_cl', trans_cl(Whatever)).
+
+trans_goal(Whatever, Whatever, _).
 
 % trans_sent(Sentence,SentList,Module) sustitutes Sentence in 
 % the program Module that is being compilated by the list of 
 % sentences SentList. The result clauses are continous
 trans_sent(Input, Output, SourceFileName) :-
-	% debug('trans_sent', trans_sent(Input)), 
-	% debug('trans_sent', source_file_name(Info)), 
-	trans_sent_aux(Input, Output, SourceFileName), !.
+	debug('trans_sent :: Input', (Input)), 
+	debug('trans_sent :: SourceFileName', (SourceFileName)), 
+	trans_sent_aux(Input, Output, SourceFileName),
+	debug('trans_sent :: Output', (Output)), 
+	!.
 
 trans_sent(Input, _Output, _SourceFileName) :-
 	msg('ERROR :: Impossible to translate', (Input)), !.
@@ -54,9 +50,9 @@ trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
 trans_sent_aux(Clause, Result, SourceFileName) :-
-	functor_local(Clause, Name, 2, _Arguments),
+	functor_local(Clause, ':-', 2, _Arguments),
 %	debug('trans_sent_aux', functor_local(Clause, Name, 2, _Arguments)),
-	Name==':-', !,
+	!,
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
 %	debug('trans_sent_aux', trans_clause_with_body(Head, Body, Result, SourceFileName)),
@@ -65,15 +61,19 @@ trans_sent_aux(Clause, Result, SourceFileName) :-
 trans_sent_aux(Clause, Result, SourceFileName) :-
 	functor_local(Clause, Name, Arity, _Arguments),
 	(
-	    Name\==':-' 
-	; 
-	    Arity\==2
+	 (
+	  Name\==':-'
+	 )
+	;
+	 (
+	  Arity\==2
+	 )
 	), !,
 	trans_clause_without_body(Clause, Result, SourceFileName).
 
 trans_sent_aux(Clause, [], _SourceFileName) :-
-	functor_local(Clause, Name, Arity, _Arguments),
-	debug('trans_sent_aux', functor_local(Clause, Name, Arity, _Arguments)),
+	functor_local(Clause, Name, Arity, Arguments),
+	debug('trans_sent_aux', functor_local(Clause, Name, Arity, Arguments)),
 	!.
 
 trans_clause_with_body(Head, Body, [Result], SourceFileName) :-
@@ -116,14 +116,14 @@ assert_information_clause_aux(ListBody, Head, PP_Info, New_PP_Info) :-
 
 save_clause_info(PP_Info, Head, ListBody, FrontierBody) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, _Index, PP_Info),
-	assertz_fact(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))).
+	assertz(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))).
 
 generate_frontier_body([], []) :- !.
 generate_frontier_body([Predicate | ListBody], [Predicate | FrontierBody]) :-
 	(
-	    goal_is_equality(Predicate, _T1, _T2), ! 
+	    goal_is_equality(Predicate, _T1_1, _T2_1), ! 
 	;
-	    goal_is_disequality(Predicate, _T1, _T2, _FreeVars), !
+	    goal_is_disequality(Predicate, _T1_2, _T2_2, _FreeVars), !
 	),
 	generate_frontier_body(ListBody, FrontierBody).
 
@@ -131,10 +131,10 @@ generate_frontier_body([_Predicate | ListBody], FrontierBody) :-
 	generate_frontier_body(ListBody, FrontierBody).
 
 save_list_of_processed_predicates(List) :-
-	assertz_fact(cneg_processed_predicates(List)).
+	assertz(cneg_processed_predicates(List)).
 
 retrieve_list_of_processed_predicates(List) :-
-	retract_fact(cneg_processed_predicates(List)), !.
+	retract(cneg_processed_predicates(List)), !.
 retrieve_list_of_processed_predicates([]).
 
 retrieve_processed_pred_info(PP_Info, [], []) :- !,
@@ -172,8 +172,8 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 	retrieve_list_of_processed_predicates(List_Of_Predicates),
 	cneg_impl(Cneg_Impl),
 	append(List_Of_Predicates, Cneg_Impl, ClsTmp_1),
-	findall(Cl,(retract_fact(cneg_dynamic_cls(Cl))), ClsTmp_2, ClsTmp_1),
-	findall(Cl,(retract_fact(cneg_static_cls(Cl))), ClsOut, ClsTmp_2),
+	findall(Cl,(retract(cneg_dynamic_cls(Cl))), ClsTmp_2, ClsTmp_1),
+	findall(Cl,(retract(cneg_static_cls(Cl))), ClsOut, ClsTmp_2),
 	!. %Backtracking forbiden.
 %	nl, nl,
 %	debug_list('ClsOut', ClsOut),
@@ -296,7 +296,7 @@ cneg_static_negation(PP_Info, Head, ListBody) :-
 	functor_local(Cneg_Cl, ':-', 2, _Arguments_Cneg_Cl),
 	arg(1, Cneg_Cl, cneg_static_cl(Goal, SourceFileName, Index)),
 	arg(2, Cneg_Cl, Sol),
-	assertz_fact(cneg_static_cls(Cneg_Cl)).
+	assertz(cneg_static_cls(Cneg_Cl)).
 
 cneg_static_negation(PP_Info, Head, ListBody) :- !,
 	msg('ERROR', cneg_static_negation(PP_Info, Head, ListBody)).

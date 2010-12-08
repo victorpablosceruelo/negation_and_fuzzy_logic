@@ -10,12 +10,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%:- module(cneg,_).
+:- module(cneg,
+	  [
+	   trans_sent/3
+	   ]).
 % To be able to call Pred from cneg
 
 % Needed to be able to compile the modules.
-:- use_module(cneg_lib, _).
-:- use_module(cneg_aux, _).  
+:- use_module(cneg_lib).
+:- use_module(cneg_aux).  
 % NO:  :- include(cneg_lib).  
 :- use_module(cneg_diseq, 
 	[
@@ -24,8 +27,9 @@
 	    remove_universal_quantification/2,
 	    keep_universal_quantification/1
 	]).
-:- use_module(library(write), [write/1]).
-:- use_module(library(system), [getenvstr/2]).
+:- use_module(cneg_tr).
+%:- use_module(library(write), [write/1]).
+%:- use_module(library(system), [getenvstr/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq,
@@ -45,10 +49,26 @@
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
-:- load_compilation_module(.('cneg_tr')).
+%:- load_compilation_module(.('cneg_tr')).
 
 % trans_sent/3 makes the transformation.
-:- add_sentence_trans(trans_sent/3).
-% :- add_clause_trans(trans_clause/3). % Only for debug !!!
+% See discussion on the SWI Prolog mailing list for December 9-10 2003.
+
+%:- multifile
+%        user:goal_expansion/2.
+%:- dynamic
+%        user:goal_expansion/2.
+%
+%user:goal_expansion( A, B ) :- 
+%  trans_goal( A, B, 'unknown').
+
+
+:- multifile
+        user:term_expansion/2.
+:- dynamic
+        user:term_expansion/2.
+
+user:term_expansion( A, B ) :-
+  trans_sent( A, B, 'unknown').
 
 

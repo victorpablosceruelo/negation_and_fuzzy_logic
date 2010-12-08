@@ -2,9 +2,9 @@
 % From Susana modified by VPC (started 29/06/2010)
 %
 
-:- module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4], [assertions]).
+:- module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4]).
 % NOT NEEDED:  perform_a_call_to/1
-:- meta_predicate cneg(goal).
+:- meta_predicate cneg(0).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
 % To access predicates from anywhere.
@@ -12,22 +12,15 @@
 :- multifile cneg_dynamic_cl/6.
 :- multifile cneg_static_cl/3.
 
-:- use_module(cneg_aux, _).
-:- use_module(cneg_diseq,[
-	cneg_diseq/3, 
-	remove_universal_quantification/2, 
-	put_universal_quantification/1
-			 ]).
+:- use_module(cneg_aux).
+:- use_module(cneg_diseq,
+	      [
+	       cneg_diseq/3, 
+	       remove_universal_quantification/2, 
+	       put_universal_quantification/1
+	      ]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
-
-:- comment(title, "Contructive Negation Library").
-
-:- comment(author, "V@'{i}ctor Pablos Ceruelo").
-
-:- comment(summary, "This module calls the predicates generated during the 
-	program transformation.").
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

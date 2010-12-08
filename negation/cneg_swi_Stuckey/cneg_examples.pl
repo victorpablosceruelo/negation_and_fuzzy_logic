@@ -1,20 +1,15 @@
-:- module(cneg_examples,_,[.(cneg), .(debugger_pkg)]).
-% :- module(cneg_examples,_,[.(cneg)]).
+:- module(cneg_examples).
+:- use_module(cneg).
 
-%:- use_module(cneg_lib, [cneg/1]).  
-%:- use_module(dist,[dist/2]).  
-% :- set_prolog_flag(multi_arity_warnings, off).
-% stored_pred_aux(X, Y) :- stored_pred(X, Y).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%               EXAMPLES  FOR PACKAGE CNEG                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%               EXAMPLES  FOR CONSTRUCTIVE NEGATION                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NUMBERS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%
+% NUMBERS %
+%%%%%%%%
 
 boole(0).
 boole(1).

@@ -20,18 +20,10 @@
 	    % add_to_list_if_not_there/3, 
 	    terms_are_equal/2,
 	    cneg_aux_equality/2
-	],
-	[assertions]).
+	]).
 
-:- use_module(library(aggregates),[setof/3]).
-:- use_module(library(write), _).
-
-:- comment(title, "Auxiliary predicates for Constructive Negation").
-
-:- comment(author, "V@'{i}ctor Pablos Ceruelo").
-
-:- comment(summary, "This module offers some predicates needed both by Constructive Negation
-	Transformation Program, by Constructive Negation Library and by Disequalities Management.").
+%:- use_module(library(aggregates),[setof/3]).
+%:- use_module(library(write), _).
 
 % To access predicates from anywhere.
 :- multifile cneg_processed_pred/4.
@@ -88,26 +80,26 @@ msg_nl :- nl.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- meta_predicate findall(?,goal,?,?).
+:- meta_predicate findall(?,+,?,?).
 findall(Template, Generator, List, Tail) :-
         save_solutions(-Template, Generator),
         list_solutions(List, Tail).
 
-:- data solution/1.
-:- meta_predicate save_solutions(?,goal).
+:- dynamic solution/1.
+:- meta_predicate save_solutions(?,+).
 save_solutions(Template, Generator) :-
-        asserta_fact(solution('-')),
+        asserta(solution('-')),
         call(Generator),
-        asserta_fact(solution(Template)),
+        asserta(solution(Template)),
         fail.
 save_solutions(_,_).
 
 list_solutions(List, Tail) :-
-        retract_fact(solution(Term)), !,
+        retract(solution(Term)), !,
         list_solutions_aux(Term,Tail,List).
 list_solutions_aux('-',L,L) :- !.
 list_solutions_aux(-Term,Sofar,List) :-
-        retract_fact(solution(NewTerm)), !,
+        retract(solution(NewTerm)), !,
         list_solutions_aux(NewTerm, [Term|Sofar],List).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -8,5 +8,5 @@ cleanall:
 clean-examples:
 	rm -fv *_intneg.P 
 mrproper:
-	killall ciaoengine; killall xsb; make clean
+	killall ciaoengine; killall xsb; killall swipl; make clean
 
