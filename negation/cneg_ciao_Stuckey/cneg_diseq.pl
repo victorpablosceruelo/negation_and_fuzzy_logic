@@ -75,8 +75,9 @@ put_attribute_local(Var, Attribute) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 put_universal_quantification(Vars) :-
-	debug('put_universal_quantification(Vars)', Vars),
-	put_universal_quantification_vars(Vars).
+	debug('put_universal_quantification :: IN     :: Vars', Vars),
+	put_universal_quantification_vars(Vars),
+	debug('put_universal_quantification :: OUT :: Vars', Vars).
 
 put_universal_quantification_vars([]) :- !.
 put_universal_quantification_vars([Var|Vars]) :-
@@ -89,10 +90,11 @@ put_universal_quantification_var(Var) :-
 put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
-	debug('remove_universal_quantification :: Vars', Vars),
+	debug('remove_universal_quantification :: IN     :: Vars', Vars),
 	vars_subset_universally_quantified(Vars, UnivQuantified),
-	debug('remove_universal_quantification :: UnivQuantified', UnivQuantified),
-	update_vars_attributes([], UnivQuantified, [], []).
+	debug('remove_universal_quantification :: IN     :: UnivQuantified', UnivQuantified),
+	update_vars_attributes([], UnivQuantified, [], []),
+	debug('remove_universal_quantification :: OUT :: UnivQuantified', UnivQuantified).
 
 vars_subset_universally_quantified([], []) :- !.
 vars_subset_universally_quantified([Var|Vars], [Var | MoreUnivQuantified]) :-

@@ -172,10 +172,11 @@ frontier_aux(Goal, [], Goal) :-
 	debug_nl, debug_nl, !, fail.
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
-simplify_frontier(Front_In, G, Front_Out) :-
-	debug_nl,
-	debug_list('simplify_frontier :: Front_In (list)', Front_In),
-	simplify_frontier_aux(Front_In, G, Front_Out).
+simplify_frontier(Front_In, Goal, Front_Out) :-
+%	debug_nl,
+%	debug_list('simplify_frontier :: Front_In (list)', Front_In),
+	debug('simplify_frontier :: Goal', Goal),
+	simplify_frontier_aux(Front_In, Goal, Front_Out).
 %	debug_list('simplify_frontier :: Front_Out (list)', Front_Out).
 
 simplify_frontier_aux([], _G, []) :- !.
@@ -232,7 +233,8 @@ combine_2_simple_frontiers(F1_1, F2_1, F3_1) :-
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
 negate_frontier(Frontier, Goal, Solutions) :-
-	debug_list('negate_frontier :: Frontier (list)', Frontier), 
+	debug_nl,
+%	debug_list('negate_frontier :: Frontier (list)', Frontier), 
 	debug('negate_frontier :: Goal', Goal), 
 	!,
 	varsbag_local(Goal, [], [], GoalVars),
