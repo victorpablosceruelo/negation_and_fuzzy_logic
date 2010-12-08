@@ -1,0 +1,744 @@
+<HTML>
+<HEAD>
+<TITLE>GRIPS - a pre-processor for functional programming in Prolog</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=WHITE>
+
+
+<H1>GRIPS &mdash; a pre-processor for functional programming in Prolog</H1>
+
+<P>
+The GRIPS pre-processor 
+allows you to write Prolog clauses as function
+definitions which it translates into Prolog clauses. Consulting
+GRIPS will automatically install such expansions via <CODE>term_expansion</CODE>,
+so you can then write function definitions in your source file in the
+same way you write grammar rules.
+In these definitions, the right-hand side
+of a definition is an expression, consisting of (possibly nested) calls
+to other functions. GRIPS allocates result variables and unwinds calls
+as described above. You can also write definitions as commands,
+to make it clear that they are being called 
+for their side-effects. 
+</P>
+
+<P>
+As an example, here are an assortment of definitions in GRIPS:
+<PRE>
+  double( N ) &lt;- N*2.
+
+  quadruple( N ) &lt;- double( double(N) ).
+
+  factorial(N) &lt;- 1 if N =< 0.
+  factorial(N) &lt;- N * factorial(N-1) if N > 0.
+
+  factorial1(0) &lt;- 1.
+  factorial1(N) &lt;- N*factorial1(N-1).
+
+  count( [] ) &lt;- 0.
+  count( [_|T] ) &lt;- 1 + count(T).
+
+  join( [], L ) &lt;- L.
+  join( [H|T], L ) &lt;- [ H | join(T,L) ].
+
+  sum( [] ) &lt;- 0.
+  sum( [H|T] ) &lt;- H + sum(T).
+
+  sum1( L ) &lt;- 0 if L = [].
+  sum1( [H|T] ) &lt;- H + sum1(T).
+
+  sum_diff( A,B,C) &lt;- A+B-C.
+
+  small( P ) if P &lt; 24.
+
+  divides_by_4( N ) if ( N rem 4 ) = 0.
+</PRE>
+</P>
+
+
+<H2>GRIPS definitions</H2>
+
+<P>
+GRIPS recognises and translates the following definitions:
+<PRE>
+  Head &lt;- Expression. (<A HREF="#function">function</A>)
+  Head does Command. (<A HREF="#command">command</A>)
+  Head if Guard. (<A HREF="#predicate">predicate</A>)
+</PRE>
+</P>
+
+<P>
+I use it mainly to expand function definitions, and added commands
+and predicates mainly as an experiment in making Prolog easier for
+novice students to read.  
+</P>
+
+
+<H2><A NAME="function">Function definitions</A></H2>
+
+<P>
+The connective <CODE>&lt;-</CODE> defines a function. Functions are
+translated into predicates with an extra argument on the right. The
+right-hand side of the function is translated as described under
+<A HREF="#expression">Expressions</A>, into a goal and a result variable. This result variable
+becomes the extra argument of the predicate.
+</P>
+
+<P>
+If the right-hand side contains a guard, that guard is translated as
+described under <A HREF="#guard">Guards</A>.
+</P>
+
+<P>
+The functions are made deterministic - GRIPS inserts a cut after each
+translated condition, or (if none), after the final tail goal.
+</P>
+
+<P>
+The forms
+<PRE>
+  f &lt;- a if b.
+
+  f &lt;- b => a.
+
+  f &lt;-
+    a if b
+  else
+    c if d
+  else
+    ex if f.
+
+  f &lt;-
+    a if b
+  else
+    c if d
+  else
+    ex.
+</PRE>
+are definitions where the right-hand side is a conditional
+expression.
+</P>
+
+
+<H2>Examples of function definitions</H2>
+
+<P>
+<PRE>
+  double( N ) &lt;- N*2.
+    <I>translates to</I>
+  double( N, V ) :- V is N*2, !.
+
+  quadruple( N ) &lt;- double( double(N) ).
+    <I>translates to</I>
+  quadruple( N, V ) :- double( N, V` ), double( V`, V ), !.
+
+  factorial(N) &lt;- 1 if N =< 0.
+  factorial(N) &lt;- N * factorial(N-1) if N > 0.
+    <I>translates to</I>
+  factorial(N, 1) :-
+    N =< 0,
+    !.
+  factorial(N, V) :-
+    N > 0 , !,
+    V` is N - 1 , factorial(V`, V``), V is N * V``.
+
+  count( L ) &lt;- 0 if L = [].
+  count( L ) &lt;- 1 + count( tail(L) ) if L \= [].
+    <I>translates to</I>
+  count([], 0) :-
+    !.
+  count(L, V) :-
+    L \= [] , ! ,
+    tail(L, V`) , count(V`, V``),
+    V is 1 + V``.
+</PRE>
+where <CODE>V</CODE>, <CODE>V`</CODE>, <CODE>V``</CODE>... indicate new Prolog variables
+introduced by GRIPS.
+</P>
+
+<P>
+GRIPS may optimise some of these translations.
+</P>
+
+
+<H2><A NAME="command">Command definitions</A></H2>
+
+<P>
+The connective <CODE>does</CODE> defines a command. Commands are
+translated into predicates with the same number of arguments. GRIPS
+translates the actions in the command body as if they were guards, and
+places them after the translated guards. The commands are made
+deterministic - GRIPS inserts a cut between the conditions and actions,
+or (if no conditions), after the final tail goal.
+</P>
+
+
+<H2>Examples of command definitions</H2>
+
+<PRE>
+  converse does write_list( reply_to( readline( `('?') ) ) ) and converse.
+    <I>translates to</I>
+  converse :-
+    readline(?, V) , reply_to(V, V`) , write_list(V`),
+    converse, !.
+</PRE>
+
+
+<H2><A NAME="predicate">Predicates</H2>
+
+<P>
+The connective <CODE>if</CODE> defines a predicate. Thus
+<PRE>
+  A if B0
+</PRE>
+translates to
+<PRE>
+  A :- B1
+</PRE>
+where <CODE>B0</CODE> is treated as a guard and translated into <CODE>B1</CODE>. The difference
+between these predicate definitions and pure Prolog ones is that arguments
+in the guards are treated as function calls and expanded.
+</P>
+
+
+<H2>Examples of predicate definitions</H2>
+
+<P>
+<PRE>
+  divides_by_4( N ) if ( N/2 rem 2 ) = 0.
+    <I>translates to</I>
+  divides_by_4(V) :-
+    V` is _1 / 2 rem 2,
+    V` = 0.
+</PRE>
+</P>
+
+
+<H2><A NAME="expression">Expressions</A></H2>
+
+<P>
+Any expression <CODE>E</CODE> is translated into a goal <CODE>G</CODE> and a result variable 
+<CODE>V</CODE>,
+such that when <CODE>G</CODE> is called, it instantiates <CODE>V</CODE>.
+</P>
+
+<P>
+Numbers, variables, and atoms (including <CODE>[]</CODE>) are translated into the
+goal <CODE>true</CODE> and a result which is the thing itself.
+</P>
+
+<P>
+Any expression <CODE>`E</CODE>
+is translated into the goal <CODE>true</CODE> and the result <CODE>E</CODE>. This is a way of
+protecting things that you don't want evaluated.
+</P>
+
+<P>
+An expression <CODE>eval(A)</CODE>
+where <CODE>A</CODE> is an atom, is translated into the goal <CODE>A(V)</CODE> and the result
+variable <CODE>V</CODE>. That is, it calls the one-argument goal whose functor is <CODE>A</CODE>.
+This provides a way of calling parameterless functions. Since such
+"functions" are likely only to be of use for their side-effects, this
+use won't be frequent. Any other expression <CODE>eval(E)</CODE>, where
+<CODE>E</CODE> is not an atom, is translated as <CODE>E</CODE>.
+</P>
+
+<P>
+Any expression <CODE>'CONS'(E)</CODE>, where <CODE>E</CODE> is an
+atom or a
+compound term <CODE>F(A1,A2,...)</CODE>, is translated into a goal that evaluates
+<CODE>A1</CODE>, <CODE>A2</CODE>, ... and the result 
+<CODE>F(EA1,EA2,...)</CODE> where <CODE>EAi</CODE> is the result
+of evaluating <CODE>Ai</CODE>. For example, <CODE>'CONS' pair(1+1,2)</CODE>
+evaluates to <CODE>pair(2,2)</CODE>. And
+<CODE>'CONS' map</CODE>
+evaluates to <CODE>map</CODE>.
+This is a convenient way
+of constructing terms with a specified functor that isn't
+to be treated as a function.
+</P>
+
+<P>
+Any expression <CODE>twist(E)</CODE>, where <CODE>E</CODE> is a
+compound term <CODE>F(A1,A2,...)</CODE>, is translated as <CODE>E</CODE>
+would be, except that it's <CODE>F</CODE>'s first argument
+rather than the final one that gives the result.
+I introduced this as a way to permute arguments to
+<CODE>maplist</CODE> and similar higher-order predicates.
+</P>
+
+<P>
+Lists are translated by making a new list, each of whose elements will
+be the result of evaluating the corresponding original element. Thus:
+<PRE>
+  [ `a, `b, 1+2, double(4) ] .
+    <I>translates to</I>
+  GOALS: _1 is 1 + 2 , double(4, _2)
+  RESULT VAR: [a, b, _1, _2]
+</PRE>
+</P>
+
+<P>
+An expression of the form <CODE>(E where G)</CODE>
+is translated by translating <CODE>G</CODE> as a guard, and then translating <CODE>E</CODE>. 
+<CODE>G</CODE> should instantiate something in <CODE>E</CODE>. Thus:
+<PRE>
+  [ 1 + V ] where V=4/5 .
+  [ 1 + (V where V=4/5) ].
+    <I>translate to</I>
+  GOALS: _1 is 4 / 5 , _2 is 1 + _1
+  RESULT VAR: [_2]
+</PRE>
+</P>
+
+<P>
+An expression of the form <CODE>(E if G)</CODE> or <CODE>(G =&gt; E)</CODE>
+is a conditional expression. It fails if <CODE>G</CODE> fails, otherwise it returns
+result <CODE>E</CODE>. It is translated by translating <CODE>G</CODE> as a guard, and then
+translating <CODE>E</CODE>. 
+</P>
+
+<P>
+The expression forms
+<PRE>
+    A if B
+  else
+    ...
+</PRE>
+are extended conditionals. If <CODE>B</CODE> succeeds they return <CODE>A</CODE>; otherwise they
+go on to the thing after the else. This can be another <CODE>if</CODE>...<CODE>else</CODE>. You can
+write <CODE>B=&gt;A</CODE> instead of <CODE>A if B</CODE>.
+</P>
+
+<P>
+Structures of other kinds are translated into function calls. How
+depends on whether they are evaluable (in Prolog) by <CODE>is</CODE>. If,
+according to the built-in predicate <CODE>current_arithmetic_function</CODE>, they are, then
+GRIPS will build an <CODE>is</CODE> goal to evaluate as much as possible, with
+subsidiary goals to evaluate some arguments. Otherwise, GRIPS will just 
+build subsidiary
+goals, which add an output argument to the structure:
+Thus:
+<PRE>
+  1 + 3
+    <I>translates to</I>
+  GOALS: _1 is 1 + 3
+  RESULT VAR: _1
+</PRE>
+
+<PRE>
+  1 + 3 * sin(3)
+    <I>translates to</I>
+  GOALS: _1 is 1 + 3 * sin(3)
+  RESULT VAR: _1
+</PRE>
+
+<PRE>
+  1 + 3 + double(3)
+    <I>translates to</I>
+  GOALS: double(3, _1) , _2 is 1 + 3 * _1
+  RESULT VAR: _2
+</PRE>
+
+<PRE>
+  factorial(1+3*double(3))+4).
+    <I>translates to</I>
+  GOALS: double(3, _1) , _2 is 1 + 3 * _1 , factorial(_2, _3) ,
+         _4 is _3 + 4
+  RESULT VAR: _4
+</PRE>
+</P>
+
+<P>
+Notice that interior structures are also evaluated, and not left as
+structures.
+</P>
+
+
+<H2><A NAME="guards">Guards</H2>
+
+<P>
+These are conditions within a GRIPS
+definition, which GRIPS translates into Prolog goals.
+</P>
+
+<P>
+Any guard <CODE>pr(G)</CODE>
+where <CODE>G</CODE> is an arbitrary term, is left as <CODE>G</CODE>. 
+This is a way of getting
+untranslated Prolog into GRIPS.
+</P>
+
+<P>
+The guard <CODE>nothing</CODE> is translated to <CODE>true</CODE>. This allows you to write the
+command definition:
+<PRE>
+  c(A) does nothing if A=1.
+</PRE>
+</P>
+
+<P>
+A guard that is a variable at translation-time is left alone.
+</P>
+
+<P>
+Any guard <CODE>(A and B)</CODE> or <CODE>(A,B)</CODE>
+is translated into <CODE>(A',B')</CODE>, where <CODE>A'</CODE> and 
+<CODE>B'</CODE> are the translations of <CODE>A</CODE>
+and <CODE>B</CODE> as guards.
+</P>
+
+<P>
+Any guard <CODE>(A or B)</CODE> or <CODE>(A;B)</CODE>
+is translated likewise into <CODE>(A';B')</CODE>.
+</P>
+
+<P>
+Any guard <CODE>not(A)</CODE> or <CODE>call(A)</CODE>
+is translated into <CODE>not(A')</CODE> or <CODE>call(A')</CODE>, 
+where <CODE>A'</CODE> and <CODE>B'</CODE> are the
+translations of <CODE>A</CODE> and <CODE>B</CODE> as guards.
+</P>
+
+<P>
+Any guard <CODE>(A=>B)</CODE> or <CODE>(B if A)</CODE>
+is translated into <CODE>(A',!,B')</CODE>, where <CODE>A'</CODE> and 
+<CODE>B'</CODE> are the translations of <CODE>A</CODE>
+and <CODE>B</CODE> as guards.
+</P>
+
+<P>
+Any guard <CODE>else(A,B)</CODE> is translated into 
+<CODE>(A';B')</CODE>. This gives the guard
+equivalent of the conditional expressions.
+</P>
+
+<P>
+Guards <CODE>P(A)</CODE>, 
+where <CODE>P</CODE> is <CODE>assert</CODE>, <CODE>asserta</CODE>, 
+<CODE>retract</CODE>, or <CODE>retractall</CODE>, are
+left alone. This ensures that <CODE>A</CODE> is treated as a term to be used with the
+database, and not an expression to be evaluated.
+</P>
+
+<P>
+A guard of the form <CODE>phrase(G,L)</CODE>
+is assumed to be a call to the DCG predicate 
+<CODE>phrase/2</CODE>. The first
+argument <CODE>G</CODE> (which will be a non-terminal symbol) is left alone. The
+second argument (which will be a list to be evaluated) is translated as
+an expression.
+</P>
+
+<P>
+Other structures are translated by treating their arguments as GRIPS
+expressions and recursively translating them. This process can be
+optimised for arithmetic operators like <CODE>&lt;</CODE> and
+<CODE>=:=</CODE>, which partly evaluate
+their arguments anyway; and for <CODE>=</CODE>.
+</P>
+
+
+<H2><A NAME="immediate evaluation">Immediate evaluation</A></H2>
+
+<P>
+GRIPS exports the predicate <CODE>grips/1</CODE>. The goal
+<CODE>grips(E)</CODE> treats its
+argument <CODE>E</CODE> as an expression, translating it, evaluating the resulting goal,
+and displaying the result. It can therefore be used to evaluate
+GRIPS expressions from the top-level interpreter.
+</P>
+
+<P>
+Examples:
+<PRE>
+  ?- grips 1.
+  Result = 1.
+
+  ?- grips 1+2.
+  Result = 3.
+
+  ?- grips length( append( [`a,`b], [`c,`d] ) ).
+  Result = 4.
+</PRE>
+</P>
+
+<P>
+There is also the exported predicate <CODE>grips/2</CODE>. 
+The goal <CODE>grips(E,V)</CODE> treats its
+argument <CODE>E</CODE> as an expression, translates and evaluates it,
+and instantiates <CODE>V</CODE> to the result.s
+</P>
+
+<P>
+The functor <CODE>echo/1</CODE> causes <CODE>grips/1</CODE>
+to display its translation, which may be useful in debugging. 
+For example:
+<PRE>
+  ?- grips echo length( append( [a,b], [c,d] ) ) * 3.
+  GOALS: (append([a, b], [c, d], _G551), 
+          length(_G551, _G542)), 
+          _G627 is _G542*3
+  RESULT VAR: _G627
+  Result = 12.
+</PRE>
+
+
+<H2>Operators</H2>
+
+<P>
+GRIPS declares these operators:
+<PRE>
+  :- op( 990, fy, user:(grips) ).
+  :- op( 700, xfx, user:(grips) ).
+  :- op( 990, fy, user:(echo) ).
+</PRE>
+For immediate-mode evaluation, as 
+in the <A HREF="#immediate evaluation">previous section</A>.
+</P>   
+
+<P>
+<PRE>
+  :- op( 1200, xfx, user:(<-) ).
+  :- op( 1200, xfx, user:(does) ).
+  :- op( 1090, xfx, user:(if) ).
+  :- op( 1100, yfx, user:(else) ).
+  :- op( 1100, xfx, user:(=>) ).
+</PRE>
+Definitions and conditional expressions.
+</P>
+
+<P>
+<PRE>
+  :- op( 1000, xfy, user:(and) ).
+  :- op( 1100, xfy, user:(or) ).
+</PRE>
+Alternatives to <CODE>,</CODE> and <CODE>;</CODE>. 
+</P>
+
+<P>
+<PRE>
+  :- op( 800, xfy, user:(where) ).
+</PRE>
+Introduces a subsidiary definition in an
+expression.
+</P>
+
+<P>
+<PRE>
+  :- op( 150, fx, user:(`) ).
+</PRE>
+Quotation operator in expressions.
+</P>
+
+<P>
+<PRE>
+  :- op( 150, fx, user:('CONS') ).
+</PRE>
+Term-building operator in expressions.
+</P>
+
+<P>
+<PRE>
+  :- op( 150, fx, user:(twist) ).
+</PRE>
+Argument-permutation operator in expressions.
+</P>
+
+
+<H2>Using GRIPS</H2>
+
+<P>
+Use module file <CODE>grips2.pl</CODE>. This reads the GRIPS
+pre-processor and then modifies <CODE>term_expansion</CODE>
+so as to add a clause for translating GRIPS definitions. These
+can be written into any Prolog source file as you would
+grammar rules. It also modifies <CODE>goal_expansion</CODE>
+in order to translate goal arguments with functor <CODE>grips/1</CODE>.
+</P>
+
+
+<H2>Test programs</H2>
+
+<P>
+The file <CODE>grips2_test.pl</CODE> contains the 
+examples given in the <A HREF="#introduction">introduction</A>.
+Below, we show them being compiled and executed.
+<PRE>
+  1 ?- cd('c:/kb7/grips').
+
+  Yes
+  2 ?- use_module(grips2).
+  % grips compiled into grips 0.03 sec, 19,880 bytes
+
+  Yes
+  3 ?- [grips2_test].
+  % grips_test compiled 0.03 sec, 13,732 bytes
+
+  Yes
+  4 ?- grips double(3).
+  Result = 6.
+
+  Yes
+  5 ?- double(3,D).
+
+  D = 6 ;
+
+  No
+  6 ?- listing(double).
+
+
+  double(A, B) :-
+          B is A*2.
+
+  Yes
+  7 ?- grips echo double(3).
+  GOALS: double(3, _G338)
+  RESULT VAR: _G338
+  Result = 6.
+
+  Yes
+  8 ?- grips quadruple(3).
+  Result = 12.
+
+  Yes
+  9 ?- grips factorial(5).
+  Result = 120.
+
+  Yes
+  10 ?- grips factorial1(5).
+  Result = 120.
+
+  Yes
+  11 ?- grips count([a,b,c,d]).
+  Result = 4.
+
+  Yes
+  12 ?- grips count( join( [1,2,3,4], [a,b,c] ) ).
+  Result = 7.
+
+  Yes
+  13 ?- grips sum([1,2,3,4,5]).
+  Result = 15.
+
+  Yes
+  14 ?- grips sum1([1,2,3,4,5]).
+  Result = 15.
+
+  Yes
+  15 ?- grips sum1([1,2+0,1.5*2,2^2,25/5]).
+  Result = 15.
+
+  Yes
+  16 ?- grips sum_diff(1,2,3).
+  Result = 0.
+
+  Yes
+  17 ?- small(23).
+
+  Yes
+  18 ?- small(24).
+
+  No
+  19 ?- divides_by_4( 3 ).
+
+  No
+  20 ?- divides_by_4( 4 ).
+
+  Yes
+</PRE>
+</P>
+
+
+<H2>Test program &mdash; the demonstration mini-compiler</H2>
+
+<P>
+There is a bigger test program in the subdirectory
+<CODE>compiler2</CODE>. This is a demonstration  mini-compiler 
+which takes  programs in  a very  small subset  of Pascal.  It
+lexically analyses them into tokens, parses  the token list into a tree,
+generates code from the tree, fixes  up references in the code, and then
+interprets the code  on a stack virtual machine. It  displays the output
+of each  stage, and the interpreter  displays the machine state  as each
+instruction is obeyed.
+The  compiler  is  written  in   a  functional  style,  using  functions
+(sometimes represented  as sets of domain->codomain  pairs) to represent
+well-known concepts in programming language semantics, such as the store
+and the environment.  I wrote it to explain in  his own idiom, compiling
+to a mathematician starting a computer science M.Sc.
+</P>
+
+<P>
+Here is an example program that it can compile and run.
+<PRE>
+    program p;
+
+    label
+        99, 100;
+
+    const
+        five = 5;
+
+    var
+        v : integer;
+        w : integer;
+
+    begin
+        write('Hello.');
+        v := 1;
+        w := 1;
+    99:
+            if v=five then goto 100;
+            v := v + 1;
+            w := w * v;
+            goto 99;
+    100:
+        write('v = ');
+        write(v);
+        write('v! = ');
+        write(w)
+    end.
+</PRE>
+</P>
+
+<P>
+To try the compiler, do as follows:
+<PRE>
+  1 ?- cd('c:/kb7/grips').
+
+  Yes
+  2 ?- use_module(grips2).
+  % grips compiled into grips 0.03 sec, 19,880 bytes
+
+  Yes
+  3 ?- cd(compiler2).
+
+  Yes
+  4 ?- [compile].
+  %  plusplus.pl compiled 0.02 sec, 1,088 bytes
+  %  ordset.pl compiled 0.00 sec, 6,820 bytes
+  %  map.pl compiled 0.02 sec, 13,108 bytes
+  %  lex.pl compiled 0.00 sec, 6,612 bytes
+  %  parser.pl compiled 0.00 sec, 16,148 bytes
+  %  code_generate.pl compiled 0.02 sec, 19,108 bytes
+  %  load.pl compiled 0.00 sec, 1,128 bytes
+  %  machine.pl compiled 0.00 sec, 12,056 bytes
+  % compile compiled 0.05 sec, 78,180 bytes
+  true.
+
+  5 ?- demo.
+</PRE>
+This will cause the compiler to try compiling <CODE>program.pas</CODE>.
+It will display the tokenised program, parse tree, environment, and
+generated virtual machine code. It will then ask for input. Just type an
+end of file. It will then run, showing the machine instructions
+executed as it does so. The file <CODE>demo</CODE> shows a run.
+</P>
+
+<P>
+<ADDRESS>12 February 2010</ADDRESS>
+<P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,672 @@
+  ?- demo.
+  Tokens           : [program, p, ;, label, 99, ,, 100, ;, const, five,
+  	 =, 5, ;, var, v, :, integer, ;, w, :, integer, ;, begin, write,
+  	 (, string(Hello.), ), ;, v, :=, 1, ;, w, :=, 1, ;, 99, :, if,
+  	 v, =, five, then, goto, 100, ;, v, :=, v, +, 1, ;, w, :=, w,
+  	 *, v, ;, goto, 99, ;, 100, :, write, (, string(v = ), ), ;, write,
+  	 (, v, ), ;, write, (, string(v! = ), ), ;, write, (, w, ), end,
+  	 .]
+
+  Tree             : PROG(p, DECLARATIONS([99, 100], [C(five, 5)], [V(v,
+  	 integer), V(w, integer)]), [WRITE(STR(Hello.)), ASSIGN(v, 1),
+  	 ASSIGN(w, 1), LABELLED(99, IF(E(=, v, five), [GOTO(100)])), ASSIGN(v
+  	, E(+, v, 1)), ASSIGN(w, E(*, w, v)), GOTO(99), LABELLED(100,
+  	 WRITE(STR(v = ))), WRITE(v), WRITE(STR(v! = )), WRITE(w)])
+
+  Environment      : 0  map{five->5}  map{v->LOC(1000, 2), w->LOC(1002,
+  	 2)}
+
+  Unfixedup code   : [OP(loadconst, 46), OP(loadconst, 111), OP(loadconst,
+  	 108), OP(loadconst, 108), OP(loadconst, 101), OP(loadconst, 72),
+  	 OP(loadconst, 6), OP(writestring), OP(loadconst, 1), OP(store,
+  	 1000), OP(loadconst, 1), OP(store, 1002), LABEL(99), OP(load,
+  	 1000), OP(loadconst, 5), OP(eq), OP(jump_if_false, -1), OP(goto,
+  	 100), LABEL(-1), OP(load, 1000), OP(loadconst, 1), OP(add), OP(store
+  	, 1000), OP(load, 1002), OP(load, 1000), OP(mult), OP(store, 1002),
+  	 OP(goto, 99), LABEL(100), OP(loadconst, 32), OP(loadconst, 61),
+  	 OP(loadconst, 32), OP(loadconst, 118), OP(loadconst, 4), OP(writestr
+  	ing), OP(load, 1000), OP(write), OP(loadconst, 32), OP(loadconst,
+  	 61), OP(loadconst, 32), OP(loadconst, 33), OP(loadconst, 118),
+  	 OP(loadconst, 5), OP(writestring), OP(load, 1002), OP(write)]
+
+  Code             : [OP(loadconst, 46), OP(loadconst, 111), OP(loadconst,
+  	 108), OP(loadconst, 108), OP(loadconst, 101), OP(loadconst, 72),
+  	 OP(loadconst, 6), OP(writestring), OP(loadconst, 1), OP(store,
+  	 1000), OP(loadconst, 1), OP(store, 1002), LABEL(46), OP(load,
+  	 1000), OP(loadconst, 5), OP(eq), OP(jump_if_false, 64), OP(goto,
+  	 96), LABEL(64), OP(load, 1000), OP(loadconst, 1), OP(add), OP(store,
+  	 1000), OP(load, 1002), OP(load, 1000), OP(mult), OP(store, 1002),
+  	 OP(goto, 46), LABEL(96), OP(loadconst, 32), OP(loadconst, 61),
+  	 OP(loadconst, 32), OP(loadconst, 118), OP(loadconst, 4), OP(writestr
+  	ing), OP(load, 1000), OP(write), OP(loadconst, 32), OP(loadconst,
+  	 61), OP(loadconst, 32), OP(loadconst, 33), OP(loadconst, 118),
+  	 OP(loadconst, 5), OP(writestring), OP(load, 1002), OP(write)]
+
+  Loaded code      : map{0->OP(loadconst, 46), 4->OP(loadconst, 111), 8->OP(loa
+  	dconst, 108), 12->OP(loadconst, 108), 16->OP(loadconst, 101),
+  	 20->OP(loadconst, 72), 24->OP(loadconst, 6), 28->OP(writestring),
+  	 30->OP(loadconst, 1), 34->OP(store, 1000), 38->OP(loadconst,
+  	 1), 42->OP(store, 1002), 46->OP(load, 1000), 50->OP(loadconst,
+  	 5), 54->OP(eq), 56->OP(jump_if_false, 64), 60->OP(goto, 96),
+  	 64->OP(load, 1000), 68->OP(loadconst, 1), 72->OP(add), 74->OP(store,
+  	 1000), 78->OP(load, 1002), 82->OP(load, 1000), 86->OP(mult),
+  	 88->OP(store, 1002), 92->OP(goto, 46), 96->OP(loadconst, 32),
+  	 100->OP(loadconst, 61), 104->OP(loadconst, 32), 108->OP(loadconst,
+  	 118), 112->OP(loadconst, 4), 116->OP(writestring), 118->OP(load,
+  	 1000), 122->OP(write), 124->OP(loadconst, 32), 128->OP(loadconst,
+  	 61), 132->OP(loadconst, 32), 136->OP(loadconst, 33), 140->OP(loadcon
+  	st, 118), 144->OP(loadconst, 5), 148->OP(writestring), 150->OP(load,
+  	 1002), 154->OP(write)}
+
+  Initial store    : map{1000->255, 1001->255, 1002->255, 1003->255}
+  Input?
+  |:
+  Stack: []
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 0
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 46)
+  Stack: [46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 4
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 111)
+  Stack: [111, 46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 8
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 108)
+  Stack: [108, 111, 46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 12
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 108)
+  Stack: [108, 108, 111, 46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 16
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 101)
+  Stack: [101, 108, 108, 111, 46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 20
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 72)
+  Stack: [72, 101, 108, 108, 111, 46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 24
+  In   : []
+  Out  : []
+
+  About to do OP(loadconst, 6)
+  Stack: [6, 72, 101, 108, 108, 111, 46]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 28
+  In   : []
+  Out  : []
+
+  About to do OP(writestring)
+  Stack: []
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 30
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 1)
+  Stack: [1]
+  Store: map{1000->255, 1001->255, 1002->255, 1003->255}
+  PC   : 34
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1000)
+  Stack: []
+  Store: map{1000->1, 1001->0, 1002->255, 1003->255}
+  PC   : 38
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 1)
+  Stack: [1]
+  Store: map{1000->1, 1001->0, 1002->255, 1003->255}
+  PC   : 42
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1002)
+  Stack: []
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 46
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [1]
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 50
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 5)
+  Stack: [5, 1]
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 54
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(eq)
+  Stack: [0]
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 56
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(jump_if_false, 64)
+  Stack: []
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 64
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [1]
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 68
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 1)
+  Stack: [1, 1]
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 72
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(add)
+  Stack: [2]
+  Store: map{1000->1, 1001->0, 1002->1, 1003->0}
+  PC   : 74
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1000)
+  Stack: []
+  Store: map{1000->2, 1001->0, 1002->1, 1003->0}
+  PC   : 78
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1002)
+  Stack: [1]
+  Store: map{1000->2, 1001->0, 1002->1, 1003->0}
+  PC   : 82
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [2, 1]
+  Store: map{1000->2, 1001->0, 1002->1, 1003->0}
+  PC   : 86
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(mult)
+  Stack: [2]
+  Store: map{1000->2, 1001->0, 1002->1, 1003->0}
+  PC   : 88
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1002)
+  Stack: []
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 92
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(goto, 46)
+  Stack: []
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 46
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [2]
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 50
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 5)
+  Stack: [5, 2]
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 54
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(eq)
+  Stack: [0]
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 56
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(jump_if_false, 64)
+  Stack: []
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 64
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [2]
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 68
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 1)
+  Stack: [1, 2]
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 72
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(add)
+  Stack: [3]
+  Store: map{1000->2, 1001->0, 1002->2, 1003->0}
+  PC   : 74
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1000)
+  Stack: []
+  Store: map{1000->3, 1001->0, 1002->2, 1003->0}
+  PC   : 78
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1002)
+  Stack: [2]
+  Store: map{1000->3, 1001->0, 1002->2, 1003->0}
+  PC   : 82
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [3, 2]
+  Store: map{1000->3, 1001->0, 1002->2, 1003->0}
+  PC   : 86
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(mult)
+  Stack: [6]
+  Store: map{1000->3, 1001->0, 1002->2, 1003->0}
+  PC   : 88
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1002)
+  Stack: []
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 92
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(goto, 46)
+  Stack: []
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 46
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [3]
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 50
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 5)
+  Stack: [5, 3]
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 54
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(eq)
+  Stack: [0]
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 56
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(jump_if_false, 64)
+  Stack: []
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 64
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [3]
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 68
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 1)
+  Stack: [1, 3]
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 72
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(add)
+  Stack: [4]
+  Store: map{1000->3, 1001->0, 1002->6, 1003->0}
+  PC   : 74
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1000)
+  Stack: []
+  Store: map{1000->4, 1001->0, 1002->6, 1003->0}
+  PC   : 78
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1002)
+  Stack: [6]
+  Store: map{1000->4, 1001->0, 1002->6, 1003->0}
+  PC   : 82
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [4, 6]
+  Store: map{1000->4, 1001->0, 1002->6, 1003->0}
+  PC   : 86
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(mult)
+  Stack: [24]
+  Store: map{1000->4, 1001->0, 1002->6, 1003->0}
+  PC   : 88
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1002)
+  Stack: []
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 92
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(goto, 46)
+  Stack: []
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 46
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [4]
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 50
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 5)
+  Stack: [5, 4]
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 54
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(eq)
+  Stack: [0]
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 56
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(jump_if_false, 64)
+  Stack: []
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 64
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [4]
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 68
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 1)
+  Stack: [1, 4]
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 72
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(add)
+  Stack: [5]
+  Store: map{1000->4, 1001->0, 1002->24, 1003->0}
+  PC   : 74
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1000)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->24, 1003->0}
+  PC   : 78
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1002)
+  Stack: [24]
+  Store: map{1000->5, 1001->0, 1002->24, 1003->0}
+  PC   : 82
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [5, 24]
+  Store: map{1000->5, 1001->0, 1002->24, 1003->0}
+  PC   : 86
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(mult)
+  Stack: [120]
+  Store: map{1000->5, 1001->0, 1002->24, 1003->0}
+  PC   : 88
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(store, 1002)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 92
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(goto, 46)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 46
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(load, 1000)
+  Stack: [5]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 50
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 5)
+  Stack: [5, 5]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 54
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(eq)
+  Stack: [1]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 56
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(jump_if_false, 64)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 60
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(goto, 96)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 96
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 32)
+  Stack: [32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 100
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 61)
+  Stack: [61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 104
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 32)
+  Stack: [32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 108
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 118)
+  Stack: [118, 32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 112
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(loadconst, 4)
+  Stack: [4, 118, 32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 116
+  In   : []
+  Out  : [Hello.]
+
+  About to do OP(writestring)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 118
+  In   : []
+  Out  : [Hello., v = ]
+
+  About to do OP(load, 1000)
+  Stack: [5]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 122
+  In   : []
+  Out  : [Hello., v = ]
+
+  About to do OP(write)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 124
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(loadconst, 32)
+  Stack: [32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 128
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(loadconst, 61)
+  Stack: [61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 132
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(loadconst, 32)
+  Stack: [32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 136
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(loadconst, 33)
+  Stack: [33, 32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 140
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(loadconst, 118)
+  Stack: [118, 33, 32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 144
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(loadconst, 5)
+  Stack: [5, 118, 33, 32, 61, 32]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 148
+  In   : []
+  Out  : [Hello., v = , 5]
+
+  About to do OP(writestring)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 150
+  In   : []
+  Out  : [Hello., v = , 5, v! = ]
+
+  About to do OP(load, 1002)
+  Stack: [120]
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 154
+  In   : []
+  Out  : [Hello., v = , 5, v! = ]
+
+  About to do OP(write)
+  Stack: []
+  Store: map{1000->5, 1001->0, 1002->120, 1003->0}
+  PC   : 156
+  In   : []
+  Out  : [Hello., v = , 5, v! = , 120]
+
+  Finished.
