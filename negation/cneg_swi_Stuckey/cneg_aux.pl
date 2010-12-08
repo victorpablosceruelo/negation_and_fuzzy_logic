@@ -2,8 +2,7 @@
 :- module(cneg_aux,
 	[
 	    findall/4, append/3,
-	    debug/2, debug_list/2, debug_nl/0, 
-	    msg/2, msg_aux/2, msg_nl/0,
+	    cneg_msg/3, cneg_msg_nl/1,
 	    first/2, second/2, unify_terms/2, functor_local/4,
 	    memberchk_local/2, term_to_meta/2,
 	    setof_local/3, filter_out_nonvars/2,
@@ -35,46 +34,36 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use the following sentences to enable/disable debugging.
-debug_is_on('yes').
-% debug_is_on('no').
+cneg_msg_are_enabled(Level) :- Level > 0.
+% > 0 -> Debug all
+% > 1 -> Debug important
+% > 2 -> Msgs
 
 %%% Debug (by VPC).
-debug(Msg, Clause) :-
-	debug_is_on('yes'), 
+cneg_msg(Level, Msg, Clause) :-
+	cneg_msg_are_enabled(Level), 
 	!, % No backtracking allowed.
 	write('% DBG % '),
 	write(Msg), 
 	write(' :: '),
 	write(Clause), nl, 
 	!. % No backtracking allowed.
-debug(_Msg, _Clause) :- 
-	debug_is_on('no').
+cneg_msg(Level, _Msg, _Clause) :-
+	\+(cneg_msg_are_enabled(Level)).
 
-debug_nl :-
-	debug_is_on('yes'),
+cneg_msg_nl(Level) :-
+	cneg_msg_are_enabled(Level),
 	!, nl.
-debug_nl :- 
-	debug_is_on('no'), !.
+cneg_msg_nl(Level) :- 
+	cneg_msg_are_enabled(Level), !.
 
-
-debug_list(Msg, []) :-
-	debug(Msg, []),
+cneg_msg_list(Level, Msg, []) :-
+	cneg_msg(Level, Msg, []),
 	!. % No backtracking allowed.
-debug_list(Msg, [Cl|Cls]) :- 
+cneg_msg_list(Level, Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
-	debug(Msg, Cl),
-	debug_list(Msg, Cls).
-
-msg(Msg1, Msg2) :-
-	msg_aux(Msg1, ' :: '),
-	msg_aux(Msg2, ' '), 
-	msg_nl, !.
-
-msg_aux(Msg1, Msg2) :-
-	write(Msg1), 
-	write(Msg2), 
-	!. % No backtracking allowed.
-msg_nl :- nl.
+	cneg_msg(Level, Msg, Cl),
+	cneg_msg_list(Level, Msg, Cls).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +105,7 @@ second([_Head|Tail], Second) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %unify_terms(Term1, Term2) :-
-%	debug_clause('unify_terms', unify_terms(Term1, Term2)), 
+%	cneg_msg(1, 'unify_terms', unify_terms(Term1, Term2)), 
 %	fail.
 
 unify_terms(Term1, Term2) :- 
@@ -287,9 +276,9 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	!.
 
 qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	debug('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	debug('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	debug('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
+	cneg_msg(1, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
+	cneg_msg(1, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
+	cneg_msg(1, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
 	!.
 
 %	name(Name, NameString),
@@ -299,10 +288,11 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 
 term_name_is_qualified(Name) :- name_has_semicolon(Name).
 name_has_semicolon(Any) :-
-	string(Any), !, 
+	is_of_type(chars, Any), !,
+%	string(Any), !, 
 	name_has_semicolon_aux(Any).
 name_has_semicolon(Any) :-
-	debug('name_has_semicolon :: NOT a string', Any), fail.
+	cneg_msg(1, 'name_has_semicolon :: NOT a string', Any), fail.
 
 name_has_semicolon_aux([]) :- !, fail.
 name_has_semicolon_aux([A]) :- 
@@ -319,7 +309,7 @@ remove_qualification(NameIn, NameOut) :-
 	name_has_semicolon(NameIn), !,
 	remove_qualification_aux(NameIn, NameOut).
 remove_qualification(NameIn, NameIn) :- !.
-%	debug_clause('WARNING: remove_qualification :: NOT a string qualified', NameIn).
+%	cneg_msg(1, 'WARNING: remove_qualification :: NOT a string qualified', NameIn).
 
 remove_qualification_aux([A|Name], Name) :-
 	semicolon_string([A]), !.
@@ -374,12 +364,12 @@ replace_in_term_variables_by_values(Term_In, [_Var|LVars], [_Value|LValues], Ter
 %	Name \== ',', Name \== ';',    % Issues
 %	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
 %	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body),
-%	debug_clause('look_for_the_relevant_clauses', cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body)),
+%	cneg_msg(1, 'look_for_the_relevant_clauses', cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body)),
 %	fail.
 
 %look_for_the_relevant_clauses(_Goal, _Frontier) :-
 %	cneg_processed_pred(G, H, I, J), 
-%	debug_clause('look_for_the_relevant_clauses', cneg_processed_pred(G, H, I, J)),
+%	cneg_msg(1, 'look_for_the_relevant_clauses', cneg_processed_pred(G, H, I, J)),
 %	fail.
 
 look_for_the_relevant_clauses(Goal, Frontier) :-
@@ -387,7 +377,7 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	Name \== ',', Name \== ';',    % Issues
 	!, % Backtracking forbiden.
 	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
-%	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
+%	cneg_msg(1, 'look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
 	setof_local(frontier(Head, Body, FrontierTest), 
 	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
 
@@ -435,12 +425,12 @@ varsbag_addition(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
 	varsbag_local(VarsBag_In, [], [], VarsBag_Out).
 
 varsbag_difference(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
-%	debug('varsbag_difference(VarsBag_1_In, VarsBag_2_In)', (VarsBag_1_In, VarsBag_2_In)),
+%	cneg_msg(1, 'varsbag_difference(VarsBag_1_In, VarsBag_2_In)', (VarsBag_1_In, VarsBag_2_In)),
 	filter_out_nonvars(VarsBag_1_In, VarsBag_1_Aux),
 	filter_out_nonvars(VarsBag_2_In, VarsBag_2_Aux),
-%	debug('varsbag_difference(VarsBag_1_Aux, VarsBag_2_Aux)', (VarsBag_1_Aux, VarsBag_2_Aux)),
+%	cneg_msg(1, 'varsbag_difference(VarsBag_1_Aux, VarsBag_2_Aux)', (VarsBag_1_Aux, VarsBag_2_Aux)),
 	varsbag_difference_aux(VarsBag_1_Aux, VarsBag_2_Aux, VarsBag_Out).
-%	debug('varsbag_difference :: VarsBag_Out', VarsBag_Out).
+%	cneg_msg(1, 'varsbag_difference :: VarsBag_Out', VarsBag_Out).
 
 varsbag_difference_aux([], _VarsBag, []) :- !.
 varsbag_difference_aux([Var | Vars_In], VarsBag, Vars_Out) :-
@@ -454,14 +444,14 @@ varsbag_difference_aux([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %varsbag_local(X, OtherBag, Bag_In, Bag_In) :- 
-%	debug_clause('varsbag_local(X, OtherBag, Bag_In)', varsbag_local(X, OtherBag, Bag_In)),
+%	cneg_msg(1, 'varsbag_local(X, OtherBag, Bag_In)', varsbag_local(X, OtherBag, Bag_In)),
 %	fail.
 
 varsbag_local(X, OtherBag, Bag_In, Bag_Out) :- 
         var(X), !,
-%	debug_clause('varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+%	cneg_msg(1, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out),
-%	debug_clause('varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+%	cneg_msg(1, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	!.
 
 varsbag_local(Term, OtherBag, Bag_In, Bag_Out) :-
