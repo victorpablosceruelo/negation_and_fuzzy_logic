@@ -68,7 +68,7 @@
 :- dynamic
         user:term_expansion/2.
 
-user:term_expansion( A, B ) :-
-  trans_sent( A, B, 'unknown').
+user:term_expansion( Input, Output ) :-
+  trans_sent( Input, Output, _FileName).
 
 

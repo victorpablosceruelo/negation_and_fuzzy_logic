@@ -13,9 +13,7 @@
 :- use_module(cneg_aux).
 
 % dynamic predicate(s) 
-:- dynamic cneg_processed_predicates/1.
-:- dynamic cneg_dynamic_cls/1.
-:- dynamic cneg_static_cls/1.
+:- dynamic cneg_dynamic/2.
 
 trans_clause(Whatever, Whatever, _) :-
 	cneg_msg(1, 'trans_cl', trans_cl(Whatever)).
@@ -94,10 +92,10 @@ trans_clause_without_body(Fact, [(Fact)], SourceFileName):-
 
 process_and_save_info(Name, Arity, SourceFileName, Head, ListBodies) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, _Index, PP_Info),
-	retrieve_list_of_processed_predicates(List_In),
-	retrieve_processed_pred_info(PP_Info, List_In, List_Out),
+	retrieve_list_of('processed_predicates', List_In),
+	processed_preds_lookup(PP_Info, List_In, List_Out),
 	process_and_save_info_aux(ListBodies, Head, PP_Info, New_PP_Info),
-	save_list_of_processed_predicates([New_PP_Info|List_Out]).
+	save_list_of('processed_predicates', [New_PP_Info|List_Out]).
 
 process_and_save_info_aux([], _Head, PP_Info, PP_Info) :- !.
 process_and_save_info_aux([ListBody|ListBodies], Head, PP_Info, New_PP_Info) :- !,
@@ -117,8 +115,9 @@ assert_information_clause_aux(ListBody, Head, PP_Info, New_PP_Info) :-
 save_clause_info(PP_Info, Head, ListBody, FrontierBody) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, _Index, PP_Info),
 	cneg_msg(1, 'save_clause_info',
-		 assertz(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody)))),
-	assertz(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))).
+		 (cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))),
+	append_to_list_of('cneg_dynamic_cls',
+			  (cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))).
 
 generate_frontier_body([], []) :- !.
 generate_frontier_body([Predicate | ListBody], [Predicate | FrontierBody]) :-
@@ -132,23 +131,34 @@ generate_frontier_body([Predicate | ListBody], [Predicate | FrontierBody]) :-
 generate_frontier_body([_Predicate | ListBody], FrontierBody) :-
 	generate_frontier_body(ListBody, FrontierBody).
 
-save_list_of_processed_predicates(List) :-
-	assertz(cneg_processed_predicates(List)).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-retrieve_list_of_processed_predicates(List) :-
-	retract(cneg_processed_predicates(List)), !.
-retrieve_list_of_processed_predicates([]).
+retrieve_list_of(Name, List) :-
+	retract(cneg_dynamic(Name, List)), !.
+retrieve_list_of(_Name, []).
 
-retrieve_processed_pred_info(PP_Info, [], []) :- !,
+save_list_of(Name, List) :-
+	assertz(cneg_dynamic(Name, List)).
+
+append_to_list_of(Name, Element) :-
+	retrieve_list_of(Name, List),
+	save_list_of(Name, [Element | List]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+processed_preds_lookup(PP_Info, [], []) :- !,
 	cneg_processed_pred_info(_Name, _Arity, _SourceFileName, 0, PP_Info), !.
-retrieve_processed_pred_info(PP_Info, [Current|List_In], List_In) :-
+processed_preds_lookup(PP_Info, [Current|List_In], List_In) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, PP_Info),
 	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, Current),
 	!.
-retrieve_processed_pred_info(PP_Info, [Current|List_In], [Current|List_Tmp]) :-
-	retrieve_processed_pred_info(PP_Info, List_In, List_Tmp), !.
+processed_preds_lookup(PP_Info, [Current|List_In], [Current|List_Tmp]) :-
+	processed_preds_lookup(PP_Info, List_In, List_Tmp), !.
 
-	
 cneg_processed_pred_info(Name, Arity, SourceFileName, Index,
 	cneg_processed_pred(Name, Arity, SourceFileName, Index)).
 
@@ -171,12 +181,22 @@ trans_head(Head, _NewHeadName, _HeadArity, Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 trans_sent_eof(ClsOut, _SourceFileName) :-
-	retrieve_list_of_processed_predicates(List_Of_Predicates),
-	cneg_impl(Cneg_Impl),
-	append(List_Of_Predicates, Cneg_Impl, ClsTmp_1),
-	findall(Cl,(retract(cneg_dynamic_cls(Cl))), ClsTmp_2, ClsTmp_1),
-	findall(Cl,(retract(cneg_static_cls(Cl))), ClsOut, ClsTmp_2),
-	!. %Backtracking forbiden.
+	retrieve_list_of('processed_predicates', List_Of_Predicates),
+	retrieve_list_of('cneg_dynamic_cls', Cls_Cneg_Dynamic),
+	retrieve_list_of('cneg_static_cls', Cls_Cneg_Static),
+	append(List_Of_Predicates, Cls_Cneg_Dynamic, ClsTmp_1),
+	append(ClsTmp_1, Cls_Cneg_Static, ClsTmp_2),
+	(
+	 (
+	  ClsTmp_2 = [], !,
+	  ClsOut = [end_of_file]
+	 )
+	;
+	 (
+	  cneg_impl(Cneg_Impl),
+	  append(ClsTmp_1, Cneg_Impl, ClsOut)
+	 )
+	), !.			%Backtracking forbiden.
 %	nl, nl,
 %	cneg_msg_list(1, 'ClsOut', ClsOut),
 %	nl, nl.
@@ -272,6 +292,12 @@ cneg_impl([
 %	   (main :- getenvstr('CIAO_CALL', CIAO_CALL_STRING), nl, write(CIAO_CALL_STRING),
 %	    atom_codes(CIAO_CALL, CIAO_CALL_STRING), call(CIAO_CALL), 
 %	    nl, write(CIAO_CALL)),
+	   (:- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2])),
+	   (:- use_module(cneg_lib)),
+	   (:- use_module(cneg_aux)),
+	   (:- multifile cneg_processed_pred/4),
+	   (:- multifile cneg_dynamic_cl/6),
+	   (:- multifile cneg_static_cl/3),
 	   end_of_file
 	  ]).
 %cneg_impl([
@@ -298,7 +324,7 @@ cneg_static_negation(PP_Info, Head, ListBody) :-
 	functor_local(Cneg_Cl, ':-', 2, _Arguments_Cneg_Cl),
 	arg(1, Cneg_Cl, cneg_static_cl(Goal, SourceFileName, Index)),
 	arg(2, Cneg_Cl, Sol),
-	assertz(cneg_static_cls(Cneg_Cl)).
+	append_to_list_of('cneg_static_cls', (Cneg_Cl)).
 
 cneg_static_negation(PP_Info, Head, ListBody) :- !,
 	msg('ERROR', cneg_static_negation(PP_Info, Head, ListBody)).

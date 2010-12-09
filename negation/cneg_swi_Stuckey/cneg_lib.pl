@@ -155,7 +155,9 @@ frontier_aux(Goal, [Frontier], NewGoal):-
 
 % Now go for other functors stored in our database.
 frontier_aux(Goal, Front, Goal):-
+	cneg_msg(1, 'frontier_aux :: look_for_the_relevant_clauses :: Goal', (Goal)), 
 	look_for_the_relevant_clauses(Goal, Front_Tmp),
+	cneg_msg(1, 'frontier_aux :: look_for_the_relevant_clauses :: Front_Tmp', (Front_Tmp)), 
 	simplify_frontier(Front_Tmp, Goal, Front),
 	!. % Frontier is uniquely determine if this clause is used.
 
@@ -163,6 +165,41 @@ frontier_aux(Goal, Front, Goal):-
 frontier_aux(Goal, [], Goal) :-
 	cneg_msg(1, 'ERROR: frontier can not be evaluated for', Goal), 
 	cneg_msg_nl(1), cneg_msg_nl(1), !, fail.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Look for those saved clauses with same name and arity.	
+%look_for_the_relevant_clauses(Goal, _Frontier) :-
+%	functor(Goal, Name, Arity),  % Security
+%	Name \== ',', Name \== ';',    % Issues
+%	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
+%	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body),
+%	cneg_msg(1, 'look_for_the_relevant_clauses', cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body)),
+%	fail.
+
+%look_for_the_relevant_clauses(_Goal, _Frontier) :-
+%	cneg_processed_pred(G, H, I, J), 
+%	cneg_msg(1, 'look_for_the_relevant_clauses', cneg_processed_pred(G, H, I, J)),
+%	fail.
+
+look_for_the_relevant_clauses(Goal, Frontier) :-
+	functor(Goal, Name, Arity),  % Security
+	Name \== ',', Name \== ';',    % Issues
+	!, % Backtracking forbiden.
+	cneg_processed_pred(Name, Arity, SourceFileName_1, _Occurences), 
+	cneg_msg(1, 'look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName_1)),
+	setof_local(frontier(Head, Body, FrontierTest), 
+		    cneg_dynamic_cl(Name, Arity, _SourceFileName_2, Head, Body, FrontierTest), Frontier),
+	cneg_msg(1, 'look_for_the_relevant_clauses :: (Frontier)', (Frontier)).
+
+frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, Goal, Front_Out) :-
