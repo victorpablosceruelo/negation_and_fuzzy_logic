@@ -2,7 +2,7 @@
 :- module(cneg_aux,
 	[
 	    findall/4, append/3,
-	    cneg_msg/3, cneg_msg_nl/1,
+	    cneg_msg/3, cneg_msg_list/3, cneg_msg_nl/1,
 	    first/2, second/2, unify_terms/2, functor_local/4,
 	    memberchk_local/2, term_to_meta/2,
 	    setof_local/3, filter_out_nonvars/2,
@@ -13,10 +13,6 @@
 	    goal_is_disequality/4, goal_is_equality/3,
 	    look_for_the_relevant_clauses/2, frontier_contents/4,
 	    qualify_string_name/3, remove_qualification/2, 
-	    % term_name_is_qualified/1,
-	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
-	    % replace_in_term_variables_by_values/4,
-	    % add_to_list_if_not_there/3, 
 	    terms_are_equal/2,
 	    cneg_aux_equality/2
 	]).
@@ -55,7 +51,7 @@ cneg_msg_nl(Level) :-
 	cneg_msg_are_enabled(Level),
 	!, nl.
 cneg_msg_nl(Level) :- 
-	cneg_msg_are_enabled(Level), !.
+	\+(cneg_msg_are_enabled(Level)).
 
 cneg_msg_list(Level, Msg, []) :-
 	cneg_msg(Level, Msg, []),
@@ -221,7 +217,7 @@ goal_clean_up(Goal, NewGoal) :-
 goal_clean_up(Goal, NewGoal) :-
 	functor_local(Goal, Goal_Name, Arity, Arguments),
 	name(Goal_Name, Goal_Name_String),
-	term_name_is_qualified(Goal_Name_String), !,
+	term_name_has_semicolon(Goal_Name_String), !,
 	remove_qualification(Goal_Name_String, NewGoal_Name_String),
 	name(NewGoal_Name, NewGoal_Name_String), 
 	functor_local(NewGoal, NewGoal_Name, Arity, Arguments).
@@ -257,17 +253,10 @@ goal_is_aux(Name, Arity, Goal, G1, G2) :-
 %	name(Name, NameString),
 
 qualify_string_name(Qualification, Name, NewName) :-
-	fail_if_string_name_has_semicolon(Name), !,
-	qualify_string_name_not_qualified(Qualification, Name, NewName).
-qualify_string_name(Qualification, Name, NewName) :-
+	term_name_has_semicolon(Name), !,
 	remove_qualification(Name, NameTmp), 
 	qualify_string_name(Qualification, NameTmp, NewName).
-
-fail_if_string_name_has_semicolon(Name) :-
-	name_has_semicolon(Name), !, fail.
-fail_if_string_name_has_semicolon(_Name) :- !.
-
-qualify_string_name_not_qualified(Qualification, Name, NewName) :-
+qualify_string_name(Qualification, Name, NewName) :-	
 	string(Qualification),
 	string(Name),
 	append(Qualification, ":", Prefix), 
@@ -275,38 +264,59 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	string(NewName), 
 	!.
 
-qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	cneg_msg(1, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	cneg_msg(1, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	cneg_msg(1, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
-	!.
+qualify_string_name(Qualification, Name, _NewName) :-
+	type_error(chars, Qualification),
+	type_error(chars, Name),
+%	cneg_msg(1, 'qualify_string_name :: FAILED (ensure args are string) :: Qualification', Qualification), 
+%	cneg_msg(1, 'qualify_string_name :: FAILED (ensure args are string) :: Name', Name), 
+	!, fail.
 
 %	name(Name, NameString),
 %	name(Qualification, QualificationString), 
 %     ....
 %	name(NewName, NewNameString).
 
-term_name_is_qualified(Name) :- name_has_semicolon(Name).
-name_has_semicolon(Any) :-
-	is_of_type(chars, Any), !,
-%	string(Any), !, 
-	name_has_semicolon_aux(Any).
-name_has_semicolon(Any) :-
-	cneg_msg(1, 'name_has_semicolon :: NOT a string', Any), fail.
+term_name_has_semicolon(Term) :-
+%	string(Any), !,
+	(
+	 is_of_type(chars, Term)
+	;
+	 is_of_type(codes, Term)
+	),
+	!,
+	term_name_has_semicolon_aux(Term).
+term_name_has_semicolon(Term) :-
+	(
+	 term_name_type_error(Term, chars)
+	;
+	 term_name_type_error(Term, string)
+	;
+	 term_name_type_error(Term, atom)
+	;
+	 term_name_type_error(Term, codes)
+	;
+	 term_name_type_error(Term, text)
+	),
+	!, fail.
 
-name_has_semicolon_aux([]) :- !, fail.
-name_has_semicolon_aux([A]) :- 
+term_name_type_error(Term, Type) :-
+	is_of_type(Type, Term),
+	cneg_msg(1, 'term_name_has_semicolon :: Term: ', Term),
+	cneg_msg(1, 'term_name_has_semicolon :: Type', Type).
+
+
+term_name_has_semicolon_aux([]) :- !, fail.
+term_name_has_semicolon_aux([A]) :- 
 	semicolon_string([A]), !.
-name_has_semicolon_aux([A|_Others]) :- 
+term_name_has_semicolon_aux([A|_Others]) :- 
 	semicolon_string([A]), !.
-name_has_semicolon_aux([_A|Others]) :- !,
-	name_has_semicolon_aux(Others).
+term_name_has_semicolon_aux([_A|Others]) :- !,
+	term_name_has_semicolon_aux(Others).
 
 semicolon_string(":") :- !.
-% semicolon_string(Other) :- msg('Other', Other), fail.
 
 remove_qualification(NameIn, NameOut) :-
-	name_has_semicolon(NameIn), !,
+	term_name_has_semicolon(NameIn), !,
 	remove_qualification_aux(NameIn, NameOut).
 remove_qualification(NameIn, NameIn) :- !.
 %	cneg_msg(1, 'WARNING: remove_qualification :: NOT a string qualified', NameIn).
@@ -315,44 +325,6 @@ remove_qualification_aux([A|Name], Name) :-
 	semicolon_string([A]), !.
 remove_qualification_aux([_A|NameIn], NameOut) :-
 	remove_qualification_aux(NameIn, NameOut).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% replace_in_term_var_by_value(Term1, Var, Value, Term2) 
-% returns Term2 that is Term1 when Var is substituted by Value.
-replace_in_term_var_by_value(Term,Var,Value,Value):-
-	var(Term), 
-	var(Var),
-	Term==Var,!.
-replace_in_term_var_by_value(Term,Var,_Value,Term):-
-	var(Term),
-	var(Var),
-	Term\==Var,!.
-replace_in_term_var_by_value(Term,Var,Value,Term1):-
-	var(Var),
-	Term=..[Functor|Args],
-	replace_in_args_var_by_value(Args,Var,Value,Args1),
-	Term1=..[Functor|Args1].
-
-% replace_in_args_var_by_value(Args_In, Var, Value, Args_Out) 
-% applies replace_in_term_var_by_value/4 to all the arguments in Args.
-replace_in_args_var_by_value([], _Var, _Value, []).
-replace_in_args_var_by_value([Arg_In|Args_In], Var, Value, [Arg_Out|Args_Out]):-
-	replace_in_term_var_by_value(Arg_In, Var, Value, Arg_Out),
-	replace_in_args_var_by_value(Args_In, Var, Value, Args_Out).
-
-% replace_in_term_variables_by_values(LVars,LValues,Term1,Term2) returns in Term2 the same term
-% Term1 but substituting each variable Vi from the position i of LVars
-% by the value Valuei from the position i of LValues
-replace_in_term_variables_by_values(Term, [], [], Term).
-replace_in_term_variables_by_values(Term_In, [Var|LVars], [Value|LValues], Term_Out):-
-	var(Var),!, % Don't do this if Var is not a variable.
-	replace_in_term_var_by_value(Term_In, Var, Value, Term_Tmp),
-	replace_in_term_variables_by_values(Term_Tmp, LVars, LValues, Term_Out).
-replace_in_term_variables_by_values(Term_In, [_Var|LVars], [_Value|LValues], Term_Out):-
-	replace_in_term_variables_by_values(Term_In, LVars, LValues, Term_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

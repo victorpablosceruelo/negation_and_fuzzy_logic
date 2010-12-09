@@ -116,6 +116,8 @@ assert_information_clause_aux(ListBody, Head, PP_Info, New_PP_Info) :-
 
 save_clause_info(PP_Info, Head, ListBody, FrontierBody) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, _Index, PP_Info),
+	cneg_msg(1, 'save_clause_info',
+		 assertz(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody)))),
 	assertz(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))).
 
 generate_frontier_body([], []) :- !.
