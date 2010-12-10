@@ -26,7 +26,7 @@
 :- data cneg_static_cls/1.
 
 trans_clause(Whatever, Whatever, _) :-
-	debug_msg('trans_cl', trans_cl(Whatever)).
+	debug_msg(0, 'trans_cl', trans_cl(Whatever)).
 
 % trans_sent(Sentence,SentList,Module) sustitutes Sentence in 
 % the program Module that is being compilated by the list of 
@@ -37,7 +37,7 @@ trans_sent(Input, Output, SourceFileName) :-
 	trans_sent_aux(Input, Output, SourceFileName), !.
 
 trans_sent(Input, _Output, _SourceFileName) :-
-	msg('ERROR :: Impossible to translate', (Input)), !.
+	debug_msg(2, 'ERROR :: Impossible to translate', (Input)), !.
 
 trans_sent_aux(X, [], _SourceFileName):- 
 	var(X), !, fail.
@@ -73,7 +73,7 @@ trans_sent_aux(Clause, Result, SourceFileName) :-
 
 trans_sent_aux(Clause, [], _SourceFileName) :-
 	functor_local(Clause, Name, Arity, _Arguments),
-	debug_msg('trans_sent_aux', functor_local(Clause, Name, Arity, _Arguments)),
+	debug_msg(0, 'trans_sent_aux', functor_local(Clause, Name, Arity, _Arguments)),
 	!.
 
 trans_clause_with_body(Head, Body, [Result], SourceFileName) :-
@@ -162,7 +162,7 @@ trans_head(Head, NewHeadName, HeadArity, NewHead) :-
 	functor_local(NewHead, NewHeadName, HeadArity, HeadArgs).
 
 trans_head(Head, _NewHeadName, _HeadArity, Head) :-
-	debug_msg('trans_head :: FAILED conversion for', Head), !, fail.
+	debug_msg(0, 'trans_head :: FAILED conversion for', Head), !, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -254,11 +254,11 @@ add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
 cneg_impl([
 	(cneg(Predicate) :- cneg_aux(Predicate, [])),
 	 (cneg_aux(Predicate, Universal_Vars) :- cneg_lib_aux(Predicate, Universal_Vars, Result), 
-	  debug_msg_nl, 
-	  debug_msg('cneg :: INPUT :: ', Predicate),
-	  debug_msg('cneg :: Universal Vars IN :: ', Universal_Vars),
-	  debug_msg('cneg :: OUTPUT :: ', call(Result)), 
-	  debug_msg_nl, 
+	  debug_msg_nl(0), 
+	  debug_msg(0, 'cneg :: INPUT :: ', Predicate),
+	  debug_msg(0, 'cneg :: Universal Vars IN :: ', Universal_Vars),
+	  debug_msg(0, 'cneg :: OUTPUT :: ', call(Result)), 
+	  debug_msg_nl(0), 
 	  !, call(Result)),
 	  (cneg_static_predicate_call(_Goal, _SourceFileName, 0)),
 	   (cneg_static_predicate_call(Goal, SourceFileName, Occurences) :-
@@ -290,16 +290,16 @@ cneg_static_negation(PP_Info, Head, ListBody) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, PP_Info),
 	functor_local(Goal, Name, Arity, Args),
 	varsbag_local(Args, [], [], GoalVars),
-%	debug_msg('cneg_static_negation IN', negate_subfrontier((Head, ListBody), Goal, GoalVars)),
+%	debug_msg(0, 'cneg_static_negation IN', negate_subfrontier((Head, ListBody), Goal, GoalVars)),
 	negate_subfrontier((Head, ListBody), Goal, GoalVars, Sol),
-%	debug_msg('cneg_static_negation OUT', Sol),
+%	debug_msg(0, 'cneg_static_negation OUT', Sol),
 	functor_local(Cneg_Cl, ':-', 2, _Arguments_Cneg_Cl),
 	arg(1, Cneg_Cl, cneg_static_cl(Goal, SourceFileName, Index)),
 	arg(2, Cneg_Cl, Sol),
 	assertz_fact(cneg_static_cls(Cneg_Cl)).
 
 cneg_static_negation(PP_Info, Head, ListBody) :- !,
-	msg('ERROR', cneg_static_negation(PP_Info, Head, ListBody)).
+	debug_msg(2, 'ERROR', cneg_static_negation(PP_Info, Head, ListBody)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

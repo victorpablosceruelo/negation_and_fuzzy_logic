@@ -2,8 +2,8 @@
 :- module(cneg_aux,
 	[
 	    findall/4, append/3,
-	    debug_msg/2, debug_msg_list/2, debug_msg_nl/0, 
-	    msg/2, msg_aux/2, msg_nl/0,
+	    debug_msg/3, debug_msg_list/3, 
+	    debug_msg_aux/3, debug_msg_nl/1, 
 	    first/2, second/2, unify_terms/2, functor_local/4,
 	    memberchk_local/2, term_to_meta/2,
 	    setof_local/3, filter_out_nonvars/2,
@@ -43,46 +43,39 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use the following sentences to enable/disable debugging.
-debug_msg_is_on('yes').
-% debug_msg_is_on('no').
+debug_msg_is_on(Level) :- Level > 0.
+
+% 0 -> crazy debug.
+% 1 -> debug.
+% 2 -> normal msgs.
 
 %%% Debug (by VPC).
-debug_msg(Msg, Clause) :-
-	debug_msg_is_on('yes'), 
-	!, % No backtracking allowed.
-	write('% DBG % '),
+debug_msg(Level, Msg, Clause) :-
+	debug_msg_aux(Level, '% cneg', ''),
+	debug_msg_aux(Level, Msg, Clause),
+	debug_msg_nl(Level).
+
+debug_msg_aux(Level, Msg, Clause) :-
+	debug_msg_is_on(Level),
 	write(Msg), 
 	write(' :: '),
-	write(Clause), nl, 
+	write(Clause).
+debug_msg_aux(Level, _Msg, _Clause) :- 
+	\+(debug_msg_is_on(Level)).
+
+debug_msg_nl(Level) :-
+	debug_msg_is_on(Level),
+	nl.
+debug_msg_nl(Level) :- 
+	\+(debug_msg_is_on(Level)).
+
+debug_msg_list(Level, Msg, []) :-
+	debug_msg(Level, Msg, []),
 	!. % No backtracking allowed.
-debug_msg(_Msg, _Clause) :- 
-	debug_msg_is_on('no').
-
-debug_msg_nl :-
-	debug_msg_is_on('yes'),
-	!, nl.
-debug_msg_nl :- 
-	debug_msg_is_on('no'), !.
-
-
-debug_msg_list(Msg, []) :-
-	debug_msg(Msg, []),
-	!. % No backtracking allowed.
-debug_msg_list(Msg, [Cl|Cls]) :- 
+debug_msg_list(Level, Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
-	debug_msg(Msg, Cl),
-	debug_msg_list(Msg, Cls).
-
-msg(Msg1, Msg2) :-
-	msg_aux(Msg1, ' :: '),
-	msg_aux(Msg2, ' '), 
-	msg_nl, !.
-
-msg_aux(Msg1, Msg2) :-
-	write(Msg1), 
-	write(Msg2), 
-	!. % No backtracking allowed.
-msg_nl :- nl.
+	debug_msg(Level, Msg, Cl),
+	debug_msg_list(Level, Msg, Cls).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -295,9 +288,9 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	!.
 
 qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	debug_msg('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	debug_msg('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	debug_msg('qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
+	debug_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
+	debug_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
+	debug_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
 	!.
 
 %	name(Name, NameString),
@@ -310,7 +303,7 @@ name_has_semicolon(Any) :-
 	string(Any), !, 
 	name_has_semicolon_aux(Any).
 name_has_semicolon(Any) :-
-	debug_msg('name_has_semicolon :: NOT a string', Any), fail.
+	debug_msg(0, 'name_has_semicolon :: NOT a string', Any), fail.
 
 name_has_semicolon_aux([]) :- !, fail.
 name_has_semicolon_aux([A]) :- 
