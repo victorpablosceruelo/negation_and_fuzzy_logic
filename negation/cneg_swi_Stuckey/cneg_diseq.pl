@@ -10,11 +10,11 @@
 :- use_module(cneg_aux).
 
 % For Ciao Prolog:
-:- multifile 
-        verify_attribute/2,
-        combine_attributes/2,
-	portray_attribute/2,
-	portray/1.
+%:- multifile 
+%        verify_attribute/2,
+%        combine_attributes/2,
+%	portray_attribute/2,
+%	portray/1.
 
 % For XSB:
 %:- import put_attr/3, get_attr/3, del_attr/2,

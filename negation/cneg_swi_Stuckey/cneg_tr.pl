@@ -5,7 +5,7 @@
 % technique for the constructive negation of the goals.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- module(cneg_tr,[trans_sent/3, trans_goal/3]).
+:- module(cneg_tr, [ trans_sent/3, trans_goal/3 ] ).
 
 %:- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
@@ -31,7 +31,7 @@ trans_sent(Input, Output, SourceFileName) :-
 	!.
 
 trans_sent(Input, _Output, _SourceFileName) :-
-	msg('ERROR :: Impossible to translate', (Input)), !.
+	cneg_msg(1, 'ERROR :: Impossible to translate', (Input)), !.
 
 trans_sent_aux(X, [], _SourceFileName):- 
 	var(X), !, fail.
@@ -44,7 +44,7 @@ trans_sent_aux(0, [], _SourceFileName) :- !.
 
 % Do not modify module imports, declarations and so on.
 trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
-%	msg('Warning: cneg does not work for imported predicates unless cneg\'s package is imported from each one. Problematic declaration:', Whatever).
+%	cneg_msg(1, 'Warning: cneg does not work for imported predicates unless cneg\'s package is imported from each one. Problematic declaration:', Whatever).
 
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
 trans_sent_aux(Clause, Result, SourceFileName) :-
@@ -169,7 +169,8 @@ cneg_processed_pred_info(Name, Arity, SourceFileName, Index,
 trans_head(Head, NewHeadName, HeadArity, NewHead) :-
 	functor_local(Head, HeadName, HeadArity, HeadArgs),
 	name(HeadName, HeadName_String),
-	remove_qualification(HeadName_String, NewHeadName_String), !,
+	name('cneg_lib', Qualification_String),
+	change_qualification(Qualification_String, HeadName_String, NewHeadName_String), !,
 	name(NewHeadName, NewHeadName_String),
 	functor_local(NewHead, NewHeadName, HeadArity, HeadArgs).
 
@@ -193,8 +194,10 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 	 )
 	;
 	 (
-	  cneg_impl(Cneg_Impl),
-	  append(ClsTmp_1, Cneg_Impl, ClsOut)
+	  cneg_definitions(Cneg_Defs),
+	  append(Cneg_Defs, ClsTmp_2, ClsTmp_3),
+	  cneg_implementation(Cneg_Impl),
+	  append(ClsTmp_3, Cneg_Impl, ClsOut)
 	 )
 	), !.			%Backtracking forbiden.
 %	nl, nl,
@@ -255,9 +258,9 @@ change_conflictive_arguments(Arity, [Arg|Args], [NewArg|NewArgs]) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change_conflictive_predicate(',', ',', 2) :- 
-%	msg('Error', 'Trying to change the name for functor --,--'), !, fail.
+%	cneg_msg(1, 'Error', 'Trying to change the name for functor --,--'), !, fail.
 %change_conflictive_predicate(';', ';', 2) :- 
-%	msg('Error', 'Trying to change the name for functor --;--'), !, fail.
+%	cneg_msg(1, 'Error', 'Trying to change the name for functor --;--'), !, fail.
 change_conflictive_predicate('dist', 'cneg_diseq', 2, 3, Args_In, Args_Out) :- !, 
 	add_empty_list_argument(Args_In, Args_Out).
 change_conflictive_predicate('cneg_diseq', 'cneg_diseq', 2, 3, Args_In, Args_Out) :- !,
@@ -273,7 +276,27 @@ add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_impl([
+cneg_definitions(
+		 [
+		  (:- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2])),
+		  (:- use_module(cneg_lib)),
+		  (:- use_module(cneg_aux)),
+% See http://old.nabble.com/Re:-Check-existance-of-undefined-procedures-facts-td21921772.html
+%		  (:- discontiguous cneg_processed_pred/4),
+%		  (:- discontiguous cneg_dynamic_cl/6),
+%		  (:- discontiguous cneg_static_cl/3)
+
+% See http://www.swi-prolog.org/pldoc/doc_for?object=section%282,%274.9%27,swi%28%27/doc/Manual/exception.html%27%29%29
+% to know why not only multifile but dynamic too.
+		  (:- dynamic cneg_lib:cneg_processed_pred/4),
+		  (:- multifile cneg_lib:cneg_processed_pred/4),
+		  (:- dynamic cneg_lib:cneg_dynamic_cl/6),
+		  (:- multifile cneg_lib:cneg_dynamic_cl/6),
+		  (:- dynamic cneg_lib:cneg_static_cl/3),
+		  (:- multifile cneg_lib:cneg_static_cl/3)
+		 ]).
+
+cneg_implementation([
 	(cneg(Predicate) :- cneg_aux(Predicate, [])),
 	 (cneg_aux(Predicate, Universal_Vars) :- cneg_lib_aux(Predicate, Universal_Vars, Result), 
 	  cneg_msg_nl(1), 
@@ -292,12 +315,6 @@ cneg_impl([
 %	   (main :- getenvstr('CIAO_CALL', CIAO_CALL_STRING), nl, write(CIAO_CALL_STRING),
 %	    atom_codes(CIAO_CALL, CIAO_CALL_STRING), call(CIAO_CALL), 
 %	    nl, write(CIAO_CALL)),
-	   (:- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2])),
-	   (:- use_module(cneg_lib)),
-	   (:- use_module(cneg_aux)),
-	   (:- multifile cneg_processed_pred/4),
-	   (:- multifile cneg_dynamic_cl/6),
-	   (:- multifile cneg_static_cl/3),
 	   end_of_file
 	  ]).
 %cneg_impl([
@@ -327,7 +344,7 @@ cneg_static_negation(PP_Info, Head, ListBody) :-
 	append_to_list_of('cneg_static_cls', (Cneg_Cl)).
 
 cneg_static_negation(PP_Info, Head, ListBody) :- !,
-	msg('ERROR', cneg_static_negation(PP_Info, Head, ListBody)).
+	cneg_msg(1, 'ERROR', cneg_static_negation(PP_Info, Head, ListBody)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

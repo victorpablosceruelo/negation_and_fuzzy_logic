@@ -7,10 +7,16 @@
 :- meta_predicate cneg(0).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
-% To access predicates from anywhere.
-:- multifile cneg_processed_pred/4.
-:- multifile cneg_dynamic_cl/6.
-:- multifile cneg_static_cl/3.
+% To access predicates defined in main module.
+% :- discontiguous cneg_processed_pred/4.
+% :- discontiguous cneg_dynamic_cl/6.
+% :- discontiguous cneg_static_cl/3.
+:- dynamic cneg_lib:cneg_processed_pred/4.
+:- multifile cneg_lib:cneg_processed_pred/4.
+:- dynamic cneg_lib:cneg_dynamic_cl/6.
+:- multifile cneg_lib:cneg_dynamic_cl/6.
+:- dynamic cneg_lib:cneg_static_cl/3.
+:- multifile cneg_lib:cneg_static_cl/3.
 
 :- use_module(cneg_aux).
 :- use_module(cneg_diseq,
@@ -21,6 +27,8 @@
 	      ]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
+
+cneg_processed_pred('feo', 'feo', 'feo', 'feo').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -189,6 +197,7 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	functor(Goal, Name, Arity),  % Security
 	Name \== ',', Name \== ';',    % Issues
 	!, % Backtracking forbiden.
+	cneg_msg(1, 'look_for_the_relevant_clauses :: (Name, Arity)', (Name, Arity)),
 	cneg_processed_pred(Name, Arity, SourceFileName_1, _Occurences), 
 	cneg_msg(1, 'look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName_1)),
 	setof_local(frontier(Head, Body, FrontierTest), 

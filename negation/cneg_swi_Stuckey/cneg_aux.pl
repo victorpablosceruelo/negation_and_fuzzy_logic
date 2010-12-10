@@ -1,20 +1,20 @@
 
 :- module(cneg_aux,
-	[
-	    findall/4, append/3,
-	    cneg_msg/3, cneg_msg_list/3, cneg_msg_nl/1,
-	    first/2, second/2, unify_terms/2, functor_local/4,
-	    memberchk_local/2, term_to_meta/2,
-	    setof_local/3, filter_out_nonvars/2,
-	    varsbag_local/4, varsbag_difference/3, 
-	    varsbag_addition/3, varsbag_remove_var/3,
-	    goal_clean_up/2,
-	    goal_is_conjunction/3, goal_is_disjunction/3, 
-	    goal_is_disequality/4, goal_is_equality/3,
-	    qualify_string_name/3, remove_qualification/2, 
-	    terms_are_equal/2,
-	    cneg_aux_equality/2
-	]).
+	  [
+	   findall/4, append/3,
+	   cneg_msg/3, cneg_msg_list/3, cneg_msg_nl/1,
+	   first/2, second/2, unify_terms/2, functor_local/4,
+	   memberchk_local/2, term_to_meta/2,
+	   setof_local/3, filter_out_nonvars/2,
+	   varsbag_local/4, varsbag_difference/3, 
+	   varsbag_addition/3, varsbag_remove_var/3,
+	   goal_clean_up/2,
+	   goal_is_conjunction/3, goal_is_disjunction/3, 
+	   goal_is_disequality/4, goal_is_equality/3,
+	   change_qualification/3, remove_qualification/2,
+	   terms_are_equal/2,
+	   cneg_aux_equality/2
+	  ]).
 
 %:- use_module(library(aggregates),[setof/3]).
 %:- use_module(library(write), _).
@@ -246,40 +246,32 @@ goal_is_aux(Name, Arity, Goal, G1, G2) :-
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),
 
-qualify_string_name(Qualification, Name, NewName) :-
+change_qualification(Qualification, Name, NewName) :-
 	term_name_has_semicolon(Name), !,
 	remove_qualification(Name, NameTmp), 
-	qualify_string_name(Qualification, NameTmp, NewName).
-qualify_string_name(Qualification, Name, NewName) :-	
-	string(Qualification),
-	string(Name),
+	change_qualification(Qualification, NameTmp, NewName).
+change_qualification(Qualification, Name, NewName) :-
+	valid_term_name(Qualification),
+	valid_term_name(Name),
 	append(Qualification, ":", Prefix), 
 	append(Prefix, Name, NewName),
-	string(NewName), 
+	valid_term_name(NewName), 
 	!.
-
-qualify_string_name(Qualification, Name, _NewName) :-
-	type_error(chars, Qualification),
-	type_error(chars, Name),
-%	cneg_msg(1, 'qualify_string_name :: FAILED (ensure args are string) :: Qualification', Qualification), 
-%	cneg_msg(1, 'qualify_string_name :: FAILED (ensure args are string) :: Name', Name), 
-	!, fail.
 
 %	name(Name, NameString),
 %	name(Qualification, QualificationString), 
 %     ....
 %	name(NewName, NewNameString).
 
-term_name_has_semicolon(Term) :-
-%	string(Any), !,
+valid_term_name(Term) :-
 	(
 	 is_of_type(chars, Term)
 	;
 	 is_of_type(codes, Term)
 	),
-	!,
-	term_name_has_semicolon_aux(Term).
-term_name_has_semicolon(Term) :-
+	!.
+valid_term_name(Term) :-
+%	string(Any), !, % Only for Ciao Prolog.	
 	(
 	 term_name_type_error(Term, chars)
 	;
@@ -292,12 +284,14 @@ term_name_has_semicolon(Term) :-
 	 term_name_type_error(Term, text)
 	),
 	!, fail.
-
 term_name_type_error(Term, Type) :-
 	is_of_type(Type, Term),
-	cneg_msg(1, 'term_name_has_semicolon :: Term: ', Term),
-	cneg_msg(1, 'term_name_has_semicolon :: Type', Type).
-
+	cneg_msg(1, 'term_name_type_error :: Term: ', Term),
+	cneg_msg(1, 'term_name_type_error :: Type', Type).
+	
+term_name_has_semicolon(Term) :-
+	valid_term_name(Term),
+	term_name_has_semicolon_aux(Term).
 
 term_name_has_semicolon_aux([]) :- !, fail.
 term_name_has_semicolon_aux([A]) :- 

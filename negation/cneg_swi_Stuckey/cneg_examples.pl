@@ -1,5 +1,6 @@
 :- module(cneg_examples).
-:- use_module(cneg).
+% :- use_module(cneg).
+:- include(cneg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %               EXAMPLES  FOR CONSTRUCTIVE NEGATION                      %
