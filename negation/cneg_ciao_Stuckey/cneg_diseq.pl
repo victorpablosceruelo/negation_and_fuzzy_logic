@@ -46,8 +46,10 @@
 
 % Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
-%	debug_msg(0, 'remove_attribute_local :: Var', Var),
-	detach_attribute(Var).
+	debug_msg_aux(0, 'cneg :: remove_attribute_local :: Var :: ', Var),
+	detach_attribute(Var),
+	debug_msg_aux(0, '  -->> Var :: ', Var),
+	debug_msg_nl(0).
 % XSB:	del_attr(Var, dist).
 
 get_attribute_local(Var, Attribute) :-
@@ -56,9 +58,12 @@ get_attribute_local(Var, Attribute) :-
 %	debug_msg(0, 'get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
 
 put_attribute_local(Var, Attribute) :-
-	debug_msg(0, 'put_attribute_local :: (Var, Attribute)', (Var, Attribute)),
+	debug_msg_aux(0, 'put_attribute_local :: Attribute :: ', Attribute),
+	debug_msg_aux(0, '  Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
-	attach_attribute(Var, Attribute).
+	attach_attribute(Var, Attribute),
+	debug_msg_aux(0, '  -->> Var :: ', Var),
+	debug_msg_nl(0).
 %	put_attr(Var, dist, Attribute).
 
 %get_attribute_if_any(Var) :-

@@ -43,7 +43,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use the following sentences to enable/disable debugging.
-debug_msg_is_on(Level) :- Level > 0.
+debug_msg_is_on(Level) :- Level >= 0.
 
 % 0 -> crazy debug.
 % 1 -> debug.
@@ -51,14 +51,14 @@ debug_msg_is_on(Level) :- Level > 0.
 
 %%% Debug (by VPC).
 debug_msg(Level, Msg, Clause) :-
-	debug_msg_aux(Level, '% cneg', ''),
-	debug_msg_aux(Level, Msg, Clause),
+	debug_msg_aux(Level, '% cneg', ' :: '),
+	debug_msg_aux(Level, Msg, ' :: '),
+	debug_msg_aux(Level, Clause, ''),
 	debug_msg_nl(Level).
 
 debug_msg_aux(Level, Msg, Clause) :-
 	debug_msg_is_on(Level),
 	write(Msg), 
-	write(' :: '),
 	write(Clause).
 debug_msg_aux(Level, _Msg, _Clause) :- 
 	\+(debug_msg_is_on(Level)).
