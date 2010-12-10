@@ -34,17 +34,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %cneg_lib_aux(Goal, [], Result) :- 
-%	debug_nl,
-%	debug('cneg_lib :: using cneg_static for', Goal), 
+%	debug_msg_nl,
+%	debug_msg('cneg_lib :: using cneg_static for', Goal), 
 %	cneg_static(Goal, Result).
 
 cneg_lib_aux(Goal, UnivVars, Result):-
 %	UnivVars \== [],
-	debug_nl,
-	debug('cneg_lib :: cneg_dynamic :: Goal', Goal), 
+	debug_msg_nl,
+	debug_msg('cneg_lib :: cneg_dynamic :: Goal', Goal), 
 	cneg_dynamic(Goal, UnivVars, Result),
-	debug('cneg_lib :: cneg_dynamic :: Goal', Goal),
-	debug('cneg_lib :: cneg_dynamic :: Result', Result),
+	debug_msg('cneg_lib :: cneg_dynamic :: Goal', Goal),
+	debug_msg('cneg_lib :: cneg_dynamic :: Result', Result),
 	!. % No backtracking allowed
 
 
@@ -55,18 +55,18 @@ cneg_lib_aux(Goal, UnivVars, Result):-
 % Be carefull: the following code produces random errors.
 %cneg_static(_Goal) :-
 %	cneg_static_pred(Goal, SourceFileName, Occurences), 
-%	debug('cneg_static_pred', (Goal, SourceFileName, Occurences)),
+%	debug_msg('cneg_static_pred', (Goal, SourceFileName, Occurences)),
 %	fail.
 
 cneg_static(Goal, (Result_G1, Result_G2)) :-
 	goal_is_conjunction(Goal, G1, G2), !,
-%	debug('cneg_static', goal_is_conjunction(Goal, G1, G2)),
+%	debug_msg('cneg_static', goal_is_conjunction(Goal, G1, G2)),
 	cneg_static(G1, Result_G1),
 	cneg_static(G2, Result_G2).
 
 cneg_static(Goal, Result) :-
 	goal_clean_up(Goal, NewGoal), !,
-%	debug('cneg_static', goal_clean_up(Goal, NewGoal)),
+%	debug_msg('cneg_static', goal_clean_up(Goal, NewGoal)),
 	cneg_static(NewGoal, Result).
 
 cneg_static(Goal, cneg_diseq(X, Y, FreeVars)) :-
@@ -89,12 +89,12 @@ cneg_static(Goal, cneg_static_predicate_call(Goal, SourceFileName, Occurences)) 
 
 cneg_dynamic(Goal, UnivVars, Solution) :-
 	varsbag_local(Goal, [], [], GoalVars),
-	debug('cneg_dynamic :: varsbag_local', (Goal, GoalVars)),
+	debug_msg('cneg_dynamic :: varsbag_local', (Goal, GoalVars)),
 	put_universal_quantification(UnivVars),
 
-	debug('cneg_dynamic :: copy_term :: Original (Goal, GoalVars)', (Goal, GoalVars)),
+	debug_msg('cneg_dynamic :: copy_term :: Original (Goal, GoalVars)', (Goal, GoalVars)),
 	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
-	debug('cneg_dynamic :: copy_term :: Copy     (Goal, GoalVars)', (Goal_Copy, GoalVars_Copy)), 
+	debug_msg('cneg_dynamic :: copy_term :: Copy     (Goal, GoalVars)', (Goal_Copy, GoalVars_Copy)), 
 	remove_universal_quantification(GoalVars_Copy, _Universally_Quantified),
 
 	frontier(Goal_Copy, Frontier, Goal_Not_Qualified), 
@@ -114,12 +114,12 @@ cneg_dynamic(Goal, UnivVars, Solution) :-
 % elements where each element is a conjunction of subgoals.
 
 frontier(Goal, Frontier, NewGoal) :-
-	debug_nl,
-%	debug('frontier :: Goal (IN)', Goal),
+	debug_msg_nl,
+%	debug_msg('frontier :: Goal (IN)', Goal),
 	frontier_aux(Goal, Frontier, NewGoal).
-%	debug('frontier :: Goal', Goal),
-%	debug('frontier :: Frontier', Frontier),
-%	debug('frontier :: NewGoal', NewGoal).
+%	debug_msg('frontier :: Goal', Goal),
+%	debug_msg('frontier :: Frontier', Frontier),
+%	debug_msg('frontier :: NewGoal', NewGoal).
 
 % First remove $ and qualification from the goal's name.
 frontier_aux(Goal, Frontier, NewGoal) :-
@@ -132,7 +132,7 @@ frontier_aux(Goal, Frontier, (NewG1; NewG2)):-
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
 	cneg_aux:append(F1, F2, Front),
-%	debug('frontier :: disjunction', Front),
+%	debug_msg('frontier :: disjunction', Front),
 	simplify_frontier(Front, (NewG1;NewG2), Frontier).
 
 % Now go for the conjunctions.
@@ -141,7 +141,7 @@ frontier_aux(Goal, Frontier, (NewG1, NewG2)):-
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
 	combine_frontiers(F1, F2, Front),
-%	debug('frontier :: conjunction', Front),
+%	debug_msg('frontier :: conjunction', Front),
 	simplify_frontier(Front, (NewG1,NewG2), Frontier).
 
 % Now go for the functors for equality and disequality.
@@ -168,24 +168,24 @@ frontier_aux(Goal, Front, Goal):-
 
 % And at last report an error if it was impossible to found a valid entry.
 frontier_aux(Goal, [], Goal) :-
-	debug('ERROR: frontier can not be evaluated for', Goal), 
-	debug_nl, debug_nl, !, fail.
+	debug_msg('ERROR: frontier can not be evaluated for', Goal), 
+	debug_msg_nl, debug_msg_nl, !, fail.
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, Goal, Front_Out) :-
-%	debug_nl,
-%	debug_list('simplify_frontier :: Front_In (list)', Front_In),
-	debug('simplify_frontier :: Goal', Goal),
+%	debug_msg_nl,
+%	debug_msg_list('simplify_frontier :: Front_In (list)', Front_In),
+	debug_msg('simplify_frontier :: Goal', Goal),
 	simplify_frontier_aux(Front_In, Goal, Front_Out).
-%	debug_list('simplify_frontier :: Front_Out (list)', Front_Out).
+%	debug_msg_list('simplify_frontier :: Front_Out (list)', Front_Out).
 
 simplify_frontier_aux([], _G, []) :- !.
 simplify_frontier_aux([SubFrontier | Frontier_In], G, [SubFrontier | Frontier_Out]):-
 	test_subfrontier_is_valid(SubFrontier, G), !,
-	debug('simplify_frontier_aux (ok)', SubFrontier),
+	debug_msg('simplify_frontier_aux (ok)', SubFrontier),
 	simplify_frontier_aux(Frontier_In, G, Frontier_Out).
 simplify_frontier_aux([SubFrontier | Frontier_In], G, Frontier_Out):-
-	debug('simplify_frontier_aux (no)', SubFrontier),
+	debug_msg('simplify_frontier_aux (no)', SubFrontier),
 	simplify_frontier_aux(Frontier_In, G, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
@@ -233,22 +233,22 @@ combine_2_simple_frontiers(F1_1, F2_1, F3_1) :-
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
 negate_frontier(Frontier, Goal, Solutions) :-
-	debug_nl,
-%	debug_list('negate_frontier :: Frontier (list)', Frontier), 
-	debug('negate_frontier :: Goal', Goal), 
+	debug_msg_nl,
+%	debug_msg_list('negate_frontier :: Frontier (list)', Frontier), 
+	debug_msg('negate_frontier :: Goal', Goal), 
 	!,
 	varsbag_local(Goal, [], [], GoalVars),
-	debug('negate_frontier :: GoalVars', GoalVars), 
+	debug_msg('negate_frontier :: GoalVars', GoalVars), 
 	negate_frontier_aux(Frontier, Goal, GoalVars, Solutions),
 	!.
-%	debug('negate_frontier :: Solutions', Solutions).
+%	debug_msg('negate_frontier :: Solutions', Solutions).
 
 negate_frontier_aux([], _Goal, _GoalVars, true) :- !.
 negate_frontier_aux([Frontier | More_Frontier], Goal, GoalVars, Sol):-
 	frontier_contents(Frontier, Head, Body, _FrontierTest),
-%	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
+%	debug_msg('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
 	negate_subfrontier((Head, Body), Goal, GoalVars, Sol_Subfr),
-%	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
+%	debug_msg('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
 	!, % Reduce the stack's memory.
 	negate_frontier_aux(More_Frontier, Goal, GoalVars, Sol_More_Subfr),
 	combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, Sol), !.
@@ -268,20 +268,20 @@ combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Sub
 % It fails if the negation of the conjunction has no solutions
 negate_subfrontier((_Head, [fail]), _G, _GoalVars, true):- !.
 negate_subfrontier(SubFrontier, Goal, GoalVars, NegatedFrontier):-
-%	debug('negate_subfrontier :: SubFrontier', SubFrontier),
+%	debug_msg('negate_subfrontier :: SubFrontier', SubFrontier),
 	split_subfrontier_into_Ci_Bi(SubFrontier, Goal, Ci, Bi),
 	!, % Reduce the stack's memory.
-%	debug('negate_subfrontier :: split_subfrontier_into_Ci_Bi', (Ci, Bi)),
+%	debug_msg('negate_subfrontier :: split_subfrontier_into_Ci_Bi', (Ci, Bi)),
 	negate_subfrontier_aux(GoalVars, Ci, Bi, NegatedFrontier),
-%	debug('negate_subfrontier :: NegatedFrontier', NegatedFrontier),
+%	debug_msg('negate_subfrontier :: NegatedFrontier', NegatedFrontier),
 	!.
 
 % negate_subfrontier_aux(C, G, GoalVars, I, D, R, SolC)
 %negate_subfrontier_aux(_C, _Goal, _GoalVars, [fail], _D, _R, []) :-
-%	debug('negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
+%	debug_msg('negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
 %	!. % Backtracking is not allowed.
 negate_subfrontier_aux(_GoalVars, [], [], fail) :-
-%	debug('negate_subfrontier_aux', 'Ci adn Bi are empty lists'),
+%	debug_msg('negate_subfrontier_aux', 'Ci adn Bi are empty lists'),
 	!. % Backtracking is not allowed.
 
 negate_subfrontier_aux(GoalVars, [], Bi_In, cneg_aux(Bi_Conj, UnivVars)) :- !,
@@ -295,9 +295,9 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	negate_Ci(Ci_In, GoalVars, Ci_Negated),
 	varsbag_local(Ci_In, [], [], Ci_Vars),
 	varsbag_local(Bi_In, GoalVars, [], Bi_FreeVars),
-%	debug('negate_subfrontier_aux :: Bi_FreeVars', Bi_FreeVars),
+%	debug_msg('negate_subfrontier_aux :: Bi_FreeVars', Bi_FreeVars),
 	varsbag_difference(Bi_FreeVars, Ci_Vars, UnivVars),
-%	debug('negate_subfrontier_aux :: UnivVars', UnivVars),
+%	debug_msg('negate_subfrontier_aux :: UnivVars', UnivVars),
 
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
@@ -337,7 +337,7 @@ split_subfrontier_into_Ci_Bi((Head, BodyList), Goal_Copy, Ci, Bi):-
 	copy_term((Head, BodyList), (Head_Copy, BodyList_Copy)),
 	unify_goal_structure_into_head(Goal_Copy, Head_Copy),
 	split_body_into_ci_Bi([cneg_eq(Goal_Copy, Head_Copy) | BodyList_Copy], [], [], Ci, Bi).
-%	debug('split_body_into_ci_Bi', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
+%	debug_msg('split_body_into_ci_Bi', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
 
 % unify_goal_structure_into_head(Goal_Copy, Head_Copy)
 unify_goal_structure_into_head(Goal_Copy, Head_Copy) :-
@@ -373,11 +373,11 @@ split_subgoal_into_ci_Bi(SubGoal, Ci, B, Ci, [SubGoal | B]) :- !.
 % solution of the negation of the main Goal. The rest of solutions will
 % be obtained by backtracking.
 call_combined_solutions(X) :-
-%	debug('call_combined_solutions', X),
+%	debug_msg('call_combined_solutions', X),
 	call_combined_solutions_conjunction(X).
 
 %call_combined_solutions_conjunction(Any) :-
-%	debug('call_combined_solutions_conjunction', Any),
+%	debug_msg('call_combined_solutions_conjunction', Any),
 %	fail.
 call_combined_solutions_conjunction([]) :- !.
 call_combined_solutions_conjunction([Sol]) :- !,
@@ -406,7 +406,7 @@ perform_a_call_to(Goal) :-
 
 % Qualify the predicate as needed.
 perform_a_call_to(Goal) :-
-	debug('perform_a_call_to(Goal)', Goal),
+	debug_msg('perform_a_call_to(Goal)', Goal),
 	functor_local(Goal, Goal_Name, Arity, Arguments),
 	cneg_processed_pred(Goal_Name, Arity, SourceFileName, _Occurences),
 	name(SourceFileName, SourceFileName_String),

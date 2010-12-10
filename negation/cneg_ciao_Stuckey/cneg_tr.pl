@@ -26,14 +26,14 @@
 :- data cneg_static_cls/1.
 
 trans_clause(Whatever, Whatever, _) :-
-	debug('trans_cl', trans_cl(Whatever)).
+	debug_msg('trans_cl', trans_cl(Whatever)).
 
 % trans_sent(Sentence,SentList,Module) sustitutes Sentence in 
 % the program Module that is being compilated by the list of 
 % sentences SentList. The result clauses are continous
 trans_sent(Input, Output, SourceFileName) :-
-	% debug('trans_sent', trans_sent(Input)), 
-	% debug('trans_sent', source_file_name(Info)), 
+	% debug_msg('trans_sent', trans_sent(Input)), 
+	% debug_msg('trans_sent', source_file_name(Info)), 
 	trans_sent_aux(Input, Output, SourceFileName), !.
 
 trans_sent(Input, _Output, _SourceFileName) :-
@@ -55,11 +55,11 @@ trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
 trans_sent_aux(Clause, Result, SourceFileName) :-
 	functor_local(Clause, Name, 2, _Arguments),
-%	debug('trans_sent_aux', functor_local(Clause, Name, 2, _Arguments)),
+%	debug_msg('trans_sent_aux', functor_local(Clause, Name, 2, _Arguments)),
 	Name==':-', !,
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
-%	debug('trans_sent_aux', trans_clause_with_body(Head, Body, Result, SourceFileName)),
+%	debug_msg('trans_sent_aux', trans_clause_with_body(Head, Body, Result, SourceFileName)),
 	trans_clause_with_body(Head, Body, Result, SourceFileName).
 
 trans_sent_aux(Clause, Result, SourceFileName) :-
@@ -73,14 +73,14 @@ trans_sent_aux(Clause, Result, SourceFileName) :-
 
 trans_sent_aux(Clause, [], _SourceFileName) :-
 	functor_local(Clause, Name, Arity, _Arguments),
-	debug('trans_sent_aux', functor_local(Clause, Name, Arity, _Arguments)),
+	debug_msg('trans_sent_aux', functor_local(Clause, Name, Arity, _Arguments)),
 	!.
 
 trans_clause_with_body(Head, Body, [Result], SourceFileName) :-
 	trans_body(Body, NewBody, ListBodies),
-%	debug('trans_clause_with_body', trans_body(Body, NewBody, ListBodies)),
+%	debug_msg('trans_clause_with_body', trans_body(Body, NewBody, ListBodies)),
 	trans_head(Head, NewHeadName, NewHeadArity, NewHead),
-%	debug('trans_clause_with_body', trans_head(Head, NewHeadName, NewHeadArity, NewHead)),
+%	debug_msg('trans_clause_with_body', trans_head(Head, NewHeadName, NewHeadArity, NewHead)),
 	process_and_save_info(NewHeadName, NewHeadArity, SourceFileName, NewHead, ListBodies),
 	functor_local(Result, ':-', 2, _Arguments),
 	arg(1, Result, NewHead),
@@ -162,7 +162,7 @@ trans_head(Head, NewHeadName, HeadArity, NewHead) :-
 	functor_local(NewHead, NewHeadName, HeadArity, HeadArgs).
 
 trans_head(Head, _NewHeadName, _HeadArity, Head) :-
-	debug('trans_head :: FAILED conversion for', Head), !, fail.
+	debug_msg('trans_head :: FAILED conversion for', Head), !, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,7 +176,7 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 	findall(Cl,(retract_fact(cneg_static_cls(Cl))), ClsOut, ClsTmp_2),
 	!. %Backtracking forbiden.
 %	nl, nl,
-%	debug_list('ClsOut', ClsOut),
+%	debug_msg_list('ClsOut', ClsOut),
 %	nl, nl.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -184,9 +184,9 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 trans_body(Body_In, NewBody, ListBodies):-
-%	debug('trans_body_aux :: IN', (Body_In)),
+%	debug_msg('trans_body_aux :: IN', (Body_In)),
 	trans_body_aux(Body_In, NewBody, [[]], ListBodies).
-%	debug('trans_body_aux :: OUT', (Body_In, NewBody, [], ListBodies)).
+%	debug_msg('trans_body_aux :: OUT', (Body_In, NewBody, [], ListBodies)).
 
 trans_body_aux(Body_In, (Body_Out_A, Body_Out_B), Before, Result):-
 	goal_is_conjunction(Body_In, Body_In_A, Body_In_B), !,
@@ -254,16 +254,16 @@ add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
 cneg_impl([
 	(cneg(Predicate) :- cneg_aux(Predicate, [])),
 	 (cneg_aux(Predicate, Universal_Vars) :- cneg_lib_aux(Predicate, Universal_Vars, Result), 
-	  debug_nl, 
-	  debug('cneg :: INPUT :: ', Predicate),
-	  debug('cneg :: Universal Vars IN :: ', Universal_Vars),
-	  debug('cneg :: OUTPUT :: ', call(Result)), 
-	  debug_nl, 
+	  debug_msg_nl, 
+	  debug_msg('cneg :: INPUT :: ', Predicate),
+	  debug_msg('cneg :: Universal Vars IN :: ', Universal_Vars),
+	  debug_msg('cneg :: OUTPUT :: ', call(Result)), 
+	  debug_msg_nl, 
 	  !, call(Result)),
 	  (cneg_static_predicate_call(_Goal, _SourceFileName, 0)),
 	   (cneg_static_predicate_call(Goal, SourceFileName, Occurences) :-
 	   Occurences \== 0,
-%	debug('cneg_static_predicate_call :: IN', cneg_static_pred(Goal, SourceFileName, Occurences)),
+%	debug_msg('cneg_static_predicate_call :: IN', cneg_static_pred(Goal, SourceFileName, Occurences)),
 	   cneg_static_cl(Goal, SourceFileName, Occurences), 
 	   NewOccurences is Occurences -1,
 	   cneg_static_predicate_call(Goal, SourceFileName, NewOccurences)),
@@ -290,9 +290,9 @@ cneg_static_negation(PP_Info, Head, ListBody) :-
 	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, PP_Info),
 	functor_local(Goal, Name, Arity, Args),
 	varsbag_local(Args, [], [], GoalVars),
-%	debug('cneg_static_negation IN', negate_subfrontier((Head, ListBody), Goal, GoalVars)),
+%	debug_msg('cneg_static_negation IN', negate_subfrontier((Head, ListBody), Goal, GoalVars)),
 	negate_subfrontier((Head, ListBody), Goal, GoalVars, Sol),
-%	debug('cneg_static_negation OUT', Sol),
+%	debug_msg('cneg_static_negation OUT', Sol),
 	functor_local(Cneg_Cl, ':-', 2, _Arguments_Cneg_Cl),
 	arg(1, Cneg_Cl, cneg_static_cl(Goal, SourceFileName, Index)),
 	arg(2, Cneg_Cl, Sol),
