@@ -46,11 +46,11 @@
 
 % Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
-	debug_msg_aux(0, '', '% cneg ::'),
-	debug_msg_aux(0, 'remove_attribute_local :: Var :: ', Var),
+	debug_msg_aux(1, '', '% cneg ::'),
+	debug_msg_aux(1, 'remove_attribute_local :: Var :: ', Var),
 	detach_attribute(Var),
-	debug_msg_aux(0, '  -->> Var :: ', Var),
-	debug_msg_nl(0).
+	debug_msg_aux(1, '  -->> Var :: ', Var),
+	debug_msg_nl(1).
 % XSB:	del_attr(Var, dist).
 
 get_attribute_local(Var, Attribute) :-
@@ -59,13 +59,13 @@ get_attribute_local(Var, Attribute) :-
 %	debug_msg(0, 'get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
 
 put_attribute_local(Var, Attribute) :-
-	debug_msg_aux(0, '', '% cneg ::'),
-	debug_msg_aux(0, 'put_attribute_local :: Attribute :: ', Attribute),
-	debug_msg_aux(0, '  Var :: ', Var), 
+	debug_msg_aux(1, '', '% cneg ::'),
+	debug_msg_aux(1, 'put_attribute_local :: Attribute :: ', Attribute),
+	debug_msg_aux(1, '  Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
 	attach_attribute(Var, Attribute),
-	debug_msg_aux(0, '  -->> Var :: ', Var),
-	debug_msg_nl(0).
+	debug_msg_aux(1, '  -->> Var :: ', Var),
+	debug_msg_nl(1).
 %	put_attr(Var, dist, Attribute).
 
 %get_attribute_if_any(Var) :-
@@ -635,8 +635,9 @@ cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], [Diseq | Args]
 % variables implicadas
 
 cneg_diseq(T1,T2, UnivVars):- 
-	debug_msg(0, 'cneg_diseq(T1,T2)', cneg_diseq(T1,T2)), 
-	debug_msg(0, 'cneg_diseq :: UnivVars', UnivVars),
+	debug_msg(1, 'cneg_diseq :: T1', T1), 
+	debug_msg(1, 'cneg_diseq :: T2', T2),
+	debug_msg(1, 'cneg_diseq :: UnivVars', UnivVars),
 	disequality_contents(Disequality, T1, T2),
         update_vars_attributes(UnivVars, [], [], [Disequality]).
 
@@ -644,8 +645,11 @@ cneg_diseq(T1,T2, UnivVars):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(X, Y) :- debug_msg(0, 'cneg_diseq :: cneg_eq', cneg_eq(X, Y)), fail.
-cneg_eq(X, X).
+cneg_eq(T1, T2) :- 
+	debug_msg(1, 'cneg_eq :: T1', T1),
+	debug_msg(1, 'cneg_eq :: T2', T2),
+	fail.
+cneg_eq(T, T).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

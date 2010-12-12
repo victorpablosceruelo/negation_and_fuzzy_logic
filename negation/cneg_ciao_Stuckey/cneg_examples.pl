@@ -70,7 +70,7 @@ queens(N, Qs):-
 queens_try([], Qs, Qs). 
 queens_try([X|Unplaced], Placed, Qs):-
         select(Q, [X|Unplaced], NewUnplaced),
-        no_attack(Q, Placed),
+        no_attack(Placed, Q, s(0)),
         queens_try(NewUnplaced, [Q|Placed], Qs).
  
 % select(X, Ys, Zs) X is an element of Ys and Zs is Ys except X
@@ -80,18 +80,16 @@ select(X, [Y|Ys], [Y|Zs]):-
 
 % no_attack(Q, Safe) checks that a queen in the next row to the ones placed
 % in Safe doesn't attack all the queens of Save if we place it in column Q
-no_attack(Q, Safe):- no_attack1(Safe, Q, s(0)). 
- 
 % no_attack1(Safe,Q,Nb) checks that a queen in the next row to the ones placed
 % in Safe doesn't attack all the queens of Save fron any diagonal with a 
 % distance Nb if we place it in column Q
-no_attack1([], _Queen, _Nb).
-no_attack1([Y|Ys], Queen, Nb):-
+no_attack([], _Queen, _Nb).
+no_attack([Y|Ys], Queen, Nb):-
 	add(Y,Nb,YNb),
         dist(Queen,YNb),
 	no_attack_down(Y,Nb,Queen), 
         add(Nb,s(0),Nb1),
-        no_attack1(Ys, Queen, Nb1).
+        no_attack(Ys, Queen, Nb1).
 
 no_attack_down(Y,Nb,Queen):-
 	greater(Y,Nb),

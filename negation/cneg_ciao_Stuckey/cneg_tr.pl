@@ -170,8 +170,7 @@ trans_head(Head, _NewHeadName, _HeadArity, Head) :-
 
 trans_sent_eof(ClsOut, _SourceFileName) :-
 	retrieve_list_of_processed_predicates(List_Of_Predicates),
-	cneg_impl(Cneg_Impl),
-	append(List_Of_Predicates, Cneg_Impl, ClsTmp_1),
+	append(List_Of_Predicates, [ end_of_file ], ClsTmp_1),
 	findall(Cl,(retract_fact(cneg_dynamic_cls(Cl))), ClsTmp_2, ClsTmp_1),
 	findall(Cl,(retract_fact(cneg_static_cls(Cl))), ClsOut, ClsTmp_2),
 	!. %Backtracking forbiden.
@@ -246,25 +245,6 @@ change_conflictive_predicate(P, P, Arity, Arity, Args, Args) :- !.
 add_empty_list_argument([], [[]]) :- !.
 add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
 	add_empty_list_argument(Args_In, Args_Out).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cneg_impl(
-	[
-	    (:- include(cneg_include)),
-	     end_of_file
-	]).
-
-%cneg_impl([
-%		 (:- import subsumes_chk/2 from subsumes),
-%	         (:- use_module(library(write))),
-%		 (:- use_module(intneg_dist,[intneg_dist/2, intneg_forall_aux/4])),
-%	         ( :- meta_predicate(cneg_static) ),
-%		 % Intneg
-%		 (cneg_static((P1, P2)) :- cneg_static(P1), cneg_static(P2))
-%		 ]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

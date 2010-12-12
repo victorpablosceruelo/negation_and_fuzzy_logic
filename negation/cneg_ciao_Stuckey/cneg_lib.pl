@@ -40,11 +40,16 @@
 
 cneg_lib_aux(Goal, UnivVars, Result):-
 %	UnivVars \== [],
-	debug_msg_nl(0),
-	debug_msg(0, 'cneg_lib :: cneg_dynamic :: Goal', Goal), 
+	debug_msg_nl(1), 
+	debug_msg_aux(1, '------------------------------------------------------------------------------', ''),
+	debug_msg_nl(1), 
+	debug_msg(1, 'cneg_lib :: cneg_dynamic :: Goal', Goal), 
+	debug_msg(1, 'cneg_lib :: cneg_dynamic :: UnivVars', UnivVars),
 	cneg_dynamic(Goal, UnivVars, Result),
-	debug_msg(0, 'cneg_lib :: cneg_dynamic :: Goal', Goal),
-	debug_msg(0, 'cneg_lib :: cneg_dynamic :: Result', Result),
+	debug_msg(1, 'cneg_lib :: cneg_dynamic :: Result', Result),
+	debug_msg_nl(1), 
+	debug_msg_aux(1, '------------------------------------------------------------------------------', ''),
+	debug_msg_nl(1), 
 	!. % No backtracking allowed
 
 
