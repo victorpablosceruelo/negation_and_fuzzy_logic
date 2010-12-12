@@ -46,7 +46,8 @@
 
 % Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
-	debug_msg_aux(0, 'cneg :: remove_attribute_local :: Var :: ', Var),
+	debug_msg_aux(0, '', '% cneg ::'),
+	debug_msg_aux(0, 'remove_attribute_local :: Var :: ', Var),
 	detach_attribute(Var),
 	debug_msg_aux(0, '  -->> Var :: ', Var),
 	debug_msg_nl(0).
@@ -58,6 +59,7 @@ get_attribute_local(Var, Attribute) :-
 %	debug_msg(0, 'get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
 
 put_attribute_local(Var, Attribute) :-
+	debug_msg_aux(0, '', '% cneg ::'),
 	debug_msg_aux(0, 'put_attribute_local :: Attribute :: ', Attribute),
 	debug_msg_aux(0, '  Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
@@ -80,9 +82,8 @@ put_attribute_local(Var, Attribute) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 put_universal_quantification(Vars) :-
-	debug_msg(0, 'put_universal_quantification :: IN     :: Vars', Vars),
-	put_universal_quantification_vars(Vars),
-	debug_msg(0, 'put_universal_quantification :: OUT :: Vars', Vars).
+	debug_msg(0, 'put_universal_quantification :: Vars', Vars),
+	put_universal_quantification_vars(Vars).
 
 put_universal_quantification_vars([]) :- !.
 put_universal_quantification_vars([Var|Vars]) :-
@@ -95,11 +96,10 @@ put_universal_quantification_var(Var) :-
 put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
-	debug_msg(0, 'remove_universal_quantification :: IN     :: Vars', Vars),
+	debug_msg(0, 'remove_universal_quantification :: Vars', Vars),
 	vars_subset_universally_quantified(Vars, UnivQuantified),
-	debug_msg(0, 'remove_universal_quantification :: IN     :: UnivQuantified', UnivQuantified),
-	update_vars_attributes([], UnivQuantified, [], []),
-	debug_msg(0, 'remove_universal_quantification :: OUT :: UnivQuantified', UnivQuantified).
+	debug_msg(0, 'remove_universal_quantification :: Vars_UnivQuantified', UnivQuantified),
+	update_vars_attributes([], UnivQuantified, [], []).
 
 vars_subset_universally_quantified([], []) :- !.
 vars_subset_universally_quantified([Var|Vars], [Var | MoreUnivQuantified]) :-

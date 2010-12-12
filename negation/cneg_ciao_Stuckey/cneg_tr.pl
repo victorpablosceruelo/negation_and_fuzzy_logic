@@ -251,27 +251,12 @@ add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_impl([
-	(cneg(Predicate) :- cneg_aux(Predicate, [])),
-	 (cneg_aux(Predicate, Universal_Vars) :- cneg_lib_aux(Predicate, Universal_Vars, Result), 
-	  debug_msg_nl(0), 
-	  debug_msg(0, 'cneg :: INPUT :: ', Predicate),
-	  debug_msg(0, 'cneg :: Universal Vars IN :: ', Universal_Vars),
-	  debug_msg(0, 'cneg :: OUTPUT :: ', call(Result)), 
-	  debug_msg_nl(0), 
-	  !, call(Result)),
-	  (cneg_static_predicate_call(_Goal, _SourceFileName, 0)),
-	   (cneg_static_predicate_call(Goal, SourceFileName, Occurences) :-
-	   Occurences \== 0,
-%	debug_msg('cneg_static_predicate_call :: IN', cneg_static_pred(Goal, SourceFileName, Occurences)),
-	   cneg_static_cl(Goal, SourceFileName, Occurences), 
-	   NewOccurences is Occurences -1,
-	   cneg_static_predicate_call(Goal, SourceFileName, NewOccurences)),
-%	   (main :- getenvstr('CIAO_CALL', CIAO_CALL_STRING), nl, write(CIAO_CALL_STRING),
-%	    atom_codes(CIAO_CALL, CIAO_CALL_STRING), call(CIAO_CALL), 
-%	    nl, write(CIAO_CALL)),
-	   end_of_file
-	  ]).
+cneg_impl(
+	[
+	    (:- include(cneg_include)),
+	     end_of_file
+	]).
+
 %cneg_impl([
 %		 (:- import subsumes_chk/2 from subsumes),
 %	         (:- use_module(library(write))),
