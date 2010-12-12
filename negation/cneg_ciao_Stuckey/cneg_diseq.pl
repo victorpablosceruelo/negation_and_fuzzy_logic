@@ -46,7 +46,7 @@
 
 % Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
-	debug_msg_aux(1, '', '% cneg ::'),
+	debug_msg_aux(1, '', '% cneg :: '),
 	debug_msg_aux(1, 'remove_attribute_local :: Var :: ', Var),
 	detach_attribute(Var),
 	debug_msg_aux(1, '  -->> Var :: ', Var),
@@ -59,7 +59,7 @@ get_attribute_local(Var, Attribute) :-
 %	debug_msg(0, 'get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
 
 put_attribute_local(Var, Attribute) :-
-	debug_msg_aux(1, '', '% cneg ::'),
+	debug_msg_aux(1, '', '% cneg :: '),
 	debug_msg_aux(1, 'put_attribute_local :: Attribute :: ', Attribute),
 	debug_msg_aux(1, '  Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
@@ -246,12 +246,13 @@ verify_attribute(Attribute, NewTarget):-
 %	debug_msg(0, verify_attribute(Attribute, NewTarget)), 
 	attribute_contents(Attribute, OldTarget, Disequalities, UnivVars), !,
 	(
-	    (
-		var(OldTarget),
-		cneg_aux:memberchk(OldTarget, UnivVars), !, 
-		fail % An universally quantified variable is not unifiable.
-	    )
-	;
+%         --->> I do not know if this is semantically correct ... :-(
+%	    (
+%		var(OldTarget),
+%		cneg_aux:memberchk(OldTarget, UnivVars), !, 
+%		fail % An universally quantified variable is not unifiable.
+%	    )
+%	;
 	    (
 		substitution_contents(Subst, OldTarget, NewTarget),
 		update_vars_attributes(UnivVars, [], [Subst], Disequalities)
@@ -267,7 +268,8 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, UnivVars_Var_2), !,
 	(
 	    (
-		var(OldTarget_Var_1), var(OldTarget_Var_1), !,
+%             Not really sure they must be variables ... it's a very strong restriction.
+%		var(OldTarget_Var_1), var(OldTarget_Var_1), !,
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 		cneg_aux:append(UnivVars_Var_1, UnivVars_Var_2, UnivVars),
 		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
@@ -326,43 +328,69 @@ retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Dis
 
 perform_substitutions([], UV_In, UV_In) :- !.
 perform_substitutions([Subst | MoreSubst], UV_In, UV_Out) :-
+	debug_msg(1, 'perform_substitutions :: Subst', Subst),
 	substitution_contents(Subst, OldTarget, NewTarget),
 	(
 	    (
 		var(OldTarget),
-		var(NewTarget), % Be sure both are vars.
-		!,
-		(
-		    (
-			(
-			    cneg_aux:memberchk(OldTarget, UV_In),
-			    cneg_aux:memberchk(NewTarget, UV_In), % Both are universally quantified.
-			    diseq_eq(UV_Aux, UV_In), ! % Keep universal quantification.
-			)
-		    ;
-			(
-			    varsbag_remove_var(OldTarget, UV_In, UV_Tmp),
-			    varsbag_remove_var(NewTarget, UV_Tmp, UV_Aux)
-			)
-		    )
-		),
-		(
-		    diseq_eq(OldTarget, NewTarget), !,
-		    perform_substitutions(MoreSubst, UV_Aux, UV_Out)
-		)
+		var(NewTarget), !, % Both are vars.
+		perform_substitution_vars(OldTarget, NewTarget, UV_In, UV_Aux)
 	    )
 	;
 	    (
-		debug_msg(2, 'perform_substitutions', 'cannot substitute if it is not a variable.'),
-		!, fail
+		var(OldTarget), !, % Only OldTarget is var.
+		perform_substitution_var_nonvar(OldTarget, NewTarget, UV_In, UV_Aux)
 	    )
-	).
+	;
+	    (
+		var(NewTarget), !, % Only NewTarget is var.
+		perform_substitution_var_nonvar(NewTarget, OldTarget, UV_In, UV_Aux)
+	    )
+	;
+	    (
+		perform_substitution_nonvars(OldTarget, NewTarget, UV_In, UV_Aux)
+	    )
+	),
+	perform_substitutions(MoreSubst, UV_Aux, UV_Out).	
 
-% diseq_eq(X,Y) unify X and Y
-diseq_eq(X, X).
-% eq(X,Y):-
- %       X=Y.
+perform_substitution_vars(OldTarget, NewTarget, UV_In, UV_Out) :-
+	var(OldTarget),
+	var(NewTarget), % Be sure both are vars.
+	(
+	    (
+		cneg_aux:memberchk(OldTarget, UV_In),
+		cneg_aux:memberchk(NewTarget, UV_In), % Both are universally quantified.
+		diseq_eq(UV_In, UV_Out), ! % Keep universal quantification.
+	    )
+	;
+	    (
+		varsbag_remove_var(OldTarget, UV_In, UV_Aux),
+		varsbag_remove_var(NewTarget, UV_Aux, UV_Out)
+	    )
+	),
+	diseq_eq(OldTarget, NewTarget), !.
 
+perform_substitution_var_nonvar(OldTarget, NewTarget, UV_In, UV_Out) :-
+	var(OldTarget), % Be sure OldTarget is a var.
+	varsbag_remove_var(OldTarget, UV_In, UV_Out),
+	diseq_eq(OldTarget, NewTarget), !.
+
+perform_substitution_nonvars(OldTarget, NewTarget, UV_In, UV_Out) :-
+	functor_local(OldTarget, Name, Arity, Args_1),
+	functor_local(NewTarget, Name, Arity, Args_2), !,
+	substitutions_cartesian_product(Args_1, Args_2, Subst_List),
+	perform_substitutions(Subst_List, UV_In, UV_Out).
+
+substitutions_cartesian_product([], [], []) :- !.
+substitutions_cartesian_product([T1], [T2], [Diseq]) :- !,
+	 substitution_contents(Diseq, T1, T2).
+substitutions_cartesian_product([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :- !,
+	substitution_contents(Diseq, T1, T2),
+	substitutions_cartesian_product(Args_1, Args_2, Args).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Need old vars to play with them too.
 restore_attributes(NO_UV_In, UV_In, Diseqs) :- 
@@ -375,6 +403,14 @@ restore_attributes_vars([Var | Affected_Vars], UV_In, Diseqs) :-
 	affected_diseqs(Var, Diseqs, Affected_Diseqs),
 	restore_attributes_var(Var, UV_In, Affected_Diseqs),
 	restore_attributes_vars(Affected_Vars, UV_In, Diseqs).
+
+affected_diseqs(_Var, [], []) :- !.
+affected_diseqs(Var, [Diseq | Diseqs], [Diseq | Affected_Diseqs]) :-
+	varsbag_local(Diseq, [], [], Diseq_Vars),
+	cneg_aux:memberchk(Var, Diseq_Vars), !,
+	affected_diseqs(Var, Diseqs, Affected_Diseqs).
+affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs) :-
+	affected_diseqs(Var, Diseqs, Affected_Diseqs).
 
 restore_attributes_var(Var, _UV_In, _Affected_Diseqs) :-
 	var(Var),
@@ -401,14 +437,6 @@ restore_attributes_var(Var, UV_In, Affected_Diseqs) :-
 		put_attribute_local(Var, Attribute)
 	    )
 	).
-
-affected_diseqs(_Var, [], []) :- !.
-affected_diseqs(Var, [Diseq | Diseqs], [Diseq | Affected_Diseqs]) :-
-	varsbag_local(Diseq, [], [], Diseq_Vars),
-	cneg_aux:memberchk(Var, Diseq_Vars),
-	affected_diseqs(Var, Diseqs, Affected_Diseqs).
-affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs) :-
-	affected_diseqs(Var, Diseqs, Affected_Diseqs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -509,7 +537,7 @@ simplify_1_diseq(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer):-  % Functors t
 	disequality_contents(Diseq, T1, T2),
  	functor_local(T1, Name, Arity, Args_1),
 	functor_local(T2, Name, Arity, Args_2), !,
-	cartesian_product_between_arguments(Args_1, Args_2, Diseq_List),
+	disequalities_cartesian_product(Args_1, Args_2, Diseq_List),
 	cneg_aux:append(Diseq_List, More_Diseq, New_More_Diseq),
 	simplify_1_diseq(fail, New_More_Diseq, No_FV_In, No_FV_Out, Answer).
 
@@ -523,6 +551,17 @@ simplify_1_diseq(Diseq, _More_Diseq, No_FV_Out, No_FV_Out, Answer):-  % Functors
 	    (Arity1 \== Arity2)
 	), !,
 	diseq_eq(Answer, []). % Answer is True.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+disequalities_cartesian_product([], [], []) :- !.
+disequalities_cartesian_product([T1], [T2], [Diseq]) :- !,
+	 disequality_contents(Diseq, T1, T2).
+disequalities_cartesian_product([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :- !,
+	disequality_contents(Diseq, T1, T2),
+	disequalities_cartesian_product(Args_1, Args_2, Args).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -608,16 +647,6 @@ simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, A
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-cartesian_product_between_arguments([], [], []) :- !.
-cartesian_product_between_arguments([T1], [T2], [Diseq]) :- !,
-	 disequality_contents(Diseq, T1, T2).
-cartesian_product_between_arguments([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :- !,
-	disequality_contents(Diseq, T1, T2),
-	cartesian_product_between_arguments(Args_1, Args_2, Args).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     PREDICADO   DISTINTO                      %
@@ -651,6 +680,10 @@ cneg_eq(T1, T2) :-
 	fail.
 cneg_eq(T, T).
 
+% diseq_eq(X,Y) unify X and Y
+diseq_eq(X, X).
+% eq(X,Y):-
+ %       X=Y.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

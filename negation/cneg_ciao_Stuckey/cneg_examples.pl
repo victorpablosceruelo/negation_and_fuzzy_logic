@@ -163,16 +163,24 @@ test2_insert(X,Y,L2):- insert(X,[Y],L2).
 % GRAPHS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-next(a,b).
-next(a,c).
-next(b,null).
+node(a).
+node(b).
+node(c).
+node(d).
 
-path(X,X).
-path(X,Y):- dist(X,Y), next(X,Z),path(Z,Y).
+path(a,b).
+path(a,c).
+
+connected(X, Y) :- node(X), node(Y), 
+	(
+	    path(X,Y)
+	; 
+	    path(Y, X)
+	).
 
 % TEST
 
-save(X):- cneg(path(X,null)).
+test_connected(X):- cneg(connected(X,Y)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BARTAK
