@@ -179,8 +179,8 @@ connected(X, Y) :- node(X), node(Y),
 	).
 
 % TEST
-
-test_connected(X):- cneg(connected(X,Y)).
+aux_connected(X) :- connected(X,Y).
+test_connected(X):- cneg(aux_connected(X)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BARTAK

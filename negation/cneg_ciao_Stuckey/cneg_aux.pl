@@ -43,7 +43,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use the following sentences to enable/disable debugging.
-debug_msg_is_on(Level) :- Level >= 0.
+debug_msg_is_on(Level) :- Level > 0.
 
 % 0 -> crazy debug.
 % 1 -> debug.
