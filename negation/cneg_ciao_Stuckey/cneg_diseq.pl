@@ -577,8 +577,7 @@ simplify_1_diseq_freevar_t1_var_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answe
 	    (   % T1 is going to be processed hereafter (appears in More_Diseq).
 		varsbag_local(More_Diseq, No_FV_In, [], More_Diseq_Vars),
 		cneg_aux:memberchk(T1, More_Diseq_Vars), !,
-		diseq_eq(T1, T2), % Answer is T1 = T2 and more
-		simplify_1_diseq(fail, More_Diseq, [T1 | No_FV_In], No_FV_Out, Answer)
+		simplify_1_diseq_hereafter_t1(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	;
 	    (   % T1 appears only once, so it is not different from T2. Just fail.
@@ -633,8 +632,7 @@ simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, A
 	    (   % T1 is going to be processed (appears in More_Diseq).
 		varsbag_local(More_Diseq, No_FV_In, [], More_Diseq_FreeVars),
 		cneg_aux:memberchk(T1, More_Diseq_FreeVars), !,
-		diseq_eq(T1, T2), % Answer is T1 = T2 and more. T1 is NO more a variable.
-		simplify_1_diseq(fail, More_Diseq, No_FV_In, No_FV_Out, Answer)
+		simplify_1_diseq_hereafter_t1(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer)
 	    )
 	;
 	    (   % T1 appears only once, so it is not different from T2. Just fail.
@@ -646,7 +644,29 @@ simplify_1_diseq_freevar_t1_functor_t2(Diseq, More_Diseq, No_FV_In, No_FV_Out, A
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
+
+simplify_1_diseq_hereafter_t1(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :-
+
+	disequality_contents(Diseq, T1, T2),
+        var(T1),
+	varsbag_local(Diseq, No_FV_In, [], Real_FreeVars),
+	cneg_aux:memberchk(T1, Real_FreeVars), !, % T1 is an universal quantified var.
+
+	varsbag_local(More_Diseq, No_FV_In, [], More_Diseq_FreeVars),
+	cneg_aux:memberchk(T1, More_Diseq_FreeVars), !, % T1 is used hereafter.
+
+	varsbag_local((Diseq, More_Diseq), [T1], [], All_Vars),
+	copy_term((Diseq, More_Diseq, T1, All_Vars), (_Diseq_Copy, More_Diseq_Copy, T1_Copy, All_Vars_Copy)),
+	diseq_eq(All_Vars, All_Vars_Copy), !,
+
+	diseq_eq(T1_Copy, T2), % Answer is T1 = T2 and more. 
+	simplify_1_diseq(fail, More_Diseq_Copy, No_FV_In, No_FV_Out, Answer).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     PREDICADO   DISTINTO                      %
