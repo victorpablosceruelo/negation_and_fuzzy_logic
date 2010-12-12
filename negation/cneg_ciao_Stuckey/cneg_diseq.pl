@@ -388,8 +388,19 @@ restore_attributes_var(Var, UV_In, Affected_Diseqs) :-
 	var(Var),
 	varsbag_local((Var, Affected_Diseqs), [], [], Affected_Vars),
 	varsbag_intersection(Affected_Vars, UV_In, UV_Affected),
-	attribute_contents(Attribute, Var, Affected_Diseqs, UV_Affected),
-	put_attribute_local(Var, Attribute).
+	!,
+	(
+	    (
+		UV_Affected == [],
+		Affected_Diseqs == [],
+		! % We do not want empty attributes.
+	    )
+	;
+	    (
+		attribute_contents(Attribute, Var, Affected_Diseqs, UV_Affected),
+		put_attribute_local(Var, Attribute)
+	    )
+	).
 
 affected_diseqs(_Var, [], []) :- !.
 affected_diseqs(Var, [Diseq | Diseqs], [Diseq | Affected_Diseqs]) :-

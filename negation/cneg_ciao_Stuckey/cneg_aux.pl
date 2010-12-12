@@ -451,6 +451,7 @@ varsbag_difference_aux([Var | Vars_In], VarsBag, Vars_Out) :-
 varsbag_difference_aux([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
 	varsbag_difference_aux(Vars_In, VarsBag, Vars_Out).
 
+varsbag_intersection([], _VarsBag_In_2, []) :- !.
 varsbag_intersection([Var_1 | VarsBag_In_1], VarsBag_In_2, [Var_1 | VarsBag_Out]) :-
 	memberchk(Var_1, VarsBag_In_2), !,
 	varsbag_intersection(VarsBag_In_1, VarsBag_In_2, VarsBag_Out).

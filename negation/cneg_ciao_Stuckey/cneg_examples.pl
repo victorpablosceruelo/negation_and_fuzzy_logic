@@ -60,17 +60,17 @@ no_greater_than_3(X):- digit(X), cneg(greater(X,s(s(s(0))))).
 % (4,3). 
 queens(N, Qs):- 
         queens_list(N, Ns),
-        queens1(Ns, [], Qs).     % To place, placed, result
+        queens_try(Ns, [], Qs).     % To place, placed, result
 
-% queens1(Ns,[],Qs) returns in Qs a permutation of the columns represented
+% queens_try(Ns,[],Qs) returns in Qs a permutation of the columns represented
 % in Ns such as there will be secure position for placing queens in them.
-% queens1(Unplaced, Placed, Qs) appends to Placed columns the columns of 
+% queens_try(Unplaced, Placed, Qs) appends to Placed columns the columns of 
 % Unplaced in a secure way for all the queens.
-queens1([], Qs, Qs). 
-queens1([X|Unplaced], Placed, Qs):-
+queens_try([], Qs, Qs). 
+queens_try([X|Unplaced], Placed, Qs):-
         select(Q, [X|Unplaced], NewUnplaced),
         no_attack(Q, Placed),
-        queens1(NewUnplaced, [Q|Placed], Qs).
+        queens_try(NewUnplaced, [Q|Placed], Qs).
  
 % select(X, Ys, Zs) X is an element of Ys and Zs is Ys except X
 select(X, [X|Ys], Ys).
@@ -118,7 +118,12 @@ subst(Z,X,Y):-
 	add(X,Y,Z).
 subst(X,X,0).
  
-% TEST
+% TESTS
+
+queens1(Q) :- queens(s(0),Q).
+queens2(Q) :- queens(s(s(0)),Q).
+queens3(Q) :- queens(s(s(s(0))),Q).
+queens4(Q) :- queens(s(s(s(s(0)))),Q).
 
 no_queens1(Q):- cneg(queens(s(0),Q)). % Q =/= [s(0)]
 no_queens2(Q):- cneg(queens(s(s(0)),Q)). % True always
