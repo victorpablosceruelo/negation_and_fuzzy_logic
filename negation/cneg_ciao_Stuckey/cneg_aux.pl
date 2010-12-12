@@ -4,11 +4,11 @@
 	    findall/4, append/3,
 	    debug_msg/3, debug_msg_list/3, 
 	    debug_msg_aux/3, debug_msg_nl/1, 
-	    first/2, second/2, unify_terms/2, functor_local/4,
-	    memberchk_local/2, term_to_meta/2,
+	    list_head/2, list_tail/2, unify_terms/2, functor_local/4,
+	    memberchk/2, term_to_meta/2,
 	    setof_local/3, filter_out_nonvars/2,
-	    varsbag_local/4, varsbag_difference/3, 
-	    varsbag_addition/3, varsbag_remove_var/3,
+	    varsbag_local/4, varsbag_remove_var/3, varsbag_difference/3, 
+	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/4, goal_is_equality/3,
@@ -107,10 +107,11 @@ list_solutions_aux(-Term,Sofar,List) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-first([Head|_Tail], Head) :- !.
-second([_Head|Tail], Second) :- !,
-	first(Tail, Second).
-
+list_head([Head | _Tail], Head).
+list_tail([_Head | Tail], Tail).
+list_snd_head(List, Second) :- !,
+	list_tail(List, Tail),
+	list_tail(Tail, Second).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -145,7 +146,7 @@ unify_variables(Term, Term) :- !.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-add_to_list_if_not_there(Elto, List, List) :- memberchk_local(Elto, List), !.
+add_to_list_if_not_there(Elto, List, List) :- memberchk(Elto, List), !.
 add_to_list_if_not_there(Elto, List, [Elto|List]) :- !.	
 
 % remove_duplicates(L_In, L_Tmp, L_Out) L2 tiene los elementos de L1 sin repetidos 
@@ -163,15 +164,15 @@ add_to_list_if_not_there(Elto, List, [Elto|List]) :- !.
 % Para mantener coherencia (y evitar problemas) lo redefinimos.
 
 % From Ciao Prolog (idlists library).
-% memberchk_local(X, [Y|_]) :- X == Y, !.
-% memberchk_local(X, [_|L]) :- memberchk_local(X, L).
+% memberchk(X, [Y|_]) :- X == Y, !.
+% memberchk(X, [_|L]) :- memberchk(X, L).
 
-memberchk_local(T1, [T2]) :-
+memberchk(T1, [T2]) :-
 	terms_are_equal(T1,T2).
-memberchk_local(T1, [T2|_L]) :- 
+memberchk(T1, [T2|_L]) :- 
 	terms_are_equal(T1,T2).
-memberchk_local(T1, [_T2|L]) :- 
-        memberchk_local(T1, L).
+memberchk(T1, [_T2|L]) :- 
+        memberchk(T1, L).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -445,10 +446,16 @@ varsbag_difference(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
 
 varsbag_difference_aux([], _VarsBag, []) :- !.
 varsbag_difference_aux([Var | Vars_In], VarsBag, Vars_Out) :-
-	memberchk_local(Var, VarsBag), !,
+	memberchk(Var, VarsBag), !,
 	varsbag_difference_aux(Vars_In, VarsBag, Vars_Out).
 varsbag_difference_aux([Var | Vars_In], VarsBag, [Var | Vars_Out]) :-
 	varsbag_difference_aux(Vars_In, VarsBag, Vars_Out).
+
+varsbag_intersection([Var_1 | VarsBag_In_1], VarsBag_In_2, [Var_1 | VarsBag_Out]) :-
+	memberchk(Var_1, VarsBag_In_2), !,
+	varsbag_intersection(VarsBag_In_1, VarsBag_In_2, VarsBag_Out).
+varsbag_intersection([_Var_1 | VarsBag_In_1], VarsBag_In_2, VarsBag_Out) :-
+	varsbag_intersection(VarsBag_In_1, VarsBag_In_2, VarsBag_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -477,10 +484,10 @@ varsbag_go_inside(Arity, Term, OtherBag, Bag_In, Bag_Out) :-
         varsbag_go_inside(NewArity, Term, OtherBag, Bag_Tmp, Bag_Out).
 
 varsbag_local_variable(X, OtherBag, Bag, Bag) :-
-	memberchk_local(X, OtherBag), % Var is in the other bag.
+	memberchk(X, OtherBag), % Var is in the other bag.
 	!.
 varsbag_local_variable(X, _OtherBag, Bag, Bag) :- 
-	memberchk_local(X, Bag), % Var is alredy in the bag.
+	memberchk(X, Bag), % Var is alredy in the bag.
 	!.
 varsbag_local_variable(X, _OtherBag, Bag, [X|Bag]) :- 
 	!.
