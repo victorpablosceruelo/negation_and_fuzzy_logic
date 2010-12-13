@@ -6,7 +6,7 @@
 
 :- set_prop tempting_restaurant/1 => restaurant/1.
 :- default(tempting_restaurant/1, 0.1).
-tempting_restaurant(R) :~ prod low_distance(R), cheap(R), traditional(R).
+tempting_restaurant(R) :~ prod((low_distance(R), cheap(R), traditional(R))).
 
 restaurant(kenzo).
 restaurant(burguer_king).
