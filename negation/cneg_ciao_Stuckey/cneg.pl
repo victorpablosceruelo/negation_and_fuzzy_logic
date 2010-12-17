@@ -27,7 +27,8 @@
 	    cneg_diseq/3, cneg_eq/2,
 	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
-	    keep_universal_quantification/1
+	    keep_universal_quantification/1,
+	    quantify_universally_new_vars/2
 	]).
 
 % Re-export predicates to use them in console.

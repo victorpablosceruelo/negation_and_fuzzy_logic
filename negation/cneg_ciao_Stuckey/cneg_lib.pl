@@ -13,11 +13,14 @@
 :- multifile cneg_static_cl/3.
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq,[
-	cneg_diseq/3, 
-	remove_universal_quantification/2, 
-	put_universal_quantification/1
-			 ]).
+:- use_module(cneg_diseq,
+	[
+	    cneg_diseq/3, 
+	    remove_universal_quantification/2, 
+	    put_universal_quantification/1,
+	    quantify_universally_new_vars/2
+	]).
+
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
 
@@ -97,9 +100,9 @@ cneg_dynamic(Goal, UnivVars, Solution) :-
 	debug_msg(0, 'cneg_dynamic :: varsbag_local', (Goal, GoalVars)),
 	put_universal_quantification(UnivVars),
 
-	debug_msg(0, 'cneg_dynamic :: copy_term :: Original (Goal, GoalVars)', (Goal, GoalVars)),
+	debug_msg(1, 'cneg_dynamic :: copy_term :: Original (Goal, GoalVars)', (Goal, GoalVars)),
 	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
-	debug_msg(0, 'cneg_dynamic :: copy_term :: Copy     (Goal, GoalVars)', (Goal_Copy, GoalVars_Copy)), 
+	debug_msg(1, 'cneg_dynamic :: copy_term :: Copy     (Goal, GoalVars)', (Goal_Copy, GoalVars_Copy)), 
 	remove_universal_quantification(GoalVars_Copy, _Universally_Quantified),
 
 	frontier(Goal_Copy, Frontier, Goal_Not_Qualified), 
@@ -200,6 +203,7 @@ test_subfrontier_is_valid(SubFrontier, Goal):-
         copy_term((Head, FrontierTest), (Head_Tmp, FrontierTest_Tmp)), 
         copy_term(Goal, Goal_Tmp),
         cneg_aux_equality(Head_Tmp, Goal_Tmp), 
+	debug_msg(1, 'test_subfrontier_is_valid', FrontierTest_Tmp),
 	call_combined_solutions(FrontierTest_Tmp), 
 	!.
 
@@ -308,9 +312,8 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 	list_to_conj(Bi_In, Bi_Conj),
 	cneg_aux_equality(Answer, (Ci_Negated 
 			; (
-			      remove_universal_quantification(Ci_Vars, Any_UQ), 
 			      Ci_Conj, 
-			      keep_universal_quantification(Any_UQ),
+			      quantify_universally_new_vars(Ci_Conj, GoalVars),
 			      cneg_aux(Bi_Conj, UnivVars)))).
 
 negate_Ci([], _GoalVars, fail) :- !.

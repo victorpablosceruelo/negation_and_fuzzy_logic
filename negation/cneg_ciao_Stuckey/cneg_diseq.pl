@@ -4,7 +4,8 @@
 	    portray_attributes_in_term/1, 
 	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
-	    keep_universal_quantification/1
+	    keep_universal_quantification/1,
+	    quantify_universally_new_vars/2
 	], 
 	[assertions]).
 
@@ -92,21 +93,21 @@ put_universal_quantification_vars([Var|Vars]) :-
 
 put_universal_quantification_var(Var) :-
 	var(Var), !,
-	update_vars_attributes([Var], [], [], []).
+	update_vars_attributes([Var], [], []).
 put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, UnivQuantified) :-
-	debug_msg(0, 'remove_universal_quantification :: Vars', Vars),
-	vars_subset_universally_quantified(Vars, UnivQuantified),
-	debug_msg(0, 'remove_universal_quantification :: Vars_UnivQuantified', UnivQuantified),
+	debug_msg(1, 'remove_universal_quantification :: Vars', Vars),
+	split_vars_into_universally_quantified_and_not(Vars, _VarsNotUQ, VarsUQ),
+	debug_msg(1, 'remove_universal_quantification :: Vars_UnivQuantified', VarsUQ),
 	update_vars_attributes([], UnivQuantified, [], []).
 
-vars_subset_universally_quantified([], []) :- !.
-vars_subset_universally_quantified([Var|Vars], [Var | MoreUnivQuantified]) :-
+split_vars_into_universally_quantified_and_not([], [], []) :- !. 
+split_vars_into_universally_quantified_and_not([Var | Vars], Vars_NUQ, [Var | Vars_UQ]) :-
 	var_is_universally_quantified(Var), !,
-	vars_subset_universally_quantified(Vars, MoreUnivQuantified).
-vars_subset_universally_quantified([_Var|Vars], MoreUnivQuantified) :-
-	vars_subset_universally_quantified(Vars, MoreUnivQuantified).
+	split_vars_into_universally_quantified_and_not(Vars, Vars_NUQ, Vars_UQ).
+split_vars_into_universally_quantified_and_not([Var | Vars], [Var | Vars_NUQ], Vars_UQ) :-
+	split_vars_into_universally_quantified_and_not(Vars, Vars_NUQ, Vars_UQ).
 
 var_is_universally_quantified(Var) :-
 	var(Var), 
@@ -115,7 +116,7 @@ var_is_universally_quantified(Var) :-
 	cneg_aux:memberchk(Var, UnivVars), !.
 
 keep_universal_quantification(Vars) :-
-	debug_msg(0, 'keep_universal_quantification(Vars)', Vars),
+	debug_msg(1, 'keep_universal_quantification(Vars)', Vars),
 	keep_universal_quantification_vars(Vars).
 
 keep_universal_quantification_vars([]) :- !.
@@ -123,8 +124,9 @@ keep_universal_quantification_vars([Var | Vars]) :-
 	var(Var), !,
 	keep_universal_quantification_var(Var),
 	keep_universal_quantification_vars(Vars).
-keep_universal_quantification_vars([_Var | Vars]) :-
-	keep_universal_quantification_vars(Vars).
+keep_universal_quantification_vars([Var | Vars]) :-
+	varsbag_local(Var, [], Vars, NewVars),
+	keep_universal_quantification_vars(NewVars).
 
 keep_universal_quantification_var(Var) :-
 	var(Var), 
@@ -133,6 +135,24 @@ keep_universal_quantification_var(Var) :-
 	var(Var), !,
 	put_universal_quantification_var(Var).
 
+test_universal_quantified(T1, T2) :-
+	varsbag_local((T1, T2), [], [], Vars),
+	test_universal_quantified_vars(Vars).
+
+test_universal_quantified_vars([]).
+test_universal_quantified_vars([Var | Vars]) :-
+	get_attribute_local(Var, Old_Attribute), !,
+	debug_msg(1, 'test_universal_quantified_vars', Old_Attribute),
+	test_universal_quantified_vars(Vars).
+test_universal_quantified_vars([Var | Vars]) :-
+	debug_msg(1, 'test_universal_quantified_vars :: no attribute for Var', Var),
+	test_universal_quantified_vars(Vars).
+
+quantify_universally_new_vars(Ci_Conj, GoalVars) :-
+	varsbag_local(GoalVars, [], [], Real_GoalVars),
+	split_vars_into_universally_quantified_and_not(Real_GoalVars, GoalVars_NUQ, GoalVars_UQ), 
+	varsbag_local(Ci_Conj, GoalVars_NUQ, GoalVars_UQ, New_Vars),
+	put_universal_quantification(New_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -290,22 +310,21 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities) :-
-	debug_msg(0, 'update_vars_attributes(UV_In, NO_UV_In, Substitutions, New_Disequalities)', (UV_In, NO_UV_In, Substitutions, New_Disequalities)), 
+update_vars_attributes(UV_In, Substitutions, New_Disequalities) :-
+	debug_msg(1, 'update_vars_attributes(UV_In, Substitutions, New_Disequalities)', (UV_In, Substitutions, New_Disequalities)), 
 
-	varsbag_addition(UV_In, NO_UV_In, Vars_In_Aux),
-	varsbag_local(New_Disequalities, [], Vars_In_Aux, Vars_In), !,
-	retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities), !,
-	debug_msg(0, '', retrieve_affected_disequalities(Vars_In, [], [], UV_Diseqs, New_Disequalities, Disequalities)),
+	varsbag_local(New_Disequalities, [], [], Vars_In), !,
+	retrieve_affected_disequalities(Vars_In, [], UV_In, UV_Diseqs, New_Disequalities, Disequalities), !,
+	debug_msg(0, '', retrieve_affected_disequalities(Vars_In, [], UV_In, UV_Diseqs, New_Disequalities, Disequalities)),
 
-	varsbag_addition(UV_In, UV_Diseqs, UV_Aux_1), % Temporaly marked as universally quantified.
-	varsbag_difference(UV_Aux_1, NO_UV_In, UV_Aux_2), % Really marked as universally quantified.
-	perform_substitutions(Substitutions, UV_Aux_2, UV_Aux_3), !,
-	varsbag_local(Disequalities, UV_Aux_3, [], NO_UV_Aux), % Not universally quantified.
+	perform_substitutions(Substitutions, UV_Diseqs, UV_Subst), !,
+	varsbag_local(Disequalities, UV_Subst, [], NO_UV_In), % Not universally quantified.
+	debug_msg(1, 'Affected Disequalities', Disequalities),
+	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UV_In),
 
-	simplify_disequations(Disequalities, NO_UV_Aux, NO_UV_Out, [], Simplified_Disequalities),
+	simplify_disequations(Disequalities, NO_UV_In, NO_UV_Out, [], Simplified_Disequalities),
 	debug_msg(0, 'update_vars_attributes(Simplified_Disequalities, NO_UV_Out)', (Simplified_Disequalities, NO_UV_Out)),
-	varsbag_difference(UV_Aux_3, NO_UV_Out, UV_Out),
+	varsbag_difference(Vars_In, NO_UV_Out, UV_Out),
 	restore_attributes(NO_UV_Out, UV_Out, Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
@@ -687,6 +706,7 @@ cneg_diseq(T1,T2, UnivVars):-
 	debug_msg(1, 'cneg_diseq :: T1', T1), 
 	debug_msg(1, 'cneg_diseq :: T2', T2),
 	debug_msg(1, 'cneg_diseq :: UnivVars', UnivVars),
+	test_universal_quantified(T1, T2),
 	disequality_contents(Disequality, T1, T2),
         update_vars_attributes(UnivVars, [], [], [Disequality]).
 
@@ -697,6 +717,7 @@ cneg_diseq(T1,T2, UnivVars):-
 cneg_eq(T1, T2) :- 
 	debug_msg(1, 'cneg_eq :: T1', T1),
 	debug_msg(1, 'cneg_eq :: T2', T2),
+	test_universal_quantified(T1, T2),
 	fail.
 cneg_eq(T, T).
 
