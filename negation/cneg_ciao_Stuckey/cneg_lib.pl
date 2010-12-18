@@ -17,8 +17,8 @@
 	[
 	    cneg_diseq/3, 
 	    remove_universal_quantification/2, 
+	    keep_universal_quantification/3, 
 	    put_universal_quantification/1,
-	    quantify_universally_new_vars/2
 	]).
 
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
@@ -307,13 +307,15 @@ negate_subfrontier_aux(GoalVars, Ci_In, Bi_In, Answer) :- !,
 %	debug_msg(0, 'negate_subfrontier_aux :: Bi_FreeVars', Bi_FreeVars),
 	varsbag_difference(Bi_FreeVars, Ci_Vars, UnivVars),
 %	debug_msg(0, 'negate_subfrontier_aux :: UnivVars', UnivVars),
+	varsbag_difference(Ci_Vars, GoalVars, New_UQ),
 
 	list_to_conj(Ci_In, Ci_Conj),
 	list_to_conj(Bi_In, Bi_Conj),
 	cneg_aux_equality(Answer, (Ci_Negated 
 			; (
+			      remove_universal_quantification(Ci_Vars, Previously_UQ), 
 			      Ci_Conj, 
-			      quantify_universally_new_vars(Ci_Conj, GoalVars),
+			      keep_universal_quantification(Ci_Vars, New_UQ, Previously_UQ),
 			      cneg_aux(Bi_Conj, UnivVars)))).
 
 negate_Ci([], _GoalVars, fail) :- !.
