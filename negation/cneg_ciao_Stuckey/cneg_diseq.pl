@@ -102,9 +102,10 @@ remove_universal_quantification(Vars, Vars_Previously_UQ) :-
 	varsbag_difference(UV_Diseqs, Vars, New_UV_Diseqs),
 	debug_msg(1, 'remove_universal_quantification :: New_UV_Diseqs', New_UV_Diseqs),
 	varsbag_local(Disequalities, New_UV_Diseqs, [], NO_UV_Diseqs),
-	varsbag_difference(Vars, NO_UV_Diseqs, Vars_Previously_UQ),
-	debug_msg(1, 'remove_universal_quantification :: Vars_Previously_UQ', Vars_Previously_UQ),
-	restore_attributes(NO_UV_Diseqs, New_UV_Diseqs, Disequalities).
+	restore_attributes(NO_UV_Diseqs, New_UV_Diseqs, Disequalities),
+
+	varsbag_intersection(Vars, UV_Diseqs, Vars_Previously_UQ),
+	debug_msg(1, 'remove_universal_quantification :: Vars_Previously_UQ', Vars_Previously_UQ).
 
 
 split_vars_into_universally_quantified_and_not([], [], []) :- !. 
