@@ -25,19 +25,18 @@
 :- use_module(cneg_diseq, 
 	[
 	    cneg_diseq/3, cneg_eq/2,
-	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
-	    keep_universal_quantification/1,
-	    quantify_universally_new_vars/2
+	    keep_universal_quantification/3,
+	    put_universal_quantification/1
 	]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq,
 	[
 	    cneg_diseq/3, cneg_eq/2,
-	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
-	    keep_universal_quantification/1
+	    keep_universal_quantification/3,
+	    put_universal_quantification/1
 	]).   
 :- reexport(cneg_lib, [ cneg_lib_aux/3 ]).   
 

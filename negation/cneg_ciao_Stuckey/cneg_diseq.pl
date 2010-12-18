@@ -98,7 +98,9 @@ put_universal_quantification_var(_Var) :- !. % NonVar
 remove_universal_quantification(Vars, Vars_Previously_UQ) :-
 	debug_msg(1, 'remove_universal_quantification :: Vars', Vars),
 	retrieve_affected_disequalities(Vars, [], [], UV_Diseqs, [], Disequalities), !,
+	debug_msg(1, 'remove_universal_quantification :: UV_Diseqs', UV_Diseqs),
 	varsbag_difference(UV_Diseqs, Vars, New_UV_Diseqs),
+	debug_msg(1, 'remove_universal_quantification :: New_UV_Diseqs', New_UV_Diseqs),
 	varsbag_local(Disequalities, New_UV_Diseqs, [], NO_UV_Diseqs),
 	varsbag_difference(Vars, NO_UV_Diseqs, Vars_Previously_UQ),
 	debug_msg(1, 'remove_universal_quantification :: Vars_Previously_UQ', Vars_Previously_UQ),
@@ -118,30 +120,33 @@ var_is_universally_quantified(Var) :-
 	attribute_contents(Old_Attribute, Var, _Disequalities, UnivVars),
 	cneg_aux:memberchk(Var, UnivVars), !.
 
-keep_universal_quantification(Vars, UQ_Vars) :-
-	debug_msg(1, 'keep_universal_quantification(Vars)', Vars),
-	debug_msg(1, 'keep_universal_quantification(UQ_Vars)', UQ_Vars),
-	keep_universal_quantification_formulaes(Vars, UQ_Vars).
+%% To keep universal quantification both the structure in Ci_Vars and the variables
+%% inside the structure must belong to the universally quantified set of variables.
+%% If one of them does not belong, the vars involved should not be universally
+%% quantified.
 
-keep_universal_quantification_formulaes(Vars, UQ_Vars) :-
-	varsbag_local(Vars, [], [], Real_Vars),
-	
+keep_universal_quantification(Ci_Vars, New_UQ, Previously_UQ) :-
+	debug_msg(1, 'keep_universal_quantification(Ci_Vars)', Ci_Vars),
+	debug_msg(1, 'keep_universal_quantification(New_UQ)', New_UQ),
+	debug_msg(1, 'keep_universal_quantification(Previously_UQ)', Previously_UQ),
+	varsbag_addition(New_UQ, Previously_UQ, Vars_UQ),
+	keep_universal_quantification_aux_1(Ci_Vars, Vars_UQ).
 
-keep_universal_quantification_vars([]) :- !.
-keep_universal_quantification_vars([Var | Vars]) :-
-	var(Var), !,
-	keep_universal_quantification_var(Var),
-	keep_universal_quantification_vars(Vars).
-keep_universal_quantification_vars([Var | Vars]) :-
-	varsbag_local(Var, [], Vars, NewVars),
-	keep_universal_quantification_vars(NewVars).
+keep_universal_quantification_aux_1([], _Vars_UQ) :- !.
+keep_universal_quantification_aux_1([Ci_Var | Ci_Vars], Vars_UQ) :-
+	cneg_aux:memberchk(Ci_Var, Vars_UQ), !,
+	varsbag_local(Ci_Var, [], [], Real_Ci_Vars),
+	keep_universal_quantification_aux_2(Real_Ci_Vars, Vars_UQ, Real_Ci_Vars),
+	keep_universal_quantification_aux_1(Ci_Vars, Vars_UQ).
+keep_universal_quantification_aux_1([_Ci_Var | Ci_Vars], Vars_UQ) :-
+	keep_universal_quantification_aux_1(Ci_Vars, Vars_UQ).
 
-keep_universal_quantification_var(Var) :-
-	var(Var), 
-	get_attribute_local(Var, _Old_Attribute), !.
-keep_universal_quantification_var(Var) :-
-	var(Var), !,
-	put_universal_quantification_var(Var).
+keep_universal_quantification_aux_2([], _Vars_UQ, Real_Ci_Vars) :- !,
+	put_universal_quantification(Real_Ci_Vars).
+keep_universal_quantification_aux_2([Ci_Var | Ci_Vars], Vars_UQ, Real_Ci_Vars) :-
+	cneg_aux:memberchk(Ci_Var, Vars_UQ), !,
+	keep_universal_quantification_aux_2(Ci_Vars, Vars_UQ, Real_Ci_Vars).
+keep_universal_quantification_aux_2([_Ci_Var | _Ci_Vars], _Vars_UQ, _Real_Ci_Vars) :- !.
 
 test_universal_quantified(T1, T2) :-
 	varsbag_local((T1, T2), [], [], Vars),

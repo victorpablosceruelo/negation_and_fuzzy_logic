@@ -18,7 +18,7 @@
 	    cneg_diseq/3, 
 	    remove_universal_quantification/2, 
 	    keep_universal_quantification/3, 
-	    put_universal_quantification/1,
+	    put_universal_quantification/1
 	]).
 
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
