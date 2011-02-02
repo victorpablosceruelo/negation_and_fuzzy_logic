@@ -14,9 +14,9 @@ mrproper: clean
 	@killall xsb ciaoengine
 
 cleanall:
-	cd debugger_pkg ; make -i mrproper  
-	cd examples ; make -i mrproper
-	cd manual ; make -i mrproper
-	cd rfuzzy_ciao ; make -i mrproper
-	cd rfuzzy_ciao_no_package ; make -i mrproper
-	cd rfuzzy_xsb ; make -i mrproper
+	cd ../debugger_pkg ; make -i mrproper  
+	cd ../examples ; make -i mrproper
+	cd ../manual ; make -i mrproper
+	cd ../rfuzzy_ciao ; make -i mrproper
+	cd ../rfuzzy_ciao_no_package ; make -i mrproper
+	cd ../rfuzzy_xsb ; make -i mrproper

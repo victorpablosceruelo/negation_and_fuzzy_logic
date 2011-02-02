@@ -577,6 +577,14 @@ build_functors(Name, Arity, Kind, _On_Error, Functor_In, Funtor, Functor_Negated
 	% Build functor.
         build_functors_aux(Fuzzy_Name, Fuzzy_Arity, Arity, Functor_In, Funtor, Functor_Negated).
 
+build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error, On_Error) :- 
+	(   % Do not show warnings if the following are missing.
+	    Kind == 'fact' ;
+	    Kind == 'function' ;
+	    Kind == 'rule' ;
+	    Kind == 'default_with_cond'
+	), !.
+
 build_functors(Name, _Arity, Kind, On_Error, _Functor_In, On_Error, On_Error) :- !,
 	rfuzzy_warning_msg(Name, Kind, 'has not been defined.').
 
