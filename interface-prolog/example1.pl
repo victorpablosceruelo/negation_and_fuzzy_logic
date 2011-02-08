@@ -20,3 +20,7 @@ main(Vars) :- query(Q, Vars), call(Q),
 %	write_out(Q, options(_,_,_,true,_), _,_,_,_,_,_), nl,
 	display('write_attribute: [ '), local_write_vars(Vars), display(' ] '), nl. 
 %	prettyvars(Vars).
+
+:- multifile portray_attribute/2.
+portray_attribute(X) :- X = eqn_var(_,_,_,_,_), !, print(X).
+
