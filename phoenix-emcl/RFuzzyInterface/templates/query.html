@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<div id="block-forms-2" class="block">
+
+  <div class="content">
+    <h2 class="title">Query</h2>
+    <div class="inner">
+
+
+      <form class="form" action="/results/" method="post" id="main_form">
+        <input type="hidden" name="funcs" value="" id="form_queries" />
+        {% csrf_token %}
+
+        <div class="columns wat-cf">
+          <div class="column left">  
+	    <tr>
+	      {% for field in form %}
+	      {% comment %}<th>{{ field.label_tag }}</th>{% endcomment %}
+		<td>{{ field }}</td> 
+	      {% endfor %}
+	    </tr>
+	    <p></p>
+            <div class="group navform wat-cf" id="add_query">
+              <a class="button" id="save_form" href="#" onclick="addSimpleQuery()">
+                <img alt="Add" src="{{MEDIA_URL}}images/plus.gif" /> Add query
+              </a>
+            </div>
+	  </div>
+	  <div class="column right" style="display:none" id="form_query_list">
+	    <h3> List of Simple Queries </h3>
+            <div class="group" id="query_list">
+            </div>
+	    <div class="group">
+	      <a class="button" href="#" onclick="submitQuery()">
+		<img alt="Query" src="{{ MEDIA_URL }}images/tick.png"> Query
+              </a>
+	    </div>
+	  </div>
+	</div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

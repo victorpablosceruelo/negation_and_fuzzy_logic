@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="block-text" class="block">
+  <div class="secondary-navigation">
+    <ul class="wat-cf">
+      <li class="first"><a href="/concept/list/">Concepts</a></li>
+      <li><a href="/negation/list/">Negations</a></li>
+      <li><a href="/quantification/list/">Quantification</a></li>
+    </ul>
+  </div>
+  <div class="content">
+    <h2 class="title">Edit {{name}} {{entity.name}}</h2>
+
+    <div class="inner">
+      <form class="form">
+        <input type="hidden" name="id_attribute" id="id_attribute" value="{{entity.attribute.id}}" />
+        <input type="hidden" name="id_name" id="id_name" value="{{entity.name}}" />
+        {% csrf_token %}
+        <div class="columns wat-cf">
+          <div id="function_list" class="column left">
+            {% for ele in functions %}
+            <div id="{{ele.0}}" value="{{ele.2}}" >
+              {{ ele.1 }} <a href="#" onclick="deleteFunc('{{name}}',{{ele.0}})">remove</a>
+            </div>
+            {% endfor %}
+          </div>
+          <div id="ad" class="column right">
+            {% for field in function_form %}
+            <div class="group">
+              <div class="label">
+                {{ field.label_tag }}
+              </div>
+              <div class="text_field" >
+                {{ field }}
+              </div>
+            </div>
+            {% endfor %}
+            <div class="group">
+              <a class="button" href="#" onclick="checkAndAddFunctionForm('{{name}}')">
+                Add {{name}} function
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="flash">
+          <div class="message error" id="message_box" {% if not error_message %} style="display:none" {% endif %}>
+            {{ error_message }}
+          </div>
+        </div>
+      </form>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

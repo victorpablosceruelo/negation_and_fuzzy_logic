@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="block-forms-2" class="block">
+  <div class="secondary-navigation">
+    <ul class="wat-cf">
+      <li class="first"><a href="/concept/list/">Concepts</a></li>
+      <li><a href="/negation/list/">Negations</a></li>
+      <li><a href="/quantification/list/">Quantification</a></li>
+    </ul>
+  </div>
+  <div class="content">
+    <h2 class="title">Add {{name}}/{{name}} function</h2>
+    <div class="inner" id="{{name}}_data">
+
+
+      <form class="form" action="/{{name}}/add/" method="post" id="main_form">
+        <input type="hidden" name="funcs" value="" id="form_funcs" />
+        {% csrf_token %}
+
+        <div class="columns wat-cf">
+          <div class="column left">
+            {% for field in form %}
+            <div class="group">
+              {{ field.errors }}
+              <div class="label">
+                {{ field.label_tag }}
+              </div>
+              <div class="text_field" >
+                {{ field }}
+              </div>
+            </div>
+            {% endfor %}
+            <div class="group navform wat-cf" id="save_div">
+              <a class="button" id="save_form" href="#" onclick="submitEntity('{{name}}')">
+                <img alt="Save" src="{{ MEDIA_URL }}images/tick.png"> Save
+              </a>
+            </div>
+          </div>
+          <div class="column left">
+
+            <div class="group" id="function_list">
+            </div>
+
+            <div id="function_form_div" style="display:none">
+
+              {% for field in function_form %}
+              <div class="group">
+                <div class="label">
+                  {{ field.label_tag }}
+                </div>
+                <div class="text_field" >
+                  {{ field }}
+                </div>
+              </div>
+              {% endfor %}
+              <div class="group">
+                <a class="button" href="#" onclick="checkFunctionForm('{{name}}')">
+                  Add {{name}} function
+                </a>
+              </div>
+            </div>
+            <div class="group">
+              <a class="button" href="#" onclick="showAddFunctionForm()" id="add_FunctionForm">
+                <img alt="Add" src="{{MEDIA_URL}}images/plus.gif" /> Add {{name}} function
+              </a>
+            </div>
+          </div>
+
+        </div>
+        <div class="flash">
+          <div class="message error" id="message_box" {% if not error_message %} style="display:none" {% endif %}>
+            {{ error_message }}
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block sidebar %}
+<div class="block notice">
+  <h4>Put descriptoion of actions and examples here</h4>
+  <p>Morbi posuere urna vitae nunc. Curabitur ultrices, lorem ac aliquam blandit, lectus eros hendrerit eros, at eleifend libero ipsum hendrerit urna. Suspendisse viverra. Morbi ut magna. Praesent id ipsum. Sed feugiat ipsum ut felis. Fusce vitae nibh sed risus commodo pulvinar. Duis ut dolor. Cras ac erat pulvinar tortor porta sodales. Aenean tempor venenatis dolor.</p>
+</div>
+{% endblock %}
