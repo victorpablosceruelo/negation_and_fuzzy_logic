@@ -69,20 +69,22 @@ class Interval:
 		f = eval("lambda x:"+expression.replace("x","float(x)"))
 		try:
 			l=self.lower.getValue(f)
+			print l
 		except:
 			raise
 		else:
 			try:
 				u=self.upper.getValue(f)
+				print u
 			except:
 				raise
 			else:
 				return l>=0 and u>=0 and [(self.lower.value,l),(self.upper.value,u)]
 
-mark = {"[":".>=.",
-	"(":".>.",
-	")":".<.",
-	"]":".=<."}
+mark = {"[":" .>=. ",
+	"(":" .>. ",
+	")":" .<. ",
+	"]":" .=<. "}
 	
 class IntervalPoint:
 	def __init__(self, edge, value):	
@@ -139,8 +141,9 @@ class LowerBound(IntervalPoint):
 		return UpperBound(newEdge,str(self.value))
 
 	def getValue(self,f):
-		tmp = f(self.value)
-		if tmp<=1:
+		tmp = round(f(self.value))
+		print tmp
+		if tmp<=1 and tmp>=0:
 			return tmp
 		else:
 			raise Exception(" ErrorMessage : The value of " + str(self) + " is out of bound ! ")
@@ -187,8 +190,9 @@ class UpperBound(IntervalPoint):
 		return LowerBound(newEdge,str(self.value))
 
 	def getValue(self,f):
-		tmp = f(self.value)
-		if tmp<=1:
+		tmp = round(f(self.value))
+		print tmp
+		if tmp<=1 and tmp>=0:
 			return tmp
 		else:
 			raise Exception(" ErrorMessage : The value of " + str(self) + " is out of bound ! ")

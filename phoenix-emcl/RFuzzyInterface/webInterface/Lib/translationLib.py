@@ -89,7 +89,9 @@ def getDBAtomPattern(position):
     predicate = str(Table.objects.all()[0].name).lower()
     prefix = list("_"*(position-1))
     postfix = list("_"*(Attribute.objects.count()-position))
+    keyword = Table.objects.all()[0].getPKterm()
     term = []
+    term.append(keyword)
     term.extend(prefix)
     term.append("%s")
     term.extend(postfix)
@@ -101,16 +103,39 @@ def generateQuery():
     queries.insert(0,"% Query List \n")
     return queries
 
-def generateInterfaceToCiao():
+def generateFuzzyInterfaceToCiao():
+#q1 :- findall((Y,[X]),not_very_expensive(Y,X),Ans),show(Ans).
+#main :- q1,nl,q2.
     print "test Query" 
     print SimpleQuery.objects.all()
-    answer = "answer(Q,Ans) :- arg(1,Q,X),arg(2,Q,Y),findall((X,Y),Q,Ans).\n"
     complexQuery = []
+    interface = []
     for sq in SimpleQuery.objects.all():
-        s1 = "answer(%s,Ans%s),\n" % (sq.getHead(),sq.id)
-        s2 = "write(Ans%s),\n" % (sq.id)
-        complexQuery.append(s1+s2)
-    body = "nl,\n".join(complexQuery)
-    body = body + "nl."
-    return [answer,"main :- " + body + "\n"]
+        head = "q" + str(sq.id)
+        pkTerm = Table.objects.all()[0].getPKterm()
+        body = "findall((%s,[V]),%s,Ans),show(Ans)" % (pkTerm,sq.getHead())
+        query = head + " :- " + body + ".\n"
+        interface.append(query)
+        complexQuery.append(head)
+    mainbody = ",nl,".join(complexQuery)
+    mainbody = mainbody + ",nl."
+    interface.append("main :- " + mainbody + "\n")
+    return interface
+
+def getCrispAtom():
+     predicate = str(Table.objects.all()[0].name).lower()
+     keyword = Table.objects.all()[0].getPKterm()
+     fix = list("_"*Attribute.objects.count())
+     term = []
+     term.append(keyword)
+     term.extend(fix)
+     atom_pattern = predicate + "(" + ",".join(term) + ")"
+     return atom_pattern
+
+def generateCrispInterfaceToCiao():
+#    main :- findall(FLAT_NUMBER,house(FLAT_NUMBER,_,_,_,_,_,_),L),write(L).
+    pattern = "main :- findall(%s,%s,L),write(L)."
+    keyword = Table.objects.all()[0].getPKterm()
+    atom = getCrispAtom()
+    return pattern % (keyword, atom)
     

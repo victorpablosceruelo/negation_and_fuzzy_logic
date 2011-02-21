@@ -1,0 +1,68 @@
+:- module(_,_,[clpr,rfuzzy,debugger_pkg]).
+:- use_module(engine(hiord_rt)).
+:- use_module(library(aggregates)).
+:- use_module(library(write)).house(lfs2168,'apartment',114,5,630000,2,5700).
+house(lfs2144,'apartment',77,3,420000,7,3500).
+house(lfs2147,'apartment',80,2,675000,12,200).
+house(lfs2145,'apartment',224,8,790000,20,100).
+house(c358,'apartment',74,3,340000,5,3100).
+house(lfs2110,'apartment',415,9,2500000,8,2400).
+house(lfs2124,'apartment',63,2,275000,15,450).
+house(lfs2123,'apartment',62,3,285000,6,1000).
+
+house(lfs2111,'villa',700,10,1100000,9,4500).
+house(lfs2047,'villa',1750,11,1650000,15,1000).
+house(lfs2041,'villa',4000,13,2500000,4,1800).
+house(es13462,'villa',600,6,4000000,6,1500).
+house(lfs1942,'villa',900,10,3100000,3,3400).
+house(lfs1917,'villa',210,5,590000,13,5000).
+house(lfb143,'villa',1200,9,2750000,7,4000).
+house(5607/152,'town_house',161,7,815000,6,1200).
+house(es13340,'town_house',1025,8,2800000,25,7000).
+house(lfs1939,'town_house',860,9,1800000,14,2400).
+house(lfs1938,'town_house',520,11,1990000,19,80).
+house(lfs2155,'villa',2300,9,3000000,13,800).
+% Fuzzy concept generated from database 
+expensive(HOUSE_CODE,V) :- house(HOUSE_CODE,_,_,_,PRICE,_,_),expensive_func(PRICE,V).
+cheap(HOUSE_CODE,V) :- house(HOUSE_CODE,_,_,_,PRICE,_,_),cheap_func(PRICE,V).
+% Fuzzy Concept Functions 
+expensive_func(X,Y) :- X .>=. 50000, X .=<. 100000, Y .=. 0.000002*X-0.100000.
+expensive_func(X,Y) :- X .>. 100000, X .=<. 250000, Y .=. 0.000001*X+0.033333.
+expensive_func(X,Y) :- X .>. 250000, X .=<. 350000, Y .=. 0.000001*X-0.05.
+expensive_func(X,Y) :- X .>. 350000, X .=<. 450000, Y .=. 0.000002*X-0.4.
+expensive_func(X,Y) :- X .>. 450000, X .=<. 550000, Y .=. 0.000001*X+0.05.
+expensive_func(X,Y) :- X .>. 550000, X .=<. 800000, Y .=. 0.38.
+expensive_func(X,Y) :- X .>. 800000, X .=<. 1000000, Y .=. 0.000001*X+0.3.
+expensive_func(X,Y) :- X .>. 1000000, X .=<. 1500000, Y .=. 0.6.
+expensive_func(X,Y) :- X .>. 1500000, X .=<. 2500000, Y .=. 0.75.
+cheap_func(X,Y) :- X .>. 0, X .=<. 30000, Y .=. 1.
+cheap_func(X,Y) :- X .>. 30000, X .=<. 50000, Y .=. -0.000010*X+1.3.
+cheap_func(X,Y) :- X .>. 50000, X .=<. 100000, Y .=. -0.000002*X+0.9.
+% Neagtion Functions 
+not_func(X,Y) :- X .>=. 0, X .=<. 1, Y .=. 1-X.
+% Quantification Functions 
+very_func(X,Y) :- X .>=. 0, X .=<. 1, Y .=. X*0.8.
+% Query List 
+not_very_expensive(HOUSE_CODE, V) :- expensive(HOUSE_CODE, V1), very_func(V1, V2), not_func(V2, V).
+not_very_cheap(HOUSE_CODE, V) :- cheap(HOUSE_CODE, V1), very_func(V1, V2), not_func(V2, V).
+local_write_vars([]).
+local_write_vars([Var|Vars]) :-
+	write_attribute(Var), display(' , '),
+	local_write_vars(Vars).
+
+local_write_answers(Vars, Dict) :- 
+%	display('display: '), display(Q), nl,
+%	display('write_term: '), write_term(Q, [portrayed(true)]), nl, 
+%	write_out(Q, options(_,_,_,true,_), _,_,_,_,_,_), nl,
+%	display('write_attribute: [ '), local_write_vars(Vars), display(' ] '), nl. 
+%	prettyvars(Vars).
+	display('dump_constraints: '), dump_constraints(Vars, Dict, C), 
+	write(C), nl.
+
+:- multifile portray_attribute/2.
+portray_attribute(X) :- X = eqn_var(_,_,_,_,_), !, print(X).
+
+show([]).
+show([(Y,Vars)|Left]) :- display('Y='), write(Y),nl, local_write_answers(Vars, ['X']), show(Left).q1 :- findall((HOUSE_CODE,[V]),not_very_expensive(HOUSE_CODE, V),Ans),show(Ans).
+q2 :- findall((HOUSE_CODE,[V]),not_very_cheap(HOUSE_CODE, V),Ans),show(Ans).
+main :- q1,nl,q2,nl.

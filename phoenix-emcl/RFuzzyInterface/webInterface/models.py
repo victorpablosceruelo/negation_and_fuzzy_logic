@@ -116,7 +116,7 @@ class SimpleQuery(models.Model):
     concept = models.ForeignKey(Concept)
 
     def __unicode__(self):
-        return " SimpleQuery: (%s, %s, %s) " % (self.negation, self.quantification, self.concept)
+        return "%s_%s_%s" % (self.negation, self.quantification, self.concept)
    
     def getQuery(self):
         pkTerm = Table.objects.all()[0].getPKterm()
@@ -134,6 +134,4 @@ class SimpleQuery(models.Model):
         head = self.negation.name + "_" + self.quantification.name + "_" + self.concept.name + "(" + pkTerm + ", V)"
         return head
 #not_very_expensive(FLAT_NUMBER,V):-not_func(V2,V),very_func(V1,V2),expensive(FLAT_NUMBER,V1).
-
-
 

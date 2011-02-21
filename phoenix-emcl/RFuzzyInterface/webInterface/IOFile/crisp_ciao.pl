@@ -1,0 +1,1 @@
+main :- findall(HOUSE_CODE,house(HOUSE_CODE,_,_,_,_,_,_),L),write(L).

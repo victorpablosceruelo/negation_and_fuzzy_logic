@@ -4,16 +4,16 @@ from webInterface.Lib.translationLib import *
 
 path=os.path.join(PROJECT_DIR, "webInterface/IOFile/")
 
-head = [":- module(query,_,[clpr,rfuzzy,debugger_pkg]).\n",
-        ":- use_module(engine(hiord_rt)).\n"]
-files = [path+"fuzzy_head.pl",InputFile.objects.all()[0].db,path+"fuzzy_db.pl",path+"fuzzy_query.pl",path+"fuzzy_ciao.pl"]
+files = [path+"fuzzy_head.pl",InputFile.objects.all()[0].db,path+"fuzzy_db.pl",path+"fuzzy_query.pl",path+"fuzzy_IO.pl",path+"fuzzy_ciao.pl"]
+
+prefiles = [InputFile.objects.all()[0].db,path+"crisp_ciao.pl"]
+
 def saveInputFile(xmlFile, dbFile):
     """store xmlFile and dbFile into table FileInfo"""
     InputFile.objects.all().delete()
     inputFile = InputFile(xml=xmlFile, db=dbFile)
     inputFile.save()
     print InputFile.objects.all()
-
 
 def writeInRFuzzy(filename,content):
     funFile = open(path+filename,"a")
@@ -27,26 +27,26 @@ def generateFuzzyFile(filename):
 def generateQueryFile(filename):
     writeInRFuzzy(filename,generateQuery())
 
-def generateFileHead(filename):
-    writeInRFuzzy(filename,head)
+def generateFuzzyCiaoInterface(filename):
+    writeInRFuzzy(filename,generateFuzzyInterfaceToCiao())
 
-def generateCiaoInterface(filename):
-    writeInRFuzzy(filename,generateInterfaceToCiao())
+def generateCrispCiaoInterface(filename):
+    writeInRFuzzy(filename,generateCrispInterfaceToCiao())
 
-def generateFile(fdb="fuzzy_db.pl",fquery="fuzzy_query.pl",fhead="fuzzy_head.pl", fCiao="fuzzy_ciao.pl"):
-    removeFiles(fdb,fquery,fhead)
-    generateFileHead(fhead)
+def generateFile(fdb="fuzzy_db.pl",fquery="fuzzy_query.pl", fCiao="fuzzy_ciao.pl", cCiao="crisp_ciao.pl"):
+    removeFiles(fdb,fquery,fCiao,cCiao)
     generateFuzzyFile(fdb)
     generateQueryFile(fquery)
-    generateCiaoInterface(fCiao)
+    generateFuzzyCiaoInterface(fCiao)
+    generateCrispCiaoInterface(cCiao)
 
-def removeFiles(fdb="fuzzy_db.pl",fquery="fuzzy_query.pl",fhead="fuzzy_head.pl",fCiao="fuzzy_ciao.pl"):
+def removeFiles(fdb="fuzzy_db.pl",fquery="fuzzy_query.pl",fCiao="fuzzy_ciao.pl",cCiao="crisp_ciao.pl"):
     os.path.exists(path+fdb) and os.remove(path+fdb)
     os.path.exists(path+fquery) and os.remove(path+fquery)
-    os.path.exists(path+fhead) and os.remove(path+fhead)
     os.path.exists(path+fCiao) and os.remove(path+fCiao)
+    os.path.exists(path+cCiao) and os.remove(path+cCiao)
 
-def fileCombination(listOfFiles=files,file_name="fuzzy_QA.pl"):
+def fileCombination(listOfFiles,file_name):
 	"""input : listOfFile is a list
 	output: return a new file named final_name
 	append all the contents from each files in the listOfFile into 
@@ -60,3 +60,8 @@ def fileCombination(listOfFiles=files,file_name="fuzzy_QA.pl"):
             fObj.close()
 	final_file.close()
 	print file(path+file_name).read()	
+
+def finalQA():
+    generateFile()
+    fileCombination(files,"fuzzy_QA.pl")
+    fileCombination(prefiles, "crisp_QA.pl")

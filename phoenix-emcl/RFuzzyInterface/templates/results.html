@@ -1,9 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}Results{% endblock %}
-
 {% block content %}
-          <div id="block-tables" class="block">
+<div id="block-tables" class="block">
+  <div class="content">
+    <h2 class="title">Query</h2>
+    <div class="inner">
+      <table class="table">
+	<tbody>
+	  <tr>
+	    <th class="first">{{ keyword }}<th>
+	    {% for q in queries %}
+	    <th>{{ q }}</th>
+	    {% endfor %}      
+	  </tr>
+	  {% for ans in answers %}
+	  <tr class = {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}>
+	    <td class="first">{{ ans.0 }}</td>
+	    {% for key,value in ans.1.items %}
+	    <td>{% if value %}{{ value }}{% endif %}</td>
+	    {% endfor %}
+	  </tr>
+	  {% endfor %}
+	 </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% comment %}  <div id="block-tables" class="block">
 
             <div class="content">
               <h2 class="title">Query</h2>
@@ -44,5 +67,5 @@
                 </form>
               </div>
             </div>
-          </div>
+          </div>{% endcomment %}
 {% endblock %}

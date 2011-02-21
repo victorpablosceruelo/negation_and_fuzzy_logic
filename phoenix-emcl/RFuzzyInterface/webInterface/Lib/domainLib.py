@@ -203,6 +203,7 @@ class Continuous(list):
         for interval in self:
             try:
                 value = interval.getValue(expression)
+                print value
             except:
                 raise
             else:
@@ -213,7 +214,7 @@ class Continuous(list):
         function=[]
         for interval in self:
             try:
-                subFunc = str(interval)+ ", " + "Y.=." + expression.upper() + ".\n"
+                subFunc = str(interval)+ ", " + "Y .=. " + expression.upper() + ".\n"
             except:
                 raise
             else:

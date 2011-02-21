@@ -9,6 +9,7 @@ from webInterface.Lib.configurationLib import *
 from webInterface.Lib.validation import *
 from webInterface.Lib.metaDBLib import *
 from webInterface.Lib.fileLib import *
+from webInterface.Lib.query import *
 
 
 def defaultDomain():
@@ -207,6 +208,7 @@ def query(request):
 
 @render_to("results.html")
 def results(request):
+    answers = []
     SimpleQuery.objects.all().delete()
     if request.method == "POST":
         print "---------HERE IS POST DATA-----------"
@@ -218,11 +220,15 @@ def results(request):
             c = vals[2]
             print "<%s, %s, %s >" % (n, q, c)
             saveSimpleQuery(n,q,c)
-        generateFile()
-        fileCombination()
+        finalQA()
         # excute query over ciaoProlog
-       
+        answers = parseAllAnswers()
+        # put answers into the table
     else:
         raise "Can't happen"
+    data = {'answers':answers.items(),
+            'queries':SimpleQuery.objects.all(),
+            'keyword':Table.objects.all()[0].getPKterm()}
+    return data
 
-    return locals()
+
