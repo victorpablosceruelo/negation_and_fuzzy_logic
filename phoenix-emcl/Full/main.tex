@@ -1,0 +1,29 @@
+\documentclass{article}
+\usepackage{subfiles}
+\usepackage{graphicx}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{listings}
+\usepackage{pifont}
+
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defin}[thm]{Definition}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{ex}[thm]{Example}
+
+\begin{document}
+\title{Web Interface for RFuzzy Query-Answering}
+\author{Lu JingWei}
+
+\maketitle
+
+\subfile{Introduction}
+\subfile{Background}
+\subfile{Project}
+\subfile{Conclusions}
+
+\newpage
+\nocite{*}
+\bibliographystyle{alpha}
+\bibliography{medium-string,main}
+\end{document}

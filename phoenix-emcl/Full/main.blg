@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2010)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+The style file: alpha.bst
+Database file #1: medium-string.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Database file #2: main.bib
+Warning--empty journal in LL90
+Warning--empty title in Llo87
+Warning--empty journal in MPS10
+You've used 11 entries,
+            2543 wiz_defined-function locations,
+            2487 strings with 74469 characters,
+and the built_in function-call counts, 3932 in all, are:
+= -- 381
+> -- 183
+< -- 4
++ -- 59
+- -- 57
+* -- 252
+:= -- 672
+add.period$ -- 32
+call.type$ -- 11
+change.case$ -- 61
+chr.to.int$ -- 11
+cite$ -- 14
+duplicate$ -- 167
+empty$ -- 289
+format.name$ -- 71
+if$ -- 799
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 13
+newline$ -- 57
+num.names$ -- 34
+pop$ -- 64
+preamble$ -- 1
+purify$ -- 75
+quote$ -- 0
+skip$ -- 144
+stack$ -- 0
+substring$ -- 191
+swap$ -- 17
+text.length$ -- 4
+text.prefix$ -- 3
+top$ -- 0
+type$ -- 76
+warning$ -- 3
+while$ -- 36
+width$ -- 14
+write$ -- 136
+(There were 3 warnings)

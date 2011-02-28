@@ -1,0 +1,22 @@
+\documentclass[main.tex]{subfiles} 
+\begin{document}
+\newpage
+\section{Dive into Fuzzy Query-Answering Web Interface}
+\label{sec:FuzzyQA}
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[scale=0.4]{FQAS.png}
+\end{center}
+\caption{Fuzzy Query-Answering System}
+\label{fig:FQAS}
+\end{figure}
+
+%Introduction of FQAS
+The framework of Fuzzy Query-Answering System (FQAS) is given in figure \ref{fig:FQAS}. FQAS receive crisp database and fuzzy query as input, and output fuzzy answer, which means users can ask fuzzy queries over crisp database. In FQAS, \textit{Loading File Module} (LFM) accepts crisp database, which parse the schema of database; \textit{Configuration Module} (CM) offers users to create fuzzy concepts over crisp database, as well as negation and quantification. Simply speaking, it generates a virtual fuzzy database upon crisp database; \textit{Query-Answering Module} (QAM) takes virtual fuzzy database and fuzzy query as input and generates a RFuzzy prolog program, which is passed to RFuzzy Framework to do the reasoning, QAM parses the result from RFuzzy Framework as fuzzy answer of FAQS.
+
+In this section, the main three modules are presented in detail in section \ref{sec:LoadingFileModule}, \ref{sec:ConfigurationModule} and \ref{sec:QAModule}, respectively.
+\input{LoadingFileModule}
+\input{ConfigurationModule}
+\input{Query-AnsweringModule}
+
+\end{document}
