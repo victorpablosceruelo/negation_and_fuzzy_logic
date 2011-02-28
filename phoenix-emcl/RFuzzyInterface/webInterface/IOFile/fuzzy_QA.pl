@@ -1,7 +1,9 @@
 :- module(_,_,[clpr,rfuzzy,debugger_pkg]).
 :- use_module(engine(hiord_rt)).
 :- use_module(library(aggregates)).
-:- use_module(library(write)).house(lfs2168,'apartment',114,5,630000,2,5700).
+:- use_module(library(write)).
+
+house(lfs2168,'apartment',114,5,630000,2,5700).
 house(lfs2144,'apartment',77,3,420000,7,3500).
 house(lfs2147,'apartment',80,2,675000,12,200).
 house(lfs2145,'apartment',224,8,790000,20,100).
@@ -25,26 +27,47 @@ house(lfs2155,'villa',2300,9,3000000,13,800).
 % Fuzzy concept generated from database 
 expensive(HOUSE_CODE,V) :- house(HOUSE_CODE,_,_,_,PRICE,_,_),expensive_func(PRICE,V).
 cheap(HOUSE_CODE,V) :- house(HOUSE_CODE,_,_,_,PRICE,_,_),cheap_func(PRICE,V).
+big(HOUSE_CODE,V) :- house(HOUSE_CODE,_,SIZE,_,_,_,_),big_func(SIZE,V).
+small(HOUSE_CODE,V) :- house(HOUSE_CODE,_,SIZE,_,_,_,_),small_func(SIZE,V).
 % Fuzzy Concept Functions 
-expensive_func(X,Y) :- X .>=. 50000, X .=<. 100000, Y .=. 0.000002*X-0.100000.
-expensive_func(X,Y) :- X .>. 100000, X .=<. 250000, Y .=. 0.000001*X+0.033333.
-expensive_func(X,Y) :- X .>. 250000, X .=<. 350000, Y .=. 0.000001*X-0.05.
-expensive_func(X,Y) :- X .>. 350000, X .=<. 450000, Y .=. 0.000002*X-0.4.
-expensive_func(X,Y) :- X .>. 450000, X .=<. 550000, Y .=. 0.000001*X+0.05.
-expensive_func(X,Y) :- X .>. 550000, X .=<. 800000, Y .=. 0.38.
-expensive_func(X,Y) :- X .>. 800000, X .=<. 1000000, Y .=. 0.000001*X+0.3.
-expensive_func(X,Y) :- X .>. 1000000, X .=<. 1500000, Y .=. 0.6.
-expensive_func(X,Y) :- X .>. 1500000, X .=<. 2500000, Y .=. 0.75.
+expensive_func(X,Y) :- X .>=. 50000, X .<. 100000, Y .=. 0.000002*X-0.1.
+expensive_func(X,Y) :- X .>=. 100000, X .<. 250000, Y .=. 0.000001*X+0.033333.
+expensive_func(X,Y) :- X .>=. 250000, X .<. 350000, Y .=. 0.000001*X-0.05.
+expensive_func(X,Y) :- X .>=. 350000, X .<. 450000, Y .=. 0.000002*X-0.4.
+expensive_func(X,Y) :- X .>=. 450000, X .<. 550000, Y .=. 0.000001*X+0.05.
+expensive_func(X,Y) :- X .>=. 550000, X .<. 800000, Y .=. 0.38.
+expensive_func(X,Y) :- X .>=. 800000, X .<. 1000000, Y .=. 0.000001*X.
+expensive_func(X,Y) :- X .>=. 1000000, X .<. 1500000, Y .=. 0.6.
+expensive_func(X,Y) :- X .>=. 1500000, X .=<. 2500000, Y .=. 0.75.
 cheap_func(X,Y) :- X .>. 0, X .=<. 30000, Y .=. 1.
-cheap_func(X,Y) :- X .>. 30000, X .=<. 50000, Y .=. -0.000010*X+1.3.
+cheap_func(X,Y) :- X .>. 30000, X .=<. 50000, Y .=. -0.00001*X+1.3.
 cheap_func(X,Y) :- X .>. 50000, X .=<. 100000, Y .=. -0.000002*X+0.9.
+cheap_func(X,Y) :- X .>. 100000, X .=<. 250000, Y .=. -0.000001*X+0.83333.
+cheap_func(X,Y) :- X .>. 250000, X .=<. 350000, Y .=. -0.000002*X+1.0.
+cheap_func(X,Y) :- X .>. 350000, X .=<. 450000, Y .=. -0.000002*X+1.
+cheap_func(X,Y) :- X .>. 450000, X .=<. 550000, Y .=. -0.000001*X+0.55.
+big_func(X,Y) :- X .>. 0, X .=<. 50, Y .=. 0.002*X.
+big_func(X,Y) :- X .>. 50, X .=<. 80, Y .=. 0.003333*X-0.066667.
+big_func(X,Y) :- X .>. 80, X .=<. 120, Y .=. 0.0025*X.
+big_func(X,Y) :- X .>. 120, X .=<. 200, Y .=. 0.00125*X+0.15.
+big_func(X,Y) :- X .>. 200, X .=<. 300, Y .=. 0.001*X+0.2.
+big_func(X,Y) :- X .>. 300, X .=<. 500, Y .=. 0.001*X+0.2.
+big_func(X,Y) :- X .>. 500, X .=<. 1500, Y .=. 0.0002*X+0.6.
+big_func(X,Y) :- X .>. 1500, X .=<. 2500, Y .=. 0.0001*X+0.75.
+small_func(X,Y) :- X .>. 0, X .=<. 50, Y .=. 1.
+small_func(X,Y) :- X .>. 50, X .=<. 80, Y .=. -0.00333*X+1.1665.
+small_func(X,Y) :- X .>. 80, X .=<. 100, Y .=. -0.005*X+1.3.
+small_func(X,Y) :- X .>. 100, X .=<. 150, Y .=. -0.002*X+1.
+small_func(X,Y) :- X .>. 150, X .=<. 200, Y .=. -0.004*X+1.3.
+small_func(X,Y) :- X .>. 200, X .=<. 300, Y .=. -0.003*X+1.1.
+small_func(X,Y) :- X .>. 300, X .=<. 500, Y .=. -0.001*X+0.5.
 % Neagtion Functions 
 not_func(X,Y) :- X .>=. 0, X .=<. 1, Y .=. 1-X.
 % Quantification Functions 
-very_func(X,Y) :- X .>=. 0, X .=<. 1, Y .=. X*0.8.
+very_func(X,Y) :- X .>=. 0, X .=<. 1, Y .=. 0.8*X.
 % Query List 
 not_very_expensive(HOUSE_CODE, V) :- expensive(HOUSE_CODE, V1), very_func(V1, V2), not_func(V2, V).
-not_very_cheap(HOUSE_CODE, V) :- cheap(HOUSE_CODE, V1), very_func(V1, V2), not_func(V2, V).
+not_very_small(HOUSE_CODE, V) :- small(HOUSE_CODE, V1), very_func(V1, V2), not_func(V2, V).
 local_write_vars([]).
 local_write_vars([Var|Vars]) :-
 	write_attribute(Var), display(' , '),
@@ -56,13 +79,15 @@ local_write_answers(Vars, Dict) :-
 %	write_out(Q, options(_,_,_,true,_), _,_,_,_,_,_), nl,
 %	display('write_attribute: [ '), local_write_vars(Vars), display(' ] '), nl. 
 %	prettyvars(Vars).
-	display('dump_constraints: '), dump_constraints(Vars, Dict, C), 
+	dump_constraints(Vars, Dict, C), 
 	write(C), nl.
 
 :- multifile portray_attribute/2.
 portray_attribute(X) :- X = eqn_var(_,_,_,_,_), !, print(X).
 
 show([]).
-show([(Y,Vars)|Left]) :- display('Y='), write(Y),nl, local_write_answers(Vars, ['X']), show(Left).q1 :- findall((HOUSE_CODE,[V]),not_very_expensive(HOUSE_CODE, V),Ans),show(Ans).
-q2 :- findall((HOUSE_CODE,[V]),not_very_cheap(HOUSE_CODE, V),Ans),show(Ans).
+show([(Y,Vars)|Left]) :- write(Y),nl, local_write_answers(Vars, ['X']), show(Left).
+
+q1 :- findall((HOUSE_CODE,[V]),not_very_expensive(HOUSE_CODE, V),Ans),show(Ans).
+q2 :- findall((HOUSE_CODE,[V]),not_very_small(HOUSE_CODE, V),Ans),show(Ans).
 main :- q1,nl,q2,nl.

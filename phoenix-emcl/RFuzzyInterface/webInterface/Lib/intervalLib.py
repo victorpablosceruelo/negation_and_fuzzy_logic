@@ -141,7 +141,7 @@ class LowerBound(IntervalPoint):
 		return UpperBound(newEdge,str(self.value))
 
 	def getValue(self,f):
-		tmp = round(f(self.value))
+		tmp = round(f(self.value), 5)
 		print tmp
 		if tmp<=1 and tmp>=0:
 			return tmp
@@ -190,7 +190,7 @@ class UpperBound(IntervalPoint):
 		return LowerBound(newEdge,str(self.value))
 
 	def getValue(self,f):
-		tmp = round(f(self.value))
+		tmp = round(f(self.value), 5)
 		print tmp
 		if tmp<=1 and tmp>=0:
 			return tmp
