@@ -20,8 +20,8 @@
 
 % :- data func_arguments/2.
 
-:- use_module(library('rfuzzy/rfaggr')).
-:- include(library('rfuzzy/rfops')).
+:- use_module(library('rfuzzy/rfuzzy_rt')).
+:- include(library('rfuzzy/rfuzzy_ops')).
 % :- include(library('clpr/ops')).
 :- include(library('clpqr-common/ops')).
 
@@ -202,13 +202,13 @@ eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	    trans_rule(Head, Body, Fuzzy_H, Fuzzy_Body)
 	;
 	    (
-		rfuzzy_error_msg('Cannot understand syntax for', (Head :~ Body)),
-		rfuzzy_error_msg('Syntax for rules is', '(predicate cred (Op1, Number) :~ Op2((Body))'),
+		rfuzzy_error_msg('translate_rule_syntax', 'Cannot understand syntax for', (Head :~ Body)),
+		rfuzzy_error_msg('translate_rule_syntax', 'Syntax for rules is', '(predicate cred (Op1, Number) :~ Op2((Body))'),
 		!, fail
 	    )
 	).
 
-eat(3, Whatever, rfuzzy_error(Whatever)) :-
+eat(3, Whatever, rfuzzy_error_msg('translate_syntax', 'failed for', Whatever)) :-
 	has_rfuzzy_symbol(Whatever), !.
 
 has_rfuzzy_symbol(( A :~ B )) :- syntax_error(( A :~ B )).
@@ -219,8 +219,8 @@ has_rfuzzy_symbol(( :- default(A,B) )) :- syntax_error(( :- default(A,B) )).
 has_rfuzzy_symbol(( :- default(A,B) => C )) :- syntax_error(( :- default(A,B) => C )).
 
 syntax_error(Whatever) :-
-	rfuzzy_error_msg('Not recognized syntax in: ', Whatever),
-	rfuzzy_error_msg('Use \"rfuzzy_error(Whatever)\" to see which predicates have syntax errors', '').
+	rfuzzy_error_msg('translate_rule_syntax', 'Not recognized syntax in: ', Whatever),
+	rfuzzy_error_msg('translate_rule_syntax', 'Use \"rfuzzy_error(Whatever)\" to see which predicates have syntax errors', '').
 
 
 trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
@@ -303,10 +303,10 @@ retrieve_aggregator_info(Op, Operator) :-
 	debug_msg('retrieve_aggregator_info :: Aggregators', Aggregators),
 	member(faggr(Op, _IAny,  Operator, _FAny), Aggregators), !.
 retrieve_aggregator_info(Op, Op) :-
-	rfaggr:defined_aggregators(Aggregators), !,
+	rfuzzy_rt:defined_aggregators(Aggregators), !,
 	member(Op, Aggregators).
 retrieve_aggregator_info(Op, 'id') :-
-	rfuzzy_error_msg(Op, ' is not a valid agregator operator.').
+	rfuzzy_error_msg('retrieve_aggregator_info', Op, ' is not a valid agregator operator.').
 
 
 add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Out, Vars_2_In, Vars_2_Out) :-

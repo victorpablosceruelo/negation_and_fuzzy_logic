@@ -1,9 +1,9 @@
-:- module(rfaggr, [defined_aggregators/1, 
+:- module(rfuzzy_rt, [defined_aggregators/1, 
 	inject/3, merge/4, id/2, id/3, prod/3, iprod/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	mean/3, supreme/2,
 	'=>'/4,
-	debug_msg/2, debug_msg_list/2, 
+	debug_msg/2, debug_msg_list/2, debug_nl/0, 
 	rfuzzy_warning_msg/3, rfuzzy_error_msg/3,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2 ],[hiord]).
 
