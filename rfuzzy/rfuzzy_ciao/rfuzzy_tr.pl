@@ -1,6 +1,6 @@
 :- module(rfuzzy_tr,[trans_fuzzy_sent/3,trans_fuzzy_cl/3],[]).
 
-:- use_module(library(aggregates), [findall/4]).
+:- use_module(library(aggregates), [findall/3]).
 :- use_module(library(terms),[copy_args/3]).
 :- use_module(library(messages),[error_message/2]).
 :- use_module(library(write),[write/1]).
@@ -24,59 +24,6 @@
 :- include(library('rfuzzy/rfops')).
 % :- include(library('clpr/ops')).
 :- include(library('clpqr-common/ops')).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-% This is to enable/disable debug.
-% do_debug_rfuzzy('No').
-do_debug_rfuzzy('Yes').
-
-debug_msg(Msg1, Msg2) :- 
-	debug_msg_aux(Msg1, '', Msg2),
-	debug_nl.
-
-debug_msg_aux(_Msg1, _Msg2, _Msg3) :- do_debug_rfuzzy('No').
-debug_msg_aux( Msg1,  Msg2, Msg3) :-
-	do_debug_rfuzzy('Yes'),
-	write('['), write(Msg1), 
-	write(Msg2),
-	write(']: '),  write(Msg3),
-	write('    ').
-
-debug_msg_list(_Msg1, _Msg2) :- do_debug_rfuzzy('No').
-debug_msg_list(Msg1, []) :-
-	do_debug_rfuzzy('Yes'),
-	debug_msg_aux(Msg1, ' (list)', ' (empty)').
-debug_msg_list(Msg1, Msg2) :-
-	do_debug_rfuzzy('Yes'),
-	debug_msg_list_aux(Msg1, ' (list)', Msg2).
-
-debug_msg_list_aux(Msg1, Msg2, []) :- !,
-	debug_msg_aux(Msg1, Msg2, '[ ]'),
-	debug_nl.
-debug_msg_list_aux(Msg1, Msg2, [Msg3|Msg3_List]) :-
-	debug_msg_aux(Msg1, Msg2, Msg3),
-	debug_nl,
-	debug_msg_list_aux(Msg1, Msg2, Msg3_List).
-
-
-debug_nl :- do_debug_rfuzzy('No').
-debug_nl :- do_debug_rfuzzy('Yes'), write('\n').
-
-rfuzzy_warning_msg(Function, Error, Msg) :-
-	write('WARNING: in \"'),
-	write(Function), write('\" '),
-	write(Error), write(' '), write(Msg),
-	nl.
-
-rfuzzy_error_msg(Function, Error) :-
-	write('ERROR: '),
-	write(Function),
-	write(Error),
-	nl.
-%	!, fail. % Finally fail.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -111,18 +58,20 @@ trans_fuzzy_sent(Arg, Arg, FileName) :-
 % eat_3 uses info supplied by eat_1 and eat_2.	
 trans_fuzzy_sent_aux(end_of_file, Sentences_Out, FileName):-
 	!,
-	findall(Cl,(retract_fact(sentence(Cl, FileName))), Sentences_In, []),
+	findall(Cl,(retract_fact(sentence(Cl, FileName))), Sentences_In),
 	eat_lists(1, Sentences_In, [], Sent_Tmp_1, [(end_of_file)], Converted_1),
 	eat_lists(2, Sent_Tmp_1, [], Sent_Tmp_2, Converted_1, Converted_2),
 	eat_lists(3, Sent_Tmp_2, [], Sent_Tmp_3, Converted_2, Converted_3),
 	debug_msg_list('Converted_3', Converted_3),
+	debug_msg_list('Sent_Tmp_3', Sent_Tmp_3),
 
 	retrieve_all_predicate_info('defined', To_Build_Fuzzy),
+	debug_msg_list('To_Build_Fuzzy', To_Build_Fuzzy),
 	build_auxiliary_clauses(To_Build_Fuzzy, Converted_4), 
-	% retrieve_all_predicate_info('defined', To_Build_Crisp),
-	append_local(Converted_3, Converted_4, Converted_5),
-	append_local(Sent_Tmp_3, Converted_5, Sentences_Out),
-	debug_msg_list('Sent_Tmp_3', Sentences_Out).
+
+	append_local(Sent_Tmp_3, Converted_3, Sentences_Out_Tmp),
+	append_local(Converted_4, Sentences_Out_Tmp, Sentences_Out),
+	debug_msg_list('Sentences_Out', Sentences_Out).
 
 trans_fuzzy_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
 
@@ -453,7 +402,7 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 
 save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 	save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-	save_predicate_info_aux('defined', Name, Arity, Fuzzy_Name, Fuzzy_Arity), % Predicate MUST be defined.
+	save_predicate_info_aux('defined', Name, Arity, Name, Arity), % Predicate MUST be defined.
 	debug_msg('save_predicate_info out', save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)).
 
 save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
@@ -469,7 +418,7 @@ retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 
 retrieve_all_predicate_info(Kind, Retrieved) :-
 	findall((rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)),
-	(retract_fact(rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity))), Retrieved, []),
+	(retract_fact(rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity))), Retrieved),
 	 !.
 
 remove_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
@@ -544,12 +493,13 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	Fuzzy_Cl_Aux = (Fuzzy_Pred_Aux :- fail).
 
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, _Fuzzy_Name, Fuzzy_Arity),
+	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 
 	% Build MAIN functors.
-        functor(Fuzzy_Pred_Main, Name, Fuzzy_Arity),
 	Arity_Fuzzy_Arg_1 is Arity + 1,
 	Arity_Fuzzy_Arg_2 is Arity + 2,
+	Fuzzy_Arity is Arity_Fuzzy_Arg_2,
+	functor(Fuzzy_Pred_Main, Name, Fuzzy_Arity),
 	arg(Arity_Fuzzy_Arg_1, Fuzzy_Pred_Main, Fuzzy_Arg_1),
 	arg(Arity_Fuzzy_Arg_2, Fuzzy_Pred_Main, Fuzzy_Arg_2),
 
@@ -595,7 +545,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	).
 
 build_auxiliary_clause(Pred_Info, (true), (true)) :-
-	rfuzzy_warning_msg('Impossible to build auxiliary clause for ', Pred_Info, ' ').
+	rfuzzy_warning_msg(Pred_Info, 'it is impossible to build the auxiliary clause', ' ').
 	
 build_functors(Name, Arity, Kind, _On_Error, Functor_In, Functor) :-
 
