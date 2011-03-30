@@ -62,15 +62,17 @@ trans_fuzzy_sent_aux(end_of_file, Sentences_Out, FileName):-
 	eat_lists(1, Sentences_In, [], Sent_Tmp_1, [(end_of_file)], Converted_1),
 	eat_lists(2, Sent_Tmp_1, [], Sent_Tmp_2, Converted_1, Converted_2),
 	eat_lists(3, Sent_Tmp_2, [], Sent_Tmp_3, Converted_2, Converted_3),
-	debug_msg_list('Converted_3', Converted_3),
-	debug_msg_list('Sent_Tmp_3', Sent_Tmp_3),
+	eat_lists(4, Sent_Tmp_3, [], Sent_Tmp_4, Converted_3, Converted_4),
+	eat_lists(5, Sent_Tmp_4, [], Sent_Tmp_5, Converted_4, Converted_5),
+	debug_msg_list('Converted_5', Converted_5),
+	debug_msg_list('Sent_Tmp_5', Sent_Tmp_5),
 
-	retrieve_all_predicate_info('defined', To_Build_Fuzzy),
-	debug_msg_list('To_Build_Fuzzy', To_Build_Fuzzy),
-	build_auxiliary_clauses(To_Build_Fuzzy, Converted_4), 
+	retrieve_all_predicate_info('defined', To_Build_Fuzzy_Aux_Predicates),
+	debug_msg_list('To_Build_Fuzzy', To_Build_Fuzzy_Aux_Predicates),
+	build_auxiliary_clauses(To_Build_Fuzzy_Aux_Predicates, Fuzzy_Aux_Predicates),  
 
-	append_local(Sent_Tmp_3, Converted_3, Sentences_Out_Tmp),
-	append_local(Converted_4, Sentences_Out_Tmp, Sentences_Out),
+	append_local(Sent_Tmp_5, Converted_5, Sentences_Out_Tmp),
+	append_local(Fuzzy_Aux_Predicates, Sentences_Out_Tmp, Sentences_Out),
 	debug_msg_list('Sentences_Out', Sentences_Out).
 
 trans_fuzzy_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
@@ -156,14 +158,6 @@ eat(1, (Head value X), Fuzzy_Head):-
 eat(1, Aggregator_Definition, Aggregator_Def_Translated) :-
 	trans_fuzzy_aggregator_def(Aggregator_Definition, Aggregator_Def_Translated), !.
 
-eat(1, Other, Other):-
-	nonvar(Other), 
-	functor(Other, ':-', 2), !,
-	arg(1, Other, Arg_1), 
-	nonvar(Arg_1), 
-	functor(Arg_1, Name, Arity),
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
-
 % function definition.
 eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	!, % If patter matching, backtracking forbiden.
@@ -172,7 +166,7 @@ eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 
 	functor(Head, Name, 0),
 	functor(H, Name, 1),
-	fuzzify_functor(H, 'fact', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	fuzzify_functor(H, 'function', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_2 is 1,
 
 	arg(1, Fuzzy_H, X),
@@ -189,8 +183,6 @@ eat(2, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_H :- Cls)):-
 	trans_each_property(Fuzzy_H, Arity, 1, Properties_Decl, Cls),
 	!, % Backtracking forbidden.
 	debug_msg('(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)).
-	
-
 
 
 % credibility value:
@@ -208,8 +200,46 @@ eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	    )
 	).
 
-eat(3, Whatever, rfuzzy_error_msg('translate_syntax', 'failed for', Whatever)) :-
+% fuzzify function:
+eat(3, Head, (Fuzzy_H :- Fuzzy_Body)):-
+	functor(Head, 'fuzzify', 3),
+	!, % If patter matching, backtracking forbiden.
+	debug_nl,
+	debug_msg('eat(Head) ', (Head)),
+	(
+	    trans_fuzzification(Head, Fuzzy_H, Fuzzy_Body)
+	;
+	    (
+		rfuzzy_error_msg('fuzzify_syntax', 'Cannot understand syntax for', (Head)),
+		rfuzzy_error_msg('fuzzify_syntax', 'Syntax is', 'fuzzify(low_distance/2, distance/2, low_distance_function/2'),
+		!, fail
+	    )
+	).
+
+eat(4, Whatever, rfuzzy_error_msg('translate_syntax', 'failed for', Whatever)) :-
 	has_rfuzzy_symbol(Whatever), !.
+
+eat(5, Other, Other) :-
+	debug_msg('Test-1 if crisp pred', Other),
+	nonvar(Other), 
+	functor(Other, ':-', 2), !,
+	arg(1, Other, Arg_1), 
+	nonvar(Arg_1), 
+	functor(Arg_1, Name, Arity),
+	save_predicate_info('crisp', Name, Arity, Name, Arity).
+
+eat(5, Other, Other) :-
+	debug_msg('Test-2 if crisp fact', Other),
+	nonvar(Other), 
+	functor(Other, Name, Arity), 
+	not_a_known_predicate_name(Name),	!,
+	save_predicate_info('crisp', Name, Arity, Name, Arity).
+
+not_a_known_predicate_name(Name) :-
+	Name \== ':-',
+	Name \== ':~',
+	Name \== ':#',
+	Name \== 'value'.
 
 has_rfuzzy_symbol(( A :~ B )) :- syntax_error(( A :~ B )).
 has_rfuzzy_symbol(( A :# B )) :- syntax_error(( A :# B )).
@@ -395,6 +425,44 @@ evaluate_V(_X, V, _X1, Vf, _X2, Vf, (V .=. Vf)) :- !.
 evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X1))) :-
 	X2 - X1 > 0,
 	V1 \= V2.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+trans_fuzzification(Head, Fuzzy_H, (Crisp_Predicate, Fuzzy_Function)) :-
+	functor(Head, 'fuzzify', 3),
+	arg(1, Head, Fuzzy_Head_Name/2),
+	arg(2, Head, Crisp_Predicate_Name/2),
+	arg(3, Head, Fuzzy_Function_Name/2),
+
+	test_predicate_has_been_defined('crisp', Crisp_Predicate_Name, 2),
+	test_predicate_has_been_defined('function', Fuzzy_Function_Name, 3), % Here arity is 3
+
+	functor(Fuzzy_H, Fuzzy_Head_Name, 2),
+	functor(Crisp_Predicate, Crisp_Predicate_Name, 2),
+	functor(Fuzzy_Function, Fuzzy_Function_Name, 2),
+
+	arg(1, Fuzzy_H, Input),
+	arg(1, Crisp_Predicate, Input),
+	arg(2, Crisp_Predicate, Crisp_Value),
+	arg(1, Fuzzy_Function, Crisp_Value),
+	arg(2, Fuzzy_Function, Fuzzy_Value),
+	arg(2, Fuzzy_H, Fuzzy_Value),
+
+	!.
+
+test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
+	% retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)
+	retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity), 
+	% rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
+	!.
+test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
+	rfuzzy_warning_msg('fuzzify: Cannot find predicate ', Kind, (Name/FuzzyArity)),
+	retrieve_predicate_info(Kind_A, Name_A, Arity_A, _FuzzyName_A, FuzzyArity_A), 
+	debug_msg('retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity)', 
+	retrieve_predicate_info(Kind_A, Name_A, Arity_A, _FuzzyName_A, FuzzyArity_A)), 
+	fail, !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------

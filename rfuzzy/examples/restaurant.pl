@@ -18,14 +18,23 @@ restaurant(kono_pizza).
 restaurant(paellador).
 restaurant(tapasbar).
 
-:- set_prop low_distance/1 => restaurant/1.
-:- default(low_distance/1, 0).
+% :- set_prop low_distance_function/1 => restaurant/1.
+:- default(low_distance_function/1, 0).
+low_distance_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
 
-low_distance(kenzo) value 1.
-low_distance(burguer_king) value 0.6.
-low_distance(il_tempietto) value 1.
-low_distance(pizza_jardin) value 0.8.
-low_distance(unknown) value 0.2.
+distance(kenzo, 150).
+distance(burguer_king, 500).
+distance(il_tempietto, 100).
+distance(pizza_jardin, 250).
+distance(unknown, 800).
+
+fuzzify(low_distance/2, distance/2, low_distance_function/2).
+
+%low_distance(kenzo) value 1.
+%low_distance(burguer_king) value 0.6.
+%low_distance(il_tempietto) value 1.
+%low_distance(pizza_jardin) value 0.8.
+%low_distance(unknown) value 0.2.
 
 :- set_prop cheap/1 => restaurant/1.
 :- default(cheap/1, 0.5).
