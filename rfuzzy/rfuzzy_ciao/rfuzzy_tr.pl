@@ -30,8 +30,8 @@
 % ------------------------------------------------------
 
 % This is to enable/disable debug.
-do_debug_rfuzzy('No').
-%do_debug_rfuzzy('Yes').
+% do_debug_rfuzzy('No').
+do_debug_rfuzzy('Yes').
 
 debug_msg(Msg1, Msg2) :- 
 	debug_msg_aux(Msg1, '', Msg2),
@@ -46,6 +46,9 @@ debug_msg_aux( Msg1,  Msg2, Msg3) :-
 	write('    ').
 
 debug_msg_list(_Msg1, _Msg2) :- do_debug_rfuzzy('No').
+debug_msg_list(Msg1, []) :-
+	do_debug_rfuzzy('Yes'),
+	debug_msg_aux(Msg1, ' (list)', ' (empty)').
 debug_msg_list(Msg1, Msg2) :-
 	do_debug_rfuzzy('Yes'),
 	debug_msg_list_aux(Msg1, ' (list)', Msg2).
@@ -55,8 +58,9 @@ debug_msg_list_aux(Msg1, Msg2, []) :- !,
 	debug_nl.
 debug_msg_list_aux(Msg1, Msg2, [Msg3|Msg3_List]) :-
 	debug_msg_aux(Msg1, Msg2, Msg3),
-	debug_msg_list_aux(Msg1, Msg2, Msg3_List),
-	debug_nl.
+	debug_nl,
+	debug_msg_list_aux(Msg1, Msg2, Msg3_List).
+
 
 debug_nl :- do_debug_rfuzzy('No').
 debug_nl :- do_debug_rfuzzy('Yes'), write('\n').
@@ -88,9 +92,14 @@ trans_fuzzy_cl(Arg1, Arg1, _Arg3) :-
 
 trans_fuzzy_sent(Arg1, Arg2, Arg3) :- 
 	debug_msg('trans_fuzzy_sent: arg1', Arg1),
-	trans_fuzzy_sent_aux(Arg1, Arg2, Arg3),
+	trans_fuzzy_sent_aux(Arg1, Arg2, Arg3), !,
 	debug_msg_list('trans_fuzzy_sent: arg2', Arg2),
 	debug_msg('trans_fuzzy_sent: arg3', Arg3),
+	debug_nl.
+
+trans_fuzzy_sent(Arg, Arg, FileName) :- 
+	debug_msg('trans_fuzzy_sent: ERROR: Input: ', Arg),
+	debug_msg('trans_fuzzy_sent: ERROR: FileName: ', FileName),
 	debug_nl.
 
 % ------------------------------------------------------
@@ -106,10 +115,13 @@ trans_fuzzy_sent_aux(end_of_file, Sentences_Out, FileName):-
 	eat_lists(1, Sentences_In, [], Sent_Tmp_1, [(end_of_file)], Converted_1),
 	eat_lists(2, Sent_Tmp_1, [], Sent_Tmp_2, Converted_1, Converted_2),
 	eat_lists(3, Sent_Tmp_2, [], Sent_Tmp_3, Converted_2, Converted_3),
+	debug_msg_list('Converted_3', Converted_3),
+
 	retrieve_all_predicate_info('defined', To_Build_Fuzzy),
-	build_auxiliary_clauses(To_Build_Fuzzy, Converted_3, Converted_4), 
+	build_auxiliary_clauses(To_Build_Fuzzy, Converted_4), 
 	% retrieve_all_predicate_info('defined', To_Build_Crisp),
-	append_local(Sent_Tmp_3, Converted_4, Sentences_Out),
+	append_local(Converted_3, Converted_4, Converted_5),
+	append_local(Sent_Tmp_3, Converted_5, Sentences_Out),
 	debug_msg_list('Sent_Tmp_3', Sentences_Out).
 
 trans_fuzzy_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
@@ -152,17 +164,20 @@ eat_lists(Index, [Sent_In | Sents_In], Invalid_In, Invalid_Out, Conv_In, Conv_Ou
 % ------------------------------------------------------
 
 % Unconditional default
-eat(1, (:- default(Name/Arity,X)),(Fuzzy_H :- Fuzzy_Arg .=. X)) :- 
+eat(1, (:- default(Name/Arity,X)),(Fuzzy_H)) :- 
 	!, % If patter matching, backtracking forbiden.
 	number(X), % X must be a number.
 	number(Arity), % A must be a number.
 	nonvar(Name), % Name can not be a variable.
 
 	functor(H, Name, Arity),
-	fuzzify_functor(H, 'default_with_no_cond', Fuzzy_H, Fuzzy_Arg).
+	fuzzify_functor(H, 'default_with_no_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	Fuzzy_Arg_1 is X, 
+	Fuzzy_Arg_2 is 0,
+	!. % Backtracking forbidden.
 
 % Conditional default
-eat(1, (:- default(Name/Arity,X) => H_Cond_Name/Arity),(Fuzzy_H :- Fuzzy_Arg .=. X, H_Cond)) :-
+eat(1, (:- default(Name/Arity,X) => H_Cond_Name/Arity),(Fuzzy_H :- H_Cond)) :-
 	!, % If patter matching, backtracking forbiden.
 	number(X), % X must be a number.
 	number(Arity), % A must be a number.
@@ -170,26 +185,24 @@ eat(1, (:- default(Name/Arity,X) => H_Cond_Name/Arity),(Fuzzy_H :- Fuzzy_Arg .=.
 	nonvar(H_Cond_Name), % Cond_Name cannot be a variable.
 
 	functor(H, Name, Arity),
-	fuzzify_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg),
+	fuzzify_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	Fuzzy_Arg_1 is X, 
+	Fuzzy_Arg_2 is 0,
 
 	functor(H_Cond, H_Cond_Name, Arity),
-	copy_args(Arity, H_Cond, H).    % Copy args from main functor.
+	copy_args(Arity, H_Cond, H),    % Copy args from main functor.
+	!. % Backtracking forbidden.
 
 % Fuzzy facts.
 eat(1, (Head value X), Fuzzy_Head):-
 	!, % If patter matching, backtracking forbiden.
 	number(X),                    % X must be a number.
-	functor(Head, Name, Arity), 
-	Fuzzy_Arity is Arity + 1,   
 
-	change_name('fact', Name, Fuzzy_Name), % Change name.
-	save_predicate_info('fact', Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-
-	functor(Fuzzy_Head, Fuzzy_Name, Fuzzy_Arity),         % NH is our new functor.
-	copy_args(Arity, Head, Fuzzy_Head),   % Copy arguments from H to NH.
-	arg(Fuzzy_Arity, Fuzzy_Head, X),        % Argument V is X.
-
-	debug_msg('fact',((Head value X) => Fuzzy_Head)).
+	fuzzify_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	Fuzzy_Arg_1 is X,
+	Fuzzy_Arg_2 is 1,
+	debug_msg('fact',((Head value X) => Fuzzy_Head)),
+	!. % Backtracking forbidden.
 
 eat(1, Aggregator_Definition, Aggregator_Def_Translated) :-
 	trans_fuzzy_aggregator_def(Aggregator_Definition, Aggregator_Def_Translated), !.
@@ -203,34 +216,33 @@ eat(1, Other, Other):-
 	save_predicate_info('crisp', Name, Arity, Name, Arity).
 
 % function definition.
-eat(1, (Head :# List), (Fuzzy_Head :- Body)) :-
+eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	!, % If patter matching, backtracking forbiden.
 	% list(Lista),
 	debug_msg('(Head :# List) ', (Head :# List)),
 
-	change_name('function', Head, Fuzzy_Head_Name), % Change atom name
-	save_predicate_info('function', Head, 1, Fuzzy_Head_Name, 2),
+	functor(Head, Name, 0),
+	functor(H, Name, 1),
+	fuzzify_functor(H, 'fact', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	Fuzzy_Arg_2 is 1,
 
-	functor(Fuzzy_Head, Fuzzy_Head_Name, 2),
-	arg(1, Fuzzy_Head, X),
-	arg(2, Fuzzy_Head, V),
-	build_straight_lines(X, V, List, Body).
+	arg(1, Fuzzy_H, X),
+	build_straight_lines(X, Fuzzy_Arg_1, List, Body).
 
 % Predicate's type(s) definition.
 % We need to confirm that the predicates for typing exist.
-eat(2, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_Pred :- Cls)):-
+eat(2, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
 	number(Arity), % A must be a number.
-	Fuzzy_Arity is Arity + 1, % Real function arity is Arity + 1.
 
-	debug_msg('(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)),
+	functor(H, Name, Arity),
+	fuzzify_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
+	trans_each_property(Fuzzy_H, Arity, 1, Properties_Decl, Cls),
+	!, % Backtracking forbidden.
+	debug_msg('(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)).
+	
 
-	change_name('type', Name, Fuzzy_Pred_Name),
-	functor(Fuzzy_Pred, Fuzzy_Pred_Name, Fuzzy_Arity),     % Build functor.
-	!, % Backtracking not allowed.
 
-	trans_each_property(Fuzzy_Pred, Arity, 1, Properties_Decl, Cls),
-	save_predicate_info('type', Name, Arity, Fuzzy_Pred_Name, Fuzzy_Arity).
 
 % credibility value:
 eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
@@ -263,28 +275,29 @@ syntax_error(Whatever) :-
 
 
 trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
-	extract_credibility(Head, H, Op1, D),
+	extract_credibility(Head, H, Op1, Credibility),
 	debug_nl,
-	debug_msg('trans_rule(H, Op1, D, Body) ', (trans_rule(H, Op1, D, Body))),
-	nonvar(H), nonvar(D), nonvar(Body),
+	debug_msg('trans_rule(H, Op1, Credibility, Body) ', (trans_rule(H, Op1, Credibility, Body))),
+	nonvar(H), nonvar(Credibility), nonvar(Body),
 
 	% Change head's name.
-	fuzzify_functor(H, 'rule', Fuzzy_Head, Fuzzy_Arg),
+	fuzzify_functor(H, 'rule', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
 
 	% Translate all predicates in the body.
 	extract_op2(Body, Op2, Tmp_Body),
 
-	debug_msg('add_the_truth_value_arg(Tmp_Body)',Tmp_Body),
-	add_the_truth_value_arg(Tmp_Body, Fuzzy_Body, [], Fuzzy_Vars),
+	debug_msg('add_auxiliar_parameters(Tmp_Body)',Tmp_Body),
+	add_auxiliar_parameters(Tmp_Body, Fuzzy_Body, [], Fuzzy_Vars_1, [], Fuzzy_Vars_2),
 
 	% Add the capability to compute the rule's truth value.
-	retrieve_aggregator_info(Op1, MAny1),
-	retrieve_aggregator_info(Op2, MAny2),
+	retrieve_aggregator_info(Op1, Operator_1),
+	retrieve_aggregator_info(Op2, Operator_2),
 	Fuzzy_Operations = (
-			       inject(Fuzzy_Vars,  MAny2, Mu),
+			       inject(Fuzzy_Vars_1,  Operator_2, Aggregated_V),
 			       Mu .>=. 0, Mu .=<. 1,
-			       inject([Mu, D], MAny1, Fuzzy_Arg),
-			       Fuzzy_Arg  .>=. 0, Fuzzy_Arg  .=<. 1
+			       inject([Aggregated_V, Credibility], Operator_1, Fuzzy_Arg_1),
+			       Fuzzy_Arg_1  .>=. 0, Fuzzy_Arg_1  .=<. 1,
+			       inject(Fuzzy_Vars_2, 'mean', Fuzzy_Arg_2)
 	      ).
 
 % ------------------------------------------------------
@@ -333,13 +346,13 @@ extract_op2(Body, Op2, Tmp_Body) :-
 extract_op2(Body, _Op2, 'fail') :-
 	debug_msg('Cannot understand syntax for', (Body)).	
 
-retrieve_aggregator_info(Op, MAny) :-
-%	faggr(Op1, _IAny,  MAny1, _FAny),
+retrieve_aggregator_info(Op, Operator) :-
+%	faggr(Op1, _IAny,  Operator, _FAny),
 	nonvar(Op),
 	aggregators(Aggregators),
 	debug_msg('retrieve_aggregator_info :: Op', Op),
 	debug_msg('retrieve_aggregator_info :: Aggregators', Aggregators),
-	member(faggr(Op, _IAny,  MAny, _FAny), Aggregators), !.
+	member(faggr(Op, _IAny,  Operator, _FAny), Aggregators), !.
 retrieve_aggregator_info(Op, Op) :-
 	rfaggr:defined_aggregators(Aggregators), !,
 	member(Op, Aggregators).
@@ -347,30 +360,33 @@ retrieve_aggregator_info(Op, 'id') :-
 	rfuzzy_error_msg(Op, ' is not a valid agregator operator.').
 
 
-add_the_truth_value_arg(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_In, Vars_Out) :-
+add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Out, Vars_2_In, Vars_2_Out) :-
 	functor(Body, ',', 2), !,
 	arg(1, Body, Body_1),
 	arg(2, Body, Body_2),
-	add_the_truth_value_arg(Body_1, Fuzzy_Body_1, Vars_In, Vars_Tmp),
-	add_the_truth_value_arg(Body_2, Fuzzy_Body_2, Vars_Tmp, Vars_Out).
+	add_auxiliar_parameters(Body_1, Fuzzy_Body_1, Vars_1_In, Vars_1_Tmp, Vars_2_In, Vars_2_Tmp),
+	add_auxiliar_parameters(Body_2, Fuzzy_Body_2, Vars_1_Tmp, Vars_1_Out, Vars_2_Tmp, Vars_2_Out).
 
-% add_the_truth_value_arg(H, Argument, Ret_Cls)
-add_the_truth_value_arg(Body, Fuzzy_Body, Vars, [X|Vars]) :-
+% add_auxiliar_parameters(H, Argument, Ret_Cls)
+add_auxiliar_parameters(Body, Fuzzy_Body, Vars_1, [V|Vars_1], Vars_2, [C|Vars_2]) :-
 	functor(Body, Body_Name, Arity),
-	real_name_and_arity(Body_Name, Arity, Fuzzy_Body_Name, Fuzzy_Arity),
-	functor(Fuzzy_Body, Fuzzy_Body_Name, Fuzzy_Arity),
+	real_name_and_arity(Body_Name, Arity, Fuzzy_Body_Name),
+	V_Arity is Arity +1,
+	C_Arity is Arity +2,
+	functor(Fuzzy_Body, Fuzzy_Body_Name, C_Arity),
 	copy_args(Arity, Fuzzy_Body, Body),
-	arg(Fuzzy_Arity, Fuzzy_Body, X).
+	arg(V_Arity, Fuzzy_Body, V),
+	arg(C_Arity, Fuzzy_Body, C).
 
-add_the_truth_value_arg(Body, Body, Vars, Vars) :-
-	debug_msg('ERROR: add_the_truth_value_arg(Body, Cls, Vars) ', (add_the_truth_value_arg(Body, Vars))),
+add_auxiliar_parameters(Body, Body, Vars_1, Vars_1, Vars_2, Vars_2) :-
+	debug_msg('ERROR: add_auxiliar_parameters(Body, Cls, Vars) ', (add_auxiliar_parameters(Body,
+	Vars_1, Vars_2))),
 	!, fail.
 
-real_name_and_arity(Body_Name, Arity, Body_Name, Arity) :-
-	retrieve_predicate_info('crisp', Body_Name, Arity, Body_Name, Arity), !.
+real_name_and_arity(Body_Name, Arity, Body_Name) :-
+	retrieve_predicate_info('crisp', Body_Name, Arity, Body_Name, _Fuzzy_Arity), !.
 
-real_name_and_arity(Body_Name, Arity, Fuzzy_Body_Name, Fuzzy_Arity) :-
-	Fuzzy_Arity is Arity +1,
+real_name_and_arity(Body_Name, _Arity, Fuzzy_Body_Name) :-
 	change_name('auxiliar', Body_Name, Fuzzy_Body_Name).
 
 % ------------------------------------------------------
@@ -378,8 +394,7 @@ real_name_and_arity(Body_Name, Arity, Fuzzy_Body_Name, Fuzzy_Arity) :-
 % ------------------------------------------------------
 
 trans_each_property(H, Arity, Actual, Properties, Cls) :-
-	debug_msg('trans_each_property', 
-	trans_each_property(H, Arity, Actual, Properties) ),
+	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual, Properties) ),
 	trans_each_property_aux(H, Arity, Actual, Properties, Cls),
 	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual, Properties, Cls) ),
 	!. % Backtracking not allowed here.
@@ -447,7 +462,7 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 
 save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 	save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-	save_predicate_info_aux('defined', Name, Arity, Name, Arity), % Predicate MUST be defined.
+	save_predicate_info_aux('defined', Name, Arity, Fuzzy_Name, Fuzzy_Arity), % Predicate MUST be defined.
 	debug_msg('save_predicate_info out', save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)).
 
 save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
@@ -477,21 +492,25 @@ rfuzzy_predicate_info_contents(rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Na
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-fuzzify_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg) :-
+fuzzify_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
 	functor(H, Name, Arity),
-	Fuzzy_Arity is Arity + 1,
+	Fuzzy_Arity_1 is Arity + 1, % For truth value.
+	Fuzzy_Arity_2 is Fuzzy_Arity_1 + 1, % For preference.
 	change_name(Preffix, Name, Fuzzy_Name), % Change name
-	save_predicate_info(Preffix, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity),
+	save_predicate_info(Preffix, Name, Arity, Fuzzy_Name, Fuzzy_Arity_2),
+	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity_2),
 	copy_args(Arity, Fuzzy_H, H),
-	arg(Fuzzy_Arity, Fuzzy_H, Fuzzy_Arg).
+	arg(Fuzzy_Arity_1, Fuzzy_H, Fuzzy_Arg_1),
+	arg(Fuzzy_Arity_2, Fuzzy_H, Fuzzy_Arg_2).
 
-change_name(Prefix, F, R) :-
+change_name(Prefix, Input, Output) :-
+	atom(Input),
 	translate_prefix(Prefix, Real_Prefix),
-	atom_codes(F, F_Chars),
-	append_local(Real_Prefix, F_Chars, R_Chars),
-	atom_codes(R, R_Chars), !.
-%	debug_msg('change_name', change_name(Prefix, F, R)).
+	atom_codes(Input, Input_Chars),
+	append_local(Real_Prefix, Input_Chars, Output_Chars),
+	atom_codes(Output, Output_Chars), 
+	atom(Output), !.
+%	debug_msg('change_name', change_name(Prefix, Input, Output)).
 
 append_local([], N2, N2).
 append_local([Elto|N1], N2, [Elto|Res]) :-
@@ -514,19 +533,19 @@ translate_prefix(_X, "rfuzzy_error_error_error_").
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_auxiliary_clauses([], Clauses_Out, Clauses_Out) :- !.
-build_auxiliary_clauses([Def_Pred|Def_Preds], Clauses_In, Clauses_Out) :-
-	build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux), 
-	build_auxiliary_clauses(Def_Preds, [Pred_Main, Pred_Aux | Clauses_In], Clauses_Out).
+build_auxiliary_clauses([], []) :- !.
+build_auxiliary_clauses([Def_Pred|Def_Preds], [Pred_Main, Pred_Aux | Clauses]) :-
+	debug_msg('build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux)', (Def_Pred, Pred_Main, Pred_Aux)),
+	build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux),
+	build_auxiliary_clauses(Def_Preds, Clauses).
 
-% This is to call the normal function. Crisp predicates only generate Aux :- Crisp.
+% For crisp predicates we only generate Aux :- Crisp.
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 	retrieve_predicate_info('crisp', Name, Arity, Name, Arity), !, 
 
 	change_name('auxiliar', Name, Fuzzy_Pred_Aux_Name),
 	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Arity),
-
         functor(Pred_Main, Name, Arity),
 	copy_args(Arity, Pred_Main, Fuzzy_Pred_Aux),
 
@@ -534,7 +553,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	Fuzzy_Cl_Aux = (Fuzzy_Pred_Aux :- fail).
 
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
+	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 
 	% Evaluate fuzzy arity.
 	Fuzzy_Arity is Arity + 1,
@@ -555,7 +574,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond, Fuzzy_Pred_Default_With_Cond_Aux),
 	build_functors(Name, Arity, 'default_with_no_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond, _Fuzzy_Pred_Default_Without_Cond_Aux),
 
-	Fuzzy_Cl_Main = (Fuzzy_Pred_Main :- V_In .=<. V_Tmp, Fuzzy_Pred_Aux), % Main Fuzzy Pred
+	Fuzzy_Cl_Main = (Fuzzy_Pred_Main :- V_In .>=. V_Tmp, Fuzzy_Pred_Aux), % Main Fuzzy Pred
 	Fuzzy_Cl_Aux = ( Fuzzy_Pred_Aux :- Fuzzy_Pred_Types, 
 	(   Fuzzy_Pred_Fact ; 
 	    (  \+(Fuzzy_Pred_Fact_Aux), 
