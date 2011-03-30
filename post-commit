@@ -45,7 +45,7 @@ popd
 
 # Mail log.
 $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -s "[neg&fl] commit" vpablos@babel.ls.fi.upm.es
-$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "phoenix-emcl" -s "[neg&fl] commit" phoenixlv0108@gmail.com
+# $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "phoenix-emcl" -s "[neg&fl] commit" phoenixlv0108@gmail.com
 $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "jose_manuel-ssii" -s "[neg&fl] commit" jmhernandoc@gmail.com
 
 #./commit-email.pl "$REPOS" "$REV" -h -m .
