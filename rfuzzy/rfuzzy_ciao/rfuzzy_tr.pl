@@ -520,7 +520,6 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	(Fuzzy_Cl_Main = (
 			     (
 				 Fuzzy_Pred_Main :- (
-							Fuzzy_Pred_Types, 
 							findall(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux, Results), 
 							supreme(Results, Result),
 							copy_args(Arity, Fuzzy_Pred_Main, Result),
@@ -538,7 +537,8 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 							  Fuzzy_Pred_Rule ;
 							  Fuzzy_Pred_Default_With_Cond ; 
 							  Fuzzy_Pred_Default_Without_Cond
-						      )
+						      ),
+						      Fuzzy_Pred_Types
 						  )
 			    )
 			)
