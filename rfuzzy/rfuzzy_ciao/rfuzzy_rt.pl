@@ -46,9 +46,11 @@ dluka(X,Y,M):-
 % ------------------------------------------------------
 
 supreme(List, Element) :-
-	
+	debug_msg_list('supreme', List),
 	reorder_elements(List, [], List_Tmp_1), !,
+	debug_msg_list('supreme_reordered', List_Tmp_1),
 	filter_out_repeated(List_Tmp_1, List_Tmp_2), !,
+	debug_msg_list('supreme_non-repeated', List_Tmp_2),
 	take_an_element(List_Tmp_2, Element).
 
 reorder_elements([], List_Out, List_Out) :- !.

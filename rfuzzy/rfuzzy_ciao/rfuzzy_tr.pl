@@ -496,18 +496,13 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 
 	% Build MAIN functors.
-	Arity_Fuzzy_Arg_1 is Arity + 1,
-	Arity_Fuzzy_Arg_2 is Arity + 2,
-	Fuzzy_Arity is Arity_Fuzzy_Arg_2,
-	functor(Fuzzy_Pred_Main, Name, Fuzzy_Arity),
-	arg(Arity_Fuzzy_Arg_1, Fuzzy_Pred_Main, Fuzzy_Arg_1),
-	arg(Arity_Fuzzy_Arg_2, Fuzzy_Pred_Main, Fuzzy_Arg_2),
+	Main_Pred_Fuzzy_Arity is Arity + 1,
+	Aux_Pred_Fuzzy_Arity is Arity +2,
+	functor(Fuzzy_Pred_Main, Name, Main_Pred_Fuzzy_Arity),
 
 	change_name('auxiliar', Name, Fuzzy_Pred_Aux_Name),
-	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Fuzzy_Arity),
+	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Aux_Pred_Fuzzy_Arity),
 	copy_args(Arity, Fuzzy_Pred_Main, Fuzzy_Pred_Aux),
-%	Fuzzy_Pred_Main=..[Name|Arguments],
-%	arg(Fuzzy_Arity, Fuzzy_Pred_Aux, V_Tmp),
 	
 	build_functors(Name, Arity, 'type', 'true', Fuzzy_Pred_Aux, Fuzzy_Pred_Types),
 	build_functors(Name, Arity, 'fact', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fact),
@@ -516,16 +511,21 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond),
 	build_functors(Name, Arity, 'default_with_no_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond),
 
+	% Argument's places and values.
+	Arity_Fuzzy_Arg_1 is Arity + 1,
+	% Arity_Fuzzy_Arg_2 is Arity + 2,
+	arg(Arity_Fuzzy_Arg_1, Fuzzy_Pred_Main, Fuzzy_Arg_1),
+	% arg(Arity_Fuzzy_Arg_2, Fuzzy_Pred_Main, Fuzzy_Arg_2),
+
 	(Fuzzy_Cl_Main = (
 			     (
 				 Fuzzy_Pred_Main :- (
-							Fuzzy_Arg_1 .>=. Fuzzy_Arg_1_Tmp, 
 							Fuzzy_Pred_Types, 
-							findall(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux, Results), !,
+							findall(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux, Results), 
 							supreme(Results, Result),
 							copy_args(Arity, Fuzzy_Pred_Main, Result),
 							arg(Arity_Fuzzy_Arg_1, Result, Fuzzy_Arg_1_Tmp),
-							arg(Arity_Fuzzy_Arg_2, Result, Fuzzy_Arg_2)
+							Fuzzy_Arg_1 .>=. Fuzzy_Arg_1_Tmp
 						    )		     
 			     ) % Main Fuzzy Pred
 			 )
@@ -568,8 +568,8 @@ build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :-
 build_functors(Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :- !,
 	rfuzzy_warning_msg(Name, Kind, 'has not been defined.').
 
-build_fail_functor(H) :-
-	functor(H, 'fail', 0).    % Create functor
+%build_fail_functor(H) :-
+%	functor(H, 'fail', 0).    % Create functor
 
 
 % ------------------------------------------------------

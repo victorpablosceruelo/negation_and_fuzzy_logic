@@ -22,19 +22,20 @@ restaurant(tapasbar).
 :- default(low_distance/1, 0).
 
 low_distance(kenzo) value 1.
-low_distance(el_rincon) value 0.6.
-low_distance(el_reventaero) value 1.
-low_distance(casa_juan) value 0.8.
+low_distance(burguer_king) value 0.6.
+low_distance(il_tempietto) value 1.
+low_distance(pizza_jardin) value 0.8.
+low_distance(unknown) value 0.2.
 
 :- set_prop cheap/1 => restaurant/1.
 :- default(cheap/1, 0.5).
 
 cheap(kenzo) value 0.2.
-cheap(el_rincon) value 1.
-cheap(el_reventaero) value 1.
+cheap(subway) value 1.
+cheap(derroscas) value 1.
 
 :- set_prop traditional/1 => restaurant/1.
 :- default(traditional/1, 1).
 
 traditional(kenzo) value 0.5.
-traditional(el_reventaero) value 0.87.
+traditional(paellador) value 0.87.
