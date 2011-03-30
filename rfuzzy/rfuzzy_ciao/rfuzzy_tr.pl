@@ -393,33 +393,24 @@ real_name_and_arity(Body_Name, _Arity, Fuzzy_Body_Name) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_each_property(H, Arity, Actual, Properties, Cls) :-
-	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual, Properties) ),
-	trans_each_property_aux(H, Arity, Actual, Properties, Cls),
-	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual, Properties, Cls) ),
+trans_each_property(H, Arity, Actual, Current_P/1, Current_PF) :-
+	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual) ),
+	Actual = Arity, !, % Security conditions.
+	trans_each_property_aux(H, Actual, Current_P, Current_PF).
+
+trans_each_property(H, Arity, Actual, (Current_P/1, More_P), (Current_PF, More_PF)) :-
+	Actual < Arity, !, 
+	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual) ),
+	trans_each_property_aux(H, Actual, Current_P, Current_PF),
+	NewActual is Actual + 1, % Next values.
+	trans_each_property(H, Arity, NewActual, More_P, More_PF),
 	!. % Backtracking not allowed here.
 
-trans_each_property_aux(H, Arity, Actual, (P/1, R), (PF, List_Out)) :-
-	Actual < Arity, % Security conditions.
+trans_each_property_aux(H, Actual, Current_P, Current_PF) :-
 
-	functor(PF, P, 1), % Build functor.
-	arg(1,PF,X),       % Argument of functor is X.
-	arg(Actual, H, X), % Unify with Argument of functor.
-
-	NewActual is Actual + 1, % Next values.
-	trans_each_property_aux(H, Arity, NewActual, R, List_Out).
-
-trans_each_property_aux(H, Arity, Actual, P/1, PF) :-
-	Actual = Arity, % Security conditions.
-
-	functor(PF, P, 1), % Build functor.
-	arg(1,PF,X),       % Argument of functor is X.
+	functor(Current_PF, Current_P, 1), % Build functor.
+	arg(1, Current_PF, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
-
-% Just FAIL.
-%trans_each_property_aux(_H, _Arity, _Actual, _Properties, PF) :-
-%	build_fail_functor(PF),
-%	rfuzzy_warning_msg(F, ' types are not right. Please fix it. ').
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -553,50 +544,70 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	Fuzzy_Cl_Aux = (Fuzzy_Pred_Aux :- fail).
 
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-
-	% Evaluate fuzzy arity.
-	Fuzzy_Arity is Arity + 1,
+	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, _Fuzzy_Name, Fuzzy_Arity),
 
 	% Build MAIN functors.
         functor(Fuzzy_Pred_Main, Name, Fuzzy_Arity),
-	arg(Fuzzy_Arity, Fuzzy_Pred_Main, V_In),
+	Arity_Fuzzy_Arg_1 is Arity + 1,
+	Arity_Fuzzy_Arg_2 is Arity + 2,
+	arg(Arity_Fuzzy_Arg_1, Fuzzy_Pred_Main, Fuzzy_Arg_1),
+	arg(Arity_Fuzzy_Arg_2, Fuzzy_Pred_Main, Fuzzy_Arg_2),
 
 	change_name('auxiliar', Name, Fuzzy_Pred_Aux_Name),
 	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Fuzzy_Arity),
-	arg(Fuzzy_Arity, Fuzzy_Pred_Aux, V_Tmp),
 	copy_args(Arity, Fuzzy_Pred_Main, Fuzzy_Pred_Aux),
+%	Fuzzy_Pred_Main=..[Name|Arguments],
+%	arg(Fuzzy_Arity, Fuzzy_Pred_Aux, V_Tmp),
+	
+	build_functors(Name, Arity, 'type', 'true', Fuzzy_Pred_Aux, Fuzzy_Pred_Types),
+	build_functors(Name, Arity, 'fact', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fact),
+	build_functors(Name, Arity, 'function', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Function),
+	build_functors(Name, Arity, 'rule', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Rule),
+	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond),
+	build_functors(Name, Arity, 'default_with_no_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond),
 
-	build_functors(Name, Arity, 'type', 'true', Fuzzy_Pred_Aux, Fuzzy_Pred_Types, _Fuzzy_Pred_Types_Aux),
-	build_functors(Name, Arity, 'fact', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fact, Fuzzy_Pred_Fact_Aux),
-	build_functors(Name, Arity, 'function', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Function, Fuzzy_Pred_Function_Aux),
-	build_functors(Name, Arity, 'rule', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Rule, Fuzzy_Pred_Rule_Aux),
-	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond, Fuzzy_Pred_Default_With_Cond_Aux),
-	build_functors(Name, Arity, 'default_with_no_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond, _Fuzzy_Pred_Default_Without_Cond_Aux),
+	(Fuzzy_Cl_Main = (
+			     (
+				 Fuzzy_Pred_Main :- (
+							Fuzzy_Arg_1 .>=. Fuzzy_Arg_1_Tmp, 
+							Fuzzy_Pred_Types, 
+							findall(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux, Results), !,
+							supreme(Results, Result),
+							copy_args(Arity, Fuzzy_Pred_Main, Result),
+							arg(Arity_Fuzzy_Arg_1, Result, Fuzzy_Arg_1_Tmp),
+							arg(Arity_Fuzzy_Arg_2, Result, Fuzzy_Arg_2)
+						    )		     
+			     ) % Main Fuzzy Pred
+			 )
+	),
+	(Fuzzy_Cl_Aux = ( 
+			    ( 
+				Fuzzy_Pred_Aux :- ( 
+						      (   Fuzzy_Pred_Fact ; 
+							  Fuzzy_Pred_Function ;
+							  Fuzzy_Pred_Rule ;
+							  Fuzzy_Pred_Default_With_Cond ; 
+							  Fuzzy_Pred_Default_Without_Cond
+						      )
+						  )
+			    )
+			)
+	).
 
-	Fuzzy_Cl_Main = (Fuzzy_Pred_Main :- V_In .>=. V_Tmp, Fuzzy_Pred_Aux), % Main Fuzzy Pred
-	Fuzzy_Cl_Aux = ( Fuzzy_Pred_Aux :- Fuzzy_Pred_Types, 
-	(   Fuzzy_Pred_Fact ; 
-	    (  \+(Fuzzy_Pred_Fact_Aux), 
-	       ( Fuzzy_Pred_Function ;
-		   ( \+(Fuzzy_Pred_Function_Aux), 
-		     ( Fuzzy_Pred_Rule ;
-			 ( \+(Fuzzy_Pred_Rule_Aux),
-			   (Fuzzy_Pred_Default_With_Cond ; 
-			       ( \+(Fuzzy_Pred_Default_With_Cond_Aux), Fuzzy_Pred_Default_Without_Cond)
-			   )))))))
-		).
-
-build_functors(Name, Arity, Kind, _On_Error, Functor_In, Funtor, Functor_Negated) :-
+build_auxiliary_clause(Pred_Info, (true), (true)) :-
+	rfuzzy_warning_msg('Impossible to build auxiliary clause for ', Pred_Info, ' ').
+	
+build_functors(Name, Arity, Kind, _On_Error, Functor_In, Functor) :-
 
 	% Do we have saved facts ??
 	remove_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	!, % Backtracking not allowed.
 
-	% Build functor.
-        build_functors_aux(Fuzzy_Name, Fuzzy_Arity, Arity, Functor_In, Funtor, Functor_Negated).
+	% Main functor.
+	functor(Functor, Fuzzy_Name, Fuzzy_Arity),           % Create functor
+	copy_args(Fuzzy_Arity, Functor_In, Functor).  % Copy arguments.
 
-build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error, On_Error) :- 
+build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :- 
 	(   % Do not show warnings if the following are missing.
 	    Kind == 'fact' ;
 	    Kind == 'function' ;
@@ -604,17 +615,8 @@ build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error, On_Error) :
 	    Kind == 'default_with_cond'
 	), !.
 
-build_functors(Name, _Arity, Kind, On_Error, _Functor_In, On_Error, On_Error) :- !,
+build_functors(Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :- !,
 	rfuzzy_warning_msg(Name, Kind, 'has not been defined.').
-
-build_functors_aux(Fuzzy_Name, Fuzzy_Arity, Arity, Functor_In, Functor, Functor_Negated) :-
-	% Main functor.
-	functor(Functor, Fuzzy_Name, Fuzzy_Arity),           % Create functor
-	copy_args(Fuzzy_Arity, Functor_In, Functor),  % Copy arguments.
-
-	% Negated functor.
-	functor(Functor_Negated, Fuzzy_Name, Fuzzy_Arity),              % Create functor
-	copy_args(Arity, Functor_In, Functor_Negated). % Copy arguments.
 
 build_fail_functor(H) :-
 	functor(H, 'fail', 0).    % Create functor
