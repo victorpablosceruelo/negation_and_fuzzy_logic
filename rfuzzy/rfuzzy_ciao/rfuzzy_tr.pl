@@ -173,19 +173,45 @@ eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	build_straight_lines(X, Fuzzy_Arg_1, List, Body).
 
 % Predicate's type(s) definition.
-% We need to confirm that the predicates for typing exist.
-eat(2, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_H :- Cls)):-
+eat(1, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
-	number(Arity), % A must be a number.
-
-	functor(H, Name, Arity),
-	fuzzify_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
-	trans_each_property(Fuzzy_H, Arity, 1, Properties_Decl, Cls),
+	(
+	    (
+		number(Arity), % A must be a number.
+		nonvar(Name), % Can not be a variable.
+		
+		functor(H, Name, Arity),
+		fuzzify_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
+		trans_each_property(Fuzzy_H, Arity, 1, Properties_Decl, Cls)
+	    )
+	;
+	    (
+		rfuzzy_error_msg('translate_types', 'Error in', (:- set_prop Name/Arity => Properties_Decl)),
+		rfuzzy_error_msg('translate_types', 'Syntax for types is', '(:- set_prop Name/Arity => Predicate/1, ..., Predicate/1)')
+	    )
+	),
 	!, % Backtracking forbidden.
 	debug_msg('(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)).
 
+% crisp predicates (non-facts).
+eat(2, Other, Other) :-
+	debug_msg('Test-1 if crisp pred', Other),
+	nonvar(Other), 
+	functor(Other, ':-', 2), !,
+	arg(1, Other, Arg_1), 
+	nonvar(Arg_1), 
+	functor(Arg_1, Name, Arity),
+	save_predicate_info('crisp', Name, Arity, Name, Arity).
 
-% credibility value:
+% crisp facts.
+eat(2, Other, Other) :-
+	debug_msg('Test-2 if crisp fact', Other),
+	nonvar(Other), 
+	functor(Other, Name, Arity), 
+	not_a_known_predicate_name(Name),	!,
+	save_predicate_info('crisp', Name, Arity, Name, Arity).
+
+% rules:
 eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	!, % If patter matching, backtracking forbiden.
 	debug_nl,
@@ -194,13 +220,14 @@ eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	    trans_rule(Head, Body, Fuzzy_H, Fuzzy_Body)
 	;
 	    (
-		rfuzzy_error_msg('translate_rule_syntax', 'Cannot understand syntax for', (Head :~ Body)),
-		rfuzzy_error_msg('translate_rule_syntax', 'Syntax for rules is', '(predicate cred (Op1, Number) :~ Op2((Body))'),
+		rfuzzy_error_msg('translate_rule_syntax', 'Error in', (Head :~ Body)),
+		rfuzzy_error_msg('translate_rule_syntax', 'Syntax for rules is', '(predicate cred(Op1, Number) :~ Op2(( Body ))'),
+		rfuzzy_error_msg('translate_rule_syntax', 'Please note there are 2 parenthesis around the variable Body', ' '),
 		!, fail
 	    )
 	).
 
-% fuzzify function:
+% fuzzification:
 eat(3, Head, (Fuzzy_H :- Fuzzy_Body)):-
 	functor(Head, 'fuzzify', 3),
 	!, % If patter matching, backtracking forbiden.
@@ -219,28 +246,6 @@ eat(3, Head, (Fuzzy_H :- Fuzzy_Body)):-
 eat(4, Whatever, rfuzzy_error_msg('translate_syntax', 'failed for', Whatever)) :-
 	has_rfuzzy_symbol(Whatever), !.
 
-eat(5, Other, Other) :-
-	debug_msg('Test-1 if crisp pred', Other),
-	nonvar(Other), 
-	functor(Other, ':-', 2), !,
-	arg(1, Other, Arg_1), 
-	nonvar(Arg_1), 
-	functor(Arg_1, Name, Arity),
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
-
-eat(5, Other, Other) :-
-	debug_msg('Test-2 if crisp fact', Other),
-	nonvar(Other), 
-	functor(Other, Name, Arity), 
-	not_a_known_predicate_name(Name),	!,
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
-
-not_a_known_predicate_name(Name) :-
-	Name \== ':-',
-	Name \== ':~',
-	Name \== ':#',
-	Name \== 'value'.
-
 has_rfuzzy_symbol(( A :~ B )) :- syntax_error(( A :~ B )).
 has_rfuzzy_symbol(( A :# B )) :- syntax_error(( A :# B )).
 has_rfuzzy_symbol(( A value B )) :- syntax_error(( A value B )).
@@ -252,6 +257,16 @@ syntax_error(Whatever) :-
 	rfuzzy_error_msg('translate_rule_syntax', 'Not recognized syntax in: ', Whatever),
 	rfuzzy_error_msg('translate_rule_syntax', 'Use \"rfuzzy_error(Whatever)\" to see which predicates have syntax errors', '').
 
+not_a_known_predicate_name(Name) :-
+	Name \== ':-',
+	Name \== ':~',
+	Name \== ':#',
+	Name \== 'value',
+	Name \== 'fuzzify'.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 
 trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
 	extract_credibility(Head, H, Op1, Credibility),
