@@ -122,7 +122,7 @@ eat(1, (:- default(Name/Arity,X)),(Fuzzy_H)) :-
 	nonvar(Name), % Name can not be a variable.
 
 	functor(H, Name, Arity),
-	fuzzify_functor(H, 'default_with_no_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	fuzzify_functor(H, 'default_without_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_1 is X, 
 	Fuzzy_Arg_2 is 0,
 	!. % Backtracking forbidden.
@@ -548,7 +548,7 @@ append_local([Elto|N1], N2, [Elto|Res]) :-
 % ------------------------------------------------------
 
 translate_prefix('type', "rfuzzy_type_").
-translate_prefix('default_with_no_cond', "rfuzzy_default_with_no_cond_").
+translate_prefix('default_without_cond', "rfuzzy_default_without_cond_").
 translate_prefix('default_with_cond', "rfuzzy_default_with_cond_").
 translate_prefix('fact', "rfuzzy_fact_").
 translate_prefix('rule', "rfuzzy_rule_").
@@ -598,7 +598,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	build_functors(Name, Arity, 'fuzzification', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fuzzification),
 	build_functors(Name, Arity, 'rule', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Rule),
 	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond),
-	build_functors(Name, Arity, 'default_with_no_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond),
+	build_functors(Name, Arity, 'default_without_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond),
 
 	% Argument's places and values.
 	Arity_Fuzzy_Arg_1 is Arity + 1,
