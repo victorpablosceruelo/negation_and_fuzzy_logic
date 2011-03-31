@@ -181,8 +181,8 @@ rfuzzy_conversion_out(X, X) :-
 % ------------------------------------------------------
 
 % This is to enable/disable debug.
-% do_debug_rfuzzy('No').
-do_debug_rfuzzy('Yes').
+do_debug_rfuzzy('No').
+% do_debug_rfuzzy('Yes').
 
 debug_msg(Msg1, Msg2) :- 
 	debug_msg_aux(Msg1, '', Msg2),

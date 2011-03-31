@@ -6,7 +6,7 @@
 
 :- set_prop tempting_restaurant/1 => restaurant/1.
 :- default(tempting_restaurant/1, 0.1).
-tempting_restaurant(R) :~ prod((low_distance(R), cheap(R), traditional(R))).
+tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), cheap(R), traditional(R))).
 
 restaurant(kenzo).
 restaurant(burguer_king).
@@ -39,7 +39,7 @@ fuzzify(low_distance/2, distance/2, low_distance_function/2).
 :- set_prop cheap/1 => restaurant/1.
 :- default(cheap/1, 0.5).
 
-cheap(kenzo) value 0.2.
+cheap(kenzo) value 0.3.
 cheap(subway) value 1.
 cheap(derroscas) value 1.
 
