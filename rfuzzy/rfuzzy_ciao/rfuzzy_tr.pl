@@ -445,7 +445,7 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_fuzzification(Head, Fuzzy_H, (Crisp_Predicate, Fuzzy_Function)) :-
+trans_fuzzification(Head, Fuzzy_H, (Crisp_Predicate, Auxiliar_Fuzzy_Function)) :-
 	functor(Head, 'fuzzify', 3),
 	arg(1, Head, Fuzzy_Head_Name/2),
 	arg(2, Head, Crisp_Predicate_Name/2),
@@ -453,17 +453,21 @@ trans_fuzzification(Head, Fuzzy_H, (Crisp_Predicate, Fuzzy_Function)) :-
 
 	test_predicate_has_been_defined('crisp', Crisp_Predicate_Name, 2),
 	test_predicate_has_been_defined('function', Fuzzy_Function_Name, 3), % Here arity is 3
+	functor(H, Fuzzy_Head_Name, 1),
+	fuzzify_functor(H, 'fuzzification', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
 
-	functor(Fuzzy_H, Fuzzy_Head_Name, 2),
+	% We need to do here as in other translations, so 
+	% it generates aux and main predicates for fuzzifications too.
 	functor(Crisp_Predicate, Crisp_Predicate_Name, 2),
-	functor(Fuzzy_Function, Fuzzy_Function_Name, 2),
+	change_name('auxiliar', Fuzzy_Function_Name, Auxiliar_Fuzzy_Function_Name),
+	functor(Auxiliar_Fuzzy_Function, Auxiliar_Fuzzy_Function_Name, 3),
 
 	arg(1, Fuzzy_H, Input),
 	arg(1, Crisp_Predicate, Input),
 	arg(2, Crisp_Predicate, Crisp_Value),
-	arg(1, Fuzzy_Function, Crisp_Value),
-	arg(2, Fuzzy_Function, Fuzzy_Value),
-	arg(2, Fuzzy_H, Fuzzy_Value),
+	arg(1, Auxiliar_Fuzzy_Function, Crisp_Value),
+	arg(2, Auxiliar_Fuzzy_Function, Fuzzy_Arg_1),
+	arg(3, Auxiliar_Fuzzy_Function, Fuzzy_Arg_2),
 
 	!.
 
@@ -549,6 +553,7 @@ translate_prefix('default_with_cond', "rfuzzy_default_with_cond_").
 translate_prefix('fact', "rfuzzy_fact_").
 translate_prefix('rule', "rfuzzy_rule_").
 translate_prefix('function', "rfuzzy_function_").
+translate_prefix('fuzzification', "rfuzzy_fuzzification_").
 translate_prefix('auxiliar', "rfuzzy_aux_").
 translate_prefix(_X, "rfuzzy_error_error_error_").
 
@@ -590,6 +595,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	build_functors(Name, Arity, 'type', 'true', Fuzzy_Pred_Aux, Fuzzy_Pred_Types),
 	build_functors(Name, Arity, 'fact', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fact),
 	build_functors(Name, Arity, 'function', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Function),
+	build_functors(Name, Arity, 'fuzzification', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fuzzification),
 	build_functors(Name, Arity, 'rule', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Rule),
 	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond),
 	build_functors(Name, Arity, 'default_with_no_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond),
@@ -617,6 +623,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 				Fuzzy_Pred_Aux :- ( 
 						      (   Fuzzy_Pred_Fact ; 
 							  Fuzzy_Pred_Function ;
+							  Fuzzy_Pred_Fuzzification ;
 							  Fuzzy_Pred_Rule ;
 							  Fuzzy_Pred_Default_With_Cond ; 
 							  Fuzzy_Pred_Default_Without_Cond
@@ -644,6 +651,7 @@ build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :-
 	(   % Do not show warnings if the following are missing.
 	    Kind == 'fact' ;
 	    Kind == 'function' ;
+	    Kind == 'fuzzification' ;
 	    Kind == 'rule' ;
 	    Kind == 'default_with_cond'
 	), !.
