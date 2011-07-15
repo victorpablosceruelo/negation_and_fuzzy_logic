@@ -21,9 +21,11 @@
 
 
 % dynamic predicate(s) 
-:- data cneg_processed_predicates/1.
-:- data cneg_dynamic_cls/1.
-:- data cneg_static_cls/1.
+:- data cneg_list_of_heads_and_bodies/1.
+:- data cneg_list_of_predicates/1.
+
+list_name_for_cneg_heads_and_bodies('cneg_list_of_heads_and_bodies').
+list_name_for_cneg_predicates('cneg_list_of_predicates').
 
 trans_clause(Whatever, Whatever, _) :-
 	debug_msg(0, 'trans_cl', trans_cl(Whatever)).
@@ -36,8 +38,9 @@ trans_sent(Input, Output, SourceFileName) :-
 	% debug_msg('trans_sent', source_file_name(Info)), 
 	trans_sent_aux(Input, Output, SourceFileName), !.
 
-trans_sent(Input, _Output, _SourceFileName) :-
-	debug_msg(2, 'ERROR :: Impossible to translate', (Input)), !.
+trans_sent(Input, [Input, cneg_not_translated(Input)], _SourceFileName).
+% :-
+%	debug_msg(2, 'ERROR :: Impossible to translate', (Input)), !.
 
 trans_sent_aux(X, [], _SourceFileName):- 
 	var(X), !, fail.
@@ -46,109 +49,74 @@ trans_sent_aux(X, [], _SourceFileName):-
 trans_sent_aux(end_of_file,ClsFinal, SourceFileName):- !,
 	trans_sent_eof(ClsFinal, SourceFileName).
 
-trans_sent_aux(0, [], _SourceFileName) :- !.
+trans_sent_aux(0, [], SourceFileName) :- 
+	debug_msg(2, 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName),
+	!.
 
 % Do not modify module imports, declarations and so on.
-trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
+% trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 %	msg('Warning: cneg does not work for imported predicates unless cneg\'s package is imported from each one. Problematic declaration:', Whatever).
 
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
-trans_sent_aux(Clause, Result, SourceFileName) :-
+trans_sent_aux(Clause, Clause, _SourceFileName) :-
+	save_sent_info(Clause).
+
+save_sent_info(Clause) :-
 	functor_local(Clause, Name, 2, _Arguments),
-%	debug_msg('trans_sent_aux', functor_local(Clause, Name, 2, _Arguments)),
 	Name==':-', !,
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
-%	debug_msg('trans_sent_aux', trans_clause_with_body(Head, Body, Result, SourceFileName)),
-	trans_clause_with_body(Head, Body, Result, SourceFileName).
+	split_disjunctions_in_bodies(Body, Bodies),
+	store_head_and_bodies_info(Head, Bodies).
 
-trans_sent_aux(Clause, Result, SourceFileName) :-
+save_sent_info(Clause) :-
 	functor_local(Clause, Name, Arity, _Arguments),
 	(
 	    Name\==':-' 
 	; 
 	    Arity\==2
 	), !,
-	trans_clause_without_body(Clause, Result, SourceFileName).
+	store_head_and_bodies_info(Clause, ['true']).
 
-trans_sent_aux(Clause, [], _SourceFileName) :-
-	functor_local(Clause, Name, Arity, _Arguments),
-	debug_msg(0, 'trans_sent_aux', functor_local(Clause, Name, Arity, _Arguments)),
-	!.
+%split_disjunctions_in_bodies(Body, Bodies) :- !.
+split_disjunctions_in_bodies(Body, [Body]) :- !.
 
-trans_clause_with_body(Head, Body, [Result], SourceFileName) :-
-	trans_body(Body, NewBody, ListBodies),
-%	debug_msg('trans_clause_with_body', trans_body(Body, NewBody, ListBodies)),
-	trans_head(Head, NewHeadName, NewHeadArity, NewHead),
-%	debug_msg('trans_clause_with_body', trans_head(Head, NewHeadName, NewHeadArity, NewHead)),
-	process_and_save_info(NewHeadName, NewHeadArity, SourceFileName, NewHead, ListBodies),
-	functor_local(Result, ':-', 2, _Arguments),
-	arg(1, Result, NewHead),
-	arg(2, Result, NewBody).
-
-trans_clause_without_body(Fact, [(Fact)], SourceFileName):-
-	Fact\==0, %% for avoiding to add store_clause(0,[])
-	!, % No backtracking.
-	trans_head(Fact, NewHeadName, NewHeadArity, NewFact),
-	process_and_save_info(NewHeadName, NewHeadArity, SourceFileName, NewFact, [[]]).
-
-process_and_save_info(Name, Arity, SourceFileName, Head, ListBodies) :-
-	cneg_processed_pred_info(Name, Arity, SourceFileName, _Index, PP_Info),
-	retrieve_list_of_processed_predicates(List_In),
-	retrieve_processed_pred_info(PP_Info, List_In, List_Out),
-	process_and_save_info_aux(ListBodies, Head, PP_Info, New_PP_Info),
-	save_list_of_processed_predicates([New_PP_Info|List_Out]).
-
-process_and_save_info_aux([], _Head, PP_Info, PP_Info) :- !.
-process_and_save_info_aux([ListBody|ListBodies], Head, PP_Info, New_PP_Info) :- !,
-	assert_information_clause_aux(ListBody, Head, PP_Info, Tmp_PP_Info),
-	cneg_static_negation(Tmp_PP_Info, Head, ListBody),
-	process_and_save_info_aux(ListBodies, Head, Tmp_PP_Info, New_PP_Info).
+store_head_and_bodies_info(Head, [Body | Bodies]) :-
+	store_head_info(Head, Counter),
+	store_body_info(Head, Body, Counter),
+	store_head_and_bodies_info(Head, Bodies).
+store_head_and_bodies_info(_Head, []) :-
+	!. % Backtracking forbidden.
 
 
-assert_information_clause_aux(ListBody, Head, PP_Info, New_PP_Info) :-
-	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, PP_Info),
-	New_Index is Index +1,
-	cneg_processed_pred_info(Name, Arity, SourceFileName, New_Index, New_PP_Info),
-	generate_frontier_body(ListBody, FrontierBody),
-	save_clause_info(New_PP_Info, Head, ListBody, FrontierBody),
-	!.
+store_body_info(Head, Body, Counter) :-
+	list_name_for_cneg_heads_and_bodies(List_Name),
+	retrieve_list_of(List_Name, List),
+	save_list_of(List_Name, [(Head, Body, Counter) | List]).
 
-save_clause_info(PP_Info, Head, ListBody, FrontierBody) :-
-	cneg_processed_pred_info(Name, Arity, SourceFileName, _Index, PP_Info),
-	assertz_fact(cneg_dynamic_cls(cneg_dynamic_cl(Name, Arity, SourceFileName, Head, ListBody, FrontierBody))).
+store_head_info(Head, NewCounter) :-
+	functor_local(Head, Name, Arity, _Arguments),
+	list_name_for_cneg_predicates(List_Name),
+	retrieve_list_of(List_Name, List),
+	remove_from_list_with_counter(List, (Name, Arity, Counter), NewList),
+	NewCounter is Counter + 1,
+	save_list_of(List_Name, [(Name, Arity, NewCounter) | NewList]).
 
-generate_frontier_body([], []) :- !.
-generate_frontier_body([Predicate | ListBody], [Predicate | FrontierBody]) :-
-	(
-	    goal_is_equality(Predicate, _T1, _T2), ! 
-	;
-	    goal_is_disequality(Predicate, _T1, _T2, _FreeVars), !
-	),
-	generate_frontier_body(ListBody, FrontierBody).
+remove_from_list_with_counter([(Name, Arity, Counter) | List], (Name, Arity, Counter), List) :- !.
+remove_from_list_with_counter([ Elto | List], (Name, Arity, Counter), [Elto | NewList]) :- !,
+	remove_from_list_with_counter(List, (Name, Arity, Counter), NewList).
+remove_from_list_with_counter([], (_Name, _Arity, 0), []) :- !.
 
-generate_frontier_body([_Predicate | ListBody], FrontierBody) :-
-	generate_frontier_body(ListBody, FrontierBody).
+% Saves a list with name List_Name and argument List.
+save_list_of(List_Name, List) :-
+	functor_local(Functor, List_Name, 1, List),
+	assertz_fact(Functor).
 
-save_list_of_processed_predicates(List) :-
-	assertz_fact(cneg_processed_predicates(List)).
-
-retrieve_list_of_processed_predicates(List) :-
-	retract_fact(cneg_processed_predicates(List)), !.
-retrieve_list_of_processed_predicates([]).
-
-retrieve_processed_pred_info(PP_Info, [], []) :- !,
-	cneg_processed_pred_info(_Name, _Arity, _SourceFileName, 0, PP_Info), !.
-retrieve_processed_pred_info(PP_Info, [Current|List_In], List_In) :-
-	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, PP_Info),
-	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, Current),
-	!.
-retrieve_processed_pred_info(PP_Info, [Current|List_In], [Current|List_Tmp]) :-
-	retrieve_processed_pred_info(PP_Info, List_In, List_Tmp), !.
-
-	
-cneg_processed_pred_info(Name, Arity, SourceFileName, Index,
-	cneg_processed_pred(Name, Arity, SourceFileName, Index)).
+% Retrieves a list with name List_Name and argument List.
+retrieve_list_of(List_Name, List) :-
+	functor_local(Functor, List_Name, 1, List),
+	retract_fact(Functor), !.
+retrieve_list_of(_List_Name, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -169,18 +137,30 @@ trans_head(Head, _NewHeadName, _HeadArity, Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 trans_sent_eof(ClsOut, _SourceFileName) :-
-	retrieve_list_of_processed_predicates(List_Of_Predicates),
-	append(List_Of_Predicates, [ end_of_file ], ClsTmp_1),
-	findall(Cl,(retract_fact(cneg_dynamic_cls(Cl))), ClsTmp_2, ClsTmp_1),
-	findall(Cl,(retract_fact(cneg_static_cls(Cl))), ClsOut, ClsTmp_2),
-	!. %Backtracking forbiden.
-%	nl, nl,
-%	debug_msg_list('ClsOut', ClsOut),
-%	nl, nl.
+	retrieve_list_of('cneg_predicate', List_Of_Preds),
+	generate_main_cls(List_Of_Preds, Cls_1),
+	retrieve_list_of('cneg_head_and_body', List_Of_H_and_B),
+	negate_head_and_bodies(List_Of_H_and_B, Cls_2),
+	append(Cls_1, Cls_2, ClsOut),
+	!, %Backtracking forbiden.
+	nl, nl,
+	debug_msg_list(1, 'ClsOut', ClsOut),
+	nl, nl.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%generate_main_cls(List_Of_Preds, Cls_1).
+generate_main_cls(_List_Of_Preds, []).
+
+% Here we convert the unifications in heads in equalities in the bodies.
+% Besides we adequate the head so we do not have to modify it again.
+% Head indexes and variables for FreeVars and Continuation are added in this step.
+
+%negate_head_and_bodies(List_Of_H_and_B, Cls_2).
+negate_head_and_bodies(_List_Of_H_and_B, []).
+
 
 trans_body(Body_In, NewBody, ListBodies):-
 %	debug_msg('trans_body_aux :: IN', (Body_In)),
@@ -250,22 +230,3 @@ add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% cneg_static_negation(_PP_Info, _Head, _ListBody) :- !.
-cneg_static_negation(PP_Info, Head, ListBody) :- 
-	cneg_processed_pred_info(Name, Arity, SourceFileName, Index, PP_Info),
-	functor_local(Goal, Name, Arity, Args),
-	varsbag_local(Args, [], [], GoalVars),
-%	debug_msg(0, 'cneg_static_negation IN', negate_subfrontier((Head, ListBody), Goal, GoalVars)),
-	negate_subfrontier((Head, ListBody), Goal, GoalVars, Sol),
-%	debug_msg(0, 'cneg_static_negation OUT', Sol),
-	functor_local(Cneg_Cl, ':-', 2, _Arguments_Cneg_Cl),
-	arg(1, Cneg_Cl, cneg_static_cl(Goal, SourceFileName, Index)),
-	arg(2, Cneg_Cl, Sol),
-	assertz_fact(cneg_static_cls(Cneg_Cl)).
-
-cneg_static_negation(PP_Info, Head, ListBody) :- !,
-	debug_msg(2, 'ERROR', cneg_static_negation(PP_Info, Head, ListBody)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,11 +1,10 @@
 :- module(queensPeano,_,[.(cneg)]).
  
-%:- module(queensPeano, [queens/2]).
-
-:- use_module(dist,[dist/2]).  
+% :- module(queensPeano, [queens/2]).
+% :- use_module(dist,[dist/2]).  
 
   
-% :- set_prolog_flag(multi_arity_warnings, off).
+:- set_prolog_flag(multi_arity_warnings, off).
 
 % queens(N,Qs) returns in Qs the column where we must place each of N
 % queens in a Checkerboard of NxN assuming each of them is in a different
@@ -762,7 +761,7 @@ no_sublist(L1,L2):-cneg(sublist(L1,L2)).
 
 
 
-less(0,s(X)).
+less(0,s(_X)).
 less(s(X),s(Y)):-
 	less(X,Y).
 

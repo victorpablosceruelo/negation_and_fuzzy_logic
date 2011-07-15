@@ -17,7 +17,7 @@
 	    % term_name_is_qualified/1,
 	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
-	    % add_to_list_if_not_there/3, 
+	    add_to_list_if_not_there/3, 
 	    terms_are_equal/2,
 	    cneg_aux_equality/2
 	],
