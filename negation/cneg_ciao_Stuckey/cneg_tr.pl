@@ -38,9 +38,8 @@ trans_sent(Input, Output, SourceFileName) :-
 	% debug_msg('trans_sent', source_file_name(Info)), 
 	trans_sent_aux(Input, Output, SourceFileName), !.
 
-trans_sent(Input, [Input, cneg_not_translated(Input)], _SourceFileName).
-% :-
-%	debug_msg(2, 'ERROR :: Impossible to translate', (Input)), !.
+trans_sent(Input, [Input, cneg_not_translated(Input)], _SourceFileName) :-
+	debug_msg(2, 'ERROR :: Impossible to translate', (Input)), !.
 
 trans_sent_aux(X, [], _SourceFileName):- 
 	var(X), !, fail.
@@ -49,16 +48,16 @@ trans_sent_aux(X, [], _SourceFileName):-
 trans_sent_aux(end_of_file,ClsFinal, SourceFileName):- !,
 	trans_sent_eof(ClsFinal, SourceFileName).
 
-trans_sent_aux(0, [], SourceFileName) :- 
-	debug_msg(2, 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName),
-	!.
+trans_sent_aux(0, [], SourceFileName) :- 	!,
+	debug_msg(2, 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName).
 
 % Do not modify module imports, declarations and so on.
-% trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
+trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 %	msg('Warning: cneg does not work for imported predicates unless cneg\'s package is imported from each one. Problematic declaration:', Whatever).
 
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
-trans_sent_aux(Clause, Clause, _SourceFileName) :-
+trans_sent_aux(Clause, [Clause], _SourceFileName) :-
+	debug_msg(1, 'INFO :: save_sent_info(Clause) ', save_sent_info(Clause)),
 	save_sent_info(Clause).
 
 save_sent_info(Clause) :-
@@ -76,9 +75,12 @@ save_sent_info(Clause) :-
 	; 
 	    Arity\==2
 	), !,
-	store_head_and_bodies_info(Clause, ['true']).
+	store_head_and_bodies_info(Clause, [['true']]).
 
-%split_disjunctions_in_bodies(Body, Bodies) :- !.
+%split_disjunctions_in_bodies(Body, Bodies)
+split_disjunctions_in_bodies(Body, _Bodies) :- 
+	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), fail.	
+
 split_disjunctions_in_bodies(Body, Bodies) :- 
 	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
 	split_disjunctions_in_bodies(Body_Conj_1, Bodies_Conj_1),
@@ -90,22 +92,29 @@ split_disjunctions_in_bodies(Body, [Body_Result_1, Body_Result_2]) :-
 	split_disjunctions_in_bodies(Body_Disj_1, Body_Result_1),
 	split_disjunctions_in_bodies(Body_Disj_2, Body_Result_2).
 
+split_disjunctions_in_bodies(Body, [[Body]]). % Goal is something else.
+
 cartesian_product_of_lists([], _List_2, []) :- !.
 cartesian_product_of_lists([Elto | List_1], List_2, Result) :-
 	cartesian_product_of_lists_aux(Elto, List_2, Result_1),
-	cartesian_product_of_lists([Elto | List_1], List_2, Result_2),
+	cartesian_product_of_lists(List_1, List_2, Result_2),
 	append(Result_1, Result_2, Result).
+
+cartesian_product_of_lists_aux(_Elto_1, [], []) :- !.
 cartesian_product_of_lists_aux(Elto_1, [Elto_2 | List], [Result | More_Results]) :-
 	append(Elto_1, Elto_2, Result),
 	cartesian_product_of_lists_aux(Elto_1, List, More_Results).
 
-store_head_and_bodies_info(Head, [Body | Bodies]) :-
+store_head_and_bodies_info(Head, Bodies) :-
+	debug_msg(1, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
+	store_head_and_bodies_info_aux(Head, Bodies).
+
+store_head_and_bodies_info_aux(_Head, []) :-
+	!. % Backtracking forbidden.
+store_head_and_bodies_info_aux(Head, [Body | Bodies]) :-
 	store_head_info(Head, Counter),
 	store_body_info(Head, Body, Counter),
 	store_head_and_bodies_info(Head, Bodies).
-store_head_and_bodies_info(_Head, []) :-
-	!. % Backtracking forbidden.
-
 
 store_body_info(Head, Body, Counter) :-
 	list_name_for_cneg_heads_and_bodies(List_Name),
@@ -120,20 +129,22 @@ store_head_info(Head, NewCounter) :-
 	NewCounter is Counter + 1,
 	save_list_of(List_Name, [(Name, Arity, NewCounter) | NewList]).
 
+remove_from_list_with_counter([], (_Name, _Arity, 0), []) :- !.
 remove_from_list_with_counter([(Name, Arity, Counter) | List], (Name, Arity, Counter), List) :- !.
 remove_from_list_with_counter([ Elto | List], (Name, Arity, Counter), [Elto | NewList]) :- !,
 	remove_from_list_with_counter(List, (Name, Arity, Counter), NewList).
-remove_from_list_with_counter([], (_Name, _Arity, 0), []) :- !.
 
 % Saves a list with name List_Name and argument List.
 save_list_of(List_Name, List) :-
-	functor_local(Functor, List_Name, 1, List),
-	assertz_fact(Functor).
+	functor_local(Functor, List_Name, 1, [List]),
+	assertz_fact(Functor), !,
+	debug_msg(1, 'assertz_fact ', assertz_fact(Functor)).
 
 % Retrieves a list with name List_Name and argument List.
 retrieve_list_of(List_Name, List) :-
-	functor_local(Functor, List_Name, 1, List),
-	retract_fact(Functor), !.
+	functor_local(Functor, List_Name, 1, [List]),
+	retract_fact(Functor), !,
+	debug_msg(1, 'retract_fact ', retract_fact(Functor)).
 retrieve_list_of(_List_Name, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,9 +166,11 @@ trans_head(Head, _NewHeadName, _HeadArity, Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 trans_sent_eof(ClsOut, _SourceFileName) :-
-	retrieve_list_of('cneg_predicate', List_Of_Preds),
+	list_name_for_cneg_predicates(List_Name_1),
+	retrieve_list_of(List_Name_1, List_Of_Preds),
 	generate_main_cls(List_Of_Preds, Cls_1),
-	retrieve_list_of('cneg_head_and_body', List_Of_H_and_B),
+	list_name_for_cneg_heads_and_bodies(List_Name_2),
+	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	negate_head_and_bodies(List_Of_H_and_B, Cls_2),
 	append(Cls_1, Cls_2, ClsOut),
 	!, %Backtracking forbiden.
