@@ -79,7 +79,25 @@ save_sent_info(Clause) :-
 	store_head_and_bodies_info(Clause, ['true']).
 
 %split_disjunctions_in_bodies(Body, Bodies) :- !.
-split_disjunctions_in_bodies(Body, [Body]) :- !.
+split_disjunctions_in_bodies(Body, Bodies) :- 
+	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
+	split_disjunctions_in_bodies(Body_Conj_1, Bodies_Conj_1),
+	split_disjunctions_in_bodies(Body_Conj_2, Bodies_Conj_2),
+	cartesian_product_of_lists(Bodies_Conj_1, Bodies_Conj_2, Bodies).
+
+split_disjunctions_in_bodies(Body, [Body_Result_1, Body_Result_2]) :- 
+	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
+	split_disjunctions_in_bodies(Body_Disj_1, Body_Result_1),
+	split_disjunctions_in_bodies(Body_Disj_2, Body_Result_2).
+
+cartesian_product_of_lists([], _List_2, []) :- !.
+cartesian_product_of_lists([Elto | List_1], List_2, Result) :-
+	cartesian_product_of_lists_aux(Elto, List_2, Result_1),
+	cartesian_product_of_lists([Elto | List_1], List_2, Result_2),
+	append(Result_1, Result_2, Result).
+cartesian_product_of_lists_aux(Elto_1, [Elto_2 | List], [Result | More_Results]) :-
+	append(Elto_1, Elto_2, Result),
+	cartesian_product_of_lists_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, [Body | Bodies]) :-
 	store_head_info(Head, Counter),

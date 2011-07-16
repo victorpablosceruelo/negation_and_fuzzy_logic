@@ -414,6 +414,7 @@ perform_substitution_nonvars(OldTarget, NewTarget, UV_In, UV_Out) :-
 	substitutions_cartesian_product(Args_1, Args_2, Subst_List),
 	perform_substitutions(Subst_List, UV_In, UV_Out).
 
+% Esto NO es producto cartesiano.
 substitutions_cartesian_product([], [], []) :- !.
 substitutions_cartesian_product([T1], [T2], [Diseq]) :- !,
 	 substitution_contents(Diseq, T1, T2).
@@ -589,6 +590,7 @@ simplify_1_diseq(Diseq, _More_Diseq, No_FV_Out, No_FV_Out, Answer):-  % Functors
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Esto NO es producto cartesiano.
 disequalities_cartesian_product([], [], []) :- !.
 disequalities_cartesian_product([T1], [T2], [Diseq]) :- !,
 	 disequality_contents(Diseq, T1, T2).
