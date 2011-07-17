@@ -5,7 +5,7 @@
 % technique for the constructive negation of the goals.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- module(cneg_tr,[trans_sent/3],[assertions]).
+:- module(cneg_tr,[trans_sent/3, trans_clause/3, cneg_main_cl_name/2],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
@@ -29,7 +29,7 @@ list_name_for_cneg_heads_and_bodies('cneg_list_of_heads_and_bodies').
 list_name_for_cneg_predicates('cneg_list_of_predicates').
 
 trans_clause(Whatever, Whatever, _) :-
-	debug_msg(0, 'trans_cl', trans_cl(Whatever)).
+	debug_msg(1, 'trans_clause', (Whatever)).
 
 % trans_sent(Sentence,SentList,Module) sustitutes Sentence in 
 % the program Module that is being compilated by the list of 
@@ -220,15 +220,15 @@ adjust_last_four_args(Arity, Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	Arity_4 is Arity_3 -1,
  	arg(Arity_4, Functor, FV_In).
 
-generate_cneg_aux_cl(Main_Pred_Name, Arity, Counter, Main_SubPred) :-
-	functor_local(Main_SubPred, ':-', 2, _Args_Main_Pred), 
-	arg(1, Main_SubPred, Head),
-	arg(2, Main_SubPred, Body),
+generate_cneg_aux_cl(Main_Cl_Name, Arity, Counter, Aux_Cl) :-
+	functor_local(Aux_Cl, ':-', 2, _Args_Main_Pred), 
+	arg(1, Aux_Cl, Head),
+	arg(2, Aux_Cl, Body),
 	NewArity is Arity + 4,
-	cneg_aux_cl_name(Main_Pred_Name, Main_SubPred_Name),
-	functor_local(Head, Main_SubPred_Name, NewArity, _Args_SubCall),
+	cneg_aux_cl_name(Main_Cl_Name, Aux_Cl_Name),
+	functor_local(Head, Aux_Cl_Name, NewArity, _Args_SubCall),
 	adjust_last_four_args(NewArity, Head, F_In, F_Out, Cont_In, Cont_Out),
-	generate_all_the_subcalls(Counter, Main_SubPred_Name, NewArity, Body, F_In, F_Out, Cont_In, Cont_Out).
+	generate_all_the_subcalls(Counter, Aux_Cl_Name, NewArity, Body, F_In, F_Out, Cont_In, Cont_Out).
 
 cneg_main_cl_name(Name, Main_Cl_Name) :-
 	name(Name, String),
@@ -241,16 +241,15 @@ cneg_aux_cl_name(Name, Aux_Cl_Name) :-
 	append(String, "_aux", New_String),
 	name(Aux_Cl_Name, New_String).
 
-generate_all_the_subcalls(0, _Main_SubPred_Name, _Arity, 'true', F_In, F_In, Cont_In, Cont_In) :- !.
-generate_all_the_subcalls(Counter, Main_SubPred_Name, Arity, (Body, Current), F_In, F_Out, Cont_In, Cont_Out) :-
-	generate_name_from_counter(Counter, Main_SubPred_Name, Current_Name),
+generate_all_the_subcalls(0, _Aux_Cl_Name, _Arity, 'true', F_In, F_In, Cont_In, Cont_In) :- !.
+generate_all_the_subcalls(Counter, Aux_Cl_Name, Arity, (Body, Current), F_In, F_Out, Cont_In, Cont_Out) :-
+	generate_name_from_counter(Counter, Aux_Cl_Name, Current_Name),
 	functor_local(Current, Current_Name, Arity, _Args), 
 	adjust_last_four_args(Arity, Current, New_F_Out, F_Out, New_Cont_Out, Cont_Out),
 	NewCounter is Counter - 1, 
-	generate_all_the_subcalls(NewCounter, Main_SubPred_Name, Arity, Body, F_In, New_F_Out, Cont_In, New_Cont_Out).
+	generate_all_the_subcalls(NewCounter, Aux_Cl_Name, Arity, Body, F_In, New_F_Out, Cont_In, New_Cont_Out).
 
-generate_name_from_counter(Counter, Name, New_Name) :-
-	cneg_aux_cl_name(Name, Aux_Cl_Name),
+generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 	name(Aux_Cl_Name, String_1),
 	name(Counter, String_2), 
 	append("_", String_2, String_3),
@@ -269,7 +268,7 @@ generate_name_from_counter(Counter, Name, New_Name) :-
 %      2.3- vars for freevars and continuation vars are inserted at this point.
 
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
-negate_head_and_bodies([], []).
+negate_head_and_bodies([], [end_of_file]).
 negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [New_Cl | More_Tr_Clauses]) :-
 	% Take the unifications in the head and move them to the body.
 	functor_local(Head, Name, Arity, Args), 

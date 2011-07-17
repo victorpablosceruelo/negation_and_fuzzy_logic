@@ -16,9 +16,9 @@
 % Needed to be able to compile the modules.
 
 % To access predicates from anywhere.
-:- multifile cneg_processed_pred/4.
-:- multifile cneg_dynamic_cl/6.
-:- multifile cneg_static_cl/3.
+%:- multifile cneg_processed_pred/4.
+%:- multifile cneg_dynamic_cl/6.
+%:- multifile cneg_static_cl/3.
 
 :- use_module(cneg_aux).    
 :- use_module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4]).
@@ -40,20 +40,26 @@
 	]).   
 :- reexport(cneg_lib, [ cneg_lib_aux/3 ]).   
 
-cneg(Predicate) :- cneg_aux(Predicate, []).
+:- use_module(cneg_tr).
 
-cneg_aux(Predicate, Universal_Vars) :- 
-	cneg_lib_aux(Predicate, Universal_Vars, Result), 
-	!, call(Result).
+cneg(Functor) :-
+	goal_is_conjunction(Functor, _Conj_1, _Conj_2),
+	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', Functor),
+	!, fail.
 
-cneg_static_predicate_call(_Goal, _SourceFileName, 0).
-cneg_static_predicate_call(Goal, SourceFileName, Occurences) :-
-	Occurences \== 0,
-%	debug_msg('cneg_static_predicate_call :: IN', cneg_static_pred(Goal, SourceFileName, Occurences)),
-	cneg_static_cl(Goal, SourceFileName, Occurences), 
-	NewOccurences is Occurences -1,
-	cneg_static_predicate_call(Goal, SourceFileName, NewOccurences).
+cneg(Functor) :-
+	goal_is_disjunction(Functor, _Conj_1, _Conj_2),
+	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', Functor),
+	!, fail.
 
+cneg(Functor) :-
+	functor_local(Functor, Name, Arity, Args),
+	cneg_main_cl_name(Name, Main_Cl_Name),
+	functor_local(New_Functor, Main_Cl_Name, Arity, Args),
+	call(New_Functor).
+
+cneg_initialize([], true).
+cneg_test(_Any, true).
 
 
 % cneg_tr contains the code transformation needed by cneg_lib
@@ -62,6 +68,6 @@ cneg_static_predicate_call(Goal, SourceFileName, Occurences) :-
 
 % trans_sent/3 makes the transformation.
 :- add_sentence_trans(trans_sent/3).
-% :- add_clause_trans(trans_clause/3). % Only for debug !!!
+:- add_clause_trans(trans_clause/3). % Only for debug !!!
 
 
