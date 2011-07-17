@@ -47,6 +47,9 @@ trans_sent_aux(X, [], _SourceFileName):-
 
 % (:- include(dist, _)), (:- include(cneg_lib)), 
 trans_sent_aux(end_of_file,ClsFinal, SourceFileName):- !,
+	debug_msg(1, 'INFO: #################################################', ''), 
+	debug_msg(1, 'INFO: #############  Now computing negation  ##############', ''), 
+	debug_msg(1, 'INFO: #################################################', ''), 
 	trans_sent_eof(ClsFinal, SourceFileName).
 
 trans_sent_aux(0, [], SourceFileName) :- 	!,
@@ -80,20 +83,23 @@ save_sent_info(Clause) :-
 
 %split_disjunctions_in_bodies(Body, Bodies)
 split_disjunctions_in_bodies(Body, _Bodies) :- 
-	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), fail.	
+	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), 
+	split_disjunctions_in_bodies_aux(Body, Bodies),
+	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Bodies ', Bodies), 
+	!.
 
-split_disjunctions_in_bodies(Body, Bodies) :- 
+split_disjunctions_in_bodies_aux(Body, Bodies) :- 
 	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
-	split_disjunctions_in_bodies(Body_Conj_1, Bodies_Conj_1),
-	split_disjunctions_in_bodies(Body_Conj_2, Bodies_Conj_2),
+	split_disjunctions_in_bodies_aux(Body_Conj_1, Bodies_Conj_1),
+	split_disjunctions_in_bodies_aux(Body_Conj_2, Bodies_Conj_2),
 	cartesian_product_of_lists(Bodies_Conj_1, Bodies_Conj_2, Bodies).
 
-split_disjunctions_in_bodies(Body, [Body_Result_1, Body_Result_2]) :- 
+split_disjunctions_in_bodies_aux(Body, [Body_Result_1, Body_Result_2]) :- 
 	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
-	split_disjunctions_in_bodies(Body_Disj_1, Body_Result_1),
-	split_disjunctions_in_bodies(Body_Disj_2, Body_Result_2).
+	split_disjunctions_in_bodies_aux(Body_Disj_1, Body_Result_1),
+	split_disjunctions_in_bodies_aux(Body_Disj_2, Body_Result_2).
 
-split_disjunctions_in_bodies(Body, [[Body]]). % Goal is something else.
+split_disjunctions_in_bodies_aux(Body, [[Body]]). % Goal is something else.
 
 cartesian_product_of_lists([], _List_2, []) :- !.
 cartesian_product_of_lists([Elto | List_1], List_2, Result) :-
@@ -107,7 +113,7 @@ cartesian_product_of_lists_aux(Elto_1, [Elto_2 | List], [Result | More_Results])
 	cartesian_product_of_lists_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Bodies) :-
-	debug_msg(1, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
+	debug_msg(0, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
 	store_head_and_bodies_info_aux(Head, Bodies).
 
 store_head_and_bodies_info_aux(_Head, []) :-
@@ -139,13 +145,13 @@ remove_from_list_with_counter([ Elto | List], (Name, Arity, Counter), [Elto | Ne
 save_list_of(List_Name, List) :-
 	functor_local(Functor, List_Name, 1, [List]),
 	assertz_fact(Functor), !,
-	debug_msg(1, 'assertz_fact ', assertz_fact(Functor)).
+	debug_msg(0, 'assertz_fact ', assertz_fact(Functor)).
 
 % Retrieves a list with name List_Name and argument List.
 retrieve_list_of(List_Name, List) :-
 	functor_local(Functor, List_Name, 1, [List]),
 	retract_fact(Functor), !,
-	debug_msg(1, 'retract_fact ', retract_fact(Functor)).
+	debug_msg(0, 'retract_fact ', retract_fact(Functor)).
 retrieve_list_of(_List_Name, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,14 +210,14 @@ generate_main_pred(Main_Pred_Name, Arity, Main_Pred) :-
 	functor_local(Initializer, 'cneg_initialize', 2, [F_In | [Cont_In]]),
 	functor_local(Tester, 'cneg_test', 2, [F_Out | [Cont_Out]]).
 
-adjust_last_four_args(Arity, Functor, F_In, F_Out, Cont_In, Cont_Out) :-
+adjust_last_four_args(Arity, Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	arg(Arity, Functor, Cont_Out), 
 	Arity_2 is Arity -1, 
 	arg(Arity_2, Functor, Cont_In), 
 	Arity_3 is Arity_2 -1,
- 	arg(Arity_3, Functor, F_Out), 
+ 	arg(Arity_3, Functor, FV_Out), 
 	Arity_4 is Arity_3 -1,
- 	arg(Arity_4, Functor, F_In).
+ 	arg(Arity_4, Functor, FV_In).
 
 generate_main_subpred(Main_Pred_Name, Arity, Counter, Main_SubPred) :-
 	functor_local(Main_SubPred, ':-', 2, _Args_Main_Pred), 
@@ -256,70 +262,47 @@ generate_name_from_counter(Counter, Name, New_Name) :-
 
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
 negate_head_and_bodies([], []).
-negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [(NewHead :- New_Body) | More_Tr_Clauses]) :-
+negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [New_Cl | More_Tr_Clauses]) :-
 	% Take the unifications in the head and move them to the body.
 	functor_local(Head, Name, Arity, Args), 
 	functor_local(TmpHead, Name, Arity, TmpArgs), 
 	functor_local(Head_Eq, '=', 2, [Args | [TmpArgs]]), 
 	append([Head_Eq], Body, Tmp_Body),
 	% New head (new name, new arity, new args).
-	NewArity is Arity + 4,
-	generate_name_from_counter(Counter, Name, NewName),
-	functor_local(NewHead, NewName, NewArity, _Args),
-	copy_args(Arity, TmpHead, NewHead),
+	New_Arity is Arity + 4,
+	generate_name_from_counter(Counter, Name, New_Name),
+	functor_local(New_Head, New_Name, New_Arity, _Args),
+	copy_args(Arity, TmpHead, New_Head),
+	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out),
+	% Determine which variables are in the body but are not in the head.
+	varsbag_local(New_Head, [], [], Vars_New_Head), 
+	varsbag_local(Tmp_Body, Vars_New_Head, [], FV_New_Body), 
+	functor_local(Vars_Append, 'append', 3, [FV_In |[FV_New_Body |[FV_Tmp]]]),
 	% negate_body_conjunction
-	negate_body_conj(Tmp_Body, New_Body),
+	negate_body_conj(Tmp_Body, New_Body, FV_Tmp, FV_Out, Cont_In, Cont_Out),
+	% Build new clause.
+	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, New_Body)]]),
+	% Recursive create the other clauses.
 	negate_head_and_bodies(List_Of_H_and_B, More_Tr_Clauses).
 
-negate_body_conj([], true) :- !.
-negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body)) :-
-	negate_atom(Atom, Negated_Atom), 
-	negate_body_conj(Body, Negated_Body).
+negate_body_conj([], true, FV_In, FV_In, Cont_In, Cont_In) :- !.
+negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), FV_In, FV_Out, Cont_In, Cont_Out) :-
+	negate_atom(Atom, Negated_Atom, FV_In, FV_Tmp, Cont_In, Cont_Tmp), 
+	negate_body_conj(Body, Negated_Body, FV_Tmp, FV_Out, Cont_Tmp, Cont_Out).
 
-% negate_atom(Atom, Negated_Atom)
-negate_atom(Atom, Atom).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-change_conflictive_predicates(A, A) :-
-	var(A), !. % Variables remain unchanged.
-change_conflictive_predicates(A, NewA) :-
-	functor_local(A, Name, Arity, Args_In),
-	change_conflictive_predicate(Name, NewName, Arity, NewArity, Args_In, Args_Aux), 
-	change_conflictive_arguments(NewArity, Args_Aux, Args_Out),
-	functor_local(NewA, NewName, NewArity, Args_Out).
-
-change_conflictive_arguments(0, [], []) :- !.
-change_conflictive_arguments(1, [Arg], [NewArg]) :- !,
-	change_conflictive_predicates(Arg, NewArg).
-change_conflictive_arguments(Arity, [Arg|Args], [NewArg|NewArgs]) :- !,
-        NewArity is Arity-1,
-	change_conflictive_predicates(Arg, NewArg),
-	change_conflictive_arguments(NewArity, Args, NewArgs).
+% negate_atom(Atom, Negated_Atom, FV_In, FV_Out, Cont_In, Cont_Out).
+negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_equality(Atom, A_Left, A_Right), !,
+	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
+	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	functor_local(Atom, Name, Arity, Args), !,
+	New_Arity is Arity + 4, 
+	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),
+	functor_local(Neg_Atom, Name, New_Arity, New_Args).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%change_conflictive_predicate(',', ',', 2) :- 
-%	msg('Error', 'Trying to change the name for functor --,--'), !, fail.
-%change_conflictive_predicate(';', ';', 2) :- 
-%	msg('Error', 'Trying to change the name for functor --;--'), !, fail.
-change_conflictive_predicate('dist', 'cneg_diseq', 2, 3, Args_In, Args_Out) :- !, 
-	add_empty_list_argument(Args_In, Args_Out).
-change_conflictive_predicate('cneg_diseq', 'cneg_diseq', 2, 3, Args_In, Args_Out) :- !,
-	add_empty_list_argument(Args_In, Args_Out).
-change_conflictive_predicate('eq', 'cneg_eq', 2, 2, Args, Args) :- !.
-change_conflictive_predicate(P, P, Arity, Arity, Args, Args) :- !.
-
-add_empty_list_argument([], [[]]) :- !.
-add_empty_list_argument([Arg|Args_In], [Arg|Args_Out]) :- !,
-	add_empty_list_argument(Args_In, Args_Out).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
