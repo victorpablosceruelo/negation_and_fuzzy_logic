@@ -183,7 +183,59 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %generate_main_cls(List_Of_Preds, Cls_1).
-generate_main_cls(_List_Of_Preds, []).
+generate_main_cls([], []) :- !.
+generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], [Main_Pred | [Main_SubPred | Cls]]) :-
+	generate_main_pred(Name, Arity, Main_Pred),
+	generate_main_subpred(Name, Arity, Counter, Main_SubPred), 
+	generate_main_cls(List_Of_Preds, Cls).
+
+generate_main_pred(Main_Pred_Name, Arity, Main_Pred) :-
+	functor_local(Main_Pred, ':-', 2, _Args_Main_Pred), 
+	arg(1, Main_Pred, Head),
+	arg(2, Main_Pred, (Initializer, (SubCall, Tester))),
+	functor_local(Head, Main_Pred_Name, Arity, _Args_Head),
+	NewArity is Arity + 4,
+	main_subpred_name(Main_Pred_Name, Main_SubPred_Name),
+	functor_local(SubCall, Main_SubPred_Name, NewArity, _Args_SubCall),
+	adjust_last_four_args(NewArity, SubCall, F_In, F_Out, Cont_In, Cont_Out),
+	% F_In, F_Out : F -> Forall
+	functor_local(Initializer, 'cneg_initialize', 2, [F_In | [Cont_In]]),
+	functor_local(Tester, 'cneg_test', 2, [F_Out | [Cont_Out]]).
+
+adjust_last_four_args(Arity, Functor, F_In, F_Out, Cont_In, Cont_Out) :-
+	arg(Arity, Functor, Cont_Out), 
+	Arity_2 is Arity -1, 
+	arg(Arity_2, Functor, Cont_In), 
+	Arity_3 is Arity_2 -1,
+ 	arg(Arity_3, Functor, F_Out), 
+	Arity_4 is Arity_3 -1,
+ 	arg(Arity_4, Functor, F_In).
+
+generate_main_subpred(Main_Pred_Name, Arity, Counter, Main_SubPred) :-
+	functor_local(Main_SubPred, ':-', 2, _Args_Main_Pred), 
+	arg(1, Main_SubPred, Head),
+	arg(2, Main_SubPred, Body),
+	NewArity is Arity + 4,
+	main_subpred_name(Main_Pred_Name, Main_SubPred_Name),
+	functor_local(Head, Main_SubPred_Name, NewArity, _Args_SubCall),
+	adjust_last_four_args(NewArity, Head, F_In, F_Out, Cont_In, Cont_Out),
+	generate_all_the_subcalls(Counter, Main_SubPred_Name, NewArity, Body, F_In, F_Out, Cont_In, Cont_Out).
+	
+main_subpred_name(Main_Pred_Name, Main_SubPred_Name) :-
+	name(Main_Pred_Name, String),
+	append("cneg_", String, NewString),
+	name(Main_SubPred_Name, NewString).
+
+generate_all_the_subcalls(0, _Main_SubPred_Name, _Arity, 'true', F_In, F_In, Cont_In, Cont_In) :- !.
+generate_all_the_subcalls(Counter, Main_SubPred_Name, Arity, (Body, Current), F_In, F_Out, Cont_In, Cont_Out) :-
+	name(Main_SubPred_Name, String_1),
+	name(Counter, String_2), 
+	append(String_1, String_2, String), 
+	name(Current_Name, String), 
+	functor_local(Current, Current_Name, Arity, _Args), 
+	adjust_last_four_args(Arity, Current, New_F_Out, F_Out, New_Cont_Out, Cont_Out),
+	NewCounter is Counter - 1, 
+	generate_all_the_subcalls(NewCounter, Main_SubPred_Name, Arity, Body, F_In, New_F_Out, Cont_In, New_Cont_Out).
 
 % Here we convert the unifications in heads in equalities in the bodies.
 % Besides we adequate the head so we do not have to modify it again.
