@@ -243,9 +243,12 @@ generate_name_from_counter(Counter, Name, New_Name) :-
 	name(New_Name, String).
 
 
-% Here we convert the unifications in heads in equalities in the bodies.
-% Besides we adequate the head so we do not have to modify it again.
-% Head indexes and variables for FreeVars and Continuation are added in this step.
+% 1- We translate the names of the predicates by using the respective counters, 
+%     and we add 4 variables for FreeVars and ContinuationVars.
+% 2- We convert:
+%      2.1- the unifications in heads in equalities in the bodies.
+%      2.2- the subcalls to other predicates are translated into prodicates we've translated.
+%      2.3- vars for freevars and continuation vars are inserted at this point.
 
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
 negate_head_and_bodies(_List_Of_H_and_B, []).
