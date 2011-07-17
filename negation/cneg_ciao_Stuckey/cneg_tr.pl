@@ -178,6 +178,7 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 	generate_cneg_main_cls(List_Of_Preds, Cls_1),
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
+	debug_msg_list(1, 'List_Of_H_and_B', List_Of_H_and_B),
 	negate_head_and_bodies(List_Of_H_and_B, Cls_2),
 	append(Cls_1, Cls_2, ClsOut),
 	!, %Backtracking forbiden.
@@ -270,6 +271,13 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
 negate_head_and_bodies([], [end_of_file]).
 negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [New_Cl | More_Tr_Clauses]) :-
+	debug_msg_list(1, 'negate_head_and_bodies_aux :: (Head, Body, Counter)', (Head, Body, Counter)),
+	negate_head_and_bodies_aux(Head, Body, Counter, New_Cl), !,
+	debug_msg_list(1, 'negate_head_and_bodies_aux :: New_Cl', New_Cl),
+	% Recursive create the other clauses.
+	negate_head_and_bodies(List_Of_H_and_B, More_Tr_Clauses).
+
+negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	% Take the unifications in the head and move them to the body.
 	functor_local(Head, Name, Arity, Args), 
 	functor_local(TmpHead, Name, Arity, TmpArgs), 
@@ -288,9 +296,7 @@ negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [New_Cl | More
 	% negate_body_conjunction
 	negate_body_conj(Tmp_Body, New_Body, FV_Tmp, FV_Out, Cont_In, Cont_Out),
 	% Build new clause.
-	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, New_Body)]]),
-	% Recursive create the other clauses.
-	negate_head_and_bodies(List_Of_H_and_B, More_Tr_Clauses).
+	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, New_Body)]]).
 
 negate_body_conj([], true, FV_In, FV_In, Cont_In, Cont_In) :- !.
 negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), FV_In, FV_Out, Cont_In, Cont_Out) :-

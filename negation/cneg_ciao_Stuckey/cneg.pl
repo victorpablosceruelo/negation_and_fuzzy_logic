@@ -68,6 +68,6 @@ cneg_test(_Any, true).
 
 % trans_sent/3 makes the transformation.
 :- add_sentence_trans(trans_sent/3).
-:- add_clause_trans(trans_clause/3). % Only for debug !!!
+% :- add_clause_trans(trans_clause/3). % Only for debug !!!
 
 
