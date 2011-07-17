@@ -79,7 +79,7 @@ save_sent_info(Clause) :-
 	; 
 	    Arity\==2
 	), !,
-	store_head_and_bodies_info(Clause, [['true']]).
+	store_head_and_bodies_info(Clause, [[]]).
 
 %split_disjunctions_in_bodies(Body, Bodies)
 split_disjunctions_in_bodies(Body, _Bodies) :- 
@@ -250,7 +250,8 @@ generate_all_the_subcalls(Counter, Main_SubPred_Name, Arity, (Body, Current), F_
 	generate_all_the_subcalls(NewCounter, Main_SubPred_Name, Arity, Body, F_In, New_F_Out, Cont_In, New_Cont_Out).
 
 generate_name_from_counter(Counter, Name, New_Name) :-
-	name(Name, String_1),
+	cneg_aux_cl_name(Name, Aux_Cl_Name),
+	name(Aux_Cl_Name, String_1),
 	name(Counter, String_2), 
 	append("_", String_2, String_3),
 	append(String_1, String_3, String), 
