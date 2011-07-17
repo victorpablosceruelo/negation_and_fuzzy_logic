@@ -251,7 +251,28 @@ generate_name_from_counter(Counter, Name, New_Name) :-
 %      2.3- vars for freevars and continuation vars are inserted at this point.
 
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
-negate_head_and_bodies(_List_Of_H_and_B, []).
+negate_head_and_bodies([], []).
+negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [Tr_Clause | More_Tr_Clauses]) :-
+	% Take the unifications in the head and move them to the body.
+	functor_local(Head, Name, Arity, Args), 
+	functor_local(TmpHead, Name, Arity, TmpArgs), 
+	functor_local(Head_Eq, '=', 2, [Args | [TmpArgs]]), 
+	append([Head_Eq], Body, Tmp_Body),
+	% New head (new name, new arity, new args).
+	NewArity is Arity + 4,
+	generate_name_from_counter(Counter, Name, NewName),
+	functor_local(NewHead, NewName, NewArity, _Args),
+	copy_args(Arity, TmpHead, NewHead),
+	% negate_body_conjunction
+	negate_body_conj(Tmp_Body, New_Body).
+
+negate_body_conj([], true) :-
+negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body)) :-
+	negate_atom(Atom, Negated_Atom), 
+	negate_body_conj(Body, Negated_Body).
+
+% negate_atom(Atom, Negated_Atom)
+negate_atom(Atom, Atom).
 
 
 trans_body(Body_In, NewBody, ListBodies):-
