@@ -11,6 +11,7 @@
 :- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
 :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).
+:- use_module(library(terms), _).
 
 :- comment(title, "Contructive Negation Transformation").
 
@@ -252,7 +253,7 @@ generate_name_from_counter(Counter, Name, New_Name) :-
 
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
 negate_head_and_bodies([], []).
-negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [Tr_Clause | More_Tr_Clauses]) :-
+negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [(NewHead :- New_Body) | More_Tr_Clauses]) :-
 	% Take the unifications in the head and move them to the body.
 	functor_local(Head, Name, Arity, Args), 
 	functor_local(TmpHead, Name, Arity, TmpArgs), 
@@ -264,9 +265,10 @@ negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [Tr_Clause | M
 	functor_local(NewHead, NewName, NewArity, _Args),
 	copy_args(Arity, TmpHead, NewHead),
 	% negate_body_conjunction
-	negate_body_conj(Tmp_Body, New_Body).
+	negate_body_conj(Tmp_Body, New_Body),
+	negate_head_and_bodies(List_Of_H_and_B, More_Tr_Clauses).
 
-negate_body_conj([], true) :-
+negate_body_conj([], true) :- !.
 negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body)) :-
 	negate_atom(Atom, Negated_Atom), 
 	negate_body_conj(Body, Negated_Body).
