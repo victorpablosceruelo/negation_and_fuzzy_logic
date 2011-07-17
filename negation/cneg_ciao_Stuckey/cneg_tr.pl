@@ -243,6 +243,9 @@ generate_name_from_counter(Counter, Name, New_Name) :-
 	append(String_1, String_3, String), 
 	name(New_Name, String).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % 1- We translate the names of the predicates by using the respective counters, 
 %     and we add 4 variables for FreeVars and ContinuationVars.
@@ -275,31 +278,6 @@ negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body)) :-
 
 % negate_atom(Atom, Negated_Atom)
 negate_atom(Atom, Atom).
-
-
-trans_body(Body_In, NewBody, ListBodies):-
-%	debug_msg('trans_body_aux :: IN', (Body_In)),
-	trans_body_aux(Body_In, NewBody, [[]], ListBodies).
-%	debug_msg('trans_body_aux :: OUT', (Body_In, NewBody, [], ListBodies)).
-
-trans_body_aux(Body_In, (Body_Out_A, Body_Out_B), Before, Result):-
-	goal_is_conjunction(Body_In, Body_In_A, Body_In_B), !,
-	trans_body_aux(Body_In_A, Body_Out_A, Before, Tmp), 
-	trans_body_aux(Body_In_B, Body_Out_B, Tmp, Result).
-trans_body_aux(Body_In, (Body_Out_A; Body_Out_B), Before, Result):-
-	goal_is_disjunction(Body_In, Body_In_A, Body_In_B), !,
-	trans_body_aux(Body_In_A, Body_Out_A, Before, Result_A), 
-	trans_body_aux(Body_In_B, Body_Out_B, Before, Result_B),
-	append(Result_A, Result_B, Result).
-trans_body_aux(Body_In, Body_Out, Before, Result) :- !,
-	change_conflictive_predicates(Body_In, Body_Out),
-	join_previous_sols_with_curent_one(Body_Out, Before, Result). 
-
-join_previous_sols_with_curent_one(_NewA, [], []) :- !.
-join_previous_sols_with_curent_one(NewA, [[]], [[NewA]]) :- !.
-join_previous_sols_with_curent_one(NewA, [Before], [[NewA|Before]]) :- !. 
-join_previous_sols_with_curent_one(NewA, [Before|MoreBefore], [[NewA|Before]|MoreResult]) :- !,
-	join_previous_sols_with_curent_one(NewA, MoreBefore, MoreResult).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
