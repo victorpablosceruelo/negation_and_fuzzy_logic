@@ -175,7 +175,7 @@ trans_head(Head, _NewHeadName, _HeadArity, Head) :-
 trans_sent_eof(ClsOut, _SourceFileName) :-
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
-	generate_main_cls(List_Of_Preds, Cls_1),
+	generate_cneg_main_cls(List_Of_Preds, Cls_1),
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	negate_head_and_bodies(List_Of_H_and_B, Cls_2),
@@ -190,22 +190,23 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %generate_main_cls(List_Of_Preds, Cls_1).
-generate_main_cls([], []) :- !.
-generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], [Main_Pred | [Main_SubPred | Cls]]) :-
-	generate_main_pred(Name, Arity, Main_Pred),
-	generate_main_subpred(Name, Arity, Counter, Main_SubPred), 
-	generate_main_cls(List_Of_Preds, Cls).
+generate_cneg_main_cls([], []) :- !.
+generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], [Main_Cl | [Aux_Cl | Cls]]) :-
+	generate_cneg_main_cl(Name, Arity, Main_Cl),
+	generate_cneg_aux_cl(Name, Arity, Counter, Aux_Cl), 
+	generate_cneg_main_cls(List_Of_Preds, Cls).
 
-generate_main_pred(Main_Pred_Name, Arity, Main_Pred) :-
-	functor_local(Main_Pred, ':-', 2, _Args_Main_Pred), 
-	arg(1, Main_Pred, Head),
-	arg(2, Main_Pred, (Initializer, (SubCall, Tester))),
-	functor_local(Head, Main_Pred_Name, Arity, _Args_Head),
+generate_cneg_main_cl(Name, Arity, Main_Cl) :-
+	functor_local(Main_Cl, ':-', 2, _Args_Main_Cl), 
+	arg(1, Main_Cl, Head),
+	arg(2, Main_Cl, (Initializer, (Cneg_Aux_Cl_Call, Tester))),
+	cneg_main_cl_name(Name, Cneg_Main_Cl_Name),
+	functor_local(Head, Cneg_Main_Cl_Name, Arity, _Args_Head),
 	NewArity is Arity + 4,
-	main_subpred_name(Main_Pred_Name, Main_SubPred_Name),
-	functor_local(SubCall, Main_SubPred_Name, NewArity, _Args_SubCall),
-	copy_args(Arity, Head, SubCall),
-	adjust_last_four_args(NewArity, SubCall, F_In, F_Out, Cont_In, Cont_Out),
+	cneg_aux_cl_name(Name, Cneg_Aux_Cl_Name),
+	functor_local(Cneg_Aux_Cl_Call, Cneg_Aux_Cl_Name, NewArity, _Args_Cneg_Aux_Cl_Call), 
+	copy_args(Arity, Head, Cneg_Aux_Cl_Call),
+	adjust_last_four_args(NewArity, Cneg_Aux_Cl_Call, F_In, F_Out, Cont_In, Cont_Out),
 	% F_In, F_Out : F -> Forall
 	functor_local(Initializer, 'cneg_initialize', 2, [F_In | [Cont_In]]),
 	functor_local(Tester, 'cneg_test', 2, [F_Out | [Cont_Out]]).
@@ -219,20 +220,26 @@ adjust_last_four_args(Arity, Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	Arity_4 is Arity_3 -1,
  	arg(Arity_4, Functor, FV_In).
 
-generate_main_subpred(Main_Pred_Name, Arity, Counter, Main_SubPred) :-
+generate_cneg_aux_cl(Main_Pred_Name, Arity, Counter, Main_SubPred) :-
 	functor_local(Main_SubPred, ':-', 2, _Args_Main_Pred), 
 	arg(1, Main_SubPred, Head),
 	arg(2, Main_SubPred, Body),
 	NewArity is Arity + 4,
-	main_subpred_name(Main_Pred_Name, Main_SubPred_Name),
+	cneg_aux_cl_name(Main_Pred_Name, Main_SubPred_Name),
 	functor_local(Head, Main_SubPred_Name, NewArity, _Args_SubCall),
 	adjust_last_four_args(NewArity, Head, F_In, F_Out, Cont_In, Cont_Out),
 	generate_all_the_subcalls(Counter, Main_SubPred_Name, NewArity, Body, F_In, F_Out, Cont_In, Cont_Out).
+
+cneg_main_cl_name(Name, Main_Cl_Name) :-
+	name(Name, String),
+	append("cneg_", String, New_String),
+	name(Main_Cl_Name, New_String).	
 	
-main_subpred_name(Main_Pred_Name, Main_SubPred_Name) :-
-	name(Main_Pred_Name, String),
-	append("cneg_", String, NewString),
-	name(Main_SubPred_Name, NewString).
+cneg_aux_cl_name(Name, Aux_Cl_Name) :-
+	cneg_main_cl_name(Name, Main_Cl_Name),
+	name(Main_Cl_Name, String),
+	append(String, "_aux", New_String),
+	name(Aux_Cl_Name, New_String).
 
 generate_all_the_subcalls(0, _Main_SubPred_Name, _Arity, 'true', F_In, F_In, Cont_In, Cont_In) :- !.
 generate_all_the_subcalls(Counter, Main_SubPred_Name, Arity, (Body, Current), F_In, F_Out, Cont_In, Cont_Out) :-
