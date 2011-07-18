@@ -318,12 +318,15 @@ negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	goal_is_equality(Atom, A_Left, A_Right), !,
 	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+
 negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
 	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
-%negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
-%	functor_local(Atom, Name, Arity, Args), 
-%	Name = 'cneg', Arity = 1.
+
+negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	functor_local(Atom, 'cneg', 1, [Arg]), !,
+	double_negation(Arg, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out).
+
 negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args), !,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
@@ -334,3 +337,28 @@ negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+double_negation(Atom, (Neg_Conj_1, Neg_Conj_2), FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
+	double_negation(Conj_1, FV_In, FV_Aux, Cont_In, Cont_Aux, Neg_Conj_1),
+	double_negation(Conj_2, FV_Aux, FV_Out, Cont_Aux, Cont_Out, Neg_Conj_2).
+
+double_negation(Atom, (Neg_Disj_1; Neg_Disj_2), FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
+	double_negation(Disj_1, FV_In, FV_Out, Cont_In, Cont_Out, Neg_Disj_1),
+	double_negation(Disj_2, FV_In, FV_Out, Cont_In, Cont_Out, Neg_Disj_2).
+
+double_negation(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	functor_local(Atom, 'cneg', 1, [Arg]), !,
+	negate_atom(Arg, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out). % Problematic
+
+double_negation(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	functor_local(Atom, Name, Arity, Args_In), !,
+	New_Arity is Arity + 4,
+	append(Args_In, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], Args_Out),
+	functor_local(Neg_Atom, Name, New_Arity, Args_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
