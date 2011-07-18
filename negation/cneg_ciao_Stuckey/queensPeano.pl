@@ -787,11 +787,11 @@ ancestor(X, Y):-
 	parent1(Z, Y),
 	ancestor(X, Z).
 
-peano(0,0).
-peano(N,s(P1)):-
-	N > 0,
-	N1 is N-1,
-	peano(N1,P1).
+%peano(0,0).
+%peano(N,s(P1)):-
+%	N > 0,
+%	N1 is N-1,
+%	peano(N1,P1).
 
 natural1(0).
 natural1(s(X)):-

@@ -245,6 +245,8 @@ goal_is_conjunction((G1,G2), G1, G2) :- !.
 goal_is_conjunction(Goal, G1, G2) :- 
 	goal_is_aux('basiccontrol:,', 2, Goal, G1, G2), !.
 goal_is_disequality(dist(X,Y), X, Y, []) :- !.
+goal_is_disequality(diseq(X,Y), X, Y, []) :- !.
+goal_is_disequality(diseq(X,Y, FreeVars), X, Y, FreeVars) :- !.
 goal_is_disequality(cneg_diseq(X,Y), X, Y, []) :- !.
 goal_is_disequality(cneg_diseq(X,Y,FreeVars), X, Y, FreeVars) :- !.
 goal_is_disequality(Goal, X, Y, []) :- 

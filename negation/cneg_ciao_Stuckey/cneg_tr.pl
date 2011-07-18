@@ -356,9 +356,14 @@ double_negation(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args_In), !,
 	New_Arity is Arity + 4,
 	append(Args_In, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], Args_Out),
-	functor_local(Neg_Atom, Name, New_Arity, Args_Out).
+	generate_double_negation_name(Name, New_Name),
+	functor_local(Neg_Atom, New_Name, New_Arity, Args_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+generate_double_negation_name(Name, New_Name) :-
+	name(Name, String_Name),
+	append("double_negation_", String_Name, String_New_Name),
+	name(New_Name, String_New_Name).
