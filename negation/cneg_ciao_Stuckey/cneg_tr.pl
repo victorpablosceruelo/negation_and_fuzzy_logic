@@ -5,11 +5,11 @@
 % technique for the constructive negation of the goals.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- module(cneg_tr,[trans_sent/3, trans_clause/3, cneg_main_cl_name/2],[assertions]).
+:- module(cneg_tr,[trans_sent/3, trans_clause/3, cneg_main_and_aux_cl_names/3],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
-:- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
-:- use_module(cneg_lib, _).
+% :- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
+% :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
@@ -46,7 +46,7 @@ trans_sent_aux(X, [], _SourceFileName):-
 	var(X), !, fail.
 
 % (:- include(dist, _)), (:- include(cneg_lib)), 
-trans_sent_aux(end_of_file,ClsFinal, SourceFileName):- !,
+trans_sent_aux(end_of_file, ClsFinal, SourceFileName):- !,
 	debug_msg(1, 'INFO: #################################################', ''), 
 	debug_msg(1, 'INFO: #############  Now computing negation  ##############', ''), 
 	debug_msg(1, 'INFO: #################################################', ''), 
@@ -113,7 +113,7 @@ cartesian_product_of_lists_aux(Elto_1, [Elto_2 | List], [Result | More_Results])
 	cartesian_product_of_lists_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Bodies) :-
-	debug_msg(1, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
+	debug_msg(0, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
 	store_head_and_bodies_info_aux(Head, Bodies).
 
 store_head_and_bodies_info_aux(_Head, []) :-
@@ -172,18 +172,24 @@ trans_head(Head, _NewHeadName, _HeadArity, Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-trans_sent_eof(ClsOut, _SourceFileName) :-
+trans_sent_eof(Cls_Out, _SourceFileName) :-
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
-	generate_cneg_main_cls(List_Of_Preds, Cls_1),
+	debug_msg_list(1, 'List_Of_Preds', List_Of_Preds),
+	debug_msg(1, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1)),
+	generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1),
+	debug_msg_list(1, 'Cls_1', Cls_1),
+	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(1, 'List_Of_H_and_B', List_Of_H_and_B),
-	negate_head_and_bodies(List_Of_H_and_B, Cls_2),
-	append(Cls_1, Cls_2, ClsOut),
+	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_Out),
+%	debug_msg_list(1, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
+%	append(Cls_1, Cls_2, ClsOut),
+%	!, %Backtracking forbiden.
 	nl, nl,
-	debug_msg_list(1, 'ClsOut', ClsOut),
+	debug_msg_list(1, 'Cls_Out', Cls_Out),
 	nl, nl.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,26 +197,38 @@ trans_sent_eof(ClsOut, _SourceFileName) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %generate_main_cls(List_Of_Preds, Cls_1).
-generate_cneg_main_cls([], []) :- !.
-generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], [Main_Cl | [Aux_Cl | Cls]]) :-
-	generate_cneg_main_cl(Name, Arity, Main_Cl),
-	generate_cneg_aux_cl(Name, Arity, Counter, Aux_Cl), 
-	generate_cneg_main_cls(List_Of_Preds, Cls).
+generate_cneg_main_cls([], Cls, Cls) :- !.
+generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
+	debug_msg(1, 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
+	debug_msg(1, 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+	append([Main_Cl | [Aux_Cl]], Cls_In, Cls_Tmp), !,
+	generate_cneg_main_cls(List_Of_Preds, Cls_Tmp, Cls_Out).
 
-generate_cneg_main_cl(Name, Arity, Main_Cl) :-
+generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
+	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name),	
+	New_Arity is Arity + 4,
+
 	functor_local(Main_Cl, ':-', 2, _Args_Main_Cl), 
-	arg(1, Main_Cl, Head),
-	arg(2, Main_Cl, (Initializer, (Cneg_Aux_Cl_Call, Tester))),
-	cneg_main_cl_name(Name, Cneg_Main_Cl_Name),
-	functor_local(Head, Cneg_Main_Cl_Name, Arity, _Args_Head),
-	NewArity is Arity + 4,
-	cneg_aux_cl_name(Name, Cneg_Aux_Cl_Name),
-	functor_local(Cneg_Aux_Cl_Call, Cneg_Aux_Cl_Name, NewArity, _Args_Cneg_Aux_Cl_Call), 
-	copy_args(Arity, Head, Cneg_Aux_Cl_Call),
-	adjust_last_four_args(NewArity, Cneg_Aux_Cl_Call, F_In, F_Out, Cont_In, Cont_Out),
+	arg(1, Main_Cl, Head_Main_Cl),
+	arg(2, Main_Cl, (Initializer, (Aux_Cl_Call, Tester))),
+
+	functor_local(Head_Main_Cl, Main_Cl_Name, Arity, _Args_Head),
+	functor_local(Aux_Cl_Call, Aux_Cl_Name, New_Arity, _Args_Aux_Cl_Call), 
+	copy_args(Arity, Head_Main_Cl, Aux_Cl_Call),
+	adjust_last_four_args(New_Arity, Aux_Cl_Call, FI_1, FO_1, CI_1, CO_1),
 	% F_In, F_Out : F -> Forall
-	functor_local(Initializer, 'cneg_initialize', 2, [F_In | [Cont_In]]),
-	functor_local(Tester, 'cneg_test', 2, [F_Out | [Cont_Out]]).
+	functor_local(Initializer, 'cneg_initialize', 2, [FI_1 | [CI_1]]),
+	functor_local(Tester, 'cneg_test', 2, [FO_1 | [CO_1]]),
+
+	functor_local(Aux_Cl, ':-', 2, _Args_Aux_Cl), 
+	arg(1, Aux_Cl, Head_Aux_Cl),
+	arg(2, Aux_Cl, Body_Aux_Cl),
+
+	functor_local(Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Args_SubCall),
+	adjust_last_four_args(New_Arity, Head_Aux_Cl, FI_2, FO_2, CI_2, CO_2),
+	debug_msg(1, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+	generate_all_the_subcalls(Counter, Aux_Cl_Name, New_Arity, Body_Aux_Cl, FI_2, FO_2, CI_2, CO_2).
 
 adjust_last_four_args(Arity, Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	arg(Arity, Functor, Cont_Out), 
@@ -221,26 +239,13 @@ adjust_last_four_args(Arity, Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	Arity_4 is Arity_3 -1,
  	arg(Arity_4, Functor, FV_In).
 
-generate_cneg_aux_cl(Main_Cl_Name, Arity, Counter, Aux_Cl) :-
-	functor_local(Aux_Cl, ':-', 2, _Args_Main_Pred), 
-	arg(1, Aux_Cl, Head),
-	arg(2, Aux_Cl, Body),
-	NewArity is Arity + 4,
-	cneg_aux_cl_name(Main_Cl_Name, Aux_Cl_Name),
-	functor_local(Head, Aux_Cl_Name, NewArity, _Args_SubCall),
-	adjust_last_four_args(NewArity, Head, F_In, F_Out, Cont_In, Cont_Out),
-	generate_all_the_subcalls(Counter, Aux_Cl_Name, NewArity, Body, F_In, F_Out, Cont_In, Cont_Out).
-
-cneg_main_cl_name(Name, Main_Cl_Name) :-
-	name(Name, String),
-	append("cneg_", String, New_String),
-	name(Main_Cl_Name, New_String).	
+cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
+	name(Name, Name_String),
+	append("cneg_", Name_String, Main_Cl_String),
+	name(Main_Cl_Name, Main_Cl_String),
 	
-cneg_aux_cl_name(Name, Aux_Cl_Name) :-
-	cneg_main_cl_name(Name, Main_Cl_Name),
-	name(Main_Cl_Name, String),
-	append(String, "_aux", New_String),
-	name(Aux_Cl_Name, New_String).
+	append(Main_Cl_String, "_aux", Aux_Cl_String),
+	name(Aux_Cl_Name, Aux_Cl_String).
 
 generate_all_the_subcalls(0, _Aux_Cl_Name, _Arity, 'true', F_In, F_In, Cont_In, Cont_In) :- !.
 generate_all_the_subcalls(Counter, Aux_Cl_Name, Arity, (Body, Current), F_In, F_Out, Cont_In, Cont_Out) :-
@@ -269,13 +274,13 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %      2.3- vars for freevars and continuation vars are inserted at this point.
 
 %negate_head_and_bodies(List_Of_H_and_B, Cls_2).
-negate_head_and_bodies([], [end_of_file]).
-negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], [New_Cl | More_Tr_Clauses]) :-
-	debug_msg_list(1, 'negate_head_and_bodies_aux :: (Head, Body, Counter)', (Head, Body, Counter)),
+negate_head_and_bodies([], Cls_In, Cls_In).
+negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+	debug_msg(0, 'negate_head_and_bodies_aux :: (Head, Body, Counter)', (Head, Body, Counter)),
 	negate_head_and_bodies_aux(Head, Body, Counter, New_Cl), !,
-	debug_msg_list(1, 'negate_head_and_bodies_aux :: New_Cl', New_Cl),
+	debug_msg(0, 'negate_head_and_bodies_aux :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
-	negate_head_and_bodies(List_Of_H_and_B, More_Tr_Clauses).
+	negate_head_and_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
 negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	% Take the unifications in the head and move them to the body.
@@ -285,7 +290,8 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	append([Head_Eq], Body, Tmp_Body),
 	% New head (new name, new arity, new args).
 	New_Arity is Arity + 4,
-	generate_name_from_counter(Counter, Name, New_Name),
+	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
+	generate_name_from_counter(Counter, Aux_Cl_Name, New_Name),
 	functor_local(New_Head, New_Name, New_Arity, _Args),
 	copy_args(Arity, TmpHead, New_Head),
 	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out),
@@ -305,12 +311,17 @@ negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), FV_In, FV_Out, Con
 
 % negate_atom(Atom, Negated_Atom, FV_In, FV_Out, Cont_In, Cont_Out).
 negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	debug_msg(0, 'negate_atom :: Atom ', Atom),
+	negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out),
+	debug_msg(0, 'negate_atom :: Neg_Atom ', Neg_Atom).
+
+negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	goal_is_equality(Atom, A_Left, A_Right), !,
 	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
-negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
 	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
-negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args), !,
 	New_Arity is Arity + 4, 
 	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),

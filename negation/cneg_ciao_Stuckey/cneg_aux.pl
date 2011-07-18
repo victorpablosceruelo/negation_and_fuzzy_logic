@@ -34,9 +34,9 @@
 	Transformation Program, by Constructive Negation Library and by Disequalities Management.").
 
 % To access predicates from anywhere.
-:- multifile cneg_processed_pred/4.
-:- multifile cneg_dynamic_cl/6.
-:- multifile cneg_static_cl/3.
+%:- multifile cneg_processed_pred/4.
+%:- multifile cneg_dynamic_cl/6.
+%:- multifile cneg_static_cl/3.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -42,7 +42,7 @@ no_attack(Q, Safe):- no_attack1(Safe, Q, s(0)).
 no_attack1([], _Queen, _Nb).
 no_attack1([Y|Ys], Queen, Nb):-
 	add(Y,Nb,YNb),
-        cneg_diseq(Queen,YNb, []),
+        diseq(Queen,YNb, []),
 	no_attack_down(Y,Nb,Queen), 
         add(Nb,s(0),Nb1),
         no_attack1(Ys, Queen, Nb1).
@@ -50,12 +50,12 @@ no_attack1([Y|Ys], Queen, Nb):-
 no_attack_down(Y,Nb,Queen):-
 	greater(Y,Nb),
 	subst(Y,Nb,NbY),
-	cneg_diseq(Queen,NbY, []).
+	diseq(Queen,NbY, []).
 no_attack_down(Y,Nb,_Queen):-
 	greater(Nb,Y).
 no_attack_down(Y,Nb,Queen):-
 	Y=Nb, 
-	cneg_diseq(Queen,0, []).
+	diseq(Queen,0, []).
 
 queens_list(0, []).
 queens_list(N, [N|Ns]):-

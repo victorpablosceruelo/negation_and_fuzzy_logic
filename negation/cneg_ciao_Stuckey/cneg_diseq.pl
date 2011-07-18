@@ -1,6 +1,6 @@
 :- module(cneg_diseq, 
 	[
-	    cneg_diseq/3, cneg_eq/2,
+	    diseq/3, cneg_diseq/6, cneg_eq/6,
 	    portray_attributes_in_term/1, 
 	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
@@ -718,24 +718,38 @@ simplify_1_diseq_hereafter_t1(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :-
 % Incluye una desigualdad en las formulas de las 
 % variables implicadas
 
-cneg_diseq(T1,T2, UnivVars):- 
+diseq(T1,T2, UnivVars):- 
+	cneg_diseq(T1, T2, UnivVars, UnivVars_Out, true, true).
+
+cneg_diseq(T1,T2, FV_In, FV_Out, Cont_In, Cont_Out):- 
 	debug_msg(1, 'cneg_diseq :: T1', T1), 
 	debug_msg(1, 'cneg_diseq :: T2', T2),
-	debug_msg(1, 'cneg_diseq :: UnivVars', UnivVars),
-	test_universal_quantified(T1, T2),
-	disequality_contents(Disequality, T1, T2),
-        test_and_update_vars_attributes(UnivVars, [], [Disequality]).
+%	debug_msg(1, 'cneg_diseq :: UnivVars', UnivVars),
+	debug_msg(1, 'cneg_eq :: FreeVars_In', FV_In),
+	debug_msg(1, 'cneg_eq :: Cont_In', Cont_In),
+
+%	test_universal_quantified(T1, T2),
+%	disequality_contents(Disequality, T1, T2),
+%        test_and_update_vars_attributes(UnivVars, [], [Disequality]),
+
+	debug_msg(1, 'cneg_eq :: FreeVars_Out', FV_Out),
+	debug_msg(1, 'cneg_eq :: Cont_Out', Cont_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(T1, T2) :- 
+cneg_eq(T1, T2, FV_In, FV_Out, Cont_In, Cont_Out) :- 
 	debug_msg(1, 'cneg_eq :: T1', T1),
 	debug_msg(1, 'cneg_eq :: T2', T2),
+	debug_msg(1, 'cneg_eq :: FreeVars_In', FV_In),
+	debug_msg(1, 'cneg_eq :: Cont_In', Cont_In),
 	test_universal_quantified(T1, T2),
-	fail.
-cneg_eq(T, T).
+
+	debug_msg(1, 'cneg_eq :: FreeVars_Out', FV_Out),
+	debug_msg(1, 'cneg_eq :: Cont_Out', Cont_Out).
+%	fail.
+% cneg_eq(T, T).
 
 % diseq_eq(X,Y) unify X and Y
 diseq_eq(X, X).

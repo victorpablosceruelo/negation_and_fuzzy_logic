@@ -21,24 +21,12 @@
 %:- multifile cneg_static_cl/3.
 
 :- use_module(cneg_aux).    
-:- use_module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4]).
-:- use_module(cneg_diseq, 
-	[
-	    cneg_diseq/3, cneg_eq/2,
-	    remove_universal_quantification/2,
-	    keep_universal_quantification/3,
-	    put_universal_quantification/1
-	]).
+%:- use_module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4]).
+:- use_module(cneg_diseq, [cneg_diseq/6, cneg_eq/6]).
 
 % Re-export predicates to use them in console.
-:- reexport(cneg_diseq,
-	[
-	    cneg_diseq/3, cneg_eq/2,
-	    remove_universal_quantification/2,
-	    keep_universal_quantification/3,
-	    put_universal_quantification/1
-	]).   
-:- reexport(cneg_lib, [ cneg_lib_aux/3 ]).   
+:- reexport(cneg_diseq, [cneg_diseq/6, cneg_eq/6]).   
+%:- reexport(cneg_lib, [ cneg_lib_aux/3 ]).   
 
 :- use_module(cneg_tr).
 
@@ -54,7 +42,7 @@ cneg(Functor) :-
 
 cneg(Functor) :-
 	functor_local(Functor, Name, Arity, Args),
-	cneg_main_cl_name(Name, Main_Cl_Name),
+	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, _Aux_Cl_Name),
 	functor_local(New_Functor, Main_Cl_Name, Arity, Args),
 	call(New_Functor).
 
