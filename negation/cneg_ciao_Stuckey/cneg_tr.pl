@@ -183,9 +183,10 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(1, 'List_Of_H_and_B', List_Of_H_and_B),
-	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_Out),
+	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_2),
 %	debug_msg_list(1, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
+	generate_double_negation_bodies(List_Of_H_and_B, Cls_2, Cls_Out),
 %	append(Cls_1, Cls_2, ClsOut),
 %	!, %Backtracking forbiden.
 	nl, nl,
@@ -359,11 +360,43 @@ double_negation(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	generate_double_negation_name(Name, New_Name),
 	functor_local(Neg_Atom, New_Name, New_Arity, Args_Out).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 generate_double_negation_name(Name, New_Name) :-
 	name(Name, String_Name),
 	append("double_negation_", String_Name, String_New_Name),
 	name(New_Name, String_New_Name).
+
+generate_double_negation_name_with_counter(Name, Counter, New_Name) :-
+	generate_double_negation_name(Name, Tmp_Name) :-
+	name(Tmp_Name, String_Tmp_Name),
+	name(Counter, String_Counter),
+	append(String_Tmp_Name, "_", String_Tmp_Name_2),
+	append(String_Tmp_Name_2, String_Counter, String_New_Name),
+	name(New_Name, String_New_Name).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+generate_double_negation_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
+	generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out).
+
+% generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
+generate_dnb([], Cls_In, Cls_In).
+generate_dnb([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+	debug_msg(0, 'generate_dnb :: (Head, Body, Counter)', (Head, Body, Counter)),
+	generate_dnb_aux(Head, Body, Counter, New_Cl), !,
+	debug_msg(0, 'generate_dnb :: New_Cl', New_Cl),
+	% Recursive create the other clauses.
+	generate_dnb(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
+
+generate_dnb_aux(Head, Body, Counter, New_Cl) :-
+	functor_local(Head, Name, Arity, Args),
+	generate_double_negation_name_with_counter(Name, Counter, New_Name),
+	New_Arity is Arity + 4,
+	functor_local(New_Head, New_Name, New_Arity, Args),
+	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
