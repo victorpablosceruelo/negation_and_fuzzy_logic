@@ -719,7 +719,7 @@ simplify_1_diseq_hereafter_t1(Diseq, More_Diseq, No_FV_In, No_FV_Out, Answer) :-
 % variables implicadas
 
 diseq(T1,T2, UnivVars):- 
-	cneg_diseq(T1, T2, UnivVars, UnivVars_Out, true, true).
+	cneg_diseq(T1, T2, UnivVars, _UnivVars_Out, true, true).
 
 cneg_diseq(T1,T2, FV_In, FV_Out, Cont_In, Cont_Out):- 
 	debug_msg(1, 'cneg_diseq :: T1', T1), 

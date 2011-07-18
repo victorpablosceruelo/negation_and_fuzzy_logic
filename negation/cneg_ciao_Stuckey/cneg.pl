@@ -14,11 +14,11 @@
 
 % Needed to be able to compile the modules.
 :- use_module(cneg_aux).    
-:- use_module(cneg_diseq, [cneg_diseq/6, cneg_eq/6]).
+:- use_module(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).
 :- use_module(cneg_tr).
 
 % Re-export predicates to use them in console.
-:- reexport(cneg_diseq, [cneg_diseq/6, cneg_eq/6]).   
+:- reexport(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).   
 
 cneg(Functor) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2),

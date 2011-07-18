@@ -321,11 +321,15 @@ negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
 	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+%negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+%	functor_local(Atom, Name, Arity, Args), 
+%	Name = 'cneg', Arity = 1.
 negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args), !,
+	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	New_Arity is Arity + 4, 
 	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),
-	functor_local(Neg_Atom, Name, New_Arity, New_Args).
+	functor_local(Neg_Atom, Aux_Cl_Name, New_Arity, New_Args).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
