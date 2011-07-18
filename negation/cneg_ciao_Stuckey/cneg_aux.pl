@@ -12,7 +12,6 @@
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/4, goal_is_equality/3,
-	    look_for_the_relevant_clauses/2, frontier_contents/4,
 	    qualify_string_name/3, remove_qualification/2, 
 	    % term_name_is_qualified/1,
 	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
@@ -32,11 +31,6 @@
 
 :- comment(summary, "This module offers some predicates needed both by Constructive Negation
 	Transformation Program, by Constructive Negation Library and by Disequalities Management.").
-
-% To access predicates from anywhere.
-%:- multifile cneg_processed_pred/4.
-%:- multifile cneg_dynamic_cl/6.
-%:- multifile cneg_static_cl/3.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -365,35 +359,6 @@ replace_in_term_variables_by_values(Term_In, [Var|LVars], [Value|LValues], Term_
 	replace_in_term_variables_by_values(Term_Tmp, LVars, LValues, Term_Out).
 replace_in_term_variables_by_values(Term_In, [_Var|LVars], [_Value|LValues], Term_Out):-
 	replace_in_term_variables_by_values(Term_In, LVars, LValues, Term_Out).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Look for those saved clauses with same name and arity.	
-%look_for_the_relevant_clauses(Goal, _Frontier) :-
-%	functor(Goal, Name, Arity),  % Security
-%	Name \== ',', Name \== ';',    % Issues
-%	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
-%	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body),
-%	debug_msg_clause('look_for_the_relevant_clauses', cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body)),
-%	fail.
-
-%look_for_the_relevant_clauses(_Goal, _Frontier) :-
-%	cneg_processed_pred(G, H, I, J), 
-%	debug_msg_clause('look_for_the_relevant_clauses', cneg_processed_pred(G, H, I, J)),
-%	fail.
-
-look_for_the_relevant_clauses(Goal, Frontier) :-
-	functor(Goal, Name, Arity),  % Security
-	Name \== ',', Name \== ';',    % Issues
-	!, % Backtracking forbiden.
-	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
-%	debug_msg_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
-	setof_local(frontier(Head, Body, FrontierTest), 
-	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
-
-frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

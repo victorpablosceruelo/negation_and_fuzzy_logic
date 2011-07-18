@@ -9,26 +9,16 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 %:- module(cneg,_).
 % To be able to call Pred from cneg
 
 % Needed to be able to compile the modules.
-
-% To access predicates from anywhere.
-%:- multifile cneg_processed_pred/4.
-%:- multifile cneg_dynamic_cl/6.
-%:- multifile cneg_static_cl/3.
-
 :- use_module(cneg_aux).    
-%:- use_module(cneg_lib, [cneg_lib_aux/3, negate_subfrontier/4]).
 :- use_module(cneg_diseq, [cneg_diseq/6, cneg_eq/6]).
+:- use_module(cneg_tr).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [cneg_diseq/6, cneg_eq/6]).   
-%:- reexport(cneg_lib, [ cneg_lib_aux/3 ]).   
-
-:- use_module(cneg_tr).
 
 cneg(Functor) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2),
