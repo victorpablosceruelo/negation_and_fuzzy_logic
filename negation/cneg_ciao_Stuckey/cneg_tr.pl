@@ -82,7 +82,7 @@ save_sent_info(Clause) :-
 	store_head_and_bodies_info(Clause, [[]]).
 
 %split_disjunctions_in_bodies(Body, Bodies)
-split_disjunctions_in_bodies(Body, _Bodies) :- 
+split_disjunctions_in_bodies(Body, Bodies) :- 
 	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), 
 	split_disjunctions_in_bodies_aux(Body, Bodies),
 	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Bodies ', Bodies), 
@@ -113,7 +113,7 @@ cartesian_product_of_lists_aux(Elto_1, [Elto_2 | List], [Result | More_Results])
 	cartesian_product_of_lists_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Bodies) :-
-	debug_msg(0, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
+	debug_msg(1, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
 	store_head_and_bodies_info_aux(Head, Bodies).
 
 store_head_and_bodies_info_aux(_Head, []) :-
