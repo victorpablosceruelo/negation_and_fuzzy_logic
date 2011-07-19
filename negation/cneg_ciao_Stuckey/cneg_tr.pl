@@ -186,12 +186,14 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_2),
 	debug_msg_list(1, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
-	generate_double_negation_clauses(List_Of_H_and_B, Cls_2, Cls_Out),
-%	append(Cls_1, Cls_2, ClsOut),
-%	!, %Backtracking forbiden.
+	generate_double_negation_main_cls(List_Of_Preds, Cls_2, Cls_3),
+	debug_msg_list(1, 'Cls_3', Cls_3),
+	!, %Backtracking forbiden.
+	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_Out),
 	nl, nl,
 	debug_msg_list(1, 'Cls_Out', Cls_Out),
-	nl, nl.
+	nl, nl, 
+	!. %Backtracking forbiden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,8 +205,8 @@ generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out
 	debug_msg(1, 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
 	debug_msg(1, 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
-	append([Main_Cl | [Aux_Cl]], Cls_In, Cls_Tmp), !,
-	generate_cneg_main_cls(List_Of_Preds, Cls_Tmp, Cls_Out).
+	!, %Backtracking forbiden.
+	generate_cneg_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
 
 generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name),	
@@ -434,8 +436,32 @@ generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),
 	functor_local(New_Atom, New_Name, New_Arity, New_Args).
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+generate_double_negation_main_cls([], Cls, Cls) :- !.
+generate_double_negation_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
+	debug_msg(1, 'generate_double_negation_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl, DN_Aux_Cl),
+	debug_msg(1, 'generate_double_negation_main_cls :: (Main_Cl, Aux_Cl)', (DN_Main_Cl, DN_Aux_Cl)),
+	!, %Backtracking forbiden.
+	generate_double_negation_main_cls(List_Of_Preds, [DN_Main_Cl | [DN_Aux_Cl | Cls_In]], Cls_Out).
+
+generate_double_negation_main_cl(Head_Name, Arity, Counter, DN_Main_Cl, DN_Aux_Cl) :-
+	generate_double_negation_name(Head_Name, New_Head_Name),
+	functor_local(DN_Main_Cl, ':-', 2, [Head_DN_Main_Cl |[ SubCall ]]),
+	New_Arity is Arity + 4,
+	functor_local(Head_DN_Main_Cl, New_Head_Name, New_Arity, _Args_Head),
+	generate_double_negation_name_with_counter(Head_Name, 1, SubCall_Name),
+	functor_local(SubCall, SubCall_Name, New_Arity, _Args_SubCall),
+	copy_args(New_Arity, Head_DN_Main_Cl, SubCall), 
+	
+	functor_local(DN_Aux_Cl, ':-', 2, [Head_DN_Aux_Cl |[ fail ]]),
+	New_Counter is Counter + 1,
+	generate_double_negation_name_with_counter(Head_Name, New_Counter, Head_DN_Aux_Cl_Name),
+	functor_local(Head_DN_Aux_Cl, Head_DN_Aux_Cl_Name, New_Arity, _Args_Head).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
