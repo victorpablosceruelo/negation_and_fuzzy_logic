@@ -184,9 +184,9 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(1, 'List_Of_H_and_B', List_Of_H_and_B),
 	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-%	debug_msg_list(1, 'Cls_2', Cls_2),
+	debug_msg_list(1, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
-	generate_double_negation_bodies(List_Of_H_and_B, Cls_2, Cls_Out),
+	generate_double_negation_clauses(List_Of_H_and_B, Cls_2, Cls_Out),
 %	append(Cls_1, Cls_2, ClsOut),
 %	!, %Backtracking forbiden.
 	nl, nl,
@@ -220,7 +220,7 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	adjust_last_four_args(New_Arity, Aux_Cl_Call, FI_1, FO_1, CI_1, CO_1),
 	% F_In, F_Out : F -> Forall
 	functor_local(Initializer, 'cneg_initialize', 2, [FI_1 | [CI_1]]),
-	functor_local(Tester, 'cneg_test', 2, [FO_1 | [CO_1]]),
+	functor_local(Tester, 'cneg_test_for_true', 2, [FO_1 | [CO_1]]),
 
 	functor_local(Aux_Cl, ':-', 2, _Args_Aux_Cl), 
 	arg(1, Aux_Cl, Head_Aux_Cl),
@@ -366,7 +366,7 @@ generate_double_negation_name(Name, New_Name) :-
 	name(New_Name, String_New_Name).
 
 generate_double_negation_name_with_counter(Name, Counter, New_Name) :-
-	generate_double_negation_name(Name, Tmp_Name) :-
+	generate_double_negation_name(Name, Tmp_Name),
 	name(Tmp_Name, String_Tmp_Name),
 	name(Counter, String_Counter),
 	append(String_Tmp_Name, "_", String_Tmp_Name_2),
@@ -377,24 +377,63 @@ generate_double_negation_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_double_negation_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out).
+generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
+	debug_msg(0, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	generate_dn_cls(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
-generate_dnb([], Cls_In, Cls_In).
-generate_dnb([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_dnb :: (Head, Body, Counter)', (Head, Body, Counter)),
-	generate_dnb_aux(Head, Body, Counter, New_Cl), !,
-	debug_msg(0, 'generate_dnb :: New_Cl', New_Cl),
+generate_dn_cls([], Cls_In, Cls_In).
+generate_dn_cls([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+	debug_msg(1, 'generate_dn_cls :: (Head, Body, Counter)', (Head, Body, Counter)),
+	generate_dn_cl(Head, Body, Counter, New_Cl), !,
+	debug_msg(1, 'generate_dn_cls :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
-	generate_dnb(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
+	generate_dn_cls(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
-generate_dnb_aux(Head, Body, Counter, New_Cl) :-
-	functor_local(Head, Name, Arity, Args),
+generate_dn_cl(Head, Body, Counter, New_Cl) :-
+	functor_local(Head, Name, Arity, _Args),
 	generate_double_negation_name_with_counter(Name, Counter, New_Name),
 	New_Arity is Arity + 4,
-	functor_local(New_Head, New_Name, New_Arity, Args),
-	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out).
+	functor_local(New_Head, New_Name, New_Arity, _New_Args),
+	copy_args(Arity, Head, New_Head),
+	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out),
+	generate_dn_body(Body, Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, New_Body),
+	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
+
+generate_dn_body([], Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, (Test_1 ; (Test_2 , SubCall))) :-
+	functor_local(Test_1, 'cneg_test_for_true', 2, [FV_In | [Cont_In]]),
+	functor_local(Test_2, 'cneg_test_for_fail', 2, [FV_In | [Cont_In]]),
+	functor_local(Head, Name, Arity, _Args),
+	New_Arity is Arity + 4,
+	New_Counter is Counter + 1,
+	generate_double_negation_name_with_counter(Name, New_Counter, New_Name),
+	functor_local(SubCall, New_Name, New_Arity, _New_Args),
+	copy_args(Arity, Head, SubCall),
+	adjust_last_four_args(New_Arity, SubCall, FV_In, FV_Out, Cont_In, Cont_Out).
+
+generate_dn_body([Atom | Body], Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, (New_Atom, New_Body)) :-
+	generate_dn_atom(Atom, New_Atom, FV_In, FV_Aux, Cont_In, Cont_Aux),
+	generate_dn_body(Body, Head, Counter, FV_Aux, FV_Out, Cont_Aux, Cont_Out, New_Body).
+
+generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_equality(Atom, A_Left, A_Right), !,
+	functor_local(New_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+
+generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
+	functor_local(New_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+
+generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	functor_local(Atom, 'cneg', 1, [Arg]), !,
+	functor_local(New_Atom, 'cneg', 5, [Arg |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]).
+
+generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	functor_local(Atom, Name, Arity, Args), !,
+	generate_double_negation_name(Name, New_Name),
+	New_Arity is Arity + 4, 
+	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),
+	functor_local(New_Atom, New_Name, New_Arity, New_Args).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

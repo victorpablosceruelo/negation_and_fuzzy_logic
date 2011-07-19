@@ -37,7 +37,8 @@ cneg(Functor) :-
 	call(New_Functor).
 
 cneg_initialize([], true).
-cneg_test(_Any, true).
+cneg_test_for_true(_Any, true).
+cneg_test_for_fail(_Any, fail).
 
 
 % cneg_tr contains the code transformation needed by cneg_lib
