@@ -301,7 +301,7 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	% Determine which variables are in the body but are not in the head.
 	varsbag_local(New_Head, [], [], Vars_New_Head), 
 	varsbag_local(Tmp_Body, Vars_New_Head, [], UQV_New_Body), 
-	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_New_Body | UQV_Tmp]]),
+	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_New_Body |[ UQV_Tmp]]]),
 	% negate_body_conjunction
 	negate_body_conj(Tmp_Body, New_Body, UQV_Tmp, UQV_Out, Cont_In, Cont_Out),
 	% Build new clause.
