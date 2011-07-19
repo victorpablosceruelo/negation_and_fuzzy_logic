@@ -20,25 +20,28 @@
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).   
 
-cneg(Functor) :-
-	goal_is_conjunction(Functor, _Conj_1, _Conj_2),
-	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', Functor),
+cneg(Functor) :- cneg_aux(Functor, [], _FV_Out, 'true', 'true').
+
+cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
+	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out)),
 	!, fail.
 
-cneg(Functor) :-
-	goal_is_disjunction(Functor, _Conj_1, _Conj_2),
-	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', Functor),
+cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
+	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
+	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out)),
 	!, fail.
 
-cneg(Functor) :-
+cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Functor, Name, Arity, Args),
+	New_Arity is Arity + 4,
 	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, _Aux_Cl_Name),
-	functor_local(New_Functor, Main_Cl_Name, Arity, Args),
+	functor_local(New_Functor, Main_Cl_Name, New_Arity,  [FV_In |[FV_Out |[Cont_In |[Cont_Out | Args]]]]),
 	call(New_Functor).
 
-cneg_initialize([], true).
-cneg_test_for_true(_Any, true).
-cneg_test_for_fail(_Any, fail).
+cneg_initialize([], 'true').
+cneg_test_for_true(_Any, 'true').
+cneg_test_for_fail(_Any, 'fail').
 
 
 % cneg_tr contains the code transformation needed by cneg_lib

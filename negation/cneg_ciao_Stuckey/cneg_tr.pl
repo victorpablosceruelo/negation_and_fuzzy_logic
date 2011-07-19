@@ -307,7 +307,7 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	% Build new clause.
 	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, New_Body)]]).
 
-negate_body_conj([], true, FV_In, FV_In, Cont_In, Cont_In) :- !.
+negate_body_conj([], 'true', FV_In, FV_In, Cont_In, Cont_In) :- !.
 negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), FV_In, FV_Out, Cont_In, Cont_Out) :-
 	negate_atom(Atom, Negated_Atom, FV_In, FV_Tmp, Cont_In, Cont_Tmp), 
 	negate_body_conj(Body, Negated_Body, FV_Tmp, FV_Out, Cont_Tmp, Cont_Out).
@@ -427,7 +427,7 @@ generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 
 generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, 'cneg', 1, [Arg]), !,
-	functor_local(New_Atom, 'cneg', 5, [Arg |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]).
+	functor_local(New_Atom, 'cneg_aux', 5, [Arg |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]).
 
 generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args), !,
