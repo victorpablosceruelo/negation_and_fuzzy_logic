@@ -177,6 +177,7 @@ quantify_universally_new_vars(Ci_Conj, GoalVars) :-
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Disequalities, UnivVars), Target, Disequalities, UnivVars).
 disequality_contents(disequality(Diseq_1, Diseq_2), Diseq_1, Diseq_2).
+disequality_status(status(FV_In, FV_Out, Cont_In, Cont_Out), FV_In, FV_Out, Cont_In, Cont_Out).
 equality_contents(equality(T1, T2), T1, T2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,8 +325,9 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-test_and_update_vars_attributes(UV_In, Substitutions, New_Disequalities) :-
+test_and_update_vars_attributes(Status, Substitutions, New_Disequalities) :-
 	debug_msg(1, 'test_and_update_vars_attributes(UV_In, Substitutions, New_Disequalities)', (UV_In, Substitutions, New_Disequalities)), 
+	disequality_status(Status, FV_In, FV_Out, Cont_In, Cont_Out).
 
 	varsbag_local(New_Disequalities, [], UV_In, Vars_In), !,
 	retrieve_affected_disequalities(Vars_In, [], UV_In, UV_Diseqs, New_Disequalities, Disequalities), !,
@@ -724,29 +726,39 @@ diseq(T1,T2, UnivVars):-
 cneg_diseq(T1,T2, FV_In, FV_Out, Cont_In, Cont_Out):- 
 	debug_msg(1, 'cneg_diseq :: T1', T1), 
 	debug_msg(1, 'cneg_diseq :: T2', T2),
-%	debug_msg(1, 'cneg_diseq :: UnivVars', UnivVars),
-	debug_msg(1, 'cneg_eq :: FreeVars_In', FV_In),
-	debug_msg(1, 'cneg_eq :: Cont_In', Cont_In),
+	debug_msg(1, 'cneg_diseq :: FreeVars_In', FV_In),
+	debug_msg(1, 'cneg_diseq :: Cont_In', Cont_In),
 
-%	test_universal_quantified(T1, T2),
-%	disequality_contents(Disequality, T1, T2),
-%        test_and_update_vars_attributes(UnivVars, [], [Disequality]),
+	disequality_contents(Disequality, T1, T2),
+	disequality_status(Status, FV_In, FV_Out, Cont_In, Cont_Out).
+        test_and_update_vars_attributes(Status, [], [Disequality]),
 
-	debug_msg(1, 'cneg_eq :: FreeVars_Out', FV_Out),
-	debug_msg(1, 'cneg_eq :: Cont_Out', Cont_Out).
+	debug_msg(1, 'cneg_diseq :: FreeVars_Out', FV_Out),
+	debug_msg(1, 'cneg_diseq :: Cont_Out', Cont_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(T1, T2, FV_In, FV_Out, Cont_In, Cont_Out) :- 
+cneg_eq(T1, T2, FV_In, FV_In, Cont_In, Cont_Out) :- 
 	debug_msg(1, 'cneg_eq :: T1', T1),
 	debug_msg(1, 'cneg_eq :: T2', T2),
 	debug_msg(1, 'cneg_eq :: FreeVars_In', FV_In),
 	debug_msg(1, 'cneg_eq :: Cont_In', Cont_In),
-	test_universal_quantified(T1, T2),
-
-	debug_msg(1, 'cneg_eq :: FreeVars_Out', FV_Out),
+	varsbag_local((T1, T2), [], [], Vars_Equality),
+	varsbag_intersection(Vars_Equality, FV_In, Intersection),
+	!,
+	(
+	    ( 
+		Intersection == [], !, diseq_eq(T1, T2)
+	    )
+	;
+	    (
+		Intersection \== [], !, fail
+	    )
+	),
+	Cont_Out is 'true',
+%	debug_msg(1, 'cneg_eq :: FreeVars_Out', FV_Out),
 	debug_msg(1, 'cneg_eq :: Cont_Out', Cont_Out).
 %	fail.
 % cneg_eq(T, T).
