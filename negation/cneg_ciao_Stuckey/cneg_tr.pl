@@ -233,14 +233,14 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	debug_msg(1, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 	generate_all_the_subcalls(Counter, Aux_Cl_Name, New_Arity, Body_Aux_Cl, FI_2, FO_2, CI_2, CO_2).
 
-adjust_last_four_args(Arity, Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
+adjust_last_four_args(Arity, Functor, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	arg(Arity, Functor, Cont_Out), 
 	Arity_2 is Arity -1, 
 	arg(Arity_2, Functor, Cont_In), 
 	Arity_3 is Arity_2 -1,
- 	arg(Arity_3, Functor, FV_Out), 
+ 	arg(Arity_3, Functor, UQV_Out), 
 	Arity_4 is Arity_3 -1,
- 	arg(Arity_4, Functor, FV_In).
+ 	arg(Arity_4, Functor, UQV_In).
 
 cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	name(Name, Name_String),
@@ -297,68 +297,68 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	generate_name_from_counter(Counter, Aux_Cl_Name, New_Name),
 	functor_local(New_Head, New_Name, New_Arity, _Args),
 	copy_args(Arity, TmpHead, New_Head),
-	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out),
+	adjust_last_four_args(New_Arity, New_Head, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	% Determine which variables are in the body but are not in the head.
 	varsbag_local(New_Head, [], [], Vars_New_Head), 
-	varsbag_local(Tmp_Body, Vars_New_Head, [], FV_New_Body), 
-	functor_local(Vars_Append, 'append', 3, [FV_In |[FV_New_Body |[FV_Tmp]]]),
+	varsbag_local(Tmp_Body, Vars_New_Head, [], UQV_New_Body), 
+	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_New_Body | UQV_Tmp]]),
 	% negate_body_conjunction
-	negate_body_conj(Tmp_Body, New_Body, FV_Tmp, FV_Out, Cont_In, Cont_Out),
+	negate_body_conj(Tmp_Body, New_Body, UQV_Tmp, UQV_Out, Cont_In, Cont_Out),
 	% Build new clause.
 	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, New_Body)]]).
 
-negate_body_conj([], 'true', FV_In, FV_In, Cont_In, Cont_In) :- !.
-negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), FV_In, FV_Out, Cont_In, Cont_Out) :-
-	negate_atom(Atom, Negated_Atom, FV_In, FV_Tmp, Cont_In, Cont_Tmp), 
-	negate_body_conj(Body, Negated_Body, FV_Tmp, FV_Out, Cont_Tmp, Cont_Out).
+negate_body_conj([], 'true', UQV_In, UQV_In, Cont_In, Cont_In) :- !.
+negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), UQV_In, UQV_Out, Cont_In, Cont_Out) :-
+	negate_atom(Atom, Negated_Atom, UQV_In, UQV_Tmp, Cont_In, Cont_Tmp), 
+	negate_body_conj(Body, Negated_Body, UQV_Tmp, UQV_Out, Cont_Tmp, Cont_Out).
 
-% negate_atom(Atom, Negated_Atom, FV_In, FV_Out, Cont_In, Cont_Out).
-negate_atom(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+% negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out).
+negate_atom(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	debug_msg(0, 'negate_atom :: Atom ', Atom),
-	negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out),
+	negate_atom_aux(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	debug_msg(0, 'negate_atom :: Neg_Atom ', Neg_Atom).
 
-negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+negate_atom_aux(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	goal_is_equality(Atom, A_Left, A_Right), !,
-	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]]]]).
 
-negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+negate_atom_aux(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
-	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]]]]).
 
-negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+negate_atom_aux(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, 'cneg', 1, [Arg]), !,
-	double_negation(Arg, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out).
+	double_negation(Arg, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out).
 
-negate_atom_aux(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+negate_atom_aux(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args), !,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	New_Arity is Arity + 4, 
-	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),
+	append(Args, [UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]], New_Args),
 	functor_local(Neg_Atom, Aux_Cl_Name, New_Arity, New_Args).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-double_negation(Atom, (Neg_Conj_1, Neg_Conj_2), FV_In, FV_Out, Cont_In, Cont_Out) :-
+double_negation(Atom, (Neg_Conj_1, Neg_Conj_2), UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
-	double_negation(Conj_1, FV_In, FV_Aux, Cont_In, Cont_Aux, Neg_Conj_1),
-	double_negation(Conj_2, FV_Aux, FV_Out, Cont_Aux, Cont_Out, Neg_Conj_2).
+	double_negation(Conj_1, UQV_In, UQV_Aux, Cont_In, Cont_Aux, Neg_Conj_1),
+	double_negation(Conj_2, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out, Neg_Conj_2).
 
-double_negation(Atom, (Neg_Disj_1; Neg_Disj_2), FV_In, FV_Out, Cont_In, Cont_Out) :-
+double_negation(Atom, (Neg_Disj_1; Neg_Disj_2), UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
-	double_negation(Disj_1, FV_In, FV_Out, Cont_In, Cont_Out, Neg_Disj_1),
-	double_negation(Disj_2, FV_In, FV_Out, Cont_In, Cont_Out, Neg_Disj_2).
+	double_negation(Disj_1, UQV_In, UQV_Out, Cont_In, Cont_Out, Neg_Disj_1),
+	double_negation(Disj_2, UQV_In, UQV_Out, Cont_In, Cont_Out, Neg_Disj_2).
 
-double_negation(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+double_negation(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, 'cneg', 1, [Arg]), !,
-	negate_atom(Arg, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out). % Problematic
+	negate_atom(Arg, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out). % Problematic
 
-double_negation(Atom, Neg_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+double_negation(Atom, Neg_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args_In), !,
 	New_Arity is Arity + 4,
-	append(Args_In, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], Args_Out),
+	append(Args_In, [UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]], Args_Out),
 	generate_double_negation_name(Name, New_Name),
 	functor_local(Neg_Atom, New_Name, New_Arity, Args_Out).
 
@@ -398,43 +398,43 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	New_Arity is Arity + 4,
 	functor_local(New_Head, New_Name, New_Arity, _New_Args),
 	copy_args(Arity, Head, New_Head),
-	adjust_last_four_args(New_Arity, New_Head, FV_In, FV_Out, Cont_In, Cont_Out),
-	generate_dn_body(Body, Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, New_Body),
+	adjust_last_four_args(New_Arity, New_Head, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	generate_dn_body(Body, Head, Counter, UQV_In, UQV_Out, Cont_In, Cont_Out, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
 
-generate_dn_body([], Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, (Test_1 ; (Test_2 , SubCall))) :-
-	functor_local(Test_1, 'cneg_test_for_true', 2, [FV_In | [Cont_In]]),
-	functor_local(Test_2, 'cneg_test_for_fail', 2, [FV_In | [Cont_In]]),
+generate_dn_body([], Head, Counter, UQV_In, UQV_Out, Cont_In, Cont_Out, (Test_1 ; (Test_2 , SubCall))) :-
+	functor_local(Test_1, 'cneg_test_for_true', 2, [UQV_In | [Cont_In]]),
+	functor_local(Test_2, 'cneg_test_for_fail', 2, [UQV_In | [Cont_In]]),
 	functor_local(Head, Name, Arity, _Args),
 	New_Arity is Arity + 4,
 	New_Counter is Counter + 1,
 	generate_double_negation_name_with_counter(Name, New_Counter, New_Name),
 	functor_local(SubCall, New_Name, New_Arity, _New_Args),
 	copy_args(Arity, Head, SubCall),
-	adjust_last_four_args(New_Arity, SubCall, FV_In, FV_Out, Cont_In, Cont_Out).
+	adjust_last_four_args(New_Arity, SubCall, UQV_In, UQV_Out, Cont_In, Cont_Out).
 
-generate_dn_body([Atom | Body], Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, (New_Atom, New_Body)) :-
-	generate_dn_atom(Atom, New_Atom, FV_In, FV_Aux, Cont_In, Cont_Aux),
-	generate_dn_body(Body, Head, Counter, FV_Aux, FV_Out, Cont_Aux, Cont_Out, New_Body).
+generate_dn_body([Atom | Body], Head, Counter, UQV_In, UQV_Out, Cont_In, Cont_Out, (New_Atom, New_Body)) :-
+	generate_dn_atom(Atom, New_Atom, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
+	generate_dn_body(Body, Head, Counter, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out, New_Body).
 
-generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+generate_dn_atom(Atom, New_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	goal_is_equality(Atom, A_Left, A_Right), !,
-	functor_local(New_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+	functor_local(New_Atom, 'cneg_eq', 6, [A_Left |[A_Right |[UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]]]]).
 
-generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+generate_dn_atom(Atom, New_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
-	functor_local(New_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]]).
+	functor_local(New_Atom, 'cneg_diseq', 6, [A_Left |[A_Right |[UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]]]]).
 
-generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+generate_dn_atom(Atom, New_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, 'cneg', 1, [Arg]), !,
-	functor_local(New_Atom, 'cneg_aux', 5, [Arg |[FV_In |[FV_Out |[Cont_In |[Cont_Out]]]]]).
+	functor_local(New_Atom, 'cneg_aux', 5, [Arg |[UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]]]).
 
-generate_dn_atom(Atom, New_Atom, FV_In, FV_Out, Cont_In, Cont_Out) :-
+generate_dn_atom(Atom, New_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	functor_local(Atom, Name, Arity, Args), !,
 	generate_double_negation_name(Name, New_Name),
 	New_Arity is Arity + 4, 
-	append(Args, [FV_In |[FV_Out |[Cont_In |[Cont_Out]]]], New_Args),
+	append(Args, [UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]], New_Args),
 	functor_local(New_Atom, New_Name, New_Arity, New_Args).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
