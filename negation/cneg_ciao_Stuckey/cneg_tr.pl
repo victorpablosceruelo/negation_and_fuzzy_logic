@@ -402,6 +402,7 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	generate_dn_body(Body, Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
+
 generate_dn_body([], Head, Counter, FV_In, FV_Out, Cont_In, Cont_Out, (Test_1 ; (Test_2 , SubCall))) :-
 	functor_local(Test_1, 'cneg_test_for_true', 2, [FV_In | [Cont_In]]),
 	functor_local(Test_2, 'cneg_test_for_fail', 2, [FV_In | [Cont_In]]),
