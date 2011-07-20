@@ -7,7 +7,7 @@
 	    list_head/2, list_tail/2, unify_terms/2, functor_local/4,
 	    memberchk/2, term_to_meta/2,
 	    setof_local/3, filter_out_nonvars/2,
-	    varsbag_local/4, varsbag_remove_var/3, varsbag_difference/3, 
+	    varsbag/4, varsbag_remove_var/3, varsbag_difference/3, 
 	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
@@ -401,7 +401,7 @@ varsbag_addition(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
 	filter_out_nonvars(VarsBag_1_In, VarsBag_1_Aux),
 	filter_out_nonvars(VarsBag_2_In, VarsBag_2_Aux),
 	cneg_aux:append(VarsBag_1_Aux, VarsBag_2_Aux, VarsBag_In),
-	varsbag_local(VarsBag_In, [], [], VarsBag_Out).
+	cneg_aux:varsbag(VarsBag_In, [], [], VarsBag_Out).
 
 varsbag_difference(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
 %	debug_msg('varsbag_difference(VarsBag_1_In, VarsBag_2_In)', (VarsBag_1_In, VarsBag_2_In)),
@@ -433,14 +433,14 @@ varsbag_intersection([_Var_1 | VarsBag_In_1], VarsBag_In_2, VarsBag_Out) :-
 %	debug_msg_clause('varsbag_local(X, OtherBag, Bag_In)', varsbag_local(X, OtherBag, Bag_In)),
 %	fail.
 
-varsbag_local(X, OtherBag, Bag_In, Bag_Out) :- 
+varsbag(X, OtherBag, Bag_In, Bag_Out) :- 
         var(X), !,
-%	debug_msg_clause('varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	debug_msg(0, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out),
-%	debug_msg_clause('varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	debug_msg(0, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	!.
 
-varsbag_local(Term, OtherBag, Bag_In, Bag_Out) :-
+varsbag(Term, OtherBag, Bag_In, Bag_Out) :-
 	functor(Term, _Name, Arity),
         varsbag_go_inside(Arity, Term, OtherBag, Bag_In, Bag_Out).
 
@@ -448,14 +448,14 @@ varsbag_go_inside(0, _Term, _OtherBag, Bag, Bag) :- !.
 varsbag_go_inside(Arity, Term, OtherBag, Bag_In, Bag_Out) :-
         NewArity is Arity-1,
         arg(Arity, Term, Argument),
-        varsbag_local(Argument, OtherBag, Bag_In, Bag_Tmp), !,
+        cneg_aux:varsbag(Argument, OtherBag, Bag_In, Bag_Tmp), !,
         varsbag_go_inside(NewArity, Term, OtherBag, Bag_Tmp, Bag_Out).
 
 varsbag_local_variable(X, OtherBag, Bag, Bag) :-
-	memberchk(X, OtherBag), % Var is in the other bag.
+	cneg_aux:memberchk(X, OtherBag), % Var is in the other bag.
 	!.
 varsbag_local_variable(X, _OtherBag, Bag, Bag) :- 
-	memberchk(X, Bag), % Var is alredy in the bag.
+	cneg_aux:memberchk(X, Bag), % Var is alredy in the bag.
 	!.
 varsbag_local_variable(X, _OtherBag, Bag, [X|Bag]) :- 
 	!.

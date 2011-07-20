@@ -299,8 +299,8 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	copy_args(Arity, TmpHead, New_Head),
 	adjust_last_four_args(New_Arity, New_Head, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	% Determine which variables are in the body but are not in the head.
-	varsbag_local(New_Head, [], [], Vars_New_Head), 
-	varsbag_local(Tmp_Body, Vars_New_Head, [], UQV_New_Body), 
+	cneg_aux:varsbag(New_Head, [], [], Vars_New_Head), 
+	cneg_aux:varsbag(Tmp_Body, Vars_New_Head, [], UQV_New_Body), 
 	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_New_Body |[ UQV_Tmp]]]),
 	% negate_body_conjunction
 	negate_body_conj(Tmp_Body, New_Body, UQV_Tmp, UQV_Out, Cont_In, Cont_Out),
