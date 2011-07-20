@@ -231,6 +231,8 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	functor_local(Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Args_SubCall),
 	adjust_last_four_args(New_Arity, Head_Aux_Cl, FI_2, FO_2, CI_2, CO_2),
 	debug_msg(1, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+
+	% We need to copy the args from the aux functor to the aux_i functors.
 	generate_all_the_subcalls(Counter, Aux_Cl_Name, New_Arity, Body_Aux_Cl, FI_2, FO_2, CI_2, CO_2).
 
 adjust_last_four_args(Arity, Functor, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
