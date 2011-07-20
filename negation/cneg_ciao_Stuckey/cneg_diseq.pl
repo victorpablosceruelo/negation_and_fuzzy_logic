@@ -2,7 +2,7 @@
 	[
 	    diseq/3, cneg_diseq/6, cneg_eq/6,
 	    portray_attributes_in_term/1, 
-	    put_universal_quantification/1,
+%	    put_universal_quantification/1,
 	    remove_universal_quantification/2,
 	    keep_universal_quantification/3
 	], 
@@ -92,7 +92,7 @@ put_universal_quantification_vars([Var|Vars]) :-
 
 put_universal_quantification_var(Var) :-
 	var(Var), !,
-	test_and_update_vars_attributes([Var], [], []).
+	test_and_update_vars_attributes([Var], _UQV_Out, 'true', 'true', [], []).
 put_universal_quantification_var(_Var) :- !. % NonVar
 
 remove_universal_quantification(Vars, Vars_Previously_UQ) :-
@@ -272,7 +272,7 @@ verify_attribute(Attribute, Target):-
 %	debug_msg(0, verify_attribute(Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, Disequalities, UnivVars), 
 	terms_are_equal(Target, NewTarget), !,
-	test_and_update_vars_attributes(UnivVars, [], Disequalities).
+	test_and_update_vars_attributes(UnivVars, [], _UQV_Out, 'true', 'true', Disequalities).
 
 
 % Only for Ciao prolog 
@@ -290,7 +290,7 @@ verify_attribute(Attribute, NewTarget):-
 %	;
 	    (
 		substitution_contents(Subst, OldTarget, NewTarget),
-		test_and_update_vars_attributes(UnivVars, [Subst], Disequalities)
+		test_and_update_vars_attributes(UnivVars, _UQV_Out, 'true', 'true', [Subst], Disequalities)
 	    )
 	).
 
@@ -308,7 +308,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
 		cneg_aux:append(UnivVars_Var_1, UnivVars_Var_2, UnivVars),
 		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
-		test_and_update_vars_attributes(UnivVars, [Subst], Disequalities)
+		test_and_update_vars_attributes(UnivVars, _UQV_Out, 'true', 'true', [Subst], Disequalities)
 	    )
 	;
 	    (
@@ -325,23 +325,22 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-test_and_update_vars_attributes(Status, Substitutions, New_Disequalities) :-
-	debug_msg(1, 'test_and_update_vars_attributes(UV_In, Substitutions, New_Disequalities)', (UV_In, Substitutions, New_Disequalities)), 
-	disequality_status(Status, UQV_In, UQV_Out, Cont_In, Cont_Out).
+test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, Substitutions, New_Disequalities) :-
+	debug_msg(1, 'test_and_update_vars_attributes(UQV_In, Cont_In, Substitutions, New_Disequalities)', (UQV_In, Cont_In, Substitutions, New_Disequalities)), 
 
-	varsbag_local(New_Disequalities, [], UV_In, Vars_In), !,
-	retrieve_affected_disequalities(Vars_In, [], UV_In, UV_Diseqs, New_Disequalities, Disequalities), !,
-	debug_msg(0, '', retrieve_affected_disequalities(Vars_In, [], UV_In, UV_Diseqs, New_Disequalities, Disequalities)),
+	varsbag_local(New_Disequalities, [], UQV_In, Vars_In), !,
+	retrieve_affected_disequalities(Vars_In, [], UQV_In, UV_Diseqs, New_Disequalities, Disequalities), !,
+	debug_msg(0, '', retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Diseqs, New_Disequalities, Disequalities)),
 
-	perform_substitutions(Substitutions, UV_Diseqs, UV_Subst), !,
-	varsbag_local(Disequalities, UV_Subst, [], NO_UV_In), % Not universally quantified.
+	perform_substitutions(Substitutions, UQV_Diseqs, UQV_Subst), !,
+	varsbag_local(Disequalities, UQV_Subst, [], NO_UQV_In), % Not universally quantified.
 	debug_msg(1, 'Affected Disequalities', Disequalities),
-	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UV_In),
+	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UQV_In),
 
-	simplify_disequations(Disequalities, NO_UV_In, NO_UV_Out, [], Simplified_Disequalities),
-	debug_msg(0, 'test_and_update_vars_attributes(Simplified_Disequalities, NO_UV_Out)', (Simplified_Disequalities, NO_UV_Out)),
-	varsbag_difference(Vars_In, NO_UV_Out, UV_Out),
-	restore_attributes(NO_UV_Out, UV_Out, Simplified_Disequalities).
+	simplify_disequations(Disequalities, NO_UQV_In, NO_UQV_Out, [], Simplified_Disequalities),
+	debug_msg(0, 'test_and_update_vars_attributes(Simplified_Disequalities, NO_UQV_Out)', (Simplified_Disequalities, NO_UQV_Out)),
+	varsbag_difference(Vars_In, NO_UQV_Out, UQV_Out),
+	restore_attributes(NO_UQV_Out, UQV_Out, Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
@@ -730,8 +729,8 @@ cneg_diseq(T1,T2, UQV_In, UQV_Out, Cont_In, Cont_Out):-
 	debug_msg(1, 'cneg_diseq :: Cont_In', Cont_In),
 
 	disequality_contents(Disequality, T1, T2),
-	disequality_status(Status, UQV_In, UQV_Out, Cont_In, Cont_Out).
-        test_and_update_vars_attributes(Status, [], [Disequality]),
+%	disequality_status(Status, UQV_In, UQV_Out, Cont_In, Cont_Out).
+        test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, [], [Disequality]),
 
 	debug_msg(1, 'cneg_diseq :: FreeVars_Out', UQV_Out),
 	debug_msg(1, 'cneg_diseq :: Cont_Out', Cont_Out).
