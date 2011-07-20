@@ -619,101 +619,58 @@ disequalities_cartesian_product([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_disequation_uqvar_t1_var_t2([Diseq | _More_Diseqs], Status_In, Answer) :-
+simplify_disequation_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answer) :-
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), 
-	cneg_aux:varsbag(Diseq, No_UQV_In, [], Real_FreeVars),
-	cneg_aux:memberchk(T1, Real_FreeVars), !, % T1 is a uq var, T2 is not a uqvar.
-	(
-	    (   % T1 is going to be processed hereafter (appears in More_Diseq).
-		cneg_aux:varsbag(More_Diseq, No_UQV_In, [], More_Diseq_Vars),
-		cneg_aux:memberchk(T1, More_Diseq_Vars), !,
-		simplify_disequation_hereafter_t1(Diseq, More_Diseq, No_UQV_In, No_UQV_Out, Answer)
-	    )
-	;
-	    (   % T1 appears only once, so it is not different from T2. Just fail.
-		simplify_disequation(fail, More_Diseq, No_UQV_In, No_UQV_Out, Answer)
-	    )
-	).
+	disequality_status(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
+	cneg_aux:memberchk(T1, UQV_In), !, % T1 is a uq var, T2 is not a uqvar.
+
+	% T1 is not different from T2. Just return fail to disunify, unify and continue.
+	varsbag_remove_var(T1, UQV_In, UQV_Aux),
+	cneg_unify(T1, T2),
+	disequality_status(Status_Out, UQV_Aux, UQV_Out, 'fail', Cont_Out),
+	simplify_disequation(More_Diseqs, Status_Out, Answer).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_disequation_var_nonvar(Diseq, More_Diseq, No_UQV_In, No_UQV_Out, Answer):- 
+simplify_disequation_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):- 
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         functor_local(T2, Name, Arity, _Args_T2), 
-	cneg_aux:varsbag(Diseq, No_UQV_In, [], Real_FreeVars),
+	disequality_status(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),	
 	(
-	    (
-		(
-		    cneg_aux:varsbag(T2, [], [], Vars_T2),
-		    cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
-		    No_UQV_In = No_UQV_Out,
-		    diseq_eq(Answer, []) % Answer is True.
-		)
-	    ;
-		(   % T1 is a uq var.
-		    cneg_aux:memberchk(T1, Real_FreeVars), !,
-		    simplify_disequation_uqvar_t1_functor_t2(Diseq, More_Diseq, No_UQV_In, No_UQV_Out, Answer)
-		)
-	    ;
-		(   % Not possible to solve it yet. 2 solutions.
-		    No_UQV_In = No_UQV_Out,
-		    diseq_eq(Answer, [Diseq]) % Answer is Diseq.
-		)
-	    ;
-		(   % Keep the functor but diseq between the arguments.
-		    cneg_aux:varsbag(No_UQV_In, [T1], [], No_UQV_Aux_1),
-		    functor_local(T1, Name, Arity, Args_T1), % Answer is T1 = functor and more.
-		    cneg_aux:varsbag(Args_T1, [T1], No_UQV_Aux_1, No_UQV_Aux_2),
-		    simplify_disequation(Diseq, More_Diseq, No_UQV_Aux_2, No_UQV_Out, Answer)
-		)
-	    )
-	).
-
-simplify_disequation_uqvar_t1_functor_t2(Diseq, More_Diseq, No_UQV_In, No_UQV_Out, Answer) :-
-	disequality_contents(Diseq, T1, T2),
-        var(T1),
-	cneg_aux:varsbag(Diseq, No_UQV_In, [], Real_FreeVars),
-	cneg_aux:memberchk(T1, Real_FreeVars), 
-        functor_local(T2, _Name, _Arity, _Args_T2), !,
-	(
-	    (   % T1 is going to be processed (appears in More_Diseq).
-		cneg_aux:varsbag(More_Diseq, No_UQV_In, [], More_Diseq_FreeVars),
-		cneg_aux:memberchk(T1, More_Diseq_FreeVars), !,
-		simplify_disequation_hereafter_t1(Diseq, More_Diseq, No_UQV_In, No_UQV_Out, Answer)
+	    (   % A variable is always different from a functor making use of it.
+		cneg_aux:varsbag(T2, [], [], Vars_T2),
+		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
+		cneg_unify(UQV_In, UQV_Out),
+		cneg_unify(Cont_Out, 'true'),
+		diseq_eq(Answer, []) % Answer is True.
 	    )
 	;
-	    (   % T1 appears only once, so it is not different from T2. Just fail.
-		simplify_disequation(fail, More_Diseq, No_UQV_In, No_UQV_Out, Answer)
+	    (   % T1 is a UQ var. Impossible to disunify.
+		cneg_aux:memberchk(T1, UQV_In), !,
+		varsbag_remove_var(T1, UQV_In, UQV_Aux),
+		cneg_unify(T1, T2),
+		disequality_status(Status_Out, UQV_Aux, UQV_Out, 'fail', Cont_Out),
+		simplify_disequation(More_Diseqs, Status_Out, Answer)
+	    )
+	;
+	    (   % The variable must not be the functor.
+		functor_local(New_T2, Name, Arity, New_Args_T2), 
+		cneg_aux:varsbag(New_Args_T2, [], UQV_In, UQV_Out),
+		cneg_unify(Cont_Out, 'true'),
+		disequality_contents(New_Diseq, T1, New_T2),
+		diseq_eq(Answer, [New_Diseq]) % Answer is Diseq.
+	    )
+	;
+	    (   % Keep the functor but diseq between the arguments.
+		functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
+		simplify_disequation([Diseq | More_Diseqs], Status_In, Answer)
 	    )
 	).
-	
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-simplify_disequation_hereafter_t1(Diseq, More_Diseq, No_UQV_In, No_UQV_Out, Answer) :-
-
-	disequality_contents(Diseq, T1, T2),
-        var(T1),
-	cneg_aux:varsbag(Diseq, No_UQV_In, [], Real_FreeVars),
-	cneg_aux:memberchk(T1, Real_FreeVars), !, % T1 is an universal quantified var.
-
-	cneg_aux:varsbag(More_Diseq, No_UQV_In, [], More_Diseq_FreeVars),
-	cneg_aux:memberchk(T1, More_Diseq_FreeVars), !, % T1 is used hereafter.
-
-	cneg_aux:varsbag((Diseq, More_Diseq), [T1], [], All_Vars),
-	copy_term((Diseq, More_Diseq, T1, All_Vars), (_Diseq_Copy, More_Diseq_Copy, T1_Copy, All_Vars_Copy)),
-	diseq_eq(All_Vars, All_Vars_Copy), !,
-
-	diseq_eq(T1_Copy, T2), % Answer is T1 = T2 and more. 
-	simplify_disequation(fail, More_Diseq_Copy, No_UQV_In, No_UQV_Out, Answer).
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -776,7 +733,8 @@ cneg_eq(T1, T2, UQV_In, UQV_In, Cont_In, Cont_Out) :-
 %	debug_msg(1, 'cneg_eq :: FreeVars_Out', UQV_Out),
 	debug_msg(1, 'cneg_eq :: Cont_Out', Cont_Out).
 %	fail.
-% cneg_eq(T, T).
+
+cneg_unify(T, T).
 
 % diseq_eq(X,Y) unify X and Y
 diseq_eq(X, X).
