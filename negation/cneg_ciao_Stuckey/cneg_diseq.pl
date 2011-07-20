@@ -278,7 +278,7 @@ verify_attribute(Attribute, Target):-
 % Only for Ciao prolog 
 verify_attribute(Attribute, NewTarget):-
 %	debug_msg(0, 'Only for Ciao Prolog: '),
-%	debug_msg(0, verify_attribute(Attribute, NewTarget)), 
+	debug_msg(1, 'verify_attribute(Attribute, NewTarget)', verify_attribute(Attribute, NewTarget)), 
 	attribute_contents(Attribute, OldTarget, Disequalities, UnivVars), !,
 	(
 %         --->> I do not know if this is semantically correct ... :-(
@@ -329,15 +329,16 @@ test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, Substitution
 	debug_msg(1, 'test_and_update_vars_attributes(UQV_In, Cont_In, Substitutions, New_Disequalities)', (UQV_In, Cont_In, Substitutions, New_Disequalities)), 
 
 	varsbag_local(New_Disequalities, [], UQV_In, Vars_In), !,
-	retrieve_affected_disequalities(Vars_In, [], UQV_In, UV_Diseqs, New_Disequalities, Disequalities), !,
+	retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Diseqs, New_Disequalities, Disequalities), !,
 	debug_msg(0, '', retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Diseqs, New_Disequalities, Disequalities)),
 
-	perform_substitutions(Substitutions, UQV_Diseqs, UQV_Subst), !,
-	varsbag_local(Disequalities, UQV_Subst, [], NO_UQV_In), % Not universally quantified.
+%	perform_substitutions(Substitutions, UQV_Diseqs, UQV_Subst), !,
+%	varsbag_local(Disequalities, UQV_Subst, [], NO_UQV_In), % Not universally quantified.
 	debug_msg(1, 'Affected Disequalities', Disequalities),
-	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UQV_In),
+%	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UQV_In),
 
-	simplify_disequations(Disequalities, NO_UQV_In, NO_UQV_Out, [], Simplified_Disequalities),
+	disequality_status(Status, UQV_Diseqs, UQV_Out, Cont_In, Cont_Out),
+	simplify_disequations(Disequalities, Status, [], Simplified_Disequalities),
 	debug_msg(0, 'test_and_update_vars_attributes(Simplified_Disequalities, NO_UQV_Out)', (Simplified_Disequalities, NO_UQV_Out)),
 	varsbag_difference(Vars_In, NO_UQV_Out, UQV_Out),
 	restore_attributes(NO_UQV_Out, UQV_Out, Simplified_Disequalities).
@@ -360,6 +361,7 @@ retrieve_affected_disequalities([Var|Vars_In], Vars_Examined, UV_In, UV_Out, Dis
         retrieve_affected_disequalities(Vars_In, [Var|Vars_Examined], UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out).
 
 
+% Substitutions need a revision in depth.
 perform_substitutions([], UV_In, UV_In) :- !.
 perform_substitutions([Subst | MoreSubst], UV_In, UV_Out) :-
 	debug_msg(1, 'perform_substitutions :: Subst', Subst),
@@ -489,20 +491,26 @@ accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	accumulate_disequations(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
 
-simplify_disequations([], No_UQV_Out, No_UQV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !.
-simplify_disequations([Diseq|Diseq_List], No_UQV_In, No_UQV_Out, Diseq_Acc_In, Diseq_Acc_Out) :- !,
-	simplify_1_diseq(Diseq, [], No_UQV_In, No_UQV_Aux, Simplified_Diseq),
-	debug_msg(0, 'simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
+simplify_disequations([], Status, Diseq_Acc_In, Diseq_Acc_In) :- !, 
+	disequality_status(Status, UQV_In, UQV_In, Cont_In, Cont_In).
+simplify_disequations([Diseq|Diseq_List], Status_In, Diseq_Acc_In, Diseq_Acc_Out) :- !,
+	disequality_status(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	disequality_status(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
+	simplify_1_diseq(Diseq, [], Status_Aux, Simplified_Diseq),
+	debug_msg(1, 'simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
+	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux) ,
 	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	simplify_disequations(Diseq_List, No_UQV_Aux, No_UQV_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
+	disequality_status(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
+	simplify_disequations(Diseq_List, Status_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_1_diseq(Diseq, More_Diseq, No_UQV_In, _No_UQV_Out, _Answer) :-
+simplify_1_diseq(Diseq, More_Diseq, Status, _Answer) :-
 %	debug_msg(0, '', ''),
-	debug_msg(0, 'simplify_1_diseq :: (Diseq, More_Diseq, No_UQV_In)', (Diseq, More_Diseq, No_UQV_In)), 
+	debug_msg(1, 'simplify_1_diseq :: (Diseq, More_Diseq)', (Diseq, More_Diseq)),
+ 	debug_msg(1, 'simplify_1_diseq :: Status', Status),
 	fail.
 		
 simplify_1_diseq(fail, [], _No_UQV_In, _No_UQV_Out, _Answer) :- !, fail.
