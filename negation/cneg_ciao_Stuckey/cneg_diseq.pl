@@ -3,7 +3,6 @@
 	    diseq/3, cneg_diseq/6, cneg_eq/6,
 	    portray_attributes_in_term/1, 
 %	    put_universal_quantification/1,
-	    remove_universal_quantification/2,
 	    keep_universal_quantification/3
 	], 
 	[assertions]).
@@ -94,19 +93,6 @@ put_universal_quantification_var(Var) :-
 	var(Var), !,
 	test_and_update_vars_attributes([Var], _UQV_Out, 'true', 'true', [], []).
 put_universal_quantification_var(_Var) :- !. % NonVar
-
-remove_universal_quantification(Vars, Vars_Previously_UQ) :-
-	debug_msg(1, 'remove_universal_quantification :: Vars', Vars),
-	retrieve_affected_disequalities(Vars, [], [], UV_Diseqs, [], Disequalities), !,
-	debug_msg(1, 'remove_universal_quantification :: UV_Diseqs', UV_Diseqs),
-	varsbag_difference(UV_Diseqs, Vars, New_UV_Diseqs),
-	debug_msg(1, 'remove_universal_quantification :: New_UV_Diseqs', New_UV_Diseqs),
-	cneg_aux:varsbag(Disequalities, New_UV_Diseqs, [], NO_UV_Diseqs),
-	restore_attributes(NO_UV_Diseqs, New_UV_Diseqs, Disequalities),
-
-	varsbag_intersection(Vars, UV_Diseqs, Vars_Previously_UQ),
-	debug_msg(1, 'remove_universal_quantification :: Vars_Previously_UQ', Vars_Previously_UQ).
-
 
 split_vars_into_universally_quantified_and_not([], [], []) :- !. 
 split_vars_into_universally_quantified_and_not([Var | Vars], Vars_NUQ, [Var | Vars_UQ]) :-
@@ -339,9 +325,8 @@ test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, Substitution
 
 	disequality_status(Status, UQV_Diseqs, UQV_Out, Cont_In, Cont_Out),
 	simplify_disequations(Disequalities, Status, [], Simplified_Disequalities),
-	debug_msg(0, 'test_and_update_vars_attributes(Simplified_Disequalities, NO_UQV_Out)', (Simplified_Disequalities, NO_UQV_Out)),
-	varsbag_difference(Vars_In, NO_UQV_Out, UQV_Out),
-	restore_attributes(NO_UQV_Out, UQV_Out, Simplified_Disequalities).
+	debug_msg(1, '(Simplified_Disequalities, UQV_Out)', (Simplified_Disequalities, UQV_Out)),
+	restore_attributes(UQV_Out, Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
 retrieve_affected_disequalities([Var|Vars], Vars_Examined, UV_In, UV_Out, Diseq_Acc_In, Diseq_Acc_Out):- 
@@ -429,17 +414,16 @@ substitutions_cartesian_product([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Need old vars to play with them too.
-restore_attributes(NO_UV_In, UV_In, Diseqs) :- 
-	varsbag_addition(NO_UV_In, UV_In, Affected_Vars),
-	debug_msg(0, 'restore_attributes_vars(Affected_Vars, UV_In, Diseqs)', (Affected_Vars, UV_In, Diseqs)),
-	restore_attributes_vars(Affected_Vars, UV_In, Diseqs).
+restore_attributes(UQV, Diseqs) :- 
+	varsbag(Diseqs, [], [], Affected_Vars),
+	debug_msg(0, 'restore_attributes_vars(Affected_Vars, UQV, Diseqs)', (Affected_Vars, UQV, Diseqs)),
+	restore_attributes_vars(Affected_Vars, UQV, Diseqs).
 
-restore_attributes_vars([], _UV_In, _Diseqs) :- !.
-restore_attributes_vars([Var | Affected_Vars], UV_In, Diseqs) :-
+restore_attributes_vars([], _UQV_In, _Diseqs) :- !.
+restore_attributes_vars([Var | Affected_Vars], UQV_In, Diseqs) :-
 	affected_diseqs(Var, Diseqs, Affected_Diseqs),
-	restore_attributes_var(Var, UV_In, Affected_Diseqs),
-	restore_attributes_vars(Affected_Vars, UV_In, Diseqs).
+	restore_attributes_var(Var, UQV_In, Affected_Diseqs),
+	restore_attributes_vars(Affected_Vars, UQV_In, Diseqs).
 
 affected_diseqs(_Var, [], []) :- !.
 affected_diseqs(Var, [Diseq | Diseqs], [Diseq | Affected_Diseqs]) :-
@@ -449,7 +433,7 @@ affected_diseqs(Var, [Diseq | Diseqs], [Diseq | Affected_Diseqs]) :-
 affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs) :-
 	affected_diseqs(Var, Diseqs, Affected_Diseqs).
 
-restore_attributes_var(Var, _UV_In, _Affected_Diseqs) :-
+restore_attributes_var(Var, _UQV_In, _Affected_Diseqs) :-
 	var(Var),
 	get_attribute_local(Var, Attribute), !,
 	debug_msg_nl(0),
@@ -457,20 +441,20 @@ restore_attributes_var(Var, _UV_In, _Affected_Diseqs) :-
 	debug_msg_nl(0),
 	fail.
 
-restore_attributes_var(Var, UV_In, Affected_Diseqs) :-
+restore_attributes_var(Var, UQV_In, Affected_Diseqs) :-
 	var(Var),
 	cneg_aux:varsbag((Var, Affected_Diseqs), [], [], Affected_Vars),
-	varsbag_intersection(Affected_Vars, UV_In, UV_Affected),
+	varsbag_intersection(Affected_Vars, UQV_In, UQV_Affected),
 	!,
 	(
 	    (
-		UV_Affected == [],
+		UQV_Affected == [],
 		Affected_Diseqs == [],
 		! % We do not want empty attributes.
 	    )
 	;
 	    (
-		attribute_contents(Attribute, Var, Affected_Diseqs, UV_Affected),
+		attribute_contents(Attribute, Var, Affected_Diseqs, UQV_Affected),
 		put_attribute_local(Var, Attribute)
 	    )
 	).
