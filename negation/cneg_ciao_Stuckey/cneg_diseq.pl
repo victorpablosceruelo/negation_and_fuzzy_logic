@@ -1,9 +1,7 @@
 :- module(cneg_diseq, 
 	[
 	    diseq/3, cneg_diseq/6, cneg_eq/6,
-	    portray_attributes_in_term/1, 
-%	    put_universal_quantification/1,
-	    keep_universal_quantification/3
+	    portray_attributes_in_term/1
 	], 
 	[assertions]).
 
@@ -75,84 +73,6 @@ put_attribute_local(Var, Attribute) :-
 %	debug_msg(0, 'Testing if var has any attribute. Var: '),
 %	debug_msg(0, Var),
 %	debug_msg(0, ' has NO attribute').
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-put_universal_quantification(Vars) :-
-	debug_msg(0, 'put_universal_quantification :: Vars', Vars),
-	put_universal_quantification_vars(Vars).
-
-put_universal_quantification_vars([]) :- !.
-put_universal_quantification_vars([Var|Vars]) :-
-	put_universal_quantification_var(Var),
-	put_universal_quantification_vars(Vars).
-
-put_universal_quantification_var(Var) :-
-	var(Var), !,
-	test_and_update_vars_attributes([Var], _UQV_Out, 'true', 'true', [], []).
-put_universal_quantification_var(_Var) :- !. % NonVar
-
-split_vars_into_universally_quantified_and_not([], [], []) :- !. 
-split_vars_into_universally_quantified_and_not([Var | Vars], Vars_NUQ, [Var | Vars_UQ]) :-
-	var_is_universally_quantified(Var), !,
-	split_vars_into_universally_quantified_and_not(Vars, Vars_NUQ, Vars_UQ).
-split_vars_into_universally_quantified_and_not([Var | Vars], [Var | Vars_NUQ], Vars_UQ) :-
-	split_vars_into_universally_quantified_and_not(Vars, Vars_NUQ, Vars_UQ).
-
-var_is_universally_quantified(Var) :-
-	var(Var), 
-	get_attribute_local(Var, Old_Attribute), 
-	attribute_contents(Old_Attribute, Var, _Disequalities, UnivVars),
-	cneg_aux:memberchk(Var, UnivVars), !.
-
-%% To keep universal quantification both the structure in Ci_Vars and the variables
-%% inside the structure must belong to the universally quantified set of variables.
-%% If one of them does not belong, the vars involved should not be universally
-%% quantified.
-
-keep_universal_quantification(Ci_Vars, New_UQ, Previously_UQ) :-
-	debug_msg(1, 'keep_universal_quantification(Ci_Vars)', Ci_Vars),
-	debug_msg(1, 'keep_universal_quantification(New_UQ)', New_UQ),
-	debug_msg(1, 'keep_universal_quantification(Previously_UQ)', Previously_UQ),
-	varsbag_addition(New_UQ, Previously_UQ, Vars_UQ),
-	keep_universal_quantification_aux_1(Ci_Vars, Vars_UQ).
-
-keep_universal_quantification_aux_1([], _Vars_UQ) :- !.
-keep_universal_quantification_aux_1([Ci_Var | Ci_Vars], Vars_UQ) :-
-	cneg_aux:memberchk(Ci_Var, Vars_UQ), !,
-	cneg_aux:varsbag(Ci_Var, [], [], Real_Ci_Vars),
-	keep_universal_quantification_aux_2(Real_Ci_Vars, Vars_UQ, Real_Ci_Vars),
-	keep_universal_quantification_aux_1(Ci_Vars, Vars_UQ).
-keep_universal_quantification_aux_1([_Ci_Var | Ci_Vars], Vars_UQ) :-
-	keep_universal_quantification_aux_1(Ci_Vars, Vars_UQ).
-
-keep_universal_quantification_aux_2([], _Vars_UQ, Real_Ci_Vars) :- !,
-	put_universal_quantification(Real_Ci_Vars).
-keep_universal_quantification_aux_2([Ci_Var | Ci_Vars], Vars_UQ, Real_Ci_Vars) :-
-	cneg_aux:memberchk(Ci_Var, Vars_UQ), !,
-	keep_universal_quantification_aux_2(Ci_Vars, Vars_UQ, Real_Ci_Vars).
-keep_universal_quantification_aux_2([_Ci_Var | _Ci_Vars], _Vars_UQ, _Real_Ci_Vars) :- !.
-
-test_universal_quantified(T1, T2) :-
-	cneg_aux:varsbag((T1, T2), [], [], Vars),
-	test_universal_quantified_vars(Vars).
-
-test_universal_quantified_vars([]).
-test_universal_quantified_vars([Var | Vars]) :-
-	get_attribute_local(Var, Old_Attribute), !,
-	debug_msg(1, 'test_universal_quantified_vars', Old_Attribute),
-	test_universal_quantified_vars(Vars).
-test_universal_quantified_vars([Var | Vars]) :-
-	debug_msg(1, 'test_universal_quantified_vars :: no attribute for Var', Var),
-	test_universal_quantified_vars(Vars).
-
-quantify_universally_new_vars(Ci_Conj, GoalVars) :-
-	cneg_aux:varsbag(GoalVars, [], [], Real_GoalVars),
-	split_vars_into_universally_quantified_and_not(Real_GoalVars, GoalVars_NUQ, GoalVars_UQ), 
-	cneg_aux:varsbag(Ci_Conj, GoalVars_NUQ, GoalVars_UQ, New_Vars),
-	put_universal_quantification(New_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
