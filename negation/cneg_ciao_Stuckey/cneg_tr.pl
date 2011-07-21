@@ -66,17 +66,25 @@ save_sent_info(Clause) :-
 	Name==':-', !,
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
-	split_disjunctions_in_bodies(Body, Bodies),
-	store_head_and_bodies_info(Head, Bodies).
+	unifications_in_head_to_equality(Head, New_Head, Equality),
+	split_disjunctions_in_bodies((Equality, Body), Bodies),
+	store_head_and_bodies_info(New_Head, Bodies).
 
-save_sent_info(Clause) :-
-	functor_local(Clause, Name, Arity, _Arguments),
+save_sent_info(Head) :-
+	functor_local(Head, Name, Arity, _Arguments),
 	(
 	    Name\==':-' 
 	; 
 	    Arity\==2
 	), !,
-	store_head_and_bodies_info(Clause, [[]]).
+	unifications_in_head_to_equality(Head, New_Head, Equality),
+	store_head_and_bodies_info(New_Head, [[Equality]]).
+
+unifications_in_head_to_equality(Head, New_Head, Equality) :-
+	% Take the unifications in the head and move them to the body.
+	functor_local(Head, Name, Arity, Args), 
+	functor_local(New_Head, Name, Arity, New_Args), 
+	functor_local(Equality, '=', 2, [New_Args | [Args]]).
 
 %split_disjunctions_in_bodies(Body, Bodies)
 split_disjunctions_in_bodies(Body, Bodies) :- 
@@ -258,7 +266,7 @@ generate_all_the_subcalls(_Index, Info_Aux_Cl, 'true', F_In, F_In, Cont_In, Cont
 	!.
 generate_all_the_subcalls(Index, Info_Aux_Cl, Body, F_In, F_Out, Cont_In, Cont_Out) :-
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	generate_name_from_counter(Counter, Aux_Cl_Name, SubCall_Name),
+	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
 	functor_local(SubCall, SubCall_Name, New_Arity, _Args), 
 	copy_args(Arity, Head_Aux_Cl, SubCall),
 	(
@@ -305,26 +313,23 @@ negate_head_and_bodies([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Ou
 	negate_head_and_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
 negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
-	% Take the unifications in the head and move them to the body.
-	functor_local(Head, Name, Arity, Args), 
-	functor_local(TmpHead, Name, Arity, TmpArgs), 
-	functor_local(Head_Eq, '=', 2, [Args | [TmpArgs]]), 
-	append([Head_Eq], Body, Tmp_Body),
+	% We suppose the head has no unifications (we've removed them before).
+	functor_local(Head, Name, Arity, _Args_Head), 
 	% New head (new name, new arity, new args).
 	New_Arity is Arity + 4,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	generate_name_from_counter(Counter, Aux_Cl_Name, New_Name),
-	functor_local(New_Head, New_Name, New_Arity, _Args),
-	copy_args(Arity, TmpHead, New_Head),
+	functor_local(New_Head, New_Name, New_Arity, _Args_New_Head),
+	copy_args(Arity, Head, New_Head),
 	adjust_last_four_args(New_Arity, New_Head, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	% Determine which variables are in the body but are not in the head.
 	cneg_aux:varsbag(New_Head, [], [], Vars_New_Head), 
-	cneg_aux:varsbag(Tmp_Body, Vars_New_Head, [], UQV_New_Body), 
-	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_New_Body |[ UQV_Tmp]]]),
+	cneg_aux:varsbag(Body, Vars_New_Head, [], UQV_Body), 
+	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_Body |[ UQV_Tmp]]]),
 	% negate_body_conjunction
-	negate_body_conj(Tmp_Body, New_Body, UQV_Tmp, UQV_Out, Cont_In, Cont_Out),
+	negate_body_conj(Body, Neg_Body, UQV_Tmp, UQV_Out, Cont_In, Cont_Out),
 	% Build new clause.
-	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, New_Body)]]).
+	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, Neg_Body)]]).
 
 negate_body_conj([], 'true', UQV_In, UQV_In, Cont_In, Cont_In) :- !.
 negate_body_conj([Atom | Body], (Negated_Atom, Negated_Body), UQV_In, UQV_Out, Cont_In, Cont_Out) :-
