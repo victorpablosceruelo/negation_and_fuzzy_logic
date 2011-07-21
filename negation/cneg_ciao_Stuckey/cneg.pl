@@ -20,7 +20,7 @@
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).   
 
-cneg(Functor) :- cneg_aux(Functor, [], _FV_Out, 'true', 'true').
+cneg(UQV, Functor) :- cneg_aux(Functor, UQV, _FV_Out, 'true', 'true').
 
 cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
@@ -39,9 +39,9 @@ cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 	functor_local(New_Functor, Main_Cl_Name, New_Arity,  [FV_In |[FV_Out |[Cont_In |[Cont_Out | Args]]]]),
 	call(New_Functor).
 
-cneg_initialize([], 'true').
-cneg_test_for_true(_Any, 'true').
-cneg_test_for_fail(_Any, 'fail').
+cneg_initialize([], _UQV_Out, 'true', _Cont_Out).
+cneg_test_for_true(UQV_Out, UQV_Out, 'true', 'true').
+cneg_test_for_fail(_UQV_Aux, _UQV_Out, 'fail', 'fail').
 
 
 % cneg_tr contains the code transformation needed by cneg_lib
