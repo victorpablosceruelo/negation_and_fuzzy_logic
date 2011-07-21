@@ -173,18 +173,18 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
 	debug_msg_list(1, 'List_Of_Preds', List_Of_Preds),
-	debug_msg(1, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1)),
+	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1)),
 	generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-	debug_msg_list(1, 'Cls_1', Cls_1),
+	debug_msg_list(0, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(1, 'List_Of_H_and_B', List_Of_H_and_B),
 	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-	debug_msg_list(1, 'Cls_2', Cls_2),
+	debug_msg_list(0, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	generate_double_negation_main_cls(List_Of_Preds, Cls_2, Cls_3),
-	debug_msg_list(1, 'Cls_3', Cls_3),
+	debug_msg_list(0, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_Out),
 	nl, nl,

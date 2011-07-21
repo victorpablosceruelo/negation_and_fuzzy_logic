@@ -419,7 +419,8 @@ simplify_disequation(Diseqs, Status, _Answer) :-
 	fail.
 
 % For the case we do not have a disequality to simplify.
-simplify_disequation([], Status_In, _Answer) :- !,
+% The answer is obviously empty, but we might fail because of Cont_In = fail.
+simplify_disequation([], Status_In, []) :- !,
 	disequality_status(Status_In, UQV_In, UQV_In, Cont_In, Cont_In).
 
 simplify_disequation([Diseq | More_Diseqs], Status_In, Answer) :- % Same var.
@@ -491,9 +492,13 @@ simplify_disequation([Diseq | More_Diseqs], Status_In, Answer):-  % Functors tha
 	disequality_contents(Diseq, T1, T2),
  	functor_local(T1, Name, Arity, Args_1),
 	functor_local(T2, Name, Arity, Args_2), !,
+
+	disequality_status(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
+	disequality_status(Status_Aux, UQV_In, UQV_Out, 'fail', Cont_Out),
+
 	disequalities_cartesian_product(Args_1, Args_2, Diseq_List),
 	cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
-	simplify_disequation(New_More_Diseqs, Status_In, Answer).
+	simplify_disequation(New_More_Diseqs, Status_Aux, Answer).
 
 simplify_disequation([Diseq | _More_Diseqs], Status_In, Answer):-  % Functors that do not unify.
 	disequality_contents(Diseq, T1, T2),
