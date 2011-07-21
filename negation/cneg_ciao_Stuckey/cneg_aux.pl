@@ -1,24 +1,24 @@
 
 :- module(cneg_aux,
 	[
-	    findall/4, append/3,
 	    debug_msg/3, debug_msg_list/3, 
 	    debug_msg_aux/3, debug_msg_nl/1, 
-	    list_head/2, list_tail/2, unify_terms/2, functor_local/4,
+	    findall/4, append/3, functor_local/4,
+	    list_head/2, list_tail/2, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
 	    setof_local/3, filter_out_nonvars/2,
 	    varsbag/4, varsbag_remove_var/3, varsbag_difference/3, 
 	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
-	    goal_is_disequality/4, goal_is_equality/3,
-	    qualify_string_name/3, remove_qualification/2, 
+	    goal_is_disequality/4, goal_is_equality/3,	    
+	    terms_are_equal/2, unify_terms/2,
+	    %	cneg_aux_equality/2,
+	    % qualify_string_name/3, remove_qualification/2, 
 	    % term_name_is_qualified/1,
 	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
-	    add_to_list_if_not_there/3, 
-	    terms_are_equal/2,
-	    cneg_aux_equality/2
+	    status_operation/5
 	],
 	[assertions]).
 
@@ -478,6 +478,12 @@ setof_local(Things, GoalCondition, Bag) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_aux_equality(X, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+status_operation([UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]], UQV_In, UQV_Out, Cont_In, Cont_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
