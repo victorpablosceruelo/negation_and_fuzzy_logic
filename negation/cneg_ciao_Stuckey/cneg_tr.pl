@@ -204,25 +204,19 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	New_Arity is Arity + 4,
 
 	% Generate the main clause.
-	functor_local(Main_Cl, ':-', 2, [Head_Main_Cl |[(Initializer, (Aux_Cl_Call, Test_For_True))]]), 
+	functor_local(Main_Cl, ':-', 2, [Head_Main_Cl |[Aux_Cl_Call]]), 
 
 	functor_local(Head_Main_Cl, Main_Cl_Name, Arity, _Args_Head),
 	functor_local(Aux_Cl_Call, Aux_Cl_Name, New_Arity, _Args_Aux_Cl_Call), 
 	copy_args(Arity, Head_Main_Cl, Aux_Cl_Call),
 	adjust_last_four_args(New_Arity, Aux_Cl_Call, Status),
-	status_operation(Status, _UQV_In, UQV_Aux, _Cont_In, Cont_Aux), 
-	% F_In, F_Out : F -> Forall
-
-	functor_local(Initializer, 'cneg_initialize', 4, Status),
-	status_operation(Status_Test_For_True, UQV_Aux, _UQV_Out, Cont_Aux, _Cont_Out),
-	functor_local(Test_For_True, 'cneg_test_for_true', 4, Status_Test_For_True),
+	status_operation(Status, [], _UQV_Aux, 'true', 'true'), 
 
 	% Generate the auxiliary clause.
 	functor_local(Aux_Cl, ':-', 2, [Head_Aux_Cl |[ Body_Aux_Cl ]]), 
 
 	functor_local(Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Args_SubCall),
 	adjust_last_four_args(New_Arity, Head_Aux_Cl, Status_Head_Aux_Cl),
-	debug_msg(0, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 
 	% We need to copy the args from the aux functor to the aux_i functors.
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
@@ -262,23 +256,23 @@ generate_subcalls_1(Index, Info_Aux_Cl, Body, Status_In) :-
 
 	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
 	copy_args(Arity, Head_Aux_Cl, SubCall),
-	status_operation(Status_Aux_1, UQV_In, UQV_Aux_1, Cont_In, Cont_Aux_1),
 	adjust_last_four_args(New_Arity, SubCall, Status_Aux_1),
-	
-	functor_local(Test_For_True, 'cneg_test_for_true', 4, Status_Aux_2),
+	status_operation(Status_Aux_1, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
+	Cont_Aux = 'true', % This substitutes cneg_test_for_true.
+
 	(
 	    (
 		Index == Counter,
-		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Out, Cont_Aux_1, Cont_Out),
-		Body = (SubCall, Test_For_True)
+		UQV_Aux = UQV_Out,
+		Cont_Aux = Cont_Out,
+		Body = SubCall
 	    )
 	;
 	    (
 		Index < Counter,
-		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Aux_2, Cont_Aux_1, Cont_Aux_2),
 		NewIndex is Index + 1, 
-		Body = ((SubCall, Test_For_True), MoreBody),
-		status_operation(Status_Out, UQV_Aux_2, UQV_Out, Cont_Aux_2, Cont_Out),
+		Body = (SubCall, MoreBody),
+		status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
 		generate_subcalls_1(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
 	    )
 	).
