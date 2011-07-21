@@ -41,7 +41,7 @@ cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out) :-
 
 cneg_initialize([], _UQV_Out, 'true', _Cont_Out).
 cneg_test_for_true(UQV_Out, UQV_Out, 'true', 'true').
-cneg_test_for_fail(_UQV_Aux, _UQV_Out, 'fail', 'fail').
+cneg_test_for_fail(UQV_Out, UQV_Out, 'fail', 'fail').
 
 
 % cneg_tr contains the code transformation needed by cneg_lib

@@ -58,7 +58,7 @@ trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
 trans_sent_aux(Clause, [Clause], _SourceFileName) :-
-	debug_msg(1, 'INFO :: save_sent_info(Clause) ', save_sent_info(Clause)),
+	debug_msg(0, 'INFO :: save_sent_info(Clause) ', save_sent_info(Clause)),
 	save_sent_info(Clause).
 
 save_sent_info(Clause) :-
@@ -88,9 +88,9 @@ unifications_in_head_to_equality(Head, New_Head, Equality) :-
 
 %split_disjunctions_in_bodies(Body, Bodies)
 split_disjunctions_in_bodies(Body, Bodies) :- 
-	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), 
+	debug_msg(0, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), 
 	split_disjunctions_in_bodies_aux(Body, Bodies),
-	debug_msg(1, 'INFO :: split_disjunctions_in_bodies :: Bodies ', Bodies), 
+	debug_msg(0, 'INFO :: split_disjunctions_in_bodies :: Bodies ', Bodies), 
 	!.
 
 split_disjunctions_in_bodies_aux(Body, Bodies) :- 
@@ -166,14 +166,14 @@ retrieve_list_of(_List_Name, []).
 trans_sent_eof(Cls_Out, _SourceFileName) :-
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
-	debug_msg_list(1, 'List_Of_Preds', List_Of_Preds),
+	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
 	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1)),
 	generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1),
 	debug_msg_list(0, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
-	debug_msg_list(1, 'List_Of_H_and_B', List_Of_H_and_B),
+	debug_msg_list(0, 'List_Of_H_and_B', List_Of_H_and_B),
 	negate_head_and_bodies(List_Of_H_and_B, Cls_1, Cls_2),
 	debug_msg_list(0, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
@@ -182,7 +182,7 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	!, %Backtracking forbiden.
 	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_Out),
 	nl, nl,
-	debug_msg_list(1, 'Cls_Out', Cls_Out),
+	debug_msg_list(0, 'Cls_Out', Cls_Out),
 	nl, nl, 
 	!. %Backtracking forbiden.
 
@@ -193,9 +193,9 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 %generate_main_cls(List_Of_Preds, Cls_1).
 generate_cneg_main_cls([], Cls, Cls) :- !.
 generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
-	debug_msg(1, 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	debug_msg(0, 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
-	debug_msg(1, 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+	debug_msg(0, 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 	!, %Backtracking forbiden.
 	generate_cneg_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
 
@@ -222,11 +222,13 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 
 	functor_local(Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Args_SubCall),
 	adjust_last_four_args(New_Arity, Head_Aux_Cl, Status_Head_Aux_Cl),
-	debug_msg(1, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+	debug_msg(0, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 
 	% We need to copy the args from the aux functor to the aux_i functors.
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	generate_all_the_subcalls(1, Info_Aux_Cl, Body_Aux_Cl, Status_Head_Aux_Cl). 
+	generate_subcalls_1(1, Info_Aux_Cl, Body_Aux_Cl_1, Status_Head_Aux_Cl),
+	generate_subcalls_2(1, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl),
+	Body_Aux_Cl = ((Body_Aux_Cl_1) ; (Body_Aux_Cl_2)). 
 
 head_aux_cl_info(head_aux_cl_info_aux(Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity), 
 	Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity).
@@ -249,32 +251,67 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
 
-generate_all_the_subcalls(_Index, Info_Aux_Cl, 'true', Status) :- 
+generate_subcalls_1(_Index, Info_Aux_Cl, 'fail', Status) :- 
 	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
 	status_operation(Status, UQV_In, UQV_In, Cont_In, Cont_In),
 	!.
-generate_all_the_subcalls(Index, Info_Aux_Cl, Body, Status_In) :-
+generate_subcalls_1(Index, Info_Aux_Cl, Body, Status_In) :-
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
-	functor_local(SubCall, SubCall_Name, New_Arity, _Args), 
+
+	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
 	copy_args(Arity, Head_Aux_Cl, SubCall),
+	status_operation(Status_Aux_1, UQV_In, UQV_Aux_1, Cont_In, Cont_Aux_1),
+	adjust_last_four_args(New_Arity, SubCall, Status_Aux_1),
+	
+	functor_local(Test_For_True, 'cneg_test_for_true', 4, Status_Aux_2),
 	(
 	    (
 		Index == Counter,
-		status_operation(Status_Aux, UQV_In, UQV_Out, Cont_In, Cont_Out),
-		adjust_last_four_args(New_Arity, SubCall, Status_Aux),
-		Body = SubCall 
+		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Out, Cont_Aux_1, Cont_Out),
+		Body = (SubCall, Test_For_True)
 	    )
 	;
 	    (
 		Index < Counter,
-		status_operation(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
-		adjust_last_four_args(New_Arity, SubCall, Status_Aux),
+		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Aux_2, Cont_Aux_1, Cont_Aux_2),
 		NewIndex is Index + 1, 
-		Body = (SubCall, (TestForFail ; (TestForTrue, MoreBody))),
-		status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
-		generate_all_the_subcalls(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
+		Body = ((SubCall, Test_For_True), MoreBody),
+		status_operation(Status_Out, UQV_Aux_2, UQV_Out, Cont_Aux_2, Cont_Out),
+		generate_subcalls_1(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
+	    )
+	).
+
+generate_subcalls_2(_Index, Info_Aux_Cl, 'fail', Status) :- 
+	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
+	status_operation(Status, UQV_In, UQV_In, Cont_In, Cont_In),
+	!.
+generate_subcalls_2(Index, Info_Aux_Cl, Body, Status_In) :-
+	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
+	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
+
+	functor_local(SubCall, SubCall_Name, New_Arity, _Args), 
+	copy_args(Arity, Head_Aux_Cl, SubCall),
+	status_operation(Status_Aux_1, UQV_In, UQV_Aux_1, Cont_In, Cont_Aux_1),
+	adjust_last_four_args(New_Arity, SubCall, Status_Aux_1),
+
+	functor_local(Test_For_Fail, 'cneg_test_for_fail', 4, Status_Aux_2),
+	(
+	    (
+		Index == Counter,
+		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Out, Cont_Aux_1, Cont_Out),
+		Body = (SubCall, Test_For_Fail) 
+	    )
+	;
+	    (
+		Index < Counter,
+		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Aux_2, Cont_Aux_1, Cont_Aux_2),
+		NewIndex is Index + 1, 
+		Body = ((SubCall, Test_For_Fail) ; MoreBody),
+		status_operation(Status_Out, UQV_Aux_2, UQV_Out, Cont_Aux_2, Cont_Out),
+		generate_subcalls_2(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
 	    )
 	).
 
@@ -421,9 +458,9 @@ generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
 generate_dn_cls([], Cls_In, Cls_In).
 generate_dn_cls([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	debug_msg(1, 'generate_dn_cls :: (Head, Body, Counter)', (Head, Body, Counter)),
+	debug_msg(0, 'generate_dn_cls :: (Head, Body, Counter)', (Head, Body, Counter)),
 	generate_dn_cl(Head, Body, Counter, New_Cl), !,
-	debug_msg(1, 'generate_dn_cls :: New_Cl', New_Cl),
+	debug_msg(0, 'generate_dn_cls :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	generate_dn_cls(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -488,9 +525,9 @@ generate_dn_atom(Atom, New_Atom, Status) :-
 
 generate_double_negation_main_cls([], Cls, Cls) :- !.
 generate_double_negation_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
-	debug_msg(1, 'generate_double_negation_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	debug_msg(0, 'generate_double_negation_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl, DN_Aux_Cl),
-	debug_msg(1, 'generate_double_negation_main_cls :: (Main_Cl, Aux_Cl)', (DN_Main_Cl, DN_Aux_Cl)),
+	debug_msg(0, 'generate_double_negation_main_cls :: (Main_Cl, Aux_Cl)', (DN_Main_Cl, DN_Aux_Cl)),
 	!, %Backtracking forbiden.
 	generate_double_negation_main_cls(List_Of_Preds, [DN_Main_Cl | [DN_Aux_Cl | Cls_In]], Cls_Out).
 
