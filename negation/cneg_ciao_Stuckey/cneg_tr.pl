@@ -8,8 +8,6 @@
 :- module(cneg_tr,[trans_sent/3, trans_clause/3, cneg_main_and_aux_cl_names/3],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
-% :- use_module(cneg_diseq,[cneg_diseq/3, cneg_eq/2]).
-% :- use_module(cneg_lib, _).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
@@ -19,7 +17,6 @@
 
 :- comment(summary, "This module does de transformation needed to evaluate 
 	the constructive negation of any predicate in the original file.").
-
 
 % dynamic predicate(s) 
 :- data cneg_list_of_heads_and_bodies/1.
@@ -233,7 +230,11 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	debug_msg(1, 'generate_cneg_main_cl :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 
 	% We need to copy the args from the aux functor to the aux_i functors.
-	generate_all_the_subcalls(Counter, Aux_Cl_Name, New_Arity, Body_Aux_Cl, FI_2, FO_2, CI_2, CO_2).
+	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
+	generate_all_the_subcalls(1, Info_Aux_Cl, Body_Aux_Cl, FI_2, FO_2, CI_2, CO_2). 
+
+head_aux_cl_info(head_aux_cl_info_aux(Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity), 
+	Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity).
 
 adjust_last_four_args(Arity, Functor, UQV_In, UQV_Out, Cont_In, Cont_Out) :-
 	arg(Arity, Functor, Cont_Out), 
@@ -252,13 +253,29 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
 
-generate_all_the_subcalls(0, _Aux_Cl_Name, _Arity, 'true', F_In, F_In, Cont_In, Cont_In) :- !.
-generate_all_the_subcalls(Counter, Aux_Cl_Name, Arity, (Body, Current), F_In, F_Out, Cont_In, Cont_Out) :-
-	generate_name_from_counter(Counter, Aux_Cl_Name, Current_Name),
-	functor_local(Current, Current_Name, Arity, _Args), 
-	adjust_last_four_args(Arity, Current, New_F_Out, F_Out, New_Cont_Out, Cont_Out),
-	NewCounter is Counter - 1, 
-	generate_all_the_subcalls(NewCounter, Aux_Cl_Name, Arity, Body, F_In, New_F_Out, Cont_In, New_Cont_Out).
+generate_all_the_subcalls(_Index, Info_Aux_Cl, 'true', F_In, F_In, Cont_In, Cont_In) :- 
+	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
+	!.
+generate_all_the_subcalls(Index, Info_Aux_Cl, Body, F_In, F_Out, Cont_In, Cont_Out) :-
+	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
+	generate_name_from_counter(Counter, Aux_Cl_Name, SubCall_Name),
+	functor_local(SubCall, SubCall_Name, New_Arity, _Args), 
+	copy_args(Arity, Head_Aux_Cl, SubCall),
+	(
+	    (
+		Index == Counter,
+		adjust_last_four_args(New_Arity, SubCall, F_In, F_Out, Cont_In, Cont_Out),
+		Body = SubCall
+	    )
+	;
+	    (
+		Index < Counter,
+		adjust_last_four_args(New_Arity, SubCall, F_In, F_Aux, Cont_In, Cont_Aux),
+		NewIndex is Index + 1, 
+		Body = (SubCall, MoreBody),
+		generate_all_the_subcalls(NewIndex, Info_Aux_Cl, MoreBody, F_Aux, F_Out, Cont_Aux, Cont_Out)
+	    )
+	).
 
 generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 	name(Aux_Cl_Name, String_1),
