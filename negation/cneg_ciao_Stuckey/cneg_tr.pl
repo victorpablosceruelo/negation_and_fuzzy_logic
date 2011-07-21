@@ -245,9 +245,9 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
 
-generate_subcalls_1(Index, Info_Aux_Cl, (Adjust_Cont_Out, Body), Status) :- 
+generate_subcalls_1(Index, Info_Aux_Cl, (Test_For_True, Body), Status) :- 
 	status_operation(Status, _UQV_In, _UQV_Out, _Cont_In, Cont_Out),
-	functor_local(Adjust_Cont_Out, '=', 2, [Cont_Out |[ 'true' ]]),
+	test_for_true(Test_For_True, Cont_Out),
 	generate_subcalls_1_aux(Index, Info_Aux_Cl, Body, Status).
 
 generate_subcalls_1_aux(_Index, Info_Aux_Cl, 'fail', Status) :- 
@@ -281,9 +281,9 @@ generate_subcalls_1_aux(Index, Info_Aux_Cl, Body, Status_In) :-
 	    )
 	).
 
-generate_subcalls_2(Index, Info_Aux_Cl, (Adjust_Cont_Out, Body), Status) :- 
+generate_subcalls_2(Index, Info_Aux_Cl, (Test_For_Fail, Body), Status) :- 
 	status_operation(Status, _UQV_In, _UQV_Out, _Cont_In, Cont_Out),
-	functor_local(Adjust_Cont_Out, '=', 2, [Cont_Out |['fail']]),
+	test_for_fail(Test_For_Fail, Cont_Out),
 	generate_subcalls_2_aux(Index, Info_Aux_Cl, Body, Status).
 
 generate_subcalls_2_aux(_Index, Info_Aux_Cl, 'fail', Status) :- 
@@ -544,3 +544,9 @@ generate_double_negation_main_cl(Head_Name, Arity, Counter, DN_Main_Cl, DN_Aux_C
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+test_for_true(Test_For_True, Var) :-
+	functor_local(Test_For_True, '=', 2, [Var |[ 'true' ]]).
+
+test_for_fail(Test_For_True, Var) :-
+	functor_local(Test_For_True, '=', 2, [Var |['fail']]).
