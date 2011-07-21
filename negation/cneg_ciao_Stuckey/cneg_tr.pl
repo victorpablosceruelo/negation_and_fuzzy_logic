@@ -245,20 +245,24 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
 
-generate_subcalls_1(_Index, Info_Aux_Cl, 'fail', Status) :- 
+generate_subcalls_1(Index, Info_Aux_Cl, (Adjust_Cont_Out, Body), Status) :- 
+	status_operation(Status, _UQV_In, _UQV_Out, _Cont_In, Cont_Out),
+	functor_local(Adjust_Cont_Out, '=', 2, [Cont_Out |[ 'true' ]]),
+	generate_subcalls_1_aux(Index, Info_Aux_Cl, Body, Status).
+
+generate_subcalls_1_aux(_Index, Info_Aux_Cl, 'fail', Status) :- 
 	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
 	status_operation(Status, UQV_In, UQV_In, Cont_In, Cont_In),
 	!.
-generate_subcalls_1(Index, Info_Aux_Cl, Body, Status_In) :-
+generate_subcalls_1_aux(Index, Info_Aux_Cl, Body, Status_In) :-
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
 
 	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
 	copy_args(Arity, Head_Aux_Cl, SubCall),
-	adjust_last_four_args(New_Arity, SubCall, Status_Aux_1),
-	status_operation(Status_Aux_1, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
-	Cont_Aux = 'true', % This substitutes cneg_test_for_true.
+	adjust_last_four_args(New_Arity, SubCall, Status_Aux),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
 
 	(
 	    (
@@ -273,39 +277,37 @@ generate_subcalls_1(Index, Info_Aux_Cl, Body, Status_In) :-
 		NewIndex is Index + 1, 
 		Body = (SubCall, MoreBody),
 		status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
-		generate_subcalls_1(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
+		generate_subcalls_1_aux(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
 	    )
 	).
 
-generate_subcalls_2(_Index, Info_Aux_Cl, 'fail', Status) :- 
+generate_subcalls_2(Index, Info_Aux_Cl, (Adjust_Cont_Out, Body), Status) :- 
+	status_operation(Status, _UQV_In, _UQV_Out, _Cont_In, Cont_Out),
+	functor_local(Adjust_Cont_Out, '=', 2, [Cont_Out |['fail']]),
+	generate_subcalls_2_aux(Index, Info_Aux_Cl, Body, Status).
+
+generate_subcalls_2_aux(_Index, Info_Aux_Cl, 'fail', Status) :- 
 	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
 	status_operation(Status, UQV_In, UQV_In, Cont_In, Cont_In),
 	!.
-generate_subcalls_2(Index, Info_Aux_Cl, Body, Status_In) :-
-	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
+generate_subcalls_2_aux(Index, Info_Aux_Cl, Body, Status_In) :-
+	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Arity),
 	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
 
 	functor_local(SubCall, SubCall_Name, New_Arity, _Args), 
-	copy_args(Arity, Head_Aux_Cl, SubCall),
-	status_operation(Status_Aux_1, UQV_In, UQV_Aux_1, Cont_In, Cont_Aux_1),
-	adjust_last_four_args(New_Arity, SubCall, Status_Aux_1),
+	copy_args(New_Arity, Head_Aux_Cl, SubCall),
 
-	functor_local(Test_For_Fail, 'cneg_test_for_fail', 4, Status_Aux_2),
 	(
 	    (
 		Index == Counter,
-		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Out, Cont_Aux_1, Cont_Out),
-		Body = (SubCall, Test_For_Fail) 
+		Body = SubCall 
 	    )
 	;
 	    (
 		Index < Counter,
-		status_operation(Status_Aux_2, UQV_Aux_1, UQV_Aux_2, Cont_Aux_1, Cont_Aux_2),
 		NewIndex is Index + 1, 
-		Body = ((SubCall, Test_For_Fail) ; MoreBody),
-		status_operation(Status_Out, UQV_Aux_2, UQV_Out, Cont_Aux_2, Cont_Out),
-		generate_subcalls_2(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
+		Body = (SubCall; MoreBody),
+		generate_subcalls_2_aux(NewIndex, Info_Aux_Cl, MoreBody, Status_In)
 	    )
 	).
 
