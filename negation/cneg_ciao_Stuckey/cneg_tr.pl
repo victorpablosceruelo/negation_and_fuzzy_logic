@@ -264,7 +264,7 @@ generate_all_the_subcalls(Index, Info_Aux_Cl, Body, Status_In) :-
 		Index == Counter,
 		status_operation(Status_Aux, UQV_In, UQV_Out, Cont_In, Cont_Out),
 		adjust_last_four_args(New_Arity, SubCall, Status_Aux),
-		Body = SubCall
+		Body = SubCall 
 	    )
 	;
 	    (
@@ -272,7 +272,7 @@ generate_all_the_subcalls(Index, Info_Aux_Cl, Body, Status_In) :-
 		status_operation(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
 		adjust_last_four_args(New_Arity, SubCall, Status_Aux),
 		NewIndex is Index + 1, 
-		Body = (SubCall, MoreBody),
+		Body = (SubCall, (TestForFail ; (TestForTrue, MoreBody))),
 		status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
 		generate_all_the_subcalls(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
 	    )
@@ -328,7 +328,7 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 
 negate_body_conj([], Test_True, Status) :- !,
 %	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	functor_local(Test_True, 'cneg_test_for_true', 4, Status).
+	functor_local(Test_True, 'cneg_test_for_fail', 4, Status).
 
 negate_body_conj([Atom | Body], (Negated_Atom, (Test_True ; (Test_Fail, Negated_Body))), Status) :-
 	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
