@@ -542,8 +542,8 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 
 	test_for_true(Test_For_True, Cont_In),
 	test_for_fail(Test_For_Fail, Cont_In),
-	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Cont_In, Cont_Out),
+	generate_equality(Op_1, UQV_Aux, UQV_Out),
+	generate_equality(Op_2, Cont_Aux, Cont_Out),
 
 	functor_local(Head, Head_Name, New_Arity, _Head_Args),
 	generate_name_with_counter(Head_Name, Index, New_Name),
