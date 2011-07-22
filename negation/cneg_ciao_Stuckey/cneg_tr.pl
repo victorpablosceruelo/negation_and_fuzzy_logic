@@ -473,26 +473,10 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	generate_dn_body(Body, Head, Counter, Status, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
-
-generate_dn_body([], Head, Counter, Status_In, (Ops_When_True ; Ops_When_Fail)) :-
+generate_dn_body([], Head, Counter, Status_In, (Op_1, Op_2)) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
-
-	test_for_true(Test_For_True, Cont_In),
-	test_for_fail(Test_For_Fail, Cont_In),
 	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Cont_In, Cont_Out),
-
-	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
-	Ops_When_Fail = (Test_For_Fail, Next_SubCall),
-
-	functor_local(Head, Name, Arity, _Args),
-	New_Arity is Arity + 4,
-	New_Counter is Counter + 1,
-	generate_double_negation_name_with_counter(Name, New_Counter, New_Name),
-	functor_local(Next_SubCall, New_Name, New_Arity, _New_Args),
-	copy_args(Arity, Head, Next_SubCall),
-	status_operation(Status_Out, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	adjust_last_four_args(New_Arity, Next_SubCall, Status_Out).
+	generate_equality(Op_2, Cont_In, Cont_Out).
 
 generate_dn_body([Atom | Body], Head, Counter, Status_In, (New_Atom, New_Body)) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
@@ -549,6 +533,25 @@ generate_double_negation_main_cl(Head_Name, Arity, Counter, DN_Main_Cl, DN_Aux_C
 	New_Counter is Counter + 1,
 	generate_double_negation_name_with_counter(Head_Name, New_Counter, Head_DN_Aux_Cl_Name),
 	functor_local(Head_DN_Aux_Cl, Head_DN_Aux_Cl_Name, New_Arity, _Args_Head).
+
+Ops_When_True ; Ops_When_Fail)
+	test_for_true(Test_For_True, Cont_In),
+	test_for_fail(Test_For_Fail, Cont_In),
+	generate_equality(Op_1, UQV_In, UQV_Out),
+	generate_equality(Op_2, Cont_In, Cont_Out),
+
+	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_Fail = (Test_For_Fail, Next_SubCall),
+
+	functor_local(Head, Name, Arity, _Args),
+	New_Arity is Arity + 4,
+	New_Counter is Counter + 1,
+	generate_double_negation_name_with_counter(Name, New_Counter, New_Name),
+	functor_local(Next_SubCall, New_Name, New_Arity, _New_Args),
+	copy_args(Arity, Head, Next_SubCall),
+	status_operation(Status_Out, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	adjust_last_four_args(New_Arity, Next_SubCall, Status_Out).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
