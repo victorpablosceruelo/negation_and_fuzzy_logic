@@ -359,23 +359,26 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	% Build new clause.
 	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, Neg_Body)]]).
 
-negate_body_conj([], Test_True, Status) :- !,
-%	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	functor_local(Test_True, 'cneg_test_for_fail', 4, Status).
-
-negate_body_conj([Atom | Body], (Negated_Atom, (Test_True ; (Test_Fail, Negated_Body))), Status) :-
+negate_body_conj([], (Op_1, Op_2), Status) :- !,
 	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	
-	negate_atom(Atom, Negated_Atom, UQV_In, UQV_Aux_1, Cont_In, Cont_Aux_1), 
+	generate_equality(Op_1, UQV_In, UQV_Out),
+	generate_equality(Op_2, Cont_In, Cont_Out).
 
-	status_operation(Status_Test_True, UQV_Aux_1, UQV_Out, Cont_Aux_1, Cont_Out),
-	functor_local(Test_True, 'cneg_test_for_true', 4, Status_Test_True),
+negate_body_conj([Atom | Body], Negated_Body, Status_In) :-
+	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	negate_atom(Atom, Negated_Atom, UQV_In, UQV_Aux, Cont_In, Cont_Aux), 
 
-	status_operation(Status_Fail_True, UQV_Aux_1, UQV_Aux_2, Cont_Aux_1, Cont_Aux_2),
-	functor_local(Test_Fail, 'cneg_test_for_fail', 4, Status_Fail_True),
+	test_for_true(Test_For_True, Cont_Aux),
+	test_for_fail(Test_For_Fail, Cont_Aux),
+	generate_equality(Op_1, UQV_Aux, UQV_Out),
+	generate_equality(Op_2, Cont_Aux, Cont_Out),
 
-	status_operation(Status_Aux, UQV_Aux_2, UQV_Out, Cont_Aux_2, Cont_Out),
-	negate_body_conj(Body, Negated_Body, Status_Aux).
+	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_Fail = (Test_For_Fail, New_Negated_Body),
+	Negated_Body = (Negated_Atom, (Ops_When_True ; Ops_When_Fail)),
+
+	status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
+	negate_body_conj(Body, New_Negated_Body, Status_Out).
 
 
 % negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Cont_In, Cont_Out).
@@ -448,7 +451,7 @@ generate_double_negation_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	debug_msg(1, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
 	generate_dn_cls(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
@@ -471,19 +474,25 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
 
-generate_dn_body([], Head, Counter, Status_In, (Test_1 ; (Test_2 , SubCall))) :-
-	functor_local(Test_1, 'cneg_test_for_true', 4, Status_In),
+generate_dn_body([], Head, Counter, Status_In, (Ops_When_True ; Ops_When_Fail)) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
-	functor_local(Test_2, 'cneg_test_for_fail', 4, Status_Aux),
+
+	test_for_true(Test_For_True, Cont_In),
+	test_for_fail(Test_For_Fail, Cont_In),
+	generate_equality(Op_1, UQV_In, UQV_Out),
+	generate_equality(Op_2, Cont_In, Cont_Out),
+
+	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_Fail = (Test_For_Fail, Next_SubCall),
+
 	functor_local(Head, Name, Arity, _Args),
 	New_Arity is Arity + 4,
 	New_Counter is Counter + 1,
 	generate_double_negation_name_with_counter(Name, New_Counter, New_Name),
-	functor_local(SubCall, New_Name, New_Arity, _New_Args),
-	copy_args(Arity, Head, SubCall),
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
-	adjust_last_four_args(New_Arity, SubCall, Status_Out).
+	functor_local(Next_SubCall, New_Name, New_Arity, _New_Args),
+	copy_args(Arity, Head, Next_SubCall),
+	status_operation(Status_Out, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	adjust_last_four_args(New_Arity, Next_SubCall, Status_Out).
 
 generate_dn_body([Atom | Body], Head, Counter, Status_In, (New_Atom, New_Body)) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
@@ -546,7 +555,14 @@ generate_double_negation_main_cl(Head_Name, Arity, Counter, DN_Main_Cl, DN_Aux_C
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 test_for_true(Test_For_True, Var) :-
-	functor_local(Test_For_True, '=', 2, [Var |[ 'true' ]]).
+	generate_equality(Test_For_True, Var, 'true').
 
 test_for_fail(Test_For_True, Var) :-
-	functor_local(Test_For_True, '=', 2, [Var |['fail']]).
+	generate_equality(Test_For_True, Var, 'fail').
+
+generate_equality(Equality, Term_1, Term_2) :-
+	functor_local(Equality, '=', 2, [Term_1 |[Term_2]]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
