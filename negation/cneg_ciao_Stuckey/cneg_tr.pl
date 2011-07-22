@@ -438,12 +438,11 @@ generate_double_negation_name(Name, New_Name) :-
 	append("double_negation_", String_Name, String_New_Name),
 	name(New_Name, String_New_Name).
 
-generate_double_negation_name_with_counter(Name, Counter, New_Name) :-
-	generate_double_negation_name(Name, Tmp_Name),
-	name(Tmp_Name, String_Tmp_Name),
+generate_name_with_counter(Name, Counter, New_Name) :-
+	name(Name, String_Name),
 	name(Counter, String_Counter),
-	append(String_Tmp_Name, "_", String_Tmp_Name_2),
-	append(String_Tmp_Name_2, String_Counter, String_New_Name),
+	append(String_Name, "_", String_Name_Tmp),
+	append(String_Name_Tmp, String_Counter, String_New_Name),
 	name(New_Name, String_New_Name).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -465,7 +464,8 @@ generate_dn_cls([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
 
 generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	functor_local(Head, Name, Arity, _Args),
-	generate_double_negation_name_with_counter(Name, Counter, New_Name),
+	generate_double_negation_name(Name, Aux_Name),
+	generate_name_with_counter(Aux_Name, Counter, New_Name),
 	New_Arity is Arity + 4,
 	functor_local(New_Head, New_Name, New_Arity, _New_Args),
 	copy_args(Arity, Head, New_Head),
@@ -473,7 +473,7 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	generate_dn_body(Body, Head, Counter, Status, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
-generate_dn_body([], Head, Counter, Status_In, (Op_1, Op_2)) :-
+generate_dn_body([], _Head, _Counter, Status_In, (Op_1, Op_2)) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	generate_equality(Op_1, UQV_In, UQV_Out),
 	generate_equality(Op_2, Cont_In, Cont_Out).
@@ -520,37 +520,52 @@ generate_double_negation_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_
 	!, %Backtracking forbiden.
 	generate_double_negation_main_cls(List_Of_Preds, [DN_Main_Cl | [DN_Aux_Cl | Cls_In]], Cls_Out).
 
-generate_double_negation_main_cl(Head_Name, Arity, Counter, DN_Main_Cl, DN_Aux_Cl) :-
+generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	generate_double_negation_name(Head_Name, New_Head_Name),
-	functor_local(DN_Main_Cl, ':-', 2, [Head_DN_Main_Cl |[ SubCall ]]),
+	functor_local(Main_Cl, ':-', 2, [Head |[ SubCalls ]]),
 	New_Arity is Arity + 4,
-	functor_local(Head_DN_Main_Cl, New_Head_Name, New_Arity, _Args_Head),
-	generate_double_negation_name_with_counter(Head_Name, 1, SubCall_Name),
-	functor_local(SubCall, SubCall_Name, New_Arity, _Args_SubCall),
-	copy_args(New_Arity, Head_DN_Main_Cl, SubCall), 
-	
-	functor_local(DN_Aux_Cl, ':-', 2, [Head_DN_Aux_Cl |[ fail ]]),
-	New_Counter is Counter + 1,
-	generate_double_negation_name_with_counter(Head_Name, New_Counter, Head_DN_Aux_Cl_Name),
-	functor_local(Head_DN_Aux_Cl, Head_DN_Aux_Cl_Name, New_Arity, _Args_Head).
+	functor_local(Head, New_Head_Name, New_Arity, _Args_Head),
+%	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	adjust_last_four_args(New_Arity, Head, Status),
 
-Ops_When_True ; Ops_When_Fail)
+	generate_double_negation_subcalls(Head, Arity, Status, 1, Counter, SubCalls),
+	Aux_Cl = 'true'. % Not used.
+	
+%	functor_local(DN_Aux_Cl, ':-', 2, [Head_DN_Aux_Cl |[ fail ]]),
+%	New_Counter is Counter + 1,
+%	generate_double_negation_name_with_counter(Head_Name, New_Counter, Head_DN_Aux_Cl_Name),
+%	functor_local(Head_DN_Aux_Cl, Head_DN_Aux_Cl_Name, New_Arity, _Args_Head).
+
+%	generate_double_negation_name_with_counter(Head_Name, 1, SubCall_Name),
+%	functor_local(SubCall, SubCall_Name, New_Arity, _Args_SubCall),
+%	copy_args(New_Arity, Head_DN_Main_Cl, SubCall), 
+
+generate_double_negation_subcalls(_Head, _Arity, _Status, Index, Counter, 'fail') :-
+	Counter < Index, !. % Security check.
+
+generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :-
+	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	Ops = (SubCall, (Ops_When_True ; Ops_When_Fail)), 
+
+	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_Fail = (Test_For_Fail, More_Ops),
+
 	test_for_true(Test_For_True, Cont_In),
 	test_for_fail(Test_For_Fail, Cont_In),
 	generate_equality(Op_1, UQV_In, UQV_Out),
 	generate_equality(Op_2, Cont_In, Cont_Out),
 
-	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
-	Ops_When_Fail = (Test_For_Fail, Next_SubCall),
+	functor_local(Head, Head_Name, New_Arity, _Head_Args),
+	generate_name_with_counter(Head_Name, Index, New_Name),
 
-	functor_local(Head, Name, Arity, _Args),
-	New_Arity is Arity + 4,
+	functor_local(SubCall, New_Name, New_Arity, _SubCall_Args),
+	copy_args(Arity, Head, SubCall),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
+	adjust_last_four_args(New_Arity, SubCall, Status_Aux),
+
+	status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
 	New_Counter is Counter + 1,
-	generate_double_negation_name_with_counter(Name, New_Counter, New_Name),
-	functor_local(Next_SubCall, New_Name, New_Arity, _New_Args),
-	copy_args(Arity, Head, Next_SubCall),
-	status_operation(Status_Out, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	adjust_last_four_args(New_Arity, Next_SubCall, Status_Out).
+	generate_double_negation_subcalls(Head, Arity, Status_Out, Index, New_Counter, More_Ops).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
