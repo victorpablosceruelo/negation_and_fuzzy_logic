@@ -450,7 +450,7 @@ generate_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	debug_msg(1, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	debug_msg(0, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
 	generate_dn_cls(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
@@ -515,12 +515,12 @@ generate_dn_atom(Atom, New_Atom, Status) :-
 generate_double_negation_main_cls([], Cls, Cls) :- !.
 generate_double_negation_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
 	debug_msg(0, 'generate_double_negation_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
-	generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl, DN_Aux_Cl),
-	debug_msg(0, 'generate_double_negation_main_cls :: (Main_Cl, Aux_Cl)', (DN_Main_Cl, DN_Aux_Cl)),
+	generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
+	debug_msg(0, 'generate_double_negation_main_cls :: Main_Cl', DN_Main_Cl),
 	!, %Backtracking forbiden.
-	generate_double_negation_main_cls(List_Of_Preds, [DN_Main_Cl | [DN_Aux_Cl | Cls_In]], Cls_Out).
+	generate_double_negation_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
 
-generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl, Aux_Cl) :-
+generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	generate_double_negation_name(Head_Name, New_Head_Name),
 	functor_local(Main_Cl, ':-', 2, [Head |[ SubCalls ]]),
 	New_Arity is Arity + 4,
@@ -528,17 +528,7 @@ generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 %	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	adjust_last_four_args(New_Arity, Head, Status),
 
-	generate_double_negation_subcalls(Head, Arity, Status, 1, Counter, SubCalls),
-	Aux_Cl = 'true'. % Not used.
-	
-%	functor_local(DN_Aux_Cl, ':-', 2, [Head_DN_Aux_Cl |[ fail ]]),
-%	New_Counter is Counter + 1,
-%	generate_double_negation_name_with_counter(Head_Name, New_Counter, Head_DN_Aux_Cl_Name),
-%	functor_local(Head_DN_Aux_Cl, Head_DN_Aux_Cl_Name, New_Arity, _Args_Head).
-
-%	generate_double_negation_name_with_counter(Head_Name, 1, SubCall_Name),
-%	functor_local(SubCall, SubCall_Name, New_Arity, _Args_SubCall),
-%	copy_args(New_Arity, Head_DN_Main_Cl, SubCall), 
+	generate_double_negation_subcalls(Head, Arity, Status, 1, Counter, SubCalls).
 
 generate_double_negation_subcalls(_Head, _Arity, _Status, Index, Counter, 'fail') :-
 	Counter < Index, !. % Security check.
@@ -564,8 +554,8 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 	adjust_last_four_args(New_Arity, SubCall, Status_Aux),
 
 	status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
-	New_Counter is Counter + 1,
-	generate_double_negation_subcalls(Head, Arity, Status_Out, Index, New_Counter, More_Ops).
+	New_Index is Index + 1,
+	generate_double_negation_subcalls(Head, Arity, Status_Out, New_Index, Counter, More_Ops).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
