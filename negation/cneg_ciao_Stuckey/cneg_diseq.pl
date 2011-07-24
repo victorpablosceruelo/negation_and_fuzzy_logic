@@ -526,12 +526,9 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
  	functor_local(T1, Name, Arity, Args_1),
 	functor_local(T2, Name, Arity, Args_2), !,
 
-	status_operation(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
-	status_operation(Status_Aux, UQV_In, UQV_Out, 'fail', Cont_Out), % Pq este es fail?
-
 	disequalities_cartesian_product(Args_1, Args_2, Diseq_List),
 	cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
-	simplify_disequation_aux(New_More_Diseqs, Accept_Fails, Status_Aux, Answer).
+	simplify_disequation_aux(New_More_Diseqs, Accept_Fails, Status_In, Answer).
 
 simplify_disequation_aux([Diseq | _More_Diseqs], _Accept_Fails, Status_In, Answer):-  % Functors that do not unify.
 	disequality_contents(Diseq, T1, T2),
@@ -598,10 +595,10 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
+		cneg_aux:memberchk(T1, UQV_In), !,
 		(   (   Accept_Fails == 'false', !, fail )
 		;   (	Accept_Fails == 'true',
 			!,
-			cneg_aux:memberchk(T1, UQV_In), !,
 			varsbag_remove_var(T1, UQV_In, UQV_Aux),
 			cneg_unify(T1, T2),
 			status_operation(Status_Out, UQV_Aux, UQV_Out, 'fail', Cont_Out),
