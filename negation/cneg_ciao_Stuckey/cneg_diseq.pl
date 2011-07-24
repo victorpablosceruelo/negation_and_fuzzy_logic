@@ -184,7 +184,7 @@ verify_attribute(Attribute, Target):-
 	status_operation(Status, UQV_In, _UQV_Out, 'true', 'true'),
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 %	test_and_update_vars_attributes(Status_In, Accept_Fails, Substitutions, New_Disequalities)
-	test_and_update_vars_attributes(Status, 'false', [], Disequalities).
+	test_and_update_vars_attributes(Status, 'fail', [], Disequalities).
 
 
 % Only for Ciao prolog 
@@ -197,7 +197,7 @@ verify_attribute(Attribute, NewTarget):-
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
 %	test_and_update_vars_attributes(Status_In, Accept_Fails, Substitutions, New_Disequalities)
-	test_and_update_vars_attributes(Status, 'false', [Subst], Disequalities).
+	test_and_update_vars_attributes(Status, 'fail', [Subst], Disequalities).
 
 substitution_contents(substitute(Var, T), Var, T).
 
@@ -214,7 +214,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	status_operation(Status, UQV_In, _UQV_Out, 'true', 'true'),
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
-	test_and_update_vars_attributes(Status, 'false', [Subst], Disequalities).
+	test_and_update_vars_attributes(Status, 'fail', [Subst], Disequalities).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -423,7 +423,7 @@ simplify_disequation(Diseqs, Accept_Fails, Status, Answer) :-
 % The answer is obviously empty, but we might fail because of Cont_In = fail.
 simplify_disequation_aux([], Accept_Fails, Status_In, []) :- 
 	!,
-	(   (   Accept_Fails == 'false', !, fail )
+	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		status_operation(Status_In, UQV_In, UQV_In, _Cont_In, 'fail')
 	    )
@@ -435,7 +435,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
         var(T2), % Both are variables.
         T1==T2, !, % Both are the same variable.
 
-	(   (   Accept_Fails == 'false', !, fail )
+	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		!,
 		status_operation(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
@@ -451,7 +451,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	status_operation(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
 	cneg_aux:memberchk(T1, UQV_In), % Both are UQ vars.
 	cneg_aux:memberchk(T2, UQV_In), !,
-	(   (   Accept_Fails == 'false', !, fail )
+	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		!,
 		diseq_eq(T1, T2), % They can not be disunified, but are still UQ.
@@ -484,7 +484,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	    )
 	;
 	    (   % T1 and T2 can not be disunified. We assign Cont = fail. 
-		(   (   Accept_Fails == 'false', !, fail )
+		(   (   Accept_Fails == 'fail', !, fail )
 		;   (	Accept_Fails == 'true',
 			!,
 			diseq_eq(T1, T2), % Since they can not be disunified, unify them.
@@ -555,7 +555,7 @@ simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Accept_Fails, St
 	cneg_aux:memberchk(T1, UQV_In), !, % T1 is a uq var, T2 is not a uqvar.
 
 	% T1 is not different from T2. Just return fail to disunify, unify and continue.
-	(   (   Accept_Fails == 'false', !, fail )
+	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		!,
 		varsbag_remove_var(T1, UQV_In, UQV_Aux),
@@ -585,7 +585,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
 		cneg_aux:memberchk(T1, UQV_In), !,
-		(   (   Accept_Fails == 'false', !, fail )
+		(   (   Accept_Fails == 'fail', !, fail )
 		;   (	Accept_Fails == 'true',
 			!,
 			varsbag_remove_var(T1, UQV_In, UQV_Aux),
