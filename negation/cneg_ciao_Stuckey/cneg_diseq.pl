@@ -231,7 +231,8 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Por q tendriamos q tener en cuenta otros atributos?
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
-test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, Substitutions, New_Disequalities) :-
+test_and_update_vars_attributes(Status_In, Accept_Fails, Substitutions, New_Disequalities) :-
+	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
 	debug_msg(1, 'test_and_update_vars_attributes(UQV_In, Cont_In, Substitutions, New_Disequalities)', (UQV_In, Cont_In, Substitutions, New_Disequalities)), 
 
 	cneg_aux:varsbag(New_Disequalities, [], UQV_In, Vars_In), !,
@@ -243,8 +244,8 @@ test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, Substitution
 	debug_msg(1, 'Affected Disequalities', Disequalities),
 %	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UQV_In),
 
-	status_operation(Status, UQV_Diseqs, UQV_Out, Cont_In, Cont_Out),
-	simplify_disequations(Disequalities, Status, [], Simplified_Disequalities),
+	status_operation(Status_Aux, UQV_Diseqs, UQV_Out, Cont_In, Cont_Out),
+	simplify_disequations(Disequalities, Status_Aux, [], Simplified_Disequalities),
 	debug_msg(1, '(Simplified_Disequalities, UQV_Out)', (Simplified_Disequalities, UQV_Out)),
 	restore_attributes(UQV_Out, Simplified_Disequalities).
 
@@ -612,7 +613,8 @@ cneg_diseq(T1,T2, UQV_In, UQV_Out, Cont_In, Cont_Out):-
 	debug_msg(1, 'cneg_diseq :: (UQV_In, Cont_In)', (UQV_In, Cont_In)),
 
 	disequality_contents(Disequality, T1, T2),
-        test_and_update_vars_attributes(UQV_In, UQV_Out, Cont_In, Cont_Out, [], [Disequality]),
+	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
+        test_and_update_vars_attributes(Status, 'true', [], [Disequality]),
 
 	debug_msg(1, 'cneg_diseq :: (UQV_Out, Cont_Out)', (UQV_Out, Cont_Out)).
 
