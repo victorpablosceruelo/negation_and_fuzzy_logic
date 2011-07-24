@@ -226,7 +226,9 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 
 test_and_update_vars_attributes(Status_In, Accept_Fails, Substitutions, New_Disequalities) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Cont_In, Cont_Out),
-	debug_msg(1, 'test_and_update_vars_attributes(UQV_In, Cont_In, Substitutions, New_Disequalities)', (UQV_In, Cont_In, Substitutions, New_Disequalities)), 
+	debug_msg(1, 'test_and_update_vars_attributes :: Status_In', Status_In), 
+	debug_msg(1, 'test_and_update_vars_attributes :: Substitutions', Substitutions),
+	debug_msg(1, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
 
 	cneg_aux:varsbag(New_Disequalities, [], UQV_In, Vars_In), !,
 	retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Diseqs, New_Disequalities, Disequalities), !,
@@ -239,7 +241,8 @@ test_and_update_vars_attributes(Status_In, Accept_Fails, Substitutions, New_Dise
 
 	status_operation(Status_Aux, UQV_Diseqs, UQV_Out, Cont_In, Cont_Out),
 	simplify_disequations(Disequalities, Accept_Fails, Status_Aux, [], Simplified_Disequalities),
-	debug_msg(1, '(Simplified_Disequalities, UQV_Out)', (Simplified_Disequalities, UQV_Out)),
+	debug_msg(1, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
+	debug_msg(1, 'test_and_update_vars_attributes :: Status_Out', Status_In), 
 	restore_attributes(UQV_Out, Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
@@ -416,7 +419,7 @@ simplify_disequation(Diseqs, Accept_Fails, Status, Answer) :-
 	debug_msg_nl(1),
 	debug_msg(1, 'simplify_disequation :: (Diseqs, Accept_Fails, Status)', (Diseqs, Accept_Fails, Status)),
 	simplify_disequation_aux(Diseqs, Accept_Fails, Status, Answer),
-	debug_msg(1, 'simplify_disequation :: (Status, Answer)', (Status, Answer)),
+	debug_msg(1, 'simplify_disequation :: (Status, Accept_Fails, Answer)', (Status, Accept_Fails, Answer)),
 	debug_msg_nl(1).
 
 % For the case we do not have a disequality to simplify.
@@ -634,14 +637,13 @@ diseq(T1,T2, UnivVars):-
 	cneg_diseq(T1, T2, UnivVars, _UnivVars_Out, true, true).
 
 cneg_diseq(T1,T2, UQV_In, UQV_Out, Cont_In, Cont_Out):- 
-	debug_msg(1, 'cneg_diseq :: (T1, =/=, T2)', (T1, '=/=', T2)), 
-	debug_msg(1, 'cneg_diseq :: (UQV_In, Cont_In)', (UQV_In, Cont_In)),
+	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
+	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), Status) [in]', ((T1, '=/=', T2), Status)), 
 
 	disequality_contents(Disequality, T1, T2),
-	status_operation(Status, UQV_In, UQV_Out, Cont_In, Cont_Out),
         test_and_update_vars_attributes(Status, 'true', [], [Disequality]),
 
-	debug_msg(1, 'cneg_diseq :: (UQV_Out, Cont_Out)', (UQV_Out, Cont_Out)).
+	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), Status) [out]', ((T1, '=/=', T2), Status)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

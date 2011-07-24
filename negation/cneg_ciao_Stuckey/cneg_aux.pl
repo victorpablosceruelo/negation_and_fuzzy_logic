@@ -161,7 +161,7 @@ add_to_list_if_not_there(Elto, List, [Elto|List]) :- !.
 % memberchk(X, [Y|_]) :- X == Y, !.
 % memberchk(X, [_|L]) :- memberchk(X, L).
 
-memberchk(T1, []) :- !, fail.
+memberchk(_T1, []) :- !, fail.
 memberchk(T1, [T2]) :-
 	terms_are_equal(T1,T2).
 memberchk(T1, [T2|_L]) :- 
