@@ -7,6 +7,10 @@
 
 :- use_module(cneg_aux,_).
 
+:- use_package(debug).
+%:- use_package(trace).
+%:- use_package(nodebug).
+
 % For Ciao Prolog:
 :- multifile 
         verify_attribute/2,
