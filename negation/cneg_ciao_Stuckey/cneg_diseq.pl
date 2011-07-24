@@ -192,23 +192,12 @@ verify_attribute(Attribute, NewTarget):-
 %	debug_msg(0, 'Only for Ciao Prolog: '),
 	debug_msg(1, 'verify_attribute(Attribute, NewTarget)', verify_attribute(Attribute, NewTarget)), 
 	attribute_contents(Attribute, OldTarget, Disequalities, UQV_In), !,
-%	(
-%         --->> I do not know if this is semantically correct ... :-(
-%	    (
-%		var(OldTarget),
-%		cneg_aux:memberchk(OldTarget, UnivVars), !, 
-%		fail % An universally quantified variable is not unifiable.
-%	    )
-%	;
-%	    (
 	substitution_contents(Subst, OldTarget, NewTarget),
 	status_operation(Status, UQV_In, _UQV_Out, 'true', 'true'),
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
 %	test_and_update_vars_attributes(Status_In, Accept_Fails, Substitutions, New_Disequalities)
 	test_and_update_vars_attributes(Status, 'false', [Subst], Disequalities).
-%	    )
-%	).
 
 substitution_contents(substitute(Var, T), Var, T).
 
@@ -217,25 +206,15 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	debug_msg(0, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UV)', Attribute_Var_2),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, UQV_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, UQV_Var_2), !,
-%	(
-%	    (
-%             Not really sure they must be variables ... it's a very strong restriction.
-%		var(OldTarget_Var_1), var(OldTarget_Var_1), !,
-		cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
-		cneg_aux:append(UQV_Var_1, UQV_Var_2, UQV_In),
-		substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
 
-		status_operation(Status, UQV_In, _UQV_Out, 'true', 'true'),
-		debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
-		debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
-		test_and_update_vars_attributes(Status, 'false', [Subst], Disequalities).
-%	    )
-%	;
-%	    (
-%		debug_msg(2, 'combine_attributes', 'they should be variables but they are not. FAIL.'),
-%		!, fail
-%	    )
-%	).
+	cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
+	cneg_aux:append(UQV_Var_1, UQV_Var_2, UQV_In),
+	substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
+	
+	status_operation(Status, UQV_In, _UQV_Out, 'true', 'true'),
+	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
+	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
+	test_and_update_vars_attributes(Status, 'false', [Subst], Disequalities).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
