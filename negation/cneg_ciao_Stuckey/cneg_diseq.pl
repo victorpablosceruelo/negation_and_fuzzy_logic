@@ -174,9 +174,10 @@ portray_disequalities_aux_4([FreeVar | FreeVars]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 verify_attribute(Attribute, Target):-
-%	debug_msg(0, verify_attribute(Attribute, Target)), 
+	debug_msg(1, 'verify_attribute :: (Attribute, Target)', (Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, Disequalities, UnivVars), 
 	terms_are_equal(Target, NewTarget), !,
+	debug_msg(1, 'test_and_update_vars_attributes', test_and_update_vars_attributes(UnivVars, [], _UQV_Out, 'true', 'true', Disequalities)), 
 	test_and_update_vars_attributes(UnivVars, [], _UQV_Out, 'true', 'true', Disequalities).
 
 
