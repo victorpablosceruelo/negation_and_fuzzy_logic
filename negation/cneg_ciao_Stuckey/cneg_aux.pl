@@ -161,6 +161,7 @@ add_to_list_if_not_there(Elto, List, [Elto|List]) :- !.
 % memberchk(X, [Y|_]) :- X == Y, !.
 % memberchk(X, [_|L]) :- memberchk(X, L).
 
+memberchk(T1, []) :- !, fail.
 memberchk(T1, [T2]) :-
 	terms_are_equal(T1,T2).
 memberchk(T1, [T2|_L]) :- 
@@ -182,8 +183,10 @@ terms_are_equal(T1, T2) :- % Different vars.
         !, fail. % Fail
 
 terms_are_equal(T1, T2) :- % For functors.
-        functor_local(T1, Name, Arity, Args1),
-        functor_local(T2, Name, Arity, Args2),
+        functor_local(T1, Name1, Arity1, Args1),
+        functor_local(T2, Name2, Arity2, Args2),
+	Name1 == Name2,
+	Arity1 == Arity2,
         !,
         terms_are_equal_list(Args1, Args2).
 

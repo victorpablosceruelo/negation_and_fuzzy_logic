@@ -7,7 +7,7 @@
 
 :- use_module(cneg_aux,_).
 
-:- use_package(debug).
+%:- use_package(debug).
 %:- use_package(trace).
 %:- use_package(nodebug).
 
@@ -398,16 +398,22 @@ restore_attributes_var(Var, UQV_In, Affected_Diseqs) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-accumulate_disequations([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+accumulate_disequations(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
+	debug_msg(1, 'accumulate_disequations :: Diseqs_In', Diseqs_In),
+	debug_msg(1, 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
+	accumulate_disequations_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
+	debug_msg(1, 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
+
+accumulate_disequations_aux([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
+accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	cneg_aux:memberchk(Diseq, Diseq_Acc_In), !, % It is there.
 	accumulate_disequations(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	disequality_contents(Diseq, T1, T2),
 	disequality_contents(Diseq_Aux, T2, T1), % Order inversion.
 	cneg_aux:memberchk(Diseq_Aux, Diseq_Acc_In), !, % It is there.
 	accumulate_disequations(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-accumulate_disequations([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	accumulate_disequations(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
 
 simplify_disequations([], _Accept_Fails, Status, Diseq_Acc_In, Diseq_Acc_In) :- !, 
