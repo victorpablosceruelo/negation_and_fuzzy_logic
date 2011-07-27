@@ -524,8 +524,9 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 
 simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer):-  % Functors that unify.
 	disequality_contents(Diseq, T1, T2),
- 	functor_local(T1, Name, Arity, Args_1),
-	functor_local(T2, Name, Arity, Args_2), !,
+ 	functor_local(T1, Name_1, Arity_1, Args_1),
+	functor_local(T2, Name_2, Arity_2, Args_2), 
+	Name_1 == Name_2, Arity_1 == Arity_2, !,
 	debug_msg(1, 'simplify_disequation_aux :: Opt_11', Diseq),
 
 	disequalities_cartesian_product(Args_1, Args_2, Diseq_List),
@@ -623,9 +624,19 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	    )
 	;
 	    (   % Keep the functor but diseq between the arguments.
+		% We need to fail because if arity is 1 we have no other way to say that we
+		% could not make difference between the terms.
 		debug_msg(1, 'simplify_disequation_aux :: Opt_17', Diseq),
-		functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
-		simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
+		
+		(   (   Accept_Fails == 'fail', !, fail )
+		;   (	Accept_Fails == 'true',
+			!,
+			
+			status_operation(Status_Out, UQV_In, UQV_Out, 'fail', Cont_Out), 
+			functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
+			simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_Out, Answer)
+		    )
+		)
 	    )
 	).
 
