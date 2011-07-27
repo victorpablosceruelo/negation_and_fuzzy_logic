@@ -18,7 +18,7 @@
 	    % term_name_is_qualified/1,
 	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
-	    status_operation/5
+	    status_operation/6
 	],
 	[assertions]).
 
@@ -486,7 +486,8 @@ cneg_aux_equality(X, X).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-status_operation([UQV_In |[UQV_Out |[Cont_In |[Cont_Out]]]], UQV_In, UQV_Out, Cont_In, Cont_Out).
+status_operation([UQV_In |[UQV_Out |[Allowed_To_Fail |[Failed_Before_In |[Failed_Before_Out]]]]], 
+	UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
