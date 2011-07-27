@@ -181,7 +181,7 @@ verify_attribute(Attribute, Target):-
 	debug_msg(1, 'verify_attribute :: (Attribute, Target)', (Attribute, Target)), 
 	attribute_contents(Attribute, NewTarget, Disequalities, UQV_In), 
 	terms_are_equal(Target, NewTarget), !,
-	status_operation(Status, UQV_In, _UQV_Out, 'fail', 'fail', 'fail'),
+	status_operation(Status, UQV_In, _UQV_Out, 'fail', [], ['fail' | _More_Before]),
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 %	test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities)
 	test_and_update_vars_attributes(Status, [], Disequalities).
@@ -193,7 +193,7 @@ verify_attribute(Attribute, NewTarget):-
 	debug_msg(1, 'verify_attribute(Attribute, NewTarget)', verify_attribute(Attribute, NewTarget)), 
 	attribute_contents(Attribute, OldTarget, Disequalities, UQV_In), !,
 	substitution_contents(Subst, OldTarget, NewTarget),
-	status_operation(Status, UQV_In, _UQV_Out, 'fail', 'fail', 'fail'),
+	status_operation(Status, UQV_In, _UQV_Out, 'fail', [], ['fail' | _More_Before]),
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
 %	test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities)
@@ -211,7 +211,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	cneg_aux:append(UQV_Var_1, UQV_Var_2, UQV_In),
 	substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
 	
-	status_operation(Status, UQV_In, _UQV_Out, 'fail', 'fail', 'fail'),
+	status_operation(Status, UQV_In, _UQV_Out, 'fail', [], ['fail' | _More_Before]),
 	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
 	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
 	test_and_update_vars_attributes(Status, [Subst], Disequalities).
@@ -405,12 +405,12 @@ simplify_disequations([], Status, Diseq_Acc_In, Diseq_Acc_In) :- !,
 	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Before_In, Before_In).
 simplify_disequations([Diseq|Diseq_List], Status_In, Diseq_Acc_In, Diseq_Acc_Out) :- !,
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, 'fail', Before_Current),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, [], Current_Before),
 	simplify_disequation([Diseq], Status_Aux, Simplified_Diseq),
 %	debug_msg(1, 'simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
 	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux) ,
 	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	failed_before_or(Before_In, Before_Current, Before_Aux),
+	failed_before_or(Before_In, Current_Before, Before_Aux),
 	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
 	simplify_disequations(Diseq_List, Status_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
