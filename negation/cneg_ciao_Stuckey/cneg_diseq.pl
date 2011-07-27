@@ -381,8 +381,8 @@ restore_attributes_var(Var, UQV_In, Affected_Diseqs) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 accumulate_disequations(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
-	debug_msg(1, 'accumulate_disequations :: Diseqs_In', Diseqs_In),
-	debug_msg(1, 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
+	debug_msg(0, 'accumulate_disequations :: Diseqs_In', Diseqs_In),
+	debug_msg(0, 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
 	accumulate_disequations_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
 	debug_msg(1, 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
 
@@ -677,7 +677,7 @@ failed_before_or(_Failed_Before_In, _FB_Current, 'fail') :- !.
 % variables implicadas
 
 diseq(T1,T2, UQV_In):- 
-	cneg_diseq(T1, T2, UQV_In, _UQV_Out, fail, fail, fail).
+	cneg_diseq(T1, T2, UQV_In, _UQV_Out, true, [], [fail | _More]).
 
 cneg_diseq(T1,T2, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out):- 
 	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out),
