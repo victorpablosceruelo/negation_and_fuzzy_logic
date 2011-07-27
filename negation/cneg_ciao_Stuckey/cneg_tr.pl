@@ -169,20 +169,20 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
 	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1)),
 	generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-	debug_msg_list(0, 'Cls_1', Cls_1),
+	debug_msg_list(1, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(0, 'List_Of_H_and_B', List_Of_H_and_B),
 	generate_cneg_disjs(List_Of_H_and_B, Cls_1, Cls_2),
-	debug_msg_list(0, 'Cls_2', Cls_2),
+	debug_msg_list(1, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	generate_double_negation_main_cls(List_Of_Preds, Cls_2, Cls_3),
-	debug_msg_list(0, 'Cls_3', Cls_3),
+	debug_msg_list(1, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0),
-	debug_msg_list(0, 'Cls_Out', Cls_Out),
+	debug_msg_list(1, 'Cls_Out', Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0), 
 	!. %Backtracking forbiden.
 
@@ -470,7 +470,7 @@ generate_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	debug_msg(1, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
 	generate_dn_cls(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
@@ -498,7 +498,7 @@ generate_dn_body([], _Head, _Counter, Status_In, (Op_1, Op_2)) :-
 	generate_equality(Op_1, UQV_In, UQV_Out),
 	generate_equality(Op_2, Result_In, 'fail').
 
-generate_dn_body([Conj_1 | Body], Head, Counter, Status_In, DN_Conj_1) :-
+generate_dn_body([Conj_1 | Body], Head, Counter, Status_In, DN_Conjunction) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
 
 	test_for_true(Test_For_True, Result_Aux),
@@ -508,7 +508,7 @@ generate_dn_body([Conj_1 | Body], Head, Counter, Status_In, DN_Conj_1) :-
 
 	Ops_When_True = (Test_For_True, DN_Body),
 	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
-	DN_Conj_1 = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
+	DN_Conjunction = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
 
 	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
 	double_negation_atom(Conj_1, DN_Conj_1, Status_C1),
