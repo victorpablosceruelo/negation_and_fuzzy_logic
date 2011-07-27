@@ -486,8 +486,8 @@ cneg_aux_equality(X, X).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-status_operation([UQV_In |[UQV_Out |[Allowed_To_Fail |[Failed_Before_In |[Failed_Before_Out]]]]], 
-	UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out).
+status_operation([UQV_In |[UQV_Out |[Allowed_To_Fail |[Results_In |[Results_Out]]]]], 
+	UQV_In, UQV_Out, Allowed_To_Fail, Results_In, Results_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
