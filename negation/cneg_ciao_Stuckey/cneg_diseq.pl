@@ -426,6 +426,7 @@ simplify_disequation(Diseqs, Accept_Fails, Status, Answer) :-
 % The answer is obviously empty, but we might fail because of Cont_In = fail.
 simplify_disequation_aux([], Accept_Fails, Status_In, []) :- 
 	!,
+	debug_msg(1, 'simplify_disequation_aux :: Opt_01', []),
 	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		status_operation(Status_In, UQV_In, UQV_In, _Cont_In, 'fail')
@@ -437,7 +438,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
         var(T1),      
         var(T2), % Both are variables.
         T1==T2, !, % Both are the same variable.
-
+	debug_msg(1, 'simplify_disequation_aux :: Opt_02', Diseq),
 	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		!,
@@ -454,6 +455,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	status_operation(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
 	cneg_aux:memberchk(T1, UQV_In), % Both are UQ vars.
 	cneg_aux:memberchk(T2, UQV_In), !,
+	debug_msg(1, 'simplify_disequation_aux :: Opt_03', Diseq),
 	(   (   Accept_Fails == 'fail', !, fail )
 	;   (	Accept_Fails == 'true',
 		!,
@@ -467,26 +469,31 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), !, % Both are variables.
+	debug_msg(1, 'simplify_disequation_aux :: Opt_04', Diseq),
 	status_operation(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
 	(
 	    (   % T1 is a UQ var, T2 is not a UQ var.
 		cneg_aux:memberchk(T1, UQV_In), !,
+		debug_msg(1, 'simplify_disequation_aux :: Opt_05', Diseq),
 		simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	    )
 	;
 	    (   % T2 is a UQ var, T1 is not a UQ var.
 		cneg_aux:memberchk(T2, UQV_In), !,
+		debug_msg(1, 'simplify_disequation_aux :: Opt_06', Diseq),
 		disequality_contents(Diseq_Aux, T2, T1),
 		simplify_disequation_aux_uqvar_t1_var_t2([Diseq_Aux | More_Diseqs], Accept_Fails, Status_In, Answer)
 	    )
 	;
 	    (   % T1 and T2 are NOT UQ vars. 2 solutions. First: T1 =/= T2.
+		debug_msg(1, 'simplify_disequation_aux :: Opt_07', Diseq),
 		diseq_eq(UQV_Out, UQV_In), % Keep UQV info.
 		diseq_eq(Cont_Out, 'true'), % The solution is completely valid.
 		diseq_eq(Answer, [Diseq])
 	    )
 	;
 	    (   % T1 and T2 can not be disunified. We assign Cont = fail. 
+		debug_msg(1, 'simplify_disequation_aux :: Opt_08', Diseq),
 		(   (   Accept_Fails == 'fail', !, fail )
 		;   (	Accept_Fails == 'true',
 			!,
@@ -503,11 +510,13 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	(
 	    (   % T1 is a VAR. T2 is not a var.
 		var(T1), !,
+		debug_msg(1, 'simplify_disequation_aux :: Opt_09', Diseq),
 		simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
 		var(T2), !,
+		debug_msg(1, 'simplify_disequation_aux :: Opt_10', Diseq),
 		disequality_contents(Diseq_Aux, T2, T1),
 		simplify_disequation_aux_var_nonvar([Diseq_Aux | More_Diseqs], Accept_Fails, Status_In, Answer)
 	    )
@@ -517,6 +526,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	disequality_contents(Diseq, T1, T2),
  	functor_local(T1, Name, Arity, Args_1),
 	functor_local(T2, Name, Arity, Args_2), !,
+	debug_msg(1, 'simplify_disequation_aux :: Opt_11', Diseq),
 
 	disequalities_cartesian_product(Args_1, Args_2, Diseq_List),
 	cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
@@ -531,6 +541,7 @@ simplify_disequation_aux([Diseq | _More_Diseqs], _Accept_Fails, Status_In, Answe
 	; 
 	    (Arity1 \== Arity2)
 	), !,
+	debug_msg(1, 'simplify_disequation_aux :: Opt_12', Diseq),
 	status_operation(Status_In, UQV_In, UQV_In, _Cont_In, 'true'),
 	diseq_eq(Answer, []). % Answer is True.
 
@@ -556,6 +567,7 @@ simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Accept_Fails, St
         var(T2), 
 	status_operation(Status_In, UQV_In, UQV_Out, _Cont_In, Cont_Out),
 	cneg_aux:memberchk(T1, UQV_In), !, % T1 is a uq var, T2 is not a uqvar.
+	debug_msg(1, 'simplify_disequation_aux :: Opt_13', Diseq),
 
 	% T1 is not different from T2. Just return fail to disunify, unify and continue.
 	(   (   Accept_Fails == 'fail', !, fail )
@@ -581,6 +593,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
+		debug_msg(1, 'simplify_disequation_aux :: Opt_14', Diseq),
 		cneg_unify(UQV_In, UQV_Out),
 		cneg_unify(Cont_Out, 'true'),
 		diseq_eq(Answer, []) % Answer is True.
@@ -588,6 +601,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
 		cneg_aux:memberchk(T1, UQV_In), !,
+		debug_msg(1, 'simplify_disequation_aux :: Opt_15', Diseq),
 		(   (   Accept_Fails == 'fail', !, fail )
 		;   (	Accept_Fails == 'true',
 			!,
@@ -600,6 +614,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	    )
 	;
 	    (   % The variable must not be the functor.
+		debug_msg(1, 'simplify_disequation_aux :: Opt_16', Diseq),
 		functor_local(New_T2, Name, Arity, New_Args_T2), 
 		cneg_aux:varsbag(New_Args_T2, [], UQV_In, UQV_Out),
 		cneg_unify(Cont_Out, 'true'),
@@ -608,6 +623,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Accept_Fails, Status_
 	    )
 	;
 	    (   % Keep the functor but diseq between the arguments.
+		debug_msg(1, 'simplify_disequation_aux :: Opt_17', Diseq),
 		functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
 		simplify_disequation_aux([Diseq | More_Diseqs], Accept_Fails, Status_In, Answer)
 	    )
