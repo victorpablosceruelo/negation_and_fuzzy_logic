@@ -14,20 +14,20 @@
 
 % Needed to be able to compile the modules.
 :- use_module(cneg_aux).    
-:- use_module(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).
+:- use_module(cneg_diseq, [diseq/3, cneg_diseq/7, cneg_eq/7]).
 :- use_module(cneg_tr).
 
 % Re-export predicates to use them in console.
-:- reexport(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).   
+:- reexport(cneg_diseq, [diseq/3, cneg_diseq/7, cneg_eq/7]).   
 
 cneg(UQV, Functor) :- cneg_aux(Functor, UQV, _FV_Out, 'fail', 'fail', 'fail').
 
-cneg_aux(Functor, FV_In, FV_Out, Allowed_To_Fail, Cont_In, Cont_Out) :-
+cneg_aux(Functor, FV_In, FV_Out, _Allowed_To_Fail, Cont_In, Cont_Out) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
 	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out)),
 	!, fail.
 
-cneg_aux(Functor, FV_In, FV_Out, Allowed_To_Fail, Cont_In, Cont_Out) :-
+cneg_aux(Functor, FV_In, FV_Out, _Allowed_To_Fail, Cont_In, Cont_Out) :-
 	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
 	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out)),
 	!, fail.

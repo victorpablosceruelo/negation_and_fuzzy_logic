@@ -201,7 +201,7 @@ generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out
 
 generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name),	
-	New_Arity is Arity + 4,
+	New_Arity is Arity + 5,
 
 	% Generate the main clause.
 	functor_local(Main_Cl, ':-', 2, [Head_Main_Cl |[Aux_Cl_Call]]), 
@@ -320,7 +320,7 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % 1- We translate the names of the predicates by using the respective counters, 
-%     and we add 4 variables for FreeVars and ContinuationVars.
+%     and we add 5 variables for UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out.
 % 2- We convert:
 %      2.1- the unifications in heads in equalities in the bodies.
 %      2.2- the subcalls to other predicates are translated into prodicates we've translated.
@@ -387,11 +387,11 @@ negate_atom(Atom, Neg_Atom, Status) :-
 
 negate_atom_aux(Atom, Neg_Atom, Status) :-
 	goal_is_equality(Atom, A_Left, A_Right), !,
-	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right | Status]]).
+	functor_local(Neg_Atom, 'cneg_diseq', 7, [A_Left |[A_Right | Status]]).
 
 negate_atom_aux(Atom, Neg_Atom, Status) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
-	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right | Status]]).
+	functor_local(Neg_Atom, 'cneg_eq', 7, [A_Left |[A_Right | Status]]).
 
 negate_atom_aux(Atom, Neg_Atom, Status_In) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
@@ -550,8 +550,8 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
 	Ops_When_True = (Test_For_True, More_Ops),
 
-	test_for_fail(Test_For_Fail, Failed_Before_In),
-	test_for_true(Test_For_True, Failed_Before_In),
+	test_for_fail(Test_For_Fail, FB_Out),
+	test_for_true(Test_For_True, FB_Out),
 	generate_equality(Op_1, UQV_Aux, UQV_Out),
 	generate_equality(Op_2, FB_Aux, FB_Out),
 
