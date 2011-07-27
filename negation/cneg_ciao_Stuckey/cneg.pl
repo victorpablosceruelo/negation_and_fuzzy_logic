@@ -20,7 +20,7 @@
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq/3, cneg_diseq/7, cneg_eq/7]).   
 
-cneg(UQV, Functor) :- cneg_aux(Functor, UQV, _FV_Out, 'fail', 'fail', 'fail').
+cneg(UQV, Functor) :- cneg_aux(Functor, UQV, _FV_Out, 'true', 'fail', 'fail').
 
 cneg_aux(Functor, FV_In, FV_Out, _Allowed_To_Fail, Cont_In, Cont_Out) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
