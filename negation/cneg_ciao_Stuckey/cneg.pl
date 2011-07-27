@@ -20,23 +20,24 @@
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq/3, cneg_diseq/7, cneg_eq/7]).   
 
-cneg(UQV, Functor) :- cneg_aux(Functor, UQV, _FV_Out, 'true', 'fail', 'fail').
+cneg(UQV, Functor) :- cneg_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
 
-cneg_aux(Functor, FV_In, FV_Out, _Allowed_To_Fail, Cont_In, Cont_Out) :-
+cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
 	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out)),
 	!, fail.
 
-cneg_aux(Functor, FV_In, FV_Out, _Allowed_To_Fail, Cont_In, Cont_Out) :-
+cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
 	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_aux(Functor, FV_In, FV_Out, Cont_In, Cont_Out)),
 	!, fail.
 
-cneg_aux(Functor, FV_In, FV_Out, Allowed_To_Fail, Cont_In, Cont_Out) :-
+cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	functor_local(Functor, Name, Arity, Args),
-	New_Arity is Arity + 5,
+	New_Arity is Arity + 4,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
-	append(Args, [FV_In |[FV_Out |[Allowed_To_Fail |[Cont_In |[Cont_Out]]]]], New_Args),
+	append(FV_Cneg, FV_In, FV_Aux),
+	append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
 	debug_msg(1, 'cneg_aux :: call', New_Functor),
 	call(New_Functor).
