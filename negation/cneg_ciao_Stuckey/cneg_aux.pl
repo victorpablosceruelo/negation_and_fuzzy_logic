@@ -12,13 +12,12 @@
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/4, goal_is_equality/3,	    
-	    terms_are_equal/2, unify_terms/2,
+	    terms_are_equal/2, unify_terms/2
 	    %	cneg_aux_equality/2,
 	    % qualify_string_name/3, remove_qualification/2, 
 	    % term_name_is_qualified/1,
 	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
-	    status_operation/6
 	],
 	[assertions]).
 
@@ -486,9 +485,3 @@ cneg_aux_equality(X, X).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-status_operation([UQV_In |[UQV_Out |[Allowed_To_Fail |[Results_In |[Results_Out]]]]], 
-	UQV_In, UQV_Out, Allowed_To_Fail, Results_In, Results_Out).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
