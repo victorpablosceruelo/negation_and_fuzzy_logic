@@ -225,7 +225,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
 test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	debug_msg(1, 'test_and_update_vars_attributes :: Status_In', Status_In), 
 	debug_msg(1, 'test_and_update_vars_attributes :: Substitutions', Substitutions),
 	debug_msg(1, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
@@ -239,7 +239,7 @@ test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities) :-
 	debug_msg(1, 'Affected Disequalities', Disequalities),
 %	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UQV_In),
 
-	status_operation(Status_Aux, UQV_Diseqs, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_Aux, UQV_Diseqs, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	simplify_disequations(Disequalities, Status_Aux, [], Simplified_Disequalities),
 	debug_msg(1, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
 	debug_msg(1, 'test_and_update_vars_attributes :: Status_Out', Status_In), 
@@ -398,20 +398,20 @@ accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :
 accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	accumulate_disequations(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
 
-% Note that each disequality analized gets a clean status on its Before variable.
+% Note that each disequality analized gets a clean status on its Failed_Before variable.
 % This is because all of them need to be satisfied, we should not override the status of
 % a previous disequality with the status of the current one.
 simplify_disequations([], Status, Diseq_Acc_In, Diseq_Acc_In) :- !, 
-	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Before_In, Before_In).
+	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Failed_Before_In, Failed_Before_In).
 simplify_disequations([Diseq|Diseq_List], Status_In, Diseq_Acc_In, Diseq_Acc_Out) :- !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, 'fail', Before_Current),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, 'fail', FB_Current),
 	simplify_disequation([Diseq], Status_Aux, Simplified_Diseq),
 %	debug_msg(1, 'simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
 	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux) ,
 	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	failed_before_or(Before_In, Before_Current, Before_Aux),
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
+	failed_before_or(Failed_Before_In, FB_Current, Failed_Before_Aux),
+	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Failed_Before_Aux, FB_Out),
 	simplify_disequations(Diseq_List, Status_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -431,11 +431,11 @@ simplify_disequation(Diseqs, Status, Answer) :-
 simplify_disequation_aux([], Status_In, []) :- 
 	!,
 	debug_msg(1, 'simplify_disequation_aux :: Opt_01', []),
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, Failed_Before_Out),
 	(   (   Allowed_To_Fail == 'fail', !, fail )
 	;   (	Allowed_To_Fail == 'true',
 		UQV_Out = UQV_In, 
-		Before_Out = 'true' % We have failed.
+		Failed_Before_Out = 'true' % We have failed.
 	    )
 	).
 
@@ -446,11 +446,11 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Same var
         T1==T2, !, % Both are the same variable.
 	debug_msg(1, 'simplify_disequation_aux :: Opt_02', Diseq),
 
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	(   (   Allowed_To_Fail == 'fail', !, fail )
 	;   (	Allowed_To_Fail == 'true',
 		!,		
-		status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', Before_Out),
+		status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', FB_Out),
 		simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
 	    )
 	).
@@ -459,7 +459,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), % Both are variables, but not the same one.
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	cneg_aux:memberchk(T1, UQV_In), % Both are UQ vars.
 	cneg_aux:memberchk(T2, UQV_In), !,
 
@@ -468,7 +468,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 	;   (	Allowed_To_Fail == 'true',
 		!,
 		diseq_eq(T1, T2), % They can not be disunified, and they are still UQ vars.
-		status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', Before_Out),
+		status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', FB_Out),
 		simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
 	    )
 	).
@@ -478,7 +478,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
         var(T1),
         var(T2), !, % Both are variables.
 	debug_msg(1, 'simplify_disequation_aux :: Opt_04', Diseq),
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	(
 	    (   % T1 is a UQ var, T2 is not a UQ var.
 		cneg_aux:memberchk(T1, UQV_In), !,
@@ -496,7 +496,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 	    (   % T1 and T2 are NOT UQ vars. 2 solutions. First: T1 =/= T2.
 		debug_msg(1, 'simplify_disequation_aux :: Opt_07', Diseq),
 		diseq_eq(UQV_Out, UQV_In), % Keep UQV info.
-		diseq_eq('fail', Before_Out), % The solution is completely valid.
+		diseq_eq('fail', FB_Out), % The solution is completely valid.
 		diseq_eq(Answer, [Diseq])
 	    )
 	;
@@ -506,7 +506,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 		;   (	Allowed_To_Fail == 'true',
 			!,
 			diseq_eq(T1, T2), % Since they can not be disunified, unify them.
-			status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', Before_Out),
+			status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', FB_Out),
 			simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
 		    )
 		)
@@ -551,7 +551,7 @@ simplify_disequation_aux([Diseq | _More_Diseqs], Status_In, Answer):-  % Functor
 	    (Arity1 \== Arity2)
 	), !,
 	debug_msg(1, 'simplify_disequation_aux :: Opt_12', Diseq),
-	status_operation(Status_In, UQV_In, UQV_In, _Allowed_To_Fail, _Before_In, 'fail'),
+	status_operation(Status_In, UQV_In, UQV_In, _Allowed_To_Fail, _FB_In, 'fail'),
 	diseq_eq(Answer, []). % Answer is True.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -574,7 +574,7 @@ simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answe
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), 
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	cneg_aux:memberchk(T1, UQV_In), !, % T1 is a uq var, T2 is not a uqvar.
 	debug_msg(1, 'simplify_disequation_aux :: Opt_13', Diseq),
 
@@ -584,7 +584,7 @@ simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answe
 		!,
 		varsbag_remove_var(T1, UQV_In, UQV_Aux),
 		cneg_unify(T1, T2),
-		status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, 'true', Before_Out),
+		status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, 'true', FB_Out),
 		simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
 	    )
 	).
@@ -597,14 +597,14 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         functor_local(T2, Name, Arity, _Args_T2), 
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Before_In, Before_Out),	
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),	
 	(
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
 		debug_msg(1, 'simplify_disequation_aux :: Opt_14', Diseq),
 		cneg_unify(UQV_In, UQV_Out),
-		cneg_unify('fail', Before_Out), % We've not failed before.
+		cneg_unify('fail', FB_Out), % We've not failed before.
 		diseq_eq(Answer, []) % Answer is True.
 	    )
 	;
@@ -616,7 +616,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 			!,
 			varsbag_remove_var(T1, UQV_In, UQV_Aux),
 			cneg_unify(T1, T2),
-			status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, 'true', Before_Out),
+			status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, 'true', FB_Out),
 			simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
 		    )
 		)
@@ -626,7 +626,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 		debug_msg(1, 'simplify_disequation_aux :: Opt_16', Diseq),
 		functor_local(New_T2, Name, Arity, New_Args_T2), 
 		cneg_aux:varsbag(New_Args_T2, [], UQV_In, UQV_Out),
-		cneg_unify(Before_Out, 'fail'), % Correct result if attr. var. satisfied.
+		cneg_unify(FB_Out, 'fail'), % Correct result if attr. var. satisfied.
 		disequality_contents(New_Diseq, T1, New_T2),
 		diseq_eq(Answer, [New_Diseq]) % Answer is Diseq.
 	    )
@@ -640,7 +640,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 		;   (	Allowed_To_Fail == 'true',
 			!,
 			
-			status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', Before_Out), 
+			status_operation(Status_Out, UQV_In, UQV_Out, Allowed_To_Fail, 'true', FB_Out), 
 			functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
 			simplify_disequation_aux([Diseq | More_Diseqs], Status_Out, Answer)
 		    )
@@ -652,10 +652,10 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% failed_before_or(Before_In, Before_Current, Before_Aux),
-failed_before_or('true', _Before_Current, 'true') :- !.
-failed_before_or(_Before_In, 'true', 'true') :- !.
-failed_before_or(_Before_In, _Before_Current, 'fail') :- !.
+% failed_before_or(Failed_Before_In, FB_Current, Failed_Before_Aux),
+failed_before_or('true', _FB_Current, 'true') :- !.
+failed_before_or(_Failed_Before_In, 'true', 'true') :- !.
+failed_before_or(_Failed_Before_In, _FB_Current, 'fail') :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -679,8 +679,8 @@ failed_before_or(_Before_In, _Before_Current, 'fail') :- !.
 diseq(T1,T2, UQV_In):- 
 	cneg_diseq(T1, T2, UQV_In, _UQV_Out, true, [], [fail | _More]).
 
-cneg_diseq(T1,T2, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out):- 
-	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+cneg_diseq(T1,T2, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out):- 
+	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out),
 	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), Status) [in]', ((T1, '=/=', T2), Status)), 
 
 	disequality_contents(Disequality, T1, T2),
@@ -692,9 +692,9 @@ cneg_diseq(T1,T2, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(T1, T2, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out) :- 
+cneg_eq(T1, T2, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out) :- 
 	debug_msg(1, 'cneg_eq :: (T1, =, T2)', (T1, '=', T2)),
-	debug_msg(1, 'cneg_eq :: (UQV_In, Allowed_To_Fail, Before_In)', (UQV_In, Allowed_To_Fail, Before_In)),
+	debug_msg(1, 'cneg_eq :: (UQV_In, Allowed_To_Fail, Failed_Before_In)', (UQV_In, Allowed_To_Fail, Failed_Before_In)),
 	cneg_aux:varsbag((T1, T2), [], [], Vars_Equality),
 	varsbag_intersection(Vars_Equality, UQV_In, Intersection),
 	!,
@@ -707,9 +707,9 @@ cneg_eq(T1, T2, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out) :-
 		Intersection \== [], !, fail
 	    )
 	),
-	failed_before_or(Before_In, 'fail', Before_Out),
+	failed_before_or(Failed_Before_In, 'fail', Failed_Before_Out),
 	UQV_Out = UQV_In,
-	debug_msg(1, 'cneg_eq :: (UQV_Out, Before_Out)', (UQV_Out, Before_Out)).
+	debug_msg(1, 'cneg_eq :: (UQV_Out, Failed_Before_Out)', (UQV_Out, Failed_Before_Out)).
 
 cneg_unify(T, T).
 

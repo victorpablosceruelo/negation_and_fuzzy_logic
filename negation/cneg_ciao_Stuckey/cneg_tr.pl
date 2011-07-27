@@ -228,10 +228,10 @@ head_aux_cl_info(head_aux_cl_info_aux(Counter, Head_Aux_Cl, Aux_Cl_Name, New_Ari
 	Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity).
 
 adjust_args_for_status(Arity, Functor, Status) :-
-	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
-	arg(Arity, Functor, Before_Out), 
+	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
+	arg(Arity, Functor, FB_Out), 
 	Arity_2 is Arity -1, 
-	arg(Arity_2, Functor, Before_In), 
+	arg(Arity_2, Functor, Failed_Before_In), 
 	Arity_3 is Arity_2 -1,
 	arg(Arity_3, Functor, Allowed_To_Fail),
 	Arity_4 is Arity_3 -1,
@@ -249,23 +249,23 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 
 generate_subcalls_1(_Index, Info_Aux_Cl, 'fail', Status) :- 
 	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
-	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Before_In, Before_In),
+	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Failed_Before_In, Failed_Before_In),
 	!.
 generate_subcalls_1(Index, Info_Aux_Cl, Body, Status_In) :-
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
 
 	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
 	copy_args(Arity, Head_Aux_Cl, SubCall),
 	adjust_args_for_status(New_Arity, SubCall, Status_Aux),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Before_In, 'fail'),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Failed_Before_In, 'fail'),
 
 	(
 	    (
 		Index == Counter,
 		UQV_Aux = UQV_Out,
-		test_for_fail(Test_For_Fail, Before_Out),
+		test_for_fail(Test_For_Fail, FB_Out),
 		Body = (SubCall, Test_For_Fail)
 	    )
 	;
@@ -273,19 +273,19 @@ generate_subcalls_1(Index, Info_Aux_Cl, Body, Status_In) :-
 		Index < Counter,
 		NewIndex is Index + 1, 
 		Body = (SubCall, MoreBody),
-		status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, 'fail', Before_Out),
+		status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, 'fail', FB_Out),
 		generate_subcalls_1(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
 	    )
 	).
 
 generate_subcalls_2(Index, Info_Aux_Cl, (Test_For_True, Body), Status) :- 
-	status_operation(Status, _UQV_In, _UQV_Out, _Allowed_To_Fail, _Before_In, Before_Out),
-	test_for_true(Test_For_True, Before_Out),
+	status_operation(Status, _UQV_In, _UQV_Out, _Allowed_To_Fail, _Failed_Before_In, FB_Out),
+	test_for_true(Test_For_True, FB_Out),
 	generate_subcalls_2_aux(Index, Info_Aux_Cl, Body, Status).
 
 generate_subcalls_2_aux(_Index, Info_Aux_Cl, 'fail', Status) :- 
 	head_aux_cl_info(Info_Aux_Cl, 0, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
-	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Before_In, Before_In),
+	status_operation(Status, UQV_In, UQV_In, _Allowed_To_Fail, Failed_Before_In, Failed_Before_In),
 	!.
 generate_subcalls_2_aux(Index, Info_Aux_Cl, Body, Status_In) :-
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Arity),
@@ -320,7 +320,7 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % 1- We translate the names of the predicates by using the respective counters, 
-%     and we add 5 variables for UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out.
+%     and we add 5 variables for UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out.
 % 2- We convert:
 %      2.1- the unifications in heads in equalities in the bodies.
 %      2.2- the subcalls to other predicates are translated into prodicates we've translated.
@@ -344,42 +344,42 @@ negate_head_and_bodies_aux(Head, Body, Counter, New_Cl) :-
 	generate_name_from_counter(Counter, Aux_Cl_Name, New_Name),
 	functor_local(New_Head, New_Name, New_Arity, _Args_New_Head),
 	copy_args(Arity, Head, New_Head),
-	status_operation(Status_New_Head, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_New_Head, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	adjust_args_for_status(New_Arity, New_Head, Status_New_Head),
 	% Determine which variables are in the body but are not in the head.
 	cneg_aux:varsbag(New_Head, [], [], Vars_New_Head), 
 	cneg_aux:varsbag(Body, Vars_New_Head, [], UQV_Body), 
 	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_Body |[ UQV_Tmp]]]),
 	% negate_body_conjunction
-	status_operation(Status, UQV_Tmp, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status, UQV_Tmp, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	negate_body_conj(Body, Neg_Body, Status),
 	% Build new clause.
 	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, Neg_Body)]]).
 
 negate_body_conj([], (Op_1, Op_2), Status) :- !,
-	status_operation(Status, UQV_In, UQV_Out, _Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status, UQV_In, UQV_Out, _Allowed_To_Fail, Failed_Before_In, FB_Out),
 	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Before_In, Before_Out).
+	generate_equality(Op_2, Failed_Before_In, FB_Out).
 
 negate_body_conj([Atom | Body], Negated_Body, Status_In) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Before_In, Before_Aux),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Failed_Before_In, FB_Aux),
 	negate_atom(Atom, Negated_Atom, Status_Aux),  
 
-	test_for_fail(Test_For_Fail, Before_Aux),
-	test_for_true(Test_For_True, Before_Aux),
+	test_for_fail(Test_For_Fail, FB_Aux),
+	test_for_true(Test_For_True, FB_Aux),
 	generate_equality(Op_1, UQV_Aux, UQV_Out),
-	generate_equality(Op_2, Before_Aux, Before_Out),
+	generate_equality(Op_2, FB_Aux, FB_Out),
 
 	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
 	Ops_When_True = (Test_For_True, New_Negated_Body),
 	Negated_Body = (Negated_Atom, (Ops_When_Fail ; Ops_When_True)),
 
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
+	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, FB_Aux, FB_Out),
 	negate_body_conj(Body, New_Negated_Body, Status_Out).
 
 
-% negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Before_In, Before_Out).
+% negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Failed_Before_In, FB_Out).
 negate_atom(Atom, Neg_Atom, Status) :-
 	debug_msg(0, 'negate_atom :: Atom ', Atom),
 	negate_atom_aux(Atom, Neg_Atom, Status),
@@ -396,9 +396,9 @@ negate_atom_aux(Atom, Neg_Atom, Status) :-
 negate_atom_aux(Atom, Neg_Atom, Status_In) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
 
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, FB_In, FB_Out),
 	append(UQV, UQV_In, UQV_Aux),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, FB_In, FB_Out),
 	double_negation(Arg, Neg_Atom, Status_Aux).
 
 negate_atom_aux(Atom, Neg_Atom, Status) :-
@@ -414,23 +414,23 @@ negate_atom_aux(Atom, Neg_Atom, Status) :-
 
 double_negation(Atom, (Neg_Conj_1, Neg_Conj_2), Status_In) :-
 	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
-	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, Before_In, Before_Aux),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, FB_In, FB_Out),
+	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, FB_In, FB_Aux),
 	double_negation(Conj_1, Neg_Conj_1, Status_C1),
-	status_operation(Status_C2, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
+	status_operation(Status_C2, UQV_Aux, UQV_Out, Allowed_To_Fail, FB_Aux, FB_Out),
 	double_negation(Conj_2, Neg_Conj_2, Status_C2).
 
 double_negation(Atom, (Neg_Disj_1; Neg_Disj_2), Status_In) :-
 	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
-	% status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	% status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, FB_In, FB_Out),
 	double_negation(Disj_1, Neg_Disj_1, Status_In), % Not sure this translation is correct, 
 	double_negation(Disj_2, Neg_Disj_2, Status_In). % but it should not be used.
 
 double_negation(Atom, Neg_Atom, Status_In) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, FB_In, FB_Out),
 	append(UQV, UQV_In, UQV_Aux),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, FB_In, FB_Out),
 	negate_atom(Arg, Neg_Atom, Status_Aux). % Problematic
 
 double_negation(Atom, Neg_Atom, Status_In) :-
@@ -481,34 +481,34 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
 generate_dn_body([], _Head, _Counter, Status_In, (Op_1, Op_2)) :-
-	status_operation(Status_In, UQV_In, UQV_Out, _Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, _Allowed_To_Fail, Failed_Before_In, FB_Out),
 	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Before_In, Before_Out).
+	generate_equality(Op_2, Failed_Before_In, FB_Out).
 
 generate_dn_body([Atom | Body], Head, Counter, Status_In, (New_Atom, New_Body)) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Before_In, Before_Aux),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Failed_Before_In, FB_Aux),
 	generate_dn_atom(Atom, New_Atom, Status_Aux),
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
+	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, FB_Aux, FB_Out),
 	generate_dn_body(Body, Head, Counter, Status_Out, New_Body).
 
 generate_dn_atom(Atom, New_Atom, Status) :-
-%	status_operation(Status, UQV_In, UQV_Out, Before_In, Before_Out),
+%	status_operation(Status, UQV_In, UQV_Out, Failed_Before_In, FB_Out),
 	goal_is_equality(Atom, A_Left, A_Right), !,
 	functor_local(New_Atom, 'cneg_eq', 7, [A_Left |[A_Right | Status]]).
 
 generate_dn_atom(Atom, New_Atom, Status_In) :-
 	goal_is_disequality(Atom, A_Left, A_Right, UQV), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	append(UQV_In, UQV, UQV_Aux),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	functor_local(New_Atom, 'cneg_diseq', 7, [A_Left |[A_Right | Status_Aux]]).
 
 generate_dn_atom(Atom, New_Atom, Status_In) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	append(UQV, UQV_In, UQV_Aux),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	functor_local(New_Atom, 'cneg_aux', 6, [Arg | Status_Aux]).
 
 generate_dn_atom(Atom, New_Atom, Status) :-
@@ -535,7 +535,7 @@ generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	functor_local(Main_Cl, ':-', 2, [Head |[ SubCalls ]]),
 	New_Arity is Arity + 5,
 	functor_local(Head, New_Head_Name, New_Arity, _Args_Head),
-%	status_operation(Status, UQV_In, UQV_Out, Before_In, Before_Out),
+%	status_operation(Status, UQV_In, UQV_Out, Failed_Before_In, FB_Out),
 	adjust_args_for_status(New_Arity, Head, Status),
 
 	generate_double_negation_subcalls(Head, Arity, Status, 1, Counter, SubCalls).
@@ -544,16 +544,16 @@ generate_double_negation_subcalls(_Head, _Arity, _Status, Index, Counter, 'fail'
 	Counter < Index, !. % Security check.
 
 generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Before_In, Before_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
 	Ops = (SubCall, (Ops_When_Fail ; Ops_When_True)), 
 
 	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
 	Ops_When_True = (Test_For_True, More_Ops),
 
-	test_for_fail(Test_For_Fail, Before_Out),
-	test_for_true(Test_For_True, Before_Out),
+	test_for_fail(Test_For_Fail, FB_Out),
+	test_for_true(Test_For_True, FB_Out),
 	generate_equality(Op_1, UQV_Aux, UQV_Out),
-	generate_equality(Op_2, Before_Aux, Before_Out),
+	generate_equality(Op_2, FB_Aux, FB_Out),
 
 	% Obtain New_Arity and Head_Name of new Head.
 	functor_local(Head, Head_Name, New_Arity, _Head_Args),
@@ -562,10 +562,10 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 	generate_name_with_counter(Head_Name, Index, New_Name),
 	functor_local(SubCall, New_Name, New_Arity, _SubCall_Args),
 	copy_args(Arity, Head, SubCall),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Before_In, Before_Aux),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Failed_Before_In, FB_Aux),
 	adjust_args_for_status(New_Arity, SubCall, Status_Aux),
 
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
+	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, FB_Aux, FB_Out),
 	New_Index is Index + 1,
 	generate_double_negation_subcalls(Head, Arity, Status_Out, New_Index, Counter, More_Ops).
 
