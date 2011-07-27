@@ -408,9 +408,19 @@ simplify_disequations([Diseq|Diseq_List], Status_In, Diseq_Acc_In, Diseq_Acc_Out
 	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, [], Current_Before),
 	simplify_disequation([Diseq], Status_Aux, Simplified_Diseq),
 %	debug_msg(1, 'simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
-	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux) ,
-	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	failed_before_or(Before_In, Current_Before, Before_Aux),
+	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux),
+	(
+	    (   % We need to re-evaluate if previous disequations are valid.
+		failed_before_has_trues(Current_Before), !,
+		append(Diseq_Acc_In, Diseq_List, New_Diseq_List),
+		accumulate_disequations(Simplified_Diseq, [], Diseq_Acc_Aux),
+		status_operation(Status_Tmp, UQV_In, UQV_Aux, Allowed_To_Fail, [], Current_Before),
+	    )
+	;
+	    (   % We do not need to re-evaluate them.
+		failed_before_has_no_trues(Current_Before), !,
+		accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
+		failed_before_or(Before_In, Current_Before, Before_Aux),
 	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Before_Aux, Before_Out),
 	simplify_disequations(Diseq_List, Status_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
 
