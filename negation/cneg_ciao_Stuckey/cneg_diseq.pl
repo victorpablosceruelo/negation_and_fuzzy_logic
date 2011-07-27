@@ -677,7 +677,7 @@ failed_before_or(_Failed_Before_In, _FB_Current, 'fail') :- !.
 % variables implicadas
 
 diseq(T1,T2, UQV_In):- 
-	cneg_diseq(T1, T2, UQV_In, _UQV_Out, true, [], [fail | _More]).
+	cneg_diseq(T1, T2, UQV_In, _UQV_Out, true, fail, fail).
 
 cneg_diseq(T1,T2, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out):- 
 	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Failed_Before_In, Failed_Before_Out),
