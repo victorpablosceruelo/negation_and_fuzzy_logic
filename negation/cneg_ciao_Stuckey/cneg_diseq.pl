@@ -231,16 +231,22 @@ test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities) :-
 	debug_msg(1, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
 
 	cneg_aux:varsbag(New_Disequalities, [], UQV_In, Vars_In), !,
-	retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Diseqs, New_Disequalities, Disequalities), !,
-	debug_msg(0, '', retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Diseqs, New_Disequalities, Disequalities)),
+	retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Tmp, [], Old_Disequalities), !,
+	debug_msg(1, 'test_and_update_vars_attributes :: Old_Disequalities', Old_Disequalities),
 
-%	perform_substitutions(Substitutions, UQV_Diseqs, UQV_Subst), !,
-%	cneg_aux:varsbag(Disequalities, UQV_Subst, [], NO_UQV_In), % Not universally quantified.
-	debug_msg(1, 'Affected Disequalities', Disequalities),
-%	debug_msg(1, 'Vars in Disequalities NOT universally quantified', NO_UQV_In),
+	perform_substitutions(Substitutions, UQV_Tmp, UQV_Aux_1), !,
 
-	status_operation(Status_Aux, UQV_Diseqs, UQV_Out, Allowed_To_Fail, Failed_Before_In, FB_Out),
-	simplify_disequations(Disequalities, Status_Aux, [], Simplified_Disequalities),
+	% At first we check that the new disequalities can be added to the old ones.
+	status_operation(Status_Aux_1, UQV_Aux_1, UQV_Aux_2, Allowed_To_Fail, Failed_Before_In, FB_Out),
+	simplify_disequations(New_Disequalities, Status_Aux_1, [], Simplified_Disequalities_1),
+
+	% At last we check that the old disequalities are still valid.
+	status_operation(Status_Aux_2, UQV_Aux_2, UQV_Out, 'fail', 'fail', 'fail'),
+	simplify_disequations(Old_Disequalities, Status_Aux_2, [], Simplified_Disequalities_2),
+
+	% Now we aggregate all of them.
+	accumulate_disequations(Simplified_Disequalities_1, Simplified_Disequalities_2, Simplified_Disequalities),
+
 	debug_msg(1, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
 	debug_msg(1, 'test_and_update_vars_attributes :: Status_Out', Status_In), 
 	restore_attributes(UQV_Out, Simplified_Disequalities).
