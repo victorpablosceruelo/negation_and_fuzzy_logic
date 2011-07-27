@@ -226,13 +226,13 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 
 test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities) :-
 	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result),
-	debug_msg(1, 'test_and_update_vars_attributes :: Status_In', Status_In), 
-	debug_msg(1, 'test_and_update_vars_attributes :: Substitutions', Substitutions),
-	debug_msg(1, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
+	debug_msg(0, 'test_and_update_vars_attributes :: Status_In', Status_In), 
+	debug_msg(0, 'test_and_update_vars_attributes :: Substitutions', Substitutions),
+	debug_msg(0, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
 
 	cneg_aux:varsbag(New_Disequalities, [], UQV_In, Vars_In), !,
 	retrieve_affected_disequalities(Vars_In, [], UQV_In, UQV_Tmp, [], Old_Disequalities), !,
-	debug_msg(1, 'test_and_update_vars_attributes :: Old_Disequalities', Old_Disequalities),
+	debug_msg(0, 'test_and_update_vars_attributes :: Old_Disequalities', Old_Disequalities),
 
 	perform_substitutions(Substitutions, UQV_Tmp, UQV_Aux_1), !,
 
@@ -247,8 +247,8 @@ test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities) :-
 	% Now we aggregate all of them.
 	accumulate_disequations(Simplified_Disequalities_1, Simplified_Disequalities_2, Simplified_Disequalities),
 
-	debug_msg(1, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
-	debug_msg(1, 'test_and_update_vars_attributes :: Status_Out', Status_In), 
+	debug_msg(0, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
+	debug_msg(0, 'test_and_update_vars_attributes :: Status_Out', Status_In), 
 	restore_attributes(UQV_Out, Simplified_Disequalities).
 
 retrieve_affected_disequalities([], _Vars_Examined, UV_Out, UV_Out, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
@@ -390,7 +390,7 @@ accumulate_disequations(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
 	debug_msg(0, 'accumulate_disequations :: Diseqs_In', Diseqs_In),
 	debug_msg(0, 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
 	accumulate_disequations_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
-	debug_msg(1, 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
+	debug_msg(0, 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
 
 accumulate_disequations_aux([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
 accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
