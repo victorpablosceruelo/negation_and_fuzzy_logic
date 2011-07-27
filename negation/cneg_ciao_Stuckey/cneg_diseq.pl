@@ -655,6 +655,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 % failed_before_or(Failed_Before_In, FB_Current, Failed_Before_Aux),
 failed_before_or('true', _FB_Current, 'true') :- !.
 failed_before_or(_Failed_Before_In, 'true', 'true') :- !.
+failed_before_or(_Failed_Before_In, _FB_Current, 'fail') :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
