@@ -204,7 +204,7 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	New_Arity is Arity + 5,
 
 	% Generate the main clause.
-	functor_local(Main_Cl, ':-', 2, [Head_Main_Cl |[Aux_Cl_Call]]), 
+	functor_local(Main_Cl, ':-', 2, [Head_Main_Cl |[(Aux_Cl_Call, Test_Last_Is_Ok)]]), 
 
 	functor_local(Head_Main_Cl, Main_Cl_Name, Arity, _Args_Head),
 	functor_local(Aux_Cl_Call, Aux_Cl_Name, New_Arity, _Args_Aux_Cl_Call), 
@@ -574,11 +574,11 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test_for_true(Test_For_True, Var) :-
-	generate_equality(Test_For_True, Var, 'true').
+test_last_is_ok(Test_For_True, Var) :-
+	generate_equality(Test_For_True, Var, ['true' | _More]).
 
-test_for_fail(Test_For_True, Var) :-
-	generate_equality(Test_For_True, Var, 'fail').
+test_last_fails(Test_For_True, Var) :-
+	generate_equality(Test_For_True, Var, ['fail' | _More]).
 
 generate_equality(Equality, Term_1, Term_2) :-
 	functor_local(Equality, '=', 2, [Term_1 |[Term_2]]).
