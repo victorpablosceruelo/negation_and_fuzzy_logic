@@ -496,7 +496,7 @@ generate_dn_cl(Head, Body, Counter, New_Cl) :-
 generate_dn_body([], _Head, _Counter, Status_In, (Op_1, Op_2)) :-
 	status_operation(Status_In, UQV_In, UQV_Out, _Allowed_To_Fail, Result_In),
 	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Result_In, 'fail').
+	generate_equality(Op_2, Result_In, 'true').
 
 generate_dn_body([Conj_1 | Body], Head, Counter, Status_In, DN_Conjunction) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
@@ -560,7 +560,7 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 	generate_name_with_counter(Head_Name, Index, New_Name),
 	functor_local(SubCall, New_Name, New_Arity, _SubCall_Args),
 	copy_args(Arity, Head, SubCall),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Result_In),
+	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
 	adjust_args_for_status(New_Arity, SubCall, Status_Aux),
 
 	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
