@@ -369,15 +369,16 @@ negate_atom(Atom, Neg_Atom, Status) :-
 
 negate_atom(Atom, Neg_Atom, Status_In) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
-
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-	status_operation(Status_Aux, UQV, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-	double_negation(Arg, Neg_Atom, Status_Aux).
+	functor_local(Difference, 'varsbag_difference', [UQV_In |[ UQV |[UQV_Aux]]]),
+	Neg_Atom = (Difference, Neg_Atom_Aux),
+	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
+	double_negation(Arg, Neg_Atom_Aux, Status_Aux).
 
 negate_atom(Atom, Neg_Atom, Status) :-
 	functor_local(Atom, Name, Arity, Args), !,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
-	New_Arity is Arity + 5, 
+	New_Arity is Arity + 4, 
 	append(Args, Status, New_Args),
 	functor_local(Neg_Atom, Aux_Cl_Name, New_Arity, New_Args).
 
@@ -385,30 +386,54 @@ negate_atom(Atom, Neg_Atom, Status) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-double_negation(Atom, (Neg_Conj_1, Neg_Conj_2), Status_In) :-
+double_negation(Atom, UQV, DN_Atom, Status_In) :-
 	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Results_In, Results_Out),
-	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, Results_In, Results_Aux),
-	double_negation(Conj_1, Neg_Conj_1, Status_C1),
-	status_operation(Status_C2, UQV_Aux, UQV_Out, Allowed_To_Fail, Results_Aux, Results_Out),
-	double_negation(Conj_2, Neg_Conj_2, Status_C2).
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
+
+	test_for_true(Test_For_True, Result_Aux),
+	test_for_fail(Test_For_Fail, Result_Aux),
+	generate_equality(Op_1, UQV_Out, UQV_Aux),
+	generate_equality(Op_2, Result_In, Result_Aux),
+
+	Ops_When_True = (Test_For_True, DN_Conj_2),
+	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
+	DN_Atom = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
+
+	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
+	double_negation(Conj_1, DN_Conj_1, Status_C1),
+	status_operation(Status_C2, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
+	double_negation(Conj_2, DN_Conj_2, Status_C2).
 
 double_negation(Atom, (Neg_Disj_1; Neg_Disj_2), Status_In) :-
 	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
-	% status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Results_In, Results_Out),
-	double_negation(Disj_1, Neg_Disj_1, Status_In), % Not sure this translation is correct, 
-	double_negation(Disj_2, Neg_Disj_2, Status_In). % but it should not be used.
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
 
-double_negation(Atom, Neg_Atom, Status_In) :-
+	test_for_true(Test_For_True, Result_Aux),
+	test_for_fail(Test_For_Fail, Result_Aux),
+	generate_equality(Op_1, UQV_Out, UQV_Aux),
+	generate_equality(Op_2, Result_In, Result_Aux),
+
+	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_Fail = (Test_For_Fail, DN_Conj_2),
+	DN_Atom = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
+
+	status_operation(Status_D1, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
+	double_negation(Disj_1, Neg_Disj_1, Status_D1),
+ 	status_operation(Status_D1, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
+	double_negation(Disj_2, Neg_Disj_2, Status_D2). 
+
+double_negation(Atom, DN_Atom, Status_In) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Results_In, Results_Out),
-	append(UQV, UQV_In, UQV_Aux),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Results_In, Results_Out),
+	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
+
+	functor_local(Addition, 'varsbag_addition', [UQV |[ UQV_In |[UQV_Aux]]]),
+	DN_Atom = (Addition, Neg_Atom),
+	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
 	negate_atom(Arg, Neg_Atom, Status_Aux). % Problematic
 
 double_negation(Atom, Neg_Atom, Status_In) :-
 	functor_local(Atom, Name, Arity, Args_In), !,
-	New_Arity is Arity + 5,
+	New_Arity is Arity + 4,
 	append(Args_In, Status_In, Args_Out),
 	generate_double_negation_name(Name, New_Name),
 	functor_local(Neg_Atom, New_Name, New_Arity, Args_Out).
