@@ -468,7 +468,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	cneg_aux:memberchk(T1, UQV_In), % Both are UQ vars.
 	cneg_aux:memberchk(T2, UQV_In), !,
-	debug_msg(1, 'simplify_disequation_aux :: UNIFY UQV(T1) /\ UQV(T2)', Diseq),
+	debug_msg(1, 'simplify_disequation_aux :: UNIFY UQV(T1) and UQV(T2)', Diseq),
 
 	(   (   Allowed_To_Fail == 'fail', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
 	;   (	Allowed_To_Fail == 'true', debug_msg(1, 'Return value is fail.', ''),
@@ -483,18 +483,18 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 	disequality_contents(Diseq, T1, T2),
         var(T1),
         var(T2), !, % Both are variables.
-	debug_msg(1, 'simplify_disequation_aux :: var(T1) /\ var(T2)', Diseq),
+	debug_msg(1, 'simplify_disequation_aux :: var(T1) and var(T2)', Diseq),
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	(
 	    (   % T1 is a UQ var, T2 is not a UQ var.
 		cneg_aux:memberchk(T1, UQV_In), !,
-		debug_msg(1, 'simplify_disequation_aux :: UQV(T1) /\ var(T2)', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and var(T2)', Diseq),
 		simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answer)
 	    )
 	;
 	    (   % T2 is a UQ var, T1 is not a UQ var.
 		cneg_aux:memberchk(T2, UQV_In), !,
-		debug_msg(1, 'simplify_disequation_aux :: UQV(T2) /\ var(T1)', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: UQV(T2) and var(T1)', Diseq),
 		disequality_contents(Diseq_Aux, T2, T1),
 		simplify_disequation_aux_uqvar_t1_var_t2([Diseq_Aux | More_Diseqs], Status_In, Answer)
 	    )
@@ -507,7 +507,7 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Differen
 	    )
 	;
 	    (   % T1 and T2 can not be disunified. We assign Cont = fail. 
-		debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) /\ var(T2)', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) and var(T2)', Diseq),
 		(   (   Allowed_To_Fail == 'fail', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
 		;   (	Allowed_To_Fail == 'true', debug_msg(1, 'Return value is fail.', ''),
 			!,
@@ -524,13 +524,13 @@ simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % var and 
 	(
 	    (   % T1 is a VAR. T2 is not a var.
 		var(T1), !,
-		debug_msg(1, 'simplify_disequation_aux :: var(T1) /\ nonvar(T2) ', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: var(T1) and nonvar(T2) ', Diseq),
 		simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
 		var(T2), !,
-		debug_msg(1, 'simplify_disequation_aux :: var(T2) /\ nonvar(T1) ', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: var(T2) and nonvar(T1) ', Diseq),
 		disequality_contents(Diseq_Aux, T2, T1),
 		simplify_disequation_aux_var_nonvar([Diseq_Aux | More_Diseqs], Status_In, Answer)
 	    )
@@ -582,7 +582,7 @@ simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answe
         var(T2), 
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, _Failed_Before_In, FB_Out),
 	cneg_aux:memberchk(T1, UQV_In), !, % T1 is a uq var, T2 is not a uqvar.
-	debug_msg(1, 'simplify_disequation_aux :: UQV(T1) /\ var(T2) ', Diseq),
+	debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and var(T2) ', Diseq),
 
 	% T1 is not different from T2. Just return fail to disunify, unify and continue.
 	(   (   Allowed_To_Fail == 'fail', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
@@ -608,7 +608,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
-		debug_msg(1, 'simplify_disequation_aux :: var(T1) /\ functor(T2) /\ T1 in vars(T2)', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: var(T1) and functor(T2) and T1 in vars(T2)', Diseq),
 		cneg_unify(UQV_In, UQV_Out),
 		cneg_unify('fail', FB_Out), % We've not failed before.
 		diseq_eq(Answer, []) % Answer is True.
@@ -616,7 +616,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
 		cneg_aux:memberchk(T1, UQV_In), !,
-		debug_msg(1, 'simplify_disequation_aux :: UQV(T1) /\ functor(T2)', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and functor(T2)', Diseq),
 		(   (   Allowed_To_Fail == 'fail', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
 		;   (	Allowed_To_Fail == 'true', debug_msg(1, 'Return value is fail.', ''),
 			!,
@@ -640,7 +640,7 @@ simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):-
 	    (   % Keep the functor but diseq between the arguments.
 		% We need to say that we have failed because if we are playing with attributed
 		% variables we have no way to get more information on the disequality.
-		debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) /\ functor(T2)', Diseq),
+		debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) and functor(T2)', Diseq),
 		
 		(   (   Allowed_To_Fail == 'fail', !, fail )
 		;   (	Allowed_To_Fail == 'true',
