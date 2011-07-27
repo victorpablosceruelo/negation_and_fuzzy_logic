@@ -181,9 +181,9 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	debug_msg_list(0, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_Out),
-	nl, nl,
+	debug_msg_nl(0), debug_msg_nl(0),
 	debug_msg_list(0, 'Cls_Out', Cls_Out),
-	nl, nl, 
+	debug_msg_nl(0), debug_msg_nl(0), 
 	!. %Backtracking forbiden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

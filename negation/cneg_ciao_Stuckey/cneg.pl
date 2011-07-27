@@ -38,6 +38,7 @@ cneg_aux(Functor, FV_In, FV_Out, Allowed_To_Fail, Cont_In, Cont_Out) :-
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	append(Args, [FV_In |[FV_Out |[Allowed_To_Fail |[Cont_In |[Cont_Out]]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
+	debug_msg(1, 'cneg_aux :: call', New_Functor),
 	call(New_Functor).
 
 %cneg_initialize([], _UQV_Out, 'true', _Cont_Out).
