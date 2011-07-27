@@ -44,13 +44,13 @@ trans_sent_aux(X, [], _SourceFileName):-
 
 % (:- include(dist, _)), (:- include(cneg_lib)), 
 trans_sent_aux(end_of_file, ClsFinal, SourceFileName):- !,
-	debug_msg(1, 'INFO: #################################################', ''), 
+%	debug_msg(1, 'INFO: #################################################', ''), 
 	debug_msg(1, 'INFO: #############  Now computing negation  ##############', ''), 
-	debug_msg(1, 'INFO: #################################################', ''), 
+%	debug_msg(1, 'INFO: #################################################', ''), 
 	trans_sent_eof(ClsFinal, SourceFileName).
 
-trans_sent_aux(0, [], SourceFileName) :- 	!,
-	debug_msg(2, 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName).
+trans_sent_aux(0, [], _SourceFileName) :- 	!.
+%	debug_msg(2, 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName).
 
 % Do not modify module imports, declarations and so on.
 trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
