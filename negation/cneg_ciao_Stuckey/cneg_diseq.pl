@@ -405,7 +405,7 @@ simplify_disequations([Diseq|Diseq_List], Accept_Fails, Status_In, Diseq_Acc_In,
 	status_operation(Status_Aux, UQV_In, UQV_Aux, Cont_In, Cont_Aux),
 	simplify_disequation([Diseq], Accept_Fails, Status_Aux, Simplified_Diseq),
 %	debug_msg(1, 'simplify_disequations :: Simplified_Diseq', Simplified_Diseq), 
-%	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux) ,
+	debug_msg(1, 'simplify_disequations :: Status_Aux', Status_Aux) ,
 	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
 	status_operation(Status_Out, UQV_Aux, UQV_Out, Cont_Aux, Cont_Out),
 	simplify_disequations(Diseq_List, Accept_Fails, Status_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
