@@ -425,11 +425,11 @@ simplify_disequations([Diseq|Diseq_List], Status_In, Diseq_Acc_In, Diseq_Acc_Out
 
 % just for debug.
 simplify_disequation(Diseqs, Status, Answer) :-
-	debug_msg_nl(1),
+	debug_msg_nl(0),
 	debug_msg(1, 'simplify_disequation :: (Diseqs, Status)', (Diseqs, Status)),
 	simplify_disequation_aux(Diseqs, Status, Answer),
 	debug_msg(1, 'simplify_disequation :: (Status, Answer)', (Status, Answer)),
-	debug_msg_nl(1).
+	debug_msg_nl(0).
 
 % For the case we do not have a disequality to simplify.
 % The answer is obviously empty, but we might fail because of Do_Not_Fail = fail.
@@ -719,7 +719,8 @@ cneg_eq(T1, T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :-
 		)
 	    )
 	),
-	debug_msg(1, 'cneg_eq :: (UQV_Out, Result)', (UQV_Out, Result)).
+	debug_msg(1, 'cneg_eq :: (UQV_Out, Result)', (UQV_Out, Result)),
+	debug_msg_nl(1).
 
 cneg_unify(T, T).
 

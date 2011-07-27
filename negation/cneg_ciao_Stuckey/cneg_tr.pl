@@ -470,7 +470,7 @@ generate_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	debug_msg(1, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	debug_msg(0, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
 	generate_dn_cls(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
