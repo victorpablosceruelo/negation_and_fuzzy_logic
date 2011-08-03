@@ -1,5 +1,5 @@
-:- module(queensPeano,_,[.(cneg), .(debugger_pkg)]).
-% :- module(queensPeano,_,[.(cneg)]).
+:- module(ex_ancestor,_,[.(cneg), .(debugger_pkg)]).
+% :- module(ex_ancestor,_,[.(cneg)]).
 
 
 parent1(john, mary).
