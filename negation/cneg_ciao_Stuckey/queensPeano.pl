@@ -784,8 +784,8 @@ parent1(peter, susan).
 ancestor(X, Y):-
  	parent1(X, Y).
 ancestor(X, Y):-
-	parent1(Z, Y),
-	ancestor(X, Z).
+	parent1(X, Z),
+	ancestor(Z, Y).
 
 %peano(0,0).
 %peano(N,s(P1)):-
