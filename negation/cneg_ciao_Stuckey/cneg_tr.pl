@@ -220,7 +220,10 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 
 	% We need to copy the args from the aux functor to the aux_i functors.
 	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	generate_cneg_conj(1, Info_Aux_Cl, Body_Aux_Cl, Status_Head_Aux_Cl).
+	generate_cneg_conj(1, Info_Aux_Cl, Body_Aux_Cl_1, Status_Head_Aux_Cl),
+	generate_cneg_conj_fail(1, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl),
+	Body_Aux_Cl = (Body_Aux_Cl_1 ; Body_Aux_Cl_2).
+
 %	generate_subcalls_2(1, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl),
 %	Body_Aux_Cl = ((Body_Aux_Cl_1) ; (Body_Aux_Cl_2)). 
 
@@ -245,6 +248,10 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
 
+% Este predicado genera un cuerpo con llamadas a cada uno de las 
+% distintas clausulas que teniamos antes unidas por una disyuncion.
+% Tendra exito si todas las negadas tienen exito, pero si no tiene 
+% exito debe poder llamar a cada una de las negadas anteriores.
 generate_cneg_conj(Index, Info_Aux_Cl, 'fail', Status_In) :- 
 	head_aux_cl_info(Info_Aux_Cl, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
 	Index > Counter, !,
@@ -271,16 +278,20 @@ generate_cneg_conj(Index, Info_Aux_Cl, Body, Status_In) :-
 	    (
 		Index < Counter,
 		test_for_true(Test_For_True, Result_Aux),
-		test_for_fail(Test_For_Fail, Result_Aux),
-		generate_equality(Op_1, UQV_Out, UQV_Aux),
-		generate_equality(Op_2, Result, Result_Aux),
-		Ops_When_Fail=(Test_For_Fail, (Op_1, Op_2)),
-		Body = (SubCall, (Ops_When_Fail ; (Test_For_True, MoreBody))),
+%		test_for_fail(Test_For_Fail, Result_Aux),
+%		generate_equality(Op_1, UQV_Out, UQV_Aux),
+%		generate_equality(Op_2, Result, Result_Aux),
+%		Ops_When_Fail=(Test_For_Fail, (Op_1, Op_2)),
+%		Body = (SubCall, (Ops_When_Fail ; (Test_For_True, MoreBody))),
+		Body = (SubCall, (Test_For_True, MoreBody)),
 		status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Result),
 		NewIndex is Index + 1,
 		generate_cneg_conj(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
 	    )
 	).
+
+generate_cneg_conj_fail(Index, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl) :-
+	
 
 generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 	name(Aux_Cl_Name, String_1),
