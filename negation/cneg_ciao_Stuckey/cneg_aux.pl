@@ -12,12 +12,14 @@
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/4, goal_is_equality/3,	    
-	    terms_are_equal/2, unify_terms/2
+	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
-	    % qualify_string_name/3, remove_qualification/2, 
-	    % term_name_is_qualified/1,
-	    % replace_in_term_var_by_value/4, % replace_in_args_var_by_value/4,
+	    qualify_string_name/3, 
+	    % term_name_is_qualified/1, remove_qualification/2, 
+	    replace_in_term_var_by_value/4,
+	    % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
+	    retrieve_element_from_list/2
 	],
 	[assertions]).
 
@@ -147,6 +149,15 @@ add_to_list_if_not_there(Elto, List, [Elto|List]) :- !.
 %remove_duplicates([X|L_In], L_Tmp_In, L_Out):-
 %	add_to_list_if_not_there(X, L_Tmp_In, L_Tmp_Out), !,
 %	remove_duplicates(L_In, L_Tmp_Out, L_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Esto es un memberchk un tanto bruto (ver memberchk debajo). 
+retrieve_element_from_list([Element|_List], Element).
+retrieve_element_from_list([_Other_Element|List], Element) :-
+	retrieve_element_from_list(List, Element).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

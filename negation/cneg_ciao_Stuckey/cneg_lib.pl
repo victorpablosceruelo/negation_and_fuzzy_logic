@@ -162,6 +162,40 @@ frontier(Goal, [], Goal) :-
 	debug_msg(1, 'ERROR: frontier can not be evaluated for', Goal), 
 	nl, nl, !, fail.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Structure to manage all the info about the frontier in an easy way.
+frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
+
+% Look for those saved clauses with same name and arity.	
+%look_for_the_relevant_clauses(Goal, _Frontier) :-
+%	functor(Goal, Name, Arity),  % Security
+%	Name \== ',', Name \== ';',    % Issues
+%	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
+%	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body),
+%	debug_clause('look_for_the_relevant_clauses', cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body)),
+%	fail.
+
+%look_for_the_relevant_clauses(_Goal, _Frontier) :-
+%	cneg_processed_pred(G, H, I, J), 
+%	debug_clause('look_for_the_relevant_clauses', cneg_processed_pred(G, H, I, J)),
+%	fail.
+
+look_for_the_relevant_clauses(Goal, Frontier) :-
+	functor(Goal, Name, Arity),  % Security
+	Name \== ',', Name \== ';',    % Issues
+	!, % Backtracking forbiden.
+	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
+%	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
+	setof_local(frontier(Head, Body, FrontierTest), 
+	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, G, Front_Out) :-
 	debug_msg_nl(1),
@@ -530,7 +564,7 @@ perform_a_call_to(Goal) :-
 
 perform_a_call_to(Goal) :-
 	goal_is_disequality(Goal, X, Y, FreeVars), !,
-	cneg_diseq(X, Y, FreeVars).
+	diseq(X, Y, FreeVars).
 
 perform_a_call_to(Goal) :-
 	goal_is_equality(Goal, X, Y), !,
