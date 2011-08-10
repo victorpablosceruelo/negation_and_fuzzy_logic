@@ -203,6 +203,8 @@ generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out
 
 generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name),	
+	generate_double_negation_name(Name, Main_DN_Name),
+
 	New_Arity is Arity + 4,
 
 	% Generate the main clause.
@@ -221,9 +223,12 @@ generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	adjust_args_for_status(New_Arity, Head_Aux_Cl, Status_Head_Aux_Cl),
 
 	% We need to copy the args from the aux functor to the aux_i functors.
-	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	generate_cneg_conj(1, Info_Aux_Cl, Body_Aux_Cl_1, Status_Head_Aux_Cl),
-	generate_cneg_conj_fail(1, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl),
+	head_aux_cl_info(Info_Aux_Cl_1, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
+	generate_cneg_conj(1, Info_Aux_Cl_1, Body_Aux_Cl_1, Status_Head_Aux_Cl),
+
+	head_aux_cl_info(Info_Aux_Cl_2, Counter, Head_Aux_Cl, Main_DN_Name, New_Arity, Arity),
+	generate_cneg_conj_fail(1, Info_Aux_Cl_2, Body_Aux_Cl_2, Status_Head_Aux_Cl),
+
 	Body_Aux_Cl = (Body_Aux_Cl_1 ; Body_Aux_Cl_2).
 
 %	generate_subcalls_2(1, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl),
@@ -292,7 +297,36 @@ generate_cneg_conj(Index, Info_Aux_Cl, Body, Status_In) :-
 	    )
 	).
 
-generate_cneg_conj_fail(Index, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl) :-
+generate_cneg_conj_fail(Index, Info_Aux_Cl, 'fail', Status_In) :- 
+	head_aux_cl_info(Info_Aux_Cl, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
+	Index > Counter, !,
+	status_operation(Status_In, UQV_In, UQV_In, _Allowed_To_Fail, 'fail').
+
+generate_cneg_conj_fail(Index, Info_Aux_Cl, Body, Status_In) :-
+	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
+	status_operation(Status_In, _UQV_In, _UQV_Out, _Allowed_To_Fail, Result),
+	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
+
+	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
+	copy_args(Arity, Head_Aux_Cl, SubCall),
+	adjust_args_for_status(New_Arity, SubCall, Status_In),
+
+	% Prepare tests.
+	test_for_true(Test_For_True, Result),
+
+	(
+	    (   % Optimizations for the last one.
+		Index == Counter,
+		Body = (SubCall, Test_For_True)
+	    )
+	;
+	    (
+		Index < Counter,
+		Body = ((SubCall, Test_For_True) ; MoreBody),
+		NewIndex is Index + 1,
+		generate_cneg_conj_fail(NewIndex, Info_Aux_Cl, MoreBody, Status_In)
+	    )
+	).
 	
 
 generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
@@ -585,7 +619,7 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_pre_frontiers([], Cls, Cls) :- !.
+generate_pre_frontiers([], _SourceFileName, Cls, Cls) :- !.
 generate_pre_frontiers([(Head, Body, _Counter) | List_Of_Preds], SourceFileName, Cls_In, Cls_Out) :-
 	functor(Head, Head_Name, Head_Arity),
 	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body, 'true')),
