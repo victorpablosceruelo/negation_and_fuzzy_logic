@@ -1,15 +1,13 @@
 %
 % From Susana modified by VPC (started 29/06/2010)
 %
-:- module(cneg_lib, [cneg_lib_aux/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
+:- module(cneg_lib, [cneg_rt/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
 % To access predicates from anywhere.
-:- multifile cneg_processed_pred/4.
-:- multifile cneg_dynamic_cl/6.
-:- multifile cneg_static_cl/3.
+:- multifile cneg_pre_frontier/6.
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, _).
@@ -28,45 +26,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%cneg_lib_aux(Goal, [], Result) :- 
-%	debug_msg(1, 'cneg_lib :: using cneg_static for', Goal), 
-%	cneg_static(Goal, Result).
-
-cneg_lib_aux(Goal, UnivVars, Result):-
-%	UnivVars \== [],
+cneg_rt(Goal, UnivVars, Result):-
 	debug_msg(1, 'cneg_lib :: using cneg_dynamic for', Goal), 
 	cneg_dynamic(Goal, UnivVars, Result).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Be carefull: the following code produces random errors.
-%cneg_static(_Goal) :-
-%	cneg_static_pred(Goal, SourceFileName, Occurences), 
-%	debug_msg(1, 'cneg_static_pred', (Goal, SourceFileName, Occurences)),
-%	fail.
-
-cneg_static(Goal, (Result_G1, Result_G2)) :-
-	goal_is_conjunction(Goal, G1, G2), !,
-%	debug_msg(1, 'cneg_static', goal_is_conjunction(Goal, G1, G2)),
-	cneg_static(G1, Result_G1),
-	cneg_static(G2, Result_G2).
-
-cneg_static(Goal, Result) :-
-	goal_clean_up(Goal, NewGoal), !,
-%	debug_msg(1, 'cneg_static', goal_clean_up(Goal, NewGoal)),
-	cneg_static(NewGoal, Result).
-
-cneg_static(Goal, cneg_diseq(X, Y, FreeVars)) :-
-	goal_is_disequality(Goal, X, Y, FreeVars), !.
-
-cneg_static(Goal, cneg_eq(X, Y)) :-
-	goal_is_equality(Goal, X, Y), !.
-
-cneg_static(Goal, cneg_static_predicate_call(Goal, SourceFileName, Occurences)) :-
-	functor_local(Goal, Name, Arity, _Args),
-	cneg_processed_pred(Name, Arity, SourceFileName, Occurences).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,7 +39,7 @@ cneg_static(Goal, cneg_static_predicate_call(Goal, SourceFileName, Occurences)) 
 % of the goal and UnivVars the universal quantified variable of it.
 
 cneg_dynamic(Goal, UnivVars, Solution) :-
-%	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
+	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
 	cneg_dynamic_aux(Goal, UnivVars, Solution),
 	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
 	debug_msg(1, 'cneg_dynamic :: Solution', Solution),
@@ -142,11 +104,6 @@ frontier(Goal, [Frontier], NewGoal):-
 	cneg_eq(NewGoal, (X = Y)),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
-
-%frontier((X=_Y), [(X=X,[])], (X=_Y)):- !.
-%frontier((X==Y),[(X==Y,[X==Y])]):- !.
-%frontier((X\==Y),[(X\==Y,[X\==Y])]):- !.
-
 % Now go for other functors stored in our database.
 frontier(Goal, Front, Goal):-
 	debug_msg(1, 'frontier :: Goal', Goal),
@@ -155,7 +112,7 @@ frontier(Goal, Front, Goal):-
 	debug_msg_list(1, 'frontier_IN', Front_Tmp),
 	simplify_frontier(Front_Tmp, Goal, Front),
 	debug_msg(1, 'frontier_OUT', Front), 
-	!. % Frontier is uniquely determine if this clause is used.
+	!. % Frontier is uniquely determined if this clause is used.
 
 % And at last report an error if it was impossible to found a valid entry.
 frontier(Goal, [], Goal) :-
@@ -187,10 +144,10 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	functor(Goal, Name, Arity),  % Security
 	Name \== ',', Name \== ';',    % Issues
 	!, % Backtracking forbiden.
-	cneg_processed_pred(Name, Arity, SourceFileName, _Occurences), 
+	cneg_pre_frontier(Name, Arity, _SourceFileName, _Head_Aux, _Body_Aux, _FrontierTest_Aux), 
 %	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
 	setof_local(frontier(Head, Body, FrontierTest), 
-	cneg_dynamic_cl(Name, Arity, SourceFileName, Head, Body, FrontierTest), Frontier).
+	cneg_pre_frontier(Name, Arity, Head, Body, FrontierTest), Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -557,7 +514,7 @@ call_combined_solutions_conjunction([Sol|More_Sols]) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This is for making the calls to the predicates
-% in the main program.
+% in the main program. For what?
 perform_a_call_to(Goal) :- 
 	goal_clean_up(Goal, NewGoal), !,
 	perform_a_call_to(NewGoal).
@@ -574,7 +531,7 @@ perform_a_call_to(Goal) :-
 perform_a_call_to(Goal) :-
 	debug_msg(1, 'perform_a_call_to(Goal)', Goal),
 	functor_local(Goal, Goal_Name, Arity, Arguments),
-	cneg_processed_pred(Goal_Name, Arity, SourceFileName, _Occurences),
+	cneg_pre_frontier(Goal_Name, Arity, SourceFileName, _Head_Aux, _Body_Aux, _FrontierTest_Aux),
 	name(SourceFileName, SourceFileName_String),
 	name(Goal_Name, Goal_Name_String),
 	qualify_string_name(SourceFileName_String, Goal_Name_String, NewGoal_Name_String),
