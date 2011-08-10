@@ -1,7 +1,7 @@
 %
 % From Susana modified by VPC (started 29/06/2010)
 %
-:- module(cneg_lib, [cneg_rt/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
+:- module(cneg_rt, [cneg_rt/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 

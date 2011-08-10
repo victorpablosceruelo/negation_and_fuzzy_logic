@@ -1,4 +1,4 @@
-:- module(ex_ancestor,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_ancestor,_,[.(cneg), debugger_pkg]).
 % :- module(ex_ancestor,_,[.(cneg)]).
 
 
