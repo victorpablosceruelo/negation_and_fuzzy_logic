@@ -163,7 +163,7 @@ retrieve_list_of(_List_Name, []).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-trans_sent_eof(Cls_Out, _SourceFileName) :-
+trans_sent_eof(Cls_Out, SourceFileName) :-
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
 	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
@@ -180,7 +180,9 @@ trans_sent_eof(Cls_Out, _SourceFileName) :-
 	generate_double_negation_main_cls(List_Of_Preds, Cls_2, Cls_3),
 	debug_msg_list(0, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
-	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_Out),
+	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_4),
+	debug_msg_list(0, 'Cls_4', Cls_4),
+	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0),
 	debug_msg_list(0, 'Cls_Out', Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0), 
@@ -578,6 +580,16 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 	New_Index is Index + 1,
 	generate_double_negation_subcalls(Head, Arity, Status_Out, New_Index, Counter, More_Ops).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+generate_pre_frontiers([], Cls, Cls) :- !.
+generate_pre_frontiers([(Head, Body, _Counter) | List_Of_Preds], SourceFileName, Cls_In, Cls_Out) :-
+	functor(Head, Head_Name, Head_Arity),
+	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body, 'true')),
+	generate_pre_frontiers(List_Of_Preds, SourceFileName, [CL | Cls_In], Cls_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
