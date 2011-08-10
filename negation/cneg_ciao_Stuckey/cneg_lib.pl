@@ -12,7 +12,7 @@
 :- multifile cneg_static_cl/3.
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq,[cneg_diseq/3]).
+:- use_module(cneg_diseq, _).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
 
@@ -29,12 +29,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %cneg_lib_aux(Goal, [], Result) :- 
-%	debug('cneg_lib :: using cneg_static for', Goal), 
+%	debug_msg(1, 'cneg_lib :: using cneg_static for', Goal), 
 %	cneg_static(Goal, Result).
 
 cneg_lib_aux(Goal, UnivVars, Result):-
 %	UnivVars \== [],
-	debug('cneg_lib :: using cneg_dynamic for', Goal), 
+	debug_msg(1, 'cneg_lib :: using cneg_dynamic for', Goal), 
 	cneg_dynamic(Goal, UnivVars, Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,18 +44,18 @@ cneg_lib_aux(Goal, UnivVars, Result):-
 % Be carefull: the following code produces random errors.
 %cneg_static(_Goal) :-
 %	cneg_static_pred(Goal, SourceFileName, Occurences), 
-%	debug('cneg_static_pred', (Goal, SourceFileName, Occurences)),
+%	debug_msg(1, 'cneg_static_pred', (Goal, SourceFileName, Occurences)),
 %	fail.
 
 cneg_static(Goal, (Result_G1, Result_G2)) :-
 	goal_is_conjunction(Goal, G1, G2), !,
-%	debug('cneg_static', goal_is_conjunction(Goal, G1, G2)),
+%	debug_msg(1, 'cneg_static', goal_is_conjunction(Goal, G1, G2)),
 	cneg_static(G1, Result_G1),
 	cneg_static(G2, Result_G2).
 
 cneg_static(Goal, Result) :-
 	goal_clean_up(Goal, NewGoal), !,
-%	debug('cneg_static', goal_clean_up(Goal, NewGoal)),
+%	debug_msg(1, 'cneg_static', goal_clean_up(Goal, NewGoal)),
 	cneg_static(NewGoal, Result).
 
 cneg_static(Goal, cneg_diseq(X, Y, FreeVars)) :-
@@ -77,24 +77,24 @@ cneg_static(Goal, cneg_static_predicate_call(Goal, SourceFileName, Occurences)) 
 % of the goal and UnivVars the universal quantified variable of it.
 
 cneg_dynamic(Goal, UnivVars, Solution) :-
-%	debug('cneg_dynamic :: Goal', Goal),
+%	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
 	cneg_dynamic_aux(Goal, UnivVars, Solution),
-	debug('cneg_dynamic :: Goal', Goal),
-	debug('cneg_dynamic :: Solution', Solution),
+	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
+	debug_msg(1, 'cneg_dynamic :: Solution', Solution),
 	!. % No backtracking allowed
 
 cneg_dynamic_aux(Goal, UnivVars, Solution) :-
-	varsbag_local(Goal, UnivVars, [], GoalVars),
+	varsbag(Goal, UnivVars, [], GoalVars),
 	frontier(Goal, Frontier, Goal_Not_Qualified), 
-	debug_list('cneg_dynamic :: Frontier (list)', Frontier),
-%	debug('cneg_dynamic :: (GoalVars, UnivVars)', (GoalVars, UnivVars)), 
+	debug_msg_list(1, 'cneg_dynamic :: Frontier (list)', Frontier),
+%	debug_msg(1, 'cneg_dynamic :: (GoalVars, UnivVars)', (GoalVars, UnivVars)), 
 	copy_term((Goal_Not_Qualified, GoalVars), (Goal_Copy, GoalVars_Copy)),
 	%copy_term((Goal_Not_Qualified, GoalVars, UnivVars), (Goal_Copy, GoalVars_Copy, UnivVars_Copy)),
 	!, % No backtracking allowed
 	negate_frontier(Frontier, Goal_Copy, GoalVars_Copy, Solution),
 	!, % No backtracking allowed
 	% Unify NewGoal with the Head of the Clause we are playing with ...
-	% debug('cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
+	% debug_msg(1, 'cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
 	unify_terms(Goal_Not_Qualified, Goal_Copy),
 	!. % No backtracking allowed
 
@@ -118,7 +118,7 @@ frontier(Goal, Frontier, (NewG1; NewG2)):-
 	frontier(G1, F1, NewG1),
 	frontier(G2, F2, NewG2),
 	cneg_aux:append(F1, F2, Front),
-	debug('frontier :: disjunction', Front),
+	debug_msg(1, 'frontier :: disjunction', Front),
 	simplify_frontier(Front, (NewG1;NewG2), Frontier).
 
 % Now go for the conjunctions.
@@ -128,7 +128,7 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 	frontier(G2, F2, NewG2),
 % Creo q esta fallando aqui ...
 	combine_frontiers(F1, F2, Front),
-	debug('frontier :: conjunction', Front),
+	debug_msg(1, 'frontier :: conjunction', Front),
 	simplify_frontier(Front, (NewG1,NewG2), Frontier).
 
 % Now go for the functors for equality and disequality.
@@ -149,27 +149,27 @@ frontier(Goal, [Frontier], NewGoal):-
 
 % Now go for other functors stored in our database.
 frontier(Goal, Front, Goal):-
-	debug('frontier :: Goal', Goal),
+	debug_msg(1, 'frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Front_Tmp),
-	debug('frontier :: format', '(Head, Body, FrontierTest)'),
-	debug_list('frontier_IN', Front_Tmp),
+	debug_msg(1, 'frontier :: format', '(Head, Body, FrontierTest)'),
+	debug_msg_list(1, 'frontier_IN', Front_Tmp),
 	simplify_frontier(Front_Tmp, Goal, Front),
-	debug('frontier_OUT', Front), 
+	debug_msg(1, 'frontier_OUT', Front), 
 	!. % Frontier is uniquely determine if this clause is used.
 
 % And at last report an error if it was impossible to found a valid entry.
 frontier(Goal, [], Goal) :-
-	debug('ERROR: frontier can not be evaluated for', Goal), 
+	debug_msg(1, 'ERROR: frontier can not be evaluated for', Goal), 
 	nl, nl, !, fail.
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, G, Front_Out) :-
-	debug_nl,
-	debug('simplify_frontier :: Front_In', Front_In),
-	debug('simplify_frontier :: Goal', G),
+	debug_msg_nl(1),
+	debug_msg(1, 'simplify_frontier :: Front_In', Front_In),
+	debug_msg(1, 'simplify_frontier :: Goal', G),
 	simplify_frontier_aux(Front_In, G, Front_Out),
-	debug('simplify_frontier :: Front_Out', Front_Out),
-	debug_nl.
+	debug_msg(1, 'simplify_frontier :: Front_Out', Front_Out),
+	debug_msg_nl(1).
 
 simplify_frontier_aux([], _G, []) :- !.
 simplify_frontier_aux([Frontier | More_Frontier_In], G, [Frontier | More_Frontier_Out]):-
@@ -182,12 +182,12 @@ simplify_frontier_aux([_Frontier|More_Frontier_In], G, More_Frontier_Out):-
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Frontier, Goal):-
 	frontier_contents(Frontier, Head, _Body, FrontierTest),
-	debug('test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
+	debug_msg(1, 'test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
         copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
         copy_term(Goal, G_Tmp),
         cneg_eq(H_Tmp, G_Tmp), 
 	call_combined_solutions(FrontierTest_Tmp), 
-	debug('test_frontier_is_valid', 'YES'),
+	debug_msg(1, 'test_frontier_is_valid', 'YES'),
 	!.
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the combined frontier of the list 
@@ -225,19 +225,19 @@ combine_2_simple_frontiers(F1_1, F2_1, F3_1) :-
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
 negate_frontier(Frontier, Goal, GoalVars, Solutions) :-
-	debug_list('negate_frontier :: Frontier (list)', Frontier), 
-	debug('negate_frontier :: (Goal, GoalVars)', (Goal, GoalVars)), 
+	debug_msg_list(1, 'negate_frontier :: Frontier (list)', Frontier), 
+	debug_msg(1, 'negate_frontier :: (Goal, GoalVars)', (Goal, GoalVars)), 
 	!,
 	negate_frontier_aux(Frontier, Goal, GoalVars, Solutions),
 	!.
-%	debug('negate_frontier :: Solutions', Solutions).
+%	debug_msg(1, 'negate_frontier :: Solutions', Solutions).
 
 negate_frontier_aux([], _Goal, _GoalVars, true) :- !.
 negate_frontier_aux([Frontier | More_Frontier], Goal, GoalVars, Sol):-
 	frontier_contents(Frontier, Head, Body, _FrontierTest),
-	debug('negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
+	debug_msg(1, 'negate_frontier_aux: (Subfr, Goal, GoalVars)', ((Head, Body), Goal, GoalVars)),
 	negate_subfrontier((Head, Body), Goal, GoalVars, Sol_Subfr),
-	debug('negate_frontier_aux: Sol_Subfr', Sol_Subfr),
+	debug_msg(1, 'negate_frontier_aux: Sol_Subfr', Sol_Subfr),
 	!, % Reduce the stack's memory.
 	negate_frontier_aux(More_Frontier, Goal, GoalVars, Sol_More_Subfr),
 	combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, Sol), !.
@@ -257,34 +257,34 @@ combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Sub
 % It fails if the negation of the conjunction has no solutions
 negate_subfrontier((_Head, [fail]), _G, _GoalVars, true):- !.
 negate_subfrontier(C, Goal, GoalVars, SolC):-
-%	debug('negate_subfrontier :: (Head, Body)', (C)),
+%	debug_msg(1, 'negate_subfrontier :: (Head, Body)', (C)),
 	split_subfrontier_into_I_D_R(C, Goal, I, D, R),
 	!, % Reduce the stack's memory.
-%	debug('negate_subfrontier', split_subfrontier_into_I_D_R(C,Goal,GoalVars,I,D,R)),
+%	debug_msg(1, 'negate_subfrontier', split_subfrontier_into_I_D_R(C,Goal,GoalVars,I,D,R)),
 	negate_subfrontier_aux(GoalVars, I, D, R, SolC),
-%	debug('negate_subfrontier :: ((Head, Body), SolC)', ((C), SolC)),
+%	debug_msg(1, 'negate_subfrontier :: ((Head, Body), SolC)', ((C), SolC)),
 	!.
 
 % negate_subfrontier_aux(C, G, GoalVars, I, D, R, SolC)
 %negate_subfrontier_aux(_C, _Goal, _GoalVars, [fail], _D, _R, []) :-
-%	debug('negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
+%	debug_msg(1, 'negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
 %	!. % Backtracking is not allowed.
 negate_subfrontier_aux(_GoalVars, [], [], [], fail) :-
-	debug('negate_subfrontier_aux', 'I, D and R are empty lists'),
+	debug_msg(1, 'negate_subfrontier_aux', 'I, D and R are empty lists'),
 	!. % Backtracking is not allowed.
 negate_subfrontier_aux(GoalVars, I_In, D_In, R_In, SolC) :-
-%	debug('negate_subfrontier_aux :: (GoalVars)', (GoalVars)),
+%	debug_msg(1, 'negate_subfrontier_aux :: (GoalVars)', (GoalVars)),
 	normalize_I_D_R(I_In, D_In, R_In, GoalVars, I_Tmp, D_Tmp, R_Tmp, ImpVars, ExpVars), 
-%	debug('negate_subfrontier_aux :: (I_Tmp, D_Tmp, R_Tmp)', (I_Tmp, D_Tmp, R_Tmp)),
-%	debug('negate_subfrontier_aux :: ImpVars (vars(I) + GoalVars)', ImpVars),
-%	debug('negate_subfrontier_aux :: ExpVars (vars(R) - ImpVars)', ExpVars),
+%	debug_msg(1, 'negate_subfrontier_aux :: (I_Tmp, D_Tmp, R_Tmp)', (I_Tmp, D_Tmp, R_Tmp)),
+%	debug_msg(1, 'negate_subfrontier_aux :: ImpVars (vars(I) + GoalVars)', ImpVars),
+%	debug_msg(1, 'negate_subfrontier_aux :: ExpVars (vars(R) - ImpVars)', ExpVars),
 	split_D_R_into_imp_and_exp(D_Tmp, R_Tmp, ImpVars, ExpVars, Dimp, Rimp, DRexp),
 	!,
 
 	% Final process
-%	debug('negate_subfrontier_aux :: (I, Dimp, Rimp, DRexp)', (I_Tmp, Dimp, Rimp, DRexp)), 
+%	debug_msg(1, 'negate_subfrontier_aux :: (I, Dimp, Rimp, DRexp)', (I_Tmp, Dimp, Rimp, DRexp)), 
 	negate_formulae(GoalVars, ExpVars, I_Tmp, Dimp, Rimp, DRexp, SolC),
-%	debug('negate_subfrontier_aux :: SolC', SolC),
+%	debug_msg(1, 'negate_subfrontier_aux :: SolC', SolC),
 	!.
 
 % split_subfrontier_into_I_D_R(C,Goal,I,D,R) 
@@ -296,7 +296,7 @@ split_subfrontier_into_I_D_R((Head, BodyList), Goal_Copy, I, D, R):-
 	copy_term((Head, BodyList), (Head_Copy, BodyList_Copy)),
 	unify_goal_structure_into_head(Goal_Copy, Head_Copy),
 	split_body_into_I_D_R([Goal_Copy = Head_Copy | BodyList_Copy], [], [], [], I, D, R).
-%	debug('split_body_into_I_D_R', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
+%	debug_msg(1, 'split_body_into_I_D_R', ([Goal_Copy = Head_Copy | BodyList_Copy], I, D, R)).
 
 % unify_goal_structure_into_head(Goal_Copy, Head_Copy)
 unify_goal_structure_into_head(Goal_Copy, Head_Copy) :-
@@ -336,8 +336,8 @@ split_subgoal_into_I_D_R(SubGoal, I, D, R, I, D, [SubGoal | R]) :- !.
 normalize_I_D_R(I_In, D_In, R_In, GoalVars, I_Out, D_Out, R_Out, ImpVars, ExpVars):-
 	remove_from_I_irrelevant_equalities(I_In,D_In,R_In,GoalVars,[],I_Tmp,D_Tmp,R_Out),  
 	remove_from_I_duplicates(I_Tmp, I_Out),
-	varsbag_local(I_Out, [], GoalVars, ImpVars), % ImpVars = vars(I) + GoalVars
-	varsbag_local(R_Out, GoalVars, [], RelVars), % RelVars = vars(R) - GoalVars
+	varsbag(I_Out, [], GoalVars, ImpVars), % ImpVars = vars(I) + GoalVars
+	varsbag(R_Out, GoalVars, [], RelVars), % RelVars = vars(R) - GoalVars
 	difference(RelVars, ImpVars, ExpVars), % ExpVars = vars(R) - ImpVars = RelVars - ImpVars
 	remove_from_D_irrelevant_disequalities(D_Tmp, ImpVars, RelVars, D_Out). 
  
@@ -345,7 +345,7 @@ normalize_I_D_R(I_In, D_In, R_In, GoalVars, I_Out, D_Out, R_Out, ImpVars, ExpVar
 % of Vars that do not appear in NFVars
 difference([],_NFVars,[]).
 difference([Var|Vars],NFVars,FreeVars):-
-	memberchk_local(Var,NFVars),!,
+	memberchk(Var,NFVars),!,
 	difference(Vars,NFVars,FreeVars).
 difference([Var|Vars],NFVars,[Var|FreeVars]):-
 	difference(Vars,NFVars,FreeVars).
@@ -363,12 +363,12 @@ difference([Var|Vars],NFVars,[Var|FreeVars]):-
 remove_from_I_irrelevant_equalities([],D,R,_GoalVars,Iac,Iac,D,R) :- !.
 remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
 	var(Var),
-	\+ memberchk_local(Var,GoalVars),!,
+	\+ memberchk(Var,GoalVars),!,
 	replace_in_term_var_by_value((Iac,I,D,R),Var,Value,(Iac1,I1,D1,R1)),
 	remove_from_I_irrelevant_equalities(I1,D1,R1,GoalVars,Iac1,Iv,Dv,Rv).
 remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
 	var(Value),
-	\+ memberchk_local(Value,GoalVars),!,
+	\+ memberchk(Value,GoalVars),!,
 	replace_in_term_var_by_value((Iac,I,D,R),Value,Var,(Iac1,I1,D1,R1)),
 	remove_from_I_irrelevant_equalities(I1,D1,R1,GoalVars,Iac1,Iv,Dv,Rv).
 remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
@@ -385,10 +385,10 @@ remove_from_I_duplicates([X=Y|L_In],L_Out):-
 	X==Y,!, 
 	remove_from_I_duplicates(L_In,L_Out).
 remove_from_I_duplicates([X=Y|L_In],L_Out):-
-	memberchk_local(X=Y,L_In),!,
+	memberchk(X=Y,L_In),!,
 	remove_from_I_duplicates(L_In,L_Out).
 remove_from_I_duplicates([X=Y|L_In],L_Out):-
-	memberchk_local(Y=X,L_In),!, %% Different order
+	memberchk(Y=X,L_In),!, %% Different order
 	remove_from_I_duplicates(L_In,L_Out).
 remove_from_I_duplicates([E|L_In],[E|L_Out]):-
 	remove_from_I_duplicates(L_In,L_Out).
@@ -401,10 +401,10 @@ remove_from_I_duplicates([E|L_In],[E|L_Out]):-
 % by using this procedure.
 remove_from_D_irrelevant_disequalities([],_ImpVars,_RelVars,[]).
 remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,D1):-
-	varsbag_local(Diseq, [], [], Vars),
+	varsbag(Diseq, [], [], Vars),
 	retrieve_element_from_list(Vars, V),
-	\+ memberchk_local(V,ImpVars),
-	\+ memberchk_local(V,RelVars),!,
+	\+ memberchk(V,ImpVars),
+	\+ memberchk(V,RelVars),!,
 	remove_from_D_irrelevant_disequalities(D,ImpVars,RelVars,D1).
 remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,[Diseq|D1]):-
 	remove_from_D_irrelevant_disequalities(D,ImpVars,RelVars,D1).
@@ -414,9 +414,9 @@ remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,[Diseq|D1]):-
 % I, D and R (equalities, disequalities and rest of subgoals).
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 split_D_R_into_imp_and_exp(D, R, ImpVars, ExpVars, Dimp, Rimp, DRexp):-
-%	debug('split_D_R_into_imp_and_exp :: ExpVars', ExpVars),
-%	debug('split_D_R_into_imp_and_exp :: D', D),
-%	debug('split_D_R_into_imp_and_exp :: R', R),
+%	debug_msg(1, 'split_D_R_into_imp_and_exp :: ExpVars', ExpVars),
+%	debug_msg(1, 'split_D_R_into_imp_and_exp :: D', D),
+%	debug_msg(1, 'split_D_R_into_imp_and_exp :: R', R),
 	split_formula_between_imp_and_exp(D, ImpVars, ExpVars, [], Dimp, [], Dexp),
 	split_formula_between_imp_and_exp(R, ImpVars, ExpVars, [], Rimp, Dexp, DRexp).
 
@@ -429,10 +429,10 @@ split_D_R_into_imp_and_exp(D, R, ImpVars, ExpVars, Dimp, Rimp, DRexp):-
 % the rest of elements of F will be in Fimp
 split_formula_between_imp_and_exp([], _ImpVars, _ExpVars, Fimp, Fimp, Fexp, Fexp) :- !.
 split_formula_between_imp_and_exp([Term|F], ImpVars, ExpVars, Fimp_In, Fimp_Out, Fexp_In, Fexp_Out):-
-	varsbag_local(Term, ImpVars, [], Vars), % Retrieve only vars not in ImpVars.
-%	debug('split_formula_between_imp_and_exp :: Vars', Vars),
+	varsbag(Term, ImpVars, [], Vars), % Retrieve only vars not in ImpVars.
+%	debug_msg(1, 'split_formula_between_imp_and_exp :: Vars', Vars),
 	retrieve_element_from_list(Vars, V),
-	memberchk_local(V, ExpVars),!,
+	memberchk(V, ExpVars),!,
 	split_formula_between_imp_and_exp(F, ImpVars, ExpVars, Fimp_In, Fimp_Out, [Term|Fexp_In], Fexp_Out).
 split_formula_between_imp_and_exp([Term|F], ImpVars, ExpVars, Fimp_In, Fimp_Out, Fexp_In, Fexp_Out):-
 	split_formula_between_imp_and_exp(F, ImpVars, ExpVars, [Term|Fimp_In], Fimp_Out, Fexp_In, Fexp_Out).
@@ -443,13 +443,13 @@ split_formula_between_imp_and_exp([Term|F], ImpVars, ExpVars, Fimp_In, Fimp_Out,
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 negate_formulae(GoalVars, ExpVars, I, Dimp, Rimp, DRexp, Sol):-
 	negate_Dexp_Rexp(DRexp, ExpVars, fail, Tmp_Sol_1), 
-%	debug('negate_formulae', negate_Dexp_Rexp(DRexp, ExpVars, fail, Tmp_Sol_1)), 
+%	debug_msg(1, 'negate_formulae', negate_Dexp_Rexp(DRexp, ExpVars, fail, Tmp_Sol_1)), 
 	negate_Rimp(Rimp, Tmp_Sol_1, Tmp_Sol_2),
-%	debug('negate_formulae', negate_Rimp(Rimp, Tmp_Sol_1, Tmp_Sol_2)),
+%	debug_msg(1, 'negate_formulae', negate_Rimp(Rimp, Tmp_Sol_1, Tmp_Sol_2)),
 	negate_Dimp(Dimp, Tmp_Sol_2, Tmp_Sol_3),
-%	debug('negate_formulae', negate_Dimp(Dimp, Tmp_Sol_2, Tmp_Sol_3)),
+%	debug_msg(1, 'negate_formulae', negate_Dimp(Dimp, Tmp_Sol_2, Tmp_Sol_3)),
 	negate_I(I, GoalVars, Tmp_Sol_3, Sol), 
-%	debug('negate_formulae', negate_I(I, GoalVars, Tmp_Sol_3, Sol)), 
+%	debug_msg(1, 'negate_formulae', negate_I(I, GoalVars, Tmp_Sol_3, Sol)), 
 	!.
 
 % 'fail' is just our terminator, so we remove it (if possible).
@@ -467,7 +467,7 @@ negate_I([Eq|I], GoalVars, Prev_Solution, Solution):-
 % negation of the equality Eq 
 negate_eq(Goal, GoalVars, cneg_diseq(T1,T2, FreeVars), cneg_eq(T1,T2)):-
 	goal_is_equality(Goal, T1, T2),
- 	varsbag_local(cneg_eq(T1,T2), GoalVars, [], FreeVars).
+ 	varsbag(cneg_eq(T1,T2), GoalVars, [], FreeVars).
 
 % new_Vars(FreeVars,UnivVars) returns in UnivVars so many new variables
 % as the number of elements of FreeVars
@@ -505,11 +505,11 @@ get_conjunction([X|L],(X,C)):-
 % solution of the negation of the main Goal. The rest of solutions will
 % be obtained by backtracking.
 call_combined_solutions(X) :-
-%	debug('call_combined_solutions', X),
+%	debug_msg(1, 'call_combined_solutions', X),
 	call_combined_solutions_conjunction(X).
 
 %call_combined_solutions_conjunction(Any) :-
-%	debug('call_combined_solutions_conjunction', Any),
+%	debug_msg(1, 'call_combined_solutions_conjunction', Any),
 %	fail.
 call_combined_solutions_conjunction([]) :- !.
 call_combined_solutions_conjunction([Sol]) :- !,
@@ -538,7 +538,7 @@ perform_a_call_to(Goal) :-
 
 % Qualify the predicate as needed.
 perform_a_call_to(Goal) :-
-	debug('perform_a_call_to(Goal)', Goal),
+	debug_msg(1, 'perform_a_call_to(Goal)', Goal),
 	functor_local(Goal, Goal_Name, Arity, Arguments),
 	cneg_processed_pred(Goal_Name, Arity, SourceFileName, _Occurences),
 	name(SourceFileName, SourceFileName_String),
@@ -553,7 +553,7 @@ perform_a_call_to(Goal) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_eq(X, Y) :- debug('cneg_lib', cneg_eq(X, Y)), fail.
+cneg_eq(X, Y) :- debug_msg(1, 'cneg_lib', cneg_eq(X, Y)), fail.
 cneg_eq(X, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
