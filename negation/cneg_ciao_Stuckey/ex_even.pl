@@ -1,4 +1,4 @@
-:- module(even,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_even,_,[.(cneg), debugger_pkg]).
 %:- module(even,_,[.(cneg)]).
 %:- use_module(dist). 
 

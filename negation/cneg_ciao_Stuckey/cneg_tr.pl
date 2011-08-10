@@ -370,7 +370,13 @@ generate_cneg_disj(Head, Body, Counter, New_Cl) :-
 
 	% Determine which variables are in the body but are not in the head.
 	cneg_aux:varsbag(New_Head, [], [], Vars_New_Head), 
-	cneg_aux:varsbag(Body, Vars_New_Head, [], UQV_Body), 
+	cneg_aux:varsbag(Body, Vars_New_Head, [], UQV_Body),
+
+	% Aqui es donde se sabe si hara falta la negacion de Chan o no.
+	% El problema es q las variables de la cabecera no la necesitan, por lo que 
+	% hay que distinguir entre cabecera y cuerpo. Jodido.
+
+ 
 	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_Body |[ UQV_Tmp]]]),
 
 	% negate_body_conjunction
