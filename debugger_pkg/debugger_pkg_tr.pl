@@ -25,7 +25,7 @@ filename_extension(".pl").
 debugger_pkg(Input, Output, FileName) :- 
 	debugger_pkg_aux(Input, Output, FileName).
 
-debugger_pkg_aux(end_of_file, Clauses, FileName) :- !,
+debugger_pkg_aux(end_of_file, [end_of_file], FileName) :- !,
 	openOutputFile(Stream, FileName),
 	findall(CL,(retract_fact(saved(CL))),Clauses,[end_of_file]),
 	debug_file_head(FileName),
@@ -35,8 +35,12 @@ debugger_pkg_aux(end_of_file, Clauses, FileName) :- !,
 
 debugger_pkg_aux(0, [], _FileName) :- !. 
 
-debugger_pkg_aux(Input, [], _FileName) :-
-	assertz_fact(saved(Input)).
+debugger_pkg_aux(Input, [Input], _FileName) :-
+	assertz_fact(saved(Input)), !.
+
+debugger_pkg_aux(Input, [Input], _FileName) :-
+	write('ERROR: Impossible to store the following clause: '),
+	write(Input), nl.
 
 %openOutputFile(_Stream) :-
 %	output_file_is_open('Yes'), !.
