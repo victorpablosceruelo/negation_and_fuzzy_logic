@@ -26,6 +26,9 @@
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(write), _).
 
+% To access pre-frontiers from anywhere.
+:- multifile cneg_pre_frontier/6.
+
 :- comment(title, "Auxiliary predicates for Constructive Negation").
 
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").

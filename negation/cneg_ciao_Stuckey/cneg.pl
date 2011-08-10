@@ -20,6 +20,11 @@
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq/3, cneg_diseq/6, cneg_eq/6]).   
+:- reexport(cneg_rt, [cneg_rt/3]).   
+
+% To access pre-frontiers from anywhere.
+:- multifile cneg_pre_frontier/6.
+
 
 cneg(UQV, Functor) :- cneg_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
 

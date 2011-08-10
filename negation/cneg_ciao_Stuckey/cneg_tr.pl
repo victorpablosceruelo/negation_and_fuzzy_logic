@@ -164,10 +164,11 @@ retrieve_list_of(_List_Name, []).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 trans_sent_eof(Cls_Out, SourceFileName) :-
+	Multifile = (:- multifile cneg_pre_frontier/6),
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
 	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
-	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1)),
+	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, [Multifile |[ end_of_file]], Cls_1)),
 	generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1),
 	debug_msg_list(0, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.

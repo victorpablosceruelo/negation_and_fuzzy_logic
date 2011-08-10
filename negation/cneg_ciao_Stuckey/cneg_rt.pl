@@ -1,12 +1,12 @@
 %
 % From Susana modified by VPC (started 29/06/2010)
 %
-:- module(cneg_rt, [cneg_rt/3, cneg_eq/2,	negate_subfrontier/4], [assertions]).
+:- module(cneg_rt, [cneg_rt/3], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
-% To access predicates from anywhere.
+% To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
 
 :- use_module(cneg_aux, _).
@@ -147,7 +147,7 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	cneg_pre_frontier(Name, Arity, _SourceFileName, _Head_Aux, _Body_Aux, _FrontierTest_Aux), 
 %	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
 	setof_local(frontier(Head, Body, FrontierTest), 
-	cneg_pre_frontier(Name, Arity, Head, Body, FrontierTest), Frontier).
+	cneg_pre_frontier(Name, Arity, _SourceFileName, Head, Body, FrontierTest), Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
