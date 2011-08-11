@@ -41,27 +41,22 @@ cneg_rt(Goal, UnivVars):-
 % the Goal considering the set of variables GoalVars as the variables
 % of the goal and UnivVars the universal quantified variable of it.
 
-cneg_dynamic(Goal, UnivVars, Solution) :-
-	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
-	cneg_dynamic_aux(Goal, UnivVars, Solution),
-	debug_msg(1, 'cneg_dynamic :: Goal', Goal),
-	debug_msg(1, 'cneg_dynamic :: Solution', Solution),
-	!. % No backtracking allowed
-
-cneg_dynamic_aux(Goal, UnivVars, Solution) :-
-	varsbag(Goal, UnivVars, [], GoalVars),
+cneg_dynamic(Goal, UQV, Result) :-
+	debug_msg(1, 'cneg_dynamic :: (Goal, UQV)', (Goal, UQV)),
+	varsbag(Goal, UQV, [], GoalVars),
 	frontier(Goal, Frontier, Goal_Not_Qualified), 
+	!, % The frontier is unique !!!
 	debug_msg_list(1, 'cneg_dynamic :: Frontier (list)', Frontier),
-%	debug_msg(1, 'cneg_dynamic :: (GoalVars, UnivVars)', (GoalVars, UnivVars)), 
 	copy_term((Goal_Not_Qualified, GoalVars), (Goal_Copy, GoalVars_Copy)),
 	%copy_term((Goal_Not_Qualified, GoalVars, UnivVars), (Goal_Copy, GoalVars_Copy, UnivVars_Copy)),
-	!, % No backtracking allowed
-	negate_frontier(Frontier, Goal_Copy, GoalVars_Copy, Solution),
-	!, % No backtracking allowed
+
+	negate_frontier(Frontier, Goal_Copy, GoalVars_Copy, Result),
+	debug_msg(1, 'cneg_dynamic :: (Goal, UQV, Result)', (Goal, UQV, Result)),
+
 	% Unify NewGoal with the Head of the Clause we are playing with ...
 	% debug_msg(1, 'cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
-	unify_terms(Goal_Not_Qualified, Goal_Copy),
-	!. % No backtracking allowed
+	unify_terms(Goal_Not_Qualified, Goal_Copy).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

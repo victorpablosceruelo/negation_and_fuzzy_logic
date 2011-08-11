@@ -723,8 +723,8 @@ cneg_eq(T1, T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :-
 		)
 	    )
 	),
-	debug_msg(1, 'cneg_eq :: (UQV_Out, Result)', (UQV_Out, Result)),
-	debug_msg_nl(1).
+	debug_msg(1, 'cneg_eq :: (UQV_Out, Result)', (UQV_Out, Result)).
+%	debug_msg_nl(1).
 
 cneg_unify(T, T).
 
