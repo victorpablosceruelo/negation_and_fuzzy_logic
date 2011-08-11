@@ -72,14 +72,15 @@ frontier(Goal, Frontier, NewGoal) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
 	frontier(Tmp_Goal, Frontier, NewGoal).
 
+% There are no disjunctions now.
 % Now go for the disjunctions.
-frontier(Goal, Frontier, (NewG1; NewG2)):- 
-	goal_is_disjunction(Goal, G1, G2), !,
-	frontier(G1, F1, NewG1),
-	frontier(G2, F2, NewG2),
-	cneg_aux:append(F1, F2, Front),
-	debug_msg(1, 'frontier :: disjunction', Front),
-	simplify_frontier(Front, (NewG1;NewG2), Frontier).
+%frontier(Goal, Frontier, (NewG1; NewG2)):- 
+%	goal_is_disjunction(Goal, G1, G2), !,
+%	frontier(G1, F1, NewG1),
+%	frontier(G2, F2, NewG2),
+%	cneg_aux:append(F1, F2, Front),
+%	debug_msg(1, 'frontier :: disjunction', Front),
+%	simplify_frontier(Front, (NewG1;NewG2), Frontier).
 
 % Now go for the conjunctions.
 frontier(Goal, Frontier, (NewG1, NewG2)):- 
