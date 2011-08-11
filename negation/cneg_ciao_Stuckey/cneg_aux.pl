@@ -11,7 +11,7 @@
 	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
-	    goal_is_disequality/4, goal_is_equality/3,	    
+	    goal_is_disequality/4, goal_is_equality/4,	    
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -256,27 +256,53 @@ goal_clean_up(Goal, NewGoal) :-
 
 goal_is_disjunction((G1;G2), G1, G2) :- !.
 goal_is_disjunction(Goal, G1, G2) :-
-	goal_is_aux('basiccontrol:;', 2, Goal, G1, G2), !.
+	goal_is_aux_2a('basiccontrol:;', Goal, G1, G2), !.
+
 goal_is_conjunction((G1,G2), G1, G2) :- !.
 goal_is_conjunction(Goal, G1, G2) :- 
-	goal_is_aux('basiccontrol:,', 2, Goal, G1, G2), !.
-goal_is_disequality(dist(X,Y), X, Y, []) :- !.
-goal_is_disequality(diseq(X,Y), X, Y, []) :- !.
-goal_is_disequality(diseq(X,Y, FreeVars), X, Y, FreeVars) :- !.
-goal_is_disequality(cneg_diseq(X,Y), X, Y, []) :- !.
-goal_is_disequality(cneg_diseq(X,Y,FreeVars), X, Y, FreeVars) :- !.
-goal_is_disequality(Goal, X, Y, []) :- 
-	goal_is_aux('=/=', 2, Goal, X, Y), !.
-goal_is_equality((X=Y), X, Y) :- !.
-goal_is_equality(Goal, X, Y) :- 
-	goal_is_aux('eq', 2, Goal, X, Y), !.
-goal_is_equality(Goal, X, Y) :- 
-	goal_is_aux('cneg_eq', 2, Goal, X, Y), !.
+	goal_is_aux_2a('basiccontrol:,', Goal, G1, G2), !.
 
-goal_is_aux(Name, Arity, Goal, G1, G2) :-
-	functor(Goal, Name, Arity), !,
-	arg(1, Goal, G1),
-	arg(2, Goal, G2).
+goal_is_disequality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('dist', Goal, Arg_1, Arg_2), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('diseq', Goal, Arg_1, Arg_2), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, UQV) :- 
+	goal_is_aux_3a('diseq', Goal, Arg_1, Arg_2, UQV), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('cneg_diseq', Goal, Arg_1, Arg_2), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, UQV) :- 
+	goal_is_aux_3a('cneg_diseq', Goal, Arg_1, Arg_2, UQV), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('disequality', Goal, Arg_1, Arg_2), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, UQV) :- 
+	goal_is_aux_3a('disequality', Goal, Arg_1, Arg_2, UQV), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('=/=', Goal, Arg_1, Arg_2), !.
+
+goal_is_equality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('=', Goal, Arg_1, Arg_2), !.
+goal_is_equality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('eq', Goal, Arg_1, Arg_2), !.
+goal_is_equality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('cneg_eq', Goal, Arg_1, Arg_2), !.
+goal_is_equality(Goal, Arg_1, Arg_2, UQV) :- 
+	goal_is_aux_3a('cneg_eq', Goal, Arg_1, Arg_2, UQV), !.
+goal_is_equality(Goal, Arg_1, Arg_2, []) :- 
+	goal_is_aux_2a('equality', Goal, Arg_1, Arg_2), !.
+goal_is_equality(Goal, Arg_1, Arg_2, UQV) :- 
+	goal_is_aux_3a('equality', Goal, Arg_1, Arg_2, UQV), !.
+
+
+goal_is_aux_2a(Name, Goal, Arg_1, Arg_2) :-
+	functor(Goal, Name, 2), !,
+	arg(1, Goal, Arg_1),
+	arg(2, Goal, Arg_2).
+
+goal_is_aux_3a(Name, Goal, Arg_1, Arg_2, Arg_3) :-
+	functor(Goal, Name, 3), !,
+	arg(1, Goal, Arg_1),
+	arg(2, Goal, Arg_2),
+	arg(3, Goal, Arg_3).
 
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),

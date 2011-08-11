@@ -414,7 +414,7 @@ negate_body_conj([Atom | Body], Negated_Body, Status_In) :-
 
 % negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Results_In, Results_Out).
 negate_atom(Atom, Neg_Atom, Status) :-
-	goal_is_equality(Atom, A_Left, A_Right), !,
+	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
 	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right | Status]]).
 
 negate_atom(Atom, Neg_Atom, Status) :-
@@ -493,7 +493,7 @@ double_negation_atom(Atom, (Addition, DN_Atom), Status_In) :-
 	functor_local(DN_Atom, 'cneg_diseq', 6, [A_Left |[A_Right | Status_Aux]]).
 
 double_negation_atom(Atom, DN_Atom, Status_In) :-
-	goal_is_equality(Atom, A_Left, A_Right),
+	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV),
 	functor_local(DN_Atom, 'cneg_eq', 6, [A_Left |[A_Right | Status_In]]).	
 
 double_negation_atom(Atom, Neg_Atom, Status_In) :-

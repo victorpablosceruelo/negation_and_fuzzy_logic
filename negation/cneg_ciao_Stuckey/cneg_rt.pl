@@ -1,7 +1,7 @@
 %
 % From Susana modified by VPC (started 29/06/2010)
 %
-:- module(cneg_rt, [cneg_rt/3], [assertions]).
+:- module(cneg_rt, [cneg_rt/2], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
@@ -26,9 +26,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt(Goal, UnivVars, Result):-
+cneg_rt(Goal, UnivVars):-
 	debug_msg(1, 'cneg_lib :: using cneg_dynamic for', Goal), 
-	cneg_dynamic(Goal, UnivVars, Result).
+	cneg_dynamic(Goal, UnivVars, Result), 
+	debug_msg(1, 'cneg_dynamic :: call :: Result', Result),
+	debug_msg_nl(1),
+	call(Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -96,12 +99,12 @@ frontier(Goal, Frontier, (NewG1, NewG2)):-
 % Now go for the functors for equality and disequality.
 frontier(Goal, [Frontier], NewGoal):- 
 	goal_is_disequality(Goal, X, Y, FreeVars), !,
-	cneg_eq(NewGoal, (cneg_diseq(X, Y, FreeVars))),
+	equality(NewGoal, (disequality(X, Y, FreeVars)), []),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
 frontier(Goal, [Frontier], NewGoal):- 
-	goal_is_equality(Goal, X, Y), !,
-	cneg_eq(NewGoal, (X = Y)),
+	goal_is_equality(Goal, X, Y, UQV), !,
+	equality(NewGoal, (X = Y), UQV),
 	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
 
 % Now go for other functors stored in our database.
@@ -156,10 +159,10 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 simplify_frontier(Front_In, G, Front_Out) :-
 	debug_msg_nl(1),
-	debug_msg(1, 'simplify_frontier :: Front_In', Front_In),
-	debug_msg(1, 'simplify_frontier :: Goal', G),
+	debug_msg(0, 'simplify_frontier :: Front_In', Front_In),
+	debug_msg(0, 'simplify_frontier :: Goal', G),
 	simplify_frontier_aux(Front_In, G, Front_Out),
-	debug_msg(1, 'simplify_frontier :: Front_Out', Front_Out),
+	debug_msg(0, 'simplify_frontier :: Front_Out', Front_Out),
 	debug_msg_nl(1).
 
 simplify_frontier_aux([], _G, []) :- !.
@@ -167,17 +170,20 @@ simplify_frontier_aux([Frontier | More_Frontier_In], G, [Frontier | More_Frontie
 	test_frontier_is_valid(Frontier, G), !,
 	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
 simplify_frontier_aux([_Frontier|More_Frontier_In], G, More_Frontier_Out):-
+%	debug_msg(1, 'simplify_frontier_aux :: rejected frontier: ', Frontier),
 	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Frontier, Goal):-
-	frontier_contents(Frontier, Head, _Body, FrontierTest),
-	debug_msg(1, 'test_frontier_is_valid(Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
-        copy_term((Head, FrontierTest), (H_Tmp, FrontierTest_Tmp)), 
-        copy_term(Goal, G_Tmp),
-        cneg_eq(H_Tmp, G_Tmp), 
-	call_combined_solutions(FrontierTest_Tmp), 
+	frontier_contents(Frontier, Head, Body, _FrontierTest_Aux),
+	list_head(Body, Test), 
+	debug_msg(1, 'test_frontier_is_valid :: (Head, Test, Goal)', (Head, Test, Goal)),
+        copy_term((Head, Test, Goal), (Head_Tmp, Test_Tmp, Goal_Tmp)), 
+        equality(Head_Tmp, Goal_Tmp, []), 
+	goal_is_equality(Test_Tmp, Test_Left, Test_Right, UQV), % It must be an equality.
+	equality(Test_Left, Test_Right, UQV), % Note that UQV = [].
+%	call_combined_solutions(FrontierTest_Tmp), 
 	debug_msg(1, 'test_frontier_is_valid', 'YES'),
 	!.
 
@@ -308,12 +314,12 @@ split_body_into_I_D_R([SubGoal|SubGoal_L], I_In, D_In, R_In, I_Out, D_Out, R_Out
 
 % split_subgoal_into_I_D_R(SubGoal, I, D, R) :-
 split_subgoal_into_I_D_R(Subgoal, I, D, R, [NewSubgoal | I], D, R) :- 
-	goal_is_equality(Subgoal, Term1, Term2), !,
-	cneg_eq(NewSubgoal, (Term1 = Term2)).
+	goal_is_equality(Subgoal, Term1, Term2, UQV), !,
+	equality(NewSubgoal, (Term1 = Term2), UQV).
 
 split_subgoal_into_I_D_R(Subgoal, I, D, R, I, [NewSubgoal | D], R) :- 
 	goal_is_disequality(Subgoal, Term1, Term2, FreeVars), !,
-	cneg_eq(NewSubgoal, cneg_diseq(Term1, Term2, FreeVars)).
+	equality(NewSubgoal, disequality(Term1, Term2, FreeVars), []).
 
 split_subgoal_into_I_D_R(SubGoal, I, D, R, I, D, [SubGoal | R]) :- !.
 
@@ -456,9 +462,9 @@ negate_I([Eq|I], GoalVars, Prev_Solution, Solution):-
 
 % negate_eq(Eq,GoalVars,Sol) returns in Sol a solution of the 
 % negation of the equality Eq 
-negate_eq(Goal, GoalVars, cneg_diseq(T1,T2, FreeVars), cneg_eq(T1,T2)):-
-	goal_is_equality(Goal, T1, T2),
- 	varsbag(cneg_eq(T1,T2), GoalVars, [], FreeVars).
+negate_eq(Goal, GoalVars, disequality(T1,T2, FreeVars), equality(T1,T2, UQV)):-
+	goal_is_equality(Goal, T1, T2, UQV),
+ 	varsbag(equality(T1,T2), GoalVars, [], FreeVars).
 
 % new_Vars(FreeVars,UnivVars) returns in UnivVars so many new variables
 % as the number of elements of FreeVars
@@ -468,14 +474,14 @@ new_Vars([_Term|R],[_New|N]):-
 
 % negate_Dimp(Dimp,SolC) obtain in SolC a solution of negating Dimp.
 negate_Dimp([], Prev_Solution, Prev_Solution) :- !.
-negate_Dimp([cneg_diseq(T1, T2, FreeVars)|Dimp], Prev_Solution, Solution) :-
-	combine_negated_element(cneg_eq(T1,T2), cneg_diseq(T1, T2, FreeVars), Prev_Solution, Tmp_Solution),
+negate_Dimp([disequality(T1, T2, FreeVars)|Dimp], Prev_Solution, Solution) :-
+	combine_negated_element(equality(T1,T2, []), disequality(T1, T2, FreeVars), Prev_Solution, Tmp_Solution),
 	negate_Dimp(Dimp, Tmp_Solution, Solution).
 
 % negate_Rimp(Rimp,SolC) obtain in SolC a solution of negating Rimp.
 negate_Rimp([], Prev_Solution, Prev_Solution) :- !.
 negate_Rimp([R|Rimp], Prev_Solution, Solution) :-
-	combine_negated_element(cneg_aux(R, []), R, Prev_Solution, Tmp_Solution),
+	combine_negated_element(cneg_rt(R, []), R, Prev_Solution, Tmp_Solution),
 	negate_Rimp(Rimp, Tmp_Solution, Solution).
 
 % negate_Dexp_Rexp(DRexp,ImpVars,ExpVars,SolC) obtain in
@@ -483,7 +489,7 @@ negate_Rimp([R|Rimp], Prev_Solution, Solution) :-
 negate_Dexp_Rexp([], _ExpVars, Prev_Solution, Prev_Solution):- !.
 negate_Dexp_Rexp(DRexp, ExpVars, Prev_Solution, Solution):-
 	get_conjunction(DRexp,DR),
-	combine_negated_element((cneg_aux(DR, ExpVars)), DRexp, Prev_Solution, Solution).
+	combine_negated_element((cneg_rt(DR, ExpVars)), DRexp, Prev_Solution, Solution).
 
 % get_conjunction(List,Conj) obtain the conjunction Conj with the
 % same elements that List
@@ -521,11 +527,11 @@ perform_a_call_to(Goal) :-
 
 perform_a_call_to(Goal) :-
 	goal_is_disequality(Goal, X, Y, FreeVars), !,
-	diseq(X, Y, FreeVars).
+	disequality(X, Y, FreeVars).
 
 perform_a_call_to(Goal) :-
-	goal_is_equality(Goal, X, Y), !,
-	cneg_eq(X, Y).
+	goal_is_equality(Goal, X, Y, UQV), !,
+	equality(X, Y, UQV).
 
 % Qualify the predicate as needed.
 perform_a_call_to(Goal) :-
@@ -539,13 +545,6 @@ perform_a_call_to(Goal) :-
 	functor_local(NewGoal, NewGoal_Name, Arity, Arguments),
 	term_to_meta(NewGoal, NewGoal_Meta),
 	call(NewGoal_Meta).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cneg_eq(X, Y) :- debug_msg(1, 'cneg_lib', cneg_eq(X, Y)), fail.
-cneg_eq(X, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

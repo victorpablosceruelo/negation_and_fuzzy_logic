@@ -1,6 +1,7 @@
 :- module(cneg_diseq, 
 	[
-	    diseq/3, cneg_diseq/6, cneg_eq/6,
+	    disequality/3, equality/3, 
+	    cneg_diseq/6, cneg_eq/6,
 	    portray_attributes_in_term/1
 	], 
 	[assertions]).
@@ -679,7 +680,7 @@ and_between_statuses('fail', 'fail', 'fail').
 % Incluye una desigualdad en las formulas de las 
 % variables implicadas
 
-diseq(T1,T2, UQV_In):- 
+disequality(T1,T2, UQV_In):- 
 	cneg_diseq(T1, T2, UQV_In, _UQV_Out, 'true', 'true').
 
 cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :- 
@@ -694,6 +695,9 @@ cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+equality(T1, T2, UQV_In) :-
+	cneg_eq(T1, T2, UQV_In, _UQV_Out, 'true', 'true').
 
 cneg_eq(T1, T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :- 
 	debug_msg(1, 'cneg_eq :: (T1, =, T2)', (T1, '=', T2)),
