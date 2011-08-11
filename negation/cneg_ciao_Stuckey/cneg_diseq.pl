@@ -685,7 +685,7 @@ disequality(T1,T2, UQV_In):-
 
 cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :- 
 	diseq_status(Status, UQV_In, UQV_Out, Do_Not_Fail, Result),
-	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), Status) [in]', ((T1, '=/=', T2), Status)), 
+	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), ---, [UQV_In |[UQV_Out |[Do_Not_Fail |[Result]]]]) [in]', ((T1, '=/=', T2), '---', Status)), 
 
 	disequality_contents(Disequality, T1, T2),
         test_and_update_vars_attributes(Status, [], [Disequality]),
@@ -700,8 +700,7 @@ equality(T1, T2, UQV_In) :-
 	cneg_eq(T1, T2, UQV_In, _UQV_Out, 'true', 'true').
 
 cneg_eq(T1, T2, UQV_In, UQV_Out, Do_Not_Fail, Result) :- 
-	debug_msg(1, 'cneg_eq :: (T1, =, T2)', (T1, '=', T2)),
-	debug_msg(1, 'cneg_eq :: (UQV_In, Do_Not_Fail)', (UQV_In, Do_Not_Fail)),
+	debug_msg(1, 'cneg_eq :: (T1, =, T2), ---, (UQV_In, Do_Not_Fail)', ((T1, '=', T2), '---', (UQV_In, Do_Not_Fail))),
 	cneg_aux:varsbag((T1, T2), [], [], Vars_Equality),
 	varsbag_intersection(Vars_Equality, UQV_In, Intersection),
 	!,
