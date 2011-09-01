@@ -8,6 +8,7 @@
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
+:- multifile call_to/1.
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, _).
@@ -43,6 +44,7 @@ cneg_rt(Goal, UQV):-
 
 % Just to debug.
 compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
+	debug_msg(1, '--------------------------------------------------------------------------------------------------------------', ' '),	
 	debug_msg(1, 'compute_neg_frontier :: (Goal, GoalVars, Pre_Frontier)', (Goal, GoalVars, Pre_Frontier)),	
 	fail. % Just debug and use backtracking to continue.
 
@@ -100,7 +102,7 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, Frontier_Tmp_2),
 	debug_msg(1, 'Frontier_Tmp_2', Frontier_Tmp_2), 
-	combine_frontiers_by_disjunction(Frontier_Tmp_2, Frontier_Tmp_3),
+	combine_frontiers_by_disjunction(Frontier_Tmp_2, 'fail', Frontier_Tmp_3),
 	debug_msg(1, 'Frontier_Tmp_3', Frontier_Tmp_3), 
 	!, % Frontier is uniquely determined if this clause is used.
 	compute_neg_frontier(Frontier_Tmp_3, GoalVars, 'true').
@@ -142,10 +144,14 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	setof_local(frontier(Head, Body, FrontierTest), 
 	cneg_pre_frontier(Name, Arity, _SourceFileName, Head, Body, FrontierTest), Frontier).
 
-combine_frontiers_by_disjunction([], 'fail') :- !.
-combine_frontiers_by_disjunction([Frontier], Frontier) :- !.
-combine_frontiers_by_disjunction([Frontier|Frontiers_List], (Frontier ; Frontiers_Disj)) :- !,
-	combine_frontiers_by_disjunction(Frontiers_List, Frontiers_Disj).
+combine_frontiers_by_disjunction([], Input, Input) :- !.
+combine_frontiers_by_disjunction([Frontier|Frontiers_List], Input, Output) :- !,
+	combine_frontiers_by_disjunction_aux(Frontier, Input, Temp),
+	combine_frontiers_by_disjunction(Frontiers_List, Temp, Output).
+
+combine_frontiers_by_disjunction_aux('fail', Frontier, Frontier) :- !.
+combine_frontiers_by_disjunction_aux(Frontier, 'fail', Frontier) :- !.
+combine_frontiers_by_disjunction_aux(Frontier_1, Frontier_2, ((Frontier_1) ; (Frontier_2))) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,18 +197,45 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 compute_pre_frontier(Goal, GoalVars, Pre_Frontier) :-
 	debug_msg(1, 'compute_pre_frontier :: Pre_Frontier', Pre_Frontier),	
 	Pre_Frontier \== 'true',
-	varsbag(Goal, GoalVars, [], UQV_Goal),
-	varsbag(Goal, UQV_Goal, [], Non_UQV_Goal),
-	debug_msg(1, 'compute_pre_frontier :: Vars_Goal', Vars_Goal),	
-	setof_local((Pre_Frontier, Non_UQV_Goal, UQV_Goal), Pre_Frontier, Pre_Frontier_Solutions),
-	debug_msg(1, 'compute_pre_frontier :: Pre_Frontier_Solutions', Pre_Frontier_Solutions),	
-	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_Solutions).
+	compute_pre_frontier_aux(Pre_Frontier),
+	compute_neg_frontier(Goal, GoalVars, 'true').
 
-compute_pre_frontier_aux(_Goal, GoalVars, []).
-compute_pre_frontier_aux(Goal, GoalVars, [(Pre_Frontier, Non_UQV_Goal, UQV_Goal) | Pre_Frontier_Solutions]) :-
+compute_pre_frontier_aux(Pre_Frontier) :-
+	goal_is_conjunction(Pre_Frontier, Pre_Frontier_1, Pre_Frontier_2), !,
+	compute_pre_frontier_aux(Pre_Frontier_1),
+	compute_pre_frontier_aux(Pre_Frontier_2).
+
+compute_pre_frontier_aux(Pre_Frontier) :-
+	goal_is_disjunction(Pre_Frontier, Pre_Frontier_1, Pre_Frontier_2), !,
+	(
+	    compute_pre_frontier_aux(Pre_Frontier_1)
+	;
+	    compute_pre_frontier_aux(Pre_Frontier_2)
+	).
+
+compute_pre_frontier_aux(Pre_Frontier) :-
+	goal_is_disequality(Pre_Frontier, Left, Right, UQV), !,
+	cneg_diseq(Left, Right, UQV, _UQV_Out, 'fail', 'true').
+
+compute_pre_frontier_aux(Pre_Frontier) :-
+	goal_is_equality(Pre_Frontier, Left, Right, UQV), !,
+	equality(Left, Right, UQV).
+
+compute_pre_frontier_aux(Pre_Frontier) :-
+	call_to(Pre_Frontier).
+
+%	varsbag(Goal, GoalVars, [], UQV_Goal),
+%	varsbag(Goal, UQV_Goal, [], Non_UQV_Goal),
+%	debug_msg(1, 'compute_pre_frontier :: Vars_Goal', Vars_Goal),	
+%	setof_local((Pre_Frontier, Non_UQV_Goal, UQV_Goal), Pre_Frontier, Pre_Frontier_Solutions),
+%	debug_msg(1, 'compute_pre_frontier :: Pre_Frontier_Solutions', Pre_Frontier_Solutions),	
+%	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_Solutions).
+
+%compute_pre_frontier_aux(_Goal, GoalVars, []).
+%compute_pre_frontier_aux(Goal, GoalVars, [(Pre_Frontier, Non_UQV_Goal, UQV_Goal) | Pre_Frontier_Solutions]) :-
 %	call(Pre_Frontier), 
-	compute_neg_frontier(Goal, GoalVars, 'true'),
-	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_Solutions).
+%	compute_neg_frontier(Goal, GoalVars, 'true'),
+%	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_Solutions).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
