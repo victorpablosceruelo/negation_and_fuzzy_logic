@@ -53,9 +53,8 @@ compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
 
 compute_neg_frontier(Goal, GoalVars, Pre_Frontier):- 
 	Pre_Frontier \== 'true',
-	varsbag(Goal, [], [], Vars_Goal),
-	setof_local((Pre_Frontier, Vars_Goal), Pre_Frontier, Set_Of_Pre_Frontiers),
-	compute_neg_frontier_aux(Goal, GoalVars, Set_Of_Pre_Frontiers).
+	debug_msg(1, 'compute_neg_frontier :: Pre_Frontier', Pre_Frontier),	
+	compute_pre_frontier(Goal, GoalVars, Pre_Frontier).
 
 % Manage true and fail ...
 compute_neg_frontier('true', _GoalVars, 'true') :- !, fail.
@@ -112,12 +111,6 @@ compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
 	debug_msg(1, 'ERROR: compute_neg_frontier :: GoalVars', GoalVars), 
 	debug_msg(1, 'ERROR: compute_neg_frontier :: Pre_Frontier', Pre_Frontier), 
 	nl, nl, !, fail.
-
-compute_neg_frontier_aux(_Goal, [], _Frontier).
-compute_neg_frontier_aux(Goal, [Pre_Frontier, Set_Of_Pre_Frontiers], Frontier) :-
-	call(Pre_Frontier), 
-	compute_neg_frontier(Goal, 'true', Frontier),
-	compute_neg_frontier_aux(Goal, Set_Of_Pre_Frontiers, Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -190,6 +183,30 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 	functor_local(Goal, _Name, _Arity, Goal_Args), 
 	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
 	equality(Test_Left, Goal_Args, []). % Note that UQV = [].
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+compute_pre_frontier(Goal, GoalVars, Pre_Frontier) :-
+	debug_msg(1, 'compute_pre_frontier :: Pre_Frontier', Pre_Frontier),	
+	Pre_Frontier \== 'true',
+	varsbag(Goal, GoalVars, [], UQV_Goal),
+	varsbag(Goal, UQV_Goal, [], Non_UQV_Goal),
+	debug_msg(1, 'compute_pre_frontier :: Vars_Goal', Vars_Goal),	
+	setof_local((Pre_Frontier, Non_UQV_Goal, UQV_Goal), Pre_Frontier, Pre_Frontier_Solutions),
+	debug_msg(1, 'compute_pre_frontier :: Pre_Frontier_Solutions', Pre_Frontier_Solutions),	
+	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_Solutions).
+
+compute_pre_frontier_aux(_Goal, GoalVars, []).
+compute_pre_frontier_aux(Goal, GoalVars, [(Pre_Frontier, Non_UQV_Goal, UQV_Goal) | Pre_Frontier_Solutions]) :-
+%	call(Pre_Frontier), 
+	compute_neg_frontier(Goal, GoalVars, 'true'),
+	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_Solutions).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the combined frontier of the list 
 % of lists F1 and F2 after using the distributive rule
