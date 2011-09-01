@@ -28,6 +28,7 @@
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
+:- multifile call_to/1.
 
 :- comment(title, "Auxiliary predicates for Constructive Negation").
 

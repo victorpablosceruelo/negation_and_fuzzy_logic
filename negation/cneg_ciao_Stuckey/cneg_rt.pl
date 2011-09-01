@@ -190,32 +190,89 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 compute_pre_frontier(Goal, GoalVars, Pre_Frontier) :-
 	debug_msg(1, 'compute_pre_frontier :: Pre_Frontier', Pre_Frontier),	
 	Pre_Frontier \== 'true',
-	compute_pre_frontier_aux(Pre_Frontier),
+	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier),
 	compute_neg_frontier(Goal, GoalVars, 'true').
 
-compute_pre_frontier_aux(Pre_Frontier) :-
+compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier) :-
 	goal_is_conjunction(Pre_Frontier, Pre_Frontier_1, Pre_Frontier_2), !,
-	compute_pre_frontier_aux(Pre_Frontier_1),
-	compute_pre_frontier_aux(Pre_Frontier_2).
+	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_1),
+	compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_2).
 
-compute_pre_frontier_aux(Pre_Frontier) :-
+compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier) :-
 	goal_is_disjunction(Pre_Frontier, Pre_Frontier_1, Pre_Frontier_2), !,
 	(
-	    compute_pre_frontier_aux(Pre_Frontier_1)
+	    (
+		compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_1),
+		compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_2)
+	    )
 	;
-	    compute_pre_frontier_aux(Pre_Frontier_2)
+	    (
+		compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_1)
+	    ;
+		compute_pre_frontier_aux(Goal, GoalVars, Pre_Frontier_2)
+	    )
 	).
 
-compute_pre_frontier_aux(Pre_Frontier) :-
+compute_pre_frontier_aux(_Goal, GoalVars, Pre_Frontier) :-
 	goal_is_disequality(Pre_Frontier, Left, Right, UQV), !,
-	cneg_diseq(Left, Right, UQV, _UQV_Out, 'fail', 'true').
+%	varsbag(Goal, GoalVars, [], UQV_Goal),
+	varsbag(GoalVars, [], [], Real_GoalVars),
+	setof_local(Real_GoalVars, cneg_diseq(Left, Right, UQV, _UQV_Out, 'fail', 'true'), To_Unify),
+	unify_solutions_when_possible(Real_GoalVars, To_Unify).
 
-compute_pre_frontier_aux(Pre_Frontier) :-
+compute_pre_frontier_aux(_Goal, _GoalVars, Pre_Frontier) :-
 	goal_is_equality(Pre_Frontier, Left, Right, UQV), !,
 	equality(Left, Right, UQV).
 
-compute_pre_frontier_aux(Pre_Frontier) :-
-	call_to(Pre_Frontier).
+compute_pre_frontier_aux(_Goal, GoalVars, Pre_Frontier) :-
+%	call_to(Pre_Frontier).
+	varsbag(GoalVars, [], [], Real_GoalVars),
+	debug_msg(1, 'compute_pre_frontier :: Real_GoalVars', Real_GoalVars),	
+	setof_local(Real_GoalVars, call_to(Pre_Frontier), To_Unify),
+	debug_msg(1, 'compute_pre_frontier :: To_Unify', To_Unify),
+	unify_solutions_when_possible(Real_GoalVars, To_Unify).
+
+unify_solutions_when_possible(_Real_GoalVars, []) :- !.
+unify_solutions_when_possible(Real_GoalVars, To_Unify) :- 
+	unify_sols_when_possible_aux_1(To_Unify, Unified, Not_Unified),
+	(
+	    (
+		Unified == [], 
+		debug_msg(1, 'compute_pre_frontier :: Not_Unified', Not_Unified),
+		take_one_solution(Real_GoalVars, Not_Unified)
+	    )
+	;
+	    (
+		Unified \== [], 
+		append(Not_Unified, Unified, New_To_Unify), 
+		debug_msg(1, 'compute_pre_frontier :: New_To_Unify', New_To_Unify),
+		unify_solutions_when_possible(Real_GoalVars, New_To_Unify)
+	    )
+	).
+
+unify_sols_when_possible_aux_1([Atom_To_Unify], [], [Atom_To_Unify]).
+unify_sols_when_possible_aux_1([Atom | Tail_To_Unify], Unified_Out, Not_Unified_Out) :-
+	unify_sols_when_possible_aux_2(Atom, Tail_To_Unify, [], Unified_Aux, Not_Unified_Aux),
+	unify_sols_when_possible_aux_1(Tail_To_Unify, Unified_In, Not_Unified_In),
+	append(Unified_Aux, Unified_In, Unified_Out),
+	append(Not_Unified_Aux, Not_Unified_In, Not_Unified_Out).
+
+unify_sols_when_possible_aux_2(Atom_To_Unify, [], [], [], [Atom_To_Unify]) :- !.
+unify_sols_when_possible_aux_2(_Atom_To_Unify, [], Unified, Unified, []) :- !.
+unify_sols_when_possible_aux_2(Atom_1, [Atom_2 | Tail_To_Unify], Unified_In, Unified_Out, Not_Unified_Out) :-
+	copy_term((Atom_1, Atom_2), (Atom_1_Copy, Atom_2_Copy)),
+	equality(Atom_1_Copy, Atom_2_Copy, []), !, % They unify !!!
+	unify_sols_when_possible_aux_2(Atom_1, Tail_To_Unify, [Atom_1_Copy | Unified_In], Unified_Out, Not_Unified_Out).
+unify_sols_when_possible_aux_2(Atom_1, [_Atom_2 | Tail_To_Unify], Unified_In, Unified_Out, Not_Unified_Out) :-
+	unify_sols_when_possible_aux_2(Atom_1, Tail_To_Unify, Unified_In, Unified_Out, Not_Unified_Out).
+
+take_one_solution(_Real_GoalVars, []) :- fail.
+take_one_solution(Real_GoalVars, [Sol | Unified]) :-
+	(
+	    equality(Real_GoalVars, Sol, [])
+	;
+	    take_one_solution(Real_GoalVars, Unified)
+	).
 
 %	varsbag(Goal, GoalVars, [], UQV_Goal),
 %	varsbag(Goal, UQV_Goal, [], Non_UQV_Goal),
