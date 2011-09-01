@@ -41,6 +41,11 @@ cneg_rt(Goal, UQV):-
 % It is a list of list that represent the disjunction of its
 % elements where each element is a conjunction of subgoals.
 
+% Just to debug.
+compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
+	debug_msg(1, 'compute_neg_frontier :: (Goal, GoalVars, Pre_Frontier)', (Goal, GoalVars, Pre_Frontier)),	
+	fail. % Just debug and use backtracking to continue.
+
 % First remove $ and qualification from the goal's name.
 compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
@@ -59,8 +64,8 @@ compute_neg_frontier('fail', _GoalVars, 'true') :- !.
 % Now go for the disjunctions.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_disjunction(Goal, G1, G2), !,
-	compute_neg_frontier(G1, GoalVars, Pre_Frontier),
-	compute_neg_frontier(G2, GoalVars, Pre_Frontier).
+	compute_neg_frontier(G1, GoalVars, 'true'),
+	compute_neg_frontier(G2, GoalVars, 'true').
 
 % Now go for the conjunctions.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
@@ -77,14 +82,16 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 
 % Now go for the functors for equality and disequality.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
-	goal_is_disequality(Goal, X, Y, UQV), !, 
+	goal_is_disequality(Goal, T1, T2, UQV), !, 
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
-	equality(X, Y, UQV_Aux).
+	equality(T1, T2, UQV_Aux).
 
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
-	goal_is_equality(Goal, X, Y, UQV), !,
+	goal_is_equality(Goal, T1, T2, UQV), !,
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
-	disequality(X, Y, UQV_Aux).
+	% cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result).
+	cneg_diseq(T1,T2, UQV_Aux, _UQV_Out, 'fail', 'true').
+	% disequality(X, Y, UQV_Aux).
 
 % Now go for other functors stored in our database.
 compute_neg_frontier(Goal, GoalVars, 'true'):-
@@ -160,29 +167,29 @@ simplify_frontier(Front_In, G, Front_Out) :-
 	debug_msg(0, 'simplify_frontier :: Front_Out', Front_Out),
 	debug_msg_nl(0).
 
-simplify_frontier_aux([], _G, []) :- !.
-simplify_frontier_aux([Frontier | More_Frontier_In], G, [Frontier | More_Frontier_Out]):-
-	test_frontier_is_valid(Frontier, G), !,
-	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
-simplify_frontier_aux([_Frontier|More_Frontier_In], G, More_Frontier_Out):-
+simplify_frontier_aux([], _Goal, []) :- !.
+simplify_frontier_aux([Frontier | More_Frontier_In], Goal, [Body | More_Bodies]):-
+	frontier_contents(Frontier, Head, Body, Frontier_Test),
+	test_frontier_is_valid(Goal, Head, Frontier_Test), !,
+	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
+simplify_frontier_aux([_Frontier|More_Frontier_In], Goal, More_Bodies):-
 %	debug_msg(1, 'simplify_frontier_aux :: rejected frontier: ', Frontier),
-	simplify_frontier(More_Frontier_In, G, More_Frontier_Out).
+	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
-test_frontier_is_valid(Frontier, Goal):-
-	frontier_contents(Frontier, Head, _Body, FrontierTest),
-	debug_msg(1, 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
-        copy_term((Head, FrontierTest, Goal), (Head_Tmp, Test_Tmp, Goal_Tmp)), 
+test_frontier_is_valid(Goal, Head, Frontier_Test) :-
+	debug_msg(1, 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, Frontier_Test, Goal)),
+        copy_term((Head, Frontier_Test, Goal), (Head_Tmp, Frontier_Test_Tmp, Goal_Tmp)), 
         equality(Head_Tmp, Goal_Tmp, []), 
-	goal_is_equality(Test_Tmp, Test_Left, Test_Right, UQV), % It must be an equality.
-	equality(Test_Left, Test_Right, UQV), % Note that UQV = [].
+	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, Tmp_UQV), % It must be an equality.
+	equality(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 	debug_msg(1, 'test_frontier_is_valid', 'YES'),
-	!,
-	functor_local(Goal, _Name, _Arity, Args), 
-	goal_is_equality(FrontierTest, Test_Left, Test_Right, UQV),
-	equality(Test_Left, Args, UQV). % Note that UQV = [].
+	!, % Backtracking forbidden.
+	functor_local(Goal, _Name, _Arity, Goal_Args), 
+	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
+	equality(Test_Left, Goal_Args, []). % Note that UQV = [].
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the combined frontier of the list 
 % of lists F1 and F2 after using the distributive rule
