@@ -26,36 +26,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt(Goal, UnivVars):-
-	debug_msg(1, 'cneg_lib :: using cneg_dynamic for', Goal), 
-	cneg_dynamic(Goal, UnivVars, Result), 
-	debug_msg(1, 'cneg_dynamic :: call :: Result', Result),
-	debug_msg_nl(1),
-	call(Result).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% cneg_dynamic(Goal,UnivVars) makes the constructive negation of 
-% the Goal considering the set of variables GoalVars as the variables
-% of the goal and UnivVars the universal quantified variable of it.
-
-cneg_dynamic(Goal, UQV, Result) :-
-	debug_msg(1, 'cneg_dynamic :: (Goal, UQV)', (Goal, UQV)),
+cneg_rt(Goal, UQV):-
+	debug_msg(1, 'cneg_rt :: (Goal, UQV)', (Goal, UQV)),
 	varsbag(Goal, UQV, [], GoalVars),
-	compute_neg_frontier(Goal, Frontier, Goal_Not_Qualified), 
-	!, % The frontier is unique !!!
-	debug_msg_list(1, 'cneg_dynamic :: Frontier (list)', Frontier),
-	copy_term((Goal_Not_Qualified, GoalVars), (Goal_Copy, GoalVars_Copy)),
-	%copy_term((Goal_Not_Qualified, GoalVars, UnivVars), (Goal_Copy, GoalVars_Copy, UnivVars_Copy)),
-
-%	negate_frontier(Frontier, Goal_Copy, GoalVars_Copy, Result),
-	debug_msg(1, 'cneg_dynamic :: (Goal, UQV, Result)', (Goal, UQV, Result)),
-
-	% Unify NewGoal with the Head of the Clause we are playing with ...
-	% debug_msg(1, 'cneg_dynamic', unify_terms(Goal_Not_Qualified, Goal_Copy)),
-	unify_terms(Goal_Not_Qualified, Goal_Copy).
+	compute_neg_frontier(Goal, GoalVars, 'true').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,54 +42,69 @@ cneg_dynamic(Goal, UQV, Result) :-
 % elements where each element is a conjunction of subgoals.
 
 % First remove $ and qualification from the goal's name.
-compute_neg_frontier(Goal, Pre_Frontier, Frontier, NewGoal) :-
+compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
-	compute_neg_frontier(Tmp_Goal, Pre_Frontier, Frontier, NewGoal).
+	compute_neg_frontier(Tmp_Goal, GoalVars, Pre_Frontier).
 
+compute_neg_frontier(Goal, GoalVars, Pre_Frontier):- 
+	Pre_Frontier \== 'true',
+	varsbag(Goal, [], [], Vars_Goal),
+	setof_local((Pre_Frontier, Vars_Goal), Pre_Frontier, Set_Of_Pre_Frontiers),
+	compute_neg_frontier_aux(Goal, GoalVars, Set_Of_Pre_Frontiers).
+	
 % Now go for the disjunctions.
-compute_neg_frontier(Goal, Pre_Frontier, Frontier, (NewG1; NewG2)):- 
+compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_disjunction(Goal, G1, G2), !,
-	compute_neg_frontier(G1, Pre_Frontier, F1, NewG1),
-	compute_neg_frontier(G2, Pre_Frontier, F2, NewG2),
-	cneg_aux:append(F1, F2, Front),
-	debug_msg(1, 'frontier :: disjunction', Front),
-	simplify_frontier(Front, (NewG1;NewG2), Frontier).
+	compute_neg_frontier(G1, GoalVars, Pre_Frontier),
+	compute_neg_frontier(G2, GoalVars, Pre_Frontier).
 
 % Now go for the conjunctions.
-compute_neg_frontier(Goal, Frontier, (NewG1, NewG2)):- 
+compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_conjunction(Goal, G1, G2), !,
-	compute_neg_frontier(G1, F1, NewG1),
-	compute_neg_frontier(G2, F2, NewG2),
-% Creo q esta fallando aqui ...
-	combine_frontiers(F1, F2, Front),
-	debug_msg(1, 'frontier :: conjunction', Front),
-	simplify_frontier(Front, (NewG1,NewG2), Frontier).
+	(
+	    (
+		compute_neg_frontier(G1, GoalVars, 'true')
+	    )
+	;
+	    (
+		compute_neg_frontier(G2, GoalVars, G1)
+	    )
+	).
 
 % Now go for the functors for equality and disequality.
-compute_neg_frontier(Goal, [Frontier], NewGoal):- 
-	goal_is_disequality(Goal, X, Y, FreeVars), !,
-	equality(NewGoal, (disequality(X, Y, FreeVars)), []),
-	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
+compute_neg_frontier(Goal, GoalVars, 'true'):- 
+	goal_is_disequality(Goal, X, Y, UQV), !, 
+	varsbag(Goal, GoalVars, UQV, UQV_Aux),
+	equality(X, Y, UQV_Aux).
 
-compute_neg_frontier(Goal, [Frontier], NewGoal):- 
+compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_equality(Goal, X, Y, UQV), !,
-	equality(NewGoal, (X = Y), UQV),
-	frontier_contents(Frontier, NewGoal, [NewGoal], [NewGoal]).
+	varsbag(Goal, GoalVars, UQV, UQV_Aux),
+	disequality(X, Y, UQV_Aux).
 
 % Now go for other functors stored in our database.
-compute_neg_frontier(Goal, Front, Goal):-
+compute_neg_frontier(Goal, GoalVars, 'true'):-
 	debug_msg(1, 'compute_neg_frontier :: Goal', Goal),
-	look_for_the_relevant_clauses(Goal, Front_Tmp),
+	look_for_the_relevant_clauses(Goal, Frontier_Tmp),
 	debug_msg(1, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-%	debug_msg_list(1, 'compute_neg_frontier :: frontier', Front_Tmp),
-	simplify_frontier(Front_Tmp, Goal, Front),
+	debug_msg_list(1, 'compute_neg_frontier :: frontier', Frontier_Tmp),
+	simplify_frontier(Frontier_Tmp, Goal, Frontier),
 %	debug_msg(1, 'frontier_OUT', Front), 
-	!. % Frontier is uniquely determined if this clause is used.
+	!, % Frontier is uniquely determined if this clause is used.
+	compute_neg_frontier(Frontier, GoalVars, 'true').
 
 % And at last report an error if it was impossible to found a valid entry.
-compute_neg_frontier(Goal, [], Goal) :-
-	debug_msg(1, 'ERROR: frontier can not be evaluated for', Goal), 
+compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
+	debug_msg(1, 'ERROR: compute_neg_frontier :: Goal', Goal), 
+	debug_msg(1, 'ERROR: compute_neg_frontier :: GoalVars', GoalVars), 
+	debug_msg(1, 'ERROR: compute_neg_frontier :: Pre_Frontier', Pre_Frontier), 
 	nl, nl, !, fail.
+
+compute_neg_frontier_aux(_Goal, [], _Frontier).
+compute_neg_frontier_aux(Goal, [Pre_Frontier, Set_Of_Pre_Frontiers], Frontier) :-
+	call(Pre_Frontier), 
+	compute_neg_frontier(Goal, 'true', Frontier),
+	compute_neg_frontier_aux(Goal, Set_Of_Pre_Frontiers, Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -629,8 +629,15 @@ generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :
 generate_pre_frontiers([], _SourceFileName, Cls, Cls) :- !.
 generate_pre_frontiers([(Head, Body, _Counter) | List_Of_Preds], SourceFileName, Cls_In, Cls_Out) :-
 	functor(Head, Head_Name, Head_Arity),
-	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body, 'true')),
+	list_head(Body, Test),
+	convert_list_to_conjunction(Body, Body_Conj),
+	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body_Conj, Test)),
 	generate_pre_frontiers(List_Of_Preds, SourceFileName, [CL | Cls_In], Cls_Out).
+
+convert_list_to_conjunction([], 'true') :- !.
+convert_list_to_conjunction([Body_Last], Body_Last) :- !.
+convert_list_to_conjunction([Body|MoreBodyList], (Body, MoreBodyConj)) :- !,
+	convert_list_to_conjunction(MoreBodyList, MoreBodyConj).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
