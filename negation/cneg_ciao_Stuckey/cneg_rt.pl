@@ -51,7 +51,11 @@ compute_neg_frontier(Goal, GoalVars, Pre_Frontier):-
 	varsbag(Goal, [], [], Vars_Goal),
 	setof_local((Pre_Frontier, Vars_Goal), Pre_Frontier, Set_Of_Pre_Frontiers),
 	compute_neg_frontier_aux(Goal, GoalVars, Set_Of_Pre_Frontiers).
-	
+
+% Manage true and fail ...
+compute_neg_frontier('true', _GoalVars, 'true') :- !, fail.
+compute_neg_frontier('fail', _GoalVars, 'true') :- !.
+
 % Now go for the disjunctions.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_disjunction(Goal, G1, G2), !,
@@ -85,13 +89,15 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 % Now go for other functors stored in our database.
 compute_neg_frontier(Goal, GoalVars, 'true'):-
 	debug_msg(1, 'compute_neg_frontier :: Goal', Goal),
-	look_for_the_relevant_clauses(Goal, Frontier_Tmp),
+	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 	debug_msg(1, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-	debug_msg_list(1, 'compute_neg_frontier :: frontier', Frontier_Tmp),
-	simplify_frontier(Frontier_Tmp, Goal, Frontier),
-%	debug_msg(1, 'frontier_OUT', Front), 
+	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
+	simplify_frontier(Frontier_Tmp_1, Goal, Frontier_Tmp_2),
+	debug_msg(1, 'Frontier_Tmp_2', Frontier_Tmp_2), 
+	combine_frontiers_by_disjunction(Frontier_Tmp_2, Frontier_Tmp_3),
+	debug_msg(1, 'Frontier_Tmp_3', Frontier_Tmp_3), 
 	!, % Frontier is uniquely determined if this clause is used.
-	compute_neg_frontier(Frontier, GoalVars, 'true').
+	compute_neg_frontier(Frontier_Tmp_3, GoalVars, 'true').
 
 % And at last report an error if it was impossible to found a valid entry.
 compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
@@ -136,6 +142,11 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	setof_local(frontier(Head, Body, FrontierTest), 
 	cneg_pre_frontier(Name, Arity, _SourceFileName, Head, Body, FrontierTest), Frontier).
 
+combine_frontiers_by_disjunction([], 'fail') :- !.
+combine_frontiers_by_disjunction([Frontier], Frontier) :- !.
+combine_frontiers_by_disjunction([Frontier|Frontiers_List], (Frontier ; Frontiers_Disj)) :- !,
+	combine_frontiers_by_disjunction(Frontiers_List, Frontiers_Disj).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,16 +171,18 @@ simplify_frontier_aux([_Frontier|More_Frontier_In], G, More_Frontier_Out):-
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Frontier, Goal):-
-	frontier_contents(Frontier, Head, Body, _FrontierTest_Aux),
-	list_head(Body, Test), 
-	debug_msg(1, 'test_frontier_is_valid :: (Head, Test, Goal)', (Head, Test, Goal)),
-        copy_term((Head, Test, Goal), (Head_Tmp, Test_Tmp, Goal_Tmp)), 
+	frontier_contents(Frontier, Head, _Body, FrontierTest),
+	debug_msg(1, 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, FrontierTest, Goal)),
+        copy_term((Head, FrontierTest, Goal), (Head_Tmp, Test_Tmp, Goal_Tmp)), 
         equality(Head_Tmp, Goal_Tmp, []), 
 	goal_is_equality(Test_Tmp, Test_Left, Test_Right, UQV), % It must be an equality.
 	equality(Test_Left, Test_Right, UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 	debug_msg(1, 'test_frontier_is_valid', 'YES'),
-	!.
+	!,
+	functor_local(Goal, _Name, _Arity, Args), 
+	goal_is_equality(FrontierTest, Test_Left, Test_Right, UQV),
+	equality(Test_Left, Args, UQV). % Note that UQV = [].
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the combined frontier of the list 
 % of lists F1 and F2 after using the distributive rule
