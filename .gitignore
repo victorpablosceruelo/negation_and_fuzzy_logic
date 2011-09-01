@@ -11,6 +11,6 @@
 *~
 \#*.*\#
 packed/*
-debug_file.txt
+debug_file*.pl
 *.\$\$\$
 */.svn/*

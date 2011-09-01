@@ -47,7 +47,8 @@ debugger_pkg_aux(Input, [Input], _FileName) :-
 
 openOutputFile(Stream, FileName) :-
 	name(FileName, FileName_String),
-	append(FileName_String, "_debug_file.pl", Debug_FileName_String),
+	append("debug_file_", FileName_String, Debug_FileName_String_Aux),
+	append(Debug_FileName_String_Aux, ".pl", Debug_FileName_String),
 	name(FN_Out, Debug_FileName_String),	% Convert string to atom.
 	open(FN_Out,write,Stream),
 	set_output(Stream).
