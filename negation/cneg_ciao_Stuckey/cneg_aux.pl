@@ -6,7 +6,8 @@
 	    findall/4, append/3, functor_local/4,
 	    list_head/2, list_tail/2, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
-	    setof_local/3, filter_out_nonvars/2,
+	    % setof_local/3, 
+	    filter_out_nonvars/2,
 	    varsbag/4, varsbag_remove_var/3, varsbag_difference/3, 
 	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
@@ -513,8 +514,8 @@ term_to_meta(X, '$:'(X)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-setof_local(Things, GoalCondition, Bag) :-
-	setof(Things, GoalCondition, Bag).
+%setof_local(Things, GoalCondition, Bag) :-
+%	setof(Things, GoalCondition, Bag).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
