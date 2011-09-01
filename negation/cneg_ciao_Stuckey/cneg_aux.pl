@@ -12,7 +12,8 @@
 	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
-	    goal_is_disequality/4, goal_is_equality/4,	    
+	    goal_is_disequality/4, goal_is_equality/4,
+	    goal_is_not_conj_disj_eq_or_diseq/1,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -305,6 +306,24 @@ goal_is_aux_3a(Name, Goal, Arg_1, Arg_2, Arg_3) :-
 	arg(1, Goal, Arg_1),
 	arg(2, Goal, Arg_2),
 	arg(3, Goal, Arg_3).
+
+goal_is_not_conj_disj_eq_or_diseq(Goal) :-
+	nonvar(Goal),
+	functor_local(Goal, Name, _Arity, _Args),
+	Name \== 'basiccontrol:;',
+	Name \== 'basiccontrol:,',
+	Name \== ';', 
+	Name \== ',',
+	Name \== '=', 
+	Name \== 'eq',
+	Name \== 'cneg_eq',
+	Name \== 'equality',
+	Name \== 'dist',  
+	Name \== 'diseq',
+	Name \== 'dist',
+	Name \== 'cneg_diseq',
+	Name \== 'disequality',
+	Name \== '=/='.
 
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),

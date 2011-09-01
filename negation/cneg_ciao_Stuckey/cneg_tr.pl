@@ -164,7 +164,8 @@ retrieve_list_of(_List_Name, []).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_auxiliary_code([ Multifile |[ end_of_file]]) :-
-	Multifile = (:- multifile cneg_pre_frontier/6, call_to/1).
+	Multifile = (:- multifile cneg_pre_frontier/6).
+%	Multifile = (:- multifile cneg_pre_frontier/6, call_to/1),
 %	Call_To_This_File_Pred = (call_to(Predicate) :- call(Predicate)).
 
 trans_sent_eof(Cls_Out, SourceFileName) :-
