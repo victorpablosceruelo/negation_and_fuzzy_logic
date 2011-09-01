@@ -258,7 +258,7 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 unify_pre_sols_when_possible([], []) :- !.
 unify_pre_sols_when_possible(To_Unify, After_Unified) :- 
 	debug_msg_list(1, 'compute_pre_frontier :: To_Unify', To_Unify),
-	unify_sols_when_possible_aux_1(To_Unify, Unified, Not_Unified), !,
+	unify_sols_when_possible_aux_1(To_Unify, [], Unified, [], Not_Unified), !,
 	(
 	    (
 		Unified == [], 
@@ -274,12 +274,15 @@ unify_pre_sols_when_possible(To_Unify, After_Unified) :-
 	    )
 	).
 
-unify_sols_when_possible_aux_1([Head_To_Unify], [], [Head_To_Unify]).
-unify_sols_when_possible_aux_1([Head | Tail_To_Unify], Unified_Out, Not_Unified_Out) :-
-	unify_sols_when_possible_aux_2(Head, Tail_To_Unify, [], Unified_Aux, Not_Unified_Aux),
-	unify_sols_when_possible_aux_1(Tail_To_Unify, Unified_In, Not_Unified_In),
-	append(Unified_Aux, Unified_In, Unified_Out),
-	append(Not_Unified_Aux, Not_Unified_In, Not_Unified_Out).
+unify_sols_when_possible_aux_1([Head_To_Unify], Unified_Out, Unified_Out, Not_Unified_In, Not_Unified_Out) :-
+	unify_sols_when_possible_aux_2(Head_To_Unify, Unified_Out, [], _Unified_With_Head, Not_Unified_With_Head),
+	append(Not_Unified_With_Head, Not_Unified_In, Not_Unified_Out).
+
+unify_sols_when_possible_aux_1([Head | Tail_To_Unify], Unified_In, Unified_Out, Not_Unified_In, Not_Unified_Out) :-
+	unify_sols_when_possible_aux_2(Head, Tail_To_Unify, [], Unified_With_Head, Not_Unified_With_Head),
+	append(Unified_With_Head, Unified_In, Unified_Aux),
+	append(Not_Unified_With_Head, Not_Unified_In, Not_Unified_Aux),
+	unify_sols_when_possible_aux_1(Tail_To_Unify, Unified_Aux, Unified_Out, Not_Unified_Aux, Not_Unified_Out).
 
 unify_sols_when_possible_aux_2(Head_To_Unify, [], [], [], [Head_To_Unify]) :- !.
 unify_sols_when_possible_aux_2(_Head_To_Unify, [], Unified, Unified, []) :- !.
