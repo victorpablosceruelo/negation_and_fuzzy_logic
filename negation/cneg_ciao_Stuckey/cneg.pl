@@ -24,7 +24,9 @@
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
-
+:- multifile call_to/1.
+:- meta_predicate call_to(?). % /1.
+%:- export(call_to/1).
 
 cneg(UQV, Functor) :- cneg_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
 
@@ -42,8 +44,8 @@ cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	functor_local(Functor, Name, Arity, Args),
 	New_Arity is Arity + 4,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
-	append(FV_Cneg, FV_In, FV_Aux),
-	append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
+	cneg_aux:append(FV_Cneg, FV_In, FV_Aux),
+	cneg_aux:append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
 	debug_msg(1, 'cneg_aux :: call', New_Functor),
 	call(New_Functor).
@@ -52,6 +54,7 @@ cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 %cneg_test_for_true(UQV_Out, UQV_Out, 'true', 'true').
 %cneg_test_for_fail(UQV_Out, UQV_Out, 'fail', 'fail').
 
+call_to(Predicate) :- call(Predicate).
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA

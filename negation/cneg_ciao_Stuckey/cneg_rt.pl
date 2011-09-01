@@ -73,10 +73,12 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	goal_is_conjunction(Goal, G1, G2), !,
 	(
 	    (
+		debug_msg(1, 'compute_neg_frontier :: negate G1', ' '),
 		compute_neg_frontier(G1, GoalVars, 'true')
 	    )
 	;
 	    (
+		debug_msg(1, 'compute_neg_frontier :: assume G1, negate G2', ' '),
 		compute_neg_frontier(G2, GoalVars, G1)
 	    )
 	).
@@ -95,7 +97,7 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	% disequality(X, Y, UQV_Aux).
 
 % Now go for other functors stored in our database.
-compute_neg_frontier(Goal, GoalVars, 'true'):-
+compute_neg_frontier(Goal, GoalVars, 'true') :-
 	debug_msg(1, 'compute_neg_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 	debug_msg(1, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
@@ -109,10 +111,8 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 
 % And at last report an error if it was impossible to found a valid entry.
 compute_neg_frontier(Goal, GoalVars, Pre_Frontier) :-
-	debug_msg(1, 'ERROR: compute_neg_frontier :: Goal', Goal), 
-	debug_msg(1, 'ERROR: compute_neg_frontier :: GoalVars', GoalVars), 
-	debug_msg(1, 'ERROR: compute_neg_frontier :: Pre_Frontier', Pre_Frontier), 
-	nl, nl, !, fail.
+	debug_msg(1, 'ERROR: compute_neg_frontier :: (Goal, GoalVars, Pre_Frontier)', (Goal, GoalVars, Pre_Frontier)), 
+	nl, !, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -158,21 +158,14 @@ combine_frontiers_by_disjunction_aux(Frontier_1, Frontier_2, ((Frontier_1) ; (Fr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
-simplify_frontier(Front_In, G, Front_Out) :-
-	debug_msg_nl(0),
-	debug_msg_list(1, 'simplify_frontier :: Front_In', Front_In),
-	debug_msg(0, 'simplify_frontier :: Goal', G),
-	simplify_frontier_aux(Front_In, G, Front_Out),
-	debug_msg(0, 'simplify_frontier :: Front_Out', Front_Out),
-	debug_msg_nl(0).
-
-simplify_frontier_aux([], _Goal, []) :- !.
-simplify_frontier_aux([Frontier | More_Frontier_In], Goal, [Body | More_Bodies]):-
+simplify_frontier([], _Goal, []) :- !.
+simplify_frontier([Frontier | More_Frontier_In], Goal, [Body | More_Bodies]):-
 	frontier_contents(Frontier, Head, Body, Frontier_Test),
 	test_frontier_is_valid(Goal, Head, Frontier_Test), !,
+	debug_msg(1, 'simplify_frontier :: valid: ', Frontier),
 	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
-simplify_frontier_aux([_Frontier|More_Frontier_In], Goal, More_Bodies):-
-%	debug_msg(1, 'simplify_frontier_aux :: rejected frontier: ', Frontier),
+simplify_frontier([Frontier|More_Frontier_In], Goal, More_Bodies):-
+	debug_msg(1, 'simplify_frontier :: not valid: ', Frontier),
 	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
@@ -184,7 +177,7 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, Tmp_UQV), % It must be an equality.
 	equality(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
-	debug_msg(1, 'test_frontier_is_valid', 'YES'),
+%	debug_msg(1, 'test_frontier_is_valid', 'YES'),
 	!, % Backtracking forbidden.
 	functor_local(Goal, _Name, _Arity, Goal_Args), 
 	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
