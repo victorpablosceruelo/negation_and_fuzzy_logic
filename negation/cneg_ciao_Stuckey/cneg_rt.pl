@@ -197,11 +197,15 @@ compute_pre_frontier(Goal, GoalVars_In, Pre_Frontier) :-
 
 	varsbag(GoalVars_In, [], [], GoalVars),
 	varsbag((Goal, Pre_Frontier), GoalVars, [], LocalVars),
-	debug_msg(1, 'compute_pre_frontier :: GoalVars_In', GoalVars_In),	
-	% This is not the way. We need to obtain 1 solution and ask for more solutions sharing its
-	% solutions for goalvars. In this way we do not hang when infinite solutions are found.
+	debug_msg(1, 'compute_pre_frontier :: GoalVars_In', GoalVars_In),
+	% We need to obtain 1 solution and ask for more solutions sharing its solutions for goalvars. 
+	% In this way we do not hang when an infinite number of solutions is found.
 	% This is not completely true because it fails for p(X) :- p(X). but in this case it's clearly 
 	% a programming error (this has no meaning at all).
+	copy_term((Pre_Frontier, GoalVars, LocalVars), (Pre_Frontier_Copy, GoalVars_Copy, _LocalVars_Copy)),
+	!,
+	compute_pre_frontier_aux(Pre_Frontier_Copy),
+	equality(GoalVars, GoalVars_Copy, []),
 	setof(([(Goal, Pre_Frontier, LocalVars)], GoalVars), compute_pre_frontier_aux(Pre_Frontier), Pre_F_Sols),
 	debug_msg(1, 'compute_pre_frontier :: Pre_F_Sols', Pre_F_Sols),
 	debug_msg_nl(1),
