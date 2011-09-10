@@ -100,8 +100,13 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	cneg_diseq(T1,T2, UQV_Aux, _UQV_Out, 'fail', 'true').
 	% disequality(X, Y, UQV_Aux).
 
+compute_neg_frontier(Goal, _GoalVars, 'true'):- 
+	goal_is_negation(Goal, SubGoal, _UQV), !,
+	call_to(SubGoal). % Forget GoalVars and UQV.
+
 % Now go for other functors stored in our database.
 compute_neg_frontier(Goal, GoalVars, 'true') :-
+	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
 	debug_msg(1, 'compute_neg_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 	debug_msg(1, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
@@ -259,8 +264,12 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 	equality(Left, Right, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
+	goal_is_negation(Pre_Frontier, SubGoal, UQV), 
+	cneg_rt(SubGoal, UQV).
+
+compute_pre_frontier_aux(Pre_Frontier) :-
 	nonvar(Pre_Frontier),
-	goal_is_not_conj_disj_eq_or_diseq(Pre_Frontier),
+	goal_is_not_conj_disj_eq_diseq_dneg(Pre_Frontier),
 	call_to(Pre_Frontier).
 
 unify_pre_sols_when_possible([], []) :- !.

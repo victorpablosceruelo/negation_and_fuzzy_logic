@@ -13,7 +13,8 @@
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/4, goal_is_equality/4,
-	    goal_is_not_conj_disj_eq_or_diseq/1,
+	    goal_is_not_conj_disj_eq_diseq_dneg/1,
+	    goal_is_negation/3,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -307,7 +308,7 @@ goal_is_aux_3a(Name, Goal, Arg_1, Arg_2, Arg_3) :-
 	arg(2, Goal, Arg_2),
 	arg(3, Goal, Arg_3).
 
-goal_is_not_conj_disj_eq_or_diseq(Goal) :-
+goal_is_not_conj_disj_eq_diseq_dneg(Goal) :-
 	nonvar(Goal),
 	functor_local(Goal, Name, _Arity, _Args),
 	Name \== 'basiccontrol:;',
@@ -323,7 +324,13 @@ goal_is_not_conj_disj_eq_or_diseq(Goal) :-
 	Name \== 'dist',
 	Name \== 'cneg_diseq',
 	Name \== 'disequality',
-	Name \== '=/='.
+	Name \== '=/=',
+	Name \== 'cneg_rt'.
+
+goal_is_negation(Goal, SubGoal, UQV) :-
+	functor_local(Goal, 'cneg_rt', 2, _Args),
+	arg(1, Goal, SubGoal),
+	arg(2, Goal, UQV).
 
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),
