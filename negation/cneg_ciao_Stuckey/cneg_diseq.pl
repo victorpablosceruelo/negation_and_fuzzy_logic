@@ -86,7 +86,7 @@ put_attribute_local(Var, Attribute) :-
 %%% Attributes contents are encapsulated via the following structure.
 
 %:- dynamic var_attribute/2.
-attribute_contents(var_attribute(Target, Disequalities), Target, Disequalities).
+attribute_contents(var_attribute(Target, Disequalities, UQV), Target, Disequalities, UQV).
 disequality_contents(disequality(Diseq_1, Diseq_2, GoalVars), Diseq_1, Diseq_2, GoalVars).
 equality_contents(equality(T1, T2), T1, T2).
 
@@ -113,8 +113,8 @@ portray_attribute(Attr, Var) :-
 	debug_msg(2, 'portray_attribute :: (Attr, Var)', (Attr, Var)).
 
 portray(Attribute) :-
-	attribute_contents(Attribute, _Target, Disequalities, UnivVars), !,
-	portray_disequalities(Disequalities, UnivVars).
+	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
+	portray_disequalities(Disequalities,UQV).
 
 portray(Anything) :- 
 	debug_msg_aux(2, '', Anything).
@@ -144,9 +144,9 @@ portray_attributes_in_variable(Var) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-portray_disequalities(Disequalities, UnivVars) :-
-	portray_disequalities_aux_1(Disequalities), 
-	portray_disequalities_aux_3(UnivVars).
+portray_disequalities(Disequalities, UQV) :-
+	portray_disequalities_aux_1(Disequalities),
+	portray_disequalities_aux_3(UQV).
 
 portray_disequalities_aux_1([]) :- !.
 portray_disequalities_aux_1([Diseq_1]) :- !,
@@ -157,7 +157,7 @@ portray_disequalities_aux_1([Diseq_1|Diseqs]) :- !,
 	portray_disequalities_aux_1(Diseqs).
 
 portray_disequalities_aux_2(Diseq) :-
-	disequality_contents(Diseq, Diseq_1, Diseq_2),
+	disequality_contents(Diseq, Diseq_1, Diseq_2, _GoalVars),
 	debug_msg_aux(2, '[ ', Diseq_1),
 	debug_msg_aux(2, ' =/= ', Diseq_2),
 	debug_msg_aux(2, '', ' ]').
@@ -178,124 +178,74 @@ portray_disequalities_aux_4([FreeVar | FreeVars]) :-
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-verify_attribute(Attribute, Target):-
+verify_attribute(Attribute, Target) :-
 	debug_msg(1, 'verify_attribute :: (Attribute, Target)', (Attribute, Target)), 
-	attribute_contents(Attribute, NewTarget, Disequalities, GoalVars), 
-	terms_are_equal(Target, NewTarget), !,
-	diseq_status(Status, GoalVars, 'true', 'true'),
-	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
-%	test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities)
-	test_and_update_vars_attributes(Status, [], Disequalities).
+	verify_attribute_aux(Attribute, Target).
 
+verify_attribute_aux(Attribute, NewTarget) :-
+	attribute_contents(Attribute, OldTarget, Disequalities, _UQV), 
+	terms_are_equal(NewTarget, OldTarget), !, % If not, a substitution is needed.
+	remove_attribute_local(OldTarget), 
+	test_and_update_vars_attributes(Disequalities, 'true', 'true').
 
 % Only for Ciao prolog 
-verify_attribute(Attribute, NewTarget):-
-%	debug_msg(0, 'Only for Ciao Prolog: '),
-	debug_msg(1, 'verify_attribute(Attribute, NewTarget)', verify_attribute(Attribute, NewTarget)), 
-	attribute_contents(Attribute, OldTarget, Disequalities, GoalVars), !,
-	substitution_contents(Subst, OldTarget, NewTarget),
-	diseq_status(Status, GoalVars, 'true', 'true'),
-	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
-	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
-%	test_and_update_vars_attributes(Status_In, Substitutions, New_Disequalities)
-	test_and_update_vars_attributes(Status, [Subst], Disequalities).
-
-substitution_contents(substitute(Var, T), Var, T).
+verify_attribute_aux(Attribute, NewTarget) :-
+	attribute_contents(Attribute, OldTarget, Disequalities, _UQV), 
+	NewTarget \== OldTarget, % A substitution is needed.
+	remove_attribute_local(OldTarget), 
+	get_goalvars_from_disequalities(Disequalities, [], GoalVars),
+	perform_substitutions([(OldTarget, NewTarget)], GoalVars),
+	test_and_update_vars_attributes(Disequalities, 'true', 'true').
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
-	debug_msg(0, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, GoalVars)', Attribute_Var_1),
-	debug_msg(0, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, GoalVars)', Attribute_Var_2),
-	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, GoalVars_Var_1), !,
-	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, GoalVars_Var_2), !,
+	debug_msg(0, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
+	debug_msg(0, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
+	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, _UQV_Var_1), !,
+	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, _UQV_Var_2), !,
+	remove_attribute_local(OldTarget_Var_1), 
+	remove_attribute_local(OldTarget_Var_2), 
 
 	cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
-	cneg_aux:append(GoalVars_Var_1, GoalVars_Var_2, GoalVars_In),
-	substitution_contents(Subst, OldTarget_Var_1, OldTarget_Var_2),
+	get_goalvars_from_disequalities(Disequalities, [], GoalVars),
+	perform_substitutions([(OldTarget_Var_1, OldTarget_Var_2)], GoalVars),
 	
-	varsbag(GoalVars_In, [], [], GoalVars_Aux),
-	diseq_status(Status, GoalVars_Aux, 'true', 'true'),
-	debug_msg(1, 'test_and_update_vars_attributes :: (Status, Disequalities)', (Status, Disequalities)), 
-	debug_msg(1, 'test_and_update_vars_attributes :: Subst', Subst), 
-	test_and_update_vars_attributes(Status, [Subst], Disequalities).
+	debug_msg(1, 'test_and_update_vars_attributes :: (Disequalities)', (Disequalities)), 
+	test_and_update_vars_attributes(Disequalities, 'true', 'true').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% An~ade la formula al atributo de las variables implicadas
-% Por q tendriamos q tener en cuenta otros atributos?
-% Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
-
-test_and_update_vars_attributes(Substitutions, New_Disequalities, Do_Not_Fail, Result) :-
-	debug_msg(0, 'test_and_update_vars_attributes :: Substitutions', Substitutions),
-	debug_msg(0, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
-
-	cneg_aux:varsbag(New_Disequalities, [], [], Diseq_Vars), !,
-	retrieve_affected_disequalities(Diseq_Vars, [], [], Old_Disequalities), !,
-	debug_msg(0, 'test_and_update_vars_attributes :: Old_Disequalities', Old_Disequalities),
-	perform_substitutions(Substitutions, GoalVars), !,
-
-	% At first we check that the new disequalities can be added to the old ones.
-	simplify_disequations(New_Disequalities, Simplified_Disequalities_1, Do_Not_Fail, Result),
-	% At last we check that the old disequalities are still valid.
-	simplify_disequations(Old_Disequalities, Simplified_Disequalities_2, 'true', 'true'),
-
-	% Now we aggregate all of them.
-	accumulate_disequations(Simplified_Disequalities_1, Simplified_Disequalities_2, Simplified_Disequalities),
-
-	debug_msg(0, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
-	restore_attributes(Simplified_Disequalities).
-
-retrieve_affected_disequalities([], _Visited_Vars, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
-retrieve_affected_disequalities([Var|Vars], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out):- 
-	var(Var), % It cannot be other things ...
-	get_attribute_local(Var, Attribute), !,
-	attribute_contents(Attribute, Var, Disequalities), 
-	remove_attribute_local(Var), 
-
-	cneg_aux:varsbag(Disequalities, [Var|Visited_Vars], Vars, New_Vars),
-	accumulate_disequations(Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
-        retrieve_affected_disequalities(New_Vars, [Var|Visited_Vars], Diseq_Acc_Aux, Diseq_Acc_Out).
-
-retrieve_affected_disequalities([Var|Vars_In], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out) :- 
-        retrieve_affected_disequalities(Vars_In, [Var|Visited_Vars], Diseq_Acc_In, Diseq_Acc_Out).
-
-
-% Substitutions need a revision in depth.
 perform_substitutions([], _GoalVars) :- !.
-perform_substitutions([Subst | MoreSubst], GoalVars) :-
-	debug_msg(1, 'perform_substitutions :: Subst', Subst),
-	substitution_contents(Subst, OldTarget, NewTarget),
+perform_substitutions([(OldTarget, NewTarget) | MoreSubst], GoalVars_In) :-
 	varsbag(GoalVars_In, [], [], GoalVars_Aux), !,
+	perform_substitution(OldTarget, NewTarget, GoalVars_Aux),
+	perform_substitutions(MoreSubst, GoalVars_Aux).	
+
+perform_substitution(OldTarget, NewTarget, GoalVars) :-
+	debug_msg(1, 'perform_substitutions :: (OldTarget, NewTarget, GoalVars)', (OldTarget, NewTarget, GoalVars)),
 	(
 	    (
-		var(OldTarget),
-		var(NewTarget), !, % Both are vars.
-		perform_substitution_vars(OldTarget, NewTarget, GoalVars_Aux)
+		perform_substitution_vars(OldTarget, NewTarget, GoalVars_Aux), ! % Both are vars.
 	    )
 	;
 	    (
-		var(OldTarget), !, % Only OldTarget is var.
-		perform_substitution_var_nonvar(OldTarget, NewTarget, GoalVars_Aux)
+		perform_substitution_var_nonvar(OldTarget, NewTarget, GoalVars_Aux), ! % Only OldTarget is var.
 	    )
 	;
 	    (
-		var(NewTarget), !, % Only NewTarget is var.
-		perform_substitution_var_nonvar(NewTarget, OldTarget, GoalVars_Aux)
+		perform_substitution_var_nonvar(NewTarget, OldTarget, GoalVars_Aux), ! % Only NewTarget is var.
 	    )
 	;
-	    (
-		perform_substitution_nonvars(OldTarget, NewTarget, GoalVars_Aux)
-	    )
-	),
-	perform_substitutions(MoreSubst, GoalVars_Aux).	
+	    perform_substitution_nonvars(OldTarget, NewTarget, GoalVars_Aux) % None is a var.
+	).
 
 perform_substitution_vars(OldTarget, NewTarget, GoalVars) :-
 	var(OldTarget),
 	var(NewTarget), % Be sure both are vars.
 	cneg_aux:memberchk(OldTarget, GoalVars),
 	cneg_aux:memberchk(NewTarget, GoalVars), % None is universally quantified.
-	diseq_eq(UV_In, UV_Out).
+	diseq_eq(OldTarget, NewTarget).
 
 perform_substitution_var_nonvar(OldTarget, NewTarget, GoalVars) :-
 	var(OldTarget), % Be sure OldTarget is a var.
@@ -310,20 +260,76 @@ perform_substitution_nonvars(OldTarget, NewTarget, GoalVars) :-
 
 % Esto NO es producto cartesiano.
 substitutions_cartesian_product([], [], []) :- !.
-substitutions_cartesian_product([T1], [T2], [Diseq]) :- !,
-	 substitution_contents(Diseq, T1, T2).
-substitutions_cartesian_product([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :- !,
-	substitution_contents(Diseq, T1, T2),
+substitutions_cartesian_product([T1], [T2], [(T1, T2)]) :- !.
+substitutions_cartesian_product([T1 | Args_1], [T2 | Args_2], [(T1, T2) | Args]) :- !,
 	substitutions_cartesian_product(Args_1, Args_2, Args).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_goalvars_from_disequalities([], GoalVars_In, GoalVars_In) :- !.
+get_goalvars_from_disequalities([(_Diseq, GoalVars_Diseq) | Disequalities], GoalVars_In, GoalVars_Out) :-
+	varsbag(GoalVars_Diseq, [], GoalVars_In, GoalVars_Aux),
+	get_goalvars_from_disequalities(Disequalities, GoalVars_Aux, GoalVars_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% An~ade la formula al atributo de las variables implicadas
+% Por q tendriamos q tener en cuenta otros atributos?
+% Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
+
+test_and_update_vars_attributes(New_Disequalities, Do_Not_Fail, Result) :-
+	debug_msg(0, 'test_and_update_vars_attributes :: New_Disequalities', New_Disequalities),  
+
+	cneg_aux:varsbag(New_Disequalities, [], [], Diseq_Vars), !,
+	retrieve_affected_disequalities(Diseq_Vars, [], [], Old_Disequalities), !,
+	debug_msg(0, 'test_and_update_vars_attributes :: Old_Disequalities', Old_Disequalities),
+
+	% Get which variables are GoalVars so we distinguish them from UQV.
+	get_goalvars_from_disequalities(New_Disequalities, [], All_GoalVars_Tmp),
+	get_goalvars_from_disequalities(Old_Disequalities, All_GoalVars_Tmp, All_GoalVars),
+
+	% At first we check that the new disequalities can be added to the old ones.
+	simplify_disequations(New_Disequalities, [], Simplified_Disequalities_1, All_GoalVars, Do_Not_Fail, Result),
+	% At last we check that the old disequalities are still valid.
+	simplify_disequations(Old_Disequalities, [], Simplified_Disequalities_2, All_GoalVars, 'true', 'true'),
+
+	% Now we aggregate all of them.
+	accumulate_disequations(Simplified_Disequalities_1, Simplified_Disequalities_2, Simplified_Disequalities),
+
+	debug_msg(0, 'test_and_update_vars_attributes :: Simplified_Disequalities', Simplified_Disequalities),
+	restore_attributes(Simplified_Disequalities).
+
+retrieve_affected_disequalities([], _Visited_Vars, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
+retrieve_affected_disequalities([Var|Vars], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out):- 
+	var(Var), % It cannot be other things ...
+	get_attribute_local(Var, Attribute), !,
+	attribute_contents(Attribute, Var, Disequalities, _UQV), 
+	remove_attribute_local(Var), 
+
+	cneg_aux:varsbag(Disequalities, [Var|Visited_Vars], Vars, New_Vars),
+	accumulate_disequations(Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
+        retrieve_affected_disequalities(New_Vars, [Var|Visited_Vars], Diseq_Acc_Aux, Diseq_Acc_Out).
+
+retrieve_affected_disequalities([Var|Vars_In], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out) :- 
+        retrieve_affected_disequalities(Vars_In, [Var|Visited_Vars], Diseq_Acc_In, Diseq_Acc_Out).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-restore_attributes(UQV, Diseqs) :- 
+restore_attributes(Diseqs) :- 
+	get_goalvars_from_disequalities(Diseqs, [], GoalVars),
 	varsbag(Diseqs, [], [], Affected_Vars),
-	debug_msg(0, 'restore_attributes_vars(Affected_Vars, UQV, Diseqs)', (Affected_Vars, UQV, Diseqs)),
-	restore_attributes_vars(Affected_Vars, UQV, Diseqs).
+	varsbag(Affected_Vars, GoalVars, [], UQV),
+	clean_up_goalvars_in_disequalities(Diseqs, Cleaned_Diseqs),
+	debug_msg(1, 'restore_attributes_vars(Affected_Vars, UQV, Diseqs)', (Affected_Vars, UQV, Cleaned_Diseqs)),
+	restore_attributes_vars(Affected_Vars, UQV, Cleaned_Diseqs).
 
 restore_attributes_vars([], _UQV_In, _Diseqs) :- !.
 restore_attributes_vars([Var | Affected_Vars], UQV_In, Diseqs) :-
@@ -369,6 +375,12 @@ restore_attributes_var(Var, UQV_In, Affected_Diseqs) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+clean_up_goalvars_in_disequalities(Diseqs, Cleaned_Diseqs) :- HERE
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 accumulate_disequations(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
 	debug_msg(0, 'accumulate_disequations :: Diseqs_In', Diseqs_In),
 	debug_msg(0, 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
@@ -380,8 +392,8 @@ accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :
 	cneg_aux:memberchk(Diseq, Diseq_Acc_In), !, % It is there.
 	accumulate_disequations_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
 accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
-	disequality_contents(Diseq, T1, T2),
-	disequality_contents(Diseq_Aux, T2, T1), % Order inversion.
+	disequality_contents(Diseq, T1, T2, GoalVars),
+	disequality_contents(Diseq_Aux, T2, T1, GoalVars), % Order inversion.
 	cneg_aux:memberchk(Diseq_Aux, Diseq_Acc_In), !, % It is there.
 	accumulate_disequations_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
 accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
@@ -390,145 +402,127 @@ accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :
 % Note that each disequality analized gets a clean status on its Result variable.
 % This is because all of them need to be satisfied, we should not override the status of
 % a previous disequality with the status of the current one.
-simplify_disequations([], Status_In, Diseq_Acc_In, Diseq_Acc_In) :- !,
-	diseq_status(Status_In, UQV_In, UQV_In, _Do_Not_Fail, 'true').
+simplify_disequations([], Diseq_Acc_In, Diseq_Acc_In, _GoalVars, _Do_Not_Fail, 'true') :- !.
 
-simplify_disequations([Diseq|Diseq_List], Status_In, Diseq_Acc_In, Diseq_Acc_Out) :- !,
-	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result_In),
-	diseq_status(Status_Aux, UQV_In, UQV_Aux, Do_Not_Fail, Result_Aux),
-	simplify_disequation([Diseq], Status_Aux, Simplified_Diseq),
+simplify_disequations([Diseq|Diseq_List], Diseq_Acc_In, Diseq_Acc_Out, GoalVars, Do_Not_Fail, Result_In) :- !,
+	simplify_disequation([Diseq], Simplified_Diseq, GoalVars, Do_Not_Fail, Result_Aux),
 	and_between_statuses(Result_Aux, Result_Out, Result_In),
 	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	diseq_status(Status_Out, UQV_Aux, UQV_Out, Do_Not_Fail, Result_Out),
-	simplify_disequations(Diseq_List, Status_Out, Diseq_Acc_Aux, Diseq_Acc_Out).
+	simplify_disequations(Diseq_List, Diseq_Acc_Aux, Diseq_Acc_Out, GoalVars, Do_Not_Fail, Result_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % just for debug.
-simplify_disequation(Diseqs, Status, Answer) :-
+simplify_disequation(Diseqs, Answer, GoalVars, Do_Not_Fail, Result) :-
 	debug_msg_nl(0),
-	debug_msg(1, 'simplify_disequation :: (Diseqs, Status)', (Diseqs, Status)),
-	simplify_disequation_aux(Diseqs, Status, Answer),
-	debug_msg(1, 'simplify_disequation :: (Status, Answer)', (Status, Answer)),
+	debug_msg(1, 'simplify_disequation :: (Diseqs, Do_Not_Fail)', (Diseqs, Do_Not_Fail)),
+	simplify_disequation_aux(Diseqs, Answer, GoalVars, Do_Not_Fail, Result),
+	debug_msg(1, 'simplify_disequation :: (Result, Answer)', (Result, Answer)),
 	debug_msg_nl(0).
 
 % For the case we do not have a disequality to simplify.
 % The answer is obviously empty, but we might fail because of Do_Not_Fail = fail.
-simplify_disequation_aux([], Status_In, []) :- 
+simplify_disequation_aux([], [], _GoalVars, Do_Not_Fail, Result) :- 
 	!,
 	debug_msg(1, 'simplify_disequation_aux :: Diseqs = []', ''),
-	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result),
-	(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-	;   (	Do_Not_Fail == 'fail', debug_msg(1, 'Return value is fail.', ''),
-		UQV_Out = UQV_In, 
-		Result = 'fail' % We have failed.
-	    )
-	).
+	check_if_allowed_to_fail(Do_Not_Fail),
+	Result = 'fail'. % We have failed.
 
-simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Same var.
-	disequality_contents(Diseq, T1, T2),
+simplify_disequation_aux([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result) :- % Same var.
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
         var(T1),
         var(T2), % Both are variables.
         T1==T2, !, % Both are the same variable.
 	debug_msg(1, 'simplify_disequation_aux :: SAME VAR, T1 == T2', Diseq),
+	check_if_allowed_to_fail(Do_Not_Fail),
+	simplify_disequation_aux(More_Diseqs, Answer, GoalVars, Do_Not_Fail, Result).
 
-	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result),
-	(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-	;   (	Do_Not_Fail == 'fail', debug_msg(1, 'No return value yet.', ''),
-		!, 
-		diseq_status(Status_Out, UQV_In, UQV_Out, Do_Not_Fail, Result),
-		simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
-	    )
-	).
-
-simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Different vars.
-	disequality_contents(Diseq, T1, T2),
+simplify_disequation_aux([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result) :- % Different vars.
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
         var(T1),
-        var(T2), % Both are variables, but not the same one.
-	diseq_status(Status_In, UQV_In, _UQV_Out, Do_Not_Fail, _Result),
-	cneg_aux:memberchk(T1, UQV_In), % Both are UQ vars.
-	cneg_aux:memberchk(T2, UQV_In), !,
-	debug_msg(1, 'simplify_disequation_aux :: UNIFY UQV(T1) and UQV(T2)', Diseq),
-
-	(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-	;   (	Do_Not_Fail == 'fail', debug_msg(1, 'No return value yet.', ''),
-		!,
-		diseq_eq(T1, T2), % They can not be disunified, and they are still UQ vars.
-		simplify_disequation_aux(More_Diseqs, Status_In, Answer)
-	    )
-	).
-
-simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % Different vars.
-	disequality_contents(Diseq, T1, T2),
-        var(T1),
-        var(T2), !, % Both are variables.
+        var(T2), !, % Both are variables, but not the same one.
+	T1 \== T2, % Not the same variable.
+	varsbag((T1, T2), GoalVars, [], UQV), % Compute UQ vars.
 	debug_msg(1, 'simplify_disequation_aux :: var(T1) and var(T2)', Diseq),
-	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result),
 	(
+	    (   % Both are UQ vars.
+		cneg_aux:memberchk(T1, UQV), 
+		cneg_aux:memberchk(T2, UQV), 
+		debug_msg(1, 'simplify_disequation_aux :: UNIFY UQV(T1) and UQV(T2)', Diseq),
+		check_if_allowed_to_fail(Do_Not_Fail),
+		diseq_eq(T1, T2), % They can not be disunified, and they are still UQ vars.
+		simplify_disequation_aux(More_Diseqs, Answer, GoalVars, Do_Not_Fail, Result)
+	    )
+	;
 	    (   % T1 is a UQ var, T2 is not a UQ var.
-		cneg_aux:memberchk(T1, UQV_In), !,
+		cneg_aux:memberchk(T1, UQV), 
+		cneg_aux:memberchk(T2, GoalVars), 
 		debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and var(T2)', Diseq),
-		simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answer)
+		simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result)
 	    )
 	;
 	    (   % T2 is a UQ var, T1 is not a UQ var.
-		cneg_aux:memberchk(T2, UQV_In), !,
+		cneg_aux:memberchk(T1, GoalVars),
+		cneg_aux:memberchk(T2, UQV), 
 		debug_msg(1, 'simplify_disequation_aux :: UQV(T2) and var(T1)', Diseq),
-		disequality_contents(Diseq_Aux, T2, T1),
-		simplify_disequation_aux_uqvar_t1_var_t2([Diseq_Aux | More_Diseqs], Status_In, Answer)
+		disequality_contents(Diseq_Aux, T2, T1, GoalVars),
+		simplify_disequation_aux_uqvar_t1_var_t2([Diseq_Aux | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result)
 	    )
 	;
-	    (   % T1 and T2 are NOT UQ vars. 2 solutions. First: T1 =/= T2.
-		debug_msg(1, 'simplify_disequation_aux :: var(T1) =/= var(T2)', Diseq),
-		diseq_eq(UQV_Out, UQV_In), % Keep UQV info.
-		diseq_eq('true', Result), % The solution is completely valid.
-		diseq_eq(Answer, [Diseq])
-	    )
-	;
-	    (   % T1 and T2 can not be disunified. We assign Cont = fail. 
-		debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) and var(T2)', Diseq),
-		(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-		;   (	Do_Not_Fail == 'fail', debug_msg(1, 'No return value yet.', ''),
-			!,
+	    (   % T1 and T2 are NOT UQ vars. 2 solutions. 
+		cneg_aux:memberchk(T1, GoalVars),
+		cneg_aux:memberchk(T2, GoalVars),
+		( 
+		    (   % First solution: T1 =/= T2.
+			debug_msg(1, 'simplify_disequation_aux :: var(T1) =/= var(T2)', Diseq),
+			diseq_eq('true', Result), % The solution is completely valid.
+			diseq_eq(Answer, [Diseq])
+		    )
+		;
+		    (   % T1 and T2 can not be disunified. We test if we can fail.
+			debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) and var(T2)', Diseq),
+			check_if_allowed_to_fail(Do_Not_Fail),
 			diseq_eq(T1, T2), % Since they can not be disunified, unify them.
-			simplify_disequation_aux(More_Diseqs, Status_In, Answer)
+			simplify_disequation_aux(More_Diseqs, Answer, GoalVars, Do_Not_Fail, Result)
 		    )
 		)
 	    )	
 	).
 
-simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer) :- % var and nonvar.
-	disequality_contents(Diseq, T1, T2),
+simplify_disequation_aux([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result) :- % var and nonvar.
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
 	(
 	    (   % T1 is a VAR. T2 is not a var.
-		var(T1), !,
+		var(T1), 
+		nonvar(T2),
 		debug_msg(1, 'simplify_disequation_aux :: var(T1) and nonvar(T2) ', Diseq),
-		simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer)
+		simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
-		var(T2), !,
+		var(T2), 
+		nonvar(T1),
 		debug_msg(1, 'simplify_disequation_aux :: var(T2) and nonvar(T1) ', Diseq),
-		disequality_contents(Diseq_Aux, T2, T1),
-		simplify_disequation_aux_var_nonvar([Diseq_Aux | More_Diseqs], Status_In, Answer)
+		disequality_contents(Diseq_Aux, T2, T1, GoalVars),
+		simplify_disequation_aux_var_nonvar([Diseq_Aux | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result)
 	    )
 	).
 
-simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer):-  % Functors that unify.
-	disequality_contents(Diseq, T1, T2),
+simplify_disequation_aux([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result):-  % Functors that unify.
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
  	functor_local(T1, Name_1, Arity_1, Args_1),
 	functor_local(T2, Name_2, Arity_2, Args_2), 
 	Name_1 == Name_2, Arity_1 == Arity_2, !,
 	debug_msg(1, 'simplify_disequation_aux :: functor(T1) == functor(T2)', Diseq),
 
-	disequalities_cartesian_product(Args_1, Args_2, Diseq_List),
+	disequalities_cartesian_product(Args_1, Args_2, GoalVars, Diseq_List),
 	cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
-	simplify_disequation_aux(New_More_Diseqs, Status_In, Answer).
+	simplify_disequation_aux(New_More_Diseqs, Answer, GoalVars, Do_Not_Fail, Result).
 
-simplify_disequation_aux([Diseq | _More_Diseqs], Status_In, Answer):-  % Functors that do not unify.
-	disequality_contents(Diseq, T1, T2),
+simplify_disequation_aux([Diseq | _More_Diseqs], Answer, _GoalVars, _Do_Not_Fail, Result):-  % Functors that do not unify.
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
 	functor_local(T1, Name1, Arity1, _Args1),
 	functor_local(T2, Name2, Arity2, _Args2),
 	(
@@ -537,41 +531,24 @@ simplify_disequation_aux([Diseq | _More_Diseqs], Status_In, Answer):-  % Functor
 	    (Arity1 \== Arity2)
 	), !,
 	debug_msg(1, 'simplify_disequation_aux :: functor(T1) =/= functor(T2)', Diseq),
-	diseq_status(Status_In, UQV_In, UQV_In, _Do_Not_Fail, 'true'), % Result is completely valid.
+	%	check_if_allowed_to_fail(Do_Not_Fail),
+	Result = 'true', % Result is completely valid.
 	diseq_eq(Answer, []). % Answer is True.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Esto NO es producto cartesiano.
-disequalities_cartesian_product([], [], []) :- !.
-disequalities_cartesian_product([T1], [T2], [Diseq]) :- !,
-	 disequality_contents(Diseq, T1, T2).
-disequalities_cartesian_product([T1 | Args_1], [T2 | Args_2], [Diseq | Args]) :- !,
-	disequality_contents(Diseq, T1, T2),
-	disequalities_cartesian_product(Args_1, Args_2, Args).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answer) :-
-	disequality_contents(Diseq, T1, T2),
-        var(T1),
-        var(T2), 
-	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result),
-	cneg_aux:memberchk(T1, UQV_In), !, % T1 is a uq var, T2 is not a uqvar.
-	debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and var(T2) ', Diseq),
-
-	% T1 is not different from T2. Just return fail to disunify, unify and continue.
-	(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-	;   (	Do_Not_Fail == 'fail', debug_msg(1, 'No return value yet.', ''),
-		!,
-		varsbag_remove_var(T1, UQV_In, UQV_Aux),
-		cneg_unify(T1, T2),
-		diseq_status(Status_Out, UQV_Aux, UQV_Out, Do_Not_Fail, Result),
-		simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
+check_if_allowed_to_fail(Do_Not_Fail) :-
+	(   
+	    ( 
+		Do_Not_Fail == 'true', 
+		debug_msg(1, 'Not allowed to return fail.', ''), 
+		fail 
+	    )
+	;   
+	    (	Do_Not_Fail == 'fail', 
+		debug_msg(1, 'No return value yet.', '')
 	    )
 	).
 
@@ -579,54 +556,77 @@ simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Status_In, Answe
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Status_In, Answer):- 
-	disequality_contents(Diseq, T1, T2),
+% Esto NO es producto cartesiano.
+disequalities_cartesian_product([], [], _GoalVars, []) :- !.
+disequalities_cartesian_product([T1], [T2], GoalVars, [Diseq]) :- !,
+	 disequality_contents(Diseq, T1, T2, GoalVars).
+disequalities_cartesian_product([T1 | Args_1], [T2 | Args_2], GoalVars, [Diseq | More_Diseqs]) :- !,
+	disequality_contents(Diseq, T1, T2, GoalVars),
+	disequalities_cartesian_product(Args_1, Args_2, GoalVars, More_Diseqs).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+simplify_disequation_aux_uqvar_t1_var_t2([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result) :-
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
         var(T1),
+        var(T2), 
+	varsbag((T1, T2), GoalVars, [], UQV), % Compute UQ vars.
+	cneg_aux:memberchk(T1, UQV), % T1 is a uq var, T2 is not a uqvar.
+	cneg_aux:memberchk(T2, GoalVars),
+	debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and var(T2) ', Diseq),
+
+	% T1 can not be different from T2. We unify them (failing) and continue.
+	check_if_allowed_to_fail(Do_Not_Fail),
+	cneg_unify(T1, T2),
+	simplify_disequation_aux(More_Diseqs, Answer, GoalVars, Do_Not_Fail, Result).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+simplify_disequation_aux_var_nonvar([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result):- 
+	disequality_contents(Diseq, T1, T2, _Diseq_GoalVars),
+        var(T1),
+	nonvar(T2),
         functor_local(T2, Name, Arity, _Args_T2), 
-	diseq_status(Status_In, UQV_In, UQV_Out, Do_Not_Fail, Result),	
+	varsbag((T1, T2), GoalVars, [], UQV), % Compute UQ vars.
 	(
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
 		debug_msg(1, 'simplify_disequation_aux :: var(T1) and functor(T2) and T1 in vars(T2)', Diseq),
-		cneg_unify(UQV_In, UQV_Out),
 		cneg_unify('true', Result), % Result is completely valid.
 		diseq_eq(Answer, []) % Answer is True.
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
-		cneg_aux:memberchk(T1, UQV_In), !,
+		cneg_aux:memberchk(T1, UQV), !,
 		debug_msg(1, 'simplify_disequation_aux :: UQV(T1) and functor(T2)', Diseq),
-		(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-		;   (	Do_Not_Fail == 'fail', debug_msg(1, 'No return value yet.', ''),
-			!,
-			varsbag_remove_var(T1, UQV_In, UQV_Aux),
-			cneg_unify(T1, T2),
-			diseq_status(Status_Out, UQV_Aux, UQV_Out, Do_Not_Fail, Result),
-			simplify_disequation_aux(More_Diseqs, Status_Out, Answer)
-		    )
-		)
+		check_if_allowed_to_fail(Do_Not_Fail),
+		cneg_unify(T1, T2),
+		simplify_disequation_aux(More_Diseqs, Answer, GoalVars, Do_Not_Fail, Result)
 	    )
 	;
 	    (   % The variable must not be the functor (use attributed variables).
+		cneg_aux:memberchk(T1, GoalVars),
 		debug_msg(1, 'simplify_disequation_aux :: var(T1) =/= functor(T2)', Diseq),
-		functor_local(New_T2, Name, Arity, New_Args_T2), 
-		cneg_aux:varsbag(New_Args_T2, [], UQV_In, UQV_Out),
-		cneg_unify(Result, 'true'), % Correct result if attr. var. satisfied.
-		disequality_contents(New_Diseq, T1, New_T2),
-		diseq_eq(Answer, [New_Diseq]) % Answer is Diseq.
-	    )
-	;
-	    (   % Keep the functor but diseq between the arguments.
-		% We need to say that we have failed because if we are playing with attributed
-		% variables we have no way to get more information on the disequality.
-		debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) and functor(T2)', Diseq),
-		
-		(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-		;   (	Do_Not_Fail == 'fail', debug_msg(1, 'No return value yet.', ''),
-			!,
+		(
+		    (
+			functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
+			cneg_unify(Result, 'true'), % Correct result if attr. var. satisfied.
+			disequality_contents(New_Diseq, T1, New_T2, GoalVars),
+			diseq_eq(Answer, [New_Diseq]) % Answer is Diseq.
+		    )
+		;
+		    (   % Keep the functor but diseq between the arguments.
+			% We need to say that we have failed because if we are playing with attributed
+			% variables we have no way to get more information on the disequality.
+			debug_msg(1, 'simplify_disequation_aux :: UNIFY var(T1) and functor(T2)', Diseq),
+			check_if_allowed_to_fail(Do_Not_Fail),
 			functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
-			simplify_disequation_aux([Diseq | More_Diseqs], Status_In, Answer)
+			simplify_disequation_aux([Diseq | More_Diseqs], Answer, GoalVars, Do_Not_Fail, Result)
 		    )
 		)
 	    )
@@ -673,50 +673,48 @@ and_between_statuses('fail', 'fail', 'fail').
 % Incluye una desigualdad en las formulas de las 
 % variables implicadas
 
-disequality(T1,T2, UQV_In):- 
-	cneg_diseq(T1, T2, UQV_In, 'true', 'true').
+disequality(T1,T2, UQV_In) :- 
+	varsbag((T1, T2), UQV_In, [], GoalVars), % Determine GoalVars.
+	cneg_diseq(T1, T2, GoalVars, 'true', 'true').
 
-cneg_diseq(T1,T2, UQV_In, Do_Not_Fail, Result) :- 
-	varsbag(UQV_In, [], [], UQV_Tmp),                              % No variable bound can be universally quantified.
-	remove_vars_with_attributes(UQV_Tmp, UQV_Aux),   % No attributed variable can be universally quantified.
-	varsbag(T1, UQV_Aux, [], Vars_T1),
-	varsbag(T2, UQV_Aux, Vars_T1, GoalVars),
-	diseq_status(Status, GoalVars, Do_Not_Fail, Result),
-	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), ---, [GoalVars |[Do_Not_Fail |[Result]]]) [in]', ((T1, '=/=', T2), '---', Status)), 
+cneg_diseq(T1,T2, GoalVars_In, Do_Not_Fail, Result) :- 
+	varsbag(GoalVars_In, [], [], GoalVars_Aux), % Only variables, please.
+	varsbag((T1, T2), GoalVars_Aux, [], UQV), % Universally Quantified Variables.
+	varsbag((T1, T2), UQV, [], Affected_GoalVars), % Affected GoalVars Only.
 
-	disequality_contents(Disequality, T1, T2),
-        test_and_update_vars_attributes(Status, [], [Disequality]),
+	debug_msg(1, 'cneg_diseq [in] :: ((T1, =/=, T2), (Affected_GoalVars, Do_Not_Fail) [out]', ((T1, '=/=', T2), (Affected_GoalVars, Do_Not_Fail))),
+	disequality_contents(Disequality, T1, T2, Affected_GoalVars),
+        test_and_update_vars_attributes([Disequality], Do_Not_Fail, Result),
 
-	debug_msg(1, 'cneg_diseq :: ((T1, =/=, T2), Status) [out]', ((T1, '=/=', T2), Status)).
+	debug_msg(1, 'cneg_diseq [out] :: ((T1, =/=, T2), Result) [out]', ((T1, '=/=', T2), Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 equality(T1, T2, UQV_In) :-
-	cneg_eq(T1, T2, UQV_In, _UQV_Out, 'true', 'true').
+	varsbag((T1, T2), UQV_In, [], GoalVars), % Determine GoalVars.
+	cneg_eq(T1, T2, GoalVars, 'true', 'true').
 
-cneg_eq(T1, T2, UQV_In, Do_Not_Fail, Result) :- 
-	debug_msg(1, 'cneg_eq :: (T1, =, T2), ---, (UQV_In, Do_Not_Fail)', ((T1, '=', T2), '---', (UQV_In, Do_Not_Fail))),
-	cneg_aux:varsbag(UQV_In, [], [], UQV_Aux),
-	cneg_aux:varsbag((T1, T2), [], [], Vars_Equality),
-	varsbag_intersection(Vars_Equality, UQV_Aux, Intersection),
+cneg_eq(T1, T2, GoalVars_In, Do_Not_Fail, Result) :- 
+	debug_msg(1, 'cneg_eq :: (T1, =, T2), ---, (GoalVars_In, Do_Not_Fail)', ((T1, '=', T2), '---', (GoalVars_In, Do_Not_Fail))),
+	cneg_aux:varsbag(GoalVars_In, [], [], GoalVars_Aux),
+	cneg_aux:varsbag((T1, T2), GoalVars_Aux, [], UQV_Equality),
 	!,
 	(
 	    ( 
-		Intersection == [], !, diseq_eq(T1, T2),
+		UQV_Equality == [], !, 
+		diseq_eq(T1, T2),
 		Result = 'true'
 	    )
 	;
 	    (
-		Intersection \== [], !, 
-		(   (   Do_Not_Fail == 'true', debug_msg(1, 'Not allowed to return fail.', ''), !, fail )
-		;   (	Do_Not_Fail == 'fail', debug_msg(1, 'Return value is fail.', ''),
-			Result = 'fail',
-			% cneg_diseq(T1,T2, GoalVars, Do_Not_Fail, Result)
-			cneg_diseq(T1, T2, [], 'true', 'true')
-		    )
-		)
+		UQV_Equality \== [], !, 
+		check_if_allowed_to_fail(Do_Not_Fail),
+		Result = 'fail',
+		cneg_aux:varsbag((T1, T2), [], [], Disequality_GoalVars),
+		% cneg_diseq(T1,T2, GoalVars, Do_Not_Fail, Result)
+		cneg_diseq(T1, T2, Disequality_GoalVars, 'fail', 'true')
 	    )
 	).
 
