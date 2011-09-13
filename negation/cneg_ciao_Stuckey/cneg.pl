@@ -30,26 +30,28 @@
 :- meta_predicate call_to(?). % /1.
 %:- export(call_to/1).
 
-cneg(UQV, Functor) :- cneg_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
+goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
 
-cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
+cneg_tr(UQV, Functor) :- cneg_tr_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
+
+cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
-	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
-cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
+cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
-	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
-cneg_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
+cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	functor_local(Functor, Name, Arity, Args),
 	New_Arity is Arity + 4,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	cneg_aux:append(FV_Cneg, FV_In, FV_Aux),
 	cneg_aux:append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
-	debug_msg(1, 'cneg_aux :: call', New_Functor),
+	debug_msg(1, 'cneg_tr_aux :: call', New_Functor),
 	call(New_Functor).
 
 %cneg_initialize([], _UQV_Out, 'true', _Cont_Out).

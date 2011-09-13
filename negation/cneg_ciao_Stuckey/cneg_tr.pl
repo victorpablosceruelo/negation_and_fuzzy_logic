@@ -174,13 +174,13 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	retrieve_list_of(List_Name_1, List_Of_Preds),
 	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
 	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, Aux_Code, Cls_1)),
-	generate_cneg_main_cls(List_Of_Preds, [end_of_file], Cls_1),
+	cneg_tr_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
 	debug_msg_list(0, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(0, 'List_Of_H_and_B', List_Of_H_and_B),
-	generate_cneg_disjs(List_Of_H_and_B, Cls_1, Cls_2),
+	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
 	debug_msg_list(0, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	generate_double_negation_main_cls(List_Of_Preds, Cls_2, Cls_3),
@@ -199,59 +199,53 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %generate_main_cls(List_Of_Preds, Cls_1).
-generate_cneg_main_cls([], Cls, Cls) :- !.
-generate_cneg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
+cneg_tr_generate_main_cls([], Cls, Cls) :- !.
+cneg_tr_generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
 	debug_msg(0, 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
-	generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
+	cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
 	debug_msg(0, 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 	!, %Backtracking forbiden.
-	generate_cneg_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
+	cneg_tr_generate_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
 
-generate_cneg_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
+cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name),	
 	generate_double_negation_name(Name, Main_DN_Name),
 
-	New_Arity is Arity + 4,
+	New_Arity is Arity + 2, % Arity + GoalVars + Result
 
 	% Generate the main clause.
-	functor_local(Main_Cl, ':-', 2, [Head_Main_Cl |[Aux_Cl_Call]]), 
+	functor_local(Main_Cl, ':-', 2, [Main_Cl_Head |[Main_Cl_Body]]), 
 
-	functor_local(Head_Main_Cl, Main_Cl_Name, Arity, _Args_Head),
-	functor_local(Aux_Cl_Call, Aux_Cl_Name, New_Arity, _Args_Aux_Cl_Call), 
-	copy_args(Arity, Head_Main_Cl, Aux_Cl_Call),
-	adjust_args_for_status(New_Arity, Aux_Cl_Call, Status),
-	status_operation(Status, [], _UQV_Aux, 'fail', 'true'), 
+	Main_Cl_Body = (goalvars(Main_Cl_Head, GoalVars), Aux_Cl_Call),
+	functor(Main_Cl_Head, Main_Cl_Name, Arity),
+	functor(Aux_Cl_Call, Aux_Cl_Name, New_Arity), 
+	copy_args(Arity, Main_Cl_Head, Aux_Cl_Call),
+	args_for_cneg_tr(New_Arity, Aux_Cl_Call, GoalVars, 'true'),
 
 	% Generate the auxiliary clause.
-	functor_local(Aux_Cl, ':-', 2, [Head_Aux_Cl |[ Body_Aux_Cl ]]), 
-
-	functor_local(Head_Aux_Cl, Aux_Cl_Name, New_Arity, _Args_SubCall),
-	adjust_args_for_status(New_Arity, Head_Aux_Cl, Status_Head_Aux_Cl),
+	functor_local(Aux_Cl, ':-', 2, [Aux_Cl_Head |[ Aux_Cl_Body ]]), 
+	functor(Aux_Cl_Head, Aux_Cl_Name, New_Arity),
+	args_for_cneg_tr(New_Arity, Aux_Cl_Head, GoalVars, Result),
+	Aux_Cl_Body = (Aux_Cl_Body_1 ; Aux_Cl_Body_2),
 
 	% We need to copy the args from the aux functor to the aux_i functors.
-	head_aux_cl_info(Info_Aux_Cl_1, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	generate_cneg_conj(1, Info_Aux_Cl_1, Body_Aux_Cl_1, Status_Head_Aux_Cl),
+	auxiliary_info(Info_1, Counter, Aux_Cl_Head, Aux_Cl_Name, New_Arity, Arity),
+	generate_auxiliary_conj(1, Info_1, Aux_Cl_Body_1, GoalVars, Result),
 
-	head_aux_cl_info(Info_Aux_Cl_2, Counter, Head_Aux_Cl, Main_DN_Name, New_Arity, Arity),
-	generate_cneg_conj_fail(1, Info_Aux_Cl_2, Body_Aux_Cl_2, Status_Head_Aux_Cl),
+	auxiliary_info(Info_2, Counter, Aux_Cl_Head, Main_DN_Name, New_Arity, Arity),
+	generate_auxiliary_disj(1, Info_2, Aux_Cl_Body_2, GoalVars, Result).
 
-	Body_Aux_Cl = (Body_Aux_Cl_1 ; Body_Aux_Cl_2).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%	generate_subcalls_2(1, Info_Aux_Cl, Body_Aux_Cl_2, Status_Head_Aux_Cl),
-%	Body_Aux_Cl = ((Body_Aux_Cl_1) ; (Body_Aux_Cl_2)). 
-
-head_aux_cl_info(head_aux_cl_info_aux(Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity), 
+auxiliary_info(head_aux_cl_info_aux(Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity), 
 	Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity).
 
-adjust_args_for_status(Arity, Functor, Status) :-
-	status_operation(Status, UQV_In, UQV_Out, Allowed_To_Fail, Result),
+args_for_cneg_tr(Arity, Functor, GoalVars, Result) :-
 	arg(Arity, Functor, Result), 
 	Arity_2 is Arity -1,
-	arg(Arity_2, Functor, Allowed_To_Fail),
-	Arity_3 is Arity_2 -1,
- 	arg(Arity_3, Functor, UQV_Out), 
-	Arity_4 is Arity_3 -1,
- 	arg(Arity_4, Functor, UQV_In).
+	arg(Arity_2, Functor, GoalVars).
 
 cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	name(Name, Name_String),
@@ -260,80 +254,6 @@ cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	
 	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
-
-% Este predicado genera un cuerpo con llamadas a cada uno de las 
-% distintas clausulas que teniamos antes unidas por una disyuncion.
-% Tendra exito si todas las negadas tienen exito, pero si no tiene 
-% exito debe poder llamar a cada una de las negadas anteriores.
-generate_cneg_conj(Index, Info_Aux_Cl, 'fail', Status_In) :- 
-	head_aux_cl_info(Info_Aux_Cl, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
-	Index > Counter, !,
-	status_operation(Status_In, UQV_In, UQV_In, _Allowed_To_Fail, 'fail').
-
-generate_cneg_conj(Index, Info_Aux_Cl, Body, Status_In) :-
-	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result),
-	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
-
-	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
-	copy_args(Arity, Head_Aux_Cl, SubCall),
-	adjust_args_for_status(New_Arity, SubCall, Status_Aux),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
-
-	(
-	    (   % Optimizations for the last one.
-		Index == Counter,
-		UQV_Aux = UQV_Out,
-		Result = Result_Aux,
-		Body = (SubCall)
-	    )
-	;
-	    (
-		Index < Counter,
-		test_for_true(Test_For_True, Result_Aux),
-%		test_for_fail(Test_For_Fail, Result_Aux),
-%		generate_equality(Op_1, UQV_Out, UQV_Aux),
-%		generate_equality(Op_2, Result, Result_Aux),
-%		Ops_When_Fail=(Test_For_Fail, (Op_1, Op_2)),
-%		Body = (SubCall, (Ops_When_Fail ; (Test_For_True, MoreBody))),
-		Body = (SubCall, (Test_For_True, MoreBody)),
-		status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Result),
-		NewIndex is Index + 1,
-		generate_cneg_conj(NewIndex, Info_Aux_Cl, MoreBody, Status_Out)
-	    )
-	).
-
-generate_cneg_conj_fail(Index, Info_Aux_Cl, 'fail', Status_In) :- 
-	head_aux_cl_info(Info_Aux_Cl, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
-	Index > Counter, !,
-	status_operation(Status_In, UQV_In, UQV_In, _Allowed_To_Fail, 'fail').
-
-generate_cneg_conj_fail(Index, Info_Aux_Cl, Body, Status_In) :-
-	head_aux_cl_info(Info_Aux_Cl, Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity),
-	status_operation(Status_In, _UQV_In, _UQV_Out, _Allowed_To_Fail, Result),
-	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
-
-	functor_local(SubCall, SubCall_Name, New_Arity, _Args),
-	copy_args(Arity, Head_Aux_Cl, SubCall),
-	adjust_args_for_status(New_Arity, SubCall, Status_In),
-
-	% Prepare tests.
-	test_for_true(Test_For_True, Result),
-
-	(
-	    (   % Optimizations for the last one.
-		Index == Counter,
-		Body = (SubCall, Test_For_True)
-	    )
-	;
-	    (
-		Index < Counter,
-		Body = ((SubCall, Test_For_True) ; MoreBody),
-		NewIndex is Index + 1,
-		generate_cneg_conj_fail(NewIndex, Info_Aux_Cl, MoreBody, Status_In)
-	    )
-	).
-	
 
 generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 	name(Aux_Cl_Name, String_1),
@@ -346,6 +266,68 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+generate_auxiliary_conj(Index, Aux_Info, 'fail', _GoalVars, 'fail') :- 
+	auxiliary_info(Aux_Info, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
+	Index > Counter, !.
+
+generate_auxiliary_conj(Index, Aux_Info, Body, GoalVars, Result) :-
+	auxiliary_info(Aux_Info, Counter, Aux_Cl_Head, Aux_Cl_Name, New_Arity, Arity),
+	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
+
+	functor(SubCall, SubCall_Name, New_Arity),
+	copy_args(Arity, Aux_Cl_Head, SubCall),
+	args_for_cneg_tr(New_Arity, SubCall, GoalVars, Result_Aux),
+	test_for_true(Test_For_True, Result_Aux),
+
+	(
+	    (   % Optimizations for the last one.
+		Index == Counter,
+		test_for_true(Result_Is_True, Result),
+		Body = ((SubCall, Test_For_True), Result_Is_True)
+	    )
+	;
+	    (
+		Index < Counter,
+		Body = (SubCall, (Test_For_True, MoreBody)),
+		NewIndex is Index + 1,
+		generate_auxiliary_conj(NewIndex, Aux_Info, MoreBody, GoalVars, Result)
+	    )
+	).
+
+generate_auxiliary_disj(Index, Aux_Info, 'fail', _GoalVars, 'fail') :- 
+	auxiliary_info(Aux_Info, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
+	Index > Counter, !.
+
+generate_auxiliary_disj(Index, Aux_Info, Body, GoalVars, Result) :-
+	auxiliary_info(Aux_Info, Counter, Aux_Cl_Head, Aux_Cl_Name, New_Arity, Arity),
+	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
+
+	functor(SubCall, SubCall_Name, New_Arity),
+	copy_args(Arity, Aux_Cl_Head, SubCall),
+	args_for_cneg_tr(New_Arity, SubCall, GoalVars, Result_Aux),
+
+	% Prepare tests.
+	test_for_true(Test_For_True, Result_Aux),
+
+	(
+	    (   % Optimizations for the last one.
+		Index == Counter,
+		test_for_fail(Result_Is_Fail, Result),
+		Body = ((SubCall, Test_For_True), Result_Is_Fail)
+	    )
+	;
+	    (
+		Index < Counter,
+		Body = ((SubCall, Test_For_True) ; MoreBody),
+		NewIndex is Index + 1,
+		generate_auxiliary_disj(NewIndex, Aux_Info, MoreBody, GoalVars, Result)
+	    )
+	).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % 1- We translate the names of the predicates by using the respective counters, 
 %     and we add 5 variables for UQV_In, UQV_Out, Allowed_To_Fail, Results_In, Results_Out.
 % 2- We convert:
@@ -353,160 +335,143 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %      2.2- the subcalls to other predicates are translated into prodicates we've translated.
 %      2.3- vars for freevars and continuation vars are inserted at this point.
 
-%generate_cneg_disjs(List_Of_H_and_B, Cls_2).
-generate_cneg_disjs([], Cls_In, Cls_In).
-generate_cneg_disjs([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+%cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
+cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
+cneg_tr_generate_cls_bodies([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
 	debug_msg(0, 'generate_cneg_disjs_aux :: (Head, Body, Counter)', (Head, Body, Counter)),
-	generate_cneg_disj(Head, Body, Counter, New_Cl), !,
+	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
 	debug_msg(0, 'generate_cneg_disjs_aux :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
-	generate_cneg_disjs(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
+	cneg_tr_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
-generate_cneg_disj(Head, Body, Counter, New_Cl) :-
+cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	% We suppose the head has no unifications (we've removed them before).
-	functor_local(Head, Name, Arity, _Args_Head), 
+	functor(Head, Name, Arity), 
 	% New head (new name, new arity, new args).
-	New_Arity is Arity + 4,
+	New_Arity is Arity + 2, % GoalVars + Result
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	generate_name_from_counter(Counter, Aux_Cl_Name, New_Name),
-	functor_local(New_Head, New_Name, New_Arity, _Args_New_Head),
+	functor(New_Head, New_Name, New_Arity),
 	copy_args(Arity, Head, New_Head),
-	status_operation(Status_New_Head, UQV_In, UQV_Out, Allowed_To_Fail, Result),
-	adjust_args_for_status(New_Arity, New_Head, Status_New_Head),
+	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
 
-	% Determine which variables are in the body but are not in the head.
-	cneg_aux:varsbag(New_Head, [], [], Vars_New_Head), 
-	cneg_aux:varsbag(Body, Vars_New_Head, [], UQV_Body),
+	% Build new clause.
+	functor(New_Cl, ':-', 2),
+	arg(1, New_Cl, New_Head),
+	arg(2, New_Cl, New_Body),
 
 	% Aqui es donde se sabe si hara falta la negacion de Chan o no.
-	% El problema es q las variables de la cabecera no la necesitan, por lo que 
-	% hay que distinguir entre cabecera y cuerpo. Jodido.
+	% El problema es q las variables de la cabecera no la necesitan, 
+	% por lo que hay que distinguir entre cabecera y cuerpo. 
 
- 
-	functor_local(Vars_Append, 'append', 3, [UQV_In |[UQV_Body |[ UQV_Tmp]]]),
+	functor(Test_Cneg_RT, 'test_if_cneg_rt_needed', 2),
+	arg(1, Test_Cneg_RT, GoalVars), 
+	arg(3, Test_Cneg_RT, Body_Unifications), 
+	arg(4, Test_Cneg_RT, Body_Conj),
+	arg(4, Test_Cneg_RT, Result_Aux),
+
+	list_head(Body, Body_Unifications),
+	convert_list_to_conjunction(Body, Body_Conj),
+	test_for_true(Test_For_True, Result_Aux),
+	test_for_fail(Test_For_Fail, Result_Aux),
+	New_Body = (Test_Cneg_RT, (Test_For_True ; (Test_For_Fail, Neg_Body))),
 
 	% negate_body_conjunction
-	status_operation(Status, UQV_Tmp, UQV_Out, Allowed_To_Fail, Result),
-	negate_body_conj(Body, Neg_Body, Status),
-	% Build new clause.
-	functor_local(New_Cl, ':-', 2, [New_Head | [(Vars_Append, Neg_Body)]]).
+	negate_body_conj(Body, GoalVars, Result, Neg_Body).
 
-negate_body_conj([], (Op_1, Op_2), Status) :- !,
-	status_operation(Status, UQV_In, UQV_Out, _Allowed_To_Fail, Result),
-	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Result, 'fail').
 
-negate_body_conj([Atom | Body], Negated_Body, Status_In) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
+negate_body_conj([], _GoalVars, Result, Test_For_Fail) :- !,
+	test_for_fail(Test_For_Fail, Result).
 
+negate_body_conj([Atom | Body], GoalVars, Result, Negated_Body) :-
 	debug_msg(0, 'negate_atom :: Atom ', Atom),
-	negate_atom(Atom, Negated_Atom, Status_Aux),  
+	negate_atom(Atom, GoalVars, Result, Negated_Atom),  
 	debug_msg(0, 'negate_atom :: Negated_Atom ', Negated_Atom),
 
 	test_for_true(Test_For_True, Result_Aux),
 	test_for_fail(Test_For_Fail, Result_Aux),
-	generate_equality(Op_1, UQV_Out, UQV_Aux),
-	generate_equality(Op_2, Result_In, Result_Aux),
+	generate_equality(Op, Result, Result_Aux),
 
-	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_True = (Test_For_True, Op),
 	Ops_When_Fail = (Test_For_Fail, New_Negated_Body),
-
 	Negated_Body = (Negated_Atom, (Ops_When_True ; Ops_When_Fail)),
 
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-	negate_body_conj(Body, New_Negated_Body, Status_Out).
+	negate_body_conj(Body, GoalVars, Result, New_Negated_Body).
 
 % negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Results_In, Results_Out).
-negate_atom(Atom, Neg_Atom, Status) :-
+negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
-	functor_local(Neg_Atom, 'cneg_diseq', 6, [A_Left |[A_Right | Status]]).
+	functor_local(Neg_Atom, 'cneg_diseq_eqv', 4, [A_Left |[A_Right |[ GoalVars |[Result]]]]).
 
-negate_atom(Atom, Neg_Atom, Status) :-
+negate_atom(Atom, _GoalVars, Result, Neg_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
-	functor_local(Neg_Atom, 'cneg_eq', 6, [A_Left |[A_Right | Status]]).
+	functor_local(Neg_Atom, 'cneg_eq_uqv', 4, [A_Left |[A_Right |[ [] |[Result]]]]). % UQV = []
 
-negate_atom(Atom, Neg_Atom, Status_In) :-
+negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-	functor_local(Difference, 'varsbag_difference', 3, [UQV_In |[ UQV |[UQV_Aux]]]),
-	Neg_Atom = (Difference, Neg_Atom_Aux),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-	double_negation_atom(Arg, Neg_Atom_Aux, Status_Aux).
+	functor_local(Op_Append, 'append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
+	Neg_Atom = (Op_Append, Neg_Atom_Aux),
+	double_negation_atom(Arg, New_GoalVars, Result, Neg_Atom_Aux).
 
-negate_atom(Atom, Neg_Atom, Status) :-
-	functor_local(Atom, Name, Arity, Args), !,
+negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+	functor(Atom, Name, Arity), !,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
-	New_Arity is Arity + 4, 
-	append(Args, Status, New_Args),
-	functor_local(Neg_Atom, Aux_Cl_Name, New_Arity, New_Args).
+	New_Arity is Arity + 2, 
+	functor(Neg_Atom, Aux_Cl_Name, New_Arity),
+	args_for_cneg_tr(New_Arity, Neg_Atom, GoalVars, Result),
+	copy_args(Arity, Atom, Neg_Atom).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-double_negation_atom(Atom, DN_Atom, Status_In) :-
+double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
 
 	test_for_true(Test_For_True, Result_Aux),
 	test_for_fail(Test_For_Fail, Result_Aux),
-	generate_equality(Op_1, UQV_Out, UQV_Aux),
-	generate_equality(Op_2, Result_In, Result_Aux),
+	generate_equality(Op, Result, Result_Aux),
 
 	Ops_When_True = (Test_For_True, DN_Conj_2),
-	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
+	Ops_When_Fail = (Test_For_Fail, Op),
 	DN_Atom = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
 
-	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
-	double_negation_atom(Conj_1, DN_Conj_1, Status_C1),
-	status_operation(Status_C2, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-	double_negation_atom(Conj_2, DN_Conj_2, Status_C2).
+	double_negation_atom(Conj_1, GoalVars, Result_Aux, DN_Conj_1),
+	double_negation_atom(Conj_2, GoalVars, Result, DN_Conj_2).
 
-double_negation_atom(Atom, DN_Atom, Status_In) :-
+double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
 
 	test_for_true(Test_For_True, Result_Aux),
 	test_for_fail(Test_For_Fail, Result_Aux),
-	generate_equality(Op_1, UQV_Out, UQV_Aux),
-	generate_equality(Op_2, Result_In, Result_Aux),
+	generate_equality(Op, Result, Result_Aux),
 
-	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
+	Ops_When_True = (Test_For_True, Op),
 	Ops_When_Fail = (Test_For_Fail, DN_Disj_2),
 	DN_Atom = (DN_Disj_1, (Ops_When_True ; Ops_When_Fail)),
 
-	status_operation(Status_D1, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
-	double_negation_atom(Disj_1, DN_Disj_1, Status_D1),
- 	status_operation(Status_D2, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-	double_negation_atom(Disj_2, DN_Disj_2, Status_D2). 
+	double_negation_atom(Disj_1, GoalVars, Result_Aux, DN_Disj_1),
+	double_negation_atom(Disj_2, GoalVars, Result, DN_Disj_2). 
 
-double_negation_atom(Atom, DN_Atom, Status_In) :-
-	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
+double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+	functor_local(Atom, 'cneg', 2, [_Unconfigured_UQV |[ Arg ]]), !,
+	negate_atom(Arg, GoalVars, Result, DN_Atom). % Problematic
 
-	functor_local(Addition, 'varsbag_addition', 3, [UQV |[ UQV_In |[UQV_Aux]]]),
-	DN_Atom = (Addition, Neg_Atom),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-	negate_atom(Arg, Neg_Atom, Status_Aux). % Problematic
+double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+	goal_is_disequality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
+	functor_local(DN_Atom, 'cneg_diseq_eqv', 4, [A_Left |[A_Right |[GoalVars |[Result ]]]]).
 
-double_negation_atom(Atom, (Addition, DN_Atom), Status_In) :-
-	goal_is_disequality(Atom, A_Left, A_Right, UQV), !,
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-	functor_local(Addition, 'varsbag_addition', 3, [UQV |[ UQV_In |[UQV_Aux]]]),
-	status_operation(Status_Aux, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-	functor_local(DN_Atom, 'cneg_diseq', 6, [A_Left |[A_Right | Status_Aux]]).
+double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
+	functor_local(DN_Atom, 'cneg_eq_eqv', 4, [A_Left |[A_Right |[GoalVars |[Result ]]]]).	
 
-double_negation_atom(Atom, DN_Atom, Status_In) :-
-	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV),
-	functor_local(DN_Atom, 'cneg_eq', 6, [A_Left |[A_Right | Status_In]]).	
-
-double_negation_atom(Atom, Neg_Atom, Status_In) :-
-	functor_local(Atom, Name, Arity, Args_In), !,
-	New_Arity is Arity + 4,
-	append(Args_In, Status_In, Args_Out),
+double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+	functor(Atom, Name, Arity), !,
+	New_Arity is Arity + 2,
 	generate_double_negation_name(Name, New_Name),
-	functor_local(Neg_Atom, New_Name, New_Arity, Args_Out).
+	functor(DN_Atom, New_Name, New_Arity),
+	args_for_cneg_tr(New_Arity, DN_Atom, GoalVars, Result),
+	copy_args(Arity, Atom, DN_Atom).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -661,8 +626,8 @@ generate_equality(Equality, Term_1, Term_2) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-status_operation([UQV_In |[UQV_Out |[Allowed_To_Fail |[Results]]]], 
-	UQV_In, UQV_Out, Allowed_To_Fail, Results).
+%status_operation([UQV_In |[UQV_Out |[Allowed_To_Fail |[Results]]]], 
+%	UQV_In, UQV_Out, Allowed_To_Fail, Results).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
