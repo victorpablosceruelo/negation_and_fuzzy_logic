@@ -2,8 +2,8 @@
 	[
 	    diseq_uqv/3, eq_uqv/3, 
 	    diseq_eqv/3, eq_eqv/3, 
-	    cneg_diseq_uqv/5, cneg_eq_uqv/5,
-	    cneg_diseq_eqv/5, cneg_eq_eqv/5,
+	    cneg_diseq_uqv/4, cneg_eq_uqv/4,
+	    cneg_diseq_eqv/4, cneg_eq_eqv/4,
 	    portray_attributes_in_term/1
 	], 
 	[assertions]).
@@ -681,16 +681,17 @@ check_if_allowed_to_fail(Can_Fail) :-
 
 diseq_uqv(T1,T2, UQV) :- 
 	varsbag((T1, T2), UQV, [], GoalVars), % Determine GoalVars.
-	cneg_diseq_eqv(T1, T2, GoalVars, 'true', 'true').
+	cneg_diseq_eqv(T1, T2, GoalVars, 'true').
 
 diseq_eqv(T1,T2, GoalVars) :- 
-	cneg_diseq_eqv(T1, T2, GoalVars, 'true', 'true').
+	cneg_diseq_eqv(T1, T2, GoalVars, 'true').
 
-cneg_diseq_uqv(T1,T2, UQV, Can_Fail, Result) :- 
+cneg_diseq_uqv(T1,T2, UQV, Result) :- 
 	varsbag((T1, T2), UQV, [], GoalVars), % Determine GoalVars.
-	cneg_diseq_eqv(T1,T2, GoalVars, Can_Fail, Result).
+	cneg_diseq_eqv(T1,T2, GoalVars, Result).
 
-cneg_diseq_eqv(T1,T2, GoalVars_In, Can_Fail, Result) :- 
+cneg_diseq_eqv(T1,T2, GoalVars_In, Result) :- 
+	Can_Fail = true,
 	varsbag(GoalVars_In, [], [], GoalVars_Aux), % Only variables, please.
 	varsbag((T1, T2), GoalVars_Aux, [], UQV), % Universally Quantified Variables.
 	varsbag((T1, T2), UQV, [], Affected_GoalVars), % Affected GoalVars Only.
@@ -707,16 +708,17 @@ cneg_diseq_eqv(T1,T2, GoalVars_In, Can_Fail, Result) :-
 
 eq_uqv(T1, T2, UQV) :-
 	varsbag((T1, T2), UQV, [], GoalVars), % Determine GoalVars.
-	cneg_eq_eqv(T1, T2, GoalVars, 'true', 'true').
+	cneg_eq_eqv(T1, T2, GoalVars, 'true').
 
 eq_eqv(T1, T2, GoalVars) :-
-	cneg_eq_eqv(T1, T2, GoalVars, 'true', 'true').
+	cneg_eq_eqv(T1, T2, GoalVars, 'true').
 
-cneg_eq_uqv(T1, T2, UQV, Can_Fail, Result) :- 
+cneg_eq_uqv(T1, T2, UQV, Result) :- 
 	varsbag((T1, T2), UQV, [], GoalVars), % Determine GoalVars.
-	cneg_eq_eqv(T1, T2, GoalVars, Can_Fail, Result).
+	cneg_eq_eqv(T1, T2, GoalVars, Result).
 
-cneg_eq_eqv(T1, T2, GoalVars_In, Can_Fail, Result) :- 
+cneg_eq_eqv(T1, T2, GoalVars_In, Result) :- 
+	Can_Fail = 'true',
 	debug_msg(1, 'cneg_eq :: (T1, =, T2), ---, (GoalVars_In, Can_Fail)', ((T1, '=', T2), '---', (GoalVars_In, Can_Fail))),
 	cneg_aux:varsbag(GoalVars_In, [], [], GoalVars_Aux),
 	cneg_aux:varsbag((T1, T2), GoalVars_Aux, [], UQV_Equality),
@@ -734,7 +736,7 @@ cneg_eq_eqv(T1, T2, GoalVars_In, Can_Fail, Result) :-
 		Result = 'fail',
 		cneg_aux:varsbag((T1, T2), [], [], Disequality_GoalVars),
 		% cneg_diseq(T1,T2, GoalVars, Can_Fail, Result)
-		cneg_diseq_eqv(T1, T2, Disequality_GoalVars, 'true', 'true')
+		cneg_diseq_eqv(T1, T2, Disequality_GoalVars, 'true')
 	    )
 	).
 
