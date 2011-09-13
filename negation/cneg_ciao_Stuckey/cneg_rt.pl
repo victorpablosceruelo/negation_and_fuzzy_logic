@@ -11,7 +11,8 @@
 :- multifile call_to/1.
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, _).
+:- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
+	cneg_diseq_uqv/5, cneg_eq_uqv/5, cneg_diseq_eqv/5, cneg_eq_eqv/5]).
 :- use_module(library(aggregates),[setof/3]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
@@ -91,14 +92,13 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_disequality(Goal, T1, T2, UQV), !, 
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
-	equality(T1, T2, UQV_Aux).
+	eq_uqv(T1, T2, UQV_Aux).
 
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_equality(Goal, T1, T2, UQV), !,
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
 	% cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result).
-	cneg_diseq(T1,T2, UQV_Aux, _UQV_Out, 'fail', 'true').
-	% disequality(X, Y, UQV_Aux).
+	diseq_uqv(T1,T2, UQV_Aux).
 
 compute_neg_frontier(Goal, _GoalVars, 'true'):- 
 	goal_is_negation(Goal, SubGoal, _UQV), !,
@@ -182,15 +182,15 @@ simplify_frontier([Frontier|More_Frontier_In], Goal, More_Bodies):-
 test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 	debug_msg(1, 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, Frontier_Test, Goal)),
         copy_term((Head, Frontier_Test, Goal), (Head_Tmp, Frontier_Test_Tmp, Goal_Tmp)), 
-        equality(Head_Tmp, Goal_Tmp, []), 
+        eq_uqv(Head_Tmp, Goal_Tmp, []), 
 	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, Tmp_UQV), % It must be an equality.
-	equality(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
+	eq_uqv(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 %	debug_msg(1, 'test_frontier_is_valid', 'YES'),
 	!, % Backtracking forbidden.
 	functor_local(Goal, _Name, _Arity, Goal_Args), 
 	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
-	equality(Test_Left, Goal_Args, []). % Note that UQV = [].
+	eq_uqv(Test_Left, Goal_Args, []). % Note that UQV = [].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -210,7 +210,7 @@ compute_pre_frontier(Goal, GoalVars_In, Pre_Frontier) :-
 	copy_term((Pre_Frontier, GoalVars, LocalVars), (Pre_Frontier_Copy, GoalVars_Copy, _LocalVars_Copy)),
 	!,
 	compute_pre_frontier_aux(Pre_Frontier_Copy),
-	equality(GoalVars, GoalVars_Copy, []),
+	eq_uqv(GoalVars, GoalVars_Copy, []),
 	setof(([(Goal, Pre_Frontier, LocalVars)], GoalVars), compute_pre_frontier_aux(Pre_Frontier), Pre_F_Sols),
 	debug_msg(1, 'compute_pre_frontier :: Pre_F_Sols', Pre_F_Sols),
 	debug_msg_nl(1),
@@ -231,7 +231,7 @@ take_and_compute_one_solution(Real_GoalVars, [Pre_F_Sol | Pre_F_Sols]) :-
 	(
 	    pre_front_sol(Pre_F_Sol, Local_Stuff, GoalVars),
 	    debug_msg(1, 'take_one_solution :: Local_Stuff ', Local_Stuff),
-	    equality(Real_GoalVars, GoalVars, []),
+	    eq_uqv(Real_GoalVars, GoalVars, []),
 	    compute_localstuff_solutions(Real_GoalVars, Local_Stuff)
 	;
 	    take_and_compute_one_solution(Real_GoalVars, Pre_F_Sols)
@@ -257,11 +257,11 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	goal_is_disequality(Pre_Frontier, Left, Right, UQV), 
-	cneg_diseq(Left, Right, UQV, _UQV_Out, 'fail', 'true').
+	diseq_uqv(Left, Right, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	goal_is_equality(Pre_Frontier, Left, Right, UQV), 
-	equality(Left, Right, UQV).
+	eq_uqv(Left, Right, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	goal_is_negation(Pre_Frontier, SubGoal, UQV), 
@@ -307,7 +307,7 @@ unify_sols_when_possible_aux_2(Head_1, [Head_2 | Tail_To_Unify], Unified_In, Uni
 	copy_term((Head_1, Head_2), (Head_1_Copy, Head_2_Copy)),
 	pre_front_sol(Head_1_Copy, Local_Stuff_1, GoalVars_1),
 	pre_front_sol(Head_2_Copy, Local_Stuff_2, GoalVars_2),
-	equality(GoalVars_1, GoalVars_2, []), !, % They unify !!!
+	eq_uqv(GoalVars_1, GoalVars_2, []), !, % They unify !!!
 	append(Local_Stuff_1, Local_Stuff_2, Local_Stuff_Aux),
 	pre_front_sol(Head_Out, Local_Stuff_Aux, GoalVars_1),
 	unify_sols_when_possible_aux_2(Head_1, Tail_To_Unify, [Head_Out | Unified_In], Unified_Out, Not_Unified_Out).
@@ -459,11 +459,11 @@ split_body_into_I_D_R([SubGoal|SubGoal_L], I_In, D_In, R_In, I_Out, D_Out, R_Out
 % split_subgoal_into_I_D_R(SubGoal, I, D, R) :-
 split_subgoal_into_I_D_R(Subgoal, I, D, R, [NewSubgoal | I], D, R) :- 
 	goal_is_equality(Subgoal, Term1, Term2, UQV), !,
-	equality(NewSubgoal, (Term1 = Term2), UQV).
+	eq_uqv(NewSubgoal, (Term1 = Term2), UQV).
 
 split_subgoal_into_I_D_R(Subgoal, I, D, R, I, [NewSubgoal | D], R) :- 
 	goal_is_disequality(Subgoal, Term1, Term2, FreeVars), !,
-	equality(NewSubgoal, disequality(Term1, Term2, FreeVars), []).
+	eq_uqv(NewSubgoal, disequality(Term1, Term2, FreeVars), []).
 
 split_subgoal_into_I_D_R(SubGoal, I, D, R, I, D, [SubGoal | R]) :- !.
 
@@ -671,11 +671,11 @@ perform_a_call_to(Goal) :-
 
 perform_a_call_to(Goal) :-
 	goal_is_disequality(Goal, X, Y, FreeVars), !,
-	disequality(X, Y, FreeVars).
+	diseq_uqv(X, Y, FreeVars).
 
 perform_a_call_to(Goal) :-
 	goal_is_equality(Goal, X, Y, UQV), !,
-	equality(X, Y, UQV).
+	eq_uqv(X, Y, UQV).
 
 % Qualify the predicate as needed.
 perform_a_call_to(Goal) :-
