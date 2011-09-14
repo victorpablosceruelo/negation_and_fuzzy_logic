@@ -118,7 +118,7 @@ combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2)
 	combine_sub_bodies_by_conjunction_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Bodies) :-
-	debug_msg(1, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
+	debug_msg(0, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
 	store_head_and_bodies_info_aux(Head, Bodies).
 
 store_head_and_bodies_info_aux(_Head, []) :-
@@ -175,22 +175,22 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
 	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, Aux_Code, Cls_1)),
 	cneg_tr_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-	debug_msg_list(1, 'Cls_1', Cls_1),
+	debug_msg_list(0, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(0, 'List_Of_H_and_B', List_Of_H_and_B),
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-	debug_msg_list(1, 'Cls_2', Cls_2),
+	debug_msg_list(0, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
-	debug_msg_list(1, 'Cls_3', Cls_3),
+	debug_msg_list(0, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_4),
-	debug_msg_list(1, 'Cls_4', Cls_4),
+	debug_msg_list(0, 'Cls_4', Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0),
-	debug_msg_list(1, 'Cls_Out', Cls_Out),
+	debug_msg_list(0, 'Cls_Out', Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0), 
 	!. %Backtracking forbiden.
 
@@ -338,9 +338,9 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 %cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
 cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
 cneg_tr_generate_cls_bodies([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	debug_msg(1, 'cneg_tr_generate_cls_bodies :: (Head, Body, Counter)', (Head, Body, Counter)),
+	debug_msg(0, 'cneg_tr_generate_cls_bodies :: (Head, Body, Counter)', (Head, Body, Counter)),
 	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
-	debug_msg(1, 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
+	debug_msg(0, 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -376,7 +376,7 @@ cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	New_Body = (Test_Cneg_RT, (Test_For_True ; (Test_For_Fail, Neg_Body))),
 
 	% negate_body_conjunction
-	debug_msg(1, 'cneg_tr_generate_cl_body :: negate_atom :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
+	debug_msg(0, 'cneg_tr_generate_cl_body :: negate_atom :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
 	negate_atom(Body, GoalVars, Result, Neg_Body).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -599,15 +599,9 @@ generate_double_negation_subcalls(Index, Aux_Info, GoalVars, Result, SubCalls) :
 generate_pre_frontiers([], _SourceFileName, Cls, Cls) :- !.
 generate_pre_frontiers([(Head, Body, _Counter) | List_Of_Preds], SourceFileName, Cls_In, Cls_Out) :-
 	functor(Head, Head_Name, Head_Arity),
-	list_head(Body, Test),
-	convert_list_to_conjunction(Body, Body_Conj),
-	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body_Conj, Test)),
+	take_body_first_unification(Body, Head_Test),
+	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body, Head_Test)),
 	generate_pre_frontiers(List_Of_Preds, SourceFileName, [CL | Cls_In], Cls_Out).
-
-convert_list_to_conjunction([], 'true') :- !.
-convert_list_to_conjunction([Body_Last], Body_Last) :- !.
-convert_list_to_conjunction([Body|MoreBodyList], (Body, MoreBodyConj)) :- !,
-	convert_list_to_conjunction(MoreBodyList, MoreBodyConj).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

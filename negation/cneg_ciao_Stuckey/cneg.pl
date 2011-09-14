@@ -54,9 +54,12 @@ cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	debug_msg(1, 'cneg_tr_aux :: call', New_Functor),
 	call(New_Functor).
 
-%cneg_initialize([], _UQV_Out, 'true', _Cont_Out).
-%cneg_test_for_true(UQV_Out, UQV_Out, 'true', 'true').
-%cneg_test_for_fail(UQV_Out, UQV_Out, 'fail', 'fail').
+test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result_Aux) :-
+	Result_Aux = 'fail',
+	debug_msg(1, 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
+	debug_msg(1, 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
+	debug_msg(1, 'test_if_cneg_rt_needed :: Body', Body), !.
+
 
 call_to(Predicate) :- call(Predicate).
 
