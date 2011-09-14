@@ -541,35 +541,30 @@ cneg_tr_generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	auxiliary_info(Aux_Info, Counter, New_Head, New_Head_Name, New_Arity, Arity),
 	generate_double_negation_subcalls(1, Aux_Info, GoalVars, Result, SubCalls).
 
-generate_double_negation_subcalls(Index, Aux_Info, 'fail', _GoalVars, 'fail') :-
-	(_Head, _Arity, _Status, Index, Counter, 'fail'),
+generate_double_negation_subcalls(Index, Aux_Info, _GoalVars, 'fail', 'fail') :-
+	auxiliary_info(Aux_Info, Counter, _New_Head, _New_Head_Name, _New_Arity, _Arity),
 	Counter < Index, !. % Security check.
 
-generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-	Ops = (SubCall, (Ops_When_True ; Ops_When_Fail)), 
+generate_double_negation_subcalls(Index, Aux_Info, GoalVars, Result, SubCalls) :-
+	auxiliary_info(Aux_Info, Counter, New_Head, New_Head_Name, New_Arity, Arity),
+	Counter >= Index,
 
-	Ops_When_True = (Test_For_True, (Op_1, Op_2)),
-	Ops_When_Fail = (Test_For_Fail, More_Ops),
+	SubCalls = (SubCall, (Ops_When_True ; Ops_When_Fail)), 
+	Ops_When_True = (Test_For_True, Op),
+	Ops_When_Fail = (Test_For_Fail, More_SubCalls),
 
 	test_for_true(Test_For_True, Result_Aux),
 	test_for_fail(Test_For_Fail, Result_Aux),
-	generate_equality(Op_1, UQV_Aux, UQV_Out),
-	generate_equality(Op_2, Result_Aux, Result_In),
-
-	% Obtain New_Arity and Head_Name of new Head.
-	functor_local(Head, Head_Name, New_Arity, _Head_Args),
+	generate_equality(Op, Result_Aux, Result),
 
 	% Generate SubCall.
-	generate_name_with_counter(Head_Name, Index, New_Name),
-	functor_local(SubCall, New_Name, New_Arity, _SubCall_Args),
-	copy_args(Arity, Head, SubCall),
-	status_operation(Status_Aux, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
-	adjust_args_for_status(New_Arity, SubCall, Status_Aux),
+	generate_name_with_counter(New_Head_Name, Index, SubCall_Name),
+	functor(SubCall, SubCall_Name, New_Arity),
+	copy_args(Arity, New_Head, SubCall),
+	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result_Aux),
 
-	status_operation(Status_Out, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
 	New_Index is Index + 1,
-	generate_double_negation_subcalls(Head, Arity, Status_Out, New_Index, Counter, More_Ops).
+	generate_double_negation_subcalls(New_Index, Aux_Info, GoalVars, Result, More_SubCalls).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
