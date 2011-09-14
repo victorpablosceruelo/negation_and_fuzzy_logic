@@ -183,10 +183,10 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
 	debug_msg_list(0, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
-	generate_double_negation_main_cls(List_Of_Preds, Cls_2, Cls_3),
+	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
 	debug_msg_list(0, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
-	generate_double_negation_clauses(List_Of_H_and_B, Cls_3, Cls_4),
+	cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_4),
 	debug_msg_list(0, 'Cls_4', Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0),
@@ -493,36 +493,35 @@ generate_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_double_negation_clauses(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_double_negation_clauses :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
-	generate_dn_cls(List_Of_H_and_B, Cls_In, Cls_Out).
+cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
+	debug_msg(0, 'cneg_tr_generate_double_neg_bodies :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
-generate_dn_cls([], Cls_In, Cls_In).
-generate_dn_cls([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_dn_cls :: (Head, Body, Counter)', (Head, Body, Counter)),
-	generate_dn_cl(Head, Body, Counter, New_Cl), !,
-	debug_msg(0, 'generate_dn_cls :: New_Cl', New_Cl),
+cneg_tr_generate_double_neg_bodies_aux([], Cls_In, Cls_In).
+cneg_tr_generate_double_neg_bodies_aux([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+	debug_msg(0, 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Counter)),
+	cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl), !,
+	debug_msg(0, 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
-	generate_dn_cls(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
+	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
-generate_dn_cl(Head, Body, Counter, New_Cl) :-
+cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 	functor_local(Head, Name, Arity, _Args),
 	generate_double_negation_name(Name, Aux_Name),
 	generate_name_with_counter(Aux_Name, Counter, New_Name),
-	New_Arity is Arity + 4,
+	New_Arity is Arity + 2,
 	functor_local(New_Head, New_Name, New_Arity, _New_Args),
 	copy_args(Arity, Head, New_Head),
-	adjust_args_for_status(New_Arity, New_Head, Status),
-	generate_dn_body(Body, Head, Counter, Status, New_Body),
+	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
+	auxiliary_info(Aux_Info, Counter, Head, Name, New_Arity, Arity),
+	cneg_tr_generate_double_neg_body_aux(Body, Aux_Info, GoalVars, Result, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
-generate_dn_body([], _Head, _Counter, Status_In, (Op_1, Op_2)) :-
-	status_operation(Status_In, UQV_In, UQV_Out, _Allowed_To_Fail, Result_In),
-	generate_equality(Op_1, UQV_In, UQV_Out),
-	generate_equality(Op_2, Result_In, 'true').
+cneg_tr_generate_double_neg_body_aux([], _Aux_Info, _GoalVars, Result, Op) :-
+	generate_equality(Op, Result, 'true').
 
-generate_dn_body([Conj_1 | Body], Head, Counter, Status_In, DN_Conjunction) :-
+cneg_tr_generate_double_neg_body_aux([Conj_1 | Body], Head, Counter, Status_In, DN_Conjunction) :-
 	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
 
 	test_for_true(Test_For_True, Result_Aux),
@@ -544,13 +543,13 @@ generate_dn_body([Conj_1 | Body], Head, Counter, Status_In, DN_Conjunction) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_double_negation_main_cls([], Cls, Cls) :- !.
-generate_double_negation_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_double_negation_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+cneg_tr_generate_double_neg_main_cls([], Cls, Cls) :- !.
+cneg_tr_generate_double_neg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
+	debug_msg(0, 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
-	debug_msg(0, 'generate_double_negation_main_cls :: Main_Cl', DN_Main_Cl),
+	debug_msg(0, 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
 	!, %Backtracking forbiden.
-	generate_double_negation_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
+	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
 
 generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	generate_double_negation_name(Head_Name, New_Head_Name),
