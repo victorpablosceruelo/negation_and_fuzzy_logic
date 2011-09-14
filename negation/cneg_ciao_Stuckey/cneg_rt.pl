@@ -12,7 +12,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_uqv/5, cneg_eq_uqv/5, cneg_diseq_eqv/5, cneg_eq_eqv/5]).
+	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
 :- use_module(library(aggregates),[setof/3]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.

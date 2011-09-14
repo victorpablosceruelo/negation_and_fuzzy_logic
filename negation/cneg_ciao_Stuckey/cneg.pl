@@ -15,13 +15,13 @@
 % Needed to be able to compile the modules.
 :- use_module(cneg_aux).    
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_uqv/5, cneg_eq_uqv/5, cneg_diseq_eqv/5, cneg_eq_eqv/5]).
+	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt, [cneg_rt/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_uqv/5, cneg_eq_uqv/5, cneg_diseq_eqv/5, cneg_eq_eqv/5]).
+	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
 :- reexport(cneg_rt, [cneg_rt/2]).   
 
 % To access pre-frontiers from anywhere.

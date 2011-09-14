@@ -78,7 +78,7 @@ save_sent_info(Head) :-
 	    Arity\==2
 	), !,
 	unifications_in_head_to_equality(Head, New_Head, Equality),
-	store_head_and_bodies_info(New_Head, [[Equality]]).
+	store_head_and_bodies_info(New_Head, [Equality]).
 
 unifications_in_head_to_equality(Head, New_Head, Equality) :-
 	% Take the unifications in the head and move them to the body.
@@ -118,7 +118,7 @@ combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2)
 	combine_sub_bodies_by_conjunction_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Bodies) :-
-	debug_msg(0, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
+	debug_msg(1, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
 	store_head_and_bodies_info_aux(Head, Bodies).
 
 store_head_and_bodies_info_aux(_Head, []) :-
@@ -175,22 +175,22 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	debug_msg_list(0, 'List_Of_Preds', List_Of_Preds),
 	debug_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, Aux_Code, Cls_1)),
 	cneg_tr_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-	debug_msg_list(0, 'Cls_1', Cls_1),
+	debug_msg_list(1, 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
 	debug_msg_list(0, 'List_Of_H_and_B', List_Of_H_and_B),
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-	debug_msg_list(0, 'Cls_2', Cls_2),
+	debug_msg_list(1, 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
-	debug_msg_list(0, 'Cls_3', Cls_3),
+	debug_msg_list(1, 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_4),
-	debug_msg_list(0, 'Cls_4', Cls_4),
+	debug_msg_list(1, 'Cls_4', Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0),
-	debug_msg_list(0, 'Cls_Out', Cls_Out),
+	debug_msg_list(1, 'Cls_Out', Cls_Out),
 	debug_msg_nl(0), debug_msg_nl(0), 
 	!. %Backtracking forbiden.
 
@@ -338,9 +338,9 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 %cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
 cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
 cneg_tr_generate_cls_bodies([(Head, Body, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	debug_msg(0, 'generate_cneg_disjs_aux :: (Head, Body, Counter)', (Head, Body, Counter)),
+	debug_msg(1, 'cneg_tr_generate_cls_bodies :: (Head, Body, Counter)', (Head, Body, Counter)),
 	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
-	debug_msg(0, 'generate_cneg_disjs_aux :: New_Cl', New_Cl),
+	debug_msg(1, 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -364,41 +364,66 @@ cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	% El problema es q las variables de la cabecera no la necesitan, 
 	% por lo que hay que distinguir entre cabecera y cuerpo. 
 
-	functor(Test_Cneg_RT, 'test_if_cneg_rt_needed', 2),
+	functor(Test_Cneg_RT, 'test_if_cneg_rt_needed', 4),
 	arg(1, Test_Cneg_RT, GoalVars), 
-	arg(3, Test_Cneg_RT, Body_Unifications), 
-	arg(4, Test_Cneg_RT, Body_Conj),
+	arg(2, Test_Cneg_RT, Body_First_Unification), 
+	arg(3, Test_Cneg_RT, Body),
 	arg(4, Test_Cneg_RT, Result_Aux),
 
-	list_head(Body, Body_Unifications),
-	convert_list_to_conjunction(Body, Body_Conj),
+	take_body_first_unification(Body, Body_First_Unification),
 	test_for_true(Test_For_True, Result_Aux),
 	test_for_fail(Test_For_Fail, Result_Aux),
 	New_Body = (Test_Cneg_RT, (Test_For_True ; (Test_For_Fail, Neg_Body))),
 
 	% negate_body_conjunction
-	negate_body_conj(Body, GoalVars, Result, Neg_Body).
+	debug_msg(1, 'cneg_tr_generate_cl_body :: negate_atom :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
+	negate_atom(Body, GoalVars, Result, Neg_Body).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-negate_body_conj([], _GoalVars, Result, Test_For_Fail) :- !,
-	test_for_fail(Test_For_Fail, Result).
+take_body_first_unification(Body, Body) :-
+	goal_is_equality(Body, _T_1, _T_2, _UQV), !.
+take_body_first_unification(Body, Body_First_Unification) :-
+	goal_is_conjunction(Body, Conj_1, _Conj_2), !,
+	take_body_first_unification(Conj_1, Body_First_Unification).
+take_body_first_unification(Body, 'fail') :-
+	debug_msg(1, 'take_body_first_unification :: Impossible to determine for Body', (Body)).
 
-negate_body_conj([Atom | Body], GoalVars, Result, Negated_Body) :-
-	debug_msg(0, 'negate_atom :: Atom ', Atom),
-	negate_atom(Atom, GoalVars, Result, Negated_Atom),  
-	debug_msg(0, 'negate_atom :: Negated_Atom ', Negated_Atom),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Results_In, Results_Out).
+negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
 
 	test_for_true(Test_For_True, Result_Aux),
 	test_for_fail(Test_For_Fail, Result_Aux),
 	generate_equality(Op, Result, Result_Aux),
 
 	Ops_When_True = (Test_For_True, Op),
-	Ops_When_Fail = (Test_For_Fail, New_Negated_Body),
-	Negated_Body = (Negated_Atom, (Ops_When_True ; Ops_When_Fail)),
+	Ops_When_Fail = (Test_For_Fail, Neg_Conj_2),
+	Neg_Atom = (Neg_Conj_1, (Ops_When_True ; Ops_When_Fail)),
 
-	negate_body_conj(Body, GoalVars, Result, New_Negated_Body).
+	negate_atom(Conj_1, GoalVars, Result_Aux, Neg_Conj_1),
+	negate_atom(Conj_2, GoalVars, Result, Neg_Conj_2).
 
-% negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Results_In, Results_Out).
+negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
+
+	test_for_true(Test_For_True, Result_Aux),
+	test_for_fail(Test_For_Fail, Result_Aux),
+	generate_equality(Op, Result, Result_Aux),
+
+	Ops_When_True = (Test_For_True, Neg_Disj_2),
+	Ops_When_Fail = (Test_For_Fail, Op),
+	Neg_Atom = (Neg_Disj_1, (Ops_When_Fail ; Ops_When_True)),
+
+	negate_atom(Disj_1, GoalVars, Result_Aux, Neg_Disj_1),
+	negate_atom(Disj_2, GoalVars, Result, Neg_Disj_2). 
+
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
 	functor_local(Neg_Atom, 'cneg_diseq_eqv', 4, [A_Left |[A_Right |[ GoalVars |[Result]]]]).
