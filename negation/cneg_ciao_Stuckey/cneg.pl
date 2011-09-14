@@ -54,12 +54,25 @@ cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	debug_msg(1, 'cneg_tr_aux :: call', New_Functor),
 	call(New_Functor).
 
-test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result_Aux) :-
-	Result_Aux = 'fail',
+test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	debug_msg(1, 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
 	debug_msg(1, 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
-	debug_msg(1, 'test_if_cneg_rt_needed :: Body', Body), !.
-
+	debug_msg(1, 'test_if_cneg_rt_needed :: Body', Body), 
+	varsbag(GoalVars, [], [], Real_GoalVars),
+	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
+	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
+	!, % No backtracking allowed.
+	(
+	    (   % If no problematic vars, use cneg_tr (INTNEG).
+		Problematic_Vars == [],
+		Result = 'fail'
+	    )
+	;
+	    (   % If problematic vars, use cneg_rt (Chan's approach).
+		Problematic_Vars \== [],
+		cneg_rt(Body)
+	    )
+	).
 
 call_to(Predicate) :- call(Predicate).
 
