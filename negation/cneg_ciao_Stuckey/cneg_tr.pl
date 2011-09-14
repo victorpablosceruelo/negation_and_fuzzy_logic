@@ -97,25 +97,25 @@ split_disjunctions_in_bodies_aux(Body, Bodies) :-
 	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
 	split_disjunctions_in_bodies_aux(Body_Conj_1, Bodies_Conj_1),
 	split_disjunctions_in_bodies_aux(Body_Conj_2, Bodies_Conj_2),
-	cartesian_product_of_lists(Bodies_Conj_1, Bodies_Conj_2, Bodies).
+	combine_sub_bodies_by_conjunction(Bodies_Conj_1, Bodies_Conj_2, Bodies).
 
-split_disjunctions_in_bodies_aux(Body, [Body_Result_1, Body_Result_2]) :- 
+split_disjunctions_in_bodies_aux(Body, Bodies) :- 
 	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
 	split_disjunctions_in_bodies_aux(Body_Disj_1, Body_Result_1),
-	split_disjunctions_in_bodies_aux(Body_Disj_2, Body_Result_2).
+	split_disjunctions_in_bodies_aux(Body_Disj_2, Body_Result_2),
+	append(Body_Result_1, Body_Result_2, Bodies).
 
-split_disjunctions_in_bodies_aux(Body, [[Body]]). % Goal is something else.
+split_disjunctions_in_bodies_aux(Body, [Body]). % Goal is something else.
 
-cartesian_product_of_lists([], _List_2, []) :- !.
-cartesian_product_of_lists([Elto | List_1], List_2, Result) :-
-	cartesian_product_of_lists_aux(Elto, List_2, Result_1),
-	cartesian_product_of_lists(List_1, List_2, Result_2),
+combine_sub_bodies_by_conjunction([], _List_2, []) :- !.
+combine_sub_bodies_by_conjunction([Elto | List_1], List_2, Result) :-
+	combine_sub_bodies_by_conjunction_aux(Elto, List_2, Result_1),
+	combine_sub_bodies_by_conjunction(List_1, List_2, Result_2),
 	append(Result_1, Result_2, Result).
 
-cartesian_product_of_lists_aux(_Elto_1, [], []) :- !.
-cartesian_product_of_lists_aux(Elto_1, [Elto_2 | List], [Result | More_Results]) :-
-	append(Elto_1, Elto_2, Result),
-	cartesian_product_of_lists_aux(Elto_1, List, More_Results).
+combine_sub_bodies_by_conjunction_aux(_Elto_1, [], []) :- !.
+combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2) | More_Results]) :-
+	combine_sub_bodies_by_conjunction_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Bodies) :-
 	debug_msg(0, 'store_head_and_bodies_info(Head, Bodies) ', store_head_and_bodies_info(Head, Bodies)),
@@ -230,10 +230,10 @@ cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 
 	% We need to copy the args from the aux functor to the aux_i functors.
 	auxiliary_info(Info_1, Counter, Aux_Cl_Head, Aux_Cl_Name, New_Arity, Arity),
-	generate_auxiliary_conj(1, Info_1, Aux_Cl_Body_1, GoalVars, Result),
+	generate_auxiliary_conj(1, Info_1, GoalVars, Result, Aux_Cl_Body_1),
 
 	auxiliary_info(Info_2, Counter, Aux_Cl_Head, Main_DN_Name, New_Arity, Arity),
-	generate_auxiliary_disj(1, Info_2, Aux_Cl_Body_2, GoalVars, Result).
+	generate_auxiliary_disj(1, Info_2, GoalVars, Result, Aux_Cl_Body_2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -266,11 +266,11 @@ generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_auxiliary_conj(Index, Aux_Info, 'fail', _GoalVars, 'fail') :- 
+generate_auxiliary_conj(Index, Aux_Info, _GoalVars, 'fail', 'fail') :- 
 	auxiliary_info(Aux_Info, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
 	Index > Counter, !.
 
-generate_auxiliary_conj(Index, Aux_Info, Body, GoalVars, Result) :-
+generate_auxiliary_conj(Index, Aux_Info, GoalVars, Result, Body) :-
 	auxiliary_info(Aux_Info, Counter, Aux_Cl_Head, Aux_Cl_Name, New_Arity, Arity),
 	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
 
@@ -290,15 +290,15 @@ generate_auxiliary_conj(Index, Aux_Info, Body, GoalVars, Result) :-
 		Index < Counter,
 		Body = (SubCall, (Test_For_True, MoreBody)),
 		NewIndex is Index + 1,
-		generate_auxiliary_conj(NewIndex, Aux_Info, MoreBody, GoalVars, Result)
+		generate_auxiliary_conj(NewIndex, Aux_Info, GoalVars, Result, MoreBody)
 	    )
 	).
 
-generate_auxiliary_disj(Index, Aux_Info, 'fail', _GoalVars, 'fail') :- 
+generate_auxiliary_disj(Index, Aux_Info, _GoalVars, 'fail', 'fail') :- 
 	auxiliary_info(Aux_Info, Counter, _Head_Aux_Cl, _Aux_Cl_Name, _New_Arity, _Arity),
 	Index > Counter, !.
 
-generate_auxiliary_disj(Index, Aux_Info, Body, GoalVars, Result) :-
+generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 	auxiliary_info(Aux_Info, Counter, Aux_Cl_Head, Aux_Cl_Name, New_Arity, Arity),
 	generate_name_from_counter(Index, Aux_Cl_Name, SubCall_Name),
 
@@ -320,7 +320,7 @@ generate_auxiliary_disj(Index, Aux_Info, Body, GoalVars, Result) :-
 		Index < Counter,
 		Body = ((SubCall, Test_For_True) ; MoreBody),
 		NewIndex is Index + 1,
-		generate_auxiliary_disj(NewIndex, Aux_Info, MoreBody, GoalVars, Result)
+		generate_auxiliary_disj(NewIndex, Aux_Info, GoalVars, Result, MoreBody)
 	    )
 	).
 
@@ -514,30 +514,10 @@ cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 	functor_local(New_Head, New_Name, New_Arity, _New_Args),
 	copy_args(Arity, Head, New_Head),
 	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
-	auxiliary_info(Aux_Info, Counter, Head, Name, New_Arity, Arity),
-	cneg_tr_generate_double_neg_body_aux(Body, Aux_Info, GoalVars, Result, New_Body),
+
+%	cneg_tr_generate_double_neg_body_aux(Body, Aux_Info, GoalVars, Result, New_Body),
+	double_negation_atom(Body, GoalVars, Result, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
-
-cneg_tr_generate_double_neg_body_aux([], _Aux_Info, _GoalVars, Result, Op) :-
-	generate_equality(Op, Result, 'true').
-
-cneg_tr_generate_double_neg_body_aux([Conj_1 | Body], Head, Counter, Status_In, DN_Conjunction) :-
-	status_operation(Status_In, UQV_In, UQV_Out, Allowed_To_Fail, Result_In),
-
-	test_for_true(Test_For_True, Result_Aux),
-	test_for_fail(Test_For_Fail, Result_Aux),
-	generate_equality(Op_1, UQV_Out, UQV_Aux),
-	generate_equality(Op_2, Result_In, Result_Aux),
-
-	Ops_When_True = (Test_For_True, DN_Body),
-	Ops_When_Fail = (Test_For_Fail, (Op_1, Op_2)),
-	DN_Conjunction = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
-
-	status_operation(Status_C1, UQV_In, UQV_Aux, Allowed_To_Fail, Result_Aux),
-	double_negation_atom(Conj_1, DN_Conj_1, Status_C1),
-	status_operation(Status_C2, UQV_Aux, UQV_Out, Allowed_To_Fail, Result_In),
-%	double_negation_atom(Conj_2, DN_Conj_2, Status_C2).
-	generate_dn_body(Body, Head, Counter, Status_C2, DN_Body).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -546,22 +526,23 @@ cneg_tr_generate_double_neg_body_aux([Conj_1 | Body], Head, Counter, Status_In, 
 cneg_tr_generate_double_neg_main_cls([], Cls, Cls) :- !.
 cneg_tr_generate_double_neg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
 	debug_msg(0, 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
-	generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
+	cneg_tr_generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
 	debug_msg(0, 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
 
-generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
+cneg_tr_generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	generate_double_negation_name(Head_Name, New_Head_Name),
-	functor_local(Main_Cl, ':-', 2, [Head |[ SubCalls ]]),
-	New_Arity is Arity + 4,
-	functor_local(Head, New_Head_Name, New_Arity, _Args_Head),
-%	status_operation(Status, UQV_In, UQV_Out, Results_In, Results_Out),
-	adjust_args_for_status(New_Arity, Head, Status),
+	functor_local(Main_Cl, ':-', 2, [New_Head |[ SubCalls ]]),
+	New_Arity is Arity + 2,
+	functor(New_Head, New_Head_Name, New_Arity),
+	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
 
-	generate_double_negation_subcalls(Head, Arity, Status, 1, Counter, SubCalls).
+	auxiliary_info(Aux_Info, Counter, New_Head, New_Head_Name, New_Arity, Arity),
+	generate_double_negation_subcalls(1, Aux_Info, GoalVars, Result, SubCalls).
 
-generate_double_negation_subcalls(_Head, _Arity, _Status, Index, Counter, 'fail') :-
+generate_double_negation_subcalls(Index, Aux_Info, 'fail', _GoalVars, 'fail') :-
+	(_Head, _Arity, _Status, Index, Counter, 'fail'),
 	Counter < Index, !. % Security check.
 
 generate_double_negation_subcalls(Head, Arity, Status_In, Index, Counter, Ops) :-
