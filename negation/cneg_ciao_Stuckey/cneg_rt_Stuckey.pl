@@ -1,7 +1,7 @@
 %
 % From Susana modified by VPC.
 %
-:- module(cneg_rt, [cneg_rt/2], [assertions]).
+:- module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2], [assertions]).
 % NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
@@ -17,19 +17,18 @@
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
 
-:- comment(title, "Contructive Negation Library").
+:- comment(title, "Contructive Negation Runtime Library - Stuckey's Proposal").
 
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
 
-:- comment(summary, "This module calls the predicates generated during the 
-	program transformation.").
+:- comment(summary, "This module implements Stuckey's proposal of Constructive Negation.").
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt(Goal, UQV):-
+cneg_rt_Stuckey(Goal, UQV):-
 	debug_msg(1, 'cneg_rt :: (Goal, UQV)', (Goal, UQV)),
 	varsbag(Goal, UQV, [], GoalVars),
 	compute_neg_frontier(Goal, GoalVars, 'true').
@@ -265,7 +264,7 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	goal_is_negation(Pre_Frontier, SubGoal, UQV), 
-	cneg_rt(SubGoal, UQV).
+	cneg_rt_Stuckey(SubGoal, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	nonvar(Pre_Frontier),

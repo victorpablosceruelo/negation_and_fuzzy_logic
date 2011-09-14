@@ -17,12 +17,14 @@
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
 :- use_module(cneg_tr).
-:- use_module(cneg_rt, [cneg_rt/2]).
+:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2]).
+:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
-:- reexport(cneg_rt, [cneg_rt/2]).   
+:- reexport(cneg_rt_Chan, [cneg_rt_Chan/2]).
+:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
@@ -61,6 +63,7 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	varsbag(GoalVars, [], [], Real_GoalVars),
 	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
 	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
+	varsbag(Body, Real_GoalVars, [], UQV),
 	!, % No backtracking allowed.
 	(
 	    (   % If no problematic vars, use cneg_tr (INTNEG).
@@ -70,10 +73,11 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	;
 	    (   % If problematic vars, use cneg_rt (Chan's approach).
 		Problematic_Vars \== [],
-		cneg_rt(Body)
+		cneg_rt(Body, UQV)
 	    )
 	).
 
+cneg_rt(Predicate, UQV) :- cneg_rt_Chan(Predicate, UQV).
 call_to(Predicate) :- call(Predicate).
 
 % cneg_tr contains the code transformation needed by cneg_lib
