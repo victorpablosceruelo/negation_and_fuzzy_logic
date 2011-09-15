@@ -265,26 +265,22 @@ add_goal_to_conjunction(Frontier_1, Frontier_2, (Frontier_2, Frontier_1)) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+	formulae_contents(formulae(E_In, IE_In, NIE_In), E_In, IE_In, NIE_In),
+
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars,ExVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE(I_In, D_In, R_In, GoalVars, I_Out, D_Out, R_Out, ImpVars, ExpVars):-
-	remove_from_I_irrelevant_equalities(I_In,D_In,R_In,GoalVars,[],I_Tmp,D_Tmp,R_Out),  
-	remove_from_I_duplicates(I_Tmp, I_Out),
-	varsbag(I_Out, [], GoalVars, ImpVars), % ImpVars = vars(I) + GoalVars
-	varsbag(R_Out, GoalVars, [], RelVars), % RelVars = vars(R) - GoalVars
-	difference(RelVars, ImpVars, ExpVars), % ExpVars = vars(R) - ImpVars = RelVars - ImpVars
-	remove_from_D_irrelevant_disequalities(D_Tmp, ImpVars, RelVars, D_Out). 
+normalize_E_IE_NIE(E_In, IE_In, NIE_In, GoalVars, E_Out, IE_Out, NIE_Out, ImpVars, ExpVars):-
+	formulae_contents(Formulae_In, E_In, IE_In, NIE_In),
+	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
+	varsbag(E_In, Real_GoalVars, [], Vars_EnoG), % Vars_EnoG = vars(E) - GoalVars
+	remove_from_E_irrelevant_equalities(Formulae_In, [], Vars_EnoG, Formulae_Aux),  
+	remove_from_E_duplicates(E_Aux, E_Out),
+	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
+	varsbag(NIE_Out, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
+	varsbag_difference(RelVars, ImpVars, ExpVars), % ExpVars = vars(NIE) - ImpVars = RelVars - ImpVars
+	remove_from_IE_irrelevant_disequalities(IE_Aux, ImpVars, RelVars, IE_Out). 
  
-% difference(Vars,NFVars,FreeVars) retuns in FreeVars the sublist of elements
-% of Vars that do not appear in NFVars
-difference([],_NFVars,[]).
-difference([Var|Vars],NFVars,FreeVars):-
-	memberchk(Var,NFVars),!,
-	difference(Vars,NFVars,FreeVars).
-difference([Var|Vars],NFVars,[Var|FreeVars]):-
-	difference(Vars,NFVars,FreeVars).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -295,19 +291,27 @@ difference([Var|Vars],NFVars,[Var|FreeVars]):-
 % makes the unification of the corresponding value in D and R.
 % Iac is use to acumulate the equalities not removed untill the process ends,
 % and update the value of I.
-remove_from_I_irrelevant_equalities([],D,R,_GoalVars,Iac,Iac,D,R) :- !.
-remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
+remove_from_E_irrelevant_equalities(Formulae_In, _E_Acc, _Vars_EnoG, Formulae_In) :- 
+	formulae_contents(Formulae_In, [], _IE_In, _NIE_In), !. % There are no equalities.
+
+remove_from_E_irrelevant_equalities(Formulae_In, E_Acc, _Vars_EnoG, Formulae_In) :-
+	formulae_contents(Formulae_In, E_In, IE_In, NIE_In), 
+[(Var=Value)|E],E_Acc,IE,NIE,Vars_EnoG, E_Out, IE_Out, NIE_Out):-
+	
+	goal_is_equality(
+	(
+	    
 	var(Var),
-	\+ memberchk(Var,GoalVars),!,
-	replace_in_term_var_by_value((Iac,I,D,R),Var,Value,(Iac1,I1,D1,R1)),
-	remove_from_I_irrelevant_equalities(I1,D1,R1,GoalVars,Iac1,Iv,Dv,Rv).
-remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
+	memberchk(Var, Vars_EnoG), !, % Vars_EnoG = vars(E) - GoalVars
+	replace_in_term_var_by_value((E,E_Acc,IE,NIE), Var, Value, (E_Aux,E_Acc_Aux,IE_Aux,NIE_Aux)),
+	remove_from_E_irrelevant_equalities(E_Aux,E_Acc_Aux,IE_Aux,NIE_Aux,Vars_EnoG,E_Out, IE_Out, NIE_Out).
+remove_from_E_irrelevant_equalities([(Var=Value)|E],E_Acc,IE,NIE,Vars_EnoG,E_Out, IE_Out, NIE_Out):-
 	var(Value),
-	\+ memberchk(Value,GoalVars),!,
-	replace_in_term_var_by_value((Iac,I,D,R),Value,Var,(Iac1,I1,D1,R1)),
-	remove_from_I_irrelevant_equalities(I1,D1,R1,GoalVars,Iac1,Iv,Dv,Rv).
-remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
-	remove_from_I_irrelevant_equalities(I,D,R,GoalVars,[(Var=Value)|Iac],Iv,Dv,Rv).
+	memberchk(Value, Vars_EnoG), !, % Vars_EnoG = vars(E) - GoalVars
+	replace_in_term_var_by_value((E,E_Acc,IE,NIE), Value, Var, (E_Aux,E_Acc_Aux,IE_Aux,NIE_Aux)),
+	remove_from_E_irrelevant_equalities(E_Aux,E_Acc_Aux,IE_Aux,NIE_Aux,Vars_EnoG,E_Out, IE_Out, NIE_Out).
+remove_from_E_irrelevant_equalities([(Var=Value)|E],E_Acc,IE,NIE,Vars_EnoG,E_Out,IE_Out, NIE_Out):-
+	remove_from_E_irrelevant_equalities(E,[(Var=Value)|E_Acc],IE,NIE,Vars_EnoG,E_Out,IE_Out, NIE_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -315,18 +319,18 @@ remove_from_I_irrelevant_equalities([(Var=Value)|I],D,R,GoalVars,Iac,Iv,Dv,Rv):-
 
 % remove_from_I_duplicates(L_In,L_Out) removes from I duplicates
 % or equalities between the same variable, X=X.
-remove_from_I_duplicates([],[]).
-remove_from_I_duplicates([X=Y|L_In],L_Out):-
+remove_from_E_duplicates([],[]).
+remove_from_E_duplicates([X=Y|L_In],L_Out):-
 	X==Y,!, 
-	remove_from_I_duplicates(L_In,L_Out).
-remove_from_I_duplicates([X=Y|L_In],L_Out):-
+	remove_from_E_duplicates(L_In,L_Out).
+remove_from_E_duplicates([X=Y|L_In],L_Out):-
 	memberchk(X=Y,L_In),!,
-	remove_from_I_duplicates(L_In,L_Out).
-remove_from_I_duplicates([X=Y|L_In],L_Out):-
+	remove_from_E_duplicates(L_In,L_Out).
+remove_from_E_duplicates([X=Y|L_In],L_Out):-
 	memberchk(Y=X,L_In),!, %% Different order
-	remove_from_I_duplicates(L_In,L_Out).
-remove_from_I_duplicates([E|L_In],[E|L_Out]):-
-	remove_from_I_duplicates(L_In,L_Out).
+	remove_from_E_duplicates(L_In,L_Out).
+remove_from_E_duplicates([E|L_In],[E|L_Out]):-
+	remove_from_E_duplicates(L_In,L_Out).
 
 % remove_from_D_irrelevant_disequalities(D,ImpVars,RelVars,D1) returns D1
 % that is D but without disequalities that contains any variable that
@@ -334,15 +338,15 @@ remove_from_I_duplicates([E|L_In],[E|L_Out]):-
 % We need to assure that the inequalities here are atomic because 
 % non-atomic ones result into a disjunction that can not be simplified
 % by using this procedure.
-remove_from_D_irrelevant_disequalities([],_ImpVars,_RelVars,[]).
-remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,D1):-
+remove_from_IE_irrelevant_disequalities([],_ImpVars,_RelVars,[]).
+remove_from_IE_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,D1):-
 	varsbag(Diseq, [], [], Vars),
 	retrieve_element_from_list(Vars, V),
 	\+ memberchk(V,ImpVars),
 	\+ memberchk(V,RelVars),!,
-	remove_from_D_irrelevant_disequalities(D,ImpVars,RelVars,D1).
-remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,[Diseq|D1]):-
-	remove_from_D_irrelevant_disequalities(D,ImpVars,RelVars,D1).
+	remove_from_IE_irrelevant_disequalities(D,ImpVars,RelVars,D1).
+remove_from_IE_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,[Diseq|D1]):-
+	remove_from_IE_irrelevant_disequalities(D,ImpVars,RelVars,D1).
 
 % split_D_R_into_imp_and_exp(I,D,R,GoalVars,ImpVars,ExpVars,SolC) returns SolC
 % that is one of the solutions of the conjunction that is divided in 
