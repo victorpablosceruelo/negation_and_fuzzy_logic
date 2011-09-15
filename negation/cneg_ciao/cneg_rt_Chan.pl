@@ -218,32 +218,12 @@ combine_negated_frontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Subfr)
 negate_frontier(Frontier, _Goal, GoalVars, Result):-
 	debug_msg(1, 'negate_frontier :: Frontier', (Frontier)),
 	split_frontier_into_E_IE_NIE(Frontier, [], [], [], E, IE, NIE),
-	!, % Reduce the stack's memory.
 	debug_msg(1, 'negate_frontier :: (E, IE, NIE)', (E, IE, NIE)),
-	negate_frontier_aux(GoalVars, E, IE, NIE, Result),
+	!, % Reduce the stack's memory.
+	normalize_E_IE_NIE(E, IE, NIE, GoalVars, E_Aux, IE_Aux, NIE_Aux, ImpVars, ExpVars), 
+	split_E_IE_between_imp_and_exp(IE_Aux, NIE_Aux, ImpVars, ExpVars, IE_imp, NIE_imp, IE_NIE_exp),
+	negate_formulae(GoalVars, ExpVars, E_Aux, IE_imp, NIE_imp, IE_NIE_exp, Result),
 	debug_msg(1, 'negate_frontier :: (Result)', (Result)),
-	!.
-
-% negate_subfrontier_aux(C, G, GoalVars, I, D, R, SolC)
-%negate_subfrontier_aux(_C, _Goal, _GoalVars, [fail], _D, _R, []) :-
-%	debug_msg(1, 'negate_subfrontier_aux', 'I = [fail] so the negation is always true.'),
-%	!. % Backtracking is not allowed.
-negate_frontier_aux(_GoalVars, [], [], [], fail) :-
-	debug_msg(1, 'negate_frontier_aux', 'I, D and R are empty lists'),
-	!. % Backtracking is not allowed.
-negate_frontier_aux(GoalVars, I_In, D_In, R_In, Result) :-
-%	debug_msg(1, 'negate_subfrontier_aux :: (GoalVars)', (GoalVars)),
-	normalize_I_D_R(I_In, D_In, R_In, GoalVars, I_Tmp, D_Tmp, R_Tmp, ImpVars, ExpVars), 
-%	debug_msg(1, 'negate_subfrontier_aux :: (I_Tmp, D_Tmp, R_Tmp)', (I_Tmp, D_Tmp, R_Tmp)),
-%	debug_msg(1, 'negate_subfrontier_aux :: ImpVars (vars(I) + GoalVars)', ImpVars),
-%	debug_msg(1, 'negate_subfrontier_aux :: ExpVars (vars(R) - ImpVars)', ExpVars),
-	split_D_R_into_imp_and_exp(D_Tmp, R_Tmp, ImpVars, ExpVars, Dimp, Rimp, DRexp),
-	!,
-
-	% Final process
-%	debug_msg(1, 'negate_subfrontier_aux :: (I, Dimp, Rimp, DRexp)', (I_Tmp, Dimp, Rimp, DRexp)), 
-	negate_formulae(GoalVars, ExpVars, I_Tmp, Dimp, Rimp, DRexp, Result),
-%	debug_msg(1, 'negate_subfrontier_aux :: SolC', SolC),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -288,7 +268,7 @@ add_goal_to_conjunction(Frontier_1, Frontier_2, (Frontier_2, Frontier_1)) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars,ExVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_I_D_R(I_In, D_In, R_In, GoalVars, I_Out, D_Out, R_Out, ImpVars, ExpVars):-
+normalize_E_IE_NIE(I_In, D_In, R_In, GoalVars, I_Out, D_Out, R_Out, ImpVars, ExpVars):-
 	remove_from_I_irrelevant_equalities(I_In,D_In,R_In,GoalVars,[],I_Tmp,D_Tmp,R_Out),  
 	remove_from_I_duplicates(I_Tmp, I_Out),
 	varsbag(I_Out, [], GoalVars, ImpVars), % ImpVars = vars(I) + GoalVars
@@ -368,7 +348,7 @@ remove_from_D_irrelevant_disequalities([Diseq|D],ImpVars,RelVars,[Diseq|D1]):-
 % that is one of the solutions of the conjunction that is divided in 
 % I, D and R (equalities, disequalities and rest of subgoals).
 % GoalVars, ImpVars and ExpVars are set of useful variables 
-split_D_R_into_imp_and_exp(D, R, ImpVars, ExpVars, Dimp, Rimp, DRexp):-
+split_E_IE_between_imp_and_exp(D, R, ImpVars, ExpVars, Dimp, Rimp, DRexp):-
 %	debug_msg(1, 'split_D_R_into_imp_and_exp :: ExpVars', ExpVars),
 %	debug_msg(1, 'split_D_R_into_imp_and_exp :: D', D),
 %	debug_msg(1, 'split_D_R_into_imp_and_exp :: R', R),
