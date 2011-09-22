@@ -89,7 +89,7 @@ put_attribute_local(Var, Attribute) :-
 
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Disequalities, UQV), Target, Disequalities, UQV).
-disequality_contents(disequality(Diseq_1, Diseq_2, GoalVars), Diseq_1, Diseq_2, GoalVars).
+disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
 equality_contents(equality(T1, T2), T1, T2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,52 +220,20 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 
 perform_substitutions([], _GoalVars) :- !.
 perform_substitutions([(OldTarget, NewTarget) | MoreSubst], GoalVars_In) :-
-	varsbag(GoalVars_In, [], [], GoalVars_Aux), !,
-	perform_substitution(OldTarget, NewTarget, GoalVars_Aux),
-	perform_substitutions(MoreSubst, GoalVars_Aux).	
-
-perform_substitution(OldTarget, NewTarget, GoalVars) :-
-	debug_msg(1, 'perform_substitutions :: (OldTarget, NewTarget, GoalVars)', (OldTarget, NewTarget, GoalVars)),
+	varsbag(GoalVars_In, [], [], GoalVars), !,
+	varsbag((OldTarget, NewTarget), GoalVars, [], UQV), !,
 	(
 	    (
-		perform_substitution_vars(OldTarget, NewTarget, GoalVars_Aux), ! % Both are vars.
+		UQV == [], !,
+		OldTarget = NewTarget,
+		perform_substitutions(MoreSubst, GoalVars)
 	    )
 	;
 	    (
-		perform_substitution_var_nonvar(OldTarget, NewTarget, GoalVars_Aux), ! % Only OldTarget is var.
+		debug_msg(1, 'perform_substitutions :: Impossible :: (OldTarget, NewTarget, GoalVars)', (OldTarget, NewTarget, GoalVars)),
+		!, fail
 	    )
-	;
-	    (
-		perform_substitution_var_nonvar(NewTarget, OldTarget, GoalVars_Aux), ! % Only NewTarget is var.
-	    )
-	;
-	    perform_substitution_nonvars(OldTarget, NewTarget, GoalVars_Aux) % None is a var.
 	).
-
-perform_substitution_vars(OldTarget, NewTarget, GoalVars) :-
-	var(OldTarget),
-	var(NewTarget), % Be sure both are vars.
-	cneg_aux:memberchk(OldTarget, GoalVars),
-	cneg_aux:memberchk(NewTarget, GoalVars), % None is universally quantified.
-	diseq_eq(OldTarget, NewTarget).
-
-perform_substitution_var_nonvar(OldTarget, NewTarget, GoalVars) :-
-	var(OldTarget), % Be sure OldTarget is a var.
-	cneg_aux:memberchk(OldTarget, GoalVars), % Var is not universally quantified.
-	diseq_eq(OldTarget, NewTarget).
-
-perform_substitution_nonvars(OldTarget, NewTarget, GoalVars) :-
-	functor_local(OldTarget, Name, Arity, Args_1),
-	functor_local(NewTarget, Name, Arity, Args_2), !,
-	substitutions_cartesian_product(Args_1, Args_2, Subst_List),
-	perform_substitutions(Subst_List, GoalVars).
-
-% Esto NO es producto cartesiano.
-substitutions_cartesian_product([], [], []) :- !.
-substitutions_cartesian_product([T1], [T2], [(T1, T2)]) :- !.
-substitutions_cartesian_product([T1 | Args_1], [T2 | Args_2], [(T1, T2) | Args]) :- !,
-	substitutions_cartesian_product(Args_1, Args_2, Args).
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
