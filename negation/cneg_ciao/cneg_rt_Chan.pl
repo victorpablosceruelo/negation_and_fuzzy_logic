@@ -29,11 +29,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_rt_Chan(Goal, UQV):-
-	debug_msg(1, 'cneg_rt :: (Goal, UQV)', (Goal, UQV)),
+	debug_msg(1, 'cneg_rt_Chan :: (Goal, UQV)', (Goal, UQV)),
 	varsbag(Goal, UQV, [], GoalVars),
 	compute_frontier(Goal, Frontier),
-	negate_set_of_frontiers(Frontier, Goal, GoalVars, Solutions),
-	call_to(Solutions).
+	debug_msg_list(1, 'cneg_rt_Chan :: Frontier', Frontier),
+	negate_set_of_frontiers(Frontier, Goal, GoalVars, Result),
+	debug_msg(1, 'cneg_rt_Chan :: Result', Result),
+	call_to(Result).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,10 +48,10 @@ cneg_rt_Chan(Goal, UQV):-
 % elements where each element is a conjunction of subgoals.
 
 % Just to debug.
-compute_frontier(Goal, _Frontier) :-
-	debug_msg(1, '--------------------------------------------------------------------------------------------------------------', ' '),
-	debug_msg(1, 'compute_frontier :: (Goal)', (Goal)),	
-	fail. % Just debug and use backtracking to continue.
+%compute_frontier(Goal, _Frontier) :-
+%	debug_msg(1, '--------------------------------------------------------------------------------------------------------------', ' '),
+%	debug_msg(1, 'compute_frontier :: (Goal)', (Goal)),	
+%	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
 compute_frontier(Goal, Frontier) :-
@@ -90,12 +92,12 @@ compute_frontier(Goal, Goal):-
 % Now go for other functors stored in our database.
 compute_frontier(Goal, Frontier_Out) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
-	debug_msg(1, 'compute_frontier :: Goal', Goal),
+%	debug_msg(0, 'compute_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
-	debug_msg(1, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
+%	debug_msg(0, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
+%	debug_msg_list(0, 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
-	debug_msg(1, 'Frontier_Out', Frontier_Out), 
+%	debug_msg(0, 'Frontier_Out', Frontier_Out), 
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
@@ -130,20 +132,20 @@ simplify_frontier([], _Goal, Body_Acc, Body_Acc) :- !.
 simplify_frontier([Frontier | More_Frontier_In], Goal, Body_Acc, Body_Out) :-
 	frontier_contents(Frontier, Head, Body, Frontier_Test),
 	test_frontier_is_valid(Goal, Head, Frontier_Test), !,
-	debug_msg(1, 'simplify_frontier :: valid: ', Frontier),
+	debug_msg(0, 'simplify_frontier :: valid: ', Frontier),
 	simplify_frontier(More_Frontier_In, Goal, [Body | Body_Acc], Body_Out).
 simplify_frontier([Frontier|More_Frontier_In], Goal, Body_Acc, Body_Out) :-
-	debug_msg(1, 'simplify_frontier :: not valid: ', Frontier),
+	debug_msg(0, 'simplify_frontier :: not valid: ', Frontier),
 	simplify_frontier(More_Frontier_In, Goal, Body_Acc, Body_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Goal, Head, Frontier_Test) :-
-	debug_msg(1, 'test_frontier_is_valid :: (Goal, Head, FrontierTest)', (Goal, Head, Frontier_Test)),
+	debug_msg(0, 'test_frontier_is_valid :: (Goal, Head, FrontierTest)', (Goal, Head, Frontier_Test)),
         copy_term((Goal, Head, Frontier_Test), (Goal_Tmp, Head_Tmp, Frontier_Test_Tmp)), 
         Head_Tmp = Goal_Tmp, 
 	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _UQV), % It must be an equality.
-	eq_uqv(Tmp_Left, Tmp_Right, []), % Note that UQV = [].
+	Tmp_Left = Tmp_Right, % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 	!, % Backtracking forbidden.
 	Head = Goal. % Unify them definitely
@@ -181,22 +183,14 @@ combine_frontier_aux(F1_1, [F2_1 | More_F2], [(F1_1, F2_1) | More_F3]):-
 % Frontier (each conjunction) is the negation.
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
-negate_set_of_frontiers(Frontier, Goal, GoalVars, Solutions) :-
-	debug_msg_list(1, 'negate_frontier :: Frontier (list)', Frontier), 
-	debug_msg(1, 'negate_frontier :: (Goal, GoalVars)', (Goal, GoalVars)), 
-	!,
-	negate_set_of_frontiers_aux(Frontier, Goal, GoalVars, Solutions),
-	!.
-%	debug_msg(1, 'negate_frontier :: Solutions', Solutions).
-
-negate_set_of_frontiers_aux([], _Goal, _GoalVars, true) :- !.
-negate_set_of_frontiers_aux([Frontier | More_Frontier], Goal, GoalVars, Sol):-
-	debug_msg(1, 'negate_frontier_aux: (Frontier, Goal, GoalVars)', (Frontier, Goal, GoalVars)),
-	negate_frontier(Frontier, Goal, GoalVars, Sol_Subfr),
-	debug_msg(1, 'negate_frontier_aux: Sol_Subfr', Sol_Subfr),
+negate_set_of_frontiers([], _Goal, _GoalVars, true) :- !. % Optimization.
+negate_set_of_frontiers([Frontier | More_Frontiers], Goal, GoalVars, Solution) :-
+	debug_msg(1, 'negate_frontier: (Frontier, Goal, GoalVars)', (Frontier, Goal, GoalVars)),
+	negate_frontier(Frontier, Goal, GoalVars, Sol_Frontier),
+	debug_msg(1, 'negate_frontier: Sol_Frontier', Sol_Frontier),
 	!, % Reduce the stack's memory.
-	negate_set_of_frontiers_aux(More_Frontier, Goal, GoalVars, Sol_More_Subfr),
-	combine_negated_frontiers(Sol_Subfr, Sol_More_Subfr, Sol), 
+	negate_set_of_frontiers(More_Frontiers, Goal, GoalVars, Sol_More_Frontiers),
+	combine_negated_frontiers(Sol_Frontier, Sol_More_Frontiers, Solution), 
 	!. % Reduce the stack's memory.
 	
 
@@ -218,18 +212,18 @@ combine_negated_frontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Subfr)
 % It fails if the negation of the conjunction has no solutions
 % negate_frontier((_Head, [fail]), _G, _GoalVars, true):- !.
 negate_frontier(Frontier_In, _Goal, GoalVars, Result):-
-	debug_msg(1, 'negate_frontier :: Frontier_In', (Frontier_In)),
+%	debug_msg(1, 'negate_frontier :: Frontier_In', (Frontier_In)),
 	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
-	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
-	debug_msg(1, 'negate_frontier :: (E_Aux_1, IE_Aux_1, NIE_Aux_1)', (E_Aux_1, IE_Aux_1, NIE_Aux_1)),
+%	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
+%	debug_msg(1, 'negate_frontier :: (E_Aux_1, IE_Aux_1, NIE_Aux_1)', (E_Aux_1, IE_Aux_1, NIE_Aux_1)),
 	!, % Reduce the stack's memory.
 	normalize_E_IE_NIE(Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars),
 	split_frontier_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
-	debug_msg(1, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
+%	debug_msg(1, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
 	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, IE_imp, NIE_imp, IE_NIE_exp),
-	debug_msg(1, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
+%	debug_msg(1, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
 	negate_formula(E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, GoalVars, ImpVars, Result),
-	debug_msg(1, 'negate_frontier :: (Result)', (Result)),
+%	debug_msg(1, 'negate_frontier :: (Result)', (Result)),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -297,7 +291,7 @@ normalize_E_IE_NIE(Formula_In, GoalVars, Formulae_Out, ImpVars):-
 	varsbag(E_In, Real_GoalVars, [], Vars_EnoG), % Vars_EnoG = vars(E) - GoalVars
 	remove_from_E_irrelevant_equalities(Formula_In, Vars_EnoG, Formula_Aux),  
 	split_frontier_contents(Formula_Aux, E_Out, IE_Aux, NIE_Out),
-	debug_msg(1, 'normalize_E_IE_NIE :: (E_Out, IE_Aux, NIE_Out)', (E_Out, IE_Aux, NIE_Out)),
+%	debug_msg(1, 'normalize_E_IE_NIE :: (E_Out, IE_Aux, NIE_Out)', (E_Out, IE_Aux, NIE_Out)),
 	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
 	varsbag(NIE_Out, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
 %	varsbag_difference(RelVars, ImpVars, ExpVars), % ExpVars = vars(NIE) - ImpVars = RelVars - ImpVars
@@ -471,8 +465,8 @@ split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE
 		IE_or_NIE_imp = [],
 		IE_or_NIE_exp = IE_or_NIE
 	    )
-	),
-	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp', (IE_or_NIE, IE_or_NIE_imp, IE_or_NIE_exp)).
+	).
+%	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp', (IE_or_NIE, IE_or_NIE_imp, IE_or_NIE_exp)).
 
 % negate_formula(GoalVars, ImpVars, ExpVars, I, Dimp, Dexp, Rimp, Rexp, R_naf, Sol)
 % returns SolC that is one of the solutions of the conjunction that is divided
@@ -480,7 +474,7 @@ split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 negate_formula([], [], [], [], _GoalVars, _ImpVars, true) :- !. % Optimization
 negate_formula(E, IE_imp, NIE_imp, IE_NIE_exp, GoalVars, ImpVars, Neg_E_IE_NIE) :-
-	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
+%	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
  	negate_IE_NIE_exp(IE_NIE_exp, ImpVars, Neg_IE_NIE_exp),
 	negate_imp_form(NIE_imp, ImpVars, Neg_IE_NIE_exp, Neg_NIE_imp_IE_NIE_exp),
 	negate_imp_form(IE_imp, ImpVars, Neg_NIE_imp_IE_NIE_exp, Neg_IE_NIE),
