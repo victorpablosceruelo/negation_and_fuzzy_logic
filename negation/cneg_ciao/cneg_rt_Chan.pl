@@ -184,29 +184,29 @@ combine_frontier_aux(F1_1, [F2_1 | More_F2], [(F1_1, F2_1) | More_F3]):-
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
 negate_set_of_frontiers([], _Goal, _GoalVars, true) :- !. % Optimization.
-negate_set_of_frontiers([Frontier | More_Frontiers], Goal, GoalVars, Solution) :-
+negate_set_of_frontiers([Frontier | More_Frontiers], Goal, GoalVars, Result) :-
 	debug_msg(1, 'negate_frontier: (Frontier, Goal, GoalVars)', (Frontier, Goal, GoalVars)),
-	negate_frontier(Frontier, Goal, GoalVars, Sol_Frontier),
-	debug_msg(1, 'negate_frontier: Sol_Frontier', Sol_Frontier),
+	negate_frontier(Frontier, Goal, GoalVars, Result_Frontier),
+	debug_msg(1, 'negate_frontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory.
-	negate_set_of_frontiers(More_Frontiers, Goal, GoalVars, Sol_More_Frontiers),
-	combine_negated_frontiers(Sol_Frontier, Sol_More_Frontiers, Solution), 
+	negate_set_of_frontiers(More_Frontiers, Goal, GoalVars, Result_More_Frontiers),
+	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
 	!. % Reduce the stack's memory.
 	
 
-% combine_negated_subfrontiers(Sol_Subfr, Sol_More_Subfr, Sol_Tmp),
-combine_negated_frontiers(fail, _Sol_More_Subfr, fail) :- !.
-combine_negated_frontiers(_Sol_Subfr, fail, fail) :- !.
-combine_negated_frontiers(true, Sol_More_Subfr, Sol_More_Subfr) :- !.
-combine_negated_frontiers(Sol_Subfr, true, Sol_Subfr) :- !.
-combine_negated_frontiers(Sol_Subfr, Sol_More_Subfr, (Sol_Subfr, Sol_More_Subfr)) :- !.
+% combine_negated_subfrontiers(Result_Subfr, Result_More_Subfr, Result_Tmp),
+combine_negated_frontiers(fail, _Result_More_Subfr, fail) :- !.
+combine_negated_frontiers(_Result_Subfr, fail, fail) :- !.
+combine_negated_frontiers(true, Result_More_Subfr, Result_More_Subfr) :- !.
+combine_negated_frontiers(Result_Subfr, true, Result_Subfr) :- !.
+combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result_More_Subfr)) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_frontier((Head, BodyList),Goal,GoalVars,SolSubfr) 
-% returns in SolSubfr a solution of the negation of the conjunction of subgoals 
+% negate_frontier((Head, BodyList),Goal,GoalVars, Result) 
+% returns in Result a solution of the negation of the conjunction of subgoals 
 % (Head, BodyList) of the goal Goal.
 % A conjunction is a pair (Head, BodyList).
 % It fails if the negation of the conjunction has no solutions
