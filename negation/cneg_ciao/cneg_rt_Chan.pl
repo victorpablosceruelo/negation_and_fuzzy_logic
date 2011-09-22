@@ -94,7 +94,7 @@ compute_frontier(Goal, Frontier_Out) :-
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 	debug_msg(1, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
 	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
-	simplify_frontier(Frontier_Tmp_1, Goal, Frontier_Out),
+	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
 	debug_msg(1, 'Frontier_Out', Frontier_Out), 
 	!. % Backtracking is forbidden.
 
@@ -124,27 +124,29 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
-simplify_frontier([], _Goal, []) :- !.
-simplify_frontier([Frontier | More_Frontier_In], Goal, [Body | More_Bodies]):-
+% Since the frontiers retrieved are in an inverted order, 
+% we must reorder them to keep procedural semantics unchanged.
+simplify_frontier([], _Goal, Body_Acc, Body_Acc) :- !.
+simplify_frontier([Frontier | More_Frontier_In], Goal, Body_Acc, Body_Out) :-
 	frontier_contents(Frontier, Head, Body, Frontier_Test),
 	test_frontier_is_valid(Goal, Head, Frontier_Test), !,
 	debug_msg(1, 'simplify_frontier :: valid: ', Frontier),
-	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
-simplify_frontier([Frontier|More_Frontier_In], Goal, More_Bodies):-
+	simplify_frontier(More_Frontier_In, Goal, [Body | Body_Acc], Body_Out).
+simplify_frontier([Frontier|More_Frontier_In], Goal, Body_Acc, Body_Out) :-
 	debug_msg(1, 'simplify_frontier :: not valid: ', Frontier),
-	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
+	simplify_frontier(More_Frontier_In, Goal, Body_Acc, Body_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 	debug_msg(1, 'test_frontier_is_valid :: (Goal, Head, FrontierTest)', (Goal, Head, Frontier_Test)),
         copy_term((Goal, Head, Frontier_Test), (Goal_Tmp, Head_Tmp, Frontier_Test_Tmp)), 
-        eq_uqv(Head_Tmp, Goal_Tmp, []), 
-	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, Tmp_UQV), % It must be an equality.
-	eq_uqv(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
+        Head_Tmp = Goal_Tmp, 
+	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _UQV), % It must be an equality.
+	eq_uqv(Tmp_Left, Tmp_Right, []), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 	!, % Backtracking forbidden.
-	eq_uqv(Goal, Head, []). % Unify them definitely
+	Head = Goal. % Unify them definitely
 %	functor_local(Goal, _Name, _Arity, Goal_Args), 
 %	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
 %	eq_uqv(Test_Left, Goal_Args, []). % Note that UQV = [].
@@ -226,7 +228,7 @@ negate_frontier(Frontier_In, _Goal, GoalVars, Result):-
 	debug_msg(1, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
 	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, IE_imp, NIE_imp, IE_NIE_exp),
 	debug_msg(1, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
-	negate_formulae(GoalVars, ImpVars, E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, Result),
+	negate_formula(E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, GoalVars, ImpVars, Result),
 	debug_msg(1, 'negate_frontier :: (Result)', (Result)),
 	!.
 
@@ -267,14 +269,12 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	split_frontier_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_equality(Frontier_In, Term1, Term2, UQV), !,
-	E_Out = (eq_uqv(Term1, Term2, UQV)),
-	split_frontier_contents(Frontier_Out, E_Out, [], []).
+	goal_is_equality(Frontier_In, _Term1, _Term2, _UQV), !,
+	split_frontier_contents(Frontier_Out, Frontier_In, [], []).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_disequality(Frontier_In, Term1, Term2, FreeVars), !,
-	IE_Out = (disequality(Term1, Term2, FreeVars)), 
-	split_frontier_contents(Frontier_Out, [], IE_Out, []).
+	goal_is_disequality(Frontier_In, _Term1, _Term2, _UQV), !,
+	split_frontier_contents(Frontier_Out, [], Frontier_In, []).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
 	goal_is_not_conj_disj_eq_diseq_dneg(Frontier_In), !,
@@ -291,12 +291,13 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars,ExVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE(Formulae_In, GoalVars, Formulae_Out, ImpVars):-
-	split_frontier_contents(Formulae_In, E_In, _IE_In, _NIE_In),
+normalize_E_IE_NIE(Formula_In, GoalVars, Formulae_Out, ImpVars):-
+	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(E_In, Real_GoalVars, [], Vars_EnoG), % Vars_EnoG = vars(E) - GoalVars
-	remove_from_E_irrelevant_equalities(Formulae_In, Vars_EnoG, Formulae_Aux),  
-	split_frontier_contents(Formulae_Aux, E_Out, IE_Aux, NIE_Out),
+	remove_from_E_irrelevant_equalities(Formula_In, Vars_EnoG, Formula_Aux),  
+	split_frontier_contents(Formula_Aux, E_Out, IE_Aux, NIE_Out),
+	debug_msg(1, 'normalize_E_IE_NIE :: (E_Out, IE_Aux, NIE_Out)', (E_Out, IE_Aux, NIE_Out)),
 	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
 	varsbag(NIE_Out, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
 %	varsbag_difference(RelVars, ImpVars, ExpVars), % ExpVars = vars(NIE) - ImpVars = RelVars - ImpVars
@@ -318,7 +319,10 @@ remove_from_E_irrelevant_equalities(Formulae_In, Vars_EnoG, Formulae_Out) :-
 	split_frontier_contents(Formulae_In, E_In, _IE_In, _NIE_In), 
 	detect_irrelevant_equalities(E_In, Vars_EnoG, [], Irrelevant_Eqs),
 	(
-	    (   Irrelevant_Eqs = [] )
+	    (   
+		Irrelevant_Eqs = [],
+		Formulae_Out = Formulae_In
+	    )
 	;
 	    (
 		Irrelevant_Eqs \== [],
@@ -467,14 +471,16 @@ split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE
 		IE_or_NIE_imp = [],
 		IE_or_NIE_exp = IE_or_NIE
 	    )
-	).
+	),
+	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp', (IE_or_NIE, IE_or_NIE_imp, IE_or_NIE_exp)).
 
-% negate_formulae(GoalVars, ImpVars, ExpVars, I, Dimp, Dexp, Rimp, Rexp, R_naf, Sol)
+% negate_formula(GoalVars, ImpVars, ExpVars, I, Dimp, Dexp, Rimp, Rexp, R_naf, Sol)
 % returns SolC that is one of the solutions of the conjunction that is divided
 % I, Dimp,Dexp,Rimp and Rexp (equalities, disequalities and rest of subgoals).
 % GoalVars, ImpVars and ExpVars are set of useful variables 
-negate_formulae([], [], [], [], _GoalVars, _ImpVars, true) :- !. % Optimization
-negate_formulae(E, IE_imp, NIE_imp, IE_NIE_exp, GoalVars, ImpVars, Neg_E_IE_NIE) :-
+negate_formula([], [], [], [], _GoalVars, _ImpVars, true) :- !. % Optimization
+negate_formula(E, IE_imp, NIE_imp, IE_NIE_exp, GoalVars, ImpVars, Neg_E_IE_NIE) :-
+	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
  	negate_IE_NIE_exp(IE_NIE_exp, ImpVars, Neg_IE_NIE_exp),
 	negate_imp_form(NIE_imp, ImpVars, Neg_IE_NIE_exp, Neg_NIE_imp_IE_NIE_exp),
 	negate_imp_form(IE_imp, ImpVars, Neg_NIE_imp_IE_NIE_exp, Neg_IE_NIE),
@@ -485,6 +491,7 @@ negate_formulae(E, IE_imp, NIE_imp, IE_NIE_exp, GoalVars, ImpVars, Neg_E_IE_NIE)
 % SolC a solution of negating Dexp y Rexp juntos.
 negate_IE_NIE_exp([], _ImpVars, []):- !.
 negate_IE_NIE_exp(IE_NIE_exp, ImpVars, Neg_IE_NIE_exp) :-
+	IE_NIE_exp \== [],
 	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
 	Neg_IE_NIE_exp = (cneg_rt(IE_NIE_exp, ExpVars)), !.
 
@@ -519,15 +526,15 @@ negate_imp_atom(Formula, ImpVars, Neg_Atom, Keep_Atom) :-
 	goal_is_equality(Formula, T1, T2, UQV),
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
  	varsbag((T1,T2), ImpVars, [], FreeVars),
-	Neg_Atom = (disequality(T1,T2, FreeVars)),
-	Keep_Atom = (equality(T1,T2, UQV)).
+	Neg_Atom = (diseq_uqv(T1,T2, FreeVars)),
+	Keep_Atom = (eq_uqv(T1,T2, UQV)).
 
 negate_imp_atom(Formula, ImpVars, Neg_Atom, Keep_Atom) :-
 	goal_is_disequality(Formula, T1, T2, UQV),
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
  	varsbag((T1,T2), ImpVars, [], FreeVars),
-	Neg_Atom = (equality(T1,T2, FreeVars)),
-	Keep_Atom = (disequality(T1,T2, UQV)).
+	Neg_Atom = (eq_uqv(T1,T2, FreeVars)),
+	Keep_Atom = (diseq_uqv(T1,T2, UQV)).
 
 negate_imp_atom(Formula, _ImpVars, Neg_Atom, Keep_Atom) :-
 	Neg_Atom = (cneg_rt(Formula, [])),
