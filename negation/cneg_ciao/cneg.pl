@@ -78,7 +78,9 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	).
 
 cneg_rt(Predicate, UQV) :- cneg_rt_Chan(Predicate, UQV).
-call_to(Predicate) :- call(Predicate).
+call_to(Predicate) :- 
+	debug_msg(1, 'call_to :: Predicate', Predicate), 
+	call(Predicate).
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
