@@ -426,15 +426,15 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, FreeVars), !,
-	functor_local(Addition, 'cneg_aux:varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
-	functor_local(Varsbag, 'cneg_aux:varsbag', 3, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
+	functor_local(Addition, 'varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
+	functor_local(Varsbag, 'varsbag', 4, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
 	functor_local(Neg_Eq, 'cneg_diseq_eqv_uqv', 5, [A_Left |[A_Right |[ EQV |[ UQV |[Result]]]]]),
 	Neg_Atom = ((Addition, Varsbag), Neg_Eq).
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, FreeVars), !,
-	functor_local(Addition, 'cneg_aux:varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
-	functor_local(Varsbag, 'cneg_aux:varsbag', 3, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
+	functor_local(Addition, 'varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
+	functor_local(Varsbag, 'varsbag', 4, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
 	functor_local(Neg_Diseq, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[ EQV |[ UQV |[Result]]]]]), % UQV = []
 	Neg_Atom = ((Addition, Varsbag), Neg_Diseq).
 

@@ -13,7 +13,8 @@
 % To be able to call Pred from cneg
 
 % Needed to be able to compile the modules.
-:- use_module(cneg_aux).    
+:- use_module(cneg_aux).
+% , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, debug_msg/3]). 
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
 :- use_module(cneg_tr).
@@ -21,6 +22,7 @@
 :- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
+:- reexport(cneg_aux, [varsbag/4, varsbag_addition/3]).    
 :- reexport(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
 :- reexport(cneg_rt_Chan, [cneg_rt_Chan/2]).
