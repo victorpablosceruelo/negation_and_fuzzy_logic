@@ -18,14 +18,14 @@
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
 :- use_module(cneg_tr).
-:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2]).
+:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
 :- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_aux, [varsbag/4, varsbag_addition/3]).    
 :- reexport(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
-:- reexport(cneg_rt_Chan, [cneg_rt_Chan/2]).
+:- reexport(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
 :- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
@@ -79,7 +79,7 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	    )
 	).
 
-cneg_rt(Predicate, UQV) :- cneg_rt_Chan(Predicate, UQV).
+cneg_rt(Predicate, UQV) :- cneg_rt_New(Predicate, UQV).
 call_to(Predicate) :- 
 	debug_msg(1, 'call_to :: Predicate', Predicate), 
 	call(Predicate).
