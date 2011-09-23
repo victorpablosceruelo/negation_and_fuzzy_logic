@@ -265,7 +265,7 @@ test_and_update_vars_attributes(New_Diseqs, Can_Fail, Result) :-
 	get_and_remove_eqv_and_uqv_from_diseqs(New_Diseqs, [], EQV_Tmp, [], UQV_Tmp, New_Diseqs_Aux),
 	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, EQV_Tmp, All_EQV_Aux, UQV_Tmp, All_UQV, Old_Diseqs_Aux),
 	varsbag(All_EQV_Aux, All_UQV, [], All_EQV), % The sets must be exclusive.
-	debug_msg(1, 'test_and_update_vars_attributes :: All_EQV', All_EQV),
+	debug_msg(1, 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
 
 	% At first we check that the new disequalities can be added to the old ones.
 	simplify_disequations(New_Diseqs_Aux, [], Simplified_Diseqs_1, All_EQV, Can_Fail, Result),
@@ -502,7 +502,7 @@ simplify_disequation_aux([(T1, T2) | More_Diseqs], Answer, EQV, Can_Fail, Result
 		), !,
 		debug_msg(1, 'simplify_disequation_aux :: functor(T1) =/= functor(T2)', (T1, T2)),
 		Result = 'true', % Result is completely valid.
-		diseq_eq(Answer, []) % Answer is True.
+		Answer = [] % Answer is True.
 	    )
 	).
 
@@ -550,7 +550,7 @@ simplify_disequation_aux_var_nonvar([(T1, T2) | More_Diseqs], Answer, EQV_In, Ca
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
 		debug_msg(1, 'simplify_disequation_aux :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
 		cneg_unify('true', Result), % Result is completely valid.
-		diseq_eq(Answer, []) % Answer is True.
+		Answer = [] % Answer is True.
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
@@ -568,7 +568,7 @@ simplify_disequation_aux_var_nonvar([(T1, T2) | More_Diseqs], Answer, EQV_In, Ca
 		    (
 			functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
 			cneg_unify(Result, 'true'), % Correct result if attr. var. satisfied.
-			Answer = (T1, New_T2) % Answer is (T1, T2).
+			Answer = [(T1, New_T2)] % Answer is (T1, T2).
 		    )
 		;
 		    (   % Keep the functor but diseq between the arguments.
