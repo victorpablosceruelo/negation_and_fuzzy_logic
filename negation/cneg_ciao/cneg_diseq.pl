@@ -191,23 +191,23 @@ verify_attribute_aux(Attribute, NewTarget) :-
 
 % Only for Ciao prolog 
 verify_attribute_aux(Attribute, NewTarget) :-
-	attribute_contents(Attribute, OldTarget, Disequalities, _Old_UQV), 
+	attribute_contents(Attribute, OldTarget, Diseqs, _Old_UQV), 
 	NewTarget \== OldTarget, % A substitution is needed.
 	remove_attribute_local(OldTarget), 
-	get_and_remove_eqv_and_uqv_from_diseqs(Disequalities, [], EQV, [], UQV, _Unused_Ts),
+	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, [], EQV, [], UQV, _Unused_Ts),
 	perform_substitutions([(OldTarget, NewTarget)], EQV, UQV),
-	test_and_update_vars_attributes(Disequalities, 'fail', 'true').
+	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	debug_msg(0, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
 	debug_msg(0, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
-	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Disequalities_Var_1, _UQV_Var_1), !,
-	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Disequalities_Var_2, _UQV_Var_2), !,
+	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Diseqs_Var_1, _UQV_Var_1), !,
+	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Diseqs_Var_2, _UQV_Var_2), !,
 	remove_attribute_local(OldTarget_Var_1), 
 	remove_attribute_local(OldTarget_Var_2), 
 
-	cneg_aux:append(Disequalities_Var_1, Disequalities_Var_2, Disequalities),
-	get_and_remove_eqv_and_uqv_from_diseqs(Disequalities, [], EQV, [], UQV, _Unused_Ts),
+	cneg_aux:append(Diseqs_Var_1, Diseqs_Var_2, Diseqs),
+	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, [], EQV, [], UQV, _Unused_Ts),
 	perform_substitutions([(OldTarget_Var_1, OldTarget_Var_2)], EQV, UQV),
 	
 	debug_msg(1, 'test_and_update_vars_attributes :: (Disequalities)', (Disequalities)), 
@@ -219,17 +219,19 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 
 perform_substitutions([], _EQV, _UQV) :- !.
 perform_substitutions([(OldTarget, NewTarget) | MoreSubst], EQV, UQV) :-
-	varsbag(EQV, UQV, [], EQV_Aux), !, % Fix possible errors.
-	varsbag((OldTarget, NewTarget), EQV_Aux, [], UQV_Aux), !,
+	varsbag(UQV, [], [], UQV_Aux), !, % Only vars, please.
+	varsbag(EQV, UQV_Aux, [], EQV_Aux), !, % Only vars, please.
+	varsbag((OldTarget, NewTarget), [], [], Vars_Targets), !,
+	varsbag_intersection(Vars_Targets, UQV_Aux, Intersection), !,
 	(
 	    (
-		UQV_Aux == [], !,
+		Intersection == [], !,
 		OldTarget = NewTarget,
 		perform_substitutions(MoreSubst, EQV_Aux, UQV_Aux)
 	    )
 	;
 	    (
-		UQV_Aux \== [], !,
+		Intersection \== [], !,
 		debug_msg(1, 'perform_substitutions :: Impossible :: (OldTarget, NewTarget, EQV, UQV)', (OldTarget, NewTarget, EQV_Aux, UQV_Aux)),
 		!, fail
 	    )
