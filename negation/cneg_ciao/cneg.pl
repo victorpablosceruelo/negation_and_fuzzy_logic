@@ -15,14 +15,14 @@
 % Needed to be able to compile the modules.
 :- use_module(cneg_aux).    
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
+	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt_Chan, [cneg_rt_Chan/2]).
 :- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_uqv/4, cneg_eq_uqv/4, cneg_diseq_eqv/4, cneg_eq_eqv/4]).
+	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
 :- reexport(cneg_rt_Chan, [cneg_rt_Chan/2]).
 :- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 

@@ -425,12 +425,19 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	negate_atom(Disj_2, GoalVars, Result, Neg_Disj_2). 
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
-	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
-	functor_local(Neg_Atom, 'cneg_diseq_eqv', 4, [A_Left |[A_Right |[ GoalVars |[Result]]]]).
+	goal_is_equality(Atom, A_Left, A_Right, FreeVars), !,
+	functor_local(Addition, 'cneg_aux:varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
+	functor_local(Varsbag, 'cneg_aux:varsbag', 3, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
+	functor_local(Neg_Eq, 'cneg_diseq_eqv_uqv', 5, [A_Left |[A_Right |[ EQV |[ UQV |[Result]]]]]),
+	Neg_Atom = ((Addition, Varsbag), Neg_Eq).
 
-negate_atom(Atom, _GoalVars, Result, Neg_Atom) :-
-	goal_is_disequality(Atom, A_Left, A_Right, _FreeVars), !,
-	functor_local(Neg_Atom, 'cneg_eq_uqv', 4, [A_Left |[A_Right |[ [] |[Result]]]]). % UQV = []
+negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+	goal_is_disequality(Atom, A_Left, A_Right, FreeVars), !,
+	functor_local(Addition, 'cneg_aux:varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
+	functor_local(Varsbag, 'cneg_aux:varsbag', 3, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
+	functor_local(Neg_Diseq, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[ EQV |[ UQV |[Result]]]]]), % UQV = []
+	Neg_Atom = ((Addition, Varsbag), Neg_Diseq).
+
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
@@ -483,12 +490,12 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	negate_atom(Arg, GoalVars, Result, DN_Atom). % Problematic
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	goal_is_disequality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
-	functor_local(DN_Atom, 'cneg_diseq_eqv', 4, [A_Left |[A_Right |[GoalVars |[Result ]]]]).
+	goal_is_disequality(Atom, A_Left, A_Right, UQV), !,
+	functor_local(DN_Atom, 'cneg_diseq_eqv_uqv', 5, [A_Left |[A_Right |[GoalVars |[ UQV |[Result ]]]]]).
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	goal_is_equality(Atom, A_Left, A_Right, _Unconfigured_UQV), !,
-	functor_local(DN_Atom, 'cneg_eq_eqv', 4, [A_Left |[A_Right |[GoalVars |[Result ]]]]).	
+	goal_is_equality(Atom, A_Left, A_Right, UQV), !,
+	functor_local(DN_Atom, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[GoalVars |[ UQV |[Result ]]]]]).	
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	functor(Atom, Name, Arity), !,
