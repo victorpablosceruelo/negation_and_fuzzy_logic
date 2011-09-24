@@ -1,0 +1,39 @@
+\subsubsection{Approximate-Base Measurement}
+\label{sec:Approximate Base}
+For the sake of clarifying the similarity between sets directly, we obtain the distance between two sets first. There are several classical distance measurements, also called \textit{metric} or \textit{distance function}  over algebra and geometry, such as \textit{Hamming distance}, \textit{Euclidean distance}, which are in a $p-norm$ form.
+In this subsection, we are going to discuss these classical \textit{metrics} and extend them into the concept ``distance between two crisp sets''. Finally, the similarity will be achieved afterwards.
+
+The distance between two crisp sets could be interpreted as the distance between the gravities of two sets. In other words, it measures the average distance between two sets, and is formalized as,
+\begin{equation}\label{FiniteDist1}
+Dist(A,B)=\frac{\sum_{i=1}^{n} \lvert \chi_{A}(e_i) - \chi_{B}(e_i) \rvert}{n}
+\end{equation}
+when $U$ is \textit{finite}. And when $U$ is \textit{infinite}, the distance is
+\begin{equation}\label{InfiniteDist1}
+Dist(A,B)=\frac{\int_{low}^{up} \lvert \chi_{A}(x) - \chi_{B}(x) \rvert\, \mathrm{d}x}{\int_{low}^{up}\, \mathrm{d}x}
+\end{equation}
+The numerators in \eqref{FiniteDist1}, \eqref{InfiniteDist1} are the \textit{1-norm} distance, also called \textit{Manhatten distance}, and is divided by the cardinality of $U$ for the average distance between $A$ and $B$.
+
+On the other hand, a set could be considered as a vector with arguments which are applications of characteristic function over all the elements in $U$.
+If $U$ is \textit{finite} with cardinality $n$, then $A$ and $B$ are represented as,
+\[A = < \chi_{A}(e_1), \dots, \chi_{A}(e_n)>\]
+\[B = < \chi_{B}(e_1), \dots, \chi_{B}(e_n)>\]
+then the distance between $A$ and $B$ is the average distance between two vectors. Distance between two vectors is measured by \textit{2-norm distance} or \textit{Euclidean distance}. Thus, the average distance is formalized as,
+\begin{equation}\label{FiniteDist2}
+Dist(A,B) = \frac{(\sum_{i=1}^{n} \lvert \chi_{A}(e_i) - \chi_{B}(e_i) \rvert ^2)^{1/2}}{n}
+\end{equation}
+We extend \eqref{FiniteDist2} considering the infinity of $U$. The distance between two infinite sets is written as,
+\begin{equation}\label{InfiniteDist2}
+Dist(A,B) = \frac{(\int_{x_{low}}^{x_{up}}\lvert \chi_{A}(x) - \chi_{B}(x) \rvert^2\, \mathrm{d}x)^{1/2}}{\int_{x_{low}}^{x_{up}}\mathrm{d}x}
+\end{equation}
+
+\eqref{FiniteDist1} and \eqref{InfiniteDist1} adopt the \textit{1-norm}, and \textit{2-norm} is applied in \eqref{FiniteDist2} and \eqref{InfiniteDist2}. With respect to these two groups of definitions, \textit{2-norm} interprets each set as a vector, whose arguments are its characteristic functions applying over each element, representing as attributes of the set. The distance measured under this interpretation implies tight coupling within a set, taking each set as an object, which satisfies the meaning of distance between sets. On the other hand, All metrics induced by the \textit{p-norm}, including the \textit{Euclidean metric}(2-norm), the \textit{Manhattan distance}(1-norm), are strongly equivalent. Considering the complexity of calculation, formulas\eqref{FiniteDist1} and \eqref{InfiniteDist1} have better performance. 
+
+Typically judgements of difference or dissimilarity are assumed to be equivalent to judgements of similarity and vice versa. The function relating these concepts generally is assumed to be an inverse relation. Simply, the inverse relation between \textit{distance} and \textit{similarity} is $Sim(A,B)=1-Dist(A,B)$. Thus, the similarity between two crisp sets is,
+\begin{equation}\label{FiniteSimApproximateBase}
+Sim(A,B)=1- \frac{\sum_{i=1}^{n} \lvert \chi_{A}(e_i) - \chi_{B}(e_i) \rvert}{n}
+\end{equation}
+when $U$ is \textit{finite set}, and
+\begin{equation}\label{InfiniteSimApproximateBase}
+Sim(A,B)=1- \frac{\int_{low}^{up} \lvert \chi_{A}(x) - \chi_{B}(x) \rvert\, \mathrm{d}x}{\int_{low}^{up}\, \mathrm{d}x}
+\end{equation}
+when $U$ is \textit{infinite set}, as well as $A$ and $B$.

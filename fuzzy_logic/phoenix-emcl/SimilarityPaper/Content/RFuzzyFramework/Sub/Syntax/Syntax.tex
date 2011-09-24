@@ -1,0 +1,90 @@
+\section{Syntax}
+\label{sec:FuzzyFrameworkSyntax}
+From $\Sigma$ a set of function symbols and a set of variables $V$, the \textit{term universe} $TU_{\Sigma,V}$ is built, whose elements are \textit{terms}. It is the minimal set such that each variable is a term and terms are closed under $\Sigma$ operations. In particular, constant symbols are terms, which is a function with arity $0$. The creation procedure of \textit{term universe} is described in definition 2.3.1.
+
+\textit{Term base} $TB_{\Pi,\Sigma,V}$ is defined from a set of predicate symbols and \textit{term universe} $TU_{\Sigma,V}$. The elements in the \textit{term base} are called \textit{atoms}, which are predicates whose arguments are elements of $TU_{\Sigma,V}$. The building procedure is described in definition 2.3.2.
+
+Atoms and terms are called \textit{ground} if they do not contain variables. The \textit{Herbrand universe} $\mathbb{HU}$ is the set of all ground terms, and the \textit{Herbrand base} $\mathbb{HB}$ is the set of all atoms with arguments from the \textit{Herbrand universe}.
+
+$\Omega$ is a set of \textit{many-valued connectives} and includes,
+\begin{enumerate}
+ \item conjunctions $\&_1$, $\&_2$, ..., $\&_k$ 
+ \item disjunctions $\vee_1$, $\vee_2$, ..., $\vee_l$
+ \item implications $\leftarrow_1$, $\leftarrow_2$, ..., $\leftarrow_m$ 
+ \item aggregations $@_1$, $@_2$, ..., $@_n$
+ \item real numbers $v\in[0,1]\subset \mathbb{R}$. These connectives are of arity $0$, that is, $v\in\Omega^{(0)}$.
+\end{enumerate}
+While $\Omega$ denotes the set of connectives symbols, $\hat{\Omega}$ denotes a set of associated truth functions. Instances of connective symbols and their truth functions are denoted by $F$ and $\hat{F}$ respectively, so $F \in \Omega$, and $\hat{F} \in \hat{\Omega}$. 
+
+\begin{defin}\textbf{(fuzzy clauses).}
+\label{def:FuzzyClauses}
+A fuzzy clause is written as,
+\[A \stackrel{c,F_c}{\leftarrow} F(B_1,...,B_n)\]
+where $A \in TB_{\Pi,\Sigma,V}$ is called head, and $B_i \in TB_{\Pi,\Sigma,V}$ is called body, $i \in [1,n]$. $c \in [0,1]$ is credibility value, and $F_c \in \{\&_1,...,\&_k\}\subset\Omega^{(2)}$ and $F\in\Omega^{(n)}$ are connective symbols for the credibility value and the body, respectively. 
+
+A \textit{fuzzy fact} is a special case of a clause where $c=1$, $F_c$ is the usual multiplication of real numbers ``.'' and $n=0$. It is written as $A \leftarrow v$, where the $c$ and $F_c$ are omitted.
+\end{defin}
+
+\begin{ex}
+\label{ex:FuzzyClauses}
+\[good-destination(X) \stackrel{1.0,.}{\leftarrow} .(nice-weather(X),many-sight(X)).\]
+This fuzzy clause models to what extent cities can be deemed good destinations - the quality of the destination depends on the weather and the availability of sights. The credibility value of the rule is 1.0, which means that we have no doubt about this relationship. The connectives used here in both cases is the usual multiplication of real numbers.
+\end{ex}
+
+\begin{defin}\textbf{(default value declaration).}
+\label{def:DefaultValueDecl}
+A \textit{default value declaration} for a predicate $p \in \Pi^{(n)}$ is written as
+\begin{center}
+ $default(p/n)= [\delta_1$ if $\varphi_1, ..., \delta_m$ if $\varphi_m]$
+\end{center}
+where $\delta_i\in[0,1]$ for all $i$. The $\varphi_i$ are FOL(First-Order Logic) formulas restricted to terms from $TU_{\Sigma,V_p}$, the predicates $=$ and $\neq$, the symbol true and the junctors $\vee$ and $\wedge$ in their usual meaning.
+\end{defin}
+
+\begin{ex}
+\label{ex:DefaultValueDecl}
+ \[default(nice-weather(X)) = 0.5\]
+\end{ex}
+
+\begin{defin}\textbf{(type declaration).}
+\label{def:TypeDecl}
+Types are built from terms $t \in \mathbb{HU}$. A \textit{term type declaration} assigns a type $\tau \in \mathcal{T}$ to a term $t \in \mathbb{HU}$ and is written as $t : \tau$. A \textit{predicate type declaration} assigns a type $(\tau_1, ..., \tau_n) \in \mathcal{T}^n$ to a predicate $p \in \Pi^n$ and is written as $p : (\tau_1, ..., \tau_n)$, where $\tau_i$ is the type of $p$'s $i-th$ argument. The set composed by all term type declarations and predicate type declarations is denoted by $T$.
+\end{defin}
+
+\begin{ex}
+\label{ex:TypeDecl}
+Suppose that the set of types is $\mathcal{T}=\{City,Continent\}$, here are some examples of  \textit{term type declaration} and \textit{predicate type declaration}.
+\[madrid : City, sydney : City\]
+\[africa : Continent, america : Continent\]
+\[nice-weather : (City)\]
+\[city-continent : (City, Continent)\]
+In this example, ``madrid", ``sydney", ``africa" and ``america" are ground terms. ``madrid" and ``sydney" have type City. ``africa" and ``america" have type Continent. ``nice-weather" and ``city-continent" are fuzzy predicates. ``nice-weather" is of type (City) and ``city-continent" is of type (City, Continent).
+\end{ex}
+
+\begin{defin}\textbf{(well-typed).}
+\label{def:WellTyped}
+A ground atom $A=p(t_1,...,t_n)\in\mathbb{HB}$ is \textit{well\_typed} with respect to $T$ \textbf{iff} $p : (\tau_1,...,\tau_n)\in T$ implies that the term type declaration $(t_i : \tau_i)\in T$ for $1 \leq i \leq n$.
+
+A ground clause $A \stackrel{c,F_c}{\leftarrow} F(B_1,...,B_n)$ is \textit{well\_typed} w.r.t $T$ \textbf{iff} all $B_i$ are \textit{well\_typed} for $1 \leq i \leq m$ implies that $A$ is \textit{well\_typed}.
+A non-ground clause is \textit{well\_typed} \textbf{iff} all its ground instances are well\_typed. 
+\end{defin}
+
+\begin{defin}\textbf{(well-defined RFuzzy program).}
+\label{def:WellDefinedProgram}
+A fuzzy program $P=(R,D,T)$ is called \textit{well-defined} \textbf{iff}
+
+\begin{itemize}
+ 
+ \item for each predicate symbol $p/n$, there exist both a predicate type declaration and a default value declaration. 
+ \item all clauses in $R$ are \textit{well\_typed}.
+ \item for each default value declaration 
+\begin{center}
+ $default(p(X_1,...,X_n))=[\delta_1$ if $\varphi_1,..., \delta_m$ if $\varphi_m]$.
+\end{center}
+the formulas $\varphi_i$ are pairwise contradictory and $\varphi_1 \vee ... \vee \varphi_m$ is a tautology.
+   
+\end{itemize}
+
+ 
+\end{defin}
+
+

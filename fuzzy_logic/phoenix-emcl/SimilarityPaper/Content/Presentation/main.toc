@@ -1,0 +1,13 @@
+\beamer@endinputifotherversion {3.10pt}
+\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
+\beamer@sectionintoc {2}{Similarity}{5}{0}{2}
+\beamer@subsectionintoc {2}{1}{Statement of Problem}{6}{0}{2}
+\beamer@subsectionintoc {2}{2}{Interpretation Based Measurement(IBM)}{8}{0}{2}
+\beamer@subsectionintoc {2}{3}{Structure Based Measurement(SBM)}{10}{0}{2}
+\beamer@subsectionintoc {2}{4}{Comparison between IBM and SBM}{12}{0}{2}
+\beamer@sectionintoc {3}{Quantification}{14}{0}{3}
+\beamer@subsectionintoc {3}{1}{Statement of Problem}{15}{0}{3}
+\beamer@subsectionintoc {3}{2}{Formalized in SOL Predicate}{17}{0}{3}
+\beamer@subsectionintoc {3}{3}{Formalized in FOL Predicate}{19}{0}{3}
+\beamer@subsectionintoc {3}{4}{Application of Quantification}{21}{0}{3}
+\beamer@sectionintoc {4}{Conclusions}{23}{0}{4}

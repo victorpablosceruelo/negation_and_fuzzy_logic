@@ -1,0 +1,11 @@
+\section{Quantification in RFuzzy Framework}
+\label{sec:QSFQ}
+As seen in the definition \ref{def:FuzzyDeterminer} of fuzzy determiner in section \ref{sec:QRW}, fuzzy quantifier can be defined as second order fuzzy relations, which is formalized as $D: \mathcal{F}(U)^n \longrightarrow [0,1]$, where $U$ is domain of interest, and $\mathcal{F}(U)$ is a set of all fuzzy subsets of $U$.
+In natural language, most of the statements with quantifiers takes less than $3$ or $4$ fuzzy subsets as arguments,  such as ``very tall pretty girls", ``extremely strict professors".
+We express the simplest statements taking $2$ fuzzy subsets as parameters, then quantifier $Q$ is defined as a function $Q: \mathcal{F}(U) \times \mathcal{F}(U) \longrightarrow [0,1]$.
+In most of such statements, the last concept is not really fuzzy one, but crisp. Normally, the value of quantifier function will not be affected by the crisp concept. In example \ref{ex:FuzzyDeterminer}, statement ``All men are tall." is expressed as \[\textbf{all}(\textbf{men},\textbf{tall}) = inf\{max(1-\textbf{men}(e), \textbf{tall}(e)), e \in U \}\],  where the value of \textbf{men} doesn't actually affect on the final result. There is a linguistics reason here. In computational linguistics, dependency among words are considered as foundation to apply linguistics function over those words. For example, in statement ``very tall men", ``very" and ``men" are not dependent on each other, but ``very" and ``tall" have dependency, so do ``tall" and ``persons". Therefore, the quantifier function ``very" is not defined dependent on crisp set ``men" according to the linguistics meaning. 
+
+Thus, we redefine quantifier without considering the crisp concept. It is formalized as $Q: \mathcal{F}(U) \longrightarrow [0,1]$. Even though, this definition is still a second order fuzzy set. In order to implement quantification in RFuzzy Framework, we need first order fuzzy set and the syntax and semantics are formalized in this section.
+
+\input{Content/Quantification/Sub/MyQuantification/Syntax/Syntax}
+\input{Content/Quantification/Sub/MyQuantification/Semantic/Semantic}

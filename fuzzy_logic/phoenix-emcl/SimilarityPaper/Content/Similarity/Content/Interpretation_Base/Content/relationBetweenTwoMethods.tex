@@ -1,0 +1,41 @@
+\subsubsection{similarity between crisp sets}
+In the previous two subsections \ref{sec:Set Theory} and \ref{sec:Approximate Base}, we obtain the same group of formulas to measure similarity between crisp sets, which are \eqref{FiniteSimSetTheory}, \eqref{InfiniteSimSetTheory} from \textit{Set-Theoretic measurement} and \eqref{FiniteSimApproximateBase}, \eqref{InfiniteSimApproximateBase} from \textit{Approximate-Base measurement}. In this subsection, the relationship between this two methods is briefly described and the definition of similarity between two crisp sets is given.
+
+In \textit{Set-Theoretic measurement} section (\ref{sec:Set Theory}), commonality is the key to explore similarity, whatever, the commonality is positive or negative. While, dissimilarity is the precedent step in \textit{Approximate-Base measurement} section (\ref{sec:Approximate Base}). From this point of view, these two approaches begin with opposite starting points. $\frac{\sum_{i=1}^{n} \lvert \chi_{A}(e_i) - \chi_{B}(e_i) \rvert}{n}$ and $\frac{\int_{low}^{up} \lvert \chi_{A}(x) - \chi_{B}(x) \rvert\, \mathrm{d}x}{\int_{low}^{up}\, \mathrm{d}x}$ in \eqref{FiniteSimSetTheory}, \eqref{InfiniteSimSetTheory} could be consider as the distance between $A$ and $B$, which is the same as the distance functions in \textit{Approximate-Base measurement}.
+
+Therefore, the definition of similarity between two crisp sets is given here.
+\begin{defin}\textbf{Similarity between crisp sets}\label{CrispSim}
+Let $U$ be the universe of discourse, $A$ and $B$ are subset of $U$ with characteristic function $\chi_{A}$, $\chi_{B}$, respectively.
+The similarity between $A$ and $B$ is,
+\begin{equation}\label{CSFinite}
+Sim(A,B)=1- \frac{\sum_{i=1}^{n} \lvert \chi_{A}(e_i) - \chi_{B}(e_i) \rvert}{n}
+\end{equation} 
+when $U$ is finite with cardinality $n$.
+\begin{equation}\label{CSInfinite}
+Sim(A,B)=1- \frac{\int_{x_{low}}^{x_{up}}\lvert \chi_{A}(x) - \chi_{B}(x) \rvert\, \mathrm{d}x}{\int_{x_{low}}^{x_{up}}\mathrm{d}x}
+\end{equation} 
+when $U$ is infinite, $x_{low}$ and $x_{up}$ are the \textit{lower bound} and \textit{upper bound} of set $U$, respectively.
+\end{defin}
+
+\begin{ex}
+The domain $U$ is a set with elements \{Andy, John, Lisa, Michelle, Tina, Susan, Juliet, Nancy, Luise, Christ, Irene\}. 
+`Popular' and `Beautiful' are two sets with elements as following,
+\[Popular = \{Andy, John, Lisa, Michelle, Tina, Luise, Susan\}\]
+\[Beautiful = \{Juliet, Lisa, Tina, Luise, Susan, Nancy\}\] 
+they are represented within their characteristic functions,
+\begin{center}
+\begin{tabular}{|c||c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+ & Andy & John & Lisa & Michelle & Tina & Susan & Juliet & Nancy & Luise & Christ & Irene \\
+\hline
+$\chi_{P}$ & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 0.0 & 0.0 & 1.0 & 0.0 & 0.0 \\
+\hline 
+$\chi_{B}$ & 0.0 & 0.0 & 1.0 & 0.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 0.0 & 0.0 \\
+\hline
+\end{tabular}
+\end{center}
+\begin{align*}
+Sim(Popular,Beautiful) & = 1- \frac{\sum_{i=1}^{11} \lvert \chi_{P}(e_i) - \chi_{B}(e_i) \rvert}{11}\\
+	        & = 1- \frac{5}{11} = \frac{6}{11}\\
+\end{align*}
+\end{ex}

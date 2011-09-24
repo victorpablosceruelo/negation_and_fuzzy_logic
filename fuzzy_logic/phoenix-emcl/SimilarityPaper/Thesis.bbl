@@ -1,0 +1,262 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{MHPCS10}
+
+\bibitem[AG58]{JH58}
+A.J.Cain and G.A.Harrison.
+\newblock An analysis of taxonomist's judgement of affinity.
+\newblock {\em Proc.Zool.Soc.Lond}, 131:85--98, 1958.
+
+\bibitem[Aga]{Aga}
+Pragya Agarwal.
+\newblock Lotfi zadeh: Fuzzy logic-incoporating real-world vagueness.
+\newblock {\em Spatially Integrated Social Science's collection}, page~68.
+
+\bibitem[A.J69]{B69}
+A.J.Boyce.
+\newblock Mapping diversity: A comparative study of numerical methods.
+\newblock {\em Numerical taxonomy}, pages 1--31, 1969.
+
+\bibitem[APC02]{PTC02}
+Enric~Trillas Ana~Pradera and Tomasa Calvo.
+\newblock A general class of triangular norm-based aggregation operators:
+  quasi-linear t-s operators.
+\newblock {\em International Journal of Approximate Reasoning}, 30(1):57--72,
+  2002.
+
+\bibitem[A.T77]{T77}
+A.Tversky.
+\newblock Features of similarity.
+\newblock {\em Psychol.Rev}, 84:327--352, 1977.
+
+\bibitem[BC81]{BC81}
+J.~Barwise and R.~Cooper.
+\newblock Generalized quantifiers and natural language.
+\newblock {\em Linguistics and Philosophy}, 4:159--219, 1981.
+
+\bibitem[BCW]{BCW}
+Ilaria Bartolini, Paolo Ciaccia, and Florian Waas.
+\newblock Feedbackbypass: A new approach to interactive similarity query
+  processing.
+\newblock {\em DEIS – CSITE-CNR and Microsoft Corp}.
+
+\bibitem[BH]{BH}
+Alexander Budanitsky and Graeme Hirst.
+\newblock Semantic distance in wordnet: An experimental application-oriented
+  evaluation of five measures.
+\newblock {\em Department of Computer Science University of Toronto}.
+
+\bibitem[BMP95]{BMP95}
+J.~F. Baldwin, T.~P. Martin, and B.~W. Pilsworth.
+\newblock Fril- fuzzy and evidential reasoning in artificial intelligence.
+\newblock 1995.
+
+\bibitem[DP03]{DP03}
+B.~A. Davey and H.~A. Priestley.
+\newblock {\em Introduction to lattices and order}.
+\newblock Cambridge Univ Press, 2003.
+
+\bibitem[ETC95]{TCC95}
+Susana~Cubillo Enric~Trillas and Juan~Luis Castro.
+\newblock Conjunction and disjunction on ([0,1],$\leq$).
+\newblock {\em Fuzzy set and systems}, 72(2):155--165, 1995.
+
+\bibitem[F.A50]{A50}
+F.Attneave.
+\newblock Dimensions of similarity.
+\newblock {\em American Journal of Psychology}, 63:516--556, 1950.
+
+\bibitem[FBF89]{FFG89}
+K.~Forbus and D.~Gentner. B.~Falkenhainer.
+\newblock The structure mapping engine: algorithms and examples.
+\newblock {\em Artificial Intelligence}, 41(1):1--63, 1989.
+
+\bibitem[Fel98]{Fel98}
+Christiane Fellbaum.
+\newblock {\em WordNet – An electronic lexical database}.
+\newblock MIT Press, 1998.
+
+\bibitem[GA59]{YH59}
+G.Young and A.S.Householder.
+\newblock Discussion of a set of points in terms of their mutual distances.
+\newblock {\em Psychometrika}, 3:19--22, 1959.
+
+\bibitem[GAI{\etalchar{+}}97]{Glockner97dfs-}
+Ingo Gl�ckner, Technischen~Fakult At, Abteilung Informationstechnik, Impressum
+  Herausgeber, Robert Giegerich, Alois Knoll, Helge Ritter, Gerhard Sagerer,
+  Ipke Wachsmuth, Ingo~Gl Ockner, and Ingo~Gl Ockner.
+\newblock Dfs - an axiomatic approach to fuzzy quantification, 1997.
+
+\bibitem[GAOC]{GO}
+Adolfo Guzman-Arenas and Jesus~M. Olivares-Ceja.
+\newblock Finding the most similar concepts in two different ontologies.
+\newblock {\em Centro de Investigación en Computación Instituto Politécnico
+  Nacional}.
+
+\bibitem[GMHV04]{GMHV04}
+S.~Guadarrama, S.~Munoz-Hernandez, and C.~Vaucheret.
+\newblock Fuzzy prolog: a new approach using soft constraints propagation.
+\newblock {\em Fuzzy Sets and Systems (FSS)}, 144(1), 2004.
+
+\bibitem[GMV04]{GMV04}
+S.~Guadarramaa, S.~Munoz, and C.~Vaucheret.
+\newblock Fuzzy prolog: a new approach using soft constraints propagation.
+\newblock {\em Fuzzy Sets and Systems}, 144:127--150, 2004.
+
+\bibitem[H.G46]{G46}
+H.Gulliksen.
+\newblock Paired comparison and the logic of measurement.
+\newblock {\em Psychological.Review}, 55:199--213, 1946.
+
+\bibitem[IK85]{IK85}
+Mitsuru Ishizuka and Naoki Kanai.
+\newblock {\em Prolog-elf incorporating fuzzy logic}.
+\newblock Morgan Kaufmann Publishers Inc, 1985.
+
+\bibitem[Jac08]{J08}
+P.~Jaccard.
+\newblock Nouvells researches sur la distribution florale.
+\newblock {\em Bulletin de la Societe de Vaud des Sciences Naturelles}, 44:223,
+  1908.
+
+\bibitem[JM08]{MM08a}
+Pedro J.Morcillo and Gines Moreno.
+\newblock Programming with fuzzy logic rules by using the floper tool.
+\newblock {\em In RuleML '08: Proceedings of the International Symposium on
+  Rule Representation, Interchange and Reasoning on the Web}, pages 119--126,
+  2008.
+
+\bibitem[KP00]{KPMRPE00}
+Radko; Klement, Erich Peter;~Mesiar and Endre Pap.
+\newblock {\em Triangular Norms}.
+\newblock Dordrecht: Kluwer, 2000.
+
+\bibitem[KS86]{KS86}
+E.~Keenan and J.~Stavi.
+\newblock A semantic characterization of natural language determiners.
+\newblock {\em Linguistics and Philosophy}, 9, 1986.
+
+\bibitem[Kun80]{ST80}
+Kenneth Kunen.
+\newblock {\em Set Theory: An Introduction to Independence Proofs}.
+\newblock North-Holland, 1980.
+
+\bibitem[Lee72]{Lee72}
+R.~C.~T. Lee.
+\newblock Fuzzy logic and the resolution principle.
+\newblock {\em the Association for Computing Machinery}, 19(1):119–129, 1972.
+
+\bibitem[LL90]{LL90}
+Deyi Li and Dongbo Liu.
+\newblock A fuzzy prolog database system.
+\newblock 1990.
+
+\bibitem[Llo87]{Llo87}
+John~Wylie Lloyd, editor.
+\newblock Springer, 1987.
+
+\bibitem[Lu.79]{SYL79}
+S.~Y. Lu.
+\newblock A tree-to-tree distance and its application to cluster analysis.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence
+  (PAMI)}, 1979.
+
+\bibitem[Luk20]{L20}
+Jan Lukasiewicz.
+\newblock {\em On three-valued logic}.
+\newblock North�Holland, 1920.
+
+\bibitem[MHPCS10]{MPS10}
+Susana Munoz-Hernandez, Victor Pablos-Ceruelo, and Hannas Strass.
+\newblock Rfuzzy: Syntax, semantics and implementation details of a simple and
+  expressive fuzzy tool over prolog.
+\newblock 2010.
+
+\bibitem[Mor06]{Mor06}
+Gines Moreno.
+\newblock Building a fuzzy transformation system.
+\newblock {\em Lecture Notes in Computer Science}, 3831:409--418, 2006.
+
+\bibitem[MT92]{MT92}
+Jiri Matousek and R.~Thomas.
+\newblock {\em On the complexity of finding iso- and others morphisms for
+  partial k-trees}.
+\newblock 1992.
+
+\bibitem[M.W38]{R38}
+Richardson M.W.
+\newblock Multidimensional psychophysics.
+\newblock {\em Psychol.Bull}, 38:659, 1938.
+
+\bibitem[NW00]{NW00}
+H.T. Nguyen and E.A. Walker.
+\newblock {\em A first Course in Fuzzy Logic}.
+\newblock Chapman and Hall/CRC, 2000.
+
+\bibitem[P.98]{HP98}
+Hajek P.
+\newblock {\em Metamathematics of Fuzzy Logic}.
+\newblock Dordrecht: Kluwer, 1998.
+
+\bibitem[RP63]{SS63}
+R.R.Sokal and P.H.Sneath.
+\newblock {\em Principles of Numerical Taxonomy}.
+\newblock Freeman San Francisco CA, 1963.
+
+\bibitem[SA95]{AHV95}
+Victor~Vianu Serge~Abiteboul, Richard~Hull.
+\newblock {\em Foundations of databases}.
+\newblock Addison Wesley Longman, 1995.
+
+\bibitem[T.02]{AT02}
+Andreasen T.
+\newblock On knowledge-guided fuzzy aggregation.
+\newblock {\em International Conference on Information Processing and
+  Management of Uncertainty in Knowledge-Based Systems}, 2002.
+
+\bibitem[Tar55]{T55}
+A.~Tarski.
+\newblock A lattice-theoretical fixpoint theorem and its applications.
+\newblock {\em Pacific J. Math}, 5:285–309, 1955.
+
+\bibitem[VA02]{SCFST02}
+Valerie V.Cross and Thomas A.Sudkamp.
+\newblock {\em Similarity and Compatiability in Fuzzy Set Theory}.
+\newblock Springer-Verlag company, 2002.
+
+\bibitem[vB83]{B83}
+J.~van Benthem.
+\newblock Determiners and logic.
+\newblock {\em Linguistics and Philosophy}, 6, 1983.
+
+\bibitem[vB84]{B84}
+J.~van Benthem.
+\newblock Questions about quantifiers.
+\newblock {\em Journal of Symbolic Logic}, 49, 1984.
+
+\bibitem[W.S65]{T65}
+W.S.Torgerson.
+\newblock Multidimensional scaling: I. theory and method.
+\newblock {\em Psychometrika}, 17:401--419, 1965.
+
+\bibitem[Zad83]{Z83}
+L.A. Zadeh.
+\newblock A computational approach to fuzzy quantifiers in natural languages.
+\newblock {\em Computers and Mathematics with Applications}, 9:149--184, 1983.
+
+\bibitem[Zad88]{Z88}
+Lofti~A. Zadeh.
+\newblock {\em Fuzzy Logic}.
+\newblock Stanford University. Center for the Study of Language and
+  Information, 1988.
+
+\bibitem[Zad96]{Z96}
+L.A. Zadeh.
+\newblock The birth and evolution of fuzzy logic.
+\newblock {\em Advances in fuzzy systems}, 6:811--814, 1996.
+
+\bibitem[ZM89]{SDM89}
+L.Ding Z.Shen and M.Mukaidono.
+\newblock Fuzzy resolution principle.
+\newblock {\em 18th International Symposium on Multiple-valued Logic}, 5, 1989.
+
+\end{thebibliography}
