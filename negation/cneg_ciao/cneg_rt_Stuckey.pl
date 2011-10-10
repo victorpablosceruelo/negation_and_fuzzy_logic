@@ -28,8 +28,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt_Stuckey(Goal, UQV):-
-	debug_msg(1, 'cneg_rt :: (Goal, UQV)', (Goal, UQV)),
+cneg_rt_Stuckey(UQV, Goal):-
+	debug_msg(1, 'cneg_rt :: (UQV, Goal)', (UQV, Goal)),
 	varsbag(Goal, UQV, [], GoalVars),
 	compute_neg_frontier(Goal, GoalVars, 'true').
 
@@ -264,7 +264,7 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	goal_is_negation(Pre_Frontier, UQV, SubGoal), 
-	cneg_rt_Stuckey(SubGoal, UQV).
+	cneg_rt_Stuckey(UQV, SubGoal).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
 	nonvar(Pre_Frontier),

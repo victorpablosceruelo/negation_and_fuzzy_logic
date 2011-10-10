@@ -28,8 +28,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt_Chan(Goal, UQV):-
-	debug_msg(1, 'cneg_rt_Chan :: (Goal, UQV)', (Goal, UQV)),
+cneg_rt_Chan(UQV, Goal):-
+	debug_msg(1, 'cneg_rt_Chan :: (UQV, Goal)', (UQV, Goal)),
 	varsbag(Goal, UQV, [], GoalVars),
 	compute_frontier(Goal, Frontier),
 	debug_msg_list(1, 'cneg_rt_Chan :: Frontier', Frontier),
@@ -37,8 +37,8 @@ cneg_rt_Chan(Goal, UQV):-
 	debug_msg(1, 'cneg_rt_Chan :: Result', Result),
 	call_to(Result).
 
-cneg_rt_New(Goal, UQV):-
-	debug_msg(1, 'cneg_rt_New :: (Goal, UQV)', (Goal, UQV)),
+cneg_rt_New(UQV, Goal):-
+	debug_msg(1, 'cneg_rt_New :: (UQV, Goal)', (UQV, Goal)),
 	varsbag(Goal, UQV, [], GoalVars),
 	compute_frontier(Goal, Frontier),
 	debug_msg_list(1, 'cneg_rt_New :: Frontier', Frontier),
@@ -504,11 +504,11 @@ negate_IE_NIE_exp([], _Proposal, _ImpVars, []):- !.
 negate_IE_NIE_exp(IE_NIE_exp, 'Chan', ImpVars, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
 	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
-	Neg_IE_NIE_exp = (cneg_rt_Chan(IE_NIE_exp, ExpVars)), !.
+	Neg_IE_NIE_exp = (cneg_rt_Chan(ExpVars, IE_NIE_exp)), !.
 negate_IE_NIE_exp(IE_NIE_exp, 'New', ImpVars, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
 	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
-	Neg_IE_NIE_exp = (cneg_rt_New(IE_NIE_exp, ExpVars)), !.
+	Neg_IE_NIE_exp = (cneg_rt_New(ExpVars, IE_NIE_exp)), !.
 
 negate_imp_form([], _Proposal, _ImpVars, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _Proposal, _ImpVars, _Next_Formula, _Neg_Formula) :-
@@ -552,11 +552,11 @@ negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
 	Keep_Atom = (diseq_uqv(T1,T2, UQV)).
 
 negate_imp_atom(Formula, 'Chan', _ImpVars, Neg_Atom, Keep_Atom) :-
-	Neg_Atom = (cneg_rt_Chan(Formula, [])),
+	Neg_Atom = (cneg_rt_Chan([], Formula)),
 	Keep_Atom = (Formula). 
 
 negate_imp_atom(Formula, 'New', _ImpVars, Neg_Atom, Keep_Atom) :-
-	Neg_Atom = (cneg_rt_New(Formula, [])),
+	Neg_Atom = (cneg_rt_New([], Formula)),
 	Keep_Atom = (Formula). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

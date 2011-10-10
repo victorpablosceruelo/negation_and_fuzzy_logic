@@ -77,11 +77,11 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	;
 	    (   % If problematic vars, use cneg_rt (Chan's approach).
 		Problematic_Vars \== [],
-		cneg_rt(Body, UQV)
+		cneg_rt(UQV, Body)
 	    )
 	).
 
-cneg_rt(Predicate, UQV) :- cneg_rt_New(Predicate, UQV).
+cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 call_to(Predicate) :- 
 	debug_msg(1, 'call_to :: Predicate', Predicate), 
 	call(Predicate).

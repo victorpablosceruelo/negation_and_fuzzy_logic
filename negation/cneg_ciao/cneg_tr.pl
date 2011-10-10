@@ -110,7 +110,7 @@ split_disjunctions_in_bodies_aux(Body, [NewBody]) :- % Goal is something else.
 
 translate_problematic_predicates(Body, NewBody) :-
 	goal_is_negation(Body, UQV, SubGoal), !,
-	functor_local(NewBody, 'cneg_tr', 2, [SubGoal |[ UQV ]]).
+	functor_local(NewBody, 'cneg_tr', 2, [UQV |[ SubGoal ]]).
 
 translate_problematic_predicates(Body, Body) :- !.
 
