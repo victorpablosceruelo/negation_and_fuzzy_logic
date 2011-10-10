@@ -1,5 +1,6 @@
 :- module(cneg_diseq, 
 	[
+	    equality/3, disequality/3,
 	    diseq_uqv/3, eq_uqv/3, 
 	    diseq_eqv/3, eq_eqv/3, 
 	    cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5,
@@ -632,6 +633,7 @@ check_if_allowed_to_fail(Can_Fail) :-
 % Incluye una desigualdad en las formulas de las 
 % variables implicadas
 
+disequality(T1,T2, UQV) :- diseq_uqv(T1,T2, UQV).
 diseq_uqv(T1,T2, UQV) :- 
 	varsbag((T1, T2), UQV, [], EQV), % Determine EQV.
 	cneg_diseq_eqv_uqv(T1, T2, EQV, UQV, 'true').
@@ -657,6 +659,7 @@ cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+equality(T1,T2, UQV) :- eq_uqv(T1,T2, UQV).
 eq_uqv(T1, T2, UQV) :-
 	varsbag((T1, T2), UQV, [], EQV), % Determine EQV.
 	cneg_eq_eqv_uqv(T1, T2, EQV, UQV, 'true').

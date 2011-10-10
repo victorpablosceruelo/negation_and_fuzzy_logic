@@ -306,7 +306,6 @@ normalize_E_IE_NIE('Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
 %	debug_msg(1, 'normalize_E_IE_NIE :: (E_Out, IE_Aux, NIE_Out)', (E_Out, IE_Aux, NIE_Out)),
 	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
 	varsbag(NIE_Out, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
-%	varsbag_difference(RelVars, ImpVars, ExpVars), % ExpVars = vars(NIE) - ImpVars = RelVars - ImpVars
 	varsbag_addition(ImpVars, RelVars, ImpVars_and_RelVars),
 	remove_from_IE_irrelevant_disequalities(IE_Aux, ImpVars_and_RelVars, IE_Out),
 	split_frontier_contents(Formula_Out, E_Out, IE_Out, NIE_Out). 
@@ -324,6 +323,7 @@ normalize_E_IE_NIE('Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
 remove_from_E_irrelevant_equalities(Formulae_In, Vars_EnoG, Formulae_Out) :- 
 	split_frontier_contents(Formulae_In, E_In, _IE_In, _NIE_In), 
 	detect_irrelevant_equalities(E_In, Vars_EnoG, [], Irrelevant_Eqs),
+%	debug_msg(1, 'remove_from_E_irrelevant_equalities :: Irrelevant_Eqs', Irrelevant_Eqs),
 	(
 	    (   
 		Irrelevant_Eqs = [],
@@ -333,8 +333,10 @@ remove_from_E_irrelevant_equalities(Formulae_In, Vars_EnoG, Formulae_Out) :-
 	    (
 		Irrelevant_Eqs \== [],
 		remove_irrelevant_equalities_1(Irrelevant_Eqs, Vars_EnoG, Formulae_In, Formulae_Aux_1),
+%		debug_msg(1, 'remove_irrelevant_equalities_1 :: Formulae_Aux_1', Formulae_Aux_1),
 		split_frontier_contents(Formulae_Aux_1, E_Aux_1, IE_Aux, NIE_Aux), 
 		remove_irrelevant_equalities_2(E_Aux_1, [], _Eqs_Visited, E_Aux_2),
+%		debug_msg(1, 'remove_irrelevant_equalities_2 :: E_Aux_2', E_Aux_2),
 		split_frontier_contents(Formulae_Aux_2, E_Aux_2, IE_Aux, NIE_Aux), 
 		remove_from_E_irrelevant_equalities(Formulae_Aux_2, Vars_EnoG, Formulae_Out)
 	    )
@@ -366,24 +368,25 @@ detect_irrelevant_equalities(E_In, Vars_EnoG, Irrelevant_Eqs_In, [ E_In | Irrele
 	).
 detect_irrelevant_equalities(_E_In, _Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_In).
 
-remove_irrelevant_equalities_1([Irrelevant_Eq | Irrelevant_Eqs], Vars_EnoG, Formulae_In, Formulae_Out) :-
+remove_irrelevant_equalities_1([], _Vars_EnoG, Formula_In, Formula_In) :- !.
+remove_irrelevant_equalities_1([Irrelevant_Eq | Irrelevant_Eqs], Vars_EnoG, Formula_In, Formula_Out) :-
 	goal_is_equality(Irrelevant_Eq, Value_1, Value_2, _UQV),
 	(
 	    (
 		var(Value_1),
 		memberchk(Value_1, Vars_EnoG), !, % Vars_EnoG = vars(E) - GoalVars
-		replace_in_term_var_by_value(Formulae_In, Value_1, Value_2, Formulae_Aux)
+		replace_in_term_var_by_value(Formula_In, Value_1, Value_2, Formula_Aux)
 	    )
 	;
 	    (
 		var(Value_2),
 		memberchk(Value_2, Vars_EnoG), !, % Vars_EnoG = vars(E) - GoalVars
-		replace_in_term_var_by_value(Formulae_In, Value_2, Value_1, Formulae_Aux)
+		replace_in_term_var_by_value(Formula_In, Value_2, Value_1, Formula_Aux)
 	    )
 	;   % In case they have been previously removed ...
 	    true
 	),
-	remove_irrelevant_equalities_1(Irrelevant_Eqs, Vars_EnoG, Formulae_Aux, Formulae_Out).
+	remove_irrelevant_equalities_1(Irrelevant_Eqs, Vars_EnoG, Formula_Aux, Formula_Out).
 
 remove_irrelevant_equalities_2([], Eqs_Visited_In, Eqs_Visited_In, []) :- !.
 remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_Out, E_Out) :-
