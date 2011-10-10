@@ -307,7 +307,9 @@ normalize_E_IE_NIE('Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
 	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
 	varsbag(NIE_Out, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
 	varsbag_addition(ImpVars, RelVars, ImpVars_and_RelVars),
+%	debug_msg(1, 'remove_from_IE_irrelevant_disequalities :: (IE_Aux, ImpVars_and_RelVars)', (IE_Aux, ImpVars_and_RelVars)),
 	remove_from_IE_irrelevant_disequalities(IE_Aux, ImpVars_and_RelVars, IE_Out),
+%	debug_msg(1, 'remove_from_IE_irrelevant_disequalities :: (IE_Out)', (IE_Out)),
 	split_frontier_contents(Formula_Out, E_Out, IE_Out, NIE_Out). 
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
