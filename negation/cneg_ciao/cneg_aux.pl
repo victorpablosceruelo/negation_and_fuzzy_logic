@@ -327,10 +327,15 @@ goal_is_not_conj_disj_eq_diseq_dneg(Goal) :-
 	Name \== '=/=',
 	Name \== 'cneg_rt'.
 
-goal_is_negation(Goal, SubGoal, UQV) :-
-	functor_local(Goal, 'cneg_rt', 2, _Args),
-	arg(1, Goal, SubGoal),
-	arg(2, Goal, UQV).
+goal_is_negation(Goal, UQV, SubGoal) :-
+	valid_names_for_negation_preds(Name),
+	functor_local(Goal, Name, 2, _Args),
+	arg(1, Goal, UQV),
+	arg(2, Goal, SubGoal).
+
+valid_names_for_negation_preds('cneg') :- !.
+valid_names_for_negation_preds('cneg_tr') :- !.
+valid_names_for_negation_preds('cneg_rt') :- !.
 
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),

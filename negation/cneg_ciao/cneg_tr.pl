@@ -105,7 +105,14 @@ split_disjunctions_in_bodies_aux(Body, Bodies) :-
 	split_disjunctions_in_bodies_aux(Body_Disj_2, Body_Result_2),
 	append(Body_Result_1, Body_Result_2, Bodies).
 
-split_disjunctions_in_bodies_aux(Body, [Body]). % Goal is something else.
+split_disjunctions_in_bodies_aux(Body, [NewBody]) :- % Goal is something else.
+	translate_problematic_predicates(Body, NewBody).
+
+translate_problematic_predicates(Body, NewBody) :-
+	goal_is_negation(Body, UQV, SubGoal), !,
+	functor_local(NewBody, 'cneg_tr', 2, [SubGoal |[ UQV ]]).
+
+translate_problematic_predicates(Body, Body) :- !.
 
 combine_sub_bodies_by_conjunction([], _List_2, []) :- !.
 combine_sub_bodies_by_conjunction([Elto | List_1], List_2, Result) :-

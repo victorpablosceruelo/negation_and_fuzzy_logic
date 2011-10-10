@@ -100,7 +100,7 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	diseq_uqv(T1,T2, UQV_Aux).
 
 compute_neg_frontier(Goal, _GoalVars, 'true'):- 
-	goal_is_negation(Goal, SubGoal, _UQV), !,
+	goal_is_negation(Goal, _UQV, SubGoal), !,
 	call_to(SubGoal). % Forget GoalVars and UQV.
 
 % Now go for other functors stored in our database.
@@ -263,7 +263,7 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 	eq_uqv(Left, Right, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
-	goal_is_negation(Pre_Frontier, SubGoal, UQV), 
+	goal_is_negation(Pre_Frontier, UQV, SubGoal), 
 	cneg_rt_Stuckey(SubGoal, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-

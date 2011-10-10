@@ -96,7 +96,7 @@ compute_frontier(Goal, Goal):-
 
 % Double negation is not managed yet. Forget it.
 compute_frontier(Goal, Goal):- 
-	goal_is_negation(Goal, _SubGoal, _UQV), !.
+	goal_is_negation(Goal, _UQV, _SubGoal), !.
 
 % Now go for other functors stored in our database.
 compute_frontier(Goal, Frontier_Out) :-
