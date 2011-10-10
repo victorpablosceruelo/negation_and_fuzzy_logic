@@ -395,7 +395,7 @@ and_between_statuses('fail', 'fail', 'fail').
 % just for debug.
 simplify_disequation(Diseqs, Answer, EQV, Can_Fail, Result) :-
 	debug_msg_nl(0),
-	debug_msg(1, 'simplify_disequation :: (Diseqs, EQV, Can_Fail)', (Diseqs, EQV, Can_Fail)),
+	debug_msg(1, 'simplify_disequation :: (Diseqs, ---, EQV, Can_Fail)', (Diseqs, '---', EQV, Can_Fail)),
 	simplify_disequation_aux(Diseqs, Answer, EQV, Can_Fail, Result),
 	debug_msg(1, 'simplify_disequation :: (Result, Answer)', (Result, Answer)),
 	debug_msg_nl(0).
