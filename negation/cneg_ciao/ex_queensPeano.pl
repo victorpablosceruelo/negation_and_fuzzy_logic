@@ -108,17 +108,17 @@ greater(s(X),s(Y)):-
 % 	greater1(X,Y).
 
 % no_queens(N,Q):-
-%  	cneg([], queens(N,Q)).
+%  	cneg_tr([], queens(N,Q)).
 % no_queens1(N,L,Q):-
-%  	cneg([], queens1(N,L,Q)).
+%  	cneg_tr([], queens1(N,L,Q)).
 
 % no_queens_list(N,Q):-
-%  	cneg([], queens_list(N,Q)).
+%  	cneg_tr([], queens_list(N,Q)).
 % no_greater(X,Y):-
-%  	cneg([], greater(X,Y)).
+%  	cneg_tr([], greater(X,Y)).
 
 % no_greater1(X,Y):-
-%  	cneg([], greater1(X,Y)).
+%  	cneg_tr([], greater1(X,Y)).
 
   
  
@@ -127,13 +127,13 @@ greater(s(X),s(Y)):-
 % p91(s(_)).
 
 % no_p9(X):-
-% 	cneg([], p9(X)).
+% 	cneg_tr([], p9(X)).
 % no_p91(X):-
-%    	cneg([], p91(X)). 
+%    	cneg_tr([], p91(X)). 
 
 
 % no_subst(N,X,N1):-
-%   	cneg([], subst(N,X,N1)).
+%   	cneg_tr([], subst(N,X,N1)).
 
 
 % p11(X):-
@@ -183,34 +183,34 @@ greater(s(X),s(Y)):-
 % 	queens1([],[s(0)],X).
 
 % no_p10(X):-
-% 	cneg([], p10(X)).
+% 	cneg_tr([], p10(X)).
 % no_p11(X):-
-% 	cneg([], p11(X)).
+% 	cneg_tr([], p11(X)).
 % no_p12(X):-
-% 	cneg([], p12(X)).
+% 	cneg_tr([], p12(X)).
 % no_p13(X):-
-% 	cneg([], p13(X)).
+% 	cneg_tr([], p13(X)).
 % no_p14(X):-
-% 	cneg([], p14(X)).
+% 	cneg_tr([], p14(X)).
 
 % no_p15(X):- 
-% 	cneg([], p15(X)). 
+% 	cneg_tr([], p15(X)). 
 
 % no_p16(X):-
-% 	cneg([], p16(X)).
+% 	cneg_tr([], p16(X)).
 
 % no_p17(X):-
-% 	cneg([], p17(X)). 
+% 	cneg_tr([], p17(X)). 
 % no_p18(X):-
-% 	cneg([], p18(X)). 
+% 	cneg_tr([], p18(X)). 
 % no_p19(X):-
-% 	cneg([], p19(X)). 
+% 	cneg_tr([], p19(X)). 
   
 % no_select(H,I,J):-
-% 	cneg([], select(H,I,J)).
+% 	cneg_tr([], select(H,I,J)).
  
 % no_no_attack(H,L):-
-%        	cneg([], no_attack(H,L)).
+%        	cneg_tr([], no_attack(H,L)).
 
 % selectK(s(0),[s(0)],[]).
 
@@ -233,14 +233,14 @@ greater(s(X),s(Y)):-
 % 	get(H),
 % 	put([],[H],X).
 % no_p20(X):-
-% 	cneg([], p20(X)).
+% 	cneg_tr([], p20(X)).
 % p21(X):-
 % 	get(H),
 % 	put([],H,X).
 % no_p21(X):-
-% 	cneg([], p21(X)).
+% 	cneg_tr([], p21(X)).
 % no_p22(X):-
-% 	cneg([], p22(X)).
+% 	cneg_tr([], p22(X)).
 
 % p22(X):-		   
 % 	queens_list(0,Z),
@@ -249,7 +249,7 @@ greater(s(X),s(Y)):-
 % 	queens1(J,[H],X).
 
 % no_p23(X):-
-% 	cneg([], p23(X)).
+% 	cneg_tr([], p23(X)).
 
 % p23(J):-		   
 % 	queens_list(0,Z),
@@ -257,7 +257,7 @@ greater(s(X),s(Y)):-
 % 	%queens1(J,[s(0)],X).
 
 % no_p24(X):-
-% 	cneg([], p24(X)).
+% 	cneg_tr([], p24(X)).
 
 % p24(J):-		   
 % 	get1(Z),
@@ -270,7 +270,7 @@ greater(s(X),s(Y)):-
 %         put1(Ys, Zs).
 
 % no_p25(X):-
-% 	cneg([], p25(X)).
+% 	cneg_tr([], p25(X)).
 
 % p25(J):-		   
 % 	get1(Z),
@@ -284,26 +284,26 @@ greater(s(X),s(Y)):-
 % 	select(s(0),[s(0)|Z],J).
 
 % no_p26(X):-
-% 	cneg([], p26(X)).
+% 	cneg_tr([], p26(X)).
 
 % no_select1(X,Y,Z):-
-% 	cneg([], select1(X,Y,Z)).
+% 	cneg_tr([], select1(X,Y,Z)).
 
 % no_p27(X):-
-% 	cneg([], p27(X)).
+% 	cneg_tr([], p27(X)).
  
 % p27(J):-		   
 % 	select(s(0),[s(0)],J). 
 
 % no_p28(X):-
-% 	cneg([], p28(X)).
+% 	cneg_tr([], p28(X)).
 
 % p28(J):-		   
 % 	get1(Z),
 % 	select(s(0),[s(0)|Z],J).
 
 % no_p17b(X):-
-% 	cneg([], p17b(X)).
+% 	cneg_tr([], p17b(X)).
 
 % p17b(X):-	   
 % 	select(H,[s(0)],J),
@@ -322,7 +322,7 @@ greater(s(X),s(Y)):-
 %         queens2(NewUnplaced, [Q|Placed], Qs).
  
 % no_queens2(X,Y,Z):-
-%  	cneg([], queens2(X,Y,Z)).
+%  	cneg_tr([], queens2(X,Y,Z)).
 
 % queens3([], Qs, Qs).
 % queens3([X], Placed, Qs):-
@@ -330,22 +330,22 @@ greater(s(X),s(Y)):-
 %         queens3([], [X|Placed], Qs).
  
 % no_queens3(X,Y,Z):-
-%  	cneg([], queens3(X,Y,Z)).
+%  	cneg_tr([], queens3(X,Y,Z)).
 
 % queens4([], Qs, Qs).
 % queens4([X], Placed, Qs):-
 %         queens4([], [X|Placed], Qs).
  
 % no_queens4(X,Y,Z):-
-%  	cneg([], queens4(X,Y,Z)).
+%  	cneg_tr([], queens4(X,Y,Z)).
 
 % queens5([X], Placed, [X|Placed]):-
 %         no_attack(X, Placed).
  
 % no_queens5(X,Y,Z):-
-%  	cneg([], queens5(X,Y,Z)).
+%  	cneg_tr([], queens5(X,Y,Z)).
 
-% no_no_attack_down(X,Y,Z):- cneg([], no_attack_down(X,Y,Z)).
+% no_no_attack_down(X,Y,Z):- cneg_tr([], no_attack_down(X,Y,Z)).
 
 % nad(Y,Nb,Queen):-
 % 	greater(Y,Nb),
@@ -357,32 +357,32 @@ greater(s(X),s(Y)):-
 % 	Y=Nb,
 % 	dist(Queen,0).
 
-% no_nad(X,Y,Z):- cneg([], nad(X,Y,Z)).
+% no_nad(X,Y,Z):- cneg_tr([], nad(X,Y,Z)).
 
 
 % p(Y):-
 % 	dist(Y,s(0)),
 % 	add(s(0),s(0),Y).
 
-% no_p(Y):- cneg([], p(Y)).
+% no_p(Y):- cneg_tr([], p(Y)).
 
 % p1(X):- %% Son libres 
 % 	dist(Y,s(0)),
 % 	add(s(0),s(0),Y).
 
-% no_p1(Y):- cneg([], p1(Y)). 
+% no_p1(Y):- cneg_tr([], p1(Y)). 
 
 % p2(X):- %% Son libres
 % 	dist(Y,s(0)),
 % 	add(0,0,Y).
 
-% no_p2(Y):- cneg([], p2(Y)).
+% no_p2(Y):- cneg_tr([], p2(Y)).
 
 % p3(X):- %% Son libres
 % 	dist(Y,s(0)),
 % 	add(0,s(0),Y).
 
-% no_p3(Y):- cneg([], p3(Y)).
+% no_p3(Y):- cneg_tr([], p3(Y)).
 
  
 % queens6([], Qs, Qs).
@@ -392,7 +392,7 @@ greater(s(X),s(Y)):-
  
 
 % no_queens6(X,Y,Z):-
-%  	cneg([], queens6(X,Y,Z)).
+%  	cneg_tr([], queens6(X,Y,Z)).
 
 
 
@@ -400,44 +400,44 @@ greater(s(X),s(Y)):-
 %         select(Q, [X], []).
  
 % no_queens7(X,Y,Z):-
-%  	cneg([], queens7(X,Y,Z)). %%% No funciona
+%  	cneg_tr([], queens7(X,Y,Z)). %%% No funciona
 
 % queens8([X], Placed, [X|Placed]):-  %%% funciona
 %         select(X, [X], []).
  
 % no_queens8(X,Y,Z):-
-%  	cneg([], queens8(X,Y,Z)).
+%  	cneg_tr([], queens8(X,Y,Z)).
 
 
 % queens9([X], Placed, [Q|Placed]):-
 %         select(Q, [X], NewUnplaced).
 
 % no_queens9(X,Y,Z):-
-%  	cneg([], queens9(X,Y,Z)).
+%  	cneg_tr([], queens9(X,Y,Z)).
  
 % select2(X, [X|Ys], Ys).
 
 % select3(X, [Y|Ys], [Y|Zs]):-
 %         select3(X, Ys, Zs).
 
-% no_select2(X,Y,Z):- cneg([], select2(X,Y,Z)).
-% no_select3(X,Y,Z):- cneg([], select3(X,Y,Z)).
+% no_select2(X,Y,Z):- cneg_tr([], select2(X,Y,Z)).
+% no_select3(X,Y,Z):- cneg_tr([], select3(X,Y,Z)).
 
 
 % select4(X, [Y|Ys], [Y|Zs]):-
 %         select4(X, Ys, Zs).
 % select4(X, [X|Ys], Ys).
-% no_select4(X,Y,Z):- cneg([], select4(X,Y,Z)).
+% no_select4(X,Y,Z):- cneg_tr([], select4(X,Y,Z)).
 
 % r(e):- 3=4.
 % r(o):- 5=5.
 
 
-% no_no_attack1(X,Y,Z):- cneg([], no_attack1(X,Y,Z)).
+% no_no_attack1(X,Y,Z):- cneg_tr([], no_attack1(X,Y,Z)).
 
 
 
-% no_add(X,Y,Z):- cneg([], add(X,Y,Z)).
+% no_add(X,Y,Z):- cneg_tr([], add(X,Y,Z)).
  
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -450,7 +450,7 @@ greater(s(X),s(Y)):-
 
 
 % no_queens11(N,L,Q):-
-%  	cneg([], queens11(N,L,Q)).
+%  	cneg_tr([], queens11(N,L,Q)).
 
 % no_attack11(s(0),[]).
 % no_attack11(s(s(0)),[]).
@@ -465,7 +465,7 @@ greater(s(X),s(Y)):-
 %         queens_list1(N1, Ns).
 
 % no_queens_list1(N,Q):-
-%  	cneg([], queens_list1(N,Q)).
+%  	cneg_tr([], queens_list1(N,Q)).
 
 
 % q1(N, Qs):-
@@ -473,7 +473,7 @@ greater(s(X),s(Y)):-
 %         queens12(Ns, [], Qs).    
 
 % no_q1(N,Q):-  
-%  	cneg([], q1(N,Q)).
+%  	cneg_tr([], q1(N,Q)).
 
 % queens12([], Qs, Qs).
 % queens12([X|Unplaced], _Placed, _Qs).
@@ -486,7 +486,7 @@ greater(s(X),s(Y)):-
 % q13([_|_]).
 
 % no_q2(N):-
-%   	cneg([], q2(N)).
+%   	cneg_tr([], q2(N)).
 
 
 
@@ -505,7 +505,7 @@ greater(s(X),s(Y)):-
  
 
 % no_q3(N):-
-%   	cneg([], q3(N)).
+%   	cneg_tr([], q3(N)).
 
 % q4(N):-
 % 	zero(_),
@@ -514,7 +514,7 @@ greater(s(X),s(Y)):-
 %       	uno(N).
  
 % no_q4(N):-
-%   	cneg([], q4(N)). 
+%   	cneg_tr([], q4(N)). 
   
 
 % list([]). 
@@ -523,12 +523,12 @@ greater(s(X),s(Y)):-
 % exist_list :- list(_X).
  
 % no_exist_list :-
-%   	cneg([], exist_list).
+%   	cneg_tr([], exist_list).
   
 % zero_list :- list(0). 
 
 % no_zero_list :-
-%           	cneg([], zero_list).  
+%           	cneg_tr([], zero_list).  
  
 
 % queens13([], Qs, Qs).
@@ -537,7 +537,7 @@ greater(s(X),s(Y)):-
 %         queens13([], [Q|P], Qs).
   
 % no_queens13(X,Y,Z):- 
-%        	cneg([], queens13(X,Y,Z)).
+%        	cneg_tr([], queens13(X,Y,Z)).
 
 
 % predf([]).
@@ -546,19 +546,19 @@ greater(s(X),s(Y)):-
 % 	predf(L).
 
 % no_predf(N):-
-%   	cneg([], predf(N)). 
+%   	cneg_tr([], predf(N)). 
 
-% goal1(S) :- cneg_aux((subst(s(0),s(0),N1),
+% goal1(S) :- cneg_tr_aux((subst(s(0),s(0),N1),
 %                                       queens_list(N1,Ns),
 %                                       select(s(0),[s(0)|Ns],N),
 %                                       queens1(N,[s(0)],S)),[S],[N,N1,Ns]).
 
-% goal2(S) :- cneg_aux((subst(0,0,N1),
+% goal2(S) :- cneg_tr_aux((subst(0,0,N1),
 %                                       queens_list(N1,Ns),
 %                                       select(s(0),[s(0)|Ns],N),
 %                                       queens1(N,[s(0)],S)),[S],[N,N1,Ns]).
 
-% goal3(S) :- cneg_aux((subst(s(0),s(0),N1),
+% goal3(S) :- cneg_tr_aux((subst(s(0),s(0),N1),
 %                                       queens_list(0,Ns),
 %                                       select(s(0),[s(0)|Ns],N),
 %                                       queens1(N,[s(0)],S)),[S],[N,N1,Ns]).
@@ -587,7 +587,7 @@ greater(s(X),s(Y)):-
 % 	p91(X),
 % 	X=s(Y).
 
-% no_p5(X,Y):- cneg([], p5(X,Y)).
+% no_p5(X,Y):- cneg_tr([], p5(X,Y)).
 
 % queens10(N, Qs):- 
 %         queens_list10(N, Ns),
@@ -600,9 +600,9 @@ greater(s(X),s(Y)):-
 % queens_list10(N, [s(s(0)),s(0)]).
 % queens110( [], [], Qs). 
 
-% no_queens10(X,Y):- cneg([], queens10(X,Y)).
+% no_queens10(X,Y):- cneg_tr([], queens10(X,Y)).
 
-% no_queens14(X,Y):- cneg([], queens14(X,Y)). 
+% no_queens14(X,Y):- cneg_tr([], queens14(X,Y)). 
 
 
 % p6(X,Y,Z,W):-
@@ -610,9 +610,9 @@ greater(s(X),s(Y)):-
 % 	Y=Z,
 % 	W=s(X).
 
-% no_p6(X,Y,Z,W):- cneg([], p6(X,Y,Z,W)).
+% no_p6(X,Y,Z,W):- cneg_tr([], p6(X,Y,Z,W)).
 
-% no_number1(X):- cneg([], number1(X)).
+% no_number1(X):- cneg_tr([], number1(X)).
 
 
 
@@ -708,30 +708,30 @@ positive(s(X)):-
 % 	r3(X,Y),
 % 	r3(Y,Z).
 
-% not_odd_number(X):- cneg([], odd(X)).   
-% no_mi_number(X):- cneg([], mi_number(X)).
-% no_boole(X):- cneg([], boole(X)).
-% no_binary_list(X):-cneg([], binary_list(X)). 
-% no_dist_list(X):-cneg([], dist_list(X)).
-% no_p(V1,V2,VX,VY):-cneg([], p(V1,V2,VX,VY)). 
-% no_q(Z):-cneg([], q(Z)).
-% no_r(X,Y):-cneg([], r(X,Y)). 
-% no_pp1(X):-cneg([], pp1(X)). 
-% no_pp2(X):-cneg([], pp2(X)).
-% no_pp3(X):-cneg([], pp3(X)).
-% no_p4(X,Y):-cneg([], p4(X,Y)).
-% no_positive(X):-cneg([], positive(X)).
-% no_natural(X):-cneg([], natural(X)).
-% no_parent(X,Y):-cneg([], parent(X,Y)). 
-% no_grandparent(X,Y):-cneg([], grandparent(X,Y)). 
-% no_pred2(X,Y):-cneg([], pred2(X,Y)).
-% no_pred1(X):-cneg([], pred1(X)).
-% no_iguales(X,Y):-cneg([], iguales(X,Y)).  
-% no_r1(X,Y):-cneg([], r1(X,Y)).
-% no_r2(X,Y):-cneg([], r2(X,Y)).
-% no_r3(X,Y):-cneg([], r3(X,Y)).
-% no_r4(X,Y):-cneg([], r4(X,Y)).
-% no_r5(X,Y,Z):-cneg([], r5(X,Y,Z)).
+% not_odd_number(X):- cneg_tr([], odd(X)).   
+% no_mi_number(X):- cneg_tr([], mi_number(X)).
+% no_boole(X):- cneg_tr([], boole(X)).
+% no_binary_list(X):-cneg_tr([], binary_list(X)). 
+% no_dist_list(X):-cneg_tr([], dist_list(X)).
+% no_p(V1,V2,VX,VY):-cneg_tr([], p(V1,V2,VX,VY)). 
+% no_q(Z):-cneg_tr([], q(Z)).
+% no_r(X,Y):-cneg_tr([], r(X,Y)). 
+% no_pp1(X):-cneg_tr([], pp1(X)). 
+% no_pp2(X):-cneg_tr([], pp2(X)).
+% no_pp3(X):-cneg_tr([], pp3(X)).
+% no_p4(X,Y):-cneg_tr([], p4(X,Y)).
+% no_positive(X):-cneg_tr([], positive(X)).
+% no_natural(X):-cneg_tr([], natural(X)).
+% no_parent(X,Y):-cneg_tr([], parent(X,Y)). 
+% no_grandparent(X,Y):-cneg_tr([], grandparent(X,Y)). 
+% no_pred2(X,Y):-cneg_tr([], pred2(X,Y)).
+% no_pred1(X):-cneg_tr([], pred1(X)).
+% no_iguales(X,Y):-cneg_tr([], iguales(X,Y)).  
+% no_r1(X,Y):-cneg_tr([], r1(X,Y)).
+% no_r2(X,Y):-cneg_tr([], r2(X,Y)).
+% no_r3(X,Y):-cneg_tr([], r3(X,Y)).
+% no_r4(X,Y):-cneg_tr([], r4(X,Y)).
+% no_r5(X,Y,Z):-cneg_tr([], r5(X,Y,Z)).
 
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -752,12 +752,12 @@ sublist([El|Sub],List):-
 	prefix(P,List),
 	suffix([El|Sub],P).
 
-no_append1(X,Y,Z):-cneg([], append1(X,Y,Z)).
-no_prefix(P,L):-cneg([], prefix(P,L)).
-no_suffix(S,L):-cneg([], suffix(S,L)).
-no_sublist(L1,L2):-cneg([], sublist(L1,L2)).
+no_append1(X,Y,Z):-cneg_tr([], append1(X,Y,Z)).
+no_prefix(P,L):-cneg_tr([], prefix(P,L)).
+no_suffix(S,L):-cneg_tr([], suffix(S,L)).
+no_sublist(L1,L2):-cneg_tr([], sublist(L1,L2)).
 
-% no:-cneg([], ).
+% no:-cneg_tr([], ).
 
 
 
@@ -770,7 +770,7 @@ even(0).
 even(s(s(X))):-
 	even(X).
 
-no_even(X):- cneg([], even(X)).
+no_even(X):- cneg_tr([], even(X)).
 
 % eq(0,0).
 % eq(s(X),s(Y)):-
@@ -804,5 +804,5 @@ grandparent2(Y,X):-
     parent2(Y,Z),
     parent2(Z,X).
 
-no_grandparent2(Y,X):- cneg([], grandparent2(Y,X)).
+no_grandparent2(Y,X):- cneg_tr([], grandparent2(Y,X)).
 
