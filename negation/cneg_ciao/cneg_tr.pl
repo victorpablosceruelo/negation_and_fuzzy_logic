@@ -461,6 +461,9 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	args_for_cneg_tr(New_Arity, Neg_Atom, GoalVars, Result),
 	copy_args(Arity, Atom, Neg_Atom).
 
+negate_atom(Atom, GoalVars, Result, Atom) :-
+	debug_msg(1, 'negate_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -506,12 +509,16 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	functor_local(DN_Atom, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[GoalVars |[ UQV |[Result ]]]]]).	
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	functor(Atom, Name, Arity), !,
+	goal_is_not_conj_disj_eq_diseq_dneg(Atom), !,
+	functor(Atom, Name, Arity), 
 	New_Arity is Arity + 2,
 	generate_double_negation_name(Name, New_Name),
 	functor(DN_Atom, New_Name, New_Arity),
 	args_for_cneg_tr(New_Arity, DN_Atom, GoalVars, Result),
 	copy_args(Arity, Atom, DN_Atom).
+
+double_negation_atom(Atom, GoalVars, Result, Atom) :-
+	debug_msg(1, 'double_negation_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

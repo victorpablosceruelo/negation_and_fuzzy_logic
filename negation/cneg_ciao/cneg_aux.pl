@@ -330,14 +330,14 @@ goal_is_not_conj_disj_eq_diseq_dneg(Goal) :-
 	Name \== 'cneg_rt'.
 
 goal_is_negation(Goal, UQV, SubGoal) :-
-	valid_names_for_negation_preds(Name), !,
-	functor(Goal, Name, 2),
+	valid_names_for_negation_preds(Name), 
+	functor(Goal, Name, 2), !,
 	arg(1, Goal, UQV),
 	arg(2, Goal, SubGoal).
 
-valid_names_for_negation_preds('cneg') :- !.
-valid_names_for_negation_preds('cneg_tr') :- !.
-valid_names_for_negation_preds('cneg_rt') :- !.
+valid_names_for_negation_preds('cneg').
+valid_names_for_negation_preds('cneg_tr').
+valid_names_for_negation_preds('cneg_rt').
 
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),

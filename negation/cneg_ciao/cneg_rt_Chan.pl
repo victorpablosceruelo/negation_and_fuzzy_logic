@@ -104,14 +104,14 @@ compute_frontier(Goal, Frontier_Out) :-
 %	debug_msg(0, 'compute_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 %	debug_msg(0, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-%	debug_msg_list(0, 'Frontier_Tmp_1', Frontier_Tmp_1),
+	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
 %	debug_msg(0, 'Frontier_Out', Frontier_Out), 
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
-compute_frontier(Goal, [true]) :-
-	debug_msg(1, 'ERROR: compute_neg_frontier :: (Goal)', (Goal)), 
+compute_frontier(Goal, [fail]) :-
+	debug_msg(1, 'ERROR: Not found frontier for Goal', Goal), 
 	nl, !. % Backtracking is forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -491,7 +491,7 @@ split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 negate_formula([], [], [], [], _Proposal, _GoalVars, _ImpVars, true) :- !. % Optimization
 negate_formula(E, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, Neg_E_IE_NIE) :-
-%	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
+	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
  	negate_IE_NIE_exp(IE_NIE_exp, Proposal, ImpVars, Neg_IE_NIE_exp),
 	negate_imp_form(NIE_imp, Proposal, ImpVars, Neg_IE_NIE_exp, Neg_NIE_imp_IE_NIE_exp),
 	negate_imp_form(IE_imp, Proposal, ImpVars, Neg_NIE_imp_IE_NIE_exp, Neg_IE_NIE),
@@ -537,6 +537,9 @@ combine_negated(Neg_Formula_1, Keep_Formula_1, Neg_Formula_2, Neg_Formula) :-
 
 % negate_I(I,ImpVars,Sol) obtains in Sol a solution of negating I
 negate_imp_atom([], _Proposal, _ImpVars, [], []) :- !. % Obvious.
+negate_imp_atom(true, _Proposal, _ImpVars, fail, true):- !. % Trivial predicates
+negate_imp_atom(fail, _Proposal, _ImpVars, true, fail):- !. % Trivial predicates
+
 negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
 	goal_is_equality(Formula, T1, T2, UQV),
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
