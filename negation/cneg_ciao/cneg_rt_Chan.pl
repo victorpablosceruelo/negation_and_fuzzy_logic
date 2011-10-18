@@ -240,10 +240,9 @@ negate_frontier(Frontier_In, Proposal, GoalVars, Result):-
 rebuild_conjunction_of_goals([], [], []) :- !. % Empty elements when re-joining
 rebuild_conjunction_of_goals(Goals, [], Goals) :- !. % Empty element when re-joining
 rebuild_conjunction_of_goals([], Goals, Goals) :- !. % Empty element when re-joining
-rebuild_conjunction_of_goals(Goals_1, Goals_2, Goals) :- 
+rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- 
 	Goals_1 \== [], 
-	Goals_2 \== [], !,
-	goal_is_conjunction(Goals, Goals_1, Goals_2).
+	Goals_2 \== [], !.
 
 split_frontier_contents(frontier(E_In, IE_In, NIE_In), E_In, IE_In, NIE_In).
 
@@ -449,7 +448,9 @@ remove_from_IE_irrelevant_disequalities(IE_In, _ImpVars_and_RelVars, _IE_Out) :-
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 split_IE_NIE_between_imp_and_exp(IE, NIE, ImpVars, IE_imp, NIE_imp, IE_NIE_exp):-
 	split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp),
+	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)', split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)),
 	split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp),
+	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)', split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)),
 	rebuild_conjunction_of_goals(IE_exp, NIE_exp, IE_NIE_exp).
 
 % split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
@@ -460,8 +461,8 @@ split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE
 	goal_is_conjunction(IE_or_NIE, IE_or_NIE_1, IE_or_NIE_2), !,
 	split_ie_or_nie_between_imp_and_exp(IE_or_NIE_1, ImpVars, IE_or_NIE_imp_1, IE_or_NIE_exp_1),
 	split_ie_or_nie_between_imp_and_exp(IE_or_NIE_2, ImpVars, IE_or_NIE_imp_2, IE_or_NIE_exp_2),
-	rebuild_conjunction_of_goals(IE_or_NIE_imp, IE_or_NIE_imp_1, IE_or_NIE_imp_2),
-	rebuild_conjunction_of_goals(IE_or_NIE_exp, IE_or_NIE_exp_1, IE_or_NIE_exp_2).
+	rebuild_conjunction_of_goals(IE_or_NIE_imp_1, IE_or_NIE_imp_2, IE_or_NIE_imp),
+	rebuild_conjunction_of_goals(IE_or_NIE_exp_1, IE_or_NIE_exp_2, IE_or_NIE_exp).
 
 split_ie_or_nie_between_imp_and_exp(IE_or_NIE, _ImpVars, _IE_or_NIE_imp, _IE_or_NIE_exp) :-
 	goal_is_disjunction(IE_or_NIE, _IE_or_NIE_1, _IE_or_NIE_2), !,
