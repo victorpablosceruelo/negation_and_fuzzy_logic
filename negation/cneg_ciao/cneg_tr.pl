@@ -447,12 +447,13 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
-	functor_local(Atom, 'cneg', 2, [UQV |[ Arg ]]), !,
+	goal_is_negation(Atom, UQV, SubGoal), !,
 	functor_local(Op_Append, 'append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
 	Neg_Atom = (Op_Append, Neg_Atom_Aux),
-	double_negation_atom(Arg, New_GoalVars, Result, Neg_Atom_Aux).
+	double_negation_atom(SubGoal, New_GoalVars, Result, Neg_Atom_Aux).
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+	goal_is_not_conj_disj_eq_diseq_dneg(Atom), !,
 	functor(Atom, Name, Arity), !,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	New_Arity is Arity + 2, 
@@ -493,8 +494,8 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	double_negation_atom(Disj_2, GoalVars, Result, DN_Disj_2). 
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	functor_local(Atom, 'cneg', 2, [_Unconfigured_UQV |[ Arg ]]), !,
-	negate_atom(Arg, GoalVars, Result, DN_Atom). % Problematic
+	goal_is_negation(Atom, _Unconfigured_UQV, SubGoal), !, 
+	negate_atom(SubGoal, GoalVars, Result, DN_Atom). % Problematic
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, UQV), !,
