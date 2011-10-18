@@ -72,12 +72,24 @@ debug_msg_nl(Level) :-
 	\+(debug_msg_is_on(Level)).
 
 debug_msg_list(Level, Msg, []) :-
-	debug_msg(Level, Msg, []),
+	debug_msg_list_aux(Level, Msg, []),
 	!. % No backtracking allowed.
 debug_msg_list(Level, Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
-	debug_msg(Level, Msg, Cl),
+	debug_msg_list_aux(Level, Msg, Cl),
 	debug_msg_list(Level, Msg, Cls).
+
+debug_msg_list_aux(Level, Msg_Atom, Cl) :-
+        atom(Msg_Atom),
+        atom_codes(Msg_Atom, Msg_Chars),
+	append(Msg_Chars, " (list) ", New_Msg_Chars),
+        atom_codes(New_Msg_Atom, New_Msg_Chars), 
+        atom(New_Msg_Atom), !,
+	debug_msg(Level, New_Msg_Atom, Cl).
+debug_msg_list_aux(Level, Msg_String, Cl) :-
+	string(Msg_String),
+	append(Msg_String, " (list) ", New_Msg_String),
+	debug_msg(Level, New_Msg_String, Cl).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

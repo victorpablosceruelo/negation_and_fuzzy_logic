@@ -85,6 +85,9 @@ cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 call_to(Predicate) :- 
 	debug_msg(1, 'call_to :: Predicate', Predicate), 
 	call(Predicate).
+call_to(Predicate) :- 
+	debug_msg(1, 'FAILED call_to :: Predicate', Predicate),
+	debug_msg_nl(1), !, fail. 
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA

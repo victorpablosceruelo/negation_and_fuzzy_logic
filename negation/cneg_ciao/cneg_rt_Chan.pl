@@ -35,6 +35,7 @@ cneg_rt_Chan(UQV, Goal):-
 	debug_msg_list(1, 'cneg_rt_Chan :: Frontier', Frontier),
 	negate_set_of_frontiers(Frontier, 'Chan', GoalVars, Result),
 	debug_msg(1, 'cneg_rt_Chan :: Result', Result),
+	debug_msg_nl(1),
 	call_to(Result).
 
 cneg_rt_New(UQV, Goal):-
@@ -44,6 +45,7 @@ cneg_rt_New(UQV, Goal):-
 	debug_msg_list(1, 'cneg_rt_New :: Frontier', Frontier),
 	negate_set_of_frontiers(Frontier, 'New', GoalVars, Result),
 	debug_msg(1, 'cneg_rt_New :: Result', Result),
+	debug_msg_nl(1),
 	call_to(Result).
 
 
@@ -104,7 +106,7 @@ compute_frontier(Goal, Frontier_Out) :-
 %	debug_msg(0, 'compute_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 %	debug_msg(0, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
+%	debug_msg_list(1, 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
 %	debug_msg(0, 'Frontier_Out', Frontier_Out), 
 	!. % Backtracking is forbidden.
@@ -112,7 +114,7 @@ compute_frontier(Goal, Frontier_Out) :-
 % And at last report an error if it was impossible to found a valid entry.
 compute_frontier(Goal, [fail]) :-
 	debug_msg(1, 'ERROR: Not found frontier for Goal', Goal), 
-	nl, !. % Backtracking is forbidden.
+	debug_msg_nl(1), !. % Backtracking is forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -448,9 +450,9 @@ remove_from_IE_irrelevant_disequalities(IE_In, _ImpVars_and_RelVars, _IE_Out) :-
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 split_IE_NIE_between_imp_and_exp(IE, NIE, ImpVars, IE_imp, NIE_imp, IE_NIE_exp):-
 	split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp),
-	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)', split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)),
+%	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)', split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)),
 	split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp),
-	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)', split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)),
+%	debug_msg(1, 'split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)', split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)),
 	rebuild_conjunction_of_goals(IE_exp, NIE_exp, IE_NIE_exp).
 
 % split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
@@ -492,7 +494,7 @@ split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE
 % GoalVars, ImpVars and ExpVars are set of useful variables 
 negate_formula([], [], [], [], _Proposal, _GoalVars, _ImpVars, true) :- !. % Optimization
 negate_formula(E, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, Neg_E_IE_NIE) :-
-	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
+%	debug_msg(1, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
  	negate_IE_NIE_exp(IE_NIE_exp, Proposal, ImpVars, Neg_IE_NIE_exp),
 	negate_imp_form(NIE_imp, Proposal, ImpVars, Neg_IE_NIE_exp, Neg_NIE_imp_IE_NIE_exp),
 	negate_imp_form(IE_imp, Proposal, ImpVars, Neg_NIE_imp_IE_NIE_exp, Neg_IE_NIE),

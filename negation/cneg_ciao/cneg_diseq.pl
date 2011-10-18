@@ -304,7 +304,7 @@ restore_attributes(Diseqs_In, All_EQV, All_UQV) :-
 	cneg_aux:varsbag(All_EQV, [], [], EQV),
 	cneg_aux:varsbag(All_UQV, EQV, [], UQV), % Exhaustive sets, please.
 	prepare_diseqs_for_restore(Diseqs_In, Diseqs, EQV, UQV, [], Affected_Vars),
-	debug_msg(1, 'restore_attributes_vars(Affected_Vars, Diseqs)', (Affected_Vars, Diseqs)),
+%	debug_msg(1, 'restore_attributes_vars(Affected_Vars, Diseqs)', (Affected_Vars, Diseqs)),
 	restore_attributes_vars(Affected_Vars, Diseqs).
 
 prepare_diseqs_for_restore([], [], _EQV, _UQV, Affected_Vars, Affected_Vars) :- !.
@@ -649,11 +649,11 @@ cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :-
 	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
 	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
 
-	debug_msg(1, 'cneg_diseq_eqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
+	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	disequality_contents(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality], Can_Fail, Result),
 
-	debug_msg(1, 'cneg_diseq_eqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
+	debug_msg(1, 'cneg_diseq_eqv_uqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -675,7 +675,7 @@ cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In, Result) :-
 	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
 	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
 
-	debug_msg(1, 'cneg_eq_eqv [in] :: (T1, =, T2), ---, (EQV_In, Can_Fail)', ((T1, '=', T2), '---', (EQV, UQV))),
+	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV_In, Can_Fail)', ((T1, '=', T2), '---', (EQV, UQV))),
 	!,
 	(
 	    ( 
