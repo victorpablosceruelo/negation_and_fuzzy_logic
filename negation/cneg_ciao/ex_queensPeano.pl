@@ -800,9 +800,9 @@ natural1(s(X)):-
 parent2(bob,mary).
 parent2(mary,joan).
 
-grandparent2(Y,X):- 
-    parent2(Y,Z),
-    parent2(Z,X).
+grandparent2(X,Y):- 
+    parent2(X,Z),
+    parent2(Z,Y).
 
 no_grandparent2(Y,X):- cneg_tr([], grandparent2(Y,X)).
 

@@ -395,9 +395,9 @@ and_between_statuses('fail', 'fail', 'fail').
 % just for debug.
 simplify_disequation(Diseqs, Answer, EQV, Can_Fail, Result) :-
 	debug_msg_nl(0),
-	debug_msg(1, 'simplify_disequation :: (Diseqs, ---, EQV, Can_Fail)', (Diseqs, '---', EQV, Can_Fail)),
+	debug_msg(0, 'simplify_disequation :: (Diseqs, ---, EQV, Can_Fail)', (Diseqs, '---', EQV, Can_Fail)),
 	simplify_disequation_aux(Diseqs, Answer, EQV, Can_Fail, Result),
-	debug_msg(1, 'simplify_disequation :: (Result, Answer)', (Result, Answer)),
+	debug_msg(0, 'simplify_disequation :: (Result, Answer)', (Result, Answer)),
 	debug_msg_nl(0).
 
 % For the case we do not have a disequality to simplify.
@@ -675,7 +675,7 @@ cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In, Result) :-
 	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
 	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
 
-	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV_In, Can_Fail)', ((T1, '=', T2), '---', (EQV, UQV))),
+	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
 	!,
 	(
 	    ( 

@@ -29,25 +29,77 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_rt_Chan(UQV, Goal):-
-	debug_msg(1, 'cneg_rt_Chan :: (UQV, Goal)', (UQV, Goal)),
-	varsbag(Goal, UQV, [], GoalVars),
-	compute_frontier(Goal, Frontier),
-	debug_msg_list(1, 'cneg_rt_Chan :: Frontier', Frontier),
-	negate_set_of_frontiers(Frontier, 'Chan', GoalVars, Result),
-	debug_msg(1, 'cneg_rt_Chan :: Result', Result),
-	debug_msg_nl(1),
-	call_to(Result).
+	cneg_rt_Aux(UQV, Goal, 'Chan').
 
 cneg_rt_New(UQV, Goal):-
-	debug_msg(1, 'cneg_rt_New :: (UQV, Goal)', (UQV, Goal)),
-	varsbag(Goal, UQV, [], GoalVars),
-	compute_frontier(Goal, Frontier),
-	debug_msg_list(1, 'cneg_rt_New :: Frontier', Frontier),
-	negate_set_of_frontiers(Frontier, 'New', GoalVars, Result),
-	debug_msg(1, 'cneg_rt_New :: Result', Result),
+	cneg_rt_Aux(UQV, Goal, 'New').
+
+cneg_rt_Aux(UQV, Goal, Proposal) :-
+	debug_msg(1, 'cneg_rt_Aux :: (UQV, Goal, Proposal)', (UQV, Goal, Proposal)),
+	varsbag(UQV, [], [], Real_UQV),
+	varsbag(Goal, Real_UQV, [], GoalVars),
+	compute_frontier(Goal, Real_Goal, Frontier_Tmp), !,
+	adequate_frontier(Frontier_Tmp, Real_Goal, Real_UQV, Frontier), !,
+	debug_msg(1, 'cneg_rt_Aux :: (UQV, Real_Goal)', (UQV, Real_Goal)),
+	debug_msg_list(1, 'cneg_rt_Aux :: Frontier', Frontier),
+	negate_set_of_frontiers(Frontier, Proposal, GoalVars, Result), !,
+	debug_msg(1, 'cneg_rt_Aux :: Result', Result),
 	debug_msg_nl(1),
 	call_to(Result).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Structure to manage all the info about the frontier in an easy way.
+frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
+
+% Predicate to change all the heads in a frontier.
+change_heads([], _New_Head, []) :- !.
+change_heads([F_In | Frontier_Tmp], New_Head, [F_Out | Frontier_Out]) :-
+	frontier_contents(F_In, _Old_Head, Body, FrontierTest),
+	frontier_contents(F_Out, New_Head, Body, FrontierTest),
+	change_heads(Frontier_Tmp, New_Head, Frontier_Out).
+
+% combine_frontiers(F1,F2,F3) returns F3 that is the resulting frontier
+% from combining the frontiers F1 and F2 in all possible ways.
+combine_frontiers([],_F2,[]):-!.
+combine_frontiers([F1_1 | More_F1], F2, F3):-
+        combine_frontier_aux(F1_1, F2, F3_1),
+        combine_frontiers(More_F1, F2, More_F3),
+        cneg_aux:append(F3_1, More_F3, F3).
+
+% combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
+% the result of combining F1_1 with each element of F2.
+combine_frontier_aux(_F1_1, [], []).
+combine_frontier_aux(F1_1, [F2_1 | More_F2], [F3 | More_F3]):-
+	frontier_contents(F1_1, F1_1_Head, F1_1_Body, F1_1_F_Test),
+	frontier_contents(F2_1, F2_1_Head, F2_1_Body, F2_1_F_Test),
+	frontier_contents(F3, ((F1_1_Head), (F2_1_Head)), ((F1_1_Body), (F2_1_Body)), ((F1_1_F_Test), (F2_1_F_Test))),
+        combine_frontier_aux(F1_1, More_F2, More_F3).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+adequate_frontier([], _Goal, _Real_UQV, []) :- !.
+adequate_frontier([F_In | Frontier_In], Goal, Real_UQV, [F_Out | Frontier_Out]) :-
+	adequate_frontier_aux(Goal, Real_UQV, F_In, F_Out),
+	adequate_frontier(Frontier_In, Goal, Real_UQV, Frontier_Out).
+
+adequate_frontier_aux(Goal, Real_UQV, F_In, Body_Copy) :-
+	frontier_contents(F_In, Head, Body, _F_Test),
+	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
+	varsbag(Goal, Real_UQV, [], Goal_GoalVars), % Determine goalvars.
+	copy_term((Goal, Goal_GoalVars), (Goal_Copy, Goal_GoalVars_Copy)),
+	Goal_GoalVars = Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
+	Goal_Copy = Head_Copy, % Unify head and goal definitely
+	!. % Backtracking is forbidden.
+
+adequate_frontier_aux(Goal, Real_UQV, F_In, _Body_Copy) :-
+	debug_msg(1, 'ERROR: adequate_frontier_aux(Goal, Real_UQV, F_In)', (Goal, Real_UQV, F_In)),
+	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,43 +117,55 @@ cneg_rt_New(UQV, Goal):-
 %	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
-compute_frontier(Goal, Frontier) :-
+compute_frontier(Goal, Real_Goal, Frontier) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
-	compute_frontier(Tmp_Goal, Frontier).
+	compute_frontier(Tmp_Goal, Real_Goal, Frontier).
 
 % Manage true and fail ...
-compute_frontier('true', ['true']) :- !.
-compute_frontier('fail', ['fail']) :- !.
+compute_frontier('true', 'true', [F_Out]) :- !,
+	frontier_contents(F_Out, 'true', 'true', 'true').
+compute_frontier('fail', 'fail', [F_Out]) :- !,
+	frontier_contents(F_Out, 'fail', 'fail', 'true').
 
 % Now go for the disjunctions.
-compute_frontier(Goal, Frontier):- 
+compute_frontier(Goal, ((Real_G1) ; (Real_G2)), Frontier_Out):- 
 	goal_is_disjunction(Goal, G1, G2), !,
-	(
-	    compute_frontier(G1, Frontier)
-	;
-	    compute_frontier(G2, Frontier)
-	).
+	compute_frontier(G1, Real_G1, Frontier_G1),
+	compute_frontier(G2, Real_G2, Frontier_G2),
+	list_head(Frontier_G1, F_G1),
+	list_head(Frontier_G2, F_G2),
+	frontier_contents(F_G1, F_G1_Head, _F_G1_Body, _F_G1_F_Test),
+	frontier_contents(F_G2, F_G2_Head, _F_G2_Body, _F_G2_F_Test),
+	append(Frontier_G1, Frontier_G2, Frontier_Tmp),
+	change_heads(Frontier_Tmp, ((F_G1_Head) ; (F_G2_Head)), Frontier_Out).
 
 % Now go for the conjunctions.
-compute_frontier(Goal, Frontier):- 
+compute_frontier(Goal, ((Real_G1) , (Real_G2)), Frontier):- 
 	goal_is_conjunction(Goal, G1, G2), !,
-	compute_frontier(G1, Frontier_G1),
-	compute_frontier(G2, Frontier_G2),
+	compute_frontier(G1, Real_G1, Frontier_G1),
+	compute_frontier(G2, Real_G2, Frontier_G2),
 	combine_frontiers(Frontier_G1, Frontier_G2, Frontier).
 
 % Now go for the functors for equality and disequality.
-compute_frontier(Goal, Goal):- 
-	goal_is_disequality(Goal, _T1, _T2, _UQV), !.
+% None of them is managed yet, so just bypass them.
+compute_frontier(Goal, Real_Goal, [F_Out]) :- 
+	goal_is_disequality(Goal, T1, T2, UQV), !,
+	functor_local(Real_Goal, 'diseq_uqv', 3, [ T1 |[ T2 |[ UQV ]]]),
+	frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
-compute_frontier(Goal, Goal):- 
-	goal_is_equality(Goal, _T1, _T2, _UQV), !.
+compute_frontier(Goal, Real_Goal, [F_Out]) :- 
+	goal_is_equality(Goal, T1, T2, UQV), !,
+	functor_local(Real_Goal, 'eq_uqv', 3, [ T1 |[ T2 |[ UQV ]]]),
+	frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
-% Double negation is not managed yet. Forget it.
-compute_frontier(Goal, Goal):- 
-	goal_is_negation(Goal, _UQV, _SubGoal), !.
+% Double negation is not managed yet. Bypass it.
+compute_frontier(Goal, Real_Goal, [F_Out]) :- 
+	goal_is_negation(Goal, UQV, SubGoal), !,
+	functor_local(Real_Goal, 'cneg_rt', 2, [ UQV |[ SubGoal ]]),
+	frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
 % Now go for other functors stored in our database.
-compute_frontier(Goal, Frontier_Out) :-
+compute_frontier(Goal, Goal, Frontier_Out) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
 %	debug_msg(0, 'compute_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
@@ -112,16 +176,13 @@ compute_frontier(Goal, Frontier_Out) :-
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
-compute_frontier(Goal, [fail]) :-
+compute_frontier(Goal, Goal, []) :-
 	debug_msg(1, 'ERROR: Not found frontier for Goal', Goal), 
 	debug_msg_nl(1), !. % Backtracking is forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Structure to manage all the info about the frontier in an easy way.
-frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 
 look_for_the_relevant_clauses(Goal, Frontier) :-
 	functor(Goal, Name, Arity),  % Security
@@ -139,48 +200,25 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_frontier([], _Goal, Body_Acc, Body_Acc) :- !.
-simplify_frontier([Frontier | More_Frontier_In], Goal, Body_Acc, Body_Out) :-
-	frontier_contents(Frontier, Head, Body, Frontier_Test),
-	test_frontier_is_valid(Goal, Head, Frontier_Test), !,
-	debug_msg(0, 'simplify_frontier :: valid: ', Frontier),
-	simplify_frontier(More_Frontier_In, Goal, [Body | Body_Acc], Body_Out).
-simplify_frontier([Frontier|More_Frontier_In], Goal, Body_Acc, Body_Out) :-
-	debug_msg(0, 'simplify_frontier :: not valid: ', Frontier),
-	simplify_frontier(More_Frontier_In, Goal, Body_Acc, Body_Out).
+simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
+simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+	test_frontier_is_valid(F_In, Goal), !,
+	debug_msg(1, 'simplify_frontier :: valid: ', F_In),
+	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
+simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+	debug_msg(1, 'simplify_frontier :: not valid: ', F_In),
+	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
-test_frontier_is_valid(Goal, Head, Frontier_Test) :-
-	debug_msg(0, 'test_frontier_is_valid :: (Goal, Head, FrontierTest)', (Goal, Head, Frontier_Test)),
-        copy_term((Goal, Head, Frontier_Test), (Goal_Tmp, Head_Tmp, Frontier_Test_Tmp)), 
-        Head_Tmp = Goal_Tmp, 
-	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _UQV), % It must be an equality.
-	Tmp_Left = Tmp_Right, % Note that UQV = [].
-%	call_combined_solutions(FrontierTest_Tmp), 
-	!, % Backtracking forbidden.
-	Head = Goal. % Unify them definitely
-%	functor_local(Goal, _Name, _Arity, Goal_Args), 
-%	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
-%	eq_uqv(Test_Left, Goal_Args, []). % Note that UQV = [].
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% combine_frontiers(F1,F2,F3) returns F3 that is the resulting frontier
-% from combining the frontiers F1 and F2 in all possible ways.
-combine_frontiers([],_F2,[]):-!.
-combine_frontiers([F1_1 | More_F1], F2, F3):-
-        combine_frontier_aux(F1_1, F2, F3_1),
-        combine_frontiers(More_F1, F2, More_F3),
-        cneg_aux:append(F3_1, More_F3, F3).
-
-% combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
-% the result of combining F1_1 with each element of F2.
-combine_frontier_aux(_F1_1, [], []).
-combine_frontier_aux(F1_1, [F2_1 | More_F2], [(F1_1, F2_1) | More_F3]):-
-        combine_frontier_aux(F1_1, More_F2, More_F3).
+test_frontier_is_valid(F_In, Goal) :-
+	frontier_contents(F_In, Head, _Body, F_Test),
+	debug_msg(0, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
+        copy_term((Goal, Head, F_Test), (Goal_Tmp, Head_Tmp, F_Test_Tmp)), 
+        Head_Tmp = Goal_Tmp, % Test that head and goal can be unified. 
+	goal_is_equality(F_Test_Tmp, Tmp_Left, Tmp_Right, _Eq_UQV), % It must be an equality.
+	Tmp_Left = Tmp_Right, % Test that unifications previously in head can be performed.
+	!. % Backtracking forbidden. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -196,7 +234,7 @@ combine_frontier_aux(F1_1, [F2_1 | More_F2], [(F1_1, F2_1) | More_F3]):-
 % it to keep the variables of the Goal and obtain the unifications
 negate_set_of_frontiers([], _Proposal, _GoalVars, true) :- !. % Optimization.
 negate_set_of_frontiers([Frontier | More_Frontiers], Proposal, GoalVars, Result) :-
-	debug_msg(1, 'negate_frontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
+%	debug_msg(1, 'negate_frontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
 	negate_frontier(Frontier, Proposal, GoalVars, Result_Frontier),
 	debug_msg(1, 'negate_frontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory.
