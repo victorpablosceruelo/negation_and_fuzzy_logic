@@ -7,80 +7,69 @@
   
 % :- set_prolog_flag(multi_arity_warnings, off).
 
-% queens(N,Qs) returns in Qs the column where we must place each of N
-% queens in a Checkerboard of NxN assuming each of them is in a different
-% row. For example :   
-%  queens(s(s(s(s(0)))),[s(s(0)),s(s(s(s(0)))),s(0),s(s(s(0)))])
-% means that the 4 queens are placed in positions (1,2),(2,4),(3,1) and
-% (4,3). 
-queens(N, Qs):- 
-        queens_list(N, Ns),
-        queens1(Ns, [], Qs).     % To place, placed, result
+% queens(N,Columns) returns in Columns the column where we must place each of N
+% queens in a Checkerboard of NxN assuming each position in the list 
+% is a different row. For example :   
+%        queens(s(s(s(s(0)))),[s(s(0)),s(s(s(s(0)))),s(0),s(s(s(0)))])
+% means that the 4 queens are placed in positions (1,2),(2,4),(3,1) and (4,3). 
 
-% queens1(Ns,[],Qs) returns in Qs a permutation of the columns represented
+queens(N, Columns):- 
+        queens_list(N, Ns),
+        queens1(Ns, [], Columns).     % To be placed, placed, result
+
+% queens_list(N, List) generates a list of N queens in List.
+% The order does not matter yet.
+queens_list(0, []).
+queens_list(s(N), [s(N)|List]) :-
+        queens_list(N, List).
+
+% queens1(Ns,[],Columns) returns in Columns a permutation of the columns represented
 % in Ns such as there will be secure position for placing queens in them.
-% queens1(Unplaced, Placed, Qs) appends to Placed columns the columns of 
+% queens1(Unplaced, Placed, Columns) appends to Placed columns the columns of 
 % Unplaced in a secure way for all the queens.
-queens1([], Qs, Qs). 
-queens1([X|Unplaced], Placed, Qs):-
-        select(Q, [X|Unplaced], NewUnplaced),
-        no_attack(Q, Placed),
-        queens1(NewUnplaced, [Q|Placed], Qs).
+queens1([], Columns, Columns). 
+queens1([X|Unplaced], Placed, Columns):-
+        select_column(Column, [X|Unplaced], NewUnplaced),
+        no_attack(Placed, Column, Column),
+        queens1(NewUnplaced, [Column|Placed], Columns).
  
 % select(X, Ys, Zs) X is an element of Ys and Zs is Ys except X
-select(X, [X|Ys], Ys).
-select(X, [Y|Ys], [Y|Zs]):-
-        select(X, Ys, Zs).
+select_column(X, [X|Ys], Ys).
+select_column(X, [Y|Ys], [Y|Zs]):-
+        select_column(X, Ys, Zs).
 
-% no_attack(Q, Safe) checks that a queen in the next row to the ones placed
-% in Safe doesn't attack all the queens of Save if we place it in column Q
-no_attack(Q, Safe):- no_attack1(Safe, Q, s(0)). 
- 
-% no_attack1(Safe,Q,Nb) checks that a queen in the next row to the ones placed
-% in Safe doesn't attack all the queens of Save fron any diagonal with a 
-% distance Nb if we place it in column Q
-no_attack1([], _Queen, _Nb).
-no_attack1([Y|Ys], Queen, Nb):-
-	add(Y,Nb,YNb),
-        disequality(Queen,YNb, []),
-	no_attack_down(Y,Nb,Queen), 
-        add(Nb,s(0),Nb1),
-        no_attack1(Ys, Queen, Nb1).
-
-no_attack_down(Y,Nb,Queen):-
-	greater(Y,Nb),
-	subst(Y,Nb,NbY),
-	disequality(Queen,NbY, []).
-no_attack_down(Y,Nb,_Queen):-
-	greater(Nb,Y).
-no_attack_down(Y,Nb,Queen):-
-	Y=Nb, 
-	disequality(Queen,0, []).
-
-queens_list(0, []).
-queens_list(N, [N|Ns]):-
-        greater(N,0),
-        subst(N,s(0),N1),
-        queens_list(N1, Ns).
-
+% no_attack(Placed, Q, Q) checks that 
+% a queen in the next row to the ones in Placed 
+% doesn't attack any queen there.
+no_attack([], _Col_Add, _Col_Subst).
+no_attack([Y|Ys], Col_Add, 0):-
+	add(Col_Add, s(0), New_Col_Add),
+        disequality(New_Col_Add, Y, []),
+        no_attack(Ys, New_Col_Add, 0).
+no_attack([Y|Ys], Col_Add, Col_Subst):-
+	add(Col_Add, s(0), New_Col_Add),
+        disequality(New_Col_Add, Y, []),
+	subst(Col_Subst, s(0), New_Col_Subst),
+	disequality(New_Col_Subst, Y, []),
+        no_attack(Ys, New_Col_Add, New_Col_Subst).
 
 add(0,X,X). 
-add(s(X),Y,s(Z)):-  
+add(s(X),Y,s(Z)) :-
 	add(X,Y,Z).
 
-subst(Z,X,Y):-
-	greater(Z,X),
-	add(X,Y,Z).
-subst(X,X,0).
+subst(X,0,X).
+subst(s(X),s(Y),Z) :-
+	subst(X,Y,Z).
+
  
-number1(0).
-number1(s(X)):-
-	number1(X).
+%number1(0).
+%number1(s(X)):-
+%	number1(X).
 
-greater(s(X),0):-
-	number1(X).
-greater(s(X),s(Y)):-
-	greater(X,Y).
+%greater(s(X),0):-
+%	number1(X).
+%greater(s(X),s(Y)):-
+%	greater(X,Y).
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -315,26 +304,26 @@ greater(s(X),s(Y)):-
 % 	select(H,[s(0)],J),
 % 	queens1(J,[H],X).
 
-% queens2([], Qs, Qs).
-% queens2([X|Unplaced], Placed, Qs):-
+% queens2([], Columns, Columns).
+% queens2([X|Unplaced], Placed, Columns):-
 %         select(Q, [X|Unplaced], NewUnplaced),
 %         no_attack(Q, Placed),
-%         queens2(NewUnplaced, [Q|Placed], Qs).
+%         queens2(NewUnplaced, [Q|Placed], Columns).
  
 % no_queens2(X,Y,Z):-
 %  	cneg_tr([], queens2(X,Y,Z)).
 
-% queens3([], Qs, Qs).
-% queens3([X], Placed, Qs):-
+% queens3([], Columns, Columns).
+% queens3([X], Placed, Columns):-
 %         no_attack(X, Placed),
-%         queens3([], [X|Placed], Qs).
+%         queens3([], [X|Placed], Columns).
  
 % no_queens3(X,Y,Z):-
 %  	cneg_tr([], queens3(X,Y,Z)).
 
-% queens4([], Qs, Qs).
-% queens4([X], Placed, Qs):-
-%         queens4([], [X|Placed], Qs).
+% queens4([], Columns, Columns).
+% queens4([X], Placed, Columns):-
+%         queens4([], [X|Placed], Columns).
  
 % no_queens4(X,Y,Z):-
 %  	cneg_tr([], queens4(X,Y,Z)).
@@ -385,10 +374,10 @@ greater(s(X),s(Y)):-
 % no_p3(Y):- cneg_tr([], p3(Y)).
 
  
-% queens6([], Qs, Qs).
-% queens6([X], Placed, Qs):-
+% queens6([], Columns, Columns).
+% queens6([X], Placed, Columns):-
 %         select(Q, [X], NewUnplaced),
-%         queens6([], [Q|Placed], Qs).
+%         queens6([], [Q|Placed], Columns).
  
 
 % no_queens6(X,Y,Z):-
@@ -442,11 +431,11 @@ greater(s(X),s(Y)):-
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% queens11([], Qs, Qs). 
-% queens11([X|Unplaced], Placed, Qs):-
+% queens11([], Columns, Columns). 
+% queens11([X|Unplaced], Placed, Columns):-
 %         select11(Q, [X|Unplaced], NewUnplaced), 
 %         no_attack11(Q, Placed),
-%         queens11(NewUnplaced, [Q|Placed], Qs).
+%         queens11(NewUnplaced, [Q|Placed], Columns).
 
 
 % no_queens11(N,L,Q):-
@@ -468,15 +457,15 @@ greater(s(X),s(Y)):-
 %  	cneg_tr([], queens_list1(N,Q)).
 
 
-% q1(N, Qs):-
+% q1(N, Columns):-
 % 	queens_list(N, Ns),
-%         queens12(Ns, [], Qs).    
+%         queens12(Ns, [], Columns).    
 
 % no_q1(N,Q):-  
 %  	cneg_tr([], q1(N,Q)).
 
-% queens12([], Qs, Qs).
-% queens12([X|Unplaced], _Placed, _Qs).
+% queens12([], Columns, Columns).
+% queens12([X|Unplaced], _Placed, _Columns).
 
 % q2(N):-
 % 	queens_list(N, Ns),
@@ -531,10 +520,10 @@ greater(s(X),s(Y)):-
 %           	cneg_tr([], zero_list).  
  
 
-% queens13([], Qs, Qs).
-% queens13([X], P, Qs):-
+% queens13([], Columns, Columns).
+% queens13([X], P, Columns):-
 %         select(Q, [X], N), 
-%         queens13([], [Q|P], Qs).
+%         queens13([], [Q|P], Columns).
   
 % no_queens13(X,Y,Z):- 
 %        	cneg_tr([], queens13(X,Y,Z)).
@@ -589,16 +578,16 @@ greater(s(X),s(Y)):-
 
 % no_p5(X,Y):- cneg_tr([], p5(X,Y)).
 
-% queens10(N, Qs):- 
+% queens10(N, Columns):- 
 %         queens_list10(N, Ns),
-%         queens110(Ns, [], Qs).     % To place, placed, result
+%         queens110(Ns, [], Columns).     % To place, placed, result
 
-% queens14(N, Qs):- 
+% queens14(N, Columns):- 
 % %        queens_list(N, Ns),
-%         queens1(Ns, [], Qs).     % To place, placed, result
+%         queens1(Ns, [], Columns).     % To place, placed, result
 
 % queens_list10(N, [s(s(0)),s(0)]).
-% queens110( [], [], Qs). 
+% queens110( [], [], Columns). 
 
 % no_queens10(X,Y):- cneg_tr([], queens10(X,Y)).
 
