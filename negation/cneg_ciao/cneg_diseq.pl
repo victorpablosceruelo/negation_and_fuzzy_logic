@@ -655,11 +655,11 @@ cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :-
 	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
 	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
 
-	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
+%	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	disequality_contents(Disequality, T1, T2, EQV, UQV),
-        test_and_update_vars_attributes([Disequality], Can_Fail, Result),
+        test_and_update_vars_attributes([Disequality], Can_Fail, Result).
 
-	debug_msg(1, 'cneg_diseq_eqv_uqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
+%	debug_msg(1, 'cneg_diseq_eqv_uqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -681,7 +681,7 @@ cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In, Result) :-
 	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
 	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
 
-	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
+%	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
 	!,
 	(
 	    ( 
