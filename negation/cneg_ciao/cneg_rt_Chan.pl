@@ -316,6 +316,14 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	goal_is_disequality(Frontier_In, _Term1, _Term2, _UQV), !,
 	split_frontier_contents(Frontier_Out, [], Frontier_In, []).
 
+% This leads to infinite loops because double negation 
+% sould be managed when generating the frontier.
+% The way to fix this is remove cneg(cneg(...))
+% when evaluating the frontier. To be done.
+split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
+	goal_is_negation(Frontier_In, _UQV, _SubGoal), !,
+	split_frontier_contents(Frontier_Out, [], [], Frontier_In).
+
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
 	goal_is_not_conj_disj_eq_diseq_dneg(Frontier_In), !,
 	split_frontier_contents(Frontier_Out, [], [], Frontier_In).
