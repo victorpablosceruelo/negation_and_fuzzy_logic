@@ -41,6 +41,7 @@ cneg_rt_Aux(UQV, Goal, Proposal) :-
 	varsbag(UQV, [], [], Real_UQV),
 	varsbag(Goal, Real_UQV, [], GoalVars),
 	compute_frontier(Goal, Real_Goal, Frontier_Tmp), !,
+	debug_msg_list(1, 'cneg_rt_Aux :: Frontier_Tmp', Frontier_Tmp),
 	adequate_frontier(Frontier_Tmp, Real_Goal, Real_UQV, Frontier), !,
 	debug_msg(1, 'cneg_rt_Aux :: (UQV, Real_Goal)', (UQV, Real_Goal)),
 	debug_msg_list(1, 'cneg_rt_Aux :: Frontier', Frontier),

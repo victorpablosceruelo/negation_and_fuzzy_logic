@@ -806,3 +806,5 @@ grandparent2(X,Y):-
 
 no_grandparent2(Y,X):- cneg_tr([], grandparent2(Y,X)).
 
+% Problematic calls being fixed.
+% (diseq_uqv([X,Y],[_692,_694],[_692,_694]);eq_uqv([X,Y],[_692,_694],[]),(diseq_uqv([X,Y],[john,mary],[]),diseq_uqv([X,Y],[john,peter],[]),diseq_uqv([X,Y],[mary,joe],[]),diseq_uqv([X,Y],[peter,susan],[]))),(diseq_uqv([X,Y],[_766,_768],[_766,_768]);eq_uqv([X,Y],[_766,_768],[]),cneg_rt_Chan([_775],(parent1(_766,_775),ancestor(_775,_768)))).

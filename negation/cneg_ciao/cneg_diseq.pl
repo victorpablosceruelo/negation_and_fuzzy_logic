@@ -206,8 +206,8 @@ verify_attribute_aux(Attribute, NewTarget) :-
 	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
-	debug_msg(0, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
-	debug_msg(0, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
+	debug_msg(1, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
+	debug_msg(1, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Diseqs_Var_1, _UQV_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Diseqs_Var_2, _UQV_Var_2), !,
 	remove_attribute_local(OldTarget_Var_1), 
@@ -217,8 +217,8 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, [], EQV, [], UQV, _Unused_Ts),
 	perform_substitutions([(OldTarget_Var_1, OldTarget_Var_2)], EQV, UQV),
 	
-	debug_msg(1, 'test_and_update_vars_attributes :: (Disequalities)', (Disequalities)), 
-	test_and_update_vars_attributes(Disequalities, 'fail', 'true').
+	debug_msg(1, 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
+	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
