@@ -3,6 +3,7 @@
 	[
 	    debug_msg/3, debug_msg_list/3, 
 	    debug_msg_aux/3, debug_msg_nl/1, 
+	    debug_msg_logo/1,
 	    findall/4, append/3, functor_local/4,
 	    list_head/2, list_tail/2, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -53,7 +54,7 @@ debug_msg_is_on(Level) :- Level > 0.
 
 %%% Debug (by VPC).
 debug_msg(Level, Msg, Clause) :-
-	debug_msg_aux(Level, '% cneg', ' :: '),
+	debug_msg_logo(Level),
 	debug_msg_aux(Level, Msg, ' :: '),
 	debug_msg_aux(Level, Clause, ''),
 	debug_msg_nl(Level).
@@ -63,6 +64,12 @@ debug_msg_aux(Level, Msg, Clause) :-
 	write(Msg), 
 	write(Clause).
 debug_msg_aux(Level, _Msg, _Clause) :- 
+	\+(debug_msg_is_on(Level)).
+
+debug_msg_logo(Level) :-
+	debug_msg_is_on(Level),
+	debug_msg_aux(Level, '% cneg', ' :: ').
+debug_msg_logo(Level) :-
 	\+(debug_msg_is_on(Level)).
 
 debug_msg_nl(Level) :-

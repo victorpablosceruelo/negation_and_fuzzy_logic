@@ -12,7 +12,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5]).
+	cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5, portray_attributes_in_term/1]).
 :- use_module(library(aggregates),[setof/3]).
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
@@ -35,7 +35,9 @@ cneg_rt_New(UQV, Goal):-
 	cneg_rt_Aux(UQV, Goal, 'New').
 
 cneg_rt_Aux(UQV, Goal, Proposal) :-
+	debug_msg_nl(1),
 	debug_msg(1, 'cneg_rt_Aux :: (UQV, Goal, Proposal)', (UQV, Goal, Proposal)),
+	portray_attributes_in_term(Goal),
 	varsbag(UQV, [], [], Real_UQV),
 	varsbag(Goal, Real_UQV, [], GoalVars),
 	compute_frontier(Goal, Real_Goal, Frontier_Tmp), !,
@@ -43,7 +45,7 @@ cneg_rt_Aux(UQV, Goal, Proposal) :-
 	debug_msg(1, 'cneg_rt_Aux :: (UQV, Real_Goal)', (UQV, Real_Goal)),
 	debug_msg_list(1, 'cneg_rt_Aux :: Frontier', Frontier),
 	negate_set_of_frontiers(Frontier, Proposal, GoalVars, Result), !,
-	debug_msg(1, 'cneg_rt_Aux :: Result', Result),
+%	debug_msg(1, 'cneg_rt_Aux :: Result', Result),
 	debug_msg_nl(1),
 	call_to(Result).
 
@@ -203,10 +205,10 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
-	debug_msg(1, 'simplify_frontier :: valid: ', F_In),
+%	debug_msg(1, 'simplify_frontier :: valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
-simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
-	debug_msg(1, 'simplify_frontier :: not valid: ', F_In),
+simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+%	debug_msg(1, 'simplify_frontier :: not valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
@@ -236,7 +238,7 @@ negate_set_of_frontiers([], _Proposal, _GoalVars, true) :- !. % Optimization.
 negate_set_of_frontiers([Frontier | More_Frontiers], Proposal, GoalVars, Result) :-
 %	debug_msg(1, 'negate_frontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
 	negate_frontier(Frontier, Proposal, GoalVars, Result_Frontier),
-	debug_msg(1, 'negate_frontier: Result_Frontier', Result_Frontier),
+%	debug_msg(1, 'negate_frontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory.
 	negate_set_of_frontiers(More_Frontiers, Proposal, GoalVars, Result_More_Frontiers),
 	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 

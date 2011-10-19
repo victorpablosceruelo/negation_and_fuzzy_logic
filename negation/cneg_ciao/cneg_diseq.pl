@@ -137,10 +137,16 @@ portray_attributes_in_variables([Var|Vars]) :-
 
 portray_attributes_in_variable(Var) :-
 	get_attribute_local(Var, Attribute),
-	debug_msg(2, 'variable', Var), 
-	portray(Attribute).
+	debug_msg_logo(2),
+	debug_msg_aux(2, 'variable :: ', Var), 
+	debug_msg_aux(2, ' has attribute', ' :: '),
+	portray(Attribute),
+	debug_msg_nl(2).
 portray_attributes_in_variable(Var) :-
-	debug_msg(2, Var, ' has NO attribute').
+	debug_msg_logo(2),
+	debug_msg_aux(2, 'variable :: ', Var), 
+	debug_msg_aux(2, ' has NO attribute', ' '),
+	debug_msg_nl(2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
