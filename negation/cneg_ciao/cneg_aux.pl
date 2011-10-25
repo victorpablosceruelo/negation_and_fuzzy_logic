@@ -5,7 +5,7 @@
 	    debug_msg_aux/3, debug_msg_nl/1, 
 	    debug_msg_logo/1,
 	    findall/4, append/3, functor_local/4,
-	    list_head/2, list_tail/2, add_to_list_if_not_there/3, 
+	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
 	    % setof_local/3, 
 	    filter_out_nonvars/2,
@@ -128,11 +128,7 @@ list_solutions_aux(-Term,Sofar,List) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-list_head([Head | _Tail], Head).
-list_tail([_Head | Tail], Tail).
-list_snd_head(List, Second) :- !,
-	list_tail(List, Tail),
-	list_tail(Tail, Second).
+list_head_and_tail([Head | Tail], Head, Tail).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
