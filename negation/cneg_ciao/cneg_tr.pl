@@ -391,7 +391,7 @@ cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 take_body_first_unification(Body, Body) :-
-	goal_is_equality(Body, _T_1, _T_2, _UQV), !.
+	goal_is_equality(Body, _T_1, _T_2, _EQV, _UQV), !.
 take_body_first_unification(Body, Body_First_Unification) :-
 	goal_is_conjunction(Body, Conj_1, _Conj_2), !,
 	take_body_first_unification(Conj_1, Body_First_Unification).
@@ -432,17 +432,19 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	negate_atom(Disj_2, GoalVars, Result, Neg_Disj_2). 
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
-	goal_is_equality(Atom, A_Left, A_Right, FreeVars), !,
-	functor_local(Addition, 'varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
-	functor_local(Varsbag, 'varsbag', 4, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
-	functor_local(Neg_Eq, 'cneg_diseq_eqv_uqv', 5, [A_Left |[A_Right |[ EQV |[ UQV |[Result]]]]]),
+	goal_is_equality(Atom, A_Left, A_Right, EQV, UQV), !,
+	EQV = [], % No EQV variables allowed !!!
+	functor_local(Addition, 'varsbag_addition', 3, [GoalVars |[UQV |[ New_EQV ]]]), 
+	functor_local(Varsbag, 'varsbag', 4, [(A_Left, A_Right) |[New_EQV |[ [] |[ New_UQV]]]]),
+	functor_local(Neg_Eq, 'cneg_diseq_eqv_uqv', 5, [A_Left |[A_Right |[ New_EQV |[ New_UQV |[Result]]]]]),
 	Neg_Atom = ((Addition, Varsbag), Neg_Eq).
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
-	goal_is_disequality(Atom, A_Left, A_Right, FreeVars), !,
-	functor_local(Addition, 'varsbag_addition', 3, [GoalVars |[FreeVars |[ EQV ]]]), 
-	functor_local(Varsbag, 'varsbag', 4, [(A_Left, A_Right) |[EQV |[[] |[UQV]]]]),
-	functor_local(Neg_Diseq, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[ EQV |[ UQV |[Result]]]]]), % UQV = []
+	goal_is_disequality(Atom, A_Left, A_Right, EQV, UQV), !,
+	EQV = [], % No EQV variables allowed !!!
+	functor_local(Addition, 'varsbag_addition', 3, [GoalVars |[ UQV |[ New_EQV ]]]), 
+	functor_local(Varsbag, 'varsbag', 4, [(A_Left, A_Right) |[ New_EQV |[ [] |[ New_UQV]]]]),
+	functor_local(Neg_Diseq, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[ New_EQV |[ New_UQV |[Result]]]]]), % New_UQV = []
 	Neg_Atom = ((Addition, Varsbag), Neg_Diseq).
 
 
@@ -501,11 +503,13 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	negate_atom(SubGoal, GoalVars, Result, DN_Atom). % Problematic
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	goal_is_disequality(Atom, A_Left, A_Right, UQV), !,
+	goal_is_disequality(Atom, A_Left, A_Right, EQV, UQV), !,
+	EQV = [], % No EQV variables allowed !!!
 	functor_local(DN_Atom, 'cneg_diseq_eqv_uqv', 5, [A_Left |[A_Right |[GoalVars |[ UQV |[Result ]]]]]).
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	goal_is_equality(Atom, A_Left, A_Right, UQV), !,
+	goal_is_equality(Atom, A_Left, A_Right, EQV, UQV), !,
+	EQV = [], % No EQV variables allowed !!!
 	functor_local(DN_Atom, 'cneg_eq_eqv_uqv', 5, [A_Left |[A_Right |[GoalVars |[ UQV |[Result ]]]]]).	
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
