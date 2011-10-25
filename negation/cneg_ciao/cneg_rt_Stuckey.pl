@@ -89,7 +89,7 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 
 % Now go for the functors for equality and disequality.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
-	goal_is_disequality(Goal, T1, T2, UQV), !, 
+	goal_is_disequality(Goal, T1, T2, EQV, UQV), !, 
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
 	eq_uqv(T1, T2, UQV_Aux).
 
