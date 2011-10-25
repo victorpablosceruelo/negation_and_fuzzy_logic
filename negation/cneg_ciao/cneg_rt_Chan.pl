@@ -136,8 +136,8 @@ compute_frontier(Goal, Proposal, ((Real_G1) ; (Real_G2)), Frontier_Out):-
 	goal_is_disjunction(Goal, G1, G2), !,
 	compute_frontier(G1, Proposal, Real_G1, Frontier_G1),
 	compute_frontier(G2, Proposal, Real_G2, Frontier_G2),
-	list_head(Frontier_G1, F_G1),
-	list_head(Frontier_G2, F_G2),
+	list_head_and_tail(Frontier_G1, F_G1, _Tail_Frontier_G1),
+	list_head_and_tail(Frontier_G2, F_G2, _Tail_Frontier_G2),
 	frontier_contents(F_G1, F_G1_Head, _F_G1_Body, _F_G1_F_Test),
 	frontier_contents(F_G2, F_G2_Head, _F_G2_Body, _F_G2_F_Test),
 	append(Frontier_G1, Frontier_G2, Frontier_Tmp),
@@ -153,13 +153,13 @@ compute_frontier(Goal, Proposal, ((Real_G1) , (Real_G2)), Frontier):-
 % Now go for the functors for equality and disequality.
 % None of them is managed yet, so just bypass them.
 compute_frontier(Goal, _Proposal, Real_Goal, [F_Out]) :- 
-	goal_is_disequality(Goal, T1, T2, UQV), !,
-	functor_local(Real_Goal, 'diseq_uqv', 3, [ T1 |[ T2 |[ UQV ]]]),
+	goal_is_disequality(Goal, T1, T2, EQV, UQV), !,
+	functor_local(Real_Goal, 'diseq_eqv_uqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
 compute_frontier(Goal, _Proposal, Real_Goal, [F_Out]) :- 
-	goal_is_equality(Goal, T1, T2, UQV), !,
-	functor_local(Real_Goal, 'eq_uqv', 3, [ T1 |[ T2 |[ UQV ]]]),
+	goal_is_equality(Goal, T1, T2, EQV, UQV), !,
+	functor_local(Real_Goal, 'eq_uqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
 % Double negation is not managed yet. Bypass it.
@@ -236,7 +236,7 @@ test_frontier_is_valid(F_In, Goal) :-
 	debug_msg(0, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
         copy_term((Goal, Head, F_Test), (Goal_Tmp, Head_Tmp, F_Test_Tmp)), 
         Head_Tmp = Goal_Tmp, % Test that head and goal can be unified. 
-	goal_is_equality(F_Test_Tmp, Tmp_Left, Tmp_Right, _Eq_UQV), % It must be an equality.
+	goal_is_equality(F_Test_Tmp, Tmp_Left, Tmp_Right, _Eq_EQV, _Eq_UQV), % It must be an equality.
 	Tmp_Left = Tmp_Right, % Test that unifications previously in head can be performed.
 	!. % Backtracking forbidden. 
 
@@ -329,11 +329,11 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	split_frontier_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_equality(Frontier_In, _Term1, _Term2, _UQV), !,
+	goal_is_equality(Frontier_In, _Term1, _Term2, _EQV, _UQV), !,
 	split_frontier_contents(Frontier_Out, Frontier_In, [], []).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_disequality(Frontier_In, _Term1, _Term2, _UQV), !,
+	goal_is_disequality(Frontier_In, _Term1, _Term2, _EQV, _UQV), !,
 	split_frontier_contents(Frontier_Out, [], Frontier_In, []).
 
 % This leads to infinite loops because double negation 
@@ -423,7 +423,7 @@ detect_irrelevant_equalities(E_In, Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_
 	detect_irrelevant_equalities(E_In_2, Vars_EnoG, Irrelevant_Eqs_Aux, Irrelevant_Eqs_Out).
 
 detect_irrelevant_equalities(E_In, Vars_EnoG, Irrelevant_Eqs_In, [ E_In | Irrelevant_Eqs_In]) :-
-	goal_is_equality(E_In, Value_1, Value_2, _UQV),
+	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
 	(
 	    (
 		var(Value_1),
@@ -439,7 +439,7 @@ detect_irrelevant_equalities(_E_In, _Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eq
 
 remove_irrelevant_equalities_1([], _Vars_EnoG, Formula_In, Formula_In) :- !.
 remove_irrelevant_equalities_1([Irrelevant_Eq | Irrelevant_Eqs], Vars_EnoG, Formula_In, Formula_Out) :-
-	goal_is_equality(Irrelevant_Eq, Value_1, Value_2, _UQV),
+	goal_is_equality(Irrelevant_Eq, Value_1, Value_2, _EQV, _UQV),
 	(
 	    (
 		var(Value_1),
@@ -465,16 +465,21 @@ remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_Out, E_Out) :-
 	rebuild_conjunction_of_goals(E_Out_1, E_Out_2, E_Out).
 
 remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_In, []) :-
-	goal_is_equality(E_In, Value_1, Value_2, _UQV),
+	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
 	Value_1 == Value_2, !.
 
 remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_In, []) :-
-	goal_is_equality(E_In, _Value_1, _Value_2, _UQV),
+	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV),
 	memberchk(E_In, Eqs_Visited_In), !.
 
 remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_In, []) :-
-	goal_is_equality(E_In, Value_1, Value_2, UQV),
-	goal_is_equality(E_Aux, Value_2, Value_1, UQV), % Different order
+	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV),
+	functor_local(E_In, Name, Arity, Args_In), 
+	functor_local(E_Aux, Name, Arity, Args_Aux), 
+	list_head_and_tail(Args_In, Head_1, Tail_1), 
+	list_head_and_tail(Tail_1, Head_2, Tail_2), 
+	list_head_and_tail(Tail_3, Head_1, Tail_2),  % Different order
+	list_head_and_tail(Args_Aux, Head_2, Tail_3), 
 	memberchk(E_Aux, Eqs_Visited_In), !.
 
 remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, [E_In | Eqs_Visited_In], E_In).
@@ -494,7 +499,7 @@ remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out) :-
 	rebuild_conjunction_of_goals(IE_Out_1, IE_Out_2, IE_Out).
 
 remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out):-
-	goal_is_disequality(IE_In, _Term1, _Term2, _FreeVars), !,
+	goal_is_disequality(IE_In, _Term1, _Term2, _EQV, _UQV), !,
 	varsbag(IE_In, ImpVars_and_RelVars, [], Problematic_Vars),
 	(
 	    (   Problematic_Vars == [],
@@ -610,18 +615,18 @@ negate_imp_atom(true, _Proposal, _ImpVars, fail, true):- !. % Trivial predicates
 negate_imp_atom(fail, _Proposal, _ImpVars, true, fail):- !. % Trivial predicates
 
 negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
-	goal_is_equality(Formula, T1, T2, UQV),
+	goal_is_equality(Formula, T1, T2, EQV, UQV),
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
  	varsbag((T1,T2), ImpVars, [], FreeVars),
 	Neg_Atom = (diseq_uqv(T1,T2, FreeVars)),
-	Keep_Atom = (eq_uqv(T1,T2, UQV)).
+	Keep_Atom = (cneg_eq_eqv_uqv(T1,T2, EQV, UQV)).
 
 negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1, T2, UQV),
+	goal_is_disequality(Formula, T1, T2, EQV, UQV),
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
  	varsbag((T1,T2), ImpVars, [], FreeVars),
 	Neg_Atom = (eq_uqv(T1,T2, FreeVars)),
-	Keep_Atom = (diseq_uqv(T1,T2, UQV)).
+	Keep_Atom = (cneg_diseq_eqv_uqv(T1,T2, EQV, UQV)).
 
 negate_imp_atom(Formula, 'Chan', _ImpVars, Neg_Atom, Keep_Atom) :-
 	Neg_Atom = (cneg_rt_Chan([], Formula)),
