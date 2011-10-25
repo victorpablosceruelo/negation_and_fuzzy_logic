@@ -48,7 +48,7 @@ cneg_rt_Aux(UQV, Goal, Proposal, Result) :-
 	debug_msg(1, 'cneg_rt_Aux :: (UQV, Real_Goal)', (UQV, Real_Goal)),
 	debug_msg_list(1, 'cneg_rt_Aux :: Frontier', Frontier),
 	negate_set_of_frontiers(Frontier, Proposal, GoalVars, Result), !,
-%	debug_msg(1, 'cneg_rt_Aux :: Result', Result),
+	debug_msg(1, 'cneg_rt_Aux :: Result', Result),
 	debug_msg_nl(1).
 
 
@@ -166,7 +166,6 @@ compute_frontier(Goal, _Proposal, Real_Goal, [F_Out]) :-
 %compute_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_frontier(Goal, Proposal, Real_Goal, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal), !,
-	functor_local(Real_Goal, 'cneg_rt', 2, [ UQV |[ SubGoal ]]),
 	(
 	    (
 		Proposal = 'Chan',
@@ -179,6 +178,7 @@ compute_frontier(Goal, Proposal, Real_Goal, Frontier) :-
 	    )
 	),
 	compute_frontier(Result, Proposal, Real_Goal, Frontier).
+%	OLD: functor_local(Real_Goal, 'cneg_rt', 2, [ UQV |[ SubGoal ]]),
 %	OLD: frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
 % Only as info.
