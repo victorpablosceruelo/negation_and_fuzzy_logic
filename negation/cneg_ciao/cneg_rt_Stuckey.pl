@@ -90,11 +90,13 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 % Now go for the functors for equality and disequality.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_disequality(Goal, T1, T2, EQV, UQV), !, 
+	EQV = [],
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
 	eq_uqv(T1, T2, UQV_Aux).
 
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
-	goal_is_equality(Goal, T1, T2, UQV), !,
+	goal_is_equality(Goal, T1, T2, EQV, UQV), !,
+	EQV = [], 
 	varsbag(Goal, GoalVars, UQV, UQV_Aux),
 	% cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result).
 	diseq_uqv(T1,T2, UQV_Aux).
@@ -182,13 +184,13 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 	debug_msg(1, 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, Frontier_Test, Goal)),
         copy_term((Head, Frontier_Test, Goal), (Head_Tmp, Frontier_Test_Tmp, Goal_Tmp)), 
         eq_uqv(Head_Tmp, Goal_Tmp, []), 
-	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, Tmp_UQV), % It must be an equality.
+	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _Tmp_EQV, Tmp_UQV), % It must be an equality.
 	eq_uqv(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 %	debug_msg(1, 'test_frontier_is_valid', 'YES'),
 	!, % Backtracking forbidden.
 	functor_local(Goal, _Name, _Arity, Goal_Args), 
-	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_UQV),
+	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_EQV, _Test_UQV),
 	eq_uqv(Test_Left, Goal_Args, []). % Note that UQV = [].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -255,11 +257,13 @@ compute_pre_frontier_aux(Pre_Frontier) :-
 	).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
-	goal_is_disequality(Pre_Frontier, Left, Right, UQV), 
+	goal_is_disequality(Pre_Frontier, Left, Right, EQV, UQV), 
+	EQV = [], 
 	diseq_uqv(Left, Right, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
-	goal_is_equality(Pre_Frontier, Left, Right, UQV), 
+	goal_is_equality(Pre_Frontier, Left, Right, EQV, UQV), 
+	EQV = [], 
 	eq_uqv(Left, Right, UQV).
 
 compute_pre_frontier_aux(Pre_Frontier) :-
