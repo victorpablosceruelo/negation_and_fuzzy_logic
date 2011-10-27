@@ -619,14 +619,14 @@ negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
  	varsbag((T1,T2), ImpVars, [], FreeVars),
 	Neg_Atom = (diseq_uqv(T1,T2, FreeVars)),
-	Keep_Atom = (cneg_eq_eqv_uqv(T1,T2, EQV, UQV)).
+	Keep_Atom = (cneg_eq_eqv_uqv(T1,T2, EQV, UQV, 'true')).
 
 negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
 	goal_is_disequality(Formula, T1, T2, EQV, UQV),
 %	varsbag(UQV, [], [], Real_UQV), % Not yet
  	varsbag((T1,T2), ImpVars, [], FreeVars),
 	Neg_Atom = (eq_uqv(T1,T2, FreeVars)),
-	Keep_Atom = (cneg_diseq_eqv_uqv(T1,T2, EQV, UQV)).
+	Keep_Atom = (cneg_diseq_eqv_uqv(T1,T2, EQV, UQV, 'true')).
 
 negate_imp_atom(Formula, 'Chan', _ImpVars, Neg_Atom, Keep_Atom) :-
 	Neg_Atom = (cneg_rt_Chan([], Formula)),
