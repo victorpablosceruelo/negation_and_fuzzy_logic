@@ -3,7 +3,8 @@
 	    equality/3, disequality/3,
 	    diseq_uqv/3, eq_uqv/3, 
 	    diseq_eqv/3, eq_eqv/3, 
-	    cneg_diseq_eqv_uqv/5, cneg_eq_eqv_uqv/5,
+	    cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
+	    cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5,
 	    portray_attributes_in_term/1
 	], 
 	[assertions]).
@@ -684,12 +685,15 @@ compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 
 disequality(T1,T2, UQV) :- diseq_uqv(T1,T2, UQV).
 diseq_uqv(T1,T2, UQV_In) :- 
-	cneg_diseq_eqv_uqv(T1, T2, 'compute', UQV_In, 'true').
+	cneg_diseq_eqv_uqv(T1, T2, 'compute', UQV_In).
 
 diseq_eqv(T1,T2, EQV_In) :- 
-	cneg_diseq_eqv_uqv(T1, T2, EQV_In, 'compute', 'true').
+	cneg_diseq_eqv_uqv(T1, T2, EQV_In, 'compute').
 
-cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :- 
+cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In) :- 
+	cneg_diseq_eqv_uqv_adv(T1,T2, EQV_In, UQV_In, 'true'). 
+
+cneg_diseq_eqv_uqv_adv(T1,T2, EQV_In, UQV_In, Result) :- 
 	Can_Fail = true,
 	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
 	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
@@ -703,12 +707,15 @@ cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :-
 
 equality(T1,T2, UQV) :- eq_uqv(T1,T2, UQV).
 eq_uqv(T1, T2, UQV) :-
-	cneg_eq_eqv_uqv(T1, T2, 'compute', UQV, 'true').
+	cneg_eq_eqv_uqv(T1, T2, 'compute', UQV).
 
 eq_eqv(T1, T2, EQV) :-
-	cneg_eq_eqv_uqv(T1, T2, EQV, 'compute', 'true').
+	cneg_eq_eqv_uqv(T1, T2, EQV, 'compute').
 
-cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In, Result) :- 
+cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In) :- 
+	cneg_eq_eqv_uqv_adv(T1, T2, EQV_In, UQV_In, 'true').
+
+cneg_eq_eqv_uqv_adv(T1, T2, EQV_In, UQV_In, Result) :- 
 	Can_Fail = 'true',
 	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
 	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
@@ -724,9 +731,9 @@ cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In, Result) :-
 		UQV \== [], !, 
 		check_if_allowed_to_fail(Can_Fail),
 		Result = 'fail',
-		cneg_aux:varsbag((T1, T2), [], [], Disequality_EQV), % Mark all vars as EQV
-		% cneg_diseq(T1,T2, EQV, Can_Fail, Result)
-		cneg_diseq_eqv_uqv(T1, T2, [], Disequality_EQV, 'true') 
+%		cneg_aux:varsbag((T1, T2), [], [], Disequality_EQV), % Mark all vars as EQV
+%		% cneg_diseq(T1,T2, EQV, Can_Fail, Result)
+		cneg_diseq_eqv_uqv(T1, T2, 'compute', []) 
 	    )
 	).
 
