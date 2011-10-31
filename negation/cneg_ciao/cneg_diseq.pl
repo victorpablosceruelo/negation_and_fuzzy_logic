@@ -624,6 +624,49 @@ check_if_allowed_to_fail(Can_Fail) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+compute_eqv_or_uqv(_T1, _T2, EQV_In, UQV_In, _EQV_Out, _UQV_Out) :-
+	EQV_In = 'compute',
+	UQV_In = 'compute',
+	!, 
+	debug_msg(1, 'ERROR: Can not compute both EQV and UQV. (EQV, UQV)', (EQV_In, UQV_In)),
+	!,
+	fail.
+compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
+	EQV_In = 'compute', !,
+	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.	
+	varsbag((T1, T2), UQV_Aux, [], EQV_Aux), % Determine EQV.
+	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Test empty intersection.
+compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
+	UQV_In = 'compute', !,
+	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.
+	varsbag((T1, T2), EQV_Aux, [], UQV_Aux), % Determine UQV.
+	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Test empty intersection.
+compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
+	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.	
+	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.
+	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
+	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
+	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out), % Only UQV affected variables.
+
+	varsbag_intersection(EQV_Out, UQV_Out, Intersection), % Compute intersection between EQV and UQV.
+	!,
+	(
+	    (
+		Intersection = [], ! % Test empty intersection.
+	    )
+	;
+	    (
+		!,
+		debug_msg(1, 'ERROR: Intersection between EQV and UQV is not empty. (EQV, UQV, Intersection)', (EQV_Out, UQV_Out, Intersection)),
+		!, fail
+	    )
+	).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     PREDICADO   DISTINTO                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -640,25 +683,18 @@ check_if_allowed_to_fail(Can_Fail) :-
 % variables implicadas
 
 disequality(T1,T2, UQV) :- diseq_uqv(T1,T2, UQV).
-diseq_uqv(T1,T2, UQV) :- 
-	varsbag((T1, T2), UQV, [], EQV), % Determine EQV.
-	cneg_diseq_eqv_uqv(T1, T2, EQV, UQV, 'true').
+diseq_uqv(T1,T2, UQV_In) :- 
+	cneg_diseq_eqv_uqv(T1, T2, 'compute', UQV_In, 'true').
 
-diseq_eqv(T1,T2, EQV) :- 
-	varsbag((T1, T2), EQV, [], UQV), % Determine UQV.
-	cneg_diseq_eqv_uqv(T1, T2, EQV, UQV, 'true').
+diseq_eqv(T1,T2, EQV_In) :- 
+	cneg_diseq_eqv_uqv(T1, T2, EQV_In, 'compute', 'true').
 
 cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :- 
 	Can_Fail = true,
-	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.
-	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.
-	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
-	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
-
-%	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
+	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
+	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	disequality_contents(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality], Can_Fail, Result).
-
 %	debug_msg(1, 'cneg_diseq_eqv_uqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -667,21 +703,15 @@ cneg_diseq_eqv_uqv(T1,T2, EQV_In, UQV_In, Result) :-
 
 equality(T1,T2, UQV) :- eq_uqv(T1,T2, UQV).
 eq_uqv(T1, T2, UQV) :-
-	varsbag((T1, T2), UQV, [], EQV), % Determine EQV.
-	cneg_eq_eqv_uqv(T1, T2, EQV, UQV, 'true').
+	cneg_eq_eqv_uqv(T1, T2, 'compute', UQV, 'true').
 
 eq_eqv(T1, T2, EQV) :-
-	varsbag((T1, T2), EQV, [], UQV), % Determine UQV. 
-	cneg_eq_eqv_uqv(T1, T2, EQV, UQV, 'true').
+	cneg_eq_eqv_uqv(T1, T2, EQV, 'compute', 'true').
 
 cneg_eq_eqv_uqv(T1, T2, EQV_In, UQV_In, Result) :- 
 	Can_Fail = 'true',
-	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.
-	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.
-	varsbag(EQV_Aux, UQV_Aux, [], EQV), % Exclussive sets, please.
-	varsbag((T1, T2), EQV, [], UQV), % Only affected universally quantified vars, please.
-
-%	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
+	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
+	debug_msg(1, 'cneg_eq_eqv_uqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
 	!,
 	(
 	    ( 
