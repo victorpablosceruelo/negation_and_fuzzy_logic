@@ -57,7 +57,7 @@ compute_neg_frontier(Goal, GoalVars, Prev_Front_Residua) :-
 compute_neg_frontier(Goal, GoalVars, Prev_Front_Residua):- 
 	Prev_Front_Residua \== 'true',
 	debug_msg(1, 'compute_neg_frontier :: Prev_Front_Residua', Prev_Front_Residua),	
-	compute_pre_frontier(Goal, GoalVars, Prev_Front_Residua).
+	evaluate_prev_frontier_residua(Goal, GoalVars, Prev_Front_Residua).
 
 % Manage true and fail ...
 compute_neg_frontier('true', _GoalVars, 'true') :- !, fail.
@@ -197,23 +197,23 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-compute_pre_frontier(Goal, GoalVars_In, Prev_Front_Residua) :-
-	debug_msg(1, 'compute_pre_frontier :: Prev_Front_Residua', Prev_Front_Residua),	
+evaluate_prev_frontier_residua(Goal, GoalVars_In, Prev_Front_Residua) :-
+	debug_msg(1, 'evaluate_prev_frontier_residua :: Prev_Front_Residua', Prev_Front_Residua),	
 	Prev_Front_Residua \== 'true',
 
 	varsbag(GoalVars_In, [], [], GoalVars),
 	varsbag((Goal, Prev_Front_Residua), GoalVars, [], LocalVars),
-	debug_msg(1, 'compute_pre_frontier :: GoalVars_In', GoalVars_In),
+	debug_msg(1, 'evaluate_prev_frontier_residua :: GoalVars_In', GoalVars_In),
 	% We need to obtain 1 solution and ask for more solutions sharing its solutions for goalvars. 
 	% In this way we do not hang when an infinite number of solutions is found.
 	% This is not completely true because it fails for p(X) :- p(X). but in this case it's clearly 
 	% a programming error (this has no meaning at all).
 	copy_term((Prev_Front_Residua, GoalVars, LocalVars), (Prev_Front_Residua_Copy, GoalVars_Copy, _LocalVars_Copy)),
 	!,
-	compute_pre_frontier_aux(Prev_Front_Residua_Copy),
+	evaluate_prev_frontier_residua_aux(Prev_Front_Residua_Copy),
 	eq_uqv(GoalVars, GoalVars_Copy, []),
-	setof(([(Goal, Prev_Front_Residua, LocalVars)], GoalVars), compute_pre_frontier_aux(Prev_Front_Residua), Pre_F_Sols),
-	debug_msg(1, 'compute_pre_frontier :: Pre_F_Sols', Pre_F_Sols),
+	setof(([(Goal, Prev_Front_Residua, LocalVars)], GoalVars), evaluate_prev_frontier_residua_aux(Prev_Front_Residua), Pre_F_Sols),
+	debug_msg(1, 'evaluate_prev_frontier_residua :: Pre_F_Sols', Pre_F_Sols),
 	debug_msg_nl(1),
 %	prepare_pre_frontier_sols(Pre_F_Sols, Pre_F_Sols_Aux),
 	unify_pre_sols_when_possible(Pre_F_Sols, Pre_F_Sols_Final),
@@ -243,53 +243,53 @@ compute_localstuff_solutions(Real_GoalVars, [(Goal, _Prev_Front_Residua, _LocalV
 	compute_neg_frontier(Goal, Real_GoalVars, 'true'),
 	compute_localstuff_solutions(Real_GoalVars, Local_Stuff).
 
-compute_pre_frontier_aux(Prev_Front_Residua) :-
+evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	goal_is_conjunction(Prev_Front_Residua, Prev_Front_Residua_1, Prev_Front_Residua_2), 
-	compute_pre_frontier_aux(Prev_Front_Residua_1),
-	compute_pre_frontier_aux(Prev_Front_Residua_2).
+	evaluate_prev_frontier_residua_aux(Prev_Front_Residua_1),
+	evaluate_prev_frontier_residua_aux(Prev_Front_Residua_2).
 
-compute_pre_frontier_aux(Prev_Front_Residua) :-
+evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	goal_is_disjunction(Prev_Front_Residua, Prev_Front_Residua_1, Prev_Front_Residua_2), 
 	(
-	    compute_pre_frontier_aux(Prev_Front_Residua_1)
+	    evaluate_prev_frontier_residua_aux(Prev_Front_Residua_1)
 	;
-	    compute_pre_frontier_aux(Prev_Front_Residua_2)
+	    evaluate_prev_frontier_residua_aux(Prev_Front_Residua_2)
 	).
 
-compute_pre_frontier_aux(Prev_Front_Residua) :-
+evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	goal_is_disequality(Prev_Front_Residua, Left, Right, EQV, UQV), 
 	EQV = [], 
 	diseq_uqv(Left, Right, UQV).
 
-compute_pre_frontier_aux(Prev_Front_Residua) :-
+evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	goal_is_equality(Prev_Front_Residua, Left, Right, EQV, UQV), 
 	EQV = [], 
 	eq_uqv(Left, Right, UQV).
 
-compute_pre_frontier_aux(Prev_Front_Residua) :-
+evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	goal_is_negation(Prev_Front_Residua, UQV, SubGoal), 
 	cneg_rt_Stuckey(UQV, SubGoal).
 
-compute_pre_frontier_aux(Prev_Front_Residua) :-
+evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	nonvar(Prev_Front_Residua),
 	goal_is_not_conj_disj_eq_diseq_dneg(Prev_Front_Residua),
 	call_to(Prev_Front_Residua).
 
 unify_pre_sols_when_possible([], []) :- !.
 unify_pre_sols_when_possible(To_Unify, After_Unified) :- 
-	debug_msg_list(1, 'compute_pre_frontier :: To_Unify', To_Unify),
+	debug_msg_list(1, 'evaluate_prev_frontier_residua :: To_Unify', To_Unify),
 	unify_sols_when_possible_aux_1(To_Unify, [], Unified, [], Not_Unified), !,
 	(
 	    (
 		Unified == [], 
-		debug_msg(1, 'compute_pre_frontier :: Not_Unified', Not_Unified),
+		debug_msg(1, 'evaluate_prev_frontier_residua :: Not_Unified', Not_Unified),
 		After_Unified = Not_Unified
 	    )
 	;
 	    (
 		Unified \== [], 
 		append(Not_Unified, Unified, New_To_Unify), 
-		debug_msg_list(1, 'compute_pre_frontier :: New_To_Unify', New_To_Unify),
+		debug_msg_list(1, 'evaluate_prev_frontier_residua :: New_To_Unify', New_To_Unify),
 		unify_pre_sols_when_possible(New_To_Unify, After_Unified)
 	    )
 	).
