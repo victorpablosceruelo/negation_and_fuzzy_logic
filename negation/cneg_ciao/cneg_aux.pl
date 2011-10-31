@@ -348,11 +348,18 @@ goal_name_is_not_disequality(Name) :-
 goal_name_is_not_negation(Name) :-
 	Name \== 'cneg',
 	Name \== 'cneg_tr',
+	Name \== 'cneg_rt_Stuckey',
+	Name \== 'cneg_rt_Chan',
+	Name \== 'cneg_rt_New',
 	Name \== 'cneg_rt'.
 
 valid_names_for_negation_preds('cneg').
 valid_names_for_negation_preds('cneg_tr').
 valid_names_for_negation_preds('cneg_rt').
+valid_names_for_negation_preds('cneg_rt_Stuckey').
+valid_names_for_negation_preds('cneg_rt_Chan').
+valid_names_for_negation_preds('cneg_rt_New').
+
 
 goal_is_negation(Goal, UQV, SubGoal) :-
 	valid_names_for_negation_preds(Name), 
