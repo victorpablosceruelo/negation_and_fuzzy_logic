@@ -51,11 +51,12 @@
 
 % Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
-	debug_msg_aux(1, '', '% cneg :: '),
-	debug_msg_aux(1, 'remove_attribute_local :: Var :: ', Var),
+	debug_msg_aux(1, '', '% cneg :: remove_attribute_local :: '),
+	debug_msg_aux(1, 'Var :: ', Var),
 	detach_attribute(Var),
 	debug_msg_aux(1, '  -->> Var :: ', Var),
 	debug_msg_nl(1).
+%	detach_attribute(Var).
 % XSB:	del_attr(Var, dist).
 
 get_attribute_local(Var, Attribute) :-
@@ -64,13 +65,14 @@ get_attribute_local(Var, Attribute) :-
 %	debug_msg(0, 'get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
 
 put_attribute_local(Var, Attribute) :-
-	debug_msg_aux(1, '', '% cneg :: '),
-	debug_msg_aux(1, 'put_attribute_local :: Attribute :: ', Attribute),
+	debug_msg_aux(1, '', '% cneg :: put_attribute_local :: '),
+%	debug_msg_aux(1, 'Attribute :: ', Attribute),
 	debug_msg_aux(1, '  Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
 	attach_attribute(Var, Attribute),
 	debug_msg_aux(1, '  -->> Var :: ', Var),
 	debug_msg_nl(1).
+%	attach_attribute(Var, Attribute).
 %	put_attr(Var, dist, Attribute).
 
 %get_attribute_if_any(Var) :-
@@ -207,8 +209,8 @@ verify_attribute_aux(Attribute, NewTarget) :-
 	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
-	debug_msg(1, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
-	debug_msg(1, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
+%	debug_msg(1, 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
+%	debug_msg(1, 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Diseqs_Var_1, _UQV_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Diseqs_Var_2, _UQV_Var_2), !,
 	remove_attribute_local(OldTarget_Var_1), 
@@ -218,7 +220,7 @@ combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
 	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, [], EQV, [], UQV, _Unused_Ts),
 	perform_substitutions([(OldTarget_Var_1, OldTarget_Var_2)], EQV, UQV),
 	
-	debug_msg(1, 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
+%	debug_msg(1, 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
 	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -704,8 +706,8 @@ cneg_diseq_eqv_uqv_adv(T1,T2, EQV_In, UQV_In, Result) :-
 	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
 	debug_msg(1, 'cneg_diseq_eqv_uqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	disequality_contents(Disequality, T1, T2, EQV, UQV),
-        test_and_update_vars_attributes([Disequality], Can_Fail, Result).
-%	debug_msg(1, 'cneg_diseq_eqv_uqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
+        test_and_update_vars_attributes([Disequality], Can_Fail, Result),
+	debug_msg(1, 'cneg_diseq_eqv_uqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
