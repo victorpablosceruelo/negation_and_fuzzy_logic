@@ -625,30 +625,36 @@ check_if_allowed_to_fail(Can_Fail) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-compute_eqv_or_uqv(_T1, _T2, EQV_In, UQV_In, _EQV_Out, _UQV_Out) :-
+compute_eqv_or_uqv(_T1, _T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	EQV_In = 'compute',
 	UQV_In = 'compute',
 	!, 
-	debug_msg(1, 'ERROR: Can not compute both EQV and UQV. (EQV, UQV)', (EQV_In, UQV_In)),
-	!,
-	fail.
+	UQV_Aux = [],
+	varsbag((T1, T2), UQV_Aux, [], EQV_Aux),
+	debug_msg(1, 'INFO: Computing both EQV and UQV. (EQV, UQV)', (EQV_Aux, UQV_Aux)),
+	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Additional tests.
+
 compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	EQV_In = 'compute', !,
 	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.	
 	varsbag((T1, T2), UQV_Aux, [], EQV_Aux), % Determine EQV.
-	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Test empty intersection.
+	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Additional tests.
+
 compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	UQV_In = 'compute', !,
 	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.
 	varsbag((T1, T2), EQV_Aux, [], UQV_Aux), % Determine UQV.
-	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Test empty intersection.
+	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Additional tests.
+
 compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.	
 	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.
 	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
-	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
+	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Tmp), % Only EQV affected variables.
 	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out), % Only UQV affected variables.
+	varsbag(Affected_Vars, UQV_Out, EQV_Tmp, EQV_Out), % Exhaustive sets, please.
 
+	% Test empty intersection between EQV and UQV.
 	varsbag_intersection(EQV_Out, UQV_Out, Intersection), % Compute intersection between EQV and UQV.
 	!,
 	(
