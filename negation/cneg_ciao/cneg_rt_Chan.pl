@@ -286,12 +286,12 @@ negate_frontier(Frontier_In, Proposal, GoalVars, Result):-
 %	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
 %	debug_msg(1, 'negate_frontier :: (E_Aux_1, IE_Aux_1, NIE_Aux_1)', (E_Aux_1, IE_Aux_1, NIE_Aux_1)),
 	!, % Reduce the stack's memory.
-	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars),
+	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars, ExpVars),
 	split_frontier_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
 %	debug_msg(1, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
-	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, IE_imp, NIE_imp, IE_NIE_exp),
+	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, ExpVars, IE_imp, NIE_imp, IE_NIE_exp),
 %	debug_msg(1, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
-	negate_formula(E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, Result),
+	negate_formula(E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, ExpVars, Result),
 %	debug_msg(1, 'negate_frontier :: (Result)', (Result)),
 	!.
 
@@ -630,12 +630,14 @@ negate_imp_atom(Formula, _Proposal, ImpVars, Neg_Atom, Keep_Atom) :-
 	Neg_Atom = (eq_uqv(T1,T2, FreeVars)),
 	Keep_Atom = (cneg_diseq_eqv_uqv(T1,T2, EQV, UQV)).
 
-negate_imp_atom(Formula, 'Chan', _ImpVars, Neg_Atom, Keep_Atom) :-
-	Neg_Atom = (cneg_rt_Chan([], Formula)),
+negate_imp_atom(Formula, 'Chan', ImpVars, Neg_Atom, Keep_Atom) :-
+ 	varsbag(Formula, ImpVars, [], FreeVars),
+	Neg_Atom = (cneg_rt_Chan(FreeVars, Formula)),
 	Keep_Atom = (Formula). 
 
-negate_imp_atom(Formula, 'New', _ImpVars, Neg_Atom, Keep_Atom) :-
-	Neg_Atom = (cneg_rt_New([], Formula)),
+negate_imp_atom(Formula, 'New', ImpVars, Neg_Atom, Keep_Atom) :-
+ 	varsbag(Formula, ImpVars, [], FreeVars),
+	Neg_Atom = (cneg_rt_New(FreeVars, Formula)),
 	Keep_Atom = (Formula). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
