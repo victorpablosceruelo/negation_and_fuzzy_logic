@@ -4,8 +4,12 @@
 % :- module(queensPeano, [queens/2]).
 % :- use_module(dist,[dist/2]).  
 
-  
+:- use_module(library(write), [write/1]).  
 % :- set_prolog_flag(multi_arity_warnings, off).
+
+test(N, Columns) :- % Let's see if we have invalid results.
+	cneg_rt([], queens(N, Columns)), % First constraints.
+	queens(N, Columns). % Secondly values generator.
 
 % queens(N,Columns) returns in Columns the column where we must place each of N
 % queens in a Checkerboard of NxN assuming each position in the list 
