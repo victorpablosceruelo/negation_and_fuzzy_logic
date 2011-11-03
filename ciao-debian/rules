@@ -144,9 +144,9 @@ install: build
 #	patch $(CURDIR)/debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el ./debian/ciao-el.patch2
 
 	# Fix the manual pages.
-	mv $(CURDIR)/debian/tmp/usr/share/man/ciao-1.13.0.manl $(CURDIR)/debian/tmp/usr/share/man/ciao.1
-	mv $(CURDIR)/debian/tmp/usr/share/man/lpdoc-2.0.38.manl $(CURDIR)/debian/tmp/usr/share/man/lpdoc.1
-	mv $(CURDIR)/debian/tmp/usr/share/man/ciaopp-1.2.0.manl $(CURDIR)/debian/tmp/usr/share/man/ciaopp.1
+#	mv $(CURDIR)/debian/tmp/usr/share/man/ciao-1.13.0.manl $(CURDIR)/debian/tmp/usr/share/man/ciao.1
+#	mv $(CURDIR)/debian/tmp/usr/share/man/lpdoc-2.0.38.manl $(CURDIR)/debian/tmp/usr/share/man/lpdoc.1
+#	mv $(CURDIR)/debian/tmp/usr/share/man/ciaopp-1.2.0.manl $(CURDIR)/debian/tmp/usr/share/man/ciaopp.1
 
 # 	sed -e "s/^\.TH ciao l \(.*\)$$/\.TH ciao 1 \1/" `pwd`/doc/reference/ciao.manl > $(TARGET)/usr/share/man/man1/ciao.1
 
