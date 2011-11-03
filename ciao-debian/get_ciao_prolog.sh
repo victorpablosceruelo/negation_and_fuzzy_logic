@@ -2,13 +2,17 @@
 
 # set -x
 
-if [ -z $1 ] || [ "$1" == "" ]; then
+if [ -z $1 ] || [ "$1" == "" ] || [ -z $2 ] || [ "$2" == "" ]; then
+	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
-	echo "Please enter Ciao Prolog subversion revision to download."
-	echo "We recommend you to use revision 11293"
+	echo "usage: $0 VERSION SVN_REVISION "
+	echo "example: $0 1.13 11293 "
+	echo "example: $0 1.14.2 13646 "
+	echo " "
 	exit 0
 else
-	REVISION="$1"
+	VERSION="$1"
+	REVISION="$2"
 fi;
 
 # Repositories urls.
@@ -17,10 +21,9 @@ REPOS_2=https://babel.ls.fi.upm.es/svn/negation_and_fuzzy_logic/ciao-debian/
 # SVNREPO_2=svn+ssh://clip.dia.fi.upm.es/home/egallego/clip/repos/ciao-debian/
 
 DATE=`date +%Y%m%d`
-# REVISION=11293
-VERSION=1.13+r$REVISION
-FOLDER_NAME=ciao-prolog-$VERSION
-FILE_NAME=ciao-prolog_$VERSION
+PKG_VERSION=$VERSION+r$REVISION
+FOLDER_NAME=ciao-prolog-$PKG_VERSION
+FILE_NAME=ciao-prolog_$PKG_VERSION
 BUILD_TGZ=$FILE_NAME.orig.tar.gz
 BUILD_DSC=$FILE_NAME.dsc
 BUILD_DIFF=$FILE_NAME.diff
@@ -73,7 +76,7 @@ tar cvfz $BUILD_TGZ $FOLDER_NAME
 
 # Create a suitable changelog entry.
 pushd $FOLDER_NAME
-dch -b -v $VERSION "Snapshot version $VERSION date $DATE."
+dch -b -v $PKG_VERSION "Snapshot version $PKG_VERSION date $DATE."
 popd
 dpkg-source -b $FOLDER_NAME
 
