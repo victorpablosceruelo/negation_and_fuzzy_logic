@@ -14,6 +14,9 @@
 # Uncomment this to turn on verbose mode. 
 export DH_VERBOSE=1
 
+# Use bash, not dash or some other ugly shell.
+export SHELL=/bin/bash
+
 # global debhelper options
 # export DH_OPTIONS=
 
