@@ -36,17 +36,17 @@ pushd ~/tmp
 rm -fv $BUILD_TGZ $BUILD_DSC $BUILD_DIFF $BUILD_DIFF_GZ
 
 # Ensure folder exists.
-rm -fR $FOLDER_NAME
+# rm -fR $FOLDER_NAME
 mkdir -p $FOLDER_NAME
 pushd $FOLDER_NAME
 
 # Update and export the Ciao's repository
 echo " "
 if [ -d .svn ]; then
-	echo "updating $REPOS_1 to revision $REVISION"
+	echo "updating CIAO to revision $REVISION from $REPOS_1"
 	svn update --revision $REVISION
 else
-	echo "checking out $REPOS_1 to revision $REVISION"
+	echo "checking out CIAO to revision $REVISION from $REPOS_1"
 	svn co $REPOS_1 . --revision $REVISION
 fi
 popd
@@ -60,11 +60,11 @@ pushd $FOLDER_NAME/debian
 echo " "
 if [ -d .svn ]; then
 # if [ -d .git ]; then
-	echo "updating $REPOS_2 to last revision "
+	echo "updating debian subfolder to last revision from $REPOS_2"
 	svn update
 	# git svn rebase
 else
-	echo "checking out $REPOS_2 to last revision."
+	echo "checking out debian subfolder to last revision from $REPOS_2"
 	svn co $REPOS_2 . 
 	# git svn clone $REPOS_2 .
 fi
