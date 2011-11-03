@@ -38,7 +38,7 @@ ciao-config-stamp:
 	    --update_cshrc=no \
 	    --install_emacs_support=yes \
             --use_threads=yes \
-            --optim_level=optimized \
+            --optim_level=normal \
 	    --update_emacs=no \
 	    --docdir=/usr/share/doc/ciao-prolog \
 	    --mandir=/usr/share/man \
