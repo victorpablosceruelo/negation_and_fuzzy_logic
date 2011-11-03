@@ -1,4 +1,4 @@
 #empezamos
-debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el      usr/share/emacs/site-lisp/ciao-prolog-el/
-debian/tmp/usr/lib/ciao/ciao-1.13/word-help.el usr/share/emacs/site-lisp/ciao-prolog-el/
-debian/tmp/usr/lib/ciao/ciao-1.13/icons        usr/share/emacs/site-lisp/ciao-prolog-el/
+debian/tmp/usr/lib/ciao/ciao-*/ciao.el      usr/share/emacs/site-lisp/ciao-prolog-el/
+debian/tmp/usr/lib/ciao/ciao-*/word-help.el usr/share/emacs/site-lisp/ciao-prolog-el/
+debian/tmp/usr/lib/ciao/ciao-*/icons        usr/share/emacs/site-lisp/ciao-prolog-el/
