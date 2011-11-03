@@ -11,8 +11,10 @@ BUILDPLACE=/var/cache/pbuilder/build/
 EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog sun-java6-jre virtual-mysql-client, virtual-mysql-server, mysql-common, libmysql++-dev, libmysqlclient16, libmysqlclient-dev, libmysqld-dev"
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
-# MIRRORSITE=http://ftp.de.debian.org/debian
-# OTHERMIRROR="deb http://ftp.de.debian.org/debian/ lenny main contrib non-free | deb-src http://ftp.de.debian.org/debian/ lenny main contrib non-free | deb http://ftp.de.debian.org/debian/ testing main contrib non-free | deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free | deb http://ftp.de.debian.org/debian/ unstable main contrib non-free | deb-src http://ftp.de.debian.org/debian/ unstable main contrib non-free | deb http://www.backports.org/debian lenny-backports main contrib non-free | deb-src http://www.backports.org/debian lenny-backports main contrib non-free | deb ftp://ftp.debian.org/debian experimental main contrib non-free | deb http://ftp.de.debian.org/debian/ experimental main contrib non-free"
+OTHERMIRROR="deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free | deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free "
+# deb http://ftp.de.debian.org/debian/ testing main contrib non-free | deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free
+# | deb http://ftp.de.debian.org/debian/ unstable main contrib non-free | deb-src http://ftp.de.debian.org/debian/ unstable main contrib non-free
+#  | deb http://www.backports.org/debian lenny-backports main contrib non-free | deb-src http://www.backports.org/debian lenny-backports main contrib non-free | deb ftp://ftp.debian.org/debian experimental main contrib non-free | deb http://ftp.de.debian.org/debian/ experimental main contrib non-free"
 # MIRRORSITE=http://ftp.jp.debian.org/debian
 # OTHERMIRROR="deb http://www.home.com/updates/ ./"
 #export http_proxy=http://your-proxy:8080/
@@ -21,7 +23,7 @@ MIRRORSITE=http://ftp.de.debian.org/debian/
 DISTRIBUTION=squeeze
 
 # APT configuration files directory
-APTCONFDIR="/etc/pbuilder/pbuilder-apt/"
+# APTCONFDIR="/etc/pbuilder/pbuilder-apt/"
 # APTCONFDIR=/etc/apt
 APTCACHE="/var/cache/pbuilder/aptcache/"
 APTCACHEHARDLINK="yes"
@@ -53,7 +55,7 @@ PBUILDERROOTCMD="sudo"
 # implementation, "pbuilder-satisfydepends-experimental", which might be useful
 # to pull packages from experimental or from repositories with a low APT Pin
 # Priority
-PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimental"
+# PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimental"
 
 #default is to build everything. Passed on to dpkg-buildpackage
 # DEBBUILDOPTS="-b"
@@ -88,4 +90,3 @@ PKGNAME_LOGFILE_EXTENTION="_$(dpkg --print-architecture).build"
 # default PKGNAME_LOGFILE
 PKGNAME_LOGFILE=""
 
-MIRRORSITE=http://ftp.de.debian.org/debian/

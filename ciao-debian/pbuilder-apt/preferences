@@ -56,86 +56,12 @@ Pin: release o=Debian,l=Debian,a=sid
 Pin-Priority: -20
 
 Package: *
-Pin: origin kernel-archive.buildserver.net
-Pin-Priority: -50
-
-Package: *
 Pin: release o=Debian,l=Debian,a=experimental
 Pin-Priority: -50
 
 Package: *
 Pin: release a=experimental
 Pin-Priority: -50
-
-// From here, non-official repositories.
-Package: *
-Pin: origin http://babel.ls.fi.upm.es
-Pin-Priority: -100
-
-Package: *
-Pin: origin mozilla.debian.net
-Pin-Priority: -200
-
-Package: *
-Pin: origin apt.wicd.net
-Pin-Priority: -200
-
-Package: *
-Pin: origin packages.kirya.net
-Pin-Priority: -200
-
-Package: *
-Pin: origin deb.opera.com
-Pin-Priority: -200
-
-Package: *
-Pin: origin lackof.org
-Pin-Priority: -200
-
-Package: *
-Pin: origin download.skype.com
-Pin-Priority: -200
-
-Package: *
-Pin: origin dl.google.com
-Pin-Priority: -200
-
-// This one generates nighty-builds, so forget updating it.
-Package: *
-Pin: origin sip-communicator.org
-Pin-Priority: -200
-
-// Ubuntu packages (non-debian) for:
-// - SubDownloader
-// - EQUINOX-FAENZA
-// - OPENSONIC
-// - TURPIAL (Cliente Twitter con sabor venezolano)
-// - PYROOM
-// - DARKTABLE (Visor de imagenes avanzado)
-// - ELEGANT GNOME (Elegant theme for gnome)
-Package: *
-Pin: origin ppa.launchpad.net
-Pin-Priority: -200
-
-// Ubuntu packages (non-debian)
-Package: *
-Pin: origin archive.getdeb.net
-Pin-Priority: -200
-
-// LIBREOFFICE
-Package: *
-Pin: origin download.tuxfamily.org
-Pin-Priority: -200
-
-// FUENTES UBUNTU
-Package: *
-Pin: origin archive.ubuntu.com
-Pin-Priority: -200
-
-// E17 (Enlightenment)
-Package: *
-Pin: origin packages.enlightenment.org
-Pin-Priority: -200
 
 // Problematic debian packages.
 Package: fglrx-glx fglrx-atieventsd fglrx-control fglrx-driver fglrx-modules-dkms fglrx-source fglrx-glx-ia32 halevt
