@@ -1,2 +1,0 @@
-# APT::Authentication::TrustCDROM "true";
-APT::Get::AllowUnauthenticated "true";

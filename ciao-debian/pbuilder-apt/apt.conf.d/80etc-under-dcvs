@@ -1,7 +1,0 @@
-DPkg{
-#   Pre-Invoke  {"cd /etc ; ./apt/hg-snapshot-script.sh pre";};
-#   Post-Invoke {"cd /etc ; ./apt/hg-snapshot-script.sh post";};
-   Pre-Invoke  {"cd /etc ; [ -x /etc/apt/git-snapshot-script.sh ] && ./apt/git-snapshot-script.sh pre";};
-   Post-Invoke {"cd /etc ; [ -x /etc/apt/git-snapshot-script.sh ] && ./apt/git-snapshot-script.sh post";};
-};
-
