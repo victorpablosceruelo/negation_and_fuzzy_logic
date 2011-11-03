@@ -82,7 +82,8 @@ dpkg-source -b $FOLDER_NAME
 
 echo " "
 echo " "
-echo "-> Now run: [ the first one only if you did not do it before ]"
+echo "-> Now run: [ the first two only if you did not execute them before ]"
+echo " sudo pbuilder --clean "
 echo " sudo cowbuilder --create "
 echo " sudo cowbuilder --update "
 echo " sudo cowbuilder --build $BUILD_DSC "
