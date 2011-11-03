@@ -46,7 +46,7 @@ ciao-config-stamp:
 	    --web_images_path=/usr/share/doc/ciao-prolog/html \
 	    --htmldir=/usr/share/doc/ciao-prolog/html \
 	    --install_prolog_name=no --execmode=755 --datamode=644 \
-	    --installgroup=root --stop-if-error=no \
+	    --installgroup=root --stop-if-error=yes \
 	    --with_gsl=no --with_ppl=no \
 	    --with_mysql=yes --mysql_client_directory=/usr/lib
 
@@ -139,7 +139,7 @@ install: build
 	# Those are based on bfulgam's old rule file. Anyways I think they should be fixed upstream.
 
 	# Patch the emacs mode.
-	patch $(CURDIR)/debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el ./debian/ciao-el.patch
+#	patch $(CURDIR)/debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el ./debian/ciao-el.patch
 #       We have returned to versioned names.
 #	patch $(CURDIR)/debian/tmp/usr/lib/ciao/ciao-1.13/ciao.el ./debian/ciao-el.patch2
 
