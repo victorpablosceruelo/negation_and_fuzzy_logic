@@ -1,0 +1,7 @@
+/*
+ * APT configuration file for junior-config package
+ */
+
+DPkg {
+	Post-Invoke {"test -f /var/run/junior-config.usermenu && if [ -x /usr/sbin/blend-update-usermenus ] ; then /usr/sbin/blend-update-usermenus junior ; fi ; rm -f /var/run/junior-config.usermenu";};
+}

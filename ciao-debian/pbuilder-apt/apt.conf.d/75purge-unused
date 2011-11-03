@@ -1,0 +1,5 @@
+# From http://www.linux-archive.org/ubuntu-user/400033-how-auto-purge-automatically-installed-packages-using-aptitude.html
+#
+
+Aptitude::Purge-Unused "true";
+

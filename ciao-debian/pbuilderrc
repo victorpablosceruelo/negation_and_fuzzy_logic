@@ -21,7 +21,7 @@ MIRRORSITE=http://ftp.de.debian.org/debian/
 DISTRIBUTION=squeeze
 
 # APT configuration files directory
-APTCONFDIR="/etc/apt/"
+APTCONFDIR="/etc/pbuilder/pbuilder-apt/"
 # APTCONFDIR=/etc/apt
 APTCACHE="/var/cache/pbuilder/aptcache/"
 APTCACHEHARDLINK="yes"

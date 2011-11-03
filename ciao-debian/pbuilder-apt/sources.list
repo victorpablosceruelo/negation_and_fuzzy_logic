@@ -1,0 +1,166 @@
+#
+# FILE: /etc/apt/sources.list
+# 
+
+deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+deb http://security.debian.org/ squeeze/updates main contrib non-free
+deb-src http://security.debian.org/ squeeze/updates main contrib non-free
+# deb http://volatile.debian.org/debian-volatile squeeze/volatile main contrib non-free
+# deb-src http://volatile.debian.org/debian-volatile squeeze/volatile main contrib non-free
+
+# Debian Testing and Unstable.
+# deb http://ftp.de.debian.org/debian/ testing main contrib non-free
+# deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free
+# deb http://ftp.de.debian.org/debian/ unstable main contrib non-free
+# deb-src http://ftp.de.debian.org/debian/ unstable main contrib non-free
+
+# Debian backports
+# wget -O - http://backports.org/debian/archive.key | sudo apt-key add -
+# deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free
+# deb-src http://backports.debian.org/debian-backports squeeze-backports main contrib non-free
+
+# This replaces volatile.
+deb http://ftp.debian.org/debian squeeze-updates main 
+deb-src http://ftp.debian.org/debian squeeze-updates main
+
+# Debian experimental
+# deb ftp://ftp.debian.org/debian experimental main contrib non-free
+# deb http://ftp.de.debian.org/debian/ experimental main contrib non-free 
+
+# Debian experimental kernels #
+# Experimental Kernels
+# deb http://kernel-archive.buildserver.net/debian-kernel/ trunk main
+# deb-src http://kernel-archive.buildserver.net/debian-kernel/ trunk main
+
+# -------------------------------------------------------------------
+# -------------------------------------------------------------------
+
+# Ciao prolog
+# deb http://babel.ls.fi.upm.es/~vpablos/others/packages/debian ./ 
+# deb-src http://babel.ls.fi.upm.es/~vpablos/others/packages/debian ./
+
+# New emacs snapshot packages:
+# wget -q -O - http://orebokech.com/Romain_Francoise.pgp | sudo apt-key add -
+# deb http://emacs.orebokech.com lenny main
+# deb-src http://emacs.orebokech.com lenny main
+
+# Debian Multimedia repository
+# wget -O - http://www.debian-multimedia.org/pool/main/d/debian-multimedia-keyring/debian-multimedia-keyring_2008.10.16_all.deb 
+# sudo aptitude install debian-multimedia-keyring
+# deb http://www.debian-multimedia.org/ squeeze main non-free
+# deb-src http://www.debian-multimedia.org/ squeeze main non-free
+# deb http://www.debian-multimedia.org/ stable main non-free
+# deb-src http://www.debian-multimedia.org/ stable main non-free
+# deb http://www.debian-multimedia.org/ testing main non-free
+# deb-src http://www.debian-multimedia.org/ testing main non-free
+# deb http://www.debian-multimedia.org/ unstable main non-free
+# deb-src http://www.debian-multimedia.org/ unstable main non-free
+
+# repositorio Debian Mozilla team APT archive for iceweasel and icedove.
+# http://ubuntu308.wordpress.com/2010/11/27/iceweasel-4-0-beta7-en-debian-squeeze/
+# http://putolinux.wordpress.com/2010/11/22/mis-putos-repositorios-debian-testing-%E2%80%9Csqueeze%E2%80%9D-%E2%80%93-22-de-noviembre-de-2010/
+# deb http://mozilla.debian.net/packages/ ./
+# deb http://mozilla.debian.net/ squeeze-backports iceweasel-beta
+# deb http://mozilla.debian.net/ squeeze-backports iceweasel-aurora
+# deb http://mozilla.debian.net/ squeeze-backports iceweasel-6.0
+# deb http://mozilla.debian.net/ squeeze-backports iceweasel-5.0
+# deb http://mozilla.debian.net/ squeeze-backports iceweasel-4.0
+# deb http://mozilla.debian.net/ squeeze-backports icedove-3.1
+
+# Debian GOTO10 repository
+# deb http://debian.goto10.org/debian/ lenny main contrib non-free
+# deb-src http://debian.goto10.org/debian/ lenny main contrib non-free
+
+# Opera
+# wget -O - http://deb.opera.com/archive.key | sudo apt-key add -
+# deb http://deb.opera.com/opera squeeze non-free
+
+# Skype
+# deb http://download.skype.com/linux/repos/debian/ stable non-free
+# deb http://download.skype.com/linux/repos/debian/ testing non-free
+# deb http://download.skype.com/linux/repos/debian/ unstable non-free
+
+# Marillat (Acrobat reader, etc)
+# deb http://oktan.ls.fi.upm.es/debian-multimedia/ stable main
+# deb-src http://oktan.ls.fi.upm.es/debian-multimedia/ stable main
+# deb http://oktan.ls.fi.upm.es/debian-multimedia/ testing main
+# deb-src http://oktan.ls.fi.upm.es/debian-multimedia/ testing main
+# deb ftp://ftp.nerim.net/debian-marillat/ unstable main
+# deb-src ftp://ftp.nerim.net/debian-marillat/ unstable main
+
+# Wicd is an open source wired and wireless network manager for Linux
+# which aims to provide a simple interface to connect to networks with
+# a wide variety of settings.
+# http://wicd.sourceforge.net/download.php
+# wget -q http://apt.wicd.net/wicd.gpg -O- | sudo apt-key add -
+# deb http://apt.wicd.net lenny extras
+
+# Just for tovid
+# wget -O - http://packages.kirya.net/Kirya.netDebianpackagesVerificationKey.asc | sudo apt-key add -
+# deb http://packages.kirya.net/debian/ stable main contrib non-free
+# deb-src http://packages.kirya.net/debian/ stable main contrib non-free
+# deb http://packages.kirya.net/debian/ squeeze main contrib non-free
+# deb-src http://packages.kirya.net/debian/ squeeze main contrib non-free
+# deb http://packages.kirya.net/debian/ sid main contrib non-free
+# deb-src http://packages.kirya.net/debian/ sid main contrib non-free
+# deb http://packages.kirya.net/debian/ experimental main contrib non-free
+# deb-src http://packages.kirya.net/debian/ experimental main contrib non-free
+# deb http://packages.kirya.net/debian/ unstable main contrib non-free
+# deb-src http://packages.kirya.net/debian/ unstable main contrib non-free
+
+# SIP communicator (no existence of stable and testing).
+# sudo apt-get install sip-communicator-keyring
+# deb http://download.sip-communicator.org/deb stable/
+# deb http://download.sip-communicator.org/deb testing/
+# deb http://download.sip-communicator.org/deb unstable/
+
+# Ekiga 3.0
+# deb http://lackof.org/~taggart/ekiga ./
+
+# Google repositories for Picassa and other apps.
+# wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+# deb http://dl.google.com/linux/deb/ stable main contrib non-free
+# deb http://dl.google.com/linux/deb/ testing main contrib non-free
+# deb http://dl.google.com/linux/deb/ unstable non-free
+
+# GetDeb Software Portal - http://www.getdeb.net/welcome/ (ubuntu packages)
+# wget -q -O- http://archive.getdeb.net/getdeb-archive.key | sudo apt-key add -
+# deb http://archive.getdeb.net/ubuntu maverick-getdeb apps
+
+# PPA for Developers of SubDownloader (ubuntu packages)
+# deb http://ppa.launchpad.net/subdownloader-developers/ppa/ubuntu lucid main 
+# deb-src http://ppa.launchpad.net/subdownloader-developers/ppa/ubuntu lucid main 
+
+# EQUINOX-FAENZA 
+# (Faenza icon theme is probably the best ever icon theme I have downloaded 
+# from third party sources. And when used along with Equinox GTK theme, 
+# this is by far one among the best themes for Ubuntu yet.)
+# From http://www.techdrivein.com/2010/08/equinox-gtk-theme-faenza-icon-theme.html
+# deb http://ppa.launchpad.net/tiheum/equinox/ubuntu maverick main
+
+# OPENSONIC
+# deb http://ppa.launchpad.net/szymonw/ppa/ubuntu maverick main
+
+# TURPIAL (Cliente Twitter con sabor venezolano)
+# deb http://ppa.launchpad.net/effie-jayx/turpial-devel/ubuntu lucid main
+
+# PYROOM
+# deb http://ppa.launchpad.net/pyroom-dev/ppa/ubuntu jaunty main
+
+# LIBREOFFICE
+# deb http://download.tuxfamily.org/gericom/libreoffice /
+
+# DARKTABLE (Visor de imagenes avanzado)
+# deb-src http://ppa.launchpad.net/pmjdebruijn/darktable-unstable/ubuntu maverick main
+
+# ELEGANT GNOME (Elegant theme for gnome)
+# deb http://ppa.launchpad.net/elegant-gnome/ppa/ubuntu maverick main 
+
+# FUENTES UBUNTU
+# deb-src http://archive.ubuntu.com/ubuntu maverick main universe
+
+# E17 (Enlightenment)
+# deb http://packages.enlightenment.org/debian squeeze main extras
+
+

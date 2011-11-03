@@ -81,6 +81,10 @@ popd
 dpkg-source -b $FOLDER_NAME
 
 echo " "
+echo "-> It is needed for the following operation the symbolic links: "
+echo "   /etc/pbuilderrc -> pbuilderrc "
+echo "   /etc/pbuilder/pbuilderrc -> pbuilderrc "
+echo "   /etc/pbuilder/pbuilder-apt -> pbuilder-apt "
 echo " "
 echo "-> Now run: [ the first two only if you did not execute them before ]"
 echo " sudo pbuilder --clean "
