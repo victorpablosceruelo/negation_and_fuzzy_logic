@@ -8,7 +8,7 @@ BASETGZ=/var/cache/pbuilder/base.tgz
 BUILDPLACE=/var/cache/pbuilder/build/
 #export DEBIAN_BUILDARCH=athlon
 #EXTRAPACKAGES=gcc3.0-athlon-builder
-EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog sun-java6-jre virtual-mysql-client, virtual-mysql-server, mysql-common, libmysql++-dev, libmysqlclient16, libmysqlclient-dev, libmysqld-dev"
+EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog sun-java6-jre virtual-mysql-client virtual-mysql-server mysql-common libmysql++-dev libmysqlclient16 libmysqlclient-dev libmysqld-dev"
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
 OTHERMIRROR="deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free | deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free "
