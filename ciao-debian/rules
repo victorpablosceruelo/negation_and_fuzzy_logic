@@ -33,7 +33,7 @@ ciao-config-stamp:
 	    --sysavail=all \
 	    --instype=ins \
 	    --prefix=/usr \
-	    --optimizing_compiler=yes \
+	    --optimizing_compiler=no \
 	    --update_bashrc=no \
 	    --update_cshrc=no \
 	    --install_emacs_support=yes \
