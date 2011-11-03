@@ -72,7 +72,8 @@ popd
 echo " "
 
 # Create .orig tarball
-tar cvfz $BUILD_TGZ $FOLDER_NAME
+echo " -> Compressing $FOLDER_NAME in file $BUILD_TGZ "
+tar cfz $BUILD_TGZ $FOLDER_NAME
 
 # Create a suitable changelog entry.
 pushd $FOLDER_NAME
