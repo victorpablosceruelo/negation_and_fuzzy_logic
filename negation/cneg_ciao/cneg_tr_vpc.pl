@@ -1,7 +1,7 @@
 
 :- module(cneg_tr_vpc,[generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, 
 	take_body_first_unification/2],[assertions]).
-:- use_module(library('cneg/cneg_aux'), _).
+:- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,17 +78,17 @@ args_for_cneg_tr(Arity, Functor, GoalVars, Result) :-
 
 cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name) :-
 	name(Name, Name_String),
-	cneg_aux:append("cneg_", Name_String, Main_Cl_String),
+	append("cneg_", Name_String, Main_Cl_String),
 	name(Main_Cl_Name, Main_Cl_String),
 	
-	cneg_aux:append(Main_Cl_String, "_aux", Aux_Cl_String),
+	append(Main_Cl_String, "_aux", Aux_Cl_String),
 	name(Aux_Cl_Name, Aux_Cl_String).
 
 generate_name_from_counter(Counter, Aux_Cl_Name, New_Name) :-
 	name(Aux_Cl_Name, String_1),
 	name(Counter, String_2), 
-	cneg_aux:append("_", String_2, String_3),
-	cneg_aux:append(String_1, String_3, String), 
+	append("_", String_2, String_3),
+	append(String_1, String_3, String), 
 	name(New_Name, String).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -272,7 +272,7 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_negation(Atom, UQV, SubGoal), !,
-	functor_local(Op_Append, 'cneg_aux:append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
+	functor_local(Op_Append, 'append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
 	Neg_Atom = (Op_Append, Neg_Atom_Aux),
 	double_negation_atom(SubGoal, New_GoalVars, Result, Neg_Atom_Aux).
 
@@ -352,14 +352,14 @@ double_negation_atom(Atom, GoalVars, Result, Atom) :-
 
 generate_double_negation_name(Name, New_Name) :-
 	name(Name, String_Name),
-	cneg_aux:append("double_negation_", String_Name, String_New_Name),
+	append("double_negation_", String_Name, String_New_Name),
 	name(New_Name, String_New_Name).
 
 generate_name_with_counter(Name, Counter, New_Name) :-
 	name(Name, String_Name),
 	name(Counter, String_Counter),
-	cneg_aux:append(String_Name, "_", String_Name_Tmp),
-	cneg_aux:append(String_Name_Tmp, String_Counter, String_New_Name),
+	append(String_Name, "_", String_Name_Tmp),
+	append(String_Name_Tmp, String_Counter, String_New_Name),
 	name(New_Name, String_New_Name).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

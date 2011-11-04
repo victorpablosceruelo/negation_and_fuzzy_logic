@@ -1,9 +1,10 @@
-% :- module(ex_queensPeano,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_queensPeano,_,[.(cneg), debugger_pkg]).
+% :- module(queensPeano,_,[.(cneg)]).
+ 
 % :- module(queensPeano, [queens/2]).
-:- module(ex_queensPeano,_).
-:- use_package(library(cneg)).
-:- use_package(library(debugger_pkg)).
 % :- use_module(dist,[dist/2]).  
+
+:- use_module(library(write), [write/1]).  
 % :- set_prolog_flag(multi_arity_warnings, off).
 
 test(N, Columns) :- % Let's see if we have invalid results.
