@@ -8,9 +8,9 @@
 :- module(cneg_tr,[trans_sent/3, trans_clause/3],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
-:- use_module(cneg_aux, _).
+:- use_module(library('cneg/cneg_aux'), _).
 :- use_module(library(terms), _).
-:- use_module(cneg_tr_vpc, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
+:- use_module(library('cneg/cneg_tr_vpc'), [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
 :- reexport(cneg_tr_vpc, [cneg_main_and_aux_cl_names/3]).
 
 :- comment(title, "Contructive Negation Transformation").

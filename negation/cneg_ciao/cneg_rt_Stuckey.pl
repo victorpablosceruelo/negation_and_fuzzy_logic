@@ -10,8 +10,8 @@
 :- multifile cneg_pre_frontier/6.
 :- multifile call_to/1.
 
-:- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
+:- use_module(library('cneg/cneg_aux'), _).
+:- use_module(library('cneg/cneg_diseq'), [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
 	cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5]).
 :- use_module(library(aggregates),[setof/3]).

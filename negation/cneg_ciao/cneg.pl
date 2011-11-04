@@ -1,3 +1,5 @@
+:- package(cneg).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package  CNEG is part of the constructive negation implementation.
 %
@@ -9,19 +11,22 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
 %:- module(cneg,_).
 % To be able to call Pred from cneg
 
 % Needed to be able to compile the modules.
-:- use_module(cneg_aux).
+% :- use_module(.(cneg_aux)).
+:- use_module(library('cneg/cneg_aux')).
 % , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, debug_msg/3]). 
-:- use_module(cneg_diseq, [equality/3, disequality/3, 
+:- use_module(library('cneg/cneg_diseq'), [equality/3, disequality/3, 
 	diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
 	cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5]).
-:- use_module(cneg_tr).
-:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
-:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
+:- use_module(library('cneg/cneg_tr'), _).
+:- use_module(library('cneg/cneg_rt_Chan'), [cneg_rt_Chan/2, cneg_rt_New/2]).
+:- use_module(library('cneg/cneg_rt_Stuckey'), [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_aux, [varsbag/4, varsbag_addition/3]).    
@@ -93,7 +98,7 @@ call_to(Predicate) :-
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
-:- load_compilation_module(.('cneg_tr')).
+:- load_compilation_module(library('cneg/cneg_tr')).
 
 % trans_sent/3 makes the transformation.
 :- add_sentence_trans(trans_sent/3).

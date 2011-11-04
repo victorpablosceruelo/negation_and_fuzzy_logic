@@ -9,7 +9,7 @@
 	], 
 	[assertions]).
 
-:- use_module(cneg_aux,_).
+:- use_module(library('cneg/cneg_aux'),_).
 
 %:- use_package(debug).
 %:- use_package(trace).
