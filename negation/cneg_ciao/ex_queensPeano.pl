@@ -1,4 +1,4 @@
-:- module(ex_queensPeano,_,[.(cneg), debugger_pkg]).
+:- module(ex_queensPeano,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano,_,[.(cneg)]).
  
 % :- module(queensPeano, [queens/2]).

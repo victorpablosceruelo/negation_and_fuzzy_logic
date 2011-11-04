@@ -1,3 +1,4 @@
+:- package(cneg).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package  CNEG is part of the constructive negation implementation.
 %
