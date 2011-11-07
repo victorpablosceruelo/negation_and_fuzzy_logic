@@ -16,6 +16,8 @@
 	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
 	cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5]).
 :- use_module(library(aggregates),[setof/3]).
+:- use_module(library(prolog_sys), [statistics/0]).
+
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
 
@@ -39,6 +41,8 @@ cneg_rt_New(UQV, Goal):-
 	call_to(Result).
 
 cneg_rt_Aux(UQV_In, Goal, Proposal, Result) :-
+	debug_msg_nl(1),
+	statistics,
 	debug_msg_nl(1),
 	debug_msg(1, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
