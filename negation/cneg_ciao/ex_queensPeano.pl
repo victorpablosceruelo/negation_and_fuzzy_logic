@@ -4,7 +4,7 @@
 % :- module(queensPeano, [queens/2]).
 % :- use_module(dist,[dist/2]).  
 
-:- use_module(library(write), [write/1]).  
+% :- use_module(library(write), [write/1]).  
 % :- set_prolog_flag(multi_arity_warnings, off).
 
 test(N, Columns) :- % Let's see if we have invalid results.
