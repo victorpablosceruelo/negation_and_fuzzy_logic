@@ -28,7 +28,7 @@
 	[assertions]).
 
 :- use_module(library(aggregates),[setof/3]).
-:- use_module(library(write), _).
+:- use_module(library(write), [write/2]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
@@ -45,6 +45,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+:- dynamic defined_stream_to_file/1.
+
 % Use the following sentences to enable/disable debugging.
 debug_msg_is_on(Level) :- Level > 0.
 
@@ -53,6 +55,13 @@ debug_msg_is_on(Level) :- Level > 0.
 % 2 -> normal msgs.
 
 %%% Debug (by VPC).
+get_stream_to_file(Stream) :-
+	defined_stream_to_file(Stream), !.
+get_stream_to_file(Stream) :-
+	name(FN_Out, "debug_pkg_cneg.pl"),	% Convert string to atom.
+	open(FN_Out,write,Stream),
+	assertz_fact(defined_stream_to_file(Stream)).
+
 debug_msg(Level, Msg, Clause) :-
 	debug_msg_logo(Level),
 	debug_msg_aux(Level, Msg, ' :: '),
@@ -61,8 +70,9 @@ debug_msg(Level, Msg, Clause) :-
 
 debug_msg_aux(Level, Msg, Clause) :-
 	debug_msg_is_on(Level),
-	write(Msg), 
-	write(Clause).
+	get_stream_to_file(Stream),
+	write(Stream, Msg), 
+	write(Stream, Clause).
 debug_msg_aux(Level, _Msg, _Clause) :- 
 	\+(debug_msg_is_on(Level)).
 
@@ -74,7 +84,8 @@ debug_msg_logo(Level) :-
 
 debug_msg_nl(Level) :-
 	debug_msg_is_on(Level),
-	nl.
+	get_stream_to_file(Stream),
+	nl(Stream).
 debug_msg_nl(Level) :- 
 	\+(debug_msg_is_on(Level)).
 
