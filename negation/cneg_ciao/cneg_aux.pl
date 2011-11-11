@@ -1,9 +1,9 @@
 
 :- module(cneg_aux,
 	[
-	    debug_msg/3, debug_msg_list/3, 
-	    debug_msg_aux/3, debug_msg_nl/1, 
-	    debug_msg_logo/1,
+	    echo_msg/3, echo_msg_list/3, 
+	    echo_msg_aux/3, echo_msg_nl/1, 
+	    echo_msg_logo/1,
 	    findall/4, append/3, functor_local/4,
 	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -28,7 +28,7 @@
 	[assertions]).
 
 :- use_module(library(aggregates),[setof/3]).
-:- use_module(library(write), [write/2]).
+:- use_module(library(write), [write/1, write/2]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
@@ -48,11 +48,10 @@
 :- dynamic defined_stream_to_file/1.
 
 % Use the following sentences to enable/disable debugging.
-debug_msg_is_on(Level) :- Level > 0.
 
-% 0 -> crazy debug.
-% 1 -> debug.
-% 2 -> normal msgs.
+% 0 -> no debug.
+% 1 -> std output + debugging.
+% 2 -> only debugging.
 
 %%% Debug (by VPC).
 get_stream_to_file(Stream) :-
@@ -62,52 +61,52 @@ get_stream_to_file(Stream) :-
 	open(FN_Out,write,Stream),
 	assertz_fact(defined_stream_to_file(Stream)).
 
-debug_msg(Level, Msg, Clause) :-
-	debug_msg_logo(Level),
-	debug_msg_aux(Level, Msg, ' :: '),
-	debug_msg_aux(Level, Clause, ''),
-	debug_msg_nl(Level).
+echo_msg(Level, Msg, Clause) :-
+	echo_msg_logo(Level),
+	echo_msg_aux(Level, Msg, ' :: '),
+	echo_msg_aux(Level, Clause, ''),
+	echo_msg_nl(Level).
 
-debug_msg_aux(Level, Msg, Clause) :-
-	debug_msg_is_on(Level),
+echo_msg_aux(0, _Msg, _Clause) :- !.
+echo_msg_aux(1, Msg, Clause) :-
+	echo_msg_aux(2, Msg, Clause),
+	write(Msg), 
+	write(Clause).
+echo_msg_aux(2, Msg, Clause) :-
 	get_stream_to_file(Stream),
 	write(Stream, Msg), 
 	write(Stream, Clause).
-debug_msg_aux(Level, _Msg, _Clause) :- 
-	\+(debug_msg_is_on(Level)).
 
-debug_msg_logo(Level) :-
-	debug_msg_is_on(Level),
-	debug_msg_aux(Level, '% cneg', ' :: ').
-debug_msg_logo(Level) :-
-	\+(debug_msg_is_on(Level)).
+echo_msg_logo(Level) :-
+	echo_msg_aux(Level, '% cneg', ' :: ').
 
-debug_msg_nl(Level) :-
-	debug_msg_is_on(Level),
+echo_msg_nl(0) :- !.
+echo_msg_nl(1) :-
+	echo_msg_nl(2),
+	nl.
+echo_msg_nl(2) :-
 	get_stream_to_file(Stream),
 	nl(Stream).
-debug_msg_nl(Level) :- 
-	\+(debug_msg_is_on(Level)).
 
-debug_msg_list(Level, Msg, []) :-
-	debug_msg_list_aux(Level, Msg, []),
+echo_msg_list(Level, Msg, []) :-
+	echo_msg_list_aux(Level, Msg, []),
 	!. % No backtracking allowed.
-debug_msg_list(Level, Msg, [Cl|Cls]) :- 
+echo_msg_list(Level, Msg, [Cl|Cls]) :- 
 	!, % No backtracking allowed.
-	debug_msg_list_aux(Level, Msg, Cl),
-	debug_msg_list(Level, Msg, Cls).
+	echo_msg_list_aux(Level, Msg, Cl),
+	echo_msg_list(Level, Msg, Cls).
 
-debug_msg_list_aux(Level, Msg_Atom, Cl) :-
+echo_msg_list_aux(Level, Msg_Atom, Cl) :-
         atom(Msg_Atom),
         atom_codes(Msg_Atom, Msg_Chars),
 	append(Msg_Chars, " (list) ", New_Msg_Chars),
         atom_codes(New_Msg_Atom, New_Msg_Chars), 
         atom(New_Msg_Atom), !,
-	debug_msg(Level, New_Msg_Atom, Cl).
-debug_msg_list_aux(Level, Msg_String, Cl) :-
+	echo_msg(Level, New_Msg_Atom, Cl).
+echo_msg_list_aux(Level, Msg_String, Cl) :-
 	string(Msg_String),
 	append(Msg_String, " (list) ", New_Msg_String),
-	debug_msg(Level, New_Msg_String, Cl).
+	echo_msg(Level, New_Msg_String, Cl).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,7 +145,7 @@ list_head_and_tail([Head | Tail], Head, Tail).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %unify_terms(Term1, Term2) :-
-%	debug_msg_clause('unify_terms', unify_terms(Term1, Term2)), 
+%	echo_msg_clause('unify_terms', unify_terms(Term1, Term2)), 
 %	fail.
 
 unify_terms(Term1, Term2) :- 
@@ -410,9 +409,9 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	!.
 
 qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	debug_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	debug_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	debug_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
+	echo_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
+	echo_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
+	echo_msg(0, 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
 	!.
 
 %	name(Name, NameString),
@@ -425,7 +424,7 @@ name_has_semicolon(Any) :-
 	string(Any), !, 
 	name_has_semicolon_aux(Any).
 name_has_semicolon(Any) :-
-	debug_msg(0, 'name_has_semicolon :: NOT a string', Any), fail.
+	echo_msg(0, 'name_has_semicolon :: NOT a string', Any), fail.
 
 name_has_semicolon_aux([]) :- !, fail.
 name_has_semicolon_aux([A]) :- 
@@ -442,7 +441,7 @@ remove_qualification(NameIn, NameOut) :-
 	name_has_semicolon(NameIn), !,
 	remove_qualification_aux(NameIn, NameOut).
 remove_qualification(NameIn, NameIn) :- !.
-%	debug_msg_clause('WARNING: remove_qualification :: NOT a string qualified', NameIn).
+%	echo_msg_clause('WARNING: remove_qualification :: NOT a string qualified', NameIn).
 
 remove_qualification_aux([A|Name], Name) :-
 	semicolon_string([A]), !.
@@ -529,12 +528,12 @@ varsbag_addition(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
 	cneg_aux:varsbag(VarsBag_In, [], [], VarsBag_Out).
 
 varsbag_difference(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
-%	debug_msg('varsbag_difference(VarsBag_1_In, VarsBag_2_In)', (VarsBag_1_In, VarsBag_2_In)),
+%	echo_msg('varsbag_difference(VarsBag_1_In, VarsBag_2_In)', (VarsBag_1_In, VarsBag_2_In)),
 	filter_out_nonvars(VarsBag_1_In, VarsBag_1_Aux),
 	filter_out_nonvars(VarsBag_2_In, VarsBag_2_Aux),
-%	debug_msg('varsbag_difference(VarsBag_1_Aux, VarsBag_2_Aux)', (VarsBag_1_Aux, VarsBag_2_Aux)),
+%	echo_msg('varsbag_difference(VarsBag_1_Aux, VarsBag_2_Aux)', (VarsBag_1_Aux, VarsBag_2_Aux)),
 	varsbag_difference_aux(VarsBag_1_Aux, VarsBag_2_Aux, VarsBag_Out).
-%	debug_msg('varsbag_difference :: VarsBag_Out', VarsBag_Out).
+%	echo_msg('varsbag_difference :: VarsBag_Out', VarsBag_Out).
 
 varsbag_difference_aux([], _VarsBag, []) :- !.
 varsbag_difference_aux([Var | Vars_In], VarsBag, Vars_Out) :-
@@ -555,14 +554,14 @@ varsbag_intersection([_Var_1 | VarsBag_In_1], VarsBag_In_2, VarsBag_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %varsbag_local(X, OtherBag, Bag_In, Bag_In) :- 
-%	debug_msg_clause('varsbag_local(X, OtherBag, Bag_In)', varsbag_local(X, OtherBag, Bag_In)),
+%	echo_msg_clause('varsbag_local(X, OtherBag, Bag_In)', varsbag_local(X, OtherBag, Bag_In)),
 %	fail.
 
 varsbag(X, OtherBag, Bag_In, Bag_Out) :- 
         var(X), !,
-	debug_msg(0, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	echo_msg(0, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out),
-	debug_msg(0, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	echo_msg(0, 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	!.
 
 varsbag(Term, OtherBag, Bag_In, Bag_Out) :-

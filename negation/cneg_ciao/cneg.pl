@@ -15,7 +15,7 @@
 
 % Needed to be able to compile the modules.
 :- use_module(cneg_aux).
-% , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, debug_msg/3]). 
+% , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, echo_msg/3]). 
 :- use_module(cneg_diseq, [equality/3, disequality/3, 
 	diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
@@ -45,12 +45,12 @@ cneg_tr(UQV, Functor) :- cneg_tr_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
 
 cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
-	debug_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	echo_msg(1, 'cneg :: Not implemented conjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
 cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
-	debug_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	echo_msg(1, 'cneg :: Not implemented disjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
 cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
@@ -60,13 +60,13 @@ cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	cneg_aux:append(FV_Cneg, FV_In, FV_Aux),
 	cneg_aux:append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
-	debug_msg(1, 'cneg_tr_aux :: call', New_Functor),
+	echo_msg(1, 'cneg_tr_aux :: call', New_Functor),
 	call(New_Functor).
 
 test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
-	debug_msg(1, 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
-	debug_msg(1, 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
-	debug_msg(1, 'test_if_cneg_rt_needed :: Body', Body), 
+	echo_msg(1, 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
+	echo_msg(1, 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
+	echo_msg(1, 'test_if_cneg_rt_needed :: Body', Body), 
 	varsbag(GoalVars, [], [], Real_GoalVars),
 	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
 	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
@@ -86,11 +86,12 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 
 cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 call_to(Predicate) :- 
-	debug_msg(1, 'call_to :: Predicate', Predicate), 
+	echo_msg(1, 'call_to :: Predicate', Predicate), 
+	echo_msg_nl(1), 
 	call(Predicate).
 call_to(Predicate) :- 
-	debug_msg(1, 'FAILED call_to :: Predicate', Predicate),
-	debug_msg_nl(1), !, fail. 
+	echo_msg(1, 'FAILED call_to :: Predicate', Predicate),
+	echo_msg_nl(1), !, fail. 
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
