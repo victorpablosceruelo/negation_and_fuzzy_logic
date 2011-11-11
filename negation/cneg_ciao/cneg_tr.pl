@@ -201,6 +201,7 @@ generate_pre_frontiers([], _SourceFileName, Cls, Cls) :- !.
 generate_pre_frontiers([(Head, Body, _Counter) | List_Of_Preds], SourceFileName, Cls_In, Cls_Out) :-
 	functor(Head, Head_Name, Head_Arity),
 	take_body_first_unification(Body, Head_Test),
+	% Noooooooooo. Esto esta mal. El test debe ser la propia cabecera vieja.
 	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Head, Body, Head_Test)),
 	generate_pre_frontiers(List_Of_Preds, SourceFileName, [CL | Cls_In], Cls_Out).
 
