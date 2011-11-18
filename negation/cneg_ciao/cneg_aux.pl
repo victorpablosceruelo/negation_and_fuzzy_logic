@@ -3,7 +3,7 @@
 	[
 	    echo_msg/3, echo_msg_list/3, 
 	    echo_msg_aux/3, echo_msg_nl/1, 
-	    echo_msg_logo/1,
+	    echo_msg_logo/1, echo_statistics/0,
 	    findall/4, append/3, functor_local/4,
 	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -27,6 +27,7 @@
 	],
 	[assertions]).
 
+:- use_module(library(prolog_sys), [statistics/0]).
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(write), [write/1, write/2]).
 
@@ -107,6 +108,15 @@ echo_msg_list_aux(Level, Msg_String, Cl) :-
 	string(Msg_String),
 	append(Msg_String, " (list) ", New_Msg_String),
 	echo_msg(Level, New_Msg_String, Cl).
+
+echo_statistics :-
+	current_output(StdOut_Stream), % Save stdout stream.
+	get_stream_to_file(File_Stream), % Get file stream.
+	set_output(File_Stream), % Redirect stdout to stream.
+	statistics, % Write statistics to file.
+	set_output(StdOut_Stream), % Recover stdout stream.
+%	statistics, % Write statistics to stdout.
+	!. % No backtracking, please.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
