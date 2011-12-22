@@ -22,8 +22,19 @@ export SHELL=/bin/sh
 
 CIAOSETUP=ciaosetup
 
+fixes:
+	@echo "Where is /bin/sh link pointing to?"
+	ls -la /bin/sh
+	rm -fv /bin/sh
+	ln -s /bin/bash /bin/sh
+	ls -la /bin/sh
+        @echo " "
+	@echo "Where is the executable?"
+	ls -la $(CIAOSETUP)
+	@echo " "
+
 ciao-config: ciao-config-stamp
-ciao-config-stamp:
+ciao-config-stamp: fixes
 	dh_testdir
 
 	# This is now done at source export time.
@@ -83,7 +94,7 @@ build-stamp:
 
 	touch build-stamp
 
-clean:
+clean:	fixes
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp ciao-config-stamp
@@ -91,8 +102,6 @@ clean:
 	# Add here commands to clean up after the build process.
 	#-$(MAKE) clean
 	#-$(MAKE) distclean
-	@echo "Where is /bin/sh link pointing to?"
-	ls -la /bin/sh
 	@echo "Test file terminal_io.sh is there "
 	ls -la $(CURDIR)/makedir/terminal_io.sh 
 	@echo " "
