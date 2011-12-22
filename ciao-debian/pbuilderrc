@@ -8,7 +8,7 @@ BASETGZ=/var/cache/pbuilder/base.tgz
 BUILDPLACE=/var/cache/pbuilder/build/
 #export DEBIAN_BUILDARCH=athlon
 #EXTRAPACKAGES=gcc3.0-athlon-builder
-EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog sun-java6-jre virtual-mysql-client virtual-mysql-server mysql-common libmysql++-dev libmysqlclient16 libmysqlclient-dev libmysqld-dev bash bash-static"
+EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog sun-java6-jre virtual-mysql-client virtual-mysql-server mysql-common libmysql++-dev libmysqlclient16 libmysqlclient-dev libmysqld-dev bash bash-static build-essential debhelper texinfo texi2html texlive-latex-base texlive-latex-extra locate gcc-multilib [amd64] libgsl0-dev mysql-server mysql-common libppl-c-dev"
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
 OTHERMIRROR="deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free | deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free "
@@ -29,7 +29,7 @@ APTCACHE="/var/cache/pbuilder/aptcache/"
 APTCACHEHARDLINK="yes"
 
 # Hooks and pkgs not needed.
-REMOVEPACKAGES="lilo grub dash"
+REMOVEPACKAGES="lilo grub"
 # HOOKDIR="/usr/lib/pbuilder/hooks"
 # HOOKDIR=""
 
