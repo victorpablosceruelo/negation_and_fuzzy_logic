@@ -29,8 +29,9 @@ ciao-config-stamp:
 	# This is now done at source export time.
 	# echo "debian" > ./REVISION
 
-	echo "Where is /bin/sh link pointing to? It should be bash, no dash."
+	@echo "Where is /bin/sh link pointing to?"
 	ls -la /bin/sh
+	@echo " "
 
 	./$(CIAOSETUP) configure \
 	    --registration_type=all \
