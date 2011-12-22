@@ -87,12 +87,12 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 
 cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 call_to(Predicate) :- 
-	echo_msg(1, 'call_to :: Predicate', Predicate), 
-	echo_msg_nl(1), 
+	echo_msg(2, 'call_to :: Predicate', Predicate), 
+	echo_msg_nl(2), 
 	call(Predicate).
 call_to(Predicate) :- 
-	echo_msg(1, 'FAILED call_to :: Predicate', Predicate),
-	echo_msg_nl(1), !, fail. 
+	echo_msg(2, 'FAILED call_to :: Predicate', Predicate),
+	echo_msg_nl(2), !, fail. 
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
