@@ -43,7 +43,7 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_msg_nl(2),
 	echo_statistics,
 	echo_msg_nl(2),
-	echo_msg(2, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
+	echo_msg(1, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
 	echo_msg(2, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_Aux, Goal, Proposal)),
 	portray_attributes_in_term(2, Goal),
