@@ -105,7 +105,7 @@ clean:	fixes
 	@echo "Test file terminal_io.sh is there "
 	ls -la $(CURDIR)/makedir/terminal_io.sh 
 	@echo " "
-	./$(CIAOSETUP) realclean
+	$(CURDIR)/$(CIAOSETUP) realclean
 
 #	rm -f ciao/library/javall/CiaoJava/PLAtom.class
 #	rm -f ciao/library/javall/CiaoJava/PLTerm.class
