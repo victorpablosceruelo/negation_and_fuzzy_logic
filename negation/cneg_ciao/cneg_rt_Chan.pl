@@ -122,7 +122,7 @@ compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV) :-
 compute_set_of_frontiers_aux([], _Proposal, _Trace, _UQV, [], []) :- !.
 compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier_Out, New_UQV_Out) :-
 	compute_goal_frontier(Goal, Proposal, Trace, Frontier_Aux), !,
-	echo_msg_list(2, 'cneg_rt_Aux :: Frontier_Aux', Frontier_Aux),
+	echo_msg_list(2, 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
 	adequate_frontier(Frontier_Aux, UQV, Frontier_Tmp, New_UQV_Tmp), !,
 %	echo_msg(2, 'cneg_rt_Aux :: (UQV)', (New_UQV_Tmp)),
 	compute_set_of_frontiers_aux(More_Goals, Proposal, Trace, UQV, Frontier_In, New_UQV_In),
@@ -135,10 +135,10 @@ compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier
 % elements where each element is a conjunction of subgoals.
 
 % Just to debug.
-%compute_goal_frontier(Goal, _Frontier) :-
-%	echo_msg(2, '--------------------------------------------------------------------------------------------------------------', ' '),
-%	echo_msg(2, 'compute_goal_frontier :: (Goal)', (Goal)),	
-%	fail. % Just debug and use backtracking to continue.
+compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier) :-
+	echo_msg(2, '--------------------------------------------------------------------------------------------------------------', ' '),
+	echo_msg(2, 'compute_goal_frontier :: (Goal)', (Goal)),	
+	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :-
@@ -210,7 +210,7 @@ compute_goal_frontier(Goal, _Proposal, _Trace, Frontier_Out) :-
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 %	echo_msg(0, 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
 %	echo_msg_list(2, 'Frontier_Tmp_1', Frontier_Tmp_1),
-	simplify_frontier(Frontier_Tmp_1, [], Frontier_Out),
+	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
 %	echo_msg(0, 'Frontier_Out', Frontier_Out), 
 	!. % Backtracking is forbidden.
 
@@ -238,7 +238,7 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	!, % Backtracking forbiden.
 	cneg_pre_frontier(Name, Arity, _SourceFileName, _Head_Aux, _Body_Aux, _FrontierTest_Aux), 
 %	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
-	setof(frontier(Goal, Head, Body, FrontierTest), 
+	setof(frontier(_Real_Goal, Head, Body, FrontierTest), 
 	cneg_pre_frontier(Name, Arity, _SourceFileName, Head, Body, FrontierTest), Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -248,18 +248,18 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_frontier([], Frontier_Acc, Frontier_Acc) :- !.
-simplify_frontier([F_In | Frontier_In], Frontier_Acc, Frontier_Out) :-
-	test_frontier_is_valid(F_In), !,
+simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
+simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+	test_frontier_is_valid(F_In, Goal), !,
 %	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
-	simplify_frontier(Frontier_In, [F_In | Frontier_Acc], Frontier_Out).
-simplify_frontier([_F_In | Frontier_In], Frontier_Acc, Frontier_Out) :-
+	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
+simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 %	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
-	simplify_frontier(Frontier_In, Frontier_Acc, Frontier_Out).
+	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
-test_frontier_is_valid(F_In) :-
+test_frontier_is_valid(F_In, Goal) :-
 	frontier_contents(F_In, Goal, Head, _Body, F_Test),
 	echo_msg(0, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
