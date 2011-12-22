@@ -57,9 +57,10 @@ ciao-config-stamp:
 	# New in version 1.15.0 r14285
 #	./$(CIAOSETUP) configure 
 #	./$(CIAOSETUP) configure --setup
-	./$(CIAOSETUP) build
-	./$(CIAOSETUP) docs
-	./$(CIAOSETUP) install
+#	./$(CIAOSETUP) build
+#	./$(CIAOSETUP) docs
+#	./$(CIAOSETUP) install
+#	./$(CIAOSETUP) install_to_destroot --destdir=[value]
 
 	touch ciao-config-stamp
 
@@ -77,7 +78,7 @@ build-stamp:
 
 	# Recompile the files which doesn't ship itfs.
 	# This is not working.
-#	$(CIAOLOCALENG) -c ciao/library/clpq.pl $(CIAOLOCALCOMP)
+	#	$(CIAOLOCALENG) -c ciao/library/clpq.pl $(CIAOLOCALCOMP)
 	#	$(CIAOLOCAL) -c 
 
 	touch build-stamp
@@ -145,7 +146,8 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp.
-	BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) install
+	# BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) install
+	./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp/	
 
 	# Those are based on bfulgam's old rule file. Anyways I think they should be fixed upstream.
 
