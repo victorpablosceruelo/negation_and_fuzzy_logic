@@ -2,17 +2,18 @@
 
 # set -x
 
-if [ -z $1 ] || [ "$1" == "" ] || [ -z $2 ] || [ "$2" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
-	echo "usage: $0 VERSION SVN_REVISION "
+	echo "usage: $0 VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
 	echo "example: $0 1.13 11293 "
-	echo "example: $0 1.14.2 13646 "
+	echo "example: $0 1.14.2 13646 382"
 	echo " "
 	exit 0
 else
 	VERSION="$1"
 	REVISION="$2"
+	DEBIAN_REPOS_REVISION="$3"
 fi;
 
 # Repositories urls.
@@ -61,11 +62,11 @@ echo " "
 if [ -d .svn ]; then
 # if [ -d .git ]; then
 	echo "updating debian subfolder to last revision from $REPOS_2"
-	svn update
+	svn update --revision $DEBIAN_REPOS_REVISION
 	# git svn rebase
 else
 	echo "checking out debian subfolder to last revision from $REPOS_2"
-	svn co $REPOS_2 . 
+	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
 	# git svn clone $REPOS_2 .
 fi
 popd
