@@ -8,6 +8,7 @@ if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ]
 	echo "usage: $0 VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
 	echo "example: $0 1.13 11293 "
 	echo "example: $0 1.14.2 13646 382"
+	echo "example: $0 1.15.0 14285 latest"
 	echo " "
 	exit 0
 else
@@ -61,13 +62,23 @@ pushd $FOLDER_NAME/debian
 echo " "
 if [ -d .svn ]; then
 # if [ -d .git ]; then
+    if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
 	echo "updating debian subfolder to last revision from $REPOS_2"
+	svn update
+    else
+	echo "updating debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
 	svn update --revision $DEBIAN_REPOS_REVISION
 	# git svn rebase
+    fi
 else
+    if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
 	echo "checking out debian subfolder to last revision from $REPOS_2"
 	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
 	# git svn clone $REPOS_2 .
+    else
+	echo "checking out debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
+	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
+    fi
 fi
 popd
 echo " "
