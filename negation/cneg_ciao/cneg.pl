@@ -1,4 +1,5 @@
 :- package(cneg).
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package  CNEG is part of the constructive negation implementation.
 %
@@ -100,5 +101,3 @@ call_to(Predicate) :-
 % trans_sent/3 makes the transformation.
 :- add_sentence_trans(trans_sent/3).
 % :- add_clause_trans(trans_clause/3). % Only for debug !!!
-
-
