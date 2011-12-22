@@ -142,16 +142,10 @@ compute_frontier('fail', _Proposal, _Trace, 'fail', [F_Out]) :- !,
 	frontier_contents(F_Out, 'fail', 'fail', 'true').
 
 % Now go for the disjunctions.
-compute_frontier(Goal, Proposal, Trace, ((Real_G1) ; (Real_G2)), Frontier_Out):- 
+% The frontiers need to evaluated one at a time. 
+compute_frontier(Goal, _Proposal, _Trace, _Real_Goal, _Frontier_Out):- 
 	goal_is_disjunction(Goal, G1, G2), !,
-	compute_frontier(G1, Proposal, Trace, Real_G1, Frontier_G1),
-	compute_frontier(G2, Proposal, Trace, Real_G2, Frontier_G2),
-	list_head_and_tail(Frontier_G1, F_G1, _Tail_Frontier_G1),
-	list_head_and_tail(Frontier_G2, F_G2, _Tail_Frontier_G2),
-	frontier_contents(F_G1, F_G1_Head, _F_G1_Body, _F_G1_F_Test),
-	frontier_contents(F_G2, F_G2_Head, _F_G2_Body, _F_G2_F_Test),
-	append(Frontier_G1, Frontier_G2, Frontier_Tmp),
-	change_heads(Frontier_Tmp, ((F_G1_Head) ; (F_G2_Head)), Frontier_Out).
+	fail.
 
 % Now go for the conjunctions.
 compute_frontier(Goal, Proposal, Trace, ((Real_G1) , (Real_G2)), Frontier):- 
@@ -188,7 +182,8 @@ compute_frontier(Goal, Proposal, Trace, Real_Goal, Frontier) :-
 	    )
 	),
 	echo_msg(0, 'compute_frontier :: Trace', [Goal | Trace]),
-	compute_frontier(Result, Proposal, [Goal | Trace], Real_Goal, Frontier).
+	convert_disjunctions_into_frontier
+%	compute_frontier(Result, Proposal, [Goal | Trace], Real_Goal, Frontier).
 %	OLD: functor_local(Real_Goal, 'cneg_rt', 2, [ UQV |[ SubGoal ]]),
 %	OLD: frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
