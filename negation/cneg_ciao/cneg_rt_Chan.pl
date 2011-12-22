@@ -184,12 +184,12 @@ compute_goal_frontier(Goal, Proposal, Trace, Frontier) :-
 	goal_is_negation(Goal, UQV, SubGoal), !,
 	(
 	    (
-		Proposal = 'Chan',
+		Proposal = 'cneg_rt_Chan',
 		cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Result)
 	    )
 	;
 	    (
-		Proposal = 'New',
+		Proposal = 'cneg_rt_New',
 		cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Result)
 	    )
 	),
@@ -310,18 +310,19 @@ combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result
 % (Head, BodyList) of the goal Goal.
 
 negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
-%	echo_msg(2, 'negate_frontier :: Frontier_In', (Frontier_In)),
+	echo_msg(2, 'negate_frontier :: Frontier_In', (Frontier_In)),
 	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
 %	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
-%	echo_msg(2, 'negate_frontier :: (E_Aux_1, IE_Aux_1, NIE_Aux_1)', (E_Aux_1, IE_Aux_1, NIE_Aux_1)),
+%	echo_msg(2, 'negate_frontier :: Frontier_Aux_1 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_1),
 	!, % Reduce the stack's memory.
 	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars),
+%	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_2),
 	split_frontier_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
 %	echo_msg(2, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
 	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, IE_imp, NIE_imp, IE_NIE_exp),
 %	echo_msg(2, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
 	negate_formula(E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, UQV, Result),
-%	echo_msg(2, 'negate_frontier :: (Result)', (Result)),
+	echo_msg(2, 'negate_frontier :: (Result)', (Result)),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -390,12 +391,12 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE('New', Formula_In, GoalVars, Formula_In, ImpVars):-
+normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars):-
 	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(E_In, [], Real_GoalVars, ImpVars). % ImpVars = vars(E) + GoalVars
 
-normalize_E_IE_NIE('Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
+normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
 	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(E_In, Real_GoalVars, [], Vars_EnoG), % Vars_EnoG = vars(E) - GoalVars
@@ -410,6 +411,12 @@ normalize_E_IE_NIE('Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
 %	echo_msg(2, 'remove_from_IE_irrelevant_disequalities :: (IE_Out)', (IE_Out)),
 	split_frontier_contents(Formula_Out, E_Out, IE_Out, NIE_Out). 
  
+normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _ImpVars) :-
+	Proposal \== 'cneg_rt_New', 
+	Proposal \== 'cneg_rt_Chan', !, 
+	echo_msg(2, 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
+	fail.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -606,12 +613,12 @@ negate_formula(E, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, UQV,
 % negate_Dexp_Rexp(DRexp,ImpVars,ExpVars,SolC) obtain in
 % SolC a solution of negating Dexp y Rexp juntos.
 negate_IE_NIE_exp([], _Proposal, _ImpVars, _UQV, []):- !.
-negate_IE_NIE_exp(IE_NIE_exp, 'Chan', ImpVars, UQV, Neg_IE_NIE_exp) :-
+negate_IE_NIE_exp(IE_NIE_exp, 'cneg_rt_Chan', ImpVars, UQV, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
 	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
 	varsbag(UQV, [], ExpVars, New_UQV),
 	Neg_IE_NIE_exp = (cneg_rt_Chan(New_UQV, IE_NIE_exp)), !.
-negate_IE_NIE_exp(IE_NIE_exp, 'New', ImpVars, UQV, Neg_IE_NIE_exp) :-
+negate_IE_NIE_exp(IE_NIE_exp, 'cneg_rt_New', ImpVars, UQV, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
 	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
 	varsbag(UQV, [], ExpVars, New_UQV),
@@ -667,13 +674,13 @@ negate_imp_atom(Formula, _Proposal, ImpVars, _UQV, Neg_Atom, Keep_Atom) :-
 	Neg_Atom = (cneg_eq_eqv_uqv(T1,T2, Eq_EQV, Eq_UQV)),
 	Keep_Atom = (cneg_diseq_eqv_uqv(T1,T2, Diseq_EQV, Diseq_UQV)).
 
-negate_imp_atom(Formula, 'Chan', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
+negate_imp_atom(Formula, 'cneg_rt_Chan', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
 	varsbag(UQV, [], [], Real_UQV),
  	varsbag(Formula, ImpVars, Real_UQV, Delayed_Negation_UQV),
 	Neg_Atom = (cneg_rt_Chan(Delayed_Negation_UQV, Formula)),
 	Keep_Atom = (Formula). 
 
-negate_imp_atom(Formula, 'New', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
+negate_imp_atom(Formula, 'cneg_rt_New', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
 	varsbag(UQV, [], [], Real_UQV),
  	varsbag(Formula, ImpVars, Real_UQV, Delayed_Negation_UQV),
 	Neg_Atom = (cneg_rt_New(Delayed_Negation_UQV, Formula)),
