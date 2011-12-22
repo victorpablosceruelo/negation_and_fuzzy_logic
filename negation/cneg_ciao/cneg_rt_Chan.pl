@@ -78,7 +78,7 @@ combine_frontiers_from_conjunction([F1_1 | More_F1], F2, F3):-
 % combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
 % the result of combining F1_1 with each element of F2.
 combine_frontiers_from_conjunction_aux(_F1_1, [], []).
-combine_frontiers_from_conjunction_aux(F1_1, [F2_1 | More_F2], [F3 | More_F3]):-
+combine_frontiers_from_conjunction_aux(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
 	frontier_contents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
 	frontier_contents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
 	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),
@@ -86,7 +86,10 @@ combine_frontiers_from_conjunction_aux(F1_1, [F2_1 | More_F2], [F3 | More_F3]):-
 	F3_Body = ((F1_1_Body), (F2_1_Body)),
 	F3_F_Test = ((F1_1_F_Test), (F2_1_F_Test)),
 	frontier_contents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
+	test_frontier_is_valid(F3, F3_Real_Goal), !, 
         combine_frontiers_from_conjunction_aux(F1_1, More_F2, More_F3).
+combine_frontiers_from_conjunction_aux(F1_1, [_F2_1 | More_F2], More_F3) :-
+	combine_frontiers_from_conjunction_aux(F1_1, More_F2, More_F3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
