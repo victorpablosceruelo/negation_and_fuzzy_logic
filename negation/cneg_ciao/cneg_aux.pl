@@ -23,7 +23,8 @@
 	    replace_in_term_var_by_value/4,
 	    % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
-	    retrieve_element_from_list/2
+	    retrieve_element_from_list/2,
+	    split_goal_with_disjunctions_into_goals/3
 	],
 	[assertions]).
 
@@ -612,6 +613,49 @@ term_to_meta(X, '$:'(X)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_aux_equality(X, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%split_goal_with_disjunctions_into_goals(Body, Bodies)
+split_goal_with_disjunctions_into_goals(Body, Negation_Predicate, Bodies) :- 
+	echo_msg(0, 'INFO :: split_goal_with_disjunctions_into_goals :: Goal ', Body), 
+	split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies),
+	echo_msg(0, 'INFO :: split_goal_with_disjunctions_into_goals :: Goals ', Bodies), 
+	!.
+
+split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :- 
+	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
+	split_goal_with_disjunctions_into_goals_aux(Body_Conj_1, Negation_Predicate, Bodies_Conj_1),
+	split_goal_with_disjunctions_into_goals_aux(Body_Conj_2, Negation_Predicate, Bodies_Conj_2),
+	combine_sub_bodies_by_conjunction(Bodies_Conj_1, Bodies_Conj_2, Bodies).
+
+split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :- 
+	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
+	split_goal_with_disjunctions_into_goals_aux(Body_Disj_1, Negation_Predicate, Body_Result_1),
+	split_goal_with_disjunctions_into_goals_aux(Body_Disj_2, Negation_Predicate, Body_Result_2),
+	append(Body_Result_1, Body_Result_2, Bodies).
+
+split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody]) :- % Goal is something else.
+	translate_problematic_predicates(Body, Negation_Predicate, NewBody).
+
+% Example for Negation_Predicate = 'cneg_tr'
+translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
+	goal_is_negation(Body, UQV, SubGoal), !,
+	functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]]).
+
+translate_problematic_predicates(Body, _Negation_Predicate, Body) :- !.
+
+combine_sub_bodies_by_conjunction([], _List_2, []) :- !.
+combine_sub_bodies_by_conjunction([Elto | List_1], List_2, Result) :-
+	combine_sub_bodies_by_conjunction_aux(Elto, List_2, Result_1),
+	combine_sub_bodies_by_conjunction(List_1, List_2, Result_2),
+	append(Result_1, Result_2, Result).
+
+combine_sub_bodies_by_conjunction_aux(_Elto_1, [], []) :- !.
+combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2) | More_Results]) :-
+	combine_sub_bodies_by_conjunction_aux(Elto_1, List, More_Results).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

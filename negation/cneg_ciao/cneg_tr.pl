@@ -69,7 +69,7 @@ save_sent_info(Clause) :-
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
 	unifications_in_head_to_equality(Head, New_Head, Equality),
-	split_disjunctions_in_bodies((Equality, Body), Bodies),
+	split_goal_with_disjunctions_into_goals((Equality, Body), 'cneg_tr', Bodies),
 	store_head_and_bodies_info(New_Head, Head, Bodies).
 
 save_sent_info(Head) :-
@@ -88,43 +88,6 @@ unifications_in_head_to_equality(Head, New_Head, Equality) :-
 	functor_local(New_Head, Name, Arity, New_Args), 
 	functor_local(Equality, '=', 2, [New_Args | [Args]]).
 
-%split_disjunctions_in_bodies(Body, Bodies)
-split_disjunctions_in_bodies(Body, Bodies) :- 
-	echo_msg(0, 'INFO :: split_disjunctions_in_bodies :: Body ', Body), 
-	split_disjunctions_in_bodies_aux(Body, Bodies),
-	echo_msg(0, 'INFO :: split_disjunctions_in_bodies :: Bodies ', Bodies), 
-	!.
-
-split_disjunctions_in_bodies_aux(Body, Bodies) :- 
-	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
-	split_disjunctions_in_bodies_aux(Body_Conj_1, Bodies_Conj_1),
-	split_disjunctions_in_bodies_aux(Body_Conj_2, Bodies_Conj_2),
-	combine_sub_bodies_by_conjunction(Bodies_Conj_1, Bodies_Conj_2, Bodies).
-
-split_disjunctions_in_bodies_aux(Body, Bodies) :- 
-	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
-	split_disjunctions_in_bodies_aux(Body_Disj_1, Body_Result_1),
-	split_disjunctions_in_bodies_aux(Body_Disj_2, Body_Result_2),
-	append(Body_Result_1, Body_Result_2, Bodies).
-
-split_disjunctions_in_bodies_aux(Body, [NewBody]) :- % Goal is something else.
-	translate_problematic_predicates(Body, NewBody).
-
-translate_problematic_predicates(Body, NewBody) :-
-	goal_is_negation(Body, UQV, SubGoal), !,
-	functor_local(NewBody, 'cneg_tr', 2, [UQV |[ SubGoal ]]).
-
-translate_problematic_predicates(Body, Body) :- !.
-
-combine_sub_bodies_by_conjunction([], _List_2, []) :- !.
-combine_sub_bodies_by_conjunction([Elto | List_1], List_2, Result) :-
-	combine_sub_bodies_by_conjunction_aux(Elto, List_2, Result_1),
-	combine_sub_bodies_by_conjunction(List_1, List_2, Result_2),
-	append(Result_1, Result_2, Result).
-
-combine_sub_bodies_by_conjunction_aux(_Elto_1, [], []) :- !.
-combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2) | More_Results]) :-
-	combine_sub_bodies_by_conjunction_aux(Elto_1, List, More_Results).
 
 store_head_and_bodies_info(Head, Test, Bodies) :-
 	echo_msg(0, 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
