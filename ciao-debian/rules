@@ -28,7 +28,7 @@ fixes:
 	rm -fv /bin/sh
 	ln -s /bin/bash /bin/sh
 	ls -la /bin/sh
-        @echo " "
+	@echo " "
 	@echo "Where is the executable?"
 	ls -la $(CIAOSETUP)
 	@echo " "
