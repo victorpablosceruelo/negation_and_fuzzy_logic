@@ -103,11 +103,14 @@ clean:	fixes
 
 	# Add here commands to clean up after the build process.
 	@echo " "
-	./$(CIAOSETUP) realclean
 	./$(CIAOSETUP) clean
+	@echo " "
 	./$(CIAOSETUP) clean_config
+	@echo " "
 	./$(CIAOSETUP) realclean
+	@echo " "
 	./$(CIAOSETUP) braveclean
+	@echo " "
 
 	# Really needed ??
 	# dh_clean
