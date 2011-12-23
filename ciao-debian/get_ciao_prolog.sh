@@ -83,6 +83,13 @@ fi
 popd
 echo " "
 
+# Apply patches to the ciao distribution.
+for file in $FOLDER_NAME/debian/patches do
+	if [ ! "$file" == "." ] && [ ! "$file" == ".." ]; then 
+		patch -p0 < $file
+	fi
+done
+
 # Create .orig tarball
 echo " -> Compressing $FOLDER_NAME in file $BUILD_TGZ "
 tar cfz $BUILD_TGZ $FOLDER_NAME
