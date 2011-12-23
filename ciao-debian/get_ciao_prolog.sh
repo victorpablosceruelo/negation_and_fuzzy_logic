@@ -50,7 +50,6 @@ if [ -d .svn ]; then
 	svn update --revision $REVISION
 else
 	echo "checking out CIAO to revision $REVISION from $REPOS_1"
-	svn revert -R .
 	svn co $REPOS_1 . --revision $REVISION
 fi
 popd
@@ -77,12 +76,10 @@ if [ -d .svn ]; then
 else
     if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
 	echo "checking out debian subfolder to last revision from $REPOS_2"
-	svn revert -R .
-	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
+	svn co $REPOS_2 . 
 	# git svn clone $REPOS_2 .
     else
 	echo "checking out debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
-	svn revert -R .
 	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
     fi
 fi
