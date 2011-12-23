@@ -84,8 +84,9 @@ popd
 echo " "
 
 # Apply patches to the ciao distribution.
-for file in $FOLDER_NAME/debian/patches do
-	if [ ! "$file" == "." ] && [ ! "$file" == ".." ]; then 
+for file in $FOLDER_NAME/debian/patches 
+do
+	if [ ! -d $file ] && [ ! "$file" == "." ] && [ ! "$file" == ".." ]; then 
 		patch -p0 < $file
 	fi
 done
