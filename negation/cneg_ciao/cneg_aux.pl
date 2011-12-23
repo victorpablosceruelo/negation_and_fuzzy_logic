@@ -312,7 +312,7 @@ goal_is_disequality(Goal, Arg_1, Arg_2, EQV, []) :-
 goal_is_disequality(Goal, Arg_1, Arg_2, [], UQV) :- 
 	goal_is_aux_3a('diseq_uqv', Goal, Arg_1, Arg_2, UQV), !.
 goal_is_disequality(Goal, Arg_1, Arg_2, EQV, UQV) :- 
-	goal_is_aux_4a('cneg_diseq_eqv_uqv', Goal, Arg_1, Arg_2, EQV, UQV), !.
+	goal_is_aux_4a('diseq_euqv', Goal, Arg_1, Arg_2, EQV, UQV), !.
 
 % goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) 
 goal_is_equality(Goal, Arg_1, Arg_2, [], []) :- 
@@ -324,7 +324,7 @@ goal_is_equality(Goal, Arg_1, Arg_2, EQV, []) :-
 goal_is_equality(Goal, Arg_1, Arg_2, [], UQV) :- 
 	goal_is_aux_3a('eq_uqv', Goal, Arg_1, Arg_2, UQV), !.
 goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) :- 
-	goal_is_aux_4a('cneg_eq_eqv_uqv', Goal, Arg_1, Arg_2, EQV, UQV), !.
+	goal_is_aux_4a('eq_euqv', Goal, Arg_1, Arg_2, EQV, UQV), !.
 
 goal_is_aux_2a(Name, Goal, Arg_1, Arg_2) :-
 	functor(Goal, Name, 2), !,

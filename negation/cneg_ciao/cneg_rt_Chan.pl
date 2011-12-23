@@ -13,8 +13,8 @@
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	portray_attributes_in_term/2,
-	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
-	cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5]).
+	diseq_euqv/4, eq_euqv/4,
+	diseq_euqv_adv/5, eq_euqv_adv/5]).
 :- use_module(library(aggregates),[setof/3]).
 
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
@@ -665,8 +665,8 @@ negate_imp_atom(Formula, _Proposal, ImpVars, _UQV, Neg_Atom, Keep_Atom) :-
 	varsbag(Eq_EQV, [], [], Real_Eq_EQV),
  	varsbag((T1,T2), ImpVars, Real_Eq_EQV, Diseq_UQV), % Eq_EQV -> Diseq_UQV
 	varsbag(Eq_UQV, Diseq_UQV, [], Diseq_EQV), % Eq_UQV -> Diseq_EQV
-	Neg_Atom = (cneg_diseq_eqv_uqv(T1, T2, Diseq_EQV, Diseq_UQV)),
-	Keep_Atom = (cneg_eq_eqv_uqv(T1, T2, Eq_EQV, Eq_UQV)).
+	Neg_Atom = (diseq_euqv(T1, T2, Diseq_EQV, Diseq_UQV)),
+	Keep_Atom = (eq_euqv(T1, T2, Eq_EQV, Eq_UQV)).
 
 % Idem for disequalities.
 negate_imp_atom(Formula, _Proposal, ImpVars, _UQV, Neg_Atom, Keep_Atom) :-
@@ -674,8 +674,8 @@ negate_imp_atom(Formula, _Proposal, ImpVars, _UQV, Neg_Atom, Keep_Atom) :-
 	varsbag(Diseq_EQV, [], [], Real_Diseq_EQV), 
  	varsbag((T1,T2), ImpVars, Real_Diseq_EQV, Eq_UQV), % Diseq_EQV -> Eq_UQV
 	varsbag(Diseq_UQV, Eq_UQV, [], Eq_EQV), % Diseq_UQV -> Eq_EQV
-	Neg_Atom = (cneg_eq_eqv_uqv(T1,T2, Eq_EQV, Eq_UQV)),
-	Keep_Atom = (cneg_diseq_eqv_uqv(T1,T2, Diseq_EQV, Diseq_UQV)).
+	Neg_Atom = (eq_euqv(T1,T2, Eq_EQV, Eq_UQV)),
+	Keep_Atom = (diseq_euqv(T1,T2, Diseq_EQV, Diseq_UQV)).
 
 negate_imp_atom(Formula, 'cneg_rt_Chan', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
 	varsbag(UQV, [], [], Real_UQV),

@@ -19,8 +19,8 @@
 % , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, echo_msg/3]). 
 :- use_module(cneg_diseq, [equality/3, disequality/3, 
 	diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
-	cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5]).
+	diseq_euqv/4, eq_euqv/4,
+	diseq_euqv_adv/5, eq_euqv_adv/5]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
 :- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
@@ -29,8 +29,8 @@
 :- reexport(cneg_aux, [varsbag/4, varsbag_addition/3]).    
 :- reexport(cneg_diseq, [equality/3, disequality/3,
 	diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	cneg_diseq_eqv_uqv/4, cneg_eq_eqv_uqv/4,
-	cneg_diseq_eqv_uqv_adv/5, cneg_eq_eqv_uqv_adv/5]).
+	diseq_euqv/4, eq_euqv/4,
+	diseq_euqv_adv/5, eq_euqv_adv/5]).
 :- reexport(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
 :- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
