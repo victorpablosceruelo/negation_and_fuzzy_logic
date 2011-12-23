@@ -46,9 +46,11 @@ pushd $FOLDER_NAME
 echo " "
 if [ -d .svn ]; then
 	echo "updating CIAO to revision $REVISION from $REPOS_1"
+	svn revert -R
 	svn update --revision $REVISION
 else
 	echo "checking out CIAO to revision $REVISION from $REPOS_1"
+	svn revert -R
 	svn co $REPOS_1 . --revision $REVISION
 fi
 popd
@@ -64,19 +66,23 @@ if [ -d .svn ]; then
 # if [ -d .git ]; then
     if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
 	echo "updating debian subfolder to last revision from $REPOS_2"
+	svn revert -R
 	svn update
     else
 	echo "updating debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
+	svn revert -R
 	svn update --revision $DEBIAN_REPOS_REVISION
 	# git svn rebase
     fi
 else
     if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
 	echo "checking out debian subfolder to last revision from $REPOS_2"
+	svn revert -R
 	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
 	# git svn clone $REPOS_2 .
     else
 	echo "checking out debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
+	svn revert -R
 	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
     fi
 fi
@@ -84,10 +90,11 @@ popd
 echo " "
 
 # Apply patches to the ciao distribution.
+echo "Applying patches to ciao distribution ..."
 for file in $FOLDER_NAME/debian/patches 
 do
 	if [ ! -d $file ] && [ ! "$file" == "." ] && [ ! "$file" == ".." ]; then 
-		patch -p0 < $file
+		patch -p0 --forward --verbose < $file
 	fi
 done
 
