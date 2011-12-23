@@ -21,6 +21,11 @@ export SHELL=/bin/sh
 # export DH_OPTIONS=
 
 CIAOSETUP=ciaosetup
+CIAOLOCALENG=./ciao/bin/LINUXi86/ciaoengine
+CIAOLOCALCOMP=-C -b ./bin/ciaoc-1.15
+RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/
+CIAOBUILDDIR=$(CURDIR)/debian/tmp/
+CIAODESRC=$(CURDIR)/ciao
 
 fixes:
 	@echo "Where is /bin/sh link pointing to?"
@@ -32,6 +37,7 @@ fixes:
 	@echo "Where is the executable?"
 	ls -la $(CIAOSETUP)
 	@echo " "
+        export RPM_BUILD_ROOT CIAOBUILDDIR CIAODESRC CIAOSETUP CIAOLOCALENG
 
 ciao-config: ciao-config-stamp
 ciao-config-stamp: fixes
@@ -75,12 +81,13 @@ ciao-config-stamp: fixes
 
 	touch ciao-config-stamp
 
-CIAOLOCALENG=./ciao/bin/LINUXi86/ciaoengine 
-CIAOLOCALCOMP=-C -b ./bin/ciaoc-1.15
-
 build: ciao-config build-stamp
 build-stamp:
 	dh_testdir
+
+	export RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/
+	export CIAOBUILDDIR=$(CURDIR)/debian/tmp/
+	export CIAODESRC=$(CURDIR)/ciao
 
 	# Add here commands to compile the package.
 	#$(MAKE)
