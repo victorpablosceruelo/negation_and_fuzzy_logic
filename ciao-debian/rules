@@ -105,9 +105,9 @@ clean:	fixes
 	@echo " "
 	./$(CIAOSETUP) realclean
 	./$(CIAOSETUP) clean
-        ./$(CIAOSETUP) clean_config
-        ./$(CIAOSETUP) realclean
-        ./$(CIAOSETUP) braveclean
+	./$(CIAOSETUP) clean_config
+	./$(CIAOSETUP) realclean
+	./$(CIAOSETUP) braveclean
 
 	# Really needed ??
 	# dh_clean
