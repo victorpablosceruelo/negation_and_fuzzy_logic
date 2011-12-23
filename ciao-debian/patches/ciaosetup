@@ -2,7 +2,7 @@ Index: ciaosetup
 ===================================================================
 --- ciaosetup	(revision 14285)
 +++ ciaosetup	(working copy)
-@@ -12,9 +12,13 @@
+@@ -12,9 +12,15 @@
  #       in 'sh'. It will be eventually ported to Prolog.
  
  # Follow symbolic links
@@ -11,7 +11,10 @@ Index: ciaosetup
 +self_exec=`echo "$0"`
 +echo "self_exec: ${self_exec}"
  # Obtain the directory where this script is located
- old_dir=`pwd`; cd `dirname ${self_exec}`; self=`pwd`; cd ${old_dir}; old_dir=
+-old_dir=`pwd`; cd `dirname ${self_exec}`; self=`pwd`; cd ${old_dir}; old_dir=
++# old_dir=`pwd`; cd `dirname ${self_exec}`; self=`pwd`; cd ${old_dir}; old_dir=
++old_dir=
++self=`dirname ${self_exec}`
 +echo "old_dir: ${old_dir}"
 +echo "self: ${self}"
  
