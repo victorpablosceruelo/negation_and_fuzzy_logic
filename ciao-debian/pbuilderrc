@@ -8,7 +8,7 @@ BASETGZ=/var/cache/pbuilder/base.tgz
 BUILDPLACE=/var/cache/pbuilder/build/
 #export DEBIAN_BUILDARCH=athlon
 #EXTRAPACKAGES=gcc3.0-athlon-builder
-EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog sun-java6-jre sun-java6-demo sun-java6-javadb sun-java6-source virtual-mysql-client virtual-mysql-server mysql-common libmysql++-dev libmysqlclient16 libmysqlclient-dev libmysqld-dev libmysql-java libmysql++-dev libmysqld-dev libmysql-cil-dev bash bash-static build-essential debhelper texlive-latex-base texlive-latex-extra texinfo texi2html dvi2ps dvi2dvi gs-gpl gs-common subversion locate libgsl0-dev libppl-c-dev libppl-c-dev gcc-multilib emacs imagemagick ant"
+EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog fakeroot sun-java6-jre sun-java6-demo sun-java6-javadb sun-java6-source virtual-mysql-client virtual-mysql-server mysql-common libmysql++-dev libmysqlclient16 libmysqlclient-dev libmysqld-dev libmysql-java libmysql++-dev libmysqld-dev libmysql-cil-dev bash bash-static build-essential debhelper texlive-latex-base texlive-latex-extra texinfo texi2html dvi2ps dvi2dvi gs-gpl gs-common subversion locate libgsl0-dev libppl-c-dev libppl-c-dev gcc-multilib emacs imagemagick ant"
 # NO: gcc-multilib [amd64] 
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
