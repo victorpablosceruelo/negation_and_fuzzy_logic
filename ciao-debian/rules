@@ -50,6 +50,11 @@ ciao-config-stamp: fixes
 	ls -la /bin/sh
 	@echo " "
 
+	./$(CIAOSETUP) clean
+	./$(CIAOSETUP) clean_config 
+	./$(CIAOSETUP) realclean
+	./$(CIAOSETUP) braveclean
+
 	./$(CIAOSETUP) configure \
 	    --registration_type=all \
 	    --instype=global \
