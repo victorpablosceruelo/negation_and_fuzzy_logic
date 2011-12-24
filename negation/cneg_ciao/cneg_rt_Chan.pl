@@ -272,7 +272,7 @@ simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
 	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
-simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
