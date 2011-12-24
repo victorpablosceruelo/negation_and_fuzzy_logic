@@ -411,10 +411,16 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars):-
-	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
+normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars, ExpVars):-
+	split_frontier_contents(Formula_In, E_In, IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
-	varsbag(E_In, [], Real_GoalVars, ImpVars). % ImpVars = vars(E) + GoalVars
+	varsbag(E_In, [], [], Vars_E_In), % Vars_E_In
+	varsbag(IE_In, [], [], Vars_IE_In), % Vars_IE_In
+	varsbag(NIE_In, [], [], Vars_NIE_In),  % Vars_NIE_In
+	varsbag(Vars_E_In, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
+	varsbag_difference(Vars_IE_In, Real_GoalVars, ExpVars_Tmp_1),
+ 	varsbag_difference(ExpVars_Tmp_1, Vars_E_In, ExpVars_Tmp_2),
+ 	varsbag_difference(ExpVars_Tmp_2, Vars_NIE_In, ExpVars), % ExpVars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
 
 normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
 	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
