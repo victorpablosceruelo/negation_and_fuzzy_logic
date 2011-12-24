@@ -4,6 +4,7 @@
 	    echo_msg/3, echo_msg_list/3, 
 	    echo_msg_aux/3, echo_msg_nl/1, 
 	    echo_msg_logo/1, echo_statistics/0,
+	    echo_separation/1,
 	    findall/4, append/3, functor_local/4,
 	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -109,6 +110,15 @@ echo_msg_list_aux(Level, Msg_String, Cl) :-
 	string(Msg_String),
 	append(Msg_String, " (list) ", New_Msg_String),
 	echo_msg(Level, New_Msg_String, Cl).
+
+echo_separation(Level) :-
+	echo_msg_nl(Level), echo_separation_aux(Level), 
+	echo_msg_nl(Level), echo_separation_aux(Level), 
+	echo_msg_nl(Level), echo_separation_aux(Level),
+	echo_msg_nl(Level).
+
+echo_separation_aux(Level) :-
+	echo_msg_aux(Level, '-----------------------------------------------', '-----------------------------------------------').
 
 echo_statistics :-
 	current_output(StdOut_Stream), % Save stdout stream.

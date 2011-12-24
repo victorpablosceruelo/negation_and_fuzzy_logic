@@ -40,6 +40,7 @@ cneg_rt_New(UQV, Goal):-
 	call_to(Result).
 
 cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
+	echo_separation(2),
 	echo_msg_nl(2),
 	echo_statistics,
 	echo_msg_nl(2),
