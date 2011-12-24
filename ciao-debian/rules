@@ -21,11 +21,6 @@ export SHELL=/bin/sh
 # export DH_OPTIONS=
 
 CIAOSETUP=ciaosetup
-CIAOLOCALENG=./ciao/bin/LINUXi86/ciaoengine
-CIAOLOCALCOMP=-C -b ./bin/ciaoc-1.15
-RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/
-CIAOBUILDDIR=$(CURDIR)/debian/tmp/
-CIAODESRC=$(CURDIR)/ciao
 
 fixes:
 	@echo "Where is /bin/sh link pointing to?"
@@ -41,10 +36,26 @@ fixes:
 	ls -la $(CURDIR)/makedir/terminal_io.sh 
 	@echo " "
 	@echo " "
-        export RPM_BUILD_ROOT CIAOBUILDDIR CIAODESRC CIAOSETUP CIAOLOCALENG
 
-ciao-config: ciao-config-stamp
-ciao-config-stamp: clean fixes
+clean:	fixes
+	dh_testdir
+	dh_testroot
+
+	# Add here commands to clean up after the build process.
+	@echo " "
+	./$(CIAOSETUP) clean
+	@echo " "
+	./$(CIAOSETUP) clean_config
+	@echo " "
+	./$(CIAOSETUP) realclean
+	@echo " "
+	./$(CIAOSETUP) braveclean
+	@echo " "
+
+	# Really needed ??
+	dh_clean
+
+build: clean fixes
 	dh_testdir
 
 	# This is now done at source export time.
@@ -79,12 +90,6 @@ ciao-config-stamp: clean fixes
 #	./$(CIAOSETUP) install
 #	./$(CIAOSETUP) install_to_destroot --destdir=[value]
 
-	touch ciao-config-stamp
-
-build: ciao-config build-stamp
-build-stamp:
-	dh_testdir
-
 	# Add here commands to compile the package.
 	# $(MAKE)
 	RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) build 
@@ -94,26 +99,6 @@ build-stamp:
 	# This is not working.
 	#	$(CIAOLOCALENG) -c ciao/library/clpq.pl $(CIAOLOCALCOMP)
 	#	$(CIAOLOCAL) -c 
-
-	touch build-stamp
-
-clean:	fixes
-	dh_testdir
-	dh_testroot
-
-	# Add here commands to clean up after the build process.
-	@echo " "
-	./$(CIAOSETUP) clean
-	@echo " "
-	./$(CIAOSETUP) clean_config
-	@echo " "
-	./$(CIAOSETUP) realclean
-	@echo " "
-	./$(CIAOSETUP) braveclean
-	@echo " "
-
-	# Really needed ??
-	# dh_clean
 
 #install:
 install: build
