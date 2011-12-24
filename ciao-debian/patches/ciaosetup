@@ -2,9 +2,20 @@ Index: ciaosetup
 ===================================================================
 --- ciaosetup	(revision 14285)
 +++ ciaosetup	(working copy)
-@@ -12,9 +12,15 @@
+@@ -11,10 +11,27 @@
+ # NOTE: This command is too complicated to be efficiently programmed
  #       in 'sh'. It will be eventually ported to Prolog.
  
++echo " "
++echo -n "command: $0 "
++args=("$@")
++for ((i=0; i < $#; i++)) {
++   # echo "argument $((i+1)): "
++   echo -n "${args[$i]} "
++}
++echo " "
++echo " "
++
  # Follow symbolic links
 -self_exec=`test -L "$0" && readlink "$0" || echo "$0"`
 +# self_exec=`test -L "$0" && readlink "$0" || echo "$0"`
@@ -17,6 +28,7 @@ Index: ciaosetup
 +self=`dirname ${self_exec}`
 +echo "old_dir: ${old_dir}"
 +echo "self: ${self}"
++echo " "
  
  # Exit immediately if a simple command exits with a non-zero status
  set -e
