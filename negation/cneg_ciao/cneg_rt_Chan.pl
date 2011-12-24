@@ -335,7 +335,7 @@ negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
 %	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
 %	echo_msg(2, 'negate_frontier :: Frontier_Aux_1 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_1),
 	!, % Reduce the stack's memory.
-	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars),
+	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars, ExpVars, UQVars),
 %	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_2),
 	split_frontier_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
 %	echo_msg(2, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
@@ -411,22 +411,14 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars, ExpVars):-
-	split_frontier_contents(Formula_In, E_In, IE_In, _NIE_In),
-	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
-	varsbag(E_In, [], [], Vars_E_In), % Vars_E_In
-	varsbag(IE_In, [], [], Vars_IE_In), % Vars_IE_In
-	varsbag(NIE_In, [], [], Vars_NIE_In),  % Vars_NIE_In
-	varsbag(Vars_E_In, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
-	varsbag_difference(Vars_IE_In, Real_GoalVars, ExpVars_Tmp_1),
- 	varsbag_difference(ExpVars_Tmp_1, Vars_E_In, ExpVars_Tmp_2),
- 	varsbag_difference(ExpVars_Tmp_2, Vars_NIE_In, ExpVars), % ExpVars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars, ExpVars, UQVars):-
+	compute_impvars_expvars_and_uqvars(Formula_In, GoalVars, ImpVars, ExpVars, UQVars).
 
-normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, ImpVars):-
+normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, ImpVars, ExpVars, UQVars):-
 	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(E_In, Real_GoalVars, [], Vars_EnoG), % Vars_EnoG = vars(E) - GoalVars
-	remove_from_E_irrelevant_equalities(Formula_In, Vars_EnoG, Formula_Aux),  
+	remove_from_E_irrelevant_equalities(Formula_In, Real_GoalVars, Formula_Aux),  
 	split_frontier_contents(Formula_Aux, E_Out, IE_Aux, NIE_Out),
 %	echo_msg(2, 'normalize_E_IE_NIE :: (E_Out, IE_Aux, NIE_Out)', (E_Out, IE_Aux, NIE_Out)),
 	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
@@ -443,119 +435,123 @@ normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _ImpVars) :-
 	echo_msg(2, 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
 	fail.
 
+compute_impvars_expvars_and_uqvars(Formula_In, GoalVars, ImpVars, ExpVars, UQVars) :-
+	split_frontier_contents(Formula_In, E_In, IE_In, _NIE_In),
+	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
+	varsbag(E_In, [], [], Vars_E_In), % Vars_E_In
+	varsbag(IE_In, [], [], Vars_IE_In), % Vars_IE_In
+	varsbag(NIE_In, [], [], Vars_NIE_In),  % Vars_NIE_In
+	varsbag(Vars_E_In, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
+	varsbag_difference(Vars_IE_In, Real_GoalVars, ExpVars_Tmp_1),
+ 	varsbag_difference(ExpVars_Tmp_1, Vars_E_In, ExpVars_Tmp_2),
+ 	varsbag_difference(ExpVars_Tmp_2, Vars_NIE_In, ExpVars). % ExpVars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% remove_from_I_irrelevant_equalities(I,D,R,GoalVars,Iac,Iv,Dv,Rv) 
-% removes from I the equalities X=Y that contain a variable, 
-% X or Y,that is not in GoalVars and 
-% makes the unification of the corresponding value in D and R.
-% Iac is use to acumulate the equalities not removed untill the process ends,
-% and update the value of I.
-remove_from_E_irrelevant_equalities(Formulae_In, Vars_EnoG, Formulae_Out) :- 
-	split_frontier_contents(Formulae_In, E_In, _IE_In, _NIE_In), 
-	detect_irrelevant_equalities(E_In, Vars_EnoG, [], Irrelevant_Eqs),
-%	echo_msg(2, 'remove_from_E_irrelevant_equalities :: Irrelevant_Eqs', Irrelevant_Eqs),
+
+% removes from E redundnant equalities and variables
+remove_from_E_redundant_eqs_and_vars(Formulae_In, GoalVars, Formulae_Out) :- 
+	split_frontier_contents(Formulae_In, E_In, IE_In, NIE_In), 
+	remove_from_E_redundant_vars(E_In, GoalVars, 'fail', Changes),
+	remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux),
+	split_frontier_contents(Formulae_Aux, E_Aux, IE_In, NIE_In), 
 	(
-	    (   
-		Irrelevant_Eqs = [],
-		Formulae_Out = Formulae_In
+	    (   % If there are no changes then we have a fixed point.
+		Changes == 'fail', % No redundant vars.
+		E_In == E_Aux, !, % No redundant eqs.
+		Formulae_Out = Formulae_Aux
 	    )
 	;
-	    (
-		Irrelevant_Eqs \== [],
-		remove_irrelevant_equalities_1(Irrelevant_Eqs, Vars_EnoG, Formulae_In, Formulae_Aux_1),
-%		echo_msg(2, 'remove_irrelevant_equalities_1 :: Formulae_Aux_1', Formulae_Aux_1),
-		split_frontier_contents(Formulae_Aux_1, E_Aux_1, IE_Aux, NIE_Aux), 
-		remove_irrelevant_equalities_2(E_Aux_1, [], _Eqs_Visited, E_Aux_2),
-%		echo_msg(2, 'remove_irrelevant_equalities_2 :: E_Aux_2', E_Aux_2),
-		split_frontier_contents(Formulae_Aux_2, E_Aux_2, IE_Aux, NIE_Aux), 
-		remove_from_E_irrelevant_equalities(Formulae_Aux_2, Vars_EnoG, Formulae_Out)
+	    (   % Else, we need to iterate again
+		remove_from_E_redundant_eqs_and_vars(Formulae_Aux, GoalVars, Formulae_Out)	 
 	    )
 	).
 
-detect_irrelevant_equalities([], _Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_In) :- !.
-detect_irrelevant_equalities(E_In, Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_Out) :-
-	goal_is_conjunction(E_In, E_In_1, E_In_2), !,
-	detect_irrelevant_equalities(E_In_1, Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_Aux),
-	detect_irrelevant_equalities(E_In_2, Vars_EnoG, Irrelevant_Eqs_Aux, Irrelevant_Eqs_Out).
 
-detect_irrelevant_equalities(E_In, Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_Out) :-
-	goal_is_disjunction(E_In, E_In_1, E_In_2), !, % Unnecessary ??
-	detect_irrelevant_equalities(E_In_1, Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_Aux),
-	detect_irrelevant_equalities(E_In_2, Vars_EnoG, Irrelevant_Eqs_Aux, Irrelevant_Eqs_Out).
-
-detect_irrelevant_equalities(E_In, Vars_EnoG, Irrelevant_Eqs_In, [ E_In | Irrelevant_Eqs_In]) :-
-	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
+remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_Out, E_Out) :- 
+	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
+	remove_from_E_irrelevant_equalities(E_In_Left, GoalVars, Visited_In, Visited_Out, E_Out_Left),
+	remove_from_E_irrelevant_equalities(E_In_Right, GoalVars, Visited_In, Visited_Out, E_Out_Right),
 	(
-	    (
-		var(Value_1),
-		memberchk(Value_1, Vars_EnoG), ! % Vars_EnoG = vars(E) - GoalVars
+	    ( E_Out_Left == [], E_Out_Right == [], !, E_Out = [] )
+	;
+	    ( E_Out_Left == [], !, E_Out = E_Out_Right )
+	;
+	    ( E_Out_Right == [], !, E_Out = E_Out_Left )
+	;
+	    ( E_Out = (E_Out_Left, E_Out_Right) )
+	).
+
+remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_In, []) :- 
+	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
+	memberchk(E_In, Visited_In), !. % Eq has been seen before. Redundant.
+
+remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_In, []) :- 
+	goal_is_equality(E_In, Value_1, Value_2, EQV, UQV),
+	goal_is_equality(E_Tmp, Value_2, Value_1, EQV, UQV), % Args interchanged.
+	memberchk(E_Tmp, Visited_In), !. % Eq has been seen before. Redundant.
+
+remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, [ E_In | Visited_In ], E_In) :- 
+	goal_is_equality(E_In, Value_1, Value_2, EQV, UQV).
+		
+remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
+	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
+	remove_from_E_redundant_vars(E_In_Left, GoalVars, Changes_In, Changes_Aux),
+	remove_from_E_redundant_vars(E_In_Right, GoalVars, Changes_Aux, Changes_Out),
+	!.
+
+remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
+	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
+	remove_from_E_irrelevant_equalities_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out).
+
+remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, 'true') :-
+	var(Value_1), 
+	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
+	varsbag(E_In, Real_GoalVars, [], Non_GoalVars),
+	(
+	    (   % Value_1 is a var in Non_GoalVars
+		memberchk(Value_1, Non_GoalVars), !,
+		Value_1 = Value_2
 	    )
 	;
-	    (
-		var(Value_2),
-		memberchk(Value_2, Vars_EnoG), ! % Vars_EnoG = vars(E) - GoalVars
+	    (   % Value_2 is a var in Non_GoalVars
+		memberchk(Value_2, Non_GoalVars), !,
+		Value_2 = Value_1
 	    )
 	).
-detect_irrelevant_equalities(_E_In, _Vars_EnoG, Irrelevant_Eqs_In, Irrelevant_Eqs_In).
 
-remove_irrelevant_equalities_1([], _Vars_EnoG, Formula_In, Formula_In) :- !.
-remove_irrelevant_equalities_1([Irrelevant_Eq | Irrelevant_Eqs], Vars_EnoG, Formula_In, Formula_Out) :-
-	goal_is_equality(Irrelevant_Eq, Value_1, Value_2, _EQV, _UQV),
+remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
+	(   var(Value_1) ; var(Value_2)   ),
+	!, fail.
+
+remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out) :-
+	functor(Term1, Name, Arity),
+	functor(Term2, Name, Arity), !,
+	Term1=..[Name|Args1],
+	Term2=..[Name|Args2],
+	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_In, Changes_Out).
+
+remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_In) :-
+	functor(Term1, Name1, Arity1),
+	functor(Term2, Name2, Arity2), 
 	(
-	    (
-		var(Value_1),
-		memberchk(Value_1, Vars_EnoG), !, % Vars_EnoG = vars(E) - GoalVars
-		replace_in_term_var_by_value(Formula_In, Value_1, Value_2, Formula_Aux)
-	    )
-	;
-	    (
-		var(Value_2),
-		memberchk(Value_2, Vars_EnoG), !, % Vars_EnoG = vars(E) - GoalVars
-		replace_in_term_var_by_value(Formula_In, Value_2, Value_1, Formula_Aux)
-	    )
-	;   % In case they have been previously removed ...
-	    true
-	),
-	remove_irrelevant_equalities_1(Irrelevant_Eqs, Vars_EnoG, Formula_Aux, Formula_Out).
+	    ( Name1 \== Name2) ;
+	    ( Arity1 \== Arity2)
+	).
 
-remove_irrelevant_equalities_2([], Eqs_Visited_In, Eqs_Visited_In, []) :- !.
-remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_Out, E_Out) :-
-	goal_is_conjunction(E_In, E_In_1, E_In_2), !,
-	remove_irrelevant_equalities_2(E_In_1, Eqs_Visited_In, Eqs_Visited_Aux, E_Out_1),
-	remove_irrelevant_equalities_2(E_In_2, Eqs_Visited_Aux, Eqs_Visited_Out, E_Out_2),
-	rebuild_conjunction_of_goals(E_Out_1, E_Out_2, E_Out).
+remove_from_E_redundant_vars_aux_list([], [], _GoalVars, Changes_In, Changes_In) :- !.
+remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Changes_In, Changes_Out) :-
+	remove_from_E_redundant_vars_aux(Arg1, Arg2, GoalVars, Changes_In, Changes_Aux), 
+	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_Aux, Changes_Out).
 
-remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_In, []) :-
-	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
-	Value_1 == Value_2, !.
+% remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out) :-
+% returns IE_Out that is IE_In but without disequalities 
+% whose variables are not in ImpVars nor in RelVars.
+% If any is in this sets we can not remove the disequality.
 
-remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_In, []) :-
-	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV),
-	memberchk(E_In, Eqs_Visited_In), !.
-
-remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, Eqs_Visited_In, []) :-
-	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV),
-	functor_local(E_In, Name, Arity, Args_In), 
-	functor_local(E_Aux, Name, Arity, Args_Aux), 
-	list_head_and_tail(Args_In, Head_1, Tail_1), 
-	list_head_and_tail(Tail_1, Head_2, Tail_2), 
-	list_head_and_tail(Tail_3, Head_1, Tail_2),  % Different order
-	list_head_and_tail(Args_Aux, Head_2, Tail_3), 
-	memberchk(E_Aux, Eqs_Visited_In), !.
-
-remove_irrelevant_equalities_2(E_In, Eqs_Visited_In, [E_In | Eqs_Visited_In], E_In).
-
-% remove_from_D_irrelevant_disequalities(D,ImpVars,RelVars,D1) returns D1
-% that is D but without disequalities that contains any variable that
-% is not in ImpVars neither RelVars
-% We need to assure that the inequalities here are atomic because 
-% non-atomic ones result into a disjunction that can not be simplified
-% by using this procedure.
 remove_from_IE_irrelevant_disequalities([], _ImpVars_and_RelVars, []) :- !.
-
 remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out) :-
 	goal_is_conjunction(IE_In, IE_In_1, IE_In_2), !,
 	remove_from_IE_irrelevant_disequalities(IE_In_1, ImpVars_and_RelVars, IE_Out_1),
@@ -564,13 +560,20 @@ remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out) :-
 
 remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out):-
 	goal_is_disequality(IE_In, _Term1, _Term2, _EQV, _UQV), !,
-	varsbag(IE_In, ImpVars_and_RelVars, [], Problematic_Vars),
+	varsbag(IE_In, [], [], Vars_IE_In),
+	varsbag_intersection(Vars_IE_In, ImpVars_and_RelVars, Useful_Vars), 
+	varsbag_difference(Vars_IE_In, Useful_Vars, Problematic_Vars),
 	(
-	    (   Problematic_Vars == [],
-		IE_Out = IE_In )
+	    (   % No problematic vars or some useful var. 
+		( Problematic_Vars == [] ; Useful_Vars == []), !,
+		  IE_Out = IE_In 
+	    )
 	;
-	    (   Problematic_Vars \== [],
-		IE_Out = [] )
+	    (   % Just problematic vars, no useful vars at all.
+		Problematic_Vars \== [],
+		Useful_Vars == [], !,
+		IE_Out = [] 
+	    )
 	).
 	
 remove_from_IE_irrelevant_disequalities(IE_In, _ImpVars_and_RelVars, _IE_Out) :-
