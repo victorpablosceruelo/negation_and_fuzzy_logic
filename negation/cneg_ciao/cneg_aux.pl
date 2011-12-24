@@ -61,7 +61,8 @@ get_stream_to_file(Stream) :-
 	defined_stream_to_file(Stream), !.
 get_stream_to_file(Stream) :-
 	name(FN_Out, "debug_pkg_cneg.pl"),	% Convert string to atom.
-	open(FN_Out,write,Stream),
+%	open(FN_Out,write,Stream), % This removes the file !!!
+	open(FN_Out,append,Stream),
 	assertz_fact(defined_stream_to_file(Stream)).
 
 echo_msg(Level, Msg, Clause) :-

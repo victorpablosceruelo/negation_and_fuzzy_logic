@@ -201,7 +201,10 @@ compute_goal_frontier(Goal, Proposal, Trace, Frontier) :-
 	),
 	echo_msg(0, 'compute_goal_frontier :: Trace', [Goal | Trace]),
 	split_goal_with_disjunctions_into_goals(Result, Proposal, Results),
-	build_a_frontier_from_each_result(Goal, Results, Frontier).
+	build_a_frontier_from_each_result(Goal, Results, Frontier),
+	echo_msg_list(2, 'double neg :: Frontier', Frontier),
+	echo_separation(2),
+	echo_msg_nl(2).
 %	compute_goal_frontier(Result, Proposal, [Goal | Trace], Real_Goal, Frontier).
 %	OLD: functor_local(Real_Goal, 'cneg_rt', 2, [ UQV |[ SubGoal ]]),
 %	OLD: frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
