@@ -45,15 +45,17 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
-	echo_msg(2, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_Aux, Goal, Proposal)),
+	echo_msg(2, 'cneg_rt_Aux :: (UQV_Aux, Goal, Proposal)', (UQV_Aux, Goal, Proposal)),
 	portray_attributes_in_term(2, Goal),
 	varsbag(UQV_Aux, [], [], UQV),
 	varsbag(Goal, UQV, [], GoalVars),
 	
 	compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV),
+	echo_msg_nl(2),
 	echo_msg_list(2, 'cneg_rt_Aux :: Frontier', Frontier),
 
 	negate_set_of_frontiers(Frontier, Proposal, GoalVars, New_UQV, Result), !,
+	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: Result', Result),
 	echo_msg_nl(2).
 
@@ -125,7 +127,7 @@ compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV) :-
 compute_set_of_frontiers_aux([], _Proposal, _Trace, _UQV, [], []) :- !.
 compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier_Out, New_UQV_Out) :-
 	compute_goal_frontier(Goal, Proposal, Trace, Frontier_Aux), !,
-	echo_msg_list(2, 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
+%	echo_msg_list(2, 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
 	adequate_frontier(Frontier_Aux, UQV, Frontier_Tmp, New_UQV_Tmp), !,
 %	echo_msg(2, 'cneg_rt_Aux :: (UQV)', (New_UQV_Tmp)),
 	compute_set_of_frontiers_aux(More_Goals, Proposal, Trace, UQV, Frontier_In, New_UQV_In),
@@ -138,10 +140,10 @@ compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier
 % elements where each element is a conjunction of subgoals.
 
 % Just to debug.
-compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier) :-
-	echo_msg(2, '--------------------------------------------------------------------------------------------------------------', ' '),
-	echo_msg(2, 'compute_goal_frontier :: (Goal)', (Goal)),	
-	fail. % Just debug and use backtracking to continue.
+%compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier) :-
+%	echo_msg(2, '--------------------------------------------------------------------------------------------------------------', ' '),
+%	echo_msg(2, 'compute_goal_frontier :: (Goal)', (Goal)),	
+%	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :-
@@ -313,6 +315,7 @@ combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result
 % (Head, BodyList) of the goal Goal.
 
 negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
+	echo_msg_nl(2),
 	echo_msg(2, 'negate_frontier :: Frontier_In', (Frontier_In)),
 	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
 %	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
