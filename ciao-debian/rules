@@ -62,6 +62,7 @@ build: clean fixes
 	# echo "debian" > ./REVISION
 
 	./$(CIAOSETUP) configure \
+	    --stop-if-error=yes \
 	    --registration_type=all \
 	    --instype=global \
 	    --prefix=/usr \
@@ -78,8 +79,9 @@ build: clean fixes
 	    --web_images_path=/usr/share/doc/ciao-prolog/html \
 	    --htmldir=/usr/share/doc/ciao-prolog/html \
 	    --install_prolog_name=no --execmode=755 --datamode=644 \
-	    --installgroup=root --stop-if-error=yes \
+	    --installgroup=root \
 	    --with_gsl=no --with_ppl=no \
+	    --with_ant=yes --with_java_interface=yes \
 	    --with_mysql=yes --mysql_client_directory=/usr/lib
 
 	# New in version 1.15.0 r14285
