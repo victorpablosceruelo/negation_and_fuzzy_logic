@@ -42,17 +42,23 @@ cneg_rt_New(UQV, Goal):-
 cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_separation(2),
 	echo_msg_nl(2),
+	echo_msg(2, 'cneg_rt_Aux :: Goal', Goal),
+	echo_msg(2, 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, 'cneg_rt_Aux :: Proposal', Proposal),
+	echo_msg_nl(2),
 	echo_statistics,
 	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
-	echo_msg(2, 'cneg_rt_Aux :: (UQV_Aux, Goal, Proposal)', (UQV_Aux, Goal, Proposal)),
+	echo_msg(2, 'cneg_rt_Aux :: UQV_Aux', UQV_Aux),
 	portray_attributes_in_term(2, Goal),
 	varsbag(UQV_Aux, [], [], UQV),
 	varsbag(Goal, UQV, [], GoalVars),
+	echo_msg(2, 'cneg_rt_Aux :: GoalVars', GoalVars),
 	
 	compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV),
 	echo_msg_nl(2),
+	echo_msg(2, 'cneg_rt_Aux :: New_UQV', New_UQV),
 	echo_msg_list(2, 'cneg_rt_Aux :: Frontier', Frontier),
 
 	negate_set_of_frontiers(Frontier, Proposal, GoalVars, New_UQV, Result), !,
@@ -122,7 +128,9 @@ adequate_frontier_aux(Real_UQV, F_In, _Body_Copy, _New_UQV) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV) :-
+	echo_msg(2, 'compute_set_of_frontiers :: (Goal, Proposal, Trace, UQV)', (Goal, Proposal, Trace, UQV)),
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
+	echo_msg_list(2, 'compute_set_of_frontiers :: Goals', Goals),
 	compute_set_of_frontiers_aux(Goals, Proposal, Trace, UQV, Frontier, New_UQV).
 
 compute_set_of_frontiers_aux([], _Proposal, _Trace, _UQV, [], []) :- !.
@@ -176,18 +184,19 @@ compute_goal_frontier(Goal, Proposal, Trace, Frontier):-
 % None of them is managed yet, so just bypass them.
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, EQV, UQV), !,
-	functor_local(Real_Goal, 'diseq_eqv_uqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
+	functor_local(Real_Goal, 'diseq_euqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true').
 
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, EQV, UQV), !,
-	functor_local(Real_Goal, 'eq_uqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
+	functor_local(Real_Goal, 'eq_euqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true').
 
 % Double negation is not managed yet. Bypass it.
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal), !,
+	echo_msg(2, 'compute_goal_frontier :: double negation for (UQV, SubGoal, Proposal)', (UQV, SubGoal, Proposal)),
 	(
 	    (
 		Proposal = 'cneg_rt_Chan',
@@ -257,20 +266,21 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
+simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !,
+	echo_msg_nl(2).
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
-%	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
+	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
 simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
-%	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
+	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
 	frontier_contents(F_In, Goal, Head, _Body, F_Test),
-	echo_msg(0, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
+	echo_msg(2, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
 % Old way:
