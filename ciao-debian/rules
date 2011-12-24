@@ -91,14 +91,8 @@ build: clean fixes
 #	./$(CIAOSETUP) install_to_destroot --destdir=[value]
 
 	# Add here commands to compile the package.
-	# $(MAKE)
-	RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) build 
-	RPM_BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) docs
-
-	# Recompile the files which doesn't ship itfs.
-	# This is not working.
-	#	$(CIAOLOCALENG) -c ciao/library/clpq.pl $(CIAOLOCALCOMP)
-	#	$(CIAOLOCAL) -c 
+	./$(CIAOSETUP) build
+	./$(CIAOSETUP) docs
 
 #install:
 install: build
@@ -109,7 +103,6 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp.
-	# BUILD_ROOT=$(CURDIR)/debian/tmp/ ./$(CIAOSETUP) install
 	./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp/	
 
 	dh_install --list-missing
