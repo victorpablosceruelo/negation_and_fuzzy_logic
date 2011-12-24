@@ -415,19 +415,12 @@ normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars, Exp
 	compute_impvars_expvars_and_uqvars(Formula_In, GoalVars, ImpVars, ExpVars, UQVars).
 
 normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, ImpVars, ExpVars, UQVars):-
-	split_frontier_contents(Formula_In, E_In, _IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
-	varsbag(E_In, Real_GoalVars, [], Vars_EnoG), % Vars_EnoG = vars(E) - GoalVars
-	remove_from_E_irrelevant_equalities(Formula_In, Real_GoalVars, Formula_Aux),  
-	split_frontier_contents(Formula_Aux, E_Out, IE_Aux, NIE_Out),
-%	echo_msg(2, 'normalize_E_IE_NIE :: (E_Out, IE_Aux, NIE_Out)', (E_Out, IE_Aux, NIE_Out)),
-	varsbag(E_Out, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
-	varsbag(NIE_Out, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
-	varsbag_addition(ImpVars, RelVars, ImpVars_and_RelVars),
-%	echo_msg(2, 'remove_from_IE_irrelevant_disequalities :: (IE_Aux, ImpVars_and_RelVars)', (IE_Aux, ImpVars_and_RelVars)),
-	remove_from_IE_irrelevant_disequalities(IE_Aux, ImpVars_and_RelVars, IE_Out),
-%	echo_msg(2, 'remove_from_IE_irrelevant_disequalities :: (IE_Out)', (IE_Out)),
-	split_frontier_contents(Formula_Out, E_Out, IE_Out, NIE_Out). 
+	remove_from_E_redundant_eqs_and_vars(Formula_In, Real_GoalVars, Formula_Aux),  
+	echo_msg(2, 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
+	remove_from_IE_irrelevant_disequalities(Formula_Aux, Real_GoalVars, Formula_Out),
+	echo_msg(2, 'normalize_E_IE_NIE :: Formula_Out', Formula_Out),
+	compute_sets_of_vars(Formula_Aux, Real_GoalVars, ImpVars, ExpVars, RelVars, UQVars).
  
 normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _ImpVars) :-
 	Proposal \== 'cneg_rt_New', 
@@ -435,16 +428,17 @@ normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _ImpVars) :-
 	echo_msg(2, 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
 	fail.
 
-compute_impvars_expvars_and_uqvars(Formula_In, GoalVars, ImpVars, ExpVars, UQVars) :-
+compute_sets_of_vars(Formula_In, GoalVars, ImpVars, ExpVars, RelVars, UQVars) :-
 	split_frontier_contents(Formula_In, E_In, IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(E_In, [], [], Vars_E_In), % Vars_E_In
 	varsbag(IE_In, [], [], Vars_IE_In), % Vars_IE_In
 	varsbag(NIE_In, [], [], Vars_NIE_In),  % Vars_NIE_In
 	varsbag(Vars_E_In, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
-	varsbag_difference(Vars_IE_In, Real_GoalVars, ExpVars_Tmp_1),
- 	varsbag_difference(ExpVars_Tmp_1, Vars_E_In, ExpVars_Tmp_2),
- 	varsbag_difference(ExpVars_Tmp_2, Vars_NIE_In, ExpVars). % ExpVars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+	varsbag_difference(Vars_NIE_In, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
+	varsbag_difference(Vars_NIE_In, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
+ 	varsbag_difference(Vars_IE_In, ImpVars, Tmp_UQVars), % Tmp_UQVars = vars(IE) - GoalVars - vars(E)
+ 	varsbag_difference(Tmp_UQVars, Vars_NIE_In, UQVars). % UQVars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -546,19 +540,26 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 	remove_from_E_redundant_vars_aux(Arg1, Arg2, GoalVars, Changes_In, Changes_Aux), 
 	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_Aux, Changes_Out).
 
-% remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out) :-
+% remove_from_IE_irrelevant_disequalities(Formula_In, Real_GoalVars, Formula_Out) :-
 % returns IE_Out that is IE_In but without disequalities 
 % whose variables are not in ImpVars nor in RelVars.
 % If any is in this sets we can not remove the disequality.
 
-remove_from_IE_irrelevant_disequalities([], _ImpVars_and_RelVars, []) :- !.
-remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out) :-
+remove_from_IE_irrelevant_disequalities(Formula_In, Real_GoalVars, Formula_Out) :-
+	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQVars),
+	split_frontier_contents(Formula_In, E_In, IE_In, NIE_In),
+	varsbag(ImpVars, [], RelVars, ImpVars_and_RelVars),
+	remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out),
+	split_frontier_contents(Formula_Out, E_In, IE_Out, NIE_In). 
+
+remove_from_IE_irrelevant_disequalities_aux([], _ImpVars_and_RelVars, []) :- !.
+remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out) :-
 	goal_is_conjunction(IE_In, IE_In_1, IE_In_2), !,
-	remove_from_IE_irrelevant_disequalities(IE_In_1, ImpVars_and_RelVars, IE_Out_1),
-	remove_from_IE_irrelevant_disequalities(IE_In_2, ImpVars_and_RelVars, IE_Out_2),
+	remove_from_IE_irrelevant_disequalities_aux(IE_In_1, ImpVars_and_RelVars, IE_Out_1),
+	remove_from_IE_irrelevant_disequalities_aux(IE_In_2, ImpVars_and_RelVars, IE_Out_2),
 	rebuild_conjunction_of_goals(IE_Out_1, IE_Out_2, IE_Out).
 
-remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out):-
+remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out):-
 	goal_is_disequality(IE_In, _Term1, _Term2, _EQV, _UQV), !,
 	varsbag(IE_In, [], [], Vars_IE_In),
 	varsbag_intersection(Vars_IE_In, ImpVars_and_RelVars, Useful_Vars), 
@@ -576,7 +577,7 @@ remove_from_IE_irrelevant_disequalities(IE_In, ImpVars_and_RelVars, IE_Out):-
 	    )
 	).
 	
-remove_from_IE_irrelevant_disequalities(IE_In, _ImpVars_and_RelVars, _IE_Out) :-
+remove_from_IE_irrelevant_disequalities_aux(IE_In, _ImpVars_and_RelVars, _IE_Out) :-
 	!,
 	echo_msg(2, 'ERROR: remove_from_IE_irrelevant_disequalities can not deal with IE_In', IE_In),
 	fail.
