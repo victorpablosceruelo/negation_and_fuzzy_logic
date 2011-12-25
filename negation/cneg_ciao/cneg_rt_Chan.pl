@@ -73,8 +73,14 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Structure to manage all the info about the frontier in an easy way.
+% Structures to manage all the info about the frontier in an easy way.
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
+frontier_E_IE_NIE_contents(frontier(E, IE, NIE), E, IE, NIE).
+frontier_E_IE_NIE_imp_exp_contents(frontier(E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp), E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the resulting frontier
 % from combining the frontiers F1 and F2 in all possible ways.
@@ -332,12 +338,12 @@ negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
 	echo_msg_nl(2),
 	echo_msg(2, 'negate_frontier :: Frontier_In', (Frontier_In)),
 	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
-%	split_frontier_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
+%	frontier_E_IE_NIE_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
 %	echo_msg(2, 'negate_frontier :: Frontier_Aux_1 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_1),
 	!, % Reduce the stack's memory.
 	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars, ExpVars, UQVars),
 %	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_2),
-	split_frontier_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
+	frontier_E_IE_NIE_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
 %	echo_msg(2, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
 	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, IE_imp, NIE_imp, IE_NIE_exp),
 %	echo_msg(2, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
@@ -356,10 +362,6 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :-
 	Goals_1 \== [], 
 	Goals_2 \== [], !.
 
-split_frontier_contents(frontier(E_In, IE_In, NIE_In), E_In, IE_In, NIE_In).
-
-%empty_frontier(Frontier) :- split_frontier_contents(Frontier, [], [], []).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -373,20 +375,20 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	goal_is_conjunction(Frontier_In, G1, G2), !,
 	split_frontier_into_E_IE_NIE(G1, Frontier_G1),
 	split_frontier_into_E_IE_NIE(G2, Frontier_G2),
-	split_frontier_contents(Frontier_G1, E_G1, IE_G1, NIE_G1),
-	split_frontier_contents(Frontier_G2, E_G2, IE_G2, NIE_G2),
+	frontier_E_IE_NIE_contents(Frontier_G1, E_G1, IE_G1, NIE_G1),
+	frontier_E_IE_NIE_contents(Frontier_G2, E_G2, IE_G2, NIE_G2),
 	rebuild_conjunction_of_goals(E_G1, E_G2, E_Out),
 	rebuild_conjunction_of_goals(IE_G1, IE_G2, IE_Out),
 	rebuild_conjunction_of_goals(NIE_G1, NIE_G2, NIE_Out),
-	split_frontier_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
+	frontier_E_IE_NIE_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
 	goal_is_equality(Frontier_In, _Term1, _Term2, _EQV, _UQV), !,
-	split_frontier_contents(Frontier_Out, Frontier_In, [], []).
+	frontier_E_IE_NIE_contents(Frontier_Out, Frontier_In, [], []).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
 	goal_is_disequality(Frontier_In, _Term1, _Term2, _EQV, _UQV), !,
-	split_frontier_contents(Frontier_Out, [], Frontier_In, []).
+	frontier_E_IE_NIE_contents(Frontier_Out, [], Frontier_In, []).
 
 % This leads to infinite loops because double negation 
 % sould be managed when generating the frontier.
@@ -394,11 +396,11 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 % when evaluating the frontier. To be done.
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
 	goal_is_negation(Frontier_In, _UQV, _SubGoal), !,
-	split_frontier_contents(Frontier_Out, [], [], Frontier_In).
+	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
 	goal_is_not_conj_disj_eq_diseq_dneg(Frontier_In), !,
-	split_frontier_contents(Frontier_Out, [], [], Frontier_In).
+	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :- 
 	echo_msg(2, 'ERROR: split_frontier_into_E_IE_NIE can not deal with frontier. Frontier_In', Frontier_In),
@@ -429,7 +431,7 @@ normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _ImpVars) :-
 	fail.
 
 compute_sets_of_vars(Formula_In, GoalVars, ImpVars, ExpVars, RelVars, UQVars) :-
-	split_frontier_contents(Formula_In, E_In, IE_In, _NIE_In),
+	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, _NIE_In),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(E_In, [], [], Vars_E_In), % Vars_E_In
 	varsbag(IE_In, [], [], Vars_IE_In), % Vars_IE_In
@@ -447,10 +449,10 @@ compute_sets_of_vars(Formula_In, GoalVars, ImpVars, ExpVars, RelVars, UQVars) :-
 
 % removes from E redundnant equalities and variables
 remove_from_E_redundant_eqs_and_vars(Formulae_In, GoalVars, Formulae_Out) :- 
-	split_frontier_contents(Formulae_In, E_In, IE_In, NIE_In), 
+	frontier_E_IE_NIE_contents(Formulae_In, E_In, IE_In, NIE_In), 
 	remove_from_E_redundant_vars(E_In, GoalVars, 'fail', Changes),
 	remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux),
-	split_frontier_contents(Formulae_Aux, E_Aux, IE_In, NIE_In), 
+	frontier_E_IE_NIE_contents(Formulae_Aux, E_Aux, IE_In, NIE_In), 
 	(
 	    (   % If there are no changes then we have a fixed point.
 		Changes == 'fail', % No redundant vars.
@@ -547,10 +549,10 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 
 remove_from_IE_irrelevant_disequalities(Formula_In, Real_GoalVars, Formula_Out) :-
 	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQVars),
-	split_frontier_contents(Formula_In, E_In, IE_In, NIE_In),
+	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
 	varsbag(ImpVars, [], RelVars, ImpVars_and_RelVars),
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out),
-	split_frontier_contents(Formula_Out, E_In, IE_Out, NIE_In). 
+	frontier_E_IE_NIE_contents(Formula_Out, E_In, IE_Out, NIE_In). 
 
 remove_from_IE_irrelevant_disequalities_aux([], _ImpVars_and_RelVars, []) :- !.
 remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out) :-
