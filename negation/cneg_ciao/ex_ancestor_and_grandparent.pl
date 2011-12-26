@@ -1,4 +1,4 @@
-:- module(ex_ancestor_grandparent,_,[.(cneg), debugger_pkg]).
+:- module(ex_ancestor_and_grandparent,_,[.(cneg), .(debugger_pkg)]).
 % :- module(ex_ancestor,_,[.(cneg)]).
 
 test_parent(X, Y) :- cneg_rt([], parent(X, Y)), parent(X, Y).
@@ -7,8 +7,8 @@ test_grandparent(X, Y) :- cneg_rt([], parent(X, Y)), parent(X, Y).
 
 parent(marcus, daniel).
 
-parent2(bob,oscar).
-parent2(oscar,joan).
+parent(bob,oscar).
+parent(oscar,joan).
 
 parent(tom, john).
 parent(john, mary).
