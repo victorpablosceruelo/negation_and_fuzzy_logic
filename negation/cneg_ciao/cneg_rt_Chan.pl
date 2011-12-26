@@ -416,13 +416,14 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, UQV, Formula_In, Vars_Info):-
 	compute_variables_information(Formula_In, GoalVars, UQV, Vars_Info).
 
-normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, UQV, Formula_Out, Vars_Info):-
-	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
-	remove_from_E_redundant_eqs_and_vars(Formula_In, Real_GoalVars, Formula_Aux),  
+normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, UQV, Formula_Out, Vars_Info_Out):-
+	compute_variables_information(Formula, GoalVars, UQV, Vars_Info_1),
+	remove_from_E_redundant_eqs_and_vars(Formula_In, Vars_Info_1, Formula_Aux),  
 	echo_msg(2, 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
-	remove_from_IE_irrelevant_disequalities(Formula_Aux, Real_GoalVars, Formula_Out),
+	compute_variables_information(Formula, GoalVars, UQV, Vars_Info_2),
+	remove_from_IE_irrelevant_disequalities(Formula_Aux, Vars_Info_2, Formula_Out),
 	echo_msg(2, 'normalize_E_IE_NIE :: Formula_Out', Formula_Out),
-	compute_variables_information(Formula_Out, GoalVars, UQV, Vars_Info).
+	compute_variables_information(Formula_Out, GoalVars, UQV, Vars_Info_Out).
  
 normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _UQV, _Formula_Out, _Vars_Info) :-
 	Proposal \== 'cneg_rt_New', 
@@ -575,49 +576,46 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 	remove_from_E_redundant_vars_aux(Arg1, Arg2, GoalVars, Changes_In, Changes_Aux), 
 	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_Aux, Changes_Out).
 
-% remove_from_IE_irrelevant_disequalities(Formula_In, Real_GoalVars, Formula_Out) :-
+% remove_from_IE_irrelevant_disequalities(Formula_In, Vars_Info, Formula_Out) :-
 % returns IE_Out that is IE_In but without disequalities 
-% whose variables are not in ImpVars nor in RelVars.
-% If any is in this sets we can not remove the disequality.
+% whose variables are not in ImpVars nor in RelVars (So they are in Dumb_Vars).
+% In practice we unify each var in Dumb_Vars to avoid a result after its negation.
 
-remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars, Formula_Out) :-
-	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQ_to_EQ_Vars, _Dumb_Vars),
+remove_from_IE_irrelevant_disequalities(Formula_In, Vars_Info_In, Formula_Out) :-
+%	Recompute.
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info_In, GoalVars_In, UQV_In, _ImpVars_In, _ExpVars_In, _RelVars_In, _UQ_to_EQ_Vars_In, _Dumb_Vars_In),
+
+	compute_variables_information(Formula_In, GoalVars_In, UQV_In, Vars_Info),
 	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
-	varsbag(ImpVars, [], RelVars, ImpVars_and_RelVars),
-	remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out),
+	remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out),
 	frontier_E_IE_NIE_contents(Formula_Out, E_In, IE_Out, NIE_In). 
 
-remove_from_IE_irrelevant_disequalities_aux([], _ImpVars_and_RelVars, []) :- !.
-remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out) :-
+remove_from_IE_irrelevant_disequalities_aux([], _Vars_Info, []) :- !.
+remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out) :-
 	goal_is_conjunction(IE_In, IE_In_1, IE_In_2), !,
-	remove_from_IE_irrelevant_disequalities_aux(IE_In_1, ImpVars_and_RelVars, IE_Out_1),
-	remove_from_IE_irrelevant_disequalities_aux(IE_In_2, ImpVars_and_RelVars, IE_Out_2),
+	remove_from_IE_irrelevant_disequalities_aux(IE_In_1, Vars_Info, IE_Out_1),
+	remove_from_IE_irrelevant_disequalities_aux(IE_In_2, Vars_Info, IE_Out_2),
 	rebuild_conjunction_of_goals(IE_Out_1, IE_Out_2, IE_Out).
 
-remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out):-
-	goal_is_disequality(IE_In, _Term1, _Term2, _EQV, _UQV), !,
+remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out):-
+	goal_is_disequality(IE_In, _Term1, _Term2, _EQV_IE_In, _UQV_IE_In), !,
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, _UQ_to_EQ_Vars, Dumb_Vars),
+
 	varsbag(IE_In, [], [], Vars_IE_In),
-	varsbag_intersection(Vars_IE_In, ImpVars_and_RelVars, Useful_Vars), 
-	varsbag_difference(Vars_IE_In, Useful_Vars, Problematic_Vars),
+	varsbag_intersection(Vars_IE_In, Dumb_Vars, Problematic_Vars),
 	(
-	    (   % No problematic vars or some useful var. 
-		( Problematic_Vars == [] ; Useful_Vars == []), !,
-		  IE_Out = IE_In 
+	    (   % No problematic vars
+		Problematic_Vars == [], !,
+		IE_Out = IE_In 
 	    )
 	;
-	    (   % Just problematic vars, no useful vars at all.
-		Problematic_Vars \== [],
-		Useful_Vars == [], !,
+	    (   % At least one problematic var.
+		Problematic_Vars \== [], !,
 		IE_Out = [] 
 	    )
 	).
 	
-remove_from_IE_irrelevant_disequalities_aux(IE_In, _ImpVars_and_RelVars, _IE_Out) :-
-	!,
-	echo_msg(2, 'ERROR: remove_from_IE_irrelevant_disequalities can not deal with IE_In', IE_In),
-	fail.
-
-
 % split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
@@ -631,7 +629,8 @@ split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, Vars_Info, Frontier_Out):-
 	split_ie_or_nie_between_imp_exp_and_dumb(NIE, Vars_Info, NIE_Imp, NIE_Exp, NIE_Dumb),
 	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp, NIE_Dumb)),
 
-	frontier_E_IE_NIE_imp_exp_contents(Frontier_Out, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+	frontier_E_IE_NIE_ied_contents(Frontier_Out, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 
 % split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
 % In Fexp are the elements of F with any variables of ExpVars and
@@ -647,24 +646,29 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Fo
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp, _Form_dumb) :-
 	goal_is_disjunction(Form, _Form_1, _Form_2), !,
-	echo_msg(2, 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with Form', Form),
+	echo_msg(2, 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with disjunctions. Form', Form),
 	fail.
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars),
-	varsbag(Form, Form_ImpVars, [], Form_ExpVars), % Retrieve only vars not in ImpVars.
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, ExpVars, _RelVars, _UQ_to_EQ_Vars, Dumb_Vars),
+	varsbag(Form, [], [], Form_Vars), 
+	varsbag_intersection(Form_Vars, ExpVars, Form_ExpVars),
+	varsbag_intersection(Form_Vars, Dumb_Vars, Form_Dumb_Vars),
 	(
-	    (
-		ExpVars == [], !,
-		Form_imp = Form,
-		Form_exp = []
+	    (   % Form has some Some ExpVars
+		Form_ExpVars \== [], !,
+		Form_exp = Form, Form_dumb = [], Form_imp = []
 	    )
 	;
-	    (
-		ExpVars \== [], !,
-		Form_imp = [],
-		Form_exp = Form
+	    (   % Form has no ExpVars but some DumbVars
+		Form_ExpVars == [], Form_Dumb_Vars \== [], !,
+		Form_exp = [], Form_dumb = Form, Form_imp = []
+	    )
+	;
+	    (   % No ExpVars nor DumbVars
+		ExpVars == [], Form_Dumb_Vars == [], !,
+		Form_exp = [], Form_dumb = [], Form_imp = Form
 	    )
 	).
 %	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb', (Form, Form_imp, Form_exp)).
@@ -679,46 +683,45 @@ negate_formula(Frontier, _Proposal, _Vars_Info, true) :-
 negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	frontier_E_IE_NIE_ied_contents(Frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, _NIE_Dumb),
-	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _UQ_to_EQ_Vars, Dumb_Vars),
 
 	rebuild_conjunction_of_goals(IE_Exp, NIE_Exp, IE_NIE_Exp), 
 	rebuild_conjunction_of_goals(IE_Imp, IE_Dumb, IE_Imp_Dumb), % IE_imp_dumb == [] in Chan proposal.
 
-%	echo_msg(2, 'negate_formula :: (E, IE_Imp, NIE_Imp, IE_NIE_Exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
- 	negate_IE_NIE_exp(IE_NIE_Exp, Proposal, ImpVars, UQV, Neg_IE_NIE_Exp),
-	negate_imp_form(NIE_Imp, Proposal, ImpVars, UQV, Neg_IE_NIE_Exp, Neg_NIE_Imp_IE_NIE_Exp),
-	negate_imp_form(IE_Imp_Dumb, Proposal, ImpVars, UQV, Neg_NIE_Imp_IE_NIE_Exp, Neg_IE_NIE),
-	negate_imp_form(E, Proposal, GoalVars, UQV, Neg_IE_NIE, Neg_E_IE_NIE),
+	rebuild_conjunction_of_goals(E, IE_Imp_Dumb, E_IE_Imp_Dumb),
+	rebuild_conjunction_of_goals(E_IE_Imp_Dumb, NIE_Imp, Formulae_Imp),
+
+	echo_msg(2, 'negate_formula :: (E, IE_Imp_Dumb, NIE_Imp, IE_NIE_Exp)', (E, IE_Imp_Dumb, NIE_Imp, IE_NIE_Exp)),
+ 	negate_IE_NIE_exp(IE_NIE_Exp, Proposal, Vars_Info, Neg_IE_NIE_Exp),
+	negate_imp_form(Formulae_Imp, Proposal, Vars_Info, Neg_IE_NIE_Exp, Neg_E_IE_NIE),
 	!. % Backtracking forbidden.
 
 % negate_Dexp_Rexp(DRexp,ImpVars,ExpVars,SolC) obtain in
 % SolC a solution of negating Dexp y Rexp juntos.
-negate_IE_NIE_exp([], _Proposal, _ImpVars, _UQV, []):- !.
-negate_IE_NIE_exp(IE_NIE_exp, 'cneg_rt_Chan', ImpVars, UQV, Neg_IE_NIE_exp) :-
+negate_IE_NIE_exp([], _Proposal, _Vars_Info, []):- !.
+negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
-	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
-	varsbag(UQV, [], ExpVars, New_UQV),
-	Neg_IE_NIE_exp = (cneg_rt_Chan(New_UQV, IE_NIE_exp)), !.
-negate_IE_NIE_exp(IE_NIE_exp, 'cneg_rt_New', ImpVars, UQV, Neg_IE_NIE_exp) :-
-	IE_NIE_exp \== [],
-	varsbag(IE_NIE_exp, ImpVars, [], ExpVars),
-	varsbag(UQV, [], ExpVars, New_UQV),
-	Neg_IE_NIE_exp = (cneg_rt_New(New_UQV, IE_NIE_exp)), !.
+	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
 
-negate_imp_form([], _Proposal, _ImpVars, _UQV, [], []) :- !. % Optimization.
-negate_imp_form(Formula, _Proposal, _ImpVars, _UQV, _Next_Formula, _Neg_Formula) :-
+	varsbag(ImpVars, [], [], Real_ImpVars), % Sometimes we have non-vars
+	varsbag(UQ_to_EQ_Vars, [], Real_ImpVars, EQ_Vars), % UQ_Vars -> EQ_Vars
+	varsbag(IE_NIE_exp, EQ_Vars, [], IE_NIE_UQ_Vars), % IE_NIE_UQ_Vars
+	varsbag(UQV, [], IE_NIE_UQ_Vars, Real_UQ_Vars), % Real_UQ_Vars
+	functor_local(Neg_IE_NIE_exp, Proposal, 2, [Real_UQ_Vars |[ IE_NIE_exp ]]), !.
+
+negate_imp_form([], _Proposal, _Vars_Info, [], []) :- !. % Optimization.
+negate_imp_form(Formula, _Proposal, _Vars_Info, _Next_Formula, _Neg_Formula) :-
 	goal_is_disjunction(Formula, _Formula_1, _Formula_2), !,
-	echo_msg(2, 'ERROR: negate_imp_form can not deal with Formula', Formula),
+	echo_msg(2, 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
 	fail.
 
-negate_imp_form(Formula, Proposal, ImpVars, UQV, Next_Formula, Neg_Formula) :-
+negate_imp_form(Formula, Proposal, Vars_Info, Next_Formula, Neg_Formula) :-
 	goal_is_conjunction(Formula, Formula_1, Formula_2), !,
- 	negate_imp_form(Formula_2, Proposal, ImpVars, UQV, Next_Formula, Next_Formula_Aux),
- 	negate_imp_form(Formula_1, Proposal, ImpVars, UQV, Next_Formula_Aux, Neg_Formula).
+ 	negate_imp_form(Formula_2, Proposal, Vars_Info, Next_Formula, Next_Formula_Aux),
+ 	negate_imp_form(Formula_1, Proposal, Vars_Info, Next_Formula_Aux, Neg_Formula).
 
-negate_imp_form(Formula, Proposal, ImpVars, UQV, Next_Formula, Neg_Formula) :-
-	negate_imp_atom(Formula, Proposal, ImpVars, UQV, Neg_Atom, Keep_Atom),
+negate_imp_form(Formula, Proposal, Vars_Info, Next_Formula, Neg_Formula) :-
+	negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom),
 	combine_negated(Neg_Atom, Keep_Atom, Next_Formula, Neg_Formula), 
 	!.
 
@@ -732,40 +735,45 @@ combine_negated(Neg_Formula_1, Keep_Formula_1, Neg_Formula_2, Neg_Formula) :-
 	Neg_Formula = (Neg_Formula_1 ; (Keep_Formula_1, Neg_Formula_2)).
 
 % negate_I(I,ImpVars,Sol) obtains in Sol a solution of negating I
-negate_imp_atom([], _Proposal, _ImpVars, _UQV, [], []) :- !. % Obvious.
-negate_imp_atom(true, _Proposal, _ImpVars, _UQV, fail, true):- !. % Trivial predicates
-negate_imp_atom(fail, _Proposal, _ImpVars, _UQV, true, fail):- !. % Trivial predicates
+negate_imp_atom([], _Proposal, _Vars_Info, [], []) :- !. % Obvious.
+negate_imp_atom(true, _Proposal, _Vars_Info, fail, true):- !. % Trivial predicates
+negate_imp_atom(fail, _Proposal, _Vars_Info, true, fail):- !. % Trivial predicates
 
 % Negation of equalities. We need to take care of converting UQV to EQV and vice-versa.
 % Since EQV are not used in equality basic predicates, we assume that EQV variables
 % are the result from applying double negation to a disequality. 
-negate_imp_atom(Formula, _Proposal, ImpVars, _UQV, Neg_Atom, Keep_Atom) :-
-	goal_is_equality(Formula, T1, T2, Eq_EQV, Eq_UQV),
-	varsbag(Eq_EQV, [], [], Real_Eq_EQV),
- 	varsbag((T1,T2), ImpVars, Real_Eq_EQV, Diseq_UQV), % Eq_EQV -> Diseq_UQV
-	varsbag(Eq_UQV, Diseq_UQV, [], Diseq_EQV), % Eq_UQV -> Diseq_EQV
+negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
+	goal_is_equality(Formula, T1, T2, Eq_EQV, Eq_UQV), !,
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info, GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
+
+	varsbag_addition(GoalVars, UQ_to_EQ_Vars, Diseq_EQV), % Diseq_EQV = GoalVars + UQ_to_EQ_Vars
+	varsbag(Formula, Diseq_EQV, [], Diseq_UQV), % Diseq_UQV = vars(Formula) - Diseq_EQV
+
 	Neg_Atom = (diseq_euqv(T1, T2, Diseq_EQV, Diseq_UQV)),
 	Keep_Atom = (eq_euqv(T1, T2, Eq_EQV, Eq_UQV)).
 
 % Idem for disequalities.
-negate_imp_atom(Formula, _Proposal, ImpVars, _UQV, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1, T2, Diseq_EQV, Diseq_UQV),
-	varsbag(Diseq_EQV, [], [], Real_Diseq_EQV), 
- 	varsbag((T1,T2), ImpVars, Real_Diseq_EQV, Eq_UQV), % Diseq_EQV -> Eq_UQV
-	varsbag(Diseq_UQV, Eq_UQV, [], Eq_EQV), % Diseq_UQV -> Eq_EQV
+negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
+	goal_is_disequality(Formula, T1, T2, Diseq_EQV, Diseq_UQV), !,
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
+
+	varsbag_addition(ImpVars, UQ_to_EQ_Vars, Eq_EQV), % Eq_EQV = GoalVars + vars(E) + UQ_to_EQ_Vars
+	varsbag(Formula, Eq_EQV, [], Eq_UQV), % Eq_UQV = vars(Formula) - Eq_EQV
+
 	Neg_Atom = (eq_euqv(T1,T2, Eq_EQV, Eq_UQV)),
 	Keep_Atom = (diseq_euqv(T1,T2, Diseq_EQV, Diseq_UQV)).
 
-negate_imp_atom(Formula, 'cneg_rt_Chan', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
-	varsbag(UQV, [], [], Real_UQV),
- 	varsbag(Formula, ImpVars, Real_UQV, Delayed_Negation_UQV),
-	Neg_Atom = (cneg_rt_Chan(Delayed_Negation_UQV, Formula)),
-	Keep_Atom = (Formula). 
+negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
 
-negate_imp_atom(Formula, 'cneg_rt_New', ImpVars, UQV, Neg_Atom, Keep_Atom) :-
-	varsbag(UQV, [], [], Real_UQV),
- 	varsbag(Formula, ImpVars, Real_UQV, Delayed_Negation_UQV),
-	Neg_Atom = (cneg_rt_New(Delayed_Negation_UQV, Formula)),
+	varsbag_addition(ImpVars, UQ_to_EQ_Vars, EQ_Vars), % EQ_Vars = GoalVars + vars(E) + UQ_to_EQ_Vars
+	varsbag(UQV, [], [], Real_UQV), % Sometimes they stop being variables.
+ 	varsbag(Formula, EQ_Vars, Real_UQV, Delayed_Negation_UQV),
+
+	functor_local(Neg_Atom, Proposal, 2, [Delayed_Negation_UQV |[ Formula ]]),
 	Keep_Atom = (Formula). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
