@@ -76,7 +76,8 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 % Structures to manage all the info about the frontier in an easy way.
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
 frontier_E_IE_NIE_contents(frontier(E, IE, NIE), E, IE, NIE).
-frontier_E_IE_NIE_imp_exp_contents(frontier(E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp), E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
+frontier_E_IE_NIE_ied_contents(frontier(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -341,13 +342,12 @@ negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
 %	frontier_E_IE_NIE_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
 %	echo_msg(2, 'negate_frontier :: Frontier_Aux_1 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_1),
 	!, % Reduce the stack's memory.
-	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, Frontier_Aux_2, ImpVars, ExpVars, UQVars),
-%	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_2),
-	frontier_E_IE_NIE_contents(Frontier_Aux_2, E_Aux_2, IE_Aux_2, NIE_Aux_2),
-%	echo_msg(2, 'negate_frontier :: (E_Aux_2, IE_Aux_2, NIE_Aux_2)', (E_Aux_2, IE_Aux_2, NIE_Aux_2)),
-	split_IE_NIE_between_imp_and_exp(IE_Aux_2, NIE_Aux_2, ImpVars, IE_imp, NIE_imp, IE_NIE_exp),
-%	echo_msg(2, 'negate_frontier :: (IE_imp, NIE_imp, IE_NIE_exp)', (IE_imp, NIE_imp, IE_NIE_exp)),
-	negate_formula(E_Aux_2, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, UQV, Result),
+	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, UQV, Frontier_Aux_2, Vars_Info),
+	echo_msg(2, 'negate_frontier :: Vars_Info', Vars_Info),
+	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_2),
+	split_IE_NIE_between_imp_exp_and_dumb(Frontier_Aux_2, Vars_Info, Frontier_Aux_3),
+	echo_msg(2, 'negate_frontier :: Frontier_Aux_3 :: frontier(E, IE_imp, IE_exp, IE_dumb, NIE_imp, NIE_exp)', Frontier_Aux_3),
+	negate_formula(Frontier_Aux_3, Proposal, Vars_Info, Result),
 	echo_msg(2, 'negate_frontier :: (Result)', (Result)),
 	!.
 
@@ -413,34 +413,67 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, ImpVars, ExpVars, UQVars):-
-	compute_impvars_expvars_and_uqvars(Formula_In, GoalVars, ImpVars, ExpVars, UQVars).
+normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, UQV, Formula_In, Vars_Info):-
+	compute_variables_information(Formula_In, GoalVars, UQV, Vars_Info).
 
-normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, ImpVars, ExpVars, UQVars):-
+normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, UQV, Formula_Out, Vars_Info):-
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	remove_from_E_redundant_eqs_and_vars(Formula_In, Real_GoalVars, Formula_Aux),  
 	echo_msg(2, 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
 	remove_from_IE_irrelevant_disequalities(Formula_Aux, Real_GoalVars, Formula_Out),
 	echo_msg(2, 'normalize_E_IE_NIE :: Formula_Out', Formula_Out),
-	compute_sets_of_vars(Formula_Aux, Real_GoalVars, ImpVars, ExpVars, RelVars, UQVars).
+	compute_variables_information(Formula_Out, GoalVars, UQV, Vars_Info).
  
-normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _ImpVars) :-
+normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _UQV, _Formula_Out, _Vars_Info) :-
 	Proposal \== 'cneg_rt_New', 
 	Proposal \== 'cneg_rt_Chan', !, 
 	echo_msg(2, 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
 	fail.
 
-compute_sets_of_vars(Formula_In, GoalVars, ImpVars, ExpVars, RelVars, UQVars) :-
-	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, _NIE_In),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+compute_variables_information(Formula, GoalVars, UQV, Vars_Info) :-
+	frontier_E_IE_NIE_contents(Formula, E, IE, NIE),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
-	varsbag(E_In, [], [], Vars_E_In), % Vars_E_In
-	varsbag(IE_In, [], [], Vars_IE_In), % Vars_IE_In
-	varsbag(NIE_In, [], [], Vars_NIE_In),  % Vars_NIE_In
-	varsbag(Vars_E_In, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
-	varsbag_difference(Vars_NIE_In, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
-	varsbag_difference(Vars_NIE_In, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
- 	varsbag_difference(Vars_IE_In, ImpVars, Tmp_UQVars), % Tmp_UQVars = vars(IE) - GoalVars - vars(E)
- 	varsbag_difference(Tmp_UQVars, Vars_NIE_In, UQVars). % UQVars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+
+	identify_uq_to_eq_vars(E, [], UQ_to_EQ_Vars_E),
+	identify_uq_to_eq_vars(IE, UQ_to_EQ_Vars_E, UQ_to_EQ_Vars_E_IE),
+	identify_uq_to_eq_vars(NIE, UQ_to_EQ_Vars_E_IE, UQ_to_EQ_Vars),
+
+	varsbag(E, UQ_to_EQ_Vars, [], Vars_E), % Vars_E = vars(E) - UQ_to_EQ_Vars
+	varsbag(IE, UQ_to_EQ_Vars, [], Vars_IE), % Vars_IE = vars(IE) - UQ_to_EQ_Vars
+	varsbag(NIE, UQ_to_EQ_Vars, [], Vars_NIE),  % Vars_NIE = vars(NIE) - UQ_to_EQ_Vars
+
+	varsbag(Vars_E, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
+	varsbag_difference(Vars_NIE, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
+	varsbag_difference(Vars_NIE, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
+
+ 	varsbag_difference(Vars_IE, ImpVars, EQ_to_UQ_Vars_Tmp), % EQ_to_UQ_Vars_Tmp = vars(IE) - GoalVars - vars(E)
+ 	varsbag_difference(EQ_to_UQ_Vars_Tmp, Vars_NIE, EQ_to_UQ_Vars), % EQ_to_UQ_Vars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
+
+identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Conjunctions
+	goal_is_conjunction(Frontier, Frontier_Left, Frontier_Right), !,
+	identify_uq_to_eq_vars(Frontier_Left, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Aux),
+	identify_uq_to_eq_vars(Frontier_Right, UQ_to_EQ_Vars_Aux, UQ_to_EQ_Vars_Out).
+
+identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Equalities
+	goal_is_equality(Frontier, _Value_1, _Value_2, _EQV, UQV),
+	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
+
+identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Disequalities
+	goal_is_disequality(Frontier, _Term1, _Term2, _EQV, UQV), !,
+	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
+
+identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Negations
+	goal_is_negation(Frontier, UQV, _SubGoal), !,
+	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
+
+identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_In) :- % Other subgoals
+	goal_is_not_conj_disj_eq_diseq_dneg(Frontier), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -466,10 +499,10 @@ remove_from_E_redundant_eqs_and_vars(Formulae_In, GoalVars, Formulae_Out) :-
 	).
 
 
-remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_Out, E_Out) :- 
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :- 
 	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
-	remove_from_E_irrelevant_equalities(E_In_Left, GoalVars, Visited_In, Visited_Out, E_Out_Left),
-	remove_from_E_irrelevant_equalities(E_In_Right, GoalVars, Visited_In, Visited_Out, E_Out_Right),
+	remove_from_E_redundant_eqs(E_In_Left, Visited_In, Visited_Out, E_Out_Left),
+	remove_from_E_redundant_eqs(E_In_Right, Visited_In, Visited_Out, E_Out_Right),
 	(
 	    ( E_Out_Left == [], E_Out_Right == [], !, E_Out = [] )
 	;
@@ -480,17 +513,17 @@ remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_Out, E_Out) :-
 	    ( E_Out = (E_Out_Left, E_Out_Right) )
 	).
 
-remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_In, []) :- 
-	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
+	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV),
 	memberchk(E_In, Visited_In), !. % Eq has been seen before. Redundant.
 
-remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, Visited_In, []) :- 
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, Value_1, Value_2, EQV, UQV),
 	goal_is_equality(E_Tmp, Value_2, Value_1, EQV, UQV), % Args interchanged.
 	memberchk(E_Tmp, Visited_In), !. % Eq has been seen before. Redundant.
 
-remove_from_E_redundant_eqs(E_In, GoalVars, Visited_In, [ E_In | Visited_In ], E_In) :- 
-	goal_is_equality(E_In, Value_1, Value_2, EQV, UQV).
+remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
+	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV).
 		
 remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
 	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
@@ -500,12 +533,12 @@ remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :-
 
 remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
 	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
-	remove_from_E_irrelevant_equalities_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out).
+	remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out).
 
-remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, 'true') :-
+remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true') :-
 	var(Value_1), 
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
-	varsbag(E_In, Real_GoalVars, [], Non_GoalVars),
+	varsbag((Value_1, Value_2), Real_GoalVars, [], Non_GoalVars),
 	(
 	    (   % Value_1 is a var in Non_GoalVars
 		memberchk(Value_1, Non_GoalVars), !,
@@ -523,15 +556,15 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Change
 	!, fail.
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out) :-
-	functor(Term1, Name, Arity),
-	functor(Term2, Name, Arity), !,
-	Term1=..[Name|Args1],
-	Term2=..[Name|Args2],
+	functor(Value_1, Name, Arity),
+	functor(Value_2, Name, Arity), !,
+	Value_1=..[Name|Args1],
+	Value_2=..[Name|Args2],
 	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_In, Changes_Out).
 
-remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_In) :-
-	functor(Term1, Name1, Arity1),
-	functor(Term2, Name2, Arity2), 
+remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
+	functor(Value_1, Name1, Arity1),
+	functor(Value_2, Name2, Arity2), 
 	(
 	    ( Name1 \== Name2) ;
 	    ( Arity1 \== Arity2)
@@ -547,8 +580,8 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 % whose variables are not in ImpVars nor in RelVars.
 % If any is in this sets we can not remove the disequality.
 
-remove_from_IE_irrelevant_disequalities(Formula_In, Real_GoalVars, Formula_Out) :-
-	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQVars),
+remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars, Formula_Out) :-
+	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQ_to_EQ_Vars, _EQ_to_UQ_Vars),
 	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
 	varsbag(ImpVars, [], RelVars, ImpVars_and_RelVars),
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out),
@@ -585,60 +618,77 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, _ImpVars_and_RelVars, _IE_Out
 	fail.
 
 
-% split_D_R_into_imp_and_exp(I,D,R,GoalVars,ImpVars,ExpVars,SolC) returns SolC
-% that is one of the solutions of the conjunction that is divided in 
-% I, D and R (equalities, disequalities and rest of subgoals).
-% GoalVars, ImpVars and ExpVars are set of useful variables 
-split_IE_NIE_between_imp_and_exp(IE, NIE, ImpVars, IE_imp, NIE_imp, IE_NIE_exp):-
-	split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp),
-%	echo_msg(2, 'split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)', split_ie_or_nie_between_imp_and_exp(IE, ImpVars, IE_imp, IE_exp)),
-	split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp),
-%	echo_msg(2, 'split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)', split_ie_or_nie_between_imp_and_exp(NIE, ImpVars, NIE_imp, NIE_exp)),
-	rebuild_conjunction_of_goals(IE_exp, NIE_exp, IE_NIE_exp).
+% split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars, Frontier_Out)
+% returns Frontier_Out that is the frontier divided betwen 
+% ImpVars, ExpVars and UQ_Vars.
+split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, Vars_Info, Frontier_Out):-
+	frontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
+	echo_msg(2, 'split_IE_NIE_between_imp_exp_and_dumb :: (E, IE, NIE)', (E, IE, NIE)),
+
+	split_ie_or_nie_between_imp_exp_and_dumb(IE, Vars_Info, IE_Imp, IE_Exp, IE_Dumb),
+	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp, IE_Dumb)),
+
+	split_ie_or_nie_between_imp_exp_and_dumb(NIE, Vars_Info, NIE_Imp, NIE_Exp, NIE_Dumb),
+	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp, NIE_Dumb)),
+
+	frontier_E_IE_NIE_imp_exp_contents(Frontier_Out, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 
 % split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
 % In Fexp are the elements of F with any variables of ExpVars and
 % the rest of elements of F will be in Fimp
-split_ie_or_nie_between_imp_and_exp([], _ImpVars, [], []) :- !.
-split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE_exp) :-
-	goal_is_conjunction(IE_or_NIE, IE_or_NIE_1, IE_or_NIE_2), !,
-	split_ie_or_nie_between_imp_and_exp(IE_or_NIE_1, ImpVars, IE_or_NIE_imp_1, IE_or_NIE_exp_1),
-	split_ie_or_nie_between_imp_and_exp(IE_or_NIE_2, ImpVars, IE_or_NIE_imp_2, IE_or_NIE_exp_2),
-	rebuild_conjunction_of_goals(IE_or_NIE_imp_1, IE_or_NIE_imp_2, IE_or_NIE_imp),
-	rebuild_conjunction_of_goals(IE_or_NIE_exp_1, IE_or_NIE_exp_2, IE_or_NIE_exp).
+split_ie_or_nie_between_imp_exp_and_dumb([], _Vars_Info, [], [], []) :- !. % Optimization.
+split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
+	goal_is_conjunction(Form, Form_1, Form_2), !,
+	split_ie_or_nie_between_imp_exp_and_dumb(Form_1, Vars_Info, Form_imp_1, Form_exp_1, Form_dumb_1),
+	split_ie_or_nie_between_imp_exp_and_dumb(Form_2, Vars_Info, Form_imp_2, Form_exp_2, Form_dumb_2),
+	rebuild_conjunction_of_goals(Form_imp_1, Form_imp_2, Form_imp),
+	rebuild_conjunction_of_goals(Form_exp_1, Form_exp_2, Form_exp),
+	rebuild_conjunction_of_goals(Form_dumb_1, Form_dumb_2, Form_dumb).
 
-split_ie_or_nie_between_imp_and_exp(IE_or_NIE, _ImpVars, _IE_or_NIE_imp, _IE_or_NIE_exp) :-
-	goal_is_disjunction(IE_or_NIE, _IE_or_NIE_1, _IE_or_NIE_2), !,
-	echo_msg(2, 'ERROR: split_ie_or_nie_between_imp_and_exp can not deal with IE_or_NIE', IE_or_NIE),
+split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp, _Form_dumb) :-
+	goal_is_disjunction(Form, _Form_1, _Form_2), !,
+	echo_msg(2, 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with Form', Form),
 	fail.
 
-split_ie_or_nie_between_imp_and_exp(IE_or_NIE, ImpVars, IE_or_NIE_imp, IE_or_NIE_exp) :-
-	varsbag(IE_or_NIE, ImpVars, [], ExpVars), % Retrieve only vars not in ImpVars.
+split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars),
+	varsbag(Form, Form_ImpVars, [], Form_ExpVars), % Retrieve only vars not in ImpVars.
 	(
 	    (
 		ExpVars == [], !,
-		IE_or_NIE_imp = IE_or_NIE,
-		IE_or_NIE_exp = []
+		Form_imp = Form,
+		Form_exp = []
 	    )
 	;
 	    (
 		ExpVars \== [], !,
-		IE_or_NIE_imp = [],
-		IE_or_NIE_exp = IE_or_NIE
+		Form_imp = [],
+		Form_exp = Form
 	    )
 	).
-%	echo_msg(2, 'split_ie_or_nie_between_imp_and_exp', (IE_or_NIE, IE_or_NIE_imp, IE_or_NIE_exp)).
+%	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb', (Form, Form_imp, Form_exp)).
 
-% negate_formula(GoalVars, ImpVars, ExpVars, I, Dimp, Dexp, Rimp, Rexp, R_naf, Sol)
-% returns SolC that is one of the solutions of the conjunction that is divided
-% I, Dimp,Dexp,Rimp and Rexp (equalities, disequalities and rest of subgoals).
-% GoalVars, ImpVars and ExpVars are set of useful variables 
-negate_formula([], [], [], [], _Proposal, _GoalVars, _ImpVars, _UQV, true) :- !. % Optimization
-negate_formula(E, IE_imp, NIE_imp, IE_NIE_exp, Proposal, GoalVars, ImpVars, UQV, Neg_E_IE_NIE) :-
-%	echo_msg(2, 'negate_formula :: (E, IE_imp, NIE_imp, IE_NIE_exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
- 	negate_IE_NIE_exp(IE_NIE_exp, Proposal, ImpVars, UQV, Neg_IE_NIE_exp),
-	negate_imp_form(NIE_imp, Proposal, ImpVars, UQV, Neg_IE_NIE_exp, Neg_NIE_imp_IE_NIE_exp),
-	negate_imp_form(IE_imp, Proposal, ImpVars, UQV, Neg_NIE_imp_IE_NIE_exp, Neg_IE_NIE),
+% negate_formula(Frontier, Proposal, GoalVars, UQV, ImpVars, ExpVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars, Result)
+% returns Result that is the result from negating the frontier.
+negate_formula(Frontier, _Proposal, _Vars_Info, true) :- 
+	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+	frontier_E_IE_NIE_ied_contents(Frontier, [], [], [], [], [], [], []),
+	!. % Optimization
+
+negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
+	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+	frontier_E_IE_NIE_ied_contents(Frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, _NIE_Dumb),
+	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _UQ_to_EQ_Vars, EQ_to_UQ_Vars),
+
+	rebuild_conjunction_of_goals(IE_Exp, NIE_Exp, IE_NIE_Exp), 
+	rebuild_conjunction_of_goals(IE_Imp, IE_Dumb, IE_Imp_Dumb), % IE_imp_dumb == [] in Chan proposal.
+
+%	echo_msg(2, 'negate_formula :: (E, IE_Imp, NIE_Imp, IE_NIE_Exp)', (E, IE_imp, NIE_imp, IE_NIE_exp)),
+ 	negate_IE_NIE_exp(IE_NIE_Exp, Proposal, ImpVars, UQV, Neg_IE_NIE_Exp),
+	negate_imp_form(NIE_Imp, Proposal, ImpVars, UQV, Neg_IE_NIE_Exp, Neg_NIE_Imp_IE_NIE_Exp),
+	negate_imp_form(IE_Imp_Dumb, Proposal, ImpVars, UQV, Neg_NIE_Imp_IE_NIE_Exp, Neg_IE_NIE),
 	negate_imp_form(E, Proposal, GoalVars, UQV, Neg_IE_NIE, Neg_E_IE_NIE),
 	!. % Backtracking forbidden.
 
