@@ -106,16 +106,21 @@ equality_contents(equality(T1, T2), T1, T2).
 
 
 portray_attribute(Attribute, Var) :-
-	echo_msg(1, 'portray_attribute :: Var', Var),
-	portray_aux(1, Attribute).
+	echo_msg(2, 'portray_attribute :: Var', Var),
+	portray_aux(1, Attribute),
+	echo_msg_nl(2), echo_msg_nl(2).
 
 portray(Attribute) :-
-	portray_aux(1, Attribute).
+	echo_msg(2, 'portray :: Attribute', Attribute),
+	portray_aux(1, Attribute),
+	echo_msg_nl(2), echo_msg_nl(2).
 
 portray_aux(Level, Attribute) :-
 	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
+	echo_msg_aux(2, '% ', 'answer value: '),
 	portray_disequalities(Level, Disequalities, UQV).
 portray_aux(Level, Anything) :- 
+	echo_msg_aux(2, '% ', 'answer value: '),
 	echo_msg_aux(Level, '', Anything).
  
 
