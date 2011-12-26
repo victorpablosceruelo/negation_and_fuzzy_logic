@@ -1,4 +1,4 @@
-:- module(ex_queensPeano,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
 test_queens(N, Columns) :- % Let's see if we have invalid results.
