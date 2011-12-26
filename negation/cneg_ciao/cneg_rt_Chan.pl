@@ -77,7 +77,7 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
 frontier_E_IE_NIE_contents(frontier(E, IE, NIE), E, IE, NIE).
 frontier_E_IE_NIE_ied_contents(frontier(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
+vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -450,10 +450,10 @@ compute_variables_information(Formula, GoalVars, UQV, Vars_Info) :-
 	varsbag_difference(Vars_NIE, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
 	varsbag_difference(Vars_NIE, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
 
- 	varsbag_difference(Vars_IE, ImpVars, EQ_to_UQ_Vars_Tmp), % EQ_to_UQ_Vars_Tmp = vars(IE) - GoalVars - vars(E)
- 	varsbag_difference(EQ_to_UQ_Vars_Tmp, Vars_NIE, EQ_to_UQ_Vars), % EQ_to_UQ_Vars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+ 	varsbag_difference(Vars_IE, ImpVars, Dumb_Vars_Tmp), % Dumb_Vars_Tmp = vars(IE) - GoalVars - vars(E)
+ 	varsbag_difference(Dumb_Vars_Tmp, Vars_NIE, Dumb_Vars), % Dumb_Vars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
 
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Conjunctions
 	goal_is_conjunction(Frontier, Frontier_Left, Frontier_Right), !,
@@ -581,7 +581,7 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 % If any is in this sets we can not remove the disequality.
 
 remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars, Formula_Out) :-
-	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQ_to_EQ_Vars, _EQ_to_UQ_Vars),
+	compute_sets_of_vars(Formula_In, GoalVars, ImpVars, _ExpVars, RelVars, _UQ_to_EQ_Vars, _Dumb_Vars),
 	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
 	varsbag(ImpVars, [], RelVars, ImpVars_and_RelVars),
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, ImpVars_and_RelVars, IE_Out),
@@ -618,7 +618,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, _ImpVars_and_RelVars, _IE_Out
 	fail.
 
 
-% split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars, Frontier_Out)
+% split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, Vars_Info, Frontier_Out):-
@@ -651,8 +651,8 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp,
 	fail.
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars),
 	varsbag(Form, Form_ImpVars, [], Form_ExpVars), % Retrieve only vars not in ImpVars.
 	(
 	    (
@@ -669,7 +669,7 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Fo
 	).
 %	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb', (Form, Form_imp, Form_exp)).
 
-% negate_formula(Frontier, Proposal, GoalVars, UQV, ImpVars, ExpVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars, Result)
+% negate_formula(Frontier, Proposal, GoalVars, UQV, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Result)
 % returns Result that is the result from negating the frontier.
 negate_formula(Frontier, _Proposal, _Vars_Info, true) :- 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
@@ -679,8 +679,8 @@ negate_formula(Frontier, _Proposal, _Vars_Info, true) :-
 negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	frontier_E_IE_NIE_ied_contents(Frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, _NIE_Dumb),
-	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, EQ_to_UQ_Vars).
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _UQ_to_EQ_Vars, EQ_to_UQ_Vars),
+	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _UQ_to_EQ_Vars, Dumb_Vars),
 
 	rebuild_conjunction_of_goals(IE_Exp, NIE_Exp, IE_NIE_Exp), 
 	rebuild_conjunction_of_goals(IE_Imp, IE_Dumb, IE_Imp_Dumb), % IE_imp_dumb == [] in Chan proposal.
