@@ -645,7 +645,7 @@ compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 
 compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.	
-	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.
+	varsbag(UQV_In, EQV_Aux, [], UQV_Aux), % Only variables, please.
 	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
 	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Tmp), % Only EQV affected variables.
 	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out), % Only UQV affected variables.
