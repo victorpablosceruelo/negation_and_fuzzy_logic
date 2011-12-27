@@ -87,11 +87,46 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 
 cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 call_to(Predicate) :- 
+	echo_msg_nl(2), 
+	echo_msg_nl(2), 
 	echo_msg(2, 'call_to :: Predicate', Predicate), 
 	echo_msg_nl(2), 
-	call(Predicate).
+	call_to_aux(Predicate).
 call_to(Predicate) :- 
-	echo_msg(2, 'FAILED call_to :: Predicate', Predicate),
+	echo_msg(2, 'call_to :: Predicate - FAILED - :: Predicate', Predicate),
+	echo_msg_nl(2), !, fail. 
+
+call_to_aux(Predicate) :-
+	goal_is_disjunction(Predicate, G1, G2), !,
+	(
+	    (
+		(	echo_msg(2, 'call_to :: G1 \\/ G2 :: G1', G1), 
+			call_to_aux(G1)  )
+	    ;
+		(	echo_msg(2, 'call_to :: G1 \\/ G2 :: G2', G2), 
+			call_to_aux(G2)  )
+	    )
+	;
+	    (           echo_msg(2, 'call_to :: G1 \\/ G2 - FAILED - :: G1 \\/ G2', Predicate), !, fail )
+	).
+
+call_to_aux(Predicate) :-
+	goal_is_conjunction(Predicate, G1, G2), !,
+	(
+	    (
+		echo_msg(2, 'call_to :: G1 /\\ G2 :: G1', G1), 
+		call_to_aux(G1),
+		echo_msg(2, 'call_to :: G1 /\\ G2 :: G2', G2), 
+		call_to_aux(G2)
+	    )
+	;
+	    (           echo_msg(2, 'call_to :: G1 /\\ G2 - FAILED - :: G1 /\\ G2', Predicate), !, fail )
+	).
+call_to_aux(Predicate) :-
+	echo_msg(2, 'call_to :: Predicate', Predicate), 
+	call(Predicate).
+call_to_aux(Predicate) :- 
+	echo_msg(2, 'call_to :: Predicate - FAILED - :: Predicate', Predicate),
 	echo_msg_nl(2), !, fail. 
 
 % cneg_tr contains the code transformation needed by cneg_lib
