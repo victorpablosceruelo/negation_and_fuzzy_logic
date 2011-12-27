@@ -259,7 +259,7 @@ compute_goal_frontier(Goal, _Proposal, _Trace, []) :-
 
 build_a_frontier_from_each_result(_Real_Goal, [], []) :- !.
 build_a_frontier_from_each_result(Real_Goal, [Result | Results], [Frontier | Frontiers]) :-
-	frontier_contents(Frontier, Real_Goal, Real_Goal, Result, 'true'),
+	frontier_contents(Frontier, Real_Goal, Real_Goal, Result, Real_Goal),
 	build_a_frontier_from_each_result(Real_Goal, Results, Frontiers).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -295,8 +295,8 @@ simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
-	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
-%	echo_msg(2, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
+	frontier_contents(F_In, Goal, Head, _Body, F_Test),
+	echo_msg(2, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
 % Old way:
