@@ -113,7 +113,7 @@ echo_msg_list_aux(Level, Msg_String, Cl) :-
 	echo_msg(Level, New_Msg_String, Cl).
 
 echo_separation(Level) :-
-	echo_msg_nl(Level), echo_separation_aux(Level), 
+%	echo_msg_nl(Level), echo_separation_aux(Level), 
 	echo_msg_nl(Level), echo_separation_aux(Level), 
 	echo_msg_nl(Level), echo_separation_aux(Level),
 	echo_msg_nl(Level).
