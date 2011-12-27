@@ -3,8 +3,8 @@
 	[
 	    echo_msg/3, echo_msg_list/3, 
 	    echo_msg_aux/3, echo_msg_nl/1, 
-	    echo_msg_logo/1, echo_statistics/0,
-	    echo_separation/1,
+	    echo_msg_logo/1, echo_statistics/1,
+	    echo_separation/1, echo_msg_for_call/4,
 	    findall/4, append/3, functor_local/4,
 	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -121,10 +121,19 @@ echo_separation(Level) :-
 echo_separation_aux(Level) :-
 	echo_msg_aux(Level, '-----------------------------------------------', '-----------------------------------------------').
 
-echo_statistics :-
+echo_msg_for_call(Echo_Level, Level, Msg1, Msg2) :-
+	echo_msg_logo(Echo_Level),
+	echo_msg_aux(Echo_Level, 'call_to (L', Level),
+	echo_msg_aux(Echo_Level, ') :: ', Msg1), 
+	echo_msg_aux(Echo_Level, ' :: ', Msg2),
+	echo_msg_nl(Echo_Level).
+
+echo_statistics(Msg) :-
 	current_output(StdOut_Stream), % Save stdout stream.
-	get_stream_to_file(File_Stream), % Get file stream.
-	set_output(File_Stream), % Redirect stdout to stream.
+	name(FN_Statistics, "debug_pkg_cneg_statistics.pl"),	% Convert string to atom.
+	open(FN_Statistics,append,Statistics_Stream),
+	set_output(Statistics_Stream), % Redirect stdout to stream.
+	nl, write(Msg), nl, nl, 
 	statistics, % Write statistics to file.
 	set_output(StdOut_Stream), % Recover stdout stream.
 %	statistics, % Write statistics to stdout.

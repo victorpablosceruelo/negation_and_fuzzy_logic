@@ -46,7 +46,7 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_msg(2, 'cneg_rt_Aux :: UQV_In', UQV_In),
 	echo_msg(2, 'cneg_rt_Aux :: Proposal', Proposal),
 	echo_msg_nl(2),
-	echo_statistics,
+	echo_statistics(cneg_rt_Aux(UQV_In, Goal, Proposal, Trace)),
 	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
@@ -282,21 +282,21 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !,
-	echo_msg_nl(2).
+simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
+%	echo_msg_nl(2).
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
-	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
+%	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
-simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
-	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
+simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+%	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
-	frontier_contents(F_In, Goal, Head, _Body, F_Test),
-	echo_msg(2, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
+	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
+%	echo_msg(2, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
 % Old way:
@@ -352,8 +352,8 @@ negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
 %	echo_msg(2, 'negate_frontier :: Frontier_Aux_1 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_1),
 	!, % Reduce the stack's memory.
 	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, UQV, Frontier_Aux_2, Vars_Info),
-	echo_msg(2, 'negate_frontier :: Vars_Info', Vars_Info),
-	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_2),
+	echo_msg(2, 'negate_frontier :: vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)', Vars_Info),
+	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E, IE, NIE)', Frontier_Aux_2),
 	split_IE_NIE_between_imp_exp_and_dumb(Frontier_Aux_2, Vars_Info, Frontier_Aux_3),
 	echo_msg(2, 'negate_frontier :: Frontier_Aux_3 :: frontier(E, IE_imp, IE_exp, IE_dumb, NIE_imp, NIE_exp)', Frontier_Aux_3),
 	negate_formula(Frontier_Aux_3, Proposal, Vars_Info, Result),
@@ -630,13 +630,13 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out):-
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, Vars_Info, Frontier_Out):-
 	frontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
-	echo_msg(2, 'split_IE_NIE_between_imp_exp_and_dumb :: (E, IE, NIE)', (E, IE, NIE)),
+	% echo_msg(2, 'split_IE_NIE_between_imp_exp_and_dumb :: (E, IE, NIE)', (E, IE, NIE)),
 
 	split_ie_or_nie_between_imp_exp_and_dumb(IE, Vars_Info, IE_Imp, IE_Exp, IE_Dumb),
-	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp, IE_Dumb)),
+	% echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp, IE_Dumb)),
 
 	split_ie_or_nie_between_imp_exp_and_dumb(NIE, Vars_Info, NIE_Imp, NIE_Exp, NIE_Dumb),
-	echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp, NIE_Dumb)),
+	% echo_msg(2, 'split_ie_or_nie_between_imp_exp_and_dumb :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp, NIE_Dumb)),
 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	frontier_E_IE_NIE_ied_contents(Frontier_Out, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).

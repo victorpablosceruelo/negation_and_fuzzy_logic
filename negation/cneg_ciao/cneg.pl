@@ -20,7 +20,8 @@
 :- use_module(cneg_diseq, [equality/3, disequality/3, 
 	diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	diseq_euqv/4, eq_euqv/4,
-	diseq_euqv_adv/5, eq_euqv_adv/5]).
+	diseq_euqv_adv/5, eq_euqv_adv/5,
+	portray_attributes_in_term/2]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
 :- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
@@ -90,44 +91,58 @@ call_to(Predicate) :-
 	echo_msg_nl(2), 
 	echo_msg_nl(2), 
 	echo_msg(2, 'call_to :: Predicate', Predicate), 
+	echo_msg_nl(2),
+	portray_attributes_in_term(2, Predicate),
 	echo_msg_nl(2), 
-	call_to_aux(Predicate).
+	call_to_aux(Predicate, 0).
 call_to(Predicate) :- 
-	echo_msg(2, 'call_to :: Predicate - FAILED - :: Predicate', Predicate),
+	echo_msg(2, 'call_to (L0) :: Predicate - FAILED - :: Predicate', Predicate),
 	echo_msg_nl(2), !, fail. 
 
-call_to_aux(Predicate) :-
+call_to_aux(Predicate, Level_In) :-
 	goal_is_disjunction(Predicate, G1, G2), !,
+	Level is Level_In + 1,
 	(
 	    (
-		(	echo_msg(2, 'call_to :: G1 \\/ G2 :: G1', G1), 
-			call_to_aux(G1)  )
+		(       echo_msg_for_call(2, Level, 'G1 \\/ G2 :: G1', G1), 
+			call_to_aux(G1, Level)
+		)
 	    ;
-		(	echo_msg(2, 'call_to :: G1 \\/ G2 :: G2', G2), 
-			call_to_aux(G2)  )
+		(       echo_msg_nl(2), % Differentiate paths.
+			echo_msg_for_call(2, Level, 'G1 \\/ G2 :: G2', G2), 
+			call_to_aux(G2, Level)
+		)
 	    )
 	;
-	    (           echo_msg(2, 'call_to :: G1 \\/ G2 - FAILED - :: G1 \\/ G2', Predicate), !, fail )
+	    (           echo_msg_for_call(2, Level, 'G1 \\/ G2 - FAILED -', Predicate), 
+			!, fail 
+	    )
 	).
 
-call_to_aux(Predicate) :-
+call_to_aux(Predicate, Level_In) :-
 	goal_is_conjunction(Predicate, G1, G2), !,
+	Level is Level_In + 1,
 	(
-	    (
-		echo_msg(2, 'call_to :: G1 /\\ G2 :: G1', G1), 
-		call_to_aux(G1),
-		echo_msg(2, 'call_to :: G1 /\\ G2 :: G2', G2), 
-		call_to_aux(G2)
+	    (	echo_msg_for_call(2, Level, 'G1 /\\ G2 :: G1', G1),
+		call_to_aux(G1, Level),
+		echo_msg_for_call(2, Level, 'G1 /\\ G2 :: G2', G2),
+		call_to_aux(G2, Level)
 	    )
 	;
-	    (           echo_msg(2, 'call_to :: G1 /\\ G2 - FAILED - :: G1 /\\ G2', Predicate), !, fail )
+	    (   echo_msg_for_call(2, Level, 'G1 /\\ G2 - FAILED -', Predicate),
+		!, fail 
+	    )
 	).
-call_to_aux(Predicate) :-
-	echo_msg(2, 'call_to :: Predicate', Predicate), 
+
+call_to_aux(Predicate, Level_In) :-
+	Level is Level_In + 1,
+	echo_msg_for_call(2, Level, 'Predicate', Predicate),
 	call(Predicate).
-call_to_aux(Predicate) :- 
-	echo_msg(2, 'call_to :: Predicate - FAILED - :: Predicate', Predicate),
-	echo_msg_nl(2), !, fail. 
+
+call_to_aux(Predicate, Level_In) :- 
+	Level is Level_In + 1,
+	echo_msg_for_call(2, Level, 'Predicate - FAILED -', Predicate),
+	!, fail. 
 
 % cneg_tr contains the code transformation needed by cneg_lib
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA

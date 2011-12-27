@@ -107,20 +107,20 @@ equality_contents(equality(T1, T2), T1, T2).
 
 portray_attribute(Attribute, Var) :-
 	echo_msg(2, 'portray_attribute :: Var', Var),
+	echo_msg_aux(2, '% ', 'answer value: '),
 	portray_aux(1, Attribute),
 	echo_msg_nl(2), echo_msg_nl(2).
 
 portray(Attribute) :-
 	echo_msg(2, 'portray :: Attribute', Attribute),
+	echo_msg_aux(2, '% ', 'answer value: '),
 	portray_aux(1, Attribute),
 	echo_msg_nl(2), echo_msg_nl(2).
 
 portray_aux(Level, Attribute) :-
 	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
-	echo_msg_aux(2, '% ', 'answer value: '),
 	portray_disequalities(Level, Disequalities, UQV).
 portray_aux(Level, Anything) :- 
-	echo_msg_aux(2, '% ', 'answer value: '),
 	echo_msg_aux(Level, '', Anything).
  
 
@@ -131,25 +131,27 @@ portray_aux(Level, Anything) :-
 portray_attributes_in_term(Level, T) :-
 	cneg_aux:varsbag(T, [], [], Variables),
 	echo_msg(Level, 'Attributes for the variables in term', T),
-	portray_attributes_in_variables(Level, Variables).
+	portray_attributes_in_variables(Level, Variables, [], Not_Attributed),
+	portray_no_attributes_in_variables(Level, Not_Attributed).
 
-portray_attributes_in_variables(_Level, []) :- !.
-portray_attributes_in_variables(Level, [Var|Vars]) :-
-	portray_attributes_in_variable(Level, Var),
-	portray_attributes_in_variables(Level, Vars).
+portray_no_attributes_in_variables(Level, Not_Attributed) :-
+	echo_msg_logo(Level),
+	echo_msg_aux(Level, ' Variables without attributes :: ', Not_Attributed), 
+	echo_msg_nl(Level).
 
-portray_attributes_in_variable(Level, Var) :-
-	get_attribute_local(Var, Attribute),
+portray_attributes_in_variables(_Level, [], List, List) :- !.
+portray_attributes_in_variables(Level, [Var|Vars], List_In, List_Out) :-
+	portray_attributes_in_variable(Level, Var, List_In, List_Aux),
+	portray_attributes_in_variables(Level, Vars, List_Aux, List_Out).
+
+portray_attributes_in_variable(Level, Var, List_In, List_In) :-
+	get_attribute_local(Var, Attribute), !,
 	echo_msg_logo(Level),
 	echo_msg_aux(Level, 'variable :: ', Var), 
 	echo_msg_aux(Level, ' has attribute', ' :: '),
 	portray_aux(Level, Attribute),
 	echo_msg_nl(Level).
-portray_attributes_in_variable(Level, Var) :-
-	echo_msg_logo(Level),
-	echo_msg_aux(Level, 'variable :: ', Var), 
-	echo_msg_aux(Level, ' has NO attribute', ' '),
-	echo_msg_nl(Level).
+portray_attributes_in_variable(_Level, Var, List_In, [Var | List_In]) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
