@@ -62,6 +62,15 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_msg_list(2, 'cneg_rt_Aux :: Frontier', Frontier),
 
 	negate_set_of_frontiers(Frontier, Proposal, GoalVars, New_UQV, Result), !,
+	echo_separation(2),
+	echo_msg_nl(2),
+	echo_msg(2, 'cneg_rt_Aux :: Summary', ' '),
+	echo_msg(2, 'cneg_rt_Aux :: Goal', Goal),
+	echo_msg(2, 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, 'cneg_rt_Aux :: Proposal', Proposal),
+	echo_msg_nl(2),
+	echo_msg_nl(2),
+	echo_msg_list(2, 'cneg_rt_Aux :: Frontier', Frontier),
 	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: Result', Result),
 	echo_msg_nl(2).
