@@ -59,12 +59,12 @@ get_stream_to_file(File_Name_Atom, Stream) :-
 	defined_stream_to_file(File_Name_Atom, Stream), !.
 get_stream_to_file(File_Name_Atom, Stream) :-
 	name(File_Name_Atom, File_Name_String_1), % Convert atom to string.
-	append("debug_pkg_cneg_", File_Name_String_1, File_Name_String_2),
+	append("debug_pkg_cneg_file_", File_Name_String_1, File_Name_String_2),
 	append(File_Name_String_2, ".pl", File_Name_String_3),
 	name(FN_Out, File_Name_String_3),	% Convert string to atom.
 %	open(FN_Out,write,Stream), % This empties the file !!!
 	open(FN_Out, append, Stream),
-	assertz_fact(defined_stream_to_file(File_Name_Atom, Stream)),
+	assertz_fact(defined_stream_to_file(File_Name_Atom, Stream)), !,
 	echo_howto_information(2, File_Name_Atom).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,8 +154,10 @@ echo_msg_aux(1, File_Name, Msg) :-
 	echo_msg_aux(2, File_Name, Msg),
 	write(Msg).
 echo_msg_aux(2, File_Name, Msg) :-
-	get_stream_to_file(File_Name, Stream),
-	write(Stream, Msg).
+	get_stream_to_file(File_Name, Stream_1),
+	write(Stream_1, Msg),
+	get_stream_to_file('with_all_debug_msgs', Stream_2),
+	write(Stream_2, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -166,8 +168,10 @@ echo_msg_nl(1, File_Name) :-
 	echo_msg_nl(2, File_Name),
 	nl.
 echo_msg_nl(2, File_Name) :-
-	get_stream_to_file(File_Name, Stream),
-	nl(Stream).
+	get_stream_to_file(File_Name, Stream_1),
+	nl(Stream_1),
+	get_stream_to_file('with_all_debug_msgs', Stream_2),
+	nl(Stream_2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
