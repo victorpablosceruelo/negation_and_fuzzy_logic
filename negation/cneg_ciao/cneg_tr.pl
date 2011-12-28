@@ -28,31 +28,31 @@ list_name_for_cneg_heads_and_bodies('cneg_list_of_heads_and_bodies').
 list_name_for_cneg_predicates('cneg_list_of_predicates').
 
 trans_clause(Whatever, Whatever, _) :-
-	echo_msg(1, 'cneg_tr', '', 'trans_clause', (Whatever)).
+	echo_msg(1, '', 'cneg_tr', 'trans_clause', (Whatever)).
 
 % trans_sent(Sentence,SentList,Module) sustitutes Sentence in 
 % the program Module that is being compilated by the list of 
 % sentences SentList. The result clauses are continous
 trans_sent(Input, Output, SourceFileName) :-
-	% echo_msg('trans_sent', trans_sent(Input)), 
-	% echo_msg('trans_sent', source_file_name(Info)), 
+	% echo_msg(trans_sent(Input)), 
+	% echo_msg('trans_sent', 'trans_sent', source_file_name(Info)), 
 	trans_sent_aux(Input, Output, SourceFileName), !.
 
 trans_sent(Input, [Input, cneg_not_translated(Input)], _SourceFileName) :-
-	echo_msg(2, 'cneg_tr', '', 'ERROR :: Impossible to translate', (Input)), !.
+	echo_msg(2, '', 'cneg_tr', 'ERROR :: Impossible to translate', (Input)), !.
 
 trans_sent_aux(X, [], _SourceFileName):- 
 	var(X), !, fail.
 
 % (:- include(dist, _)), (:- include(cneg_lib)), 
 trans_sent_aux(end_of_file, ClsFinal, SourceFileName):- !,
-%	echo_msg(1, 'cneg_tr', '', 'INFO: #################################################', ''), 
-	echo_msg(1, 'cneg_tr', '', 'INFO: #############  Now computing negation  ##############', ''), 
-%	echo_msg(1, 'cneg_tr', '', 'INFO: #################################################', ''), 
+%	echo_msg(1, '', 'cneg_tr', 'INFO: #################################################', ''), 
+	echo_msg(1, '', 'cneg_tr', 'INFO: #############  Now computing negation  ##############', ''), 
+%	echo_msg(1, '', 'cneg_tr', 'INFO: #################################################', ''), 
 	trans_sent_eof(ClsFinal, SourceFileName).
 
 trans_sent_aux(0, [], _SourceFileName) :- 	!.
-%	echo_msg(2, 'cneg_tr', '', 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName).
+%	echo_msg(2, '', 'cneg_tr', 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName).
 
 % Do not modify module imports, declarations and so on.
 trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
@@ -60,7 +60,7 @@ trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 
 % Aqui es donde da el warning porque no conoce a dist:dist aqui.
 trans_sent_aux(Clause, [Clause], _SourceFileName) :-
-	echo_msg(0, 'cneg_tr', '', 'INFO :: save_sent_info(Clause) ', save_sent_info(Clause)),
+	echo_msg(0, '', 'cneg_tr', 'INFO :: save_sent_info(Clause) ', save_sent_info(Clause)),
 	save_sent_info(Clause).
 
 save_sent_info(Clause) :-
@@ -90,7 +90,7 @@ unifications_in_head_to_equality(Head, New_Head, Equality) :-
 
 
 store_head_and_bodies_info(Head, Test, Bodies) :-
-	echo_msg(0, 'cneg_tr', '', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
+	echo_msg(0, '', 'cneg_tr', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
 	store_head_and_bodies_info_aux(Head, Test, Bodies).
 
 store_head_and_bodies_info_aux(_Head, _Test, []) :-
@@ -122,13 +122,13 @@ remove_from_list_with_counter([ Elto | List], (Name, Arity, Counter), [Elto | Ne
 save_list_of(List_Name, List) :-
 	functor_local(Functor, List_Name, 1, [List]),
 	assertz_fact(Functor), !,
-	echo_msg(0, 'cneg_tr', '', 'assertz_fact ', assertz_fact(Functor)).
+	echo_msg(0, '', 'cneg_tr', 'assertz_fact ', assertz_fact(Functor)).
 
 % Retrieves a list with name List_Name and argument List.
 retrieve_list_of(List_Name, List) :-
 	functor_local(Functor, List_Name, 1, [List]),
 	retract_fact(Functor), !,
-	echo_msg(0, 'cneg_tr', '', 'retract_fact ', retract_fact(Functor)).
+	echo_msg(0, '', 'cneg_tr', 'retract_fact ', retract_fact(Functor)).
 retrieve_list_of(_List_Name, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,18 +144,18 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	generate_auxiliary_code(Aux_Code),
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
-	echo_msg(0, 'cneg_tr', '', 'List_Of_Preds', List_Of_Preds),
+	echo_msg(0, '', 'cneg_tr', 'List_Of_Preds', List_Of_Preds),
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
-	echo_msg(0, 'cneg_tr', '', 'List_Of_H_and_B', List_Of_H_and_B),
+	echo_msg(0, '', 'cneg_tr', 'List_Of_H_and_B', List_Of_H_and_B),
 
 	generate_cneg_tr_vpc(List_Of_Preds, List_Of_H_and_B, Aux_Code, Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
-	echo_msg(0, 'cneg_tr', 'nl', '', ''), 
-	echo_msg(0, 'cneg_tr', 'nl', '', ''), 
-	echo_msg(0, 'cneg_tr', '', 'Cls_Out', Cls_Out),
-	echo_msg(0, 'cneg_tr', 'nl', '', ''), 
-	echo_msg(0, 'cneg_tr', 'nl', '', ''), 
+	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(0, '', 'cneg_tr', 'Cls_Out', Cls_Out),
+	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
 	!. %Backtracking forbiden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

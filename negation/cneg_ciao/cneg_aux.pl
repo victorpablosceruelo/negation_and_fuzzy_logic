@@ -59,7 +59,7 @@ get_stream_to_file(File_Name_Atom, Stream) :-
 	defined_stream_to_file(File_Name_Atom, Stream), !.
 get_stream_to_file(File_Name_Atom, Stream) :-
 	name(File_Name_Atom, File_Name_String_1), % Convert atom to string.
-	append("debug_pkg_cneg", File_Name_String_1, File_Name_String_2),
+	append("debug_pkg_cneg_", File_Name_String_1, File_Name_String_2),
 	append(File_Name_String_2, ".pl", File_Name_String_3),
 	name(FN_Out, File_Name_String_3),	% Convert string to atom.
 %	open(FN_Out,write,Stream), % This empties the file !!!
@@ -71,6 +71,7 @@ get_stream_to_file(File_Name_Atom, Stream) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% echo_msg(Echo_Level, Mode, File_Name, Pre_Msg, Msg).
 echo_msg(0, _Mode, _File_Name, _Pre_Msg, _Msg) :- !. % No debugging.
 
 echo_msg(Echo_Level, 'aux', File_Name, Pre_Msg, Msg) :- !,
@@ -84,7 +85,10 @@ echo_msg(Echo_Level, 'list', File_Name, Pre_Msg, Msg) :-
 	).
 
 echo_msg(Echo_Level, 'logo', File_Name, _Pre_Msg, _Msg) :-
-	echo_msg_aux(Echo_Level, File_Name, '% cneg :: '), !.
+	echo_msg_aux(Echo_Level, File_Name, '% '), 
+	echo_msg_aux(Echo_Level, File_Name, File_Name), 
+	echo_msg_aux(Echo_Level, File_Name, ' :: '), 
+	!.
 
 echo_msg(Echo_Level, 'statistics', File_Name, _Pre_Msg, Msg) :-
 	echo_msg_statistics(Echo_Level, File_Name, Msg), !.
@@ -134,7 +138,7 @@ echo_msg_list(Echo_Level, File_Name, Pre_Msg, [Msg|Msgs]) :-
 	echo_msg_list(Echo_Level, File_Name, Pre_Msg, Msgs).
 
 echo_msg_list_aux(Echo_Level, File_Name, Pre_Msg, Msg) :-
-	echo_msg(Echo_Level, File_Name, 'logo', Pre_Msg, Msg),
+	echo_msg(Echo_Level, 'logo', File_Name, Pre_Msg, Msg),
 	echo_msg_aux(Echo_Level, File_Name, Pre_Msg),
 	echo_msg_aux(Echo_Level, File_Name, ' (list)'),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
@@ -176,7 +180,7 @@ echo_msg_separation(Echo_Level, File_Name) :-
 	echo_msg_nl(Echo_Level, File_Name).
 
 echo_msg_separation_aux(Echo_Level, File_Name) :-
-	echo_msg(Echo_Level, File_Name, 'logo', '', ''), 
+	echo_msg(Echo_Level, 'logo', File_Name, '', ''), 
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_nl(Echo_Level, File_Name).

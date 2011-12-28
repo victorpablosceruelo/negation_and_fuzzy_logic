@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_rt_Stuckey(UQV, Goal):-
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'cneg_rt :: (UQV, Goal)', (UQV, Goal)),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'cneg_rt :: (UQV, Goal)', (UQV, Goal)),
 	varsbag(Goal, UQV, [], GoalVars),
 	compute_neg_frontier(Goal, GoalVars, 'true').
 
@@ -46,8 +46,8 @@ cneg_rt_Stuckey(UQV, Goal):-
 
 % Just to debug.
 compute_neg_frontier(Goal, GoalVars, Prev_Front_Residua) :-
-	echo_msg(1, 'cneg_rt_Stuckey', '', '--------------------------------------------------------------------------------------------------------------', ' '),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: (Goal, GoalVars, Prev_Front_Residua)', (Goal, GoalVars, Prev_Front_Residua)),	
+	echo_msg(1, '', 'cneg_rt_Stuckey', '--------------------------------------------------------------------------------------------------------------', ' '),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: (Goal, GoalVars, Prev_Front_Residua)', (Goal, GoalVars, Prev_Front_Residua)),	
 	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
@@ -57,7 +57,7 @@ compute_neg_frontier(Goal, GoalVars, Prev_Front_Residua) :-
 
 compute_neg_frontier(Goal, GoalVars, Prev_Front_Residua):- 
 	Prev_Front_Residua \== 'true',
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: Prev_Front_Residua', Prev_Front_Residua),	
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: Prev_Front_Residua', Prev_Front_Residua),	
 	evaluate_prev_frontier_residua(Goal, GoalVars, Prev_Front_Residua).
 
 % Manage true and fail ...
@@ -67,9 +67,9 @@ compute_neg_frontier('fail', _GoalVars, 'true') :- !.
 % Now go for the disjunctions.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
 	goal_is_disjunction(Goal, G1, G2), !,
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: disj :: negate G1', ' '),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: disj :: negate G1', ' '),
 	compute_neg_frontier(G1, GoalVars, 'true'),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: disj :: negate G2', ' '),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: disj :: negate G2', ' '),
 	compute_neg_frontier(G2, GoalVars, 'true').
 
 % Now go for the conjunctions.
@@ -77,13 +77,13 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	goal_is_conjunction(Goal, G1, G2), !,
 	(
 	    (
-		echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: conj :: negate G1', ' '),
+		echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: conj :: negate G1', ' '),
 		compute_neg_frontier(G1, GoalVars, 'true')
 	    )
 	;
 	    (
-		echo_msg(1, 'cneg_rt_Stuckey', '', '--------------------------------------------------------------------------------------------------------------', ' '),
-		echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: conj :: assume G1, negate G2', ' '),
+		echo_msg(1, '', 'cneg_rt_Stuckey', '--------------------------------------------------------------------------------------------------------------', ' '),
+		echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: conj :: assume G1, negate G2', ' '),
 		compute_neg_frontier(G2, GoalVars, G1)
 	    )
 	).
@@ -109,20 +109,20 @@ compute_neg_frontier(Goal, _GoalVars, 'true'):-
 % Now go for other functors stored in our database.
 compute_neg_frontier(Goal, GoalVars, 'true') :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: Goal', Goal),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'Frontier_Tmp_1', Frontier_Tmp_1),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, Frontier_Tmp_2),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'Frontier_Tmp_2', Frontier_Tmp_2), 
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'Frontier_Tmp_2', Frontier_Tmp_2), 
 	combine_frontiers_by_disjunction(Frontier_Tmp_2, 'fail', Frontier_Tmp_3),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'Frontier_Tmp_3', Frontier_Tmp_3), 
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'Frontier_Tmp_3', Frontier_Tmp_3), 
 	!, % Frontier is uniquely determined if this clause is used.
 	compute_neg_frontier(Frontier_Tmp_3, GoalVars, 'true').
 
 % And at last report an error if it was impossible to found a valid entry.
 compute_neg_frontier(Goal, GoalVars, Prev_Front_Residua) :-
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'ERROR: compute_neg_frontier :: (Goal, GoalVars, Prev_Front_Residua)', (Goal, GoalVars, Prev_Front_Residua)), 
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'ERROR: compute_neg_frontier :: (Goal, GoalVars, Prev_Front_Residua)', (Goal, GoalVars, Prev_Front_Residua)), 
 	nl, !, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,22 +173,22 @@ simplify_frontier([], _Goal, []) :- !.
 simplify_frontier([Frontier | More_Frontier_In], Goal, [Body | More_Bodies]):-
 	frontier_contents(Frontier, Head, Body, Frontier_Test),
 	test_frontier_is_valid(Goal, Head, Frontier_Test), !,
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'simplify_frontier :: valid: ', Frontier),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'simplify_frontier :: valid: ', Frontier),
 	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
 simplify_frontier([Frontier|More_Frontier_In], Goal, More_Bodies):-
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'simplify_frontier :: not valid: ', Frontier),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'simplify_frontier :: not valid: ', Frontier),
 	simplify_frontier(More_Frontier_In, Goal, More_Bodies).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(Goal, Head, Frontier_Test) :-
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, Frontier_Test, Goal)),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, Frontier_Test, Goal)),
         copy_term((Head, Frontier_Test, Goal), (Head_Tmp, Frontier_Test_Tmp, Goal_Tmp)), 
         eq_uqv(Head_Tmp, Goal_Tmp, []), 
 	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _Tmp_EQV, Tmp_UQV), % It must be an equality.
 	eq_uqv(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
-%	echo_msg(1, 'cneg_rt_Stuckey', '', 'test_frontier_is_valid', 'YES'),
+%	echo_msg(1, '', 'cneg_rt_Stuckey', 'test_frontier_is_valid', 'YES'),
 	!, % Backtracking forbidden.
 	functor_local(Goal, _Name, _Arity, Goal_Args), 
 	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_EQV, _Test_UQV),
@@ -199,12 +199,12 @@ test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 evaluate_prev_frontier_residua(Goal, GoalVars_In, Prev_Front_Residua) :-
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'evaluate_prev_frontier_residua :: Prev_Front_Residua', Prev_Front_Residua),	
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: Prev_Front_Residua', Prev_Front_Residua),	
 	Prev_Front_Residua \== 'true',
 
 	varsbag(GoalVars_In, [], [], GoalVars),
 	varsbag((Goal, Prev_Front_Residua), GoalVars, [], LocalVars),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'evaluate_prev_frontier_residua :: GoalVars_In', GoalVars_In),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: GoalVars_In', GoalVars_In),
 	% We need to obtain 1 solution and ask for more solutions sharing its solutions for goalvars. 
 	% In this way we do not hang when an infinite number of solutions is found.
 	% This is not completely true because it fails for p(X) :- p(X). but in this case it's clearly 
@@ -214,8 +214,8 @@ evaluate_prev_frontier_residua(Goal, GoalVars_In, Prev_Front_Residua) :-
 	evaluate_prev_frontier_residua_aux(Prev_Front_Residua_Copy),
 	eq_uqv(GoalVars, GoalVars_Copy, []),
 	setof(([(Goal, Prev_Front_Residua, LocalVars)], GoalVars), evaluate_prev_frontier_residua_aux(Prev_Front_Residua), Pre_F_Sols),
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'evaluate_prev_frontier_residua :: Pre_F_Sols', Pre_F_Sols),
-	echo_msg(1, 'cneg_rt_Stuckey', 'nl', '', ''),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: Pre_F_Sols', Pre_F_Sols),
+	echo_msg(1, 'nl', 'cneg_rt_Stuckey', '', ''),
 %	prepare_pre_frontier_sols(Pre_F_Sols, Pre_F_Sols_Aux),
 	unify_pre_sols_when_possible(Pre_F_Sols, Pre_F_Sols_Final),
 	take_and_compute_one_solution(GoalVars, Pre_F_Sols_Final).
@@ -232,7 +232,7 @@ take_and_compute_one_solution(_Real_GoalVars, []) :- fail.
 take_and_compute_one_solution(Real_GoalVars, [Pre_F_Sol | Pre_F_Sols]) :-
 	(
 	    pre_front_sol(Pre_F_Sol, Local_Stuff, GoalVars),
-	    echo_msg(1, 'cneg_rt_Stuckey', '', 'take_one_solution :: Local_Stuff ', Local_Stuff),
+	    echo_msg(1, '', 'cneg_rt_Stuckey', 'take_one_solution :: Local_Stuff ', Local_Stuff),
 	    eq_uqv(Real_GoalVars, GoalVars, []),
 	    compute_localstuff_solutions(Real_GoalVars, Local_Stuff)
 	;
@@ -278,19 +278,19 @@ evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 
 unify_pre_sols_when_possible([], []) :- !.
 unify_pre_sols_when_possible(To_Unify, After_Unified) :- 
-	echo_msg(1, 'cneg_rt_Stuckey', '', 'evaluate_prev_frontier_residua :: To_Unify', To_Unify),
+	echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: To_Unify', To_Unify),
 	unify_sols_when_possible_aux_1(To_Unify, [], Unified, [], Not_Unified), !,
 	(
 	    (
 		Unified == [], 
-		echo_msg(1, 'cneg_rt_Stuckey', '', 'evaluate_prev_frontier_residua :: Not_Unified', Not_Unified),
+		echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: Not_Unified', Not_Unified),
 		After_Unified = Not_Unified
 	    )
 	;
 	    (
 		Unified \== [], 
 		append(Not_Unified, Unified, New_To_Unify), 
-		echo_msg(1, 'cneg_rt_Stuckey', '', 'evaluate_prev_frontier_residua :: New_To_Unify', New_To_Unify),
+		echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: New_To_Unify', New_To_Unify),
 		unify_pre_sols_when_possible(New_To_Unify, After_Unified)
 	    )
 	).

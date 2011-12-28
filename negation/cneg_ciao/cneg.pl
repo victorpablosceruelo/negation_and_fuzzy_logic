@@ -47,12 +47,12 @@ cneg_tr(UQV, Functor) :- cneg_tr_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
 
 cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
-	echo_msg(1, 'cneg', '', 'cneg :: Not implemented conjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	echo_msg(1, '', 'cneg', 'cneg :: Not implemented conjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
 cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
-	echo_msg(1, 'cneg', '', 'cneg :: Not implemented disjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	echo_msg(1, '', 'cneg', 'cneg :: Not implemented disjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
 cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
@@ -62,13 +62,13 @@ cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	cneg_aux:append(FV_Cneg, FV_In, FV_Aux),
 	cneg_aux:append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
-	echo_msg(1, 'cneg', '', 'cneg_tr_aux :: call', New_Functor),
+	echo_msg(1, '', 'cneg', 'cneg_tr_aux :: call', New_Functor),
 	call(New_Functor).
 
 test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
-	echo_msg(1, 'cneg', '', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
-	echo_msg(1, 'cneg', '', 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
-	echo_msg(1, 'cneg', '', 'test_if_cneg_rt_needed :: Body', Body), 
+	echo_msg(1, '', 'cneg', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
+	echo_msg(1, '', 'cneg', 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
+	echo_msg(1, '', 'cneg', 'test_if_cneg_rt_needed :: Body', Body), 
 	varsbag(GoalVars, [], [], Real_GoalVars),
 	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
 	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
@@ -88,33 +88,33 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 
 cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 call_to(Predicate) :- 
-	echo_msg(2, 'cneg', 'nl', '', ''), 
-	echo_msg(2, 'cneg', 'nl', '', ''), 
-	echo_msg(2, 'cneg', '', 'call_to :: Predicate', Predicate), 
-	echo_msg(2, 'cneg', 'nl', '', ''),
+	echo_msg(2, 'nl', 'cneg', '', ''), 
+	echo_msg(2, 'nl', 'cneg', '', ''), 
+	echo_msg(2, '', 'cneg', 'call_to :: Predicate', Predicate), 
+	echo_msg(2, 'nl', 'cneg', '', ''),
 	portray_attributes_in_term(2, Predicate),
-	echo_msg(2, 'cneg', 'nl', '', ''), 
+	echo_msg(2, 'nl', 'cneg', '', ''), 
 	call_to_aux(Predicate, 0).
 call_to(Predicate) :- 
-	echo_msg(2, 'cneg', '', 'call_to (L0) :: Predicate - FAILED - :: Predicate', Predicate),
-	echo_msg(2, 'cneg', 'nl', '', ''), !, fail. 
+	echo_msg(2, '', 'cneg', 'call_to (L0) :: Predicate - FAILED - :: Predicate', Predicate),
+	echo_msg(2, 'nl', 'cneg', '', ''), !, fail. 
 
 call_to_aux(Predicate, Level_In) :-
 	goal_is_disjunction(Predicate, G1, G2), !,
 	Level is Level_In + 1,
 	(
 	    (
-		(       echo_msg_for_call(2, 'cneg', Level, 'G1 \\/ G2 :: G1', G1), 
+		(       echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', G1), 
 			call_to_aux(G1, Level)
 		)
 	    ;
-		(       echo_msg(2, 'cneg', 'nl', '', ''), % Differentiate paths.
-			echo_msg_for_call(2, 'cneg', Level, 'G1 \\/ G2 :: G2', G2), 
+		(       echo_msg(2, 'nl', 'cneg', '', ''), % Differentiate paths.
+			echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: G1 \\/ G2 :: G2', G2), 
 			call_to_aux(G2, Level)
 		)
 	    )
 	;
-	    (           echo_msg_for_call(2, 'cneg', Level, 'G1 \\/ G2 - FAILED -', Predicate), 
+	    (           echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: G1 \\/ G2 - FAILED -', Predicate), 
 			!, fail 
 	    )
 	).
@@ -123,25 +123,25 @@ call_to_aux(Predicate, Level_In) :-
 	goal_is_conjunction(Predicate, G1, G2), !,
 	Level is Level_In + 1,
 	(
-	    (	echo_msg_for_call(2, 'cneg', Level, 'G1 /\\ G2 :: G1', G1),
+	    (	echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', G1),
 		call_to_aux(G1, Level),
-		echo_msg_for_call(2, 'cneg', Level, 'G1 /\\ G2 :: G2', G2),
+		echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: G1 /\\ G2 :: G2', G2),
 		call_to_aux(G2, Level)
 	    )
 	;
-	    (   echo_msg_for_call(2, 'cneg', Level, 'G1 /\\ G2 - FAILED -', Predicate),
+	    (   echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: G1 /\\ G2 - FAILED -', Predicate),
 		!, fail 
 	    )
 	).
 
 call_to_aux(Predicate, Level_In) :-
 	Level is Level_In + 1,
-	echo_msg_for_call(2, 'cneg', Level, 'Predicate', Predicate),
+	echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: Predicate', Predicate),
 	call(Predicate).
 
 call_to_aux(Predicate, Level_In) :- 
 	Level is Level_In + 1,
-	echo_msg_for_call(2, 'cneg', Level, 'Predicate - FAILED -', Predicate),
+	echo_msg_3pm(2, '', 'cneg', 'call_to (L', Level, ') :: Predicate - FAILED -', Predicate),
 	!, fail. 
 
 % cneg_tr contains the code transformation needed by cneg_lib
