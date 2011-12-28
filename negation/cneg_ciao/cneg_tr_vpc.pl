@@ -9,18 +9,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_cneg_tr_vpc(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
-	echo_msg(0, 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, Cls_In, Cls_1)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'trans_sent_eof', generate_cneg_main_cls(List_Of_Preds, Cls_In, Cls_1)),
 	cneg_tr_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-	echo_msg_list(0, 'Cls_1', Cls_1),
+	echo_msg(0, 'cneg_tr_vpc', '', 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-	echo_msg_list(0, 'Cls_2', Cls_2),
+	echo_msg(0, 'cneg_tr_vpc', '', 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
-	echo_msg_list(0, 'Cls_3', Cls_3),
+	echo_msg(0, 'cneg_tr_vpc', '', 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_Out),
-	echo_msg_list(0, 'Cls_4', Cls_Out),
+	echo_msg(0, 'cneg_tr_vpc', '', 'Cls_4', Cls_Out),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -30,9 +30,9 @@ generate_cneg_tr_vpc(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 %generate_main_cls(List_Of_Preds, Cls_1).
 cneg_tr_generate_main_cls([], Cls, Cls) :- !.
 cneg_tr_generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
-	echo_msg(0, 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
-	echo_msg(0, 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
 
@@ -167,9 +167,9 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 %cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
 cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
 cneg_tr_generate_cls_bodies([(Head, Body, Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	echo_msg(0, 'cneg_tr_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
 	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
-	echo_msg(0, 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -205,7 +205,7 @@ cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	New_Body = (Test_Cneg_RT, (Test_For_True ; (Test_For_Fail, Neg_Body))),
 
 	% negate_body_conjunction
-	echo_msg(0, 'cneg_tr_generate_cl_body :: negate_atom :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_cl_body :: negate_atom :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
 	negate_atom(Body, GoalVars, Result, Neg_Body).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,7 +218,7 @@ take_body_first_unification(Body, Body_First_Unification) :-
 	goal_is_conjunction(Body, Conj_1, _Conj_2), !,
 	take_body_first_unification(Conj_1, Body_First_Unification).
 take_body_first_unification(Body, 'fail') :-
-	echo_msg(1, 'take_body_first_unification :: Impossible to determine for Body', (Body)).
+	echo_msg(1, 'cneg_tr_vpc', '', 'take_body_first_unification :: Impossible to determine for Body', (Body)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -286,7 +286,7 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	copy_args(Arity, Atom, Neg_Atom).
 
 negate_atom(Atom, GoalVars, Result, Atom) :-
-	echo_msg(1, 'negate_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
+	echo_msg(1, 'cneg_tr_vpc', '', 'negate_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -344,7 +344,7 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	copy_args(Arity, Atom, DN_Atom).
 
 double_negation_atom(Atom, GoalVars, Result, Atom) :-
-	echo_msg(1, 'double_negation_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
+	echo_msg(1, 'cneg_tr_vpc', '', 'double_negation_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -367,15 +367,15 @@ generate_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
-	echo_msg(0, 'cneg_tr_generate_double_neg_bodies :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_double_neg_bodies :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
 	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
 cneg_tr_generate_double_neg_bodies_aux([], Cls_In, Cls_In).
 cneg_tr_generate_double_neg_bodies_aux([(Head, Body, Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	echo_msg(0, 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
 	cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl), !,
-	echo_msg(0, 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -398,9 +398,9 @@ cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 
 cneg_tr_generate_double_neg_main_cls([], Cls, Cls) :- !.
 cneg_tr_generate_double_neg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
-	echo_msg(0, 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	cneg_tr_generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
-	echo_msg(0, 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
+	echo_msg(0, 'cneg_tr_vpc', '', 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
 
