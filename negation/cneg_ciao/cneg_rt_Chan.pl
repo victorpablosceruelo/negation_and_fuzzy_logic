@@ -32,12 +32,32 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_rt_Chan(UQV, Goal):-
-	cneg_rt_Aux(UQV, Goal, 'cneg_rt_Chan', [], Result),
-	call_to(Result).
+	Proposal = 'cneg_rt_Chan',
+	cneg_rt_Generic(UQV, Goal, Proposal).
 
-cneg_rt_New(UQV, Goal):-
-	cneg_rt_Aux(UQV, Goal, 'cneg_rt_New', [], Result),
-	call_to(Result).
+cneg_rt_New(UQV, Goal) :-
+	Proposal = 'cneg_rt_New',
+	cneg_rt_Generic(UQV, Goal, Proposal).
+
+% The following definition of the predicate cneg_rt_Generic
+% can be changed by the commented one
+% when we find the current bug 
+% (It is just to make it easy debugging). 
+cneg_rt_Generic(UQV, Goal, Proposal) :-
+	cneg_rt_Aux(UQV, Goal, Proposal, [], Conj_Of_Disj_Result),
+	split_goal_with_disjunctions_into_goals(Conj_Of_Disj_Result, Proposal, List_Of_Disj_Result),
+	generate_disjunction_from_list(List_Of_Disj_Result, Disj_Result),
+	call_to(Disj_Result).
+
+%cneg_rt_Generic(UQV, Goal, Proposal) :-
+%	cneg_rt_Aux(UQV, Goal, Proposal, [], Result),
+%	call_to(Result).
+
+generate_disjunction_from_list([], fail) :- !.
+generate_disjunction_from_list([Goal], Goal) :- !.
+generate_disjunction_from_list([Goal | Goals], (Goal ; Disj_Goals)) :-
+	Goals \== [],
+	generate_disjunction_from_list(Goals, Disj_Goals).
 
 cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_separation(2),
