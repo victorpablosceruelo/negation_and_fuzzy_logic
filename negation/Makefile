@@ -7,6 +7,9 @@ cleandist: clean
 cleanall:
 	cd intneg; make cleandist
 	cd examples; make cleandist
+kill:
+	killall ciaoengine; killall xsb; killall swipl;
 mrproper: 
-	killall ciaoengine; killall xsb; killall swipl; make cleandist
+	make -i kill
+	make -i cleandist
 

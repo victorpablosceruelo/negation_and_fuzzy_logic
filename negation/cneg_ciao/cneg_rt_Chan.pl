@@ -45,9 +45,15 @@ cneg_rt_New(UQV, Goal) :-
 % (It is just to make it easy debugging). 
 cneg_rt_Generic(UQV, Goal, Proposal) :-
 	cneg_rt_Aux(UQV, Goal, Proposal, [], Conj_Of_Disj_Result),
+	!, % Reduce the stack's memory by forbidding backtracking.
+	echo_msg(2, 'cneg_rt_Generic :: Conj_Of_Disj_Result', Conj_Of_Disj_Result),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disj_Result, Proposal, List_Of_Disj_Result),
-	generate_disjunction_from_list(List_Of_Disj_Result, Disj_Result),
-	call_to(Disj_Result).
+	!, % Reduce the stack's memory by forbidding backtracking.
+	echo_msg_list(2, 'cneg_rt_Generic :: List_Of_Disj_Result', List_Of_Disj_Result),
+	generate_disjunction_from_list(List_Of_Disj_Result, Disj_Of_Conj_Result),
+	!, % Reduce the stack's memory by forbidding backtracking.
+	echo_msg(2, 'cneg_rt_Generic :: Disj_Of_Conj_Result', Disj_Of_Conj_Result),
+	call_to(Disj_Of_Conj_Result).
 
 %cneg_rt_Generic(UQV, Goal, Proposal) :-
 %	cneg_rt_Aux(UQV, Goal, Proposal, [], Result),
@@ -62,9 +68,9 @@ generate_disjunction_from_list([Goal | Goals], (Goal ; Disj_Goals)) :-
 cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	echo_separation(2),
 	echo_msg_nl(2),
-	echo_msg(2, 'cneg_rt_Aux :: Goal', Goal),
-	echo_msg(2, 'cneg_rt_Aux :: UQV_In', UQV_In),
 	echo_msg(2, 'cneg_rt_Aux :: Proposal', Proposal),
+	echo_msg(2, 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, 'cneg_rt_Aux :: Goal', Goal),
 	echo_msg_nl(2),
 	echo_statistics(cneg_rt_Aux(UQV_In, Goal, Proposal, Trace)),
 	echo_msg_nl(2),
@@ -74,25 +80,27 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
 	portray_attributes_in_term(2, Goal),
 	varsbag(UQV_Aux, [], [], UQV),
 	varsbag(Goal, UQV, [], GoalVars),
+	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'cneg_rt_Aux :: GoalVars', GoalVars),
 	
 	compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV),
+	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: New_UQV', New_UQV),
 	echo_msg_list(2, 'cneg_rt_Aux :: Frontier', Frontier),
 
-	negate_set_of_frontiers(Frontier, Proposal, GoalVars, New_UQV, Result), !,
+	negate_frontier_list(Frontier, Proposal, GoalVars, New_UQV, Result), 
+	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_separation(2),
 	echo_msg_nl(2),
-	echo_msg(2, 'cneg_rt_Aux :: Summary', ' '),
+	echo_msg(2, 'cneg_rt_Aux :: Summary for Proposal', Proposal),
 	echo_msg(2, 'cneg_rt_Aux :: Goal', Goal),
 	echo_msg(2, 'cneg_rt_Aux :: UQV_In', UQV_In),
-	echo_msg(2, 'cneg_rt_Aux :: Proposal', Proposal),
-	echo_msg_nl(2),
 	echo_msg_nl(2),
 	echo_msg_list(2, 'cneg_rt_Aux :: Frontier', Frontier),
 	echo_msg_nl(2),
 	echo_msg(2, 'cneg_rt_Aux :: Result', Result),
+	echo_separation(2),
 	echo_msg_nl(2).
 
 by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
@@ -104,8 +112,8 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 
 % Structures to manage all the info about the frontier in an easy way.
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
-frontier_E_IE_NIE_contents(frontier(E, IE, NIE), E, IE, NIE).
-frontier_E_IE_NIE_ied_contents(frontier(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+frontier_E_IE_NIE_contents(frontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
+frontier_E_IE_NIE_ied_contents(frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -232,27 +240,15 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal), !,
-	echo_msg(2, 'compute_goal_frontier :: double negation for (UQV, SubGoal, Proposal)', (UQV, SubGoal, Proposal)),
-	(
-	    (
-		Proposal = 'cneg_rt_Chan',
-		cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Result)
-	    )
-	;
-	    (
-		Proposal = 'cneg_rt_New',
-		cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Result)
-	    )
-	),
-	echo_msg(0, 'compute_goal_frontier :: Trace', [Goal | Trace]),
-	split_goal_with_disjunctions_into_goals(Result, Proposal, Results),
-	build_a_frontier_from_each_result(Goal, Results, Frontier),
+	echo_msg(2, 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
+	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_Of_Disjs_Frontier),
+	echo_msg(0, 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
+	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier),
+	echo_msg_list(2, 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
+	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier),
 	echo_msg_list(2, 'double neg :: Frontier', Frontier),
 	echo_separation(2),
 	echo_msg_nl(2).
-%	compute_goal_frontier(Result, Proposal, [Goal | Trace], Real_Goal, Frontier).
-%	OLD: functor_local(Real_Goal, 'cneg_rt', 2, [ UQV |[ SubGoal ]]),
-%	OLD: frontier_contents(F_Out, Real_Goal, Real_Goal, 'true').
 
 % Only as info.
 % frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
@@ -302,21 +298,21 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
-%	echo_msg_nl(2).
+simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !,
+	echo_msg_nl(2).
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
-%	echo_msg(2, 'simplify_frontier :: valid: ', F_In),
+	echo_msg(2, 'simplify_frontier :: valid :: F_In', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
-simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
-%	echo_msg(2, 'simplify_frontier :: not valid: ', F_In),
+simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+	echo_msg(2, 'simplify_frontier :: not valid :: F_In', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
-	frontier_contents(F_In, Goal, Head, _Body, F_Test),
-	echo_msg(2, 'test_frontier_is_valid :: (Goal, Head, F_Test)', (Goal, Head, F_Test)),
+	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
+%	echo_msg(2, 'test_frontier_is_valid :: F_In', F_In),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
 % Old way:
@@ -330,7 +326,7 @@ test_frontier_is_valid(F_In, Goal) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_set_of_frontiers(Frontier,Goal,LSolutions) returns in LSolutions
+% negate_frontier_list(Frontier,Goal,LSolutions) returns in LSolutions
 % a list with the same number of elements of the list Frontier.
 % Each element of LSolutions will be one solution of negating the 
 % conjuction that is in the same position in Frontier. The predicate 
@@ -338,15 +334,15 @@ test_frontier_is_valid(F_In, Goal) :-
 % Frontier (each conjunction) is the negation.
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
-negate_set_of_frontiers([], _Proposal, _GoalVars, _UQV, true) :- !. % Optimization.
-negate_set_of_frontiers([Frontier | More_Frontiers], Proposal, GoalVars, UQV, Result) :-
-%	echo_msg(2, 'negate_frontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
-	negate_frontier(Frontier, Proposal, GoalVars, UQV, Result_Frontier),
-%	echo_msg(2, 'negate_frontier: Result_Frontier', Result_Frontier),
-	!, % Reduce the stack's memory.
-	negate_set_of_frontiers(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers),
+negate_frontier_list([], _Proposal, _GoalVars, _UQV, true) :- !. % Optimization.
+negate_frontier_list([Frontier | More_Frontiers], Proposal, GoalVars, UQV, Result) :-
+%	echo_msg(2, 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
+	negate_subfrontier(Frontier, Proposal, GoalVars, UQV, Result_Frontier),
+%	echo_msg(2, 'negate_subfrontier: Result_Frontier', Result_Frontier),
+	!, % Reduce the stack's memory by forbidding backtracking.
+	negate_frontier_list(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers),
 	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
-	!. % Reduce the stack's memory.
+	!. % Reduce the stack's memory by forbidding backtracking.
 	
 
 % combine_negated_subfrontiers(Result_Subfr, Result_More_Subfr, Result_Tmp),
@@ -360,25 +356,25 @@ combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_frontier((Head, BodyList), Proposal, GoalVars, Result) 
+% negate_subfrontier((Head, BodyList), Proposal, GoalVars, Result) 
 % returns in Result a solution of the negation of the conjunction of subgoals 
 % (Head, BodyList) of the goal Goal.
 
-negate_frontier(Frontier_In, Proposal, GoalVars, UQV, Result):-
+negate_subfrontier(Frontier_In, Proposal, GoalVars, UQV, (Result)):-
 	echo_msg_nl(2),
-	echo_msg(2, 'negate_frontier :: Frontier_In', (Frontier_In)),
+	echo_msg(2, 'negate_subfrontier :: Frontier_In', (Frontier_In)),
 	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
-%	frontier_E_IE_NIE_contents(Frontier_Aux_1, E_Aux_1, IE_Aux_1, NIE_Aux_1),
-%	echo_msg(2, 'negate_frontier :: Frontier_Aux_1 :: frontier(E_In, IE_In, NIE_In)', Frontier_Aux_1),
-	!, % Reduce the stack's memory.
+	!, % Reduce the stack's memory by forbidding backtracking.
 	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, UQV, Frontier_Aux_2, Vars_Info),
-	echo_msg(2, 'negate_frontier :: vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)', Vars_Info),
-	echo_msg(2, 'negate_frontier :: Frontier_Aux_2 :: frontier(E, IE, NIE)', Frontier_Aux_2),
+	!, % Reduce the stack's memory by forbidding backtracking.
+	echo_msg(2, 'negate_subfrontier', Vars_Info),
+	echo_msg(2, 'negate_subfrontier', Frontier_Aux_2),
 	split_IE_NIE_between_imp_exp_and_dumb(Frontier_Aux_2, Vars_Info, Frontier_Aux_3),
-	echo_msg(2, 'negate_frontier :: Frontier_Aux_3 :: frontier(E, IE_imp, IE_exp, IE_dumb, NIE_imp, NIE_exp)', Frontier_Aux_3),
+	echo_msg(2, 'negate_subfrontier', Frontier_Aux_3),
+	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_formula(Frontier_Aux_3, Proposal, Vars_Info, Result),
-	echo_msg(2, 'negate_frontier :: (Result)', (Result)),
-	!.
+	echo_msg(2, 'negate_subfrontier :: (Result)', (Result)),
+	!. % Reduce the stack's memory by forbidding backtracking.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -719,7 +715,8 @@ negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
 	rebuild_conjunction_of_goals(E, IE_Imp_Dumb, E_IE_Imp_Dumb),
 	rebuild_conjunction_of_goals(E_IE_Imp_Dumb, NIE_Imp, Formulae_Imp),
 
-	echo_msg(2, 'negate_formula :: (E, IE_Imp_Dumb, NIE_Imp, IE_NIE_Exp)', (E, IE_Imp_Dumb, NIE_Imp, IE_NIE_Exp)),
+	echo_msg(2, 'negate_formula :: Formulae_Imp', Formulae_Imp),
+	echo_msg(2, 'negate_formula :: IE_NIE_Exp', IE_NIE_Exp),
  	negate_IE_NIE_exp(IE_NIE_Exp, Proposal, Vars_Info, Neg_IE_NIE_Exp),
 	negate_imp_form(Formulae_Imp, Proposal, Vars_Info, Neg_IE_NIE_Exp, Neg_E_IE_NIE),
 	!. % Backtracking forbidden.

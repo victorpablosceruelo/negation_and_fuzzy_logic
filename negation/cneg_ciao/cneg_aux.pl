@@ -63,7 +63,8 @@ get_stream_to_file(Stream) :-
 	name(FN_Out, "debug_pkg_cneg.pl"),	% Convert string to atom.
 %	open(FN_Out,write,Stream), % This removes the file !!!
 	open(FN_Out,append,Stream),
-	assertz_fact(defined_stream_to_file(Stream)).
+	assertz_fact(defined_stream_to_file(Stream)),
+	echo_howto_information.
 
 echo_msg(Level, Msg, Clause) :-
 	echo_msg_logo(Level),
@@ -114,9 +115,9 @@ echo_msg_list_aux(Level, Msg_String, Cl) :-
 
 echo_separation(Level) :-
 %	echo_msg_nl(Level), echo_separation_aux(Level), 
-	echo_msg_nl(Level), echo_separation_aux(Level), 
-	echo_msg_nl(Level), echo_separation_aux(Level),
-	echo_msg_nl(Level).
+	echo_msg_nl(Level), 
+	echo_msg_logo(Level), echo_separation_aux(Level), echo_msg_nl(Level), 
+	echo_msg_logo(Level), echo_separation_aux(Level), echo_msg_nl(Level).
 
 echo_separation_aux(Level) :-
 	echo_msg_aux(Level, '-----------------------------------------------', '-----------------------------------------------').
@@ -138,6 +139,22 @@ echo_statistics(Msg) :-
 	set_output(StdOut_Stream), % Recover stdout stream.
 %	statistics, % Write statistics to stdout.
 	!. % No backtracking, please.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+echo_howto_information :-
+	echo_separation(2),
+	echo_msg_nl(2),
+	echo_msg(2, 'Info for debugging', ' '),
+	echo_msg_nl(2),
+	echo_msg(2, 'Basic frontier', 'frontier(Goal, Head, Body, FrontierTest)'),
+	echo_msg(2, 'frontier_E_IE_NIE', 'frontier_E_IE_NIE(E, IE, NIE)'),
+	echo_msg(2, 'frontier_E_IE_NIE_ied', 'frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb)'),
+	echo_msg(2, 'Vars_Info', 'vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)'),
+	echo_separation(2),
+	echo_msg_nl(2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
