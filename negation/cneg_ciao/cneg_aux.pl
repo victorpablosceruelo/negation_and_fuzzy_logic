@@ -16,6 +16,7 @@
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/5, goal_is_equality/5,
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
+	    goal_is_not_conj_disj_neg/1,
 	    goal_is_negation/3,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
@@ -425,6 +426,13 @@ goal_is_negation(Goal, UQV, SubGoal) :-
 	arg(1, Goal, UQV),
 	arg(2, Goal, SubGoal).
 
+goal_is_not_conj_disj_neg(Goal) :-
+	nonvar(Goal),
+	functor_local(Goal, Name, _Arity, _Args),
+	goal_name_is_not_conjunction(Name),
+	goal_name_is_not_disjunction(Name),
+	goal_name_is_not_negation(Name).
+
 goal_is_not_conj_disj_eq_diseq_dneg(Goal) :-
 	nonvar(Goal),
 	functor_local(Goal, Name, _Arity, _Args),
@@ -675,14 +683,15 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :-
 	append(Body_Result_1, Body_Result_2, Bodies).
 
 split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody]) :- % Goal is something else.
-	translate_problematic_predicates(Body, Negation_Predicate, NewBody).
+	translate_problematic_predicates(Body, Negation_Predicate, NewBody), !.
 
 % Example for Negation_Predicate = 'cneg_tr'
 translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
 	goal_is_negation(Body, UQV, SubGoal), !,
 	functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]]).
 
-translate_problematic_predicates(Body, _Negation_Predicate, Body) :- !.
+translate_problematic_predicates(Body, _Negation_Predicate, Body) :- 
+	goal_is_not_conj_disj_neg(Body), !.
 
 combine_sub_bodies_by_conjunction([], _List_2, []) :- !.
 combine_sub_bodies_by_conjunction([Elto | List_1], List_2, Result) :-
