@@ -120,11 +120,11 @@ portray(Attribute) :-
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''), 
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
-portray_aux(Level, Attribute) :-
+portray_aux(Echo_Level, Attribute) :-
 	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
-	portray_disequalities(Level, Disequalities, UQV).
-portray_aux(Level, Anything) :- 
-	echo_msg(Level, '', 'cneg_diseq', '', Anything).
+	portray_disequalities(Echo_Level, Disequalities, UQV).
+portray_aux(Echo_Level, Anything) :- 
+	echo_msg(Echo_Level, 'aux', 'cneg_diseq', '', Anything).
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
