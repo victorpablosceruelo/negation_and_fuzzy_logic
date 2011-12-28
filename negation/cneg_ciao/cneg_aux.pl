@@ -1,9 +1,7 @@
 
 :- module(cneg_aux,
 	[
-	    echo_msg/4, echo_msg_aux/3, echo_msg_nl/2, 
-	    echo_msg_logo/2, echo_msg_statistics/3,
-	    echo_msg_separation/2, echo_msg_for_call/5,
+	    echo_msg/5, echo_msg_for_call/5,
 	    findall/4, append/3, functor_local/4,
 	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -73,12 +71,34 @@ get_stream_to_file(File_Name_Atom, Stream) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg(0, _File_Name, _Pre_Msg, _Msg) :- !. % No debugging.
-echo_msg(Echo_Level, File_Name, Pre_Msg, Msg) :-
-	echo_msg_is_a_list(Msg), !,
-	echo_msg_list(Echo_Level, File_Name, Pre_Msg, Msg).
-echo_msg(Echo_Level, File_Name, Pre_Msg, Msg) :-
-	echo_msg_logo(Echo_Level, File_Name),
+echo_msg(0, _Mode, _File_Name, _Pre_Msg, _Msg) :- !. % No debugging.
+
+echo_msg(Echo_Level, 'aux', File_Name, Pre_Msg, Msg) :- !,
+	echo_msg_aux(Echo_Level, File_Name, Pre_Msg),
+	echo_msg_aux(Echo_Level, File_Name, Msg).
+
+echo_msg(Echo_Level, 'list', File_Name, Pre_Msg, Msg) :-
+	(   (echo_msg_list(Echo_Level, File_Name, Pre_Msg, Msg), !)
+	;
+	    (echo_msg(Echo_Level, 'normal', File_Name, Pre_Msg, Msg), !)
+	).
+
+echo_msg(Echo_Level, 'logo', File_Name, _Pre_Msg, _Msg) :-
+	echo_msg_aux(Echo_Level, File_Name, '% cneg :: '), !.
+
+echo_msg(Echo_Level, 'statistics', File_Name, _Pre_Msg, Msg) :-
+	echo_msg_statistics(Echo_Level, File_Name, Msg), !.
+
+echo_msg(Echo_Level, 'nl', File_Name, _Pre_Msg, _Msg) :-
+	echo_msg_nl(Echo_Level, File_Name), !.
+
+echo_msg(Echo_Level, 'separation', File_Name, _Pre_Msg, _Msg) :-
+	echo_msg_separation(Echo_Level, File_Name).	
+
+echo_msg(Echo_Level, Mode, File_Name, Pre_Msg, Msg) :-
+	(Mode \== 'aux'), (Mode \== 'list'), (Mode \== 'logo'), 
+	 (Mode \== 'statistics'), (Mode \== 'nl'), (Mode \== 'separation'), !,
+	echo_msg(Echo_Level, 'logo', File_Name, Pre_Msg, Msg),
 	echo_msg_aux(Echo_Level, File_Name, Pre_Msg),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
 	echo_msg_aux(Echo_Level, File_Name, Msg),
@@ -100,7 +120,7 @@ echo_msg_list(Echo_Level, File_Name, Pre_Msg, [Msg|Msgs]) :-
 	echo_msg_list(Echo_Level, File_Name, Pre_Msg, Msgs).
 
 echo_msg_list_aux(Echo_Level, File_Name, Pre_Msg, Msg) :-
-	echo_msg_logo(Echo_Level, File_Name),
+	echo_msg(Echo_Level, File_Name, 'logo', Pre_Msg, Msg),
 	echo_msg_aux(Echo_Level, File_Name, Pre_Msg),
 	echo_msg_aux(Echo_Level, File_Name, ' (list)'),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
@@ -118,9 +138,6 @@ echo_msg_aux(1, File_Name, Msg) :-
 echo_msg_aux(2, File_Name, Msg) :-
 	get_stream_to_file(File_Name, Stream),
 	write(Stream, Msg).
-
-echo_msg_logo(Echo_Level, File_Name) :-
-	echo_msg_aux(Echo_Level, File_Name, '% cneg :: ').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -145,7 +162,7 @@ echo_msg_separation(Echo_Level, File_Name) :-
 	echo_msg_nl(Echo_Level, File_Name).
 
 echo_msg_separation_aux(Echo_Level, File_Name) :-
-	echo_msg_logo(Echo_Level, File_Name), 
+	echo_msg(Echo_Level, File_Name, 'logo', '', ''), 
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_nl(Echo_Level, File_Name).
@@ -180,7 +197,7 @@ echo_pre_msg_from_list_aux_2(Elto, Pre_Msg_In, Pre_Msg_Out) :-
 	
 echo_msg_for_call(Echo_Level, File_Name, Call_Level, Pre_Msg, Msg) :-
 	echo_pre_msg_from_list(['call_to (L' |[ Call_Level |[ ') :: ' |[ Pre_Msg ]]]], Pre_Msg_Aux),
-	echo_msg(Echo_Level, File_Name, Pre_Msg_Aux, Msg).
+	echo_msg(Echo_Level, '', File_Name, Pre_Msg_Aux, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -210,12 +227,12 @@ echo_msg_statistics_aux(Msg) :-
 echo_howto_information(Echo_Level, File_Name) :-
 	echo_msg_separation(Echo_Level, File_Name),
 	echo_msg_nl(Echo_Level, File_Name),
-	echo_msg(Echo_Level, File_Name, 'Info for debugging', ' '),
+	echo_msg(Echo_Level, '', File_Name, 'Info for debugging', ' '),
 	echo_msg_nl(Echo_Level, File_Name),
-	echo_msg(Echo_Level, File_Name, 'Basic frontier', 'frontier(Goal, Head, Body, FrontierTest)'),
-	echo_msg(Echo_Level, File_Name, 'frontier_E_IE_NIE', 'frontier_E_IE_NIE(E, IE, NIE)'),
-	echo_msg(Echo_Level, File_Name, 'frontier_E_IE_NIE_ied', 'frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb)'),
-	echo_msg(Echo_Level, File_Name, 'Vars_Info', 'vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)'),
+	echo_msg(Echo_Level, '', File_Name, 'Basic frontier', 'frontier(Goal, Head, Body, FrontierTest)'),
+	echo_msg(Echo_Level, '', File_Name, 'frontier_E_IE_NIE', 'frontier_E_IE_NIE(E, IE, NIE)'),
+	echo_msg(Echo_Level, '', File_Name, 'frontier_E_IE_NIE_ied', 'frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb)'),
+	echo_msg(Echo_Level, '', File_Name, 'Vars_Info', 'vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)'),
 	echo_msg_separation(Echo_Level, File_Name),
 	echo_msg_nl(Echo_Level, File_Name).
 
@@ -527,9 +544,9 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	!.
 
 qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	echo_msg(0, 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	echo_msg(0, 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	echo_msg(0, 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
+	echo_msg(0, '', 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
+	echo_msg(0, '', 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
+	echo_msg(0, '', 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
 	!.
 
 %	name(Name, NameString),
@@ -542,7 +559,7 @@ name_has_semicolon(Any) :-
 	string(Any), !, 
 	name_has_semicolon_aux(Any).
 name_has_semicolon(Any) :-
-	echo_msg(0, 'cneg_aux', 'name_has_semicolon :: NOT a string', Any), fail.
+	echo_msg(0, '', 'cneg_aux', 'name_has_semicolon :: NOT a string', Any), fail.
 
 name_has_semicolon_aux([]) :- !, fail.
 name_has_semicolon_aux([A]) :- 
@@ -677,9 +694,9 @@ varsbag_intersection([_Var_1 | VarsBag_In_1], VarsBag_In_2, VarsBag_Out) :-
 
 varsbag(X, OtherBag, Bag_In, Bag_Out) :- 
         var(X), !,
-	echo_msg(0, 'cneg_aux', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	echo_msg(0, '', 'cneg_aux', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out),
-	echo_msg(0, 'cneg_aux', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	echo_msg(0, '', 'cneg_aux', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	!.
 
 varsbag(Term, OtherBag, Bag_In, Bag_Out) :-
@@ -727,9 +744,9 @@ cneg_aux_equality(X, X).
 
 %split_goal_with_disjunctions_into_goals(Body, Bodies)
 split_goal_with_disjunctions_into_goals(Body, Negation_Predicate, Bodies) :- 
-	echo_msg(0, 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goal ', Body), 
+	echo_msg(0, '', 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goal ', Body), 
 	split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies),
-	echo_msg(0, 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goals ', Bodies), 
+	echo_msg(0, '', 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goals ', Bodies), 
 	!.
 
 split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :- 
