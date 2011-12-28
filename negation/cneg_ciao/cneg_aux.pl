@@ -1,7 +1,7 @@
 
 :- module(cneg_aux,
 	[
-	    echo_msg/5, echo_msg_for_call/5,
+	    echo_msg/5, echo_msg_2pm/6, echo_msg_3pm/7,
 	    findall/4, append/3, functor_local/4,
 	    list_head_and_tail/3, add_to_list_if_not_there/3, 
 	    memberchk/2, term_to_meta/2,
@@ -96,13 +96,27 @@ echo_msg(Echo_Level, 'separation', File_Name, _Pre_Msg, _Msg) :-
 	echo_msg_separation(Echo_Level, File_Name).	
 
 echo_msg(Echo_Level, Mode, File_Name, Pre_Msg, Msg) :-
+	  echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg, '', '', Msg).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+echo_msg_2pm(Echo_Level, Mode, File_Name, Pre_Msg_1, Pre_Msg_2, Msg) :-
+	echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg_1, Pre_Msg_2, '', Msg).
+
+echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg_1, Pre_Msg_2, Pre_Msg_3, Msg) :-
 	(Mode \== 'aux'), (Mode \== 'list'), (Mode \== 'logo'), 
 	 (Mode \== 'statistics'), (Mode \== 'nl'), (Mode \== 'separation'), !,
-	echo_msg(Echo_Level, 'logo', File_Name, Pre_Msg, Msg),
-	echo_msg_aux(Echo_Level, File_Name, Pre_Msg),
+	echo_msg(Echo_Level, 'logo', File_Name, Pre_Msg_1, Msg),
+	echo_msg_aux(Echo_Level, File_Name, Pre_Msg_1),
+	echo_msg_aux(Echo_Level, File_Name, Pre_Msg_2),
+	echo_msg_aux(Echo_Level, File_Name, Pre_Msg_3),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
 	echo_msg_aux(Echo_Level, File_Name, Msg),
-	echo_msg_nl(Echo_Level, File_Name).
+	echo_msg_nl(Echo_Level, File_Name), 
+	!.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -166,38 +180,6 @@ echo_msg_separation_aux(Echo_Level, File_Name) :-
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_nl(Echo_Level, File_Name).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-echo_pre_msg_from_list(List, Pre_Msg) :-
-	(   (   echo_pre_msg_from_list_aux_1(List, '', Pre_Msg) )
-	;
-	    (   echo_msg_aux(1, 'debug', 'Error in echo_pre_msg_from_list/2. Pre_Msg :: '),
-		echo_msg_aux(1, 'debug', Pre_Msg),
-		echo_msg_nl(1, 'debug')
-	    )
-	).
-
-echo_pre_msg_from_list_aux_1([], Pre_Msg, Pre_Msg) :- !.
-echo_pre_msg_from_list_aux_1([Elto|List], Pre_Msg_In, Pre_Msg_Out) :- 
-	echo_pre_msg_from_list_aux_2(Elto, Pre_Msg_In, Pre_Msg_Aux), !,
-	echo_pre_msg_from_list_aux_1(List, Pre_Msg_Aux, Pre_Msg_Out).
- 
-echo_pre_msg_from_list_aux_2(Elto, Pre_Msg_In, Pre_Msg_Out) :- 
-	(
-	    (   name(Elto, Elto_String), !  )
-	;
-	    (   Elto_String = Elto, !  )
-	),
-	name(Pre_Msg_In, Pre_Msg_In_String),
-	append(Pre_Msg_In_String, Elto_String, Pre_Msg_Out_String),
-	name(Pre_Msg_Out, Pre_Msg_Out_String).
-	
-echo_msg_for_call(Echo_Level, File_Name, Call_Level, Pre_Msg, Msg) :-
-	echo_pre_msg_from_list(['call_to (L' |[ Call_Level |[ ') :: ' |[ Pre_Msg ]]]], Pre_Msg_Aux),
-	echo_msg(Echo_Level, '', File_Name, Pre_Msg_Aux, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
