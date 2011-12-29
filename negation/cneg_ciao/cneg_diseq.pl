@@ -108,24 +108,31 @@ disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, D
 
 portray_attribute(Attribute, Var) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray_attribute :: Var', Var),
-	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
-	echo_msg(2, 'aux', 'cneg_diseq', 'answer value: ', ''),
-	portray_aux(1, 'all', Attribute),
-	echo_msg(2, 'nl', 'cneg_diseq', '', ''), 
-	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+	portray_and_portray_attribute(Attribute).
 
 portray(Attribute) :-
+	portray_and_portray_attribute(Attribute).
+
+portray_and_portray_attribute(Attribute) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray :: Attribute', Attribute),
-	echo_msg(2, 'aux', 'cneg_diseq', '% ', 'answer value: '),
-	portray_aux(1, 'all', Attribute),
+	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
+	echo_msg(2, 'aux', 'cneg_diseq', 'answer value :: ', ''),
+	portray_aux(1, 'cneg_diseq', Attribute),
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''), 
-	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
+
+	% We need to know about results in cneg_rt.
+	echo_msg(2, 'logo', 'cneg_rt', '', ''),
+	echo_msg(2, 'aux', 'cneg_rt', 'answer value :: ', ''),
+	portray_aux(2, 'cneg_rt', Attribute),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
 
 portray_aux(Echo_Level, File_Name, Attribute) :-
 	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
 	portray_disequalities(Echo_Level, File_Name, Disequalities, UQV).
 portray_aux(Echo_Level, File_Name, Anything) :- 
-	echo_msg(Echo_Level, '', File_Name, '', Anything).
+	echo_msg(Echo_Level, 'aux', File_Name, '', Anything).
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

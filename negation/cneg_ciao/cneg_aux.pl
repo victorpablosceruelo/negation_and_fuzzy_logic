@@ -55,13 +55,12 @@
 % 2 -> only debugging.
 
 %%% Debug (by VPC).
-get_stream_to_file(File_Name_Atom, Stream) :-
-	var(File_Name_Atom), !, 
-	defined_stream_to_file(File_Name_Atom, Stream).
 get_stream_to_file(File_Name_Atom, _Stream) :-
-	var(File_Name_Atom), !, fail.
+	var(File_Name_Atom), !, 
+	echo_msg(1, '', 'fail', 'get_stream_to_file can not work if File_Name is a variable', ''),
+	!, fail.
 get_stream_to_file(File_Name_Atom, Stream) :-
-	defined_stream_to_file(File_Name_Atom, Stream), !, fail.
+	defined_stream_to_file(File_Name_Atom, Stream), !.
 get_stream_to_file(File_Name_Atom, Stream) :-
 	name(File_Name_Atom, File_Name_String_1), % Convert atom to string.
 	append("debug_pkg_cneg_file_", File_Name_String_1, File_Name_String_2),
@@ -159,21 +158,10 @@ echo_msg_aux(1, File_Name, Msg) :-
 	echo_msg_aux(2, File_Name, Msg),
 	write(Msg).
 echo_msg_aux(2, File_Name, Msg) :-
-	(   (	File_Name == 'all', ! )
-	;   (   File_Name_Aux = File_Name )
-	),
-	(   (	get_stream_to_file(File_Name_Aux, Stream_1),
-		write(Stream_1, Msg),
-		(    (	File_Name == 'all', fail )
-		;    (  File_Name \== 'all',
-			get_stream_to_file('with_all_debug_msgs', Stream_2),
-			write(Stream_2, Msg)
-		     )
-		)
-	    )
-	;
-	    (	File_Name == 'all' )
-	).
+	get_stream_to_file(File_Name, Stream_1),
+	write(Stream_1, Msg),
+	get_stream_to_file('with_all_debug_msgs', Stream_2),
+	write(Stream_2, Msg).
 			
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
