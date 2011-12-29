@@ -26,7 +26,10 @@
 	    retrieve_element_from_list/2,
 	    split_goal_with_disjunctions_into_goals/3,
 	    generate_empty_trace/1,
-	    generate_conjunction_trace/3
+	    generate_conjunction_trace/3,
+	    add_predicate_to_trace/2,
+	    get_trace_status_list/2,
+	    get_trace_final_status_list/2
 	],
 	[assertions]).
 
@@ -795,6 +798,9 @@ combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2)
 
 generate_empty_trace(trace([], _Out)).
 generate_conjunction_trace(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
+add_predicate_to_trace(Predicate, trace(In, [Predicate | In])). 
+get_trace_status_list(trace(In, _Out), In).
+get_trace_final_status_list(trace(_In, Out), Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

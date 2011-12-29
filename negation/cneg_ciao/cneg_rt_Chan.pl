@@ -45,6 +45,9 @@ cneg_rt_New(UQV, Goal) :-
 % when we find the current bug 
 % (It is just to make it easy debugging). 
 cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
+	get_trace_status_list(Trace, Trace_Status_List),
+	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Trace_Status_List),
+	!,
 	cneg_rt_Aux(UQV, Goal, Proposal, [], Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
 %	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Generic :: Conj_Of_Disj_Result', Conj_Of_Disj_Result),
@@ -63,10 +66,13 @@ cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
 
 % Please note this mechanism wastes less memory and cpu, 
 % since it goes one by one, but allows backtracking.
-call_to_all_negated_subfrontiers([], _Level, _Trace) :- true.
+call_to_all_negated_subfrontiers([], _Level, Trace) :- 
+	get_trace_final_status_list(Trace, Status_List),
+	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List).
 call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace) :-
-	call_to(Result, Level, Trace),
-	call_to_all_negated_subfrontiers(Result_List, Level, Trace).
+	generate_conjunction_trace(Trace, Trace_G1, Trace_G2),
+	call_to(Result, Level, Trace_G1),
+	call_to_all_negated_subfrontiers(Result_List, Level, Trace_G2).
 
 %generate_disjunction_from_list([], fail) :- !.
 %generate_disjunction_from_list([Goal], Goal) :- !.
@@ -81,7 +87,7 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result_List) :-
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_In', UQV_In),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Goal', Goal),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg_rt_Aux(UQV_In, Goal, Proposal, Trace))),
+	echo_msg(2, 'statistics', 'statistics', '', (cneg_rt_Aux(UQV_In, Goal, Proposal, Trace))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),

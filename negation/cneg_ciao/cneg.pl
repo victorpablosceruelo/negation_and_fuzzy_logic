@@ -93,10 +93,12 @@ call_to(Predicate, Level_In, Trace) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
 	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', Predicate), 
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Trace', Trace), 
+%	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Trace', Trace), 
 	portray_attributes_in_term(2, Predicate),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
-	call_to_aux(Predicate, Level, Trace).
+	generate_conjunction_trace(Trace, Trace_G1, Trace_G2),
+	add_predicate_to_trace(evaluating(Predicate), Trace_G1),
+	call_to_aux(Predicate, Level, Trace_G2).
 
 call_to(Predicate, Level_In, _Trace) :- 
 	Level is Level_In + 1,
@@ -163,15 +165,22 @@ call_to_aux(Predicate, Level_In, Trace) :-
 call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
 	goal_is_negation(Predicate, UQV, Goal, Proposal),
+%	get_trace_status_list(Trace, Status_List),
+%	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
 	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', Predicate),
-	cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace).
+	generate_conjunction_trace(Trace, Trace_1, Trace_2),
+	add_predicate_to_trace(Predicate, Trace_1),
+	cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace_2).
 
 call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
 	goal_is_not_negation(Predicate),
+%	get_trace_status_list(Trace, Status_List),
+%	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
 	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', Predicate),
-	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Trace', Trace),
+	add_predicate_to_trace(Predicate, Trace),
 	call(Predicate).
+
 
 %call_to_aux(Predicate, Level_In) :- 
 %	Level is Level_In + 1,
