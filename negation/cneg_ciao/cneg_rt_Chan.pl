@@ -1,14 +1,13 @@
 %
 % From Susana modified by VPC.
 %
-:- module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2], [assertions]).
-% NOT NEEDED:  perform_a_call_to/1
+:- module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_Generic/5], [assertions]).
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
-:- multifile call_to/1.
+:- multifile call_to/3.
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
@@ -33,17 +32,19 @@
 
 cneg_rt_Chan(UQV, Goal):-
 	Proposal = 'cneg_rt_Chan',
-	cneg_rt_Generic(UQV, Goal, Proposal).
+	generate_empty_trace(Trace),
+	cneg_rt_Generic(UQV, Goal, Proposal, 0, Trace).
 
 cneg_rt_New(UQV, Goal) :-
 	Proposal = 'cneg_rt_New',
-	cneg_rt_Generic(UQV, Goal, Proposal).
+	generate_empty_trace(Trace),
+	cneg_rt_Generic(UQV, Goal, Proposal, 0, Trace).
 
 % The following definition of the predicate cneg_rt_Generic
 % can be changed by the commented one
 % when we find the current bug 
 % (It is just to make it easy debugging). 
-cneg_rt_Generic(UQV, Goal, Proposal) :-
+cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
 	cneg_rt_Aux(UQV, Goal, Proposal, [], Conj_Of_Disj_Result),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Generic :: Conj_Of_Disj_Result', Conj_Of_Disj_Result),
@@ -53,7 +54,7 @@ cneg_rt_Generic(UQV, Goal, Proposal) :-
 	generate_disjunction_from_list(List_Of_Disj_Result, Disj_Of_Conj_Result),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Generic :: Disj_Of_Conj_Result', Disj_Of_Conj_Result),
-	call_to(Disj_Of_Conj_Result).
+	call_to(Disj_Of_Conj_Result, Level, Trace).
 
 %cneg_rt_Generic(UQV, Goal, Proposal) :-
 %	cneg_rt_Aux(UQV, Goal, Proposal, [], Result),
@@ -239,7 +240,7 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 % Double negation is not managed yet. Bypass it.
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
-	goal_is_negation(Goal, UQV, SubGoal), !,
+	goal_is_negation(Goal, UQV, SubGoal, _Negation_Proposal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
 	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_Of_Disjs_Frontier),
 	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
@@ -420,7 +421,7 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 % The way to fix this is remove cneg(cneg(...))
 % when evaluating the frontier. To be done.
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_negation(Frontier_In, _UQV, _SubGoal), !,
+	goal_is_negation(Frontier_In, _UQV, _SubGoal, _Negation_Proposal), !,
 	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
@@ -495,7 +496,7 @@ identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Diseq
 	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Negations
-	goal_is_negation(Frontier, UQV, _SubGoal), !,
+	goal_is_negation(Frontier, UQV, _SubGoal, _Negation_Proposal), !,
 	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_In) :- % Other subgoals

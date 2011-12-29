@@ -14,6 +14,7 @@
 	    goal_is_disequality/5, goal_is_equality/5,
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
 	    goal_is_not_conj_disj_neg/1,
+	    goal_is_not_negation/1,
 	    goal_is_negation/4,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
@@ -23,7 +24,9 @@
 	    % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
 	    retrieve_element_from_list/2,
-	    split_goal_with_disjunctions_into_goals/3
+	    split_goal_with_disjunctions_into_goals/3,
+	    generate_empty_trace/1,
+	    generate_conjunction_trace/3
 	],
 	[assertions]).
 
@@ -33,7 +36,7 @@
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
-:- multifile call_to/1.
+:- multifile call_to/3.
 
 :- comment(title, "Auxiliary predicates for Constructive Negation").
 
@@ -518,6 +521,11 @@ goal_is_not_conj_disj_eq_diseq_dneg(Goal) :-
 	goal_name_is_not_disequality(Name),
 	goal_name_is_not_negation(Name).
 
+goal_is_not_negation(Goal) :-
+	nonvar(Goal),
+	functor_local(Goal, Name, _Arity, _Args),
+	goal_name_is_not_negation(Name).
+
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),
 
@@ -778,6 +786,13 @@ combine_sub_bodies_by_conjunction([Elto | List_1], List_2, Result) :-
 combine_sub_bodies_by_conjunction_aux(_Elto_1, [], []) :- !.
 combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2) | More_Results]) :-
 	combine_sub_bodies_by_conjunction_aux(Elto_1, List, More_Results).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+generate_empty_trace(trace([], _Out)).
+generate_conjunction_trace(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

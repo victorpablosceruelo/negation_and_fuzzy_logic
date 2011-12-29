@@ -2,13 +2,12 @@
 % From Susana modified by VPC.
 %
 :- module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2], [assertions]).
-% NOT NEEDED:  perform_a_call_to/1
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
-:- multifile call_to/1.
+:- multifile call_to/3.
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
@@ -103,8 +102,9 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	diseq_uqv(T1,T2, UQV_Aux).
 
 compute_neg_frontier(Goal, _GoalVars, 'true'):- 
-	goal_is_negation(Goal, _UQV, SubGoal), !,
-	call_to(SubGoal). % Forget GoalVars and UQV.
+	goal_is_negation(Goal, _UQV, SubGoal, _Negation_Proposal), !,
+	generate_empty_trace(Trace),	
+	call_to(SubGoal, 0, Trace). % Forget GoalVars and UQV.
 
 % Now go for other functors stored in our database.
 compute_neg_frontier(Goal, GoalVars, 'true') :-
@@ -268,13 +268,14 @@ evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	eq_uqv(Left, Right, UQV).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
-	goal_is_negation(Prev_Front_Residua, UQV, SubGoal), 
+	goal_is_negation(Prev_Front_Residua, UQV, SubGoal, _Negation_Proposal), 
 	cneg_rt_Stuckey(UQV, SubGoal).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	nonvar(Prev_Front_Residua),
 	goal_is_not_conj_disj_eq_diseq_dneg(Prev_Front_Residua),
-	call_to(Prev_Front_Residua).
+	generate_empty_trace(Trace),
+	call_to(Prev_Front_Residua, 0, Trace).
 
 unify_pre_sols_when_possible([], []) :- !.
 unify_pre_sols_when_possible(To_Unify, After_Unified) :- 

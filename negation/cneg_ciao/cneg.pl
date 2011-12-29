@@ -23,7 +23,7 @@
 	diseq_euqv_adv/5, eq_euqv_adv/5,
 	portray_attributes_in_term/2]).
 :- use_module(cneg_tr).
-:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
+:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_Generic/5]).
 :- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
@@ -32,14 +32,14 @@
 	diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	diseq_euqv/4, eq_euqv/4,
 	diseq_euqv_adv/5, eq_euqv_adv/5]).
-:- reexport(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2]).
+:- reexport(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_Generic/5]).
 :- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
-:- multifile call_to/1.
-:- meta_predicate call_to(?). % /1.
-%:- export(call_to/1).
+:- multifile call_to/3.
+:- meta_predicate call_to(?). % /3.
+%:- export(call_to/3).
 
 goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
 
@@ -87,28 +87,32 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	).
 
 cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
-call_to(Predicate) :- 
+call_to(Predicate, Level_In, Trace) :- 
+	Level is Level_In + 1,
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
-	echo_msg(2, '', 'cneg_rt', 'call_to (L0) :: Predicate', Predicate), 
+	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', Predicate), 
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Trace', Trace), 
 	portray_attributes_in_term(2, Predicate),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
-	call_to_aux(Predicate, 0).
-call_to(Predicate) :- 
-	echo_msg(2, '', 'cneg_rt', 'call_to (L0) :: Predicate', 'FAILED'),
+	call_to_aux(Predicate, Level, Trace).
+
+call_to(Predicate, Level_In, _Trace) :- 
+	Level is Level_In + 1,
+	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', 'FAILED'), 
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
-	echo_msg(2, '', 'cneg_rt', 'call_to (L0) :: Predicate was ', Predicate),
+	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate FAILED was', Predicate), 
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
 	!, fail. 
 
-call_to_aux(Predicate, Level_In) :-
+call_to_aux(Predicate, Level_In, Trace) :-
 	goal_is_disjunction(Predicate, G1, G2), !,
 	Level is Level_In + 1,
 	(
 	    (
 		(       echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', G1), 
-			call_to_aux(G1, Level),
+			call_to_aux(G1, Level, Trace),
 			echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', 'OK'),
 			echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2', 'OK')
 		)
@@ -116,7 +120,7 @@ call_to_aux(Predicate, Level_In) :-
 		(       echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', 'FAIL'),
 			echo_msg(2, 'nl', 'cneg_rt', '', ''), % Differentiate paths.
 			echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2 :: G2', G2), 
-			call_to_aux(G2, Level),
+			call_to_aux(G2, Level, Trace),
 			echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2 :: G2', 'OK'),
 			echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 \\/ G2', 'OK')
 		)
@@ -128,12 +132,13 @@ call_to_aux(Predicate, Level_In) :-
 	    )
 	).
 
-call_to_aux(Predicate, Level_In) :-
+call_to_aux(Predicate, Level_In, Trace) :-
 	goal_is_conjunction(Predicate, G1, G2), !,
 	Level is Level_In + 1,
+	generate_conjunction_trace(Trace, Trace_G1, Trace_G2),
 	(   % 1st conjunct
 	    (	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', G1),
-		call_to_aux(G1, Level),
+		call_to_aux(G1, Level, Trace_G1),
 		echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', 'OK')
 	    )
 	;
@@ -144,7 +149,7 @@ call_to_aux(Predicate, Level_In) :-
 	),
 	(   % 2nd conjunct
 	    (   echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 /\\ G2 :: G2', G2),
-		call_to_aux(G2, Level),
+		call_to_aux(G2, Level, Trace_G2),
 		echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 /\\ G2 :: G2', 'OK'),
 		echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: G1 /\\ G2', 'OK')
 	    )
@@ -155,9 +160,17 @@ call_to_aux(Predicate, Level_In) :-
 	    )
 	).
 
-call_to_aux(Predicate, Level_In) :-
+call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
+	goal_is_negation(Predicate, UQV, Goal, Proposal),
 	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', Predicate),
+	cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace).
+
+call_to_aux(Predicate, Level_In, Trace) :-
+	Level is Level_In + 1,
+	goal_is_not_negation(Predicate),
+	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Predicate', Predicate),
+	echo_msg_3pm(2, '', 'cneg_rt', 'call_to (L', Level, ') :: Trace', Trace),
 	call(Predicate).
 
 %call_to_aux(Predicate, Level_In) :- 
