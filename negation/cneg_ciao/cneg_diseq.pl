@@ -60,14 +60,14 @@ remove_attribute_local(Var) :-
 % XSB:	del_attr(Var, dist).
 
 get_attribute_local(Var, Attribute) :-
-	get_attribute(Var, Attribute).
+	get_attribute(Var, Attribute),
 % XSB:	get_attr(Var, dist, Attribute),
-%	echo_msg(2, '', 'cneg_diseq', 'get_attribute_local :: (Var, Attribute)', (Var, Attribute)).
+ 	echo_msg(2, '', 'cneg_diseq', 'get_attribute_local :: Attribute', Attribute).
 
 put_attribute_local(Var, Attribute) :-
+	echo_msg(2, '', 'cneg_diseq', 'put_attribute_local :: Attribute', Attribute),
 	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
 	echo_msg(2, 'aux', 'cneg_diseq', 'put_attribute_local', ''),
-%	echo_msg(2, 'aux', 'cneg_diseq', ' :: Attribute :: ', Attribute),
 	echo_msg(2, 'aux', 'cneg_diseq', ' :: Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
 	attach_attribute(Var, Attribute),
@@ -85,7 +85,7 @@ put_attribute_local(Var, Attribute) :-
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Disequalities, UQV), Target, Disequalities, UQV).
 disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
-equality_contents(equality(T1, T2), T1, T2).
+% equality_contents(equality(T1, T2), T1, T2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,88 +108,88 @@ equality_contents(equality(T1, T2), T1, T2).
 
 portray_attribute(Attribute, Var) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray_attribute :: Var', Var),
-	echo_msg(2, 'aux', 'cneg_diseq', '% ', 'answer value: '),
-	portray_aux(1, Attribute),
+	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
+	echo_msg(2, 'aux', 'cneg_diseq', 'answer value: ', ''),
+	portray_aux(1, 'all', Attribute),
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''), 
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
 portray(Attribute) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray :: Attribute', Attribute),
 	echo_msg(2, 'aux', 'cneg_diseq', '% ', 'answer value: '),
-	portray_aux(1, Attribute),
+	portray_aux(1, 'all', Attribute),
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''), 
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
-portray_aux(Echo_Level, Attribute) :-
+portray_aux(Echo_Level, File_Name, Attribute) :-
 	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
-	portray_disequalities(Echo_Level, Disequalities, UQV).
-portray_aux(Echo_Level, Anything) :- 
-	echo_msg(Echo_Level, 'aux', 'cneg_diseq', '', Anything).
+	portray_disequalities(Echo_Level, File_Name, Disequalities, UQV).
+portray_aux(Echo_Level, File_Name, Anything) :- 
+	echo_msg(Echo_Level, '', File_Name, '', Anything).
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-portray_attributes_in_term(Level, T) :-
+portray_attributes_in_term(Echo_Level, T) :-
 	cneg_aux:varsbag(T, [], [], Variables),
-	echo_msg(Level, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(Level, '', 'cneg_diseq', 'Attributes for the variables in term', T),
-	portray_attributes_in_variables(Level, Variables, [], Not_Attributed),
-	portray_no_attributes_in_variables(Level, Not_Attributed).
+	echo_msg(Echo_Level, 'nl', 'cneg_diseq', '', ''),
+	echo_msg(Echo_Level, '', 'cneg_diseq', 'Attributes for the variables in term', T),
+	portray_attributes_in_variables(Echo_Level, Variables, [], Not_Attributed),
+	portray_no_attributes_in_variables(Echo_Level, Not_Attributed).
 
-portray_no_attributes_in_variables(Level, Not_Attributed) :-
-	echo_msg(Level, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(Level, '', 'cneg_diseq', ' Variables without attributes :: ', Not_Attributed), 
-	echo_msg(Level, 'nl', 'cneg_diseq', '', '').
+portray_no_attributes_in_variables(Echo_Level, Not_Attributed) :-
+	echo_msg(Echo_Level, '', 'cneg_diseq', 'Variables without attributes :: ', Not_Attributed), 
+	echo_msg(Echo_Level, 'nl', 'cneg_diseq', '', '').
 
-portray_attributes_in_variables(_Level, [], List, List) :- !.
-portray_attributes_in_variables(Level, [Var|Vars], List_In, List_Out) :-
-	portray_attributes_in_variable(Level, Var, List_In, List_Aux),
-	portray_attributes_in_variables(Level, Vars, List_Aux, List_Out).
+portray_attributes_in_variables(_Echo_Level, [], List, List) :- !.
+portray_attributes_in_variables(Echo_Level, [Var|Vars], List_In, List_Out) :-
+	portray_attributes_in_variable(Echo_Level, Var, List_In, List_Aux),
+	portray_attributes_in_variables(Echo_Level, Vars, List_Aux, List_Out).
 
-portray_attributes_in_variable(Level, Var, List_In, List_In) :-
+portray_attributes_in_variable(Echo_Level, Var, List_In, List_In) :-
 	get_attribute_local(Var, Attribute), !,
-	echo_msg(Level, 'logo', 'cneg_diseq', '', ''),
-	echo_msg(Level, 'aux', 'cneg_diseq', 'variable :: ', Var), 
-	echo_msg(Level, 'aux', 'cneg_diseq', ' has attribute', ' :: '),
-	portray_aux(Level, Attribute),
-	echo_msg(Level, 'nl', 'cneg_diseq', '', '').
-portray_attributes_in_variable(_Level, Var, List_In, [Var | List_In]) :- !.
+	echo_msg(Echo_Level, 'logo', 'cneg_diseq', '', ''),
+	echo_msg(Echo_Level, 'aux', 'cneg_diseq', 'variable :: ', Var), 
+	echo_msg(Echo_Level, 'aux', 'cneg_diseq', ' has attribute', ' :: '),
+	portray_aux(Echo_Level, 'cneg_diseq', Attribute),
+	echo_msg(Echo_Level, 'nl', 'cneg_diseq', '', '').
+portray_attributes_in_variable(_Echo_Level, Var, List_In, [Var | List_In]) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-portray_disequalities(Level, Disequalities, UQV) :-
-	portray_disequalities_aux_1(Level, Disequalities),
-	portray_disequalities_aux_3(Level, UQV).
+portray_disequalities(Echo_Level, File_Name, Disequalities, UQV) :-
+	portray_disequalities_aux_1(Echo_Level, File_Name, Disequalities),
+	portray_disequalities_aux_3(Echo_Level, File_Name, UQV).
 
-portray_disequalities_aux_1(_Level, []) :- !.
-portray_disequalities_aux_1(Level, [Diseq_1]) :- !,
-	portray_disequalities_aux_2(Level, Diseq_1).
-portray_disequalities_aux_1(Level, [Diseq_1|Diseqs]) :- !,
-	portray_disequalities_aux_2(Level, Diseq_1), 
-	echo_msg(Level, 'aux', 'cneg_diseq', ' AND ', ''),
-	portray_disequalities_aux_1(Level, Diseqs).
+portray_disequalities_aux_1(_Echo_Level, _File_Name, []) :- !.
+portray_disequalities_aux_1(Echo_Level, File_Name, [Diseq_1]) :- !,
+	portray_disequalities_aux_2(Echo_Level, File_Name, Diseq_1).
+portray_disequalities_aux_1(Echo_Level, File_Name, [Diseq_1|Diseqs]) :- !,
+	portray_disequalities_aux_2(Echo_Level, File_Name, Diseq_1), 
+	echo_msg(Echo_Level, 'aux', File_Name, ' AND ', ''),
+	portray_disequalities_aux_1(Echo_Level, File_Name, Diseqs).
 
-portray_disequalities_aux_2(Level, Diseq) :-
+portray_disequalities_aux_2(Echo_Level, File_Name, Diseq) :-
 	disequality_contents(Diseq, Diseq_1, Diseq_2, _EQ_Vars, _UQ_Vars),
-	echo_msg(Level, 'aux', 'cneg_diseq', '[ ', Diseq_1),
-	echo_msg(Level, 'aux', 'cneg_diseq', ' =/= ', Diseq_2),
-	echo_msg(Level, 'aux', 'cneg_diseq', '', ' ]').
+	echo_msg(Echo_Level, 'aux', File_Name, '[ ', Diseq_1),
+	echo_msg(Echo_Level, 'aux', File_Name, ' =/= ', Diseq_2),
+	echo_msg(Echo_Level, 'aux', File_Name, '', ' ]').
 
-portray_disequalities_aux_3(_Level, []).
-portray_disequalities_aux_3(Level, UnivVars) :-
+portray_disequalities_aux_3(_Echo_Level, _File_Name, []).
+portray_disequalities_aux_3(Echo_Level, File_Name, UnivVars) :-
 	UnivVars \== [], !,
-	echo_msg(Level, 'aux', 'cneg_diseq', ', Universally quantified: [', ''), 
-	portray_disequalities_aux_4(Level, UnivVars),
-	echo_msg(Level, 'aux', 'cneg_diseq', '', ' ]').
+	echo_msg(Echo_Level, 'aux', File_Name, ', Universally quantified: [', ''), 
+	portray_disequalities_aux_4(Echo_Level, File_Name, UnivVars),
+	echo_msg(Echo_Level, 'aux', File_Name, '', ' ]').
 
-portray_disequalities_aux_4(_Level, []) :- !.
-portray_disequalities_aux_4(Level, [FreeVar | FreeVars]) :-
-	echo_msg(Level, 'aux', 'cneg_diseq', ' ', FreeVar),
-	portray_disequalities_aux_4(Level, FreeVars).
+portray_disequalities_aux_4(_Echo_Level, _File_Name, []) :- !.
+portray_disequalities_aux_4(Echo_Level, File_Name, [FreeVar | FreeVars]) :-
+	echo_msg(Echo_Level, 'aux', File_Name, ' ', FreeVar),
+	portray_disequalities_aux_4(Echo_Level, File_Name, FreeVars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
@@ -215,6 +215,7 @@ verify_attribute_aux(Attribute, NewTarget) :-
 	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
 combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
+	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
 	echo_msg(2, '', 'cneg_diseq', 'combine_attributes :: Attr_Var1 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_1),
 	echo_msg(2, '', 'cneg_diseq', 'combine_attributes :: Attr_Var2 :: (Attr, Target, Diseqs, UQV)', Attribute_Var_2),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Diseqs_Var_1, _UQV_Var_1), !,

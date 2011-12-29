@@ -56,7 +56,12 @@
 
 %%% Debug (by VPC).
 get_stream_to_file(File_Name_Atom, Stream) :-
-	defined_stream_to_file(File_Name_Atom, Stream), !.
+	var(File_Name_Atom), !, 
+	defined_stream_to_file(File_Name_Atom, Stream).
+get_stream_to_file(File_Name_Atom, _Stream) :-
+	var(File_Name_Atom), !, fail.
+get_stream_to_file(File_Name_Atom, Stream) :-
+	defined_stream_to_file(File_Name_Atom, Stream), !, fail.
 get_stream_to_file(File_Name_Atom, Stream) :-
 	name(File_Name_Atom, File_Name_String_1), % Convert atom to string.
 	append("debug_pkg_cneg_file_", File_Name_String_1, File_Name_String_2),
@@ -94,7 +99,7 @@ echo_msg(Echo_Level, 'statistics', File_Name, _Pre_Msg, Msg) :-
 	echo_msg_statistics(Echo_Level, File_Name, Msg), !.
 
 echo_msg(Echo_Level, 'nl', File_Name, _Pre_Msg, _Msg) :-
-	echo_msg_nl(Echo_Level, File_Name), !.
+	echo_msg_aux(Echo_Level, File_Name, '\n'), !.
 
 echo_msg(Echo_Level, 'separation', File_Name, _Pre_Msg, _Msg) :-
 	echo_msg_separation(Echo_Level, File_Name).	
@@ -118,7 +123,7 @@ echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg_1, Pre_Msg_2, Pre_Msg_3, Msg) 
 	echo_msg_aux(Echo_Level, File_Name, Pre_Msg_3),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
 	echo_msg_aux(Echo_Level, File_Name, Msg),
-	echo_msg_nl(Echo_Level, File_Name), 
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''), 
 	!.
 
 
@@ -143,7 +148,7 @@ echo_msg_list_aux(Echo_Level, File_Name, Pre_Msg, Msg) :-
 	echo_msg_aux(Echo_Level, File_Name, ' (list)'),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
 	echo_msg_aux(Echo_Level, File_Name, Msg),
-	echo_msg_nl(Echo_Level, File_Name).
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,40 +159,51 @@ echo_msg_aux(1, File_Name, Msg) :-
 	echo_msg_aux(2, File_Name, Msg),
 	write(Msg).
 echo_msg_aux(2, File_Name, Msg) :-
-	get_stream_to_file(File_Name, Stream_1),
-	write(Stream_1, Msg),
-	get_stream_to_file('with_all_debug_msgs', Stream_2),
-	write(Stream_2, Msg).
-
+	(   (	File_Name == 'all', ! )
+	;   (   File_Name_Aux = File_Name )
+	),
+	(   (	get_stream_to_file(File_Name_Aux, Stream_1),
+		write(Stream_1, Msg),
+		(    (	File_Name == 'all', fail )
+		;    (  File_Name \== 'all',
+			get_stream_to_file('with_all_debug_msgs', Stream_2),
+			write(Stream_2, Msg)
+		     )
+		)
+	    )
+	;
+	    (	File_Name == 'all' )
+	).
+			
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg_nl(0, _File_Name) :- !.
-echo_msg_nl(1, File_Name) :-
-	echo_msg_nl(2, File_Name),
-	nl.
-echo_msg_nl(2, File_Name) :-
-	get_stream_to_file(File_Name, Stream_1),
-	nl(Stream_1),
-	get_stream_to_file('with_all_debug_msgs', Stream_2),
-	nl(Stream_2).
+%echo_msg_nl(0, _File_Name) :- !.
+%echo_msg_nl(1, File_Name) :-
+%	echo_msg_nl(2, File_Name),
+%	nl.
+%echo_msg_nl(2, File_Name) :-
+%	get_stream_to_file(File_Name, Stream_1),
+%	nl(Stream_1),
+%	get_stream_to_file('with_all_debug_msgs', Stream_2),
+%	nl(Stream_2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 echo_msg_separation(Echo_Level, File_Name) :-
-	echo_msg_nl(Echo_Level, File_Name), 
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''), 
 	echo_msg_separation_aux(Echo_Level, File_Name), 
 	echo_msg_separation_aux(Echo_Level, File_Name),
-	echo_msg_nl(Echo_Level, File_Name).
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
 echo_msg_separation_aux(Echo_Level, File_Name) :-
 	echo_msg(Echo_Level, 'logo', File_Name, '', ''), 
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
 	echo_msg_aux(Echo_Level, File_Name, '-----------------------------------------------'),
-	echo_msg_nl(Echo_Level, File_Name).
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -216,15 +232,15 @@ echo_msg_statistics_aux(Msg) :-
 
 echo_howto_information(Echo_Level, File_Name) :-
 	echo_msg_separation(Echo_Level, File_Name),
-	echo_msg_nl(Echo_Level, File_Name),
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
 	echo_msg(Echo_Level, '', File_Name, 'Info for debugging', ' '),
-	echo_msg_nl(Echo_Level, File_Name),
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
 	echo_msg(Echo_Level, '', File_Name, 'Basic frontier', 'frontier(Goal, Head, Body, FrontierTest)'),
 	echo_msg(Echo_Level, '', File_Name, 'frontier_E_IE_NIE', 'frontier_E_IE_NIE(E, IE, NIE)'),
 	echo_msg(Echo_Level, '', File_Name, 'frontier_E_IE_NIE_ied', 'frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb)'),
 	echo_msg(Echo_Level, '', File_Name, 'Vars_Info', 'vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)'),
 	echo_msg_separation(Echo_Level, File_Name),
-	echo_msg_nl(Echo_Level, File_Name).
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
