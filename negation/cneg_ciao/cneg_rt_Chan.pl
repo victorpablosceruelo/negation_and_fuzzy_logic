@@ -63,16 +63,16 @@ cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
 
 % Please note this mechanism wastes less memory and cpu, 
 % since it goes one by one, but allows backtracking.
-call_to_all_negated_subfrontiers([], Level, Trace) :- true.
+call_to_all_negated_subfrontiers([], _Level, _Trace) :- true.
 call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace) :-
 	call_to(Result, Level, Trace),
 	call_to_all_negated_subfrontiers(Result_List, Level, Trace).
 
-generate_disjunction_from_list([], fail) :- !.
-generate_disjunction_from_list([Goal], Goal) :- !.
-generate_disjunction_from_list([Goal | Goals], (Goal ; Disj_Goals)) :-
-	Goals \== [],
-	generate_disjunction_from_list(Goals, Disj_Goals).
+%generate_disjunction_from_list([], fail) :- !.
+%generate_disjunction_from_list([Goal], Goal) :- !.
+%generate_disjunction_from_list([Goal | Goals], (Goal ; Disj_Goals)) :-
+%	Goals \== [],
+%	generate_disjunction_from_list(Goals, Disj_Goals).
 
 cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result_List) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
@@ -98,7 +98,7 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result_List) :-
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: New_UQV', New_UQV),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
 	!,
-	negate_frontier_list(Frontier, Proposal, GoalVars, New_UQV, [], Result_List).
+	negate_frontier_list(Frontier, Proposal, GoalVars, New_UQV, Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
@@ -108,7 +108,7 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result_List) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Result (conj)', Result),
+	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Result (conj)', Result_List),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
 
@@ -343,16 +343,15 @@ test_frontier_is_valid(F_In, Goal) :-
 % Frontier (each conjunction) is the negation.
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
-negate_frontier_list([], _Proposal, _GoalVars, _UQV, Result_In, Result_In) :- !. % Optimization.
-negate_frontier_list([Frontier | More_Frontiers], Proposal, GoalVars, UQV, Result_In, Result_Out) :-
+negate_frontier_list([], _Proposal, _GoalVars, _UQV, []) :- !. % Optimization.
+negate_frontier_list([Frontier | More_Frontiers], Proposal, GoalVars, UQV, [Result_Frontier | Result_More_Frontiers]) :-
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
 	negate_subfrontier(Frontier, Proposal, GoalVars, UQV, Result_Frontier),
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_frontier_list(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers),
-	append(Result_Frontier, Result_More_Frontiers, Result_Out),
+	negate_frontier_list(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers).
 %	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
-	!. % Reduce the stack's memory by forbidding backtracking.
+%	!. % Reduce the stack's memory by forbidding backtracking.
 	
 
 % combine_negated_subfrontiers(Result_Subfr, Result_More_Subfr, Result_Tmp),
