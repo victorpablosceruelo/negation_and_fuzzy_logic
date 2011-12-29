@@ -133,12 +133,13 @@ portray_aux(Echo_Level, Anything) :-
 
 portray_attributes_in_term(Level, T) :-
 	cneg_aux:varsbag(T, [], [], Variables),
+	echo_msg(Level, 'nl', 'cneg_diseq', '', ''),
 	echo_msg(Level, '', 'cneg_diseq', 'Attributes for the variables in term', T),
 	portray_attributes_in_variables(Level, Variables, [], Not_Attributed),
 	portray_no_attributes_in_variables(Level, Not_Attributed).
 
 portray_no_attributes_in_variables(Level, Not_Attributed) :-
-	echo_msg(Level, 'logo', 'cneg_diseq', '', ''),
+	echo_msg(Level, 'nl', 'cneg_diseq', '', ''),
 	echo_msg(Level, '', 'cneg_diseq', ' Variables without attributes :: ', Not_Attributed), 
 	echo_msg(Level, 'nl', 'cneg_diseq', '', '').
 
@@ -712,7 +713,8 @@ diseq_euqv_adv(T1,T2, EQV_In, UQV_In, Result) :-
 	echo_msg(2, '', 'cneg_diseq', 'diseq_euqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	disequality_contents(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality], Can_Fail, Result),
-	echo_msg(2, '', 'cneg_diseq', 'diseq_euqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)).
+	echo_msg(2, '', 'cneg_diseq', 'diseq_euqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)),
+	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -737,13 +739,17 @@ eq_euqv_adv(T1, T2, EQV_In, UQV_In, Result) :-
 	    ( 
 		UQV == [], !, 
 		diseq_eq(T1, T2),
-		Result = 'true'
+		Result = 'true',
+		echo_msg(2, '', 'cneg_diseq', 'eq_euqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
+		echo_msg(2, 'nl', 'cneg_diseq', '', '')
 	    )
 	;
 	    (
 		UQV \== [], !, 
 		check_if_allowed_to_fail(Can_Fail),
 		Result = 'fail',
+		echo_msg(2, '', 'cneg_diseq', 'eq_euqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
+		echo_msg(2, '', 'cneg_diseq', 'continues', '...'),
 %		cneg_aux:varsbag((T1, T2), [], [], Disequality_EQV), % Mark all vars as EQV
 %		% cneg_diseq(T1,T2, EQV, Can_Fail, Result)
 		diseq_euqv(T1, T2, 'compute', []) 
