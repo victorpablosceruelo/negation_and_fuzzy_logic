@@ -767,7 +767,9 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :-
 	append(Body_Result_1, Body_Result_2, Bodies).
 
 split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody]) :- % Goal is something else.
-	translate_problematic_predicates(Body, Negation_Predicate, NewBody), !.
+	!,
+	translate_problematic_predicates(Body, Negation_Predicate, NewBody), 
+	!.
 
 % Example for Negation_Predicate = 'cneg_tr'
 translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-

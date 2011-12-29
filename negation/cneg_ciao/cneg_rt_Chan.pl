@@ -159,7 +159,7 @@ combine_frontiers_from_conjunction_aux(F1_1, [_F2_1 | More_F2], More_F3) :-
 
 adequate_frontier([], Real_UQV, [], Real_UQV) :- !.
 adequate_frontier([F_In | Frontier_In], Real_UQV, [F_Out | Frontier_Out], Frontier_New_UQV_Out) :-
-	adequate_frontier_aux(Real_UQV, F_In, F_Out, F_New_UQV),
+	adequate_frontier_aux(Real_UQV, F_In, F_Out, F_New_UQV), !,
 	adequate_frontier(Frontier_In, Real_UQV, Frontier_Out, Frontier_New_UQV_Aux),
 	append(F_New_UQV, Frontier_New_UQV_Aux, Frontier_New_UQV_Out).
 
@@ -183,8 +183,10 @@ adequate_frontier_aux(Real_UQV, F_In, _Body_Copy, _New_UQV) :-
 compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV) :-
 	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, Proposal, Trace, UQV)', (Goal, Proposal, Trace, UQV)),
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
+	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_set_of_frontiers_aux(Goals, Proposal, Trace, UQV, Frontier, New_UQV).
+	compute_set_of_frontiers_aux(Goals, Proposal, Trace, UQV, Frontier, New_UQV),
+	!.
 
 compute_set_of_frontiers_aux([], _Proposal, _Trace, _UQV, [], []) :- !.
 compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier_Out, New_UQV_Out) :-
@@ -231,35 +233,40 @@ compute_goal_frontier(Goal, Proposal, Trace, Frontier):-
 	goal_is_conjunction(Goal, G1, G2), !,
 	compute_goal_frontier(G1, Proposal, Trace, Frontier_G1),
 	compute_goal_frontier(G2, Proposal, Trace, Frontier_G2),
-	combine_frontiers_from_conjunction(Frontier_G1, Frontier_G2, Frontier).
+	!,
+	combine_frontiers_from_conjunction(Frontier_G1, Frontier_G2, Frontier),
+	!.
 
 % Now go for the functors for equality and disequality.
 % None of them is managed yet, so just bypass them.
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, EQV, UQV), !,
 	functor_local(Real_Goal, 'diseq_euqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
-	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true').
+	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'),
+	!.
 
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, EQV, UQV), !,
 	functor_local(Real_Goal, 'eq_euqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
-	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true').
+	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'), 
+	!.
 
 % Double negation is not managed yet. Bypass it.
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal, _Negation_Proposal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
-	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_List_Result),
+	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_List_Result), !,
 	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
-	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier),
+	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
-	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier),
+	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
-	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier),
+	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'double neg :: Frontier', Frontier),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	!.
 
 % Only as info.
 % frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
@@ -357,13 +364,19 @@ test_frontier_is_valid(F_In, Goal) :-
 % Frontier (each conjunction) is the negation.
 % Frontier is the frontier of subgoals of deep 1 of Goal and we need
 % it to keep the variables of the Goal and obtain the unifications
-negate_frontier_list([], _Proposal, _GoalVars, _UQV, []) :- !. % Optimization.
-negate_frontier_list([Frontier | More_Frontiers], Proposal, GoalVars, UQV, [Result_Frontier | Result_More_Frontiers]) :-
+negate_frontier_list([], _Proposal, _GoalVars, _UQV, [true]) :- !. % Optimization.
+negate_frontier_list(Frontier, Proposal, GoalVars, UQV, Negated_Frontier) :- 
+	Frontier \== [], !,
+	negate_frontier_list_aux(Frontier, Proposal, GoalVars, UQV, Negated_Frontier),
+	!.
+
+negate_frontier_list_aux([], _Proposal, _GoalVars, _UQV, []) :- !.
+negate_frontier_list_aux([Frontier | More_Frontiers], Proposal, GoalVars, UQV, [Result_Frontier | Result_More_Frontiers]) :-
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
 	negate_subfrontier(Frontier, Proposal, GoalVars, UQV, Result_Frontier),
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_frontier_list(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers).
+	negate_frontier_list_aux(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers).
 %	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
 %	!. % Reduce the stack's memory by forbidding backtracking.
 	
