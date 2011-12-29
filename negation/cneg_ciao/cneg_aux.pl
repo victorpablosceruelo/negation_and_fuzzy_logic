@@ -14,7 +14,7 @@
 	    goal_is_disequality/5, goal_is_equality/5,
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
 	    goal_is_not_conj_disj_neg/1,
-	    goal_is_negation/3,
+	    goal_is_negation/4,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -83,7 +83,7 @@ echo_msg(Echo_Level, 'aux', File_Name, Pre_Msg, Msg) :- !,
 	echo_msg_aux(Echo_Level, File_Name, Msg).
 
 echo_msg(Echo_Level, 'list', File_Name, Pre_Msg, Msg) :-
-	(   (echo_msg_list(Echo_Level, File_Name, Pre_Msg, Msg), !)
+	(   (echo_msg_list(Echo_Level, File_Name, 1, Pre_Msg, Msg), !)
 	;
 	    (echo_msg(Echo_Level, 'normal', File_Name, Pre_Msg, Msg), !)
 	).
@@ -133,18 +133,21 @@ echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg_1, Pre_Msg_2, Pre_Msg_3, Msg) 
 echo_msg_is_a_list([]).
 echo_msg_is_a_list([_Elto|_List]).
 
-echo_msg_list(Echo_Level, File_Name, Pre_Msg, []) :-
-	echo_msg_list_aux(Echo_Level, File_Name, Pre_Msg, []),
+echo_msg_list(Echo_Level, File_Name, Index, Pre_Msg, []) :-
+	echo_msg_list_aux(Echo_Level, File_Name, Index, Pre_Msg, []),
 	!. % No backtracking allowed.
-echo_msg_list(Echo_Level, File_Name, Pre_Msg, [Msg|Msgs]) :- 
+echo_msg_list(Echo_Level, File_Name, Index, Pre_Msg, [Msg|Msgs]) :- 
 	!, % No backtracking allowed.
-	echo_msg_list_aux(Echo_Level, File_Name, Pre_Msg, Msg),
-	echo_msg_list(Echo_Level, File_Name, Pre_Msg, Msgs).
+	echo_msg_list_aux(Echo_Level, File_Name, Index, Pre_Msg, Msg),
+	NewIndex is Index +1,
+	echo_msg_list(Echo_Level, File_Name, NewIndex, Pre_Msg, Msgs).
 
-echo_msg_list_aux(Echo_Level, File_Name, Pre_Msg, Msg) :-
+echo_msg_list_aux(Echo_Level, File_Name, Index, Pre_Msg, Msg) :-
 	echo_msg(Echo_Level, 'logo', File_Name, Pre_Msg, Msg),
 	echo_msg_aux(Echo_Level, File_Name, Pre_Msg),
-	echo_msg_aux(Echo_Level, File_Name, ' (list)'),
+	echo_msg_aux(Echo_Level, File_Name, ' (list '),
+	echo_msg_aux(Echo_Level, File_Name, Index),
+	echo_msg_aux(Echo_Level, File_Name, ')'),
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
 	echo_msg_aux(Echo_Level, File_Name, Msg),
 	echo_msg(Echo_Level, 'nl', File_Name, '', '').
@@ -493,9 +496,9 @@ valid_names_for_negation_preds('cneg_rt_Chan').
 valid_names_for_negation_preds('cneg_rt_New').
 
 
-goal_is_negation(Goal, UQV, SubGoal) :-
-	valid_names_for_negation_preds(Name), 
-	functor(Goal, Name, 2), !,
+goal_is_negation(Goal, UQV, SubGoal, Proposal) :-
+	valid_names_for_negation_preds(Proposal), 
+	functor(Goal, Proposal, 2), !,
 	arg(1, Goal, UQV),
 	arg(2, Goal, SubGoal).
 
@@ -760,7 +763,7 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody])
 
 % Example for Negation_Predicate = 'cneg_tr'
 translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
-	goal_is_negation(Body, UQV, SubGoal), !,
+	goal_is_negation(Body, UQV, SubGoal, _Proposal), !,
 	functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]]).
 
 translate_problematic_predicates(Body, _Negation_Predicate, Body) :- 
