@@ -46,13 +46,13 @@ cneg_rt_New(UQV, Goal) :-
 cneg_rt_Generic(UQV, Goal, Proposal) :-
 	cneg_rt_Aux(UQV, Goal, Proposal, [], Conj_Of_Disj_Result),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Generic :: Conj_Of_Disj_Result', Conj_Of_Disj_Result),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Generic :: Conj_Of_Disj_Result', Conj_Of_Disj_Result),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disj_Result, Proposal, List_Of_Disj_Result),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, 'list', 'cneg_rt_Chan', 'cneg_rt_Generic :: List_Of_Disj_Result', List_Of_Disj_Result),
+	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Generic :: List_Of_Disj_Result', List_Of_Disj_Result),
 	generate_disjunction_from_list(List_Of_Disj_Result, Disj_Of_Conj_Result),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Generic :: Disj_Of_Conj_Result', Disj_Of_Conj_Result),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Generic :: Disj_Of_Conj_Result', Disj_Of_Conj_Result),
 	call_to(Disj_Of_Conj_Result).
 
 %cneg_rt_Generic(UQV, Goal, Proposal) :-
@@ -66,42 +66,42 @@ generate_disjunction_from_list([Goal | Goals], (Goal ; Disj_Goals)) :-
 	generate_disjunction_from_list(Goals, Disj_Goals).
 
 cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result) :-
-	echo_msg(2, 'separation', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: Proposal', Proposal),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: UQV_In', UQV_In),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: Goal', Goal),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, 'statistics', 'cneg_rt_Chan', '', (cneg_rt_Aux(UQV_In, Goal, Proposal, Trace))),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
+	echo_msg(2, 'separation', 'cneg_rt', '', ''),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Proposal', Proposal),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Goal', Goal),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg_rt_Aux(UQV_In, Goal, Proposal, Trace))),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: UQV_Aux', UQV_Aux),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_Aux', UQV_Aux),
 	portray_attributes_in_term(2, Goal),
 	varsbag(UQV_Aux, [], [], UQV),
 	varsbag(Goal, UQV, [], GoalVars),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: GoalVars', GoalVars),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: GoalVars', GoalVars),
 	
 	compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: New_UQV', New_UQV),
-	echo_msg(2, 'list', 'cneg_rt_Chan', 'cneg_rt_Aux :: Frontier', Frontier),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: New_UQV', New_UQV),
+	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
 
 	negate_frontier_list(Frontier, Proposal, GoalVars, New_UQV, Result), 
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, 'separation', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: Summary for Proposal', Proposal),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: Goal', Goal),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: UQV_In', UQV_In),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, 'list', 'cneg_rt_Chan', 'cneg_rt_Aux :: Frontier', Frontier),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: Result', Result),
-	echo_msg(2, 'separation', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', '').
+	echo_msg(2, 'separation', 'cneg_rt', '', ''),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Summary for Proposal', Proposal),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Goal', Goal),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Result', Result),
+	echo_msg(2, 'separation', 'cneg_rt', '', ''),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
 
 by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 	varsbag(UQV_In, [], [], UQV_Aux). % All vars in UQV_In are now UQV.
@@ -164,7 +164,7 @@ adequate_frontier_aux(Real_UQV, F_In, Body_Copy, New_UQV) :-
 	!. % Backtracking is forbidden.
 
 adequate_frontier_aux(Real_UQV, F_In, _Body_Copy, _New_UQV) :-
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: adequate_frontier_aux(Real_UQV, F_In)', (Real_UQV, F_In)),
+	echo_msg(2, '', 'cneg_rt', 'ERROR: adequate_frontier_aux(Real_UQV, F_In)', (Real_UQV, F_In)),
 	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -172,17 +172,17 @@ adequate_frontier_aux(Real_UQV, F_In, _Body_Copy, _New_UQV) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV) :-
-	echo_msg(2, '', 'cneg_rt_Chan', 'compute_set_of_frontiers :: (Goal, Proposal, Trace, UQV)', (Goal, Proposal, Trace, UQV)),
+	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, Proposal, Trace, UQV)', (Goal, Proposal, Trace, UQV)),
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
-	echo_msg(2, 'list', 'cneg_rt_Chan', 'compute_set_of_frontiers :: Goals', Goals),
+	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
 	compute_set_of_frontiers_aux(Goals, Proposal, Trace, UQV, Frontier, New_UQV).
 
 compute_set_of_frontiers_aux([], _Proposal, _Trace, _UQV, [], []) :- !.
 compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier_Out, New_UQV_Out) :-
 	compute_goal_frontier(Goal, Proposal, Trace, Frontier_Aux), !,
-%	echo_msg(2, 'list', 'cneg_rt_Chan', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
+%	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
 	adequate_frontier(Frontier_Aux, UQV, Frontier_Tmp, New_UQV_Tmp), !,
-%	echo_msg(2, '', 'cneg_rt_Chan', 'cneg_rt_Aux :: (UQV)', (New_UQV_Tmp)),
+%	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (UQV)', (New_UQV_Tmp)),
 	compute_set_of_frontiers_aux(More_Goals, Proposal, Trace, UQV, Frontier_In, New_UQV_In),
 	append(Frontier_Tmp, Frontier_In, Frontier_Out),
 	varsbag(New_UQV_Tmp, [], New_UQV_In, New_UQV_Out).
@@ -194,8 +194,8 @@ compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier
 
 % Just to debug.
 %compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier) :-
-%	echo_msg(2, '', 'cneg_rt_Chan', '--------------------------------------------------------------------------------------------------------------', ' '),
-%	echo_msg(2, '', 'cneg_rt_Chan', 'compute_goal_frontier :: (Goal)', (Goal)),	
+%	echo_msg(2, '', 'cneg_rt', '--------------------------------------------------------------------------------------------------------------', ' '),
+%	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: (Goal)', (Goal)),	
 %	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
@@ -213,8 +213,8 @@ compute_goal_frontier('fail', _Proposal, _Trace, [F_Out]) :- !,
 % The frontiers need to evaluated one at a time. 
 compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier_Out):- 
 	goal_is_disjunction(Goal, _G1, _G2), !,
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''), !, % Backtracking is forbidden.
+	echo_msg(2, '', 'cneg_rt', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
+	echo_msg(2, 'nl', 'cneg_rt', '', ''), !, % Backtracking is forbidden.
 	fail.
 
 % Now go for the conjunctions.
@@ -240,15 +240,15 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal), !,
-	echo_msg(2, '', 'cneg_rt_Chan', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
+	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
 	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_Of_Disjs_Frontier),
-	echo_msg(0, '', 'cneg_rt_Chan', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
+	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier),
-	echo_msg(2, 'list', 'cneg_rt_Chan', 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
 	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier),
-	echo_msg(2, 'list', 'cneg_rt_Chan', 'double neg :: Frontier', Frontier),
-	echo_msg(2, 'separation', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', '').
+	echo_msg(2, 'list', 'cneg_rt', 'double neg :: Frontier', Frontier),
+	echo_msg(2, 'separation', 'cneg_rt', '', ''),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
 
 % Only as info.
 % frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
@@ -256,18 +256,18 @@ compute_goal_frontier(Goal, Proposal, Trace, Frontier) :-
 % Now go for other functors stored in our database.
 compute_goal_frontier(Goal, _Proposal, _Trace, Frontier_Out) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
-%	echo_msg(0, '', 'cneg_rt_Chan', 'compute_goal_frontier :: Goal', Goal),
+%	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
-%	echo_msg(0, '', 'cneg_rt_Chan', 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
-%	echo_msg(2, 'list', 'cneg_rt_Chan', 'Frontier_Tmp_1', Frontier_Tmp_1),
+%	echo_msg(0, '', 'cneg_rt', 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
+%	echo_msg(2, 'list', 'cneg_rt', 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
-%	echo_msg(0, '', 'cneg_rt_Chan', 'Frontier_Out', Frontier_Out), 
+%	echo_msg(0, '', 'cneg_rt', 'Frontier_Out', Frontier_Out), 
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
 compute_goal_frontier(Goal, _Proposal, _Trace, []) :-
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: Not found frontier for Goal', Goal), 
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''), !. % Backtracking is forbidden.
+	echo_msg(2, '', 'cneg_rt', 'ERROR: Not found frontier for Goal', Goal), 
+	echo_msg(2, 'nl', 'cneg_rt', '', ''), !. % Backtracking is forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -299,20 +299,20 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
 simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !,
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', '').
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
-	echo_msg(2, '', 'cneg_rt_Chan', 'simplify_frontier :: valid :: F_In', F_In),
+	echo_msg(2, '', 'cneg_rt', 'simplify_frontier :: valid :: F_In', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
-	echo_msg(2, '', 'cneg_rt_Chan', 'simplify_frontier :: not valid :: F_In', F_In),
+	echo_msg(2, '', 'cneg_rt', 'simplify_frontier :: not valid :: F_In', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
 	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
-%	echo_msg(2, '', 'cneg_rt_Chan', 'test_frontier_is_valid :: F_In', F_In),
+%	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: F_In', F_In),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
 % Old way:
@@ -336,9 +336,9 @@ test_frontier_is_valid(F_In, Goal) :-
 % it to keep the variables of the Goal and obtain the unifications
 negate_frontier_list([], _Proposal, _GoalVars, _UQV, true) :- !. % Optimization.
 negate_frontier_list([Frontier | More_Frontiers], Proposal, GoalVars, UQV, Result) :-
-%	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
+%	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
 	negate_subfrontier(Frontier, Proposal, GoalVars, UQV, Result_Frontier),
-%	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier: Result_Frontier', Result_Frontier),
+%	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_frontier_list(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers),
 	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
@@ -361,19 +361,19 @@ combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result
 % (Head, BodyList) of the goal Goal.
 
 negate_subfrontier(Frontier_In, Proposal, GoalVars, UQV, (Result)):-
-	echo_msg(2, 'nl', 'cneg_rt_Chan', '', ''),
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier :: Frontier_In', (Frontier_In)),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: Frontier_In', (Frontier_In)),
 	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, UQV, Frontier_Aux_2, Vars_Info),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier', Vars_Info),
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier', Frontier_Aux_2),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', Vars_Info),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', Frontier_Aux_2),
 	split_IE_NIE_between_imp_exp_and_dumb(Frontier_Aux_2, Vars_Info, Frontier_Aux_3),
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier', Frontier_Aux_3),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', Frontier_Aux_3),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_formula(Frontier_Aux_3, Proposal, Vars_Info, Result),
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_subfrontier :: (Result)', (Result)),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -393,7 +393,7 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :-
 
 split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 	goal_is_disjunction(Frontier_In, _G1, _G2), !, 
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: split_frontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
+	echo_msg(2, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
 	fail.
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
@@ -428,7 +428,7 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :- 
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: split_frontier_into_E_IE_NIE can not deal with frontier. Frontier_In', Frontier_In),
+	echo_msg(2, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with frontier. Frontier_In', Frontier_In),
 	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -444,16 +444,16 @@ normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, UQV, Formula_In, Vars_In
 normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, UQV, Formula_Out, Vars_Info_Out):-
 	compute_variables_information(Formula, GoalVars, UQV, Vars_Info_1),
 	remove_from_E_redundant_eqs_and_vars(Formula_In, Vars_Info_1, Formula_Aux),  
-	echo_msg(2, '', 'cneg_rt_Chan', 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
+	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
 	compute_variables_information(Formula, GoalVars, UQV, Vars_Info_2),
 	remove_from_IE_irrelevant_disequalities(Formula_Aux, Vars_Info_2, Formula_Out),
-	echo_msg(2, '', 'cneg_rt_Chan', 'normalize_E_IE_NIE :: Formula_Out', Formula_Out),
+	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_Out', Formula_Out),
 	compute_variables_information(Formula_Out, GoalVars, UQV, Vars_Info_Out).
  
 normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _UQV, _Formula_Out, _Vars_Info) :-
 	Proposal \== 'cneg_rt_New', 
 	Proposal \== 'cneg_rt_Chan', !, 
-	echo_msg(2, '', 'cneg_rt_Chan', 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
+	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
 	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -646,13 +646,13 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out):-
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, Vars_Info, Frontier_Out):-
 	frontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
-	% echo_msg(2, '', 'cneg_rt_Chan', 'split_IE_NIE_between_imp_exp_and_dumb :: (E, IE, NIE)', (E, IE, NIE)),
+	% echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_exp_and_dumb :: (E, IE, NIE)', (E, IE, NIE)),
 
 	split_ie_or_nie_between_imp_exp_and_dumb(IE, Vars_Info, IE_Imp, IE_Exp, IE_Dumb),
-	% echo_msg(2, '', 'cneg_rt_Chan', 'split_ie_or_nie_between_imp_exp_and_dumb :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp, IE_Dumb)),
+	% echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_exp_and_dumb :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp, IE_Dumb)),
 
 	split_ie_or_nie_between_imp_exp_and_dumb(NIE, Vars_Info, NIE_Imp, NIE_Exp, NIE_Dumb),
-	% echo_msg(2, '', 'cneg_rt_Chan', 'split_ie_or_nie_between_imp_exp_and_dumb :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp, NIE_Dumb)),
+	% echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_exp_and_dumb :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp, NIE_Dumb)),
 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	frontier_E_IE_NIE_ied_contents(Frontier_Out, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
@@ -671,7 +671,7 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Fo
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp, _Form_dumb) :-
 	goal_is_disjunction(Form, _Form_1, _Form_2), !,
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with disjunctions. Form', Form),
+	echo_msg(2, '', 'cneg_rt', 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with disjunctions. Form', Form),
 	fail.
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
@@ -696,7 +696,7 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Fo
 		Form_exp = [], Form_dumb = [], Form_imp = Form
 	    )
 	).
-%	echo_msg(2, '', 'cneg_rt_Chan', 'split_ie_or_nie_between_imp_exp_and_dumb', (Form, Form_imp, Form_exp)).
+%	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_exp_and_dumb', (Form, Form_imp, Form_exp)).
 
 % negate_formula(Frontier, Proposal, GoalVars, UQV, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Result)
 % returns Result that is the result from negating the frontier.
@@ -715,8 +715,8 @@ negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
 	rebuild_conjunction_of_goals(E, IE_Imp_Dumb, E_IE_Imp_Dumb),
 	rebuild_conjunction_of_goals(E_IE_Imp_Dumb, NIE_Imp, Formulae_Imp),
 
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_formula :: Formulae_Imp', Formulae_Imp),
-	echo_msg(2, '', 'cneg_rt_Chan', 'negate_formula :: IE_NIE_Exp', IE_NIE_Exp),
+	echo_msg(2, '', 'cneg_rt', 'negate_formula :: Formulae_Imp', Formulae_Imp),
+	echo_msg(2, '', 'cneg_rt', 'negate_formula :: IE_NIE_Exp', IE_NIE_Exp),
  	negate_IE_NIE_exp(IE_NIE_Exp, Proposal, Vars_Info, Neg_IE_NIE_Exp),
 	negate_imp_form(Formulae_Imp, Proposal, Vars_Info, Neg_IE_NIE_Exp, Neg_E_IE_NIE),
 	!. % Backtracking forbidden.
@@ -738,7 +738,7 @@ negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 negate_imp_form([], _Proposal, _Vars_Info, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _Proposal, _Vars_Info, _Next_Formula, _Neg_Formula) :-
 	goal_is_disjunction(Formula, _Formula_1, _Formula_2), !,
-	echo_msg(2, '', 'cneg_rt_Chan', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
+	echo_msg(2, '', 'cneg_rt', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
 	fail.
 
 negate_imp_form(Formula, Proposal, Vars_Info, Next_Formula, Neg_Formula) :-
