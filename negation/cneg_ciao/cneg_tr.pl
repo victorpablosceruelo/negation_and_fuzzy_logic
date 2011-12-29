@@ -39,7 +39,7 @@ trans_sent(Input, Output, SourceFileName) :-
 	trans_sent_aux(Input, Output, SourceFileName), !.
 
 trans_sent(Input, [Input, cneg_not_translated(Input)], _SourceFileName) :-
-	echo_msg(2, '', 'cneg_tr', 'ERROR :: Impossible to translate', (Input)), !.
+	echo_msg(1, '', 'cneg_tr', 'ERROR :: Impossible to translate', (Input)), !.
 
 trans_sent_aux(X, [], _SourceFileName):- 
 	var(X), !, fail.

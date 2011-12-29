@@ -363,9 +363,9 @@ affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs, Diseqs_UQV_In, Diseqs_U
 restore_attributes_var(Var, _Diseqs, _Diseqs_UQV) :-
 	var(Var),
 	get_attribute_local(Var, Attribute), !,
-	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'ERROR: var has an attribute. Attribute: ', Attribute),
-	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
+	echo_msg(1, 'nl', 'cneg_diseq', '', ''),
+	echo_msg(1, '', 'cneg_diseq', 'ERROR: var has an attribute. Attribute: ', Attribute),
+	echo_msg(1, 'nl', 'cneg_diseq', '', ''),
 	fail.
 
 restore_attributes_var(Var, Diseqs, _Diseqs_UQV) :-
@@ -688,7 +688,7 @@ compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	;
 	    (
 		!,
-		echo_msg(2, '', 'cneg_diseq', 'ERROR: Intersection between EQV and UQV is not empty. (EQV, UQV, Intersection)', (EQV_Out, UQV_Out, Intersection)),
+		echo_msg(1, '', 'cneg_diseq', 'ERROR: Intersection between EQV and UQV is not empty. (EQV, UQV, Intersection)', (EQV_Out, UQV_Out, Intersection)),
 		!, fail
 	    )
 	).

@@ -173,7 +173,7 @@ adequate_frontier_aux(Real_UQV, F_In, Body_Copy, New_UQV) :-
 	!. % Backtracking is forbidden.
 
 adequate_frontier_aux(Real_UQV, F_In, _Body_Copy, _New_UQV) :-
-	echo_msg(2, '', 'cneg_rt', 'ERROR: adequate_frontier_aux(Real_UQV, F_In)', (Real_UQV, F_In)),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier_aux(Real_UQV, F_In)', (Real_UQV, F_In)),
 	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -222,8 +222,8 @@ compute_goal_frontier('fail', _Proposal, _Trace, [F_Out]) :- !,
 % The frontiers need to evaluated one at a time. 
 compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier_Out):- 
 	goal_is_disjunction(Goal, _G1, _G2), !,
-	echo_msg(2, '', 'cneg_rt', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
-	echo_msg(2, 'nl', 'cneg_rt', '', ''), !, % Backtracking is forbidden.
+	echo_msg(1, '', 'cneg_rt', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
+	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, % Backtracking is forbidden.
 	fail.
 
 % Now go for the conjunctions.
@@ -250,8 +250,10 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal, _Negation_Proposal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
-	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_Of_Disjs_Frontier),
+	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_List_Result),
 	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
+	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier),
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier),
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
 	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier),
@@ -275,8 +277,20 @@ compute_goal_frontier(Goal, _Proposal, _Trace, Frontier_Out) :-
 
 % And at last report an error if it was impossible to found a valid entry.
 compute_goal_frontier(Goal, _Proposal, _Trace, []) :-
-	echo_msg(2, '', 'cneg_rt', 'ERROR: Not found frontier for Goal', Goal), 
-	echo_msg(2, 'nl', 'cneg_rt', '', ''), !. % Backtracking is forbidden.
+	echo_msg(1, '', 'cneg_rt', 'ERROR: Not found frontier for Goal', Goal), 
+	echo_msg(1, 'nl', 'cneg_rt', '', ''), !. % Backtracking is forbidden.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+generate_conjunction_from_list([], fail) :- !,
+	echo_msg(1, '', 'cneg_rt', 'ERROR: generate_conjunction_from_list can not generate a frontier from an empty list.', ''), 
+	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, fail. % Backtracking is forbidden.
+generate_conjunction_from_list([Goal], Goal) :- !.
+generate_conjunction_from_list([Goal | Goals], (Goal , Disj_Goals)) :-
+	Goals \== [],
+	generate_conjunction_from_list(Goals, Disj_Goals).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -402,7 +416,7 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :-
 
 split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 	goal_is_disjunction(Frontier_In, _G1, _G2), !, 
-	echo_msg(2, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
 	fail.
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
@@ -437,7 +451,7 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :- 
-	echo_msg(2, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with frontier. Frontier_In', Frontier_In),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with frontier. Frontier_In', Frontier_In),
 	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -680,7 +694,7 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Fo
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp, _Form_dumb) :-
 	goal_is_disjunction(Form, _Form_1, _Form_2), !,
-	echo_msg(2, '', 'cneg_rt', 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with disjunctions. Form', Form),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_ie_or_nie_between_imp_exp_and_dumb can not deal with disjunctions. Form', Form),
 	fail.
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
@@ -747,7 +761,7 @@ negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 negate_imp_form([], _Proposal, _Vars_Info, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _Proposal, _Vars_Info, _Next_Formula, _Neg_Formula) :-
 	goal_is_disjunction(Formula, _Formula_1, _Formula_2), !,
-	echo_msg(2, '', 'cneg_rt', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
 	fail.
 
 negate_imp_form(Formula, Proposal, Vars_Info, Next_Formula, Neg_Formula) :-
