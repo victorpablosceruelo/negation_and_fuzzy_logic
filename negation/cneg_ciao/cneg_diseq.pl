@@ -126,7 +126,15 @@ portray_and_portray_attribute(Attribute) :-
 	echo_msg(2, 'aux', 'cneg_rt', 'answer value :: ', ''),
 	portray_aux(2, 'cneg_rt', Attribute),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''), 
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+
+	% We need to know about results in trace.
+	echo_msg(2, 'logo', 'trace', '', ''),
+	echo_msg(2, 'aux', 'trace', 'answer value :: ', ''),
+	portray_aux(2, 'trace', Attribute),
+	echo_msg(2, 'nl', 'trace', '', ''), 
+	echo_msg(2, 'nl', 'trace', '', '').
+
 
 portray_aux(Echo_Level, File_Name, Attribute) :-
 	attribute_contents(Attribute, _Target, Disequalities, UQV), !,
