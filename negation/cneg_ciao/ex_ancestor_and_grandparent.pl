@@ -32,7 +32,7 @@ no_grandparent(X,Y):- cneg_tr([], grandparent(X, Y)).
 
 parent1(john, mary).
 %parent1(john, peter).
-%parent1(mary, joe).
+parent1(mary, joe).
 %parent1(peter, susan).
 
 ancestor1(X, Y):-
