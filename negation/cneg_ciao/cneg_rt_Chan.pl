@@ -773,11 +773,10 @@ negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
 	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
-	varsbag(ImpVars, [], [], Real_ImpVars), % Sometimes we have non-vars
-	varsbag(UQ_to_EQ_Vars, [], Real_ImpVars, EQ_Vars), % UQ_Vars -> EQ_Vars
-	varsbag(IE_NIE_exp, EQ_Vars, [], IE_NIE_UQ_Vars), % IE_NIE_UQ_Vars
-	varsbag(UQV, [], IE_NIE_UQ_Vars, Real_UQ_Vars), % Real_UQ_Vars
-	functor_local(Neg_IE_NIE_exp, Proposal, 2, [Real_UQ_Vars |[ IE_NIE_exp ]]), !.
+	varsbag(ImpVars, [], [], Real_ImpVars), % Sometimes we have non-vars (Chan method).
+	varsbag_addition(Real_ImpVars, UQ_to_EQ_Vars, Non_UQV), % Non_UQV = vars(UQ_to_EQ) + vars(E) + GoalVars
+	varsbag(IE_NIE_exp, Non_UQV, [], IE_NIE_Exp_UQV), % IE_NIE_Exp_UQV = vars(IE_NIE_Exp) - Non_UQV
+	functor_local(Neg_IE_NIE_exp, Proposal, 2, [IE_NIE_Exp_UQV |[ IE_NIE_exp ]]), !.
 
 negate_imp_form([], _Proposal, _Vars_Info, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _Proposal, _Vars_Info, _Next_Formula, _Neg_Formula) :-
@@ -840,8 +839,7 @@ negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag_addition(ImpVars, UQ_to_EQ_Vars, EQ_Vars), % EQ_Vars = GoalVars + vars(E) + UQ_to_EQ_Vars
-	varsbag(UQV, [], [], Real_UQV), % Sometimes they stop being variables.
- 	varsbag(Formula, EQ_Vars, Real_UQV, Delayed_Negation_UQV),
+ 	varsbag(Formula, EQ_Vars, [], Delayed_Negation_UQV),
 
 	functor_local(Neg_Atom, Proposal, 2, [Delayed_Negation_UQV |[ Formula ]]),
 	Keep_Atom = (Formula). 
