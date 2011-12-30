@@ -771,7 +771,7 @@ negate_IE_NIE_exp([], _Proposal, _Vars_Info, []):- !.
 negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
 	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag(ImpVars, [], [], Real_ImpVars), % Sometimes we have non-vars (Chan method).
 	varsbag_addition(Real_ImpVars, UQ_to_EQ_Vars, Non_UQV), % Non_UQV = vars(UQ_to_EQ) + vars(E) + GoalVars
@@ -836,7 +836,7 @@ negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 
 negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag_addition(ImpVars, UQ_to_EQ_Vars, EQ_Vars), % EQ_Vars = GoalVars + vars(E) + UQ_to_EQ_Vars
  	varsbag(Formula, EQ_Vars, [], Delayed_Negation_UQV),
