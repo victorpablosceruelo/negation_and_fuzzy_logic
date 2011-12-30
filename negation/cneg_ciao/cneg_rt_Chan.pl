@@ -129,7 +129,7 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
 frontier_E_IE_NIE_contents(frontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
 frontier_E_IE_NIE_ied_contents(frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -521,7 +521,9 @@ compute_variables_information(Formula, GoalVars, UQV, Vars_Info) :-
  	varsbag_difference(Vars_IE, ImpVars, Dumb_Vars_Tmp), % Dumb_Vars_Tmp = vars(IE) - GoalVars - vars(E)
  	varsbag_difference(Dumb_Vars_Tmp, Vars_NIE, Dumb_Vars), % Dumb_Vars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
 
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
+	varsbag((Vars_E, Vars_IE, Vars_NIE), GoalVars, [], EQ_to_UQ_Vars), % EQ_to_UQ_Vars = Vars(Formula) - UQ_to_EQ_Vars - GoalVars
+
+	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Conjunctions
 	goal_is_conjunction(Frontier, Frontier_Left, Frontier_Right), !,
@@ -651,7 +653,7 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 remove_from_IE_irrelevant_disequalities(Formula_In, Vars_Info_In, Formula_Out) :-
 %	Recompute.
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info_In, GoalVars_In, UQV_In, _ImpVars_In, _ExpVars_In, _RelVars_In, _UQ_to_EQ_Vars_In, _Dumb_Vars_In),
+	vars_info_contents(Vars_Info_In, GoalVars_In, UQV_In, _ImpVars_In, _ExpVars_In, _RelVars_In, _Dumb_Vars_In, _EQ_to_UQ_Vars_In, _UQ_to_EQ_Vars_In),
 
 	compute_variables_information(Formula_In, GoalVars_In, UQV_In, Vars_Info),
 	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
@@ -667,7 +669,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out) :-
 
 remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out):-
 	goal_is_disequality(IE_In, _Term1, _Term2, _EQV_IE_In, _UQV_IE_In), !,
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, _UQ_to_EQ_Vars, Dumb_Vars),
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, Dumb_Vars, _EQ_to_UQ_Vars, _UQ_to_EQ_Vars),
 
 	varsbag(IE_In, [], [], Vars_IE_In),
 	varsbag_intersection(Vars_IE_In, Dumb_Vars, Problematic_Vars),
@@ -717,8 +719,8 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp,
 	fail.
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, ExpVars, _RelVars, _UQ_to_EQ_Vars, Dumb_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, ExpVars, _RelVars, Dumb_Vars, _EQ_to_UQ_Vars, _UQ_to_EQ_Vars),
 	varsbag(Form, [], [], Form_Vars), 
 	varsbag_intersection(Form_Vars, ExpVars, Form_ExpVars),
 	varsbag_intersection(Form_Vars, Dumb_Vars, Form_Dumb_Vars),
@@ -768,8 +770,8 @@ negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
 negate_IE_NIE_exp([], _Proposal, _Vars_Info, []):- !.
 negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
-	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
+	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag(ImpVars, [], [], Real_ImpVars), % Sometimes we have non-vars
 	varsbag(UQ_to_EQ_Vars, [], Real_ImpVars, EQ_Vars), % UQ_Vars -> EQ_Vars
@@ -812,8 +814,8 @@ negate_imp_atom(fail, _Proposal, _Vars_Info, true, fail):- !. % Trivial predicat
 % are the result from applying double negation to a disequality. 
 negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	goal_is_equality(Formula, T1, T2, Eq_EQV, Eq_UQV), !,
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
+	vars_info_contents(Vars_Info, GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag_addition(GoalVars, UQ_to_EQ_Vars, Diseq_EQV), % Diseq_EQV = GoalVars + UQ_to_EQ_Vars
 	varsbag(Formula, Diseq_EQV, [], Diseq_UQV), % Diseq_UQV = vars(Formula) - Diseq_EQV
@@ -824,8 +826,8 @@ negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 % Idem for disequalities.
 negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	goal_is_disequality(Formula, T1, T2, Diseq_EQV, Diseq_UQV), !,
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars, ).
+	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag_addition(ImpVars, UQ_to_EQ_Vars, Eq_EQV), % Eq_EQV = GoalVars + vars(E) + UQ_to_EQ_Vars
 	varsbag(Formula, Eq_EQV, [], Eq_UQV), % Eq_UQV = vars(Formula) - Eq_EQV
@@ -834,8 +836,8 @@ negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	Keep_Atom = (diseq_euqv(T1,T2, Diseq_EQV, Diseq_UQV)).
 
 negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, UQ_to_EQ_Vars, _Dumb_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
 
 	varsbag_addition(ImpVars, UQ_to_EQ_Vars, EQ_Vars), % EQ_Vars = GoalVars + vars(E) + UQ_to_EQ_Vars
 	varsbag(UQV, [], [], Real_UQV), % Sometimes they stop being variables.
