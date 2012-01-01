@@ -12,6 +12,7 @@
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
 	portray_attributes_in_term_vars/3,
+	get_attributes_in_term_vars/3,
 	diseq_euqv/4, eq_euqv/4,
 	diseq_euqv_adv/5, eq_euqv_adv/5]).
 :- use_module(library(aggregates),[setof/3]).
@@ -66,13 +67,19 @@ call_to_all_negated_subfrontiers([], _Level, Trace, Debug_Msg) :-
 	add_predicate_to_trace(ended_subfrontiers_for(Debug_Msg), Trace_Logo),
 	add_predicate_to_trace('-----------------------', Trace_End),
 	get_trace_final_status_list(Trace, Status_List),
-	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List).
+	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
 call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, Debug_Msg) :-
 	generate_conjunction_trace(Trace, Trace_Current_Goal, Trace_Next_Goal),
 	generate_conjunction_trace(Trace_Current_Goal, Trace_Info, Trace_Result),
-	generate_conjunction_trace(Trace_Info, Trace_Logo, Trace_Subfrontier),
-	add_predicate_to_trace(subfrontier_for(Debug_Msg), Trace_Logo),
-	add_predicate_to_trace(Result, Trace_Subfrontier),
+	generate_conjunction_trace(Trace_Info, Trace_Info_1, Trace_Info_2),
+	generate_conjunction_trace(Trace_Info_2, Trace_Info_3, Trace_Info_4),
+	generate_conjunction_trace(Trace_Info_4, Trace_Info_5, Trace_Info_6),
+	add_predicate_to_trace('-----------------------', Trace_Info_1),
+	add_predicate_to_trace(subfrontier_for(Debug_Msg), Trace_Info_3),
+	add_predicate_to_trace(Result, Trace_Info_5),
+ 	get_attributes_in_term_vars(Result, Vars_With_Attrs, _Vars_Without_Attrs), 
+	add_predicate_to_trace(attributes(Vars_With_Attrs), Trace_Info_6),
 	echo_msg(2, '', 'cneg_rt', 'SUBFRONTIER for goal', Debug_Msg),
 	echo_msg(2, '', 'cneg_rt', '', Result),
 	portray_attributes_in_term_vars(2, 'cneg_rt', Result),

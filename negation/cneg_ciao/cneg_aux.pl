@@ -806,7 +806,9 @@ reverse_list([H_In | L_In], L_Aux, L_Out) :-
 
 generate_empty_trace(trace([], _Out)).
 generate_conjunction_trace(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
-add_predicate_to_trace(Predicate, trace(In, [Predicate | In])). 
+add_predicate_to_trace(Predicate, trace(In, [Predicate | In])) :- !.
+% They should be converted to an string to avoid problems ...
+%	name(Predicate, Predicate_String), !. 
 get_trace_status_list(trace(In, _Out), In_Reversed) :- reverse_list(In, [], In_Reversed), !.
 get_trace_final_status_list(trace(_In, Out), Out_Reversed) :- reverse_list(Out, [], Out_Reversed), !.
 
