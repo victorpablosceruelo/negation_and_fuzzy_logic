@@ -228,7 +228,7 @@ echo_msg_statistics_aux(Msg) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 echo_howto_information(Echo_Level, File_Name) :-
-	echo_msg_separation(Echo_Level, File_Name),
+%	echo_msg_separation(Echo_Level, File_Name),
 	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
 	echo_msg(Echo_Level, '', File_Name, 'Info for debugging', ' '),
 	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
@@ -236,7 +236,7 @@ echo_howto_information(Echo_Level, File_Name) :-
 	echo_msg(Echo_Level, '', File_Name, 'frontier_E_IE_NIE', 'frontier_E_IE_NIE(E, IE, NIE)'),
 	echo_msg(Echo_Level, '', File_Name, 'frontier_E_IE_NIE_ied', 'frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb)'),
 	echo_msg(Echo_Level, '', File_Name, 'Vars_Info', 'vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, UQ_to_EQ_Vars, Dumb_Vars)'),
-	echo_msg_separation(Echo_Level, File_Name),
+%	echo_msg_separation(Echo_Level, File_Name),
 	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -796,11 +796,19 @@ combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+reverse_list([], L_Out, L_Out) :- !.
+reverse_list([H_In | L_In], L_Aux, L_Out) :- 
+	reverse_list(L_In, [H_In | L_Aux], L_Out), !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 generate_empty_trace(trace([], _Out)).
 generate_conjunction_trace(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
 add_predicate_to_trace(Predicate, trace(In, [Predicate | In])). 
-get_trace_status_list(trace(In, _Out), In).
-get_trace_final_status_list(trace(_In, Out), Out).
+get_trace_status_list(trace(In, _Out), In_Reversed) :- reverse_list(In, [], In_Reversed), !.
+get_trace_final_status_list(trace(_In, Out), Out_Reversed) :- reverse_list(Out, [], Out_Reversed), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
