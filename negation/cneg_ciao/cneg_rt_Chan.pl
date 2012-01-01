@@ -11,7 +11,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
-	portray_attributes_in_term/2,
+	portray_attributes_in_term_vars/3,
 	diseq_euqv/4, eq_euqv/4,
 	diseq_euqv_adv/5, eq_euqv_adv/5]).
 :- use_module(library(aggregates),[setof/3]).
@@ -75,6 +75,7 @@ call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, Debug_Msg
 	add_predicate_to_trace(Result, Trace_Subfrontier),
 	echo_msg(2, '', 'cneg_rt', 'SUBFRONTIER for goal', Debug_Msg),
 	echo_msg(2, '', 'cneg_rt', '', Result),
+	portray_attributes_in_term_vars(2, 'cneg_rt', Result),
 	call_to(Result, Level, Trace_Result),
 	call_to_all_negated_subfrontiers(Result_List, Level, Trace_Next_Goal, Debug_Msg).
 
@@ -96,7 +97,7 @@ cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result_List) :-
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
 	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_Aux', UQV_Aux),
-	portray_attributes_in_term(2, Goal),
+	portray_attributes_in_term_vars(2, 'cneg_rt', Goal),
 	varsbag(UQV_Aux, [], [], UQV),
 	varsbag(Goal, UQV, [], GoalVars),
 	!, % Reduce the stack's memory by forbidding backtracking.

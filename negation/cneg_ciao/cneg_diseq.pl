@@ -5,7 +5,8 @@
 	    diseq_eqv/3, eq_eqv/3, 
 	    diseq_euqv/4, eq_euqv/4,
 	    diseq_euqv_adv/5, eq_euqv_adv/5,
-	    portray_attributes_in_term/2
+	    portray_attributes_in_term_vars/3,
+	    get_attributes_in_term_vars/3
 	], 
 	[assertions]).
 
@@ -147,30 +148,41 @@ portray_aux(Echo_Level, File_Name, Anything) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-portray_attributes_in_term(Echo_Level, T) :-
-	cneg_aux:varsbag(T, [], [], Variables),
-	echo_msg(Echo_Level, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(Echo_Level, '', 'cneg_diseq', 'Attributes for the variables in term', T),
-	portray_attributes_in_variables(Echo_Level, Variables, [], Not_Attributed),
-	portray_no_attributes_in_variables(Echo_Level, Not_Attributed).
+portray_attributes_in_term_vars(Echo_Level, File_Name, T) :-
+	get_attributes_in_term_vars(T, Vars_With_Attrs, Vars_Without_Attrs),
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
+	echo_msg(Echo_Level, '', File_Name, 'Attributes for the variables in term', T),
+	portray_attributes_in_variables(Echo_Level, File_Name, Vars_With_Attrs),
+	portray_no_attributes_in_variables(Echo_Level, File_Name, Vars_Without_Attrs).
 
-portray_no_attributes_in_variables(Echo_Level, Not_Attributed) :-
-	echo_msg(Echo_Level, '', 'cneg_diseq', 'Variables without attributes :: ', Not_Attributed), 
-	echo_msg(Echo_Level, 'nl', 'cneg_diseq', '', '').
+portray_no_attributes_in_variables(Echo_Level, File_Name, Vars_Without_Attrs) :-
+	echo_msg(Echo_Level, '', File_Name, 'Variables without attributes :: ', Vars_Without_Attrs), 
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
-portray_attributes_in_variables(_Echo_Level, [], List, List) :- !.
-portray_attributes_in_variables(Echo_Level, [Var|Vars], List_In, List_Out) :-
-	portray_attributes_in_variable(Echo_Level, Var, List_In, List_Aux),
-	portray_attributes_in_variables(Echo_Level, Vars, List_Aux, List_Out).
+portray_attributes_in_variables(_Echo_Level, _File_Name, []) :- !.
+portray_attributes_in_variables(Echo_Level, File_Name, [Var_With_Attr | Vars_With_Attrs]) :-
+	portray_attributes_in_variable(Echo_Level, File_Name, Var_With_Attr), !,
+	portray_attributes_in_variables(Echo_Level, File_Name, Vars_With_Attrs).
 
-portray_attributes_in_variable(Echo_Level, Var, List_In, List_In) :-
+portray_attributes_in_variable(Echo_Level, File_Name, Var_With_Attr) :-
+	attribute_contents(Var_With_Attr, Target, Disequalities, UQV),
+	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
+	echo_msg(Echo_Level, 'aux', File_Name, 'variable :: ', Target), 
+	echo_msg(Echo_Level, 'aux', File_Name, ' has attribute', ' :: '),
+	portray_aux(Echo_Level, File_Name, Disequalities),
+	echo_msg(Echo_Level, 'aux', File_Name, ' with UQV = ', UQV),
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
+
+get_attributes_in_term_vars(T, Vars_With_Attrs, Vars_Without_Attrs) :-
+	cneg_aux:varsbag(T, [], [], Vars),
+	get_attributes_in_term_vars_aux(Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs).
+
+get_attributes_in_term_vars_aux([], Vars_WA, Vars_WA, Vars_WOA, Vars_WOA) :- !.
+get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
 	get_attribute_local(Var, Attribute), !,
-	echo_msg(Echo_Level, 'logo', 'cneg_diseq', '', ''),
-	echo_msg(Echo_Level, 'aux', 'cneg_diseq', 'variable :: ', Var), 
-	echo_msg(Echo_Level, 'aux', 'cneg_diseq', ' has attribute', ' :: '),
-	portray_aux(Echo_Level, 'cneg_diseq', Attribute),
-	echo_msg(Echo_Level, 'nl', 'cneg_diseq', '', '').
-portray_attributes_in_variable(_Echo_Level, Var, List_In, [Var | List_In]) :- !.
+	get_attributes_in_term_vars_aux(Vars, [Attribute | Vars_WA_In], Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out).
+get_attributes_in_term_vars_aux([_Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
+	get_attributes_in_term_vars_aux(Vars, Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
