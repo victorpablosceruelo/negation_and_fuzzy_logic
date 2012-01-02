@@ -1,10 +1,8 @@
 :- module(cneg_diseq, 
 	[
 	    equality/3, disequality/3,
-	    diseq_uqv/3, eq_uqv/3, 
-	    diseq_eqv/3, eq_eqv/3, 
-	    diseq_euqv/4, eq_euqv/4,
-	    diseq_euqv_adv/5, eq_euqv_adv/5,
+	    diseq_geuqv/5, eq_geuqv/5,
+	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    portray_attributes_in_term_vars/3,
 	    get_attributes_in_term_vars/3
 	], 
@@ -85,7 +83,7 @@ put_attribute_local(Var, Attribute) :-
 
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Disequalities, UQV), Target, Disequalities, UQV).
-disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
+disequality_contents(disequality(Diseq_1, Diseq_2, GV, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, GV, EQ_Vars, UQ_Vars).
 % equality_contents(equality(T1, T2), T1, T2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -201,7 +199,7 @@ portray_disequalities_aux_1(Echo_Level, File_Name, [Diseq_1|Diseqs]) :- !,
 	portray_disequalities_aux_1(Echo_Level, File_Name, Diseqs).
 
 portray_disequalities_aux_2(Echo_Level, File_Name, Diseq) :-
-	disequality_contents(Diseq, Diseq_1, Diseq_2, _EQ_Vars, _UQ_Vars),
+	disequality_contents(Diseq, Diseq_1, Diseq_2, _GV, _EQ_Vars, _UQ_Vars),
 	echo_msg(Echo_Level, 'aux', File_Name, '[ ', Diseq_1),
 	echo_msg(Echo_Level, 'aux', File_Name, ' =/= ', Diseq_2),
 	echo_msg(Echo_Level, 'aux', File_Name, '', ' ]').
@@ -287,7 +285,7 @@ perform_substitutions([(OldTarget, NewTarget) | MoreSubst], EQV, UQV) :-
 
 get_and_remove_eqv_and_uqv_from_diseqs([], EQV_In, EQV_In, UQV_In, UQV_In, []) :- !.
 get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In, UQV_Out, [(T1, T2) | More_Ts]) :-
-	disequality_contents(Diseq, T1, T2, Diseq_EQV, Diseq_UQV),
+	disequality_contents(Diseq, T1, T2, _Diseq_GV, Diseq_EQV, Diseq_UQV),
 	varsbag(Diseq_EQV, [], EQV_In, EQV_Aux),
 	varsbag(Diseq_UQV, [], UQV_In, UQV_Aux),
 	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, EQV_Aux, EQV_Out, UQV_Aux, UQV_Out, More_Ts).
@@ -354,7 +352,7 @@ prepare_diseqs_for_restore([], [], _EQV, _UQV, Affected_Vars, Affected_Vars) :- 
 prepare_diseqs_for_restore([(T1, T2) | Diseqs_In], [(Diseq, Vars) | Diseqs_Out], EQV, UQV, Aff_Vars_In, Aff_Vars_Out) :-
 	cneg_aux:varsbag((T1, T2), [], [], Vars), 
 	cneg_aux:varsbag(Vars, [], Aff_Vars_In, Aff_Vars_Aux), !,
-	disequality_contents(Diseq, T1, T2, EQV, UQV),
+	disequality_contents(Diseq, T1, T2, _Diseq_GV, EQV, UQV),
 	prepare_diseqs_for_restore(Diseqs_In, Diseqs_Out, EQV, UQV, Aff_Vars_Aux, Aff_Vars_Out).
 
 restore_attributes_vars([], _Diseqs) :- !.
@@ -366,7 +364,7 @@ restore_attributes_vars([Var | Affected_Vars], Diseqs) :-
 affected_diseqs(_Var, [], [], Diseqs_UQV_In, Diseqs_UQV_In) :- !.
 affected_diseqs(Var, [(Diseq, Diseq_Vars) | Diseqs], [Diseq | Affected_Diseqs], Diseqs_UQV_In, Diseqs_UQV_Out) :-
 	cneg_aux:memberchk(Var, Diseq_Vars), !,
-	disequality_contents(Diseq, T1, T2, EQV, _Unused_UQV),
+	disequality_contents(Diseq, T1, T2, _Diseq_GV, EQV, _Unused_UQV),
 	cneg_aux:varsbag((T1, T2), EQV, Diseqs_UQV_In, Diseqs_UQV_Aux), !,
 	affected_diseqs(Var, Diseqs, Affected_Diseqs, Diseqs_UQV_Aux, Diseqs_UQV_Out).
 affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs, Diseqs_UQV_In, Diseqs_UQV_Out) :-
@@ -661,49 +659,42 @@ check_if_allowed_to_fail(Can_Fail) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-compute_eqv_or_uqv(_T1, _T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
+adequate_gv_eqv_uqv(_T1, _T2, GoalVars_In, EQV_In, UQV_In, GoalVars_Out, EQV_Out, UQV_Out) :-
+	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: In :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
+	adequate_gv_eqv_uqv_aux(_T1, _T2, GoalVars_In, EQV_In, UQV_In, GoalVars_Out, EQV_Out, UQV_Out),
+	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: Out :: (GV, EQV, UQV)', (GoalVars_Out, EQV_Out, UQV_Out)).
+
+adequate_gv_eqv_uqv_aux(_T1, _T2, GoalVars_In, EQV_In, UQV_In, GoalVars_Out, EQV_Out, UQV_Out) :-
 	EQV_In = 'compute',
 	UQV_In = 'compute',
 	!, 
 	UQV_Aux = [],
-	varsbag((T1, T2), UQV_Aux, [], EQV_Aux),
-	echo_msg(2, '', 'cneg_diseq', 'INFO: Computing both EQV and UQV. (EQV, UQV)', (EQV_Aux, UQV_Aux)),
-	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Additional tests.
+	varsbag(GoalVars_In, [], [], GoalVars_Aux), % Only variables, please.
+	varsbag((T1, T2), UQV_Aux, GoalVars_Aux, EQV_Aux),
+	adequate_gv_eqv_uqv_aux(T1, T2, GoalVars_Aux, EQV_Aux, UQV_Aux, GoalVars_Out, EQV_Out, UQV_Out). % Additional tests.
 
-compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
+adequate_gv_eqv_uqv_aux(T1, T2, GoalVars_In, EQV_In, UQV_In, GoalVars_Out, EQV_Out, UQV_Out) :-
 	EQV_In = 'compute', !,
-	varsbag(UQV_In, [], [], UQV_Aux), % Only variables, please.	
-	varsbag((T1, T2), UQV_Aux, [], EQV_Aux), % Determine EQV.
-	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Additional tests.
+	varsbag(GoalVars_In, [], [], GoalVars_Aux), % Only variables, please.
+	varsbag(UQV_In, GoalVars_Aux, [], UQV_Aux), % UQV = UQV_In - GoalVars
+	varsbag((T1, T2), UQV_Aux, GoalVars_Aux, EQV_Aux), % EQV = vars(T1, T2) + (UQV - GoalVars)
+	adequate_gv_eqv_uqv_aux(T1, T2, GoalVars_Aux, EQV_Aux, UQV_Aux, GoalVars_Out, EQV_Out, UQV_Out). % Additional tests.
 
-compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
+adequate_gv_eqv_uqv_aux(T1, T2, GoalVars_In, EQV_In, UQV_In, GoalVars_Out, EQV_Out, UQV_Out) :-
 	UQV_In = 'compute', !,
-	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.
+	varsbag(GoalVars_In, [], [], GoalVars_Aux), % Only variables, please.
+	varsbag(EQV_In, [], GoalVars_Aux, EQV_Aux), % Only variables, please.
 	varsbag((T1, T2), EQV_Aux, [], UQV_Aux), % Determine UQV.
-	compute_eqv_or_uqv(T1, T2, EQV_Aux, UQV_Aux, EQV_Out, UQV_Out). % Additional tests.
+	adequate_gv_eqv_uqv_aux(T1, T2, GoalVars_Aux, EQV_Aux, UQV_Aux, GoalVars_Out, EQV_Out, UQV_Out). % Additional tests.
 
-compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
-	varsbag(EQV_In, [], [], EQV_Aux), % Only variables, please.	
-	varsbag(UQV_In, EQV_Aux, [], UQV_Aux), % Only variables, please.
+adequate_gv_eqv_uqv_aux(T1, T2, GoalVars_In, EQV_In, UQV_In, GoalVars_Out, EQV_Out, UQV_Out) :-
+	varsbag(GoalVars_In, [], [], GoalVars_Out), % Only variables, please.
+	varsbag(EQV_In, [], GoalVars_Out, EQV_Aux), % Only variables, please.
+	varsbag(UQV_In, EQV_Aux, [], UQV_Aux), % Only variables, please. EQV /\ UQV = empty.
+
 	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
-	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Tmp), % Only EQV affected variables.
-	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out), % Only UQV affected variables.
-	varsbag(Affected_Vars, UQV_Out, EQV_Tmp, EQV_Out), % Exhaustive sets, please.
-
-	% Test empty intersection between EQV and UQV.
-	varsbag_intersection(EQV_Out, UQV_Out, Intersection), % Compute intersection between EQV and UQV.
-	!,
-	(
-	    (
-		Intersection = [], ! % Test empty intersection.
-	    )
-	;
-	    (
-		!,
-		echo_msg(1, '', 'cneg_diseq', 'ERROR: Intersection between EQV and UQV is not empty. (EQV, UQV, Intersection)', (EQV_Out, UQV_Out, Intersection)),
-		!, fail
-	    )
-	).
+	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
+	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out). % Only UQV affected variables.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -725,50 +716,40 @@ compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 % Incluye una desigualdad en las formulas de las 
 % variables implicadas
 
-disequality(T1,T2, UQV) :- diseq_uqv(T1,T2, UQV).
-diseq_uqv(T1,T2, UQV_In) :- 
-	diseq_euqv(T1, T2, 'compute', UQV_In).
+disequality(T1,T2, UQV) :- diseq_geuqv(T1,T2, [], 'compute', UQV).
 
-diseq_eqv(T1,T2, EQV_In) :- 
-	diseq_euqv(T1, T2, EQV_In, 'compute').
+diseq_geuqv(T1,T2, GoalVars_In, EQV_In, UQV_In) :- 
+	diseq_geuqv_adv(T1,T2, GoalVars_In, EQV_In, UQV_In, 'true'). 
 
-diseq_euqv(T1,T2, EQV_In, UQV_In) :- 
-	diseq_euqv_adv(T1,T2, EQV_In, UQV_In, 'true'). 
-
-diseq_euqv_adv(T1,T2, EQV_In, UQV_In, Result) :- 
+diseq_geuqv_adv(T1,T2, GoalVars_In, EQV_In, UQV_In, Result) :- 
 	Can_Fail = true,
-	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
-	echo_msg(2, '', 'cneg_diseq', 'diseq_euqv [in] :: ((T1, =/=, T2), ---, (EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
-	disequality_contents(Disequality, T1, T2, EQV, UQV),
+	adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, GoalVars, EQV, UQV),
+	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [in] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (GoalVars, EQV, UQV))),
+	disequality_contents(Disequality, T1, T2, GoalVars, EQV, UQV),
         test_and_update_vars_attributes([Disequality], Can_Fail, Result),
-	echo_msg(2, '', 'cneg_diseq', 'diseq_euqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)),
+	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)),
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-equality(T1,T2, UQV) :- eq_uqv(T1,T2, UQV).
-eq_uqv(T1, T2, UQV) :-
-	eq_euqv(T1, T2, 'compute', UQV).
+equality(T1,T2, UQV) :- eq_geuqv(T1,T2, [], 'compute', UQV).
 
-eq_eqv(T1, T2, EQV) :-
-	eq_euqv(T1, T2, EQV, 'compute').
+eq_geuqv(T1, T2, GoalVars_In, EQV_In, UQV_In) :- 
+	eq_geuqv_adv(T1, T2, GoalVars_In, EQV_In, UQV_In, 'true').
 
-eq_euqv(T1, T2, EQV_In, UQV_In) :- 
-	eq_euqv_adv(T1, T2, EQV_In, UQV_In, 'true').
-
-eq_euqv_adv(T1, T2, EQV_In, UQV_In, Result) :- 
+eq_geuqv_adv(T1, T2, GoalVars_In, EQV_In, UQV_In, Result) :- 
 	Can_Fail = 'true',
-	compute_eqv_or_uqv(T1, T2, EQV_In, UQV_In, EQV, UQV),
-	echo_msg(2, '', 'cneg_diseq', 'eq_euqv [in] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
+	adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, GoalVars, EQV, UQV),
+	echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [in] :: (T1, =, T2), ---, (GV, EQV, UQV)', ((T1, '=', T2), '---', (GoalVars, EQV, UQV))),
 	!,
 	(
 	    ( 
 		UQV == [], !, 
 		diseq_eq(T1, T2),
 		Result = 'true',
-		echo_msg(2, '', 'cneg_diseq', 'eq_euqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
+		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
 		echo_msg(2, 'nl', 'cneg_diseq', '', '')
 	    )
 	;
@@ -776,11 +757,11 @@ eq_euqv_adv(T1, T2, EQV_In, UQV_In, Result) :-
 		UQV \== [], !, 
 		check_if_allowed_to_fail(Can_Fail),
 		Result = 'fail',
-		echo_msg(2, '', 'cneg_diseq', 'eq_euqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
+		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
 		echo_msg(2, '', 'cneg_diseq', 'continues', '...'),
 %		cneg_aux:varsbag((T1, T2), [], [], Disequality_EQV), % Mark all vars as EQV
 %		% cneg_diseq(T1,T2, EQV, Can_Fail, Result)
-		diseq_euqv(T1, T2, 'compute', []) 
+		diseq_geuqv(T1, T2, GoalVars, 'compute', []) 
 	    )
 	).
 
