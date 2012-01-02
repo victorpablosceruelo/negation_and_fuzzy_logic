@@ -708,12 +708,15 @@ varsbag_go_inside(Arity, Term, OtherBag, Bag_In, Bag_Out) :-
         varsbag_go_inside(NewArity, Term, OtherBag, Bag_Tmp, Bag_Out).
 
 varsbag_local_variable(X, OtherBag, Bag, Bag) :-
+	var(X),
 	cneg_aux:memberchk(X, OtherBag), % Var is in the other bag.
 	!.
 varsbag_local_variable(X, _OtherBag, Bag, Bag) :- 
+	var(X),
 	cneg_aux:memberchk(X, Bag), % Var is alredy in the bag.
 	!.
 varsbag_local_variable(X, _OtherBag, Bag, [X|Bag]) :- 
+	var(X),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
