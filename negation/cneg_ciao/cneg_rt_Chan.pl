@@ -10,11 +10,11 @@
 :- multifile call_to/3.
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [diseq_uqv/3, eq_uqv/3, diseq_eqv/3, eq_eqv/3, 
+:- use_module(cneg_diseq, [ 
 	portray_attributes_in_term_vars/3,
 	get_attributes_in_term_vars/3,
-	diseq_euqv/4, eq_euqv/4,
-	diseq_euqv_adv/5, eq_euqv_adv/5]).
+	diseq_geuqv/5, eq_geuqv/5,
+	diseq_geuqv_adv/6, eq_geuqv_adv/6]).
 :- use_module(library(aggregates),[setof/3]).
 
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
@@ -264,14 +264,14 @@ compute_goal_frontier(Goal, Proposal, Trace, Frontier):-
 % Now go for the functors for equality and disequality.
 % None of them is managed yet, so just bypass them.
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
-	goal_is_disequality(Goal, T1, T2, EQV, UQV), !,
-	functor_local(Real_Goal, 'diseq_euqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
+	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
+	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'),
 	!.
 
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
-	goal_is_equality(Goal, T1, T2, EQV, UQV), !,
-	functor_local(Real_Goal, 'eq_euqv', 4, [ T1 |[ T2 |[ EQV |[ UQV ]]]]),
+	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
+	functor_local(Real_Goal, 'eq_euqv', 4, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'), 
 	!.
 
@@ -468,11 +468,11 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 	frontier_E_IE_NIE_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_equality(Frontier_In, _Term1, _Term2, _EQV, _UQV), !,
+	goal_is_equality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
 	frontier_E_IE_NIE_contents(Frontier_Out, Frontier_In, [], []).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_disequality(Frontier_In, _Term1, _Term2, _EQV, _UQV), !,
+	goal_is_disequality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
 	frontier_E_IE_NIE_contents(Frontier_Out, [], Frontier_In, []).
 
 % This leads to infinite loops because double negation 
@@ -550,11 +550,11 @@ identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Conju
 	identify_uq_to_eq_vars(Frontier_Right, UQ_to_EQ_Vars_Aux, UQ_to_EQ_Vars_Out).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Equalities
-	goal_is_equality(Frontier, _Value_1, _Value_2, _EQV, UQV),
+	goal_is_equality(Frontier, _Value_1, _Value_2, _GV, _EQV, UQV),
 	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Disequalities
-	goal_is_disequality(Frontier, _Term1, _Term2, _EQV, UQV), !,
+	goal_is_disequality(Frontier, _Term1, _Term2, _GV, _EQV, UQV), !,
 	varsbag(UQV, [], UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out).
 
 identify_uq_to_eq_vars(Frontier, UQ_to_EQ_Vars_In, UQ_to_EQ_Vars_Out) :- % Negations
@@ -603,16 +603,16 @@ remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :-
 	).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
-	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV),
+	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV),
 	memberchk(E_In, Visited_In), !. % Eq has been seen before. Redundant.
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
-	goal_is_equality(E_In, Value_1, Value_2, EQV, UQV),
-	goal_is_equality(E_Tmp, Value_2, Value_1, EQV, UQV), % Args interchanged.
+	goal_is_equality(E_In, Value_1, Value_2, GV, EQV, UQV),
+	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
 	memberchk(E_Tmp, Visited_In), !. % Eq has been seen before. Redundant.
 
 remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
-	goal_is_equality(E_In, _Value_1, _Value_2, _EQV, _UQV).
+	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
 		
 remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
 	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
@@ -621,7 +621,7 @@ remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :-
 	!.
 
 remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
-	goal_is_equality(E_In, Value_1, Value_2, _EQV, _UQV),
+	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
 	remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out).
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true') :-
@@ -687,7 +687,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out) :-
 	rebuild_conjunction_of_goals(IE_Out_1, IE_Out_2, IE_Out).
 
 remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out):-
-	goal_is_disequality(IE_In, _Term1, _Term2, _EQV_IE_In, _UQV_IE_In), !,
+	goal_is_disequality(IE_In, _Term1, _Term2, _GV_IE_In, _EQV_IE_In, _UQV_IE_In), !,
 	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, Dumb_Vars, _EQ_to_UQ_Vars, _UQ_to_EQ_Vars),
 
 	varsbag(IE_In, [], [], Vars_IE_In),
@@ -831,27 +831,35 @@ negate_imp_atom(fail, _Proposal, _Vars_Info, true, fail):- !. % Trivial predicat
 % Since EQV are not used in equality basic predicates, we assume that EQV variables
 % are the result from applying double negation to a disequality. 
 negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
-	goal_is_equality(Formula, T1, T2, Eq_EQV, Eq_UQV), !,
+	goal_is_equality(Formula, T1, T2, _Eq_GV_In, Eq_EQV_In, Eq_UQV_In), !,
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
-	vars_info_contents(Vars_Info, GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
+	vars_info_contents(Vars_Info, GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, _UQ_to_EQ_Vars),
 
-	varsbag_addition(GoalVars, UQ_to_EQ_Vars, Diseq_EQV), % Diseq_EQV = GoalVars + UQ_to_EQ_Vars
-	varsbag(Formula, Diseq_EQV, [], Diseq_UQV), % Diseq_UQV = vars(Formula) - Diseq_EQV
+	varsbag((T1, T2), [], [], Vars_Eq), % Just variables
+	varsbag(Eq_EQV_In, [], [], Eq_EQV), % Just variables
+	varsbag(Eq_UQV_In, [], [], Eq_UQV), % Just variables
+	varsbag_difference(Vars_Eq, GoalVars, Diseq_UQV_Tmp), % GoalVars are not free vars.
+	varsbag_difference(Diseq_UQV_Tmp, Eq_UQV, Diseq_UQV), % Eq_UQV are not free vars.
 
-	Neg_Atom = (diseq_euqv(T1, T2, Diseq_EQV, Diseq_UQV)),
-	Keep_Atom = (eq_euqv(T1, T2, Eq_EQV, Eq_UQV)).
+	Neg_Atom = (diseq_geuqv(T1, T2, GoalVars, Eq_UQV, Diseq_UQV)),
+	Keep_Atom = (eq_geuqv(T1, T2, GoalVars, Eq_EQV, Eq_UQV)).
 
 % Idem for disequalities.
 negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1, T2, Diseq_EQV, Diseq_UQV), !,
+	goal_is_disequality(Formula, T1, T2, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars, ).
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, UQ_to_EQ_Vars),
+	vars_info_contents(Vars_Info, GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _EQ_to_UQ_Vars, _UQ_to_EQ_Vars),
 
-	varsbag_addition(ImpVars, UQ_to_EQ_Vars, Eq_EQV), % Eq_EQV = GoalVars + vars(E) + UQ_to_EQ_Vars
-	varsbag(Formula, Eq_EQV, [], Eq_UQV), % Eq_UQV = vars(Formula) - Eq_EQV
+	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
+	varsbag(Diseq_EQV_In, [], [], Diseq_EQV), % Just variables
+	varsbag(Diseq_UQV_In, [], [], Diseq_UQV), % Just variables
+	varsbag(ImpVars, [], [], ImpVars_Aux), % Just variables
+	varsbag_difference(Vars_Diseq, ImpVars_Aux, Diseq_UQV_Tmp), % ImpVars are not free vars.
+	varsbag_difference(Diseq_UQV_Tmp, Diseq_UQV, Eq_UQV), % Diseq_UQV are not free vars.
+	varsbag(ImpVars_Aux, GoalVars, Diseq_UQV, Eq_EQV), % 
 
-	Neg_Atom = (eq_euqv(T1,T2, Eq_EQV, Eq_UQV)),
-	Keep_Atom = (diseq_euqv(T1,T2, Diseq_EQV, Diseq_UQV)).
+	Neg_Atom = (eq_geuqv(T1,T2, GoalVars, Eq_EQV, Eq_UQV)),
+	Keep_Atom = (diseq_geuqv(T1,T2, Diseq_EQV, Diseq_UQV)).
 
 negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
