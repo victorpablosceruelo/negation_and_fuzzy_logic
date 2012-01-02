@@ -11,6 +11,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [ 
+	equality/3, disequality/3,
 	diseq_geuqv/5, eq_geuqv/5,
 	diseq_geuqv_adv/6, eq_geuqv_adv/6]).
 :- use_module(library(aggregates),[setof/3]).
@@ -89,17 +90,16 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 
 % Now go for the functors for equality and disequality.
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
-	goal_is_disequality(Goal, T1, T2, EQV, UQV), !, 
-	EQV = [],
-	varsbag(Goal, GoalVars, UQV, UQV_Aux),
-	eq_uqv(T1, T2, UQV_Aux).
+	goal_is_disequality(Goal, T1, T2, _Diseq_GV, Diseq_EQV, Diseq_UQV), !, 
+	Diseq_EQV = [],
+	varsbag((T1, T2), GoalVars, Diseq_UQV, Eq_UQV),
+	eq_geuqv(T1, T2, GoalVars, Diseq_UQV, Eq_UQV).
 
 compute_neg_frontier(Goal, GoalVars, 'true'):- 
-	goal_is_equality(Goal, T1, T2, EQV, UQV), !,
-	EQV = [], 
-	varsbag(Goal, GoalVars, UQV, UQV_Aux),
-	% cneg_diseq(T1,T2, UQV_In, UQV_Out, Do_Not_Fail, Result).
-	diseq_uqv(T1,T2, UQV_Aux).
+	goal_is_equality(Goal, T1, T2, _Eq_GV, Eq_EQV, Eq_UQV), !,
+	Eq_EQV = [], 
+	varsbag((T1, T2), GoalVars, Eq_UQV, Diseq_UQV),
+	diseq_geuqv(T1,T2, GoalVars, Eq_UQV, Diseq_UQV).
 
 compute_neg_frontier(Goal, _GoalVars, 'true'):- 
 	goal_is_negation(Goal, _UQV, SubGoal, _Negation_Proposal), !,
@@ -184,15 +184,15 @@ simplify_frontier([Frontier|More_Frontier_In], Goal, More_Bodies):-
 test_frontier_is_valid(Goal, Head, Frontier_Test) :-
 	echo_msg(1, '', 'cneg_rt_Stuckey', 'test_frontier_is_valid :: (Head, FrontierTest, Goal)', (Head, Frontier_Test, Goal)),
         copy_term((Head, Frontier_Test, Goal), (Head_Tmp, Frontier_Test_Tmp, Goal_Tmp)), 
-        eq_uqv(Head_Tmp, Goal_Tmp, []), 
-	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _Tmp_EQV, Tmp_UQV), % It must be an equality.
-	eq_uqv(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
+        equality(Head_Tmp, Goal_Tmp, []), % Note that UQV = []
+	goal_is_equality(Frontier_Test_Tmp, Tmp_Left, Tmp_Right, _Tmp_GV, _Tmp_EQV, Tmp_UQV), % It must be an equality.
+	equality(Tmp_Left, Tmp_Right, Tmp_UQV), % Note that UQV = [].
 %	call_combined_solutions(FrontierTest_Tmp), 
 %	echo_msg(1, '', 'cneg_rt_Stuckey', 'test_frontier_is_valid', 'YES'),
 	!, % Backtracking forbidden.
 	functor_local(Goal, _Name, _Arity, Goal_Args), 
-	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_EQV, _Test_UQV),
-	eq_uqv(Test_Left, Goal_Args, []). % Note that UQV = [].
+	goal_is_equality(Frontier_Test, Test_Left, _Test_Right, _Test_GV, _Test_EQV, _Test_UQV),
+	equality(Test_Left, Goal_Args, []). % Note that UQV = [].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -212,7 +212,7 @@ evaluate_prev_frontier_residua(Goal, GoalVars_In, Prev_Front_Residua) :-
 	copy_term((Prev_Front_Residua, GoalVars, LocalVars), (Prev_Front_Residua_Copy, GoalVars_Copy, _LocalVars_Copy)),
 	!,
 	evaluate_prev_frontier_residua_aux(Prev_Front_Residua_Copy),
-	eq_uqv(GoalVars, GoalVars_Copy, []),
+	equality(GoalVars, GoalVars_Copy, []),
 	setof(([(Goal, Prev_Front_Residua, LocalVars)], GoalVars), evaluate_prev_frontier_residua_aux(Prev_Front_Residua), Pre_F_Sols),
 	echo_msg(1, '', 'cneg_rt_Stuckey', 'evaluate_prev_frontier_residua :: Pre_F_Sols', Pre_F_Sols),
 	echo_msg(1, 'nl', 'cneg_rt_Stuckey', '', ''),
@@ -233,7 +233,7 @@ take_and_compute_one_solution(Real_GoalVars, [Pre_F_Sol | Pre_F_Sols]) :-
 	(
 	    pre_front_sol(Pre_F_Sol, Local_Stuff, GoalVars),
 	    echo_msg(1, '', 'cneg_rt_Stuckey', 'take_one_solution :: Local_Stuff ', Local_Stuff),
-	    eq_uqv(Real_GoalVars, GoalVars, []),
+	    equality(Real_GoalVars, GoalVars, []),
 	    compute_localstuff_solutions(Real_GoalVars, Local_Stuff)
 	;
 	    take_and_compute_one_solution(Real_GoalVars, Pre_F_Sols)
@@ -258,14 +258,12 @@ evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
-	goal_is_disequality(Prev_Front_Residua, Left, Right, EQV, UQV), 
-	EQV = [], 
-	diseq_uqv(Left, Right, UQV).
+	goal_is_disequality(Prev_Front_Residua, Left, Right, GV, EQV, UQV), 
+	diseq_geuqv(Left, Right, GV, EQV, UQV).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
-	goal_is_equality(Prev_Front_Residua, Left, Right, EQV, UQV), 
-	EQV = [], 
-	eq_uqv(Left, Right, UQV).
+	goal_is_equality(Prev_Front_Residua, Left, Right, GV, EQV, UQV), 
+	eq_geuqv(Left, Right, GV, EQV, UQV).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	goal_is_negation(Prev_Front_Residua, UQV, SubGoal, _Negation_Proposal), 
@@ -312,7 +310,7 @@ unify_sols_when_possible_aux_2(Head_1, [Head_2 | Tail_To_Unify], Unified_In, Uni
 	copy_term((Head_1, Head_2), (Head_1_Copy, Head_2_Copy)),
 	pre_front_sol(Head_1_Copy, Local_Stuff_1, GoalVars_1),
 	pre_front_sol(Head_2_Copy, Local_Stuff_2, GoalVars_2),
-	eq_uqv(GoalVars_1, GoalVars_2, []), !, % They unify !!!
+	equality(GoalVars_1, GoalVars_2, []), !, % They unify !!!
 	append(Local_Stuff_1, Local_Stuff_2, Local_Stuff_Aux),
 	pre_front_sol(Head_Out, Local_Stuff_Aux, GoalVars_1),
 	unify_sols_when_possible_aux_2(Head_1, Tail_To_Unify, [Head_Out | Unified_In], Unified_Out, Not_Unified_Out).
