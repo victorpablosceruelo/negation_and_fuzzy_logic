@@ -257,13 +257,13 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, Eq_GV, Eq_EQV, Eq_UQV), !,
 	Eq_GV = [], % No GV variables allowed !!!
 	Eq_EQV = [], % No EQV variables allowed !!!
-	functor_local(Neg_Atom, 'diseq_euqv_adv', 5, [A_Left |[A_Right |[ GoalVars |[ Eq_UQV |[ 'compute' |[Result]]]]]]).
+	functor_local(Neg_Atom, 'diseq_geuqv_adv', 5, [A_Left |[A_Right |[ GoalVars |[ Eq_UQV |[ 'compute' |[Result]]]]]]).
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, Diseq_GV, Diseq_EQV, Diseq_UQV), !,
 	Diseq_GV = [], % No GV variables allowed !!!
 	Diseq_EQV = [], % No EQV variables allowed !!!
-	functor_local(Neg_Atom, 'eq_euqv_adv', 5, [A_Left |[A_Right |[ GoalVars |[ Diseq_UQV |[ 'compute' |[Result]]]]]]).
+	functor_local(Neg_Atom, 'eq_geuqv_adv', 5, [A_Left |[A_Right |[ GoalVars |[ Diseq_UQV |[ 'compute' |[Result]]]]]]).
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_negation(Atom, UQV, SubGoal, _Proposal), !,
@@ -323,13 +323,13 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, Diseq_GV, Diseq_EQV, Diseq_UQV), !,
 	Diseq_GV = [], % No GV variables allowed !!! 
 	Diseq_EQV = [], % No EQV variables allowed !!!
-	functor_local(DN_Atom, 'diseq_euqv_adv', 5, [A_Left |[A_Right |[ GoalVars |[ 'compute' |[ Diseq_UQV |[ Result ]]]]]]).
+	functor_local(DN_Atom, 'diseq_geuqv_adv', 5, [A_Left |[A_Right |[ GoalVars |[ 'compute' |[ Diseq_UQV |[ Result ]]]]]]).
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, Eq_GV, Eq_EQV, Eq_UQV), !,
 	Eq_GV = [], % No GV variables allowed !!! 
 	Eq_EQV = [], % No EQV variables allowed !!!
-	functor_local(DN_Atom, 'eq_euqv_adv', 5, [A_Left |[A_Right |[GoalVars |[ 'compute' |[ Eq_UQV |[Result ]]]]]]).	
+	functor_local(DN_Atom, 'eq_geuqv_adv', 5, [A_Left |[A_Right |[GoalVars |[ 'compute' |[ Eq_UQV |[Result ]]]]]]).	
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Atom), !,
