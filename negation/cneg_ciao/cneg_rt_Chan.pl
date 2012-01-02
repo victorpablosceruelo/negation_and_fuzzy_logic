@@ -271,6 +271,9 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal, _Negation_Proposal), !,
+
+There is a problem here: how do we know if we are playing with Goalvars or with UQV ??
+
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
 	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_List_Result), !,
 	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
