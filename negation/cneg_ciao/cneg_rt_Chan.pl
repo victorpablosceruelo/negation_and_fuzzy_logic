@@ -45,7 +45,7 @@ cneg_rt_New(UQV, Goal) :-
 % can be changed by the commented one
 % when we find the current bug 
 % (It is just to make it easy debugging). 
-cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
+cneg_rt_Generic(GoalVars, Goal, Proposal, Level, Trace) :-
 	% Save trace information (basic for debugging).
 	CN_Call = (cneg_rt_Generic(UQV, Goal, Proposal, Level)),
 	generate_conjunction_trace(Trace, Trace_1, Trace_2),
