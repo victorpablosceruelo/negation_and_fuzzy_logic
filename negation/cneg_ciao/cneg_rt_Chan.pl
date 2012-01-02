@@ -47,9 +47,9 @@ cneg_rt_New(UQV, Goal) :-
 % (It is just to make it easy debugging). 
 cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
 	% Save trace information (basic for debugging).
-	Debug_Msg = (cneg_rt_Generic(UQV, Goal, Proposal, Level)),
+	CN_Call = (cneg_rt_Generic(UQV, Goal, Proposal, Level)),
 	generate_conjunction_trace(Trace, Trace_1, Trace_2),
-	add_predicate_to_trace(Debug_Msg, Trace_1),
+	add_predicate_to_trace(CN_Call, Trace_1),
 
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
@@ -58,33 +58,36 @@ cneg_rt_Generic(UQV, Goal, Proposal, Level, Trace) :-
 	!,
 	cneg_rt_Aux(UQV, Goal, Proposal, [], Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	call_to_all_negated_subfrontiers(Result_List, Level, Trace_2, Debug_Msg).
+	call_to_all_negated_subfrontiers(Result_List, Level, Trace_2, CN_Call).
 
 % Please note this mechanism wastes less memory and cpu, 
 % since it goes one by one, but allows backtracking.
-call_to_all_negated_subfrontiers([], _Level, Trace, Debug_Msg) :- 
-	generate_conjunction_trace(Trace, Trace_Logo, Trace_End),
-	add_predicate_to_trace(ended_subfrontiers_for(Debug_Msg), Trace_Logo),
+call_to_all_negated_subfrontiers([], _Level, Trace, CN_Call) :- 
+	generate_conjunction_trace(Trace, Trace_Info, Trace_End),
+	generate_conjunction_trace(Trace_Info, Trace_Info_1, Trace_Info_2),
+	add_predicate_to_trace(ended_subfrontiers_for(CN_Call), Trace_Info_1),
+  	get_attributes_in_term_vars(CN_Call, Vars_With_Attrs, _Vars_Without_Attrs), 
+	add_predicate_to_trace(attributes(Vars_With_Attrs), Trace_Info_2),
 	add_predicate_to_trace('-----------------------', Trace_End),
 	get_trace_final_status_list(Trace, Status_List),
 	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
-call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, Debug_Msg) :-
+call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, CN_Call) :-
 	generate_conjunction_trace(Trace, Trace_Current_Goal, Trace_Next_Goal),
 	generate_conjunction_trace(Trace_Current_Goal, Trace_Info, Trace_Result),
 	generate_conjunction_trace(Trace_Info, Trace_Info_1, Trace_Info_2),
 	generate_conjunction_trace(Trace_Info_2, Trace_Info_3, Trace_Info_4),
 	generate_conjunction_trace(Trace_Info_4, Trace_Info_5, Trace_Info_6),
 	add_predicate_to_trace('-----------------------', Trace_Info_1),
-	add_predicate_to_trace(subfrontier_for(Debug_Msg), Trace_Info_3),
+	add_predicate_to_trace(subfrontier_for(CN_Call), Trace_Info_3),
 	add_predicate_to_trace(Result, Trace_Info_5),
- 	get_attributes_in_term_vars(Result, Vars_With_Attrs, _Vars_Without_Attrs), 
+  	get_attributes_in_term_vars(Result, Vars_With_Attrs, _Vars_Without_Attrs), 
 	add_predicate_to_trace(attributes(Vars_With_Attrs), Trace_Info_6),
-	echo_msg(2, '', 'cneg_rt', 'SUBFRONTIER for goal', Debug_Msg),
+	echo_msg(2, '', 'cneg_rt', 'SUBFRONTIER for goal', CN_Call),
 	echo_msg(2, '', 'cneg_rt', '', Result),
 	portray_attributes_in_term_vars(2, 'cneg_rt', Result),
 	call_to(Result, Level, Trace_Result),
-	call_to_all_negated_subfrontiers(Result_List, Level, Trace_Next_Goal, Debug_Msg).
+	call_to_all_negated_subfrontiers(Result_List, Level, Trace_Next_Goal, CN_Call).
 
 %generate_disjunction_from_list([], fail) :- !.
 %generate_disjunction_from_list([Goal], Goal) :- !.
