@@ -40,3 +40,7 @@ ancestor1(X, Y):-
 ancestor1(X, Y):-
 	parent1(X, Z),
 	ancestor1(Z, Y).
+
+grandparent1(X,Y):- 
+    parent1(X,Z),
+    parent1(Z,Y).
