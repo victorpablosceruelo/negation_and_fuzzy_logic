@@ -271,7 +271,7 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 
 compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
-	functor_local(Real_Goal, 'eq_euqv', 4, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
+	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'), 
 	!.
 
@@ -859,7 +859,7 @@ negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	varsbag(ImpVars_Aux, GoalVars, Diseq_UQV, Eq_EQV), % 
 
 	Neg_Atom = (eq_geuqv(T1,T2, GoalVars, Eq_EQV, Eq_UQV)),
-	Keep_Atom = (diseq_geuqv(T1,T2, Diseq_EQV, Diseq_UQV)).
+	Keep_Atom = (diseq_geuqv(T1,T2, GoalVars, Diseq_EQV, Diseq_UQV)).
 
 negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 %	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, EQ_to_UQ_Vars, UQ_to_EQ_Vars).
