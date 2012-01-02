@@ -11,7 +11,7 @@
 	    varsbag_addition/3, varsbag_intersection/3,  
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
-	    goal_is_disequality/5, goal_is_equality/5,
+	    goal_is_disequality/6, goal_is_equality/6,
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
 	    goal_is_not_conj_disj_neg/1,
 	    goal_is_not_negation/1,
@@ -423,28 +423,20 @@ goal_is_conjunction(Goal, G1, G2) :-
 	goal_is_aux_2a('basiccontrol:,', Goal, G1, G2), !.
 
 % goal_is_disequality(Goal, Arg_1, Arg_2, EQV, UQV) 
-goal_is_disequality(Goal, Arg_1, Arg_2, [], []) :- 
+goal_is_disequality(Goal, Arg_1, Arg_2, [], [], []) :- 
 	goal_is_aux_2a('=/=', Goal, Arg_1, Arg_2), !.
-goal_is_disequality(Goal, Arg_1, Arg_2, [], UQV) :- 
+goal_is_disequality(Goal, Arg_1, Arg_2, [], [], UQV) :- 
 	goal_is_aux_3a('disequality', Goal, Arg_1, Arg_2, UQV), !.
-goal_is_disequality(Goal, Arg_1, Arg_2, EQV, []) :- 
-	goal_is_aux_3a('diseq_eqv', Goal, Arg_1, Arg_2, EQV), !.
-goal_is_disequality(Goal, Arg_1, Arg_2, [], UQV) :- 
-	goal_is_aux_3a('diseq_uqv', Goal, Arg_1, Arg_2, UQV), !.
-goal_is_disequality(Goal, Arg_1, Arg_2, EQV, UQV) :- 
-	goal_is_aux_4a('diseq_euqv', Goal, Arg_1, Arg_2, EQV, UQV), !.
+goal_is_disequality(Goal, Arg_1, Arg_2, GV, EQV, UQV) :- 
+	goal_is_aux_5a('diseq_geuqv', Goal, Arg_1, Arg_2, GV, EQV, UQV), !.
 
 % goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) 
-goal_is_equality(Goal, Arg_1, Arg_2, [], []) :- 
+goal_is_equality(Goal, Arg_1, Arg_2, [], [], []) :- 
 	goal_is_aux_2a('=', Goal, Arg_1, Arg_2), !.
-goal_is_equality(Goal, Arg_1, Arg_2, [], UQV) :- 
+goal_is_equality(Goal, Arg_1, Arg_2, [], [], UQV) :- 
 	goal_is_aux_3a('equality', Goal, Arg_1, Arg_2, UQV), !.
-goal_is_equality(Goal, Arg_1, Arg_2, EQV, []) :- 
-	goal_is_aux_3a('eq_eqv', Goal, Arg_1, Arg_2, EQV), !.
-goal_is_equality(Goal, Arg_1, Arg_2, [], UQV) :- 
-	goal_is_aux_3a('eq_uqv', Goal, Arg_1, Arg_2, UQV), !.
-goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) :- 
-	goal_is_aux_4a('eq_euqv', Goal, Arg_1, Arg_2, EQV, UQV), !.
+goal_is_equality(Goal, Arg_1, Arg_2, GV, EQV, UQV) :- 
+	goal_is_aux_5a('eq_geuqv', Goal, Arg_1, Arg_2, GV, EQV, UQV), !.
 
 goal_is_aux_2a(Name, Goal, Arg_1, Arg_2) :-
 	functor(Goal, Name, 2), !,
@@ -457,12 +449,13 @@ goal_is_aux_3a(Name, Goal, Arg_1, Arg_2, Arg_3) :-
 	arg(2, Goal, Arg_2),
 	arg(3, Goal, Arg_3).
 
-goal_is_aux_4a(Name, Goal, Arg_1, Arg_2, Arg_3, Arg_4) :-
-	functor(Goal, Name, 4), !,
+goal_is_aux_5a(Name, Goal, Arg_1, Arg_2, Arg_3, Arg_4, Arg_5) :-
+	functor(Goal, Name, 5), !,
 	arg(1, Goal, Arg_1),
 	arg(2, Goal, Arg_2),
 	arg(3, Goal, Arg_3),
-	arg(4, Goal, Arg_4).
+	arg(4, Goal, Arg_4),
+	arg(5, Goal, Arg_5).
 
 goal_name_is_not_conjunction(Name) :-
 	Name \== ',',
@@ -474,25 +467,21 @@ goal_name_is_not_disjunction(Name) :-
 
 goal_name_is_not_equality(Name) :-
 	Name \== '=', 
-	Name \== 'eq',
-	Name \== 'cneg_eq',
-	Name \== 'equality'.
+	Name \== 'equality',
+	Name \== 'eq_geuqv'.
 
 goal_name_is_not_disequality(Name) :-
-	Name \== 'dist',  
-	Name \== 'diseq',
-	Name \== 'dist',
-	Name \== 'cneg_diseq',
+	Name \== '=/=',
 	Name \== 'disequality',
-	Name \== '=/='.
+	Name \== 'diseq_geuqv'.
 
 goal_name_is_not_negation(Name) :-
 	Name \== 'cneg',
 	Name \== 'cneg_tr',
+	Name \== 'cneg_rt',
 	Name \== 'cneg_rt_Stuckey',
 	Name \== 'cneg_rt_Chan',
-	Name \== 'cneg_rt_New',
-	Name \== 'cneg_rt'.
+	Name \== 'cneg_rt_New'.
 
 valid_names_for_negation_preds('cneg').
 valid_names_for_negation_preds('cneg_tr').
