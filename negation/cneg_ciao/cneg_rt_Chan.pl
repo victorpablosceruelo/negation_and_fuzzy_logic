@@ -1,7 +1,7 @@
 %
 % From Susana modified by VPC.
 %
-:- module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_Generic/5], [assertions]).
+:- module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_gv/5], [assertions]).
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
@@ -34,20 +34,18 @@
 cneg_rt_Chan(UQV, Goal):-
 	Proposal = 'cneg_rt_Chan',
 	generate_empty_trace(Trace),
-	cneg_rt_Generic(UQV, Goal, Proposal, 0, Trace).
+	varsbag(Goal, UQV, [], GoalVars), % We prefer to play with goalvars
+	cneg_rt_gv(Goal, GoalVars, Proposal, 0, Trace).
 
 cneg_rt_New(UQV, Goal) :-
 	Proposal = 'cneg_rt_New',
 	generate_empty_trace(Trace),
-	cneg_rt_Generic(UQV, Goal, Proposal, 0, Trace).
+	varsbag(Goal, UQV, [], GoalVars), % We prefer to play with goalvars
+	cneg_rt_gv(Goal, GoalVars, Proposal, 0, Trace).
 
-% The following definition of the predicate cneg_rt_Generic
-% can be changed by the commented one
-% when we find the current bug 
-% (It is just to make it easy debugging). 
-cneg_rt_Generic(GoalVars, Goal, Proposal, Level, Trace) :-
+cneg_rt_gv(Goal, GoalVars, Proposal, Level, Trace) :-
 	% Save trace information (basic for debugging).
-	CN_Call = (cneg_rt_Generic(UQV, Goal, Proposal, Level)),
+	CN_Call = (cneg_rt_gv(Goal, GoalVars, Proposal, Level)),
 	generate_conjunction_trace(Trace, Trace_1, Trace_2),
 	add_predicate_to_trace(CN_Call, Trace_1),
 
@@ -56,7 +54,7 @@ cneg_rt_Generic(GoalVars, Goal, Proposal, Level, Trace) :-
 	get_trace_status_list(Trace_2, Trace_Status_List),
 	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Trace_Status_List),
 	!,
-	cneg_rt_Aux(UQV, Goal, Proposal, [], Result_List),
+	cneg_rt_Aux(Goal, GoalVars, Proposal, [], Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	call_to_all_negated_subfrontiers(Result_List, Level, Trace_2, CN_Call).
 
@@ -98,37 +96,32 @@ call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, CN_Call) 
 %	Goals \== [],
 %	generate_disjunction_from_list(Goals, Disj_Goals).
 
-cneg_rt_Aux(UQV_In, Goal, Proposal, Trace, Result_List) :-
+cneg_rt_Aux(Goal, GoalVars, Proposal, Trace, Result_List) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Proposal', Proposal),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: GoalVars', GoalVars),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Goal', Goal),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'statistics', 'statistics', '', (cneg_rt_Aux(UQV_In, Goal, Proposal, Trace))),
+	echo_msg(2, 'statistics', 'statistics', '', (cneg_rt_Aux(Goal, GoalVars, Proposal, Trace))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (UQV_In, Goal, Proposal)', (UQV_In, Goal, Proposal)),
-	by_pass_universallity_of_variables(UQV_In, UQV_Aux),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_Aux', UQV_Aux),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
+	varsbag(GoalVars, [], [], Real_GoalVars), % Clean up non-vars
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Real_GoalVars', Real_GoalVars),
 	portray_attributes_in_term_vars(2, 'cneg_rt', Goal),
-	varsbag(UQV_Aux, [], [], UQV),
-	varsbag(Goal, UQV, [], GoalVars),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: GoalVars', GoalVars),
-	
-	compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV),
+	compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Trace, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: New_UQV', New_UQV),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
 	!,
-	negate_frontier_list(Frontier, Proposal, GoalVars, New_UQV, Result_List),
+	negate_frontier_list(Frontier, GoalVars, Proposal, Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Summary for Proposal', Proposal),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Goal', Goal),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: UQV_In', UQV_In),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Real_GoalVars', Real_GoalVars),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
@@ -147,7 +140,7 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
 frontier_E_IE_NIE_contents(frontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
 frontier_E_IE_NIE_ied_contents(frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-vars_info_contents(vars_info(GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars), GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+vars_info_contents(vars_info(GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars), GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -181,46 +174,45 @@ combine_frontiers_from_conjunction_aux(F1_1, [_F2_1 | More_F2], More_F3) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-adequate_frontier([], Real_UQV, [], Real_UQV) :- !.
-adequate_frontier([F_In | Frontier_In], Real_UQV, [F_Out | Frontier_Out], Frontier_New_UQV_Out) :-
-	adequate_frontier_aux(Real_UQV, F_In, F_Out, F_New_UQV), !,
-	adequate_frontier(Frontier_In, Real_UQV, Frontier_Out, Frontier_New_UQV_Aux),
-	append(F_New_UQV, Frontier_New_UQV_Aux, Frontier_New_UQV_Out).
+adequate_frontier([], _GoalVars, []) :- !.
+adequate_frontier([F_In | Frontier_In], GoalVars, [F_Out | Frontier_Out]) :-
+	adequate_frontier_aux(F_In, GoalVars, F_Out), !,
+	adequate_frontier(Frontier_In, GoalVars, Frontier_Out).
 
-adequate_frontier_aux(Real_UQV, F_In, Body_Copy, New_UQV) :-
+adequate_frontier_aux(F_In, GoalVars, Body_Copy) :-
 	frontier_contents(F_In, Real_Goal, Head, Body, _F_Test),
 	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
-	varsbag(Real_Goal, Real_UQV, [], Real_Goal_GoalVars), % Determine goalvars.
-	copy_term((Real_Goal, Real_Goal_GoalVars, Real_UQV), (Real_Goal_Copy, Real_Goal_GoalVars_Copy, New_UQV)),
+	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
+	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
+	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
 	Real_Goal_GoalVars = Real_Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
 	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
 	!. % Backtracking is forbidden.
 
-adequate_frontier_aux(Real_UQV, F_In, _Body_Copy, _New_UQV) :-
-	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier_aux(Real_UQV, F_In)', (Real_UQV, F_In)),
+adequate_frontier_aux(F_In, GoalVars, _Body_Copy) :-
+	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier_aux(F_In, GoalVars)', (F_In, GoalVars)),
 	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-compute_set_of_frontiers(Goal, Proposal, Trace, UQV, Frontier, New_UQV) :-
-	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, Proposal, Trace, UQV)', (Goal, Proposal, Trace, UQV)),
+% compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Trace, Frontier)
+compute_set_of_frontiers(Goal, GoalVars, Proposal, Trace, Frontier) :-
+	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_set_of_frontiers_aux(Goals, Proposal, Trace, UQV, Frontier, New_UQV),
+	compute_set_of_frontiers_aux(Goals, GoalVars, Proposal, Trace, Frontier),
 	!.
 
-compute_set_of_frontiers_aux([], _Proposal, _Trace, _UQV, [], []) :- !.
-compute_set_of_frontiers_aux([Goal | More_Goals], Proposal, Trace, UQV, Frontier_Out, New_UQV_Out) :-
+compute_set_of_frontiers_aux([], _GoalVars, _Proposal, _Trace, []) :- !.
+compute_set_of_frontiers_aux([Goal | More_Goals], GoalVars, Proposal, Trace, Frontier_Out) :-
 	compute_goal_frontier(Goal, Proposal, Trace, Frontier_Aux), !,
 %	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
-	adequate_frontier(Frontier_Aux, UQV, Frontier_Tmp, New_UQV_Tmp), !,
-%	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (UQV)', (New_UQV_Tmp)),
-	compute_set_of_frontiers_aux(More_Goals, Proposal, Trace, UQV, Frontier_In, New_UQV_In),
-	append(Frontier_Tmp, Frontier_In, Frontier_Out),
-	varsbag(New_UQV_Tmp, [], New_UQV_In, New_UQV_Out).
+	adequate_frontier(Frontier_Aux, GoalVars, Frontier_Tmp), !,
+	compute_set_of_frontiers_aux(More_Goals, GoalVars, Proposal, Trace, Frontier_In),
+	append(Frontier_Tmp, Frontier_In, Frontier_Out).
 
 % compute_neg_frontier(Goal,Frontier) 
 % obtains in Frontier the frontier of the  goal Goal.
@@ -380,27 +372,22 @@ test_frontier_is_valid(F_In, Goal) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_frontier_list(Frontier,Goal,LSolutions) returns in LSolutions
-% a list with the same number of elements of the list Frontier.
-% Each element of LSolutions will be one solution of negating the 
-% conjuction that is in the same position in Frontier. The predicate 
-% is a "map" where the fuction that is applied to each element of
-% Frontier (each conjunction) is the negation.
-% Frontier is the frontier of subgoals of deep 1 of Goal and we need
-% it to keep the variables of the Goal and obtain the unifications
-negate_frontier_list([], _Proposal, _GoalVars, _UQV, [true]) :- !. % Optimization.
-negate_frontier_list(Frontier, Proposal, GoalVars, UQV, Negated_Frontier) :- 
+% negate_frontier_list(Frontier, GoalVars, Proposal, Result_List),
+% returns in Result_List a list with the negation of each subfrontier in Frontier.
+
+negate_frontier_list([], _GoalVars, _Proposal, [true]) :- !. % Optimization.
+negate_frontier_list(Frontier, GoalVars, Proposal, Negated_Frontier) :- 
 	Frontier \== [], !,
-	negate_frontier_list_aux(Frontier, Proposal, GoalVars, UQV, Negated_Frontier),
+	negate_frontier_list_aux(Frontier, GoalVars, Proposal, Negated_Frontier),
 	!.
 
-negate_frontier_list_aux([], _Proposal, _GoalVars, _UQV, []) :- !.
-negate_frontier_list_aux([Frontier | More_Frontiers], Proposal, GoalVars, UQV, [Result_Frontier | Result_More_Frontiers]) :-
+negate_frontier_list_aux([], _GoalVars, _Proposal, []) :- !.
+negate_frontier_list_aux([Frontier | More_Frontiers], GoalVars, Proposal, [Result_Frontier | Result_More_Frontiers]) :-
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
-	negate_subfrontier(Frontier, Proposal, GoalVars, UQV, Result_Frontier),
+	negate_subfrontier(Frontier, GoalVars, Proposal, Result_Frontier),
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_frontier_list_aux(More_Frontiers, Proposal, GoalVars, UQV, Result_More_Frontiers).
+	negate_frontier_list_aux(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
 %	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
 %	!. % Reduce the stack's memory by forbidding backtracking.
 	
@@ -416,23 +403,22 @@ negate_frontier_list_aux([Frontier | More_Frontiers], Proposal, GoalVars, UQV, [
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_subfrontier((Head, BodyList), Proposal, GoalVars, Result) 
-% returns in Result a solution of the negation of the conjunction of subgoals 
-% (Head, BodyList) of the goal Goal.
+% negate_subfrontier(SubFrontier, GoalVars, Proposal, Result_Frontier)
+% returns in Result_Frontier the negation of the subfrontier in SubFrontier
 
-negate_subfrontier(Frontier_In, Proposal, GoalVars, UQV, (Result)):-
+negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: Frontier_In', (Frontier_In)),
-	split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Aux_1),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
+	split_frontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	normalize_E_IE_NIE(Proposal, Frontier_Aux_1, GoalVars, UQV, Frontier_Aux_2, Vars_Info),
+	normalize_E_IE_NIE(Proposal, SubFrontier_Aux_1, GoalVars, SubFrontier_Aux_2, Vars_Info),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', Vars_Info),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', Frontier_Aux_2),
-	split_IE_NIE_between_imp_exp_and_dumb(Frontier_Aux_2, Vars_Info, Frontier_Aux_3),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', Frontier_Aux_3),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_2),
+	split_IE_NIE_between_imp_exp_and_dumb(SubFrontier_Aux_2, Vars_Info, SubFrontier_Aux_3),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_3),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_formula(Frontier_Aux_3, Proposal, Vars_Info, Result),
+	negate_formula(SubFrontier_Aux_3, Proposal, Vars_Info, Result),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
 
@@ -498,19 +484,19 @@ split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
 % normalize_I_D_R(I,D,R,GoalVars, In,Dn,Rn,ImpVars) 
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
-normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, UQV, Formula_In, Vars_Info):-
-	compute_variables_information(Formula_In, GoalVars, UQV, Vars_Info).
+normalize_E_IE_NIE('cneg_rt_New', Formula_In, GoalVars, Formula_In, Vars_Info):-
+	compute_variables_information(Formula_In, GoalVars, Vars_Info).
 
-normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, UQV, Formula_Out, Vars_Info_Out):-
-	compute_variables_information(Formula, GoalVars, UQV, Vars_Info_1),
+normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out, Vars_Info_Out):-
+	compute_variables_information(Formula, GoalVars, Vars_Info_1),
 	remove_from_E_redundant_eqs_and_vars(Formula_In, Vars_Info_1, Formula_Aux),  
 	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
-	compute_variables_information(Formula, GoalVars, UQV, Vars_Info_2),
+	compute_variables_information(Formula, GoalVars, Vars_Info_2),
 	remove_from_IE_irrelevant_disequalities(Formula_Aux, Vars_Info_2, Formula_Out),
 	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_Out', Formula_Out),
-	compute_variables_information(Formula_Out, GoalVars, UQV, Vars_Info_Out).
+	compute_variables_information(Formula_Out, GoalVars, Vars_Info_Out).
  
-normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _UQV, _Formula_Out, _Vars_Info) :-
+normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out, _Vars_Info) :-
 	Proposal \== 'cneg_rt_New', 
 	Proposal \== 'cneg_rt_Chan', !, 
 	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
@@ -520,8 +506,7 @@ normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _UQV, _Formula_Out, _Vars_I
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-compute_variables_information(Formula, GoalVars, UQV, Vars_Info) :-
-% Bug is here !!!
+compute_variables_information(Formula, GoalVars, Vars_Info) :-
 	frontier_E_IE_NIE_contents(Formula, E, IE, NIE),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 
@@ -541,7 +526,7 @@ compute_variables_information(Formula, GoalVars, UQV, Vars_Info) :-
  	varsbag_difference(Vars_IE, ImpVars, Dumb_Vars_Tmp), % Dumb_Vars_Tmp = vars(IE) - GoalVars - vars(E)
  	varsbag_difference(Dumb_Vars_Tmp, Vars_NIE, Dumb_Vars), % Dumb_Vars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
 
-	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Conjunctions
 	goal_is_conjunction(Frontier, Frontier_Left, Frontier_Right), !,
@@ -670,10 +655,10 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 
 remove_from_IE_irrelevant_disequalities(Formula_In, Vars_Info_In, Formula_Out) :-
 %	Recompute.
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
-	vars_info_contents(Vars_Info_In, GoalVars_In, UQV_In, _ImpVars_In, _ExpVars_In, _RelVars_In, _Dumb_Vars_In, _Closed_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info_In, GoalVars_In, _ImpVars_In, _ExpVars_In, _RelVars_In, _Dumb_Vars_In, _Closed_Vars),
 
-	compute_variables_information(Formula_In, GoalVars_In, UQV_In, Vars_Info),
+	compute_variables_information(Formula_In, GoalVars_In, Vars_Info),
 	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out),
 	frontier_E_IE_NIE_contents(Formula_Out, E_In, IE_Out, NIE_In). 
@@ -687,7 +672,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out) :-
 
 remove_from_IE_irrelevant_disequalities_aux(IE_In, Vars_Info, IE_Out):-
 	goal_is_disequality(IE_In, _Term1, _Term2, _GV_IE_In, _EQV_IE_In, _UQV_IE_In), !,
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, Dumb_Vars, _Closed_Vars),
+	vars_info_contents(Vars_Info, _GoalVars, _ImpVars, _ExpVars, _RelVars, Dumb_Vars, _Closed_Vars),
 
 	varsbag(IE_In, [], [], Vars_IE_In),
 	varsbag_intersection(Vars_IE_In, Dumb_Vars, Problematic_Vars),
@@ -737,8 +722,8 @@ split_ie_or_nie_between_imp_exp_and_dumb(Form, _Vars_Info, _Form_imp, _Form_exp,
 	fail.
 
 split_ie_or_nie_between_imp_exp_and_dumb(Form, Vars_Info, Form_imp, Form_exp, Form_dumb) :-
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, _ImpVars, ExpVars, _RelVars, Dumb_Vars, _Closed_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info, _GoalVars, _ImpVars, ExpVars, _RelVars, Dumb_Vars, _Closed_Vars),
 	varsbag(Form, [], [], Form_Vars), 
 	varsbag_intersection(Form_Vars, ExpVars, Form_ExpVars),
 	varsbag_intersection(Form_Vars, Dumb_Vars, Form_Dumb_Vars),
@@ -789,12 +774,10 @@ negate_formula(Frontier, Proposal, Vars_Info, Neg_E_IE_NIE) :-
 negate_IE_NIE_exp([], _Proposal, _Vars_Info, []):- !.
 negate_IE_NIE_exp(IE_NIE_exp, Proposal, Vars_Info, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
-	% vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, Closed_Vars),
+	% vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info, GoalVars, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _Closed_Vars),
 
-	varsbag((ImpVars, Closed_Vars), [], [], Non_UQV), % Sometimes we have non-vars (Chan method).
-	varsbag(IE_NIE_exp, Non_UQV, [], IE_NIE_Exp_UQV), % IE_NIE_Exp_UQV = vars(IE_NIE_Exp) - Non_UQV
-	functor_local(Neg_IE_NIE_exp, Proposal, 2, [IE_NIE_Exp_UQV |[ IE_NIE_exp ]]), !.
+	functor_local(Neg_IE_NIE_exp, 'cneg_rt_gv', 3, [IE_NIE_exp |[ GoalVars |[ Proposal]]]), !.
 
 negate_imp_form([], _Proposal, _Vars_Info, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _Proposal, _Vars_Info, _Next_Formula, _Neg_Formula) :-
@@ -831,8 +814,8 @@ negate_imp_atom(fail, _Proposal, _Vars_Info, true, fail):- !. % Trivial predicat
 % are the result from applying double negation to a disequality. 
 negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	goal_is_equality(Formula, T1, T2, _Eq_GV_In, Eq_EQV_In, Eq_UQV_In), !,
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
-	vars_info_contents(Vars_Info, GoalVars, _UQV, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _Closed_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info, GoalVars, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _Closed_Vars),
 
 	varsbag((T1, T2), [], [], Vars_Eq), % Just variables
 	varsbag(Eq_EQV_In, [], [], Eq_EQV), % Just variables
@@ -846,8 +829,8 @@ negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 % Idem for disequalities.
 negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	goal_is_disequality(Formula, T1, T2, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
-	vars_info_contents(Vars_Info, GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _Closed_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info, GoalVars, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _Closed_Vars),
 
 	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
 	varsbag(Diseq_EQV_In, [], [], Diseq_EQV), % Just variables
@@ -861,13 +844,10 @@ negate_imp_atom(Formula, _Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
 	Keep_Atom = (diseq_geuqv(T1,T2, GoalVars, Diseq_EQV, Diseq_UQV)).
 
 negate_imp_atom(Formula, Proposal, Vars_Info, Neg_Atom, Keep_Atom) :-
-%	vars_info_contents(Vars_Info, GoalVars, UQV, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
-	vars_info_contents(Vars_Info, _GoalVars, _UQV, ImpVars, _ExpVars, _RelVars, _Dumb_Vars, Closed_Vars),
+%	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
+	vars_info_contents(Vars_Info, GoalVars, _ImpVars, _ExpVars, _RelVars, _Dumb_Vars, _Closed_Vars),
 
-	varsbag((ImpVars, Closed_Vars), [], [], Non_UQV), 
- 	varsbag(Formula, Non_UQV, [], Delayed_Negation_UQV),
-
-	functor_local(Neg_Atom, Proposal, 2, [Delayed_Negation_UQV |[ Formula ]]),
+	functor_local(Neg_Atom, 'cneg_rt_gv', 3, [Formula |[ GoalVars |[ Proposal]]]),
 	Keep_Atom = (Formula). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
