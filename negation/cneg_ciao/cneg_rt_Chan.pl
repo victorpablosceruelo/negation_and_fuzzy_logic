@@ -71,7 +71,10 @@ call_to_all_negated_subfrontiers([], _Level, Trace, CN_Call) :-
 	add_predicate_to_trace('-----------------------', Trace_End),
 	get_trace_final_status_list(Trace, Status_List),
 	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, 'list', 'trace', 'TRACE: ', Status_List),
+	echo_msg(2, 'nl', 'trace', '', '').
+
 call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, CN_Call) :-
 	generate_conjunction_trace(Trace, Trace_Current_Goal, Trace_Next_Goal),
 	generate_conjunction_trace(Trace_Current_Goal, Trace_Info, Trace_Result),
@@ -518,6 +521,7 @@ normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _UQV, _Formula_Out, _Vars_I
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 compute_variables_information(Formula, GoalVars, UQV, Vars_Info) :-
+% Bug is here !!!
 	frontier_E_IE_NIE_contents(Formula, E, IE, NIE),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 
