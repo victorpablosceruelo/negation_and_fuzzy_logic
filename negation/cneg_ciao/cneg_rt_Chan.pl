@@ -277,7 +277,7 @@ compute_goal_frontier(Goal, Proposal, Frontier) :-
 	cneg_rt_Aux(SubGoal, GoalVars, Proposal, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
-	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier), !,
+	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, 'cneg_rt_gv', List_Of_Conjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
 	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'double neg :: Frontier', Frontier),

@@ -517,13 +517,13 @@ goal_is_negation(Goal, 'compute', UQV, SubGoal, Proposal) :-
 	arg(1, Goal, UQV),
 	arg(2, Goal, SubGoal).
 
-goal_is_negation(Goal, GoalVars, 'compute', SubGoal, Real_Proposal) :-
-	valid_negation_preds(Proposal, Arity), 
+goal_is_negation(Goal, GoalVars, 'compute', SubGoal, Proposal) :-
+	valid_negation_preds(Name, Arity), 
 	Arity == 3,
-	functor(Goal, Proposal, Arity), !,
+	functor(Goal, Name, Arity), !,
 	arg(1, Goal, SubGoal),
  	arg(2, Goal, GoalVars),
- 	arg(3, Goal, Real_Proposal).
+ 	arg(3, Goal, Proposal).
 
 goal_is_not_negation(Goal) :-
 	nonvar(Goal), % Security issues.
@@ -536,7 +536,7 @@ goal_is_not_negation(Goal) :-
 	echo_msg(1, '', 'cneg_aux', 'goal_is_not_negation', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
-goal_is_negation_uqv(Goal, UQV, SubGoal, Proposal) :-
+goal_is_negation_uqv(Goal, Real_UQV, SubGoal, Proposal) :-
 	goal_is_negation(Goal, GoalVars, UQV, SubGoal, Proposal), !,
  	(
 	    (   GoalVars == 'compute', !, Real_UQV = UQV )
@@ -819,9 +819,17 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody])
 % Example for Negation_Predicate = 'cneg_tr'
 translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
 	goal_is_negation(Body, _GoalVars_Invalid, _UQV_Invalid, SubGoal, Proposal), !,
-	goal_is_negation_uqv(Body, UQV, SubGoal, Proposal), !,
-
-	functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]]).
+	(
+	    (	Negation_Predicate \== 'cneg_rt_gv', !,
+		goal_is_negation_uqv(Body, UQV, SubGoal, Proposal), !,
+		functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]])
+	    )
+	;
+	    (   Negation_Predicate == 'cneg_rt_gv', !,
+		goal_is_negation_gv(Body, GoalVars, SubGoal, Proposal), !,
+		functor_local(NewBody, Negation_Predicate, 3, [ SubGoal |[ GoalVars |[ Proposal ]]])
+	    )
+	), !.
 
 translate_problematic_predicates(Body, _Negation_Predicate, Body) :- 
 	goal_is_not_conj_disj_neg(Body), !.
