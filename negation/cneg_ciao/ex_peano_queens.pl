@@ -1,9 +1,13 @@
 :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
-test_queens(N, Columns) :- % Let's see if we have invalid results.
+test_queens_1(N, Columns) :- % Let's see if we have invalid results.
 	cneg_rt([], queens(N, Columns)), % First constraints.
 	queens(N, Columns). % Secondly values generator.
+
+test_queens_2(N, Columns) :- % Let's see if we have invalid results.
+	queens(N, Columns), % First values generator.
+	cneg_rt([], queens(N, Columns)). % Second constraints.
 
 % queens(N,Columns) returns in Columns the column where we must place each of N
 % queens in a Checkerboard of NxN assuming each position in the list 
