@@ -15,7 +15,7 @@
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
 	    goal_is_not_conj_disj_neg/1,
 	    goal_is_not_negation/1,
-	    goal_is_negation/4,
+	    goal_is_negation/5,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -418,9 +418,31 @@ goal_is_disjunction((G1;G2), G1, G2) :- !.
 goal_is_disjunction(Goal, G1, G2) :-
 	goal_is_aux_2a('basiccontrol:;', Goal, G1, G2), !.
 
+goal_is_not_disjunction(Goal) :-
+	nonvar(Goal), % Security issues.
+	goal_is_disjunction(Goal, _G1, _G2), !, fail.
+goal_is_not_disjunction(Goal) :-
+	nonvar(Goal), % Security issues.
+	!.
+goal_is_not_disjunction(Goal) :-
+	var(Goal), 
+	echo_msg(1, '', 'cneg_aux', 'goal_is_not_disjunction', 'Goal can not be a variable. ERROR.'),
+	!, fail.
+
 goal_is_conjunction((G1,G2), G1, G2) :- !.
 goal_is_conjunction(Goal, G1, G2) :- 
 	goal_is_aux_2a('basiccontrol:,', Goal, G1, G2), !.
+
+goal_is_not_conjunction(Goal) :-
+	nonvar(Goal), % Security issues.
+	goal_is_conjunction(Goal, _G1, _G2), !, fail.
+goal_is_not_conjunction(Goal) :-
+	nonvar(Goal), % Security issues.
+	!.
+goal_is_not_conjunction(Goal) :-
+	var(Goal), 
+	echo_msg(1, '', 'cneg_aux', 'goal_is_not_conjunction', 'Goal can not be a variable. ERROR.'),
+	!, fail.
 
 % goal_is_disequality(Goal, Arg_1, Arg_2, EQV, UQV) 
 goal_is_disequality(Goal, Arg_1, Arg_2, [], [], []) :- 
@@ -430,6 +452,17 @@ goal_is_disequality(Goal, Arg_1, Arg_2, [], [], UQV) :-
 goal_is_disequality(Goal, Arg_1, Arg_2, GV, EQV, UQV) :- 
 	goal_is_aux_5a('diseq_geuqv', Goal, Arg_1, Arg_2, GV, EQV, UQV), !.
 
+goal_is_not_disequality(Goal) :-
+	nonvar(Goal), % Security issues.
+	goal_is_disequality(Goal, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !, fail.
+goal_is_not_disequality(Goal) :-
+	nonvar(Goal), % Security issues.
+	!.
+goal_is_not_disequality(Goal) :-
+	var(Goal), 
+	echo_msg(1, '', 'cneg_aux', 'goal_is_not_disequality', 'Goal can not be a variable. ERROR.'),
+	!, fail.
+
 % goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) 
 goal_is_equality(Goal, Arg_1, Arg_2, [], [], []) :- 
 	goal_is_aux_2a('=', Goal, Arg_1, Arg_2), !.
@@ -437,6 +470,17 @@ goal_is_equality(Goal, Arg_1, Arg_2, [], [], UQV) :-
 	goal_is_aux_3a('equality', Goal, Arg_1, Arg_2, UQV), !.
 goal_is_equality(Goal, Arg_1, Arg_2, GV, EQV, UQV) :- 
 	goal_is_aux_5a('eq_geuqv', Goal, Arg_1, Arg_2, GV, EQV, UQV), !.
+
+goal_is_not_equality(Goal) :-
+	nonvar(Goal), % Security issues.
+	goal_is_equality(Goal, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !, fail.
+goal_is_not_equality(Goal) :-
+	nonvar(Goal), % Security issues.
+	!.
+goal_is_not_equality(Goal) :-
+	var(Goal), 
+	echo_msg(1, '', 'cneg_aux', 'goal_is_not_equality', 'Goal can not be a variable. ERROR.'),
+	!, fail.
 
 goal_is_aux_2a(Name, Goal, Arg_1, Arg_2) :-
 	functor(Goal, Name, 2), !,
@@ -457,66 +501,55 @@ goal_is_aux_5a(Name, Goal, Arg_1, Arg_2, Arg_3, Arg_4, Arg_5) :-
 	arg(4, Goal, Arg_4),
 	arg(5, Goal, Arg_5).
 
-goal_name_is_not_conjunction(Name) :-
-	Name \== ',',
-	Name \== 'basiccontrol:,'.
+valid_negation_preds('cneg', 2).
+valid_negation_preds('cneg_tr', 2).
+valid_negation_preds('cneg_rt', 2).
+valid_negation_preds('cneg_rt_Stuckey', 2).
+valid_negation_preds('cneg_rt_Chan', 2).
+valid_negation_preds('cneg_rt_New', 2).
+valid_negation_preds('cneg_rt_gv', 3).
 
-goal_name_is_not_disjunction(Name) :-
-	Name \== 'basiccontrol:;',
-	Name \== ';'.
-
-goal_name_is_not_equality(Name) :-
-	Name \== '=', 
-	Name \== 'equality',
-	Name \== 'eq_geuqv'.
-
-goal_name_is_not_disequality(Name) :-
-	Name \== '=/=',
-	Name \== 'disequality',
-	Name \== 'diseq_geuqv'.
-
-goal_name_is_not_negation(Name) :-
-	Name \== 'cneg',
-	Name \== 'cneg_tr',
-	Name \== 'cneg_rt',
-	Name \== 'cneg_rt_Stuckey',
-	Name \== 'cneg_rt_Chan',
-	Name \== 'cneg_rt_New'.
-
-valid_names_for_negation_preds('cneg').
-valid_names_for_negation_preds('cneg_tr').
-valid_names_for_negation_preds('cneg_rt').
-valid_names_for_negation_preds('cneg_rt_Stuckey').
-valid_names_for_negation_preds('cneg_rt_Chan').
-valid_names_for_negation_preds('cneg_rt_New').
-
-
-goal_is_negation(Goal, UQV, SubGoal, Proposal) :-
-	valid_names_for_negation_preds(Proposal), 
-	functor(Goal, Proposal, 2), !,
+goal_is_negation(Goal, 'compute', UQV, SubGoal, Proposal) :-
+	valid_negation_preds(Proposal, Arity), 
+	Arity == 2,
+	functor(Goal, Proposal, Arity), !,
 	arg(1, Goal, UQV),
 	arg(2, Goal, SubGoal).
+
+goal_is_negation(Goal, GoalVars, 'compute', SubGoal, Real_Proposal) :-
+	valid_negation_preds(Proposal, Arity), 
+	Arity == 3,
+	functor(Goal, Proposal, Arity), !,
+	arg(1, Goal, SubGoal),
+ 	arg(2, Goal, GoalVars),
+ 	arg(3, Goal, Real_Proposal).
+
+goal_is_not_negation(Goal) :-
+	nonvar(Goal), % Security issues.
+	goal_is_negation(Goal, _GoalVars, _UQV, _SubGoal, _Proposal), !, fail.
+goal_is_not_negation(Goal) :-
+	nonvar(Goal), % Security issues.
+	!.
+goal_is_not_negation(Goal) :-
+	var(Goal), 
+	echo_msg(1, '', 'cneg_aux', 'goal_is_not_negation', 'Goal can not be a variable. ERROR.'),
+	!, fail.
 
 goal_is_not_conj_disj_neg(Goal) :-
 	nonvar(Goal),
 	functor_local(Goal, Name, _Arity, _Args),
-	goal_name_is_not_conjunction(Name),
-	goal_name_is_not_disjunction(Name),
-	goal_name_is_not_negation(Name).
+	goal_is_not_conjunction(Name),
+	goal_is_not_disjunction(Name),
+	goal_is_not_negation(Name).
 
 goal_is_not_conj_disj_eq_diseq_dneg(Goal) :-
 	nonvar(Goal),
 	functor_local(Goal, Name, _Arity, _Args),
-	goal_name_is_not_conjunction(Name),
-	goal_name_is_not_disjunction(Name),
-	goal_name_is_not_equality(Name),
-	goal_name_is_not_disequality(Name),
-	goal_name_is_not_negation(Name).
-
-goal_is_not_negation(Goal) :-
-	nonvar(Goal),
-	functor_local(Goal, Name, _Arity, _Args),
-	goal_name_is_not_negation(Name).
+	goal_is_not_conjunction(Name),
+	goal_is_not_disjunction(Name),
+	goal_is_not_equality(Name),
+	goal_is_not_disequality(Name),
+	goal_is_not_negation(Name).
 
 % Ensure you do this before calling predicates here !!!
 %	name(Name, NameString),
@@ -768,8 +801,19 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody])
 
 % Example for Negation_Predicate = 'cneg_tr'
 translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
-	goal_is_negation(Body, UQV, SubGoal, _Proposal), !,
-	functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]]).
+	goal_is_negation(Body, GoalVars, UQV, SubGoal, _Proposal), !,
+	(
+	    (
+		GoalVars == 'compute', !,
+		Real_UQV = UQV
+	    )
+	;
+	    (
+		UQV == 'compute', !,
+		varsbag(SubGoal, GoalVars, [], Real_UQV)
+	    )
+	),
+	functor_local(NewBody, Negation_Predicate, 2, [Real_UQV |[ SubGoal ]]).
 
 translate_problematic_predicates(Body, _Negation_Predicate, Body) :- 
 	goal_is_not_conj_disj_neg(Body), !.
