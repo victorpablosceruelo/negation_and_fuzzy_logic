@@ -820,6 +820,7 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody])
 translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
 	goal_is_negation(Body, _GoalVars_Invalid, _UQV_Invalid, SubGoal, Proposal), !,
 	goal_is_negation_uqv(Body, UQV, SubGoal, Proposal), !,
+
 	functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]]).
 
 translate_problematic_predicates(Body, _Negation_Predicate, Body) :- 
