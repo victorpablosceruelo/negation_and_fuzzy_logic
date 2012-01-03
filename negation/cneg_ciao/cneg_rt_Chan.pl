@@ -96,21 +96,21 @@ call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, CN_Call) 
 %	Goals \== [],
 %	generate_disjunction_from_list(Goals, Disj_Goals).
 
-cneg_rt_Aux(Goal, GoalVars, Proposal, Trace, Result_List) :-
+cneg_rt_Aux(Goal, GoalVars, Proposal, Result_List) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Proposal', Proposal),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: GoalVars', GoalVars),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Goal', Goal),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'statistics', 'statistics', '', (cneg_rt_Aux(Goal, GoalVars, Proposal, Trace))),
+	echo_msg(2, 'statistics', 'statistics', '', (cneg_rt_Aux(Goal, GoalVars, Proposal))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Clean up non-vars
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Real_GoalVars', Real_GoalVars),
 	portray_attributes_in_term_vars(2, 'cneg_rt', Goal),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Trace, Frontier),
+	compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
@@ -197,21 +197,21 @@ adequate_frontier_aux(F_In, GoalVars, _Body_Copy) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Trace, Frontier)
-compute_set_of_frontiers(Goal, GoalVars, Proposal, Trace, Frontier) :-
+% compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Frontier)
+compute_set_of_frontiers(Goal, GoalVars, Proposal, Frontier) :-
 	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_set_of_frontiers_aux(Goals, GoalVars, Proposal, Trace, Frontier),
+	compute_set_of_frontiers_aux(Goals, GoalVars, Proposal, Frontier),
 	!.
 
-compute_set_of_frontiers_aux([], _GoalVars, _Proposal, _Trace, []) :- !.
-compute_set_of_frontiers_aux([Goal | More_Goals], GoalVars, Proposal, Trace, Frontier_Out) :-
-	compute_goal_frontier(Goal, Proposal, Trace, Frontier_Aux), !,
+compute_set_of_frontiers_aux([], _GoalVars, _Proposal, []) :- !.
+compute_set_of_frontiers_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_Out) :-
+	compute_goal_frontier(Goal, Proposal, Frontier_Aux), !,
 %	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
 	adequate_frontier(Frontier_Aux, GoalVars, Frontier_Tmp), !,
-	compute_set_of_frontiers_aux(More_Goals, GoalVars, Proposal, Trace, Frontier_In),
+	compute_set_of_frontiers_aux(More_Goals, GoalVars, Proposal, Frontier_In),
 	append(Frontier_Tmp, Frontier_In, Frontier_Out).
 
 % compute_neg_frontier(Goal,Frontier) 
@@ -220,48 +220,48 @@ compute_set_of_frontiers_aux([Goal | More_Goals], GoalVars, Proposal, Trace, Fro
 % elements where each element is a conjunction of subgoals.
 
 % Just to debug.
-%compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier) :-
+%compute_goal_frontier(Goal, _Proposal, _Frontier) :-
 %	echo_msg(2, '', 'cneg_rt', '--------------------------------------------------------------------------------------------------------------', ' '),
 %	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: (Goal)', (Goal)),	
 %	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
-compute_goal_frontier(Goal, Proposal, Trace, Frontier) :-
+compute_goal_frontier(Goal, Proposal, Frontier) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
-	compute_goal_frontier(Tmp_Goal, Proposal, Trace, Frontier).
+	compute_goal_frontier(Tmp_Goal, Proposal, Frontier).
 
 % Manage true and fail ...
-compute_goal_frontier('true', _Proposal, _Trace, [F_Out]) :- !,
+compute_goal_frontier('true', _Proposal, [F_Out]) :- !,
 	frontier_contents(F_Out, 'true', 'true', 'true', 'true').
-compute_goal_frontier('fail', _Proposal, _Trace, [F_Out]) :- !,
+compute_goal_frontier('fail', _Proposal, [F_Out]) :- !,
 	frontier_contents(F_Out, 'fail', 'fail', 'fail', 'true').
 
 % Now go for the disjunctions.
 % The frontiers need to evaluated one at a time. 
-compute_goal_frontier(Goal, _Proposal, _Trace, _Frontier_Out):- 
+compute_goal_frontier(Goal, _Proposal, _Frontier_Out):- 
 	goal_is_disjunction(Goal, _G1, _G2), !,
 	echo_msg(1, '', 'cneg_rt', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
 	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, % Backtracking is forbidden.
 	fail.
 
 % Now go for the conjunctions.
-compute_goal_frontier(Goal, Proposal, Trace, Frontier):- 
+compute_goal_frontier(Goal, Proposal, Frontier):- 
 	goal_is_conjunction(Goal, G1, G2), !,
-	compute_goal_frontier(G1, Proposal, Trace, Frontier_G1),
-	compute_goal_frontier(G2, Proposal, Trace, Frontier_G2),
+	compute_goal_frontier(G1, Proposal, Frontier_G1),
+	compute_goal_frontier(G2, Proposal, Frontier_G2),
 	!,
 	combine_frontiers_from_conjunction(Frontier_G1, Frontier_G2, Frontier),
 	!.
 
 % Now go for the functors for equality and disequality.
 % None of them is managed yet, so just bypass them.
-compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
+compute_goal_frontier(Goal, _Proposal, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'),
 	!.
 
-compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :- 
+compute_goal_frontier(Goal, _Proposal, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'), 
@@ -269,14 +269,13 @@ compute_goal_frontier(Goal, _Proposal, _Trace, [F_Out]) :-
 
 % Double negation is not managed yet. Bypass it.
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
-compute_goal_frontier(Goal, Proposal, Trace, Frontier) :- 
+compute_goal_frontier(Goal, Proposal, Frontier) :- 
 	goal_is_negation(Goal, UQV, SubGoal, _Negation_Proposal), !,
 
 There is a problem here: how do we know if we are playing with Goalvars or with UQV ??
 
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
-	cneg_rt_Aux(UQV, SubGoal, Proposal, Trace, Conj_List_Result), !,
-	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: dn :: Trace', [Goal | Trace]),
+	cneg_rt_Aux(UQV, SubGoal, Proposal, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier), !,
@@ -291,7 +290,7 @@ There is a problem here: how do we know if we are playing with Goalvars or with 
 % frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 
 % Now go for other functors stored in our database.
-compute_goal_frontier(Goal, _Proposal, _Trace, Frontier_Out) :-
+compute_goal_frontier(Goal, _Proposal, Frontier_Out) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
 %	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
@@ -302,7 +301,7 @@ compute_goal_frontier(Goal, _Proposal, _Trace, Frontier_Out) :-
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
-compute_goal_frontier(Goal, _Proposal, _Trace, []) :-
+compute_goal_frontier(Goal, _Proposal, []) :-
 	echo_msg(1, '', 'cneg_rt', 'ERROR: Not found frontier for Goal', Goal), 
 	echo_msg(1, 'nl', 'cneg_rt', '', ''), !. % Backtracking is forbidden.
 
