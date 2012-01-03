@@ -102,7 +102,7 @@ compute_neg_frontier(Goal, GoalVars, 'true'):-
 	diseq_geuqv(T1,T2, GoalVars, Eq_UQV, Diseq_UQV).
 
 compute_neg_frontier(Goal, _GoalVars, 'true'):- 
-	goal_is_negation(Goal, _UQV, SubGoal, _Negation_Proposal), !,
+	goal_is_negation(Goal, _Negation_UQV, _Negation_GoalVars, SubGoal, _Negation_Proposal), !,
 	generate_empty_trace(Trace),	
 	call_to(SubGoal, 0, Trace). % Forget GoalVars and UQV.
 
@@ -266,7 +266,7 @@ evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	eq_geuqv(Left, Right, GV, EQV, UQV).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
-	goal_is_negation(Prev_Front_Residua, UQV, SubGoal, _Negation_Proposal), 
+	goal_is_negation_uqv(Prev_Front_Residua, UQV, SubGoal, _Negation_Proposal), 
 	cneg_rt_Stuckey(UQV, SubGoal).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-

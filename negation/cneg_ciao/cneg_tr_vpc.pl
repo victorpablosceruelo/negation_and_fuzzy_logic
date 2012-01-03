@@ -266,7 +266,7 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	functor_local(Neg_Atom, 'eq_geuqv_adv', 6, [A_Left |[A_Right |[ GoalVars |[ Diseq_UQV |[ 'compute' |[Result]]]]]]).
 
 negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
-	goal_is_negation(Atom, UQV, SubGoal, _Proposal), !,
+	goal_is_negation_uqv(Atom, UQV, SubGoal, _Proposal), !,
 	functor_local(Op_Append, 'append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
 	Neg_Atom = (Op_Append, Neg_Atom_Aux),
 	double_negation_atom(SubGoal, New_GoalVars, Result, Neg_Atom_Aux).
@@ -316,7 +316,7 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	double_negation_atom(Disj_2, GoalVars, Result, DN_Disj_2). 
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
-	goal_is_negation(Atom, _Unconfigured_UQV, SubGoal, _Proposal), !, 
+	goal_is_negation_uqv(Atom, _Unconfigured_UQV, SubGoal, _Proposal), !, 
 	negate_atom(SubGoal, GoalVars, Result, DN_Atom). % Problematic
 
 double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-

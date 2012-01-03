@@ -31,14 +31,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt_Chan(UQV, Goal):-
+cneg_rt_Chan(UQV, Goal) :-
 	Proposal = 'cneg_rt_Chan',
-	generate_empty_trace(Trace),
-	varsbag(Goal, UQV, [], GoalVars), % We prefer to play with goalvars
-	cneg_rt_gv(Goal, GoalVars, Proposal, 0, Trace).
+	cneg_rt_uqv(Goal, UQV, Proposal).
 
 cneg_rt_New(UQV, Goal) :-
 	Proposal = 'cneg_rt_New',
+	cneg_rt_uqv(Goal, UQV, Proposal).
+
+cneg_rt_uqv(Goal, UQV, Proposal) :-
 	generate_empty_trace(Trace),
 	varsbag(Goal, UQV, [], GoalVars), % We prefer to play with goalvars
 	cneg_rt_gv(Goal, GoalVars, Proposal, 0, Trace).
@@ -54,7 +55,7 @@ cneg_rt_gv(Goal, GoalVars, Proposal, Level, Trace) :-
 	get_trace_status_list(Trace_2, Trace_Status_List),
 	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Trace_Status_List),
 	!,
-	cneg_rt_Aux(Goal, GoalVars, Proposal, [], Result_List),
+	cneg_rt_Aux(Goal, GoalVars, Proposal, Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	call_to_all_negated_subfrontiers(Result_List, Level, Trace_2, CN_Call).
 
@@ -270,12 +271,10 @@ compute_goal_frontier(Goal, _Proposal, [F_Out]) :-
 % Double negation is not managed yet. Bypass it.
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Frontier) :- 
-	goal_is_negation(Goal, UQV, SubGoal, _Negation_Proposal), !,
-
-There is a problem here: how do we know if we are playing with Goalvars or with UQV ??
-
-	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, SubGoal)', (Proposal, UQV, SubGoal)),
-	cneg_rt_Aux(UQV, SubGoal, Proposal, Conj_List_Result), !,
+	goal_is_negation(Goal, _UQV_Invalid, _GoalVars_Invalid, SubGoal, Negation_Proposal), !,
+	goal_is_negation_gv(Goal, GoalVars, SubGoal, Negation_Proposal), !,
+	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, GoalVars, SubGoal)', (Proposal, GoalVars, SubGoal)),
+	cneg_rt_Aux(SubGoal, GoalVars, Proposal, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, Proposal, List_Of_Conjs_Frontier), !,
@@ -468,7 +467,7 @@ split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 % The way to fix this is remove cneg(cneg(...))
 % when evaluating the frontier. To be done.
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_negation(Frontier_In, _UQV, _SubGoal, _Negation_Proposal), !,
+	goal_is_negation(Frontier_In, _GoalVars, _UQV, _SubGoal, _Negation_Proposal), !,
 	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
@@ -544,7 +543,7 @@ identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Disequaliti
 	varsbag(UQV, [], Closed_Vars_In, Closed_Vars_Out).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Negations
-	goal_is_negation(Frontier, UQV, _SubGoal, _Negation_Proposal), !,
+	goal_is_negation_uqv(Frontier, UQV, _SubGoal, _Negation_Proposal), !,
 	varsbag(UQV, [], Closed_Vars_In, Closed_Vars_Out).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_In) :- % Other subgoals
