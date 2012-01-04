@@ -141,7 +141,6 @@ by_pass_universallity_of_variables(UQV_In, UQV_Aux) :-
 frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
 frontier_E_IE_NIE_contents(frontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
 frontier_E_IE_NIE_ied_contents(frontier_E_IE_NIE_ied(E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb), E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-vars_info_contents(vars_info(GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars), GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -716,21 +715,20 @@ compute_imp_exp_dumb_vars(SubFrontier_In, GoalVars, ImpVars, ExpVars, DumbVars) 
 
 	identify_closed_vars(E, [], Closed_Vars_E),
 	identify_closed_vars(IE, Closed_Vars_E, Closed_Vars_E_IE),
-	identify_closed_vars(NIE, Closed_Vars_E_IE, Closed_Vars_E_IE_NIE),
+	identify_closed_vars(NIE, Closed_Vars_E_IE, Closed_Vars_E_IE_NIE), % In Chan's proposal it is always empty.
 	varsbag(GoalVars, [], Closed_Vars_E_IE_NIE, Closed_Vars), 
 
 	varsbag(E, Closed_Vars, [], _Vars_E), % Vars_E = vars(E) - Closed_Vars
 	varsbag(IE, Closed_Vars, [], Vars_IE), % Vars_IE = vars(IE) - Closed_Vars
 	varsbag(NIE, Closed_Vars, [], Vars_NIE),  % Vars_NIE = vars(NIE) - Closed_Vars
 
-	identify_impvars(E, Closed_Vars, Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
+	identify_impvars(E, Closed_Vars, Real_GoalVars, ImpVars), % In Chan's proposal ImpVars = vars(E) + GoalVars
 	varsbag_difference(Vars_NIE, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
-	varsbag_difference(Vars_NIE, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
+%	varsbag_difference(Vars_NIE, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
 
- 	varsbag_difference(Vars_IE, ImpVars, Dumb_Vars_Tmp), % Dumb_Vars_Tmp = vars(IE) - GoalVars - vars(E)
- 	varsbag_difference(Dumb_Vars_Tmp, Vars_NIE, Dumb_Vars), % Dumb_Vars = vars(IE) - GoalVars - Vars(E) - Vars(NIE)
+	varsbag_addition(ImpVars, Vars_NIE, Valid_Vars), % Valid_Vars = ImpVars + Vars(NIE)
+ 	varsbag_difference(Vars_IE, Valid_Vars, DumbVars). % Dumb_Vars = vars(IE) - Valid_Vars
 
-	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -767,8 +765,8 @@ identify_impvars(E, Closed_Vars, ImpVars_In, ImpVars_Out) :-
 		varsbag(Unclosed_Vars_Value_1, [], ImpVars_In, ImpVars_Out) 
 	    )
 	;
-	    (	% In both values. No impvar.
-		Unclosed_Vars_Value_1 == [],
+	    (	% In both values at least one new variable. Need to evaluate it to know.
+		Unclosed_Vars_Value_1 \== [],
 		Unclosed_Vars_Value_2 \== [], !,
 		ImpVars_Out = ImpVars_In 
 	    )
