@@ -430,7 +430,7 @@ negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 rebuild_conjunction_of_goals([], [], []) :- !. % Empty elements when re-joining
 rebuild_conjunction_of_goals(Goals, [], Goals) :- !. % Empty element when re-joining
 rebuild_conjunction_of_goals([], Goals, Goals) :- !. % Empty element when re-joining
-rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- 
+rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empty elements.
 	Goals_1 \== [], 
 	Goals_2 \== [], !.
 
@@ -516,11 +516,11 @@ compute_variables_information(Formula, GoalVars, Vars_Info) :-
 	identify_closed_vars(NIE, Closed_Vars_E_IE, Closed_Vars_E_IE_NIE),
 	varsbag(GoalVars, [], Closed_Vars_E_IE_NIE, Closed_Vars), 
 
-	varsbag(E, Closed_Vars, [], Vars_E), % Vars_E = vars(E) - Closed_Vars
+	varsbag(E, Closed_Vars, [], _Vars_E), % Vars_E = vars(E) - Closed_Vars
 	varsbag(IE, Closed_Vars, [], Vars_IE), % Vars_IE = vars(IE) - Closed_Vars
 	varsbag(NIE, Closed_Vars, [], Vars_NIE),  % Vars_NIE = vars(NIE) - Closed_Vars
 
-	varsbag(Vars_E, [], Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
+	identify_impvars(E, Closed_Vars, Real_GoalVars, ImpVars), % ImpVars = vars(E) + GoalVars
 	varsbag_difference(Vars_NIE, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
 	varsbag_difference(Vars_NIE, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
 
@@ -529,6 +529,54 @@ compute_variables_information(Formula, GoalVars, Vars_Info) :-
 
 	vars_info_contents(Vars_Info, GoalVars, ImpVars, ExpVars, RelVars, Dumb_Vars, Closed_Vars).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% In Chan's proposal we have ImpVars = vars(E) + GoalVars
+% but he has removed equalities 
+identify_impvars([], _Closed_Vars, ImpVars, ImpVars) :- !. % It can be empty.
+identify_impvars(E, Closed_Vars, ImpVars_In, ImpVars_Out) :-
+	goal_is_conjunction(E, E_Left, E_Right), !,
+	identify_impvars(E_Left, Closed_Vars, ImpVars_In, ImpVars_Aux),
+	identify_impvars(E_Right, Closed_Vars, ImpVars_Aux, ImpVars_Out).
+identify_impvars(E, Closed_Vars, ImpVars_In, ImpVars_Out) :-
+	goal_is_equality(E, Value_1, Value_2, _GV, _EQV, _UQV), !,
+	varsbag_addition(Closed_Vars, ImpVars_In, Really_Closed_Vars),
+	varsbag(Value_1, Really_Closed_Vars, [], Unclosed_Vars_Value_1),
+	varsbag(Value_2, Really_Closed_Vars, [], Unclosed_Vars_Value_2),
+	(
+	    (   % No new variables in equality.
+		Unclosed_Vars_Value_1 == [],
+		Unclosed_Vars_Value_2 == [], !,
+		ImpVars_Out = ImpVars_In
+	    )
+	;
+	    (   % Only in Value_2
+		Unclosed_Vars_Value_1 == [],
+		Unclosed_Vars_Value_2 \== [], !,
+		varsbag(Unclosed_Vars_Value_2, [], ImpVars_In, ImpVars_Out) 
+	    )
+	;
+	    (   % Only in Value_1
+		Unclosed_Vars_Value_1 \== [],
+		Unclosed_Vars_Value_2 == [], !,
+		varsbag(Unclosed_Vars_Value_1, [], ImpVars_In, ImpVars_Out) 
+	    )
+	;
+	    (	% In both values. No impvar.
+		Unclosed_Vars_Value_1 == [],
+		Unclosed_Vars_Value_2 \== [], !,
+		ImpVars_Out = ImpVars_In 
+	    )
+	).
+		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+identify_closed_vars([], Closed_Vars, Closed_Vars) :- !. % It can be empty.
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Conjunctions
 	goal_is_conjunction(Frontier, Frontier_Left, Frontier_Right), !,
 	identify_closed_vars(Frontier_Left, Closed_Vars_In, Closed_Vars_Aux),
