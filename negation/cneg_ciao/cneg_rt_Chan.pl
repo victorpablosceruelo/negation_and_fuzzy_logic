@@ -722,8 +722,11 @@ compute_imp_exp_dumb_vars(SubFrontier_In, GoalVars, ImpVars, ExpVars, DumbVars) 
 	varsbag(IE, Closed_Vars, [], Vars_IE), % Vars_IE = vars(IE) - Closed_Vars
 	varsbag(NIE, Closed_Vars, [], Vars_NIE),  % Vars_NIE = vars(NIE) - Closed_Vars
 
-	identify_impvars(E, Closed_Vars, Real_GoalVars, ImpVars), % In Chan's proposal ImpVars = vars(E) + GoalVars
-	varsbag_difference(Vars_NIE, ImpVars, ExpVars), % Expvars = vars(NIE) - ImpVars
+	identify_imp_and_delay_vars(E, Closed_Vars, Real_GoalVars, ImpVars, [], DelayVars), 
+	% In Chan's proposal ImpVars = vars(E) + GoalVars
+	% and DelayVars = []
+	varsbag_difference(Vars_NIE, ImpVars, ExpVars_Chan), % Expvars = vars(NIE) - ImpVars
+	varsbag(DelayVars, [], ExpVars_Chan, ExpVars), % Delay_Vars = special ExpVars.
 %	varsbag_difference(Vars_NIE, Real_GoalVars, RelVars), % RelVars = vars(NIE) - GoalVars
 
 	varsbag_addition(ImpVars, Vars_NIE, Valid_Vars), % Valid_Vars = ImpVars + Vars(NIE)
@@ -736,12 +739,12 @@ compute_imp_exp_dumb_vars(SubFrontier_In, GoalVars, ImpVars, ExpVars, DumbVars) 
 
 % In Chan's proposal we have ImpVars = vars(E) + GoalVars
 % but he has removed equalities 
-identify_impvars([], _Closed_Vars, ImpVars, ImpVars) :- !. % It can be empty.
-identify_impvars(E, Closed_Vars, ImpVars_In, ImpVars_Out) :-
+identify_imp_and_delay_vars([], _Closed_Vars, ImpVars, ImpVars, DelayVars, DelayVars) :- !. % It can be empty.
+identify_imp_and_delay_vars(E, Closed_Vars, ImpVars_In, ImpVars_Out, DelayVars_In, DelayVars_Out) :-
 	goal_is_conjunction(E, E_Left, E_Right), !,
-	identify_impvars(E_Left, Closed_Vars, ImpVars_In, ImpVars_Aux),
-	identify_impvars(E_Right, Closed_Vars, ImpVars_Aux, ImpVars_Out).
-identify_impvars(E, Closed_Vars, ImpVars_In, ImpVars_Out) :-
+	identify_imp_and_delay_vars(E_Left, Closed_Vars, ImpVars_In, ImpVars_Aux, DelayVars_In, DelayVars_Aux),
+	identify_imp_and_delay_vars(E_Right, Closed_Vars, ImpVars_Aux, ImpVars_Out, DelayVars_Aux, DelayVars_Out).
+identify_imp_and_delay_vars(E, Closed_Vars, ImpVars_In, ImpVars_Out, DelayVars_In, DelayVars_Out) :-
 	goal_is_equality(E, Value_1, Value_2, _GV, _EQV, _UQV), !,
 	varsbag_addition(Closed_Vars, ImpVars_In, Really_Closed_Vars),
 	varsbag(Value_1, Really_Closed_Vars, [], Unclosed_Vars_Value_1),
@@ -750,25 +753,30 @@ identify_impvars(E, Closed_Vars, ImpVars_In, ImpVars_Out) :-
 	    (   % No new variables in equality.
 		Unclosed_Vars_Value_1 == [],
 		Unclosed_Vars_Value_2 == [], !,
-		ImpVars_Out = ImpVars_In
+		ImpVars_Out = ImpVars_In,
+		DelayVars_Out = DelayVars_In, !
 	    )
 	;
 	    (   % Only in Value_2
 		Unclosed_Vars_Value_1 == [],
 		Unclosed_Vars_Value_2 \== [], !,
-		varsbag(Unclosed_Vars_Value_2, [], ImpVars_In, ImpVars_Out) 
+		varsbag(Unclosed_Vars_Value_2, [], ImpVars_In, ImpVars_Out),
+		DelayVars_Out = DelayVars_In, !
 	    )
 	;
 	    (   % Only in Value_1
 		Unclosed_Vars_Value_1 \== [],
 		Unclosed_Vars_Value_2 == [], !,
-		varsbag(Unclosed_Vars_Value_1, [], ImpVars_In, ImpVars_Out) 
+		varsbag(Unclosed_Vars_Value_1, [], ImpVars_In, ImpVars_Out),
+		DelayVars_Out = DelayVars_In, !
 	    )
 	;
 	    (	% In both values at least one new variable. Need to evaluate it to know.
 		Unclosed_Vars_Value_1 \== [],
 		Unclosed_Vars_Value_2 \== [], !,
-		ImpVars_Out = ImpVars_In 
+		ImpVars_Out = ImpVars_In,
+		varsbag(Unclosed_Vars_Value_1, [], DelayVars_In, DelayVars_Aux),
+		varsbag(Unclosed_Vars_Value_2, [], DelayVars_Aux, DelayVars_Out), !
 	    )
 	).
 		
