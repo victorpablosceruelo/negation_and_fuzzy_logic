@@ -53,7 +53,7 @@ clean:	fixes
 	@echo " "
 
 	# Really needed ??
-	dh_clean
+	# dh_clean
 
 build: clean fixes
 	dh_testdir
