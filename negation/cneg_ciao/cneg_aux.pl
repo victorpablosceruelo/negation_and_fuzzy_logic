@@ -66,7 +66,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Comment out the following sentences to disable all debugging.
-echo_msg_aux(_N, _File_Name, _Msg) :- !. % No debugging at all.
+echo_msg_aux(2, _File_Name, _Msg) :- !. % No debugging at all.
 	
 echo_msg_aux(0, _File_Name, _Msg) :- !.
 echo_msg_aux(1, File_Name, Msg) :-
