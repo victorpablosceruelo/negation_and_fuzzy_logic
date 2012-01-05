@@ -1,6 +1,9 @@
 :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
+tests(N, C) :- test_queens_1(N, C).
+tests(N, C) :- test_queens_2(N, C).
+
 test_queens_1(N, Columns) :- % Let's see if we have invalid results.
 	cneg_rt([], queens(N, Columns)), % First constraints.
 	queens(N, Columns). % Secondly values generator.
