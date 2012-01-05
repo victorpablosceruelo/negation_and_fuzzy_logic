@@ -144,12 +144,16 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	generate_auxiliary_code(Aux_Code),
 	list_name_for_cneg_predicates(List_Name_1),
 	retrieve_list_of(List_Name_1, List_Of_Preds),
-	echo_msg(0, '', 'cneg_tr', 'List_Of_Preds', List_Of_Preds),
+	echo_msg(2, '', 'cneg_tr', 'List_Of_Preds', List_Of_Preds),
 	list_name_for_cneg_heads_and_bodies(List_Name_2),
 	retrieve_list_of(List_Name_2, List_Of_H_and_B),
-	echo_msg(0, '', 'cneg_tr', 'List_Of_H_and_B', List_Of_H_and_B),
+	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B', List_Of_H_and_B),
 
-	generate_cneg_tr_vpc(List_Of_Preds, List_Of_H_and_B, Aux_Code, Cls_4),
+	remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds_Aux, List_Of_H_and_B_Aux),
+	echo_msg(2, '', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
+	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux),
+
+	generate_cneg_tr_vpc(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
 	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
@@ -175,3 +179,55 @@ generate_pre_frontiers([(Head, Body, Test, _Counter) | List_Of_Preds], SourceFil
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds_Aux, List_Of_H_and_B_Aux) :-
+	get_list_of_preds_to_ignore(List_Of_H_and_B, List), 
+	List \== [], !, % If empty this procedure is not useful.
+	echo_msg(2, 'nl', 'cneg_tr', '', ''),
+	echo_msg(2, '', 'cneg_tr', 'get_list_of_preds_to_ignore :: List', List),  
+	echo_msg(2, 'list', 'cneg_tr', 'get_list_of_preds_to_ignore :: List', List),  
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
+	remove_each_pred_in_list_1(List, List_Of_Preds, List_Of_Preds_Aux),
+	echo_msg(2, 'list', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
+	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux),
+	echo_msg(2, 'list', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux).
+
+remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds, List_Of_H_and_B) :- !,
+	echo_msg(2, 'nl', 'cneg_tr', '', ''),
+	echo_msg(2, '', 'cneg_tr', 'get_list_of_preds_to_ignore', 'No List'),  
+	echo_msg(2, 'nl', 'cneg_tr', '', '').
+
+get_list_of_preds_to_ignore([], []) :- !.
+get_list_of_preds_to_ignore([(_Head, _Body, Test, _Counter) | _List_Of_H_and_B], List) :-
+%	echo_msg(2, '', 'cneg_tr', 'get_list_of_preds_to_ignore :: Test', Test),  
+	functor(Test, 'cneg_ignores_preds', 1), !,
+	arg(1, Test, List).
+get_list_of_preds_to_ignore([(_Head, _Body, _Test, _Counter) | List_Of_H_and_B], List) :-
+	get_list_of_preds_to_ignore(List_Of_H_and_B, List).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+remove_each_pred_in_list_1(_List, [], []) :- !. % Optimization.
+remove_each_pred_in_list_1(List, [(Name, Arity, _C) | List_Of_Preds], List_Of_Preds_Aux) :-
+	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_1 :: Testing (Name, Arity)', (Name, Arity)),
+	memberchk(Name/Arity, List), !,
+	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_1 :: Removing (Name, Arity)', (Name, Arity)),
+	remove_each_pred_in_list_1(List, List_Of_Preds, List_Of_Preds_Aux).
+remove_each_pred_in_list_1(List, [(Name, Arity, C) | List_Of_Preds], [(Name, Arity, C) | List_Of_Preds_Aux]) :-
+	remove_each_pred_in_list_1(List, List_Of_Preds, List_Of_Preds_Aux).
+
+remove_each_pred_in_list_2(_List, [], []) :- !. % Optimization.
+remove_each_pred_in_list_2(List, [(Head, _Body, _T, _C) | List_Of_H_and_B], List_Of_H_and_B_Aux) :- 
+	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Testing (Head)', (Head)),
+	functor(Head, Name, Arity), 
+	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Testing (Name, Arity)', (Name, Arity)),
+	memberchk(Name/Arity, List), !,
+	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Removing (Name, Arity)', (Name, Arity)),  
+	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux).
+remove_each_pred_in_list_2(List, [(Head, Body, T, C) | List_Of_H_and_B], [(Head, Body, T, C) | List_Of_H_and_B_Aux]) :- 
+	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
