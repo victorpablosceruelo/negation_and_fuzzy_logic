@@ -1,10 +1,14 @@
 :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
+cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2]).
+
 tests(N, C) :- test_queens_1(N, C).
 tests(N, C) :- test_queens_2(N, C).
 
 test_queens_1(N, Columns) :- % Let's see if we have invalid results.
+	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
+	echo_msg(1, '', '', 'N', N),
 	cneg_rt([], queens(N, Columns)), % First constraints.
 	queens(N, Columns). % Secondly values generator.
 
