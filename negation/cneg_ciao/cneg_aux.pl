@@ -55,13 +55,33 @@
 
 :- dynamic defined_stream_to_file/2.
 
-% Use the following sentences to enable/disable debugging.
-
+% Meaning of values for variable Echo_Level:
+%
 % 0 -> no debug.
 % 1 -> std output + debugging.
 % 2 -> only debugging.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%% Debug (by VPC).
+% Comment out the following sentences to disable all debugging.
+echo_msg_aux(_N, _File_Name, _Msg) :- !. % No debugging at all.
+	
+echo_msg_aux(0, _File_Name, _Msg) :- !.
+echo_msg_aux(1, File_Name, Msg) :-
+	echo_msg_aux(2, File_Name, Msg),
+	write(Msg).
+echo_msg_aux(2, File_Name, Msg) :-
+	get_stream_to_file(File_Name, Stream_1),
+	write(Stream_1, Msg),
+	get_stream_to_file('with_all_debug_msgs', Stream_2),
+	write(Stream_2, Msg).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 get_stream_to_file(File_Name_Atom, _Stream) :-
 	var(File_Name_Atom), !, 
 	echo_msg(1, '', 'fail', 'get_stream_to_file can not work if File_Name is a variable', ''),
@@ -158,20 +178,6 @@ echo_msg_list_aux(Echo_Level, File_Name, Index, Pre_Msg, Msg) :-
 	echo_msg_aux(Echo_Level, File_Name, ' :: '),
 	echo_msg_aux(Echo_Level, File_Name, Msg),
 	echo_msg(Echo_Level, 'nl', File_Name, '', '').
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-echo_msg_aux(0, _File_Name, _Msg) :- !.
-echo_msg_aux(1, File_Name, Msg) :-
-	echo_msg_aux(2, File_Name, Msg),
-	write(Msg).
-echo_msg_aux(2, File_Name, Msg) :-
-	get_stream_to_file(File_Name, Stream_1),
-	write(Stream_1, Msg),
-	get_stream_to_file('with_all_debug_msgs', Stream_2),
-	write(Stream_2, Msg).
 			
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
