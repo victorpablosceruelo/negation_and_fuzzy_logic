@@ -52,9 +52,6 @@ clean:	fixes
 	./$(CIAOSETUP) braveclean
 	@echo " "
 
-	# Really needed ??
-	# dh_clean
-
 build: clean fixes
 	dh_testdir
 
@@ -101,7 +98,6 @@ install: build
 
 	dh_testdir
 	dh_testroot
-	# dh_clean -k
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp.
