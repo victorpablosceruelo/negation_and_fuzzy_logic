@@ -175,6 +175,7 @@ combine_frontiers_from_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
 % the result of combining F1_1 with each element of F2.
 combine_frontiers_from_conjunction_aux_2(_F1_1, [], []).
 combine_frontiers_from_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	frontier_contents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
 	frontier_contents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
 	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),
@@ -197,6 +198,7 @@ adequate_frontier([F_In | Frontier_In], GoalVars, [F_Out | Frontier_Out]) :-
 	adequate_frontier(Frontier_In, GoalVars, Frontier_Out).
 
 adequate_frontier_aux(F_In, GoalVars, Body_Copy) :-
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	frontier_contents(F_In, Real_Goal, Head, Body, _F_Test),
 	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
 	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
@@ -249,9 +251,11 @@ compute_goal_frontier(Goal, Proposal, Frontier) :-
 
 % Manage true and fail ...
 compute_goal_frontier('true', _Proposal, [F_Out]) :- !,
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	frontier_contents(F_Out, 'true', 'true', 'true', 'true').
 compute_goal_frontier('fail', _Proposal, [F_Out]) :- !,
-	frontier_contents(F_Out, 'fail', 'fail', 'fail', 'true').
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	frontier_contents(F_Out, 'fail', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
 % The frontiers need to evaluated one at a time. 
@@ -275,13 +279,15 @@ compute_goal_frontier(Goal, Proposal, Frontier):-
 compute_goal_frontier(Goal, _Proposal, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
-	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'),
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal),
 	!.
 
 compute_goal_frontier(Goal, _Proposal, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
-	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true'), 
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal), 
 	!.
 
 % Double negation is not managed yet. Bypass it.
@@ -300,9 +306,6 @@ compute_goal_frontier(Goal, Proposal, Frontier) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	!.
-
-% Only as info.
-% frontier_contents(frontier(Head, Body, FrontierTest), Head, Body, FrontierTest).
 
 % Now go for other functors stored in our database.
 compute_goal_frontier(Goal, _Proposal, Frontier_Out) :-
@@ -339,6 +342,7 @@ generate_conjunction_from_list([Goal | Goals], (Goal , Disj_Goals)) :-
 
 build_a_frontier_from_each_result(_Real_Goal, [], []) :- !.
 build_a_frontier_from_each_result(Real_Goal, [Result | Results], [Frontier | Frontiers]) :-
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	frontier_contents(Frontier, Real_Goal, Real_Goal, Result, Real_Goal),
 	build_a_frontier_from_each_result(Real_Goal, Results, Frontiers).
 
@@ -375,6 +379,7 @@ simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
+%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
