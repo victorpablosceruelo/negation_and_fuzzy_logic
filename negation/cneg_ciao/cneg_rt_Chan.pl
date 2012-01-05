@@ -148,16 +148,33 @@ frontier_E_IE_NIE_ie_contents(frontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_Imp, N
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the resulting frontier
 % from combining the frontiers F1 and F2 in all possible ways.
-combine_frontiers_from_conjunction([],_F2,[]):-!.
-combine_frontiers_from_conjunction([F1_1 | More_F1], F2, F3):-
-        combine_frontiers_from_conjunction_aux(F1_1, F2, F3_1),
-        combine_frontiers_from_conjunction(More_F1, F2, More_F3),
+combine_frontiers_from_conjunction([],_F2,[]) :- !, % Optimization
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'empty F1 -> empty F3'),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
+combine_frontiers_from_conjunction(_F1,[],[]) :- !, % Optimization
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'empty F2 -> empty F3'),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
+combine_frontiers_from_conjunction(F1,F2,F3) :-
+	F1 \== [], F2 \== [],
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'F1 /\\ F2 -> F3 '),
+	combine_frontiers_from_conjunction_aux_1(F1,F2,F3),
+	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'F3'),
+	echo_msg(2, 'list', 'cneg_rt', '', F3),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
+	
+combine_frontiers_from_conjunction_aux_1([],_F2,[]) :- !.
+combine_frontiers_from_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
+        combine_frontiers_from_conjunction_aux_2(F1_1, F2, F3_1),
+        combine_frontiers_from_conjunction_aux_1(More_F1, F2, More_F3),
         cneg_aux:append(F3_1, More_F3, F3).
 
 % combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
 % the result of combining F1_1 with each element of F2.
-combine_frontiers_from_conjunction_aux(_F1_1, [], []).
-combine_frontiers_from_conjunction_aux(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
+combine_frontiers_from_conjunction_aux_2(_F1_1, [], []).
+combine_frontiers_from_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
 	frontier_contents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
 	frontier_contents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
 	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),
@@ -166,9 +183,9 @@ combine_frontiers_from_conjunction_aux(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :
 	F3_F_Test = ((F1_1_F_Test), (F2_1_F_Test)),
 	frontier_contents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
 	test_frontier_is_valid(F3, F3_Real_Goal), !, 
-        combine_frontiers_from_conjunction_aux(F1_1, More_F2, More_F3).
-combine_frontiers_from_conjunction_aux(F1_1, [_F2_1 | More_F2], More_F3) :-
-	combine_frontiers_from_conjunction_aux(F1_1, More_F2, More_F3).
+        combine_frontiers_from_conjunction_aux_2(F1_1, More_F2, More_F3).
+combine_frontiers_from_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
+	combine_frontiers_from_conjunction_aux_2(F1_1, More_F2, More_F3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -290,12 +307,13 @@ compute_goal_frontier(Goal, Proposal, Frontier) :-
 % Now go for other functors stored in our database.
 compute_goal_frontier(Goal, _Proposal, Frontier_Out) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
-%	echo_msg(0, '', 'cneg_rt', 'compute_goal_frontier :: Goal', Goal),
+	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 %	echo_msg(0, '', 'cneg_rt', 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
 %	echo_msg(2, 'list', 'cneg_rt', 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
-%	echo_msg(0, '', 'cneg_rt', 'Frontier_Out', Frontier_Out), 
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: Frontier_Out', Frontier_Out), 
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
@@ -344,29 +362,27 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 % simplify_frontier(Front,Frontier) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !,
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
+simplify_frontier([], _Goal, Frontier_Acc, Frontier_Acc) :- !.
+%	echo_msg(2, 'nl', 'cneg_rt', '', '').
 simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 	test_frontier_is_valid(F_In, Goal), !,
-	echo_msg(2, '', 'cneg_rt', 'simplify_frontier :: valid :: F_In', F_In),
+%	echo_msg(2, '', 'cneg_rt', 'simplify_frontier :: valid :: F_In', F_In),
 	simplify_frontier(Frontier_In, Goal, [F_In | Frontier_Acc], Frontier_Out).
-simplify_frontier([F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
-	echo_msg(2, '', 'cneg_rt', 'simplify_frontier :: not valid :: F_In', F_In),
+simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
+%	echo_msg(2, '', 'cneg_rt', 'simplify_frontier :: not valid :: F_In', F_In),
 	simplify_frontier(Frontier_In, Goal, Frontier_Acc, Frontier_Out).
 
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
 	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
-%	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: F_In', F_In),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
-% Old way:
-%        copy_term((Goal, Head, F_Test), (Goal_Tmp, Head_Tmp, F_Test_Tmp)), 
- %       Head_Tmp = Goal_Tmp, % Test that head and goal can be unified. 
-%	goal_is_equality(F_Test_Tmp, Tmp_Left, Tmp_Right, _Eq_EQV, _Eq_UQV), % It must be an equality.
-%	Tmp_Left = Tmp_Right, % Test that unifications previously in head can be performed.
+	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: (Goal, F_In)', (Goal, F_In)),
 	!. % Backtracking forbidden. 
+test_frontier_is_valid(F_In, Goal) :-
+	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: (Goal, F_In)', (Goal, F_In)),
+	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
