@@ -8,7 +8,7 @@ if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ]
 	echo "usage: $0 VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
 	echo "example: $0 1.13 11293 "
 	echo "example: $0 1.14.2 13646 382"
-	echo "example: $0 1.15.0 14285 latest"
+	echo "example: $0 1.15.0 14431 latest"
 	echo " "
 	exit 0
 else
