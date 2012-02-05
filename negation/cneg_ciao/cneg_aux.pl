@@ -22,6 +22,7 @@
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
 	    % term_name_is_qualified/1, remove_qualification/2, 
+	    replace_in_term_vars_by_values/4,
 	    replace_in_term_var_by_value/4,
 	    % replace_in_args_var_by_value/4,
 	    % replace_in_term_variables_by_values/4,
@@ -636,6 +637,15 @@ remove_qualification_aux([A|Name], Name) :-
 	semicolon_string([A]), !.
 remove_qualification_aux([_A|NameIn], NameOut) :-
 	remove_qualification_aux(NameIn, NameOut).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+replace_in_term_vars_by_values(Term_Out, [], [], Term_Out) :- !.
+replace_in_term_vars_by_values(Term_In, [Var | Vars], [Value | Values], Term_Out):-
+	replace_in_term_var_by_value(Term_In, Var, Value, Term_Aux), !,
+	replace_in_term_vars_by_values(Term_Aux, Vars, Values, Term_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -849,13 +849,22 @@ negate_imp_atom(Formula, _Proposal, GoalVars, Neg_Atom, Keep_Atom) :-
 
 % Idem for disequalities.
 negate_imp_atom(Formula, _Proposal, GoalVars, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1, T2, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
+	goal_is_disequality(Formula, T1_In, T2_In, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
 
-	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
-	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV), % Just variables
-	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV), % Just variables
+	varsbag((T1_In, T2_In), [], [], Vars_Diseq), % Just variables
+	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV_Aux), % Just variables
+	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV_Aux), % Just variables
 	varsbag_difference(Vars_Diseq, GoalVars, Eq_UQV_Tmp), % GoalVars are not free vars.
-	varsbag_difference(Eq_UQV_Tmp, Diseq_UQV, Eq_UQV), % Previous UQV are not free vars.
+	varsbag_difference(Eq_UQV_Tmp, Diseq_UQV_Aux, Eq_UQV_Aux), % Previous UQV are not free vars.
+
+	% Need to replace UQV by new fresh variables.
+	% This is our real improvement to Chan's version.
+	copy_term(Eq_UQV_Aux, Eq_UQV),
+	replace_in_term_vars_by_values(T1_In, Eq_UQV_Aux, Eq_UQV, T1),
+	replace_in_term_vars_by_values(T2_In, Eq_UQV_Aux, Eq_UQV, T2),
+	replace_in_term_vars_by_values(Diseq_EQV_Aux, Eq_UQV_Aux, Eq_UQV, Diseq_EQV),
+	replace_in_term_vars_by_values(Diseq_UQV_Aux, Eq_UQV_Aux, Eq_UQV, Diseq_UQV),
+	!, % Clean up backtracking stack.
 
 	Neg_Atom = (eq_geuqv(T1,T2, GoalVars, Diseq_UQV, Eq_UQV)),
 	Keep_Atom = (diseq_geuqv(T1,T2, GoalVars, Diseq_EQV, Diseq_UQV)).
