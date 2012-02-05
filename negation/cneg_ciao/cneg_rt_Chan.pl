@@ -435,7 +435,7 @@ negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 	normalize_E_IE_NIE(Proposal, SubFrontier_Aux_1, GoalVars, SubFrontier_Aux_2),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_2),
-	split_IE_NIE_between_imp_exp_and_dumb(SubFrontier_Aux_2, GoalVars, SubFrontier_Aux_3),
+	split_IE_NIE_between_imp_and_exp(SubFrontier_Aux_2, GoalVars, SubFrontier_Aux_3),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_3),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_formula(SubFrontier_Aux_3, Proposal, GoalVars, Result),
@@ -668,12 +668,12 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Dumb_Vars, IE_Out):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-% split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
+% split_IE_NIE_between_imp_and_exp(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
-split_IE_NIE_between_imp_exp_and_dumb(Frontier_In, GoalVars, Frontier_Out):-
+split_IE_NIE_between_imp_and_exp(Frontier_In, GoalVars, Frontier_Out):-
 	frontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
-	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_exp_and_dumb :: (E, IE, NIE)', (E, IE, NIE)),
+	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: (E, IE, NIE)', (E, IE, NIE)),
 
 	% Delayed diseqs are those ones which have a variable not in GoalVars but in E or NIE.
 	% If all the variables of the diseq are GoalVars or do not appear in E or NIE then they are not delayed diseqs.
@@ -839,10 +839,10 @@ negate_imp_atom(Formula, _Proposal, GoalVars, Neg_Atom, Keep_Atom) :-
 	goal_is_equality(Formula, T1, T2, _Eq_GV_In, Eq_EQV_In, Eq_UQV_In), !,
 
 	varsbag((T1, T2), [], [], Vars_Eq), % Just variables
-	varsbag(Eq_EQV_In, [], [], Eq_EQV), % Just variables
-	varsbag(Eq_UQV_In, [], [], Eq_UQV), % Just variables
+	varsbag_clean_up(Eq_EQV_In, Eq_EQV), % Just variables
+	varsbag_clean_up(Eq_UQV_In, Eq_UQV), % Just variables
 	varsbag_difference(Vars_Eq, GoalVars, Diseq_UQV_Tmp), % GoalVars are not free vars.
-	varsbag_difference(Diseq_UQV_Tmp, Eq_UQV, Diseq_UQV), % Eq_UQV are not free vars.
+	varsbag_difference(Diseq_UQV_Tmp, Eq_UQV, Diseq_UQV), % Previous UQV are not free vars.
 
 	Neg_Atom = (diseq_geuqv(T1, T2, GoalVars, Eq_UQV, Diseq_UQV)),
 	Keep_Atom = (eq_geuqv(T1, T2, GoalVars, Eq_EQV, Eq_UQV)).
@@ -851,13 +851,11 @@ negate_imp_atom(Formula, _Proposal, GoalVars, Neg_Atom, Keep_Atom) :-
 negate_imp_atom(Formula, _Proposal, GoalVars, Neg_Atom, Keep_Atom) :-
 	goal_is_disequality(Formula, T1, T2, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
 
-	varsbag(Diseq_EQV_In, [], [], Diseq_EQV), % Just variables
-	varsbag(Diseq_UQV_In, [], [], Diseq_UQV), % Just variables
-	varsbag_addition(Diseq_EQV, Diseq_UQV, Diseq_Closed_Vars_Tmp),
-	varsbag_addition(Diseq_Closed_Vars_Tmp, GoalVars, Diseq_Closed_Vars),
-	varsbag((T1, T2), Diseq_Closed_Vars, [], Diseq_UnClosed_Vars), % Just variables
-
-	varsbag_addition(Diseq_EQV, Diseq_UnClosed_Vars, Eq_UQV),
+	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
+	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV), % Just variables
+	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV), % Just variables
+	varsbag_difference(Vars_Diseq, GoalVars, Eq_UQV_Tmp), % GoalVars are not free vars.
+	varsbag_difference(Eq_UQV_Tmp, Diseq_UQV, Eq_UQV), % Previous UQV are not free vars.
 
 	Neg_Atom = (eq_geuqv(T1,T2, GoalVars, Diseq_UQV, Eq_UQV)),
 	Keep_Atom = (diseq_geuqv(T1,T2, GoalVars, Diseq_EQV, Diseq_UQV)).

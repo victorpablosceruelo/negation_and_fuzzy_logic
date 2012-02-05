@@ -9,6 +9,7 @@
 	    filter_out_nonvars/2,
 	    varsbag/4, varsbag_remove_var/3, varsbag_difference/3, 
 	    varsbag_addition/3, varsbag_intersection/3,  
+	    varsbag_clean_up/2,
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
 	    goal_is_disequality/6, goal_is_equality/6,
@@ -684,6 +685,21 @@ filter_out_nonvars([Var | Vars_In], [Var | Vars_Out]) :-
 	filter_out_nonvars(Vars_In, Vars_Out).
 filter_out_nonvars([_Var | Vars_In], Vars_Out) :-
 	filter_out_nonvars(Vars_In, Vars_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% This predicate removes the elements in a varsbag 
+% that have stopped being variables 
+% (that have been unified with something different from a variable).
+% varsbag_clean_up(Vars_In, Vars_Out) :- 
+varsbag_clean_up([], []) :- !.
+varsbag_clean_up([Var | Vars_In], [Var | Vars_Out]) :- 
+	var(Var), !,
+	varsbag_clean_up(Vars_In, Vars_Out).
+varsbag_clean_up([_Var | Vars_In], Vars_Out) :- 
+	varsbag_clean_up(Vars_In, Vars_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
