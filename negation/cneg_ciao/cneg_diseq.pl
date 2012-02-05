@@ -3,6 +3,7 @@
 	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
+	    portray_term_with_attributes/1,
 	    portray_attributes_in_term_vars/3,
 	    get_attributes_in_term_vars/3
 	], 
@@ -141,6 +142,41 @@ portray_aux(Echo_Level, File_Name, Attribute) :-
 portray_aux(Echo_Level, File_Name, Anything) :- 
 	echo_msg(Echo_Level, 'aux', File_Name, '', Anything).
  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+portray_term_with_attributes(Term) :- 
+	echo_msg(1, 'aux', 'cneg_diseq', Term, '  '),
+	get_attributes_in_term_vars(Term, Vars_With_Attrs, _Vars_Without_Attrs),
+%	portray_attributes_in_term_vars(1, 'cneg_diseq', Term),
+	echo_msg(1, 'aux', 'cneg_diseq', '', '  --  '),
+	portray_term_with_attributes_aux(Vars_With_Attrs),
+	echo_msg(1, 'nl', 'cneg_diseq', '', '').
+
+portray_term_with_attributes_aux([]) :- !.
+portray_term_with_attributes_aux([Var_With_Attrs | Vars_With_Attrs]) :- !,
+	attribute_contents(Var_With_Attrs, _Target, Disequalities, UQV),
+	(
+	    (   UQV \== [], !,
+		echo_msg(1, 'nl', 'cneg_diseq', '\-/ ', UQV),
+		echo_msg(1, 'nl', 'cneg_diseq', ' ', '.  ')
+	    )
+	;
+	    (   UQV == [], !  )
+	),
+	portray_term_with_attributes_aux_2(Disequalities),
+%	echo_msg(1, 'aux', 'cneg_diseq', '', '  '),
+	portray_term_with_attributes_aux(Vars_With_Attrs).
+
+portray_term_with_attributes_aux_2([]) :- !.
+portray_term_with_attributes_aux_2([Diseq | Diseqs]) :- 
+	disequality_contents(Diseq, T1, T2, _GV, _EQ_Vars, _UQ_Vars),
+	echo_msg(1, 'aux', 'cneg_diseq', T1, ' =/= '),
+	echo_msg(1, 'aux', 'cneg_diseq', T2, ',  '),
+	portray_term_with_attributes_aux_2(Diseqs). 
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

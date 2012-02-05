@@ -1,13 +1,15 @@
 :- module(ex_ancestor_and_grandparent,_,[.(cneg), .(debugger_pkg)]).
 % :- module(ex_ancestor,_,[.(cneg)]).
 
+cneg_ignores_preds([tests/2, test_parent/2, test_grandparent/2, test_ancestor/2]).
+
 tests(X, Y) :- test_parent(X, Y).
 tests(X, Y) :- test_grandparent(X, Y).
 tests(X, Y) :- test_ancestor(X, Y).
 
-test_parent(X, Y) :- cneg_rt([], parent(X, Y)), parent(X, Y).
-test_grandparent(X, Y) :- cneg_rt([], grandparent(X, Y)), grandparent(X, Y).
-test_ancestor(X, Y) :- cneg_rt([], ancestor(X, Y)), ancestor(X, Y).
+test_parent(X, Y) :- cneg_rt([], parent(X, Y)), portray_term_with_attributes(parent(X, Y)), parent(X, Y).
+test_grandparent(X, Y) :- cneg_rt([], grandparent(X, Y)), portray_term_with_attributes(grandparent(X, Y)), grandparent(X, Y).
+test_ancestor(X, Y) :- cneg_rt([], ancestor(X, Y)), portray_term_with_attributes(ancestor(X, Y)), ancestor(X, Y).
 
 
 parent(marcus, daniel).
