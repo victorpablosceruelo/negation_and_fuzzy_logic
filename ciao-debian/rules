@@ -37,7 +37,7 @@ fixes:
 	@echo " "
 	@echo " "
 
-clean:	fixes
+clean:
 	dh_testdir
 	dh_testroot
 
@@ -52,7 +52,7 @@ clean:	fixes
 	./$(CIAOSETUP) braveclean
 	@echo " "
 
-build: clean fixes
+build: fixes
 	dh_testdir
 
 	# This is now done at source export time.
