@@ -107,7 +107,7 @@ install: build
 	# Add here commands to install the package into debian/tmp.
 	./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp/	
 
-	make clean-after
+#	make clean-after
 	dh_install --list-missing
 #	dh_install
 
