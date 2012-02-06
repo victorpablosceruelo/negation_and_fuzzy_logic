@@ -23,6 +23,7 @@ export SHELL=/bin/sh
 CIAOSETUP=ciaosetup
 
 fixes:
+	@echo "Makefile :: fixes"
 	@echo "Where is /bin/sh link pointing to?"
 	ls -la /bin/sh
 	rm -fv /bin/sh
@@ -37,10 +38,12 @@ fixes:
 	@echo " "
 	@echo " "
 
-clean:
+clean: fixes
+	@echo "Makefile :: clean"
 	dh_testdir
 	dh_testroot
 
+clean-after: fixes
 	# Add here commands to clean up after the build process.
 	@echo " "
 	./$(CIAOSETUP) clean
@@ -53,6 +56,7 @@ clean:
 	@echo " "
 
 build: fixes
+	@echo "Makefile :: build"
 	dh_testdir
 
 	# This is now done at source export time.
@@ -95,7 +99,7 @@ build: fixes
 
 #install:
 install: build
-
+	@echo "Makefile :: install"
 	dh_testdir
 	dh_testroot
 	dh_installdirs
@@ -103,11 +107,13 @@ install: build
 	# Add here commands to install the package into debian/tmp.
 	./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp/	
 
+	make clean-after
 	dh_install --list-missing
 #	dh_install
 
 # Build architecture-independent files here.
 binary-indep: build install
+	@echo "Makefile :: binary-indep"
 	dh_testdir -i
 	dh_testroot -i
 	dh_installchangelogs -i
@@ -128,6 +134,7 @@ binary-indep: build install
 
 # Build architecture-dependent files here.
 binary-arch: build install
+	@echo "Makefile :: binary-arch"
 	dh_testdir -a
 	dh_testroot -a
 	dh_installchangelogs -a
@@ -151,4 +158,6 @@ binary-arch: build install
 
 #binary: binary-indep binary-arch
 binary: binary-arch binary-indep
+	@echo "Makefile :: binary"
+
 .PHONY: build clean binary-indep binary-arch binary install ciao-config
