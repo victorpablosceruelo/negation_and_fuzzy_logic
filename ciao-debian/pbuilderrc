@@ -12,7 +12,7 @@ EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog fakeroot sun-java6-jre sun-j
 # NO: gcc-multilib [amd64] 
 
 MIRRORSITE=http://ftp.de.debian.org/debian/
-OTHERMIRROR="deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free | deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free "
+OTHERMIRROR="deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free | deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free | deb http://security.debian.org/ squeeze/updates main contrib non-free | deb-src http://security.debian.org/ squeeze/updates main contrib non-free"
 # deb http://ftp.de.debian.org/debian/ testing main contrib non-free | deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free
 # | deb http://ftp.de.debian.org/debian/ unstable main contrib non-free | deb-src http://ftp.de.debian.org/debian/ unstable main contrib non-free
 #  | deb http://www.backports.org/debian lenny-backports main contrib non-free | deb-src http://www.backports.org/debian lenny-backports main contrib non-free | deb ftp://ftp.debian.org/debian experimental main contrib non-free | deb http://ftp.de.debian.org/debian/ experimental main contrib non-free"

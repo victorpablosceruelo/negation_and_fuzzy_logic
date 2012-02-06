@@ -93,7 +93,7 @@ for file in debian/patches/*
 do
 	if [ ! -d $file ] && [ ! "$file" == "." ] && [ ! "$file" == ".." ]; then 
 		echo "Found file patch in $file"
-		patch -p0 --forward --verbose < $file
+	#	patch -p0 --forward --verbose < $file
 	fi
 done
 echo " "
