@@ -20,7 +20,7 @@
 :- use_module(cneg_diseq, [equality/3, disequality/3, 
 	diseq_geuqv/5, eq_geuqv/5,
 	diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	portray_term_with_attributes/1,
+	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_gv/5]).
@@ -31,7 +31,7 @@
 :- reexport(cneg_diseq, [equality/3, disequality/3,
 	diseq_geuqv/5, eq_geuqv/5,
 	diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	portray_term_with_attributes/1,
+	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- reexport(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_gv/5]).
 :- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).

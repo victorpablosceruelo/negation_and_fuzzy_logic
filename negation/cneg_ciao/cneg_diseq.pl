@@ -3,7 +3,7 @@
 	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	    portray_term_with_attributes/1,
+	    portray_term_with_attributes/2,
 	    portray_attributes_in_term_vars/3,
 	    get_attributes_in_term_vars/3
 	], 
@@ -147,21 +147,35 @@ portray_aux(Echo_Level, File_Name, Anything) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-portray_term_with_attributes(Term) :- 
+portray_term_with_attributes('nl', _Term) :- 
+	echo_msg(1, 'nl', 'cneg_diseq', '', '').
+portray_term_with_attributes(Mode, Term) :- 
+	Mode \== 'nl',
 	echo_msg(1, 'aux', 'cneg_diseq', Term, '  '),
 	get_attributes_in_term_vars(Term, Vars_With_Attrs, _Vars_Without_Attrs),
 %	portray_attributes_in_term_vars(1, 'cneg_diseq', Term),
-	echo_msg(1, 'aux', 'cneg_diseq', '', '  --  '),
-	portray_term_with_attributes_aux(Vars_With_Attrs),
-	echo_msg(1, 'nl', 'cneg_diseq', '', '').
+	(
+	    (   Vars_With_Attrs == []  )
+	;
+	    (   Vars_With_Attrs \== [],
+		echo_msg(1, 'aux', 'cneg_diseq', '', '  --  '),
+		portray_term_with_attributes_aux(Vars_With_Attrs)
+	    )
+	),
+	(
+	    (   Mode == '',  portray_term_with_attributes('nl', Term)  )
+	;
+	    (   Mode == 'aux'  )
+	)
+	.
 
 portray_term_with_attributes_aux([]) :- !.
 portray_term_with_attributes_aux([Var_With_Attrs | Vars_With_Attrs]) :- !,
 	attribute_contents(Var_With_Attrs, _Target, Disequalities, UQV),
 	(
 	    (   UQV \== [], !,
-		echo_msg(1, 'nl', 'cneg_diseq', '\-/ ', UQV),
-		echo_msg(1, 'nl', 'cneg_diseq', ' ', '.  ')
+		echo_msg(1, 'aux', 'cneg_diseq', '\\!/ ', UQV),
+		echo_msg(1, 'aux', 'cneg_diseq', ' ', '.  ')
 	    )
 	;
 	    (   UQV == [], !  )
@@ -506,7 +520,7 @@ simplify_disequation_aux([(T1, T2) | More_Diseqs], Answer, EQV_In, Can_Fail, Res
 		cneg_aux:memberchk(T2, UQV), !,
 %		echo_msg(2, '', 'cneg_diseq', 'simplify_disequation_aux :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
 		check_if_allowed_to_fail(Can_Fail),
-		diseq_eq(T1, T2), % They can not be disunified, and they are still UQ vars.
+		cneg_diseq_unify(T1, T2), % They can not be disunified, and they are still UQ vars.
 		simplify_disequation_aux(More_Diseqs, Answer, EQV, Can_Fail, Result)
 	    )
 	;
@@ -530,14 +544,14 @@ simplify_disequation_aux([(T1, T2) | More_Diseqs], Answer, EQV_In, Can_Fail, Res
 		( 
 		    (   % First solution: T1 =/= T2.
 %			echo_msg(2, '', 'cneg_diseq', 'simplify_disequation_aux :: var(T1) =/= var(T2)', (T1, T2)),
-			diseq_eq('true', Result), % The solution is completely valid.
+			cneg_diseq_unify('true', Result), % The solution is completely valid.
 			Answer = [(T1, T2)]
 		    )
 		;
 		    (   % T1 and T2 can not be disunified. We test if we can fail.
 %			echo_msg(2, '', 'cneg_diseq', 'simplify_disequation_aux :: UNIFY var(T1) and var(T2)', (T1, T2)),
 			check_if_allowed_to_fail(Can_Fail),
-			diseq_eq(T1, T2), % Since they can not be disunified, unify them.
+			cneg_diseq_unify(T1, T2), % Since they can not be disunified, unify them.
 			simplify_disequation_aux(More_Diseqs, Answer, EQV, Can_Fail, Result)
 		    )
 		)
@@ -611,7 +625,7 @@ simplify_disequation_aux_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Answer, EQV_I
 
 	% T1 can not be different from T2. We unify them (failing) and continue.
 	check_if_allowed_to_fail(Can_Fail),
-	cneg_unify(T1, T2),
+	cneg_diseq_unify(T1, T2),
 	simplify_disequation_aux(More_Diseqs, Answer, EQV, Can_Fail, Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -629,7 +643,7 @@ simplify_disequation_aux_var_nonvar([(T1, T2) | More_Diseqs], Answer, EQV_In, Ca
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
 %		echo_msg(2, '', 'cneg_diseq', 'simplify_disequation_aux :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
-		cneg_unify('true', Result), % Result is completely valid.
+		cneg_diseq_unify('true', Result), % Result is completely valid.
 		Answer = [] % Answer is True.
 	    )
 	;
@@ -637,7 +651,7 @@ simplify_disequation_aux_var_nonvar([(T1, T2) | More_Diseqs], Answer, EQV_In, Ca
 		cneg_aux:memberchk(T1, UQV), !,
 %		echo_msg(2, '', 'cneg_diseq', 'simplify_disequation_aux :: UQV(T1) and functor(T2)', (T1, T2)),
 		check_if_allowed_to_fail(Can_Fail),
-		cneg_unify(T1, T2),
+		cneg_diseq_unify(T1, T2),
 		simplify_disequation_aux(More_Diseqs, Answer, EQV, Can_Fail, Result)
 	    )
 	;
@@ -647,7 +661,7 @@ simplify_disequation_aux_var_nonvar([(T1, T2) | More_Diseqs], Answer, EQV_In, Ca
 		(
 		    (
 			functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
-			cneg_unify(Result, 'true'), % Correct result if attr. var. satisfied.
+			cneg_diseq_unify(Result, 'true'), % Correct result if attr. var. satisfied.
 			Answer = [(T1, New_T2)] % Answer is (T1, T2).
 		    )
 		;
@@ -673,6 +687,100 @@ remove_vars_with_attributes([Var|List_In], List_Out) :-   % If variables have at
 	remove_vars_with_attributes(List_In, List_Out).
 remove_vars_with_attributes([Var|List_In], [Var|List_Out]) :- % Keep only vars without attributes.
 	remove_vars_with_attributes(List_In, List_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+cneg_diseq_unify(T, T).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% diseq_eq(X,Y) unify X and Y
+cneg_diseq_eq(T1, T2, _UQV) :-
+	var(T1),
+	var(T2),
+	T1 == T2, % Both are the same var. This is valid if they are in UQV too.
+	echo_msg(2, '', 'cneg_diseq', 'cneg_diseq_eq: same var. ok.', (T1, T2)),
+	!.
+
+cneg_diseq_eq(T1, _T2, UQV) :-
+	var(T1),
+	memberchk(T1, UQV),
+	echo_msg(2, '', 'cneg_diseq', 'cneg_diseq_eq: T1 in UQV. fail.', (T1, UQV)),
+	!, fail.
+
+cneg_diseq_eq(_T1, T2, UQV) :-
+	var(T2),
+	memberchk(T2, UQV),
+	echo_msg(2, '', 'cneg_diseq', 'cneg_diseq_eq: T2 in UQV. fail.', (T2, UQV)),
+	!, fail.
+
+cneg_diseq_eq(T1, T2, _UQV) :-
+	var(T1),
+	var(T2), !, % Both vars and not in UQV.
+	echo_msg(2, '', 'cneg_diseq', 'T1 and T2 not in UQV. ok.', (T1, T2)),
+	cneg_diseq_unify(T1, T2), !.
+
+cneg_diseq_eq(T1, T2, _UQV) :-
+	var(T1), % Var vs functor using var.
+	varsbag(T2, [], [], Vars),
+	memberchk(T1, Vars), !,
+	echo_msg(2, '', 'cneg_diseq', 'T1 appears in T2. fail.', (T1, T2)),
+	!, fail.
+
+cneg_diseq_eq(T1, T2, UQV) :-
+	var(T1), !, % Var vs functor
+	functor_local(T2, Name, Arity, Args_T2),
+	functor_local(T1, Name, Arity, Args_T1),
+	echo_msg(2, '', 'cneg_diseq', 'T1 var, T2 functor. ok.', (T1, T2, UQV)),
+	!, 
+	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
+
+cneg_diseq_eq(T1, T2, _UQV) :-
+	var(T2), % Var vs functor using var.
+	varsbag(T1, [], [], Vars),
+	memberchk(T2, Vars), !,
+	echo_msg(2, '', 'cneg_diseq', 'T2 appears in T1. fail.', (T1, T2)),
+	!, fail.
+
+cneg_diseq_eq(T1, T2, UQV) :-
+	var(T2), !, % Var vs functor
+	functor_local(T1, Name, Arity, Args_T1),
+	functor_local(T2, Name, Arity, Args_T2),
+	echo_msg(2, '', 'cneg_diseq', 'T2 var, T1 functor. ok.', (T1, T2, UQV)),
+	!, 
+	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
+
+cneg_diseq_eq(T1, T2, UQV) :-
+	functor_local(T1, Name, Arity, Args_T1),
+	functor_local(T2, Name, Arity, Args_T2), 
+	echo_msg(2, '', 'cneg_diseq', 'T1 and T2 functors. ok.', (T1, T2, UQV)),
+	!, % functor vs functor.
+	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
+
+cneg_diseq_eq(T1, T2, UQV) :-
+	functor_local(T1, Name_T1, Arity_T1, _Args_T1),
+	functor_local(T2, Name_T2, Arity_T2, _Args_T2), 
+	(
+	    (   Name_T1 \== Name_T2  )
+	;
+	    (   Arity_T1 \== Arity_T2  )
+	),
+	echo_msg(2, '', 'cneg_diseq', 'T1 and T2 different functors. fail.', (T1, T2, UQV)),
+	!, % functor vs functor.
+	fail.
+
+
+cneg_diseq_eq_args([], [], _UQV) :- !.
+cneg_diseq_eq_args([Arg_T1 | Args_T1], [Arg_T2 | Args_T2], UQV) :-
+	cneg_diseq_eq(Arg_T1, Arg_T2, UQV), !,
+	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
+
+% eq(X,Y):-
+ %       X=Y.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -782,31 +890,20 @@ eq_geuqv_adv(T1, T2, GoalVars_In, EQV_In, UQV_In, Result) :-
 	!,
 	(
 	    ( 
-		UQV == [], !, 
-		diseq_eq(T1, T2),
+		cneg_diseq_eq(T1, T2, UQV),
 		Result = 'true',
 		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
 		echo_msg(2, 'nl', 'cneg_diseq', '', '')
 	    )
 	;
 	    (
-		UQV \== [], !, 
 		check_if_allowed_to_fail(Can_Fail),
 		Result = 'fail',
 		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2), Result)', ((T1, '=', T2), Result)),
 		echo_msg(2, '', 'cneg_diseq', 'continues', '...'),
-%		cneg_aux:varsbag((T1, T2), [], [], Disequality_EQV), % Mark all vars as EQV
-%		% cneg_diseq(T1,T2, EQV, Can_Fail, Result)
-		diseq_geuqv(T1, T2, GoalVars, 'compute', []) 
+		diseq_geuqv(T1, T2, GoalVars, UQV, 'compute') 
 	    )
 	).
-
-cneg_unify(T, T).
-
-% diseq_eq(X,Y) unify X and Y
-diseq_eq(X, X).
-% eq(X,Y):-
- %       X=Y.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
