@@ -1,4 +1,5 @@
-:- module(ex_chan_fails,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_error_in_chan,_,[.(cneg)]).
+% :- module(ex_error_in_chan,_,[.(cneg), .(debugger_pkg)]).
 
 
 q(V, W) :- disequality((Z, W), (3, a), []), equality(V, Z, []).

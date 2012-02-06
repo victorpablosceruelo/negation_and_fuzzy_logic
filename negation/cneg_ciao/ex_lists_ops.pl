@@ -1,4 +1,5 @@
-:- module(ex_lists_ops,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_lists_ops,_,[.(cneg)]).
+% :- module(ex_lists_ops,_,[.(cneg), .(debugger_pkg)]).
 
 append1([],L,L).
 append1([X|L],L1,[X|R]):-

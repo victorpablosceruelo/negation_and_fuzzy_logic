@@ -1,4 +1,5 @@
-:- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_peano_queens,_,[.(cneg)]).
+% :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
 cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2]).
@@ -10,12 +11,12 @@ test_queens_1(N, Columns) :- % Let's see if we have invalid results.
 	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
 %	echo_msg(1, '', '', 'N', N),
 	cneg_rt([], queens(N, Columns)), % First constraints.
-	portray_term_with_attributes(queens(N, Columns)),
+	portray_term_with_attributes('', queens(N, Columns)),
 	queens(N, Columns). % Secondly values generator.
 
 test_queens_2(N, Columns) :- % Let's see if we have invalid results.
 	queens(N, Columns), % First values generator.
-	portray_term_with_attributes(queens(N, Columns)),
+	portray_term_with_attributes('', queens(N, Columns)),
 	cneg_rt([], queens(N, Columns)). % Second constraints.
 
 % queens(N,Columns) returns in Columns the column where we must place each of N

@@ -1,4 +1,5 @@
-:- module(ex_peano_numbers,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_peano_numbers,_,[.(cneg)]).
+%:- module(ex_peano_numbers,_,[.(cneg), .(debugger_pkg)]).
 
 %peano(0,0).
 %peano(N,s(P1)):-

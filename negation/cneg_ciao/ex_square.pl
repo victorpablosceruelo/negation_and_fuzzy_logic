@@ -1,4 +1,5 @@
-:- module(ex_square,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_square,_,[.(cneg)]).
+%:- module(ex_square,_,[.(cneg), .(debugger_pkg)]).
 
 square(X) :- nat(Y), prod(Y, Y, X).
 

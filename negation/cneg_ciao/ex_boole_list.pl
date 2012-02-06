@@ -1,4 +1,5 @@
-:- module(ex_boole_list,_,[.(cneg), .(debugger_pkg)]).
+:- module(ex_boole_list,_,[.(cneg)]).
+% :- module(ex_boole_list,_,[.(cneg), .(debugger_pkg)]).
 
 boole(0).
 boole(1).
