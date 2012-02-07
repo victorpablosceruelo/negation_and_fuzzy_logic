@@ -23,8 +23,8 @@
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- use_module(cneg_tr).
-:- use_module(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_gv/5]).
-:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
+:- use_module(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5, cneg_rt_Aux/4]).
+%:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
 :- reexport(cneg_aux, [varsbag/4, varsbag_addition/3]).    
@@ -33,8 +33,8 @@
 	diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
-:- reexport(cneg_rt_Chan, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_gv/5]).
-:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
+:- reexport(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5, cneg_rt_Aux/4]).
+%:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
