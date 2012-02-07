@@ -102,7 +102,7 @@ cneg_rt_Aux(Goal, GoalVars, Proposal, Result_List) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
 	!,
-	negate_frontier_list(Frontier, GoalVars, Proposal, Result_List),
+	negate_frontier(Frontier, GoalVars, Proposal, Result_List),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
