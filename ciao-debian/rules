@@ -105,10 +105,15 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp.
-	./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp/	
+	# ./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/result/
+	./$(CIAOSETUP) install_to_destroot --destdir=/usr
+	@echo " "
 
+#	@echo "Just a list of files in $(CURDIR)/debian/tmp/ "
+#	find $(CURDIR)/debian/tmp/
+#	@echo " "
 #	make clean-after
-	dh_install --list-missing
+#	dh_install --list-missing
 #	dh_install
 
 # Build architecture-independent files here.
@@ -117,13 +122,13 @@ binary-indep: build install
 	dh_testdir -i
 	dh_testroot -i
 	dh_installchangelogs -i
-	dh_installdocs -i
-	dh_installexamples -i
+#	dh_installdocs -i
+#	dh_installexamples -i
 #	dh_installmenu -i
 #	dh_installdebconf -i
-	dh_installemacsen -i
-	dh_installinfo -i
-	dh_installman -i
+#	dh_installemacsen -i
+#	dh_installinfo -i
+#	dh_installman -i
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
@@ -138,13 +143,13 @@ binary-arch: build install
 	dh_testdir -a
 	dh_testroot -a
 	dh_installchangelogs -a
-	dh_installdocs -a
+#	dh_installdocs -a
 #	dh_installexamples -a
 #	dh_installmenu -a
 #	dh_installdebconf -a
 #	dh_installemacsen -a
-	dh_installinfo -a
-	dh_installman -a
+#	dh_installinfo -a
+#	dh_installman -a
 	dh_strip -a
 	dh_link -a
 	dh_compress -a
