@@ -37,8 +37,8 @@ pushd ~/tmp
 # Clean up
 rm -fv $BUILD_TGZ $BUILD_DSC $BUILD_DIFF $BUILD_DIFF_GZ
 
-# Ensure folder exists.
-# rm -fR $FOLDER_NAME
+# Ensure folder exists and has a pristine copy.
+rm -fR $FOLDER_NAME
 mkdir -p $FOLDER_NAME
 pushd $FOLDER_NAME
 
