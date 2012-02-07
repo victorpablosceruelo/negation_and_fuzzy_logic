@@ -199,12 +199,15 @@ portray_term_with_attributes_aux_2([Diseq | Diseqs]) :-
 portray_attributes_in_term_vars(Echo_Level, File_Name, T) :-
 	get_attributes_in_term_vars(T, Vars_With_Attrs, Vars_Without_Attrs),
 	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
-	echo_msg(Echo_Level, '', File_Name, 'Attributes for the variables in term', T),
+	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
+	echo_msg(Echo_Level, 'aux', File_Name, 'Attributes for the variables in term :: ', T),
+	echo_msg(Echo_Level, 'aux', File_Name, ' :: (Vars_With_Attrs, Vars_Without_Attrs) :: ', (Vars_With_Attrs, Vars_Without_Attrs)),
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
 	portray_attributes_in_variables(Echo_Level, File_Name, Vars_With_Attrs),
 	portray_no_attributes_in_variables(Echo_Level, File_Name, Vars_Without_Attrs).
 
 portray_no_attributes_in_variables(Echo_Level, File_Name, Vars_Without_Attrs) :-
-	echo_msg(Echo_Level, '', File_Name, 'Variables without attributes :: ', Vars_Without_Attrs), 
+	echo_msg(Echo_Level, '', File_Name, 'Variables without attributes', Vars_Without_Attrs), 
 	echo_msg(Echo_Level, 'nl', File_Name, '', '').
 
 portray_attributes_in_variables(_Echo_Level, _File_Name, []) :- !.
@@ -229,8 +232,8 @@ get_attributes_in_term_vars_aux([], Vars_WA, Vars_WA, Vars_WOA, Vars_WOA) :- !.
 get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
 	get_attribute_local(Var, Attribute), !,
 	get_attributes_in_term_vars_aux(Vars, [Attribute | Vars_WA_In], Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out).
-get_attributes_in_term_vars_aux([_Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
-	get_attributes_in_term_vars_aux(Vars, Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out).
+get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
+	get_attributes_in_term_vars_aux(Vars, Vars_WA_In, Vars_WA_Out, [ Var | Vars_WOA_In ], Vars_WOA_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

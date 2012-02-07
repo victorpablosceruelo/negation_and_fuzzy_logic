@@ -15,6 +15,7 @@
 :- comment(summary, "This module implements predicates to deal with frontiers.").
 
 :- use_module(cneg_aux, _).
+:- use_module(cneg_diseq, [portray_attributes_in_term_vars/3]).
 :- use_module(cneg_rt, [cneg_rt_Aux/4]).
 :- use_module(library(aggregates),[setof/3]).
 
@@ -199,7 +200,7 @@ look_for_the_relevant_clauses(Goal, Frontier) :-
 	!, % Backtracking forbiden.
 	cneg_pre_frontier(Name, Arity, _SourceFileName, _Head_Aux, _Body_Aux, _FrontierTest_Aux), 
 %	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
-	setof(frontier(_Real_Goal, Head, Body, FrontierTest), 
+	setof(subfrontier(_Real_Goal, Head, Body, FrontierTest), 
 	cneg_pre_frontier(Name, Arity, _SourceFileName, Head, Body, FrontierTest), Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -230,6 +231,8 @@ test_frontier_is_valid(F_In, Goal) :-
 	!. % Backtracking forbidden. 
 test_frontier_is_valid(F_In, Goal) :-
 	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: (Goal, F_In)', (Goal, F_In)),
+	portray_attributes_in_term_vars(2, 'cneg_rt', Goal),
+	portray_attributes_in_term_vars(2, 'cneg_rt', F_In),
 	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
