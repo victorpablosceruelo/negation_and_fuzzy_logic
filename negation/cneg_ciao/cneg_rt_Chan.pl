@@ -41,6 +41,7 @@
 % returns in Result_Frontier the negation of the subfrontier in SubFrontier
 
 negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
+	Proposal = 'cneg_rt_Chan',
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
 	split_subfrontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
@@ -58,119 +59,12 @@ negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%negate_subfrontier_aux(SubFrontier_In, GoalVars, Proposal, (Result)):- !.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-% split_IE_NIE_between_imp_and_exp(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
-% returns Frontier_Out that is the frontier divided betwen 
-% ImpVars, ExpVars and UQ_Vars.
-split_IE_NIE_between_imp_and_exp(Frontier_In, GoalVars, Frontier_Out):-
-	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
-	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: (E, IE, NIE)', (E, IE, NIE)),
-
-	% Delayed diseqs are those ones which have a variable not in GoalVars but in E or NIE.
-	% If all the variables of the diseq are GoalVars or do not appear in E or NIE then they are not delayed diseqs.
-	compute_delayed_and_non_goalvars_variables(Frontier_In, GoalVars, Delayed_Vars, Non_GoalVars),
-
-	split_ie_or_nie_between_imp_and_exp(IE, Delayed_Vars, IE_Imp, IE_Exp),
-	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),
-
-	split_ie_or_nie_between_imp_and_exp(NIE, Non_GoalVars, NIE_Imp, NIE_Exp),
-	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
-
-	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-	subfrontier_E_IE_NIE_ie_contents(Frontier_Out, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
-
-% split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
-% In Fexp are the elements of F with any variables of ExpVars and
-% the rest of elements of F will be in Fimp
-split_ie_or_nie_between_imp_and_exp([], _ExpVars, [], []) :- !. % Optimization.
-split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
-	goal_is_conjunction(Form, Form_1, Form_2), !,
-	split_ie_or_nie_between_imp_and_exp(Form_1, ExpVars, Form_imp_1, Form_exp_1),
-	split_ie_or_nie_between_imp_and_exp(Form_2, ExpVars, Form_imp_2, Form_exp_2),
-	rebuild_conjunction_of_goals(Form_imp_1, Form_imp_2, Form_imp),
-	rebuild_conjunction_of_goals(Form_exp_1, Form_exp_2, Form_exp).
-
-split_ie_or_nie_between_imp_and_exp(Form, _ExpVars, _Form_imp, _Form_exp) :-
-	goal_is_disjunction(Form, _Form_1, _Form_2), !,
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_ie_or_nie_between_imp_and_exp can not deal with disjunctions. Form', Form),
-	fail.
-
-split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
-	varsbag(Form, [], [], Form_Vars), 
-	varsbag_intersection(Form_Vars, ExpVars, Intersection),
-	(
-	    (   % Form has some ExpVars
-		Intersection \== [], !,
-		Form_exp = Form, Form_imp = []
-	    )
-	;
-	    (   % Form has no ExpVars 
-		Intersection == [], !,
-		Form_exp = [], Form_imp = Form
-	    )
-	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Delayed diseqs are those ones which have a variable not in GoalVars but in E or NIE.
-% If all the variables of the diseq are GoalVars or do not appear in E or NIE then they are not delayed diseqs.
-% Closed variables are not taken into account for this process.
-compute_delayed_and_non_goalvars_variables(SubFrontier_In, GoalVars, Delayed_Vars, Non_GoalVars) :-
-	subfrontier_E_IE_NIE_contents(SubFrontier_In, E, IE, NIE),
-
-	identify_closed_vars(E, [], Closed_Vars_E),
-	identify_closed_vars(IE, Closed_Vars_E, Closed_Vars_E_IE),
-	identify_closed_vars(NIE, Closed_Vars_E_IE, Closed_Vars_E_IE_NIE), % In Chan's proposal it is always empty.
-	varsbag(GoalVars, [], Closed_Vars_E_IE_NIE, Closed_Vars), 
-
-	varsbag(E, Closed_Vars, [], Unclosed_Vars_E), % Vars_E = vars(E) - Closed_Vars
-	varsbag(IE, Closed_Vars, [], Unclosed_Vars_IE), % Vars_IE = vars(IE) - Closed_Vars
-	varsbag(NIE, Closed_Vars, [], Unclosed_Vars_NIE),  % Vars_NIE = vars(NIE) - Closed_Vars
-
-	varsbag_difference(Unclosed_Vars_IE, Unclosed_Vars_E, Delayed_Tmp_1),
-	varsbag_difference(Unclosed_Vars_IE, Unclosed_Vars_NIE, Delayed_Tmp_2),
-	varsbag_addition(Delayed_Tmp_1, Delayed_Tmp_2, Delayed_Vars),
-	
-	varsbag_addition(Unclosed_Vars_E, Unclosed_Vars_IE, Unclosed_Vars_E_IE),
-	varsbag_addition(Unclosed_Vars_E_IE, Unclosed_Vars_NIE, Non_GoalVars).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-identify_closed_vars([], Closed_Vars, Closed_Vars) :- !. % It can be empty.
-identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Conjunctions
-	goal_is_conjunction(Frontier, Frontier_Left, Frontier_Right), !,
-	identify_closed_vars(Frontier_Left, Closed_Vars_In, Closed_Vars_Aux),
-	identify_closed_vars(Frontier_Right, Closed_Vars_Aux, Closed_Vars_Out).
-
-identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Equalities
-	goal_is_equality(Frontier, _Value_1, _Value_2, _GV, _EQV, UQV),
-	varsbag(UQV, [], Closed_Vars_In, Closed_Vars_Out).
-
-identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Disequalities
-	goal_is_disequality(Frontier, _Term1, _Term2, _GV, _EQV, UQV), !,
-	varsbag(UQV, [], Closed_Vars_In, Closed_Vars_Out).
-
-identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Negations
-	goal_is_negation_uqv(Frontier, UQV, _SubGoal, _Negation_Proposal), !,
-	varsbag(UQV, [], Closed_Vars_In, Closed_Vars_Out).
-
-identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_In) :- % Other subgoals
-	goal_is_not_conj_disj_eq_diseq_dneg(Frontier), !.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % negate_formula(Frontier, Proposal, GoalVars, UQV, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Result)
 % returns Result that is the result from negating the frontier.

@@ -339,3 +339,58 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empt
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% split_IE_NIE_between_imp_and_exp(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
+% returns Frontier_Out that is the frontier divided betwen 
+% ImpVars, ExpVars and UQ_Vars.
+split_IE_NIE_between_imp_and_exp(Frontier_In, GoalVars, Frontier_Out):-
+	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
+	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: (E, IE, NIE)', (E, IE, NIE)),
+
+	% Delayed diseqs are those ones which have a variable not in GoalVars but in E or NIE.
+	% If all the variables of the diseq are GoalVars or do not appear in E or NIE then they are not delayed diseqs.
+	compute_delayed_and_non_goalvars_variables(Frontier_In, GoalVars, Delayed_Vars, Non_GoalVars),
+
+	split_ie_or_nie_between_imp_and_exp(IE, Delayed_Vars, IE_Imp, IE_Exp),
+	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),
+
+	split_ie_or_nie_between_imp_and_exp(NIE, Non_GoalVars, NIE_Imp, NIE_Exp),
+	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
+
+	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
+	subfrontier_E_IE_NIE_ie_contents(Frontier_Out, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
+
+% split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
+% In Fexp are the elements of F with any variables of ExpVars and
+% the rest of elements of F will be in Fimp
+split_ie_or_nie_between_imp_and_exp([], _ExpVars, [], []) :- !. % Optimization.
+split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
+	goal_is_conjunction(Form, Form_1, Form_2), !,
+	split_ie_or_nie_between_imp_and_exp(Form_1, ExpVars, Form_imp_1, Form_exp_1),
+	split_ie_or_nie_between_imp_and_exp(Form_2, ExpVars, Form_imp_2, Form_exp_2),
+	rebuild_conjunction_of_goals(Form_imp_1, Form_imp_2, Form_imp),
+	rebuild_conjunction_of_goals(Form_exp_1, Form_exp_2, Form_exp).
+
+split_ie_or_nie_between_imp_and_exp(Form, _ExpVars, _Form_imp, _Form_exp) :-
+	goal_is_disjunction(Form, _Form_1, _Form_2), !,
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_ie_or_nie_between_imp_and_exp can not deal with disjunctions. Form', Form),
+	fail.
+
+split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
+	varsbag(Form, [], [], Form_Vars), 
+	varsbag_intersection(Form_Vars, ExpVars, Intersection),
+	(
+	    (   % Form has some ExpVars
+		Intersection \== [], !,
+		Form_exp = Form, Form_imp = []
+	    )
+	;
+	    (   % Form has no ExpVars 
+		Intersection == [], !,
+		Form_exp = [], Form_imp = Form
+	    )
+	).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
