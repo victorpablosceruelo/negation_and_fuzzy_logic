@@ -1,7 +1,7 @@
 %
 % From Susana modified by VPC.
 %
-:- module(cneg_rt_Chan, [negate_frontier/4], [assertions]).
+:- module(cneg_rt_Chan, [negate_subfrontier/4], [assertions]).
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
@@ -37,37 +37,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_frontier_list(Frontier, GoalVars, Proposal, Result_List),
-% returns in Result_List a list with the negation of each subfrontier in Frontier.
-
-negate_frontier([], _GoalVars, _Proposal, [true]) :- !. % Optimization.
-negate_frontier(Frontier, GoalVars, Proposal, Negated_Frontier) :- 
-	Frontier \== [], !,
-	negate_each_subfrontier(Frontier, GoalVars, Proposal, Negated_Frontier),
-	!.
-
-negate_each_subfrontier([], _GoalVars, _Proposal, []) :- !.
-negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, [Result_Frontier | Result_More_Frontiers]) :-
-%	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
-	negate_subfrontier(Frontier, GoalVars, Proposal, Result_Frontier),
-%	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
-	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
-%	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
-%	!. % Reduce the stack's memory by forbidding backtracking.
-	
-
-% combine_negated_subfrontiers(Result_Subfr, Result_More_Subfr, Result_Tmp),
-%combine_negated_frontiers(fail, _Result_More_Subfr, fail) :- !.
-%combine_negated_frontiers(_Result_Subfr, fail, fail) :- !.
-%combine_negated_frontiers(true, Result_More_Subfr, Result_More_Subfr) :- !.
-%combine_negated_frontiers(Result_Subfr, true, Result_Subfr) :- !.
-%combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result_More_Subfr)) :- !.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % negate_subfrontier(SubFrontier, GoalVars, Proposal, Result_Frontier)
 % returns in Result_Frontier the negation of the subfrontier in SubFrontier
 
@@ -85,6 +54,13 @@ negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 	negate_formula(SubFrontier_Aux_3, Proposal, GoalVars, Result),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%negate_subfrontier_aux(SubFrontier_In, GoalVars, Proposal, (Result)):- !.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

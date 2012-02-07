@@ -16,7 +16,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [portray_attributes_in_term_vars/3]).
-:- use_module(cneg_rt, [cneg_rt_Aux/4]).
+:- use_module(cneg_rt_aux, [cneg_rt_Aux/4]).
 :- use_module(library(aggregates),[setof/3]).
 
 % To access pre-frontiers from anywhere.
