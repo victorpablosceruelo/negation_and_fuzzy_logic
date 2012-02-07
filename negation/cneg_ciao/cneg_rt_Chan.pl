@@ -10,6 +10,13 @@
 :- multifile call_to/3.
 
 :- use_module(cneg_aux, _).
+:- use_module(cneg_rt_aux_frontiers, 
+	[  subfrontier_contents/5, 
+	   subfrontier_E_IE_NIE_contents/4,
+	   subfrontier_E_IE_NIE_ie_contents/6,
+	   split_subfrontier_into_E_IE_NIE/2,
+	   rebuild_conjunction_of_goals/3 
+	]).
 :- use_module(cneg_diseq, [ 
 	portray_attributes_in_term_vars/3,
 	get_attributes_in_term_vars/3,
@@ -25,19 +32,6 @@
 
 :- comment(summary, "This module implements Chan's proposal of Constructive Negation.").
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Structures to manage all the info about the frontier in an easy way.
-frontier_E_IE_NIE_contents(frontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
-frontier_E_IE_NIE_ie_contents(frontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp), E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,7 +74,7 @@ negate_frontier_list_aux([Frontier | More_Frontiers], GoalVars, Proposal, [Resul
 negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
-	split_frontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
+	split_subfrontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	normalize_E_IE_NIE(Proposal, SubFrontier_Aux_1, GoalVars, SubFrontier_Aux_2),
 	!, % Reduce the stack's memory by forbidding backtracking.
@@ -91,61 +85,6 @@ negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
 	negate_formula(SubFrontier_Aux_3, Proposal, GoalVars, Result),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-rebuild_conjunction_of_goals([], [], []) :- !. % Empty elements when re-joining
-rebuild_conjunction_of_goals(Goals, [], Goals) :- !. % Empty element when re-joining
-rebuild_conjunction_of_goals([], Goals, Goals) :- !. % Empty element when re-joining
-rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empty elements.
-	Goals_1 \== [], 
-	Goals_2 \== [], !.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
-	goal_is_disjunction(Frontier_In, _G1, _G2), !, 
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
-	fail.
-
-split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
-	goal_is_conjunction(Frontier_In, G1, G2), !,
-	split_frontier_into_E_IE_NIE(G1, Frontier_G1),
-	split_frontier_into_E_IE_NIE(G2, Frontier_G2),
-	frontier_E_IE_NIE_contents(Frontier_G1, E_G1, IE_G1, NIE_G1),
-	frontier_E_IE_NIE_contents(Frontier_G2, E_G2, IE_G2, NIE_G2),
-	rebuild_conjunction_of_goals(E_G1, E_G2, E_Out),
-	rebuild_conjunction_of_goals(IE_G1, IE_G2, IE_Out),
-	rebuild_conjunction_of_goals(NIE_G1, NIE_G2, NIE_Out),
-	frontier_E_IE_NIE_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
-
-split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_equality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
-	frontier_E_IE_NIE_contents(Frontier_Out, Frontier_In, [], []).
-
-split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_disequality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
-	frontier_E_IE_NIE_contents(Frontier_Out, [], Frontier_In, []).
-
-% This leads to infinite loops because double negation 
-% sould be managed when generating the frontier.
-% The way to fix this is remove cneg(cneg(...))
-% when evaluating the frontier. To be done.
-split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_negation(Frontier_In, _GoalVars, _UQV, _SubGoal, _Negation_Proposal), !,
-	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
-
-split_frontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_not_conj_disj_eq_diseq_dneg(Frontier_In), !,
-	frontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
-
-split_frontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :- 
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_frontier_into_E_IE_NIE can not deal with frontier. Frontier_In', Frontier_In),
-	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -165,7 +104,7 @@ normalize_E_IE_NIE('cneg_rt_Chan', Formula_In, GoalVars, Formula_Out) :-
 normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out) :-
 	Proposal \== 'cneg_rt_New', 
 	Proposal \== 'cneg_rt_Chan', !, 
-	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
+	echo_msg(1, '', 'cneg_rt', 'normalize_E_IE_NIE :: Unknown proposal', Proposal), !, 
 	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -174,10 +113,10 @@ normalize_E_IE_NIE(Proposal, _Formula_In, _GoalVars, _Formula_Out) :-
 
 % removes from E redundnant equalities and variables
 remove_from_E_redundant_eqs_and_vars(Formulae_In, GoalVars, Formulae_Out) :- 
-	frontier_E_IE_NIE_contents(Formulae_In, E_In, IE_In, NIE_In), 
+	subfrontier_E_IE_NIE_contents(Formulae_In, E_In, IE_In, NIE_In), 
 	remove_from_E_redundant_vars(E_In, GoalVars, 'fail', Changes),
 	remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux),
-	frontier_E_IE_NIE_contents(Formulae_Aux, E_Aux, IE_In, NIE_In), 
+	subfrontier_E_IE_NIE_contents(Formulae_Aux, E_Aux, IE_In, NIE_In), 
 	(
 	    (   % If there are no changes then we have a fixed point.
 		Changes == 'fail', % No redundant vars.
@@ -277,7 +216,7 @@ remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Chan
 % In practice we unify each var in Dumb_Vars to avoid a result after its negation.
 
 remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars, Formula_Out) :-
-	frontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
+	subfrontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
 
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(NIE_In, Real_GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
@@ -287,7 +226,7 @@ remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars, Formula_Out) :-
 	varsbag(IE_In, Valid_Vars, [], Dumb_Vars), % Dumb_Vars = vars(IE) - (GoalVars + vars(E) + RelVars).
 
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, Dumb_Vars, IE_Out),
-	frontier_E_IE_NIE_contents(Formula_Out, E_In, IE_Out, NIE_In). 
+	subfrontier_E_IE_NIE_contents(Formula_Out, E_In, IE_Out, NIE_In). 
 
 remove_from_IE_irrelevant_disequalities_aux(IE, [], IE) :- !. % Optimization.
 remove_from_IE_irrelevant_disequalities_aux([], _Dumb_Vars, []) :- !.
@@ -322,7 +261,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Dumb_Vars, IE_Out):-
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_and_exp(Frontier_In, GoalVars, Frontier_Out):-
-	frontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
+	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
 	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: (E, IE, NIE)', (E, IE, NIE)),
 
 	% Delayed diseqs are those ones which have a variable not in GoalVars but in E or NIE.
@@ -336,7 +275,7 @@ split_IE_NIE_between_imp_and_exp(Frontier_In, GoalVars, Frontier_Out):-
 	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-	frontier_E_IE_NIE_ie_contents(Frontier_Out, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
+	subfrontier_E_IE_NIE_ie_contents(Frontier_Out, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
 
 % split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
 % In Fexp are the elements of F with any variables of ExpVars and
@@ -377,7 +316,7 @@ split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
 % If all the variables of the diseq are GoalVars or do not appear in E or NIE then they are not delayed diseqs.
 % Closed variables are not taken into account for this process.
 compute_delayed_and_non_goalvars_variables(SubFrontier_In, GoalVars, Delayed_Vars, Non_GoalVars) :-
-	frontier_E_IE_NIE_contents(SubFrontier_In, E, IE, NIE),
+	subfrontier_E_IE_NIE_contents(SubFrontier_In, E, IE, NIE),
 
 	identify_closed_vars(E, [], Closed_Vars_E),
 	identify_closed_vars(IE, Closed_Vars_E, Closed_Vars_E_IE),
@@ -428,12 +367,12 @@ identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_In) :- % Other subgoa
 % returns Result that is the result from negating the frontier.
 negate_formula(Frontier, _Proposal, _GoalVars, true) :- 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-	frontier_E_IE_NIE_ie_contents(Frontier, [], [], [], [], []),
+	subfrontier_E_IE_NIE_ie_contents(Frontier, [], [], [], [], []),
 	!. % Optimization
 
 negate_formula(Frontier, Proposal, GoalVars, Neg_E_IE_NIE) :-
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-	frontier_E_IE_NIE_ie_contents(Frontier, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp),
+	subfrontier_E_IE_NIE_ie_contents(Frontier, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp),
 
 	rebuild_conjunction_of_goals(IE_Exp, NIE_Exp, IE_NIE_Exp), 
 	rebuild_conjunction_of_goals(E, IE_Imp, E_IE_Imp),

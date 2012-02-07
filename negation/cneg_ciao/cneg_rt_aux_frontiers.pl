@@ -1,5 +1,12 @@
 
-:- module(cneg_rt_aux_frontiers, [compute_set_of_frontiers/4, frontier_contents/5], [assertions]).
+:- module(cneg_rt_aux_frontiers, 
+	[  compute_frontier/4, 
+	   subfrontier_contents/5, 
+	   subfrontier_E_IE_NIE_contents/4,
+	   subfrontier_E_IE_NIE_ie_contents/6,
+	   split_subfrontier_into_E_IE_NIE/2,
+	   rebuild_conjunction_of_goals/3
+	], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library - Chan's Proposal").
 
@@ -8,7 +15,7 @@
 :- comment(summary, "This module implements predicates to deal with frontiers.").
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_rt, _).
+:- use_module(cneg_rt, [cneg_rt_Aux/4]).
 :- use_module(library(aggregates),[setof/3]).
 
 % To access pre-frontiers from anywhere.
@@ -20,28 +27,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Structures to manage all the info about the frontier in an easy way.
-frontier_contents(frontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
+% Structures to manage all the info about the subfrontier in an easy way.
+subfrontier_contents(subfrontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
+subfrontier_E_IE_NIE_contents(subfrontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
+subfrontier_E_IE_NIE_ie_contents(subfrontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp), E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Frontier)
-compute_set_of_frontiers(Goal, GoalVars, Proposal, Frontier) :-
+compute_frontier(Goal, GoalVars, Proposal, Frontier) :-
 	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_set_of_frontiers_aux(Goals, GoalVars, Proposal, Frontier),
+	compute_frontier_aux(Goals, GoalVars, Proposal, Frontier),
 	!.
 
-compute_set_of_frontiers_aux([], _GoalVars, _Proposal, []) :- !.
-compute_set_of_frontiers_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_Out) :-
+compute_frontier_aux([], _GoalVars, _Proposal, []) :- !.
+compute_frontier_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_Out) :-
 	compute_goal_frontier(Goal, Proposal, Frontier_Aux), !,
 %	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
 	adequate_frontier(Frontier_Aux, GoalVars, Frontier_Tmp), !,
-	compute_set_of_frontiers_aux(More_Goals, GoalVars, Proposal, Frontier_In),
+	compute_frontier_aux(More_Goals, GoalVars, Proposal, Frontier_In),
 	append(Frontier_Tmp, Frontier_In, Frontier_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,8 +64,8 @@ adequate_frontier([F_In | Frontier_In], GoalVars, [F_Out | Frontier_Out]) :-
 	adequate_frontier(Frontier_In, GoalVars, Frontier_Out).
 
 adequate_frontier_aux(F_In, GoalVars, Body_Copy) :-
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F_In, Real_Goal, Head, Body, _F_Test),
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F_In, Real_Goal, Head, Body, _F_Test),
 	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
 	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
 	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
@@ -85,11 +95,11 @@ compute_goal_frontier(Goal, Proposal, Frontier) :-
 
 % Manage true and fail ...
 compute_goal_frontier('true', _Proposal, [F_Out]) :- !,
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F_Out, 'true', 'true', 'true', 'true').
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F_Out, 'true', 'true', 'true', 'true').
 compute_goal_frontier('fail', _Proposal, [F_Out]) :- !,
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F_Out, 'fail', 'fail', 'fail', 'fail').
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F_Out, 'fail', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
 % The frontiers need to evaluated one at a time. 
@@ -113,15 +123,15 @@ compute_goal_frontier(Goal, Proposal, Frontier):-
 compute_goal_frontier(Goal, _Proposal, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal),
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal),
 	!.
 
 compute_goal_frontier(Goal, _Proposal, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal), 
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal), 
 	!.
 
 % Double negation is not managed yet. Bypass it.
@@ -176,8 +186,8 @@ generate_conjunction_from_list([Goal | Goals], (Goal , Disj_Goals)) :-
 
 build_a_frontier_from_each_result(_Real_Goal, [], []) :- !.
 build_a_frontier_from_each_result(Real_Goal, [Result | Results], [Frontier | Frontiers]) :-
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(Frontier, Real_Goal, Real_Goal, Result, Real_Goal),
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(Frontier, Real_Goal, Real_Goal, Result, Real_Goal),
 	build_a_frontier_from_each_result(Real_Goal, Results, Frontiers).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,8 +223,8 @@ simplify_frontier([_F_In | Frontier_In], Goal, Frontier_Acc, Frontier_Out) :-
 % simplify_frontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
 test_frontier_is_valid(F_In, Goal) :-
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F_In, Goal, _Head, _Body, F_Test),
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F_In, Goal, _Head, _Body, F_Test),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
 	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: (Goal, F_In)', (Goal, F_In)),
@@ -256,14 +266,14 @@ combine_frontiers_from_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
 % the result of combining F1_1 with each element of F2.
 combine_frontiers_from_conjunction_aux_2(_F1_1, [], []).
 combine_frontiers_from_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
-%	frontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	frontier_contents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
-	frontier_contents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
+%	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
+	subfrontier_contents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
+	subfrontier_contents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
 	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),
 	F3_Head = ((F1_1_Head), (F2_1_Head)),
 	F3_Body = ((F1_1_Body), (F2_1_Body)),
 	F3_F_Test = ((F1_1_F_Test), (F2_1_F_Test)),
-	frontier_contents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
+	subfrontier_contents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
 	test_frontier_is_valid(F3, F3_Real_Goal), !, 
         combine_frontiers_from_conjunction_aux_2(F1_1, More_F2, More_F3).
 combine_frontiers_from_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
@@ -273,4 +283,57 @@ combine_frontiers_from_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+split_subfrontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
+	goal_is_disjunction(Frontier_In, _G1, _G2), !, 
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_subfrontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
+	fail.
 
+split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
+	goal_is_conjunction(Frontier_In, G1, G2), !,
+	split_subfrontier_into_E_IE_NIE(G1, Frontier_G1),
+	split_subfrontier_into_E_IE_NIE(G2, Frontier_G2),
+	subfrontier_E_IE_NIE_contents(Frontier_G1, E_G1, IE_G1, NIE_G1),
+	subfrontier_E_IE_NIE_contents(Frontier_G2, E_G2, IE_G2, NIE_G2),
+	rebuild_conjunction_of_goals(E_G1, E_G2, E_Out),
+	rebuild_conjunction_of_goals(IE_G1, IE_G2, IE_Out),
+	rebuild_conjunction_of_goals(NIE_G1, NIE_G2, NIE_Out),
+	subfrontier_E_IE_NIE_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
+
+split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
+	goal_is_equality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
+	subfrontier_E_IE_NIE_contents(Frontier_Out, Frontier_In, [], []).
+
+split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
+	goal_is_disequality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
+	subfrontier_E_IE_NIE_contents(Frontier_Out, [], Frontier_In, []).
+
+% This leads to infinite loops because double negation 
+% sould be managed when generating the subfrontier.
+% The way to fix this is remove cneg(cneg(...))
+% when evaluating the subfrontier. To be done.
+split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
+	goal_is_negation(Frontier_In, _GoalVars, _UQV, _SubGoal, _Negation_Proposal), !,
+	subfrontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
+
+split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
+	goal_is_not_conj_disj_eq_diseq_dneg(Frontier_In), !,
+	subfrontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
+
+split_subfrontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :- 
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_subfrontier_into_E_IE_NIE can not deal with subfrontier. Frontier_In', Frontier_In),
+	fail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+rebuild_conjunction_of_goals([], [], []) :- !. % Empty elements when re-joining
+rebuild_conjunction_of_goals(Goals, [], Goals) :- !. % Empty element when re-joining
+rebuild_conjunction_of_goals([], Goals, Goals) :- !. % Empty element when re-joining
+rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empty elements.
+	Goals_1 \== [], 
+	Goals_2 \== [], !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -97,7 +97,7 @@ cneg_rt_Aux(Goal, GoalVars, Proposal, Result_List) :-
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_Aux :: Real_GoalVars', Real_GoalVars),
 	portray_attributes_in_term_vars(2, 'cneg_rt', Goal),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Frontier),
+	compute_frontier(Goal, Real_GoalVars, Proposal, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_Aux :: Frontier', Frontier),
