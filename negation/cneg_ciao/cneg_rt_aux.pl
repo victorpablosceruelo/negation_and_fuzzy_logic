@@ -13,12 +13,12 @@
 :- use_module(cneg_diseq, _).
 
 :- use_module(cneg_rt_aux_frontiers, _).
+:- use_module(cneg_rt_New, _).
 :- use_module(cneg_rt_Chan, _).
 :- use_module(cneg_rt_Stuckey, _).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
-
 
 cneg_rt_Aux(Goal, GoalVars, Proposal, Result_List) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
@@ -72,7 +72,17 @@ negate_frontier(Frontier, GoalVars, Proposal, Negated_Frontier) :-
 negate_each_subfrontier([], _GoalVars, _Proposal, []) :- !.
 negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, [Result_Frontier | Result_More_Frontiers]) :-
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
-	negate_subfrontier(Frontier, GoalVars, Proposal, Result_Frontier),
+	(
+	    (
+		Proposal = 'cneg_rt_New',
+		negate_subfrontier_new(Frontier, GoalVars, Proposal, Result_Frontier)
+	    )
+	;
+	    (
+		Proposal = 'cneg_rt_Chan',
+		negate_subfrontier_chan(Frontier, GoalVars, Proposal, Result_Frontier)
+	    )
+	),
 %	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).

@@ -5,7 +5,8 @@
 	   subfrontier_E_IE_NIE_contents/4,
 	   subfrontier_E_IE_NIE_ie_contents/6,
 	   split_subfrontier_into_E_IE_NIE/2,
-	   rebuild_conjunction_of_goals/3
+	   rebuild_conjunction_of_goals/3,
+	   split_IE_NIE_between_imp_and_exp/3
 	], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library - Chan's Proposal").
@@ -343,18 +344,15 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empt
 % split_IE_NIE_between_imp_and_exp(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
-split_IE_NIE_between_imp_and_exp(Frontier_In, GoalVars, Frontier_Out):-
+split_IE_NIE_between_imp_and_exp(Frontier_In, ExpVars, Frontier_Out):-
 	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
 	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: (E, IE, NIE)', (E, IE, NIE)),
+	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: ExpVars', ExpVars),
 
-	% Delayed diseqs are those ones which have a variable not in GoalVars but in E or NIE.
-	% If all the variables of the diseq are GoalVars or do not appear in E or NIE then they are not delayed diseqs.
-	compute_delayed_and_non_goalvars_variables(Frontier_In, GoalVars, Delayed_Vars, Non_GoalVars),
-
-	split_ie_or_nie_between_imp_and_exp(IE, Delayed_Vars, IE_Imp, IE_Exp),
+	split_ie_or_nie_between_imp_and_exp(IE, ExpVars, IE_Imp, IE_Exp),
 	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),
 
-	split_ie_or_nie_between_imp_and_exp(NIE, Non_GoalVars, NIE_Imp, NIE_Exp),
+	split_ie_or_nie_between_imp_and_exp(NIE, ExpVars, NIE_Imp, NIE_Exp),
 	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).

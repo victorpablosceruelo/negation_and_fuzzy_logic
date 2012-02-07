@@ -1,12 +1,9 @@
-%
-% From Susana modified by VPC.
-%
-:- module(cneg_rt_Chan, [negate_subfrontier/4], [assertions]).
+
+:- module(cneg_rt_Chan, [negate_subfrontier_chan/4], [assertions]).
 :- meta_predicate cneg(goal).
 %:- meta_predicate cneg_processed_pred(goal,?). 
 
-% To access pre-frontiers from anywhere.
-:- multifile cneg_pre_frontier/6.
+:- multifile negate_subfrontier/4.
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_rt_aux_frontiers, 
@@ -14,7 +11,8 @@
 	   subfrontier_E_IE_NIE_contents/4,
 	   subfrontier_E_IE_NIE_ie_contents/6,
 	   split_subfrontier_into_E_IE_NIE/2,
-	   rebuild_conjunction_of_goals/3 
+	   rebuild_conjunction_of_goals/3,
+	   split_IE_NIE_between_imp_and_exp/3
 	]).
 :- use_module(cneg_diseq, [ 
 	portray_attributes_in_term_vars/3,
@@ -40,7 +38,7 @@
 % negate_subfrontier(SubFrontier, GoalVars, Proposal, Result_Frontier)
 % returns in Result_Frontier the negation of the subfrontier in SubFrontier
 
-negate_subfrontier(SubFrontier_In, GoalVars, Proposal, (Result)):-
+negate_subfrontier_chan(SubFrontier_In, GoalVars, Proposal, (Result)):-
 	Proposal = 'cneg_rt_Chan',
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
