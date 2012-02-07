@@ -17,7 +17,6 @@
 	get_attributes_in_term_vars/3,
 	diseq_geuqv/5, eq_geuqv/5,
 	diseq_geuqv_adv/6, eq_geuqv_adv/6]).
-:- use_module(cneg_rt_aux_Chan, [normalize_E_IE_NIE/4]).
 
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.
