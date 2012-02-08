@@ -31,8 +31,9 @@ generate_tr_intneg_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: List_Of_Preds', (List_Of_Preds)),
 	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
 
-	generate_tr_intneg_main_clauses(List_Of_Preds, Cls_In, Cls_Aux),
-	generate_tr_intneg_auxiliary_clauses(List_Of_H_and_B, Cls_Aux, Cls_Out).
+%	generate_tr_intneg_main_clauses(List_Of_Preds, Cls_In, Cls_Aux),
+%	generate_tr_intneg_auxiliary_clauses(List_Of_H_and_B, Cls_Aux, Cls_Out).
+	Cls_Out = Cls_In.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
