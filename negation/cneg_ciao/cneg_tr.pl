@@ -8,6 +8,7 @@
 :- module(cneg_tr,[trans_sent/3, trans_clause/3],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
+:- use_module(library(aggregates),[setof/3]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 :- use_module(cneg_tr_aux, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
@@ -21,11 +22,11 @@
 	the constructive negation of any predicate in the original file.").
 
 % dynamic predicate(s) 
-:- data cneg_list_of_heads_and_bodies/1.
-:- data cneg_list_of_predicates/1.
+:- data cneg_tr_pred_head_and_body/1.
+:- data cneg_tr_pred_info/1.
 
-list_name_for_cneg_heads_and_bodies('cneg_list_of_heads_and_bodies').
-list_name_for_cneg_predicates('cneg_list_of_predicates').
+name_for_assert_cneg_tr_pred_head_and_body('cneg_tr_pred_head_and_body').
+name_for_assert_cneg_tr_pred_info('cneg_tr_pred_info').
 
 trans_clause(Whatever, Whatever, _) :-
 	echo_msg(1, '', 'cneg_tr', 'trans_clause', (Whatever)).
@@ -99,35 +100,34 @@ store_head_and_bodies_info_aux(Head, Test, [Body | Bodies]) :-
 	store_head_and_bodies_info(Head, Test, Bodies).
 
 store_body_info(Head, Body, Test, Counter) :-
-	list_name_for_cneg_heads_and_bodies(List_Name),
-	retrieve_list_of(List_Name, List),
-	save_list_of(List_Name, [(Head, Body, Test, Counter) | List]).
+	name_for_assert_cneg_tr_pred_head_and_body(Store_Name),
+	assertz_fact_local(Store_Name, (Head, Body, Test, Counter)).
+
 
 store_head_info(Head, NewCounter) :-
+	name_for_assert_cneg_tr_pred_info(Store_Name),
 	functor_local(Head, Name, Arity, _Arguments),
-	list_name_for_cneg_predicates(List_Name),
-	retrieve_list_of(List_Name, List),
-	remove_from_list_with_counter(List, (Name, Arity, Counter), NewList),
+	retract_fact_local(Store_Name, (Name, Arity, Counter), (Name, Arity, 0)),
 	NewCounter is Counter + 1,
-	save_list_of(List_Name, [(Name, Arity, NewCounter) | NewList]).
-
-remove_from_list_with_counter([], (_Name, _Arity, 0), []) :- !.
-remove_from_list_with_counter([(Name, Arity, Counter) | List], (Name, Arity, Counter), List) :- !.
-remove_from_list_with_counter([ Elto | List], (Name, Arity, Counter), [Elto | NewList]) :- !,
-	remove_from_list_with_counter(List, (Name, Arity, Counter), NewList).
+	assertz_fact_local(Store_Name, (Name, Arity, NewCounter)).
 
 % Saves a list with name List_Name and argument List.
-save_list_of(List_Name, List) :-
-	functor_local(Functor, List_Name, 1, [List]),
-	assertz_fact(Functor), !,
-	echo_msg(2, '', 'cneg_tr', 'assertz_fact(Functor)', assertz_fact(Functor)).
+assertz_fact_local(Store_Name, Whatever) :-
+	functor_local(To_Store, Store_Name, 1, [Whatever]),
+	assertz_fact(To_Store), !,
+	echo_msg(2, '', 'cneg_tr', 'assertz_fact(To_Store)', assertz_fact(To_Store)).
 
 % Retrieves a list with name List_Name and argument List.
-retrieve_list_of(List_Name, List) :-
-	functor_local(Functor, List_Name, 1, [List]),
-	retract_fact(Functor), !,
-	echo_msg(2, '', 'cneg_tr', 'retract_fact(Functor)', retract_fact(Functor)).
-retrieve_list_of(_List_Name, []).
+retract_fact_local(Store_Name, Whatever, _Whatever_On_Error) :-
+	functor_local(To_Retrieve, Store_Name, 1, [Whatever]),
+	retract_fact(To_Retrieve), !,
+	echo_msg(2, '', 'cneg_tr', 'retract_fact_local', To_Retrieve).
+retract_fact_local(_Store_Name, Whatever, Whatever) :-
+	echo_msg(2, '', 'cneg_tr', 'retract_fact_local', Whatever).
+
+retract_all_fact_local(Store_Name, Result) :-
+	functor_local(To_Retrieve, Store_Name, 1, [Whatever]),
+	setof(Whatever, retract_fact(To_Retrieve), Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,11 +140,13 @@ generate_auxiliary_code([ Multifile |[ end_of_file]]) :-
 
 trans_sent_eof(Cls_Out, SourceFileName) :-
 	generate_auxiliary_code(Aux_Code),
-	list_name_for_cneg_predicates(List_Name_1),
-	retrieve_list_of(List_Name_1, List_Of_Preds),
+
+	name_for_assert_cneg_tr_pred_info(Store_Name_1),
+	retract_all_fact_local(Store_Name_1, List_Of_Preds),
 	echo_msg(2, '', 'cneg_tr', 'List_Of_Preds', List_Of_Preds),
-	list_name_for_cneg_heads_and_bodies(List_Name_2),
-	retrieve_list_of(List_Name_2, List_Of_H_and_B),
+
+	name_for_assert_cneg_tr_pred_head_and_body(Store_Name_2),
+	retract_all_fact_local(Store_Name_2, List_Of_H_and_B),
 	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B', List_Of_H_and_B),
 
 	remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds_Aux, List_Of_H_and_B_Aux),
@@ -152,7 +154,7 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux),
 
 	generate_cneg_tr_vpc(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
-	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
+	generate_pre_frontiers(List_Of_H_and_B_Aux, SourceFileName, Cls_4, Cls_Out),
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, '', 'cneg_tr', 'Cls_Out', Cls_Out),

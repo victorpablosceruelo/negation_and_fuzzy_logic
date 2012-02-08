@@ -41,9 +41,9 @@ greater(s(X),s(Y)):-
 
 % TEST
 
-no_boole(X):- cneg(boole(X)).
-no_boole2(X):- cneg((boole(X), boole(X))).
-no_greater_than_3(X):- digit(X), cneg(greater(X,s(s(s(0))))).
+no_boole(X):- cneg_tr([], boole(X)).
+no_boole2(X):- cneg_tr([], (boole(X), boole(X))).
+no_greater_than_3(X):- digit(X), cneg_tr([], greater(X,s(s(s(0))))).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % QUEENS                              
@@ -82,7 +82,7 @@ select(X, [Y|Ys], [Y|Zs]):-
 no_attack([], _Queen, _Nb).
 no_attack([Y|Ys], Queen, Nb):-
 	add(Y,Nb,YNb),
-        dist(Queen,YNb),
+        disequality(Queen,YNb, []),
 	no_attack_down(Y,Nb,Queen), 
         add(Nb,s(0),Nb1),
         no_attack(Ys, Queen, Nb1).
@@ -90,12 +90,12 @@ no_attack([Y|Ys], Queen, Nb):-
 no_attack_down(Y,Nb,Queen):-
 	greater(Y,Nb),
 	subst(Y,Nb,NbY),
-	dist(Queen,NbY).
+	disequality(Queen,NbY, []).
 no_attack_down(Y,Nb,_Queen):-
 	greater(Nb,Y).
 no_attack_down(Y,Nb,Queen):-
 	Y=Nb, 
-	dist(Queen,0).
+	disequality(Queen,0, []).
 
 queens_list(0, []).
 queens_list(N, [N|Ns]):-
@@ -120,10 +120,10 @@ queens2(Q) :- queens(s(s(0)),Q).
 queens3(Q) :- queens(s(s(s(0))),Q).
 queens4(Q) :- queens(s(s(s(s(0)))),Q).
 
-no_queens1(Q):- cneg(queens(s(0),Q)). % Q =/= [s(0)]
-no_queens2(Q):- cneg(queens(s(s(0)),Q)). % True always
-no_queens3(Q):- cneg(queens(s(s(s(0))),Q)). % True always
-no_queens4(Q):- cneg(queens(s(s(s(0))),Q)). % 10^4 sols.
+no_queens1(Q):- cneg_tr([], queens(s(0),Q)). % Q =/= [s(0)]
+no_queens2(Q):- cneg_tr([], queens(s(s(0)),Q)). % True always
+no_queens3(Q):- cneg_tr([], queens(s(s(s(0))),Q)). % True always
+no_queens4(Q):- cneg_tr([], queens(s(s(s(0))),Q)). % 10^4 sols.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -137,8 +137,8 @@ even(X):- sum(Y,Y,X).
 
 % TEST
 
-odd1(X):- cneg(even(X)).
-odd2(X):- number1(X), cneg(even(X)).
+odd1(X):- cneg_tr([], even(X)).
+odd2(X):- number1(X), cneg_tr([], even(X)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INSERT
@@ -147,7 +147,7 @@ odd2(X):- number1(X), cneg(even(X)).
 member1(X,[X|_Ys]).
 member1(X,[_Y|Ys]):- member1(X,Ys).
 
-insert(X,Xs,[X|Xs]):- cneg(member1(X,Xs)).
+insert(X,Xs,[X|Xs]):- cneg_tr([], member1(X,Xs)).
 % insert(X,Xs,Xs):- member1(X,Xs).
 
 % TEST
@@ -176,7 +176,7 @@ connected(X, Y) :- node(X), node(Y),
 
 % TEST
 aux_connected(X) :- connected(X,_Y).
-test_connected(X):- cneg(aux_connected(X)).
+test_connected(X):- cneg_tr([], aux_connected(X)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BARTAK
@@ -188,7 +188,7 @@ t(c).
 
 % TEST
 
-no_p(X,Y):- cneg(p(X,Y)).
+no_p(X,Y):- cneg_tr([], p(X,Y)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SYMMETRIC
@@ -204,7 +204,7 @@ mirror(f2(X,Y),f2(Z,W)):- mirror(X,W), mirror(Y,Z).
 
 % TEST
 
-no_mirror(Z):- cneg(symmetric(Z)).
+no_mirror(Z):- cneg_tr([], symmetric(Z)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DUPLICATES
@@ -222,14 +222,14 @@ digit1(3).
 
 % TEST
 
-test_has_duplicates(L):- L=[_,_,_], cneg(has_duplicates(L)), list_of_digits(L).
+test_has_duplicates(L):- L=[_,_,_], cneg_tr([], has_duplicates(L)), list_of_digits(L).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DUPLICATES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disjoint([],_).
-disjoint([X|L1],L2):- cneg(member1(X,L2)), disjoint(L1,L2).
+disjoint([X|L1],L2):- cneg_tr([], member1(X,L2)), disjoint(L1,L2).
 
 % TEST
 
@@ -276,12 +276,12 @@ grandparent2(Y,X):-
     parent2(Y,Z),
     parent2(Z,X).
 
-no_grandparent2(Y,X):- cneg(grandparent2(Y,X)).
+no_grandparent2(Y,X):- cneg_tr([], grandparent2(Y,X)).
 
 grandparent3(X, Y) :- grandparent3(X, Z), grandparent3(Z, Y).
 grandparent3(X, Y) :- parent2(X,Y).
 
-no_grandparent3(X, Y) :- cneg(grandparent3(X,Y)).
+no_grandparent3(X, Y) :- cneg_tr([], grandparent3(X,Y)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
