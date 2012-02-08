@@ -23,7 +23,7 @@
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- use_module(cneg_tr).
-:- use_module(cneg_tr_cintneg, [cneg_main_and_aux_cl_names/3]).
+:- use_module(cneg_tr_hybrid, [cneg_main_and_aux_cl_names/3]).
 :- use_module(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5]).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
@@ -53,39 +53,39 @@ goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_tr(UQV, Functor) :- cneg_tr_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
+cneg_hybrid(UQV, Functor) :- cneg_hybrid_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
 
-cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
+cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
-	echo_msg(1, '', 'cneg_tr', 'cneg :: Not implemented conjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	echo_msg(1, '', 'cneg_hybrid', 'cneg :: Not implemented conjunction. Error processing ', cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
-cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
+cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
 	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
-	echo_msg(1, '', 'cneg_tr', 'cneg :: Not implemented disjunction. Error processing ', cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
+	echo_msg(1, '', 'cneg_hybrid', 'cneg :: Not implemented disjunction. Error processing ', cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
 	!, fail.
 
-cneg_tr_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
+cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
 	functor_local(Functor, Name, Arity, Args),
 	New_Arity is Arity + 4,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	cneg_aux:append(FV_Cneg, FV_In, FV_Aux),
 	cneg_aux:append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
 	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
-	echo_msg(1, '', 'cneg_tr', 'cneg_tr_aux :: call', New_Functor),
+	echo_msg(1, '', 'cneg_hybrid', 'cneg_hybrid_aux :: call', New_Functor),
 	call(New_Functor).
 
 test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
-	echo_msg(1, '', 'cneg_tr', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
-	echo_msg(1, '', 'cneg_tr', 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
-	echo_msg(1, '', 'cneg_tr', 'test_if_cneg_rt_needed :: Body', Body), 
+	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
+	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
+	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: Body', Body), 
 	varsbag(GoalVars, [], [], Real_GoalVars),
 	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
 	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
 	varsbag(Body, Real_GoalVars, [], UQV),
 	!, % No backtracking allowed.
 	(
-	    (   % If no problematic vars, use cneg_tr (INTNEG).
+	    (   % If no problematic vars, use cneg_hybrid (INTNEG).
 		Problematic_Vars == [],
 		Result = 'fail'
 	    )
@@ -101,6 +101,11 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 call_to(Predicate, Level_In, Trace) :- 
 	Level is Level_In + 1,
 	echo_msg(2, 'nl', 'trace', '', ''), 
@@ -196,7 +201,9 @@ call_to_aux(Predicate, Level_In, Trace) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% cneg_tr contains the code transformation needed by cneg_lib
+% cneg_tr contains the code transformation needed by Constructive Negation.
+% This includes all the all the transformations needed by each one of the proposals included,
+% i.e. Chan's proposal, Barbuti's proposal, the New proposal and the hybrid proposal.
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
 :- load_compilation_module(.('cneg_tr')).
 

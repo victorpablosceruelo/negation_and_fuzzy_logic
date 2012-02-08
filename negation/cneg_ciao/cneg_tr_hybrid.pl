@@ -1,5 +1,5 @@
 
-:- module(cneg_tr_cintneg,[generate_tr_hybrid_cls/4, cneg_main_and_aux_cl_names/3],[assertions]).
+:- module(cneg_tr_hybrid,[generate_tr_hybrid_cls/4, cneg_main_and_aux_cl_names/3],[assertions]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
@@ -8,9 +8,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-prefix_main_clauses("cneg_tr_cneg_").
-prefix_auxiliary_clauses("cneg_tr_aux_").
-prefix_double_negation_clauses("cneg_tr_dneg_").
+name_main_negation_predicate("cneg_hybrid").
+prefix_main_clauses("cneg_tr_hybrid_cneg_").
+prefix_auxiliary_clauses("cneg_tr_hybrid_aux_").
+prefix_double_negation_clauses("cneg_tr_hybrid_dneg_").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
