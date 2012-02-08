@@ -11,7 +11,7 @@
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
-:- use_module(cneg_tr_aux, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
+:- use_module(cneg_tr_cintneg, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
 %:- reexport(cneg_tr_vpc, [cneg_main_and_aux_cl_names/3]).
 
 :- comment(title, "Contructive Negation Transformation").

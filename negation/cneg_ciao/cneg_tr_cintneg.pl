@@ -1,5 +1,5 @@
 
-:- module(cneg_tr_aux,[generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, 
+:- module(cneg_tr_cintneg,[generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, 
 	take_body_first_unification/2],[assertions]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
