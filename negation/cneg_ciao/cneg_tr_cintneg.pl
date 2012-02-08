@@ -1,6 +1,5 @@
 
-:- module(cneg_tr_cintneg,[generate_cintneg_cls/4, cneg_main_and_aux_cl_names/3, 
-	take_body_first_unification/2],[assertions]).
+:- module(cneg_tr_cintneg,[generate_tr_hybrid_cls/4, cneg_main_and_aux_cl_names/3],[assertions]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
@@ -17,7 +16,7 @@ prefix_double_negation_clauses("cneg_tr_dneg_").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_cintneg_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
+generate_tr_hybrid_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: Cls_In', (Cls_In)),
 	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: List_Of_Preds', (List_Of_Preds)),
 	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
