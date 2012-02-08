@@ -1,5 +1,5 @@
 
-:- module(cneg_tr_hybrid,[generate_tr_hybrid_cls/4, cneg_main_and_aux_cl_names/3, cneg_tr_hybrid_negate_literal/4],[assertions]).
+:- module(cneg_tr_hybrid,[generate_tr_hybrid_cls/4, cneg_tr_hybrid_negate_literal/4],[assertions]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
@@ -18,9 +18,9 @@ prefix_double_negation_clauses("cneg_tr_hybrid_dneg_").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_tr_hybrid_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
-	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cintneg_cls :: Cls_In', (Cls_In)),
-	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cintneg_cls :: List_Of_Preds', (List_Of_Preds)),
-	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cintneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_tr_hybrid_cls :: Cls_In', (Cls_In)),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_tr_hybrid_cls :: List_Of_Preds', (List_Of_Preds)),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_tr_hybrid_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
 
 	cneg_tr_hybrid_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
 %	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_1', Cls_1),
@@ -32,7 +32,7 @@ generate_tr_hybrid_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 %	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	cneg_tr_hybrid_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_Out),
-	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_Out', Cls_Out),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_tr_hybrid_cls :: Cls_Out', Cls_Out),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

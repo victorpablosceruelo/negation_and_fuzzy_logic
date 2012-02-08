@@ -23,7 +23,7 @@
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- use_module(cneg_tr).
-:- use_module(cneg_tr_hybrid, [cneg_main_and_aux_cl_names/3, cneg_tr_hybrid_negate_literal/4]).
+:- use_module(cneg_tr_hybrid, [cneg_tr_hybrid_negate_literal/4]).
 :- use_module(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5]).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 

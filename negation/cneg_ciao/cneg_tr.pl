@@ -12,7 +12,7 @@
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 :- use_module(cneg_tr_hybrid, [generate_tr_hybrid_cls/4]).
-%:- reexport(cneg_tr_vpc, [cneg_main_and_aux_cl_names/3]).
+:- use_module(cneg_tr_intneg, [generate_tr_intneg_cls/4]).
 
 :- comment(title, "Contructive Negation Transformation").
 
@@ -156,7 +156,8 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	echo_msg(2, 'list', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux),
 
 	generate_tr_hybrid_cls(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
-	generate_pre_frontiers(List_Of_H_and_B_Aux, SourceFileName, Cls_4, Cls_Out),
+	generate_tr_intneg_cls(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Cls_4, Cls_5),
+	generate_pre_frontiers(List_Of_H_and_B_Aux, SourceFileName, Cls_5, Cls_Out),
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, 'list', 'cneg_tr', 'Cls_Out', Cls_Out),
