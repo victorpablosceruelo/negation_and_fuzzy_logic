@@ -181,7 +181,7 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 
 %cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
 cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
-cneg_tr_generate_cls_bodies([(Head, Body, Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+cneg_tr_generate_cls_bodies([(Head, Body, _Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
 %	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
 	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
 %	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
@@ -385,7 +385,7 @@ cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
 cneg_tr_generate_double_neg_bodies_aux([], Cls_In, Cls_In).
-cneg_tr_generate_double_neg_bodies_aux([(Head, Body, Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+cneg_tr_generate_double_neg_bodies_aux([(Head, Body, _Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
 %	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
 	cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl), !,
 %	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
