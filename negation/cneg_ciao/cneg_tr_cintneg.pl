@@ -23,13 +23,13 @@ generate_cintneg_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
 
 	cneg_tr_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_1', Cls_1),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_2', Cls_2),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_3', Cls_3),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_Out),
 	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_Out', Cls_Out),
@@ -42,9 +42,9 @@ generate_cintneg_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 %generate_main_cls(List_Of_Preds, Cls_1).
 cneg_tr_generate_main_cls([], Cls, Cls) :- !.
 cneg_tr_generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
-	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
 
@@ -182,9 +182,9 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 %cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
 cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
 cneg_tr_generate_cls_bodies([(Head, Body, Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
 	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
-	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	cneg_tr_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -386,9 +386,9 @@ cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
 cneg_tr_generate_double_neg_bodies_aux([], Cls_In, Cls_In).
 cneg_tr_generate_double_neg_bodies_aux([(Head, Body, Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
 	cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl), !,
-	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
 	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
@@ -411,9 +411,9 @@ cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 
 cneg_tr_generate_double_neg_main_cls([], Cls, Cls) :- !.
 cneg_tr_generate_double_neg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
-	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
 	cneg_tr_generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
+%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
 	!, %Backtracking forbiden.
 	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
 
