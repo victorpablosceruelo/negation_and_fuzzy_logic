@@ -46,9 +46,11 @@ trans_sent_aux(X, [], _SourceFileName):-
 
 % (:- include(dist, _)), (:- include(cneg_lib)), 
 trans_sent_aux(end_of_file, ClsFinal, SourceFileName):- !,
-%	echo_msg(1, '', 'cneg_tr', 'INFO: #################################################', ''), 
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(2, '', 'cneg_tr', 'INFO: #################################################', ''), 
 	echo_msg(1, '', 'cneg_tr', 'INFO: #############  Now computing negation  ##############', ''), 
-%	echo_msg(1, '', 'cneg_tr', 'INFO: #################################################', ''), 
+	echo_msg(2, '', 'cneg_tr', 'INFO: #################################################', ''), 
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	trans_sent_eof(ClsFinal, SourceFileName).
 
 trans_sent_aux(0, [], _SourceFileName) :- !.
@@ -59,7 +61,7 @@ trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 %	msg('Warning: cneg does not work for imported predicates unless cneg\'s package is imported from each one. Problematic declaration:', Whatever).
 
 trans_sent_aux(Clause, [Clause], _SourceFileName) :-
-	echo_msg(2, '', 'cneg_tr', 'save_sent_info(Clause) ', save_sent_info(Clause)),
+%	echo_msg(2, '', 'cneg_tr', 'save_sent_info(Clause) ', save_sent_info(Clause)),
 	save_sent_info(Clause).
 
 save_sent_info(Clause) :-
@@ -89,7 +91,7 @@ unifications_in_head_to_equality(Head, New_Head, Equality) :-
 
 
 store_head_and_bodies_info(Head, Test, Bodies) :-
-	echo_msg(2, '', 'cneg_tr', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
+%	echo_msg(2, '', 'cneg_tr', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
 	store_head_and_bodies_info_aux(Head, Test, Bodies).
 
 store_head_and_bodies_info_aux(_Head, _Test, []) :-
@@ -114,16 +116,16 @@ store_head_info(Head, NewCounter) :-
 % Saves a list with name List_Name and argument List.
 assertz_fact_local(Store_Name, Whatever) :-
 	functor_local(To_Store, Store_Name, 1, [Whatever]),
-	assertz_fact(To_Store), !,
-	echo_msg(2, '', 'cneg_tr', 'assertz_fact(To_Store)', assertz_fact(To_Store)).
+	assertz_fact(To_Store), !.
+%	echo_msg(2, '', 'cneg_tr', 'assertz_fact(To_Store)', assertz_fact(To_Store)).
 
 % Retrieves a list with name List_Name and argument List.
 retract_fact_local(Store_Name, Whatever, _Whatever_On_Error) :-
 	functor_local(To_Retrieve, Store_Name, 1, [Whatever]),
-	retract_fact(To_Retrieve), !,
-	echo_msg(2, '', 'cneg_tr', 'retract_fact_local', To_Retrieve).
-retract_fact_local(_Store_Name, Whatever, Whatever) :-
-	echo_msg(2, '', 'cneg_tr', 'retract_fact_local', Whatever).
+	retract_fact(To_Retrieve), !.
+%	echo_msg(2, '', 'cneg_tr', 'retract_fact_local', To_Retrieve).
+retract_fact_local(_Store_Name, Whatever, Whatever) :- !.
+%	echo_msg(2, '', 'cneg_tr', 'retract_fact_local', Whatever).
 
 retract_all_fact_local(Store_Name, Result) :-
 	functor_local(To_Retrieve, Store_Name, 1, [Whatever]),
@@ -143,21 +145,21 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 
 	name_for_assert_cneg_tr_pred_info(Store_Name_1),
 	retract_all_fact_local(Store_Name_1, List_Of_Preds),
-	echo_msg(2, '', 'cneg_tr', 'List_Of_Preds', List_Of_Preds),
+	echo_msg(2, 'list', 'cneg_tr', 'List_Of_Preds', List_Of_Preds),
 
 	name_for_assert_cneg_tr_pred_head_and_body(Store_Name_2),
 	retract_all_fact_local(Store_Name_2, List_Of_H_and_B),
-	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B', List_Of_H_and_B),
+	echo_msg(2, 'list', 'cneg_tr', 'List_Of_H_and_B', List_Of_H_and_B),
 
 	remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds_Aux, List_Of_H_and_B_Aux),
-	echo_msg(2, '', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
-	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux),
+	echo_msg(2, 'list', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
+	echo_msg(2, 'list', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux),
 
 	generate_cintneg_cls(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B_Aux, SourceFileName, Cls_4, Cls_Out),
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
-	echo_msg(2, '', 'cneg_tr', 'Cls_Out', Cls_Out),
+	echo_msg(2, 'list', 'cneg_tr', 'Cls_Out', Cls_Out),
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	!. %Backtracking forbiden.
