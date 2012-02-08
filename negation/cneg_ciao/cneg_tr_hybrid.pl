@@ -1,5 +1,5 @@
 
-:- module(cneg_tr_hybrid,[generate_tr_hybrid_cls/4, cneg_main_and_aux_cl_names/3],[assertions]).
+:- module(cneg_tr_hybrid,[generate_tr_hybrid_cls/4, cneg_main_and_aux_cl_names/3, cneg_tr_hybrid_negate_literal/4],[assertions]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 
@@ -18,21 +18,21 @@ prefix_double_negation_clauses("cneg_tr_hybrid_dneg_").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_tr_hybrid_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
-	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: Cls_In', (Cls_In)),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: List_Of_Preds', (List_Of_Preds)),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cintneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cintneg_cls :: Cls_In', (Cls_In)),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cintneg_cls :: List_Of_Preds', (List_Of_Preds)),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cintneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
 
-	cneg_tr_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_1', Cls_1),
+	cneg_tr_hybrid_generate_main_cls(List_Of_Preds, [end_of_file], Cls_1),
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_1', Cls_1),
 	!, %Backtracking forbiden.
-	cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_2', Cls_2),
+	cneg_tr_hybrid_generate_cls_bodies(List_Of_H_and_B, Cls_1, Cls_2),
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_2', Cls_2),
 	!, %Backtracking forbiden.
-	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_3', Cls_3),
+	cneg_tr_hybrid_generate_double_neg_main_cls(List_Of_Preds, Cls_2, Cls_3),
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_3', Cls_3),
 	!, %Backtracking forbiden.
-	cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_Out),
-	echo_msg(2, '', 'cneg_tr_cintneg', 'Cls_Out', Cls_Out),
+	cneg_tr_hybrid_generate_double_neg_bodies(List_Of_H_and_B, Cls_3, Cls_Out),
+	echo_msg(2, '', 'cneg_tr_hybrid', 'Cls_Out', Cls_Out),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,15 +40,15 @@ generate_tr_hybrid_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %generate_main_cls(List_Of_Preds, Cls_1).
-cneg_tr_generate_main_cls([], Cls, Cls) :- !.
-cneg_tr_generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
-	cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
+cneg_tr_hybrid_generate_main_cls([], Cls, Cls) :- !.
+cneg_tr_hybrid_generate_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :- !,
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cneg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	cneg_tr_hybrid_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl),
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_cneg_main_cls :: (Main_Cl, Aux_Cl)', (Main_Cl, Aux_Cl)),
 	!, %Backtracking forbiden.
-	cneg_tr_generate_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
+	cneg_tr_hybrid_generate_main_cls(List_Of_Preds, [Main_Cl |[Aux_Cl | Cls_In]], Cls_Out).
 
-cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
+cneg_tr_hybrid_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	cneg_main_and_aux_cl_names(Name, Main_Cl_Name, Aux_Cl_Name),	
 	generate_double_negation_name(Name, Main_DN_Name),
 
@@ -179,16 +179,16 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 %      2.2- the subcalls to other predicates are translated into prodicates we've translated.
 %      2.3- vars for freevars and continuation vars are inserted at this point.
 
-%cneg_tr_generate_cls_bodies(List_Of_H_and_B, Cls_2).
-cneg_tr_generate_cls_bodies([], Cls_In, Cls_In).
-cneg_tr_generate_cls_bodies([(Head, Body, _Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
-	cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl), !,
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cls_bodies :: New_Cl', New_Cl),
+%cneg_tr_hybrid_generate_cls_bodies(List_Of_H_and_B, Cls_2).
+cneg_tr_hybrid_generate_cls_bodies([], Cls_In, Cls_In).
+cneg_tr_hybrid_generate_cls_bodies([(Head, Body, _Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_cls_bodies :: (Head, Body, Test, Counter)', (Head, Body, Test, Counter)),
+	cneg_tr_hybrid_generate_cl_body(Head, Body, Counter, New_Cl), !,
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_cls_bodies :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
-	cneg_tr_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
+	cneg_tr_hybrid_generate_cls_bodies(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
-cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
+cneg_tr_hybrid_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	% We suppose the head has no unifications (we've removed them before).
 	functor(Head, Name, Arity), 
 	% New head (new name, new arity, new args).
@@ -220,8 +220,8 @@ cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	New_Body = (Test_Cneg_RT, (Test_For_True ; (Test_For_Fail, Neg_Body))),
 
 	% negate_body_conjunction
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_cl_body :: negate_atom :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
-	negate_atom(Body, GoalVars, Result, Neg_Body).
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_cl_body :: negate_literal :: (Body, GoalVars, Result)', (Body, GoalVars, Result)),
+	cneg_tr_hybrid_negate_literal(Body, GoalVars, Result, Neg_Body).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -233,14 +233,14 @@ take_body_first_unification(Body, Body_First_Unification) :-
 	goal_is_conjunction(Body, Conj_1, _Conj_2), !,
 	take_body_first_unification(Conj_1, Body_First_Unification).
 take_body_first_unification(Body, 'fail') :-
-	echo_msg(1, '', 'cneg_tr_cintneg', 'take_body_first_unification :: Impossible to determine for Body', (Body)).
+	echo_msg(1, '', 'cneg_tr_hybrid', 'take_body_first_unification :: Impossible to determine for Body', (Body)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_atom(Atom, Negated_Atom, UQV_In, UQV_Out, Results_In, Results_Out).
-negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+% cneg_tr_hybrid_negate_literal(Atom, Negated_Atom, UQV_In, UQV_Out, Results_In, Results_Out).
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
 
 	test_for_true(Test_For_True, Result_Aux),
@@ -251,10 +251,10 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	Ops_When_Fail = (Test_For_Fail, Neg_Conj_2),
 	Neg_Atom = (Neg_Conj_1, (Ops_When_True ; Ops_When_Fail)),
 
-	negate_atom(Conj_1, GoalVars, Result_Aux, Neg_Conj_1),
-	negate_atom(Conj_2, GoalVars, Result, Neg_Conj_2).
+	cneg_tr_hybrid_negate_literal(Conj_1, GoalVars, Result_Aux, Neg_Conj_1),
+	cneg_tr_hybrid_negate_literal(Conj_2, GoalVars, Result, Neg_Conj_2).
 
-negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
 
 	test_for_true(Test_For_True, Result_Aux),
@@ -265,28 +265,28 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	Ops_When_Fail = (Test_For_Fail, Op),
 	Neg_Atom = (Neg_Disj_1, (Ops_When_Fail ; Ops_When_True)),
 
-	negate_atom(Disj_1, GoalVars, Result_Aux, Neg_Disj_1),
-	negate_atom(Disj_2, GoalVars, Result, Neg_Disj_2). 
+	cneg_tr_hybrid_negate_literal(Disj_1, GoalVars, Result_Aux, Neg_Disj_1),
+	cneg_tr_hybrid_negate_literal(Disj_2, GoalVars, Result, Neg_Disj_2). 
 
-negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, Eq_GV, Eq_EQV, Eq_UQV), !,
 	Eq_GV = [], % No GV variables allowed !!!
 	Eq_EQV = [], % No EQV variables allowed !!!
 	functor_local(Neg_Atom, 'diseq_geuqv_adv', 6, [A_Left |[A_Right |[ GoalVars |[ Eq_UQV |[ 'compute' |[Result]]]]]]).
 
-negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, Diseq_GV, Diseq_EQV, Diseq_UQV), !,
 	Diseq_GV = [], % No GV variables allowed !!!
 	Diseq_EQV = [], % No EQV variables allowed !!!
 	functor_local(Neg_Atom, 'eq_geuqv_adv', 6, [A_Left |[A_Right |[ GoalVars |[ Diseq_UQV |[ 'compute' |[Result]]]]]]).
 
-negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_negation_uqv(Atom, UQV, SubGoal, _Proposal), !,
 	functor_local(Op_Append, 'append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
 	Neg_Atom = (Op_Append, Neg_Atom_Aux),
-	double_negation_atom(SubGoal, New_GoalVars, Result, Neg_Atom_Aux).
+	cneg_tr_hybrid_double_negation_literal(SubGoal, New_GoalVars, Result, Neg_Atom_Aux).
 
-negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Atom), !,
 	functor(Atom, Name, Arity), !,
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
@@ -295,14 +295,14 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	args_for_cneg_tr_hybrid(New_Arity, Neg_Atom, GoalVars, Result),
 	copy_args(Arity, Atom, Neg_Atom).
 
-negate_atom(Atom, GoalVars, Result, Atom) :-
-	echo_msg(1, '', 'cneg_tr_cintneg', 'unknown atom for negate_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
+cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Atom) :-
+	echo_msg(1, '', 'cneg_tr_hybrid', 'unknown literal for cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result)', cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_conjunction(Atom, Conj_1, Conj_2), !,
 
 	test_for_true(Test_For_True, Result_Aux),
@@ -313,10 +313,10 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	Ops_When_Fail = (Test_For_Fail, Op),
 	DN_Atom = (DN_Conj_1, (Ops_When_Fail ; Ops_When_True)),
 
-	double_negation_atom(Conj_1, GoalVars, Result_Aux, DN_Conj_1),
-	double_negation_atom(Conj_2, GoalVars, Result, DN_Conj_2).
+	cneg_tr_hybrid_double_negation_literal(Conj_1, GoalVars, Result_Aux, DN_Conj_1),
+	cneg_tr_hybrid_double_negation_literal(Conj_2, GoalVars, Result, DN_Conj_2).
 
-double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_disjunction(Atom, Disj_1, Disj_2), !,
 
 	test_for_true(Test_For_True, Result_Aux),
@@ -327,26 +327,26 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	Ops_When_Fail = (Test_For_Fail, DN_Disj_2),
 	DN_Atom = (DN_Disj_1, (Ops_When_True ; Ops_When_Fail)),
 
-	double_negation_atom(Disj_1, GoalVars, Result_Aux, DN_Disj_1),
-	double_negation_atom(Disj_2, GoalVars, Result, DN_Disj_2). 
+	cneg_tr_hybrid_double_negation_literal(Disj_1, GoalVars, Result_Aux, DN_Disj_1),
+	cneg_tr_hybrid_double_negation_literal(Disj_2, GoalVars, Result, DN_Disj_2). 
 
-double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_negation_uqv(Atom, _Unconfigured_UQV, SubGoal, _Proposal), !, 
-	negate_atom(SubGoal, GoalVars, Result, DN_Atom). % Problematic
+	cneg_tr_hybrid_negate_literal(SubGoal, GoalVars, Result, DN_Atom). % Problematic
 
-double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_disequality(Atom, A_Left, A_Right, Diseq_GV, Diseq_EQV, Diseq_UQV), !,
 	Diseq_GV = [], % No GV variables allowed !!! 
 	Diseq_EQV = [], % No EQV variables allowed !!!
 	functor_local(DN_Atom, 'diseq_geuqv_adv', 6, [A_Left |[A_Right |[ GoalVars |[ 'compute' |[ Diseq_UQV |[ Result ]]]]]]).
 
-double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_equality(Atom, A_Left, A_Right, Eq_GV, Eq_EQV, Eq_UQV), !,
 	Eq_GV = [], % No GV variables allowed !!! 
 	Eq_EQV = [], % No EQV variables allowed !!!
 	functor_local(DN_Atom, 'eq_geuqv_adv', 6, [A_Left |[A_Right |[GoalVars |[ 'compute' |[ Eq_UQV |[Result ]]]]]]).	
 
-double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Atom), !,
 	functor(Atom, Name, Arity), 
 	New_Arity is Arity + 2,
@@ -355,8 +355,8 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	args_for_cneg_tr_hybrid(New_Arity, DN_Atom, GoalVars, Result),
 	copy_args(Arity, Atom, DN_Atom).
 
-double_negation_atom(Atom, GoalVars, Result, Atom) :-
-	echo_msg(1, '', 'cneg_tr_cintneg', 'unknown atom for double_negation_atom(Atom, GoalVars, Result)', negate_atom(Atom, GoalVars, Result)).
+cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, Atom) :-
+	echo_msg(1, '', 'cneg_tr_hybrid', 'unknown literal for cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result)', cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -379,20 +379,20 @@ generate_name_with_counter(Name, Counter, New_Name) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_tr_generate_double_neg_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_bodies :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
-	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, Cls_In, Cls_Out).
+cneg_tr_hybrid_generate_double_neg_bodies(List_Of_H_and_B, Cls_In, Cls_Out) :-
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_double_neg_bodies :: List_Of_H_and_B, Cls_In', (List_Of_H_and_B, Cls_In)),
+	cneg_tr_hybrid_generate_double_neg_bodies_aux(List_Of_H_and_B, Cls_In, Cls_Out).
 
 % generate_dnb(List_Of_H_and_B, Cls_In, Cls_Out) :-
-cneg_tr_generate_double_neg_bodies_aux([], Cls_In, Cls_In).
-cneg_tr_generate_double_neg_bodies_aux([(Head, Body, _Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
-	cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl), !,
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_body :: New_Cl', New_Cl),
+cneg_tr_hybrid_generate_double_neg_bodies_aux([], Cls_In, Cls_In).
+cneg_tr_hybrid_generate_double_neg_bodies_aux([(Head, Body, _Test, Counter) | List_Of_H_and_B], Cls_In, Cls_Out) :-
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_double_neg_body :: (Head, Body, Counter)', (Head, Body, Test, Counter)),
+	cneg_tr_hybrid_generate_double_neg_body(Head, Body, Counter, New_Cl), !,
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_double_neg_body :: New_Cl', New_Cl),
 	% Recursive create the other clauses.
-	cneg_tr_generate_double_neg_bodies_aux(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
+	cneg_tr_hybrid_generate_double_neg_bodies_aux(List_Of_H_and_B, [New_Cl | Cls_In], Cls_Out).
 
-cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
+cneg_tr_hybrid_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 	functor_local(Head, Name, Arity, _Args),
 	generate_double_negation_name(Name, Aux_Name),
 	generate_name_with_counter(Aux_Name, Counter, New_Name),
@@ -401,23 +401,23 @@ cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 	copy_args(Arity, Head, New_Head),
 	args_for_cneg_tr_hybrid(New_Arity, New_Head, GoalVars, Result),
 
-%	cneg_tr_generate_double_neg_body_aux(Body, Aux_Info, GoalVars, Result, New_Body),
-	double_negation_atom(Body, GoalVars, Result, New_Body),
+%	cneg_tr_hybrid_generate_double_neg_body_aux(Body, Aux_Info, GoalVars, Result, New_Body),
+	cneg_tr_hybrid_double_negation_literal(Body, GoalVars, Result, New_Body),
 	functor_local(New_Cl, ':-', 2, [New_Head |[New_Body]]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_tr_generate_double_neg_main_cls([], Cls, Cls) :- !.
-cneg_tr_generate_double_neg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
-	cneg_tr_generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
-%	echo_msg(2, '', 'cneg_tr_cintneg', 'cneg_tr_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
+cneg_tr_hybrid_generate_double_neg_main_cls([], Cls, Cls) :- !.
+cneg_tr_hybrid_generate_double_neg_main_cls([(Name, Arity, Counter) | List_Of_Preds], Cls_In, Cls_Out) :-
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_double_neg_main_cls :: (Name, Arity, Counter)', (Name, Arity, Counter)),
+	cneg_tr_hybrid_generate_double_negation_main_cl(Name, Arity, Counter, DN_Main_Cl),
+%	echo_msg(2, '', 'cneg_tr_hybrid', 'cneg_tr_hybrid_generate_double_neg_main_cls :: Main_Cl', DN_Main_Cl),
 	!, %Backtracking forbiden.
-	cneg_tr_generate_double_neg_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
+	cneg_tr_hybrid_generate_double_neg_main_cls(List_Of_Preds, [DN_Main_Cl | Cls_In], Cls_Out).
 
-cneg_tr_generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
+cneg_tr_hybrid_generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	generate_double_negation_name(Head_Name, New_Head_Name),
 	functor_local(Main_Cl, ':-', 2, [New_Head |[ SubCalls ]]),
 	New_Arity is Arity + 2,

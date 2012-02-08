@@ -23,7 +23,7 @@
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- use_module(cneg_tr).
-:- use_module(cneg_tr_hybrid, [cneg_main_and_aux_cl_names/3]).
+:- use_module(cneg_tr_hybrid, [cneg_main_and_aux_cl_names/3, cneg_tr_hybrid_negate_literal/4]).
 :- use_module(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5]).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
@@ -53,27 +53,18 @@ goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_hybrid(UQV, Functor) :- cneg_hybrid_aux(Functor, UQV, [], _FV_Out, 'fail', 'true').
-
-cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
-	goal_is_conjunction(Functor, _Conj_1, _Conj_2), !,
-	echo_msg(1, '', 'cneg_hybrid', 'cneg :: Not implemented conjunction. Error processing ', cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
-	!, fail.
-
-cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result) :-
-	goal_is_disjunction(Functor, _Conj_1, _Conj_2), !,
-	echo_msg(1, '', 'cneg_hybrid', 'cneg :: Not implemented disjunction. Error processing ', cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, _Allowed_To_Fail, Result)),
-	!, fail.
-
-cneg_hybrid_aux(Functor, FV_Cneg, FV_In, FV_Out, Allowed_To_Fail, Result) :-
-	functor_local(Functor, Name, Arity, Args),
-	New_Arity is Arity + 4,
-	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
-	cneg_aux:append(FV_Cneg, FV_In, FV_Aux),
-	cneg_aux:append(Args, [FV_Aux |[FV_Out |[Allowed_To_Fail |[Result]]]], New_Args),
-	functor_local(New_Functor, Aux_Cl_Name, New_Arity, New_Args),
-	echo_msg(1, '', 'cneg_hybrid', 'cneg_hybrid_aux :: call', New_Functor),
-	call(New_Functor).
+cneg_rt_hybrid(UQV, Body) :- 
+	test_if_cneg_rt_needed(GoalVars, true, Body, Result),
+	(
+	    (   Result == 'true', !   )
+	;
+	    (   Result == 'fail',  !,
+		varsbag(Body, UQV, [], GoalVars),
+		cneg_tr_hybrid_negate_literal(Body, GoalVars, 'true', Neg_Body),
+		echo_msg(1, '', 'cneg_hybrid', 'cneg_hybrid :: call', Neg_Body),
+		call(Neg_Body)
+	    )
+	).
 
 test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
@@ -92,6 +83,7 @@ test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
 	;
 	    (   % If problematic vars, use cneg_rt (Chan's approach).
 		Problematic_Vars \== [],
+		Result = 'true',
 		cneg_rt(UQV, Body)
 	    )
 	).
