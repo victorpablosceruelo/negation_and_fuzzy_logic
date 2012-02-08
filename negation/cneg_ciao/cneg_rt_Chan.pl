@@ -145,7 +145,7 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Change
 	!, 
 	echo_msg(1, '', 'cneg_rt', 'ERROR: Chans proposal can not deal with the equality between', ''),
 	echo_msg(1, '', 'cneg_rt', 'ERROR: T1 and T2: (T1, T2)', (Value_1, Value_2)),
-	echo_msg(1, '', 'cneg_rt', 'ERROR: Result will be wrong because it can not remove the local variable', Value_1),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: Result will be wrong because it can not remove or ground the local variable', Value_1),
 	!,
 	fail.
 
