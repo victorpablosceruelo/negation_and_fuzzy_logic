@@ -10,7 +10,7 @@
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
-:- use_module(cneg_tr_vpc, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
+:- use_module(cneg_tr_aux, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
 :- reexport(cneg_tr_vpc, [cneg_main_and_aux_cl_names/3]).
 
 :- comment(title, "Contructive Negation Transformation").
@@ -34,9 +34,8 @@ trans_clause(Whatever, Whatever, _) :-
 % the program Module that is being compilated by the list of 
 % sentences SentList. The result clauses are continous
 trans_sent(Input, Output, SourceFileName) :-
-	% echo_msg(trans_sent(Input)), 
-	% echo_msg('trans_sent', 'trans_sent', source_file_name(Info)), 
-	trans_sent_aux(Input, Output, SourceFileName), !.
+	trans_sent_aux(Input, Output, SourceFileName), !,
+	echo_msg(2, '', 'cneg_tr', 'trans_sent(Input, Output, SourceFileName)', trans_sent(Input, Output, SourceFileName)), !.
 
 trans_sent(Input, [Input, cneg_not_translated(Input)], _SourceFileName) :-
 	echo_msg(1, '', 'cneg_tr', 'ERROR :: Impossible to translate', (Input)), !.
@@ -51,16 +50,15 @@ trans_sent_aux(end_of_file, ClsFinal, SourceFileName):- !,
 %	echo_msg(1, '', 'cneg_tr', 'INFO: #################################################', ''), 
 	trans_sent_eof(ClsFinal, SourceFileName).
 
-trans_sent_aux(0, [], _SourceFileName) :- 	!.
+trans_sent_aux(0, [], _SourceFileName) :- !.
 %	echo_msg(2, '', 'cneg_tr', 'INFO :: Use cneg_not_translated/1 to see errors in translation of ', SourceFileName).
 
 % Do not modify module imports, declarations and so on.
 trans_sent_aux((:- Whatever),[(:- Whatever)],_):- !.
 %	msg('Warning: cneg does not work for imported predicates unless cneg\'s package is imported from each one. Problematic declaration:', Whatever).
 
-% Aqui es donde da el warning porque no conoce a dist:dist aqui.
 trans_sent_aux(Clause, [Clause], _SourceFileName) :-
-	echo_msg(0, '', 'cneg_tr', 'INFO :: save_sent_info(Clause) ', save_sent_info(Clause)),
+	echo_msg(2, '', 'cneg_tr', 'save_sent_info(Clause) ', save_sent_info(Clause)),
 	save_sent_info(Clause).
 
 save_sent_info(Clause) :-
@@ -90,7 +88,7 @@ unifications_in_head_to_equality(Head, New_Head, Equality) :-
 
 
 store_head_and_bodies_info(Head, Test, Bodies) :-
-	echo_msg(0, '', 'cneg_tr', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
+	echo_msg(2, '', 'cneg_tr', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Test, Bodies)),
 	store_head_and_bodies_info_aux(Head, Test, Bodies).
 
 store_head_and_bodies_info_aux(_Head, _Test, []) :-
@@ -122,13 +120,13 @@ remove_from_list_with_counter([ Elto | List], (Name, Arity, Counter), [Elto | Ne
 save_list_of(List_Name, List) :-
 	functor_local(Functor, List_Name, 1, [List]),
 	assertz_fact(Functor), !,
-	echo_msg(0, '', 'cneg_tr', 'assertz_fact ', assertz_fact(Functor)).
+	echo_msg(2, '', 'cneg_tr', 'assertz_fact(Functor)', assertz_fact(Functor)).
 
 % Retrieves a list with name List_Name and argument List.
 retrieve_list_of(List_Name, List) :-
 	functor_local(Functor, List_Name, 1, [List]),
 	retract_fact(Functor), !,
-	echo_msg(0, '', 'cneg_tr', 'retract_fact ', retract_fact(Functor)).
+	echo_msg(2, '', 'cneg_tr', 'retract_fact(Functor)', retract_fact(Functor)).
 retrieve_list_of(_List_Name, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,11 +153,11 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 
 	generate_cneg_tr_vpc(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, Cls_4, Cls_Out),
-	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
-	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
-	echo_msg(0, '', 'cneg_tr', 'Cls_Out', Cls_Out),
-	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
-	echo_msg(0, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(2, '', 'cneg_tr', 'Cls_Out', Cls_Out),
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
+	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	!. %Backtracking forbiden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,9 +185,9 @@ remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds_Aux, L
 	echo_msg(2, 'list', 'cneg_tr', 'get_list_of_preds_to_ignore :: List', List),  
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	remove_each_pred_in_list_1(List, List_Of_Preds, List_Of_Preds_Aux),
-	echo_msg(2, 'list', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
-	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux),
-	echo_msg(2, 'list', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux).
+%	echo_msg(2, 'list', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
+	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux).
+%	echo_msg(2, 'list', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux).
 
 remove_predicates_to_ignore(List_Of_Preds, List_Of_H_and_B, List_Of_Preds, List_Of_H_and_B) :- !,
 	echo_msg(2, 'nl', 'cneg_tr', '', ''),
@@ -210,20 +208,20 @@ get_list_of_preds_to_ignore([(_Head, _Body, _Test, _Counter) | List_Of_H_and_B],
 
 remove_each_pred_in_list_1(_List, [], []) :- !. % Optimization.
 remove_each_pred_in_list_1(List, [(Name, Arity, _C) | List_Of_Preds], List_Of_Preds_Aux) :-
-	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_1 :: Testing (Name, Arity)', (Name, Arity)),
+%	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_1 :: Testing (Name, Arity)', (Name, Arity)),
 	memberchk(Name/Arity, List), !,
-	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_1 :: Removing (Name, Arity)', (Name, Arity)),
+%	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_1 :: Removing (Name, Arity)', (Name, Arity)),
 	remove_each_pred_in_list_1(List, List_Of_Preds, List_Of_Preds_Aux).
 remove_each_pred_in_list_1(List, [(Name, Arity, C) | List_Of_Preds], [(Name, Arity, C) | List_Of_Preds_Aux]) :-
 	remove_each_pred_in_list_1(List, List_Of_Preds, List_Of_Preds_Aux).
 
 remove_each_pred_in_list_2(_List, [], []) :- !. % Optimization.
 remove_each_pred_in_list_2(List, [(Head, _Body, _T, _C) | List_Of_H_and_B], List_Of_H_and_B_Aux) :- 
-	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Testing (Head)', (Head)),
+%	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Testing (Head)', (Head)),
 	functor(Head, Name, Arity), 
-	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Testing (Name, Arity)', (Name, Arity)),
+%	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Testing (Name, Arity)', (Name, Arity)),
 	memberchk(Name/Arity, List), !,
-	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Removing (Name, Arity)', (Name, Arity)),  
+%	echo_msg(2, '', 'cneg_tr', 'remove_each_pred_in_list_2 :: Removing (Name, Arity)', (Name, Arity)),  
 	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux).
 remove_each_pred_in_list_2(List, [(Head, Body, T, C) | List_Of_H_and_B], [(Head, Body, T, C) | List_Of_H_and_B_Aux]) :- 
 	remove_each_pred_in_list_2(List, List_Of_H_and_B, List_Of_H_and_B_Aux).
