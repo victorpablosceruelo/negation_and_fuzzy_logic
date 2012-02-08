@@ -42,7 +42,7 @@ negate_subfrontier_new(SubFrontier_In, GoalVars, 'cneg_rt_New', (Result)):-
 	split_subfrontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_1),
-	compute_expvars(SubFrontier_In, GoalVars, ExpVars),
+	compute_expvars(SubFrontier_Aux_1, GoalVars, ExpVars),
 	split_IE_NIE_between_imp_and_exp(SubFrontier_Aux_1, ExpVars, SubFrontier_Aux_3),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_3),
 	!, % Reduce the stack's memory by forbidding backtracking.
