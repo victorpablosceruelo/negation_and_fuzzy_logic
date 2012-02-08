@@ -8,7 +8,7 @@
 :- module(cneg_tr,[trans_sent/3, trans_clause/3],[assertions]).
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
-:- use_module(library(aggregates),[setof/3]).
+:- use_module(library(aggregates),[findall/3]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
 :- use_module(cneg_tr_cintneg, [generate_cintneg_cls/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
@@ -127,7 +127,7 @@ retract_fact_local(_Store_Name, Whatever, Whatever) :-
 
 retract_all_fact_local(Store_Name, Result) :-
 	functor_local(To_Retrieve, Store_Name, 1, [Whatever]),
-	setof(Whatever, retract_fact(To_Retrieve), Result).
+	findall(Whatever, retract_fact(To_Retrieve), Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
