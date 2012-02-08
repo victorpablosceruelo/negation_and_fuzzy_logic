@@ -11,7 +11,7 @@
 :- use_module(library(aggregates),[setof/3]).
 :- use_module(cneg_aux, _).
 :- use_module(library(terms), _).
-:- use_module(cneg_tr_cintneg, [generate_cneg_tr_vpc/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
+:- use_module(cneg_tr_cintneg, [generate_cintneg_cls/4, cneg_main_and_aux_cl_names/3, take_body_first_unification/2]).
 %:- reexport(cneg_tr_vpc, [cneg_main_and_aux_cl_names/3]).
 
 :- comment(title, "Contructive Negation Transformation").
@@ -153,7 +153,7 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	echo_msg(2, '', 'cneg_tr', 'List_Of_Preds_Aux', List_Of_Preds_Aux),
 	echo_msg(2, '', 'cneg_tr', 'List_Of_H_and_B_Aux', List_Of_H_and_B_Aux),
 
-	generate_cneg_tr_vpc(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
+	generate_cintneg_cls(List_Of_Preds_Aux, List_Of_H_and_B_Aux, Aux_Code, Cls_4),
 	generate_pre_frontiers(List_Of_H_and_B_Aux, SourceFileName, Cls_4, Cls_Out),
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
 	echo_msg(2, 'nl', 'cneg_tr', '', ''), 
