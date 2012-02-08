@@ -61,12 +61,12 @@ cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 	functor(Main_Cl_Head, Main_Cl_Name, Arity),
 	functor(Aux_Cl_Call, Aux_Cl_Name, New_Arity), 
 	copy_args(Arity, Main_Cl_Head, Aux_Cl_Call),
-	args_for_cneg_tr(New_Arity, Aux_Cl_Call, GoalVars, 'true'),
+	args_for_cneg_tr_hybrid(New_Arity, Aux_Cl_Call, GoalVars, 'true'),
 
 	% Generate the auxiliary clause.
 	functor_local(Aux_Cl, ':-', 2, [Aux_Cl_Head |[ Aux_Cl_Body ]]), 
 	functor(Aux_Cl_Head, Aux_Cl_Name, New_Arity),
-	args_for_cneg_tr(New_Arity, Aux_Cl_Head, GoalVars, Result),
+	args_for_cneg_tr_hybrid(New_Arity, Aux_Cl_Head, GoalVars, Result),
 	Aux_Cl_Body = (Aux_Cl_Body_1 ; Aux_Cl_Body_2),
 
 	% We need to copy the args from the aux functor to the aux_i functors.
@@ -83,7 +83,7 @@ cneg_tr_generate_main_cl(Name, Arity, Counter, Main_Cl, Aux_Cl) :-
 auxiliary_info(head_aux_cl_info_aux(Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity), 
 	Counter, Head_Aux_Cl, Aux_Cl_Name, New_Arity, Arity).
 
-args_for_cneg_tr(Arity, Functor, GoalVars, Result) :-
+args_for_cneg_tr_hybrid(Arity, Functor, GoalVars, Result) :-
 	arg(Arity, Functor, Result), 
 	Arity_2 is Arity -1,
 	arg(Arity_2, Functor, GoalVars).
@@ -120,7 +120,7 @@ generate_auxiliary_conj(Index, Aux_Info, GoalVars, Result, Body) :-
 
 	functor(SubCall, SubCall_Name, New_Arity),
 	copy_args(Arity, Aux_Cl_Head, SubCall),
-	args_for_cneg_tr(New_Arity, SubCall, GoalVars, Result_Aux),
+	args_for_cneg_tr_hybrid(New_Arity, SubCall, GoalVars, Result_Aux),
 	test_for_true(Test_For_True, Result_Aux),
 
 	(
@@ -148,7 +148,7 @@ generate_auxiliary_disj(Index, Aux_Info, GoalVars, Result, Body) :-
 
 	functor(SubCall, SubCall_Name, New_Arity),
 	copy_args(Arity, Aux_Cl_Head, SubCall),
-	args_for_cneg_tr(New_Arity, SubCall, GoalVars, Result_Aux),
+	args_for_cneg_tr_hybrid(New_Arity, SubCall, GoalVars, Result_Aux),
 
 	% Prepare tests.
 	test_for_true(Test_For_True, Result_Aux),
@@ -197,7 +197,7 @@ cneg_tr_generate_cl_body(Head, Body, Counter, New_Cl) :-
 	generate_name_from_counter(Counter, Aux_Cl_Name, New_Name),
 	functor(New_Head, New_Name, New_Arity),
 	copy_args(Arity, Head, New_Head),
-	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
+	args_for_cneg_tr_hybrid(New_Arity, New_Head, GoalVars, Result),
 
 	% Build new clause.
 	functor(New_Cl, ':-', 2),
@@ -292,7 +292,7 @@ negate_atom(Atom, GoalVars, Result, Neg_Atom) :-
 	cneg_main_and_aux_cl_names(Name, _Main_Cl_Name, Aux_Cl_Name),
 	New_Arity is Arity + 2, 
 	functor(Neg_Atom, Aux_Cl_Name, New_Arity),
-	args_for_cneg_tr(New_Arity, Neg_Atom, GoalVars, Result),
+	args_for_cneg_tr_hybrid(New_Arity, Neg_Atom, GoalVars, Result),
 	copy_args(Arity, Atom, Neg_Atom).
 
 negate_atom(Atom, GoalVars, Result, Atom) :-
@@ -352,7 +352,7 @@ double_negation_atom(Atom, GoalVars, Result, DN_Atom) :-
 	New_Arity is Arity + 2,
 	generate_double_negation_name(Name, New_Name),
 	functor(DN_Atom, New_Name, New_Arity),
-	args_for_cneg_tr(New_Arity, DN_Atom, GoalVars, Result),
+	args_for_cneg_tr_hybrid(New_Arity, DN_Atom, GoalVars, Result),
 	copy_args(Arity, Atom, DN_Atom).
 
 double_negation_atom(Atom, GoalVars, Result, Atom) :-
@@ -399,7 +399,7 @@ cneg_tr_generate_double_neg_body(Head, Body, Counter, New_Cl) :-
 	New_Arity is Arity + 2,
 	functor_local(New_Head, New_Name, New_Arity, _New_Args),
 	copy_args(Arity, Head, New_Head),
-	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
+	args_for_cneg_tr_hybrid(New_Arity, New_Head, GoalVars, Result),
 
 %	cneg_tr_generate_double_neg_body_aux(Body, Aux_Info, GoalVars, Result, New_Body),
 	double_negation_atom(Body, GoalVars, Result, New_Body),
@@ -422,7 +422,7 @@ cneg_tr_generate_double_negation_main_cl(Head_Name, Arity, Counter, Main_Cl) :-
 	functor_local(Main_Cl, ':-', 2, [New_Head |[ SubCalls ]]),
 	New_Arity is Arity + 2,
 	functor(New_Head, New_Head_Name, New_Arity),
-	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result),
+	args_for_cneg_tr_hybrid(New_Arity, New_Head, GoalVars, Result),
 
 	auxiliary_info(Aux_Info, Counter, New_Head, New_Head_Name, New_Arity, Arity),
 	generate_double_negation_subcalls(1, Aux_Info, GoalVars, Result, SubCalls).
@@ -447,7 +447,7 @@ generate_double_negation_subcalls(Index, Aux_Info, GoalVars, Result, SubCalls) :
 	generate_name_with_counter(New_Head_Name, Index, SubCall_Name),
 	functor(SubCall, SubCall_Name, New_Arity),
 	copy_args(Arity, New_Head, SubCall),
-	args_for_cneg_tr(New_Arity, New_Head, GoalVars, Result_Aux),
+	args_for_cneg_tr_hybrid(New_Arity, New_Head, GoalVars, Result_Aux),
 
 	New_Index is Index + 1,
 	generate_double_negation_subcalls(New_Index, Aux_Info, GoalVars, Result, More_SubCalls).
