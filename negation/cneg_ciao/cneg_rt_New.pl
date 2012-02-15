@@ -184,9 +184,9 @@ negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 
 % Idem for disequalities.
 negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1_In, T2_In, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
+	goal_is_disequality(Formula, T1, T2, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
 
-	varsbag((T1_In, T2_In), [], [], Vars_Diseq), % Just variables
+	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
 	varsbag(GoalVars_In, [], [], GoalVars), % Just variables
 	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV), % Just variables
 	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV), % Just variables
@@ -197,7 +197,7 @@ negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 	Neg_Atom_Aux = (eq_geuqv(T1,T2, GoalVars, Diseq_UQV, Eq_UQV_Aux)),
 	copy_term(Eq_UQV_Aux, Eq_UQV),
 	replace_in_term_vars_by_values(Neg_Atom_Aux, Eq_UQV_Aux, Eq_UQV, Neg_Atom),
-	Keep_Atom = (diseq_geuqv(T1_In,T2_In, GoalVars, Diseq_EQV, Diseq_UQV)),
+	Keep_Atom = (diseq_geuqv(T1, T2, GoalVars, Diseq_EQV, Diseq_UQV)),
  	!. % Clean up backtracking stack.
 
 negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
