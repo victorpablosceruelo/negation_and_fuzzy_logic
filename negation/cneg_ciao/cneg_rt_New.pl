@@ -165,45 +165,43 @@ negate_imp_atom(fail, _GoalVars, true, fail):- !. % Trivial predicates
 % Negation of equalities. We need to take care of converting UQV to EQV and vice-versa.
 % Since EQV are not used in equality basic predicates, we assume that EQV variables
 % are the result from applying double negation to a disequality. 
-negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
+negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	goal_is_equality(Formula, T1, T2, _Eq_GV_In, Eq_EQV_In, Eq_UQV_In), !,
 
 	varsbag((T1, T2), [], [], Vars_Eq), % Just variables
-	varsbag(GoalVars_In, [], [], GoalVars), % Just variables
 	varsbag_clean_up(Eq_EQV_In, Eq_EQV), % Just variables
 	varsbag_clean_up(Eq_UQV_In, Eq_UQV), % Just variables
 	varsbag_difference(Vars_Eq, GoalVars, Diseq_UQV_Tmp), % GoalVars are not free vars.
-	varsbag_difference(Diseq_UQV_Tmp, Eq_UQV, Diseq_UQV_Aux), % Previous UQV are not free vars.
+	varsbag_difference(Diseq_UQV_Tmp, Eq_UQV, Diseq_UQV), % Previous UQV are not free vars.
 
-	% Ensure UQV do not clash with EQV.
-	Neg_Atom_Aux = (diseq_geuqv(T1, T2, GoalVars, Eq_UQV, Diseq_UQV)),
-	copy_term(Diseq_UQV_Aux, Diseq_UQV),
-	replace_in_term_vars_by_values(Neg_Atom_Aux, Diseq_UQV_Aux, Diseq_UQV, Neg_Atom),
-	Keep_Atom = (eq_geuqv(T1, T2, GoalVars, Eq_EQV, Eq_UQV)),
- 	!. % Clean up backtracking stack.
+	Neg_Atom = (diseq_geuqv(T1, T2, GoalVars, Eq_UQV, Diseq_UQV)),
+	Keep_Atom = (eq_geuqv(T1, T2, GoalVars, Eq_EQV, Eq_UQV)).
 
 % Idem for disequalities.
-negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1, T2, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
+negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
+	goal_is_disequality(Formula, T1_In, T2_In, _Diseq_GV_In, Diseq_EQV_In, Diseq_UQV_In), !,
 
-	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
-	varsbag(GoalVars_In, [], [], GoalVars), % Just variables
-	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV), % Just variables
-	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV), % Just variables
+	varsbag((T1_In, T2_In), [], [], Vars_Diseq), % Just variables
+	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV_Aux), % Just variables
+	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV_Aux), % Just variables
 	varsbag_difference(Vars_Diseq, GoalVars, Eq_UQV_Tmp), % GoalVars are not free vars.
-	varsbag_difference(Eq_UQV_Tmp, Diseq_UQV, Eq_UQV_Aux), % Previous UQV are not free vars.
+	varsbag_difference(Eq_UQV_Tmp, Diseq_UQV_Aux, Eq_UQV_Aux), % Previous UQV are not free vars.
 
-	% Ensure UQV do not clash with EQV.
-	Neg_Atom_Aux = (eq_geuqv(T1,T2, GoalVars, Diseq_UQV, Eq_UQV_Aux)),
+	% Need to replace UQV by new fresh variables.
+	% This is our real improvement to Chan's version.
 	copy_term(Eq_UQV_Aux, Eq_UQV),
-	replace_in_term_vars_by_values(Neg_Atom_Aux, Eq_UQV_Aux, Eq_UQV, Neg_Atom),
-	Keep_Atom = (diseq_geuqv(T1, T2, GoalVars, Diseq_EQV, Diseq_UQV)),
- 	!. % Clean up backtracking stack.
+	replace_in_term_vars_by_values(T1_In, Eq_UQV_Aux, Eq_UQV, T1),
+	replace_in_term_vars_by_values(T2_In, Eq_UQV_Aux, Eq_UQV, T2),
+	replace_in_term_vars_by_values(Diseq_EQV_Aux, Eq_UQV_Aux, Eq_UQV, Diseq_EQV),
+	replace_in_term_vars_by_values(Diseq_UQV_Aux, Eq_UQV_Aux, Eq_UQV, Diseq_UQV),
+	!, % Clean up backtracking stack.
+
+	Neg_Atom = (eq_geuqv(T1,T2, GoalVars, Diseq_UQV, Eq_UQV)),
+	Keep_Atom = (diseq_geuqv(T1,T2, GoalVars, Diseq_EQV, Diseq_UQV)).
 
 negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	functor_local(Neg_Atom, 'cneg_rt_gv', 3, [Formula |[ GoalVars |[ 'cneg_rt_New' ]]]),
-	Keep_Atom = (Formula),
- 	!. % Clean up backtracking stack.
+	Keep_Atom = (Formula). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
