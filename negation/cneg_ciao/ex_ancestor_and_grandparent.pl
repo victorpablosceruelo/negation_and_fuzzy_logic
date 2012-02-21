@@ -2,7 +2,7 @@
 :- module(ex_ancestor_and_grandparent,_,[.(cneg)]).
 
 cneg_ignores_preds([tests/2, test_parent/2, test_grandparent/2, test_ancestor/2]).
-cneg_choosen_negation(chan).
+%cneg_choosen_negation(cneg_rt_Chan).
 
 tests(X, Y) :- test_parent(X, Y).
 tests(X, Y) :- test_grandparent(X, Y).

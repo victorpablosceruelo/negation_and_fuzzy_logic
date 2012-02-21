@@ -39,6 +39,7 @@
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
 :- multifile call_to/3.
+:- multifile cneg_choosen_negation/1.
 :- meta_predicate call_to(?). % /3.
 %:- export(call_to/3).
 
@@ -51,8 +52,10 @@ cneg(UQV, Predicate) :-
 	    (   cneg_choosen_negation(Negation_Mechanism), !   )
 	;
 	    (   
+		echo_msg(1, 'nl', 'cneg_rt', '', ''),
 		echo_msg(1, '', 'cneg_rt', 'You can choose the negation mechanism by defining the predicate', 'cneg_choosen_negation/1'),
-		echo_msg(1, '', 'cneg_rt', 'Examples: .', 'cneg_choosen_negation(cneg_rt_Chan)'),
+		echo_msg(1, '', 'cneg_rt', 'We will assume this time', 'cneg_choosen_negation(cneg_rt_Chan)'),
+		echo_msg(1, 'nl', 'cneg_rt', '', ''),
 		Negation_Mechanism = 'cneg_rt_Chan', !
 	    )
 	),

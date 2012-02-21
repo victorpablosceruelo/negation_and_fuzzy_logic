@@ -31,6 +31,7 @@ cneg_rt(UQV, Goal, Proposal) :-
 	cneg_rt_hybrid(UQV, Goal).
 
 cneg_rt(UQV, Goal, Proposal) :-
+	validate_proposal(Proposal),
 	generate_empty_trace(Trace),
 	varsbag(Goal, UQV, [], GoalVars), % We prefer to play with goalvars
 	cneg_rt_gv(Goal, GoalVars, Proposal, 0, Trace).
