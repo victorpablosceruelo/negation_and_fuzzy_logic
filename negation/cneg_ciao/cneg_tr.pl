@@ -203,7 +203,8 @@ get_list_of_preds_to_ignore([], []) :- !.
 get_list_of_preds_to_ignore([(_Head, _Body, Test, _Counter) | _List_Of_H_and_B], List) :-
 %	echo_msg(2, '', 'cneg_tr', 'get_list_of_preds_to_ignore :: Test', Test),  
 	functor(Test, 'cneg_ignores_preds', 1), !,
-	arg(1, Test, List).
+	arg(1, Test, List_Tmp),
+	List = ['cneg_ignores_preds'/1 | [ 'cneg_choosen_negation'/1 | List_Tmp ]].
 get_list_of_preds_to_ignore([(_Head, _Body, _Test, _Counter) | List_Of_H_and_B], List) :-
 	get_list_of_preds_to_ignore(List_Of_H_and_B, List).
 

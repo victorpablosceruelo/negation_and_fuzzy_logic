@@ -23,8 +23,7 @@
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
 :- use_module(cneg_tr).
-:- use_module(cneg_tr_hybrid, [cneg_tr_hybrid_negate_literal/4]).
-:- use_module(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5]).
+:- use_module(cneg_rt, [cneg_rt/3, cneg_rt_gv/5]).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
@@ -34,7 +33,7 @@
 	diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	portray_term_with_attributes/2,
 	portray_attributes_in_term_vars/3]).
-:- reexport(cneg_rt, [cneg_rt_Chan/2, cneg_rt_New/2, cneg_rt_uqv/3, cneg_rt_gv/5]).
+:- reexport(cneg_rt, [cneg_rt_gv/5]).
 %:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
@@ -47,52 +46,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+cneg(UQV, Predicate) :-
+	(
+	    (   cneg_choosen_negation(Negation_Mechanism), !   )
+	;
+	    (   
+		echo_msg(1, '', 'cneg_rt', 'You can choose the negation mechanism by defining the predicate', 'cneg_choosen_negation/1'),
+		echo_msg(1, '', 'cneg_rt', 'Examples: .', 'cneg_choosen_negation(cneg_rt_Chan)'),
+		Negation_Mechanism = 'cneg_rt_Chan', !
+	    )
+	),
+	cneg_rt(UQV, Predicate, Negation_Mechanism).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt_hybrid(UQV, Body) :- 
-	test_if_cneg_rt_needed(GoalVars, true, Body, Result),
-	(
-	    (   Result == 'true', !   )
-	;
-	    (   Result == 'fail',  !,
-		varsbag(Body, UQV, [], GoalVars),
-		cneg_tr_hybrid_negate_literal(Body, GoalVars, 'true', Neg_Body),
-		echo_msg(1, '', 'cneg_hybrid', 'cneg_hybrid :: call', Neg_Body),
-		call(Neg_Body)
-	    )
-	).
-
-test_if_cneg_rt_needed(GoalVars, Body_First_Unification, Body, Result) :-
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: Body', Body), 
-	varsbag(GoalVars, [], [], Real_GoalVars),
-	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
-	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
-	varsbag(Body, Real_GoalVars, [], UQV),
-	!, % No backtracking allowed.
-	(
-	    (   % If no problematic vars, use cneg_hybrid (INTNEG).
-		Problematic_Vars == [],
-		Result = 'fail'
-	    )
-	;
-	    (   % If problematic vars, use cneg_rt (Chan's approach).
-		Problematic_Vars \== [],
-		Result = 'true',
-		cneg_rt(UQV, Body)
-	    )
-	).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cneg_rt(UQV, Predicate) :- cneg_rt_New(UQV, Predicate).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

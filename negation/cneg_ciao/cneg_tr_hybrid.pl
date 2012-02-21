@@ -17,6 +17,8 @@ prefix_double_negation_clauses("cneg_tr_hybrid_dneg_").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+generate_tr_hybrid_cls(_List_Of_Preds, _List_Of_H_and_B, Cls_In, Cls_In) :- !.
+
 generate_tr_hybrid_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_tr_hybrid_cls :: Cls_In', (Cls_In)),
 	echo_msg(2, '', 'cneg_tr_hybrid', 'generate_tr_hybrid_cls :: List_Of_Preds', (List_Of_Preds)),
