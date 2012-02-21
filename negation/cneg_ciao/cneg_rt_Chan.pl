@@ -125,6 +125,10 @@ remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :-
 	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
 	memberchk(E_Tmp, Visited_In), !. % Eq has been seen before. Redundant.
 
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
+	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
+	Value_1 == Value_2, !. % Equality between same terms.
+
 remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
 	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
 		
@@ -141,24 +145,22 @@ remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :-
 remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
 	var(Value_1), 
 	var(Value_2),
-	Value_1 == Value_2, % Same var. This is the case for which Chan fails.
-	!, 
-	echo_msg(1, '', 'cneg_rt', 'ERROR: Chans proposal can not deal with the equality between', ''),
-	echo_msg(1, '', 'cneg_rt', 'ERROR: T1 and T2: (T1, T2)', (Value_1, Value_2)),
-	echo_msg(1, '', 'cneg_rt', 'ERROR: Result will be wrong because it can not remove or ground the local variable', Value_1),
+	Value_1 == Value_2, % Same var. This can be a redundant eq.
 	!.
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true') :-
-	var(Value_1), 
+	(   var(Value_1)  ;  var(Value_2)   ), % One of them needs to be a variable.
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag((Value_1, Value_2), Real_GoalVars, [], Non_GoalVars),
 	(
 	    (   % Value_1 is a var in Non_GoalVars
+		var(Value_1),
 		memberchk(Value_1, Non_GoalVars), !,
 		Value_1 = Value_2
 	    )
 	;
 	    (   % Value_2 is a var in Non_GoalVars
+		var(Value_2),
 		memberchk(Value_2, Non_GoalVars), !,
 		Value_2 = Value_1
 	    )
@@ -166,7 +168,7 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true'
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
 	(   var(Value_1) ; var(Value_2)   ),
-	!, fail.
+	!. 
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out) :-
 	functor_local(Value_1, Name, Arity, Args1),
