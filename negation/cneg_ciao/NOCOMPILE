@@ -1,11 +1,13 @@
-cneg_examples.pl
 ex_ancestor_and_grandparent.pl
 ex_boole_list.pl
-ex_chan_fails.pl
-ex_even.pl
+ex_constructive_negation.pl
+ex_diseqs.pl
+ex_error_in_chan.pl
+ex_error_in_stuckey.pl
 ex_lists_ops.pl
+ex_odd_and_even.pl
 ex_peano_numbers.pl
 ex_peano_queens.pl
 ex_russels_paradox.pl
 ex_square.pl
-ex_stuckey_fails.pl
+
