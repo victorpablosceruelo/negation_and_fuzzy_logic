@@ -8,7 +8,7 @@ Section: devel
 Package: ciao-prolog
 Section: devel
 Architecture: i386 amd64 powerpc
-Depends: ${shlibs:Depends}, ${misc:Depends}, ciao-prolog-libs, emacs | emacs23 | emacs23-nox | emacs22 | emacs22-nox | emacs21 | emacs21-nox | emacsen
+Depends: ${shlibs:Depends}, ${misc:Depends}, emacs | emacs23 | emacs23-nox | emacs22 | emacs22-nox | emacs21 | emacs21-nox | emacsen
 Recommends: libmysqlclient16 | libmysqlclient, sun-java6-jre, sun-java6-jdk, texlive-latex-base, texlive-latex-extra, info-browser
 Description: The Ciao Prolog Development Environment
  Ciao is an Open Source, next generation, multi-paradigm
