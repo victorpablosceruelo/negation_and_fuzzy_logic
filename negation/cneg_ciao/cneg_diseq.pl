@@ -10,6 +10,7 @@
 	[assertions]).
 
 :- use_module(cneg_aux,_).
+:- use_module(engine(attributes)).
 
 %:- use_package(debug).
 %:- use_package(trace).

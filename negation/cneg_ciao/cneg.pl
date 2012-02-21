@@ -200,5 +200,5 @@ call_to_aux(Predicate, Level_In, Trace) :-
 :- load_compilation_module(.('cneg_tr')).
 
 % trans_sent/3 makes the transformation.
-:- add_sentence_trans(trans_sent/3).
+:- add_sentence_trans(trans_sent/3, 1). % TODO: Right priority?
 % :- add_clause_trans(trans_clause/3). % Only for debug !!!
