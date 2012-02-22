@@ -8,7 +8,7 @@
 	    % setof_local/3, 
 	    filter_out_nonvars/2,
 	    varsbag/4, varsbag_remove_var/3, varsbag_difference/3, 
-	    varsbag_addition/3, varsbag_intersection/3,  
+	    varsbag_union/3, varsbag_intersection/3,  
 	    varsbag_clean_up/2,
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
@@ -735,7 +735,7 @@ varsbag_remove_var_aux(Var_In, [Var | VarsBag_In], [Var | VarsBag_Out]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-varsbag_addition(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
+varsbag_union(VarsBag_1_In, VarsBag_2_In, VarsBag_Out) :-
 	filter_out_nonvars(VarsBag_1_In, VarsBag_1_Aux),
 	filter_out_nonvars(VarsBag_2_In, VarsBag_2_Aux),
 	cneg_aux:append(VarsBag_1_Aux, VarsBag_2_Aux, VarsBag_In),

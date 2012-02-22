@@ -70,7 +70,7 @@ compute_expvars(SubFrontier_In, GoalVars_In, ExpVars) :-
 	% varsbag(IE, Closed_Vars, [], Local_Vars_IE), % Vars_IE = vars(IE) - Closed_Vars
 	varsbag(NIE, Closed_Vars, [], Local_Vars_NIE),  % Vars_NIE = vars(NIE) - Closed_Vars
 
-	varsbag_addition(Local_Vars_E, Local_Vars_NIE, ExpVars).
+	varsbag_union(Local_Vars_E, Local_Vars_NIE, ExpVars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -85,17 +85,17 @@ identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Conjunction
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Equalities
 	goal_is_equality(Frontier, _Value_1, _Value_2, _GV, _EQV, UQV_In),
 	varsbag_clean_up(UQV_In, UQV),
-	varsbag_addition(UQV, Closed_Vars_In, Closed_Vars_Out).
+	varsbag_union(UQV, Closed_Vars_In, Closed_Vars_Out).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Disequalities
 	goal_is_disequality(Frontier, _Term1, _Term2, _GV, _EQV, UQV_In), !,
 	varsbag_clean_up(UQV_In, UQV),
-	varsbag_addition(UQV, Closed_Vars_In, Closed_Vars_Out).
+	varsbag_union(UQV, Closed_Vars_In, Closed_Vars_Out).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Negations
 	goal_is_negation_uqv(Frontier, UQV_In, _SubGoal, _Negation_Proposal), !,
 	varsbag_clean_up(UQV_In, UQV),
-	varsbag_addition(UQV, Closed_Vars_In, Closed_Vars_Out).
+	varsbag_union(UQV, Closed_Vars_In, Closed_Vars_Out).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_In) :- % Other subgoals
 	goal_is_not_conj_disj_eq_diseq_dneg(Frontier), !.

@@ -27,7 +27,7 @@
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
-:- reexport(cneg_aux, [varsbag/4, varsbag_addition/3]).    
+%:- reexport(cneg_aux, [varsbag/4, varsbag_union/3]).    
 :- reexport(cneg_diseq, [equality/3, disequality/3,
 	diseq_geuqv/5, eq_geuqv/5,
 	diseq_geuqv_adv/6, eq_geuqv_adv/6,

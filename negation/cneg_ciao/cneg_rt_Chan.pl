@@ -203,8 +203,8 @@ remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars_In, Formula_Out) :-
 	varsbag(GoalVars_In, [], [], GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(NIE_In, GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
 	varsbag(E_In, GoalVars, [], Vars_E), % Vars equality part
-	varsbag_addition(GoalVars, RelVars, Valid_Vars_Tmp), % GoalVars + RelVars
-	varsbag_addition(Valid_Vars_Tmp, Vars_E, Valid_Vars), % GoalVars + RelVars + vars(E)
+	varsbag_union(GoalVars, RelVars, Valid_Vars_Tmp), % GoalVars + RelVars
+	varsbag_union(Valid_Vars_Tmp, Vars_E, Valid_Vars), % GoalVars + RelVars + vars(E)
 	varsbag(IE_In, Valid_Vars, [], Irrelevant_Vars), % vars(IE) - (GoalVars + RelVars + vars(E)).
 
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out),
