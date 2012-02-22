@@ -22,12 +22,12 @@ tests :-
 	portray_term_with_attributes('', 'if test_result not shown there is an ERROR.').
 
 logo(Text) :- portray_term_with_attributes('aux', Text).
-nl :- 	portray_term_with_attributes('nl', '').
+just_nl :- 	portray_term_with_attributes('nl', '').
 
 tests_fail(T1, T2) :- logo('f01'), T1 = a, T2 = b, equality(T1, T2, []).
 tests_fail(T1, T2) :- logo('f02'), T1 = a, T2 = a, disequality(T1, T2, []).
 tests_fail(T1, T2) :- logo('f03'), equality(T1, T2, []), disequality(T1, T2, []).
-tests_fail(T1, T2) :- logo('f04'), disequality(T1, T2, []), nl, portray_term_with_attributes('', f04_intermediate(T1, T2)), nl, equality(T1, T2, []).
+tests_fail(T1, T2) :- logo('f04'), disequality(T1, T2, []), just_nl, portray_term_with_attributes('', f04_intermediate(T1, T2)), nl, equality(T1, T2, []).
 tests_fail(T1, T2) :- logo('f05'), equality(T2, s(T1), []), equality(T1, T2, []).
 tests_fail(T1, T2) :- logo('f06'), equality(T1, T2, [T2]).
 tests_fail(T1, T2) :- logo('f07'), equality(T1, s(T3), []), equality(T1, T2, [T3]).
