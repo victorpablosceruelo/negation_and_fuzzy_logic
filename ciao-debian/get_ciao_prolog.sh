@@ -126,3 +126,7 @@ popd
 echo " "
 echo " "
 
+set -x
+sudo cowbuilder --build $BUILD_DSC
+
+
