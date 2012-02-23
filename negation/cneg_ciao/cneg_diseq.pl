@@ -18,11 +18,11 @@
 %:- use_package(nodebug).
 
 % For Ciao Prolog:
-%:- multifile 
+:- multifile 
 %        verify_attribute/2,
 %        combine_attributes/2,
-%	portray_attribute/2,
-%	portray/1.
+	portray_attribute/2,
+	portray/1.
 
 :- comment(title, "Disequality Management Library").
 
@@ -111,12 +111,16 @@ disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, D
 % portray(eqn_var(Self,A,B,R,Nl)) :- print(eqn_var(Self,A,B,R,Nl)).
 
 attr_portray_hook(Attribute, Var):- 
-%portray_attribute(Attribute, Var) :-
+	portray_attribute(Attribute, Var).
+
+portray_attribute(Attribute, Var) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray_attribute :: Var', Var),
 	portray_and_portray_attribute(Attribute).
 
-portray(Attribute) :-
-	portray_and_portray_attribute(Attribute).
+portray(Term) :-
+	echo_msg(2, '', 'cneg_diseq', 'portray :: Term', Term),
+	portray_term_with_attributes('', Term).
+%	portray_and_portray_attribute(Attribute).
 
 portray_and_portray_attribute(Attribute) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray :: Attribute', Attribute),

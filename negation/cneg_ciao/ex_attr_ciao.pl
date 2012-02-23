@@ -2,6 +2,10 @@
 :- module(ex_attr_ciao, _, _).
 :- use_package(attr).
 :- use_module(library(write), [write/1, write/2]).
+:- use_module(library(terms_vars)).
+
+:- multifile portray_attribute/2.
+:- multifile portray/1.
 
 %:- attributes(portray).
 
@@ -45,7 +49,22 @@ attr_unify_hook_aux((Var_1, Value_1), (Var_2, Value_2)) :-
 	print_attributes('5th: Note the attributes unified are the same one.', New_Attr_1, New_Attr_2),
 	nl.
 
+portray(Term) :-
+	varsbag(Term, [], Vars),
+	portray_vars_attributes(Vars),
+	nl,
+	write('portray: '), 
+	write(Term), 
+	write(' with vars '), 
+	write(Vars), 
+	nl.
+
+portray_attribute(Attribute, Var) :-
+	write('portray_attribute'), nl, 
+	attr_portray_hook(Attribute, Var).
+
 attr_portray_hook(Attribute, Var) :-
+	write('attr_portray_hook'), nl, 
 	write('Attribute for '),
 	write(Var),
 	write(' is '),
@@ -55,3 +74,13 @@ attribute_goals(X) -->
 	[ex_attr_ciao:attr_portray_hook(X, G)],
 	{get_attr(X, G)}.
 
+portray_vars_attributes([]).
+portray_vars_attributes([Var | Vars]) :-
+	portray_var_attributes(Var),
+	portray_vars_attributes(Vars).
+
+portray_var_attributes(Var) :-
+	get_attr(Var, Attribute), !, 
+	attr_portray_hook(Attribute, Var).
+
+portray_var_attributes(_Var) :- !.
