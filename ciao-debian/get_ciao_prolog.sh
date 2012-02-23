@@ -129,4 +129,5 @@ echo " "
 set -x
 sudo cowbuilder --build $BUILD_DSC
 
+sudo ciao-prolog-autoinstall.sh 
 
