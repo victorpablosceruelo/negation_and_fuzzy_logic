@@ -286,12 +286,16 @@ verify_attribute_aux(Attribute, NewTarget) :-
 	perform_substitutions([(OldTarget, NewTarget)], EQV, UQV),
 	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
 
-attr_unify_hook(Attribute_Var_1, Attribute_Var_2) :-
-% combine_attributes(Attribute_Var_1, Attribute_Var_2) :-
+attr_unify_hook(Attribute, Value) :-
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Fomat', 'var_attribute(Target, Disequalities)'),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Diseq_Fomat', 'disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars)'),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Var1', Attribute_Var_1),
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: (Attribute, Value)', (Attribute, Value)),
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Fomat', 'var_attribute(Target, [disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars)])'),
+	attr_unify_hook_aux(Attribute, Value).
+
+attr_unify_hook_aux(Attribute, Value)
+	var(Value),
+	get_attr(Value, Attribute_Value),
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attribute', Attribute),
 	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Var2', Attribute_Var_2),
 	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Diseqs_Var_1), !,
 	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Diseqs_Var_2), !,
