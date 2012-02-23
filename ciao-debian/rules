@@ -38,7 +38,7 @@ fixes:
 	@echo " "
 	@echo " "
 
-clean: fixes
+clean: fixes clean-after
 	@echo "Makefile :: clean"
 	dh_testdir
 	dh_testroot
