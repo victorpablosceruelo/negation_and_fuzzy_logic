@@ -18,11 +18,11 @@
 %:- use_package(nodebug).
 
 % For Ciao Prolog:
-:- multifile 
-        verify_attribute/2,
+%:- multifile 
+%        verify_attribute/2,
 %        combine_attributes/2,
-	portray_attribute/2,
-	portray/1.
+%	portray_attribute/2,
+%	portray/1.
 
 :- comment(title, "Disequality Management Library").
 
@@ -110,8 +110,8 @@ disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, D
 % portray(rat(N,D)) :- print(N/D).
 % portray(eqn_var(Self,A,B,R,Nl)) :- print(eqn_var(Self,A,B,R,Nl)).
 
-
-portray_attribute(Attribute, Var) :-
+attr_portray_hook(Attribute, Var):- 
+%portray_attribute(Attribute, Var) :-
 	echo_msg(2, '', 'cneg_diseq', 'portray_attribute :: Var', Var),
 	portray_and_portray_attribute(Attribute).
 
@@ -267,47 +267,38 @@ portray_disequality(Echo_Level, File_Name, Diseq) :-
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-verify_attribute(Attribute, Target) :-
-	echo_msg(2, '', 'cneg_diseq', 'verify_attribute :: (Attribute, Target)', (Attribute, Target)), 
-	verify_attribute_aux(Attribute, Target).
-
-verify_attribute_aux(Attribute, NewTarget) :-
-	attribute_contents(Attribute, OldTarget, Disequalities), 
-	terms_are_equal(NewTarget, OldTarget), !, % If not, a substitution is needed.
-	remove_attribute_local(OldTarget), 
-	test_and_update_vars_attributes(Disequalities, 'fail', 'true').
-
-% Only for Ciao prolog 
-verify_attribute_aux(Attribute, NewTarget) :-
-	attribute_contents(Attribute, OldTarget, Diseqs), 
-	NewTarget \== OldTarget, % A substitution is needed.
-	remove_attribute_local(OldTarget), 
-	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, [], EQV, [], UQV, _Unused_Ts),
-	perform_substitutions([(OldTarget, NewTarget)], EQV, UQV),
-	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
-
 attr_unify_hook(Attribute, Value) :-
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: (Attribute, Value)', (Attribute, Value)),
 	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Fomat', 'var_attribute(Target, [disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars)])'),
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: (Attribute, Value)', (Attribute, Value)),
 	attr_unify_hook_aux(Attribute, Value).
 
-attr_unify_hook_aux(Attribute, Value)
+attr_unify_hook_aux(Attribute, Value) :-
 	var(Value),
-	get_attr(Value, Attribute_Value),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attribute', Attribute),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Var2', Attribute_Var_2),
-	attribute_contents(Attribute_Var_1, OldTarget_Var_1, Diseqs_Var_1), !,
-	attribute_contents(Attribute_Var_2, OldTarget_Var_2, Diseqs_Var_2), !,
-	remove_attribute_local(OldTarget_Var_1), 
-	remove_attribute_local(OldTarget_Var_2), 
-
+	get_attribute_local(Value, Attribute_Value), !,
+	remove_attribute_local(Value), 
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attribute_Value', Attribute_Value),
+	attribute_contents(Attribute, _OldTarget_Var_1, Diseqs_Var_1), 
+	attribute_contents(Attribute_Value, _OldTarget_Var_2, Diseqs_Var_2), 
+	!,
 	cneg_aux:append(Diseqs_Var_1, Diseqs_Var_2, Diseqs),
-	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, [], EQV, [], UQV, _Unused_Ts),
-	perform_substitutions([(OldTarget_Var_1, OldTarget_Var_2)], EQV, UQV),
-	
+	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
+
+attr_unify_hook_aux(Attribute, Value) :-
+	var(Value), !,
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Var_Value (no attr)', Value),
+	attribute_contents(Attribute, _OldTarget_Var_1, Diseqs), 
 	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
 	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
+
+attr_unify_hook_aux(Attribute, Value) :-
+	!,
+	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Nonvar_Value (no attr)', Value),
+	attribute_contents(Attribute, _OldTarget_Var_1, Diseqs), 
+	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
+	test_and_update_vars_attributes(Diseqs, 'fail', 'true').
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -339,7 +330,9 @@ perform_substitutions([(OldTarget, NewTarget) | MoreSubst], EQV, UQV) :-
 
 get_and_remove_eqv_and_uqv_from_diseqs([], EQV_In, EQV_In, UQV_In, UQV_In, []) :- !.
 get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In, UQV_Out, [(T1, T2) | More_Ts]) :-
-	disequality_contents(Diseq, T1, T2, Diseq_EQV, Diseq_UQV),
+	disequality_contents(Diseq, T1, T2, Diseq_EQV_In, Diseq_UQV_In),
+	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV),
+	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV),
 	varsbag(Diseq_EQV, [], EQV_In, EQV_Aux),
 	varsbag(Diseq_UQV, [], UQV_In, UQV_Aux),
 	get_and_remove_eqv_and_uqv_from_diseqs(Diseqs, EQV_Aux, EQV_Out, UQV_Aux, UQV_Out, More_Ts).

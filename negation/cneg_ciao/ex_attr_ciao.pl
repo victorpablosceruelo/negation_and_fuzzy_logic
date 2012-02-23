@@ -1,7 +1,9 @@
 
-:- module(ex_bug_ciao, _, _).
+:- module(ex_attr_ciao, _, _).
 :- use_package(attr).
 :- use_module(library(write), [write/1, write/2]).
+
+%:- attributes(portray).
 
 test(Var1, Var2) :-
 	put_attr(Var1, (Var1, one)),
@@ -23,13 +25,11 @@ print_attributes(Msg, Attribute_Var_1, Attribute_Var_2) :-
 	write(Attribute_Var_2),
 	nl.
 
-
 attr_unify_hook(Attribute_Var_1, Attribute_Var_2) :-
 	print_attributes('2nd: Note the second argument is not an attribute.', Attribute_Var_1, Attribute_Var_2),
 	get_attr(Attribute_Var_2, Real_Attribute_Var_2), 
 	print_attributes('3rd: You must retrieve the attribute of the second argument (if any)', Attribute_Var_1, Real_Attribute_Var_2),
-	attr_unify_hook_aux(Attribute_Var_1, Real_Attribute_Var_2),
-	fail. % Just fail.
+	attr_unify_hook_aux(Attribute_Var_1, Real_Attribute_Var_2).
 
 attr_unify_hook_aux((Var_1, _Value_1), (Var_2, _Value_2)) :-
 	get_attr(Var_1, Attribute_Var_1), 
@@ -44,3 +44,14 @@ attr_unify_hook_aux((Var_1, Value_1), (Var_2, Value_2)) :-
 	get_attr(Var_2, New_Attr_2),
 	print_attributes('5th: Note the attributes unified are the same one.', New_Attr_1, New_Attr_2),
 	nl.
+
+attr_portray_hook(Attribute, Var) :-
+	write('Attribute for '),
+	write(Var),
+	write(' is '),
+	write(Attribute).
+
+attribute_goals(X) --> 
+	[ex_attr_ciao:attr_portray_hook(X, G)],
+	{get_attr(X, G)}.
+
