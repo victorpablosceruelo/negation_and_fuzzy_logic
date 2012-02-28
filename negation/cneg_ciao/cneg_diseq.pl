@@ -18,11 +18,11 @@
 %:- use_package(nodebug).
 
 % For Ciao Prolog:
-:- multifile 
+%:- multifile 
 %        verify_attribute/2,
 %        combine_attributes/2,
-	portray_attribute/2,
-	portray/1.
+%	portray_attribute/2,
+%	portray/1.
 
 :- comment(title, "Disequality Management Library").
 
@@ -118,28 +118,31 @@ attribute_goals(Term) -->
 % portray(rat(N,D)) :- print(N/D).
 % portray(eqn_var(Self,A,B,R,Nl)) :- print(eqn_var(Self,A,B,R,Nl)).
 
-attr_portray_hook(_Attribute, Var) :- 
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'attr_portray_hook(_Attribute, Var)'),
-	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
+%attr_portray_hook(_Attribute, Var) :- 
+%	cneg_diseq_echo(2, '', 'cneg_diseq', 'attr_portray_hook(_Attribute, Var)'),
+%	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
 
-portray_attribute(_Attribute, Var) :-
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray_attribute(_Attribute, Var)'),
-	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
+%portray_attribute(_Attribute, Var) :-
+%	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray_attribute(_Attribute, Var)'),
+%	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
 
-portray(Attribute) :-
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Attribute)'),
-	attribute_contents(Attribute, Target, _Disequalities), !,
-	portray(Target).
+%portray(Attribute) :-
+%	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Attribute)'),
+%	attribute_contents(Attribute, Target, _Disequalities), !,
+%	portray(Target).
 
-portray(Term) :-
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Term)'),
-	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Term).
+%portray(Term) :-
+%	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Term)'),
+%	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, _Term) :-
+%cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
+%	echo_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
+
+ cneg_diseq_echo(Echo_Level, Mode, File_Name, _Term) :-
 	(
 	    Mode == 'nl'
 	;
@@ -151,15 +154,15 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 	Mode \== 'nl', 
 	Mode \== 'logo',
 	echo_msg(Echo_Level, 'aux', File_Name, '', Term),
-	varsbag(Term, [], [], Vars),
+	prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
 	(
-	    (   Vars == [], !   )  % No vars -> No printing.
+	    (   Attributes_For_Printing_Conj == [], !   )  % No attrs -> No printing.
 	;
-	    (   Vars \== [], !, 
-		prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
+	    (   Attributes_For_Printing_Conj \== [], !, 
 		echo_msg(Echo_Level, 'aux', File_Name, ' : ', Attributes_For_Printing_Conj)
 	    )
 	),
+%	echo_msg(Echo_Level, 'aux', File_Name, ' ', ' '), % Space for reading.
 	(
 	    (   Mode == 'aux', !   )
 	;
@@ -236,13 +239,22 @@ format_diseq_for_printing(Disequality, Print_Disequality) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-attrs_list_to_conj([], []) :- fail.
-attrs_list_to_conj([Elto], Elto) :- !.
-attrs_list_to_conj([Elto | List], New_Elto) :- 
+attrs_list_to_conj([], []) :- !. % No attributes.
+attrs_list_to_conj(Attrs_List, Attrs_Conj) :- % One or more attributes.
+	Attrs_List \== [], !,
+	attrs_list_to_conj_aux(Attrs_List, Attrs_Conj).
+
+attrs_list_to_conj_aux([Elto], Real_Elto) :- !,
+	attrs_list_to_conj_aux(Elto, Real_Elto).
+attrs_list_to_conj_aux([Elto | List], New_Elto) :- !,
 	functor(New_Elto, '/\\', 2),
-	arg(1, New_Elto, Elto), 
+	attrs_list_to_conj_aux(Elto, Real_Elto),
+	arg(1, New_Elto, Real_Elto), 
 	arg(2, New_Elto, More_Eltos), 
 	attrs_list_to_conj(List, More_Eltos).
+attrs_list_to_conj_aux(Elto, Elto) :- 
+	Elto \== [], !. % An empty list is not an individual.
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%

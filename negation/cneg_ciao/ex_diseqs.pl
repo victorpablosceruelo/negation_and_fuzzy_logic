@@ -15,13 +15,15 @@ tests :-
 	cneg_diseq_echo(1, 'nl', 'ex_diseqs', ''),
 	cneg_diseq_echo(1, '', 'ex_diseqs', 'Tests that should succeed:'),
 	tests_succeed(T1, T2), 
-	cneg_diseq_echo(1, '', 'ex_diseqs', test_result(T1, T2)), 
+	cneg_diseq_echo(1, 'aux', 'ex_diseqs', test_result(T1, T2)), 
+	cneg_diseq_echo(1, 'aux', 'ex_diseqs', ' : ok'), 
+	cneg_diseq_echo(1, 'nl', 'ex_diseqs', ''), 
 	fail.
 tests :- 	
 	cneg_diseq_echo(1, 'nl', 'ex_diseqs', ''),
-	cneg_diseq_echo(1, '', 'ex_diseqs', 'if test_result not shown there is an ERROR.').
+	cneg_diseq_echo(1, '', 'ex_diseqs', 'if test_result(Whatever) :ok not shown there is an ERROR.').
 
-logo(Text) :- cneg_diseq_echo(1, 'aux', 'ex_diseqs', Text).
+logo(Text) :- cneg_diseq_echo(1, 'aux', 'ex_diseqs', Text), cneg_diseq_echo(1, 'aux', 'ex_diseqs', '  ').
 just_nl :- 	cneg_diseq_echo(1, 'nl', 'ex_diseqs', '').
 
 tests_fail(T1, T2) :- logo('f01'), T1 = a, T2 = b, equality(T1, T2, []).
