@@ -16,7 +16,7 @@
 :- comment(summary, "This module implements predicates to deal with frontiers.").
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [portray_attributes_in_term_vars/3]).
+:- use_module(cneg_diseq, [cneg_diseq_echo/4]).
 :- use_module(cneg_rt_aux, [cneg_rt_Aux/4]).
 :- use_module(library(aggregates),[setof/3]).
 
@@ -232,8 +232,8 @@ test_frontier_is_valid(F_In, Goal) :-
 	!. % Backtracking forbidden. 
 test_frontier_is_valid(F_In, Goal) :-
 	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: (Goal, F_In)', (Goal, F_In)),
-	portray_attributes_in_term_vars(2, 'cneg_rt', Goal),
-	portray_attributes_in_term_vars(2, 'cneg_rt', F_In),
+	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
+	cneg_diseq_echo(2, '', 'cneg_rt', F_In),
 	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

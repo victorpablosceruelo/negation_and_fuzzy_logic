@@ -40,4 +40,5 @@ tests_succeed(T1, T2) :- logo('s02'), equality(T1, T2, []), equality(T1, T2, [])
 tests_succeed(T1, T2) :- logo('s03'), disequality(T1, T2, []), disequality(T1, T2, []).
 tests_succeed(T1, T2) :- logo('s04'), equality(T1, T2, []), equality(T1, T2, [T1]).
 tests_succeed(T1, T2) :- logo('s05'), equality(T1, s(T3), []), disequality(T1, T2, [T3]).
+tests_succeed(T1, T2) :- logo('s06'), disequality(T1, s(T3), [T3]), disequality(T1, s(T2), [T2]), equality(T1, T2, []).
 

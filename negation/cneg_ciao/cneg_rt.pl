@@ -8,7 +8,7 @@
 :- comment(summary, "This module implements negation predicates for runtime evaluation.").
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [portray_attributes_in_term_vars/3, get_attributes_in_term_vars/3]).
+:- use_module(cneg_diseq, [prepare_attributes_for_printing/2, cneg_diseq_echo/4]).
 :- use_module(cneg_rt_aux, [cneg_rt_Aux/4]).
 :- use_module(cneg_tr_hybrid, [cneg_tr_hybrid_negate_literal/4]).
 
@@ -77,8 +77,8 @@ call_to_all_negated_subfrontiers([], _Level, Trace, CN_Call) :-
 	generate_conjunction_trace(Trace, Trace_Info, Trace_End),
 	generate_conjunction_trace(Trace_Info, Trace_Info_1, Trace_Info_2),
 	add_predicate_to_trace(ended_subfrontiers_for(CN_Call), Trace_Info_1),
-  	get_attributes_in_term_vars(CN_Call, Vars_With_Attrs, _Vars_Without_Attrs), 
-	add_predicate_to_trace(attributes(Vars_With_Attrs), Trace_Info_2),
+	prepare_attributes_for_printing(CN_Call, Attributes_For_Printing_Conj),
+	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_Info_2),
 	add_predicate_to_trace('-----------------------', Trace_End),
 	get_trace_final_status_list(Trace, Status_List),
 	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
@@ -95,11 +95,11 @@ call_to_all_negated_subfrontiers([Result | Result_List], Level, Trace, CN_Call) 
 	add_predicate_to_trace('-----------------------', Trace_Info_1),
 	add_predicate_to_trace(subfrontier_for(CN_Call), Trace_Info_3),
 	add_predicate_to_trace(Result, Trace_Info_5),
-  	get_attributes_in_term_vars(Result, Vars_With_Attrs, _Vars_Without_Attrs), 
-	add_predicate_to_trace(attributes(Vars_With_Attrs), Trace_Info_6),
+	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
+	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_Info_6),
 	echo_msg(2, '', 'cneg_rt', 'SUBFRONTIER for goal', CN_Call),
 	echo_msg(2, '', 'cneg_rt', '', Result),
-	portray_attributes_in_term_vars(2, 'cneg_rt', Result),
+	cneg_diseq_echo(2, '', 'cneg_rt', Result),
 	call_to(Result, Level, Trace_Result),
 	call_to_all_negated_subfrontiers(Result_List, Level, Trace_Next_Goal, CN_Call).
 

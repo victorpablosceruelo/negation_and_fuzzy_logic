@@ -22,9 +22,8 @@
 	    equality/3, disequality/3, 
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	    cneg_diseq_echo/4,
-	    portray_attributes_in_term_vars/3,
-	    get_attributes_in_term_vars/3
+	    prepare_attributes_for_printing/2,
+	    cneg_diseq_echo/4
 	]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt, [cneg_rt/3, cneg_rt_gv/5]).
@@ -32,13 +31,13 @@
 
 % Re-export predicates to use them in console.
 %:- reexport(cneg_aux, [varsbag/4, varsbag_union/3]).    
-:- reexport(cneg_diseq, [
-	equality/3, disequality/3,
-	diseq_geuqv/5, eq_geuqv/5,
-	diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	    cneg_diseq_echo/4,
-	    portray_attributes_in_term_vars/3,
-	    get_attributes_in_term_vars/3
+:- reexport(cneg_diseq, 
+	[
+	    equality/3, disequality/3,
+	    diseq_geuqv/5, eq_geuqv/5,
+	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
+	    prepare_attributes_for_printing/2,
+	    cneg_diseq_echo/4
 	]).
 :- reexport(cneg_rt, [cneg_rt_gv/5]).
 %:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
@@ -88,7 +87,7 @@ call_to(Predicate, Level_In, Trace) :-
 	echo_msg(2, 'nl', 'trace', '', ''), 
 	get_trace_status_list(Trace, Trace_Status_List),
 	echo_msg(2, 'list', 'trace', 'call_to :: TRACE ', Trace_Status_List),
-	portray_attributes_in_term_vars(2, 'cneg_diseq', Predicate),
+	cneg_diseq_echo(2, '', 'cneg_diseq', Predicate),
 	echo_msg(2, 'nl', 'trace', '', ''), 
 	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: Predicate', Predicate), 
 	call_to_aux(Predicate, Level, Trace).

@@ -1,11 +1,10 @@
 :- module(cneg_diseq, 
 	[
-	    equality/3, disequality/3,
+ 	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	    cneg_diseq_echo/4,
-	    portray_attributes_in_term_vars/3,
-	    get_attributes_in_term_vars/3
+ 	    prepare_attributes_for_printing/2,
+	    cneg_diseq_echo/4
 	], 
 	[assertions]).
 
@@ -98,12 +97,9 @@ disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, D
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-attribute_goals(X) --> 
-	[Attributes_For_Printing],
-	 {	echo_msg(2, '', 'cneg_diseq', 'attribute_goals(X)', attribute_goals(X)),
-		get_attributes_in_term_vars(X, Vars_With_Attrs, _Vars_Without_Attrs), 
-		format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing)
-	 }.
+attribute_goals(Term) --> 
+	[Term : Attributes_For_Printing_Conj],
+	 { prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) }.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,21 +118,22 @@ attribute_goals(X) -->
 % portray(rat(N,D)) :- print(N/D).
 % portray(eqn_var(Self,A,B,R,Nl)) :- print(eqn_var(Self,A,B,R,Nl)).
 
-attr_portray_hook(Attribute, Var):- 
-	portray_attribute(Attribute, Var).
+attr_portray_hook(_Attribute, Var) :- 
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'attr_portray_hook(_Attribute, Var)'),
+	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
 
-portray_attribute(Attribute, Var) :-
-	echo_msg(2, '', 'cneg_diseq', 'portray_attribute :: Var', Var),
-	echo_msg(2, '', 'cneg_diseq', 'portray_attribute :: Attribute', Attribute),
-	portray(Var).
+portray_attribute(_Attribute, Var) :-
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray_attribute(_Attribute, Var)'),
+	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
 
-%portray(Attribute) :-
-%	attribute_contents(Attribute, Target, _Disequalities), !,
-%	portray(Target).
+portray(Attribute) :-
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Attribute)'),
+	attribute_contents(Attribute, Target, _Disequalities), !,
+	portray(Target).
 
-%portray(Term) :-
-%	echo_msg(2, '', 'cneg_diseq', 'portray :: Term', Term),
- %	portray_attributes_in_term_vars(1, 'cneg_diseq', Term).
+portray(Term) :-
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Term)'),
+	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,46 +150,34 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, _Term) :-
 cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 	Mode \== 'nl', 
 	Mode \== 'logo',
-	echo_msg(Echo_Level, '', File_Name, '', Term),
+	echo_msg(Echo_Level, 'aux', File_Name, '', Term),
 	varsbag(Term, [], [], Vars),
 	(
 	    (   Vars == [], !   )  % No vars -> No printing.
 	;
 	    (   Vars \== [], !, 
-		portray_attributes_in_term_vars(Echo_Level, File_Name, Term)	
+		prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
+		echo_msg(Echo_Level, 'aux', File_Name, ' : ', Attributes_For_Printing_Conj)
+	    )
+	),
+	(
+	    (   Mode == 'aux', !   )
+	;
+	    (   Mode \== 'aux', !, 
+		echo_msg(Echo_Level, 'nl', File_Name, '', '')
 	    )
 	).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	    
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-portray_attributes_in_term_vars(Echo_Level, File_Name, Term) :-
-	get_attributes_in_term_vars(Term, Vars_With_Attrs, Vars_Without_Attrs),
-	echo_msg(2, '', File_Name, '(Term, Vars_With_Attrs, Vars_Without_Attrs) :: ', (Term, Vars_With_Attrs, Vars_Without_Attrs)),
-	echo_msg(2, 'logo', File_Name, '', ''),
-	echo_msg(Echo_Level, 'aux', File_Name, Term, ''),
-	format_attributes_for_printing(Vars_With_Attrs, Term_Attributes), 
-
-	(
-	    (
-		Term_Attributes \== [], !, 
-		echo_msg(Echo_Level, 'aux', File_Name, ' where ', Term_Attributes)
-	    )
-	;
-	    (   Term_Attributes == [], !   )
-	),
-	echo_msg(2, 'nl', File_Name, '', ''),
-
-	echo_msg(2, '', 'cneg_diseq', Term, Term_Attributes),
-	echo_msg(2, '', 'cneg_diseq', '(Vars_With_Attrs, Vars_Without_Attrs) :: ', (Vars_With_Attrs, Vars_Without_Attrs)),
-
-	echo_msg(2, '', 'cneg_rt', Term, Term_Attributes),
-	echo_msg(2, '', 'cneg_rt', '(Vars_With_Attrs, Vars_Without_Attrs) :: ', (Vars_With_Attrs, Vars_Without_Attrs)),
-
-	echo_msg(2, '', 'trace', Term, Term_Attributes),
-	echo_msg(2, '', 'trace', '(Vars_With_Attrs, Vars_Without_Attrs) :: ', (Vars_With_Attrs, Vars_Without_Attrs)).
+prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
+	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Term', Term),
+	get_attributes_in_term_vars(Term, Vars_With_Attrs, _Vars_Without_Attrs), 
+	format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing),
+	attrs_list_to_conj(Attributes_For_Printing, Attributes_For_Printing_Conj),
+	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -202,9 +187,9 @@ get_attributes_in_term_vars(Term, Vars_With_Attrs, Vars_Without_Attrs) :-
 	cneg_aux:varsbag(Term, [], [], Vars),
 	get_attributes_in_term_vars_aux(Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs),
 	echo_msg(2, '', 'cneg_diseq', 'Variables with attributes', Vars_With_Attrs), 
-	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'Variables without attributes', Vars_Without_Attrs), 
-	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+%	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
+	echo_msg(2, '', 'cneg_diseq', 'Variables without attributes', Vars_Without_Attrs). 
+%	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
 get_attributes_in_term_vars_aux([], Vars_WA, Vars_WA, Vars_WOA, Vars_WOA) :- !.
 get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
@@ -219,9 +204,9 @@ get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_
 
 format_attributes_for_printing([], []) :- !.
 format_attributes_for_printing([Attribute|Attributes], [Printing_Attribute|Printing_Attributes]) :-
-	echo_msg(2, '', 'cneg_diseq', 'format_attribute_for_printing :: Attribute', Attribute), 
+%	echo_msg(2, '', 'cneg_diseq', 'format_attribute_for_printing :: Attribute', Attribute), 
 	format_attribute_for_printing(Attribute, Printing_Attribute),
-	echo_msg(2, '', 'cneg_diseq', 'format_attribute_for_printing :: Printing_Attribute', Printing_Attribute),
+%	echo_msg(2, '', 'cneg_diseq', 'format_attribute_for_printing :: Printing_Attribute', Printing_Attribute),
 	format_attributes_for_printing(Attributes, Printing_Attributes).
 
 format_attribute_for_printing(Attribute, Printing_Attribute) :-
@@ -230,35 +215,34 @@ format_attribute_for_printing(Attribute, Printing_Attribute) :-
 
 format_diseqs_list_for_printing([], []) :- !.
 format_diseqs_list_for_printing([Disequality | Disequalities], [Print_Disequality | Print_Disequalities]) :-
-	echo_msg(2, '', 'cneg_diseq', 'format_diseq_for_printing :: Disequality', Disequality), 
+%	echo_msg(2, '', 'cneg_diseq', 'format_diseq_for_printing :: Disequality', Disequality), 
 	format_diseq_for_printing(Disequality, Print_Disequality),
-	echo_msg(2, '', 'cneg_diseq', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
+%	echo_msg(2, '', 'cneg_diseq', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
 	format_diseqs_list_for_printing(Disequalities, Print_Disequalities).
 
 % Need to convert to a single term everything.
 % This predicate is not working as expected.
 format_diseq_for_printing(Disequality, Print_Disequality) :-
-	disequality_contents(Disequality, T1, T2, _EQ_Vars, UQ_Vars),
-	(
-	    (
-		UQ_Vars == [], !, 
-		functor(Print_Disequality, '\\!/', 2), 
-		arg(1, Print_Disequality, UQ_Vars), 
-		arg(2, Print_Disequality, Real_Diseq), 
-		echo_msg(2, 'aux', 'cneg_diseq', ' \\!/ ', UQ_Vars),
-		echo_msg(2, 'aux', 'cneg_diseq', ' ', '.  ')
-	    )
-	;
-	    (   UQ_Vars \== [], !,
-		Print_Disequality = Real_Diseq
-	    )
-	),
-	functor(Real_Diseq, '=/=', 2), 
-	arg(1, Real_Diseq, T1), 
-	arg(2, Real_Diseq, T2), 
-	!.
+	disequality_contents(Disequality, T1, T2, _EQ_Vars_In, UQ_Vars_In),
+	varsbag_clean_up(UQ_Vars_In, UQ_Vars),
+	varsbag((T1, T2), [], [], Terms_Vars), 
+	varsbag_intersection(UQ_Vars, Terms_Vars, Real_UQ_Vars),
+	functor(Print_Disequality, 'disequality', 3), 
+	arg(1, Print_Disequality, T1), 
+	arg(2, Print_Disequality, T2), 
+	arg(3, Print_Disequality, Real_UQ_Vars).
 
-% format_diseq_for_printing(Disequality, Disequality).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+attrs_list_to_conj([], []) :- fail.
+attrs_list_to_conj([Elto], Elto) :- !.
+attrs_list_to_conj([Elto | List], New_Elto) :- 
+	functor(New_Elto, '/\\', 2),
+	arg(1, New_Elto, Elto), 
+	arg(2, New_Elto, More_Eltos), 
+	attrs_list_to_conj(List, More_Eltos).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
