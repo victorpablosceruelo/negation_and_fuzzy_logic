@@ -9,7 +9,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [prepare_attributes_for_printing/2, cneg_diseq_echo/4]).
-:- use_module(cneg_rt_aux, [cneg_rt_Dynamic/5]).
+:- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(cneg_tr_hybrid, [cneg_tr_hybrid_negate_literal/4]).
 
 % To access pre-frontiers from anywhere.
@@ -50,7 +50,7 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 		;
 		    Proposal == 'cneg_rt_Stuckey', !
 		),
-		cneg_rt_Dynamic(UQV, GoalVars, Goal, Proposal, Result)
+		cneg_rt_dynamic(UQV, GoalVars, Goal, Proposal, Result)
 	    ),
 	    call_to_conjunction_list(Result, Depth_Level, Trace, CN_Call)
 	).

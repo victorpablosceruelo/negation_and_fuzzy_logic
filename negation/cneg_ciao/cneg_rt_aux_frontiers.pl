@@ -17,7 +17,7 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_diseq, [cneg_diseq_echo/4]).
-:- use_module(cneg_rt_aux, [cneg_rt_Dynamic/5]).
+:- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(library(aggregates),[setof/3]).
 
 % To access pre-frontiers from anywhere.
@@ -140,7 +140,7 @@ compute_goal_frontier(Goal, _Proposal, [F_Out]) :-
 compute_goal_frontier(Goal, Proposal, Frontier) :- 
 	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal, _Unused_Negation_Proposal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, GoalVars, SubGoal)', (Proposal, UQV, GoalVars, SubGoal)),
-	cneg_rt_Dynamic(UQV, GoalVars, SubGoal, Proposal, Conj_List_Result), !,
+	cneg_rt_dynamic(UQV, GoalVars, SubGoal, Proposal, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, 'cneg_rt_gv', List_Of_Conjs_Frontier), !,
