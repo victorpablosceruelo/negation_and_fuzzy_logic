@@ -26,10 +26,9 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 	validate_proposal(Proposal),
 
 	% Save trace (for debugging and tabling usage)
-	CN_Call = (cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace)), 
-	generate_conjunction_trace(Trace, Trace_1, Trace_2),
-	add_predicate_to_trace(CN_Call, Trace_1),
-	echo_msg(2, 'trace', 'cneg_rt', 'cneg_rt/6: ', Trace_2),
+	CN_Call = (cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level)), 
+	add_predicate_to_trace(CN_Call, Trace, NewTrace),
+	echo_msg(2, 'trace', 'cneg_rt', 'cneg_rt/6: ', NewTrace),
 
 	% Now select the adequate code for each negation.
 	(
@@ -52,7 +51,7 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 		),
 		cneg_rt_dynamic(UQV, GoalVars, Goal, Proposal, Result)
 	    ),
-	    call_to_conjunction_list(Result, Depth_Level, Trace, CN_Call)
+	    call_to_conjunction_list(Result, Depth_Level, NewTrace, CN_Call)
 	).
 
 
@@ -128,34 +127,26 @@ cneg_rt_test(UQV, GoalVars, Body_First_Unification, Body, Result) :-
 % Please note this mechanism wastes less memory and cpu, 
 % since it goes one by one, but allows backtracking.
 call_to_conjunction_list([], _Level, Trace, CN_Call) :- 
-	generate_conjunction_trace(Trace, Trace_Info, Trace_End),
-	generate_conjunction_trace(Trace_Info, Trace_Info_1, Trace_Info_2),
-	add_predicate_to_trace(ended_subfrontiers_for(CN_Call), Trace_Info_1),
+	add_predicate_to_trace(ended_subfrontiers_for(CN_Call), Trace, Trace_1),
 	prepare_attributes_for_printing(CN_Call, Attributes_For_Printing_Conj),
-	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_Info_2),
-	add_predicate_to_trace('-----------------------', Trace_End),
-	get_trace_final_status_list(Trace, Status_List),
-	echo_msg(2, 'list', 'cneg_rt', 'TRACE: ', Status_List),
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'list', 'trace', 'TRACE: ', Status_List),
-	echo_msg(2, 'nl', 'trace', '', '').
+	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_1, Trace_2),
+	add_predicate_to_trace('-----------------------', Trace_2, Trace_3),
+	end_trace(Trace_3),
+	echo_msg(2, 'trace', 'cneg_rt', 'call_to_conjunction_list: ', Trace_3),
+	echo_msg(2, 'trace', 'trace', 'call_to_conjunction_list: ', Trace_3).
 
 call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
-	generate_conjunction_trace(Trace, Trace_Current_Goal, Trace_Next_Goal),
-	generate_conjunction_trace(Trace_Current_Goal, Trace_Info, Trace_Result),
-	generate_conjunction_trace(Trace_Info, Trace_Info_1, Trace_Info_2),
-	generate_conjunction_trace(Trace_Info_2, Trace_Info_3, Trace_Info_4),
-	generate_conjunction_trace(Trace_Info_4, Trace_Info_5, Trace_Info_6),
-	add_predicate_to_trace('-----------------------', Trace_Info_1),
-	add_predicate_to_trace(subfrontier_for(CN_Call), Trace_Info_3),
-	add_predicate_to_trace(Result, Trace_Info_5),
+	add_predicate_to_trace('-----------------------', Trace, Trace_1),
+	add_predicate_to_trace(subfrontier_for(CN_Call), Trace_1, Trace_2),
+	add_predicate_to_trace(Result, Trace_2, Trace_3),
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
-	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_Info_6),
-	echo_msg(2, '', 'cneg_rt', 'SUBFRONTIER for goal', CN_Call),
-	echo_msg(2, '', 'cneg_rt', '', Result),
+	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
+	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: goal', CN_Call),
+	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: result', Result),
 	cneg_diseq_echo(2, '', 'cneg_rt', Result),
-	call_to(Result, Level, Trace_Result),
-	call_to_conjunction_list(Result_List, Level, Trace_Next_Goal, CN_Call).
+	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
+	call_to(Result, Level, Trace_5),
+	call_to_conjunction_list(Result_List, Level, Trace_6, CN_Call).
 
 %generate_disjunction_from_list([], fail) :- !.
 %generate_disjunction_from_list([Goal], Goal) :- !.

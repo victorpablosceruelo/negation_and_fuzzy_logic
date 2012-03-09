@@ -127,7 +127,7 @@ call_to_aux(Predicate, Level_In, Trace) :-
 call_to_aux(Predicate, Level_In, Trace) :-
 	goal_is_conjunction(Predicate, G1, G2), !,
 	Level is Level_In + 1,
-	generate_conjunction_trace(Trace, Trace_G1, Trace_G2),
+	generate_traces_for_conjunction(Trace, Trace_G1, Trace_G2),
 	(   % 1st conjunct
 	    (	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', G1),
 		call_to_aux(G1, Level, Trace_G1),
@@ -162,7 +162,8 @@ call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
 	goal_is_not_negation(Predicate),
 	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: Predicate', Predicate),
-	add_predicate_to_trace(Predicate, Trace),
+	add_predicate_to_trace(Predicate, Trace, NewTrace),
+	end_trace(NewTrace),
 	call(Predicate).
 
 

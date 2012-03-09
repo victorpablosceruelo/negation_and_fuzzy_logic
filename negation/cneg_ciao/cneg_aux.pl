@@ -29,10 +29,10 @@
 	    retrieve_element_from_list/2,
 	    split_goal_with_disjunctions_into_goals/3,
 	    generate_empty_trace/1,
-	    generate_conjunction_trace/3,
-	    add_predicate_to_trace/2,
-	    get_trace_status_list/2,
-	    get_trace_final_status_list/2
+	    generate_traces_for_conjunction/3,
+	    add_predicate_to_trace/3,
+	    end_trace/1,
+	    get_trace_status_list/2
 	],
 	[assertions]).
 
@@ -243,8 +243,7 @@ echo_msg_trace(Echo_Level, File_Name, Pre_Msg, Trace) :-
 	echo_msg(Echo_Level, 'separation', File_Name, '', ''),
 	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
 	get_trace_status_list(Trace, Trace_Status_List),
-	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
-	echo_msg(Echo_Level, 'aux', File_Name, Pre_Msg, 'TRACE: '),
+	echo_msg(Echo_Level, '', File_Name, Pre_Msg, 'TRACE: '),
 	echo_msg(Echo_Level, 'list', File_Name, '', Trace_Status_List),
 	!.
 
@@ -905,12 +904,19 @@ reverse_list([H_In | L_In], L_Aux, L_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_empty_trace(trace([], _Out)).
-generate_conjunction_trace(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
-add_predicate_to_trace(Predicate, trace(In, [Predicate | In])) :- !.
+generate_traces_for_conjunction(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
+add_predicate_to_trace(Predicate, trace(In, Out), trace([Predicate | In], Out)).
+end_trace(trace(In, In)).
+
 % They should be converted to an string to avoid problems ...
 %	name(Predicate, Predicate_String), !. 
-get_trace_status_list(trace(In, _Out), In_Reversed) :- reverse_list(In, [], In_Reversed), !.
-get_trace_final_status_list(trace(_In, Out), Out_Reversed) :- reverse_list(Out, [], Out_Reversed), !.
+get_trace_status_list(trace(In, Out), List_Reversed) :- 
+	(
+	    (   var(Out), !, List = In   )  % Get current status.
+	;
+	    (   nonvar(Out), !, List = Out   )   % Get final status.
+	),
+	reverse_list(List, [], List_Reversed), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

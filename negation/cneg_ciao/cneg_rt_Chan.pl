@@ -45,9 +45,9 @@ negate_subfrontier_chan(SubFrontier_In, GoalVars_In, 'cneg_rt_Chan', (Result)) :
 	split_subfrontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier', (SubFrontier_Aux_1)),
 	!, % Reduce the stack's memory by forbidding backtracking.
+	varsbag(GoalVars_In, [], [], GoalVars),
 	normalize_E_IE_NIE(SubFrontier_Aux_1, GoalVars, SubFrontier_Aux_2),
 	subfrontier_E_IE_NIE_contents(SubFrontier_Aux_2, E, _IE, NIE),
-	varsbag(GoalVars_In, [], [], GoalVars),
 	varsbag(E, [], GoalVars, ImpVars),
 	varsbag(NIE, ImpVars, [], ExpVars),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: ExpVars', ExpVars),
@@ -83,6 +83,7 @@ normalize_E_IE_NIE(Formula_In, GoalVars, Formula_Out) :-
 % removes from E redundnant equalities and variables
 remove_from_E_redundant_eqs_and_vars(Formula_In, GoalVars, Formula_Out) :- 
 	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs_and_vars :: Formula_In', Formula_In),
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs_and_vars :: GoalVars', GoalVars),
 	subfrontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In), 
 	remove_from_E_redundant_vars(E_In, GoalVars, 'fail', Changes),
 	remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux),
@@ -121,16 +122,19 @@ remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :-
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV),
-	memberchk(E_In, Visited_In), !. % Eq has been seen before. Redundant.
+	memberchk(E_In, Visited_In), !, % Eq has been seen before. Redundant.
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, Value_1, Value_2, GV, EQV, UQV),
 	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
-	memberchk(E_Tmp, Visited_In), !. % Eq has been seen before. Redundant.
+	memberchk(E_Tmp, Visited_In), !, % Eq has been seen before. Redundant.
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
-	Value_1 == Value_2, !. % Equality between same terms.
+	Value_1 == Value_2, !, % Equality between same terms.
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs :: redundant (eq between identical terms)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
 	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
@@ -160,12 +164,16 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true'
 	    (   % Value_1 is a var in Non_GoalVars
 		var(Value_1),
 		memberchk(Value_1, Non_GoalVars), !,
+		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: redundant (1st var not in GoalVars)', (Value_1, Value_2)),
+		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: GoalVars', GoalVars),
 		Value_1 = Value_2
 	    )
 	;
 	    (   % Value_2 is a var in Non_GoalVars
 		var(Value_2),
 		memberchk(Value_2, Non_GoalVars), !,
+		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: redundant (2nd var not in GoalVars)', (Value_1, Value_2)),
+		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: GoalVars', GoalVars),
 		Value_2 = Value_1
 	    )
 	).
