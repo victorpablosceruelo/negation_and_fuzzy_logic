@@ -268,9 +268,11 @@ negate_formula(Frontier, GoalVars, Neg_E_IE_NIE) :-
 % negate_Dexp_Rexp(DRexp,ImpVars,ExpVars,SolC) obtain in
 % SolC a solution of negating Dexp y Rexp juntos.
 negate_IE_NIE_exp([], _GoalVars, []):- !.
-negate_IE_NIE_exp(IE_NIE_exp, GoalVars, Neg_IE_NIE_exp) :-
+negate_IE_NIE_exp(IE_NIE_exp, GoalVars_In, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [],
-	functor_local(Neg_IE_NIE_exp, 'cneg_rt_gv', 3, [IE_NIE_exp |[ GoalVars |[ 'cneg_rt_Chan' ]]]), !.
+	varsbag(GoalVars_In, [], [], GoalVars),
+	varsbag(IE_NIE_exp, GoalVars, [], UQV),
+	functor_local(Neg_IE_NIE_exp, 'cneg_rt', 4, [ UQV |[ GoalVars |[ IE_NIE_exp |[ 'cneg_rt_Chan' ]]]]), !.
 
 negate_imp_form([], _GoalVars, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _GoalVars, _Next_Formula, _Neg_Formula) :-
@@ -377,8 +379,10 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	).
 
 
-negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
-	functor_local(Neg_Atom, 'cneg_rt_gv', 3, [Formula |[ GoalVars |[ 'cneg_rt_Chan' ]]]),
+negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
+	varsbag(GoalVars_In, [], [], GoalVars),
+	varsbag(Formula, GoalVars, [], UQV),
+	functor_local(Neg_Atom, 'cneg_rt', 4, [ UQV |[ GoalVars |[ Formula |[ 'cneg_rt_Chan' ]]]]),
 	Keep_Atom = (Formula). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
