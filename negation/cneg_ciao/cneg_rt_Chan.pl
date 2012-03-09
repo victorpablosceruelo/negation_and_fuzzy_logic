@@ -104,7 +104,7 @@ remove_from_E_redundant_eqs_and_vars(Formula_In, GoalVars, Formula_Out) :-
 	    )
 	).
 
-
+remove_from_E_redundant_eqs([], Visited, Visited, []) :- !. % Empty E
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :- 
 	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
 	remove_from_E_redundant_eqs(E_In_Left, Visited_In, Visited_Aux, E_Out_Left),
@@ -134,7 +134,8 @@ remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :-
 
 remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
 	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
-		
+
+remove_from_E_redundant_vars([], _GoalVars, Changes, Changes) :- !. % Empty E
 remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
 	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
 	remove_from_E_redundant_vars(E_In_Left, GoalVars, Changes_In, Changes_Aux),

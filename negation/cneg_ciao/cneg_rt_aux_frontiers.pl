@@ -314,7 +314,7 @@ split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
 % The way to fix this is remove cneg(cneg(...))
 % when evaluating the subfrontier. To be done.
 split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_negation(Frontier_In, _GoalVars, _UQV, _SubGoal, _Negation_Proposal), !,
+	goal_is_negation(Frontier_In, _UQV, _GoalVars, _SubGoal, _Negation_Proposal), !,
 	subfrontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
 
 split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
