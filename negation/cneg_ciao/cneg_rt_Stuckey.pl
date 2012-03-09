@@ -266,7 +266,7 @@ evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
 	eq_geuqv(Left, Right, GV, EQV, UQV).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-
-	goal_is_negation_uqv(Prev_Front_Residua, UQV, SubGoal, _Negation_Proposal), 
+	goal_is_cneg_rt(Prev_Front_Residua, UQV, _Unused_GoalVars, SubGoal, _Negation_Proposal), 
 	cneg_rt_Stuckey(UQV, SubGoal).
 
 evaluate_prev_frontier_residua_aux(Prev_Front_Residua) :-

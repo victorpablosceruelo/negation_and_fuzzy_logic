@@ -283,7 +283,7 @@ cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
 	functor_local(Neg_Atom, 'eq_geuqv_adv', 6, [A_Left |[A_Right |[ GoalVars |[ Diseq_UQV |[ 'compute' |[Result]]]]]]).
 
 cneg_tr_hybrid_negate_literal(Atom, GoalVars, Result, Neg_Atom) :-
-	goal_is_negation_uqv(Atom, UQV, SubGoal, _Proposal), !,
+	goal_is_cneg_rt(Atom, UQV, _Unused_GoalVars, SubGoal, _Proposal), !,
 	functor_local(Op_Append, 'append', 3, [UQV |[ GoalVars |[New_GoalVars]]]),
 	Neg_Atom = (Op_Append, Neg_Atom_Aux),
 	cneg_tr_hybrid_double_negation_literal(SubGoal, New_GoalVars, Result, Neg_Atom_Aux).
@@ -333,7 +333,7 @@ cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
 	cneg_tr_hybrid_double_negation_literal(Disj_2, GoalVars, Result, DN_Disj_2). 
 
 cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-
-	goal_is_negation_uqv(Atom, _Unconfigured_UQV, SubGoal, _Proposal), !, 
+	goal_is_cneg_rt(Atom, _Unconfigured_UQV, _Unused_GoalVars, SubGoal, _Proposal), !, 
 	cneg_tr_hybrid_negate_literal(SubGoal, GoalVars, Result, DN_Atom). % Problematic
 
 cneg_tr_hybrid_double_negation_literal(Atom, GoalVars, Result, DN_Atom) :-

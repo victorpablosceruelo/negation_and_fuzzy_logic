@@ -17,7 +17,7 @@
 	    goal_is_not_conj_disj_neg/1,
 	    goal_is_not_negation/1,
 	    goal_is_negation/5,
-	    goal_is_negation_uqv/4, goal_is_negation_gv/4,
+	    goal_is_cneg_rt/5,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -132,6 +132,9 @@ echo_msg(Echo_Level, 'nl', File_Name, _Pre_Msg, _Msg) :-
 echo_msg(Echo_Level, 'separation', File_Name, _Pre_Msg, _Msg) :-
 	echo_msg_separation(Echo_Level, File_Name).	
 
+echo_msg(Echo_Level, 'trace', File_Name, Pre_Msg, Msg) :-
+	echo_msg_trace(Echo_Level, File_Name, Pre_Msg, Msg).
+
 echo_msg(Echo_Level, Mode, File_Name, Pre_Msg, Msg) :-
 	  echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg, '', '', Msg).
 
@@ -231,6 +234,20 @@ echo_msg_statistics(2, File_Name, Msg) :-
 echo_msg_statistics_aux(Msg) :-
 	nl, write(Msg), nl, nl, 
 	statistics, !. % Write statistics to file.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+echo_msg_trace(Echo_Level, File_Name, Pre_Msg, Trace) :-
+	echo_msg(Echo_Level, 'separation', File_Name, '', ''),
+	echo_msg(Echo_Level, 'nl', File_Name, '', ''),
+	get_trace_status_list(Trace, Trace_Status_List),
+	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
+	echo_msg(Echo_Level, 'aux', File_Name, Pre_Msg, 'TRACE: '),
+	echo_msg(Echo_Level, 'list', File_Name, '', Trace_Status_List),
+	!.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -516,26 +533,27 @@ valid_negation_preds('cneg_rt', 2).
 valid_negation_preds('cneg_rt_Stuckey', 2).
 valid_negation_preds('cneg_rt_Chan', 2).
 valid_negation_preds('cneg_rt_New', 2).
-valid_negation_preds('cneg_rt_gv', 3).
+valid_negation_preds('cneg_rt', 4).
 
-goal_is_negation(Goal, 'compute', UQV, SubGoal, Proposal) :-
+goal_is_negation(Goal, UQV, 'compute', SubGoal, Proposal) :-
 	valid_negation_preds(Proposal, Arity), 
 	Arity == 2,
 	functor(Goal, Proposal, Arity), !,
 	arg(1, Goal, UQV),
 	arg(2, Goal, SubGoal).
 
-goal_is_negation(Goal, GoalVars, 'compute', SubGoal, Proposal) :-
+goal_is_negation(Goal, UQV, GoalVars, SubGoal, Proposal) :-
 	valid_negation_preds(Name, Arity), 
-	Arity == 3,
+	Arity == 4,
 	functor(Goal, Name, Arity), !,
-	arg(1, Goal, SubGoal),
+ 	arg(1, Goal, UQV),
  	arg(2, Goal, GoalVars),
- 	arg(3, Goal, Proposal).
+	arg(3, Goal, SubGoal),
+ 	arg(4, Goal, Proposal).
 
 goal_is_not_negation(Goal) :-
 	nonvar(Goal), % Security issues.
-	goal_is_negation(Goal, _GoalVars, _UQV, _SubGoal, _Proposal), !, fail.
+	goal_is_negation(Goal, _UQV, _GoalVars, _SubGoal, _Proposal), !, fail.
 goal_is_not_negation(Goal) :-
 	nonvar(Goal), % Security issues.
 	!.
@@ -544,20 +562,27 @@ goal_is_not_negation(Goal) :-
 	echo_msg(1, '', 'cneg_aux', 'goal_is_not_negation', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
-goal_is_negation_uqv(Goal, Real_UQV, SubGoal, Proposal) :-
-	goal_is_negation(Goal, GoalVars, UQV, SubGoal, Proposal), !,
+goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal, Proposal) :-
+	goal_is_negation(Goal, UQV_In, GoalVars_In, SubGoal, Proposal), !,
  	(
-	    (   GoalVars == 'compute', !, Real_UQV = UQV )
+	    (   % Need to compute GoalVars.
+		GoalVars_In == 'compute', !, 
+		varsbag_clean_up(UQV_In, UQV),
+		varsbag(SubGoal, UQV, [], GoalVars)
+	    )
+	;  
+	    (   % Need to compute UQV.
+		UQV_In == 'compute', !, 
+		varsbag(GoalVars_In, [], [], GoalVars),
+		varsbag(SubGoal, GoalVars, [], UQV) 
+	    )
 	;
-	    (	UQV == 'compute', !, varsbag(SubGoal, GoalVars, [], Real_UQV) )
-	), !.
-
-goal_is_negation_gv(Goal, Real_GoalVars, SubGoal, Proposal) :-
-	goal_is_negation(Goal, GoalVars, UQV, SubGoal, Proposal),
- 	(
-	    (   GoalVars == 'compute', !, varsbag(SubGoal, UQV, [], Real_GoalVars) )
-	;
-	    (	UQV == 'compute', !, Real_GoalVars = GoalVars )
+	    (   % Nothing to compute.
+		GoalVars_In \== 'compute', 
+		UQV_In \== 'compute', !, 
+		GoalVars = GoalVars_In, 
+		UQV = UQV_In
+	    )
 	), !.
 
 goal_is_not_conj_disj_neg(Goal) :-
@@ -848,20 +873,11 @@ split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, [NewBody])
 	translate_problematic_predicates(Body, Negation_Predicate, NewBody), 
 	!.
 
-% Example for Negation_Predicate = 'cneg_tr'
-translate_problematic_predicates(Body, Negation_Predicate, NewBody) :-
-	goal_is_negation(Body, _GoalVars_Invalid, _UQV_Invalid, SubGoal, Proposal), !,
-	(
-	    (	Negation_Predicate \== 'cneg_rt_gv', !,
-		goal_is_negation_uqv(Body, UQV, SubGoal, Proposal), !,
-		functor_local(NewBody, Negation_Predicate, 2, [UQV |[ SubGoal ]])
-	    )
-	;
-	    (   Negation_Predicate == 'cneg_rt_gv', !,
-		goal_is_negation_gv(Body, GoalVars, SubGoal, Proposal), !,
-		functor_local(NewBody, Negation_Predicate, 3, [ SubGoal |[ GoalVars |[ Proposal ]]])
-	    )
-	), !.
+% Example for New_Proposal = 'cneg_rt_intneg'
+translate_problematic_predicates(Body, New_Proposal, NewBody) :-
+	goal_is_cneg_rt(Body, UQV, GoalVars, SubGoal, _Old_Proposal),
+	functor_local(NewBody, 'cneg_rt', 4, [UQV |[ GoalVars |[ SubGoal |[ New_Proposal ]]]]),
+	!.
 
 translate_problematic_predicates(Body, _Negation_Predicate, Body) :- 
 	goal_is_not_conj_disj_neg(Body), !.

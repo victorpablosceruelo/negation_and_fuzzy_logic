@@ -26,7 +26,7 @@
 	    cneg_diseq_echo/4
 	]).
 :- use_module(cneg_tr).
-:- use_module(cneg_rt, [cneg_rt/3, cneg_rt_gv/5]).
+:- use_module(cneg_rt, [cneg_rt/6]).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
@@ -39,7 +39,7 @@
 	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/4
 	]).
-:- reexport(cneg_rt, [cneg_rt_gv/5]).
+:- reexport(cneg_rt, [cneg_rt/6]).
 %:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
@@ -65,18 +65,16 @@ cneg(UQV, Predicate) :-
 		Negation_Mechanism = 'cneg_rt_Chan', !
 	    )
 	),
-	cneg_rt(UQV, Predicate, Negation_Mechanism).
+	varsbag_clean_up(UQV, Real_UQV), % UQV is a list of variables. Remove anything else.
+	varsbag(Predicate, Real_UQV, [], GoalVars), % Compute goalvars. It is used by some methods.
+	generate_empty_trace(Trace), % This is for debugging and a future tabling mechanism.
+	cneg_rt(UQV, GoalVars, Predicate, Negation_Mechanism, 0, Trace). % 0 is the depth level.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,9 +154,9 @@ call_to_aux(Predicate, Level_In, Trace) :-
 
 call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
-	goal_is_negation_gv(Predicate, GoalVars, Goal, Proposal),
+	goal_is_cneg_rt(Predicate, UQV, GoalVars, Goal, Proposal),
 	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: Predicate', Predicate),
-	cneg_rt_gv(Goal, GoalVars, Proposal, Level, Trace).
+	cneg_rt(UQV, GoalVars, Goal, Proposal, Level, Trace).
 
 call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,

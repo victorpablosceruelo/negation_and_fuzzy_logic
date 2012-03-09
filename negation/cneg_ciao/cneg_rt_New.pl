@@ -97,7 +97,7 @@ identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Disequaliti
 	varsbag_union(UQV, Closed_Vars_In, Closed_Vars_Out).
 
 identify_closed_vars(Frontier, Closed_Vars_In, Closed_Vars_Out) :- % Negations
-	goal_is_negation_uqv(Frontier, UQV_In, _SubGoal, _Negation_Proposal), !,
+	goal_is_cneg_rt(Frontier, UQV_In, _GoalVars_In, _SubGoal, _Negation_Proposal), !,
 	varsbag_clean_up(UQV_In, UQV),
 	varsbag_union(UQV, Closed_Vars_In, Closed_Vars_Out).
 
