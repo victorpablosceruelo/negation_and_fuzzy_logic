@@ -79,11 +79,26 @@ convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, Frontier_N_I
 convert_frontier_prenode_to_nodes(F_In, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
-	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
+	varsbag((Head, Body), [], [], Vars_Pre_Node),
+	copy_term((Head, Body, Vars_Pre_Node), (Head_Copy, Body_Copy, Vars_Pre_Node)), % Fresh copy to avoid variable clashes.
 
-	split_frontier_prenode_to_nodes(Body, Proposal, Frontier_Nodes),
-	 
-test_frontier_node_validity
+	split_body_between_E_IE_and_NIE(Body_Copy, [], E_IE_Body, [], NIE_Body),
+	split_frontier_prenode_to_nodes(Head_Copy, E_IE_Body, NIE_Body, Real_Goal, Proposal, Frontier_Nodes),
+	append(Frontier_In, Frontier_Nodes, Frontier_Out).
+
+split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_Out, NIE_Body_In, NIE_Body_Out) :-
+	goal_is_conjunction(Body, Body_1, Body_2),
+	split_body_between_E_IE_and_NIE(Body_1, E_IE_Body_In, E_IE_Body_Aux, NIE_Body_In, NIE_Body_Aux),
+	split_body_between_E_IE_and_NIE(Body_1, E_IE_Body_Aux, E_IE_Body_Out, NIE_Body_Aux, NIE_Body_Out).
+split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-
+	goal_is_equality(Body, _Arg1, _Arg2, _GV, _EQV, _UQV), !.
+split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-
+	goal_is_disequality(Body, _Arg1, _Arg2, _GV, _EQV, _UQV), !.
+split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_In, NIE_Body_In, [Body | NIE_Body_In]) :- !.
+
+split_frontier_prenode_to_nodes(Head_Copy, E_IE_Body, NIE_Body, Real_Goal, Proposal, Frontier_Nodes) :-
+
+%test_frontier_node_validity
 	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
 	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
 	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
