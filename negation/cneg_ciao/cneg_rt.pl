@@ -28,7 +28,7 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 	% Save trace (for debugging and tabling usage)
 	CN_Call = (cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level)), 
 	add_predicate_to_trace(CN_Call, Trace, NewTrace),
-	echo_msg(2, 'trace', 'cneg_rt', 'cneg_rt/6: ', NewTrace),
+	echo_msg(2, 'trace', 'cneg_rt', 'call to cneg_rt/6 with (updated) trace', NewTrace),
 
 	% Now select the adequate code for each negation.
 	(

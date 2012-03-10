@@ -224,6 +224,10 @@ echo_msg_statistics(1, File_Name, Msg) :-
 	echo_msg_statistics(2, File_Name, Msg),
 	!. % No backtracking, please.
 echo_msg_statistics(2, File_Name, Msg) :-
+	echo_msg_statistics_file(2, File_Name, Msg),
+	echo_msg_statistics_file(2, 'statistics', Msg).
+
+echo_msg_statistics_file(2, File_Name, Msg) :-
 	current_output(StdOut_Stream), % Save stdout stream.
 	get_stream_to_file(File_Name, Statistics_Stream),
 	set_output(Statistics_Stream), % Redirect stdout to stream.

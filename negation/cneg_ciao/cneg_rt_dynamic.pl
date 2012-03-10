@@ -28,7 +28,7 @@ cneg_rt_dynamic(_UQV, GoalVars, Goal, Proposal, Result_List) :-
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: GoalVars', GoalVars),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Goal', Goal),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'statistics', 'statistics', '', (cneg_rt_dynamic(Goal, GoalVars, Proposal))),
+	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg_rt_dynamic(Goal, GoalVars, Proposal))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Clean up non-vars

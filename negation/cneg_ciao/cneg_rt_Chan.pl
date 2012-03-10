@@ -185,6 +185,8 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Change
 remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out) :-
 	functor_local(Value_1, Name, Arity, Args1),
 	functor_local(Value_2, Name, Arity, Args2), !,
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: eq between functors :: erroneous frontier :: terms', (Value_1, Value_2)),
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars', 'ERROR computing the frontier.'),
 	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_In, Changes_Out).
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
@@ -193,7 +195,8 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Change
 	(
 	    ( Name1 \== Name2) ;
 	    ( Arity1 \== Arity2)
-	).
+	),
+	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: eq between different terms :: failed frontier :: terms', (Value_1, Value_2)).
 
 remove_from_E_redundant_vars_aux_list([], [], _GoalVars, Changes_In, Changes_In) :- !.
 remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Changes_In, Changes_Out) :-
