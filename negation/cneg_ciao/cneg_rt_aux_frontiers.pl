@@ -75,16 +75,33 @@ adequate_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], GoalVars, Proposal, Fronti
 	adequate_frontier(G_F_Pre_Nodes, GoalVars, Proposal, Frontier_N_Aux, Frontier_N_Out).
 
 convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, Frontier_N_In, Frontier_N_Out) :-
-
-convert_frontier_prenode_to_nodes(F_In, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
 	varsbag((Head, Body), [], [], Vars_Pre_Node),
-	copy_term((Head, Body, Vars_Pre_Node), (Head_Copy, Body_Copy, Vars_Pre_Node)), % Fresh copy to avoid variable clashes.
-
+	copy_term((Head, Body, Vars_Pre_Node), (Head_Copy, Body_Copy, Vars_Pre_Node_Copy)), % Fresh copy to avoid variable clashes.
 	split_body_between_E_IE_and_NIE(Body_Copy, [], E_IE_Body, [], NIE_Body),
-	split_frontier_prenode_to_nodes(Head_Copy, E_IE_Body, NIE_Body, Real_Goal, Proposal, Frontier_Nodes),
+	eval_frontier_prenode_to_get_nodes(Head_Copy, E_IE_Body, NIE_Body, Vars_Pre_Node, Real_Goal, Proposal, Frontier_Nodes),
 	append(Frontier_In, Frontier_Nodes, Frontier_Out).
+
+eval_frontier_prenode_to_get_nodes(_Head_Copy, [], [], _Vars_Pre_Node, _Real_Goal, _Proposal, []) :- !.
+eval_frontier_prenode_to_get_nodes(_Head_Copy, [], NIE_Body, _Vars_Pre_Node, _Real_Goal, _Proposal, Frontier_Nodes) :- !,
+	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
+eval_frontier_prenode_to_get_nodes(Head_Copy, E_IE_Body, NIE_Body, Vars_Pre_Node, Real_Goal, Proposal, Frontier_Nodes) :-
+	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
+	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof(Vars_Pre_Node, Conj_E_IE_Body)', 
+	setof(Vars_Pre_Node, Conj_E_IE_Body)),
+	setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node),
+	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node)', 
+	setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node)),
+%test_frontier_node_validity
+	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
+	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
+	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
+	Real_Goal_GoalVars = Real_Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
+	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
+	!. % Backtracking is forbidden.
+	
+	 
 
 split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_Out, NIE_Body_In, NIE_Body_Out) :-
 	goal_is_conjunction(Body, Body_1, Body_2),
@@ -95,16 +112,6 @@ split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_B
 split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-
 	goal_is_disequality(Body, _Arg1, _Arg2, _GV, _EQV, _UQV), !.
 split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_In, NIE_Body_In, [Body | NIE_Body_In]) :- !.
-
-split_frontier_prenode_to_nodes(Head_Copy, E_IE_Body, NIE_Body, Real_Goal, Proposal, Frontier_Nodes) :-
-
-%test_frontier_node_validity
-	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
-	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
-	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
-	Real_Goal_GoalVars = Real_Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
-	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
-	!. % Backtracking is forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
