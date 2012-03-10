@@ -44,40 +44,52 @@ compute_frontier(Goal, GoalVars, Proposal, Frontier) :-
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_frontier_aux(Goals, GoalVars, Proposal, Frontier),
+	compute_frontier_aux(Goals, GoalVars, Proposal, [], Frontier),
 	!.
 
-compute_frontier_aux([], _GoalVars, _Proposal, []) :- !.
-compute_frontier_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_Out) :-
-	compute_goal_frontier(Goal, Proposal, Frontier_Aux), !,
+compute_frontier_aux([], _GoalVars, _Proposal, Frontier_Out, Frontier_Out) :- !.
+compute_frontier_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_In, Frontier_Out) :-
+	compute_goal_frontier(Goal, Proposal, Goal_Frontier), !,
 %	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
-	adequate_frontier(Frontier_Aux, GoalVars, Frontier_Tmp), !,
-	compute_frontier_aux(More_Goals, GoalVars, Proposal, Frontier_In),
-	append(Frontier_Tmp, Frontier_In, Frontier_Out).
+	adequate_frontier(Goal_Frontier, GoalVars, Proposal, [], Frontier_Tmp), !,
+	append(Frontier_In, Frontier_Tmp, Frontier_Aux),
+	compute_frontier_aux(More_Goals, GoalVars, Proposal, Frontier_Aux, Frontier_Out).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-adequate_frontier([], _GoalVars, []) :- !.
-adequate_frontier([F_In | Frontier_In], GoalVars, [F_Out | Frontier_Out]) :-
-	adequate_frontier_aux(F_In, GoalVars, F_Out), !,
-	adequate_frontier(Frontier_In, GoalVars, Frontier_Out).
+adequate_frontier(Goal_Frontier, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
+	adequate_frontier_aux(Goal_Frontier, GoalVars, Proposal, Frontier_In, Frontier_Out), !.
 
-adequate_frontier_aux(F_In, GoalVars, Body_Copy) :-
+adequate_frontier(Goal_Frontier, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
+	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier :: (Goal_Frontier, GoalVars)', (Goal_Frontier, GoalVars)),
+	echo_msg(1, 'list', 'cneg_rt', 'ERROR: adequate_frontier :: Frontier_In', Frontier_In),
+	!, fail.
+
+adequate_frontier_aux([], _GoalVars, _Proposal, Frontier_N_Out, Frontier_N_Out) :- !.
+adequate_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], GoalVars, Proposal, Frontier_N_In, Frontier_N_Out) :-
+	convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, [], Frontier_Nodes), !,
+	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Aux), !,
+	adequate_frontier(G_F_Pre_Nodes, GoalVars, Proposal, Frontier_N_Aux, Frontier_N_Out).
+
+convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, Frontier_N_In, Frontier_N_Out) :-
+
+convert_frontier_prenode_to_nodes(F_In, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
-	subfrontier_contents(F_In, Real_Goal, Head, Body, _F_Test),
+	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
 	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
+
+	split_frontier_prenode_to_nodes(Body, Proposal, Frontier_Nodes),
+	 
+test_frontier_node_validity
 	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
 	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
 	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
 	Real_Goal_GoalVars = Real_Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
 	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
 	!. % Backtracking is forbidden.
-
-adequate_frontier_aux(F_In, GoalVars, _Body_Copy) :-
-	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier_aux(F_In, GoalVars)', (F_In, GoalVars)),
-	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -30,7 +30,7 @@ cneg_rt_dynamic(_UQV, GoalVars, Goal, Proposal, Result_List) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg_rt_dynamic(Goal, GoalVars, Proposal))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
+%	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Clean up non-vars
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Real_GoalVars', Real_GoalVars),
 	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
@@ -92,7 +92,10 @@ negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, [Result
 	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
 %	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
 %	!. % Reduce the stack's memory by forbidding backtracking.
-	
+
+negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, Result_More_Frontiers) :-
+	echo_msg(1, '', 'cneg_rt', 'negate_each_subfrontier :: ERROR negating Frontier. Frontier', Frontier), !,
+	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
 
 % combine_negated_subfrontiers(Result_Subfr, Result_More_Subfr, Result_Tmp),
 %combine_negated_frontiers(fail, _Result_More_Subfr, fail) :- !.
