@@ -10,16 +10,17 @@ tests(N, C) :- test_queens_2(N, C).
 
 test_queens_1(N, Columns) :- % Let's see if we have invalid results.
 	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'N :: '),
+	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_1 :: N :: '),
 	cneg_diseq_echo(1, '', 'ex_peano_queens', N),
 %	echo_msg(1, '', '', 'N', N),
 	cneg([], queens(N, Columns)), % First constraints.
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'queens(N, Columns) :: '),
+	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_1 :: queens(N, Columns) :: '),
 	cneg_diseq_echo(1, '', 'ex_peano_queens', queens(N, Columns)),
 	queens(N, Columns). % Secondly values generator.
 
 test_queens_2(N, Columns) :- % Let's see if we have invalid results.
 	queens(N, Columns), % First values generator.
+	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_2 :: queens(N, Columns) :: '),
 	cneg_diseq_echo(1, '', 'ex_peano_queens', queens(N, Columns)),
 	cneg([], queens(N, Columns)). % Second constraints.
 

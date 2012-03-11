@@ -16,7 +16,7 @@
 :- comment(summary, "This module implements predicates to deal with frontiers.").
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [cneg_diseq_echo/4]).
+:- use_module(cneg_diseq, [cneg_diseq_echo/4, get_disequalities_from_constraints_and_remove_them/2]).
 :- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(library(aggregates),[setof/3]).
 
@@ -50,7 +50,7 @@ compute_frontier(Goal, GoalVars, Proposal, Frontier) :-
 
 compute_frontier_aux([], _GoalVars, _Proposal, Frontier_Out, Frontier_Out) :- !.
 compute_frontier_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_In, Frontier_Out) :-
-	varsbag(Goal, GoalVars, [], UQV),
+%	varsbag(Goal, GoalVars, [], UQV),
 	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
 	GoalVars_Copy = GoalVars, % Take independent variables for universal quantification.
 	compute_goal_frontier(Goal_Copy, Proposal, Goal_Frontier), !,
@@ -67,7 +67,7 @@ compute_frontier_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_In, Front
 adequate_frontier(Goal_Frontier, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
 	adequate_frontier_aux(Goal_Frontier, GoalVars, Proposal, Frontier_In, Frontier_Out), !.
 
-adequate_frontier(Goal_Frontier, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
+adequate_frontier(Goal_Frontier, GoalVars, _Proposal, Frontier_In, _Frontier_Out) :-
 	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier :: (Goal_Frontier, GoalVars)', (Goal_Frontier, GoalVars)),
 	echo_msg(1, 'list', 'cneg_rt', 'ERROR: adequate_frontier :: Frontier_In', Frontier_In),
 	!, fail.
@@ -78,7 +78,7 @@ adequate_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], GoalVars, Proposal, Fronti
 	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Aux), !,
 	adequate_frontier(G_F_Pre_Nodes, GoalVars, Proposal, Frontier_N_Aux, Frontier_N_Out).
 
-convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, Frontier_N_In, Frontier_N_Out) :-
+convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, _Proposal, Frontier_N_In, Frontier_N_Out) :-
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
 
@@ -91,35 +91,58 @@ convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, Frontier_N_I
 	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
 	!, % Backtracking is forbidden.
 
-	(
-	    (
-		Proposal == 'cneg_rt_Chan',
-		varsbag((Head, Body), GoalVars, [], Pre_Node_UQV), % Identify UQV in Pre_Node
-
-		split_body_between_E_IE_and_NIE(Body_Copy, [], E_IE_Body, [], NIE_Body),
-		eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, GoalVars, Pre_Node_UQV, Frontier_Nodes),
-		append(Frontier_In, Frontier_Nodes, Frontier_Out),
-		t
-)
-
-eval_frontier_prenode_to_get_nodes(_Head_Copy, [], [], _Vars_Pre_Node, _Real_Goal, _Proposal, []) :- !.
-eval_frontier_prenode_to_get_nodes(_Head_Copy, [], NIE_Body, _Vars_Pre_Node, _Real_Goal, _Proposal, Frontier_Nodes) :- !,
-	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
-eval_frontier_prenode_to_get_nodes(Head_Copy, E_IE_Body, NIE_Body, Vars_Pre_Node, Real_Goal, Proposal, Frontier_Nodes) :-
-	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
-	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof(Vars_Pre_Node, Conj_E_IE_Body)', 
-	setof(Vars_Pre_Node, Conj_E_IE_Body)),
-	setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node),
-	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node)', 
-	setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node)),
-%test_frontier_node_validity
+	% Proposal == 'cneg_rt_Chan',
+	varsbag((Head_Copy, Body_Copy), GoalVars, [], Pre_Node_UQV), % Identify UQV in Pre_Node
 	
-	 
+	split_body_between_E_IE_and_NIE(Body_Copy, [], E_IE_Body, [], NIE_Body),
+	eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, GoalVars, Pre_Node_UQV, Frontier_Nodes),
+	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+eval_frontier_prenode_to_get_nodes([], [], _GoalVars, _Pre_Node_UQV, []) :- !.
+eval_frontier_prenode_to_get_nodes([], NIE_Body, _GoalVars, _Pre_Node_UQV, Frontier_Nodes) :- !,
+	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
+eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, GoalVars, Pre_Node_UQV, Frontier_Nodes) :-
+	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof(Vars_Pre_Node, Conj_E_IE_Body)', 
+	setof(GoalVars, Pre_Node_UQV, Conj_E_IE_Body)),
+	setof((GoalVars, Pre_Node_UQV), Conj_E_IE_Body, Pre_Node_Answers),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: Pre_Node_Answers', Pre_Node_Answers),
+	
+	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, GoalVars, Pre_Node_UQV, NIE_Body, [], Frontier_Nodes).
+
+get_eqs_and_diseqs_from_answers([], _GoalVars, _Pre_Node_UQV, _NIE_Body, Frontier_Nodes, Frontier_Nodes).
+get_eqs_and_diseqs_from_answers([(Answer_GoalVars, Answer_UQV) | Answers], GoalVars, Pre_Node_UQV, NIE_Body, Frontier_Nodes_In, Frontier_Nodes_Out) :-
+	varsbag((Answer_GoalVars, Answer_UQV), [], [], Answer_Vars),
+	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
+	copy_term((GoalVars, Pre_Node_UQV, NIE_Body), (GoalVars_Copy, Pre_Node_UQV_Copy, NIE_Body_Copy)),
+	GoalVars_Copy = GoalVars, % Keep only one copy of GoalVars.
+	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Disequalities, Eqs_and_Diseqs_Tmp), 
+	get_equalities_list_from_lists(Pre_Node_UQV_Copy, Answer_UQV, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
+	append(Eqs_and_Diseqs, NIE_Body_Copy, Frontier_Node_Body_List),
+	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
+	get_eqs_and_diseqs_from_answers(Answers, GoalVars, Pre_Node_UQV, NIE_Body, [Frontier_Node_Body | Frontier_Nodes_In], Frontier_Nodes_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
+
+get_equalities_list_from_lists([], [], List_In, List_In) :- !.
+get_equalities_list_from_lists([Elto_1], [Elto_2], List_In, [(Elto_1 = Elto_2) | List_In]) :- !.
+get_equalities_list_from_lists([Elto_1 | List_1], [Elto_2 | List_2], List_In, List_Out) :- !,
+	get_equalities_list_from_lists(List_1, List_2, [(Elto_1 = Elto_2) | List_In], List_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
 
 split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_Out, NIE_Body_In, NIE_Body_Out) :-
 	goal_is_conjunction(Body, Body_1, Body_2),
 	split_body_between_E_IE_and_NIE(Body_1, E_IE_Body_In, E_IE_Body_Aux, NIE_Body_In, NIE_Body_Aux),
-	split_body_between_E_IE_and_NIE(Body_1, E_IE_Body_Aux, E_IE_Body_Out, NIE_Body_Aux, NIE_Body_Out).
+	split_body_between_E_IE_and_NIE(Body_2, E_IE_Body_Aux, E_IE_Body_Out, NIE_Body_Aux, NIE_Body_Out).
 split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-
 	goal_is_equality(Body, _Arg1, _Arg2, _GV, _EQV, _UQV), !.
 split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-

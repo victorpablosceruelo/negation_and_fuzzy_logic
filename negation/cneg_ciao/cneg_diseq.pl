@@ -3,6 +3,7 @@
  	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
+	    get_disequalities_from_constraints_and_remove_them/2,
  	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/4
 	], 
@@ -825,6 +826,30 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+get_disequalities_from_constraints_and_remove_them([], []) :- !.
+get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities) :-
+	get_disequalities_from_constraints_and_remove_them_aux(Answer_Vars, [], [], Disequalities).
+
+get_disequalities_from_constraints_and_remove_them_aux([], _Visited, Disequalities, Disequalities) :- !.
+get_disequalities_from_constraints_and_remove_them_aux([Answer_Var | Answer_Vars], Visited, Diseqs_In, Diseqs_Out) :-
+	get_attribute_local(Answer_Var, Attribute), !,
+	remove_attribute_local(Answer_Var),
+	varsbag(Attribute, [Answer_Var | Visited], [], New_Vars),
+	append(Answer_Vars, New_Vars, New_Answer_Vars),
+	attribute_contents(Attribute, _Target, Disequalities),
+	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Aux),
+	get_disequalities_from_constraints_and_remove_them_aux(New_Answer_Vars, [Answer_Var | Visited], Diseqs_Aux, Diseqs_Out).
+
+disequalities_bag_add_diseqs([], Diseqs_In, Diseqs_In) :- !.
+disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :-
+	cneg_aux:memberchk(Diseq, Diseqs_In), !, 
+	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Out).
+disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :- !,
+	disequalities_bag_add_diseqs(Disequalities, [Diseq | Diseqs_In], Diseqs_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     PREDICADO   DISTINTO                      %
