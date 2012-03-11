@@ -44,12 +44,16 @@ compute_frontier(Goal, GoalVars, Proposal, Frontier) :-
 	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_frontier_aux(Goals, GoalVars, Proposal, [], Frontier),
+	varsbag(GoalVars, [], [], Real_GoalVars),
+	compute_frontier_aux(Goals, Real_GoalVars, Proposal, [], Frontier),
 	!.
 
 compute_frontier_aux([], _GoalVars, _Proposal, Frontier_Out, Frontier_Out) :- !.
 compute_frontier_aux([Goal | More_Goals], GoalVars, Proposal, Frontier_In, Frontier_Out) :-
-	compute_goal_frontier(Goal, Proposal, Goal_Frontier), !,
+	varsbag(Goal, GoalVars, [], UQV),
+	copy_term((Goal, GoalVars), (Goal_Copy, GoalVars_Copy)),
+	GoalVars_Copy = GoalVars, % Take independent variables for universal quantification.
+	compute_goal_frontier(Goal_Copy, Proposal, Goal_Frontier), !,
 %	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers_aux :: Frontier_Aux', Frontier_Aux),
 	adequate_frontier(Goal_Frontier, GoalVars, Proposal, [], Frontier_Tmp), !,
 	append(Frontier_In, Frontier_Tmp, Frontier_Aux),
@@ -77,11 +81,26 @@ adequate_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], GoalVars, Proposal, Fronti
 convert_frontier_prenode_to_nodes(G_F_Pre_Node, GoalVars, Proposal, Frontier_N_In, Frontier_N_Out) :-
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
-	varsbag((Head, Body), [], [], Vars_Pre_Node),
-	copy_term((Head, Body, Vars_Pre_Node), (Head_Copy, Body_Copy, Vars_Pre_Node_Copy)), % Fresh copy to avoid variable clashes.
-	split_body_between_E_IE_and_NIE(Body_Copy, [], E_IE_Body, [], NIE_Body),
-	eval_frontier_prenode_to_get_nodes(Head_Copy, E_IE_Body, NIE_Body, Vars_Pre_Node, Real_Goal, Proposal, Frontier_Nodes),
-	append(Frontier_In, Frontier_Nodes, Frontier_Out).
+
+	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
+	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
+	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
+	Real_Goal_GoalVars = Real_Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
+
+	copy_term((Head, Body), (Head_Copy, Body_Copy)), % Fresh copy to avoid variable clashes.
+	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
+	!, % Backtracking is forbidden.
+
+	(
+	    (
+		Proposal == 'cneg_rt_Chan',
+		varsbag((Head, Body), GoalVars, [], Pre_Node_UQV), % Identify UQV in Pre_Node
+
+		split_body_between_E_IE_and_NIE(Body_Copy, [], E_IE_Body, [], NIE_Body),
+		eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, GoalVars, Pre_Node_UQV, Frontier_Nodes),
+		append(Frontier_In, Frontier_Nodes, Frontier_Out),
+		t
+)
 
 eval_frontier_prenode_to_get_nodes(_Head_Copy, [], [], _Vars_Pre_Node, _Real_Goal, _Proposal, []) :- !.
 eval_frontier_prenode_to_get_nodes(_Head_Copy, [], NIE_Body, _Vars_Pre_Node, _Real_Goal, _Proposal, Frontier_Nodes) :- !,
@@ -94,12 +113,6 @@ eval_frontier_prenode_to_get_nodes(Head_Copy, E_IE_Body, NIE_Body, Vars_Pre_Node
 	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node)', 
 	setof(Vars_Pre_Node, Conj_E_IE_Body, Set_Of_Vars_Pre_Node)),
 %test_frontier_node_validity
-	varsbag(Real_Goal, GoalVars, [], Real_Goal_UQV), 
-	varsbag(Real_Goal, Real_Goal_UQV, [], Real_Goal_GoalVars), % Determine affected goalvars.
-	copy_term((Real_Goal, Real_Goal_GoalVars), (Real_Goal_Copy, Real_Goal_GoalVars_Copy)),
-	Real_Goal_GoalVars = Real_Goal_GoalVars_Copy, % Unify goalvars, but not UQV.
-	Real_Goal_Copy = Head_Copy, % Unify head and goal definitely
-	!. % Backtracking is forbidden.
 	
 	 
 
