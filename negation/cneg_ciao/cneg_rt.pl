@@ -29,6 +29,8 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 	CN_Call = (cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level)), 
 	add_predicate_to_trace(evaluating(CN_Call), Trace, NewTrace),
 	echo_msg(2, 'trace', 'cneg_rt', 'call to cneg_rt/6 with (updated) trace', NewTrace),
+	echo_msg(2, 'nl', 'calls_trace', '', ''),
+	echo_msg(2, '', 'calls_trace', 'cneg_rt', evaluating(CN_Call)),
 
 	% Now select the adequate code for each negation.
 	(
@@ -134,6 +136,7 @@ call_to_conjunction_list([], _Level, Trace, CN_Call) :-
 	add_predicate_to_trace('-----------------------', Trace_2, Trace_3),
 	end_trace(Trace_3),
 	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list ', 'EMPTY LIST'),
+	echo_msg(2, '', 'calls_trace', 'call_to_conjunction_list ', 'EMPTY LIST'),
 	echo_msg(2, 'nl', 'calls_trace', '', ''),
 	echo_msg(2, 'nl', 'calls_trace', '', '').
 
