@@ -826,11 +826,12 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	UQV_In \== 'compute',
 	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: In :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
 	varsbag(GoalVars_In, [], [], GoalVars), % Only variables, please.
-	varsbag_clean_up(EQV_In, EQV_Aux), % Only variables, please.
+	varsbag_clean_up(EQV_In, EQV_Tmp), % Only variables, please.
 	varsbag_clean_up(UQV_In, UQV_Tmp), % Only variables, please. EQV /\ UQV = empty.
+%	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: (GoalVars, EQV_Aux, UQV_Tmp)', (GoalVars, EQV_Tmp, UQV_Tmp)),
 
-	varsbag_union(GoalVars, EQV_Aux, EQV),
-	varsbag(UQV_Tmp, EQV, [], UQV_Aux),
+	varsbag_union(GoalVars, EQV_Tmp, EQV_Aux),
+	varsbag(UQV_Tmp, EQV_Aux, [], UQV_Aux),
 
 	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
 	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
