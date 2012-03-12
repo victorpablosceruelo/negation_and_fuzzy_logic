@@ -75,20 +75,30 @@ adequate_frontier(Goal_Frontier, UQV, GoalVars, Proposal, Frontier_In, Frontier_
 	echo_msg(2, 'list', 'cneg_rt', 'adequate_frontier :: Frontier_Out', Frontier_Out).
 
 adequate_frontier(Goal_Frontier, UQV, GoalVars, _Proposal, Frontier_In, _Frontier_Out) :-
-	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier :: (Goal_Frontier, UQV, GoalVars)', (Goal_Frontier, UQV, GoalVars)),
+	echo_msg(1, 'nl', 'cneg_rt', '', ''),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(1, 'nl', 'cneg_rt', '', ''),
+	echo_msg(1, 'list', 'cneg_rt', 'ERROR: adequate_frontier :: Goal_Frontier', Goal_Frontier),
+	echo_msg(1, 'nl', 'cneg_rt', '', ''),
 	echo_msg(1, 'list', 'cneg_rt', 'ERROR: adequate_frontier :: Frontier_In', Frontier_In),
+	echo_msg(1, 'nl', 'cneg_rt', '', ''),
 	!, fail.
 
 adequate_frontier_aux([], _UQV, _GoalVars, _Proposal, Frontier_N_Out, Frontier_N_Out) :- !.
 adequate_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], UQV, GoalVars, Proposal, Frontier_N_In, Frontier_N_Out) :-
+	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: G_F_Pre_Node', G_F_Pre_Node),
 	convert_frontier_prenode_to_nodes(G_F_Pre_Node, UQV, GoalVars, Proposal, [], Frontier_Nodes), !,
+	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: Frontier_Nodes', Frontier_Nodes),
 	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Aux), !,
-	adequate_frontier(G_F_Pre_Nodes, UQV, GoalVars, Proposal, Frontier_N_Aux, Frontier_N_Out).
+	adequate_frontier_aux(G_F_Pre_Nodes, UQV, GoalVars, Proposal, Frontier_N_Aux, Frontier_N_Out).
 
 convert_frontier_prenode_to_nodes(G_F_Pre_Node, UQV, GoalVars, _Proposal, Frontier_N_In, Frontier_N_Out) :-
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
 	split_body_between_E_IE_and_NIE(Body, [], E_IE_Body, [], NIE_Body),
+	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: Body', Body),
+	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: E_IE_Body', E_IE_Body),
+	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: NIE_Body', NIE_Body),
 
 	% Link the query and the pre-node (only goalvars, not uqv).
 	copy_term((Real_Goal, UQV, GoalVars), (Real_Goal_Copy, _UQV_Copy, GoalVars_Copy)),
@@ -99,7 +109,8 @@ convert_frontier_prenode_to_nodes(G_F_Pre_Node, UQV, GoalVars, _Proposal, Fronti
 	% Proposal == 'cneg_rt_Chan',
 	varsbag((Head, Body), GoalVars, [], Pre_Node_UQV), % Identify UQV in Pre_Node
 	eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, Pre_Node_UQV, GoalVars, Frontier_Nodes),
-	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Out).
+	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: Frontier_Nodes', Frontier_Nodes),
+	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Out). % Is order really relevant ???
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,29 +121,72 @@ eval_frontier_prenode_to_get_nodes([], NIE_Body, _UQV, _GoalVars, Frontier_Nodes
 	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
 eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_Nodes) :-
 	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body)', 
-	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body)),
-	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'Attributted Pre_Node_Answers (list) :: '),
-	cneg_diseq_echo(2, 'list', 'cneg_rt', Pre_Node_Answers),
+	eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers),
 	
 	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, UQV, GoalVars, [], Frontier_Nodes), !,
 	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Frontier_Nodes', Frontier_Nodes).
 
+eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body)'),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: UQV', UQV),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: GoalVars', GoalVars),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: NIE_Body', NIE_Body),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
+	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'Attributted Pre_Node_Answers (list) :: '),
+	cneg_diseq_echo(2, 'list', 'cneg_rt', Pre_Node_Answers),
+	!.
+
+eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, _Pre_Node_Answers) :-
+	call(Conj_E_IE_Body), !, % If this succeeds there is an error.
+	echo_msg(1, 'nl', 'cneg_rt', '', ''),
+	echo_msg(1, '', 'cneg_rt', 'ERROR in eval_frontier_prenode_to_get_nodes_aux', 'setof/3 has failed'),
+	echo_msg(1, 'nl', 'cneg_rt', '', ''),
+	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers)'),
+	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: UQV', UQV),
+	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: GoalVars', GoalVars),
+	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: NIE_Body', NIE_Body),
+	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
+ 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
+	!, fail.
+
+eval_frontier_prenode_to_get_nodes_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE_Body, []) :-
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: not satisfiable :: Conj_E_IE_Body', Conj_E_IE_Body), !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 get_eqs_and_diseqs_from_answers([], _UQV, _GoalVars, Frontier_Nodes, Frontier_Nodes).
-get_eqs_and_diseqs_from_answers([(Answer_UQV, Answer_GoalVars, NIE_Body) | Answers], UQV, GoalVars, FN_In, FN_Out) :-
+get_eqs_and_diseqs_from_answers([(Answer_UQV, Answer_GoalVars, NIE_Body) | Answers], UQV, GoalVars, FN_In, FN_Out) :- !,
 
 	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
+	cneg_diseq_echo(2, 'aux', 'cneg_rt', 'Answer_Vars :: '),
+	cneg_diseq_echo(2, '', 'cneg_rt', Answer_Vars),
 	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
+	cneg_diseq_echo(2, 'aux', 'cneg_rt', 'Disequalities :: '),
+	cneg_diseq_echo(2, '', 'cneg_rt', Disequalities),
 
 	copy_term(UQV, Fresh_UQV),
 	get_equalities_list_from_lists(Fresh_UQV, Answer_UQV, Disequalities, Eqs_and_Diseqs_Tmp), 
 	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
+	cneg_diseq_echo(2, 'aux', 'cneg_rt', 'Eqs_and_Diseqs :: '),
+	cneg_diseq_echo(2, '', 'cneg_rt', Eqs_and_Diseqs),
 
 	append(Eqs_and_Diseqs, NIE_Body, Frontier_Node_Body_List),
+	cneg_diseq_echo(2, 'aux', 'cneg_rt', 'Frontier_Node_Body_List :: '),
+	cneg_diseq_echo(2, '', 'cneg_rt', Frontier_Node_Body_List),
 	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
+	!,
 	get_eqs_and_diseqs_from_answers(Answers, UQV, GoalVars, [Frontier_Node_Body | FN_In], FN_Out).
+
+get_eqs_and_diseqs_from_answers(Answers, UQV, GoalVars, FN_In, _FN_Out) :- !,
+	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. Answers', Answers),
+	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. UQV', UQV),
+	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. GoalVars', GoalVars),
+	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. FN_In', FN_In),
+	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -305,11 +359,15 @@ test_frontier_is_valid(F_In, Goal) :-
 	subfrontier_contents(F_In, Goal, _Head, _Body, F_Test),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
-	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: (Goal, F_In)', (Goal, F_In)),
+	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: VALID :: Goal :: ', ''),
+	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
+	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: VALID :: F_In :: ', ''),
+	cneg_diseq_echo(2, '', 'cneg_rt', F_In),
 	!. % Backtracking forbidden. 
 test_frontier_is_valid(F_In, Goal) :-
-	echo_msg(2, '', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: (Goal, F_In)', (Goal, F_In)),
+	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: Goal :: ', ''),
 	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
+	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: F_In :: ', ''),
 	cneg_diseq_echo(2, '', 'cneg_rt', F_In),
 	!, fail.
 
@@ -423,8 +481,8 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empt
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_and_exp(Frontier_In, ExpVars, Frontier_Out):-
 	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
-	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: (E, IE, NIE)', (E, IE, NIE)),
-	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_expw :: ExpVars', ExpVars),
+	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_exp :: (E, IE, NIE)', (E, IE, NIE)),
+	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_exp :: ExpVars', ExpVars),
 
 	split_ie_or_nie_between_imp_and_exp(IE, ExpVars, IE_Imp, IE_Exp),
 	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),

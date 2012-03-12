@@ -27,7 +27,7 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 
 	% Save trace (for debugging and tabling usage)
 	CN_Call = (cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level)), 
-	add_predicate_to_trace(CN_Call, Trace, NewTrace),
+	add_predicate_to_trace(evaluating(CN_Call), Trace, NewTrace),
 	echo_msg(2, 'trace', 'cneg_rt', 'call to cneg_rt/6 with (updated) trace', NewTrace),
 
 	% Now select the adequate code for each negation.
@@ -127,9 +127,9 @@ cneg_rt_test(UQV, GoalVars, Body_First_Unification, Body, Result) :-
 % Please note this mechanism wastes less memory and cpu, 
 % since it goes one by one, but allows backtracking.
 call_to_conjunction_list([], _Level, Trace, CN_Call) :- 
-	add_predicate_to_trace(ended_subfrontiers_for(CN_Call), Trace, Trace_1),
+	add_predicate_to_trace(ended_results_for(CN_Call), Trace, Trace_1),
 	prepare_attributes_for_printing(CN_Call, Attributes_For_Printing_Conj),
-	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_1, Trace_2),
+	add_predicate_to_trace(current_attributes(Attributes_For_Printing_Conj), Trace_1, Trace_2),
 	add_predicate_to_trace('-----------------------', Trace_2, Trace_3),
 	end_trace(Trace_3),
 	echo_msg(2, 'trace', 'cneg_rt', 'call_to_conjunction_list: ', Trace_3),
@@ -137,12 +137,12 @@ call_to_conjunction_list([], _Level, Trace, CN_Call) :-
 
 call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 	add_predicate_to_trace('-----------------------', Trace, Trace_1),
-	add_predicate_to_trace(subfrontier_for(CN_Call), Trace_1, Trace_2),
-	add_predicate_to_trace(Result, Trace_2, Trace_3),
+	add_predicate_to_trace(result_for(CN_Call), Trace_1, Trace_2),
+	add_predicate_to_trace(subgoal(Result), Trace_2, Trace_3),
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
-	add_predicate_to_trace(attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
+	add_predicate_to_trace(with_attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
 	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: goal', CN_Call),
-	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: result', Result),
+	echo_msg(2, 'aux', 'cneg_rt', 'call_to_conjunction_list :: result :: ', ''),
 	cneg_diseq_echo(2, '', 'cneg_rt', Result),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
 	call_to(Result, Level, Trace_5),

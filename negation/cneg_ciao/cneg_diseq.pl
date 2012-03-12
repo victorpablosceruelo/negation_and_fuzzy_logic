@@ -90,7 +90,7 @@ put_attribute_local(Var, Attribute) :-
 
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Disequalities), Target, Disequalities).
-disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
+attribute_disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
 % equality_contents(equality(T1, T2), T1, T2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -243,7 +243,7 @@ format_diseqs_list_for_printing([Disequality | Disequalities], [Print_Disequalit
 % Need to convert to a single term everything.
 % This predicate is not working as expected.
 format_diseq_for_printing(Disequality, Print_Disequality) :-
-	disequality_contents(Disequality, T1, T2, _EQ_Vars_In, UQ_Vars_In),
+	attribute_disequality_contents(Disequality, T1, T2, _EQ_Vars_In, UQ_Vars_In),
 	varsbag_clean_up(UQ_Vars_In, UQ_Vars),
 	varsbag((T1, T2), [], [], Terms_Vars), 
 	varsbag_intersection(UQ_Vars, Terms_Vars, Real_UQ_Vars),
@@ -340,7 +340,7 @@ perform_substitutions([(OldTarget, NewTarget) | MoreSubst], EQV, UQV) :-
 
 get_and_remove_eqv_and_uqv_from_diseqs([], EQV_In, EQV_In, UQV_In, UQV_In, []) :- !.
 get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In, UQV_Out, [(T1, T2) | More_Ts]) :-
-	disequality_contents(Diseq, T1, T2, Diseq_EQV_In, Diseq_UQV_In),
+	attribute_disequality_contents(Diseq, T1, T2, Diseq_EQV_In, Diseq_UQV_In),
 	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV),
 	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV),
 	varsbag(Diseq_EQV, [], EQV_In, EQV_Aux),
@@ -409,7 +409,7 @@ prepare_diseqs_for_restore([], [], _EQV, _UQV, Affected_Vars, Affected_Vars) :- 
 prepare_diseqs_for_restore([(T1, T2) | Diseqs_In], [(Diseq, Vars) | Diseqs_Out], EQV, UQV, Aff_Vars_In, Aff_Vars_Out) :-
 	cneg_aux:varsbag((T1, T2), [], [], Vars), 
 	cneg_aux:varsbag(Vars, [], Aff_Vars_In, Aff_Vars_Aux), !,
-	disequality_contents(Diseq, T1, T2, EQV, UQV),
+	attribute_disequality_contents(Diseq, T1, T2, EQV, UQV),
 	prepare_diseqs_for_restore(Diseqs_In, Diseqs_Out, EQV, UQV, Aff_Vars_Aux, Aff_Vars_Out).
 
 restore_attributes_vars([], _Diseqs) :- !.
@@ -461,8 +461,8 @@ accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :
 	cneg_aux:memberchk(Diseq, Diseq_Acc_In), !, % It is there.
 	accumulate_disequations_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
 accumulate_disequations_aux([(T1, T2) | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
-%	disequality_contents(Diseq, T1, T2, EQV, UQV),
-%	disequality_contents(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
+%	attribute_disequality_contents(Diseq, T1, T2, EQV, UQV),
+%	attribute_disequality_contents(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
 	cneg_aux:memberchk((T2, T1), Diseq_Acc_In), !, % It is there.
 	accumulate_disequations_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
 accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
@@ -871,13 +871,17 @@ get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Di
 
 disequalities_bag_add_diseqs([], Diseqs_In, Diseqs_In) :- !.
 disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :-
-%	term_to_meta(Diseq, Real_Diseq),
-	cneg_aux:memberchk(Diseq, Diseqs_In), !, 
+	attribute_diseq_to_executable_diseq(Diseq, Real_Diseq),
+	cneg_aux:memberchk(Real_Diseq, Diseqs_In), !, 
 	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Out).
 disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :- !,
-%	term_to_meta(Diseq, Real_Diseq),
-	echo_msg(2, '', 'cneg_diseq', 'disequalities_bag_add_diseqs: adding', Diseq), 
-	disequalities_bag_add_diseqs(Disequalities, [Diseq | Diseqs_In], Diseqs_Out).
+	attribute_diseq_to_executable_diseq(Diseq, Real_Diseq),
+	echo_msg(2, '', 'cneg_diseq', 'disequalities_bag_add_diseqs: adding', Real_Diseq), 
+	disequalities_bag_add_diseqs(Disequalities, [Real_Diseq | Diseqs_In], Diseqs_Out).
+
+attribute_diseq_to_executable_diseq(Constraint_Diseq, Executable_Diseq) :-
+	attribute_disequality_contents(Constraint_Diseq, Diseq_1, Diseq_2, EQ_Vars, UQ_Vars),
+	functor_local(Executable_Diseq, 'diseq_geuqv', 5, [Diseq_1 |[ Diseq_2 |[ [] |[ EQ_Vars |[ UQ_Vars ]]]]]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -910,7 +914,7 @@ diseq_geuqv_adv(T1,T2, GoalVars_In, EQV_In, UQV_In, Result) :-
 	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [in] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (GoalVars_In, EQV_In, UQV_In))),
 	adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV, UQV),
 	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [tmp] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
-	disequality_contents(Disequality, T1, T2, EQV, UQV),
+	attribute_disequality_contents(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality], true, Result),
 	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [out] :: ((T1, =/=, T2), Result)', ((T1, '=/=', T2), Result)),
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
