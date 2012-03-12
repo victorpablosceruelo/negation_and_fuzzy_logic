@@ -907,14 +907,14 @@ reverse_list([H_In | L_In], L_Aux, L_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_empty_trace(trace([], _Out)).
-generate_traces_for_conjunction(trace(In, Out), trace(In, Aux), trace(Aux, Out)).
-add_predicate_to_trace(Predicate, trace(In, Out), trace([Predicate | In], Out)).
-end_trace(trace(In, In)).
+generate_empty_trace(trace([], _Out)) :- !.
+generate_traces_for_conjunction(trace(In, Out), trace(In, Aux), trace(Aux, Out)) :- !.
+add_predicate_to_trace(Predicate, trace(In, Out), trace([Predicate | In], Out)) :- !.
+end_trace(trace(In, In)) :- !.
 
 % They should be converted to an string to avoid problems ...
 %	name(Predicate, Predicate_String), !. 
-get_trace_status_list(trace(In, Out), List_Reversed) :- 
+get_trace_status_list(trace(In, Out), List_Reversed) :- !,
 	(
 	    (   var(Out), !, List = In   )  % Get current status.
 	;

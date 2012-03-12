@@ -194,10 +194,11 @@ cneg_diseq_echo(Echo_Level, _Mode, File_Name, Term) :-
 	    
 prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
 	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Term', Term),
-	get_attributes_in_term_vars(Term, Vars_With_Attrs, _Vars_Without_Attrs), 
-	format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing),
-	attrs_list_to_conj(Attributes_For_Printing, Attributes_For_Printing_Conj),
-	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj).
+	get_attributes_in_term_vars(Term, Vars_With_Attrs, _Vars_Without_Attrs), !,
+	format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing), !,
+	attrs_list_to_conj(Attributes_For_Printing, Attributes_For_Printing_Conj), !,
+	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj), 
+	!. % Backtracking forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

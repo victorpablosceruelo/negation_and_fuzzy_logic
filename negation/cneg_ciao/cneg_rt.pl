@@ -51,6 +51,7 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 		),
 		cneg_rt_dynamic(UQV, GoalVars, Goal, Proposal, Result)
 	    ),
+	    !, % Backtracking forbidden.
 	    call_to_conjunction_list(Result, Depth_Level, NewTrace, CN_Call)
 	).
 

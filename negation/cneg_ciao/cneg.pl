@@ -92,9 +92,7 @@ call_to(Predicate, Level_In, Trace) :-
 
 call_to(Predicate, Level_In, _Trace) :- 
 	Level is Level_In + 1,
-	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: Predicate', 'FAILED'), 
-	echo_msg(2, 'nl', 'calls', '', ''), 
-	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: Predicate FAILED was', Predicate), 
+	echo_msg_3pm(2, '', 'calls', 'call_to (L', Level, ') :: FAILED Predicate call. Predicate', Predicate), 
 	echo_msg(2, 'nl', 'calls', '', ''), 
 	!, fail. 
 
