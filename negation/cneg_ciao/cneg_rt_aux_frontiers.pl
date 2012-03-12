@@ -134,7 +134,7 @@ eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, 
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
 	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
-	echo_msg(2, '', 'cneg_rt', 'Pre_Node_Answers with attributes (list) :: '),
+	echo_msg(2, '', 'cneg_rt', 'Pre_Node_Answers with attributes (list) :: ', ''),
 	cneg_diseq_echo(2, 'list', 'cneg_rt', Pre_Node_Answers),
 	!.
 

@@ -147,6 +147,7 @@ call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
 	add_predicate_to_trace(with_attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
 	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: goal', CN_Call),
+	echo_msg(2, 'logo', 'cneg_rt', '', ''),
 	echo_msg(2, 'aux', 'cneg_rt', 'call_to_conjunction_list :: result :: ', ''),
 	cneg_diseq_echo(2, '', 'cneg_rt', Result),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
