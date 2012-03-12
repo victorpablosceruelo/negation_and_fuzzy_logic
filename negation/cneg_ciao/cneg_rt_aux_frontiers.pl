@@ -16,7 +16,15 @@
 :- comment(summary, "This module implements predicates to deal with frontiers.").
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [cneg_diseq_echo/4, get_disequalities_from_constraints_and_remove_them/2]).
+:- use_module(cneg_diseq, 
+	[
+ 	    equality/3, disequality/3,
+	    diseq_geuqv/5, eq_geuqv/5,
+	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
+	    get_disequalities_from_constraints_and_remove_them/2,
+% 	    prepare_attributes_for_printing/2,
+	    cneg_diseq_echo/4
+	]).
 :- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(library(aggregates),[setof/3]).
 

@@ -844,12 +844,12 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
 get_disequalities_from_constraints_and_remove_them(Vars, Disequalities) :-
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_disequalities_from_constraints_and_remove_them :: Vars'),
-	cneg_diseq_echo(2, '', 'cneg_rt', Vars),
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Vars'),
+	cneg_diseq_echo(2, '', 'cneg_diseq', Vars),
 
 	get_disequalities_from_constraints_and_remove_them_aux(Vars, [], [], Disequalities), !,
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_disequalities_from_constraints_and_remove_them :: Disequalities'),
-	cneg_diseq_echo(2, '', 'cneg_rt', Disequalities),
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Disequalities'),
+	cneg_diseq_echo(2, '', 'cneg_diseq', Disequalities),
 	!.
 
 get_disequalities_from_constraints_and_remove_them_aux([], _Visited, Disequalities, Disequalities) :- !.
@@ -871,9 +871,12 @@ get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Di
 
 disequalities_bag_add_diseqs([], Diseqs_In, Diseqs_In) :- !.
 disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :-
+%	term_to_meta(Diseq, Real_Diseq),
 	cneg_aux:memberchk(Diseq, Diseqs_In), !, 
 	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Out).
 disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :- !,
+%	term_to_meta(Diseq, Real_Diseq),
+	echo_msg(2, '', 'cneg_diseq', 'disequalities_bag_add_diseqs: adding', Diseq), 
 	disequalities_bag_add_diseqs(Disequalities, [Diseq | Diseqs_In], Diseqs_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
