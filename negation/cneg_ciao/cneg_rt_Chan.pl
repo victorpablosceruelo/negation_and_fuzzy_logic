@@ -257,9 +257,9 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out):-
 
 % negate_formula(Frontier, Proposal, GoalVars, UQV, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Result)
 % returns Result that is the result from negating the frontier.
-negate_formula(Frontier, _GoalVars, true) :- 
+negate_formula(Frontier, _GoalVars, fail) :- 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-	subfrontier_E_IE_NIE_ie_contents(Frontier, [], [], [], [], []),
+	subfrontier_E_IE_NIE_ie_contents(Frontier, [], [], [], [], []), % Equivalent to true, nothing to negate.
 	!. % Optimization
 
 negate_formula(Frontier, GoalVars, Neg_E_IE_NIE) :-

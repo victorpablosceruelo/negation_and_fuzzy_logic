@@ -159,6 +159,7 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 	Mode == 'list',
 	list_head_and_tail(Term, Head, Tail), !,
+	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
 	cneg_diseq_echo(Echo_Level, '', File_Name, Head),
 	cneg_diseq_echo(Echo_Level, 'list', File_Name, Tail).
 
