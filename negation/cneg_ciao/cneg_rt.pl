@@ -133,8 +133,9 @@ call_to_conjunction_list([], _Level, Trace, CN_Call) :-
 	add_predicate_to_trace(current_attributes(Attributes_For_Printing_Conj), Trace_1, Trace_2),
 	add_predicate_to_trace('-----------------------', Trace_2, Trace_3),
 	end_trace(Trace_3),
-	echo_msg(2, 'trace', 'cneg_rt', 'call_to_conjunction_list: ', Trace_3),
-	echo_msg(2, 'trace', 'trace', 'call_to_conjunction_list: ', Trace_3).
+	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list ', 'EMPTY LIST'),
+	echo_msg(2, 'nl', 'calls_trace', '', ''),
+	echo_msg(2, 'nl', 'calls_trace', '', '').
 
 call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 	add_predicate_to_trace('-----------------------', Trace, Trace_1),
