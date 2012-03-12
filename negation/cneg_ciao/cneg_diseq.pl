@@ -148,12 +148,24 @@ attribute_goals(Term) -->
 	    Mode == 'nl'
 	;
 	    Mode == 'logo'
-	),
+	), !,
 	echo_msg(Echo_Level, Mode, File_Name, '', '').
+
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
+	Mode == 'list',
+	Term == [], !,
+	echo_msg(Echo_Level, Mode, File_Name, '[]', ' -- list end').
+
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
+	Mode == 'list',
+	list_head_and_tail(Term, Head, Tail), !,
+	cneg_diseq_echo(Echo_Level, '', File_Name, Head),
+	cneg_diseq_echo(Echo_Level, 'list', File_Name, Tail).
 
 cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 	Mode \== 'nl', 
 	Mode \== 'logo',
+	Mode \== 'list', !,
 	echo_msg(Echo_Level, 'aux', File_Name, '', Term),
 	prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
 	(
@@ -171,6 +183,10 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 		echo_msg(Echo_Level, 'nl', File_Name, '', '')
 	    )
 	).
+
+cneg_diseq_echo(Echo_Level, _Mode, File_Name, Term) :-
+	echo_msg(1, '', 'cneg_diseq', 'ERROR in cneg_diseq_echo printing', Term), !,
+	cneg_diseq_echo(Echo_Level, '', File_Name, Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -827,18 +843,31 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
-get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities) :-
-	get_disequalities_from_constraints_and_remove_them_aux(Answer_Vars, [], [], Disequalities).
+get_disequalities_from_constraints_and_remove_them(Vars, Disequalities) :-
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_disequalities_from_constraints_and_remove_them :: Vars'),
+	cneg_diseq_echo(2, '', 'cneg_rt', Vars),
+
+	get_disequalities_from_constraints_and_remove_them_aux(Vars, [], [], Disequalities), !,
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_disequalities_from_constraints_and_remove_them :: Disequalities'),
+	cneg_diseq_echo(2, '', 'cneg_rt', Disequalities),
+	!.
 
 get_disequalities_from_constraints_and_remove_them_aux([], _Visited, Disequalities, Disequalities) :- !.
-get_disequalities_from_constraints_and_remove_them_aux([Answer_Var | Answer_Vars], Visited, Diseqs_In, Diseqs_Out) :-
-	get_attribute_local(Answer_Var, Attribute), !,
-	remove_attribute_local(Answer_Var),
-	varsbag(Attribute, [Answer_Var | Visited], [], New_Vars),
-	append(Answer_Vars, New_Vars, New_Answer_Vars),
+%  Optimization: If it has been visited it can not have attribute and this check is much more faster.
+%get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Diseqs_In, Diseqs_Out) :-
+%	cneg_aux:memberchk(Var, Visited), !, 
+%	get_disequalities_from_constraints_and_remove_them_aux(Vars, Visited, Diseqs_In, Diseqs_Out).
+get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Diseqs_In, Diseqs_Out) :-
+	get_attribute_local(Var, Attribute), !,
+	remove_attribute_local(Var),
+	varsbag(Attribute, [Var | Visited], [], More_Vars),
+	append(More_Vars, Vars, New_Vars),
 	attribute_contents(Attribute, _Target, Disequalities),
 	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Aux),
-	get_disequalities_from_constraints_and_remove_them_aux(New_Answer_Vars, [Answer_Var | Visited], Diseqs_Aux, Diseqs_Out).
+	get_disequalities_from_constraints_and_remove_them_aux(New_Vars, [Var | Visited], Diseqs_Aux, Diseqs_Out).
+get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Diseqs_In, Diseqs_Out) :- !,
+	% No attribute in variable.
+	get_disequalities_from_constraints_and_remove_them_aux(Vars, [Var | Visited], Diseqs_In, Diseqs_Out).
 
 disequalities_bag_add_diseqs([], Diseqs_In, Diseqs_In) :- !.
 disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :-

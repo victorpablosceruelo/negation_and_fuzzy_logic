@@ -20,22 +20,24 @@
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
 
-cneg_rt_dynamic(_UQV, GoalVars, Goal, Proposal, Result_List) :-
+cneg_rt_dynamic(UQV_In, GoalVars_In, Goal, Proposal, Result_List) :-
 % cneg_rt_Aux(Goal, GoalVars, Proposal, Result_List) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Proposal', Proposal),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: GoalVars', GoalVars),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (UQV_In, GoalVars_In)', (UQV_In, GoalVars_In)),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Goal', Goal),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg_rt_dynamic(Goal, GoalVars, Proposal))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 %	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (Goal, GoalVars, Proposal)', (Goal, GoalVars, Proposal)),
-	varsbag(GoalVars, [], [], Real_GoalVars), % Clean up non-vars
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Real_GoalVars', Real_GoalVars),
+	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
+	varsbag_clean_up(UQV_In, UQV), % Clean up non-vars in UQV (subterms are not in UQV).
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (UQV, GoalVars)', (UQV, GoalVars)),
+	cneg_diseq_echo(2, 'aux', 'cneg_rt', 'Attributted Goal :: '),
 	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	compute_frontier(Goal, Real_GoalVars, Proposal, Frontier),
+	compute_frontier(UQV, GoalVars, Goal, Proposal, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_dynamic :: Frontier', Frontier),
@@ -46,7 +48,7 @@ cneg_rt_dynamic(_UQV, GoalVars, Goal, Proposal, Result_List) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Summary for Proposal', Proposal),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Goal', Goal),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Real_GoalVars', Real_GoalVars),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (UQV, GoalVars)', (UQV, GoalVars)),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt_dynamic :: Frontier', Frontier),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
