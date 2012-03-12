@@ -5,24 +5,45 @@
 cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2]).
 cneg_choosen_negation(cneg_rt_Chan).
 
-tests(N, C) :- test_queens_1(N, C).
-tests(N, C) :- test_queens_2(N, C).
+tests(N, C) :- 
+	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
+	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
+	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
+	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'tests(N, C) :: value for N :: '),
+	cneg_diseq_echo(1, '', 'ex_peano_queens', N),
+	(
+	    test_queens_1(N, C)
+	;
+	    test_queens_2(N, C)
+	).
 
 test_queens_1(N, Columns) :- % Let's see if we have invalid results.
-	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_1 :: N :: '),
-	cneg_diseq_echo(1, '', 'ex_peano_queens', N),
-%	echo_msg(1, '', '', 'N', N),
 	cneg([], queens(N, Columns)), % First constraints.
+	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
 	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_1 :: queens(N, Columns) :: '),
 	cneg_diseq_echo(1, '', 'ex_peano_queens', queens(N, Columns)),
-	queens(N, Columns). % Secondly values generator.
+	(
+	    queens(N, Columns) % Secondly values generator.
+	;
+	    (  
+		cneg_diseq_echo(1, '', 'ex_peano_queens', 'FAILED'),
+		fail
+	    )
+	).
 
 test_queens_2(N, Columns) :- % Let's see if we have invalid results.
 	queens(N, Columns), % First values generator.
+	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
 	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_2 :: queens(N, Columns) :: '),
 	cneg_diseq_echo(1, '', 'ex_peano_queens', queens(N, Columns)),
-	cneg([], queens(N, Columns)). % Second constraints.
+	(
+	    cneg([], queens(N, Columns)) % Second constraints.
+	;
+	    (  
+		cneg_diseq_echo(1, '', 'ex_peano_queens', 'FAILED'),
+		fail
+	    )
+	).
 
 % queens(N,Columns) returns in Columns the column where we must place each of N
 % queens in a Checkerboard of NxN assuming each position in the list 
