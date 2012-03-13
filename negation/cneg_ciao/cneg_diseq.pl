@@ -5,7 +5,7 @@
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    get_disequalities_from_constraints_and_remove_them/2,
  	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/4
+	    cneg_diseq_echo/5
 	], 
 	[assertions]).
 
@@ -143,7 +143,7 @@ attribute_goals(Term) -->
 %cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 %	echo_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
 
- cneg_diseq_echo(Echo_Level, Mode, File_Name, _Term) :-
+cneg_diseq_echo(Echo_Level, Mode, File_Name, _Msg, _Term) :-
 	(
 	    Mode == 'nl'
 	;
@@ -151,23 +151,23 @@ attribute_goals(Term) -->
 	), !,
 	echo_msg(Echo_Level, Mode, File_Name, '', '').
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
 	Mode == 'list',
 	Term == [], !,
-	echo_msg(Echo_Level, Mode, File_Name, '[]', ' -- list end').
+	echo_msg(Echo_Level, Mode, File_Name, Msg, '[] -- list end').
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
 	Mode == 'list',
 	list_head_and_tail(Term, Head, Tail), !,
 	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
-	cneg_diseq_echo(Echo_Level, '', File_Name, Head),
-	cneg_diseq_echo(Echo_Level, 'list', File_Name, Tail).
+	cneg_diseq_echo(Echo_Level, '', File_Name, Msg, Head),
+	cneg_diseq_echo(Echo_Level, 'list', File_Name, Msg, Tail).
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
-	Mode \== 'nl', 
-	Mode \== 'logo',
-	Mode \== 'list', !,
-	echo_msg(Echo_Level, 'aux', File_Name, '', Term),
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Term, Unused) :-
+	Mode == 'aux', 
+	Unused == '',
+	!, 
+	echo_msg(Echo_Level, 'aux', File_Name, Term, ''),
 	prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
 	(
 	    (   Attributes_For_Printing_Conj == [], !   )  % No attrs -> No printing.
@@ -175,19 +175,31 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
 	    (   Attributes_For_Printing_Conj \== [], !, 
 		echo_msg(Echo_Level, 'aux', File_Name, ' : ', Attributes_For_Printing_Conj)
 	    )
-	),
-%	echo_msg(Echo_Level, 'aux', File_Name, ' ', ' '), % Space for reading.
-	(
-	    (   Mode == 'aux', !   )
-	;
-	    (   Mode \== 'aux', !, 
-		echo_msg(Echo_Level, 'nl', File_Name, '', '')
-	    )
 	).
 
-cneg_diseq_echo(Echo_Level, _Mode, File_Name, Term) :-
+
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
+	Mode == 'aux', 
+	Term \== '',
+	!, 
+	cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, ''),
+	cneg_diseq_echo(Echo_Level, Mode, File_Name, Term, '').
+
+cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
+	Mode \== 'nl', 
+	Mode \== 'logo',
+ 	Mode \== 'list', 
+ 	Mode \== 'aux', 
+	!,
+	cneg_diseq_echo(Echo_Level, 'logo', File_Name, '', ''),
+	cneg_diseq_echo(Echo_Level, 'aux', File_Name, Msg, ' :: '),
+	cneg_diseq_echo(Echo_Level, 'aux', File_Name, Term, ''),
+	echo_msg(Echo_Level, 'nl', File_Name, '', '').
+
+cneg_diseq_echo(Echo_Level, _Mode, File_Name, Msg, Term) :-
+	echo_msg(1, '', 'cneg_diseq', 'ERROR in cneg_diseq_echo printing', Msg), 
 	echo_msg(1, '', 'cneg_diseq', 'ERROR in cneg_diseq_echo printing', Term), !,
-	cneg_diseq_echo(Echo_Level, '', File_Name, Term).
+	cneg_diseq_echo(Echo_Level, '', File_Name, Msg, Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -847,12 +859,10 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
 get_disequalities_from_constraints_and_remove_them(Vars, Disequalities) :-
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Vars'),
-	cneg_diseq_echo(2, '', 'cneg_diseq', Vars),
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
 
 	get_disequalities_from_constraints_and_remove_them_aux(Vars, [], [], Disequalities), !,
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Disequalities'),
-	cneg_diseq_echo(2, '', 'cneg_diseq', Disequalities),
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Disequalities', Disequalities),
 	!.
 
 get_disequalities_from_constraints_and_remove_them_aux([], _Visited, Disequalities, Disequalities) :- !.

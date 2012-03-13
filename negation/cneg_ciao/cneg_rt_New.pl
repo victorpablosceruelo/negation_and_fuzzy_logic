@@ -18,7 +18,7 @@
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
  	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/4
+	    cneg_diseq_echo/5
 	]).
 
 

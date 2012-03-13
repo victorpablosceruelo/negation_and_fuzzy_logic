@@ -8,7 +8,7 @@
 :- comment(summary, "This module implements negation predicates for runtime evaluation.").
 
 :- use_module(cneg_aux, _).
-:- use_module(cneg_diseq, [prepare_attributes_for_printing/2, cneg_diseq_echo/4]).
+:- use_module(cneg_diseq, [prepare_attributes_for_printing/2, cneg_diseq_echo/5]).
 :- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(cneg_tr_hybrid, [cneg_tr_hybrid_negate_literal/4]).
 
@@ -147,9 +147,7 @@ call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
 	add_predicate_to_trace(with_attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
 	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: goal', CN_Call),
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'call_to_conjunction_list :: result :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Result),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'call_to_conjunction_list :: result', Result),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
 	call_to(Result, Level, Trace_5),
 	call_to_conjunction_list(Result_List, Level, Trace_6, CN_Call).

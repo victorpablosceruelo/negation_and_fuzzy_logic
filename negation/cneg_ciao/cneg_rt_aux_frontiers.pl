@@ -23,7 +23,7 @@
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    get_disequalities_from_constraints_and_remove_them/2,
 % 	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/4
+	    cneg_diseq_echo/5
 	]).
 :- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(library(aggregates),[setof/3]).
@@ -131,9 +131,7 @@ eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, 
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
 	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
-	echo_msg(2, 'list', 'cneg_rt', 'setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
-	echo_msg(2, '', 'cneg_rt', 'Pre_Node_Answers with attributes (list) :: ', ''),
-	cneg_diseq_echo(2, 'list', 'cneg_rt', Pre_Node_Answers),
+	cneg_diseq_echo(2, 'list', 'cneg_rt', 'setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
 	!.
 
 eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, _Pre_Node_Answers) :-
@@ -172,25 +170,17 @@ get_eqs_and_diseqs_from_one_answer([], [], [], _UQV, _GoalVars, true) :- !.
 get_eqs_and_diseqs_from_one_answer(Answer_UQV, Answer_GoalVars, NIE_Body, UQV, GoalVars, Frontier_Node_Body) :-
 
 	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'Answer_Vars :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Answer_Vars),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'Answer_Vars', Answer_Vars),
 	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'Disequalities :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Disequalities),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'Disequalities', Disequalities),
 
 	copy_term(UQV, Fresh_UQV),
 	get_equalities_list_from_lists(Fresh_UQV, Answer_UQV, Disequalities, Eqs_and_Diseqs_Tmp), 
 	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'Eqs_and_Diseqs :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Eqs_and_Diseqs),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'Eqs_and_Diseqs', Eqs_and_Diseqs),
 
 	append(Eqs_and_Diseqs, NIE_Body, Frontier_Node_Body_List),
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'Frontier_Node_Body_List :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Frontier_Node_Body_List),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'Frontier_Node_Body_List', Frontier_Node_Body_List),
 	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
 	!.
 
@@ -368,18 +358,12 @@ test_frontier_is_valid(F_In, Goal) :-
 	subfrontier_contents(F_In, Goal, _Head, _Body, F_Test),
 	copy_term((Goal, F_Test), (Goal_Tmp, F_Test_Tmp)),
 	F_Test_Tmp = Goal_Tmp, % Test that test and goal can be unified. 
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: VALID :: Goal :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: VALID :: F_In :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', F_In),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: Goal', Goal),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: F_In', F_In),
 	!. % Backtracking forbidden. 
 test_frontier_is_valid(F_In, Goal) :-
-	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: Goal :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
-	echo_msg(2, 'aux', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: F_In :: ', ''),
-	cneg_diseq_echo(2, '', 'cneg_rt', F_In),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: Goal', Goal),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'test_frontier_is_valid :: NOT VALID :: F_In', F_In),
 	!, fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -2,15 +2,25 @@
 % :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
-cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2]).
+cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2, echo_fail/0, echo_test/2, echo_nl/0]).
 cneg_choosen_negation(cneg_rt_Chan).
+
+echo_nl :- cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', '').
+echo_fail :-
+		cneg_diseq_echo(1, 'aux', 'ex_peano_queens', ' -- FAILED', ''),
+		echo_nl,
+		!,
+		fail.
+
+echo_test(Msg1, Msg2) :-
+	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', ''),
+	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', Msg1, Msg2).
+
 
 tests(N, C) :- 
 	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
-	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
-	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'tests(N, C) :: value for N :: '),
-	cneg_diseq_echo(1, '', 'ex_peano_queens', N),
+	echo_nl,
+	echo_test('tests(N, C) :: value for N :: ', N),
 	(
 	    test_queens_1(N, C)
 	;
@@ -19,30 +29,20 @@ tests(N, C) :-
 
 test_queens_1(N, Columns) :- % Let's see if we have invalid results.
 	cneg([], queens(N, Columns)), % First constraints.
-	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_1 :: queens(N, Columns) :: '),
-	cneg_diseq_echo(1, '', 'ex_peano_queens', queens(N, Columns)),
+ 	echo_test('test_queens_1 :: queens(N, Columns) :: ', queens(N, Columns)),
 	(
 	    queens(N, Columns) % Secondly values generator.
 	;
-	    (  
-		cneg_diseq_echo(1, '', 'ex_peano_queens', 'FAILED'),
-		fail
-	    )
+	    echo_fail
 	).
 
 test_queens_2(N, Columns) :- % Let's see if we have invalid results.
 	queens(N, Columns), % First values generator.
-	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', ''),
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', 'test_queens_2 :: queens(N, Columns) :: '),
-	cneg_diseq_echo(1, '', 'ex_peano_queens', queens(N, Columns)),
+ 	echo_test('test_queens_2 :: queens(N, Columns) :: ', queens(N, Columns)),
 	(
 	    cneg([], queens(N, Columns)) % Second constraints.
 	;
-	    (  
-		cneg_diseq_echo(1, '', 'ex_peano_queens', 'FAILED'),
-		fail
-	    )
+	    echo_fail
 	).
 
 % queens(N,Columns) returns in Columns the column where we must place each of N

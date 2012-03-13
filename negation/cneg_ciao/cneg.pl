@@ -23,7 +23,7 @@
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/4
+	    cneg_diseq_echo/5
 	]).
 :- use_module(cneg_tr).
 :- use_module(cneg_rt, [cneg_rt/6]).
@@ -37,7 +37,7 @@
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/4
+	    cneg_diseq_echo/5
 	]).
 :- reexport(cneg_rt, [cneg_rt/6]).
 %:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
@@ -85,10 +85,7 @@ call_to(Predicate, Level_In, Trace) :-
 	echo_msg(2, 'nl', 'calls_trace', '', ''), 
 	echo_msg(2, 'nl', 'calls_trace', '', ''), 
 	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate), 
-	echo_msg(2, 'logo', 'calls_trace', '', ''), 
-	echo_msg(2, 'aux', 'calls_trace', 'Predicate with attrs :: ', ''), 
-	cneg_diseq_echo(2, '', 'calls_trace', Predicate),
-	echo_msg(2, 'nl', 'calls_trace', '', ''), 
+	cneg_diseq_echo(2, '', 'calls_trace', 'Predicate with attrs', Predicate),
 	get_trace_status_list(Trace, Trace_Status_List),
 	echo_msg(2, 'list', 'calls_trace', 'call_to :: TRACE ', Trace_Status_List),
 	echo_msg(2, 'nl', 'calls_trace', '', ''), 

@@ -34,9 +34,7 @@ cneg_rt_dynamic(UQV_In, GoalVars_In, Goal, Proposal, Result_List) :-
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
 	varsbag_clean_up(UQV_In, UQV), % Clean up non-vars in UQV (subterms are not in UQV).
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt_dynamic :: (UQV, GoalVars)', (UQV, GoalVars)),
-	echo_msg(2, 'logo', 'cneg_rt', '', ''),
-	cneg_diseq_echo(2, 'aux', 'cneg_rt', 'cneg_rt_dynamic :: Goal with attrs :: '),
-	cneg_diseq_echo(2, '', 'cneg_rt', Goal),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'cneg_rt_dynamic :: Goal with attrs', Goal),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	compute_frontier(UQV, GoalVars, Goal, Proposal, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.

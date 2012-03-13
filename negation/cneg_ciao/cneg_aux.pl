@@ -117,6 +117,8 @@ echo_msg(Echo_Level, 'list', File_Name, Pre_Msg, Msg) :-
 	    (echo_msg(Echo_Level, 'normal', File_Name, Pre_Msg, Msg), !)
 	).
 
+echo_msg(1, 'logo', File_Name, Pre_Msg, Msg) :- !, % No logo to stdout.
+	echo_msg(2, 'logo', File_Name, Pre_Msg, Msg).
 echo_msg(Echo_Level, 'logo', File_Name, _Pre_Msg, _Msg) :-
 	echo_msg_aux(Echo_Level, File_Name, '% '), 
 	echo_msg_aux(Echo_Level, File_Name, File_Name), 
