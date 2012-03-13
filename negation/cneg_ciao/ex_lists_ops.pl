@@ -15,7 +15,7 @@ sublist([El|Sub],List):-
 	prefix(P,List),
 	suffix([El|Sub],P).
 
-no_append1(X,Y,Z):-cneg_tr([], append1(X,Y,Z)).
-no_prefix(P,L):-cneg_tr([], prefix(P,L)).
-no_suffix(S,L):-cneg_tr([], suffix(S,L)).
-no_sublist(L1,L2):-cneg_tr([], sublist(L1,L2)).
+no_append1(X,Y,Z):-cneg([], append1(X,Y,Z)).
+no_prefix(P,L):-cneg([], prefix(P,L)).
+no_suffix(S,L):-cneg([], suffix(S,L)).
+no_sublist(L1,L2):-cneg([], sublist(L1,L2)).

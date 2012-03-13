@@ -4,5 +4,5 @@
 even(0).
 even(s(s(X))):- even(X).
 
-odd(X):- cneg_rt([], even(X)).
+odd(X):- cneg([], even(X)).
 

@@ -19,7 +19,7 @@ less(s(X),s(Y)) :- less(X,Y).
 even(0).
 even(s(s(X))) :- even(X).
 
-no_even(X) :- cneg_tr([], even(X)).
+no_even(X) :- cneg([], even(X)).
 
 odd(s(0)).
 odd(s(s(X))) :- odd(X).

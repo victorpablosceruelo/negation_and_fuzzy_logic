@@ -2,8 +2,7 @@ ex_ancestor_and_grandparent.pl
 ex_boole_list.pl
 ex_constructive_negation.pl
 ex_diseqs.pl
-ex_error_in_chan.pl
-ex_error_in_stuckey.pl
+ex_with_errors.pl
 ex_lists_ops.pl
 ex_odd_and_even.pl
 ex_peano_numbers.pl
