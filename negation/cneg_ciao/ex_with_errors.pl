@@ -11,9 +11,9 @@ test_chan :- cneg([], r(Y)), echo(r(Y)), r(Y), echo_error.
 test_stuckey :- cneg([], s(X)), echo(s(X)), s(X), echo_error.
 
 echo(Term) :- 
-	cneg_diseq_echo(1, 'aux', 'ex_ancestor_and_grandparent', 'testing '),
-	cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', Term).
-echo_error :- cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', 'ERROR: test has failed.').
+	cneg_diseq_echo(1, 'aux', 'ex_ancestor_and_grandparent', 'testing ', ''),
+	cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', Term, '').
+echo_error :- cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', 'ERROR: test has failed.', '').
 
 
 s(X) :- disequality(X, Z, []), equality(Z, 3, []). 

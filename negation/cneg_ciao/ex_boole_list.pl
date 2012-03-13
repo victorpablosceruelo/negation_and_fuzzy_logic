@@ -8,9 +8,9 @@ tests :- binary_list(L), echo(binary_list(L)), cneg([], binary_list(L)), echo_er
 tests :- cneg([], binary_list(L)), echo(binary_list(L)), binary_list(L), echo_error.
 
 echo(Term) :- 
-	cneg_diseq_echo(1, 'aux', 'ex_boole_list', 'testing '),
-	cneg_diseq_echo(1, '', 'ex_boole_list', Term).
-echo_error :- cneg_diseq_echo(1, '', 'ex_boole_list', 'ERROR: test has failed.').
+	cneg_diseq_echo(1, 'aux', 'ex_boole_list', 'testing ', ''),
+	cneg_diseq_echo(1, '', 'ex_boole_list', Term, '').
+echo_error :- cneg_diseq_echo(1, '', 'ex_boole_list', 'ERROR: test has failed.', '').
 
 
 boole(0).

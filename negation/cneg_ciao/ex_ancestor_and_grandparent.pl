@@ -1,17 +1,19 @@
 % :- module(ex_ancestor_and_grandparent,_,[.(cneg), .(debugger_pkg)]).
 :- module(ex_ancestor_and_grandparent,_,[.(cneg)]).
 
-cneg_ignores_preds([tests/2, test_parent/2, test_grandparent/2, test_ancestor/2, echo/1, echo_error/0]).
+cneg_ignores_preds([tests/2, test_parent/2, test_grandparent/2, test_ancestor/2, echo/1, echo_error/0, echo_nl/0]).
 cneg_choosen_negation(cneg_rt_Chan).
 
 tests(X, Y) :- test_parent(X, Y).
 tests(X, Y) :- test_grandparent(X, Y).
 tests(X, Y) :- test_ancestor(X, Y).
 
+echo_nl :- cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', '').
 echo(Term) :- 
-	cneg_diseq_echo(1, 'aux', 'ex_ancestor_and_grandparent', 'testing '),
-	cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', Term).
-echo_error :- cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', 'ERROR: test has failed.').
+	cneg_diseq_echo(1, 'aux', 'ex_ancestor_and_grandparent', 'testing ', Term),
+	echo_nl.
+
+echo_error :- cneg_diseq_echo(1, '', 'ex_ancestor_and_grandparent', 'ERROR: test has failed.', '').
 
 test_parent(X, Y) :- cneg([], parent(X, Y)), echo(parent(X, Y)), parent(X, Y), echo_error.
 test_parent(X, Y) :- parent(X, Y), echo(parent(X, Y)), cneg([], parent(X, Y)), echo_error.
