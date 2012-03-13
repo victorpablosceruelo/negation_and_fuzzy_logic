@@ -1,6 +1,9 @@
 :- module(ex_peano_numbers,_,[.(cneg)]).
 %:- module(ex_peano_numbers,_,[.(cneg), .(debugger_pkg)]).
 
+cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2]).
+cneg_choosen_negation(cneg_rt_Chan).
+
 %peano(0,0).
 %peano(N,s(P1)):-
 %	N > 0,

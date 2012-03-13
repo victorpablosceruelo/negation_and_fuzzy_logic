@@ -121,19 +121,17 @@ eval_frontier_prenode_to_get_nodes([], NIE_Body, _UQV, _GoalVars, Frontier_Nodes
 	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
 eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_Nodes) :-
 	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Conj_E_IE_Body', Conj_E_IE_Body),
 	eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers),
 	
 	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, UQV, GoalVars, [], Frontier_Nodes), !,
 	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Frontier_Nodes', Frontier_Nodes).
 
 eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body)'),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: UQV', UQV),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: GoalVars', GoalVars),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: NIE_Body', NIE_Body),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
 	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
+	echo_msg(2, 'list', 'cneg_rt', 'setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
 	echo_msg(2, '', 'cneg_rt', 'Pre_Node_Answers with attributes (list) :: ', ''),
 	cneg_diseq_echo(2, 'list', 'cneg_rt', Pre_Node_Answers),
 	!.
