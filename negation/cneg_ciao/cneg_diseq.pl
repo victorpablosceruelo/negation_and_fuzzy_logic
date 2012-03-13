@@ -159,7 +159,6 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
 cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
 	Mode == 'list',
 	list_head_and_tail(Term, Head, Tail), !,
-	echo_msg(Echo_Level, 'logo', File_Name, '', ''),
 	cneg_diseq_echo(Echo_Level, '', File_Name, Msg, Head),
 	cneg_diseq_echo(Echo_Level, 'list', File_Name, Msg, Tail).
 
@@ -176,7 +175,6 @@ cneg_diseq_echo(Echo_Level, Mode, File_Name, Term, Unused) :-
 		echo_msg(Echo_Level, 'aux', File_Name, ' : ', Attributes_For_Printing_Conj)
 	    )
 	).
-
 
 cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
 	Mode == 'aux', 

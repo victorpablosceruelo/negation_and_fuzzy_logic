@@ -132,6 +132,7 @@ eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, 
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
 	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
 	cneg_diseq_echo(2, 'list', 'cneg_rt', 'setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
+	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
 	!.
 
 eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, _Pre_Node_Answers) :-
@@ -169,18 +170,22 @@ get_eqs_and_diseqs_from_answers(Answers, UQV, GoalVars, FN_In, _FN_Out) :- !,
 get_eqs_and_diseqs_from_one_answer([], [], [], _UQV, _GoalVars, true) :- !.
 get_eqs_and_diseqs_from_one_answer(Answer_UQV, Answer_GoalVars, NIE_Body, UQV, GoalVars, Frontier_Node_Body) :-
 
-	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'Answer_Vars', Answer_Vars),
-	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'Disequalities', Disequalities),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (Answer_UQV, Answer_GoalVars)', (Answer_UQV, Answer_GoalVars)),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (UQV, GoalVars)', (UQV, GoalVars)),
 
+	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answer_Vars', Answer_Vars),
+	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Disequalities', Disequalities),
+
+	% Ojo q al cambiar las UQV hemos de modificar las viejas por las nuevas en las desigualdades ... !!!
 	copy_term(UQV, Fresh_UQV),
 	get_equalities_list_from_lists(Fresh_UQV, Answer_UQV, Disequalities, Eqs_and_Diseqs_Tmp), 
 	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
-	cneg_diseq_echo(2, '', 'cneg_rt', 'Eqs_and_Diseqs', Eqs_and_Diseqs),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Eqs_and_Diseqs', Eqs_and_Diseqs),
 
 	append(Eqs_and_Diseqs, NIE_Body, Frontier_Node_Body_List),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'Frontier_Node_Body_List', Frontier_Node_Body_List),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node_Body_List', Frontier_Node_Body_List),
 	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
 	!.
 
