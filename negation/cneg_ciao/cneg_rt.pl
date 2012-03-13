@@ -15,7 +15,7 @@
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
 % To evaluate predicates only from the top package.
-:- multifile call_to/3.
+:- multifile call_to_predicate/1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,7 +149,7 @@ call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: goal', CN_Call),
 	cneg_diseq_echo(2, '', 'cneg_rt', 'call_to_conjunction_list :: result', Result),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
-	call_to(Result, Level, Trace_5),
+	local_call_to(Result, Level, Trace_5),
 	call_to_conjunction_list(Result_List, Level, Trace_6, CN_Call).
 
 %generate_disjunction_from_list([], fail) :- !.
@@ -157,6 +157,103 @@ call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 %generate_disjunction_from_list([Goal | Goals], (Goal ; Disj_Goals)) :-
 %	Goals \== [],
 %	generate_disjunction_from_list(Goals, Disj_Goals).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+local_call_to(Predicate, Level_In, Trace) :- 
+	Level is Level_In + 1,
+	echo_msg(2, 'nl', 'calls_trace', '', ''), 
+	echo_msg(2, 'nl', 'calls_trace', '', ''), 
+	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate), 
+	cneg_diseq_echo(2, '', 'calls_trace', 'Predicate with attrs', Predicate),
+	get_trace_status_list(Trace, Trace_Status_List),
+	echo_msg(2, 'list', 'calls_trace', 'call_to :: TRACE ', Trace_Status_List),
+	echo_msg(2, 'nl', 'calls_trace', '', ''), 
+	local_call_to_aux(Predicate, Level, Trace).
+
+local_call_to(Predicate, Level_In, _Trace) :- 
+	Level is Level_In + 1,
+	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: FAILED Predicate call. Predicate', Predicate), 
+%	echo_msg(2, 'nl', 'calls_trace', '', ''), 
+	!, fail. 
+
+local_call_to_aux(Predicate, Level_In, Trace) :-
+	goal_is_disjunction(Predicate, G1, G2), !,
+	Level is Level_In + 1,
+	(
+	    (
+		(       echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', G1), 
+			local_call_to_aux(G1, Level, Trace),
+			echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', 'OK'),
+			echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2', 'OK')
+		)
+	    ;
+		(       echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2 :: G1', 'FAIL'),
+			echo_msg(2, 'nl', 'calls_trace', '', ''), % Differentiate paths.
+			echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2 :: G2', G2), 
+			local_call_to_aux(G2, Level, Trace),
+			echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2 :: G2', 'OK'),
+			echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2', 'OK')
+		)
+	    )
+	;
+	    (           echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2 :: G2', 'FAIL'),
+			echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 \\/ G2', 'FAIL'), 
+			fail 
+	    )
+	).
+
+local_call_to_aux(Predicate, Level_In, Trace) :-
+	goal_is_conjunction(Predicate, G1, G2), !,
+	Level is Level_In + 1,
+	generate_traces_for_conjunction(Trace, Trace_G1, Trace_G2),
+	(   % 1st conjunct
+	    (	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', G1),
+		local_call_to_aux(G1, Level, Trace_G1),
+		echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', 'OK')
+	    )
+	;
+	    (	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2 :: G1', 'FAIL'),
+		echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2', 'FAIL'),
+		fail 
+	    )
+	),
+	(   % 2nd conjunct
+	    (   echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2 :: G2', G2),
+		local_call_to_aux(G2, Level, Trace_G2),
+		echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2 :: G2', 'OK'),
+		echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2', 'OK')
+	    )
+	;
+	    (   echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2 :: G2', 'FAIL'),
+		echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: G1 /\\ G2', 'FAIL'),
+		fail   
+	    )
+	).
+
+local_call_to_aux(Predicate, Level_In, Trace) :-
+	Level is Level_In + 1,
+	goal_is_cneg_rt(Predicate, UQV, GoalVars, Goal, Proposal),
+	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate),
+	cneg_rt(UQV, GoalVars, Goal, Proposal, Level, Trace),
+	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: SUCCEED Predicate call. Predicate', Predicate).
+
+local_call_to_aux(Predicate, Level_In, Trace) :-
+	Level is Level_In + 1,
+	goal_is_not_negation(Predicate),
+	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate),
+	add_predicate_to_trace(Predicate, Trace, NewTrace),
+	end_trace(NewTrace),
+	call_to_predicate(Predicate),
+	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: SUCCEED Predicate call. Predicate', Predicate).
+
+
+%local_call_to_aux(Predicate, Level_In) :- 
+%	Level is Level_In + 1,
+%	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate - FAILED -', Predicate),
+%	!, fail. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

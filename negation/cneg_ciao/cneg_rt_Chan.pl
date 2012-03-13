@@ -330,9 +330,8 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	(   (   Eq_UQV = [], !   )
 	;
 	    (
-		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the equality', ''),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: eq_geuqv(T1, T2, GoalVars, EQV, UQV)', Formula),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: but the current implementation can.', '')
+		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the equality below, but ours can.', ''),
+		echo_msg(1, '', 'cneg_rt', 'WARNING: eq_geuqv(T1, T2, GoalVars, EQV, UQV)', Formula)
 	    )
 	),
 
@@ -342,9 +341,8 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	(   (   Diseq_UQV = [], !   )
 	;
 	    (
-		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the resultant disequality', ''),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: diseq_geuqv(T1, T2, GoalVars, EQV, UQV)', Neg_Atom),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: but the current implementation can.', '')
+		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the disequality below, but ours can.', ''),
+		echo_msg(1, '', 'cneg_rt', 'WARNING: diseq_geuqv(T1, T2, GoalVars, EQV, UQV)', Neg_Atom)
 	    )
 	).
 
