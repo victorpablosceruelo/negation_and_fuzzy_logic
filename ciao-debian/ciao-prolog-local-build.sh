@@ -110,14 +110,14 @@ ${CIAOSETUP} configure \
     --with_gsl=no --with_ppl=no \
     --with_java_interface=yes \
     --with_ant=yes \
-    --optimizing_compiler=yes \
+    --optimizing_compiler=no \
     --use_threads=yes \
     --use_posix_locks=no \
     --and_parallel_execution=no \
     --par_back=no \
     --tabled_execution=no \
-    --optim_level=optimized \
-    --with_chr=yes \
+    --optim_level=normal \
+    --with_chr=no \
     --with_ciaoppcl=no \
     --compress_lib=no \
     --unused_pred_warnings=no \
