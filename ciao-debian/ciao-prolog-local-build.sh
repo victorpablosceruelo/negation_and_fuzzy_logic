@@ -125,7 +125,7 @@ ${CIAOSETUP} configure \
 echo " "
 echo " "
 echo " " 
-read -p "Press enter to continue with Ciao Prolog compilation"
+#read -p "Press enter to continue with Ciao Prolog COMPILATION"
 echo_ten
 
 # Fixes
@@ -150,7 +150,7 @@ echo_ten
 echo_ten
 ./${CIAOSETUP} docs
 echo_ten
-read -p "Press enter to continue with Ciao Prolog compilation"
+read -p "Press enter to continue with Ciao Prolog INSTALLATION"
 echo_ten
 ./${CIAOSETUP} install
 
