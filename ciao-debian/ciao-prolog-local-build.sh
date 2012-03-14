@@ -9,7 +9,7 @@ if [ -z "$1" ] || [ "$1" == "" ]; then
 	echo "usage: $0 nocheckout "
 	echo "example: $0 14440 "
 	echo "example: $0 14482 "
-	echo "example: $0 14505 "
+	echo "example: $0 14505 <- YES (at least as pbuilder pkg)"
 	echo "example: $0 14566 <- NO "
 	echo "example: $0 14580 <- NO "
 	echo " "
