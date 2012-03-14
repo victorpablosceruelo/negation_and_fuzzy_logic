@@ -113,10 +113,10 @@ ${CIAOSETUP} configure \
     --par_back=no \
     --tabled_execution=no \
     --optim_level=optimized \
-    --with_chr=no \
+    --with_chr=yes \
     --with_ciaoppcl=no \
     --compress_lib=no \
-    --unused_pred_warnings=yes \
+    --unused_pred_warnings=no \
     --runtime_checks=no \
     --set_flag_options=yes 
 
