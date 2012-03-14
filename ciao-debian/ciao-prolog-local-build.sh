@@ -144,8 +144,8 @@ function nocompile_nor_distribute () {
 }
 
 echo "FIXES:"
-nocompile_nor_distribute ciao/contrib/clpfd
-nocompile_nor_distribute ciao/contrib/difference_constraints
+#nocompile_nor_distribute ciao/contrib/clpfd
+#nocompile_nor_distribute ciao/contrib/difference_constraints
 echo_ten
 
 ./${CIAOSETUP} build
