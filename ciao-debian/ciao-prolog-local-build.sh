@@ -113,7 +113,7 @@ ${CIAOSETUP} configure \
     --par_back=no \
     --tabled_execution=no \
     --optim_level=optimized \
-    --with_chr=yes \
+    --with_chr=no \
     --with_ciaoppcl=no \
     --compress_lib=no \
     --unused_pred_warnings=yes \
@@ -126,9 +126,29 @@ echo " "
 read -p "Press enter to continue with Ciao Prolog compilation"
 echo_ten
 
+# Fixes
+function nocompile_nor_distribute () {
+    if [ ! -z "$1" ] && [ ! "$1" == "" ] && [ -d "$1" ]; then
+	touch $1/NOCOMPILE
+	pushd $1
+	ls -1 *.pl > NOCOMPILE 2>&1
+	popd
+	touch $1/NODISTRIBUTE
+    else
+	echo "Erroneous folder: $1"
+    fi
+}
+
+echo "FIXES:"
+nocompile_nor_distribute ciao/contrib/clpfd
+nocompile_nor_distribute ciao/contrib/difference_constraints
+echo_ten
+
 ./${CIAOSETUP} build
 echo_ten
 ./${CIAOSETUP} docs
+echo_ten
+read -p "Press enter to continue with Ciao Prolog compilation"
 echo_ten
 ./${CIAOSETUP} install
 
