@@ -6,6 +6,7 @@ if [ -z "$1" ] || [ "$1" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
 	echo "usage: $0 SVN_REVISION_CIAO "
+	echo "usage: $0 nocheckout "
 	echo "example: $0 14440 "
 	echo " "
 	exit 0
@@ -13,8 +14,21 @@ else
 	REVISION="$1"
 fi;
 
+function echo_ten() {
+    echo " "
+    echo " "
+    echo " " 
+    echo " "
+    echo " "
+    echo " " 
+    echo " "
+    echo " "
+    echo " " 
+    echo " "
+}
+
 # Compilation script.
-CIAOSETUP=./ciaosetup
+CIAOSETUP="./ciaosetup"
 
 # Repositories urls.
 REPOS_1=svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk
@@ -33,38 +47,50 @@ echo " "
 if [ -d .svn ]; then
 	echo "updating CIAO to revision $REVISION from $REPOS_1"
 	svn revert -R .
-	svn update --revision $REVISION
+	if [ ! "$REVISION" == "nocheckout" ]; then
+	    svn update --revision $REVISION
+	fi
 else
 	echo "checking out CIAO to revision $REVISION from $REPOS_1"
-	svn co $REPOS_1 . --revision $REVISION
+	if [ ! "$REVISION" == "nocheckout" ]; then
+	    svn co $REPOS_1 . --revision $REVISION
+	fi
 fi
-popd
 echo " "
 
 echo " "
-$(CIAOSETUP) clean
+${CIAOSETUP} clean
 echo " "
-$(CIAOSETUP) clean_config
+${CIAOSETUP} clean_config
 echo " "
-$(CIAOSETUP) realclean
+${CIAOSETUP} realclean
 echo " "
-$(CIAOSETUP) braveclean
+${CIAOSETUP} braveclean
 echo " "
 
 # exit 0
+echo_ten
 
-$(CIAOSETUP) configure \
-    --stop-if-error=yes \
 #    --registration_type=all \
-    --registration_type=user \
 #    --instype=global \
-    --instype=local
 #    --prefix=/usr \
-    --prefix=~/secured/local \
-    --execmode=755 
-    --datamode=644 
 #    --installgroup=root \
 #    --update_bashrc=no \
+#    --optim_level=normal \
+#    --prefix=~/secured/local \
+#    --htmldir=~/public_html/ciao-manual \
+#    --htmlurl=http://localhost/ciao-manual \
+#    --docdir=~/secured/local/share/doc/ciao-prolog \
+#    --mandir=~/secured/local/share/man \
+#    --infodir=~/secured/local/share/info \
+#    --web_images_path=~/secured/local/share/doc/ciao-prolog/html \
+
+${CIAOSETUP} configure \
+    --stop-if-error=yes \
+    --registration_type=user \
+    --instype=local \
+    --execmode=755 \
+    --datamode=644 \
     --update_bashrc=yes \
     --dotbashrc=~/.bashrc \
     --update_cshrc=no \
@@ -75,12 +101,6 @@ $(CIAOSETUP) configure \
     --dotemacs=~/.emacs \
     --emacsinitdir=~/.emacs.d \
     --update_dotxemacs=no \
-    --htmldir=~/public_html/ciao-manual \
-    --htmlurl=http://localhost/ciao-manual \
-    --docdir=~/secured/local/share/doc/ciao-prolog \
-    --mandir=~/secured/local/share/man \
-    --infodir=~/secured/local/share/info \
-    --web_images_path=~/secured/local/share/doc/ciao-prolog/html \
     --with_mysql=yes \
     --mysql_client_directory=/usr/lib \
     --with_gsl=no --with_ppl=no \
@@ -92,7 +112,6 @@ $(CIAOSETUP) configure \
     --and_parallel_execution=no \
     --par_back=no \
     --tabled_execution=no \
-#    --optim_level=normal \
     --optim_level=optimized \
     --with_chr=yes \
     --with_ciaoppcl=no \
@@ -101,6 +120,18 @@ $(CIAOSETUP) configure \
     --runtime_checks=no \
     --set_flag_options=yes 
 
-./$(CIAOSETUP) build
-./$(CIAOSETUP) docs
+echo " "
+echo " "
+echo " " 
+read -p "Press enter to continue with Ciao Prolog compilation"
+echo_ten
 
+./${CIAOSETUP} build
+echo_ten
+./${CIAOSETUP} docs
+echo_ten
+./${CIAOSETUP} install
+
+echo " "
+popd
+echo " "
