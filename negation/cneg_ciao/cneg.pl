@@ -93,5 +93,5 @@ call_to_predicate(Predicate) :- call(Predicate).
 :- load_compilation_module(.('cneg_tr')).
 
 % trans_sent/3 makes the transformation.
-:- add_sentence_trans(trans_sent/3, 750). % TODO: Right priority?
+:- add_sentence_trans(trans_sent/3, 740). % TODO: Right priority?
 % :- add_clause_trans(trans_clause/3). % Only for debug !!!
