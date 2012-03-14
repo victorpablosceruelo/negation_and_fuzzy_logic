@@ -8,6 +8,7 @@ if [ -z "$1" ] || [ "$1" == "" ]; then
 	echo "usage: $0 SVN_REVISION_CIAO "
 	echo "usage: $0 nocheckout "
 	echo "example: $0 14440 "
+	echo "example: $0 14580 "
 	echo " "
 	exit 0
 else
