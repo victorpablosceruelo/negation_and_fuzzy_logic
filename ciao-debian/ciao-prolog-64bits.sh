@@ -23,7 +23,15 @@ echo " "
 set | grep "\(ABS\|CIAO\)"
 echo " "
 
-exit 0
+if [ -z "$1" ] || [ "$1" == "" ]; then 
+	exit 0
+fi
+
+TEST=`set | grep "\(ABS\|CIAO\)"`
+if [ -z "$TEST" ] || [ "$TEST" == "" ]; then
+	echo "Environment variables not set-up."
+	exit 0
+fi
 
 pushd ~/secured/tests/CiaoDE_trunk
 pushd optim_comp
