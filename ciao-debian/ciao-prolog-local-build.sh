@@ -165,6 +165,7 @@ nocompile_nor_distribute ciao/contrib/clpfd
 nocompile_nor_distribute ciao/contrib/difference_constraints
 nocompile_nor_distribute ciao/contrib/ppl/0_10
 nocompile_nor_distribute ciao/contrib/ppl/0_9
+rm -fv ciao/contrib/cneg/NOCOMPILE ciao/contrib/cneg/NODISTRIBUTE
 
 echo_ten
 
