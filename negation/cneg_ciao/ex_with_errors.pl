@@ -22,3 +22,6 @@ q(V, W) :- disequality((Z, W), (3, W), []), equality(V, Z, []).
 r(V) :- q(V, _W).
 
 p(X) :- disequality(struct(X, _Y), struct(a, b), []).
+
+test_occur_check :- m(X, X).
+m(Y, f(Y)).
