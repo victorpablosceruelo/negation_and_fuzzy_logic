@@ -56,7 +56,7 @@
 remove_attribute_local(Var) :- 
 	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
 	echo_msg(2, 'aux', 'cneg_diseq', 'remove_attribute_local :: Var :: ', Var),
-	del_attr(Var),
+	del_attr_local(Var),
 %	detach_attribute(Var),
 	echo_msg(2, 'aux', 'cneg_diseq', '  -->> Var :: ', Var),
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
@@ -64,7 +64,7 @@ remove_attribute_local(Var) :-
 % XSB:	del_attr(Var, dist).
 
 get_attribute_local(Var, Attribute) :-
-	get_attr(Var, Attribute),
+	get_attr_local(Var, Attribute),
 %	get_attribute(Var, Attribute),
 % XSB:	get_attr(Var, dist, Attribute),
  	echo_msg(2, '', 'cneg_diseq', 'get_attribute_local :: Attribute', Attribute).
@@ -75,7 +75,7 @@ put_attribute_local(Var, Attribute) :-
 	echo_msg(2, 'aux', 'cneg_diseq', 'put_attribute_local', ''),
 	echo_msg(2, 'aux', 'cneg_diseq', ' :: Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
-	put_attr(Var, Attribute),
+	put_attr_local(Var, Attribute),
 %	attach_attribute(Var, Attribute),
 	echo_msg(2, 'aux', 'cneg_diseq', '  -->> Var :: ', Var),
 	echo_msg(2, 'nl', 'cneg_diseq', '', '').
