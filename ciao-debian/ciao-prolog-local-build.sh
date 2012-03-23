@@ -2,11 +2,11 @@
 
 # set -x
 
-if [ -z "$1" ] || [ "$1" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
-	echo "usage: $0 SVN_REVISION_CIAO "
-	echo "usage: $0 nocheckout "
+	echo "usage: $0 SVN_REVISION_CIAO (reset|noreset)"
+	echo "usage: $0 nocheckout (reset|noreset)"
 	echo "example: $0 14440 "
 	echo "example: $0 14482 "
 	echo "example: $0 14505 <- YES (at least as pbuilder pkg)"
@@ -16,6 +16,7 @@ if [ -z "$1" ] || [ "$1" == "" ]; then
 	exit 0
 else
 	REVISION="$1"
+	RESET="$2"
 fi;
 
 function echo_ten() {
@@ -49,9 +50,14 @@ pushd $FOLDER_NAME
 # Update and export the Ciao's repository
 echo " "
 if [ -d .git ]; then
-    echo "return the entire working tree to the last committed state "
-    echo "git reset --hard HEAD "
-    git reset --hard HEAD
+    if [ ! -z "$RESET" ] && [ ! "$RESET"=="noreset" ]; then
+        echo "return the entire working tree to the last committed state "
+        echo "git reset --hard HEAD "
+	git reset --hard HEAD
+    else
+	echo "Not returning to the last committed state (useful for testing)"
+    fi
+    echo " "
     echo "updating CIAO to revision $REVISION from $REPOS_1"
     # svn revert -R .
     if [ ! "$REVISION" == "nocheckout" ]; then
