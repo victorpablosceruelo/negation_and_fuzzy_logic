@@ -48,16 +48,19 @@ pushd $FOLDER_NAME
 
 # Update and export the Ciao's repository
 echo " "
-if [ -d .svn ]; then
-	echo "updating CIAO to revision $REVISION from $REPOS_1"
-	svn revert -R .
-	if [ ! "$REVISION" == "nocheckout" ]; then
-	    svn update --revision $REVISION
-	fi
+if [ -d .git ]; then
+    echo "return the entire working tree to the last committed state "
+    echo "git reset --hard HEAD "
+    git reset --hard HEAD
+    echo "updating CIAO to revision $REVISION from $REPOS_1"
+    # svn revert -R .
+    if [ ! "$REVISION" == "nocheckout" ]; then
+	git svn fetch --revision $REVISION
+    fi
 else
 	echo "checking out CIAO to revision $REVISION from $REPOS_1"
 	if [ ! "$REVISION" == "nocheckout" ]; then
-	    svn co $REPOS_1 . --revision $REVISION
+	    git svn clone $REPOS_1 . --revision $REVISION
 	fi
 fi
 echo " "
