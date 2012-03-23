@@ -164,6 +164,8 @@ call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
 
 local_call_to(Predicate, Level_In, Trace) :- 
 	Level is Level_In + 1,
+	echo_msg(2, 'statistics', 'cneg_rt', '', (local_call_to(Predicate, Level))),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'calls_trace', '', ''), 
 	echo_msg(2, 'nl', 'calls_trace', '', ''), 
 	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate), 

@@ -54,6 +54,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cneg(UQV, Predicate) :-
+
+	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg(UQV, Predicate))),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+
 	(
 	    (   cneg_choosen_negation(Negation_Mechanism), !   )
 	;
