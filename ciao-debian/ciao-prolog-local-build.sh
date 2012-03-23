@@ -50,6 +50,9 @@ pushd $FOLDER_NAME
 # Update and export the Ciao's repository
 echo " "
 if [ -d .git ]; then
+    echo "Current status of git repository: "
+    git status --untracked-files=no
+    echo " "
     if [ ! -z "$RESET" ] && [ ! "$RESET"=="noreset" ]; then
         echo "return the entire working tree to the last committed state "
         echo "git reset --hard HEAD "
@@ -83,6 +86,11 @@ echo " "
 
 # exit 0
 echo_ten
+echo "Current status of git repository: "
+git status --untracked-files=no
+echo_ten
+git status
+echo_ten
 
 #    --registration_type=all \
 #    --instype=global \
@@ -97,6 +105,7 @@ echo_ten
 #    --mandir=~/secured/local/share/man \
 #    --infodir=~/secured/local/share/info \
 #    --web_images_path=~/secured/local/share/doc/ciao-prolog/html \
+#    --with_ciaoppcl=no \
 
 ${CIAOSETUP} configure \
     --stop-if-error=yes \
@@ -127,9 +136,8 @@ ${CIAOSETUP} configure \
     --tabled_execution=no \
     --optim_level=normal \
     --with_chr=no \
-    --with_ciaoppcl=no \
     --compress_lib=no \
-    --unused_pred_warnings=no \
+    --unused_pred_warnings=yes \
     --runtime_checks=no \
     --set_flag_options=yes 
 
