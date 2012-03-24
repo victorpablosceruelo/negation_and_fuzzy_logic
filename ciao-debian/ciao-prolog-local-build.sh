@@ -2,7 +2,7 @@
 
 # set -x
 
-if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
 	echo "usage: $0 SVN_REVISION_CIAO (reset|noreset)"
@@ -16,7 +16,11 @@ if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
 	exit 0
 else
 	REVISION="$1"
-	RESET="$2"
+	if [ -z "$2" ] || [ "$2" == "" ]; then
+		RESET="reset"
+	else
+		RESET="$2"
+	fi
 fi;
 
 function echo_ten() {
@@ -53,7 +57,7 @@ if [ -d .git ]; then
     echo "Current status of git repository: "
     git status --untracked-files=no
     echo " "
-    if [ ! -z "$RESET" ] && [ ! "$RESET"=="noreset" ]; then
+    if [ "$RESET"=="reset" ]; then
         echo "return the entire working tree to the last committed state "
         echo "git reset --hard HEAD "
 	git reset --hard HEAD
