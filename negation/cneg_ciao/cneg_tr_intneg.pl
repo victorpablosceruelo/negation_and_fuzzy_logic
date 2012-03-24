@@ -1,7 +1,7 @@
 
 :- module(cneg_tr_intneg,[generate_tr_intneg_cls/4, cneg_tr_intneg_negate_literal/4],[assertions]).
 :- use_module(cneg_aux, _).
-:- use_module(library(terms), _).
+%:- use_module(library(terms), _).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,7 +18,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-name_main_negation_predicate("cneg_rt_intneg").
+%name_main_negation_predicate("cneg_rt_intneg").
 prefix_main_clauses("cneg_tr_intneg_").
 prefix_auxiliary_clauses("cneg_tr_intneg_aux_").
 
@@ -26,14 +26,18 @@ prefix_auxiliary_clauses("cneg_tr_intneg_aux_").
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+generate_tr_intneg_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :- % Disabled INTNEG
+	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: Cls_In', (Cls_In)),
+	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: List_Of_Preds', (List_Of_Preds)),
+	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
+	Cls_Out = Cls_In, !. 
+
 generate_tr_intneg_cls(List_Of_Preds, List_Of_H_and_B, Cls_In, Cls_Out) :-
 	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: Cls_In', (Cls_In)),
 	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: List_Of_Preds', (List_Of_Preds)),
 	echo_msg(2, '', 'cneg_tr_intneg', 'generate_tr_intneg_cls :: List_Of_H_and_B', (List_Of_H_and_B)),
-
-%	generate_tr_intneg_main_clauses(List_Of_Preds, Cls_In, Cls_Aux),
-%	generate_tr_intneg_auxiliary_clauses(List_Of_H_and_B, Cls_Aux, Cls_Out).
-	Cls_Out = Cls_In.
+	generate_tr_intneg_main_clauses(List_Of_Preds, Cls_In, Cls_Aux),
+	generate_tr_intneg_auxiliary_clauses(List_Of_H_and_B, Cls_Aux, Cls_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

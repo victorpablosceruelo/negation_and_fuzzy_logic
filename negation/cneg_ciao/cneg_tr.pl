@@ -10,7 +10,7 @@
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(library(aggregates),[findall/3]).
 :- use_module(cneg_aux, _).
-:- use_module(library(terms), _).
+%:- use_module(library(terms), _).
 :- use_module(cneg_tr_hybrid, [generate_tr_hybrid_cls/4]).
 :- use_module(cneg_tr_intneg, [generate_tr_intneg_cls/4]).
 
