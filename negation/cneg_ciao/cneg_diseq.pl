@@ -326,25 +326,25 @@ attr_unify_hook_aux(Attribute, Value) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-perform_substitutions([], _EQV, _UQV) :- !.
-perform_substitutions([(OldTarget, NewTarget) | MoreSubst], EQV, UQV) :-
-	varsbag(UQV, [], [], UQV_Aux), !, % Only vars, please.
-	varsbag(EQV, UQV_Aux, [], EQV_Aux), !, % Only vars, please.
-	varsbag((OldTarget, NewTarget), [], [], Vars_Targets), !,
-	varsbag_intersection(Vars_Targets, UQV_Aux, Intersection), !,
-	(
-	    (
-		Intersection == [], !,
-		OldTarget = NewTarget,
-		perform_substitutions(MoreSubst, EQV_Aux, UQV_Aux)
-	    )
-	;
-	    (
-		Intersection \== [], !,
-		echo_msg(2, '', 'cneg_diseq', 'perform_substitutions :: Impossible :: (OldTarget, NewTarget, EQV, UQV)', (OldTarget, NewTarget, EQV_Aux, UQV_Aux)),
-		!, fail
-	    )
-	).
+%perform_substitutions([], _EQV, _UQV) :- !.
+%perform_substitutions([(OldTarget, NewTarget) | MoreSubst], EQV, UQV) :-
+%	varsbag(UQV, [], [], UQV_Aux), !, % Only vars, please.
+%	varsbag(EQV, UQV_Aux, [], EQV_Aux), !, % Only vars, please.
+%	varsbag((OldTarget, NewTarget), [], [], Vars_Targets), !,
+%	varsbag_intersection(Vars_Targets, UQV_Aux, Intersection), !,
+%	(
+%	    (
+%		Intersection == [], !,
+%		OldTarget = NewTarget,
+%		perform_substitutions(MoreSubst, EQV_Aux, UQV_Aux)
+%	    )
+%	;
+%	    (
+%		Intersection \== [], !,
+%		echo_msg(2, '', 'cneg_diseq', 'perform_substitutions :: Impossible :: (OldTarget, NewTarget, EQV, UQV)', (OldTarget, NewTarget, EQV_Aux, UQV_Aux)),
+%		!, fail
+%	    )
+%	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -698,12 +698,12 @@ simplify_disequation_aux_var_nonvar([(T1, T2) | More_Diseqs], Answer, EQV_In, Ca
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-remove_vars_with_attributes([], []) :- !.
-remove_vars_with_attributes([Var|List_In], List_Out) :-   % If variables have attributes, remove them from the bag.
-	get_attribute_local(Var, _Attribute), !,
-	remove_vars_with_attributes(List_In, List_Out).
-remove_vars_with_attributes([Var|List_In], [Var|List_Out]) :- % Keep only vars without attributes.
-	remove_vars_with_attributes(List_In, List_Out).
+%remove_vars_with_attributes([], []) :- !.
+%remove_vars_with_attributes([Var|List_In], List_Out) :-   % If variables have attributes, remove them from the bag.
+%	get_attribute_local(Var, _Attribute), !,
+%	remove_vars_with_attributes(List_In, List_Out).
+%remove_vars_with_attributes([Var|List_In], [Var|List_Out]) :- % Keep only vars without attributes.
+%	remove_vars_with_attributes(List_In, List_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

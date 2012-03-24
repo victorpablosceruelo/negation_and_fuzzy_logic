@@ -16,6 +16,7 @@
 :- comment(summary, "This module implements predicates to deal with frontiers.").
 
 :- use_module(cneg_aux, _).
+:- push_prolog_flag(unused_pred_warnings, no).
 :- use_module(cneg_diseq, 
 	[
  	    equality/3, disequality/3,
@@ -25,6 +26,7 @@
 % 	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5
 	]).
+:- pop_prolog_flag(unused_pred_warnings).
 :- use_module(cneg_rt_dynamic, [cneg_rt_dynamic/5]).
 :- use_module(library(aggregates),[setof/3]).
 
@@ -126,7 +128,8 @@ eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_
 	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, UQV, GoalVars, [], Frontier_Nodes), !,
 	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Frontier_Nodes', Frontier_Nodes).
 
-:- meta_predicate eval_frontier_prenode_to_get_nodes_aux(?, ?, ?, goal, ?).
+:- push_prolog_flag(unused_pred_warnings, no).
+%:- meta_predicate eval_frontier_prenode_to_get_nodes_aux(?, ?, ?, goal, ?).
 eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
@@ -150,6 +153,7 @@ eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, 
 
 eval_frontier_prenode_to_get_nodes_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE_Body, []) :-
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: not satisfiable :: Conj_E_IE_Body', Conj_E_IE_Body), !.
+:- pop_prolog_flag(unused_pred_warnings).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
