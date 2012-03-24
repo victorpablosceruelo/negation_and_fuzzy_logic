@@ -24,8 +24,7 @@
 	    % term_name_is_qualified/1, remove_qualification/2, 
 	    replace_in_term_vars_by_values/4,
 	    replace_in_term_var_by_value/4,
-	    % replace_in_args_var_by_value/4,
-	    % replace_in_term_variables_by_values/4,
+	    replace_in_terms_list_var_by_value/4,
 	    retrieve_element_from_list/2,
 	    split_goal_with_disjunctions_into_goals/3,
 	    generate_empty_trace/1,
@@ -36,7 +35,7 @@
 	],
 	[assertions]).
 
-:- use_module(library(aggregates),[setof/3]).
+% :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(prolog_sys), [statistics/0]).
 :- use_module(library(write), [write/1, write/2]).
 
@@ -164,8 +163,8 @@ echo_msg_3pm(Echo_Level, Mode, File_Name, Pre_Msg_1, Pre_Msg_2, Pre_Msg_3, Msg) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg_is_a_list([]).
-echo_msg_is_a_list([_Elto|_List]).
+%echo_msg_is_a_list([]).
+%echo_msg_is_a_list([_Elto|_List]).
 
 echo_msg_list(Echo_Level, File_Name, Index, Pre_Msg, []) :-
 	echo_msg_list_aux(Echo_Level, File_Name, Index, Pre_Msg, []),
@@ -329,7 +328,7 @@ unify_list_of_terms([Arg1|Args1], [Arg2|Args2]) :- !,
 	unify_terms(Arg1, Arg2),
 	unify_list_of_terms(Args1, Args2).
 
-unify_variables(Term, Term) :- !.
+% unify_variables(Term, Term) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -672,15 +671,6 @@ remove_qualification_aux([_A|NameIn], NameOut) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-replace_in_term_vars_by_values(Term_Out, [], [], Term_Out) :- !.
-replace_in_term_vars_by_values(Term_In, [Var | Vars], [Value | Values], Term_Out):-
-	replace_in_term_var_by_value(Term_In, Var, Value, Term_Aux), !,
-	replace_in_term_vars_by_values(Term_Aux, Vars, Values, Term_Out).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % replace_in_term_var_by_value(Term1, Var, Value, Term2) 
 % returns Term2 that is Term1 when Var is substituted by Value.
 replace_in_term_var_by_value(Term,Var,Value,Value):-
@@ -694,26 +684,26 @@ replace_in_term_var_by_value(Term,Var,_Value,Term):-
 replace_in_term_var_by_value(Term,Var,Value,Term1):-
 	var(Var),
 	Term=..[Functor|Args],
-	replace_in_args_var_by_value(Args,Var,Value,Args1),
+	replace_in_terms_list_var_by_value(Args,Var,Value,Args1),
 	Term1=..[Functor|Args1].
 
 % replace_in_args_var_by_value(Args_In, Var, Value, Args_Out) 
 % applies replace_in_term_var_by_value/4 to all the arguments in Args.
-replace_in_args_var_by_value([], _Var, _Value, []).
-replace_in_args_var_by_value([Arg_In|Args_In], Var, Value, [Arg_Out|Args_Out]):-
+replace_in_terms_list_var_by_value([], _Var, _Value, []).
+replace_in_terms_list_var_by_value([Arg_In|Args_In], Var, Value, [Arg_Out|Args_Out]):-
 	replace_in_term_var_by_value(Arg_In, Var, Value, Arg_Out),
-	replace_in_args_var_by_value(Args_In, Var, Value, Args_Out).
+	replace_in_terms_list_var_by_value(Args_In, Var, Value, Args_Out).
 
 % replace_in_term_variables_by_values(LVars,LValues,Term1,Term2) returns in Term2 the same term
 % Term1 but substituting each variable Vi from the position i of LVars
 % by the value Valuei from the position i of LValues
-replace_in_term_variables_by_values(Term, [], [], Term).
-replace_in_term_variables_by_values(Term_In, [Var|LVars], [Value|LValues], Term_Out):-
+replace_in_term_vars_by_values(Term, [], [], Term).
+replace_in_term_vars_by_values(Term_In, [Var|LVars], [Value|LValues], Term_Out):-
 	var(Var),!, % Don't do this if Var is not a variable.
 	replace_in_term_var_by_value(Term_In, Var, Value, Term_Tmp),
-	replace_in_term_variables_by_values(Term_Tmp, LVars, LValues, Term_Out).
-replace_in_term_variables_by_values(Term_In, [_Var|LVars], [_Value|LValues], Term_Out):-
-	replace_in_term_variables_by_values(Term_In, LVars, LValues, Term_Out).
+	replace_in_term_vars_by_values(Term_Tmp, LVars, LValues, Term_Out).
+replace_in_term_vars_by_values(Term_In, [_Var|LVars], [_Value|LValues], Term_Out):-
+	replace_in_term_vars_by_values(Term_In, LVars, LValues, Term_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
