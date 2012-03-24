@@ -5,21 +5,21 @@
 
 :- use_module(cneg_aux, _).
 :- use_module(cneg_rt_aux_frontiers, 
-	[  subfrontier_contents/5, 
+	[  % subfrontier_contents/5, 
 	   subfrontier_E_IE_NIE_contents/4,
 	   subfrontier_E_IE_NIE_ie_contents/6,
 	   split_subfrontier_into_E_IE_NIE/2,
 	   rebuild_conjunction_of_goals/3,
 	   split_IE_NIE_between_imp_and_exp/3
 	]).
-:- use_module(cneg_diseq, 
-	[ 
+%:- use_module(cneg_diseq, 
+%	[ 
  	    % equality/3, disequality/3,
-	    diseq_geuqv/5, eq_geuqv/5,
-	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
- 	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/5
-	]).
+	    %diseq_geuqv/5, eq_geuqv/5,
+	    %diseq_geuqv_adv/6, eq_geuqv_adv/6,
+ 	    %prepare_attributes_for_printing/2,
+	    %cneg_diseq_echo/5
+%	]).
 
 %:- use_module(library(cneg_diseq),[cneg_diseq/3]).
 % Esta linea para cuando cneg sea una libreria.

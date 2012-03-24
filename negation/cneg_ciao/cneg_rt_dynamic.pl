@@ -15,7 +15,7 @@
 :- use_module(cneg_rt_aux_frontiers, _).
 :- use_module(cneg_rt_New, _).
 :- use_module(cneg_rt_Chan, _).
-:- use_module(cneg_rt_Stuckey, _).
+%:- use_module(cneg_rt_Stuckey, _).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.

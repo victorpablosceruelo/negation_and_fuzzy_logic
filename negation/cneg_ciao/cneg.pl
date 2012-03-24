@@ -46,7 +46,7 @@
 :- multifile cneg_choosen_negation/1.
 :- multifile cneg_pre_frontier/6.
 :- multifile call_to_predicate/1.
-:- meta_predicate call_to_predicate(?). % /3.
+:- meta_predicate call_to_predicate(?). % /1.
 %:- export(call_to/3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

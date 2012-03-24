@@ -8,7 +8,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-name_main_negation_predicate("cneg_hybrid").
+%name_main_negation_predicate("cneg_hybrid").
 prefix_main_clauses("cneg_tr_hybrid_cneg_").
 prefix_auxiliary_clauses("cneg_tr_hybrid_aux_").
 prefix_double_negation_clauses("cneg_tr_hybrid_dneg_").
