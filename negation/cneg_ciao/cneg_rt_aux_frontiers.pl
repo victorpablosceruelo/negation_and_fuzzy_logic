@@ -128,7 +128,7 @@ eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_
 	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, UQV, GoalVars, [], Frontier_Nodes), !,
 	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Frontier_Nodes', Frontier_Nodes).
 
-:- push_prolog_flag(unused_pred_warnings, no).
+%:- push_prolog_flag(unused_pred_warnings, no).
 %:- meta_predicate eval_frontier_prenode_to_get_nodes_aux(?, ?, ?, goal, ?).
 eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
@@ -153,7 +153,7 @@ eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, 
 
 eval_frontier_prenode_to_get_nodes_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE_Body, []) :-
 	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: not satisfiable :: Conj_E_IE_Body', Conj_E_IE_Body), !.
-:- pop_prolog_flag(unused_pred_warnings).
+%:- pop_prolog_flag(unused_pred_warnings).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
