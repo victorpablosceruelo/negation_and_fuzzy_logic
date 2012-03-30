@@ -179,6 +179,8 @@ get_eqs_and_diseqs_from_one_answer(Answer_UQV, Answer_GoalVars, NIE_Body, UQV, G
 
 	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
 	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answer_Vars', Answer_Vars),
+	% There is a bug here: a variable can have attributes coming from a higher level, 
+	% and this ones are NOT part of the current frontier.
 	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
 	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Disequalities', Disequalities),
 
