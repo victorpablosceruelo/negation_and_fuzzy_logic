@@ -36,9 +36,46 @@ public class UploadServlet extends HttpServlet {
 	private int maxMemSize = 50000 * 1024;
 	private File file ;
 
+	private int test_directory(String dirPath) {
+		if (dirPath==null) {
+			return 1;
+		}
+		try {
+			File dir = new File(dirPath);
+			dir.mkdirs();
+		} 
+		catch (Exception ex) {
+			System.out.println(ex);
+			return 1;
+		}
+		return 0;
+	}
+	
 	public void init( ){
+		int res = 0;
+		
 		// Get the file location where it would be stored.
-		filePath = getServletContext().getInitParameter("file-upload"); 
+		filePath=System.getProperty("java.io.tmpdir");
+		res = test_directory(filePath);
+		if (res == 0){
+			filePath = filePath + "/java-apps/fuzzy-search/";
+			res = test_directory(filePath);
+		}
+		
+		if (res != 0){
+			filePath = getServletContext().getInitParameter("file-upload");
+			res = test_directory(filePath);
+		}
+		
+		if (res != 0){
+			filePath="/home/java-apps/fuzzy-search/";
+			res = test_directory(filePath);
+		}
+		
+		if (res != 0){
+			filePath="/tmp/java-apps/fuzzy-search/";
+			res = test_directory(filePath);
+		}
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -58,11 +95,12 @@ public class UploadServlet extends HttpServlet {
 			out.println("</html>");
 			return;
 		}
+		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// maximum size that will be stored in memory
 		factory.setSizeThreshold(maxMemSize);
 		// Location to save data that is larger than maxMemSize.
-		factory.setRepository(new File("/tmp/uploads/"));
+		factory.setRepository(new File("/tmp/uploads"));
 
 		// Create a new file upload handler
 		ServletFileUpload upload = new ServletFileUpload(factory);
@@ -83,25 +121,26 @@ public class UploadServlet extends HttpServlet {
 			out.println("<body>");
 			while ( i.hasNext () ) 
 			{
-				FileItem fi = (FileItem)i.next();
-				if ( !fi.isFormField () )	
+				FileItem fileItem = (FileItem)i.next();
+				if ( !fileItem.isFormField () )	
 				{
 					// Get the uploaded file parameters
 					//	            String fieldName = fi.getFieldName();
-					String fileName = fi.getName();
+					String fileName = fileItem.getName();
+					String fileNameReal = ""; 
 					//	            String contentType = fi.getContentType();
 					//	            boolean isInMemory = fi.isInMemory();
 					//	            long sizeInBytes = fi.getSize();
 					// Write the file
 					if( fileName.lastIndexOf("\\") >= 0 ){
-						file = new File( filePath + 
-								fileName.substring( fileName.lastIndexOf("\\"))) ;
+						fileNameReal = filePath + fileName.substring( fileName.lastIndexOf("\\"));
+
 					}else{
-						file = new File( filePath + 
-								fileName.substring(fileName.lastIndexOf("\\")+1)) ;
+						fileNameReal = filePath + fileName.substring(fileName.lastIndexOf("\\")+1);
 					}
-					fi.write( file ) ;
-					out.println("Uploaded Filename: " + fileName + "<br>");
+					file = new File( fileNameReal ) ;
+					fileItem.write( file ) ;
+					out.println("Uploaded Filename: " + fileName + "to" + fileNameReal + "<br>");
 				}
 			}
 			out.println("</body>");
