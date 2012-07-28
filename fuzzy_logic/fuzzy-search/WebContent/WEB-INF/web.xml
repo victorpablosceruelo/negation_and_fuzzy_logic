@@ -22,8 +22,8 @@
 	<servlet>
 		<description></description>
 		<display-name>Hello World Servlet</display-name>
-		<servlet-name>HelloWorld</servlet-name>
-		<servlet-class>tests.HelloWold</servlet-class>
+		<servlet-name>HelloWorldServlet</servlet-name>
+		<servlet-class>tests.HelloWoldServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>HelloWorld</servlet-name>
