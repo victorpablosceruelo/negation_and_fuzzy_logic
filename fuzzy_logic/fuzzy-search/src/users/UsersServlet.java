@@ -13,13 +13,17 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/UsersServlet")
 public class UsersServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+    
+	UsersClass users = null;
+	
     /**
      * @see HttpServlet#HttpServlet()
      */
     public UsersServlet() {
         super();
-        // TODO Auto-generated constructor stub
+    	if (users == null) {
+    		users = new UsersClass();
+    	}
     }
 
 	/**
@@ -27,6 +31,8 @@ public class UsersServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		UsersClass.test();
 	}
 
 	/**

@@ -8,5 +8,10 @@
 </head>
 <body>
 
+<FORM ENCTYPE='multipart/form-data' method='POST' action="UsersServlet">
+<INPUT TYPE='file' NAME='fuzzy-database' size="50">
+<INPUT TYPE='submit' VALUE='Upload File'>
+</FORM>
+
 </body>
 </html>

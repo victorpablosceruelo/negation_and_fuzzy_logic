@@ -1,6 +1,5 @@
 package uploads;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,13 +9,15 @@ import java.io.*;
 import java.util.*;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.output.*;
+//import org.apache.commons.fileupload.FileUploadException;
+//import org.apache.commons.io.output.*;
 
-import storage.StorageClass;
-import storage.StorageClass.ValidPaths;
+import auxiliar.StorageClass;
+import auxiliar.StorageClass.ValidPaths;
+import auxiliar.Castings;
+
 
 
 @WebServlet("/UploadServlet")
@@ -70,10 +71,10 @@ public class UploadServlet extends HttpServlet {
 
 		try{ 
 			// Parse the request to get file items.
-			List /* FileItem */ fileItems = upload.parseRequest(request);
+			List<FileItem> fileItems = Castings.castList(FileItem.class, upload.parseRequest(request));
 
 			// Process the uploaded file items
-			Iterator i = fileItems.iterator();
+			Iterator<FileItem> i = fileItems.iterator();
 
 			out.println("<html>");
 			out.println("<head>");

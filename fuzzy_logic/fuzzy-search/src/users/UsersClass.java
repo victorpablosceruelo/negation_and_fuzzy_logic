@@ -1,6 +1,9 @@
 package users;
 import java.sql.*;
 
+import auxiliar.StorageClass;
+import auxiliar.StorageClass.ValidPaths;
+
 public class UsersClass {
 
 /*
@@ -15,6 +18,8 @@ public class UsersClass {
 	 } catch (Exception e) {
 	 }
 */
+	
+	StorageClass storage = new StorageClass();
 
 	public UsersClass() {
 		test();
@@ -26,7 +31,9 @@ public class UsersClass {
 			try {
 				Class.forName("SQLite.JDBCDriver");
 				// Note: /test.db is the test.db in the *current* working directory
-				c = DriverManager.getConnection("jdbc:sqlite:/test.db","","");
+				
+				String database = "jdbc:sqlite:" + storage.getPath(ValidPaths.usersDB);
+				c = DriverManager.getConnection(database,"","");
 				c.setAutoCommit(false);
 
 				Statement st = c.createStatement();
