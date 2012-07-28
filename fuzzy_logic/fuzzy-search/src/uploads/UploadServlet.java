@@ -32,8 +32,8 @@ public class UploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private boolean isMultipart;
 	private String filePath;
-	private int maxFileSize = 50 * 1024;
-	private int maxMemSize = 4 * 1024;
+	private int maxFileSize = 50000 * 1024;
+	private int maxMemSize = 50000 * 1024;
 	private File file ;
 
 	public void init( ){
