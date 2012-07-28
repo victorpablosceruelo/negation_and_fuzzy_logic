@@ -9,6 +9,7 @@
 *_co.pl 
 *_shfr_co* 
 *~
+*.class
 \#*.*\#
 packed/*
 debug_file*.pl
