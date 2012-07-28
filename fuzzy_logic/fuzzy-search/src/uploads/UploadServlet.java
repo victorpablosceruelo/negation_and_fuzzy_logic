@@ -9,18 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.ServletConfig;
-/*import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
- */
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.output.*;
+
+import storage.StorageClass;
+import storage.StorageClass.ValidPaths;
 
 
 @WebServlet("/UploadServlet")
@@ -36,46 +32,11 @@ public class UploadServlet extends HttpServlet {
 	private int maxMemSize = 50000 * 1024;
 	private File file ;
 
-	private int test_directory(String dirPath) {
-		if (dirPath==null) {
-			return 1;
-		}
-		try {
-			File dir = new File(dirPath);
-			dir.mkdirs();
-		} 
-		catch (Exception ex) {
-			System.out.println(ex);
-			return 1;
-		}
-		return 0;
-	}
+
 	
 	public void init( ){
-		int res = 0;
-		
-		// Get the file location where it would be stored.
-		filePath=System.getProperty("java.io.tmpdir");
-		res = test_directory(filePath);
-		if (res == 0){
-			filePath = filePath + "/java-apps/fuzzy-search/";
-			res = test_directory(filePath);
-		}
-		
-		if (res != 0){
-			filePath = getServletContext().getInitParameter("file-upload");
-			res = test_directory(filePath);
-		}
-		
-		if (res != 0){
-			filePath="/home/java-apps/fuzzy-search/";
-			res = test_directory(filePath);
-		}
-		
-		if (res != 0){
-			filePath="/tmp/java-apps/fuzzy-search/";
-			res = test_directory(filePath);
-		}
+		StorageClass aux = new StorageClass(this);
+		filePath = aux.getPath(ValidPaths.programs);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -140,7 +101,8 @@ public class UploadServlet extends HttpServlet {
 					}
 					file = new File( fileNameReal ) ;
 					fileItem.write( file ) ;
-					out.println("Uploaded Filename: " + fileName + "to" + fileNameReal + "<br>");
+					out.println("Uploaded Filename: " + fileName + "<br>");
+					out.println("Destiny Filename: " + fileNameReal + "<br>");
 				}
 			}
 			out.println("</body>");

@@ -4,14 +4,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Initial page</title>
+<title>Add user to the application</title>
 </head>
 <body>
-
-<H1>Testing the server</H1>
-
-<a href="upload.jsp">Upload</a>
-<a href="addUser.jsp">Add User</a>
 
 </body>
 </html>
