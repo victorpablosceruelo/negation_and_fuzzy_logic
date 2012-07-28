@@ -17,13 +17,13 @@ import javax.servlet.*;
  * Servlet implementation class HelloWorld
  */
 @WebServlet("/HelloWorld")
-public class HelloWorld extends HttpServlet {
+public class HelloWorldServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public HelloWorld() {
+    public HelloWorldServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
