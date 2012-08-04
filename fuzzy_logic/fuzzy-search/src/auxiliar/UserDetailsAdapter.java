@@ -1,28 +1,20 @@
 package auxiliar;
 
 @Service("userDetailsAdapter")
-public class UserDetailsAdapter {   
+public class UserDetailsAdapter extends org.springframework.security.core.userdetails.User {
+    private final Long id;
+    public UserDetailsAdapter(User userEntity) {
 
-    private Long id;
-
-    org.springframework.security.core.userdetails.User buildUserFromUserEntity(User userEntity) {
-        String username = userEntity.getUsername();
-        String password = userEntity.getPassword();
-        boolean enabled = userEntity.isEnabled();
-        boolean accountNonExpired = true;
-        boolean credentialsNonExpired = true;
-        boolean accountNonLocked = true;
-
-        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        for (String authority: userEntity.getAuthorities()) {
-
-            authorities.add(new GrantedAuthorityImpl(authority));
-        }
-
+        super(userEntity.getUsername(), userEntity.getPassword(), userEntity.isEnabled(), true, true, true, toAuthorities(userEntity.getAuthorities()));
         this.id = userEntity.getId();
+    }
 
-        org.springframework.security.core.userdetails.User user = new org.springframework.security.core.userdetails.User(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-        return user;
+    private static Collection<GrantedAuthority> toAuthorities(List<String> authorities) {
+        Collection<GrantedAuthority> authorityList = new ArrayList<GrantedAuthority>();
+        for (String authority: authorities) {
+            authorityList.add(new GrantedAuthorityImpl(authority));
+        }
+        return authorityList;
     }
 
     public Long getId() {

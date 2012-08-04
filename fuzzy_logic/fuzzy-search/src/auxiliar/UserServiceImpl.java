@@ -23,8 +23,7 @@ public class UserServiceImpl implements UserService {
     public void createUser(User user) {
         userDao.create(user);
 
-        UserDetailsAdapter userDetailsAdapter = new UserDetailsAdapter();
-        org.springframework.security.core.userdetails.User userDetails =  userDetailsAdapter.buildUserFromUserEntity(user);
+        UserDetailsAdapter userDetails = new UserDetailsAdapter(user);
         String password = userDetails.getPassword();
         Object salt = saltSource.getSalt(userDetails);
         user.setPassword(passwordEncoder.encodePassword(password, salt));

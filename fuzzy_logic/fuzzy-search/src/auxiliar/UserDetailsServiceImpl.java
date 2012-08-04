@@ -6,9 +6,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserDao userDao;
 
-    @Autowired
-    private UserDetailsAdapter userDetailsAdapter;
-
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
         UserDetails userDetails = null;
         User userEntity = userDao.findByUsername(username);
@@ -16,7 +13,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userEntity == null) {
           throw new UsernameNotFoundException("user not found");
         }
-        userDetails = userDetailsAdapter.buildUserFromUserEntity(userEntity);
+        userDetails = new UserDetailsAdapter(userEntity);
 
         return userDetails;
     }
