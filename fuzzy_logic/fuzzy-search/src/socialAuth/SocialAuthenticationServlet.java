@@ -149,7 +149,9 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	    	//url = new String(".");
 	    	//response.sendRedirect( url );
 	    	//LOG.info("Redirecting to: " + url);
-	    }    
+	    }
+	    
+
 
 		
 		// AuthForm authForm = (AuthForm) form;
@@ -181,9 +183,10 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			authForm.setSocialAuthManager(manager);
 		}
 
-		System.out.println("Redirecting ...");
+		System.out.println("Redirecting to open authentication service for "+id);
 		// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
-		String returnToUrl = new String("/socialAuthenticationServlet");
+		String returnToUrl = getUrlFromRequest(request); 
+		// new String("/socialAuthenticationServlet");
 		url = manager.getAuthenticationUrl(id, returnToUrl);
 		LOG.info("Redirecting to: " + url);
 		if (url != null) {
@@ -331,15 +334,15 @@ public class SocialAuthenticationServlet extends HttpServlet {
 
 		// Get the values of all request parameters
 		Enumeration<String> parametersList = request.getParameterNames();
-		String parameterName="";
-		String parameterValue="";
+		String parameterName;
+		// String parameterValue;
 		while (parametersList.hasMoreElements()) {
 			// Get the name of the request parameter
 			parameterName = (String)parametersList.nextElement();
 			out.println(parameterName+" = ");
 
 			// Get the value of the request parameter
-			parameterValue = request.getParameter(parameterName);
+			// parameterValue = request.getParameter(parameterName);
 
 			// If the request parameter can appear more than once in the query string, get all values
 			String[] values = request.getParameterValues(parameterName);
@@ -350,6 +353,16 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			out.println(" ");
 		}
 		out.close();
+	}
+	
+	private String getUrlFromRequest(HttpServletRequest req) {
+	    String requestUrl = req.getRequestURL().toString();
+	    String queryString = req.getQueryString();   // d=789
+	    if (queryString != null) {
+	        requestUrl += "?"+queryString;
+	    }
+	    LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
+	    return requestUrl;
 	}
 }
 

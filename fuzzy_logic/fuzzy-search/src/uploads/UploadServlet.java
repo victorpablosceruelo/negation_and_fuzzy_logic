@@ -11,6 +11,10 @@ import java.util.*;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import socialAuth.SocialAuthenticationServlet;
 //import org.apache.commons.fileupload.FileUploadException;
 //import org.apache.commons.io.output.*;
 
@@ -27,18 +31,13 @@ public class UploadServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	final Log LOG = LogFactory.getLog(UploadServlet.class);
+	private static String filesPath = "";
+	
 	private boolean isMultipart;
-	private String filePath;
 	private int maxFileSize = 50000 * 1024;
 	private int maxMemSize = 50000 * 1024;
 	private File file ;
-
-
-	
-	public void init( ){
-		StorageClass aux = new StorageClass(this);
-		filePath = aux.getPath(ValidPaths.programs);
-	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
@@ -68,6 +67,10 @@ public class UploadServlet extends HttpServlet {
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		// maximum file size to be uploaded.
 		upload.setSizeMax( maxFileSize );
+		
+		if ((filesPath==null) || (filesPath.equals(""))) {
+			whereShouldBeUploadedTheFile();
+		}
 
 		try{ 
 			// Parse the request to get file items.
@@ -95,10 +98,10 @@ public class UploadServlet extends HttpServlet {
 					//	            long sizeInBytes = fi.getSize();
 					// Write the file
 					if( fileName.lastIndexOf("\\") >= 0 ){
-						fileNameReal = filePath + fileName.substring( fileName.lastIndexOf("\\"));
+						fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
 
 					}else{
-						fileNameReal = filePath + fileName.substring(fileName.lastIndexOf("\\")+1);
+						fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
 					}
 					file = new File( fileNameReal ) ;
 					fileItem.write( file ) ;
@@ -118,6 +121,35 @@ public class UploadServlet extends HttpServlet {
 		throw new ServletException("GET method used with " +
 				getClass( ).getName( )+": POST method required.");
 	} 
+	
+	private void whereShouldBeUploadedTheFile() {
+		// Reconfigure only the first time.
+		if ((filesPath==null) || (filesPath.equals(""))) {
+			// Try the different options one by one.
+			test_files_path("/home/java-apps/fuzzy-search/");
+			test_files_path(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
+			test_files_path(getServletContext().getInitParameter("file-upload"));
+			test_files_path("/tmp/java-apps/fuzzy-search/");
+		}
+	}
+	
+	private void test_files_path(String tmp_filesPath) {
+		boolean retval = false;
+		if (filesPath.equals("")) {
+			File dir; 
+			try {
+				dir = new File(tmp_filesPath);
+				retval = dir.mkdirs();
+			} 
+			catch (Exception ex) {
+				LOG.info("testFilesPath: not valid: " + tmp_filesPath);
+				LOG.info("Exception: " + ex);
+			}
+			if (retval) filesPath = tmp_filesPath;
+		}
+	}
+
+	
 }
 
 
