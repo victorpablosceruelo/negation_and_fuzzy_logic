@@ -1,20 +1,19 @@
 package auxiliar;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 public class HibernationSessionClass {
 
 	private static Session session = null;
-	SessionFactory sessionFactory = null;
-	
-	public HibernationSessionClass () {
-		private static SessionFactory sessionFactory;
-		private static ServiceRegistry serviceRegistry;
+	private static SessionFactory sessionFactory = null;
+	private static ServiceRegistry serviceRegistry;
 
-		private static SessionFactory configureSessionFactory() throws
-		HibernateException {
+	public static SessionFactory configureSessionFactory() throws HibernateException {
 		    Configuration configuration = new Configuration();
 		    configuration.configure();
 		    serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
