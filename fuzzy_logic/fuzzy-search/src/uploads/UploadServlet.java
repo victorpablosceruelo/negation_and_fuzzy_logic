@@ -14,12 +14,10 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import socialAuth.SocialAuthenticationServlet;
-//import org.apache.commons.fileupload.FileUploadException;
-//import org.apache.commons.io.output.*;
+// import socialAuth.SocialAuthenticationServlet;
+// import org.apache.commons.fileupload.FileUploadException;
+// import org.apache.commons.io.output.*;
 
-import auxiliar.StorageClass;
-import auxiliar.StorageClass.ValidPaths;
 import auxiliar.Castings;
 
 
@@ -123,29 +121,39 @@ public class UploadServlet extends HttpServlet {
 	} 
 	
 	private void whereShouldBeUploadedTheFile() {
-		// Reconfigure only the first time.
-		if ((filesPath==null) || (filesPath.equals(""))) {
-			// Try the different options one by one.
-			test_files_path("/home/java-apps/fuzzy-search/");
-			test_files_path(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
-			test_files_path(getServletContext().getInitParameter("file-upload"));
-			test_files_path("/tmp/java-apps/fuzzy-search/");
-		}
+		// Try the different options one by one.
+		test_files_path("/home/java-apps/fuzzy-search/");
+		test_files_path(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
+		test_files_path(getServletContext().getInitParameter("file-upload"));
+		test_files_path("/tmp/java-apps/fuzzy-search/");
+		LOG.info("choosen folder for uploads: " + filesPath);
 	}
 	
-	private void test_files_path(String tmp_filesPath) {
+	private void test_files_path(String newFilesPath) {
+		LOG.info("testFilesPath: testing: " + newFilesPath);
 		boolean retval = false;
-		if (filesPath.equals("")) {
-			File dir; 
-			try {
-				dir = new File(tmp_filesPath);
-				retval = dir.mkdirs();
-			} 
-			catch (Exception ex) {
-				LOG.info("testFilesPath: not valid: " + tmp_filesPath);
-				LOG.info("Exception: " + ex);
+		String testFolder=newFilesPath+".test";
+		if ((filesPath!=null) && (! filesPath.equals(""))) {
+			return; // No need to update its value.
+		}
+		if ((newFilesPath==null) || (newFilesPath.equals(""))){
+			return; // Invalid input value
+		}
+			
+		File dir; 
+		try {
+			dir = new File(testFolder);
+			if (dir.exists()) {
+				dir.delete();
 			}
-			if (retval) filesPath = tmp_filesPath;
+			retval = dir.mkdirs();
+		} 
+		catch (Exception ex) {
+			LOG.info("testFilesPath: not valid: " + newFilesPath);
+			LOG.info("Exception: " + ex);
+		}
+		if (retval) {
+			filesPath = newFilesPath;
 		}
 	}
 
