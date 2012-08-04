@@ -9,11 +9,11 @@
    <generator class="assigned"/>
   </id>
 
-  <property name="firstName">
-   <column name="FIRSTNAME" />
+  <property name="userFirstName">
+   <column name="USERFIRSTNAME" />
   </property>
-  <property name="lastName">
-  <column name="LASTNAME"/>
+  <property name="userLastName">
+  <column name="USERLASTNAME"/>
   </property>
   <property name="userName">
   <column name="USERNAME"/>

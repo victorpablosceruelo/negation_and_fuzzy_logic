@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UsersServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
-	UsersClass users = null;
+	UserClass users = null;
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -41,7 +41,7 @@ public class UsersServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		Boolean error_en_conexion = false;
 		try {
-			users = new UsersClass();
+			users = new UserClass();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
