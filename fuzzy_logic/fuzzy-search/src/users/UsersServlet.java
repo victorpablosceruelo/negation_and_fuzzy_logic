@@ -1,6 +1,8 @@
 package users;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,9 +23,6 @@ public class UsersServlet extends HttpServlet {
      */
     public UsersServlet() {
         super();
-    	if (users == null) {
-    		users = new UsersClass();
-    	}
     }
 
 	/**
@@ -31,8 +30,8 @@ public class UsersServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-		UsersClass.test();
+		System.out.println("Redirecting to addUser.jsp ");
+		response.encodeRedirectURL("addUser.jsp");
 	}
 
 	/**
@@ -40,6 +39,29 @@ public class UsersServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		Boolean error_en_conexion = false;
+		try {
+			users = new UsersClass();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			error_en_conexion = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			error_en_conexion = true;
+		}
+		
+		if (error_en_conexion) {
+			System.out.println("Redirecting to databaseError.jsp ");
+			response.encodeRedirectURL("databaseError.jsp");
+		}
+		else {
+			System.out.println("Creating new user ...");
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
+			users.createUsername(username, password);
+		}
 	}
 
 }

@@ -1,68 +1,29 @@
 package users;
+
 import java.sql.*;
 
-import auxiliar.StorageClass;
-import auxiliar.StorageClass.ValidPaths;
+import auxiliar.DBConnectionClass;
+//import auxiliar.StorageClass;
+//import auxiliar.StorageClass.ValidPaths;
+
 
 public class UsersClass {
-
-/*
-	 Connection conn = null;
-	 SQLite.Database db = null;
-	 try {
-	   Class.forName("SQLite.JDBCDriver").newInstance();
-	   conn = DriverManager.getConnection("jdbc:sqlite:/blabla");
-	   java.lang.reflect.Method m =
-	     conn.getClass().getMethod("getSQLiteDatabase", null);
-	   db = (SQLite.Database) m.invoke(conn, null);
-	 } catch (Exception e) {
-	 }
-*/
 	
-	StorageClass storage = new StorageClass();
+	DBConnectionClass DBConnection = null;
+	// StorageClass storage = new StorageClass();
 
-	public UsersClass() {
-		test();
+	public UsersClass() throws ClassNotFoundException, SQLException {
+		// Esta info convendria obtenerla de otra manera.
+		DBConnection = new DBConnectionClass("org.postgresql.Driver", 
+				"jdbc:postgresql://127.0.0.1:5432/", "fuzzy-search", 
+				"fuzzy-search-user", "fuzzy-search-pwd");
+	//	test();
+	//  "org.postgresql.Driver",
+	//  "postgresql"
 	}
-	
-	private void test () { 
-		{
-			Connection c = null;
-			try {
-				Class.forName("SQLite.JDBCDriver");
-				// Note: /test.db is the test.db in the *current* working directory
-				
-				String database = "jdbc:sqlite:" + storage.getPath(ValidPaths.usersDB);
-				c = DriverManager.getConnection(database,"","");
-				c.setAutoCommit(false);
 
-				Statement st = c.createStatement();
-				int rc = st.executeUpdate( "INSERT INTO x(b) VALUES('qwer')" );
-				System.out.println( "insert returns " + rc );
-
-				ResultSet rs = st.executeQuery( "SELECT * FROM x" );
-				while ( rs.next() ) {
-					int i = rs.getInt(1);
-					String  s = rs.getString(2);
-					System.out.println( "i=" + i + ", s=" + s );
-				}
-				rs.close();
-				st.close();
-
-				c.commit();
-				c.close();
-			} catch ( Exception e ) {
-				System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-				System.exit(1);
-				try {
-					if ( c != null && ! c.isClosed() ) {
-						c.rollback();
-						c.close();
-					}
-				} catch ( SQLException sql ) { 
-					// ignore
-				}
-			}
-		}
+	public void createUsername (String Username, String Password) {
+		
 	}
+
 }

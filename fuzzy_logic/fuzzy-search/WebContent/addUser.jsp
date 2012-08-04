@@ -9,8 +9,16 @@
 <body>
 
 <FORM ENCTYPE='multipart/form-data' method='POST' action="UsersServlet">
-<INPUT TYPE='file' NAME='fuzzy-database' size="50">
-<INPUT TYPE='submit' VALUE='Upload File'>
+<div class="email-div">
+  <label for="Email"><strong class="email-label">Username</strong></label>
+  <input type="text" name="Email" id="Email" value="">
+  <!-- spellcheck="false" -->
+</div>
+<div class="passwd-div">
+  <label for="Passwd"><strong class="passwd-label">Password</strong></label>
+  <input type="password" name="Passwd" id="Passwd">
+</div>
+<INPUT TYPE='submit' VALUE='submit'>
 </FORM>
 
 </body>
