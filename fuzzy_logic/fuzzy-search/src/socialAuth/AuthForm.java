@@ -24,7 +24,7 @@
  */
 package socialAuth;
 
-import org.apache.struts.action.ActionForm;
+// import org.apache.struts.action.ActionForm;
 import socialAuth.SocialAuthManager;
 
 /**
@@ -33,7 +33,10 @@ import socialAuth.SocialAuthManager;
  * @author tarunn@brickred.com
  * 
  */
-public class AuthForm extends ActionForm {
+public class AuthForm {
+	// extends ActionForm {
+
+
 	/**
 	 * Id, denoted the auth provider type
 	 */

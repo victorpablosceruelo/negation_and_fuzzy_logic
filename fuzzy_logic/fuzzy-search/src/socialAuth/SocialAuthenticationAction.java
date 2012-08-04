@@ -26,6 +26,9 @@ package socialAuth;
 
 import java.io.InputStream;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,9 +39,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.RequestUtils;
+
+
 import socialAuth.SocialAuthConfig;
 import socialAuth.SocialAuthManager;
-
 import socialAuth.AuthForm;
 
 /**
@@ -52,8 +56,15 @@ import socialAuth.AuthForm;
  * @author tarunn@brickred.com
  * 
  */
-public class SocialAuthenticationAction extends Action {
+// public class SocialAuthenticationAction extends Action {
 
+@WebServlet("/SocialAuthenticationServlet")
+public class SocialAuthenticationAction extends HttpServlet {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(SocialAuthenticationAction.class);
 
 	/**
@@ -74,12 +85,74 @@ public class SocialAuthenticationAction extends Action {
 	 *             if an error occurs
 	 */
 
-	@Override
-	public ActionForward execute(final ActionMapping mapping,
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+		
+		
+		try {
+			login_or_logout(request, response);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+		
+	private void login_or_logout(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		// AuthForm authForm = (AuthForm) form;
+		AuthForm authForm = new AuthForm();
+		authForm.setId("Still unknown !!!");
+		String id = authForm.getId();
+		SocialAuthManager manager;
+		String url = "";
+		
+		if (authForm.getSocialAuthManager() != null) {
+			manager = authForm.getSocialAuthManager();
+			if ("signout".equals(request.getParameter("mode"))) {
+				manager.disconnectProvider(id);
+			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
+			    // response.sendRedirect( urlWithSessionID );
+				// return mapping.findForward("home");
+				url = RequestUtils.absoluteURL(request, "/").toString();
+				response.sendRedirect( url );
+			}
+		} else {
+			InputStream in = SocialAuthenticationAction.class.getClassLoader()
+					.getResourceAsStream("oauth_consumer.properties");
+			SocialAuthConfig conf = SocialAuthConfig.getDefault();
+			conf.load(in);
+			manager = new SocialAuthManager();
+			manager.setSocialAuthConfig(conf);
+			authForm.setSocialAuthManager(manager);
+		}
+
+		String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
+		url = manager.getAuthenticationUrl(id, returnToUrl);
+		LOG.info("Redirecting to: " + url);
+		if (url != null) {
+			// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
+			// return fwd;
+			response.sendRedirect( url );
+		}
+		
+		System.out.println("ERROR: Last line in doPost");
+		// return mapping.findForward("failure");
+		
+	}
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+			System.out.println("Expected doPost instead of doGet. Calling doPost.");
+			doPost(request, response);
+	}
+	
+/*	private ActionForward execute(final ActionMapping mapping,
 			final ActionForm form, final HttpServletRequest request,
 			final HttpServletResponse response) throws Exception {
 
 		AuthForm authForm = (AuthForm) form;
+
 
 		String id = authForm.getId();
 		SocialAuthManager manager;
@@ -109,4 +182,6 @@ public class SocialAuthenticationAction extends Action {
 		}
 		return mapping.findForward("failure");
 	}
+*/
 }
+
