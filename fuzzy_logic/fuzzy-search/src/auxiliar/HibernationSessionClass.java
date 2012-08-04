@@ -6,11 +6,23 @@ import org.hibernate.cfg.Configuration;
 
 public class HibernationSessionClass {
 
-	Session session = null;
+	private static Session session = null;
 	SessionFactory sessionFactory = null;
 	
 	public HibernationSessionClass () {
-		sessionFactory = new Configuration().configure().buildSessionFactory();
+		private static SessionFactory sessionFactory;
+		private static ServiceRegistry serviceRegistry;
+
+		private static SessionFactory configureSessionFactory() throws
+		HibernateException {
+		    Configuration configuration = new Configuration();
+		    configuration.configure();
+		    serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+		    sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		    return sessionFactory;
+
+		// deprecated:
+		// sessionFactory = new Configuration().configure().buildSessionFactory();
 		
 		
 	}

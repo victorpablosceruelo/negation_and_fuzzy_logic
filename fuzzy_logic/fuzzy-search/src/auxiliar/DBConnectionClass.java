@@ -1,10 +1,10 @@
 package auxiliar;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 // import org.postgresql.Driver;
-import org.postgresql.*;
+// import org.postgresql.*;
+// import java.sql.DriverManager;
 
 public class DBConnectionClass {
 

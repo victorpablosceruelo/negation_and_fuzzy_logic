@@ -1,5 +1,8 @@
 package users;
 
+import auxiliar.HibernationSessionClass;
+import auxiliar.HibernationSessionClassException;
+
 import org.hibernate.Session;
 
 public class UserClass {
@@ -11,7 +14,14 @@ public class UserClass {
 	private String userFirstName;
 	private String userLastName;
 
-	public UserClass() {
+	// To access the session.
+	
+	Session session = null;
+	HibernationSessionClass hibernationSessionClass = null;
+	
+	public UserClass() throws HibernationSessionClassException {
+		hibernationSessionClass = new HibernationSessionClass(); 
+		session = hibernationSessionClass.getSession();
 	}
 
 	public void createUsername (String Username, String Password) {
