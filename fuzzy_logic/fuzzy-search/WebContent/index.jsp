@@ -36,7 +36,7 @@
         
         <div id="text" >
 	       	<table cellpadding="10" cellspacing="10" align="center">
-				<tr><td colspan="8"><h3 align="center">Welcome to Social Auth Demo</h3></td></tr>
+				<tr><td colspan="8"><h3 align="center">Social Authentication</h3></td></tr>
 				<tr><td colspan="8"><p align="center">Please click on any icon.</p></td></tr>
 				<tr>
 					<td>
