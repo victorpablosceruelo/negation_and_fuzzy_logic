@@ -12,6 +12,7 @@
 
 <a href="upload.jsp">Upload</a>
 <a href="addUser.jsp">Add User</a>
+<a href="index-authentication.jsp">Authentication</a>
 
 </body>
 </html>

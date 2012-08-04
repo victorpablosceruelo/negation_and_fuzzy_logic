@@ -59,13 +59,13 @@ import socialAuth.AuthForm;
 // public class SocialAuthenticationAction extends Action {
 
 @WebServlet("/SocialAuthenticationServlet")
-public class SocialAuthenticationAction extends HttpServlet {
+public class SocialAuthenticationServlet extends HttpServlet {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(SocialAuthenticationAction.class);
+	final Log LOG = LogFactory.getLog(SocialAuthenticationServlet.class);
 
 	/**
 	 * creates a instance of the requested provider from AuthProviderFactory and
@@ -118,7 +118,7 @@ public class SocialAuthenticationAction extends HttpServlet {
 				response.sendRedirect( url );
 			}
 		} else {
-			InputStream in = SocialAuthenticationAction.class.getClassLoader()
+			InputStream in = SocialAuthenticationServlet.class.getClassLoader()
 					.getResourceAsStream("oauth_consumer.properties");
 			SocialAuthConfig conf = SocialAuthConfig.getDefault();
 			conf.load(in);
