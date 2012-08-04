@@ -24,8 +24,11 @@
  */
 package socialAuth;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -107,6 +110,8 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			login_or_logout(request, response);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			System.out.print("Exception thrown: ");
+			System.out.print(e);
 			e.printStackTrace();
 			
 		}
@@ -115,12 +120,45 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	private void login_or_logout(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
+		String url = "";
+		
+		System.out.print("login_or_logout entered.");
+		
+		// Get the value of the parameter; the name is case-sensitive
+		String request_id = request.getParameter("id");
+	    if ((request_id == null) || ("".equals(request_id))) { 
+	        // (request_id == null) :: The request parameter was not present in the query string.
+	        // e.g. http://hostname.com?a=b
+	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
+	        // e.g. http://hostname.com?param=&a=b
+	    	show_request_parameters(request, response);
+	    	
+	    	//url = new String(".");
+	    	//response.sendRedirect( url );
+	    	//LOG.info("Redirecting to: " + url);
+	    }
+	    
+		String request_mode = request.getParameter("mode");
+	    if ((request_id == null) || ("".equals(request_id))) { 
+	        // (request_id == null) :: The request parameter was not present in the query string.
+	        // e.g. http://hostname.com?a=b
+	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
+	        // e.g. http://hostname.com?param=&a=b
+	    	show_request_parameters(request, response);
+	    	
+	    	//url = new String(".");
+	    	//response.sendRedirect( url );
+	    	//LOG.info("Redirecting to: " + url);
+	    }    
+
+		
 		// AuthForm authForm = (AuthForm) form;
 		AuthForm authForm = new AuthForm();
-		authForm.setId("Still unknown !!!");
+		authForm.setId(request_id);
+		
+		// Old code ...
 		String id = authForm.getId();
-		SocialAuthManager manager;
-		String url = "";
+		SocialAuthManager manager = null;
 		
 		if (authForm.getSocialAuthManager() != null) {
 			manager = authForm.getSocialAuthManager();
@@ -143,6 +181,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			authForm.setSocialAuthManager(manager);
 		}
 
+		System.out.println("Redirecting ...");
 		// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
 		String returnToUrl = new String("/socialAuthenticationServlet");
 		url = manager.getAuthenticationUrl(id, returnToUrl);
@@ -170,6 +209,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	 * @param response
 	 *            the http servlet response
 	 * @return ActionForward where the action should flow
+	 * @throws IOException 
 	 * @throws Exception
 	 *             if an error occurs
 	 */
@@ -284,5 +324,32 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	}
 */
 
+	private void show_request_parameters(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	    // The following generates a page showing all the request parameters
+	    PrintWriter out = response.getWriter();
+	    response.setContentType("text/plain");
+
+		// Get the values of all request parameters
+		Enumeration<String> parametersList = request.getParameterNames();
+		String parameterName="";
+		String parameterValue="";
+		while (parametersList.hasMoreElements()) {
+			// Get the name of the request parameter
+			parameterName = (String)parametersList.nextElement();
+			out.println(parameterName+" = ");
+
+			// Get the value of the request parameter
+			parameterValue = request.getParameter(parameterName);
+
+			// If the request parameter can appear more than once in the query string, get all values
+			String[] values = request.getParameterValues(parameterName);
+
+			for (int i=0; i<values.length; i++) {
+				out.print(values[i]+", ");
+			}
+			out.println(" ");
+		}
+		out.close();
+	}
 }
 
