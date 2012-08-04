@@ -42,15 +42,11 @@ public class UsersServlet extends HttpServlet {
 		Boolean error_en_conexion = false;
 		try {
 			users = new UserClass();
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			error_en_conexion = true;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			error_en_conexion = true;
-		}
+		} 
 		
 		if (error_en_conexion) {
 			System.out.println("Redirecting to databaseError.jsp ");

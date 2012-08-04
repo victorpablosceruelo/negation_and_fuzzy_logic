@@ -19,31 +19,29 @@ public class DBConnectionClass {
 		}
 		else {
 			System.out.println("-------- PostgreSQL JDBC Connecting ------------");
-//			register_driver(DB_Driver);
-			perform_connection(DB_path, DB_name, DB_user, DB_pwd);
+			// register_driver(DB_Driver);
+			
+			try {
+				connection = new org.postgresql.jdbc4.Jdbc4Connection("localhost", 0, DB_pwd, DB_pwd, null, DB_pwd);
+				// DriverManager.getConnection(DB_path + DB_name, DB_user, DB_pwd);
+				// connection = DriverManager.getConnection(
+				//				"jdbc:postgresql://127.0.0.1:5432/testdb", "mkyong", "123456"); 
+			} catch (SQLException e) {
+				System.out.println("Connection Failed! Check output console");
+				e.printStackTrace();
+				throw e;
+			}
+
+			if (connection == null) {
+				throw new SQLException("Unknown problem when trying to connect to database.");
+			}	
+
 			System.out.println("-------- PostgreSQL JDBC Connection established ------------");
 		}
 	}
-	
-	private void perform_connection(String Host, int Port, String User, String Database, DB_path, String DB_name, String DB_user, String DB_pwd)
-			throws SQLException {
-		try {
-			connection = new org.postgresql.jdbc4.Jdbc4Connection("localhost", 0, DB_pwd, DB_pwd, null, DB_pwd)
-					// DriverManager.getConnection(DB_path + DB_name, DB_user, DB_pwd);
-/*			connection = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/testdb", "mkyong", "123456"); */
-		} catch (SQLException e) {
-			System.out.println("Connection Failed! Check output console");
-			e.printStackTrace();
-			throw e;
-		}
+}
 
-		if (connection == null) {
-			throw new SQLException("Unknown problem when trying to connect to database.");
-		}	
-	}
-
-
+/*
 	private void register_driver(String DB_Driver) throws ClassNotFoundException, SQLException { 
 		System.out.println("Registering PostgreSQL JDBC Driver"); 
 		try {
@@ -58,18 +56,20 @@ public class DBConnectionClass {
 			e.printStackTrace();
 			throw e;			
 		}
-		 /*catch (ClassNotFoundException e) {
-
-				System.out.println("Where is your PostgreSQL JDBC Driver? "
-						+ "Include in your library path!");
-				e.printStackTrace();
-				throw e;
-			}*/ 
 
 		System.out.println("PostgreSQL JDBC Driver Registered!");
 	}
 	
 }
+
+/*
+ catch (ClassNotFoundException e) {
+ 				System.out.println("Where is your PostgreSQL JDBC Driver? "
+						+ "Include in your library path!");
+				e.printStackTrace();
+				throw e;
+			}
+*/ 
 
 /*
 Connection conn = null;
@@ -124,5 +124,8 @@ private void test () {
 			}
 		}
 	}
-}
 */
+
+
+
+// EOF
