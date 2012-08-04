@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <http auto-config="true" use-expressions="true">
     <intercept-url pattern="/welcome.do" access="hasRole('ROLE_USER')" /> 
     <form-login login-page="/login.do" authentication-failure-url="/login.do?login_error=1"/>       

@@ -1,7 +1,5 @@
-package users;
+package auxiliar;
 
-import auxiliar.HibernationSessionClass;
-import auxiliar.HibernationSessionClassException;
 
 import org.hibernate.Session;
 
