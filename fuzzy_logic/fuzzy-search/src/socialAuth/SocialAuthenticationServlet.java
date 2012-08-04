@@ -25,6 +25,9 @@
 package socialAuth;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,18 +35,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+/* Do not use struts !!!
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.RequestUtils;
-
+*/
 
 import socialAuth.SocialAuthConfig;
 import socialAuth.SocialAuthManager;
 import socialAuth.AuthForm;
+import socialAuth.exception.SocialAuthException;
+import socialAuth.util.SocialAuthUtil;
 
 /**
  * 
@@ -85,6 +95,12 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	 *             if an error occurs
 	 */
 
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+			System.out.println("Expected doPost instead of doGet. Calling doPost.");
+			doPost(request, response);
+	}
+	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
 		
@@ -94,6 +110,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
 	}
 		
@@ -114,7 +131,8 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
 			    // response.sendRedirect( urlWithSessionID );
 				// return mapping.findForward("home");
-				url = RequestUtils.absoluteURL(request, "/").toString();
+				// url = RequestUtils.absoluteURL(request, "/").toString();
+				url = new String("/");
 				response.sendRedirect( url );
 			}
 		} else {
@@ -127,7 +145,8 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			authForm.setSocialAuthManager(manager);
 		}
 
-		String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
+		// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
+		String returnToUrl = new String("/socialAuthenticationServlet");
 		url = manager.getAuthenticationUrl(id, returnToUrl);
 		LOG.info("Redirecting to: " + url);
 		if (url != null) {
@@ -140,12 +159,23 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		// return mapping.findForward("failure");
 		
 	}
+	
+	/**
+	 * Displays the user profile and contacts for the given provider.
+	 * 
+	 * @param mapping
+	 *            the action mapping
+	 * @param form
+	 *            the action form
+	 * @param request
+	 *            the http servlet request
+	 * @param response
+	 *            the http servlet response
+	 * @return ActionForward where the action should flow
+	 * @throws Exception
+	 *             if an error occurs
+	 */
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
-			System.out.println("Expected doPost instead of doGet. Calling doPost.");
-			doPost(request, response);
-	}
 	
 /*	private ActionForward execute(final ActionMapping mapping,
 			final ActionForm form, final HttpServletRequest request,
@@ -183,5 +213,78 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		return mapping.findForward("failure");
 	}
 */
+	
+	/*	@Override
+	public ActionForward execute(final ActionMapping mapping,
+			final ActionForm form, final HttpServletRequest request,
+			final HttpServletResponse response) throws Exception {
+
+		AuthForm authForm = (AuthForm) form;
+		SocialAuthManager manager = null;
+		if (authForm.getSocialAuthManager() != null) {
+			manager = authForm.getSocialAuthManager();
+		}
+		if (manager != null) {
+			List<Contact> contactsList = new ArrayList<Contact>();
+			Profile profile = null;
+			try {
+				Map<String, String> paramsMap = SocialAuthUtil
+						.getRequestParametersMap(request);
+				AuthProvider provider = manager.connect(paramsMap);
+
+				profile = provider.getUserProfile();
+				contactsList = provider.getContactList();
+				if (contactsList != null && contactsList.size() > 0) {
+					for (Contact p : contactsList) {
+						if (StringUtils.isEmpty(p.getFirstName())
+								&& StringUtils.isEmpty(p.getLastName())) {
+							p.setFirstName(p.getDisplayName());
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			request.setAttribute("profile", profile);
+			request.setAttribute("contacts", contactsList);
+
+			return mapping.findForward("success");
+		}
+		// if provider null
+		return mapping.findForward("failure");
+	}
+*/
+
+/*
+	@Override
+	public ActionForward execute(final ActionMapping mapping,
+			final ActionForm form, final HttpServletRequest request,
+			final HttpServletResponse response) throws Exception {
+		String statusMsg = request.getParameter("statusMessage");
+		if (statusMsg == null || statusMsg.trim().length() == 0) {
+			request.setAttribute("Message", "Status can't be left blank.");
+			return mapping.findForward("failure");
+		}
+		AuthForm authForm = (AuthForm) form;
+		SocialAuthManager manager = authForm.getSocialAuthManager();
+		AuthProvider provider = null;
+		if (manager != null) {
+			provider = manager.getCurrentAuthProvider();
+		}
+		if (provider != null) {
+			try {
+				provider.updateStatus(statusMsg);
+				request.setAttribute("Message", "Status Updated successfully");
+				return mapping.findForward("success");
+			} catch (SocialAuthException e) {
+				request.setAttribute("Message", e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		// if provider null
+		return mapping.findForward("failure");
+	}
+*/
+
 }
 
