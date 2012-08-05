@@ -24,11 +24,11 @@
  */
 package socialAuth;
 
-import java.io.IOException;
+// import java.io.IOException;
 import java.io.InputStream;
 //import java.io.PrintWriter;
 //import java.util.ArrayList;
-import java.util.Enumeration;
+//import java.util.Enumeration;
 //import java.util.List;
 //import java.util.Map;
 
@@ -42,6 +42,8 @@ import javax.servlet.http.HttpSession;
 // import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import auxiliar.ServletsAuxClass;
 
 import socialAuth.SocialAuthConfig;
 import socialAuth.SocialAuthManager;
@@ -110,7 +112,6 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		try {
 			login_or_logout(request, response);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.print("Exception thrown: ");
 			System.out.print(e);
 			e.printStackTrace();
@@ -134,12 +135,9 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	        // e.g. http://hostname.com?a=b
 	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
 	        // e.g. http://hostname.com?param=&a=b
-	    	show_request_attributes(request);
-	    	
-	    	//url = new String(".");
-	    	//response.sendRedirect( url );
-	    	//LOG.info("Redirecting to: " + url);
-			url = new String("/index-authentication.jsp");
+	    	ServletsAuxClass.show_request_parameters(request, LOG);
+	    	url = ServletsAuxClass.getAppUrlFromRequest(request, LOG);
+	    	url += "/index-authentication.jsp";
 			response.sendRedirect( url );
 			return;
 	    }
@@ -161,8 +159,8 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			
 			LOG.info("Redirecting to open authentication service for "+request_id);
 			// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
-			String returnToUrl = getUrlFromRequest(request); 
-			// new String("/socialAuthenticationServlet");
+			String returnToUrl = ServletsAuxClass.getAppUrlFromRequest(request, LOG); 
+			returnToUrl += "/socialAuthenticationServlet"; 
 			url = manager.getAuthenticationUrl(request_id, returnToUrl);
 			LOG.info("Redirecting to: " + url);
 			if (url != null) {
@@ -182,7 +180,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			    // response.sendRedirect( urlWithSessionID );
 				// return mapping.findForward("home");
 				// url = RequestUtils.absoluteURL(request, "/").toString();
-				url = new String("/");
+				url = ServletsAuxClass.getAppUrlFromRequest(request, LOG);
 				response.sendRedirect( url );
 				return;
 			}
@@ -320,35 +318,8 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	}
 */
 
-	private void show_request_attributes(HttpServletRequest request) throws IOException {
-		// Get the values of all request parameters
-		Enumeration<String> elementsEnum = request.getAttributeNames();
-		String to_be_printed;
 
-		while (elementsEnum.hasMoreElements()) {
-			// Get the name of the request parameter
-			String attrName = elementsEnum.nextElement().toString();
-			to_be_printed = new String(attrName);
-			to_be_printed.concat(": ");
-			
-			String[] values = request.getParameterValues(attrName);
-			for (int i=0; i<values.length; i++) {
-				to_be_printed.concat(values[i]);
-				to_be_printed.concat(", ");
-			}
-			LOG.info(to_be_printed);
-		}
-		LOG.info("<end of attributes list>");
-	}
 	
-	private String getUrlFromRequest(HttpServletRequest req) {
-	    String requestUrl = req.getRequestURL().toString();
-	    String queryString = req.getQueryString();   // d=789
-	    if (queryString != null) {
-	        requestUrl += "?"+queryString;
-	    }
-	    LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
-	    return requestUrl;
-	}
+
 }
 
