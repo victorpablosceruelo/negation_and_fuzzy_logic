@@ -26,27 +26,28 @@ package socialAuth;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
+//import java.io.PrintWriter;
+//import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+//import java.util.List;
+//import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
+// import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import socialAuth.SocialAuthConfig;
 import socialAuth.SocialAuthManager;
 import socialAuth.AuthForm;
-import socialAuth.exception.SocialAuthException;
-import socialAuth.util.SocialAuthUtil;
+// import socialAuth.exception.SocialAuthException;
+// import socialAuth.util.SocialAuthUtil;
 
 // Do not use struts !!!
 // import org.apache.struts.action.Action;
@@ -98,7 +99,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
-			System.out.println("Expected doPost instead of doGet. Calling doPost.");
+			LOG.info("doGet invocation. Calling doPost");
 			doPost(request, response);
 	}
 	
@@ -120,60 +121,36 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	private void login_or_logout(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
+		HttpSession session = request.getSession(true);
 		String url = "";
-		
-		System.out.print("login_or_logout entered.");
+		LOG.info("login_or_logout entered");
 		
 		// Get the value of the parameter; the name is case-sensitive
 		String request_id = request.getParameter("id");
-	    if ((request_id == null) || ("".equals(request_id))) { 
-	        // (request_id == null) :: The request parameter was not present in the query string.
-	        // e.g. http://hostname.com?a=b
-	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
-	        // e.g. http://hostname.com?param=&a=b
-	    	show_request_parameters(request, response);
-	    	
-	    	//url = new String(".");
-	    	//response.sendRedirect( url );
-	    	//LOG.info("Redirecting to: " + url);
-	    }
-	    
 		String request_mode = request.getParameter("mode");
-	    if ((request_id == null) || ("".equals(request_id))) { 
+	    if ((request_id == null) || ("".equals(request_id)) ||
+	    	(request_mode == null) || ("".equals(request_mode))	) { 
 	        // (request_id == null) :: The request parameter was not present in the query string.
 	        // e.g. http://hostname.com?a=b
 	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
 	        // e.g. http://hostname.com?param=&a=b
-	    	show_request_parameters(request, response);
+	    	show_request_attributes(request);
 	    	
 	    	//url = new String(".");
 	    	//response.sendRedirect( url );
 	    	//LOG.info("Redirecting to: " + url);
+			url = new String("/index-authentication.jsp");
+			response.sendRedirect( url );
+			return;
 	    }
 	    
-
-
 		
 		// AuthForm authForm = (AuthForm) form;
-		AuthForm authForm = new AuthForm();
+		AuthForm authForm = (AuthForm) session.getAttribute("authForm");
 		authForm.setId(request_id);
-		
-		// Old code ...
-		String id = authForm.getId();
 		SocialAuthManager manager = null;
 		
-		if (authForm.getSocialAuthManager() != null) {
-			manager = authForm.getSocialAuthManager();
-			if ("signout".equals(request.getParameter("mode"))) {
-				manager.disconnectProvider(id);
-			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
-			    // response.sendRedirect( urlWithSessionID );
-				// return mapping.findForward("home");
-				// url = RequestUtils.absoluteURL(request, "/").toString();
-				url = new String("/");
-				response.sendRedirect( url );
-			}
-		} else {
+		if ("signin".equals(request_mode)) {
 			InputStream in = SocialAuthenticationServlet.class.getClassLoader()
 					.getResourceAsStream("oauth_consumer.properties");
 			SocialAuthConfig conf = SocialAuthConfig.getDefault();
@@ -181,18 +158,34 @@ public class SocialAuthenticationServlet extends HttpServlet {
 			manager = new SocialAuthManager();
 			manager.setSocialAuthConfig(conf);
 			authForm.setSocialAuthManager(manager);
-		}
+			
+			LOG.info("Redirecting to open authentication service for "+request_id);
+			// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
+			String returnToUrl = getUrlFromRequest(request); 
+			// new String("/socialAuthenticationServlet");
+			url = manager.getAuthenticationUrl(request_id, returnToUrl);
+			LOG.info("Redirecting to: " + url);
+			if (url != null) {
+				// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
+				// return fwd;
+				response.sendRedirect( url );
+				return;
+			}
 
-		System.out.println("Redirecting to open authentication service for "+id);
-		// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
-		String returnToUrl = getUrlFromRequest(request); 
-		// new String("/socialAuthenticationServlet");
-		url = manager.getAuthenticationUrl(id, returnToUrl);
-		LOG.info("Redirecting to: " + url);
-		if (url != null) {
-			// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
-			// return fwd;
-			response.sendRedirect( url );
+		}
+		
+		if ("signout".equals(request_mode)) {
+			if (authForm.getSocialAuthManager() != null) {
+				manager = authForm.getSocialAuthManager();
+				manager.disconnectProvider(authForm.getId());
+			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
+			    // response.sendRedirect( urlWithSessionID );
+				// return mapping.findForward("home");
+				// url = RequestUtils.absoluteURL(request, "/").toString();
+				url = new String("/");
+				response.sendRedirect( url );
+				return;
+			}
 		}
 		
 		System.out.println("ERROR: Last line in doPost");
@@ -327,32 +320,25 @@ public class SocialAuthenticationServlet extends HttpServlet {
 	}
 */
 
-	private void show_request_parameters(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	    // The following generates a page showing all the request parameters
-	    PrintWriter out = response.getWriter();
-	    response.setContentType("text/plain");
-
+	private void show_request_attributes(HttpServletRequest request) throws IOException {
 		// Get the values of all request parameters
-		Enumeration<String> parametersList = request.getParameterNames();
-		String parameterName;
-		// String parameterValue;
-		while (parametersList.hasMoreElements()) {
+		Enumeration<String> elementsEnum = request.getAttributeNames();
+		String to_be_printed;
+
+		while (elementsEnum.hasMoreElements()) {
 			// Get the name of the request parameter
-			parameterName = (String)parametersList.nextElement();
-			out.println(parameterName+" = ");
-
-			// Get the value of the request parameter
-			// parameterValue = request.getParameter(parameterName);
-
-			// If the request parameter can appear more than once in the query string, get all values
-			String[] values = request.getParameterValues(parameterName);
-
+			String attrName = elementsEnum.nextElement().toString();
+			to_be_printed = new String(attrName);
+			to_be_printed.concat(": ");
+			
+			String[] values = request.getParameterValues(attrName);
 			for (int i=0; i<values.length; i++) {
-				out.print(values[i]+", ");
+				to_be_printed.concat(values[i]);
+				to_be_printed.concat(", ");
 			}
-			out.println(" ");
+			LOG.info(to_be_printed);
 		}
-		out.close();
+		LOG.info("<end of attributes list>");
 	}
 	
 	private String getUrlFromRequest(HttpServletRequest req) {
