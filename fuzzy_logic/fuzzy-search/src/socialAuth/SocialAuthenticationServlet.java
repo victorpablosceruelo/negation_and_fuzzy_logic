@@ -43,7 +43,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.ServletsAuxClass;
+import auxiliar.AuxMethodsClass;
 
 import socialAuth.SocialAuthConfig;
 import socialAuth.SocialAuthManager;
@@ -110,7 +110,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		
 		
 		try {
-			login_or_logout(request, response);
+			socialAuthentication(request, response);
 		} catch (Exception e) {
 			System.out.print("Exception thrown: ");
 			System.out.print(e);
@@ -119,76 +119,95 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		}
 	}
 		
-	private void login_or_logout(HttpServletRequest request, HttpServletResponse response)
+	private void socialAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
 		HttpSession session = request.getSession(true);
-		String url = "";
-		LOG.info("login_or_logout entered");
+		String appUrl = AuxMethodsClass.getAppUrlFromRequest(request);
+		String newUrl = appUrl + "/index-authentication.jsp";
+		
+		LOG.info("socialAuthentication entered");
+		AuxMethodsClass.show_request_parameters(request, LOG);
 		
 		// Get the value of the parameter; the name is case-sensitive
 		String request_id = request.getParameter("id");
 		String request_mode = request.getParameter("mode");
-	    if ((request_id == null) || ("".equals(request_id)) ||
-	    	(request_mode == null) || ("".equals(request_mode))	) { 
+	    if ((request_id != null) && (! "".equals(request_id)) &&
+	    	(request_mode != null) && (! "".equals(request_mode))	) { 
 	        // (request_id == null) :: The request parameter was not present in the query string.
 	        // e.g. http://hostname.com?a=b
 	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
 	        // e.g. http://hostname.com?param=&a=b
-	    	ServletsAuxClass.show_request_parameters(request, LOG);
-	    	url = ServletsAuxClass.getAppUrlFromRequest(request, LOG);
-	    	url += "/index-authentication.jsp";
-			response.sendRedirect( url );
-			return;
+
+	    	if ("signin".equals(request_mode)) {
+	    		newUrl = socialAuthenticationLogIn(appUrl, request_mode, request_id, session, response);
+	    	}
+	    	else {
+	    		if ("signout".equals(request_mode)) {
+	    			newUrl = socialAuthenticationLogOut(appUrl, request_mode, request_id, session, response);
+	    		}
+	    	}
 	    }
 	    
+	    // Go to the newUrl
+	    if (newUrl != null) {
+	    	LOG.info(newUrl);
+	    	response.sendRedirect( newUrl );
+	    	// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
+	    	// return fwd;
+	    }
+	    else {
+	    	LOG.info("ERROR: newUrl is null !!! ");
+	    }
+
+		System.out.println("ERROR: Last line in doPost !!!");
+		// return mapping.findForward("failure");
+	}
 		
+	private String socialAuthenticationLogIn(String appUrl, String request_mode, String request_id,
+			HttpSession session, HttpServletResponse response) throws Exception {
 		// AuthForm authForm = (AuthForm) form;
-		AuthForm authForm = (AuthForm) session.getAttribute("authForm");
-		authForm.setId(request_id);
-		SocialAuthManager manager = null;
-		
+		AuthForm authForm = null;
+		String newUrl = "";
+
 		if ("signin".equals(request_mode)) {
+			authForm = new AuthForm();
+			authForm.setId(request_id);
 			InputStream in = SocialAuthenticationServlet.class.getClassLoader()
 					.getResourceAsStream("oauth_consumer.properties");
 			SocialAuthConfig conf = SocialAuthConfig.getDefault();
 			conf.load(in);
-			manager = new SocialAuthManager();
-			manager.setSocialAuthConfig(conf);
-			authForm.setSocialAuthManager(manager);
-			
+			authForm.setSocialAuthManager(new SocialAuthManager());
+			authForm.getSocialAuthManager().setSocialAuthConfig(conf);
+
 			LOG.info("Redirecting to open authentication service for "+request_id);
 			// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
-			String returnToUrl = ServletsAuxClass.getAppUrlFromRequest(request, LOG); 
-			returnToUrl += "/socialAuthenticationServlet"; 
-			url = manager.getAuthenticationUrl(request_id, returnToUrl);
-			LOG.info("Redirecting to: " + url);
-			if (url != null) {
-				// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
-				// return fwd;
-				response.sendRedirect( url );
-				return;
-			}
-
+			String returnToUrl = appUrl + "/socialAuthenticationServlet";  
+			newUrl = authForm.getSocialAuthManager().getAuthenticationUrl(request_id, returnToUrl);
 		}
+		// if (newUrl != null) {
+		return newUrl;
+		// }
+
+
+	}
+	
+	private String socialAuthenticationLogOut(String appUrl, String request_mode, String request_id,
+			HttpSession session, HttpServletResponse response) {
 		
+		AuthForm authForm = null;
 		if ("signout".equals(request_mode)) {
+			authForm = (AuthForm) session.getAttribute("authForm");
 			if (authForm.getSocialAuthManager() != null) {
-				manager = authForm.getSocialAuthManager();
-				manager.disconnectProvider(authForm.getId());
+				authForm.getSocialAuthManager().disconnectProvider(authForm.getId());
 			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
 			    // response.sendRedirect( urlWithSessionID );
 				// return mapping.findForward("home");
 				// url = RequestUtils.absoluteURL(request, "/").toString();
-				url = ServletsAuxClass.getAppUrlFromRequest(request, LOG);
-				response.sendRedirect( url );
-				return;
 			}
+			session.invalidate();
 		}
-		
-		System.out.println("ERROR: Last line in doPost");
-		// return mapping.findForward("failure");
-		
+		return appUrl;
 	}
 	
 	/**

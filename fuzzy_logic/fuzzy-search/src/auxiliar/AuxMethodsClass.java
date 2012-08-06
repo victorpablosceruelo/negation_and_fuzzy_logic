@@ -6,7 +6,7 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 
-public class ServletsAuxClass {
+public class AuxMethodsClass {
 
 	public static void show_request_parameters(HttpServletRequest request, Log LOG) throws IOException {
 		// Get the values of all request parameters
@@ -30,15 +30,21 @@ public class ServletsAuxClass {
 		LOG.info("<end of attributes list>");
 	}
 	
-	public static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
+	public static String getAppUrlFromRequest(HttpServletRequest request) {
 	    String requestUrl = request.getRequestURL().toString();
 	    String queryString = request.getQueryString();   // d=789
 	    //if (queryString != null) {
 	    //    requestUrl += "?"+queryString;
 	    //}
-	    LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
-	    LOG.info("getUrlFromRequest: queryString: " + queryString);
-	    return requestUrl;
+	    // LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
+	    // LOG.info("getUrlFromRequest: queryString: " + queryString);
+	    System.out.print("getUrlFromRequest: requestUrl: " + requestUrl);
+	    System.out.print("getUrlFromRequest: queryString: " + queryString);
+	    
+	    Integer index = 0;
+	    index = requestUrl.lastIndexOf("/"); // http:// ... /page
+	    String appUrl = requestUrl.substring(0, index);
+	    return appUrl;
 	}
 		
 }
