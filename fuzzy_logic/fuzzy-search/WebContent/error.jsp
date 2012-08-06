@@ -10,8 +10,7 @@
 
 <%@page import="java.util.*" %>
 
-		<BR>
-		Parameters<BR>
+		<BR><h1>Parameters</h1><BR>
       <%
         for(Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ){
                 String paramName = (String) e.nextElement().toString();
@@ -25,17 +24,23 @@
     			}
         }
 		%>
-		<BR><BR><BR><BR>
-		Attributes<BR>
+		<BR><BR><BR><BR><H1>Attributes</H1><BR>
       <%
         for(Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements(); ){
                 String attName = (String) e.nextElement().toString();
                 out.println("<br/>" + attName);
         }
 		%>
+		
+		<% if (request.getAttribute("msg") != null) { %>
+			<h1>MSG: <%=request.getAttribute("msg") %>
+			</h1>
+		<% } %>
 
+<br/><br/><br/><br/><H1>
 <%@page import="socialAuth.AuxMethodsClass" %>
 <a href="<%=AuxMethodsClass.getAppUrlFromRequest(request) %>/index.jsp">Go to starting page.</a>
-
+</H1>
+<BR/><BR/><BR/><BR/>
 </body>
 </html>

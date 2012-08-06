@@ -156,9 +156,10 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			authForm.setSocialAuthManager(new SocialAuthManager());
 			authForm.getSocialAuthManager().setSocialAuthConfig(conf);
 
+			session.setAttribute("authForm", authForm);
 			LOG.info("Redirecting to open authentication service for "+request_id);
 			// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
-			String returnToUrl = appUrl + "/socialAuthUpdateStatusServlet";  
+			String returnToUrl = appUrl + "/SocialAuthLoggedInServlet";  
 			newUrl = authForm.getSocialAuthManager().getAuthenticationUrl(request_id, returnToUrl);
 		}
 		// if (newUrl != null) {
@@ -238,47 +239,6 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			ActionForward fwd = new ActionForward("openAuthUrl", url, true);
 			return fwd;
 		}
-		return mapping.findForward("failure");
-	}
-*/
-	
-	/*	@Override
-	public ActionForward execute(final ActionMapping mapping,
-			final ActionForm form, final HttpServletRequest request,
-			final HttpServletResponse response) throws Exception {
-
-		AuthForm authForm = (AuthForm) form;
-		SocialAuthManager manager = null;
-		if (authForm.getSocialAuthManager() != null) {
-			manager = authForm.getSocialAuthManager();
-		}
-		if (manager != null) {
-			List<Contact> contactsList = new ArrayList<Contact>();
-			Profile profile = null;
-			try {
-				Map<String, String> paramsMap = SocialAuthUtil
-						.getRequestParametersMap(request);
-				AuthProvider provider = manager.connect(paramsMap);
-
-				profile = provider.getUserProfile();
-				contactsList = provider.getContactList();
-				if (contactsList != null && contactsList.size() > 0) {
-					for (Contact p : contactsList) {
-						if (StringUtils.isEmpty(p.getFirstName())
-								&& StringUtils.isEmpty(p.getLastName())) {
-							p.setFirstName(p.getDisplayName());
-						}
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			request.setAttribute("profile", profile);
-			request.setAttribute("contacts", contactsList);
-
-			return mapping.findForward("success");
-		}
-		// if provider null
 		return mapping.findForward("failure");
 	}
 */

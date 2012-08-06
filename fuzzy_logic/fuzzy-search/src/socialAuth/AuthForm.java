@@ -40,13 +40,21 @@ public class AuthForm {
 	/**
 	 * Id, denoted the auth provider type
 	 */
-	String id;
+	private String id = null;
 
 	/**
 	 * The SocialAuth Manager
 	 */
-	SocialAuthManager socialAuthManager;
+	private SocialAuthManager socialAuthManager = null;
 
+	/*
+	 * Initialices the object attributes.
+	 */
+	public AuthForm () {
+		id = null;
+		socialAuthManager = null;
+	}
+	
 	/**
 	 * Retrieves the id
 	 * 

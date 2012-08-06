@@ -15,14 +15,14 @@ import org.apache.commons.logging.LogFactory;
 import socialAuth.exception.SocialAuthException;
 
 
-@WebServlet("/socialAuthUpdateStatusServlet")
-public class SocialAuthStatusUpdateServlet extends HttpServlet {
+@WebServlet("/SocialAuthUpdateStatusServlet")
+public class SocialAuthUpdateStatusServlet extends HttpServlet {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(SocialAuthStatusUpdateServlet.class);
+	private final Log LOG = LogFactory.getLog(SocialAuthUpdateStatusServlet.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
@@ -71,10 +71,7 @@ public class SocialAuthStatusUpdateServlet extends HttpServlet {
 		if ((authForm != null) && 
 				(authForm.getSocialAuthManager() != null)) {
 			
-			AuthProvider provider = null;
-			if (authForm.getSocialAuthManager() != null) {
-				provider = authForm.getSocialAuthManager().getCurrentAuthProvider();
-			}
+			AuthProvider provider = authForm.getSocialAuthManager().getCurrentAuthProvider();
 			
 			if (provider != null) {
 				try {
@@ -87,10 +84,23 @@ public class SocialAuthStatusUpdateServlet extends HttpServlet {
 					e.printStackTrace();
 				}
 			}
-			// if provider null
-			AuxMethodsClass.redirectToError(request, response);
-			return;
+			else {
+				// if provider null
+				AuxMethodsClass.redirectToError(request, response);
+				return;
+			}
 
+		}
+		else {
+			if (authForm == null) {
+				LOG.info("authForm is null");
+				request.setAttribute("msg", "authForm is null");
+			}
+			else {
+				LOG.info("authForm.getSocialAuthManager is null");
+				request.setAttribute("msg", "authForm.getSocialAuthManager is null");
+			}
+				
 		}
 		// if authForm null
 		AuxMethodsClass.redirectToLogout(request, response);

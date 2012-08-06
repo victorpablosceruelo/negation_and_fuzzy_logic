@@ -3,6 +3,8 @@ package socialAuth;
 import java.io.IOException;
 import java.util.Enumeration;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -89,12 +91,12 @@ public class AuxMethodsClass {
 	
 	public static void redirectToAuthenticationIndex(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String appUrl = getAppUrlFromRequest(request);
-		response.sendRedirect( appUrl + "/error.jsp");
+		response.sendRedirect( appUrl + "/index-authentication.jsp");
 	}
 	
 	public static void redirectToSearch(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String appUrl = getAppUrlFromRequest(request);
-		response.sendRedirect( appUrl + "/index-search.jsp" );
+		response.sendRedirect( appUrl + "/search-menu.jsp" );
 	}
 	
 	public static void redirectToLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -103,12 +105,20 @@ public class AuxMethodsClass {
 	}
 	
 	public static void redirectToError(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		final Log LOG = LogFactory.getLog(SocialAuthStatusUpdateServlet.class);
+		final Log LOG = LogFactory.getLog(SocialAuthUpdateStatusServlet.class);
 		AuxMethodsClass.log_request_parameters(request, LOG);
 		String retString = AuxMethodsClass.request_parameters(request, LOG);
 
 		String appUrl = getAppUrlFromRequest(request);
 		response.sendRedirect( appUrl + "/error.jsp" + retString );
+	}
+	
+	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
+		final Log LOG = LogFactory.getLog(SocialAuthUpdateStatusServlet.class);
+		LOG.info("forward_to " + where);
+		RequestDispatcher dispatcher = request.getRequestDispatcher(where);
+		dispatcher.forward(request, response);
 	}
 	
 }
