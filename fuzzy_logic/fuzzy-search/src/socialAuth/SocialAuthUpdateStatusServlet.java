@@ -53,17 +53,20 @@ public class SocialAuthUpdateStatusServlet extends HttpServlet {
 
 		if (session == null) {
 			LOG.info("session is null");
-			AuxMethodsClass.redirectToAuthenticationIndex(request, response);
+			AuxMethodsClass.goToAppIndex(request, response, LOG);
 			return;
 		}
 		
+		/*
+		 * ERROR AQUI: Este parametro no consigo q aparezca !!!!
+		 */
 		String statusMsg = request.getParameter("statusMessage");
 		if ((statusMsg == null) || (statusMsg.trim().length() == 0)) {
 			LOG.info("ERROR: statusMsg is null or empty.");
 			if (statusMsg != null) {
 				LOG.info("statusMsg: " + statusMsg);
 			}
-			AuxMethodsClass.redirectToError(request, response);
+			AuxMethodsClass.goToError(request, response, LOG);
 			return;
 		}
 		
@@ -76,34 +79,34 @@ public class SocialAuthUpdateStatusServlet extends HttpServlet {
 			if (provider != null) {
 				try {
 					provider.updateStatus(statusMsg);
-					request.setAttribute("Message", "Status Updated successfully");
-					AuxMethodsClass.redirectToSearch(request, response);
+					request.setAttribute("msg1", "Status Updated successfully");
+					AuxMethodsClass.goToSearchMenu(request, response, LOG);
 					return;
 				} catch (SocialAuthException e) {
-					request.setAttribute("Message", e.getMessage());
+					request.setAttribute("msg1", e.getMessage());
 					e.printStackTrace();
 				}
 			}
 			else {
 				// if provider null
-				AuxMethodsClass.redirectToError(request, response);
-				return;
+				LOG.info("provider is null");
+				request.setAttribute("msg2", "provider is null");
 			}
 
 		}
 		else {
 			if (authForm == null) {
 				LOG.info("authForm is null");
-				request.setAttribute("msg", "authForm is null");
+				request.setAttribute("msg2", "authForm is null");
 			}
 			else {
 				LOG.info("authForm.getSocialAuthManager is null");
-				request.setAttribute("msg", "authForm.getSocialAuthManager is null");
+				request.setAttribute("msg2", "authForm.getSocialAuthManager is null");
 			}
 				
 		}
 		// if authForm null
-		AuxMethodsClass.redirectToLogout(request, response);
+		AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 		return;
 	}
 	

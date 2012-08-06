@@ -62,7 +62,7 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		if (session == null) {
 			LOG.info("session is null");
-			AuxMethodsClass.redirectToAuthenticationIndex(request, response);
+			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 			return;
 		}
 		
@@ -91,7 +91,7 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 			request.setAttribute("contacts", contactsList);
 
 			// return mapping.findForward("success");
-			AuxMethodsClass.forward_to("SocialAuthUpdateStatusServlet", request, response);
+			AuxMethodsClass.forward_to("SocialAuthUpdateStatusServlet", request, response, LOG);
 		}
 		else {
 			if (authForm == null) {
@@ -106,7 +106,7 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 		}
 		// if provider null
 		// return mapping.findForward("failure");
-		AuxMethodsClass.forward_to("error.jsp", request, response);
+		AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 	}
 	
 	/*	@Override

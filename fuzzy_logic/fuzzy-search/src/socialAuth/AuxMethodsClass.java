@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.LogFactory;
 
 public class AuxMethodsClass {
 
@@ -67,55 +67,62 @@ public class AuxMethodsClass {
 		return retString;
 	}
 	
-	public static String getAppUrlFromRequest(HttpServletRequest request) {
+	public static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
 	    String requestUrl = request.getRequestURL().toString();
 	    String queryString = request.getQueryString();   // d=789
 	    
-	    if (requestUrl != null) {
-	    	System.out.print("getUrlFromRequest: requestUrl: " + requestUrl);
-	    }
-	    if (queryString != null) {
-	    	System.out.print("getUrlFromRequest: queryString: " + queryString);
+	    if (LOG != null) {
+	    	if (requestUrl != null) {
+	    		LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
+	    	}
+	    	if (queryString != null) {
+	    		LOG.info("getUrlFromRequest: queryString: " + queryString);
+	    	}
 	    }
 
 	    if (requestUrl != null) {
 	    	Integer index = requestUrl.lastIndexOf("/"); // http:// ... /page
 	    	String appUrl = requestUrl.substring(0, index);
 	    	if (appUrl != null) {
-	    		System.out.print("getUrlFromRequest: appUrl: " + appUrl);
+	    		if (LOG != null) {
+	    			LOG.info("getUrlFromRequest: appUrl: " + appUrl);
+	    		}
 	    		return appUrl;
 	    	}
 	    }
 	    return ""; // Better an empty stream than a null pointer !!!
 	}
 	
-	public static void redirectToAuthenticationIndex(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String appUrl = getAppUrlFromRequest(request);
-		response.sendRedirect( appUrl + "/index-authentication.jsp");
-	}
-	
-	public static void redirectToSearch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String appUrl = getAppUrlFromRequest(request);
-		response.sendRedirect( appUrl + "/search-menu.jsp" );
-	}
-	
-	public static void redirectToLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String appUrl = getAppUrlFromRequest(request);
-		response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-	}
-	
-	public static void redirectToError(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		final Log LOG = LogFactory.getLog(SocialAuthUpdateStatusServlet.class);
-		AuxMethodsClass.log_request_parameters(request, LOG);
-		String retString = AuxMethodsClass.request_parameters(request, LOG);
-
-		String appUrl = getAppUrlFromRequest(request);
-		response.sendRedirect( appUrl + "/error.jsp" + retString );
-	}
-	
-	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response) 
+	public static void goToAppIndex(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
-		final Log LOG = LogFactory.getLog(SocialAuthUpdateStatusServlet.class);
+		// String appUrl = getAppUrlFromRequest(request);
+		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
+		AuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
+	}	
+	
+	public static void goToAuthenticationLogout(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+			throws ServletException, IOException {
+		// String appUrl = getAppUrlFromRequest(request);
+		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
+		AuxMethodsClass.forward_to("/SocialAuthLogInAndOutServlet?mode=logout", request, response, LOG);
+	}
+
+	public static void goToSearchMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+			throws ServletException, IOException {
+		// String appUrl = getAppUrlFromRequest(request);
+		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
+		AuxMethodsClass.forward_to("/search-menu.jsp", request, response, LOG);
+	}
+	
+	public static void goToError(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+			throws ServletException, IOException {
+		// String appUrl = getAppUrlFromRequest(request);
+		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
+		AuxMethodsClass.forward_to("/error.jsp", request, response, LOG);
+	}
+	
+	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+			throws ServletException, IOException {
 		LOG.info("forward_to " + where);
 		RequestDispatcher dispatcher = request.getRequestDispatcher(where);
 		dispatcher.forward(request, response);

@@ -8,7 +8,7 @@
 	// Not necessary: jsp pages know about the session.
 	// HttpSession session = request.getSession(false);
 	if (session==null) { 
-    	String url = AuxMethodsClass.getAppUrlFromRequest(request) + "index-authentication.jsp";
+    	String url = AuxMethodsClass.getAppUrlFromRequest(request, null) + "index-authentication.jsp";
     	//response.sendRedirect( url );
 %>
 <meta http-equiv="Refresh" content="5; url=<%=url %>">

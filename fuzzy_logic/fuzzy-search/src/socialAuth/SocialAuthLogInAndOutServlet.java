@@ -99,7 +99,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			throws Exception {
 		
 		HttpSession session = request.getSession(true);
-		String appUrl = AuxMethodsClass.getAppUrlFromRequest(request);
+		String appUrl = AuxMethodsClass.getAppUrlFromRequest(request, LOG);
 		String newUrl = appUrl + "/index-authentication.jsp";
 		
 		LOG.info("socialAuthentication entered");
@@ -117,26 +117,30 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 
 	    	if ("signin".equals(request_mode)) {
 	    		newUrl = socialAuthenticationLogIn(appUrl, request_mode, request_id, session, response);
+	    		
+	    	    // Go to the newUrl
+	    	    if (newUrl != null) {
+	    	    	LOG.info(newUrl);
+	    	    	response.sendRedirect( newUrl );
+	    	    	// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
+	    	    	// return fwd;
+	    	    	return;
+	    	    }
+	    	    else {
+	    	    	LOG.info("ERROR: newUrl is null !!! ");
+	    	    }
 	    	}
 	    	else {
 	    		if ("signout".equals(request_mode)) {
-	    			newUrl = socialAuthenticationLogOut(appUrl, request_mode, request_id, session, response);
+	    			socialAuthenticationLogOut(appUrl, request_mode, request_id, session, response);
+	    			AuxMethodsClass.goToAppIndex(request, response, LOG);
+	    			return;
 	    		}
 	    	}
 	    }
-	    
-	    // Go to the newUrl
-	    if (newUrl != null) {
-	    	LOG.info(newUrl);
-	    	response.sendRedirect( newUrl );
-	    	// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
-	    	// return fwd;
-	    }
-	    else {
-	    	LOG.info("ERROR: newUrl is null !!! ");
-	    }
 
-		System.out.println("ERROR: Last line in doPost !!!");
+		LOG.info("ERROR: Last line in doPost !!!");
+		AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 		// return mapping.findForward("failure");
 	}
 		
@@ -169,7 +173,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 
 	}
 	
-	private String socialAuthenticationLogOut(String appUrl, String request_mode, String request_id,
+	private void socialAuthenticationLogOut(String appUrl, String request_mode, String request_id,
 			HttpSession session, HttpServletResponse response) {
 		
 		AuthForm authForm = null;
@@ -185,7 +189,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			}
 			session.invalidate();
 		}
-		return appUrl;
+		
 	}
 	
 	/**

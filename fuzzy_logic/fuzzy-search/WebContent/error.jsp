@@ -39,7 +39,7 @@
 
 <br/><br/><br/><br/><H1>
 <%@page import="socialAuth.AuxMethodsClass" %>
-<a href="<%=AuxMethodsClass.getAppUrlFromRequest(request) %>/index.jsp">Go to starting page.</a>
+<a href="<%=AuxMethodsClass.getAppUrlFromRequest(request, null) %>/index.jsp">Go to starting page.</a>
 </H1>
 <BR/><BR/><BR/><BR/>
 </body>

@@ -8,13 +8,13 @@
 </head>
 <body>
 
-		<% if (request.getAttribute("msg") != null) { %>
-			<h1>MSG: <%=request.getAttribute("msg") %>
+		<% if (request.getAttribute("msg1") != null) { %>
+			<h1>MSG: <%=request.getAttribute("msg1") %>
 			</h1>
 		<% } %>
 		
-		<% if (request.getAttribute("msg") != null) { %>
-			<h1>MSG: <%=request.getAttribute("Message") %>
+		<% if (request.getAttribute("msg2") != null) { %>
+			<h1>MSG: <%=request.getAttribute("msg2") %>
 			</h1>
 		<% } %>
 
