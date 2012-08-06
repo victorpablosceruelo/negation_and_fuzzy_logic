@@ -40,69 +40,69 @@
 				<tr><td colspan="8"><p align="center">Please click on any icon.</p></td></tr>
 				<tr>
 					<td>
-						<a href="SocialAuthenticationServlet?id=facebook"><img src="images/facebook_icon.png" alt="Facebook" title="Facebook" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=facebook"><img src="images/facebook_icon.png" alt="Facebook" title="Facebook" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=facebook&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=facebook&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=facebook&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=facebook&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=twitter"><img src="images/twitter_icon.png" alt="Twitter" title="Twitter" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=twitter"><img src="images/twitter_icon.png" alt="Twitter" title="Twitter" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=twitter&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=twitter&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=twitter&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=twitter&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=google"><img src="images/gmail-icon.jpg" alt="Gmail" title="Gmail" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=google"><img src="images/gmail-icon.jpg" alt="Gmail" title="Gmail" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=google&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=google&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=google&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=google&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=yahoo"><img src="images/yahoomail_icon.jpg" alt="YahooMail" title="YahooMail" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=yahoo"><img src="images/yahoomail_icon.jpg" alt="YahooMail" title="YahooMail" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=yahoo&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=yahoo&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=yahoo&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=yahoo&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=hotmail"><img src="images/hotmail.jpeg" alt="HotMail" title="HotMail" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=hotmail"><img src="images/hotmail.jpeg" alt="HotMail" title="HotMail" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=hotmail&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=hotmail&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=hotmail&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=hotmail&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=linkedin"><img src="images/linkedin.gif" alt="Linked In" title="Linked In" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=linkedin"><img src="images/linkedin.gif" alt="Linked In" title="Linked In" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=linkedin&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=linkedin&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=linkedin&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=linkedin&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=foursquare"><img src="images/foursquare.jpeg" alt="FourSquare" title="FourSquare" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=foursquare"><img src="images/foursquare.jpeg" alt="FourSquare" title="FourSquare" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=foursquare&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=foursquare&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=foursquare&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=foursquare&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=myspace"><img src="images/myspace.jpeg" alt="MySpace" title="MySpace" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=myspace"><img src="images/myspace.jpeg" alt="MySpace" title="MySpace" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=myspace&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=myspace&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=myspace&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=myspace&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=mendeley"><img src="images/mendeley.jpg" alt="Mendeley" title="Mendeley" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=mendeley"><img src="images/mendeley.jpg" alt="Mendeley" title="Mendeley" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=mendeley&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=mendeley&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=mendeley&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=mendeley&mode=signin">Signin</a><br/>
 					</td>
 					<td>
-						<a href="SocialAuthenticationServlet?id=yammer"><img src="images/yammer.jpg" alt="Yammer" title="Yammer" border="0"></img></a>
+						<a href="SocialAuthLogInAndOutServlet?id=yammer"><img src="images/yammer.jpg" alt="Yammer" title="Yammer" border="0"></img></a>
 						<br/><br/>
-							<a href="SocialAuthenticationServlet?id=yammer&mode=signout">Signout</a>
-							<a href="SocialAuthenticationServlet?id=yammer&mode=signin">Signin</a><br/>
+							<a href="SocialAuthLogInAndOutServlet?id=yammer&mode=signout">Signout</a>
+							<a href="SocialAuthLogInAndOutServlet?id=yammer&mode=signin">Signin</a><br/>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="8" align="center">
-						<form action="SocialAuthenticationServlet" onsubmit="return validate(this);">
+						<form action="SocialAuthLogInAndOutServlet" onsubmit="return validate(this);">
 							or enter OpenID url: <input type="text" value="" name="id"/>
 							<input type="submit" value="Submit"/> 
 						</form>

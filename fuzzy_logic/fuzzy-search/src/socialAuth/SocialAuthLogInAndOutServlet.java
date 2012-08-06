@@ -1,27 +1,4 @@
-/*
- ===========================================================================
- Copyright (c) 2010 BrickRed Technologies Limited
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sub-license, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ===========================================================================
-
- */
 package socialAuth;
 
 // import java.io.IOException;
@@ -43,7 +20,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.AuxMethodsClass;
 
 import socialAuth.SocialAuthConfig;
 import socialAuth.SocialAuthManager;
@@ -72,14 +48,14 @@ import socialAuth.AuthForm;
  */
 // public class SocialAuthenticationAction extends Action {
 
-@WebServlet("/SocialAuthenticationServlet")
-public class SocialAuthenticationServlet extends HttpServlet {
+@WebServlet("/SocialAuthLogInAndOutServlet")
+public class SocialAuthLogInAndOutServlet extends HttpServlet {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(SocialAuthenticationServlet.class);
+	final Log LOG = LogFactory.getLog(SocialAuthLogInAndOutServlet.class);
 
 	/**
 	 * creates a instance of the requested provider from AuthProviderFactory and
@@ -127,7 +103,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		String newUrl = appUrl + "/index-authentication.jsp";
 		
 		LOG.info("socialAuthentication entered");
-		AuxMethodsClass.show_request_parameters(request, LOG);
+		AuxMethodsClass.log_request_parameters(request, LOG);
 		
 		// Get the value of the parameter; the name is case-sensitive
 		String request_id = request.getParameter("id");
@@ -173,7 +149,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		if ("signin".equals(request_mode)) {
 			authForm = new AuthForm();
 			authForm.setId(request_id);
-			InputStream in = SocialAuthenticationServlet.class.getClassLoader()
+			InputStream in = SocialAuthLogInAndOutServlet.class.getClassLoader()
 					.getResourceAsStream("oauth_consumer.properties");
 			SocialAuthConfig conf = SocialAuthConfig.getDefault();
 			conf.load(in);
@@ -182,7 +158,7 @@ public class SocialAuthenticationServlet extends HttpServlet {
 
 			LOG.info("Redirecting to open authentication service for "+request_id);
 			// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
-			String returnToUrl = appUrl + "/socialAuthenticationServlet";  
+			String returnToUrl = appUrl + "/socialAuthUpdateStatusServlet";  
 			newUrl = authForm.getSocialAuthManager().getAuthenticationUrl(request_id, returnToUrl);
 		}
 		// if (newUrl != null) {
@@ -198,7 +174,8 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		AuthForm authForm = null;
 		if ("signout".equals(request_mode)) {
 			authForm = (AuthForm) session.getAttribute("authForm");
-			if (authForm.getSocialAuthManager() != null) {
+			if ((authForm != null) && 
+				(authForm.getSocialAuthManager() != null)) {
 				authForm.getSocialAuthManager().disconnectProvider(authForm.getId());
 			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
 			    // response.sendRedirect( urlWithSessionID );
@@ -305,40 +282,6 @@ public class SocialAuthenticationServlet extends HttpServlet {
 		return mapping.findForward("failure");
 	}
 */
-
-/*
-	@Override
-	public ActionForward execute(final ActionMapping mapping,
-			final ActionForm form, final HttpServletRequest request,
-			final HttpServletResponse response) throws Exception {
-		String statusMsg = request.getParameter("statusMessage");
-		if (statusMsg == null || statusMsg.trim().length() == 0) {
-			request.setAttribute("Message", "Status can't be left blank.");
-			return mapping.findForward("failure");
-		}
-		AuthForm authForm = (AuthForm) form;
-		SocialAuthManager manager = authForm.getSocialAuthManager();
-		AuthProvider provider = null;
-		if (manager != null) {
-			provider = manager.getCurrentAuthProvider();
-		}
-		if (provider != null) {
-			try {
-				provider.updateStatus(statusMsg);
-				request.setAttribute("Message", "Status Updated successfully");
-				return mapping.findForward("success");
-			} catch (SocialAuthException e) {
-				request.setAttribute("Message", e.getMessage());
-				e.printStackTrace();
-			}
-		}
-		// if provider null
-		return mapping.findForward("failure");
-	}
-*/
-
-
-	
 
 }
 
