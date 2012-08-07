@@ -142,6 +142,7 @@
     <a href="upload.jsp">Upload</a><br />
 	<a href="addUser.jsp">Add User</a><br />
 	<a href="index-authentication.jsp">Authentication</a><br />
+	<a href="AuthServlet?openid_identifier=https://www.google.com/accounts/o8/ud">Signin</a>
     <br /><br /><br />
     
     <div id="footer">
