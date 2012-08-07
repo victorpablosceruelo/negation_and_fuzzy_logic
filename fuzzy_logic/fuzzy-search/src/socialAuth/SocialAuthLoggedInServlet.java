@@ -49,10 +49,10 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 		try {
 			socialAuthLoggedIn(request, response);
 		} catch (Exception e) {
-			System.out.print("Exception thrown: ");
-			System.out.print(e);
+			LOG.error("Exception thrown: ");
+			LOG.error(e);
 			e.printStackTrace();
-			
+			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 		}
 	}
 
@@ -63,50 +63,54 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 		if (session == null) {
 			LOG.info("session is null");
 			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
-			return;
-		}
-		
-		// String appUrl = AuxMethodsClass.getAppUrlFromRequest(request);
-		AuthForm authForm = (AuthForm) session.getAttribute("authForm");;
-		if ((authForm != null) && (authForm.getSocialAuthManager() != null)) {
-			List<Contact> contactsList = new ArrayList<Contact>();
-			Profile profile = null;
-			try {
-				Map<String, String> paramsMap = SocialAuthUtil.getRequestParametersMap(request);
-				AuthProvider provider = authForm.getSocialAuthManager().connect(paramsMap);
-
-				profile = provider.getUserProfile();
-				contactsList = provider.getContactList();
-				if (contactsList != null && contactsList.size() > 0) {
-					for (Contact p : contactsList) {
-						if (StringUtils.isEmpty(p.getFirstName()) && StringUtils.isEmpty(p.getLastName())) {
-							p.setFirstName(p.getDisplayName());
-						}
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			request.setAttribute("profile", profile);
-			request.setAttribute("contacts", contactsList);
-
-			// return mapping.findForward("success");
-			AuxMethodsClass.forward_to("SocialAuthUpdateStatusServlet", request, response, LOG);
 		}
 		else {
+
+			// String appUrl = AuxMethodsClass.getAppUrlFromRequest(request);
+			AuthForm authForm = (AuthForm) session.getAttribute("authForm");;
 			if (authForm == null) {
 				LOG.info("authForm is null");
 				request.setAttribute("msg", "authForm is null");
+				AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 			}
 			else {
-				LOG.info("authForm.getSocialAuthManager is null");
-				request.setAttribute("msg", "authForm.getSocialAuthManager is null");
+				if (authForm.getSocialAuthManager() == null) {
+					LOG.info("authForm.getSocialAuthManager is null");
+					request.setAttribute("msg", "authForm.getSocialAuthManager is null");
+					AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+				}
+				else {
+
+					List<Contact> contactsList = new ArrayList<Contact>();
+					Profile profile = null;
+					try {
+						Map<String, String> paramsMap = SocialAuthUtil.getRequestParametersMap(request);
+						AuthProvider provider = authForm.getSocialAuthManager().connect(paramsMap);
+
+						profile = provider.getUserProfile();
+						contactsList = provider.getContactList();
+						if (contactsList != null && contactsList.size() > 0) {
+							for (Contact p : contactsList) {
+								if (StringUtils.isEmpty(p.getFirstName()) && StringUtils.isEmpty(p.getLastName())) {
+									p.setFirstName(p.getDisplayName());
+								}
+							}
+						}
+						request.setAttribute("profile", profile);
+						request.setAttribute("contacts", contactsList);
+
+						// return mapping.findForward("success");
+						AuxMethodsClass.forward_to("SocialAuthUpdateStatusServlet", request, response, LOG);
+
+					} catch (Exception e) {
+						LOG.error("Exception thrown: ");
+						LOG.error(e);
+						e.printStackTrace();
+						AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+					}
+				}
 			}
-				
 		}
-		// if provider null
-		// return mapping.findForward("failure");
-		AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 	}
 	
 	/*	@Override

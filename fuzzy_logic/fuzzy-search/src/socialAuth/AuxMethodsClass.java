@@ -20,12 +20,12 @@ public class AuxMethodsClass {
 
 		while (parametersEnum.hasMoreElements()) {
 			// Get the name of the request parameter
-			parameterName = parametersEnum.nextElement().toString();
+			parameterName = (parametersEnum.nextElement()).toString();
 			LOG.info("Parameter name: " + parameterName);
 			
 			String[] values = request.getParameterValues(parameterName);
 			for (int i=0; i<values.length; i++) {
-				LOG.info("Parameter name and value: " + parameterName + ": " + values[i]);
+				LOG.info("Parameter name and value: " + parameterName + "[" + i + "]: " + values[i]);
 //				System.out.print(values[i]);
 //				System.out.print(", ");
 			}

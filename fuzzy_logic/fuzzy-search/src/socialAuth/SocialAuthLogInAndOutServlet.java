@@ -88,10 +88,10 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 		try {
 			socialAuthentication(request, response);
 		} catch (Exception e) {
-			System.out.print("Exception thrown: ");
-			System.out.print(e);
+			LOG.error("Exception thrown: ");
+			LOG.error(e);
 			e.printStackTrace();
-			
+			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 		}
 	}
 		
@@ -99,58 +99,55 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			throws Exception {
 		
 		HttpSession session = request.getSession(true);
-		String appUrl = AuxMethodsClass.getAppUrlFromRequest(request, LOG);
-		String newUrl = appUrl + "/index-authentication.jsp";
-		
 		LOG.info("socialAuthentication entered");
-		AuxMethodsClass.log_request_parameters(request, LOG);
+		// AuxMethodsClass.log_request_parameters(request, LOG);
 		
-		// Get the value of the parameter; the name is case-sensitive
-		String request_id = request.getParameter("id");
 		String request_mode = request.getParameter("mode");
-	    if ((request_id != null) && (! "".equals(request_id)) &&
-	    	(request_mode != null) && (! "".equals(request_mode))	) { 
-	        // (request_id == null) :: The request parameter was not present in the query string.
-	        // e.g. http://hostname.com?a=b
-	        // ("".equals(request_id)) The request parameter was present in the query string but has no value.
-	        // e.g. http://hostname.com?param=&a=b
-
+		if ((request_mode == null) || ("".equals(request_mode))	) { 
+			LOG.info("ERROR: erroneous request_mode (empty or null). ");
+			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+		}
+	    else {
 	    	if ("signin".equals(request_mode)) {
-	    		newUrl = socialAuthenticationLogIn(appUrl, request_mode, request_id, session, response);
-	    		
-	    	    // Go to the newUrl
-	    	    if (newUrl != null) {
-	    	    	LOG.info(newUrl);
-	    	    	response.sendRedirect( newUrl );
-	    	    	// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
-	    	    	// return fwd;
-	    	    	return;
-	    	    }
-	    	    else {
-	    	    	LOG.info("ERROR: newUrl is null !!! ");
-	    	    }
+	    		socialAuthenticationLogIn(session, request, response);
 	    	}
 	    	else {
 	    		if ("signout".equals(request_mode)) {
-	    			socialAuthenticationLogOut(appUrl, request_mode, request_id, session, response);
+	    			socialAuthenticationLogOut(session, response);
 	    			AuxMethodsClass.goToAppIndex(request, response, LOG);
-	    			return;
+	    		}
+	    		else {
+	    			LOG.info("ERROR: erroneous request_mode: " + request_mode);
+	    			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
 	    		}
 	    	}
 	    }
 
-		LOG.info("ERROR: Last line in doPost !!!");
-		AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+		LOG.info("Last line in doPost !!!");
+
 		// return mapping.findForward("failure");
 	}
 		
-	private String socialAuthenticationLogIn(String appUrl, String request_mode, String request_id,
-			HttpSession session, HttpServletResponse response) throws Exception {
+	private void socialAuthenticationLogIn(HttpSession session, HttpServletRequest request, HttpServletResponse response) 
+			throws Exception {
 		// AuthForm authForm = (AuthForm) form;
+		String appUrl = AuxMethodsClass.getAppUrlFromRequest(request, LOG);
 		AuthForm authForm = null;
 		String newUrl = "";
 
-		if ("signin".equals(request_mode)) {
+		// Get the value of the parameter; the name is case-sensitive
+		String request_id = request.getParameter("id");
+
+		if ((request_id == null) || ("".equals(request_id))) {
+
+			// (request_id == null) :: The request parameter was not present in the query string.
+			// e.g. http://hostname.com?a=b
+			// ("".equals(request_id)) The request parameter was present in the query string but has no value.
+			// e.g. http://hostname.com?param=&a=b
+			LOG.info("ERROR: erroneous request_id or request_mode. ");
+			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+		}
+		else {
 			authForm = new AuthForm();
 			authForm.setId(request_id);
 			InputStream in = SocialAuthLogInAndOutServlet.class.getClassLoader()
@@ -165,31 +162,32 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			// String returnToUrl = RequestUtils.absoluteURL(request, "/socialAuthenticationServlet").toString();
 			String returnToUrl = appUrl + "/SocialAuthLoggedInServlet";  
 			newUrl = authForm.getSocialAuthManager().getAuthenticationUrl(request_id, returnToUrl);
+			
+		    if ((newUrl == null) || ("".equals(newUrl))) {
+		    	LOG.info("ERROR: newUrl is empty or null !!! ");
+		    	AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+		    }
+		    else {
+		    	LOG.info("Redirect to: " + newUrl);
+		    	response.sendRedirect( newUrl );
+		    	// ActionForward fwd = new ActionForward("openAuthUrl", url, true);
+		    	// return fwd;
+		    }
 		}
-		// if (newUrl != null) {
-		return newUrl;
-		// }
-
-
 	}
 	
-	private void socialAuthenticationLogOut(String appUrl, String request_mode, String request_id,
-			HttpSession session, HttpServletResponse response) {
+	private void socialAuthenticationLogOut(HttpSession session, HttpServletResponse response) {
 		
-		AuthForm authForm = null;
-		if ("signout".equals(request_mode)) {
-			authForm = (AuthForm) session.getAttribute("authForm");
-			if ((authForm != null) && 
+		AuthForm authForm = (AuthForm) session.getAttribute("authForm");
+		if ((authForm != null) && 
 				(authForm.getSocialAuthManager() != null)) {
-				authForm.getSocialAuthManager().disconnectProvider(authForm.getId());
-			    // String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
-			    // response.sendRedirect( urlWithSessionID );
-				// return mapping.findForward("home");
-				// url = RequestUtils.absoluteURL(request, "/").toString();
-			}
-			session.invalidate();
+			authForm.getSocialAuthManager().disconnectProvider(authForm.getId());
+			// String urlWithSessionID = response.encodeRedirectURL(aDestinationPage.toString());
+			// response.sendRedirect( urlWithSessionID );
+			// return mapping.findForward("home");
+			// url = RequestUtils.absoluteURL(request, "/").toString();
 		}
-		
+		session.invalidate();
 	}
 	
 	/**
