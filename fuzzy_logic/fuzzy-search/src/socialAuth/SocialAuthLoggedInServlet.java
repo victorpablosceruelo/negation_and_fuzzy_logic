@@ -52,7 +52,7 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		if (session == null) {
 			LOG.info("session is null");
-			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 		else {
 
@@ -71,13 +71,13 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 			if (authForm == null) {
 				LOG.info("authForm is null");
 				request.setAttribute("msg", "authForm is null");
-				AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+				AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 			}
 			else {
 				if (authForm.getSocialAuthManager() == null) {
 					LOG.info("authForm.getSocialAuthManager is null");
 					request.setAttribute("msg", "authForm.getSocialAuthManager is null");
-					AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+					AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 				}
 				else {
 
@@ -106,7 +106,9 @@ public class SocialAuthLoggedInServlet extends HttpServlet {
 						LOG.error("Exception thrown: ");
 						LOG.error(e);
 						e.printStackTrace();
-						AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+						request.setAttribute("msg1", e.toString());
+						AuxMethodsClass.goToError(request, response, LOG);
+						// AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 					}
 				}
 			}

@@ -38,7 +38,7 @@ public class SocialAuthUpdateStatusServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 	}
 
@@ -60,20 +60,20 @@ public class SocialAuthUpdateStatusServlet extends HttpServlet {
 				if (statusMsg != null) {
 					LOG.info("statusMsg: " + statusMsg);
 				}
-				AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+				AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 			}
 			else {
 				AuthForm authForm = (AuthForm) session.getAttribute("authForm");
 				if (authForm == null) {
 					LOG.info("authForm is null");
 					request.setAttribute("msg2", "authForm is null");
-					AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+					AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 				}
 				else {
 					if (authForm.getSocialAuthManager() == null) {
 						LOG.info("authForm.getSocialAuthManager is null");
 						request.setAttribute("msg2", "authForm.getSocialAuthManager is null");
-						AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+						AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 					}
 					else {
 						AuthProvider provider = authForm.getSocialAuthManager().getCurrentAuthProvider();
@@ -82,7 +82,7 @@ public class SocialAuthUpdateStatusServlet extends HttpServlet {
 							// if provider null
 							LOG.info("provider is null");
 							request.setAttribute("msg2", "provider is null");
-							AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+							AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 						}
 						else {
 							try {

@@ -91,7 +91,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 	}
 		
@@ -105,7 +105,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 		String request_mode = request.getParameter("mode");
 		if ((request_mode == null) || ("".equals(request_mode))	) { 
 			LOG.info("ERROR: erroneous request_mode (empty or null). ");
-			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 	    else {
 	    	if ("signin".equals(request_mode)) {
@@ -118,7 +118,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 	    		}
 	    		else {
 	    			LOG.info("ERROR: erroneous request_mode: " + request_mode);
-	    			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+	    			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 	    		}
 	    	}
 	    }
@@ -145,7 +145,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			// ("".equals(request_id)) The request parameter was present in the query string but has no value.
 			// e.g. http://hostname.com?param=&a=b
 			LOG.info("ERROR: erroneous request_id or request_mode. ");
-			AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+			AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 		else {
 			authForm = new AuthForm();
@@ -165,7 +165,7 @@ public class SocialAuthLogInAndOutServlet extends HttpServlet {
 			
 		    if ((newUrl == null) || ("".equals(newUrl))) {
 		    	LOG.info("ERROR: newUrl is empty or null !!! ");
-		    	AuxMethodsClass.goToAuthenticationLogout(request, response, LOG);
+		    	AuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		    }
 		    else {
 		    	LOG.info("Redirect to: " + newUrl);

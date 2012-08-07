@@ -100,11 +100,11 @@ public class AuxMethodsClass {
 		AuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
 	}	
 	
-	public static void goToAuthenticationLogout(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToAuthenticationSignout(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		AuxMethodsClass.forward_to("/SocialAuthLogInAndOutServlet?mode=logout", request, response, LOG);
+		AuxMethodsClass.forward_to("/SocialAuthLogInAndOutServlet?mode=signout", request, response, LOG);
 	}
 
 	public static void goToSearchMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
@@ -118,7 +118,7 @@ public class AuxMethodsClass {
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		AuxMethodsClass.forward_to("/error.jsp", request, response, LOG);
+		AuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
 	}
 	
 	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
