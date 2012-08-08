@@ -2,7 +2,7 @@ package auxiliar;
 
 import java.util.*;
 
-public class Castings {
+public class CastingsClass {
 
 	public static <T> List<T> castList(Class<? extends T> clazz, Collection<?> c) {
 	    List<T> r = new ArrayList<T>(c.size());

@@ -18,18 +18,18 @@ import org.apache.commons.logging.LogFactory;
 // import org.apache.commons.fileupload.FileUploadException;
 // import org.apache.commons.io.output.*;
 
-import auxiliar.Castings;
+import auxiliar.CastingsClass;
 
 
 
 @WebServlet("/UploadServlet")
-public class UploadServlet extends HttpServlet {
+public class UploadFileServlet extends HttpServlet {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(UploadServlet.class);
+	final Log LOG = LogFactory.getLog(UploadFileServlet.class);
 	private static String filesPath = "";
 	
 	private boolean isMultipart;
@@ -72,7 +72,7 @@ public class UploadServlet extends HttpServlet {
 
 		try{ 
 			// Parse the request to get file items.
-			List<FileItem> fileItems = Castings.castList(FileItem.class, upload.parseRequest(request));
+			List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
 
 			// Process the uploaded file items
 			Iterator<FileItem> i = fileItems.iterator();

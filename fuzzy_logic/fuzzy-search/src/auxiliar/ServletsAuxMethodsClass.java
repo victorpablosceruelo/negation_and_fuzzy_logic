@@ -1,4 +1,4 @@
-package socialAuth;
+package auxiliar;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 //import org.apache.commons.logging.LogFactory;
 
-public class AuxMethodsClass {
+public class ServletsAuxMethodsClass {
 
 	public static void log_request_parameters(HttpServletRequest request, Log LOG) throws IOException {
 		// Get the values of all request parameters
@@ -97,28 +97,28 @@ public class AuxMethodsClass {
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		AuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
 	}	
 	
 	public static void goToAuthenticationSignout(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		AuxMethodsClass.forward_to("/SocialAuthLogInAndOutServlet?mode=signout", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/SocialAuthLogInAndOutServlet?mode=signout", request, response, LOG);
 	}
 
 	public static void goToSearchMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		AuxMethodsClass.forward_to("/search-menu.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/search-menu.jsp", request, response, LOG);
 	}
 	
 	public static void goToError(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		AuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
 	}
 	
 	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
