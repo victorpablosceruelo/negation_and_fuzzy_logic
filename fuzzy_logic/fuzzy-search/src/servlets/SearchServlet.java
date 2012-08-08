@@ -1,4 +1,4 @@
-package tests;
+package servlets;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -7,43 +7,33 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.*;
-
-//import javax.servlet.http.*;
-//import javax.servlet.*;
-
-
 /**
- * Servlet implementation class HelloWorld
+ * Servlet implementation class SearchServlet
  */
-@WebServlet("/HelloWorld")
-public class HelloWorldServlet extends HttpServlet {
+@WebServlet("/SearchServlet")
+public class SearchServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public HelloWorldServlet() {
+    public SearchServlet() {
         super();
+        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		    PrintWriter out = response.getWriter();
-
-		    out.println("Hello, world!");
-		    out.close();
+		// TODO Auto-generated method stub
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-			doGet(request, response);
+		// TODO Auto-generated method stub
 	}
 
 }
-

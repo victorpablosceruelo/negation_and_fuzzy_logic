@@ -97,14 +97,14 @@ public class ServletsAuxMethodsClass {
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		ServletsAuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/WEB-INF/index.jsp", request, response, LOG);
 	}	
 	
 	public static void goToAuthenticationSignout(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		ServletsAuxMethodsClass.forward_to("/SocialAuthLogInAndOutServlet?mode=signout", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/SocialAuthServlet?mode=signout", request, response, LOG);
 	}
 
 	public static void goToSearchMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
@@ -118,12 +118,14 @@ public class ServletsAuxMethodsClass {
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		ServletsAuxMethodsClass.forward_to("/index.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/error.jsp", request, response, LOG);
 	}
 	
 	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
-		LOG.info("forward_to " + where);
+		if (LOG != null) {
+			LOG.info("forward_to " + where);
+		}
 		RequestDispatcher dispatcher = request.getRequestDispatcher(where);
 		dispatcher.forward(request, response);
 	}

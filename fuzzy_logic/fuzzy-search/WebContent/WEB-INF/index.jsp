@@ -28,8 +28,8 @@
     <div id="main">        
         <div id="text" >
 			<center>
-				<H1>Fuzzy Search Social Authentication</H1>
-				<H2>Please choose a provider.</H2>
+				<h1>Fuzzy Search Social Authentication</h1 >
+				<h2>Please choose a provider.</h2 >
 
 				<a href="SocialAuthLogInAndOutServlet?id=facebook">
 				<img src=""	alt="Facebook" title="Facebook" border="0"></img>
