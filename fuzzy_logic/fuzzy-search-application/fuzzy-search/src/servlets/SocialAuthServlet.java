@@ -45,7 +45,7 @@ import auxiliar.ServletsAuxMethodsClass;
  */
 // public class SocialAuthenticationAction extends Action {
 
-@WebServlet("/")
+@WebServlet("/SocialAuthServlet")
 public class SocialAuthServlet extends HttpServlet {
 
 	/**
@@ -101,7 +101,7 @@ public class SocialAuthServlet extends HttpServlet {
 		String request_mode = request.getParameter("mode");
 		if ((request_mode == null) || ("".equals(request_mode))	) { 
 			LOG.info("ERROR: erroneous request_mode (empty or null). ");
-			request_mode = "signout";
+			request_mode = "signin";
 		}
 
 		if ("signed".equals(request_mode)) {
@@ -130,11 +130,12 @@ public class SocialAuthServlet extends HttpServlet {
 		
 		LOG.info("socialAuthenticationSignIn method call. ");
 		
-		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
+		// Ask for the previously created session or a new one.
+		HttpSession session = request.getSession(true);
 		Boolean error = false;
 		String msg = "";
 		String athenticationUrl = "";
+		SocialAuthManager manager = null;
 		
 		if (session == null) {
 			error = true;
@@ -143,17 +144,27 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			// Get the value of the parameter; the name is case-sensitive
-			String request_id = request.getParameter("id");
-
-			if ((request_id == null) || ("".equals(request_id))) {
-				// (request_id == null) :: The request parameter was not present in the query string. 
-				// ("".equals(id)) The request parameter was present in the query string but has no value. 
-				error = true;
-				msg = "Session is null";
-				LOG.info("ERROR: erroneous request_id (empty or null). ");
+			String id = (String) session.getAttribute("id");
+			if ((id == null) || ("".equals(id))) {
+				id = request.getParameter("id");
 			}
 			else {
-				SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
+				if ((request.getParameter("id") != null) &&
+					(! request.getParameter("id").equals(id))) {
+					LOG.info("INFO: user has tried to authenticate with a different provider. Strange. ");
+				}
+			}
+				
+			if ((id == null) || ("".equals(id))) {
+				// (id == null) :: The request parameter was not present in the query string. 
+				// ("".equals(id)) The request parameter was present in the query string but has no value. 
+				error = true;
+				msg = "id is null or empty in request and in session.";
+				LOG.info("ERROR: erroneous id (empty or null) in request and in session. ");
+			}
+			
+			if (! error) {
+				 manager = (SocialAuthManager) session.getAttribute("authManager");
 				if (manager == null) {
 					LOG.info("INFO: creating a new manager because it was null. ");
 					//Create an instance of SocialAuthConfgi object
@@ -167,37 +178,26 @@ public class SocialAuthServlet extends HttpServlet {
 					manager = new SocialAuthManager();
 					manager.setSocialAuthConfig(config);
 				}
-				else {
-					LOG.info("INFO: using the manager stored in the session. ");
-					if (request_id.equals((String)session.getAttribute("id"))) {
-						LOG.info("INFO: the id is the expected one. ");
-					}
-					else {
-						LOG.info("INFO: user is trying to authenticate with a different provider. ");
-						error = true;
-						msg = "You have tried to authenticate with a different provider when you were authenticated.";	
-					}
-				}
+			}
 
-				if (! error) {
-					// URL of YOUR application which will be called after authentication
-					String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-					String successUrl= appUrl + "/SocialAuthServlet?mode=signed";
+			if (! error) {
+				// URL of YOUR application which will be called after authentication
+				String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
+				String successUrl= appUrl + "/SocialAuthServlet?mode=signed";
 
-					// get Provider URL to which you should redirect for authentication.
-					// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
-					athenticationUrl = manager.getAuthenticationUrl(request_id, successUrl);
+				// get Provider URL to which you should redirect for authentication.
+				// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
+				athenticationUrl = manager.getAuthenticationUrl(id, successUrl);
 
-					// Store in session.
-					session.setAttribute("authManager", manager);
-					session.setAttribute("id", request_id);
-					session.setAttribute("authenticated", false);
+				// Store in session.
+				session.setAttribute("authManager", manager);
+				session.setAttribute("id", id);
+				session.setAttribute("authenticated", false);
 
-					if ((athenticationUrl == null) || ("".equals(athenticationUrl))) {
-						LOG.info("ERROR: newUrl is empty or null !!! ");
-						error = true;
-						msg = "ERROR: newUrl is empty or null !!! ";	
-					}
+				if ((athenticationUrl == null) || ("".equals(athenticationUrl))) {
+					LOG.info("ERROR: newUrl is empty or null !!! ");
+					error = true;
+					msg = "ERROR: newUrl is empty or null !!! ";	
 				}
 			}
 		}
@@ -231,7 +231,7 @@ public class SocialAuthServlet extends HttpServlet {
 			}
 			session.invalidate();
 		}
-		ServletsAuxMethodsClass.goToAppIndex(request, response, LOG);
+		ServletsAuxMethodsClass.goToAppIndexPage(request, response, LOG);
 	}
 	
 	private void socialAuthenticationSigned(HttpServletRequest request, HttpServletResponse response) throws Exception {

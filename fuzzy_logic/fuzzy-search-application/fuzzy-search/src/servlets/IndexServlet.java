@@ -10,19 +10,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.ServletsAuxMethodsClass;
+
 /**
- * Servlet implementation class SearchServlet
+ * Servlet implementation class IndexServlet
  */
-@WebServlet("/SearchServlet")
-public class SearchServlet extends HttpServlet {
+@WebServlet("/")
+public class IndexServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(SearchServlet.class);
+	final Log LOG = LogFactory.getLog(IndexServlet.class);
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		LOG.info("doGet invocation. Calling doPost");
 		doPost(request, response);
 	}
@@ -31,7 +32,7 @@ public class SearchServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		ServletsAuxMethodsClass.goToAuthenticationSignin(request, response, LOG);
 	}
 
 }
