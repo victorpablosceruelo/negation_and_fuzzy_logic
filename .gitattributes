@@ -1,0 +1,23 @@
+# From http://www.bluishcoder.co.nz/2007/09/git-binary-files-and-cherry-picking.html
+#
+# Git has a heuristic for detecting binary files. 
+# You can force other file types to be binary by adding a .gitattributes 
+# file to your repository. This file contains a list of glob patterns, 
+# followed by attributes to be applied to files matching those patterns. 
+# By adding .gitattributes to the repository all cloned repositories 
+# will pick this up as well.
+#
+# For example, if you want all *.foo files 
+# to be treated as binary files you can have 
+# this line in .gitattributes:
+#
+# *.foo -crlf -diff -merge
+# 
+# This will mean all files with a .foo extension will 
+# not have carriage return/line feed translations done, 
+# won't be diffed and merges will result in conflicts 
+# leaving the original file untouched.
+# 
+*.jar -crlf -diff -merge
+*.war -crlf -diff -merge
+
