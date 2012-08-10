@@ -5,6 +5,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import java.io.*;
 import java.util.*;
 
@@ -54,81 +56,77 @@ public class UploadFileServlet extends HttpServlet {
 	public void uploadFile(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
 		
-		// Check that we have a file upload request
-		isMultipart = ServletFileUpload.isMultipartContent(request);
-		response.setContentType("text/html");
-		java.io.PrintWriter out = response.getWriter( );
-		if( !isMultipart ){
-			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Servlet upload</title>");  
-			out.println("</head>");
-			out.println("<body>");
-			out.println("<p>No file uploaded</p>"); 
-			out.println("</body>");
-			out.println("</html>");
-			return;
+		// Ask for the previously created session.
+		HttpSession session = request.getSession(false);
+				
+		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
+			LOG.info("session is new. showing index page.");
+			ServletsAuxMethodsClass.goToAppIndexPage(request, response, LOG);
 		}
+		else {
 		
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		// maximum size that will be stored in memory
-		factory.setSizeThreshold(maxMemSize);
-		// Location to save data that is larger than maxMemSize.
-		factory.setRepository(new File("/tmp/uploads"));
+			// Check that we have a file upload request
+			isMultipart = ServletFileUpload.isMultipartContent(request);
+			if( !isMultipart ){
+				session.setAttribute("msg1", "ERROR. No file uploaded.");
+			}
+			else {
 
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-		// maximum file size to be uploaded.
-		upload.setSizeMax( maxFileSize );
-		
-		// Get the path where we are going to upload the file.
-		String filesPath = ((new WorkingFolderClass(this)).getWorkingFolder(this));
+				DiskFileItemFactory factory = new DiskFileItemFactory();
+				// maximum size that will be stored in memory
+				factory.setSizeThreshold(maxMemSize);
+				// Location to save data that is larger than maxMemSize.
+				factory.setRepository(new File("/tmp/uploads"));
 
-		try{ 
-			// Parse the request to get file items.
-			List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
+				// Create a new file upload handler
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				// maximum file size to be uploaded.
+				upload.setSizeMax( maxFileSize );
 
-			// Process the uploaded file items
-			Iterator<FileItem> i = fileItems.iterator();
+				// Get the path where we are going to upload the file.
+				String filesPath = ((new WorkingFolderClass(this)).getWorkingFolder(this));
 
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Servlet upload</title>");  
-			out.println("</head>");
-			out.println("<body>");
-			while ( i.hasNext () ) 
-			{
-				FileItem fileItem = (FileItem)i.next();
-				if ( !fileItem.isFormField () )	
-				{
-					// Get the uploaded file parameters
-					//	            String fieldName = fi.getFieldName();
-					String fileName = fileItem.getName();
-					String fileNameReal = ""; 
-					//	            String contentType = fi.getContentType();
-					//	            boolean isInMemory = fi.isInMemory();
-					//	            long sizeInBytes = fi.getSize();
-					// Write the file
-					if( fileName.lastIndexOf("\\") >= 0 ){
-						fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
+				try{ 
+					// Parse the request to get file items.
+					List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
 
-					}else{
-						fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
+					// Process the uploaded file items
+					Iterator<FileItem> i = fileItems.iterator();
+
+					while ( i.hasNext () ) 
+					{
+						FileItem fileItem = (FileItem)i.next();
+						if ( !fileItem.isFormField () )	
+						{
+							// Get the uploaded file parameters
+							//	            String fieldName = fi.getFieldName();
+							String fileName = fileItem.getName();
+							String fileNameReal = ""; 
+							//	            String contentType = fi.getContentType();
+							//	            boolean isInMemory = fi.isInMemory();
+							//	            long sizeInBytes = fi.getSize();
+							// Write the file
+							if( fileName.lastIndexOf("\\") >= 0 ){
+								fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
+
+							}else{
+								fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
+							}
+							file = new File( fileNameReal ) ;
+							fileItem.write( file );
+							session.setAttribute("msg1", "Uploaded Filename: " + fileName + " to " + fileNameReal);
+						}
 					}
-					file = new File( fileNameReal ) ;
-					fileItem.write( file ) ;
-					out.println("Uploaded Filename: " + fileName + "<br>");
-					out.println("Destiny Filename: " + fileNameReal + "<br>");
+				}catch(Exception e) {
+					LOG.error("Exception thrown: ");
+					LOG.error(e);
+					e.printStackTrace();
+					// System.out.println(e);
 				}
 			}
-			out.println("</body>");
-			out.println("</html>");
-		}catch(Exception ex) {
-			System.out.println(ex);
-		}
+			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
+		}	
 	}
-	
 }
 
 
