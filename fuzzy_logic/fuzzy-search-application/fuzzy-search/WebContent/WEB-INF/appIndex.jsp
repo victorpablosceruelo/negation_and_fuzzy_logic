@@ -136,6 +136,11 @@
 	                }
     		    }
 			}
+			
+			out.print("Session information" + " <br /> ");
+			out.print("Session ID: " + session.getId() + " <br /> ");
+			out.print("Creation Time" + new Date(session.getCreationTime()) + " <br /> ");
+			out.print("Time of Last Access" + new Date(session.getLastAccessedTime()) + " <br /> ");
 		%>
     
     <br /><br /><br />

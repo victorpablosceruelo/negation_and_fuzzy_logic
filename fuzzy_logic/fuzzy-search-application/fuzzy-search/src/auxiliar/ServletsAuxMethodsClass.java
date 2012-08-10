@@ -7,11 +7,16 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 //import org.apache.commons.logging.LogFactory;
 
 public class ServletsAuxMethodsClass {
+	
+	public static Boolean client_session_is_not_authenticated(HttpSession session) {
+		return ((session == null) || (session.getAttribute("authenticated") == null) || (! (Boolean) session.getAttribute("authenticated")));
+	}
 
 	public static void log_request_parameters(HttpServletRequest request, Log LOG) throws IOException {
 		// Get the values of all request parameters
@@ -115,18 +120,18 @@ public class ServletsAuxMethodsClass {
 		ServletsAuxMethodsClass.forward_to("/WEB-INF/appIndex.jsp", request, response, LOG);
 	}
 	
-	public static void goToSearchIndexPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToSelectDatabasePage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/searchIndex.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/WEB-INF/selectDatabase.jsp", request, response, LOG);
 	}
 
-	public static void goToSearchMenuPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToPerformQueryPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// String appUrl = getAppUrlFromRequest(request);
 		// response.sendRedirect( appUrl + "/SocialAuthLogInAndOutServlet?mode=logout" );
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/searchMenu.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/WEB-INF/performQuery.jsp", request, response, LOG);
 	}
 	
 	// ----------------------------------------------------------------------------------------------

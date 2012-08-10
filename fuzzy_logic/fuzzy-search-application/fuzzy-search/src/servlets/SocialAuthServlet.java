@@ -74,14 +74,20 @@ public class SocialAuthServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
-			LOG.info("doGet invocation. Calling doPost");
-			doPost(request, response);
+		LOG.info("--- doGet invocation ---");
+		doGetAndDoPost(request, response);
+		LOG.info("--- doGet end ---");
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
-		
-		
+		LOG.info("--- doPost invocation ---");
+		doGetAndDoPost(request, response);
+		LOG.info("--- doPost end ---");	
+	}
+	
+	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
 		try {
 			socialAuthentication(request, response);
 		} catch (Exception e) {
@@ -91,7 +97,7 @@ public class SocialAuthServlet extends HttpServlet {
 			ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 	}
-		
+	
 	private void socialAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
@@ -121,8 +127,6 @@ public class SocialAuthServlet extends HttpServlet {
 				}
 			}
 		}
-		
-		LOG.info("Last line in doPost !!!");
 	}
 		
 	private void socialAuthenticationSignIn(HttpServletRequest request, HttpServletResponse response) 
@@ -130,8 +134,8 @@ public class SocialAuthServlet extends HttpServlet {
 		
 		LOG.info("socialAuthenticationSignIn method call. ");
 		
-		// Ask for the previously created session or a new one.
-		HttpSession session = request.getSession(true);
+		// Ask for the previously created session.
+		HttpSession session = request.getSession(false);
 		Boolean error = false;
 		String msg = "";
 		String athenticationUrl = "";
