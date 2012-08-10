@@ -19,6 +19,8 @@ import org.apache.commons.logging.LogFactory;
 // import org.apache.commons.io.output.*;
 
 import auxiliar.CastingsClass;
+import auxiliar.ServletsAuxMethodsClass;
+import auxiliar.WorkingFolderClass;
 
 
 
@@ -30,7 +32,7 @@ public class UploadFileServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(UploadFileServlet.class);
-	private static String filesPath = "";
+	
 	
 	private boolean isMultipart;
 	private int maxFileSize = 50000 * 1024;
@@ -39,11 +41,25 @@ public class UploadFileServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
+		uploadFile(request, response);
+
+	}
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+
+		throw new ServletException("GET method used with " +
+				getClass( ).getName( )+": POST method required.");
+	} 
+	
+	public void uploadFile(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, java.io.IOException {
+		
 		// Check that we have a file upload request
 		isMultipart = ServletFileUpload.isMultipartContent(request);
 		response.setContentType("text/html");
 		java.io.PrintWriter out = response.getWriter( );
 		if( !isMultipart ){
+			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
 			out.println("<html>");
 			out.println("<head>");
 			out.println("<title>Servlet upload</title>");  
@@ -66,9 +82,8 @@ public class UploadFileServlet extends HttpServlet {
 		// maximum file size to be uploaded.
 		upload.setSizeMax( maxFileSize );
 		
-		if ((filesPath==null) || (filesPath.equals(""))) {
-			whereShouldBeUploadedTheFile();
-		}
+		// Get the path where we are going to upload the file.
+		String filesPath = ((new WorkingFolderClass(this)).getWorkingFolder(this));
 
 		try{ 
 			// Parse the request to get file items.
@@ -113,50 +128,6 @@ public class UploadFileServlet extends HttpServlet {
 			System.out.println(ex);
 		}
 	}
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
-
-		throw new ServletException("GET method used with " +
-				getClass( ).getName( )+": POST method required.");
-	} 
-	
-	private void whereShouldBeUploadedTheFile() {
-		// Try the different options one by one.
-		test_files_path("/home/java-apps/fuzzy-search/");
-		test_files_path(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
-		test_files_path(getServletContext().getInitParameter("file-upload"));
-		test_files_path("/tmp/java-apps/fuzzy-search/");
-		LOG.info("choosen folder for uploads: " + filesPath);
-	}
-	
-	private void test_files_path(String newFilesPath) {
-		LOG.info("testFilesPath: testing: " + newFilesPath);
-		boolean retval = false;
-		String testFolder=newFilesPath+".test";
-		if ((filesPath!=null) && (! filesPath.equals(""))) {
-			return; // No need to update its value.
-		}
-		if ((newFilesPath==null) || (newFilesPath.equals(""))){
-			return; // Invalid input value
-		}
-			
-		File dir; 
-		try {
-			dir = new File(testFolder);
-			if (dir.exists()) {
-				dir.delete();
-			}
-			retval = dir.mkdirs();
-		} 
-		catch (Exception ex) {
-			LOG.info("testFilesPath: not valid: " + newFilesPath);
-			LOG.info("Exception: " + ex);
-		}
-		if (retval) {
-			filesPath = newFilesPath;
-		}
-	}
-
 	
 }
 
