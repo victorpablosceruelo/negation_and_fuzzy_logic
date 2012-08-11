@@ -83,10 +83,12 @@ public class UploadFileServlet extends HttpServlet {
 				// maximum file size to be uploaded.
 				upload.setSizeMax( maxFileSize );
 
-				// Get the path where we are going to upload the file.
-				String filesPath = ((new WorkingFolderClass(this)).getWorkingFolder(this));
-
 				try{ 
+					// Working folder
+					WorkingFolderClass workingFolder = new WorkingFolderClass();
+					// Get the path where we are going to upload the file.
+					String filesPath = workingFolder.getUserWorkingFolder((String) session.getAttribute("user_display_name"));
+
 					// Parse the request to get file items.
 					List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
 
@@ -101,20 +103,25 @@ public class UploadFileServlet extends HttpServlet {
 							// Get the uploaded file parameters
 							//	            String fieldName = fi.getFieldName();
 							String fileName = fileItem.getName();
-							String fileNameReal = ""; 
-							//	            String contentType = fi.getContentType();
-							//	            boolean isInMemory = fi.isInMemory();
-							//	            long sizeInBytes = fi.getSize();
-							// Write the file
-							if( fileName.lastIndexOf("\\") >= 0 ){
-								fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
-
-							}else{
-								fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
+							if ((fileName == null) || ("".equals(fileName))) {
+								session.setAttribute("msg1", "Please choose a correct fuzzy database file.");
 							}
-							file = new File( fileNameReal ) ;
-							fileItem.write( file );
-							session.setAttribute("msg1", "Uploaded Filename: " + fileName + " to " + fileNameReal);
+							else {
+								String fileNameReal = ""; 
+								//	            String contentType = fi.getContentType();
+								//	            boolean isInMemory = fi.isInMemory();
+								//	            long sizeInBytes = fi.getSize();
+								// Write the file
+								if( fileName.lastIndexOf("\\") >= 0 ){
+									fileNameReal = filesPath + "/" + fileName.substring( fileName.lastIndexOf("\\"));
+
+								}else{
+									fileNameReal = filesPath + "/" + fileName.substring(fileName.lastIndexOf("\\")+1);
+								}
+								file = new File( fileNameReal ) ;
+								fileItem.write( file );
+								session.setAttribute("msg1", "Uploaded Filename: " + fileName + " to " + fileNameReal);
+							}
 						}
 					}
 				}catch(Exception e) {

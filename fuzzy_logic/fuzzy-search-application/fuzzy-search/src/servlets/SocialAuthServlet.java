@@ -318,11 +318,8 @@ public class SocialAuthServlet extends HttpServlet {
 	    		LOG.info(msg);
 	    	}
 	    	else {
-
-	    		Profile profile = new Profile();
-	    		profile.setDisplayName("Testing User for fuzzy-search");
 	    		session.setAttribute("authenticated", true);
-	    		session.setAttribute("profile", profile);
+	    		session.setAttribute("user_display_name", "Testing User");
 	    	}
 		}
 	    
