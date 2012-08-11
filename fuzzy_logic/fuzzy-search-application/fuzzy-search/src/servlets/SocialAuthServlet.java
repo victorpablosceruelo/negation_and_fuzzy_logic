@@ -109,13 +109,15 @@ public class SocialAuthServlet extends HttpServlet {
 			LOG.info("ERROR: erroneous request_mode (empty or null). ");
 			request_mode = "signin";
 		}
-
+		
 		if ("signed".equals(request_mode)) {
 			socialAuthenticationSigned(request, response);
 		}
 		else {
 			if ("signin".equals(request_mode)) {
-				socialAuthenticationSignIn(request, response);
+				if (! socialAuthenticationInTestingMode(request, response)) {
+					socialAuthenticationSignIn(request, response);
+				}
 			}
 			else {
 				if ("signout".equals(request_mode)) {
@@ -298,5 +300,42 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 	}
 
+	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// Ask for the previously created session.
+		HttpSession session = request.getSession(false);
+		Boolean error = false;
+		Boolean retval = false;
+		String msg = "";
+
+	    // Returns the host name of the server to which the request was sent.
+	    LOG.info("request.getServerName(): " + request.getServerName());
+	    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
+    		retval = true;
+
+	    	if (session == null) {
+	    		error = true;
+	    		msg = "ERROR: session is null.";
+	    		LOG.info(msg);
+	    	}
+	    	else {
+
+	    		Profile profile = new Profile();
+	    		profile.setDisplayName("Testing User for fuzzy-search");
+	    		session.setAttribute("authenticated", true);
+	    		session.setAttribute("profile", profile);
+	    	}
+		}
+	    
+		if (error) {
+			request.setAttribute("msg1", msg);
+			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+			socialAuthenticationSignOut(request, response);
+		}
+		else {
+			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
+		}
+
+	    return retval;
+	}
 }
 
