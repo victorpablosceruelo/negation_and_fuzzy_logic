@@ -19,7 +19,7 @@ fi;
 
 # Repositories urls.
 REPOS_1=svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk
-REPOS_2=https://babel.ls.fi.upm.es/svn/negation_and_fuzzy_logic/ciao-debian/
+REPOS_2=https://babel.ls.fi.upm.es/svn/negation_and_fuzzy_logic/ciao-pkg-for-debian/
 # SVNREPO_2=svn+ssh://clip.dia.fi.upm.es/home/egallego/clip/repos/ciao-debian/
 
 DATE=`date +%Y%m%d`
