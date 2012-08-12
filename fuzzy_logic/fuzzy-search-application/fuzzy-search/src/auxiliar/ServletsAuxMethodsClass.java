@@ -118,14 +118,14 @@ public class ServletsAuxMethodsClass {
 		ServletsAuxMethodsClass.forward_to("/WEB-INF/appIndex.jsp", request, response, LOG);
 	}
 	
-	public static void goToSelectDatabasePage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToDatabasesMenuPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/selectDatabase.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBasesMenu.jsp", request, response, LOG);
 	}
 
-	public static void goToPerformQueryPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToDataBaseQueryPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/performQuery.jsp", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
 	
 	// ----------------------------------------------------------------------------------------------
@@ -142,10 +142,16 @@ public class ServletsAuxMethodsClass {
 		ServletsAuxMethodsClass.forward_to("/SocialAuthServlet?mode=signout", request, response, LOG);
 	}
 
-	public static void goToSearchMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToDataBasesMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		// ServletsAuxMethodsClass.forward_to("/SearchServlet", request, response, LOG);
-		ServletsAuxMethodsClass.redirect_to("/SearchServlet", request, response, LOG);
+		ServletsAuxMethodsClass.redirect_to("/DataBasesMenuServlet", request, response, LOG);
+	}
+	
+	public static void goToDataBaseQuery(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+			throws ServletException, IOException {
+		// ServletsAuxMethodsClass.forward_to("/SearchServlet", request, response, LOG);
+		ServletsAuxMethodsClass.redirect_to("/DataBaseQueryServlet", request, response, LOG);
 	}
 	
 	public static void goToError(HttpServletRequest request, HttpServletResponse response, Log LOG) 

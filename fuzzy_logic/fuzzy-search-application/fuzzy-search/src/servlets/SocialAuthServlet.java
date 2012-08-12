@@ -296,7 +296,7 @@ public class SocialAuthServlet extends HttpServlet {
 			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 		else {
-			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
+			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 		}
 	}
 
@@ -329,7 +329,7 @@ public class SocialAuthServlet extends HttpServlet {
 			socialAuthenticationSignOut(request, response);
 		}
 		else {
-			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
+			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 		}
 
 	    return retval;

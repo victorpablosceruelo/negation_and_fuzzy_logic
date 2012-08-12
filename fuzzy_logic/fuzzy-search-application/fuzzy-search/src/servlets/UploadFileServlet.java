@@ -131,7 +131,7 @@ public class UploadFileServlet extends HttpServlet {
 					// System.out.println(e);
 				}
 			}
-			ServletsAuxMethodsClass.goToSearchMenu(request, response, LOG);
+			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 		}	
 	}
 }

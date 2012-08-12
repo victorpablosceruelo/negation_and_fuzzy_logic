@@ -34,16 +34,17 @@
 		<INPUT TYPE='file' NAME='fuzzy-database' size="50"> <INPUT
 			TYPE='submit' VALUE='Upload File'>
 	</FORM>
-	<h2>Choose an existing database for querying, viewing or remove</h2>
 	<%
 		WorkingFolderClass workingFolder = new WorkingFolderClass();
 		ArrayList<DataBaseInfoClass> databasesList = workingFolder.listDatabases((String) session.getAttribute("user_display_name"));
 		if (!databasesList.isEmpty()) {
-	%><table>
+	%>
+	<h2>Choose an existing database for querying, viewing or remove</h2>
+		<table>
 				<tr>
 					<td>DataBaseOwner</td>
 					<td>DataBaseName</td>
-					<td>Execute</td>
+					<td>Query the database</td>
 					<td>Remove</td>
 				</tr>
 	<%     
@@ -54,13 +55,13 @@
 				<tr>
 					<td><%=dataBaseInfo.getDataBaseOwner() %></td>
 					<td><%=dataBaseInfo.getDataBaseName() %></td>
-					<td></td>
-					<td></td>
+					<td><a href="DataBaseQueryServlet?op=query&database=<%=dataBaseInfo.getDataBaseName()%>">Query</a></td>
+					<td><a href="DataBasesMenuServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>">Remove</a></td>
 				</tr>
 				<%
 			}
 	%>
-	</table>
+		</table>
 	<% } %>
 	
 </body>

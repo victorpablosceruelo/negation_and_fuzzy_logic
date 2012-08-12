@@ -13,15 +13,16 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 import auxiliar.ServletsAuxMethodsClass;
 
 /**
  * Servlet implementation class SearchServlet
  */
-@WebServlet("/SearchServlet")
-public class SearchServlet extends HttpServlet {
+@WebServlet("/DataBasesMenuServlet")
+public class DataBasesMenuServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(SearchServlet.class);
+	final Log LOG = LogFactory.getLog(DataBasesMenuServlet.class);
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,7 +46,7 @@ public class SearchServlet extends HttpServlet {
 	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, java.io.IOException {
 		try {
-			selectDbOrQuery(request, response);
+			dataBasesMenu(request, response);
 		} catch (Exception e) {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
@@ -54,10 +55,11 @@ public class SearchServlet extends HttpServlet {
 		}
 	}
 
-	private void selectDbOrQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void dataBasesMenu(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		String database;
+		String operation;
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("no session. logout.");
@@ -66,20 +68,45 @@ public class SearchServlet extends HttpServlet {
 		else {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
 			database = request.getParameter("database");
-			if (database == null) {
-				selectDb(request, response);
+			operation = request.getParameter("op");
+			if ((database == null) || (operation == null)) {
+				selectDb(session, request, response);
 			}
 			else {
-				performQuery(request, response);
+				if (operation != null) {
+					if ("query".equals(operation)) {
+						performQuery(session, request, response);
+					}
+					if ("remove".equals(operation)) {
+						removeDatabase(database);
+					}
+				}
+				else {
+					selectDb(session, request, response);
+				}
 			}
 		}
 	}
 	
-	private void selectDb(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ServletsAuxMethodsClass.goToSelectDatabasePage(request, response, LOG);
+	private void selectDb(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+/*		if (session.getAttribute("databasesList") != null) {
+			session.removeAttribute("databasesList");
+		}
+		try {
+			WorkingFolderClass workingFolder = new WorkingFolderClass();
+			ArrayList<DataBaseInfoClass> databasesList = workingFolder.listDatabases((String) session.getAttribute("user_display_name"));
+			session.setAttribute("databasesList", databasesList );
+		}
+		catch (WorkingFolderClassException e) {
+			session.setAttribute("databasesList", new ArrayList<DataBaseInfoClass>() );
+		}
+*/
+		ServletsAuxMethodsClass.goToDatabasesMenuPage(request, response, LOG);
 	}
-	private void performQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ServletsAuxMethodsClass.goToPerformQueryPage(request, response, LOG);
+	private void performQuery(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletsAuxMethodsClass.goToDataBaseQuery(request, response, LOG);
 	}
+	
+	private void removeDa
 
 }
