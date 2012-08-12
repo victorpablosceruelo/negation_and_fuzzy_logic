@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 import auxiliar.ServletsAuxMethodsClass;
+import auxiliar.WorkingFolderClass;
 
 /**
  * Servlet implementation class SearchServlet
@@ -70,43 +71,34 @@ public class DataBasesMenuServlet extends HttpServlet {
 			database = request.getParameter("database");
 			operation = request.getParameter("op");
 			if ((database == null) || (operation == null)) {
-				selectDb(session, request, response);
+				dataBasesMenuAux(session, request, response);
 			}
 			else {
-				if (operation != null) {
-					if ("query".equals(operation)) {
-						performQuery(session, request, response);
-					}
-					if ("remove".equals(operation)) {
-						removeDatabase(database);
-					}
+				if ((operation != null) && ("remove".equals(operation))) {
+					removeDataBase(database, session, request, response);
 				}
 				else {
-					selectDb(session, request, response);
+					dataBasesMenuAux(session, request, response);
 				}
 			}
 		}
 	}
 	
-	private void selectDb(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-/*		if (session.getAttribute("databasesList") != null) {
-			session.removeAttribute("databasesList");
-		}
-		try {
-			WorkingFolderClass workingFolder = new WorkingFolderClass();
-			ArrayList<DataBaseInfoClass> databasesList = workingFolder.listDatabases((String) session.getAttribute("user_display_name"));
-			session.setAttribute("databasesList", databasesList );
-		}
-		catch (WorkingFolderClassException e) {
-			session.setAttribute("databasesList", new ArrayList<DataBaseInfoClass>() );
-		}
-*/
+	private void dataBasesMenuAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletsAuxMethodsClass.goToDatabasesMenuPage(request, response, LOG);
 	}
+
+	/*
 	private void performQuery(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletsAuxMethodsClass.goToDataBaseQuery(request, response, LOG);
 	}
+	*/
 	
-	private void removeDa
+	private void removeDataBase(String database, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+		
+		WorkingFolderClass workingFolder = new WorkingFolderClass();
+		String userDisplayName = (String) session.getAttribute("user_display_name");
+		workingFolder.removeDataBase(database, userDisplayName);
+	}
 
 }

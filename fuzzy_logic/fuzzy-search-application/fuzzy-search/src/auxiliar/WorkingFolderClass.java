@@ -101,6 +101,28 @@ public class WorkingFolderClass {
 		return retval;
 	}
 	
+	public Boolean removeDataBase(String database, String userDisplayName) throws WorkingFolderClassException {
+		configureWorkingFolder();
+		String userWorkingFolder = getUserWorkingFolder(userDisplayName);
+		
+		String fileToRemove=userWorkingFolder+database;
+		File dir;
+		Boolean retval = false;
+		
+		try {
+			dir = new File(fileToRemove);
+			if (dir.exists()) {
+				dir.delete();
+				retval = true;
+			}
+		} 
+		catch (Exception ex) {
+			LOG.info("configureWorkingFolderAux: not valid: " + userWorkingFolder);
+			LOG.info("Exception: " + ex);
+		}
+		return retval;
+	}
+	
 	public ArrayList<DataBaseInfoClass> listDatabases(String userDisplayName) throws WorkingFolderClassException {
 		
 		configureWorkingFolder();		
