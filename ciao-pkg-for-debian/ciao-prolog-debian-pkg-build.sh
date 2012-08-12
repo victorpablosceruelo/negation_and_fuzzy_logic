@@ -131,5 +131,7 @@ set -x
 sudo cowbuilder --build $BUILD_DSC
 
 DIR=`dirname $0`
-sudo $DIR/ciao-prolog-autoinstall.sh 
+echo "-> Now run "
+echo " sudo $DIR/ciao-prolog-autoinstall.sh "
+echo " "
 
