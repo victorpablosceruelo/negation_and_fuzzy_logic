@@ -32,6 +32,7 @@ BUILD_DIFF=$FILE_NAME.diff
 BUILD_DIFF_GZ=$FILE_NAME.diff.gz
 
 # Where to put everything.
+mkdir -p ~/tmp
 pushd ~/tmp
 
 # Clean up
