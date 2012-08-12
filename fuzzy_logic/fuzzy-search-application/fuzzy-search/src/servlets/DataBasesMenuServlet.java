@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.WorkingFolderClass;
+import auxiliar.WorkingFolderClassException;
 
 /**
  * Servlet implementation class SearchServlet
@@ -94,11 +95,21 @@ public class DataBasesMenuServlet extends HttpServlet {
 	}
 	*/
 	
-	private void removeDataBase(String database, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+	private void removeDataBase(String database, HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		WorkingFolderClass workingFolder = new WorkingFolderClass();
-		String userDisplayName = (String) session.getAttribute("user_display_name");
-		workingFolder.removeDataBase(database, userDisplayName);
+		WorkingFolderClass workingFolder;
+		try {
+			workingFolder = new WorkingFolderClass();
+			String userDisplayName = (String) session.getAttribute("user_display_name");
+			workingFolder.removeDataBase(database, userDisplayName);
+			request.setAttribute("msg1", "The database "+database+" has been removed. ");
+		} catch (WorkingFolderClassException e) {
+			LOG.info("Exception: " + e);
+			// e.printStackTrace();
+			request.setAttribute("msg1", "The database "+database+" could not be removed. ");
+		}
+		dataBasesMenuAux(session, request, response);
+		
 	}
 
 }

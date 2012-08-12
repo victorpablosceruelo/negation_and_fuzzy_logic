@@ -113,10 +113,10 @@ public class UploadFileServlet extends HttpServlet {
 								//	            long sizeInBytes = fi.getSize();
 								// Write the file
 								if( fileName.lastIndexOf("\\") >= 0 ){
-									fileNameReal = filesPath + "/" + fileName.substring( fileName.lastIndexOf("\\"));
+									fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
 
 								}else{
-									fileNameReal = filesPath + "/" + fileName.substring(fileName.lastIndexOf("\\")+1);
+									fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
 								}
 								file = new File( fileNameReal ) ;
 								fileItem.write( file );

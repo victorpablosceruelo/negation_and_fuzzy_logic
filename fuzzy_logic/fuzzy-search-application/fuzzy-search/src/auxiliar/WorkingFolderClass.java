@@ -24,7 +24,7 @@ public class WorkingFolderClass {
 	public String getUserWorkingFolder(String userDisplayName) throws WorkingFolderClassException {
 
 		configureWorkingFolder();
-		String userWorkingFolder = workingFolder + "/" + fixUserDisplayName(userDisplayName) + "/";
+		String userWorkingFolder = workingFolder + fixUserDisplayName(userDisplayName) + "/";
 		testOrCreateWorkingFolder(userWorkingFolder);
 		return userWorkingFolder ;
 	}
