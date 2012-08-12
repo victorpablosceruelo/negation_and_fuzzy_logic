@@ -31,9 +31,12 @@ BUILD_DSC=$FILE_NAME.dsc
 BUILD_DIFF=$FILE_NAME.diff
 BUILD_DIFF_GZ=$FILE_NAME.diff.gz
 
+# Working folder
+WORKING_FOLDER=~/tmp
+
 # Where to put everything.
-mkdir -p ~/tmp
-pushd ~/tmp
+mkdir -p ${WORKING_FOLDER}
+pushd ${WORKING_FOLDER}
 
 # Clean up
 rm -fv $BUILD_TGZ $BUILD_DSC $BUILD_DIFF $BUILD_DIFF_GZ
@@ -128,10 +131,11 @@ echo " "
 echo " "
 
 set -x
-sudo cowbuilder --build $BUILD_DSC
+sudo cowbuilder --build ${WORKING_FOLDER}/${BUILD_DSC}
 
 DIR=`dirname $0`
 echo "-> Now run "
 echo " sudo $DIR/ciao-prolog-autoinstall.sh "
 echo " "
+
 
