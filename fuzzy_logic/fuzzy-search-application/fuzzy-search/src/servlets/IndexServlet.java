@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.LogServerInfoClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 /**
@@ -23,6 +24,7 @@ public class IndexServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(IndexServlet.class);
 	private Integer counter = new Integer(0);
+	LogServerInfoClass logServerInfo = null;
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,6 +49,9 @@ public class IndexServlet extends HttpServlet {
 		if (counter == Integer.MAX_VALUE) {
 			counter = Integer.valueOf(0);
 		}
+		
+		// Log info about the server.
+		logServerInfo = new LogServerInfoClass(request);
 		
 		// Create a new session if the client has no session.
 		HttpSession session = request.getSession(true);

@@ -303,36 +303,26 @@ public class SocialAuthServlet extends HttpServlet {
 	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
-		Boolean error = false;
 		Boolean retval = false;
-		String msg = "";
 
 	    // Returns the host name of the server to which the request was sent.
 	    LOG.info("request.getServerName(): " + request.getServerName());
 	    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
-    		retval = true;
-
-	    	if (session == null) {
-	    		error = true;
-	    		msg = "ERROR: session is null.";
-	    		LOG.info(msg);
-	    	}
-	    	else {
+	    	if (session != null) {
+	    		retval = true; // Fake authentication !!!
 	    		session.setAttribute("authenticated", true);
 	    		session.setAttribute("user_display_name", "Testing User");
+	    		ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);		
 	    	}
-		}
-	    
-		if (error) {
-			request.setAttribute("msg1", msg);
-			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
-			socialAuthenticationSignOut(request, response);
-		}
-		else {
-			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 		}
 
 	    return retval;
 	}
 }
+
+
+
+
+//// EOF
+
 

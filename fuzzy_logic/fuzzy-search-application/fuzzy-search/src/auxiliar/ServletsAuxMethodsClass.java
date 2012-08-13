@@ -85,17 +85,6 @@ public class ServletsAuxMethodsClass {
 	    	}
 	    }
 	    
-	    // Returns the host name of the server to which the request was sent.
-	    LOG.info("request.getServerName(): " + request.getServerName());
-	    // Returns the host name of the server to which the request was sent.	
-	    LOG.info("request.getServerPort()" + request.getServerPort());
-	    // Returns the host name of the Internet Protocol (IP) interface on which the request was received.
-	    LOG.info("request.getLocalName()" + request.getLocalName());
-	    // Returns the Internet Protocol (IP) port number of the interface on which the request was received.
-	    LOG.info("request.getLocalPort()" + request.getLocalPort()); 
-
-
-
 	    if (requestUrl != null) {
 	    	Integer index = requestUrl.lastIndexOf("/"); // http:// ... /page
 	    	String appUrl = requestUrl.substring(0, index);
