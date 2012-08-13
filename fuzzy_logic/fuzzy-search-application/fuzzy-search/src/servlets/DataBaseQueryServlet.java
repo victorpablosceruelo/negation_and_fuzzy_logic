@@ -13,7 +13,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import CiaoJava.PLException;
+import auxiliar.CiaoPrologConnectionClass;
 import auxiliar.ServletsAuxMethodsClass;
+import auxiliar.WorkingFolderClassException;
 
 /**
  * Servlet implementation class DbQueryServlet
@@ -21,7 +24,7 @@ import auxiliar.ServletsAuxMethodsClass;
 @WebServlet("/DataBaseQueryServlet")
 public class DataBaseQueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(DataBaseQueryServlet.class);
+	private static final Log LOG = LogFactory.getLog(DataBaseQueryServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -71,6 +74,28 @@ public class DataBaseQueryServlet extends HttpServlet {
 		}
 	}
 	protected void dbQueryAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		CiaoPrologConnectionClass connection = null; 
+		try {
+			connection = new CiaoPrologConnectionClass();
+		} catch (PLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			connection = null;
+		} catch (WorkingFolderClassException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			connection = null;
+		}
+		String userDisplayName = (String) session.getAttribute("user_display_name");
+		try {
+			connection.changeCiaoPrologWorkingFolder(userDisplayName);
+		} catch (WorkingFolderClassException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ServletsAuxMethodsClass.goToDataBaseQueryPage(request, response, LOG);
 	}
 }

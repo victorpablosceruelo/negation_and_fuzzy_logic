@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 public class WorkingFolderClass {
 
 	// private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(WorkingFolderClass.class);
+	private static final Log LOG = LogFactory.getLog(WorkingFolderClass.class);
 	private static String workingFolder = null;
 	
 	
