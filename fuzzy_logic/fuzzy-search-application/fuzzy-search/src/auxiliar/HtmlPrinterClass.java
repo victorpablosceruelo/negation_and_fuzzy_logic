@@ -9,9 +9,11 @@ public class HtmlPrinterClass {
 
 	PrintWriter out = null;
 	
-	public HtmlPrinterClass (HttpServletResponse response) throws IOException {
+	public HtmlPrinterClass (HttpServletResponse response, Boolean setContentTypeToTextAndPlain) throws IOException {
 		out = response.getWriter();
-		response.setContentType("text/plain");
+		if (setContentTypeToTextAndPlain) {
+			response.setContentType("text/plain");
+		}
 	}
 	
 	public void write(String Text) {

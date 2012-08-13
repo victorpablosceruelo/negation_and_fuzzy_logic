@@ -4,6 +4,7 @@ package auxiliar;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -121,6 +122,25 @@ public class WorkingFolderClass {
 			LOG.info("Exception: " + ex);
 		}
 		return retval;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public Iterator<DataBaseInfoClass> returnDatabasesIterator(String userDisplayName) {
+		Iterator<DataBaseInfoClass> databasesIterator = null;
+		try {
+			ArrayList<DataBaseInfoClass> databasesList = listDatabases(userDisplayName);
+			if (!databasesList.isEmpty()) {
+				databasesIterator = databasesList.iterator(); 
+			}
+		} catch (Exception e) {
+			LOG.info("Exception: " + e);
+			e.printStackTrace();
+			databasesIterator = null;
+		}
+		return databasesIterator;
 	}
 	
 	public ArrayList<DataBaseInfoClass> listDatabases(String userDisplayName) throws WorkingFolderClassException {

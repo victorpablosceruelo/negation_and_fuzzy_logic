@@ -86,7 +86,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 			e.printStackTrace();
 			connection = null;
 		}
-		String userDisplayName = (String) session.getAttribute("user_display_name");
+		String userDisplayName = (String) session.getAttribute("userDisplayName");
 		try {
 			connection.changeCiaoPrologWorkingFolder(userDisplayName);
 		} catch (WorkingFolderClassException e) {
@@ -96,6 +96,6 @@ public class DataBaseQueryServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ServletsAuxMethodsClass.goToDataBaseQueryPage(request, response, LOG);
+		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
 }

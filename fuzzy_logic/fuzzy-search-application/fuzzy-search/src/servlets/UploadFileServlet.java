@@ -61,7 +61,7 @@ public class UploadFileServlet extends HttpServlet {
 				
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("session is new. showing index page.");
-			ServletsAuxMethodsClass.goToAppIndexPage(request, response, LOG);
+			ServletsAuxMethodsClass.goToAppIndex(request, response, LOG);
 		}
 		else {
 		
@@ -87,7 +87,8 @@ public class UploadFileServlet extends HttpServlet {
 					// Working folder
 					WorkingFolderClass workingFolder = new WorkingFolderClass();
 					// Get the path where we are going to upload the file.
-					String filesPath = workingFolder.getUserWorkingFolder((String) session.getAttribute("user_display_name"));
+					String userDisplayName = (String) session.getAttribute("userDisplayName");
+					String filesPath = workingFolder.getUserWorkingFolder(userDisplayName);
 
 					// Parse the request to get file items.
 					List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));

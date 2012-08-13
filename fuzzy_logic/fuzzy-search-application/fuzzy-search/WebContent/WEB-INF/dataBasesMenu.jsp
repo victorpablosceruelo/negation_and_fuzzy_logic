@@ -11,10 +11,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Fuzzy Search App</title>
 
+<% String userDisplayName = (String) session.getAttribute("userDisplayName"); %>
 </head>
 <body>
-
-	<h1>Welcome to the fuzzy search application. Your username here is <%= session.getAttribute("user_display_name") %></h1>
+	
+	<h1>Welcome to the fuzzy search application. Your username here is <%= userDisplayName %></h1>
 	<%	
 		if (session != null) {
 			if (session.getAttribute("msg1") != null) {
@@ -36,8 +37,15 @@
 	</FORM>
 	<%
 		WorkingFolderClass workingFolder = new WorkingFolderClass();
-		ArrayList<DataBaseInfoClass> databasesList = workingFolder.listDatabases((String) session.getAttribute("user_display_name"));
-		if (!databasesList.isEmpty()) {
+		Iterator<DataBaseInfoClass> databasesIterator = null;
+		if (workingFolder != null) {
+			databasesIterator = workingFolder.returnDatabasesIterator(userDisplayName);
+		}
+		/*
+		else {
+			out.print("<h2>Error in application: working folder should not be null</h2>");
+		}*/
+		if (databasesIterator != null) {
 	%>
 	<h2>Choose an existing database for querying, viewing or remove</h2>
 		<table>
@@ -47,8 +55,7 @@
 					<td>Query the database</td>
 					<td>Remove</td>
 				</tr>
-	<%     
-			Iterator<DataBaseInfoClass> databasesIterator = databasesList.iterator(); 
+	<%
 			while (databasesIterator.hasNext()) {
 				DataBaseInfoClass dataBaseInfo = databasesIterator.next();
 				%>

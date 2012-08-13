@@ -59,7 +59,7 @@ public class IndexServlet extends HttpServlet {
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("session is new. showing index page.");
-			ServletsAuxMethodsClass.goToAppIndexPage(request, response, LOG);
+			ServletsAuxMethodsClass.forward_to("/WEB-INF/appIndex.jsp", request, response, LOG);
 		}
 		else {
 			LOG.info("session is not new. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));

@@ -237,7 +237,7 @@ public class SocialAuthServlet extends HttpServlet {
 			}
 			session.invalidate();
 		}
-		ServletsAuxMethodsClass.goToAppIndexPage(request, response, LOG);
+		ServletsAuxMethodsClass.goToAppIndex(request, response, LOG);
 	}
 	
 	private void socialAuthenticationSigned(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -286,6 +286,7 @@ public class SocialAuthServlet extends HttpServlet {
 					session.setAttribute("authenticated", true);
 					session.setAttribute("profile", profile);
 					session.setAttribute("contactsList", contactsList);
+					session.setAttribute("userDisplayName", profile.getDisplayName());
 				}
 			}
 		}
@@ -311,7 +312,7 @@ public class SocialAuthServlet extends HttpServlet {
 	    	if (session != null) {
 	    		retval = true; // Fake authentication !!!
 	    		session.setAttribute("authenticated", true);
-	    		session.setAttribute("user_display_name", "Testing User");
+	    		session.setAttribute("userDisplayName", "Testing User");
 	    		ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);		
 	    	}
 		}

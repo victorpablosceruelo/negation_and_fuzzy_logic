@@ -102,24 +102,10 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	
-	public static void goToAppIndexPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void goToAppIndex(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/appIndex.jsp", request, response, LOG);
-	}
-	
-	public static void goToDatabasesMenuPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBasesMenu.jsp", request, response, LOG);
-	}
-
-	public static void goToDataBaseQueryPage(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
-	}
-	
-	// ----------------------------------------------------------------------------------------------
-	// ----------------------------------------------------------------------------------------------
-	// ----------------------------------------------------------------------------------------------
+		ServletsAuxMethodsClass.forward_to("/IndexServlet", request, response, LOG);
+	}	
 	
 	public static void goToAuthenticationSignin(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {

@@ -71,24 +71,14 @@ public class DataBasesMenuServlet extends HttpServlet {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
 			database = request.getParameter("database");
 			operation = request.getParameter("op");
-			if ((database == null) || (operation == null)) {
-				dataBasesMenuAux(session, request, response);
+			if ((database != null) && (operation != null) && ("remove".equals(operation))) {
+				removeDataBase(database, session, request, response);
 			}
-			else {
-				if ((operation != null) && ("remove".equals(operation))) {
-					removeDataBase(database, session, request, response);
-				}
-				else {
-					dataBasesMenuAux(session, request, response);
-				}
-			}
+			
+			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBasesMenu.jsp", request, response, LOG);
 		}
 	}
 	
-	private void dataBasesMenuAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ServletsAuxMethodsClass.goToDatabasesMenuPage(request, response, LOG);
-	}
-
 	/*
 	private void performQuery(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletsAuxMethodsClass.goToDataBaseQuery(request, response, LOG);
@@ -100,7 +90,7 @@ public class DataBasesMenuServlet extends HttpServlet {
 		WorkingFolderClass workingFolder;
 		try {
 			workingFolder = new WorkingFolderClass();
-			String userDisplayName = (String) session.getAttribute("user_display_name");
+			String userDisplayName = (String) session.getAttribute("userDisplayName");
 			workingFolder.removeDataBase(database, userDisplayName);
 			request.setAttribute("msg1", "The database "+database+" has been removed. ");
 		} catch (WorkingFolderClassException e) {
@@ -108,8 +98,6 @@ public class DataBasesMenuServlet extends HttpServlet {
 			// e.printStackTrace();
 			request.setAttribute("msg1", "The database "+database+" could not be removed. ");
 		}
-		dataBasesMenuAux(session, request, response);
-		
 	}
 
 }
