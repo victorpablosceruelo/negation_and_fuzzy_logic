@@ -15,6 +15,12 @@
 <%@page import="java.util.*" %>
 
       <%
+      
+			out.print("Session information" + " <br /> ");
+			out.print("Session ID: " + session.getId() + " <br /> ");
+			out.print("Creation Time" + new Date(session.getCreationTime()) + " <br /> ");
+			out.print("Time of Last Access" + new Date(session.getLastAccessedTime()) + " <br /> ");
+		
       		Enumeration<String> e1 = request.getParameterNames();
 			if ( e1.hasMoreElements()) {
 				%><br /><br /><br /><h1>Parameters</h1><br /><%

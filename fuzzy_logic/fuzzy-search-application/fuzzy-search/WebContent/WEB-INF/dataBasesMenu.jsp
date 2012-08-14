@@ -16,7 +16,7 @@
 <body>
 	
 	<h1>Fuzzy search application</h1>
-	<h2>Check your user information <a href="UserInfoServlet">here</a></h2>
+	<h2>Check your user information <a href="UserInfoServlet">here</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
 	<%	
 		if (session != null) {
 			if ((session.getAttribute("msg1") != null) || (session.getAttribute("msg2") != null)) {
