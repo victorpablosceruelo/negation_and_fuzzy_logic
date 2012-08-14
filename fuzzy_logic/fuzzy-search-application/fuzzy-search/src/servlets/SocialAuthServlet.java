@@ -286,7 +286,15 @@ public class SocialAuthServlet extends HttpServlet {
 					session.setAttribute("authenticated", true);
 					session.setAttribute("profile", profile);
 					session.setAttribute("provider", provider);
-					session.setAttribute("userDisplayName", profile.getDisplayName());
+
+					// Determine correct value for variable userDisplayName
+					
+					if (profile.getDisplayName() != null) {
+						session.setAttribute("userDisplayName", profile.getDisplayName());
+					}
+					else {
+						session.setAttribute("userDisplayName", "Testing User");
+					}
 				}
 			}
 		}
