@@ -15,21 +15,25 @@
 </head>
 <body>
 	
-	<h1>Welcome to the fuzzy search application. Your username here is <%= userDisplayName %></h1>
+	<h1>Fuzzy search application</h1>
+	<h2>Check your user information <a href="UserInfoServlet">here</a></h2>
 	<%	
 		if (session != null) {
+			if ((session.getAttribute("msg1") != null) || (session.getAttribute("msg2") != null)) {
+				out.print("<h2>Messages to the user</h2>");
+			}
 			if (session.getAttribute("msg1") != null) {
-				%> <h2><%=session.getAttribute("msg1") %></h2>
-				<%
+				out.print("<h3>"+session.getAttribute("msg1")+"</h3>");
+				session.removeAttribute("msg1");
 			}
 			if (session.getAttribute("msg2") != null) {
-				%> <h2><%=session.getAttribute("msg2") %></h2>
-				<%
+				out.print("<h3>"+session.getAttribute("msg2")+"</h3>");
+				session.removeAttribute("msg2");
 			}			
 		}
 	%>
-	<h1>Please choose between one of the following tasks:</h1>
-	<h2>Upload a new database</h2>
+	<h2>Please choose between one of the following tasks:</h2>
+	<h3>Upload a new database</h3>
 	<FORM ENCTYPE='multipart/form-data' method='POST'
 		action="UploadServlet">
 		<INPUT TYPE='file' NAME='fuzzy-database' size="50"> <INPUT
@@ -43,11 +47,11 @@
 		}
 		/*
 		else {
-			out.print("<h2>Error in application: working folder should not be null</h2>");
+			out.print("<h4>Error in application: working folder should not be null</h4>");
 		}*/
 		if (databasesIterator != null) {
 	%>
-	<h2>Choose an existing database for querying, viewing or remove</h2>
+	<h3>Choose an existing database for querying, viewing or remove</h3>
 		<table>
 				<tr>
 					<td>DataBaseOwner</td>

@@ -2,7 +2,7 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.List;
+// import java.util.List;
 //import java.io.PrintWriter;
 //import java.util.ArrayList;
 //import java.util.Enumeration;
@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.AuthProvider;
-import org.brickred.socialauth.Contact;
+// import org.brickred.socialauth.Contact;
 import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
@@ -281,11 +281,11 @@ public class SocialAuthServlet extends HttpServlet {
 					// System.out.println(profile.getFirstName());
 
 					// OR also obtain list of contacts
-					List<Contact> contactsList = provider.getContactList();
+					// List<Contact> contactsList = provider.getContactList();
 
 					session.setAttribute("authenticated", true);
 					session.setAttribute("profile", profile);
-					session.setAttribute("contactsList", contactsList);
+					session.setAttribute("provider", provider);
 					session.setAttribute("userDisplayName", profile.getDisplayName());
 				}
 			}
@@ -297,6 +297,7 @@ public class SocialAuthServlet extends HttpServlet {
 			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 		else {
+			request.setAttribute("msg1", "Welcome to the fuzzy search application !!");
 			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 		}
 	}
