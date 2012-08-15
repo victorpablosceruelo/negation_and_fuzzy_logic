@@ -63,7 +63,7 @@ build: fixes
 	# echo "debian" > ./REVISION
 
 	# Facility to use always the same configuration
-	debian/ciao-prolog-configure.sh $(CIAOSETUP)
+	./debian/ciao-prolog-configure.sh $(CIAOSETUP)
 
 	# Add here commands to compile the package.
 	./$(CIAOSETUP) build
