@@ -34,6 +34,9 @@ ${SCRIPT_DIR}/ciao-prolog-svn-co.sh ${DEST_FOLDER} ${VERSION} ${SVN_REVISION_CIA
 # Apply patches.
 ${SCRIPT_DIR}/ciao-prolog-apply-patches.sh ${DEST_FOLDER}/${FOLDER_NAME}
 
+# FIXES.
+# ${SCRIPT_DIR}/ciao-prolog-fixes.sh
+
 # Ensure we work locally.
 pushd ${DEST_FOLDER}
 

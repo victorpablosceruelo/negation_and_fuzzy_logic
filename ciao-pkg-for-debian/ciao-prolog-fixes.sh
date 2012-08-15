@@ -1,10 +1,11 @@
 #!/bin/bash
 
 if [ -z $1 ] || [ "$1" == "" ]; then
-	echo "usage: $0 path_of_folder_to_nocompile_and_nodistribute"
+	echo "usage: $0 path_ciao_prolog_de "
 	exit 0
 fi
 
+pushd ${1}
 
 function nocompile_nor_distribute () {
     if [ ! -z "$1" ] && [ ! "$1" == "" ] && [ -d "$1" ]; then
@@ -18,4 +19,13 @@ function nocompile_nor_distribute () {
     fi
 }
 
-nocompile_nor_distribute $1
+echo "FIXES:"
+nocompile_nor_distribute ciao/contrib/clpfd
+nocompile_nor_distribute ciao/contrib/difference_constraints
+nocompile_nor_distribute ciao/contrib/ppl/0_10
+nocompile_nor_distribute ciao/contrib/ppl/0_9
+rm -fv ciao/contrib/cneg/NOCOMPILE ciao/contrib/cneg/NODISTRIBUTE
+
+popd
+# EOF
+
