@@ -20,6 +20,39 @@ fi
 #    --web_images_path=~/secured/local/share/doc/ciao-prolog/html \
 #    --with_ciaoppcl=no \
 
+${CIAOSETUP} configure \
+    --stop-if-error=yes \
+    --registration_type=user \
+    --instype=local \
+    --execmode=755 \
+    --datamode=644 \
+    --update_bashrc=yes \
+    --dotbashrc=~/.bashrc \
+    --update_cshrc=no \
+    --install_prolog_name=no \
+    --install_emacs_support=yes \
+    --install_xemacs_support=no \
+    --update_dotemacs=yes \
+    --dotemacs=~/.emacs \
+    --emacsinitdir=~/.emacs.d \
+    --update_dotxemacs=no \
+    --with_mysql=yes \
+    --mysql_client_directory=/usr/lib \
+    --with_gsl=no --with_ppl=no \
+    --with_java_interface=yes \
+    --with_ant=yes \
+    --optimizing_compiler=no \
+    --use_threads=yes \
+    --use_posix_locks=no \
+    --and_parallel_execution=no \
+    --par_back=no \
+    --tabled_execution=no \
+    --optim_level=normal \
+    --with_chr=no \
+    --compress_lib=no \
+    --unused_pred_warnings=yes \
+    --runtime_checks=no \
+    --set_flag_options=yes 
 
 ./ciaosetup configure \
 	--stop-if-error=yes \
