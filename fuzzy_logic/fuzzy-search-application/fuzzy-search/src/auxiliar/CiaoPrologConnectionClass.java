@@ -10,7 +10,8 @@ import CiaoJava.*;
 public class CiaoPrologConnectionClass {
 
 	final Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
-	static private String pathToPlServer = "/usr/lib/ciao/ciao-1.15/library/javall/plserver";
+	// static private String pathToPlServer = "/usr/lib/ciao/ciao-1.15/library/javall/plserver";
+	static private String pathToPlServer = "/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver";
 	static private PLConnection plServer = null;
 	static private WorkingFolderClass workingFolderObject = null;
 	static String currentUserDisplayName = null;

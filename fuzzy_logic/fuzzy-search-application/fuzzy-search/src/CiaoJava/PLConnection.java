@@ -239,14 +239,18 @@ public class PLConnection {
      *                        process.
      */
     private void start2(String[] where) throws IOException, PLException {
-    LOG.info("Starting plServer at String[] " + where);
+    LOG.info("Starting plServer at String[] ");
     String[] whereAux = new String[where.length +2];
     int port = ss.getLocalPort();
     for (int i=0; i<where.length; i++) {
     	whereAux[i] = where[i];
     }
-    whereAux[where.length] = "--java";
+    whereAux[where.length] = "--javalocal";
     whereAux[where.length +1] = Integer.toString(port);
+    LOG.info("Starting plServer with command ");
+    for (int i=0; i<whereAux.length; i++) {
+    	LOG.info(whereAux[i]);
+    }
     
 	Runtime rt = Runtime.getRuntime();
 	plProc = rt.exec(whereAux);
