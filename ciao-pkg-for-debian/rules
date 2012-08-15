@@ -65,7 +65,7 @@ build: fixes
 	./$(CIAOSETUP) configure \
 	    --stop-if-error=yes \
 	    --registration_type=all \
-	    --instype=global \
+	    --instype=local \
 	    --prefix=/usr \
 	    --optimizing_compiler=no \
 	    --update_bashrc=no \
@@ -110,7 +110,9 @@ install: build
 	@echo " "
 
 	@echo "Just a list of files in $(CURDIR)/debian/tmp/ "
-	find $(CURDIR)/debian/tmp/
+	@echo "curdir: $(CURDIR)" > $(CURDIR)/debian/tmp/files-in-curdir.txt
+	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir.txt
+	
 	@echo " "
 #	make clean-after
 	dh_install --list-missing
