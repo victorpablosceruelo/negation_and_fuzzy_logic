@@ -166,7 +166,9 @@ public class PLConnection {
     private void start(String where) throws IOException, PLException {
 	Runtime rt = Runtime.getRuntime();
 
-	plProc = rt.exec(where);
+	plProc = rt.exec(where); // runs plServer
+	testPlProcHasNotDied();
+	
 	OutputStream pipeOut = plProc.getOutputStream();
 	PrintStream out = new PrintStream(pipeOut);
 	plInterpreter = new PLInterpreter(this);
@@ -197,6 +199,8 @@ public class PLConnection {
 	Runtime rt = Runtime.getRuntime();
 
 	plProc = rt.exec(where);
+	testPlProcHasNotDied();
+	
 	OutputStream pipeOut = plProc.getOutputStream();
 	PrintStream out = new PrintStream(pipeOut);
 	plInterpreter = new PLInterpreter(this);
@@ -244,6 +248,17 @@ public class PLConnection {
 	System.out.println(port + ".");
 	System.out.flush();
 	bindSockets(System.out);
+    }
+    
+    private void testPlProcHasNotDied () throws PLException {
+    	int exitVal;
+    	try{
+    		exitVal = plProc.exitValue(); // asks for plServer return value
+    		throw new PLException("ERROR: plServer process has died.");
+    	}
+    	catch (IllegalThreadStateException ex) { // if it is still running, all is ok.
+    		true;
+    	}
     }
 
     /**
