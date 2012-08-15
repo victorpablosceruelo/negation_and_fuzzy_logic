@@ -65,6 +65,17 @@ echo " "
 #    --web_images_path=~/secured/local/share/doc/ciao-prolog/html \
 #    --with_ciaoppcl=no \
 
+# 	--update_bashrc=no \
+#	--update_cshrc=no \
+#	--update_dotemacs=no \
+#	--docdir=/usr/share/doc/ciao-prolog \
+#	--mandir=/usr/share/man \
+#	--infodir=/usr/share/info \
+#	--web_images_path=/usr/share/doc/ciao-prolog/html \
+#	--htmldir=/usr/share/doc/ciao-prolog/html \
+#	--installgroup=root \
+
+
 ${CIAOSETUP} configure \
     --stop-if-error=yes \
     --registration_type=user \

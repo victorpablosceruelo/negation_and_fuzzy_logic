@@ -20,6 +20,17 @@ fi
 #    --web_images_path=~/secured/local/share/doc/ciao-prolog/html \
 #    --with_ciaoppcl=no \
 
+# 	--update_bashrc=no \
+#	--update_cshrc=no \
+#	--update_dotemacs=no \
+#	--docdir=/usr/share/doc/ciao-prolog \
+#	--mandir=/usr/share/man \
+#	--infodir=/usr/share/info \
+#	--web_images_path=/usr/share/doc/ciao-prolog/html \
+#	--htmldir=/usr/share/doc/ciao-prolog/html \
+#	--installgroup=root \
+
+
 ${CIAOSETUP} configure \
     --stop-if-error=yes \
     --registration_type=user \
@@ -54,28 +65,6 @@ ${CIAOSETUP} configure \
     --runtime_checks=no \
     --set_flag_options=yes 
 
-./ciaosetup configure \
-	--stop-if-error=yes \
-	--registration_type=all \
-	--instype=local \
-	--prefix=/usr \
-	--optimizing_compiler=no \
-	--update_bashrc=no \
-	--update_cshrc=no \
-	--install_emacs_support=yes \
-	--use_threads=yes \
-	--optim_level=normal \
-	--update_dotemacs=no \
-	--docdir=/usr/share/doc/ciao-prolog \
-	--mandir=/usr/share/man \
-	--infodir=/usr/share/info \
-	--web_images_path=/usr/share/doc/ciao-prolog/html \
-	--htmldir=/usr/share/doc/ciao-prolog/html \
-	--install_prolog_name=no --execmode=755 --datamode=644 \
-	--installgroup=root \
-	--with_gsl=no --with_ppl=no \
-	--with_ant=yes --with_java_interface=yes \
-	--with_mysql=yes --mysql_client_directory=/usr/lib
 
 	# New in version 1.15.0 r14285
 #	./$(CIAOSETUP) configure 
