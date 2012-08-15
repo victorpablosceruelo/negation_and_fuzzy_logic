@@ -6,8 +6,6 @@ import java.net.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.CiaoPrologConnectionClass;
-
 /**
  * Class for managing communication to Prolog.
  * Starts and handles a connection to a Prolog process via sockets.
@@ -52,7 +50,7 @@ public class PLConnection {
     private static final PLTerm JP_SYNC = new PLAtom("event");
     private static final PLTerm ID_INTERFACE = new PLInteger(0);
     
-    final Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
+    final Log LOG = LogFactory.getLog(PLConnection.class);
 
     /**
      * Creates a new <code>PLConnection</code> object, establishing
