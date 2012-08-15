@@ -2,13 +2,13 @@
 
 # set -x
 
-if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ] || [ -z "$4" ] || [ "$4" == "" ]; then
         echo " "
         echo "This is an utility to build Ciao Prolog debian packages."
         echo "usage: $0 DEST_FOLDER VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
-        echo "example: $0 ./tmp 1.13 11293 "
-        echo "example: $0 ./tmp 1.14.2 13646 382"
-        echo "example: $0 ./tmp 1.15.0 14440 latest"
+        echo "example: $0 ~/tmp 1.13 11293 "
+        echo "example: $0 ~/tmp 1.14.2 13646 382"
+        echo "example: $0 ~/tmp 1.15.0 14440 latest"
         echo " "
         exit 0
 else
@@ -35,7 +35,7 @@ ${SCRIPT_DIR}/ciao-prolog-svn-co.sh ${DEST_FOLDER} ${VERSION} ${SVN_REVISION_CIA
 ${SCRIPT_DIR}/ciao-prolog-apply-patches.sh ${DEST_FOLDER}/${FOLDER_NAME}
 
 # Ensure we work locally.
-pushd ${DEST_FOLDER}
+pushd ${DEST_FOLDER}/${FOLDER_NAME}
 
 # Compilation script.
 CIAOSETUP="./ciaosetup"
@@ -49,24 +49,23 @@ echo " "
 ${CIAOSETUP} braveclean
 echo " "
 
-${SCRIPT_DIR}/ciao-prolog-configure.sh local
+./debian/ciao-prolog-configure.sh local
 
 echo " "
 echo " "
 echo " " 
 #read -p "Press enter to continue with Ciao Prolog COMPILATION"
-${SCRIPT_DIR}/ciao-prolog-echo-ten.sh
-echo_ten
+./debian/ciao-prolog-echo-ten.sh
 
 # FIXES.
-# ${SCRIPT_DIR}/ciao-prolog-fixes.sh
+# debian/ciao-prolog-fixes.sh
 
 ./${CIAOSETUP} build
-echo_ten
+./debian/ciao-prolog-echo-ten.sh
 ./${CIAOSETUP} docs
-echo_ten
+./debian/ciao-prolog-echo-ten.sh
 read -p "Press enter to continue with Ciao Prolog INSTALLATION"
-echo_ten
+./debian/ciao-prolog-echo-ten.sh
 ./${CIAOSETUP} install
 
 echo " "

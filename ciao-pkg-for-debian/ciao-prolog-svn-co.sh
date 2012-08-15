@@ -2,7 +2,7 @@
 
 # set -x
 
-if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ] || [ -z "$4" ] || [ "$4" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
 	echo "usage: $0 DEST_FOLDER VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
@@ -17,6 +17,8 @@ else
 	REVISION="$3"
 	DEBIAN_REPOS_REVISION="$4"
 fi;
+
+echo "$*"
 
 # Repositories urls.
 REPOS_1=svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk
