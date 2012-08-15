@@ -31,7 +31,7 @@ fi
 #	--installgroup=root \
 
 
-${CIAOSETUP} configure \
+./ciaosetup configure \
     --stop-if-error=yes \
     --registration_type=user \
     --instype=local \
