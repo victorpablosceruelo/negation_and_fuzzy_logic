@@ -2,82 +2,43 @@
 
 # set -x
 
-if [ -z "$1" ] || [ "$1" == "" ]; then
-	echo " "
-	echo "This is an utility to build Ciao Prolog debian packages."
-	echo "usage: $0 SVN_REVISION_CIAO (reset|noreset)"
-	echo "usage: $0 nocheckout (reset|noreset)"
-	echo "example: $0 14440 "
-	echo "example: $0 14482 "
-	echo "example: $0 14505 <- YES (at least as pbuilder pkg)"
-	echo "example: $0 14566 <- NO "
-	echo "example: $0 14580 <- NO "
-	echo " "
-	exit 0
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ]; then
+        echo " "
+        echo "This is an utility to build Ciao Prolog debian packages."
+        echo "usage: $0 DEST_FOLDER VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
+        echo "example: $0 ./tmp 1.13 11293 "
+        echo "example: $0 ./tmp 1.14.2 13646 382"
+        echo "example: $0 ./tmp 1.15.0 14440 latest"
+        echo " "
+        exit 0
 else
-	REVISION="$1"
-	if [ -z "$2" ] || [ "$2" == "" ]; then
-		RESET="reset"
-	else
-		RESET="$2"
-	fi
+        DEST_FOLDER="$1"
+        VERSION="$2"
+        SVN_REVISION_CIAO="$3"
+        SVN_REVISION_DEBIAN_CIAO_REPOS="$4"
 fi;
 
-function echo_ten() {
-    echo " "
-    echo " "
-    echo " " 
-    echo " "
-    echo " "
-    echo " " 
-    echo " "
-    echo " "
-    echo " " 
-    echo " "
-}
+DATE=`date +%Y%m%d`
+PKG_VERSION=${VERSION}+r${SVN_REVISION_CIAO}
+FOLDER_NAME=ciao-prolog-${PKG_VERSION}
+FILE_NAME=ciao-prolog_${PKG_VERSION}
+BUILD_TGZ=${FILE_NAME}.orig.tar.gz
+BUILD_DSC=${FILE_NAME}.dsc
+BUILD_DIFF=${FILE_NAME}.diff
+BUILD_DIFF_GZ=${FILE_NAME}.diff.gz
+SCRIPT_DIR=`dirname $0`
+
+# Checkout the correct revisions.
+${SCRIPT_DIR}/ciao-prolog-svn-co.sh ${DEST_FOLDER} ${VERSION} ${SVN_REVISION_CIAO} ${SVN_REVISION_DEBIAN_CIAO_REPOS}
+
+# Apply patches.
+${SCRIPT_DIR}/ciao-prolog-apply-patches.sh ${DEST_FOLDER}/${FOLDER_NAME}
+
+# Ensure we work locally.
+pushd ${DEST_FOLDER}
 
 # Compilation script.
 CIAOSETUP="./ciaosetup"
-
-# Repositories urls.
-REPOS_1=svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk
-# REPOS_2=https://babel.ls.fi.upm.es/svn/negation_and_fuzzy_logic/ciao-pkg-for-debian/
-# SVNREPO_2=svn+ssh://clip.dia.fi.upm.es/home/egallego/clip/repos/ciao-debian/
-
-FOLDER_NAME=~/secured/tests/CiaoDE_trunk
-
-# Ensure folder exists and has a pristine copy.
-# rm -fR $FOLDER_NAME
-mkdir -p $FOLDER_NAME
-pushd $FOLDER_NAME
-
-# Update and export the Ciao's repository
-echo " "
-if [ -d .git ]; then
-    echo "Current status of git repository: "
-    git status --untracked-files=no
-    echo " "
-    if [ "$RESET"=="reset" ]; then
-        echo "return the entire working tree to the last committed state "
-        echo "git reset --hard HEAD "
-	git reset --hard HEAD
-    else
-	echo "Not returning to the last committed state (useful for testing)"
-    fi
-    echo " "
-    echo "updating CIAO to revision $REVISION from $REPOS_1"
-    # svn revert -R .
-    if [ ! "$REVISION" == "nocheckout" ]; then
-	git svn fetch --revision $REVISION
-    fi
-else
-	echo "checking out CIAO to revision $REVISION from $REPOS_1"
-	if [ ! "$REVISION" == "nocheckout" ]; then
-	    git svn clone $REPOS_1 . --revision $REVISION
-	fi
-fi
-echo " "
-
 echo " "
 ${CIAOSETUP} clean
 echo " "
@@ -88,13 +49,6 @@ echo " "
 ${CIAOSETUP} braveclean
 echo " "
 
-# exit 0
-echo_ten
-echo "Current status of git repository: "
-git status --untracked-files=no
-echo_ten
-git status
-echo_ten
 
 #    --registration_type=all \
 #    --instype=global \
@@ -152,18 +106,6 @@ echo " "
 echo_ten
 
 # Fixes
-function nocompile_nor_distribute () {
-    if [ ! -z "$1" ] && [ ! "$1" == "" ] && [ -d "$1" ]; then
-	touch $1/NOCOMPILE
-	pushd $1
-	ls -1 *.pl > NOCOMPILE 2>&1
-	popd
-	touch $1/NODISTRIBUTE
-    else
-	echo "Erroneous folder: $1"
-    fi
-}
-
 echo "FIXES:"
 nocompile_nor_distribute ciao/contrib/clpfd
 nocompile_nor_distribute ciao/contrib/difference_constraints

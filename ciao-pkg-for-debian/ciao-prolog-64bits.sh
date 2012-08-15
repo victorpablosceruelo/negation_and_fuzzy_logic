@@ -1,12 +1,18 @@
 #!/bin/bash
 
+if [ -z $1 ] || [ "$1" == "" ]; then
+	echo "usage: $0 path_of_CiaoDE_trunk"
+	exit 0
+fi
+
+pushd ${1}
 echo " "
 echo "(estos comandos ponen variables de entorno que deben"
 echo " estar siempre activas cuando llames a 'ciaosh')"
 echo " "
 echo "eval \`./ciaotool bash-env\`"
 echo " "
-pushd ~/secured/tests/CiaoDE_trunk/optim_comp 2>&1 >/dev/null
+pushd optim_comp 2>&1 >/dev/null
 echo "`./ciaotool bash-env`"
 popd 2>&1 >/dev/null
 echo "export ABSMACH_OPTGRP=tags"
@@ -33,7 +39,6 @@ if [ -z "$TEST" ] || [ "$TEST" == "" ]; then
 	exit 0
 fi
 
-pushd ~/secured/tests/CiaoDE_trunk
 pushd optim_comp
 
 eval `./ciaotool bash-env`
