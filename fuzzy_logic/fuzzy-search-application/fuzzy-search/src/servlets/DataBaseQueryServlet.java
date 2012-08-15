@@ -69,33 +69,22 @@ public class DataBaseQueryServlet extends HttpServlet {
 			}
 			else {
 				LOG.info("database to be used is " + database + ".");
-				dbQueryAux(session, request, response);
+				try {
+					dbQueryAux(session, request, response);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
-	protected void dbQueryAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void dbQueryAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException, PLException, WorkingFolderClassException {
+		
 		CiaoPrologConnectionClass connection = null; 
-		try {
-			connection = new CiaoPrologConnectionClass();
-		} catch (PLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			connection = null;
-		} catch (WorkingFolderClassException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			connection = null;
-		}
+
+		connection = new CiaoPrologConnectionClass();
 		String userDisplayName = (String) session.getAttribute("userDisplayName");
-		try {
-			connection.changeCiaoPrologWorkingFolder(userDisplayName);
-		} catch (WorkingFolderClassException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		connection.changeCiaoPrologWorkingFolder(userDisplayName);
 		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
 }
