@@ -80,9 +80,10 @@ public class PLConnection {
      *                     for command-line arguments.
      */
     public PLConnection(String[] where) throws PLException, IOException {
-	ss = new ServerSocket(0);
-	start(where);
-	previousConnection = this;
+    	ss = new ServerSocket(0);
+    	// start(where);
+    	start2(where);
+    	previousConnection = this;
     }
 
     /**
@@ -96,9 +97,12 @@ public class PLConnection {
      *                     client that wants to connect to it.
      */
     public PLConnection(String where) throws PLException, IOException {
-	ss = new ServerSocket(0);
-	start(where);
-	previousConnection = this;
+    	ss = new ServerSocket(0);
+    	// start(where);
+    	String [] whereAux = new String[1];
+    	whereAux[0] = where;
+    	start2(whereAux);
+    	previousConnection = this;
     }
 
     /**
@@ -169,7 +173,7 @@ public class PLConnection {
      *                        process.
      */
     private void start(String where) throws IOException, PLException {
-    LOG.info("Starting plServer at " + where);
+    LOG.info("Starting plServer at String " + where);
 	Runtime rt = Runtime.getRuntime();
 
 	plProc = rt.exec(where); // runs plServer
@@ -202,7 +206,7 @@ public class PLConnection {
      *                        process.
      */
     private void start(String[] where) throws IOException, PLException {
-    LOG.info("Starting plServer at " + where);
+    LOG.info("Starting plServer at String[] " + where);
 	Runtime rt = Runtime.getRuntime();
 
 	plProc = rt.exec(where);
@@ -221,6 +225,46 @@ public class PLConnection {
 	bindSockets(out);
     }
 
+    /**
+     * Starts a PLConnection to use the Java/Prolog
+     * bidirectional interface. Starts the Prolog server
+     * process and connects to it creating the sockets, and
+     * starts the internal threads needed for interface communication.
+     *
+     * @param where command used to start the Prolog server process,
+     *              including optional arguments.
+     *
+     * @exception IOException if there are I/O problems.
+     * @exception PLException if there are problems regarding the Prolog
+     *                        process.
+     */
+    private void start2(String[] where) throws IOException, PLException {
+    LOG.info("Starting plServer at String[] " + where);
+    String[] whereAux = new String[where.length +2];
+    int port = ss.getLocalPort();
+    for (int i=0; i<where.length; i++) {
+    	whereAux[i] = where[i];
+    }
+    whereAux[where.length] = "--java";
+    whereAux[where.length +1] = Integer.toString(port);
+    
+	Runtime rt = Runtime.getRuntime();
+	plProc = rt.exec(whereAux);
+	plProcHasNotDied(true);
+	
+	OutputStream pipeOut = plProc.getOutputStream();
+	PrintStream out = new PrintStream(pipeOut);
+	plInterpreter = new PLInterpreter(this);
+
+	// port number output.
+	//out.println(port + ".");
+	//out.flush();
+	//out.close();
+
+	bindSockets(out);
+    }
+    
+    
     /**
      * Starts the PLConnection for the Prolog-to-Java
      * interface, connecting to an already executing Prolog server,
