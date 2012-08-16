@@ -38,60 +38,31 @@ fixes:
 	@echo " "
 	@echo " "
 
-clean: fixes clean-after
-	@echo "Makefile :: clean"
-	dh_testdir
-	dh_testroot
-
-clean-after: fixes
-	# Add here commands to clean up after the build process.
-	@echo " "
-	./$(CIAOSETUP) clean
-	@echo " "
-	./$(CIAOSETUP) clean_config
-	@echo " "
-	./$(CIAOSETUP) realclean
-	@echo " "
-	./$(CIAOSETUP) braveclean
-	@echo " "
-
-build: fixes
-	@echo "Makefile :: build"
-	dh_testdir
-
-	# This is now done at source export time.
-	# echo "debian" > ./REVISION
-
-	# Facility to use always the same configuration
-	./debian/ciao-prolog-configure.sh $(CIAOSETUP)
-
-	# Add here commands to compile the package.
-	./$(CIAOSETUP) build
-	./$(CIAOSETUP) docs
-
-#install:
-install: build
-	@echo "Makefile :: install"
+build-and-install: fixes
+	@echo "Makefile :: build and install"
 	dh_testdir
 	dh_testroot
 	dh_installdirs
 
-	# Add here commands to install the package into debian/tmp.
-	./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp
-#	./$(CIAOSETUP) install_to_destroot --destdir=/usr
+	@echo "Listing the files in $(CURDIR) before in $(CURDIR)/debian/tmp/files-in-curdir-before.txt."
+	@echo "Files in $(CURDIR) before." > $(CURDIR)/debian/tmp/files-in-curdir-before.txt
+	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir-before.txt
+	@echo "Done. "
 	@echo " "
 
-	@echo "Just a list of files in $(CURDIR)/debian/tmp/ "
-	@echo "curdir: $(CURDIR)" > $(CURDIR)/debian/tmp/files-in-curdir.txt
-	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir.txt
+	./ciao-prolog-prepare-chroot.sh $(CURDIR)/debian/tmp/ /usr/share/CiaoDE
+
+	@echo " "
+	@echo "Listing the files in $(CURDIR) after in $(CURDIR)/debian/tmp/files-in-curdir-after.txt."
+	@echo "Files in $(CURDIR) after." > $(CURDIR)/debian/tmp/files-in-curdir-after.txt
+	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir-after.txt
 	
 	@echo " "
-#	make clean-after
 	dh_install --list-missing
 #	dh_install
 
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep: build-and-install
 	@echo "Makefile :: binary-indep"
 	dh_testdir -i
 	dh_testroot -i
@@ -112,7 +83,7 @@ binary-indep: build install
 	dh_builddeb -i
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: build-and-install
 	@echo "Makefile :: binary-arch"
 	dh_testdir -a
 	dh_testroot -a
