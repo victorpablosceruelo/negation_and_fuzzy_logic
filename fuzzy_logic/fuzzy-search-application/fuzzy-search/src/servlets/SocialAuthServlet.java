@@ -53,7 +53,7 @@ public class SocialAuthServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(SocialAuthServlet.class);
+	private static final Log LOG = LogFactory.getLog(SocialAuthServlet.class);
 
 	/**
 	 * creates a instance of the requested provider from AuthProviderFactory and
@@ -317,7 +317,10 @@ public class SocialAuthServlet extends HttpServlet {
 	    	if (session != null) {
 	    		retval = true; // Fake authentication !!!
 	    		session.setAttribute("authenticated", true);
-	    		session.setAttribute("localUserName", "Testing User");
+	    		
+				// Determine correct value for variable localUserName
+				String localUserName = LocalUserNameFixesClass.getLocalUserName(null);
+	    		session.setAttribute("localUserName", localUserName);
 	    		ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);		
 	    	}
 		}

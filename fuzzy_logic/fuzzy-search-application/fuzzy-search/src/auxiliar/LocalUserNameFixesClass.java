@@ -1,27 +1,33 @@
 package auxiliar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.Profile;
 
 public class LocalUserNameFixesClass {
 
+	private static final Log LOG = LogFactory.getLog(LocalUserNameFixesClass.class);
+	
 	public static String getLocalUserName(Profile profile) {
 		String localUserName = null;
-		
-		localUserName = ifLocalUserNameNullReturn(localUserName, profile.getEmail());
-		localUserName = ifLocalUserNameNullReturn(localUserName, profile.getDisplayName());
-		
+		if (profile != null) {
+			
+			localUserName = ifLocalUserNameNullReturn(localUserName, profile.getEmail());
+			localUserName = ifLocalUserNameNullReturn(localUserName, profile.getDisplayName());
+
+		}
 		localUserName = ifLocalUserNameNullReturn(localUserName, "Testing User@wakamola.es");
 		
+		LOG.info("localUserName: " + localUserName);
 		return localUserName;
 	}
 
 	public static String ifLocalUserNameNullReturn(String localUserName, String newLocalUserName) {
-		if (localUserName != null) {
+		if (localUserName == null) {
 			if (newLocalUserName != null) {
 				try {
 					localUserName = fixlocalUserName(newLocalUserName);
 				} catch (LocalUserNameFixesClassException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					localUserName = null;
 				}
@@ -32,21 +38,25 @@ public class LocalUserNameFixesClass {
 	
 	private static String fixlocalUserName(String localUserName) 
 			throws LocalUserNameFixesClassException {
-		String fixedlocalUserName = null;
+		String fixedLocalUserName = null;
 		if ((localUserName == null) || "".equals(localUserName)) {
 			throw new LocalUserNameFixesClassException("getWorkingFolder: localUserName can not be null nor empty string.");
 		}
 		else {
-			fixedlocalUserName = localUserName.replaceAll("\\s", "_");
-			fixedlocalUserName = localUserName.replaceAll("@", "_at_");
-			fixedlocalUserName = localUserName.replaceAll(".", "_");
+			fixedLocalUserName = localUserName.replaceAll("\\s", "_");
+			LOG.info("fixedLocalUserName: " + fixedLocalUserName);
+			fixedLocalUserName = fixedLocalUserName.replaceAll("\\@", "_at_");
+			LOG.info("fixedLocalUserName: " + fixedLocalUserName);
+			fixedLocalUserName = fixedLocalUserName.replaceAll("\\.", "_");
+			LOG.info("fixedLocalUserName: " + fixedLocalUserName);
 		}
-		return fixedlocalUserName;
+		return fixedLocalUserName;
 	}
 	
 	public static void checkValidLocalUserName(String localUserName) throws LocalUserNameFixesClassException {
 		if ((localUserName == null) || "".equals(localUserName)) {
-			throw new LocalUserNameFixesClassException("getWorkingFolder: localUserName can not be null nor empty string.");
+			LOG.info("localUserName: " + localUserName);
+			throw new LocalUserNameFixesClassException("getWorkingFolder: localUserName can not be null nor empty string. localUserName: " + localUserName);
 		}
 		return;
 	}
