@@ -3,8 +3,8 @@ package CiaoJava;
 import java.io.*;
 import java.net.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+// import org.apache.commons.logging.Log;
+// import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for managing communication to Prolog.
@@ -50,7 +50,7 @@ public class PLConnection {
     private static final PLTerm JP_SYNC = new PLAtom("event");
     private static final PLTerm ID_INTERFACE = new PLInteger(0);
     
-    final Log LOG = LogFactory.getLog(PLConnection.class);
+    // final Log LOG = LogFactory.getLog(PLConnection.class);
 
     /**
      * Creates a new <code>PLConnection</code> object, establishing
@@ -80,10 +80,9 @@ public class PLConnection {
      *                     for command-line arguments.
      */
     public PLConnection(String[] where) throws PLException, IOException {
-    	ss = new ServerSocket(0);
-    	// start(where);
-    	start2(where);
-    	previousConnection = this;
+	ss = new ServerSocket(0);
+	start(where);
+	previousConnection = this;
     }
 
     /**
@@ -97,12 +96,9 @@ public class PLConnection {
      *                     client that wants to connect to it.
      */
     public PLConnection(String where) throws PLException, IOException {
-    	ss = new ServerSocket(0);
-    	// start(where);
-    	String [] whereAux = new String[1];
-    	whereAux[0] = where;
-    	start2(whereAux);
-    	previousConnection = this;
+	ss = new ServerSocket(0);
+	start(where);
+	previousConnection = this;
     }
 
     /**
@@ -173,7 +169,6 @@ public class PLConnection {
      *                        process.
      */
     private void start(String where) throws IOException, PLException {
-    LOG.info("Starting plServer at String " + where);
 	Runtime rt = Runtime.getRuntime();
 
 	plProc = rt.exec(where); // runs plServer
@@ -206,7 +201,6 @@ public class PLConnection {
      *                        process.
      */
     private void start(String[] where) throws IOException, PLException {
-    LOG.info("Starting plServer at String[] " + where);
 	Runtime rt = Runtime.getRuntime();
 
 	plProc = rt.exec(where);
@@ -225,50 +219,6 @@ public class PLConnection {
 	bindSockets(out);
     }
 
-    /**
-     * Starts a PLConnection to use the Java/Prolog
-     * bidirectional interface. Starts the Prolog server
-     * process and connects to it creating the sockets, and
-     * starts the internal threads needed for interface communication.
-     *
-     * @param where command used to start the Prolog server process,
-     *              including optional arguments.
-     *
-     * @exception IOException if there are I/O problems.
-     * @exception PLException if there are problems regarding the Prolog
-     *                        process.
-     */
-    private void start2(String[] where) throws IOException, PLException {
-    LOG.info("Starting plServer at String[] ");
-    String[] whereAux = new String[where.length +2];
-    int port = ss.getLocalPort();
-    for (int i=0; i<where.length; i++) {
-    	whereAux[i] = where[i];
-    }
-    whereAux[where.length] = "--javalocal";
-    whereAux[where.length +1] = Integer.toString(port);
-    LOG.info("Starting plServer with command ");
-    for (int i=0; i<whereAux.length; i++) {
-    	LOG.info(whereAux[i]);
-    }
-    
-	Runtime rt = Runtime.getRuntime();
-	plProc = rt.exec(whereAux);
-	plProcHasNotDied(true);
-	
-	OutputStream pipeOut = plProc.getOutputStream();
-	PrintStream out = new PrintStream(pipeOut);
-	plInterpreter = new PLInterpreter(this);
-
-	// port number output.
-	//out.println(port + ".");
-	//out.flush();
-	//out.close();
-
-	bindSockets(out);
-    }
-    
-    
     /**
      * Starts the PLConnection for the Prolog-to-Java
      * interface, connecting to an already executing Prolog server,
@@ -315,25 +265,25 @@ public class PLConnection {
      *                        process.
      */
     private Boolean plProcHasNotDied (Boolean ifDiedThrowException) throws PLException {
-    	LOG.info("Testing if plProc has died. ");
+    	// LOG.info("Testing if plProc has died. ");
     	Boolean hasDied;
     	try {
-    		LOG.info("Waiting 1 sec for plServer to load.");
+    		// LOG.info("Waiting 1 sec for plServer to load.");
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			LOG.info("Interruption received when waiting for plServer to load.");
-			// e.printStackTrace();
+			// LOG.info("Interruption received when waiting for plServer to load.");
+			e.printStackTrace();
 		}
     	try{
     		plProc.exitValue(); // asks for plServer return value
-    		LOG.info("plProc has died. ERROR. ");
+    		// LOG.info("plProc has died. ERROR. ");
     		if (ifDiedThrowException) {
     			throw new PLException("ERROR: plServer process has died.");
     		}
     		hasDied = true;
     	}
     	catch (IllegalThreadStateException ex) { // if it is still running, all is ok.
-    		LOG.info("plProc has NOT died. OK. ");
+    		// LOG.info("plProc has NOT died. OK. ");
     		hasDied= false;
     	}
     	return hasDied;
