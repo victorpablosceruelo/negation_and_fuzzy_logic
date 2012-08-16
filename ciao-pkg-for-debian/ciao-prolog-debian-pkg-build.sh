@@ -8,9 +8,9 @@ if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ]
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
 	echo "usage: $0 DEST_FOLDER VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
-	echo "example: $0 ./tmp 1.13 11293 "
-	echo "example: $0 ./tmp 1.14.2 13646 382"
-	echo "example: $0 ./tmp 1.15.0 14440 latest"
+	echo "example: $0 ~/tmp 1.13 11293 "
+	echo "example: $0 ~/tmp 1.14.2 13646 382"
+	echo "example: $0 ~/tmp 1.15.0 14440 latest"
 	echo " "
 	exit 0
 else
