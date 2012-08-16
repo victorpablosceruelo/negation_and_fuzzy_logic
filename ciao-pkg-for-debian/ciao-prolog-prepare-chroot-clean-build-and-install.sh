@@ -22,23 +22,19 @@ mkdir -p ${FULL_PATH}
 
 for file in *; do
 	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "debian" ] && [ ! "$file" == ".svn" ]; then
-		mv -v $file ${FULL_PATH}
+		mv -v $file ${FULL_PATH} 2>&1 >> ${FULL_PATH}/files-moved.txt
 	fi
 done
 
-# Copy the scripts in debian folder.
-cp -dpRv debian ${FULL_PATH}
-
-pushd ${FULL_PATH}
-ln -s debian/ciao-prolog-build-and-install.sh ciao-prolog-build-and-install.sh
-popd
+# Copy the scripts we need to clean, build and install
+cp -dpRv debian/ciao-prolog-configure-clean-build-and-install.sh ${FULL_PATH}
 
 # To save configurations for emacs and bash
 mkdir -p ${CHROOT_FOLDER}/root
 touch ${CHROOT_FOLDER}/root/.emacs
 touch ${CHROOT_FOLDER}/root/.bashrc
 
-/usr/sbin/chroot ${CHROOT_FOLDER} ${DEST_FOLDER}/ciao-prolog-build-and-install.sh
+/usr/sbin/chroot ${CHROOT_FOLDER} ${DEST_FOLDER}/ciao-prolog-configure-clean-build-and-install.sh
 
 mv ${CHROOT_FOLDER}/root/.emacs ${FULL_PATH}/add_to_.emacs
 mv ${CHROOT_FOLDER}/root/.bashrc ${FULL_PATH}/add_to_.bashrc

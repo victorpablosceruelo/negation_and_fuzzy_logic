@@ -21,6 +21,8 @@ export SHELL=/bin/sh
 # export DH_OPTIONS=
 
 CIAOSETUP=ciaosetup
+DEST_DIR=/usr/share/CiaoDE
+CHROOT_DIR=$(CURDIR)/debian/tmp/
 
 clean:
 	@echo "Makefile :: clean (it does nothing)"
@@ -55,21 +57,21 @@ build-and-install: fixes
 	dh_testroot
 	dh_installdirs
 
-	mkdir -p $(CURDIR)/debian/tmp/
-	@echo "Listing the files in $(CURDIR) before in $(CURDIR)/debian/tmp/files-in-curdir-before.txt."
-	@echo "Files in $(CURDIR) before." > $(CURDIR)/debian/tmp/files-in-curdir-before.txt
-	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir-before.txt
+	mkdir -p $(CHROOT_DIR)/$(DEST_DIR)/
+	@echo "Listing the files in $(CURDIR) before in $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-before.txt."
+	@echo "Files in $(CURDIR) before." > $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-before.txt
+	find $(CURDIR) >> $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-before.txt
 	@echo "Done. "
 	@echo " "
 	@echo " "
 	@echo " "
-	./debian/ciao-prolog-prepare-chroot-clean-build-and-install.sh $(CURDIR)/debian/tmp/ /usr/share/CiaoDE
+	./debian/ciao-prolog-prepare-chroot-clean-build-and-install.sh $(CHROOT_DIR) $(DEST_DIR)
 	@echo " "
 	@echo " "
 	@echo " "
-	@echo "Listing the files in $(CURDIR) after in $(CURDIR)/debian/tmp/files-in-curdir-after.txt."
-	@echo "Files in $(CURDIR) after." > $(CURDIR)/debian/tmp/files-in-curdir-after.txt
-	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir-after.txt
+	@echo "Listing the files in $(CURDIR) after in $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-after.txt."
+	@echo "Files in $(CURDIR) after." > $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-after.txt
+	find $(CURDIR) >> $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-after.txt
 	
 	@echo " "
 	dh_install --list-missing

@@ -37,36 +37,7 @@ ${SCRIPT_DIR}/ciao-prolog-apply-patches.sh ${DEST_FOLDER}/${FOLDER_NAME}
 # Ensure we work locally.
 pushd ${DEST_FOLDER}/${FOLDER_NAME}
 
-# Compilation script.
-CIAOSETUP="./ciaosetup"
-echo " "
-${CIAOSETUP} clean
-echo " "
-${CIAOSETUP} clean_config
-echo " "
-${CIAOSETUP} realclean
-echo " "
-${CIAOSETUP} braveclean
-echo " "
-
-./debian/ciao-prolog-configure.sh local
-
-echo " "
-echo " "
-echo " " 
-#read -p "Press enter to continue with Ciao Prolog COMPILATION"
-./debian/ciao-prolog-echo-ten.sh
-
-# FIXES.
-# debian/ciao-prolog-fixes.sh
-
-./${CIAOSETUP} build
-./debian/ciao-prolog-echo-ten.sh
-./${CIAOSETUP} docs
-./debian/ciao-prolog-echo-ten.sh
-read -p "Press enter to continue with Ciao Prolog INSTALLATION"
-./debian/ciao-prolog-echo-ten.sh
-./${CIAOSETUP} install
+debian/ciao-prolog-configure-clean-build-and-install.sh
 
 echo " "
 popd
