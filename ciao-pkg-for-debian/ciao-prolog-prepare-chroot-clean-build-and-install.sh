@@ -28,6 +28,8 @@ done
 
 # Copy the scripts we need to clean, build and install
 cp -dpRv debian/ciao-prolog-configure-clean-build-and-install.sh ${FULL_PATH}
+cp -dpRv debian/ciao-prolog-configure.sh ${FULL_PATH}
+ls -la ${FULL_PATH}
 
 # To save configurations for emacs and bash
 mkdir -p ${CHROOT_FOLDER}/root
