@@ -2,6 +2,8 @@
 
 # set -x
 
+echo "running $0 $* ... "
+
 if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "running $0 $* ... "
+
 if [ -z $1 ] || [ "$1" == "" ]; then
 	echo "usage: $0 path_ciao_prolog_de "
 	exit 0

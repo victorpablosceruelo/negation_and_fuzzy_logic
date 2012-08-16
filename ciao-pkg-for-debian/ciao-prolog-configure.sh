@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "running $0 $* ... "
+
 if [ -z $1 ] || [ "$1" == "" ]; then
 	echo "usage: $0 path_of_ciaosetup"
 	exit 0

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "running $0 $* ... "
+
 CIAOSETUP=ciaosetup
 
 @echo " "
