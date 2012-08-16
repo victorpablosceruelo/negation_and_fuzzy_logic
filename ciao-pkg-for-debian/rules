@@ -61,9 +61,11 @@ build-and-install: fixes
 	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir-before.txt
 	@echo "Done. "
 	@echo " "
-
-	./ciao-prolog-prepare-chroot.sh $(CURDIR)/debian/tmp/ /usr/share/CiaoDE
-
+	@echo " "
+	@echo " "
+	./debian/ciao-prolog-prepare-chroot.sh $(CURDIR)/debian/tmp/ /usr/share/CiaoDE
+	@echo " "
+	@echo " "
 	@echo " "
 	@echo "Listing the files in $(CURDIR) after in $(CURDIR)/debian/tmp/files-in-curdir-after.txt."
 	@echo "Files in $(CURDIR) after." > $(CURDIR)/debian/tmp/files-in-curdir-after.txt
