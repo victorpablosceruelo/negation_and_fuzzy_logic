@@ -65,14 +65,14 @@ echo "-> Now run: [ the first two only if you did not execute them before ]"
 echo " sudo pbuilder --clean "
 echo " sudo cowbuilder --create "
 echo " sudo cowbuilder --update "
-echo " sudo cowbuilder --build $BUILD_DSC "
+echo " sudo cowbuilder --build ${DEST_FOLDER}/$BUILD_DSC "
 echo " "
 
 echo " "
 echo " "
 
 set -x
-sudo cowbuilder --build ${WORKING_FOLDER}/${BUILD_DSC}
+sudo cowbuilder --build ${DEST_FOLDER}/${BUILD_DSC}
 popd
 
 echo "-> Now run "

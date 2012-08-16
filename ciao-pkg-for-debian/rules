@@ -22,7 +22,16 @@ export SHELL=/bin/sh
 
 CIAOSETUP=ciaosetup
 
+clean:
+	@echo "Makefile :: clean (it does nothing)"
+build:
+	@echo "Makefile :: build (it does nothing)"
+
 fixes:
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
 	@echo "Makefile :: fixes"
 	@echo "Where is /bin/sh link pointing to?"
 	ls -la /bin/sh
@@ -37,6 +46,8 @@ fixes:
 	ls -la $(CURDIR)/makedir/terminal_io.sh 
 	@echo " "
 	@echo " "
+	@echo " "
+	@echo " "
 
 build-and-install: fixes
 	@echo "Makefile :: build and install"
@@ -44,6 +55,7 @@ build-and-install: fixes
 	dh_testroot
 	dh_installdirs
 
+	mkdir -p $(CURDIR)/debian/tmp/
 	@echo "Listing the files in $(CURDIR) before in $(CURDIR)/debian/tmp/files-in-curdir-before.txt."
 	@echo "Files in $(CURDIR) before." > $(CURDIR)/debian/tmp/files-in-curdir-before.txt
 	find $(CURDIR) >> $(CURDIR)/debian/tmp/files-in-curdir-before.txt
@@ -62,7 +74,11 @@ build-and-install: fixes
 #	dh_install
 
 # Build architecture-independent files here.
-binary-indep: build-and-install
+binary-indep: 
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
 	@echo "Makefile :: binary-indep"
 	dh_testdir -i
 	dh_testroot -i
@@ -83,7 +99,11 @@ binary-indep: build-and-install
 	dh_builddeb -i
 
 # Build architecture-dependent files here.
-binary-arch: build-and-install
+binary-arch: 
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
 	@echo "Makefile :: binary-arch"
 	dh_testdir -a
 	dh_testroot -a
@@ -107,7 +127,15 @@ binary-arch: build-and-install
 	dh_builddeb -a
 
 #binary: binary-indep binary-arch
-binary: binary-arch binary-indep
-	@echo "Makefile :: binary"
+binary: build-and-install binary-arch binary-indep
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo "Makefile :: binary (it does nothing)"
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
 
-.PHONY: build clean binary-indep binary-arch binary install ciao-config
+.PHONY: build clean binary-indep binary-arch binary install
