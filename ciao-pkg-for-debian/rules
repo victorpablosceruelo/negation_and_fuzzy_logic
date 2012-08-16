@@ -65,7 +65,7 @@ build-and-install: fixes
 	@echo " "
 	@echo " "
 	@echo " "
-	./debian/ciao-prolog-prepare-chroot-clean-build-and-install.sh $(CHROOT_DIR) $(DEST_DIR)
+	./debian/ciao-prolog-prepare-configure-clean-build-and-install.sh $(CHROOT_DIR) $(DEST_DIR)
 	@echo " "
 	@echo " "
 	@echo " "
