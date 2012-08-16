@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 // import javax.servlet.http.HttpServlet;
@@ -102,6 +103,10 @@ public class WorkingFolderClass {
 		return retval;
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public Boolean removeDataBase(String database, String userDisplayName) throws WorkingFolderClassException {
 		configureWorkingFolder();
 		String userWorkingFolder = getUserWorkingFolder(userDisplayName);
@@ -194,4 +199,70 @@ public class WorkingFolderClass {
 		}
 		return currentList;
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public static String lookForPlServer() throws WorkingFolderClassException {
+		String pathOfPlServer = null;
+		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/usr/lib/ciao/ciao-1.15/library/javall/plserver");
+		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
+		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+		
+		// ToDo: Convendria un mecanismo algo más avanzado ... :-(
+		lookForPlServerAdvanced(pathOfPlServer, "/usr/");
+		lookForPlServerAdvanced(pathOfPlServer, "/home/");
+		lookForPlServerAdvanced(pathOfPlServer, "/");
+		
+		if (pathOfPlServer == null) {
+			throw new WorkingFolderClassException("lookForPlServer: impossible to find it.");
+		}
+		
+		return pathOfPlServer;
+	}
+	
+	private static String lookForPlServerAdvanced(String pathOfPlServer, String folderPath) {
+		if (pathOfPlServer == null) {
+			File currentDir = new File(folderPath);
+			File[] subFiles = currentDir.listFiles();
+			File file = null;
+			int counter;
+			
+			// Test first the files.
+			counter = 0;
+			while ((pathOfPlServer == null) && (counter<subFiles.length)) {
+				file = subFiles[counter];
+				if (file.isFile()) {
+					if ("plserver".equals(file.getName())) {
+						pathOfPlServer = lookForPlServerAux(pathOfPlServer, file.getAbsolutePath());
+					}
+				}
+				counter++;
+			}
+
+			// And at last the directories.
+			counter = 0;
+			while ((pathOfPlServer == null) && (counter<subFiles.length)) {
+				file = subFiles[counter];
+				if (file.isDirectory() && file.canRead() && file.canExecute()) {
+					pathOfPlServer = lookForPlServerAdvanced(pathOfPlServer, file.getAbsolutePath());
+				}
+				counter++;
+			}
+		}
+		return pathOfPlServer;
+	}
+	
+	private static String lookForPlServerAux(String pathOfPlServer, String executableFileWithPath) {
+		if (pathOfPlServer == null) {
+			File file = new File(executableFileWithPath);
+			if (file.exists() && file.isFile() && file.canRead() && file.canExecute()) {
+				pathOfPlServer = executableFileWithPath;
+			}
+		}
+		return pathOfPlServer;
+	}	
+	
 }

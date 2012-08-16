@@ -10,9 +10,6 @@ import CiaoJava.*;
 public class CiaoPrologConnectionClass {
 
 	final Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
-	// static private String pathToPlServer = "/usr/lib/ciao/ciao-1.15/library/javall/plserver";
-	// static private String pathToPlServer = "/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver";
-	static private String pathToPlServer = "/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver";
 	static private PLConnection plServer = null;
 	static private WorkingFolderClass workingFolderObject = null;
 	static String currentUserDisplayName = null;
@@ -20,7 +17,7 @@ public class CiaoPrologConnectionClass {
 	public CiaoPrologConnectionClass() throws PLException, IOException, WorkingFolderClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
 		String [] argv = new String[1];
-		argv[0] = pathToPlServer;
+		argv[0] = WorkingFolderClass.lookForPlServer();
 		if (plServer == null) {
 			plServer = new PLConnection(argv);
 		}
