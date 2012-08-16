@@ -28,6 +28,7 @@ import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
+import auxiliar.LocalUserNameFixesClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 
@@ -288,13 +289,8 @@ public class SocialAuthServlet extends HttpServlet {
 					session.setAttribute("provider", provider);
 
 					// Determine correct value for variable localUserName
-					
-					if (profile.getDisplayName() != null) {
-						session.setAttribute("localUserName", profile.getDisplayName());
-					}
-					else {
-						session.setAttribute("localUserName", "Testing User");
-					}
+					String localUserName = LocalUserNameFixesClass.getLocalUserName(profile);
+					session.setAttribute("localUserName", localUserName);
 				}
 			}
 		}

@@ -12,7 +12,7 @@ public class WorkingFolderClassException extends Exception {
 	final Log LOG = LogFactory.getLog(WorkingFolderClassException .class);
 
 	public WorkingFolderClassException(String string) {
-		
+		super();
 	}
 	
 }

@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.WorkingFolderClass;
-import auxiliar.WorkingFolderClassException;
+// import auxiliar.WorkingFolderClassException;
 
 /**
  * Servlet implementation class SearchServlet
@@ -93,7 +93,7 @@ public class DataBasesMenuServlet extends HttpServlet {
 			String localUserName = (String) session.getAttribute("localUserName");
 			workingFolder.removeDataBase(database, localUserName);
 			request.setAttribute("msg1", "The database "+database+" has been removed. ");
-		} catch (WorkingFolderClassException e) {
+		} catch (Exception e) {
 			LOG.info("Exception: " + e);
 			// e.printStackTrace();
 			request.setAttribute("msg1", "The database "+database+" could not be removed. ");

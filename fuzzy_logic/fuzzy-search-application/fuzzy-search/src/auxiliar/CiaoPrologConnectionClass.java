@@ -29,7 +29,8 @@ public class CiaoPrologConnectionClass {
 		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initialized local objects.");
 	}
 	
-	public void changeCiaoPrologWorkingFolder(String localUserName) throws WorkingFolderClassException, PLException, IOException {
+	public void changeCiaoPrologWorkingFolder(String localUserName) 
+			throws WorkingFolderClassException, PLException, IOException, LocalUserNameFixesClassException {
 		// Change it only if necessary.
 		LOG.info("changeCiaoPrologWorkingFolder: changing to " + localUserName);
 		if ((currentlocalUserName == null) || (! currentlocalUserName.equals(localUserName))) {
