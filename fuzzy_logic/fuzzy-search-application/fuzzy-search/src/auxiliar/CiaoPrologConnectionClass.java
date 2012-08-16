@@ -12,7 +12,7 @@ public class CiaoPrologConnectionClass {
 	final Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
 	static private PLConnection plServer = null;
 	static private WorkingFolderClass workingFolderObject = null;
-	static String currentUserDisplayName = null;
+	static String currentlocalUserName = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, WorkingFolderClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
@@ -29,12 +29,12 @@ public class CiaoPrologConnectionClass {
 		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initialized local objects.");
 	}
 	
-	public void changeCiaoPrologWorkingFolder(String userDisplayName) throws WorkingFolderClassException, PLException, IOException {
+	public void changeCiaoPrologWorkingFolder(String localUserName) throws WorkingFolderClassException, PLException, IOException {
 		// Change it only if necessary.
-		LOG.info("changeCiaoPrologWorkingFolder: changing to " + userDisplayName);
-		if ((currentUserDisplayName == null) || (! currentUserDisplayName.equals(userDisplayName))) {
+		LOG.info("changeCiaoPrologWorkingFolder: changing to " + localUserName);
+		if ((currentlocalUserName == null) || (! currentlocalUserName.equals(localUserName))) {
 
-			String newWorkingFolder = workingFolderObject.getUserWorkingFolder(userDisplayName);
+			String newWorkingFolder = workingFolderObject.getUserWorkingFolder(localUserName);
 			
 			// Change working folder.
 			PLVariable var1 = new PLVariable();
@@ -45,7 +45,7 @@ public class CiaoPrologConnectionClass {
 			LOG.info("changeCiaoPrologWorkingFolder: answer: " + answer.toString());
 			
 		}
-		LOG.info("changeCiaoPrologWorkingFolder: changed to " + userDisplayName);
+		LOG.info("changeCiaoPrologWorkingFolder: changed to " + localUserName);
 	}
 
 	public PLGoal runQuery(PLStructure query) throws PLException {

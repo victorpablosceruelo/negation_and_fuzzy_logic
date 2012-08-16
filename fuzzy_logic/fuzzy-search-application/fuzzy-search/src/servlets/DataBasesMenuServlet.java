@@ -90,8 +90,8 @@ public class DataBasesMenuServlet extends HttpServlet {
 		WorkingFolderClass workingFolder;
 		try {
 			workingFolder = new WorkingFolderClass();
-			String userDisplayName = (String) session.getAttribute("userDisplayName");
-			workingFolder.removeDataBase(database, userDisplayName);
+			String localUserName = (String) session.getAttribute("localUserName");
+			workingFolder.removeDataBase(database, localUserName);
 			request.setAttribute("msg1", "The database "+database+" has been removed. ");
 		} catch (WorkingFolderClassException e) {
 			LOG.info("Exception: " + e);

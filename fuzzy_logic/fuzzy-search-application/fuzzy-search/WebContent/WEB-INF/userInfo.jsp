@@ -19,7 +19,7 @@
 		Profile profile = (Profile) session.getAttribute("profile");
 		if (profile == null) {
 			out.print("<h3>"+"Sorry, user profile is null"+"</h3>");
-			out.print("<h3>"+"DisplayName: "+session.getAttribute("userDisplayName")+"</h3>");
+			out.print("<h3>"+"DisplayName: "+session.getAttribute("localUserName")+"</h3>");
 		}
 		else {
 			out.print("<h3>"+"Country: "+profile.getCountry()+"</h3>");

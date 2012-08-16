@@ -22,8 +22,8 @@ public class DataBaseInfoClass {
 	public String getDataBaseOwner() {
 		return dataBaseOwner;
 	}
-	public Boolean canDeleteDataBase(String userDisplayName) {
-		return dataBaseOwner.equals(userDisplayName);
+	public Boolean canDeleteDataBase(String localUserName) {
+		return dataBaseOwner.equals(localUserName);
 	}
 	
 }

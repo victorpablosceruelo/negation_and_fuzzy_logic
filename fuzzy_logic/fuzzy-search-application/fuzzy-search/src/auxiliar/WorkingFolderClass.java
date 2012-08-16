@@ -23,10 +23,10 @@ public class WorkingFolderClass {
 	public WorkingFolderClass() throws WorkingFolderClassException {
 		configureWorkingFolder();
 	}
-	public String getUserWorkingFolder(String userDisplayName) throws WorkingFolderClassException {
+	public String getUserWorkingFolder(String localUserName) throws WorkingFolderClassException {
 
 		configureWorkingFolder();
-		String userWorkingFolder = workingFolder + fixUserDisplayName(userDisplayName) + "/";
+		String userWorkingFolder = workingFolder + fixlocalUserName(localUserName) + "/";
 		testOrCreateWorkingFolder(userWorkingFolder);
 		return userWorkingFolder ;
 	}
@@ -36,15 +36,15 @@ public class WorkingFolderClass {
 		return workingFolder;
 	}
 	
-	private String fixUserDisplayName(String userDisplayName) throws WorkingFolderClassException {
-		String fixedUserDisplayName = null;
-		if ((userDisplayName == null) || "".equals(userDisplayName)) {
-			throw new WorkingFolderClassException("getWorkingFolder: userDisplayName can not be null nor empty string.");
+	private String fixlocalUserName(String localUserName) throws WorkingFolderClassException {
+		String fixedlocalUserName = null;
+		if ((localUserName == null) || "".equals(localUserName)) {
+			throw new WorkingFolderClassException("getWorkingFolder: localUserName can not be null nor empty string.");
 		}
 		else {
-			fixedUserDisplayName = userDisplayName.replaceAll("\\s", "_");
+			fixedlocalUserName = localUserName.replaceAll("\\s", "_");
 		}
-		return fixedUserDisplayName;
+		return fixedlocalUserName;
 	}
 		
 	private void configureWorkingFolder() throws WorkingFolderClassException {
@@ -107,9 +107,9 @@ public class WorkingFolderClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Boolean removeDataBase(String database, String userDisplayName) throws WorkingFolderClassException {
+	public Boolean removeDataBase(String database, String localUserName) throws WorkingFolderClassException {
 		configureWorkingFolder();
-		String userWorkingFolder = getUserWorkingFolder(userDisplayName);
+		String userWorkingFolder = getUserWorkingFolder(localUserName);
 		
 		String fileToRemove=userWorkingFolder+database;
 		File dir;
@@ -133,10 +133,10 @@ public class WorkingFolderClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public Iterator<DataBaseInfoClass> returnDatabasesIterator(String userDisplayName) {
+	public Iterator<DataBaseInfoClass> returnDatabasesIterator(String localUserName) {
 		Iterator<DataBaseInfoClass> databasesIterator = null;
 		try {
-			ArrayList<DataBaseInfoClass> databasesList = listDatabases(userDisplayName);
+			ArrayList<DataBaseInfoClass> databasesList = listDatabases(localUserName);
 			if (!databasesList.isEmpty()) {
 				databasesIterator = databasesList.iterator(); 
 			}
@@ -148,7 +148,7 @@ public class WorkingFolderClass {
 		return databasesIterator;
 	}
 	
-	public ArrayList<DataBaseInfoClass> listDatabases(String userDisplayName) throws WorkingFolderClassException {
+	public ArrayList<DataBaseInfoClass> listDatabases(String localUserName) throws WorkingFolderClassException {
 		
 		configureWorkingFolder();		
 		File dir = new File(workingFolder);
@@ -157,7 +157,7 @@ public class WorkingFolderClass {
 		FilenameFilter filter;
 		String[] subDirs;
 		
-		filter = (FilenameFilter) new OnlyUserDisplayNameFolderFilterClass(fixUserDisplayName(userDisplayName));
+		filter = (FilenameFilter) new OnlyLocalUserNameFolderFilterClass(fixlocalUserName(localUserName));
 		subDirs = dir.list(filter);
 
 		if (subDirs != null) {
@@ -167,7 +167,7 @@ public class WorkingFolderClass {
 		    }
 		}
 
-		filter = (FilenameFilter) new OnlyNotUserDisplayNameFolderFilterClass(fixUserDisplayName(userDisplayName));
+		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(fixlocalUserName(localUserName));
 		subDirs = dir.list(filter);
 
 		if (subDirs != null) {

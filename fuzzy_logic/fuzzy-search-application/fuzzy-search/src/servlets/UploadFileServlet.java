@@ -87,8 +87,8 @@ public class UploadFileServlet extends HttpServlet {
 					// Working folder
 					WorkingFolderClass workingFolder = new WorkingFolderClass();
 					// Get the path where we are going to upload the file.
-					String userDisplayName = (String) session.getAttribute("userDisplayName");
-					String filesPath = workingFolder.getUserWorkingFolder(userDisplayName);
+					String localUserName = (String) session.getAttribute("localUserName");
+					String filesPath = workingFolder.getUserWorkingFolder(localUserName);
 
 					// Parse the request to get file items.
 					List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));

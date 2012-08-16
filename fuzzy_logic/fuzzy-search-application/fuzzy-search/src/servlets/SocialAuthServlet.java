@@ -287,13 +287,13 @@ public class SocialAuthServlet extends HttpServlet {
 					session.setAttribute("profile", profile);
 					session.setAttribute("provider", provider);
 
-					// Determine correct value for variable userDisplayName
+					// Determine correct value for variable localUserName
 					
 					if (profile.getDisplayName() != null) {
-						session.setAttribute("userDisplayName", profile.getDisplayName());
+						session.setAttribute("localUserName", profile.getDisplayName());
 					}
 					else {
-						session.setAttribute("userDisplayName", "Testing User");
+						session.setAttribute("localUserName", "Testing User");
 					}
 				}
 			}
@@ -321,7 +321,7 @@ public class SocialAuthServlet extends HttpServlet {
 	    	if (session != null) {
 	    		retval = true; // Fake authentication !!!
 	    		session.setAttribute("authenticated", true);
-	    		session.setAttribute("userDisplayName", "Testing User");
+	    		session.setAttribute("localUserName", "Testing User");
 	    		ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);		
 	    	}
 		}

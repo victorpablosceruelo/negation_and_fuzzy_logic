@@ -11,7 +11,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Fuzzy Search App</title>
 
-<% String userDisplayName = (String) session.getAttribute("userDisplayName"); %>
+<% String localUserName = (String) session.getAttribute("localUserName"); %>
 </head>
 <body>
 	
@@ -43,7 +43,7 @@
 		WorkingFolderClass workingFolder = new WorkingFolderClass();
 		Iterator<DataBaseInfoClass> databasesIterator = null;
 		if (workingFolder != null) {
-			databasesIterator = workingFolder.returnDatabasesIterator(userDisplayName);
+			databasesIterator = workingFolder.returnDatabasesIterator(localUserName);
 		}
 		/*
 		else {
