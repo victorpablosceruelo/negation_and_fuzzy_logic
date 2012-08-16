@@ -18,7 +18,7 @@ FULL_PATH="${CHROOT_FOLDER}/${DEST_FOLDER}/"
 
 # ensure folders exist.
 mkdir -p ${CHROOT_FOLDER}
-mkdir -p ${DEST_FOLDER}
+mkdir -p ${FULL_PATH}
 
 for file in *; do
 	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "debian" ] && [ ! "$file" == ".svn" ]; then
