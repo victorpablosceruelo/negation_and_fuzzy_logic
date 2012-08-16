@@ -19,14 +19,17 @@ public class CiaoPrologConnectionClass {
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, WorkingFolderClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
+		String [] argv = new String[1];
+		argv[0] = pathToPlServer;
 		if (plServer == null) {
-			plServer = new PLConnection(pathToPlServer);
+			plServer = new PLConnection(argv);
 		}
+		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initializing local objects.");
 		if (workingFolderObject == null) {
 			workingFolderObject = new WorkingFolderClass();
 		}
 		// changeCiaoPrologWorkingFolder("");
-		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer");
+		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initialized local objects.");
 	}
 	
 	public void changeCiaoPrologWorkingFolder(String userDisplayName) throws WorkingFolderClassException, PLException, IOException {
