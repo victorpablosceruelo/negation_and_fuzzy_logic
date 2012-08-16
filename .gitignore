@@ -17,3 +17,5 @@ debug_pkg_*.pl
 debug_pkg_cneg_statistics.pl
 *.\$\$\$
 */.svn/*
+.svn/
+build/
