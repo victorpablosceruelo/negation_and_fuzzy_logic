@@ -27,19 +27,16 @@ for file in *; do
 	fi
 done
 
-# Copy the scripts we need to clean, build and install
-cp -dpRv debian/ciao-prolog-configure-clean-build-and-install.sh ${COMPILATION_PATH}
-cp -dpRv debian/ciao-prolog-configure.sh ${COMPILATION_PATH}
-ls -la ${FULL_PATH}
-
 # To save configurations for emacs and bash
-mkdir -p ${CHROOT_FOLDER}/root
-touch ${CHROOT_FOLDER}/root/.emacs
-touch ${CHROOT_FOLDER}/root/.bashrc
+mkdir -p /root
+touch /root/.emacs
+touch /root/.bashrc
 
 pushd ${COMPILATION_PATH}
-debian/ciao-prolog-configure-clean-build-and-install.sh
+debian/ciao-prolog-configure-clean-build-and-install.sh ${COMPILATION_PATH}
 popd
+
+# Need to move files to the $FULL_PATH
 
 mv ${CHROOT_FOLDER}/root/.emacs ${FULL_PATH}/add_to_.emacs
 mv ${CHROOT_FOLDER}/root/.bashrc ${FULL_PATH}/add_to_.bashrc
