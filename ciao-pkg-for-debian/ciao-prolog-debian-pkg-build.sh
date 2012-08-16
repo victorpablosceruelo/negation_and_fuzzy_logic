@@ -68,12 +68,12 @@ echo " sudo cowbuilder --update "
 echo " sudo cowbuilder --build $BUILD_DSC "
 echo " "
 
-popd
 echo " "
 echo " "
 
 set -x
 sudo cowbuilder --build ${WORKING_FOLDER}/${BUILD_DSC}
+popd
 
 echo "-> Now run "
 echo " sudo ${SCRIPT_DIR}/ciao-prolog-autoinstall.sh "
