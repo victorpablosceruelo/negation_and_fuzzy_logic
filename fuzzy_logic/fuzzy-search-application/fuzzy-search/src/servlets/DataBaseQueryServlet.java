@@ -84,7 +84,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 
 		connection = new CiaoPrologConnectionClass();
 		String userDisplayName = (String) session.getAttribute("userDisplayName");
-		// connection.changeCiaoPrologWorkingFolder(userDisplayName);
+		connection.changeCiaoPrologWorkingFolder(userDisplayName);
 		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
 }
