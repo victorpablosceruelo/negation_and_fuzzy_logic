@@ -5,7 +5,7 @@ echo "running $0 $* ... "
 if [ -z $1 ] || [ "$1" == "" ] || [ -z $2 ] || [ "$2" == "" ]; then
 	echo " "
 	echo "ERROR: This arguments needs two arguments to be run."
-	echo "${0} CHROOT_FOLDER DEST_FOLDER
+	echo "${0} CHROOT_FOLDER DEST_FOLDER"
 	echo " "
 	exit -1
 fi
