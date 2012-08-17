@@ -21,8 +21,8 @@ export SHELL=/bin/sh
 # export DH_OPTIONS=
 
 CIAOSETUP=ciaosetup
-DEST_DIR=/usr/share/CiaoDE
-CHROOT_DIR=$(CURDIR)/debian/tmp/
+PKG_FINAL_PATH=$(CURDIR)/debian/tmp/
+PKG_FINAL_SUBPATH=/usr/share/CiaoDE
 
 clean:
 	@echo "Makefile :: clean (it does nothing)"
@@ -57,22 +57,8 @@ build-and-install: fixes
 	dh_testroot
 	dh_installdirs
 
-	mkdir -p $(CHROOT_DIR)/$(DEST_DIR)/
-	@echo "Listing the files in $(CURDIR) before in $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-before.txt."
-	@echo "Files in $(CURDIR) before." > $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-before.txt
-	find $(CURDIR) >> $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-before.txt
-	@echo "Done. "
-	@echo " "
-	@echo " "
-	@echo " "
-	./debian/ciao-prolog-prepare-configure-clean-build-and-install.sh $(CHROOT_DIR) $(DEST_DIR)
-	@echo " "
-	@echo " "
-	@echo " "
-	@echo "Listing the files in $(CURDIR) after in $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-after.txt."
-	@echo "Files in $(CURDIR) after." > $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-after.txt
-	find $(CURDIR) >> $(CHROOT_DIR)/$(DEST_DIR)/files-in-curdir-after.txt
-	
+	./debian/ciao-prolog-prepare-configure-clean-build-and-install.sh $(PKG_FINAL_PATH) $(PKG_FINAL_SUBPATH)
+
 	@echo " "
 	dh_install --list-missing
 #	dh_install
