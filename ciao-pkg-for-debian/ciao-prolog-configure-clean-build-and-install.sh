@@ -8,7 +8,18 @@ fi
 
 COMPILATION_PATH="$0"
 
-push ${COMPILATION_PATH}
+mkdir -p ${COMPILATION_PATH}
+if [ ! -d ${COMPILATION_PATH} ]; then
+    exit -1
+fi
+
+function test_retval() {
+    if [ -z $1 ] || [ "$1" == "" ] || [ ! "$1" == "0" ]; then
+	exit $1
+    fi
+}
+
+pushd ${COMPILATION_PATH}
 read -t 60 -p "Press enter to continue with Ciao Prolog INSTALLATION"
 
 CIAOSETUP=ciaosetup
@@ -16,15 +27,19 @@ CIAOSETUP=ciaosetup
 echo " "
 echo " "
 ./${CIAOSETUP} clean
+test_retval $?
 echo " "
 echo " "
 ./${CIAOSETUP} clean_config
+test_retval $?
 echo " "
 echo " "
 ./${CIAOSETUP} realclean
+test_retval $?
 echo " "
 echo " "
 ./${CIAOSETUP} braveclean
+test_retval $?
 echo " "
 echo " "
 
@@ -92,6 +107,7 @@ echo " "
     --runtime_checks=no \
     --set_flag_options=yes 
 
+test_retval $?
 
 	# New in version 1.15.0 r14285
 #	./${CIAOSETUP} configure 
@@ -116,9 +132,11 @@ echo " "
 
 # Add here commands to compile the package.
 ./${CIAOSETUP} build
+test_retval $?
 echo " "
 echo " "
 ./${CIAOSETUP} docs
+test_retval $?
 echo " "
 echo " "
 
@@ -128,6 +146,7 @@ echo " "
 
 # And the commands to install it.
 ./${CIAOSETUP} install
+test_retval $?
 echo " "
 echo " "
 

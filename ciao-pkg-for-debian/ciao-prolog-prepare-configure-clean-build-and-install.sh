@@ -17,8 +17,14 @@ LOGS_PATH="${FULL_PATH}/debian-pkg-logs/"
 
 # Info: PKG_FINAL_SUBPATH must point to ${CURDIR}/debian/tmp
 
-# ensure folders exist.
+function test_retval() {
+    if [ -z $1 ] || [ "$1" == "" ] || [ ! "$1" == "0" ]; then
+	exit $1
+    fi
+}
 
+
+# ensure folders exist.
 mkdir -p ${PKG_FINAL_SUBPATH}
 mkdir -p ${PKG_FINAL_PATH}
 mkdir -p ${FULL_PATH}
@@ -46,6 +52,7 @@ touch /root/.bashrc
 
 # Configure, clean, build and install.
 ./debian/ciao-prolog-configure-clean-build-and-install.sh ${PKG_FINAL_SUBPATH}
+test_retval $?
 
 # Need to move files to the $FULL_PATH
 echo " "
