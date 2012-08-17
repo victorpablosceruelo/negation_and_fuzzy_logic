@@ -1,3 +1,10 @@
+ciao-prolog (1.15+r14854) unstable; urgency=low
+
+  * New upstream release. Changed system installation local installation.
+  * New mechanism to make a local installation appear as a system one.
+
+ -- Victor Pablos Ceruelo <vpablos@babel.ls.fi.upm.es>  Tue, 21 Feb 2012 13:00:00 +0200
+
 ciao-prolog (1.13+r14482) unstable; urgency=low
 
   * New upstream release, using get_ciao_prolog.sh 1.15.0 14482 latest

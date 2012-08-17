@@ -105,7 +105,7 @@ binary-arch:
 #	dh_installemacsen -a
 #	dh_installinfo -a
 #	dh_installman -a
-	dh_strip -a
+#	dh_strip -a
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
