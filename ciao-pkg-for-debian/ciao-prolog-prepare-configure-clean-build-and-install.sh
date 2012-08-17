@@ -22,7 +22,7 @@ LOGS_PATH="${FULL_PATH}/debian-pkg-logs/"
 mkdir -p ${PKG_FINAL_SUBPATH}
 mkdir -p ${PKG_FINAL_PATH}
 mkdir -p ${FULL_PATH}
-mkdir -p ${FULL_PATH}/debian_pkg
+mkdir -p ${LOGS_PATH}
 
 echo "Listing the files in ${CURDIR} before in ${LOGS_PATH}/files-in-curdir-before.txt."
 echo "Files in ${CURDIR} before." > ${LOGS_PATH}/files-in-curdir-before.txt
