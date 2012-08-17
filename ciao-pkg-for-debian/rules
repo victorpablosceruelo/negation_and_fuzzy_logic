@@ -57,7 +57,7 @@ build-and-install: fixes
 	dh_testroot
 	dh_installdirs
 
-	./debian/ciao-prolog-prepare-configure-clean-build-and-install.sh $(PKG_FINAL_PATH) $(PKG_FINAL_SUBPATH)
+	./debian/ciao-prolog-prepare-configure-clean-build-and-install.sh $(CURDIR) $(PKG_FINAL_PATH) $(PKG_FINAL_SUBPATH)
 
 	@echo " "
 	dh_install --list-missing

@@ -3,7 +3,7 @@
 echo "running $0 $* ... "
 
 if [ -z $1 ] || [ "$1" == "" ]; then
-	echo "${0}: usage: $0 COMPILATION PATH"
+	echo "${0}: usage: $0 COMPILATION_PATH"
 fi
 
 COMPILATION_PATH="$0"
@@ -94,18 +94,18 @@ echo " "
 
 
 	# New in version 1.15.0 r14285
-#	./$(CIAOSETUP) configure 
-#	./$(CIAOSETUP) configure --setup
-#	./$(CIAOSETUP) build
-#	./$(CIAOSETUP) docs
-#	./$(CIAOSETUP) install
-#	./$(CIAOSETUP) install_to_destroot --destdir=[value]
+#	./${CIAOSETUP} configure 
+#	./${CIAOSETUP} configure --setup
+#	./${CIAOSETUP} build
+#	./${CIAOSETUP} docs
+#	./${CIAOSETUP} install
+#	./${CIAOSETUP} install_to_destroot --destdir=[value]
 
 # Add here commands to compile and install the package.
-# ./$(CIAOSETUP) build
-# ./$(CIAOSETUP) docs
-# ./$(CIAOSETUP) install_to_destroot --destdir=$(CURDIR)/debian/tmp
-# ./$(CIAOSETUP) install_to_destroot --destdir=/usr
+# ./${CIAOSETUP} build
+# ./${CIAOSETUP} docs
+# ./${CIAOSETUP} install_to_destroot --destdir=${CURDIR}/debian/tmp
+# ./${CIAOSETUP} install_to_destroot --destdir=/usr
 
 #######################################################
 #######################################################
