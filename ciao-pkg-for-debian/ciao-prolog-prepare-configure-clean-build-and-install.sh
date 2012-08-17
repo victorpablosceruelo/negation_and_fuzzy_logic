@@ -10,12 +10,13 @@ if [ -z $1 ] || [ "$1" == "" ] || [ -z $2 ] || [ "$2" == "" ] || [ -z $3 ] || [ 
 	exit -1
 fi
 
-PKG_FINAL_PATH="$1" 
-PKG_FINAL_SUBPATH="${2}"
+CURRENT_DIR="${1}" 
+PKG_FINAL_PATH="${2}" 
+PKG_FINAL_SUBPATH="${3}"
 FULL_PATH="${PKG_FINAL_PATH}/${PKG_FINAL_SUBPATH}/"
 LOGS_PATH="${FULL_PATH}/debian-pkg-logs/"
 
-# Info: PKG_FINAL_SUBPATH must point to ${CURDIR}/debian/tmp
+# Info: PKG_FINAL_SUBPATH must point to ${CURRENT_DIR}/debian/tmp
 
 function test_retval() {
     if [ -z $1 ] || [ "$1" == "" ] || [ ! "$1" == "0" ]; then
@@ -33,9 +34,9 @@ mkdir -p ${PKG_FINAL_PATH}
 mkdir -p ${FULL_PATH}
 mkdir -p ${LOGS_PATH}
 
-echo "Listing the files in ${CURDIR} before in ${LOGS_PATH}/files-in-curdir-before.txt."
-echo "Files in ${CURDIR} before." > ${LOGS_PATH}/files-in-curdir-before.txt
-find ${CURDIR} >> ${LOGS_PATH}/files-in-curdir-before.txt
+echo "Listing the files in ${CURRENT_DIR} before in ${LOGS_PATH}/files-in-curdir-before.txt."
+echo "Files in ${CURRENT_DIR} before." > ${LOGS_PATH}/files-in-curdir-before.txt
+find ${CURRENT_DIR} >> ${LOGS_PATH}/files-in-curdir-before.txt
 echo "Done. "
 echo " "
 echo " "
@@ -69,7 +70,7 @@ mv -v ${PKG_FINAL_SUBPATH} ${FULL_PATH}
 echo " "
 echo " "
 echo " "
-echo "Listing the files in ${CURDIR} after in ${LOGS_PATH}/files-in-curdir-after.txt."
-echo "Files in ${CURDIR} after." > ${LOGS_PATH}/files-in-curdir-after.txt
-find ${CURDIR} >> ${LOGS_PATH}/files-in-curdir-after.txt
+echo "Listing the files in ${CURRENT_DIR} after in ${LOGS_PATH}/files-in-curdir-after.txt."
+echo "Files in ${CURRENT_DIR} after." > ${LOGS_PATH}/files-in-curdir-after.txt
+find ${CURRENT_DIR} >> ${LOGS_PATH}/files-in-curdir-after.txt
 

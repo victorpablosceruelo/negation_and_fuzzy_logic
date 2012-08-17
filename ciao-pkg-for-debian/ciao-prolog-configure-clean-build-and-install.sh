@@ -6,7 +6,7 @@ if [ -z $1 ] || [ "$1" == "" ]; then
 	echo "${0}: usage: $0 COMPILATION_PATH"
 fi
 
-COMPILATION_PATH="$0"
+COMPILATION_PATH="$1"
 
 mkdir -p ${COMPILATION_PATH}
 if [ ! -d ${COMPILATION_PATH} ]; then
