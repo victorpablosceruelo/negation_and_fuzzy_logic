@@ -19,6 +19,9 @@ LOGS_PATH="${FULL_PATH}/debian-pkg-logs/"
 
 function test_retval() {
     if [ -z $1 ] || [ "$1" == "" ] || [ ! "$1" == "0" ]; then
+	echo " "
+	echo "Return value is: --${1}-- "
+	echo " "
 	exit $1
     fi
 }
