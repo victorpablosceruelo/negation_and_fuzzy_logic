@@ -17,7 +17,7 @@ import CiaoJava.PLException;
 import auxiliar.CiaoPrologConnectionClass;
 import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.ServletsAuxMethodsClass;
-import auxiliar.WorkingFolderClassException;
+import auxiliar.FoldersUtilsClassException;
 
 /**
  * Servlet implementation class DbQueryServlet
@@ -79,7 +79,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 		}
 	}
 	protected void dbQueryAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException, PLException, WorkingFolderClassException, LocalUserNameFixesClassException {
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
 		CiaoPrologConnectionClass connection = null; 
 

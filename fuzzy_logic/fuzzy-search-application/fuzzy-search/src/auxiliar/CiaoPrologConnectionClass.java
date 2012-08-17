@@ -9,28 +9,30 @@ import CiaoJava.*;
 
 public class CiaoPrologConnectionClass {
 
-	final Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
+	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
 	static private PLConnection plServer = null;
-	static private WorkingFolderClass workingFolderObject = null;
-	static String currentlocalUserName = null;
+	static private FoldersUtilsClass workingFolderObject = null;
+	static private String currentlocalUserName = null;
 	
-	public CiaoPrologConnectionClass() throws PLException, IOException, WorkingFolderClassException {
+	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
+		if (workingFolderObject == null) {
+			workingFolderObject = new FoldersUtilsClass();
+		}
+		
 		String [] argv = new String[1];
-		argv[0] = WorkingFolderClass.lookForPlServer();
+		argv[0] = workingFolderObject.getPlServerPath();
 		if (plServer == null) {
 			plServer = new PLConnection(argv);
 		}
 		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initializing local objects.");
-		if (workingFolderObject == null) {
-			workingFolderObject = new WorkingFolderClass();
-		}
+
 		// changeCiaoPrologWorkingFolder("");
 		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initialized local objects.");
 	}
 	
-	public void changeCiaoPrologWorkingFolder(String localUserName) 
-			throws WorkingFolderClassException, PLException, IOException, LocalUserNameFixesClassException {
+	public void changeCiaoPrologWorkingFolder(String newWorkingFolder) 
+			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
 		// Change it only if necessary.
 		LOG.info("changeCiaoPrologWorkingFolder: changing to " + localUserName);
 		if ((currentlocalUserName == null) || (! currentlocalUserName.equals(localUserName))) {

@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 import auxiliar.ServletsAuxMethodsClass;
-import auxiliar.WorkingFolderClass;
+import auxiliar.FoldersUtilsClass;
 // import auxiliar.WorkingFolderClassException;
 
 /**
@@ -87,9 +87,9 @@ public class DataBasesMenuServlet extends HttpServlet {
 	
 	private void removeDataBase(String database, HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		WorkingFolderClass workingFolder;
+		FoldersUtilsClass workingFolder;
 		try {
-			workingFolder = new WorkingFolderClass();
+			workingFolder = new FoldersUtilsClass();
 			String localUserName = (String) session.getAttribute("localUserName");
 			workingFolder.removeDataBase(database, localUserName);
 			request.setAttribute("msg1", "The database "+database+" has been removed. ");

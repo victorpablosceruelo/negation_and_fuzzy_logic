@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.CastingsClass;
 import auxiliar.ServletsAuxMethodsClass;
-import auxiliar.WorkingFolderClass;
+import auxiliar.FoldersUtilsClass;
 
 
 
@@ -85,10 +85,10 @@ public class UploadFileServlet extends HttpServlet {
 
 				try{ 
 					// Working folder
-					WorkingFolderClass workingFolder = new WorkingFolderClass();
+					FoldersUtilsClass workingFolder = new FoldersUtilsClass();
 					// Get the path where we are going to upload the file.
 					String localUserName = (String) session.getAttribute("localUserName");
-					String filesPath = workingFolder.getUserWorkingFolder(localUserName);
+					String filesPath = workingFolder.getCompletePathOfSubPathFolder(localUserName, true);
 
 					// Parse the request to get file items.
 					List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));

@@ -3,15 +3,15 @@ package auxiliar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class WorkingFolderClassException extends Exception {
+public class FoldersUtilsClassException extends Exception {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(WorkingFolderClassException .class);
+	final Log LOG = LogFactory.getLog(FoldersUtilsClassException .class);
 
-	public WorkingFolderClassException(String string) {
+	public FoldersUtilsClassException(String string) {
 		super();
 	}
 	
