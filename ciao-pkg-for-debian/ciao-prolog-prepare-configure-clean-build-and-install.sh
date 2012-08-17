@@ -34,20 +34,25 @@ mkdir -p ${PKG_FINAL_PATH}
 mkdir -p ${FULL_PATH}
 mkdir -p ${LOGS_PATH}
 
-echo "Listing the files in ${CURRENT_DIR} before in ${LOGS_PATH}/files-in-curdir-before.txt."
-echo "Files in ${CURRENT_DIR} before." > ${LOGS_PATH}/files-in-curdir-before.txt
-find ${CURRENT_DIR} >> ${LOGS_PATH}/files-in-curdir-before.txt
-echo "Done. "
-echo " "
-echo " "
-echo " "
+./debian/ciao-prolog-check-folders-status.sh ${CURRENT_DIR} ${PKG_FINAL_PATH} ${PKG_FINAL_SUBPATH}
 
+echo " "
+echo "Removing subversion subfolders"
+echo " "
+find . -name ".svn" -type d -exec rm -vrf {} \;
+
+./debian/ciao-prolog-check-folders-status.sh ${CURRENT_DIR} ${PKG_FINAL_PATH} ${PKG_FINAL_SUBPATH}
 
 for file in *; do
 	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "debian" ] && [ ! "$file" == ".svn" ]; then
 		mv -v $file ${PKG_FINAL_SUBPATH} 2>&1 >> ${LOGS_PATH}/files-moved.txt
 	fi
 done
+echo " " >> ${LOGS_PATH}/files-moved.txt
+echo " " >> ${LOGS_PATH}/files-moved.txt
+ls -la 2>&1 >> ${LOGS_PATH}/files-moved.txt
+echo " " >> ${LOGS_PATH}/files-moved.txt
+echo " " >> ${LOGS_PATH}/files-moved.txt
 
 # To save configurations for emacs and bash
 mkdir -p /root
@@ -65,12 +70,16 @@ mv -v ${PKG_FINAL_PATH}/root/.emacs ${LOGS_PATH}/add_to_.emacs
 mv -v ${PKG_FINAL_PATH}/root/.bashrc ${LOGS_PATH}/add_to_.bashrc
 echo " "
 echo "Moving the sources and the compiled files from ${PKG_FINAL_SUBPATH} to ${FULL_PATH} "
-mv -v ${PKG_FINAL_SUBPATH} ${FULL_PATH}
+for file in ${PKG_FINAL_SUBPATH}/*; do
+	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "debian" ] && [ ! "$file" == ".svn" ]; then
+		mv -v ${PKG_FINAL_SUBPATH}/${file} ${FULL_PATH} 2>&1 >> ${LOGS_PATH}/files-moved.txt
+	fi
+done
+echo " " >> ${LOGS_PATH}/files-moved.txt
+echo " " >> ${LOGS_PATH}/files-moved.txt
+ls -la 2>&1 >> ${LOGS_PATH}/files-moved.txt
+echo " " >> ${LOGS_PATH}/files-moved.txt
+echo " " >> ${LOGS_PATH}/files-moved.txt
 
-echo " "
-echo " "
-echo " "
-echo "Listing the files in ${CURRENT_DIR} after in ${LOGS_PATH}/files-in-curdir-after.txt."
-echo "Files in ${CURRENT_DIR} after." > ${LOGS_PATH}/files-in-curdir-after.txt
-find ${CURRENT_DIR} >> ${LOGS_PATH}/files-in-curdir-after.txt
+./debian/ciao-prolog-check-folders-status.sh ${CURRENT_DIR} ${PKG_FINAL_PATH} ${PKG_FINAL_SUBPATH}
 
