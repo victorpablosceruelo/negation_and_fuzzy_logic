@@ -47,3 +47,4 @@ echo " "
 # Compress to save space, and remove just after.
 tar -cjvf ${LOGS_FILE}.tar.bz2 ${LOGS_FILE}
 rm -fv ${LOGS_FILE}
+ls -la ${LOGS_FILE}.tar.bz2

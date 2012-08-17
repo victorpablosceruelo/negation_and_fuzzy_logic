@@ -66,13 +66,13 @@ test_retval $?
 # Need to move files to the $FULL_PATH
 echo " "
 echo "Saving user configuration files to a non-problematic path:  ${LOGS_PATH} "
-mv -v ${PKG_FINAL_PATH}/root/.emacs ${LOGS_PATH}/add_to_.emacs
-mv -v ${PKG_FINAL_PATH}/root/.bashrc ${LOGS_PATH}/add_to_.bashrc
+mv -v /root/.emacs ${LOGS_PATH}/add_to_.emacs
+mv -v /root/.bashrc ${LOGS_PATH}/add_to_.bashrc
 echo " "
 echo "Moving the sources and the compiled files from ${PKG_FINAL_SUBPATH} to ${FULL_PATH} "
 for file in ${PKG_FINAL_SUBPATH}/*; do
 	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "debian" ] && [ ! "$file" == ".svn" ]; then
-		mv -v ${PKG_FINAL_SUBPATH}/${file} ${FULL_PATH} 2>&1 >> ${LOGS_PATH}/files-moved.txt
+		mv -v ${file} ${FULL_PATH} 2>&1 >> ${LOGS_PATH}/files-moved.txt
 	fi
 done
 echo " " >> ${LOGS_PATH}/files-moved.txt
@@ -80,6 +80,12 @@ echo " " >> ${LOGS_PATH}/files-moved.txt
 ls -la 2>&1 >> ${LOGS_PATH}/files-moved.txt
 echo " " >> ${LOGS_PATH}/files-moved.txt
 echo " " >> ${LOGS_PATH}/files-moved.txt
+
+#pushd ${PKG_FINAL_PATH}
+#pushd usr/bin
+#ln -s ../../${PKG_FINAL_SUBPATH}/build/bin .
+#popd
+#popd
 
 ./debian/ciao-prolog-check-folders-status.sh ${CURRENT_DIR} ${PKG_FINAL_PATH} ${PKG_FINAL_SUBPATH}
 
