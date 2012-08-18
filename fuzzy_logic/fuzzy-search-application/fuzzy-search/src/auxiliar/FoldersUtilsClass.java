@@ -21,8 +21,38 @@ public class FoldersUtilsClass {
 	private static String plServerPath = null;
 	
 	public FoldersUtilsClass() throws FoldersUtilsClassException {
-		configureProgramsPath();
-		plServerPath = lookForPlServer();
+		
+		// Configure the programsPath: Try the different options one by one.
+		configureProgramsPathAux("/home/java-apps/fuzzy-search/");
+		configureProgramsPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
+		// configureProgramsPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
+		configureProgramsPathAux("/tmp/java-apps/fuzzy-search/");
+
+		if ((programsPath == null) || (programsPath.equals(""))) {
+			throw new FoldersUtilsClassException("configureProgramsPath: Cannot configure the path for the programs.");
+		}
+		else {
+			LOG.info("choosen folder for uploads: " + programsPath);
+		}
+		
+		// Configure plServer path
+		configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
+		configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
+		configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+		configurePlServerPathAux("/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+		
+		// ToDo: Convendria un mecanismo algo más avanzado ... :-(
+		configurePlServerPathAdvanced("/usr/lib/ciao");
+		configurePlServerPathAdvanced("/usr/share/CiaoDE");
+		configurePlServerPathAdvanced("/home/");
+		configurePlServerPathAdvanced("/");
+		
+		if (plServerPath == null) {
+			throw new FoldersUtilsClassException("lookForPlServer: impossible to find plserver.");
+		}
+		else {
+			LOG.info("plServer path: " + plServerPath);
+		}
 	}
 	
 	/**
@@ -50,29 +80,7 @@ public class FoldersUtilsClass {
 	 * @return the path in which programs can be found and/or stored.
 	 */
 	public String getprogramsPath() throws FoldersUtilsClassException {
-		configureProgramsPath();
 		return programsPath;
-	}
-	
-	/**
-	 * Configures the attribute programsPath (if possible)  
-	 * by assigning to it the value of a path where the programs can be 
-	 * stored.
-	 */
-	private void configureProgramsPath() throws FoldersUtilsClassException {
-
-		// Try the different options one by one.
-		configureProgramsPathAux("/home/java-apps/fuzzy-search/");
-		configureProgramsPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
-		// configureProgramsPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
-		configureProgramsPathAux("/tmp/java-apps/fuzzy-search/");
-
-		if ((programsPath == null) || (programsPath.equals(""))) {
-			throw new FoldersUtilsClassException("configureProgramsPath: Cannot configure the path for the programs.");
-		}
-		else {
-			LOG.info("choosen folder for uploads: " + programsPath);
-		}
 	}
 
 	/**
@@ -102,7 +110,7 @@ public class FoldersUtilsClass {
 	 * @return    true if the folder was there or has been created. False otherwise. 
 	 * @exception FoldersUtilsClassException if the folder can not be created
 	 */
-	private Boolean testOrCreateProgramsPath(String newProgramsPath, Boolean createIfDoesNotExist) 
+	public Boolean testOrCreateProgramsPath(String newProgramsPath, Boolean createIfDoesNotExist) 
 			throws FoldersUtilsClassException {
 		boolean retval = false;
 		
@@ -173,6 +181,12 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Gets an iterator to iterate on the existing databases.
+	 * 
+	 * @param     localUserName is the name of the user that is logged in.
+	 * @return    the databases iterator, null if there are no databases to iterate.
+	 */
 	public Iterator<DataBaseInfoClass> returnDatabasesIterator(String localUserName) {
 		Iterator<DataBaseInfoClass> databasesIterator = null;
 		try {
@@ -188,15 +202,24 @@ public class FoldersUtilsClass {
 		return databasesIterator;
 	}
 	
-	public ArrayList<DataBaseInfoClass> listDatabases(String localUserName) throws FoldersUtilsClassException, LocalUserNameFixesClassException {
-		
-		configureProgramsPath();		
+	/**
+	 * Gets a list with the existing databases.
+	 * 
+	 * @param     localUserName is the name of the user that is logged in.
+	 * @return    the databases iterator, null if there are no databases to iterate.
+	 * @exception LocalUserNameFixesClassException if owner is empty or null.
+	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
+	 */
+	private ArrayList<DataBaseInfoClass> listDatabases(String localUserName) 
+			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
+				
 		File dir = new File(programsPath);
 		ArrayList<DataBaseInfoClass> currentList = new ArrayList<DataBaseInfoClass>();
 
 		FilenameFilter filter;
 		String[] subDirs;
 		
+		// We list first the localUserName databases.
 		LocalUserNameFixesClass.checkValidLocalUserName(localUserName);
 		filter = (FilenameFilter) new OnlyLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
@@ -208,6 +231,7 @@ public class FoldersUtilsClass {
 		    }
 		}
 
+		// We list in second (and last) place the other databases.
 		LocalUserNameFixesClass.checkValidLocalUserName(localUserName);
 		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
@@ -222,9 +246,17 @@ public class FoldersUtilsClass {
 		return currentList;
 	}
 
-	private ArrayList<DataBaseInfoClass> listDatabasesInSubDir(String subDir, ArrayList<DataBaseInfoClass> currentList) throws FoldersUtilsClassException {
+	/**
+	 * Gets a list with the existing databases.
+	 * 
+	 * @param     subDir is the full path of the subdirectory we are listing.
+	 * @return    the databases iterator, null if there are no databases to iterate.
+	 * @exception LocalUserNameFixesClassException if owner is empty or null.
+	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
+	 */
+	private ArrayList<DataBaseInfoClass> listDatabasesInSubDir(String subDir, ArrayList<DataBaseInfoClass> currentList) 
+			throws FoldersUtilsClassException {
 
-		configureProgramsPath();
 		if ((subDir == null) || ("".equals(subDir))) {
 			throw new FoldersUtilsClassException("listDatabasesInSubDir: subDir cannot be null nor empty string.");
 		}
@@ -245,51 +277,42 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+	/**
+	 * Returns the value of the path of plserver
+	 * 
+	 * @return    the path of the executable file plServer.
+	 * @exception FoldersUtilsClassException if plServer is null.
+	 * 
+	 */
 	public String getPlServerPath() throws FoldersUtilsClassException {
-		if (plServerPath == null) {
-			plServerPath = lookForPlServer();
-		}
 		if (plServerPath == null) {
 			throw new FoldersUtilsClassException("getPlServerPath: plServerPath is null.");
 		}
 		return plServerPath;
 	}
 	
-	private String lookForPlServer() throws FoldersUtilsClassException {
-		String pathOfPlServer = null;
-		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/usr/lib/ciao/ciao-1.15/library/javall/plserver");
-		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
-		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
-		pathOfPlServer = lookForPlServerAux(pathOfPlServer, "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
-		
-		// ToDo: Convendria un mecanismo algo más avanzado ... :-(
-		lookForPlServerAdvanced(pathOfPlServer, "/usr/lib/ciao");
-		lookForPlServerAdvanced(pathOfPlServer, "/usr/share/CiaoDE");
-		lookForPlServerAdvanced(pathOfPlServer, "/home/");
-		lookForPlServerAdvanced(pathOfPlServer, "/");
-		
-		if (pathOfPlServer == null) {
-			throw new FoldersUtilsClassException("lookForPlServer: impossible to find plserver.");
-		}
-		
-		return pathOfPlServer;
-	}
-	
-	private String lookForPlServerAdvanced(String pathOfPlServer, String folderPath) {
-		if (pathOfPlServer == null) {
-			File currentDir = new File(folderPath);
+	/**
+	 * If the path of the plServer is not configured yet, 
+	 * it looks for the plServer executable in the subpath given.
+	 * 
+	 * @param subPath is the new proposed subpath for the plServer.
+	 * 
+	 */
+	private void configurePlServerPathAdvanced(String subPath) {
+		if (plServerPath == null) {
+			File currentDir = new File(subPath);
 			File[] subFiles = currentDir.listFiles();
 			File file = null;
 			int counter;
 			
 			// Test first the files.
 			counter = 0;
-			while ((pathOfPlServer == null) && (counter<subFiles.length)) {
+			while ((plServerPath == null) && (counter<subFiles.length)) {
 				file = subFiles[counter];
 				if (file.isFile()) {
 					if ("plserver".equals(file.getName())) {
-						pathOfPlServer = lookForPlServerAux(pathOfPlServer, file.getAbsolutePath());
+						configurePlServerPathAux(file.getAbsolutePath());
 					}
 				}
 				counter++;
@@ -297,25 +320,31 @@ public class FoldersUtilsClass {
 
 			// And at last the directories.
 			counter = 0;
-			while ((pathOfPlServer == null) && (counter<subFiles.length)) {
+			while ((plServerPath == null) && (counter<subFiles.length)) {
 				file = subFiles[counter];
 				if (file.isDirectory() && file.canRead() && file.canExecute()) {
-					pathOfPlServer = lookForPlServerAdvanced(pathOfPlServer, file.getAbsolutePath());
+					configurePlServerPathAdvanced(file.getAbsolutePath());
 				}
 				counter++;
 			}
 		}
-		return pathOfPlServer;
 	}
 	
-	private String lookForPlServerAux(String pathOfPlServer, String executableFileWithPath) {
-		if (pathOfPlServer == null) {
-			File file = new File(executableFileWithPath);
+	/**
+	 * If the path of the plServer is not configured yet, 
+	 * it looks for the plServer executable in the path given.
+	 * If it is a valid path, it just sets the attribute plServerPath.
+	 * 
+	 * @param untestedPathForPlServer is the new proposed path for the plServer.
+	 * 
+	 */
+	private void configurePlServerPathAux(String untestedPathForPlServer) {
+		if (plServerPath == null) {
+			File file = new File(untestedPathForPlServer);
 			if (file.exists() && file.isFile() && file.canRead() && file.canExecute()) {
-				pathOfPlServer = executableFileWithPath;
+				plServerPath = untestedPathForPlServer;
 			}
 		}
-		return pathOfPlServer;
 	}	
 	
 }

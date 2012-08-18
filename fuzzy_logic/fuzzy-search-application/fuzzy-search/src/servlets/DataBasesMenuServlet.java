@@ -91,7 +91,8 @@ public class DataBasesMenuServlet extends HttpServlet {
 		try {
 			workingFolder = new FoldersUtilsClass();
 			String localUserName = (String) session.getAttribute("localUserName");
-			workingFolder.removeDataBase(database, localUserName);
+			String owner = (String) session.getAttribute("owner");
+			workingFolder.removeDataBase(database, owner, localUserName);
 			request.setAttribute("msg1", "The database "+database+" has been removed. ");
 		} catch (Exception e) {
 			LOG.info("Exception: " + e);
