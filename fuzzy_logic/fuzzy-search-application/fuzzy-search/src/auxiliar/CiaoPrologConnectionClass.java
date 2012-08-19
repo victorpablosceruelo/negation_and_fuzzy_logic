@@ -11,17 +11,17 @@ public class CiaoPrologConnectionClass {
 
 	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
 	static private PLConnection plServer = null;
-	static private FoldersUtilsClass workingFolderObject = null;
+	static private FoldersUtilsClass FoldersUtilsObject = null;
 	static private String currentWorkingFolder = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
-		if (workingFolderObject == null) {
-			workingFolderObject = new FoldersUtilsClass();
+		if (FoldersUtilsObject == null) {
+			FoldersUtilsObject = new FoldersUtilsClass();
 		}
 		
 		String [] argv = new String[1];
-		argv[0] = workingFolderObject.getPlServerPath();
+		argv[0] = FoldersUtilsObject.getPlServerPath();
 		if (plServer == null) {
 			plServer = new PLConnection(argv);
 		}
@@ -34,13 +34,13 @@ public class CiaoPrologConnectionClass {
 	public void changeCiaoPrologWorkingFolder(String newWorkingFolder) 
 			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
 		
-		if (newWorkingFolder == null) {
-			HERE !!!
+		if ((newWorkingFolder == null) || ("".equals(newWorkingFolder))){
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is null or empty.");
 		}
 		
 		// Change it only if necessary.
 		if ((currentWorkingFolder == null) || (! currentWorkingFolder.equals(newWorkingFolder))) { 
-			if (workingFolderObject.testOrCreateProgramsPath(newWorkingFolder, false)) {
+			if (FoldersUtilsObject.testOrCreateProgramsPath(newWorkingFolder, false)) {
 			
 				// Change working folder.
 				PLVariable var1 = new PLVariable();
@@ -53,9 +53,10 @@ public class CiaoPrologConnectionClass {
 			else {
 				LOG.info("changeCiaoPrologWorkingFolder: folder " + newWorkingFolder + " does not exist.");
 			}
-			LOG.info("changeCiaoPrologWorkingFolder: not changing working folder because " + newWorkingFolder + " = " currentWorkingFolder);
+			LOG.info("changeCiaoPrologWorkingFolder: not changing working folder because " + 
+						newWorkingFolder + " = " + currentWorkingFolder);
 		}
-		LOG.info("changeCiaoPrologWorkingFolder: changed to " + localUserName);
+		LOG.info("changeCiaoPrologWorkingFolder: changed to " + newWorkingFolder);
 	}
 
 	public PLGoal runQuery(PLStructure query) throws PLException {

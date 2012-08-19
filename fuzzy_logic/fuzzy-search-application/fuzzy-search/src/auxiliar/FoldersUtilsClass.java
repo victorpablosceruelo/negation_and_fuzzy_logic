@@ -257,6 +257,7 @@ public class FoldersUtilsClass {
 	private ArrayList<DataBaseInfoClass> listDatabasesInSubDir(String subDir, ArrayList<DataBaseInfoClass> currentList) 
 			throws FoldersUtilsClassException {
 
+		LOG.info("listDatabasesInSubDir: subDir: " + subDir);
 		if ((subDir == null) || ("".equals(subDir))) {
 			throw new FoldersUtilsClassException("listDatabasesInSubDir: subDir cannot be null nor empty string.");
 		}

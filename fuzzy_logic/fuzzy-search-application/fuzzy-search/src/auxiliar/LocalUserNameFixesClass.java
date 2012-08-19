@@ -67,13 +67,13 @@ public class LocalUserNameFixesClass {
 		}
 		else {
 			fixedLocalUserName = localUserName.replaceAll("\\s", "_");
-			LOG.info("fixedLocalUserName: " + fixedLocalUserName);
+			LOG.info("fixedLocalUserName step 1: " + fixedLocalUserName);
 			fixedLocalUserName = fixedLocalUserName.replaceAll("\\@", "_at_");
-			LOG.info("fixedLocalUserName: " + fixedLocalUserName);
+			LOG.info("fixedLocalUserName step 2: " + fixedLocalUserName);
 			fixedLocalUserName = fixedLocalUserName.replaceAll("\\.", "_");
-			LOG.info("fixedLocalUserName: " + fixedLocalUserName);
+			LOG.info("fixedLocalUserName step 3: " + fixedLocalUserName);
 		}
-		checkValidLocalUserName(fixedLocalUserName);
+		// checkValidLocalUserName(fixedLocalUserName);
 		return fixedLocalUserName;
 	}
 	
