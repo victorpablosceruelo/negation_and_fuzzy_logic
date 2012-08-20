@@ -38,6 +38,10 @@ public class CiaoPrologConnectionClass {
 			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is null or empty.");
 		}
 		
+		if ((! FoldersUtilsObject.folderExists(newWorkingFolder))) {
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: folder selected is not valid.");
+		}
+		
 		// Change it only if necessary.
 		if ((currentWorkingFolder == null) || (! currentWorkingFolder.equals(newWorkingFolder))) { 
 			if (FoldersUtilsObject.testOrCreateProgramsPath(newWorkingFolder, false)) {

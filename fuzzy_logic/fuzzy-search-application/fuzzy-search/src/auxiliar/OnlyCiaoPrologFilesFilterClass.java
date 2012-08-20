@@ -17,10 +17,7 @@ public class OnlyCiaoPrologFilesFilterClass implements FilenameFilter {
 	public boolean accept(File dir, String name) {
 		// dir va a ser el directorio contenedor y no el manejador del archivo a filtrar !!!
 		LOG.info("OnlyCiaoPrologFilesFilterClass: accept: dir.AbsolutePath: " + dir.getAbsolutePath());
-		LOG.info("OnlyCiaoPrologFilesFilterClass: accept: dir.name: " + dir.getName());
-		LOG.info("OnlyCiaoPrologFilesFilterClass: accept: dir.isFile: " + dir.isFile());
-		LOG.info("OnlyCiaoPrologFilesFilterClass: accept: dir.canRead: " + dir.canRead());
-		return ((name.endsWith(".pl")) && (dir.isFile()) && (dir.canRead()));
+		return ((dir.isDirectory()) && (dir.canRead()) && (dir.canExecute()) && (name.endsWith(".pl")));
 	}
 
 }

@@ -26,7 +26,7 @@ public class OnlyLocalUserNameFolderFilterClass implements FilenameFilter {
 	
 	@Override
 	public boolean accept(File dir, String name) {
-		return (name.equals(owner)) && (dir.isDirectory()) && (dir.canRead()) && (dir.canExecute());
+		return ((dir.isDirectory()) && (dir.canRead()) && (dir.canExecute()) && (name.equals(owner)));
 	}
 
 }
