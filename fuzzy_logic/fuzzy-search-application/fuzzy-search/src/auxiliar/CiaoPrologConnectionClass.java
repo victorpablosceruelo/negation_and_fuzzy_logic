@@ -11,9 +11,12 @@ import CiaoJava.*;
 public class CiaoPrologConnectionClass {
 
 	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
-	static private PLConnection plServer = null;
 	static private FoldersUtilsClass FoldersUtilsObject = null;
 	static private String currentWorkingFolder = null;
+	
+	// This one can not be shared between different processes.
+	private PLConnection plServer = null;
+	private PLGoal currentGoal = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
@@ -52,21 +55,18 @@ public class CiaoPrologConnectionClass {
 		
 		// Change it only if necessary.
 		if ((currentWorkingFolder == null) || (! currentWorkingFolder.equals(newWorkingFolder))) { 
-			if (FoldersUtilsObject.testOrCreateProgramsPath(newWorkingFolder, false)) {
 			
 				// Change working folder.
 				PLVariable var1 = new PLVariable();
 				PLStructure query = new PLStructure("working_directory",
 						new PLTerm[]{var1, new PLAtom(newWorkingFolder)}); 
-				PLGoal execution = runQuery(query);
-				PLTerm answer = getAnswer(execution);
+				runQuery(query);
+				PLTerm answer = getAnswer();
 				LOG.info("changeCiaoPrologWorkingFolder: answer: " + answer.toString());
-			}
-			else {
-				LOG.info("changeCiaoPrologWorkingFolder: folder " + newWorkingFolder + " does not exist.");
-			}
+		}
+		else {
 			LOG.info("changeCiaoPrologWorkingFolder: not changing working folder because " + 
-						newWorkingFolder + " = " + currentWorkingFolder);
+					newWorkingFolder + " = " + currentWorkingFolder);
 		}
 		LOG.info("changeCiaoPrologWorkingFolder: changed to " + newWorkingFolder);
 	}
@@ -81,25 +81,45 @@ public class CiaoPrologConnectionClass {
 	}
 
 	
-	public PLGoal runQuery(PLStructure query) throws PLException {
-		LOG.info("runQuery: executing query: " + query);
+	public void runQuery(PLStructure query) throws PLException, IOException {
+		if (query == null) {
+			LOG.info("runQuery: query is null.");
+			throw new PLException("runQuery: query is null.");
+		}
+		
+		if (currentGoal != null) {
+			currentGoal.terminate();
+			currentGoal = null;
+		}
+		
+		LOG.info("runQuery: executing query: " + query.toString());
 		if (plServer == null) throw new PLException("runQuery: plServer is null.");
-		if (query == null) throw new PLException("runQuery: query is null.");
-		LOG.info("runQuery: executed query: " + query);
-		return new PLGoal(plServer, query);
+		currentGoal = new PLGoal(plServer, query);
+		currentGoal.query();
+		
+		LOG.info("runQuery: executed query: " + query.toString());
 	}
 	
-	public PLTerm getAnswer(PLGoal execution) throws IOException, PLException {
+	public PLTerm getAnswer() throws IOException, PLException {
 		LOG.info("getAnswer: getting another answer");
 		PLTerm answer = null;
+		Integer counter = new Integer(0);
 		do {
-			answer = execution.nextSolution();
-		} while ((answer == null) && execution.isStillRunning());
+			answer = currentGoal.nextSolution();
+			counter++;
+			if (counter.equals(Integer.MAX_VALUE)) {
+				LOG.info("We have waited for the answer for " + counter.toString() + " times.");
+				counter = new Integer(0);
+			}
+		} while ((answer == null) && currentGoal.isStillRunning()); // && (counter < loopCounterMaximum));
 		
 		if (answer == null) {
-			throw new PLException("getAnswer: Invalid answer.");
+			LOG.info("getAnswer: answer obtained is null.");
+			// throw new PLException("getAnswer: answer obtained is null.");
 		}
-		LOG.info("getAnswer: obtained another answer");
+		else {
+			LOG.info("getAnswer: obtained another answer: " + answer.toString());	
+		}
 		return answer;
 	}
 
