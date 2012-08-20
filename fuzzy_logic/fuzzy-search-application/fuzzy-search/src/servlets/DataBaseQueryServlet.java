@@ -112,6 +112,9 @@ public class DataBaseQueryServlet extends HttpServlet {
 			connection.changeCiaoPrologWorkingFolder(owner);
 			connection.selectDatabase(owner, database);
 			connection.databaseIntrospectionQuery();
+			
+			request.setAttribute("database", database);
+			request.setAttribute("owner", owner);
 
 			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
