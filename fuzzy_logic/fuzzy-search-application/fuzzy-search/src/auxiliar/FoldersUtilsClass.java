@@ -22,6 +22,7 @@ public class FoldersUtilsClass {
 	
 	public FoldersUtilsClass() throws FoldersUtilsClassException {
 		
+		LOG.info("looking for a folder for uploading databases ... ");
 		// Configure the programsPath: Try the different options one by one.
 		configureProgramsPathAux("/home/java-apps/fuzzy-search/");
 		configureProgramsPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
@@ -35,10 +36,11 @@ public class FoldersUtilsClass {
 			LOG.info("choosen folder for uploads: " + programsPath);
 		}
 		
+		LOG.info("looking for the path of plserver ... ");
 		// Configure plServer path
-		configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
-		configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
-		configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+		// configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
+		// configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
+		// configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
 		configurePlServerPathAux("/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
 		
 		// ToDo: Convendria un mecanismo algo más avanzado ... :-(
@@ -298,35 +300,43 @@ public class FoldersUtilsClass {
 	 * it looks for the plServer executable in the subpath given.
 	 * 
 	 * @param subPath is the new proposed subpath for the plServer.
+	 * @throws FoldersUtilsClassException when subPath is an empty string or null,
 	 * 
 	 */
-	private void configurePlServerPathAdvanced(String subPath) {
+	private void configurePlServerPathAdvanced(String subPath) throws FoldersUtilsClassException {
 		if (plServerPath == null) {
+			if ((subPath == null) || ("".equals(subPath))) {
+				throw new FoldersUtilsClassException("configurePlServerPathAdvanced: subPath is empty string or null.");
+			}
 			File currentDir = new File(subPath);
-			File[] subFiles = currentDir.listFiles();
-			File file = null;
-			int counter;
-			
-			// Test first the files.
-			counter = 0;
-			while ((plServerPath == null) && (counter<subFiles.length)) {
-				file = subFiles[counter];
-				if (file.isFile()) {
-					if ("plserver".equals(file.getName())) {
-						configurePlServerPathAux(file.getAbsolutePath());
+			if ((currentDir.exists()) || (currentDir.isDirectory()) || (currentDir.canRead()) || (currentDir.canExecute())) {
+				File[] subFiles = currentDir.listFiles();
+				File file = null;
+				int counter;
+
+				if (subFiles != null) {
+					// Test first the files.
+					counter = 0;
+					while ((plServerPath == null) && (counter<subFiles.length)) {
+						file = subFiles[counter];
+						if (file.isFile()) {
+							if ("plserver".equals(file.getName())) {
+								configurePlServerPathAux(file.getAbsolutePath());
+							}
+						}
+						counter++;
+					}
+
+					// And at last the directories.
+					counter = 0;
+					while ((plServerPath == null) && (counter<subFiles.length)) {
+						file = subFiles[counter];
+						if ((file.exists()) && (file.isDirectory()) && (file.canRead()) && (file.canExecute())) {
+							configurePlServerPathAdvanced(file.getAbsolutePath());
+						}
+						counter++;
 					}
 				}
-				counter++;
-			}
-
-			// And at last the directories.
-			counter = 0;
-			while ((plServerPath == null) && (counter<subFiles.length)) {
-				file = subFiles[counter];
-				if (file.isDirectory() && file.canRead() && file.canExecute()) {
-					configurePlServerPathAdvanced(file.getAbsolutePath());
-				}
-				counter++;
 			}
 		}
 	}
@@ -337,12 +347,16 @@ public class FoldersUtilsClass {
 	 * If it is a valid path, it just sets the attribute plServerPath.
 	 * 
 	 * @param untestedPathForPlServer is the new proposed path for the plServer.
+	 * @throws FoldersUtilsClassException when untestedPathForPlServer is empty string or null.
 	 * 
 	 */
-	private void configurePlServerPathAux(String untestedPathForPlServer) {
+	private void configurePlServerPathAux(String untestedPathForPlServer) throws FoldersUtilsClassException {
 		if (plServerPath == null) {
+			if ((untestedPathForPlServer == null) || ("".equals(untestedPathForPlServer))) {
+				throw new FoldersUtilsClassException("configurePlServerPathAux: untestedPathForPlServer is empty string or null.");
+			}
 			File file = new File(untestedPathForPlServer);
-			if (file.exists() && file.isFile() && file.canRead() && file.canExecute()) {
+			if ((file.exists()) && (file.isFile()) && (file.canRead()) && (file.canExecute()) && (file.getName().equals("plserver"))) {
 				plServerPath = untestedPathForPlServer;
 			}
 		}
