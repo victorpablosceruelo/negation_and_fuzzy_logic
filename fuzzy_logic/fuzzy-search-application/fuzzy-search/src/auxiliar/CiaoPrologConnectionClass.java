@@ -60,9 +60,10 @@ public class CiaoPrologConnectionClass {
 				PLVariable var1 = new PLVariable();
 				PLStructure query = new PLStructure("working_directory",
 						new PLTerm[]{var1, new PLAtom(newWorkingFolder)}); 
-				runQuery(query);
-				PLTerm answer = getAnswer();
-				LOG.info("changeCiaoPrologWorkingFolder: answer: " + answer.toString());
+				runQueryEvaluation(query);
+				PLTerm queryAnswered = getQueryAnswered();
+				LOG.info("changeCiaoPrologWorkingFolder: queryAnswered: " + queryAnswered.toString());
+				LOG.info("changeCiaoPrologWorkingFolder: var1 value: " + var1.toString());
 		}
 		else {
 			LOG.info("changeCiaoPrologWorkingFolder: not changing working folder because " + 
@@ -70,6 +71,10 @@ public class CiaoPrologConnectionClass {
 		}
 		LOG.info("changeCiaoPrologWorkingFolder: changed to " + newWorkingFolder);
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void selectDatabase(String database) {
 		
@@ -80,16 +85,23 @@ public class CiaoPrologConnectionClass {
 		return programElements;
 	}
 
-	
-	public void runQuery(PLStructure query) throws PLException, IOException {
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Asks the prolog server to evaluate the query.
+	 * 
+	 * @param query is the query to be evaluated.
+	 */
+	public void runQueryEvaluation(PLStructure query) throws PLException, IOException {
 		if (query == null) {
 			LOG.info("runQuery: query is null.");
 			throw new PLException("runQuery: query is null.");
 		}
 		
 		if (currentGoal != null) {
-			currentGoal.terminate();
-			currentGoal = null;
+			runQueryTermination();
 		}
 		
 		LOG.info("runQuery: executing query: " + query.toString());
@@ -100,27 +112,62 @@ public class CiaoPrologConnectionClass {
 		LOG.info("runQuery: executed query: " + query.toString());
 	}
 	
-	public PLTerm getAnswer() throws IOException, PLException {
+	/**
+	 * Terminates the evaluation of the current query.
+	 */
+	public void runQueryTermination() {
+		if (currentGoal != null) {
+			try {
+				currentGoal.terminate();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			currentGoal = null;
+		}	
+	}
+	
+	/**
+	 * Destroys the current connection to the plServer, so it should dye. 
+	 */
+	public void connectionTermination() {
+		runQueryTermination();
+		if (plServer != null) {
+			try {
+				plServer.stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			plServer = null;
+		}
+	}
+	
+	
+	/**
+	 * Obtains the answer to the query, but the answer is contained in the original query.
+	 * This differs from the usual behavior in Prolog interpreters, 
+	 * where we get just the answers to the variables involved.
+	 */
+	public PLTerm getQueryAnswered() throws IOException, PLException {
 		LOG.info("getAnswer: getting another answer");
-		PLTerm answer = null;
+		PLTerm queryAnswered = null;
 		Integer counter = new Integer(0);
 		do {
-			answer = currentGoal.nextSolution();
+			queryAnswered = currentGoal.nextSolution();
 			counter++;
 			if (counter.equals(Integer.MAX_VALUE)) {
 				LOG.info("We have waited for the answer for " + counter.toString() + " times.");
 				counter = new Integer(0);
 			}
-		} while ((answer == null) && currentGoal.isStillRunning()); // && (counter < loopCounterMaximum));
+		} while ((queryAnswered == null) && currentGoal.isStillRunning()); // && (counter < loopCounterMaximum));
 		
-		if (answer == null) {
+		if (queryAnswered == null) {
 			LOG.info("getAnswer: answer obtained is null.");
 			// throw new PLException("getAnswer: answer obtained is null.");
 		}
 		else {
-			LOG.info("getAnswer: obtained another answer: " + answer.toString());	
+			LOG.info("getAnswer: obtained another answer: " + queryAnswered.toString());	
 		}
-		return answer;
+		return queryAnswered;
 	}
 
 }

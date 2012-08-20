@@ -26,11 +26,12 @@ import auxiliar.FoldersUtilsClassException;
 public class DataBaseQueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(DataBaseQueryServlet.class);
-       
+	private CiaoPrologConnectionClass connection = null;
+	
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public DataBaseQueryServlet() {
+    public DataBaseQueryServlet() { 
         super();
     }
 
@@ -52,7 +53,16 @@ public class DataBaseQueryServlet extends HttpServlet {
 		LOG.info("--- doPost end ---");
 	}
 	
-	protected void dbQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	public void destroy() {
+		LOG.info("Destroy any resoource associated with the Ciao Prolog connection.");
+		if (connection != null) {
+			connection.runQueryTermination();
+			connection.connectionTermination();
+		}
+	}
+	
+	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		String database = null;
@@ -93,11 +103,10 @@ public class DataBaseQueryServlet extends HttpServlet {
 	 * and shows the results in a web page.
 	 * Offers to the jsp all the collected information.
 	 */
-	protected void dbQueryAux(String owner, String database, 
+	private void dbQueryAux(String owner, String database, 
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
-		CiaoPrologConnectionClass connection = null; 
 		connection = new CiaoPrologConnectionClass();
 		connection.changeCiaoPrologWorkingFolder(owner);
 		connection.selectDatabase(database);

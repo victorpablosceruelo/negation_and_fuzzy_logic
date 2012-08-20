@@ -100,5 +100,4 @@ public class DataBasesMenuServlet extends HttpServlet {
 			request.setAttribute("msg1", "The database "+database+" could not be removed. ");
 		}
 	}
-
 }
