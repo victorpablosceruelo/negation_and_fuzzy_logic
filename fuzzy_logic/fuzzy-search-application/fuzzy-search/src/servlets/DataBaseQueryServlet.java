@@ -56,6 +56,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		String database = null;
+		String owner = null;
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("no session. logout.");
@@ -64,21 +65,31 @@ public class DataBaseQueryServlet extends HttpServlet {
 		else {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
 			database = request.getParameter("database");
-			if (database == null) {
+			owner = request.getParameter("owner");
+			if ((database == null) || (owner == null)) {
 				LOG.info("database is null.");
 				ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 			}
 			else {
-				LOG.info("database to be used is " + database + ".");
+				LOG.info("Choosen database and owner are: " + database + " :: " + owner + ".");
 				try {
-					dbQueryAux(session, request, response);
+					dbQueryAux(owner, database, session, request, response);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
-	protected void dbQueryAux(HttpSession session, HttpServletRequest request, HttpServletResponse response) 
+	
+	/**
+	 * Connects to prolog server plserver, 
+	 * changes the current folder to the one owned by the owner of the database,
+	 * asks the database for the available predicates via introspection
+	 * and shows the results in a web page.
+	 * Offers to the jsp all the collected information.
+	 */
+	protected void dbQueryAux(String owner, String database, 
+			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
 		CiaoPrologConnectionClass connection = null; 

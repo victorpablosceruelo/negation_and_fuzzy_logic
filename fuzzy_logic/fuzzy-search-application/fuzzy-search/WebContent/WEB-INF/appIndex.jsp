@@ -27,6 +27,9 @@
 <body>
     <div id="main">        
         <div id="text" >
+        
+        	<jsp:include page="showErrors.jsp" />
+			
 			<center>
 				<h1>Fuzzy Search Social Authentication</h1 >
 				<h2>Please choose a provider to sign in.</h2 >

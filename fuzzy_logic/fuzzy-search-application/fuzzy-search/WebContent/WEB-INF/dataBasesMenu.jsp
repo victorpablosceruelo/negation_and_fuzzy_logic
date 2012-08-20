@@ -10,30 +10,12 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Fuzzy Search App</title>
-
-<%
-	String localUserName = (String) session.getAttribute("localUserName");
-%>
 </head>
 <body>
 	
 	<h1>Fuzzy search application</h1>
 	<h2>Check your user information <a href="UserInfoServlet">here</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
-	<%
-		if (session != null) {
-		if ((session.getAttribute("msg1") != null) || (session.getAttribute("msg2") != null)) {
-			out.print("<h2>Messages to the user</h2>");
-		}
-		if (session.getAttribute("msg1") != null) {
-			out.print("<h3>"+session.getAttribute("msg1")+"</h3>");
-			session.removeAttribute("msg1");
-		}
-		if (session.getAttribute("msg2") != null) {
-			out.print("<h3>"+session.getAttribute("msg2")+"</h3>");
-			session.removeAttribute("msg2");
-		}			
-			}
-	%>
+	<jsp:include page="showErrors.jsp" />
 	<h2>Please choose between one of the following tasks:</h2>
 	<h3>Upload a new database</h3>
 	<FORM ENCTYPE='multipart/form-data' method='POST'
@@ -42,6 +24,8 @@
 			TYPE='submit' VALUE='Upload File'>
 	</FORM>
 	<%
+		String localUserName = (String) session.getAttribute("localUserName");
+
 		FoldersUtilsClass workingFolder = new FoldersUtilsClass();
 			Iterator<DataBaseInfoClass> databasesIterator = null;
 			if (workingFolder != null) {

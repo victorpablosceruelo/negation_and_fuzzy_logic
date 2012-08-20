@@ -4,22 +4,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Fuzzy Search</title>
+<title>Fuzzy Search App</title>
 </head>
 <body>
-		<H1>Perform your query.</H1>
-
-		<% if (request.getAttribute("msg1") != null) { %>
-			<h1>MSG: <%=request.getAttribute("msg1") %>
-			</h1>
-		<% } %>
-		
-		<% if (request.getAttribute("msg2") != null) { %>
-			<h1>MSG: <%=request.getAttribute("msg2") %>
-			</h1>
-		<% } %>
-
-
+	<h1>Fuzzy search application</h1>
+		<h2><a href="DatabasesMenu">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
+		<jsp:include page="showErrors.jsp">
+		</jsp:include>
+		<h2>Perform your query.</h2>
 
 
 </body>

@@ -46,7 +46,9 @@ public class FoldersUtilsClass {
 		// ToDo: Convendria un mecanismo algo más avanzado ... :-(
 		configurePlServerPathAdvanced("/usr/lib/ciao");
 		configurePlServerPathAdvanced("/usr/share/CiaoDE");
-		configurePlServerPathAdvanced("/home/");
+		configurePlServerPathAdvanced("/usr");
+		configurePlServerPathAdvanced("/opt");
+		configurePlServerPathAdvanced("/home");
 		configurePlServerPathAdvanced("/");
 		
 		if (plServerPath == null) {
