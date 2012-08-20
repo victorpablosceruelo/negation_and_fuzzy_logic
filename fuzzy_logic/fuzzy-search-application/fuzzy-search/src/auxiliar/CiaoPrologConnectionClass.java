@@ -1,6 +1,7 @@
 package auxiliar;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,6 +68,16 @@ public class CiaoPrologConnectionClass {
 		LOG.info("changeCiaoPrologWorkingFolder: changed to " + newWorkingFolder);
 	}
 
+	public void selectDatabase(String database) {
+		
+	}
+	
+	public List<CiaoPrologProgramElementClass> databaseIntrospectionQuery() {
+		List<CiaoPrologProgramElementClass> programElements = null;
+		return programElements;
+	}
+
+	
 	public PLGoal runQuery(PLStructure query) throws PLException {
 		LOG.info("runQuery: executing query: " + query);
 		if (plServer == null) throw new PLException("runQuery: plServer is null.");

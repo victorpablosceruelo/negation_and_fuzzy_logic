@@ -76,10 +76,15 @@ public class DataBaseQueryServlet extends HttpServlet {
 					dbQueryAux(owner, database, session, request, response);
 				} catch (Exception e) {
 					e.printStackTrace();
+					request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
+					ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
 				}
 			}
 		}
 	}
+	
+	//String localUserName = (String) session.getAttribute("localUserName");
+	//connection.changeCiaoPrologWorkingFolder(localUserName);
 	
 	/**
 	 * Connects to prolog server plserver, 
@@ -93,10 +98,11 @@ public class DataBaseQueryServlet extends HttpServlet {
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
 		CiaoPrologConnectionClass connection = null; 
-
 		connection = new CiaoPrologConnectionClass();
-		String localUserName = (String) session.getAttribute("localUserName");
-		connection.changeCiaoPrologWorkingFolder(localUserName);
+		connection.changeCiaoPrologWorkingFolder(owner);
+		connection.selectDatabase(database);
+		connection.databaseIntrospectionQuery();
+
 		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
 }
