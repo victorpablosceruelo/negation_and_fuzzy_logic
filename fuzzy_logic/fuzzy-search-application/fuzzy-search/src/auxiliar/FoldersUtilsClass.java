@@ -376,11 +376,23 @@ public class FoldersUtilsClass {
 	 * and the files inside can be accessed. 
 	 * 
 	 * @param folderPath is the path of the folder.
+	 * @param relativePath if true then programsPath + relativePath will be used instead.
+	 * @throws FoldersUtilsClassException when folderPath is empty string or null.
 	 * 
 	 */
-	public Boolean folderExists (String folderPath) {
+	public Boolean folderExists (String folderPath, Boolean relativePath) throws FoldersUtilsClassException {
+		
+		LOG.info("folderExists: folderPath: " + folderPath);
+		if ((folderPath == null) || ("".equals(folderPath))) {
+			throw new FoldersUtilsClassException("configurePlServerPathAdvanced: folderPath is empty string or null.");
+		}
+		if (relativePath) {
+			folderPath = programsPath + folderPath;
+		}
 		File dir = new File(folderPath);
 		Boolean retVal = ((dir.exists()) && (dir.isDirectory()) && (dir.canRead()) && (dir.canExecute()));
+		LOG.info("dir.exists(): " + dir.exists() + " dir.isDirectory(): " + dir.isDirectory());
+		LOG.info("dir.canRead(): " + dir.canRead() + " dir.canExecute(): " + dir.canExecute());
 		return retVal;
 	}
 	
