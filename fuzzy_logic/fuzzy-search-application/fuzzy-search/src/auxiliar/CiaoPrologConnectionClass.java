@@ -76,8 +76,20 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void selectDatabase(String database) {
-		
+	public void selectDatabase(String owner, String database) 
+			throws FoldersUtilsClassException, LocalUserNameFixesClassException, PLException, IOException {
+		// Usage example:
+		// use_module('/home/vpablos/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/examples/age.pl').
+		LOG.info("selectDatabase: selecting owner: " + owner + " database: " + database);
+		if (! FoldersUtilsObject.databaseExists(owner, database, true)) {
+			throw new FoldersUtilsClassException("ERROR: requested database does not exist.");
+		}
+		String databaseFullPath = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
+		PLStructure query = new PLStructure("use_module", new PLTerm[]{new PLAtom(databaseFullPath)}); 
+		runQueryEvaluation(query);
+		PLTerm queryAnswered = getQueryAnswered();
+		LOG.info("selectDatabase: queryAnswered: " + queryAnswered.toString());
+		LOG.info("selectDatabase: selected owner: " + owner + " database: " + database);
 	}
 	
 	public List<CiaoPrologProgramElementClass> databaseIntrospectionQuery() {

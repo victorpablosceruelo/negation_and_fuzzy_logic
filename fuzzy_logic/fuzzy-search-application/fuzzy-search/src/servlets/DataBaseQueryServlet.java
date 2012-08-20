@@ -27,6 +27,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(DataBaseQueryServlet.class);
 	private CiaoPrologConnectionClass connection = null;
+	// static private FoldersUtilsClass FoldersUtilsObject = null;
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -107,11 +108,11 @@ public class DataBaseQueryServlet extends HttpServlet {
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
-		connection = new CiaoPrologConnectionClass();
-		connection.changeCiaoPrologWorkingFolder(owner);
-		connection.selectDatabase(database);
-		connection.databaseIntrospectionQuery();
+			connection = new CiaoPrologConnectionClass();
+			connection.changeCiaoPrologWorkingFolder(owner);
+			connection.selectDatabase(owner, database);
+			connection.databaseIntrospectionQuery();
 
-		ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}
 }

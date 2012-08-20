@@ -76,6 +76,30 @@ public class FoldersUtilsClass {
 		testOrCreateProgramsPath(userProgramsPath, createIfDoesNotExist);
 		return userProgramsPath ;
 	}
+
+	/**
+	 * Obtains the complete path of the database. 
+	 * 
+	 * @param    owner It is the owner of the database.
+	 * @param    database It is the database for which we are computing the path.
+	 * @return   the complete path where the owner can read/store his/her databases.
+	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
+	 * @exception FoldersUtilsClassException if the folder or the database do not exist or are invalid.
+	 */
+	public String getCompletePathOfDatabase(String owner, String database) 
+			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
+
+		LocalUserNameFixesClass.checkValidLocalUserName(owner);
+		String ownerPath = programsPath + owner + "/";
+		testOrCreateProgramsPath(ownerPath, false);
+		String databasePath = ownerPath + database;
+		File file = new File(databasePath);
+		if ((! file.exists()) || (! file.isFile()) || (! file.canRead())) {
+			throw new FoldersUtilsClassException("getCompletePathOfDatabase: database does not exist or is invalid.");
+		}
+		return databasePath;
+	}
+
 	
 	/**
 	 * Obtains the complete path of the folder in which programs can be found
@@ -384,7 +408,7 @@ public class FoldersUtilsClass {
 		
 		LOG.info("folderExists: folderPath: " + folderPath);
 		if ((folderPath == null) || ("".equals(folderPath))) {
-			throw new FoldersUtilsClassException("configurePlServerPathAdvanced: folderPath is empty string or null.");
+			throw new FoldersUtilsClassException("folderExists: folderPath is empty string or null.");
 		}
 		if (relativePath) {
 			folderPath = programsPath + folderPath;
@@ -400,5 +424,25 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public Boolean databaseExists(String owner, String database, Boolean relativePath) throws FoldersUtilsClassException {
+		
+		LOG.info("databaseExists: owner: " + owner + " database: " + database);
+		if ((owner == null) || ("".equals(owner))) {
+			throw new FoldersUtilsClassException("databaseExists: owner is empty string or null.");
+		}
+		if ((database == null) || ("".equals(database))) {
+			throw new FoldersUtilsClassException("databaseExists: database is empty string or null.");
+		}
+		
+		String fullPath = null;
+		if (relativePath) {
+			fullPath = programsPath + owner + "/" + database;
+		}
+		File file = new File(fullPath);
+		Boolean retVal = ((file.exists()) && (file.isFile()) && (file.canRead()));
+		LOG.info("file.exists(): " + file.exists() + " file.isFile(): " + file.isFile());
+		LOG.info("file.canRead(): " + file.canRead());
+		return retVal;
+	}
 	
 }
