@@ -9,8 +9,7 @@
 <body>
 	<h1>Fuzzy search application</h1>
 		<h2><a href="DatabasesMenu">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
-		<jsp:include page="showErrors.jsp">
-		</jsp:include>
+		<jsp:include page="showErrors.jsp" />
 		<h2>Perform your query.</h2>
 
 
