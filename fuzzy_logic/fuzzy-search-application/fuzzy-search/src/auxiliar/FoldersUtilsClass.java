@@ -114,6 +114,9 @@ public class FoldersUtilsClass {
 	 */
 	public Boolean testOrCreateProgramsPath(String newProgramsPath, Boolean createIfDoesNotExist) 
 			throws FoldersUtilsClassException {
+		
+		LOG.info("testOrCreateuserProgramsPath: newProgramsPath: " + newProgramsPath + " createIfDoesNotExist: " +
+				createIfDoesNotExist);
 		boolean retval = false;
 		
 		if ((newProgramsPath==null) || (newProgramsPath.equals(""))){

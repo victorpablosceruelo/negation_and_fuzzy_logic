@@ -33,13 +33,17 @@ public class CiaoPrologConnectionClass {
 	
 	public void changeCiaoPrologWorkingFolder(String newWorkingFolder) 
 			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
+		// Log info
+		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + newWorkingFolder);
 		
 		if ((newWorkingFolder == null) || ("".equals(newWorkingFolder))){
+			LOG.info("changeCiaoPrologWorkingFolder: newWorkingFolder is null or empty.");
 			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is null or empty.");
 		}
 		
 		if ((! FoldersUtilsObject.folderExists(newWorkingFolder))) {
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: folder selected is not valid.");
+			LOG.info("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
 		}
 		
 		// Change it only if necessary.
