@@ -9,25 +9,26 @@
 
 %:- dynamic output_file_is_open/1.
 %:- dynamic output_stream/1.
-:- dynamic saved/1.
+:- dynamic saved_clause_for_debug/1.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     Options                        %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-filename_suffix("_rfuzzy").
-filename_extension(".pl").
+
+filename_prefix("debug_file_").
+filename_suffix(".pl").
 	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                Consulting a file                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 debugger_pkg(Input, Output, FileName) :- 
 	debugger_pkg_aux(Input, Output, FileName).
 
 debugger_pkg_aux(end_of_file, [end_of_file], FileName) :- !,
 	openOutputFile(Stream, FileName),
-	findall(CL,(retract_fact(saved(CL))),Clauses,[end_of_file]),
+	findall(CL,(retract_fact(saved_clause_for_debug(CL))),Clauses,[end_of_file]),
 	debug_file_head(FileName),
 	debug_sentences(Clauses),
 %	write_eof,
@@ -36,7 +37,7 @@ debugger_pkg_aux(end_of_file, [end_of_file], FileName) :- !,
 debugger_pkg_aux(0, [], _FileName) :- !. 
 
 debugger_pkg_aux(Input, [Input], _FileName) :-
-	assertz_fact(saved(Input)), !.
+	assertz_fact(saved_clause_for_debug(Input)), !.
 
 debugger_pkg_aux(Input, [Input], _FileName) :-
 	write('ERROR: Impossible to store the following clause: '),
@@ -47,8 +48,10 @@ debugger_pkg_aux(Input, [Input], _FileName) :-
 
 openOutputFile(Stream, FileName) :-
 	name(FileName, FileName_String),
-	append("debug_file_", FileName_String, Debug_FileName_String_Aux),
-	append(Debug_FileName_String_Aux, ".pl", Debug_FileName_String),
+	filename_prefix(FileNamePrefix),
+	append(FileNamePrefix, FileName_String, Debug_FileName_String_Aux),
+	filename_suffix(FileNameSuffix),
+	append(Debug_FileName_String_Aux, FileNameSuffix, Debug_FileName_String),
 	name(FN_Out, Debug_FileName_String),	% Convert string to atom.
 	open(FN_Out,write,Stream),
 	set_output(Stream).

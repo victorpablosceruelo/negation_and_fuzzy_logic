@@ -1,4 +1,4 @@
-:- module(restaurant,_,[rfuzzy, clpr]).
+:- module(restaurant,_,[rfuzzy, clpr, debugger_pkg]).
 % or clpq. We can use clpr or clpq.
 
 :- prop restaurant/1.
