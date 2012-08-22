@@ -2,16 +2,15 @@
 
 :- use_module(library(aggregates), [findall/3]).
 :- use_module(library(terms),[copy_args/3]).
-:- use_module(library(messages),[error_message/2]).
-:- use_module(library(write),[write/1]).
+% :- use_module(library(messages),[error_message/2]).
+% :- use_module(library(write),[write/1]).
 
-:- use_module(library('compiler/c_itf')).
-
-%:- data fpred/1.
-%:- data fclause/2.
-%:- data frule/3.
-%:- data fnegclause/3.
-%:- data faggr/4.
+% :- use_module(library('compiler/c_itf')).
+% :- data fpred/1.
+% :- data fclause/2.
+% :- data frule/3.
+% :- data fnegclause/3.
+% :- data faggr/4.
 :- data sentence/2.
 :- data aggregators/1.
 

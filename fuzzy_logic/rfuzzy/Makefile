@@ -11,7 +11,7 @@ clean:
 
 mrproper: clean
 	@echo "-> Kill all ciao and xsb processes."
-	@killall xsb ciaoengine
+	@killall xsb ciaoengine ciaoengine.LINUXi86_64
 
 cleanall:
 	cd ../debugger_pkg ; make -i mrproper  
