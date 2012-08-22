@@ -81,6 +81,12 @@ ls -la 2>&1 >> ${LOGS_PATH}/files-moved.txt
 echo " " >> ${LOGS_PATH}/files-moved.txt
 echo " " >> ${LOGS_PATH}/files-moved.txt
 
+# Facilities for bash and emacs.
+cp -v ./debian/ciao-prolog-bash-and-emacs-configure.sh ${FULL_PATH}
+chmod +x ${FULL_PATH}/ciao-prolog-bash-and-emacs-configure.sh
+# test_retval $?
+
+
 #pushd ${PKG_FINAL_PATH}
 #pushd usr/bin
 #ln -s ../../${PKG_FINAL_SUBPATH}/build/bin .
