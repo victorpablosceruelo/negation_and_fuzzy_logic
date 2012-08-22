@@ -74,6 +74,7 @@ echo " "
 
 set -x
 sudo cowbuilder --build ${DEST_FOLDER}/${BUILD_DSC}
+set +x
 popd
 
 echo "-> Now run "
