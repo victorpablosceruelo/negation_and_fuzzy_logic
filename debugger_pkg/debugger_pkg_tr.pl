@@ -10,13 +10,14 @@
 %:- dynamic output_file_is_open/1.
 %:- dynamic output_stream/1.
 :- dynamic saved_clause_for_debug/1.
+:- dynamic debugging_file_name/1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     Options                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-filename_prefix("debug_file_").
+filename_prefix("debug_file_of_file_").
 filename_suffix(".pl").
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,7 +35,14 @@ debugger_pkg_aux(end_of_file, [end_of_file], FileName) :- !,
 %	write_eof,
 	close_output_file(Stream).
 
-debugger_pkg_aux(0, [], _FileName) :- !. 
+debugger_pkg_aux(0, [], FileName) :- !,
+	computeOutputFileName(FileName),
+	debugging_file_name(FN_Out),
+	write('INFO: Debugging to file '),
+	write(FN_Out),
+	nl.
+
+debugger_pkg_aux(:- define_debug_
 
 debugger_pkg_aux(Input, [Input], _FileName) :-
 	assertz_fact(saved_clause_for_debug(Input)), !.
@@ -43,16 +51,17 @@ debugger_pkg_aux(Input, [Input], _FileName) :-
 	write('ERROR: Impossible to store the following clause: '),
 	write(Input), nl.
 
-%openOutputFile(_Stream) :-
-%	output_file_is_open('Yes'), !.
-
-openOutputFile(Stream, FileName) :-
+computeOutputFileName(FileName) :-
 	name(FileName, FileName_String),
 	filename_prefix(FileNamePrefix),
 	append(FileNamePrefix, FileName_String, Debug_FileName_String_Aux),
 	filename_suffix(FileNameSuffix),
 	append(Debug_FileName_String_Aux, FileNameSuffix, Debug_FileName_String),
 	name(FN_Out, Debug_FileName_String),	% Convert string to atom.
+	assertz_fact(debugging_file_name(FN_Out)).
+
+openOutputFile(Stream, _FileName) :-
+	debugging_file_name(FN_Out),
 	open(FN_Out,write,Stream),
 	set_output(Stream).
 %	assertz_fact(output_file_is_open('Yes')).
