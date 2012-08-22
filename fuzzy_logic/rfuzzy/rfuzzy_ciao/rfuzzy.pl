@@ -1,3 +1,4 @@
+:- package(rfuzzy).
 % :- include(library('clpr/clpr')).
 :- include(library('rfuzzy/rfuzzy_ops')).
 :- use_module(library('rfuzzy/rfuzzy_rt')). % Previously rfaggr
@@ -7,8 +8,8 @@
 :- use_module(library(terms),[copy_args/3]).
 
 :- load_compilation_module(library('rfuzzy/rfuzzy_tr')).
-:- add_sentence_trans(trans_fuzzy_sent/3).
-:- add_clause_trans(trans_fuzzy_cl/3).
+:- add_sentence_trans(trans_fuzzy_sent/3, 740). % TODO: Right priority?
+:- add_clause_trans(trans_fuzzy_cl/3, 740). % TODO: Right priority?
 
 :- aggr min.
 :- aggr luka.
