@@ -1,5 +1,5 @@
 :- module(rfuzzy_rt, [defined_aggregators/1, 
-	inject/3, merge/4, prod/3, iprod/3, 
+	inject/3, merge/4, id/2, id/3, prod/3, iprod/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	mean/3, supreme/2,
 	'=>'/4,
@@ -12,7 +12,7 @@
 :- use_module(library(terms),[copy_args/3]).
 
 
-% REMOVED: preinject/3,postinject/4, id/2, id/3, 
+% REMOVED: preinject/3,postinject/4, 
 
 defined_aggregators([id, min, max, luka, dluka, prod, iprod, dprod, complement, mean]).
 
@@ -109,12 +109,12 @@ take_an_element([_FirstElement|List], Element) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
  
-%:- meta_predicate preinject(?,pred(2),?).
-%
-%id(L,L).
-%
-%preinject([],_,[]):-!.
-%preinject(L,P,T):- P(L,T).
+:- meta_predicate preinject(?,pred(2),?).
+
+id(L,L).
+
+preinject([],_,[]):-!.
+preinject(L,P,T):- P(L,T).
 
 :- meta_predicate inject(?,pred(3),?).
 
@@ -124,11 +124,11 @@ inject([X,Y|Rest],P,T):-
 	P(X,Y,T0),
 	inject([T0|Rest],P,T).
 
-%:- meta_predicate postinject(?,?,pred(3),?).
-%
-%id(_,V,V).
-%postinject([],A,_,A):-!.
-%postinject(L,V,P,T):- P(L,V,T).
+:- meta_predicate postinject(?,?,pred(3),?).
+
+id(_,V,V).
+postinject([],A,_,A):-!.
+postinject(L,V,P,T):- P(L,V,T).
 
 
 :- meta_predicate merge(?,?,pred(3),?).
@@ -220,6 +220,12 @@ debug_nl :- do_debug_rfuzzy('Yes'), write('\n').
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+rfuzzy_property_error(X) :-
+	write('Error on rfuzzy property: '),
+	write(X), nl, 
+	!, % Backtracking is not allowed here.
+	fail. % Don't continue
+	
 rfuzzy_warning_msg(Function, Error, Msg) :-
 	write('WARNING: in \"'),
 	write(Function), write('\" '),
