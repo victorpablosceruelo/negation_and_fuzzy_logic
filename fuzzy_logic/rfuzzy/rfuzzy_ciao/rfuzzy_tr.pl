@@ -1,51 +1,33 @@
-:- module(rfuzzy_tr,[trans_fuzzy_sent/3,trans_fuzzy_cl/3],[]).
+:- module(rfuzzy_tr,[rfuzzy_trans_sentence/3, rfuzzy_trans_clause/3],[]).
 
 :- use_module(library(aggregates), [findall/3]).
 :- use_module(library(terms),[copy_args/3]).
-% :- use_module(library(messages),[error_message/2]).
-% :- use_module(library(write),[write/1]).
-
-% :- use_module(library('compiler/c_itf')).
-% :- data fpred/1.
-% :- data fclause/2.
-% :- data frule/3.
-% :- data fnegclause/3.
-% :- data faggr/4.
-:- data sentence/2.
-:- data aggregators/1.
+:- use_module(library('rfuzzy/rfuzzy_rt')).
+:- include(library('clpqr-common/ops')).
+:- include(library('rfuzzy/rfuzzy_included')).
 
 % Important info to be saved.
 :- data rfuzzy_predicate_info/5.
-
-% :- data func_arguments/2.
-
-:- use_module(library('rfuzzy/rfuzzy_rt')).
-:- include(library('rfuzzy/rfuzzy_ops')).
-% :- include(library('clpr/ops')).
-:- include(library('clpqr-common/ops')).
+:- data aggregators/1.
+:- data sentence/2.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% trans_fuzzy_cl(Arg1, Arg2, Arg3) :- 
-trans_fuzzy_cl(Arg1, Arg1, _Arg3) :- 
+rfuzzy_trans_clause(Arg1, Arg1, _Arg3) :- 
 	debug_msg('trans_fuzzy_clause: arg1', Arg1).
-%	original_fuzzy_clause_trans(Arg1, Arg2, Arg3),
-%	debug_msg('clause: arg2', Arg2),
-%	debug_msg('clause: arg3', Arg3),
-%	debug_nl.
 
-trans_fuzzy_sent(Arg1, Arg2, Arg3) :- 
-	debug_msg('trans_fuzzy_sent: arg1', Arg1),
-	trans_fuzzy_sent_aux(Arg1, Arg2, Arg3), !,
-	debug_msg_list('trans_fuzzy_sent: arg2', Arg2),
-	debug_msg('trans_fuzzy_sent: arg3', Arg3),
+rfuzzy_trans_sentence(Arg1, Arg2, Arg3) :- 
+	debug_msg('rfuzzy_trans_sent: arg1', Arg1),
+	rfuzzy_trans_sent_aux(Arg1, Arg2, Arg3), !,
+	debug_msg_list('rfuzzy_trans_sent: arg2', Arg2),
+	debug_msg('rfuzzy_trans_sent: arg3', Arg3),
 	debug_nl.
 
-trans_fuzzy_sent(Arg, Arg, FileName) :- 
-	debug_msg('trans_fuzzy_sent: ERROR: Input: ', Arg),
-	debug_msg('trans_fuzzy_sent: ERROR: FileName: ', FileName),
+rfuzzy_trans_sentence(Arg, Arg, FileName) :- 
+	debug_msg('rfuzzy_trans_sent: ERROR: Input: ', Arg),
+	debug_msg('rfuzzy_trans_sent: ERROR: FileName: ', FileName),
 	debug_nl.
 
 % ------------------------------------------------------
@@ -55,7 +37,7 @@ trans_fuzzy_sent(Arg, Arg, FileName) :-
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-trans_fuzzy_sent_aux(end_of_file, Sentences_Out, FileName):-
+rfuzzy_trans_sent_aux(end_of_file, Sentences_Out, FileName):-
 	!,
 	findall(Cl,(retract_fact(sentence(Cl, FileName))), Sentences_In),
 	eat_lists(1, Sentences_In, [], Sent_Tmp_1, [(end_of_file)], Converted_1),
@@ -74,12 +56,12 @@ trans_fuzzy_sent_aux(end_of_file, Sentences_Out, FileName):-
 	append_local(Fuzzy_Aux_Predicates, Sentences_Out_Tmp, Sentences_Out),
 	debug_msg_list('Sentences_Out', Sentences_Out).
 
-trans_fuzzy_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
+rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
 
-trans_fuzzy_sent_aux(Sentence, [Sentence], _FileName) :-
+rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
 	do_not_translate(Sentence), !.
 
-trans_fuzzy_sent_aux(Sentence, [], FileName) :-
+rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
 	assertz_fact(sentence(Sentence, FileName)).
 
 % Some sentences that do not need to be translated ...

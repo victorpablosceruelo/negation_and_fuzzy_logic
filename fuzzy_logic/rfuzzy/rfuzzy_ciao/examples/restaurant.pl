@@ -1,6 +1,9 @@
 :- module(restaurant,_,[rfuzzy, pkgs_output_debug, clpr]).
 % or clpq. We can use clpr or clpq.
 
+% Define the file where we want debug msgs.
+:- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
+
 :- prop restaurant/1.
 
 :- set_prop preferred_restaurant/2 => restaurant/1, restaurant/1.
