@@ -3,8 +3,7 @@
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	mean/3, supreme/2,
 	'=>'/4,
-	debug_msg/2, debug_msg_list/2, debug_nl/0, 
-	rfuzzy_warning_msg/3, rfuzzy_error_msg/3,
+	print_msg/3, print_msg_nl/1, 
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2 ],[hiord]).
 
 :- use_module(library(write),[write/1]).
@@ -49,11 +48,11 @@ dluka(X,Y,M):-
 % ------------------------------------------------------
 
 supreme(List, Element) :-
-	debug_msg_list('supreme', List),
+	print_msg('debug', 'supreme', List),
 	reorder_elements(List, [], List_Tmp_1), !,
-	debug_msg_list('supreme_reordered', List_Tmp_1),
+	print_msg('debug', 'supreme_reordered', List_Tmp_1),
 	filter_out_repeated(List_Tmp_1, List_Tmp_2), !,
-	debug_msg_list('supreme_non-repeated', List_Tmp_2),
+	print_msg('debug', 'supreme_non-repeated', List_Tmp_2),
 	take_an_element(List_Tmp_2, Element).
 
 reorder_elements([], List_Out, List_Out) :- !.
@@ -184,58 +183,50 @@ rfuzzy_conversion_out(X, X) :-
 % ------------------------------------------------------
 
 % This is to enable/disable debug.
-do_debug_rfuzzy('No').
-% do_debug_rfuzzy('Yes').
+print_msg_level('debug'). % The lowest level
+print_msg_level('info'). % An intermediate level
+print_msg_level('warning'). % The level printing less
+print_msg_level('error'). % The level printing less
 
-debug_msg(Msg1, Msg2) :- 
-	debug_msg_aux(Msg1, '', Msg2),
-	debug_nl.
+% Main predicate in charge of printing.
+print_msg(Level, Msg1, Msg2) :- 
+	print_msg_level(Level), !,
+	translate_level_to_pre_msg1(Level, Pre_Msg1),
+	print_msg_aux(Pre_Msg1, Msg1, [], Msg2),
+	print_msg_nl(Level).
+print_msg(_Level, _Msg1, _Msg2) :- !. 
 
-debug_msg_aux(_Msg1, _Msg2, _Msg3) :- do_debug_rfuzzy('No').
-debug_msg_aux( Msg1,  Msg2, Msg3) :-
-	do_debug_rfuzzy('Yes'),
+translate_level_to_pre_msg1('debug', 'DEBUG: ') :- !.
+translate_level_to_pre_msg1('info', 'INFO: ') :- !.
+translate_level_to_pre_msg1('warning', 'WARNING: ') :- !.
+translate_level_to_pre_msg1('error', 'ERROR: ') :- !.
+translate_level_to_pre_msg1('', '') :- !.
+
+% This gets rid of lists.
+print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, []) :- !,
+	print_msg_real(Pre_Msg1, Msg1, [ ' (list)' | Msg1_Info ], ' (empty)').
+print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, [ Msg2_Head | Msg2_Tail ]) :- !,
+	print_msg_aux(Pre_Msg1, Msg1, [ ' (list)' | Msg1_Info ], Msg2_Head),
+	print_msg_nl('error'), % Print it always.
+	print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, Msg2_Tail).
+print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, Msg2) :- !,
+	print_msg_real(Pre_Msg1, Msg1, Msg1_Info, Msg2).
+
+% Predicate that really prints.
+print_msg_real(Pre_Msg1, Msg1,  Msg1_Info, Msg2) :-
+	write(Pre_Msg1), 
 	write('['), write(Msg1), 
-	write(Msg2),
-	write(']: '),  write(Msg3),
+	print_msg1_info(Msg1_Info),
+	write(']: '),  write(Msg2),
 	write('    ').
 
-debug_msg_list(_Msg1, _Msg2) :- do_debug_rfuzzy('No').
-debug_msg_list(Msg1, []) :-
-	do_debug_rfuzzy('Yes'),
-	debug_msg_aux(Msg1, ' (list)', ' (empty)').
-debug_msg_list(Msg1, Msg2) :-
-	do_debug_rfuzzy('Yes'),
-	debug_msg_list_aux(Msg1, ' (list)', Msg2).
+% Print msg1 Info (in reverse order to show the structure).
+print_msg1_info([]) :- !.
+print_msg1_info([Head | Tail]) :- !,
+	print_msg1_info(Tail),
+	write(' '),
+	write(Head).
 
-debug_msg_list_aux(Msg1, Msg2, []) :- !,
-	debug_msg_aux(Msg1, Msg2, '[ ]'),
-	debug_nl.
-debug_msg_list_aux(Msg1, Msg2, [Msg3|Msg3_List]) :-
-	debug_msg_aux(Msg1, Msg2, Msg3),
-	debug_nl,
-	debug_msg_list_aux(Msg1, Msg2, Msg3_List).
+print_msg_nl(Level) :- print_msg_level(Level), !, nl.
+print_msg_nl(_Level) :- !.
 
-
-debug_nl :- do_debug_rfuzzy('No').
-debug_nl :- do_debug_rfuzzy('Yes'), write('\n').
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-rfuzzy_warning_msg(Function, Error, Msg) :-
-	write('WARNING: in \"'),
-	write(Function), write('\" '),
-	write(Error), write(' '), write(Msg),
-	nl.
-
-rfuzzy_error_msg(Function, Error, Msg) :-
-	write('ERROR: in \"'),
-	write(Function), write('\" '),
-	write(Error), write(' '), write(Msg),
-	nl.
-%	!, fail. % Finally fail.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------

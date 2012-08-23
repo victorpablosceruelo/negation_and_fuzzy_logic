@@ -16,19 +16,19 @@
 % ------------------------------------------------------
 
 rfuzzy_trans_clause(Arg1, Arg1, _Arg3) :- 
-	debug_msg('trans_fuzzy_clause: arg1', Arg1).
+	print_msg('debug', 'trans_fuzzy_clause: arg1', Arg1).
 
 rfuzzy_trans_sentence(Arg1, Arg2, Arg3) :- 
-	debug_msg('rfuzzy_trans_sent: arg1', Arg1),
+	print_msg('debug', 'rfuzzy_trans_sent: arg1', Arg1),
 	rfuzzy_trans_sent_aux(Arg1, Arg2, Arg3), !,
-	debug_msg_list('rfuzzy_trans_sent: arg2', Arg2),
-	debug_msg('rfuzzy_trans_sent: arg3', Arg3),
-	debug_nl.
+	print_msg('debug', 'rfuzzy_trans_sent: arg2', Arg2),
+	print_msg('debug', 'rfuzzy_trans_sent: arg3', Arg3),
+	print_msg_nl('debug').
 
 rfuzzy_trans_sentence(Arg, Arg, FileName) :- 
-	debug_msg('rfuzzy_trans_sent: ERROR: Input: ', Arg),
-	debug_msg('rfuzzy_trans_sent: ERROR: FileName: ', FileName),
-	debug_nl.
+	print_msg('debug', 'rfuzzy_trans_sent: ERROR: Input: ', Arg),
+	print_msg('debug', 'rfuzzy_trans_sent: ERROR: FileName: ', FileName),
+	print_msg_nl('debug').
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -45,16 +45,16 @@ rfuzzy_trans_sent_aux(end_of_file, Sentences_Out, FileName):-
 	eat_lists(3, Sent_Tmp_2, [], Sent_Tmp_3, Converted_2, Converted_3),
 	eat_lists(4, Sent_Tmp_3, [], Sent_Tmp_4, Converted_3, Converted_4),
 	eat_lists(5, Sent_Tmp_4, [], Sent_Tmp_5, Converted_4, Converted_5),
-	debug_msg_list('Converted_5', Converted_5),
-	debug_msg_list('Sent_Tmp_5', Sent_Tmp_5),
+	print_msg('debug', 'Converted_5', Converted_5),
+	print_msg('debug', 'Sent_Tmp_5', Sent_Tmp_5),
 
 	retrieve_all_predicate_info('defined', To_Build_Fuzzy_Aux_Predicates),
-	debug_msg_list('To_Build_Fuzzy', To_Build_Fuzzy_Aux_Predicates),
+	print_msg('debug', 'To_Build_Fuzzy', To_Build_Fuzzy_Aux_Predicates),
 	build_auxiliary_clauses(To_Build_Fuzzy_Aux_Predicates, Fuzzy_Aux_Predicates),  
 
 	append_local(Sent_Tmp_5, Converted_5, Sentences_Out_Tmp),
 	append_local(Fuzzy_Aux_Predicates, Sentences_Out_Tmp, Sentences_Out),
-	debug_msg_list('Sentences_Out', Sentences_Out).
+	print_msg('debug', 'Sentences_Out', Sentences_Out).
 
 rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
 
@@ -83,10 +83,10 @@ do_not_translate((:-op(_Priority, _Position, _Op_Names))) :- !.
 % Extract and Transform (Lists).
 eat_lists(_Index, [], Invalid, Invalid, Conv_Out, Conv_Out) :- !.	
 eat_lists(Index, [Sent_In | Sents_In], Invalid_In, Invalid_Out, Conv_In, Conv_Out) :-
-	debug_msg('eat(Index, Sent_In)', (Index, Sent_In)),
+	print_msg('debug', 'eat(Index, Sent_In)', (Index, Sent_In)),
 	eat(Index, Sent_In, Sent_Out), !,
-	debug_msg('eat(Index, Sent_In, Sent_Out)', (Index, Sent_In, Sent_Out)),
-	debug_nl,
+	print_msg('debug', 'eat(Index, Sent_In, Sent_Out)', (Index, Sent_In, Sent_Out)),
+	print_msg_nl('debug'),
 	eat_lists(Index, Sents_In, Invalid_In, Invalid_Out, [Sent_Out | Conv_In], Conv_Out).
 eat_lists(Index, [Sent_In | Sents_In], Invalid_In, Invalid_Out, Conv_In, Conv_Out) :-
 	eat_lists(Index, Sents_In, [Sent_In | Invalid_In], Invalid_Out, Conv_In, Conv_Out).
@@ -133,7 +133,7 @@ eat(1, (Head value X), Fuzzy_Head):-
 	fuzzify_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_1 is X,
 	Fuzzy_Arg_2 is 1,
-	debug_msg('fact',((Head value X) => Fuzzy_Head)),
+	print_msg('debug', 'fact',((Head value X) => Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
 eat(1, Aggregator_Definition, Aggregator_Def_Translated) :-
@@ -143,7 +143,7 @@ eat(1, Aggregator_Definition, Aggregator_Def_Translated) :-
 eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	!, % If patter matching, backtracking forbiden.
 	% list(Lista),
-	debug_msg('(Head :# List) ', (Head :# List)),
+	print_msg('debug', '(Head :# List) ', (Head :# List)),
 
 	functor(Head, Name, 0),
 	functor(H, Name, 1),
@@ -167,16 +167,16 @@ eat(1, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_H :- Cls)):-
 	    )
 	;
 	    (
-		rfuzzy_error_msg('translate_types', 'Error in', (:- set_prop Name/Arity => Properties_Decl)),
-		rfuzzy_error_msg('translate_types', 'Syntax for types is', '(:- set_prop Name/Arity => Predicate/1, ..., Predicate/1)')
+		print_msg('error', 'translate_types :: Error in', (:- set_prop Name/Arity => Properties_Decl)),
+		print_msg('error', 'translate_types :: Syntax for types is', '(:- set_prop Name/Arity => Predicate/1, ..., Predicate/1)')
 	    )
 	),
 	!, % Backtracking forbidden.
-	debug_msg('(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)).
+	print_msg('debug', '(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)).
 
 % crisp predicates (non-facts).
 eat(2, Other, Other) :-
-	debug_msg('Test-1 if crisp pred', Other),
+	print_msg('debug', 'Test-1 if crisp pred', Other),
 	nonvar(Other), 
 	functor(Other, ':-', 2), !,
 	arg(1, Other, Arg_1), 
@@ -186,7 +186,7 @@ eat(2, Other, Other) :-
 
 % crisp facts.
 eat(2, Other, Other) :-
-	debug_msg('Test-2 if crisp fact', Other),
+	print_msg('debug', 'Test-2 if crisp fact', Other),
 	nonvar(Other), 
 	functor(Other, Name, Arity), 
 	not_a_known_predicate_name(Name),	!,
@@ -195,15 +195,15 @@ eat(2, Other, Other) :-
 % rules:
 eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	!, % If patter matching, backtracking forbiden.
-	debug_nl,
-	debug_msg('eat(Head :~ Body) ', (Head :~ Body)),
+	print_msg_nl('debug'),
+	print_msg('debug', 'eat(Head :~ Body) ', (Head :~ Body)),
 	(
 	    trans_rule(Head, Body, Fuzzy_H, Fuzzy_Body)
 	;
 	    (
-		rfuzzy_error_msg('translate_rule_syntax', 'Error in', (Head :~ Body)),
-		rfuzzy_error_msg('translate_rule_syntax', 'Syntax for rules is', '(predicate cred(Op1, Number) :~ Op2(( Body ))'),
-		rfuzzy_error_msg('translate_rule_syntax', 'Please note there are 2 parenthesis around the variable Body', ' '),
+		print_msg('error', 'translate_rule_syntax :: Error in', (Head :~ Body)),
+		print_msg('error', 'translate_rule_syntax :: Syntax for rules is', '(predicate cred(Op1, Number) :~ Op2(( Body ))'),
+		print_msg('error', 'translate_rule_syntax :: Please note there are 2 parenthesis around the variable Body', ' '),
 		!, fail
 	    )
 	).
@@ -212,19 +212,19 @@ eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 eat(3, Head, (Fuzzy_H :- Fuzzy_Body)):-
 	functor(Head, 'fuzzify', 3),
 	!, % If patter matching, backtracking forbiden.
-	debug_nl,
-	debug_msg('eat(Head) ', (Head)),
+	print_msg_nl('debug'),
+	print_msg('debug', 'eat(Head) ', (Head)),
 	(
 	    trans_fuzzification(Head, Fuzzy_H, Fuzzy_Body)
 	;
 	    (
-		rfuzzy_error_msg('fuzzify_syntax', 'Cannot understand syntax for', (Head)),
-		rfuzzy_error_msg('fuzzify_syntax', 'Syntax is', 'fuzzify(low_distance/2, distance/2, low_distance_function/2'),
+		print_msg('error', 'fuzzify_syntax :: Cannot understand syntax for', (Head)),
+		print_msg('error', 'fuzzify_syntax :: Syntax is', 'fuzzify(low_distance/2, distance/2, low_distance_function/2'),
 		!, fail
 	    )
 	).
 
-eat(4, Whatever, rfuzzy_error_msg('translate_syntax', 'failed for', Whatever)) :-
+eat(4, Whatever, print_msg('error', 'translate_syntax', 'failed for', Whatever)) :-
 	has_rfuzzy_symbol(Whatever), !.
 
 has_rfuzzy_symbol(( A :~ B )) :- syntax_error(( A :~ B )).
@@ -235,8 +235,8 @@ has_rfuzzy_symbol(( :- default(A,B) )) :- syntax_error(( :- default(A,B) )).
 has_rfuzzy_symbol(( :- default(A,B) => C )) :- syntax_error(( :- default(A,B) => C )).
 
 syntax_error(Whatever) :-
-	rfuzzy_error_msg('translate_rule_syntax', 'Not recognized syntax in: ', Whatever),
-	rfuzzy_error_msg('translate_rule_syntax', 'Use \"rfuzzy_error(Whatever)\" to see which predicates have syntax errors', '').
+	print_msg('error', 'translate_rule_syntax :: Not recognized syntax in: ', Whatever),
+	print_msg('error', 'translate_rule_syntax :: Use \"rfuzzy_error(Whatever)\" to see which predicates have syntax errors', '').
 
 not_a_known_predicate_name(Name) :-
 	Name \== ':-',
@@ -251,8 +251,8 @@ not_a_known_predicate_name(Name) :-
 
 trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
 	extract_credibility(Head, H, Op1, Credibility),
-	debug_nl,
-	debug_msg('trans_rule(H, Op1, Credibility, Body) ', (trans_rule(H, Op1, Credibility, Body))),
+	print_msg_nl('debug'),
+	print_msg('debug', 'trans_rule(H, Op1, Credibility, Body) ', (trans_rule(H, Op1, Credibility, Body))),
 	nonvar(H), nonvar(Credibility), nonvar(Body),
 
 	% Change head's name.
@@ -261,7 +261,7 @@ trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
 	% Translate all predicates in the body.
 	extract_op2(Body, Op2, Tmp_Body),
 
-	debug_msg('add_auxiliar_parameters(Tmp_Body)',Tmp_Body),
+	print_msg('debug', 'add_auxiliar_parameters(Tmp_Body)',Tmp_Body),
 	add_auxiliar_parameters(Tmp_Body, Fuzzy_Body, [], Fuzzy_Vars_1, [], Fuzzy_Vars_2),
 
 	% Add the capability to compute the rule's truth value.
@@ -319,20 +319,20 @@ extract_op2(Body, Op2, Tmp_Body) :-
 	functor(Body, Op2, 1),
 	arg(1, Body, Tmp_Body).
 extract_op2(Body, _Op2, 'fail') :-
-	debug_msg('Cannot understand syntax for', (Body)).	
+	print_msg('debug', 'Cannot understand syntax for', (Body)).	
 
 retrieve_aggregator_info(Op, Operator) :-
 %	faggr(Op1, _IAny,  Operator, _FAny),
 	nonvar(Op),
 	aggregators(Aggregators),
-	debug_msg('retrieve_aggregator_info :: Op', Op),
-	debug_msg('retrieve_aggregator_info :: Aggregators', Aggregators),
+	print_msg('debug', 'retrieve_aggregator_info :: Op', Op),
+	print_msg('debug', 'retrieve_aggregator_info :: Aggregators', Aggregators),
 	member(faggr(Op, _IAny,  Operator, _FAny), Aggregators), !.
 retrieve_aggregator_info(Op, Op) :-
 	rfuzzy_rt:defined_aggregators(Aggregators), !,
 	member(Op, Aggregators).
 retrieve_aggregator_info(Op, 'id') :-
-	rfuzzy_error_msg('retrieve_aggregator_info', Op, ' is not a valid agregator operator.').
+	print_msg('error', 'retrieve_aggregator_info :: not a valid agregator operator :: ', Op).
 
 
 add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Out, Vars_2_In, Vars_2_Out) :-
@@ -354,7 +354,7 @@ add_auxiliar_parameters(Body, Fuzzy_Body, Vars_1, [V|Vars_1], Vars_2, [C|Vars_2]
 	arg(C_Arity, Fuzzy_Body, C).
 
 add_auxiliar_parameters(Body, Body, Vars_1, Vars_1, Vars_2, Vars_2) :-
-	debug_msg('ERROR: add_auxiliar_parameters(Body, Cls, Vars) ', (add_auxiliar_parameters(Body,
+	print_msg('debug', 'ERROR: add_auxiliar_parameters(Body, Cls, Vars) ', (add_auxiliar_parameters(Body,
 	Vars_1, Vars_2))),
 	!, fail.
 
@@ -369,13 +369,13 @@ real_name_and_arity(Body_Name, _Arity, Fuzzy_Body_Name) :-
 % ------------------------------------------------------
 
 trans_each_property(H, Arity, Actual, Current_P/1, Current_PF) :-
-	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual) ),
+	print_msg('debug', 'trans_each_property', trans_each_property(H, Arity, Actual) ),
 	Actual = Arity, !, % Security conditions.
 	trans_each_property_aux(H, Actual, Current_P, Current_PF).
 
 trans_each_property(H, Arity, Actual, (Current_P/1, More_P), (Current_PF, More_PF)) :-
 	Actual < Arity, !, 
-	debug_msg('trans_each_property', trans_each_property(H, Arity, Actual) ),
+	print_msg('debug', 'trans_each_property', trans_each_property(H, Arity, Actual) ),
 	trans_each_property_aux(H, Actual, Current_P, Current_PF),
 	NewActual is Actual + 1, % Next values.
 	trans_each_property(H, Arity, NewActual, More_P, More_PF),
@@ -392,22 +392,22 @@ trans_each_property_aux(H, Actual, Current_P, Current_PF) :-
 % ------------------------------------------------------
 
 build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1 ; Line ; Point2)) :-
-	debug_msg('build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1, Line, Point2)))),
+	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1, Line, Point2)))),
 	build_point(X, V, X1, V1, Point1),
 	build_line(X, V, X1, V1, X2, V2, Line),
 	build_point(X, V, X2, V2, Point2).
 
 build_straight_lines(X, V, [(X1,V1),(X2,V2)|List], (Point ; Line ; More)) :-
-	debug_msg('build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)|List], (Point, Line, More)))),
+	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)|List], (Point, Line, More)))),
 	build_point(X, V, X1, V1, Point),
 	build_line(X, V, X1, V1, X2, V2, Line),
 	build_straight_lines(X, V, [(X2,V2)|List], More).
 
 build_point(X, V, X1, V1, (X .=. X1, V .=. V1)) :-
-	debug_msg('build_point', build_point(X, V, X, V, (H :- (H :- X1 .=. X, V1 .=. V)))).
+	print_msg('debug', 'build_point', build_point(X, V, X, V, (H :- (H :- X1 .=. X, V1 .=. V)))).
 
 build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)) :-
-	debug_msg('build_line', (build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)))),
+	print_msg('debug', 'build_line', (build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)))),
 
 	number(X1), number(X2),
 	number(V1), number(V2),
@@ -458,9 +458,9 @@ test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 	% rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 	!.
 test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
-	rfuzzy_warning_msg('fuzzify: Cannot find predicate ', Kind, (Name/FuzzyArity)),
+	print_msg('info', 'fuzzify: Cannot find predicate defined by (Kind, Name, FuzzyArity) :: ', (Kind, Name, FuzzyArity)),
 	retrieve_predicate_info(Kind_A, Name_A, Arity_A, _FuzzyName_A, FuzzyArity_A), 
-	debug_msg('retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity)', 
+	print_msg('debug', 'retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity)', 
 	retrieve_predicate_info(Kind_A, Name_A, Arity_A, _FuzzyName_A, FuzzyArity_A)), 
 	fail, !.
 
@@ -471,7 +471,7 @@ test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 	save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	save_predicate_info_aux('defined', Name, Arity, Name, Arity), % Predicate MUST be defined.
-	debug_msg('save_predicate_info out', save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)).
+	print_msg('debug', 'save_predicate_info out', save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)).
 
 save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 	rfuzzy_predicate_info_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
@@ -518,7 +518,7 @@ change_name(Prefix, Input, Output) :-
 	append_local(Real_Prefix, Input_Chars, Output_Chars),
 	atom_codes(Output, Output_Chars), 
 	atom(Output), !.
-%	debug_msg('change_name', change_name(Prefix, Input, Output)).
+%	print_msg('debug', 'change_name', change_name(Prefix, Input, Output)).
 
 append_local([], N2, N2).
 append_local([Elto|N1], N2, [Elto|Res]) :-
@@ -544,7 +544,7 @@ translate_prefix(_X, "rfuzzy_error_error_error_").
 
 build_auxiliary_clauses([], []) :- !.
 build_auxiliary_clauses([Def_Pred|Def_Preds], [Pred_Main, Pred_Aux | Clauses]) :-
-	debug_msg('build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux)', (Def_Pred, Pred_Main, Pred_Aux)),
+	print_msg('debug', 'build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux)', (Def_Pred, Pred_Main, Pred_Aux)),
 	build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux),
 	build_auxiliary_clauses(Def_Preds, Clauses).
 
@@ -616,7 +616,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	).
 
 build_auxiliary_clause(Pred_Info, (true), (true)) :-
-	rfuzzy_warning_msg(Pred_Info, 'it is impossible to build the auxiliary clause', ' ').
+	print_msg('info', 'it is impossible to build the auxiliary clause for predicate ', Pred_Info).
 	
 build_functors(Name, Arity, Kind, _On_Error, Functor_In, Functor) :-
 
@@ -638,7 +638,7 @@ build_functors(_Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :-
 	), !.
 
 build_functors(Name, _Arity, Kind, On_Error, _Functor_In, On_Error) :- !,
-	rfuzzy_warning_msg(Name, Kind, 'has not been defined.').
+	print_msg('info', 'The predicate has not been defined :: (Name, Kind) ', (Name, Kind)).
 
 %build_fail_functor(H) :-
 %	functor(H, 'fail', 0).    % Create functor
