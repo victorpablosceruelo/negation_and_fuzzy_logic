@@ -64,3 +64,5 @@ traditional(kenzo) value 0.5.
 traditional(paellador) value 0.87.
 
 rfuzzy_quantifier(very, 0.7, [cheap/1]).
+
+rfuzzy_aggregator(max_with_min_a_half(X, Y, Z), [(max(X, Y, W), min(W, 0.5, Z))]).

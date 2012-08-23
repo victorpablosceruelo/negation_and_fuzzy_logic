@@ -74,24 +74,23 @@ rfuzzy_trans_sent_aux(end_of_file, Result, FileName):-
 
 rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
 
-%rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
-%	do_not_translate(Sentence), !.
+rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
+	deprecated_syntax(Sentence), !.
+
+rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)], _FileName) :- !.
 
 rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
 	assertz_fact(sentence(Sentence, FileName)).
 
-% Some sentences that do not need to be translated ...
-%do_not_translate((:-add_goal_trans(_Whatever))) :- !.
-%do_not_translate((:-add_clause_trans(_Whatever))) :- !.
-%do_not_translate((:-add_sentence_trans(_Whatever))) :- !. % 
-%do_not_translate((:-load_compilation_module(_Whatever))) :- !.
-%do_not_translate((:-use_module(_Whatever))) :- !.
-%do_not_translate((:-include(_Whatever))) :- !.
-%do_not_translate((:-multifile _Whatever)) :- !.
-%do_not_translate((:-new_declaration(_Whatever_1, _Whatever_2))) :- !.
-%do_not_translate((:-op(_Priority, _Position, _Op_Names))) :- !.
-
-
+% Deprecated syntax (we just warn about it).
+deprecated_syntax((:- default(_Name/_Arity,_X))) :-
+	print_msg('warning', 'deprecated syntax', ':- default(Name/Arity,X)'), !.
+deprecated_syntax((:- default(_Name/_Arity,_X) => _H_Cond_Name/_Arity)) :-
+	print_msg('warning', 'deprecated syntax', '(:- default(Name/Arity,X) => H_Cond_Name/Arity)'), !.
+deprecated_syntax((:- set_prop _Name/_Arity => _Properties_Decl)) :-
+	print_msg('warning', 'deprecated syntax', '(:- set_prop Name/Arity => Properties_Decl)'), !.
+deprecated_syntax((:- aggr _Whatever)) :-
+	print_msg('warning', 'deprecated syntax', '(:- aggr Whatever)'), !.
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -112,33 +111,35 @@ eat_lists(Index, [Sent_In | Sents_In], [Sent_In | Invalid], Converted) :-
 % ------------------------------------------------------
 
 % Unconditional default
-eat(1, (:- default(Name/Arity,X)),(Fuzzy_H)) :- 
+eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :- 
 	!, % If patter matching, backtracking forbiden.
-	number(X), % X must be a number.
-	number(Arity), % A must be a number.
-	nonvar(Name), % Name can not be a variable.
+	number(Value), % Value must be a number.
+	number(Pred_Arity), % A must be a number.
+	nonvar(Pred_Name), % Name can not be a variable.
 
-	functor(H, Name, Arity),
+	functor(H, Pred_Name, Pred_Arity),
 	fuzzify_functor(H, 'default_without_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is X, 
+	Fuzzy_Arg_1 is Value, 
 	Fuzzy_Arg_2 is 0,
 	!. % Backtracking forbidden.
 
 % Conditional default
-eat(1, (:- default(Name/Arity,X) => H_Cond_Name/Arity),(Fuzzy_H :- H_Cond)) :-
+eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred2_Arity), (Fuzzy_H :- H_Cond)) :-
+	Pred_Arity = Pred2_Arity,
 	!, % If patter matching, backtracking forbiden.
-	number(X), % X must be a number.
-	number(Arity), % A must be a number.
-	nonvar(Name), % Name cannot be a variable.
-	nonvar(H_Cond_Name), % Cond_Name cannot be a variable.
+	number(Value), % Value must be a number.
+	number(Pred_Arity), % Pred_Arity must be a number.
+	number(Pred2_Arity), % Pred2_Arity must be a number.
+	nonvar(Pred_Name), % Pred_Name cannot be a variable.
+	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
 
-	functor(H, Name, Arity),
+	functor(H, Pred_Name, Pred_Arity),
 	fuzzify_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is X, 
+	Fuzzy_Arg_1 is Value, 
 	Fuzzy_Arg_2 is 0,
 
-	functor(H_Cond, H_Cond_Name, Arity),
-	copy_args(Arity, H_Cond, H),    % Copy args from main functor.
+	functor(H_Cond, Pred2_Name, Pred2_Arity),
+	copy_args(Pred_Arity, H_Cond, H),    % Copy args from main functor.
 	!. % Backtracking forbidden.
 
 % Fuzzy facts.
@@ -170,7 +171,7 @@ eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	build_straight_lines(X, Fuzzy_Arg_1, List, Body).
 
 % Predicate's type(s) definition.
-eat(1, (:- set_prop Name/Arity => Properties_Decl),(Fuzzy_H :- Cls)):-
+eat(1, ,(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
 	(
 	    (
@@ -205,7 +206,11 @@ eat(2, Other, Other) :-
 	print_msg('debug', 'Test-2 if crisp fact', Other),
 	nonvar(Other), 
 	functor(Other, Name, Arity), 
-	not_a_known_predicate_name(Name),	!,
+	Name \== ':-',
+	Name \== ':~',
+	Name \== ':#',
+	Name \== 'value',
+	Name \== 'fuzzify'.
 	save_predicate_info('crisp', Name, Arity, Name, Arity).
 
 % rules:
@@ -239,27 +244,6 @@ eat(3, Head, (Fuzzy_H :- Fuzzy_Body)):-
 		!, fail
 	    )
 	).
-
-eat(4, Whatever, print_msg('error', 'translate_syntax', 'failed for', Whatever)) :-
-	has_rfuzzy_symbol(Whatever), !.
-
-has_rfuzzy_symbol(( A :~ B )) :- syntax_error(( A :~ B )).
-has_rfuzzy_symbol(( A :# B )) :- syntax_error(( A :# B )).
-has_rfuzzy_symbol(( A value B )) :- syntax_error(( A value B )).
-has_rfuzzy_symbol(( :- set_prop A )) :- syntax_error(( :- set_prop A )).
-has_rfuzzy_symbol(( :- default(A,B) )) :- syntax_error(( :- default(A,B) )).
-has_rfuzzy_symbol(( :- default(A,B) => C )) :- syntax_error(( :- default(A,B) => C )).
-
-syntax_error(Whatever) :-
-	print_msg('error', 'translate_rule_syntax :: Not recognized syntax in: ', Whatever),
-	print_msg('error', 'translate_rule_syntax :: Use \"rfuzzy_error(Whatever)\" to see which predicates have syntax errors', '').
-
-not_a_known_predicate_name(Name) :-
-	Name \== ':-',
-	Name \== ':~',
-	Name \== ':#',
-	Name \== 'value',
-	Name \== 'fuzzify'.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
