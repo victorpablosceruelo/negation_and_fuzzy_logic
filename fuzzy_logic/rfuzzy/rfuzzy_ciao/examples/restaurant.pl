@@ -35,13 +35,12 @@ distance_to_us(il_tempietto, 100).
 distance_to_us(pizza_jardin, 250).
 % distance_to(unknown, 800).
 
-rfuzzy_define_fuzzification(near_to_us/2, distance_to/2, near_function/2).
+rfuzzy_define_fuzzification(near_to_us/2, distance_to_us/2, near_function/2).
 
-%low_distance(kenzo) value 1.
-%low_distance(burguer_king) value 0.6.
-%low_distance(il_tempietto) value 1.
-%low_distance(pizza_jardin) value 0.8.
-%low_distance(unknown) value 0.2.
+distance_to_the_city_center(meson_del_jamon, 100).
+distance_to_the_city_center(museo_del_jamon, 150).
+
+rfuzzy_define_fuzzification(near_the_city_center/2, distance_to_the_city_center/2, near_function/2).
 
 % before:
 % :- set_prop cheap/1 => restaurant/1.
@@ -49,6 +48,7 @@ rfuzzy_types_for(cheap/1, [restaurant/1]).
 % before: 
 % :- default(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.5).
+rfuzzy_default_value_for(cheap/1, 0.2) if near_the_city_center/2.
 
 cheap(kenzo) value 0.3.
 cheap(subway) value 1.
