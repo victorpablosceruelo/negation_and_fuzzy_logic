@@ -37,43 +37,59 @@ rfuzzy_trans_sentence(Arg, Arg, FileName) :-
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-rfuzzy_trans_sent_aux(end_of_file, Sentences_Out, FileName):-
+rfuzzy_trans_sent_aux(end_of_file, Result, FileName):-
 	!,
 	findall(Cl,(retract_fact(sentence(Cl, FileName))), Sentences_In),
-	eat_lists(1, Sentences_In, [], Sent_Tmp_1, [(end_of_file)], Converted_1),
-	eat_lists(2, Sent_Tmp_1, [], Sent_Tmp_2, Converted_1, Converted_2),
-	eat_lists(3, Sent_Tmp_2, [], Sent_Tmp_3, Converted_2, Converted_3),
-	eat_lists(4, Sent_Tmp_3, [], Sent_Tmp_4, Converted_3, Converted_4),
-	eat_lists(5, Sent_Tmp_4, [], Sent_Tmp_5, Converted_4, Converted_5),
-	print_msg('debug', 'Converted_5', Converted_5),
-	print_msg('debug', 'Sent_Tmp_5', Sent_Tmp_5),
+	eat_lists(1, Sentences_In, Sentences_In_1, Converted_1),
+	eat_lists(2, Sentences_In_1, Sentences_In_2, Converted_2),
+	eat_lists(3, Sentences_In_2, Sentences_In_3, Converted_3),
+	eat_lists(4, Sentences_In_3, Sentences_In_4, Converted_4),
+	eat_lists(5, Sentences_In_4, Sentences_In_5, Converted_5),
+
+	print_msg_nl('debug'),
+	print_msg_nl('debug'),
+	print_msg('debug', 'Sentences_In_5', Sentences_In_5),
+	print_msg_nl('debug'),
+	print_msg_nl('debug'),
 
 	retrieve_all_predicate_info('defined', To_Build_Fuzzy_Aux_Predicates),
 	print_msg('debug', 'To_Build_Fuzzy', To_Build_Fuzzy_Aux_Predicates),
 	build_auxiliary_clauses(To_Build_Fuzzy_Aux_Predicates, Fuzzy_Aux_Predicates),  
 
-	append_local(Sent_Tmp_5, Converted_5, Sentences_Out_Tmp),
-	append_local(Fuzzy_Aux_Predicates, Sentences_Out_Tmp, Sentences_Out),
-	print_msg('debug', 'Sentences_Out', Sentences_Out).
+	append_local(Sentences_In_5, Fuzzy_Aux_Predicates, Result_1),
+	append_local(Result_1, Converted_5, Result_2),
+	append_local(Result_2, Converted_4, Result_3),
+	append_local(Result_3, Converted_3, Result_4),
+	append_local(Result_4, Converted_2, Result_5),
+	append_local(Result_5, Converted_1, Result_6),
+	append_local(Result_6, [(end_of_file)], Result),
+
+	print_msg_nl('debug'),
+	print_msg_nl('debug'),
+	print_msg_nl('debug'),
+	print_msg('debug', 'OUT', Result),
+	print_msg_nl('debug'),
+	print_msg_nl('debug'),
+	print_msg_nl('debug').
 
 rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
 
-rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
-	do_not_translate(Sentence), !.
+%rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
+%	do_not_translate(Sentence), !.
 
 rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
 	assertz_fact(sentence(Sentence, FileName)).
 
 % Some sentences that do not need to be translated ...
-do_not_translate((:-add_goal_trans(_Whatever))) :- !.
-do_not_translate((:-add_clause_trans(_Whatever))) :- !.
-do_not_translate((:-add_sentence_trans(_Whatever))) :- !. % 
-do_not_translate((:-load_compilation_module(_Whatever))) :- !.
-do_not_translate((:-use_module(_Whatever))) :- !.
-do_not_translate((:-include(_Whatever))) :- !.
-do_not_translate((:-multifile _Whatever)) :- !.
-do_not_translate((:-new_declaration(_Whatever_1, _Whatever_2))) :- !.
-do_not_translate((:-op(_Priority, _Position, _Op_Names))) :- !.
+%do_not_translate((:-add_goal_trans(_Whatever))) :- !.
+%do_not_translate((:-add_clause_trans(_Whatever))) :- !.
+%do_not_translate((:-add_sentence_trans(_Whatever))) :- !. % 
+%do_not_translate((:-load_compilation_module(_Whatever))) :- !.
+%do_not_translate((:-use_module(_Whatever))) :- !.
+%do_not_translate((:-include(_Whatever))) :- !.
+%do_not_translate((:-multifile _Whatever)) :- !.
+%do_not_translate((:-new_declaration(_Whatever_1, _Whatever_2))) :- !.
+%do_not_translate((:-op(_Priority, _Position, _Op_Names))) :- !.
 
 
 % ------------------------------------------------------
@@ -81,15 +97,15 @@ do_not_translate((:-op(_Priority, _Position, _Op_Names))) :- !.
 % ------------------------------------------------------
 
 % Extract and Transform (Lists).
-eat_lists(_Index, [], Invalid, Invalid, Conv_Out, Conv_Out) :- !.	
-eat_lists(Index, [Sent_In | Sents_In], Invalid_In, Invalid_Out, Conv_In, Conv_Out) :-
+eat_lists(_Index, [], [], []) :- !.	
+eat_lists(Index, [Sent_In | Sents_In], Invalid, [ Sent_Converted | Converted]) :-
 	print_msg('debug', 'eat(Index, Sent_In)', (Index, Sent_In)),
-	eat(Index, Sent_In, Sent_Out), !,
-	print_msg('debug', 'eat(Index, Sent_In, Sent_Out)', (Index, Sent_In, Sent_Out)),
+	eat(Index, Sent_In, Sent_Converted), !,
+	print_msg('debug', 'eat(Index, Sent_In, Sent_Converted)', (Index, Sent_In, Sent_Converted)),
 	print_msg_nl('debug'),
-	eat_lists(Index, Sents_In, Invalid_In, Invalid_Out, [Sent_Out | Conv_In], Conv_Out).
-eat_lists(Index, [Sent_In | Sents_In], Invalid_In, Invalid_Out, Conv_In, Conv_Out) :-
-	eat_lists(Index, Sents_In, [Sent_In | Invalid_In], Invalid_Out, Conv_In, Conv_Out).
+	eat_lists(Index, Sents_In, Invalid, Converted).
+eat_lists(Index, [Sent_In | Sents_In], [Sent_In | Invalid], Converted) :-
+	eat_lists(Index, Sents_In, Invalid, Converted).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
