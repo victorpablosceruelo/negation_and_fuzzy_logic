@@ -4,7 +4,7 @@
 :- use_module(library(terms),[copy_args/3]).
 :- use_module(library('rfuzzy/rfuzzy_rt')).
 :- include(library('clpqr-common/ops')).
-:- include(library('rfuzzy/rfuzzy_included')).
+:- include(library('rfuzzy/rfuzzy_ops')).
 
 % Important info to be saved.
 :- data rfuzzy_predicate_info/5.
@@ -85,12 +85,13 @@ rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
 % Deprecated syntax (we just warn about it).
 deprecated_syntax((:- default(_Name/_Arity,_X))) :-
 	print_msg('warning', 'deprecated syntax', ':- default(Name/Arity,X)'), !.
-deprecated_syntax((:- default(_Name/_Arity,_X) => _H_Cond_Name/_Arity)) :-
-	print_msg('warning', 'deprecated syntax', '(:- default(Name/Arity,X) => H_Cond_Name/Arity)'), !.
-deprecated_syntax((:- set_prop _Name/_Arity => _Properties_Decl)) :-
-	print_msg('warning', 'deprecated syntax', '(:- set_prop Name/Arity => Properties_Decl)'), !.
-deprecated_syntax((:- aggr _Whatever)) :-
-	print_msg('warning', 'deprecated syntax', '(:- aggr Whatever)'), !.
+% deprecated_syntax((:- default(_Name/_Arity,_X) => _H_Cond_Name/_Arity)) :-
+%	print_msg('warning', 'deprecated syntax', '(:- default(Name/Arity,X) => H_Cond_Name/Arity)'), !.
+%deprecated_syntax((:- set_prop _Name/_Arity => _Properties_Decl)) :-
+%	print_msg('warning', 'deprecated syntax', '(:- set_prop Name/Arity => Properties_Decl)'), !.
+%deprecated_syntax((:- aggr _Whatever)) :-
+%	print_msg('warning', 'deprecated syntax', '(:- aggr Whatever)'), !.
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -125,8 +126,8 @@ eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 
 % Conditional default
 eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred2_Arity), (Fuzzy_H :- H_Cond)) :-
-	Pred_Arity = Pred2_Arity,
 	!, % If patter matching, backtracking forbiden.
+	Pred_Arity = Pred2_Arity,
 	number(Value), % Value must be a number.
 	number(Pred_Arity), % Pred_Arity must be a number.
 	number(Pred2_Arity), % Pred2_Arity must be a number.
@@ -145,16 +146,18 @@ eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred
 % Fuzzy facts.
 eat(1, (Head value X), Fuzzy_Head):-
 	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', 'fact conversion :: IN ',(Head value X)),
 	number(X),                    % X must be a number.
 
 	fuzzify_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_1 is X,
 	Fuzzy_Arg_2 is 1,
-	print_msg('debug', 'fact',((Head value X) => Fuzzy_Head)),
+	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
-eat(1, Aggregator_Definition, Aggregator_Def_Translated) :-
-	trans_fuzzy_aggregator_def(Aggregator_Definition, Aggregator_Def_Translated), !.
+eat(1, (rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), true) :-
+	!,
+	save_aggregator(Aggregator_Name, Aggregator_Arity), !.
 
 % function definition.
 eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
@@ -171,25 +174,23 @@ eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	build_straight_lines(X, Fuzzy_Arg_1, List, Body).
 
 % Predicate's type(s) definition.
-eat(1, ,(Fuzzy_H :- Cls)):-
+eat(1, rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', 'rfuzzy_type_for(Pred_Name/Pred_Arity, Types)', rfuzzy_type_for(Pred_Name/Pred_Arity, Types)),
 	(
-	    (
-		number(Arity), % A must be a number.
-		nonvar(Name), % Can not be a variable.
+	    (   % Types has the form [restaurant/1]
+		number(Pred_Arity), % A must be a number.
+		nonvar(Pred_Name), % Can not be a variable.
 		
-		functor(H, Name, Arity),
+		functor(H, Pred_Name, Pred_Arity),
 		fuzzify_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
-		trans_each_property(Fuzzy_H, Arity, 1, Properties_Decl, Cls)
+		trans_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
 	    )
 	;
-	    (
-		print_msg('error', 'translate_types :: Error in', (:- set_prop Name/Arity => Properties_Decl)),
-		print_msg('error', 'translate_types :: Syntax for types is', '(:- set_prop Name/Arity => Predicate/1, ..., Predicate/1)')
-	    )
+	    print_msg('error', 'translate_types :: Syntax Error in', rfuzzy_type_for(Pred_Name/Pred_Arity, Types))
 	),
-	!, % Backtracking forbidden.
-	print_msg('debug', '(:- set_prop Name/Arity => Properties_Decl) ', (:- set_prop Name/Arity => Properties_Decl)).
+	!. % Backtracking forbidden.
+
 
 % crisp predicates (non-facts).
 eat(2, Other, Other) :-
@@ -210,7 +211,7 @@ eat(2, Other, Other) :-
 	Name \== ':~',
 	Name \== ':#',
 	Name \== 'value',
-	Name \== 'fuzzify'.
+	Name \== 'fuzzify',
 	save_predicate_info('crisp', Name, Arity, Name, Arity).
 
 % rules:
@@ -279,33 +280,11 @@ trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% aggregator definition:
-trans_fuzzy_aggregator_def((:- aggr A <# I ## M #> F ),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,I,M,F)), !.
-
-trans_fuzzy_aggregator_def((:- aggr A ## M #> F ),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,id,M,F)), !.
-
-trans_fuzzy_aggregator_def((:- aggr A <# I ## M ),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,I,M,id)), !.
-
-trans_fuzzy_aggregator_def((:- aggr A <# I ),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,I,A,id)), !.
-
-trans_fuzzy_aggregator_def((:- aggr A #> F ),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,id,A,F)), !.
-
-trans_fuzzy_aggregator_def((:- aggr A ## M ),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,id,M,id)), !.
-
-trans_fuzzy_aggregator_def((:- aggr A),(:- op(1190,fx,A))):-
-	save_aggregator(faggr(A,id,A,id)), !.
-
-save_aggregator(Aggregator) :-
+save_aggregator(Aggregator_Name, 3) :-
         retract_fact(aggregators(List)), !,
-	assertz_fact(aggregators([Aggregator|List])).
-save_aggregator(Aggregator) :-
-	assertz_fact(aggregators([Aggregator])).
+	assertz_fact(aggregators([Aggregator_Name|List])).
+save_aggregator(Aggregator_Name, 3) :-
+	assertz_fact(aggregators([Aggregator_Name])).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -368,23 +347,25 @@ real_name_and_arity(Body_Name, _Arity, Fuzzy_Body_Name) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_each_property(H, Arity, Actual, Current_P/1, Current_PF) :-
-	print_msg('debug', 'trans_each_property', trans_each_property(H, Arity, Actual) ),
+trans_each_type(H, Arity, Actual, [Type/1], Type_F) :-
+	print_msg('debug', 'trans_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
 	Actual = Arity, !, % Security conditions.
-	trans_each_property_aux(H, Actual, Current_P, Current_PF).
+	trans_each_type_aux(H, Actual, Type, Type_F),
+	!. % Backtracking not allowed.
 
-trans_each_property(H, Arity, Actual, (Current_P/1, More_P), (Current_PF, More_PF)) :-
-	Actual < Arity, !, 
-	print_msg('debug', 'trans_each_property', trans_each_property(H, Arity, Actual) ),
-	trans_each_property_aux(H, Actual, Current_P, Current_PF),
+trans_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
+	Actual < Arity, !,  % Security conditions.
+	print_msg('debug', 'trans_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
+	trans_each_type_aux(H, Actual, Type, Type_F),
 	NewActual is Actual + 1, % Next values.
-	trans_each_property(H, Arity, NewActual, More_P, More_PF),
+	!,
+	trans_each_type(H, Arity, NewActual, More, More_F),
 	!. % Backtracking not allowed here.
 
-trans_each_property_aux(H, Actual, Current_P, Current_PF) :-
+trans_each_type_aux(H, Actual, Type, Type_F) :-
 
-	functor(Current_PF, Current_P, 1), % Build functor.
-	arg(1, Current_PF, X),       % Argument of functor is X.
+	functor(Type_F, Type, 1), % Build functor.
+	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
 
 % ------------------------------------------------------
