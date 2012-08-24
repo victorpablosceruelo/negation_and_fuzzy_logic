@@ -74,17 +74,30 @@ rfuzzy_trans_sent_aux(end_of_file, Result, FileName):-
 
 rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
 
-rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
-	deprecated_syntax(Sentence), !.
+%rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
+%	deprecated_syntax(Sentence), !.
 
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)], _FileName) :- !.
 
 rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
+%	print_info(Sentence),
 	assertz_fact(sentence(Sentence, FileName)).
 
+%print_info(Sentence) :-
+%	print_msg('info', 'print_info', Sentence),
+%	functor(Sentence, Name, Arity),
+%	print_msg('info', 'print_info: (Name, Arity)', (Name, Arity)),
+%	Sentence=..[Name|Args],
+%	print_list_info(Args).
+%print_list_info([]) :- !,
+%	print_msg('info', 'print_list_info', 'empty list').
+%print_list_info([Arg | Args]) :- !,
+%	print_info(Arg),
+%	print_list_info(Args).
+
 % Deprecated syntax (we just warn about it).
-deprecated_syntax((:- default(_Name/_Arity,_X))) :-
-	print_msg('warning', 'deprecated syntax', ':- default(Name/Arity,X)'), !.
+%deprecated_syntax((:- default(_Name/_Arity,_X))) :-
+%	print_msg('warning', 'deprecated syntax', ':- default(Name/Arity,X)'), !.
 % deprecated_syntax((:- default(_Name/_Arity,_X) => _H_Cond_Name/_Arity)) :-
 %	print_msg('warning', 'deprecated syntax', '(:- default(Name/Arity,X) => H_Cond_Name/Arity)'), !.
 %deprecated_syntax((:- set_prop _Name/_Arity => _Properties_Decl)) :-
@@ -181,6 +194,8 @@ eat(1, rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 	    (   % Types has the form [restaurant/1]
 		number(Pred_Arity), % A must be a number.
 		nonvar(Pred_Name), % Can not be a variable.
+		nonvar(Types),
+		list(Types),
 		
 		functor(H, Pred_Name, Pred_Arity),
 		fuzzify_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
@@ -231,17 +246,13 @@ eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	).
 
 % fuzzification:
-eat(3, Head, (Fuzzy_H :- Fuzzy_Body)):-
-	functor(Head, 'fuzzify', 3),
+eat(3, rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Func_P_Arity), (Fuzzy_H :- Fuzzy_Body)):-
 	!, % If patter matching, backtracking forbiden.
-	print_msg_nl('debug'),
-	print_msg('debug', 'eat(Head) ', (Head)),
 	(
-	    trans_fuzzification(Head, Fuzzy_H, Fuzzy_Body)
+	    trans_fuzzification(Pred, Arity, Crisp_P, Crisp_P_Arity, Funct_P, Func_P_Arity, Fuzzy_H, Fuzzy_Body)
 	;
 	    (
-		print_msg('error', 'fuzzify_syntax :: Cannot understand syntax for', (Head)),
-		print_msg('error', 'fuzzify_syntax :: Syntax is', 'fuzzify(low_distance/2, distance/2, low_distance_function/2'),
+		print_msg('error', 'Syntax Error in', rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Func_P_Arity)),
 		!, fail
 	    )
 	).
@@ -407,29 +418,25 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_fuzzification(Head, Fuzzy_H, (Crisp_Predicate, Auxiliar_Fuzzy_Function)) :-
-	functor(Head, 'fuzzify', 3),
-	arg(1, Head, Fuzzy_Head_Name/2),
-	arg(2, Head, Crisp_Predicate_Name/2),
-	arg(3, Head, Fuzzy_Function_Name/2),
+trans_fuzzification(Pred, 2, Crisp_P, 2, Funct_P, 2, Fuzzy_Pred_F, (Crisp_P_F, Auxiliar_Funct_P_F)) :-
 
-	test_predicate_has_been_defined('crisp', Crisp_Predicate_Name, 2),
-	test_predicate_has_been_defined('function', Fuzzy_Function_Name, 3), % Here arity is 3
-	functor(H, Fuzzy_Head_Name, 1),
-	fuzzify_functor(H, 'fuzzification', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	test_predicate_has_been_defined('crisp', Crisp_P, 2),
+	test_predicate_has_been_defined('function', Funct_P, 3), % Here arity is 3
+	functor(Pred_F, Pred, 1),
+	fuzzify_functor(Pred_F, 'fuzzification', Fuzzy_Pred_F, Fuzzy_Arg_1, Fuzzy_Arg_2),
 
 	% We need to do here as in other translations, so 
 	% it generates aux and main predicates for fuzzifications too.
-	functor(Crisp_Predicate, Crisp_Predicate_Name, 2),
-	change_name('auxiliar', Fuzzy_Function_Name, Auxiliar_Fuzzy_Function_Name),
-	functor(Auxiliar_Fuzzy_Function, Auxiliar_Fuzzy_Function_Name, 3),
+	functor(Crisp_P_F, Crisp_P, 2),
+	change_name('auxiliar', Funct_P, Auxiliar_Funct_P),
+	functor(Auxiliar_Funct_P_F, Auxiliar_Funct_P, 3),
 
-	arg(1, Fuzzy_H, Input),
-	arg(1, Crisp_Predicate, Input),
-	arg(2, Crisp_Predicate, Crisp_Value),
-	arg(1, Auxiliar_Fuzzy_Function, Crisp_Value),
-	arg(2, Auxiliar_Fuzzy_Function, Fuzzy_Arg_1),
-	arg(3, Auxiliar_Fuzzy_Function, Fuzzy_Arg_2),
+	arg(1, Fuzzy_Pred_F, Input),
+	arg(1, Crisp_P_F, Input),
+	arg(2, Crisp_P_F, Crisp_Value),
+	arg(1, Auxiliar_Funct_P_F, Crisp_Value),
+	arg(2, Auxiliar_Funct_P_F, Fuzzy_Arg_1),
+	arg(3, Auxiliar_Funct_P_F, Fuzzy_Arg_2),
 
 	!.
 
