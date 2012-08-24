@@ -7,9 +7,9 @@
 :- include(library('rfuzzy/rfuzzy_ops')).
 
 % Important info to be saved.
-:- data rfuzzy_predicate_info/5.
+:- data predicate_definition/5.
 :- data aggregators/1.
-:- data sentence/2.
+:- data sentences/2.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -39,7 +39,7 @@ rfuzzy_trans_sentence(Arg, Arg, FileName) :-
 % eat_3 uses info supplied by eat_1 and eat_2.	
 rfuzzy_trans_sent_aux(end_of_file, Result, FileName):-
 	!,
-	findall(Cl,(retract_fact(sentence(Cl, FileName))), Sentences_In),
+	findall(Cl,(retract_fact(sentences(Clauses_List, FileName))), Sentences_In),
 	eat_lists(1, Sentences_In, Sentences_In_1, Converted_1),
 	eat_lists(2, Sentences_In_1, Sentences_In_2, Converted_2),
 	eat_lists(3, Sentences_In_2, Sentences_In_3, Converted_3),
@@ -73,15 +73,10 @@ rfuzzy_trans_sent_aux(end_of_file, Result, FileName):-
 	print_msg_nl('debug').
 
 rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
-
-%rfuzzy_trans_sent_aux(Sentence, [Sentence], _FileName) :-
-%	deprecated_syntax(Sentence), !.
-
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)], _FileName) :- !.
-
-rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
+rfuzzy_trans_sent_aux(Sentence, [], _FileName) :-
 %	print_info(Sentence),
-	assertz_fact(sentence(Sentence, FileName)).
+	translate(Sentence, Translation).
 
 %print_info(Sentence) :-
 %	print_msg('info', 'print_info', Sentence),
@@ -109,26 +104,8 @@ rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% Extract and Transform (Lists).
-eat_lists(_Index, [], [], []) :- !.	
-eat_lists(Index, [Sent_In | Sents_In], Invalid, Converted_Out) :-
-	print_msg('debug', 'eat(Index, Sent_In)', (Index, Sent_In)),
-	eat(Index, Sent_In, Sent_Converted), !,
-	print_msg('debug', 'eat(Index, Sent_In, Sent_Converted)', (Index, Sent_In, Sent_Converted)),
-	print_msg_nl('debug'),
-	eat_lists(Index, Sents_In, Invalid, Converted_In), !,
-	add_to_Converted_if_not_empty_list(Sent_Converted, Converted_In, Converted_Out), !.
-eat_lists(Index, [Sent_In | Sents_In], [Sent_In | Invalid], Converted) :-
-	eat_lists(Index, Sents_In, Invalid, Converted).
-
-add_to_Converted_if_not_empty_list([], Converted, Converted) :- !.
-add_to_Converted_if_not_empty_list(Converted_Sent, Converted, [Converted_Sent | Converted]) :- !.
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 % Unconditional default
-eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :- 
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :- 
 	!, % If patter matching, backtracking forbiden.
 	number(Value), % Value must be a number.
 	number(Pred_Arity), % A must be a number.
@@ -141,7 +118,7 @@ eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 	!. % Backtracking forbidden.
 
 % Conditional default
-eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred2_Arity), (Fuzzy_H :- H_Cond)) :-
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred2_Arity), (Fuzzy_H :- H_Cond)) :-
 	!, % If patter matching, backtracking forbiden.
 	Pred_Arity = Pred2_Arity,
 	number(Value), % Value must be a number.
@@ -160,7 +137,7 @@ eat(1, (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred
 	!. % Backtracking forbidden.
 
 % Fuzzy facts.
-eat(1, (Head value X), Fuzzy_Head):-
+translate((Head value X), Fuzzy_Head):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'fact conversion :: IN ',(Head value X)),
 	number(X),                    % X must be a number.
@@ -171,12 +148,12 @@ eat(1, (Head value X), Fuzzy_Head):-
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
-eat(1, (rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), []) :-
+translate((rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), []) :-
 	!,
 	save_aggregator(Aggregator_Name, Aggregator_Arity), !.
 
 % function definition.
-eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
+translate((Head :# List), (Fuzzy_H :- Body)) :-
 	!, % If patter matching, backtracking forbiden.
 	% list(Lista),
 	print_msg('debug', '(Head :# List) ', (Head :# List)),
@@ -190,7 +167,7 @@ eat(1, (Head :# List), (Fuzzy_H :- Body)) :-
 	build_straight_lines(X, Fuzzy_Arg_1, List, Body).
 
 % Predicate's type(s) definition.
-eat(1, rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
+translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'rfuzzy_type_for(Pred_Name/Pred_Arity, Types)', rfuzzy_type_for(Pred_Name/Pred_Arity, Types)),
 	(
@@ -210,7 +187,7 @@ eat(1, rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 	!. % Backtracking forbidden.
 
 % rules:
-eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
+translate((Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg_nl('debug'),
 	print_msg('debug', 'eat(Head :~ Body) ', (Head :~ Body)),
@@ -226,7 +203,7 @@ eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	).
 
 % fuzzification:
-eat(3, rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Func_P_Arity), (Fuzzy_H :- Fuzzy_Body)):-
+translate(rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Func_P_Arity), (Fuzzy_H :- Fuzzy_Body)):-
 	!, % If patter matching, backtracking forbiden.
 	(
 	    trans_fuzzification(Pred, Arity, Crisp_P, Crisp_P_Arity, Funct_P, Func_P_Arity, Fuzzy_H, Fuzzy_Body)
@@ -238,17 +215,17 @@ eat(3, rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Fu
 	).
 
 % crisp predicates (non-facts).
-eat(6, Other, Other) :-
+translate(Other, Other) :-
 	print_msg('debug', 'Test-1 if crisp pred', Other),
 	nonvar(Other), 
 	functor(Other, ':-', 2), !,
 	arg(1, Other, Arg_1), 
 	nonvar(Arg_1), 
 	functor(Arg_1, Name, Arity),
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
+	save_predicate_definition('crisp', Name, Arity, Name, Arity).
 
 % crisp facts.
-eat(6, Other, Other) :-
+translate(Other, Other) :-
 	print_msg('debug', 'Test-2 if crisp fact', Other),
 	nonvar(Other), 
 	functor(Other, Name, Arity), 
@@ -257,7 +234,7 @@ eat(6, Other, Other) :-
 	Name \== ':#',
 	Name \== 'value',
 	Name \== 'fuzzify',
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
+	save_predicate_definition('crisp', Name, Arity, Name, Arity).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -445,7 +422,7 @@ trans_fuzzification(Pred, 2, Crisp_P, 2, Funct_P, 2, Fuzzy_Pred_F, (Crisp_P_F, A
 test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 	% retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)
 	retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity), 
-	% rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
+	% predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 	!.
 test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 	print_msg('info', 'fuzzify: Cannot find predicate defined by (Kind, Name, FuzzyArity) :: ', (Kind, Name, FuzzyArity)),
@@ -458,33 +435,52 @@ test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-	save_predicate_info_aux('defined', Name, Arity, Name, Arity), % Predicate MUST be defined.
-	print_msg('debug', 'save_predicate_info out', save_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)).
+kind_translation('type', "rfuzzy_type_", 0).                         %---|
+kind_translation('aggregator', "rfuzzy_error_", 0).             %    |
+kind_translation('function', "rfuzzy_function_", 0).             %    |   This are just utils. No priority.
+kind_translation('quantifier', "rfuzzy_error_", 0).                %    |
+kind_translation('auxiliar', "rfuzzy_aux_", 0).                      %---|
 
-save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	rfuzzy_predicate_info_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+kind_translation('sinonym', "rfuzzy_error_", 0).                  %---|   And this ones rely on the priority
+kind_translation('antonym', "rfuzzy_error_", 0).                  %---|   of the defined predicates.
+
+kind_translation('default_without_cond', "rfuzzy_default_without_cond_", 0). % Lowest priority
+kind_translation('default_with_cond', "rfuzzy_default_with_cond_", 0.25). 
+kind_translation('rule', "rfuzzy_rule_", 0.5).
+kind_translation('fuzzification', "rfuzzy_fuzzification_", 0.75).
+kind_translation('fact', "rfuzzy_fact_", 1).
+
+kind_translation(_X, "rfuzzy_error_error_error_").
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+predicate_definition_contents(predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity), 
+	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !,
+	kind_translation(Kind, _Anything), !,
+	nonvar(Kind), !.
+
+save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
+	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	retract_fact(Pred_Info), !, % Retract last
 	assertz_fact(Pred_Info).
-save_predicate_info_aux(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	rfuzzy_predicate_info_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
+	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	assertz_fact(Pred_Info).
 
 retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity).
+	predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity).
 
 retrieve_all_predicate_info(Kind, Retrieved) :-
-	findall((rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)),
-	(retract_fact(rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity))), Retrieved),
+	findall((predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)),
+	(retract_fact(predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity))), Retrieved),
 	 !.
 
-remove_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	rfuzzy_predicate_info_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-	retract_fact(Pred_Info), !. % Retract 
+%remove_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
+%	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+%	retract_fact(Pred_Info), !. % Retract 
 
-rfuzzy_predicate_info_contents(rfuzzy_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity), 
-	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -495,7 +491,7 @@ fuzzify_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
 	Fuzzy_Arity_1 is Arity + 1, % For truth value.
 	Fuzzy_Arity_2 is Fuzzy_Arity_1 + 1, % For preference.
 	change_name(Preffix, Name, Fuzzy_Name), % Change name
-	save_predicate_info(Preffix, Name, Arity, Fuzzy_Name, Fuzzy_Arity_2),
+	save_predicate_definition(Preffix, Name, Arity, Fuzzy_Name, Fuzzy_Arity_2),
 	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity_2),
 	copy_args(Arity, Fuzzy_H, H),
 	arg(Fuzzy_Arity_1, Fuzzy_H, Fuzzy_Arg_1),
@@ -503,7 +499,7 @@ fuzzify_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
 
 change_name(Prefix, Input, Output) :-
 	atom(Input),
-	translate_prefix(Prefix, Real_Prefix),
+	kind_translation(Prefix, Real_Prefix),
 	atom_codes(Input, Input_Chars),
 	append_local(Real_Prefix, Input_Chars, Output_Chars),
 	atom_codes(Output, Output_Chars), 
@@ -518,20 +514,6 @@ append_local([Elto|N1], N2, [Elto|Res]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_prefix('type', "rfuzzy_type_").
-translate_prefix('default_without_cond', "rfuzzy_default_without_cond_").
-translate_prefix('default_with_cond', "rfuzzy_default_with_cond_").
-translate_prefix('fact', "rfuzzy_fact_").
-translate_prefix('rule', "rfuzzy_rule_").
-translate_prefix('function', "rfuzzy_function_").
-translate_prefix('fuzzification', "rfuzzy_fuzzification_").
-translate_prefix('auxiliar', "rfuzzy_aux_").
-translate_prefix(_X, "rfuzzy_error_error_error_").
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 build_auxiliary_clauses([], []) :- !.
 build_auxiliary_clauses([Def_Pred|Def_Preds], [Pred_Main, Pred_Aux | Clauses]) :-
 	print_msg('debug', 'build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux)', (Def_Pred, Pred_Main, Pred_Aux)),
@@ -540,7 +522,7 @@ build_auxiliary_clauses([Def_Pred|Def_Preds], [Pred_Main, Pred_Aux | Clauses]) :
 
 % For crisp predicates we only generate Aux :- Crisp.
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
+	predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 	retrieve_predicate_info('crisp', Name, Arity, Name, Arity), !, 
 
 	change_name('auxiliar', Name, Fuzzy_Pred_Aux_Name),
@@ -552,7 +534,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	Fuzzy_Cl_Aux = (Fuzzy_Pred_Aux :- fail).
 
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	rfuzzy_predicate_info_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
+	predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
 
 	% Build MAIN functors.
 	Main_Pred_Fuzzy_Arity is Arity + 1,
