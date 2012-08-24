@@ -24,6 +24,8 @@ restaurant(tapasbar).
 restaurant(meson_del_jamon).
 restaurant(museo_del_jamon).
 
+expensive_restaurant(zalacain).
+
 % :- set_prop low_distance_function/1 => restaurant/1.
 rfuzzy_default_value_for(low_distance_function/1, 0).
 near_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
@@ -47,7 +49,8 @@ rfuzzy_types_for(cheap/1, [restaurant/1]).
 % before: 
 % :- default(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.5).
-rfuzzy_default_value_for(cheap/1, 0.2) if near_the_city_center/2.
+rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/2, over, 0.7).
+rfuzzy_default_value_for(cheap/1, 0.1) if expensive_restaurant/1.
 
 cheap(kenzo) value 0.3.
 cheap(subway) value 1.
