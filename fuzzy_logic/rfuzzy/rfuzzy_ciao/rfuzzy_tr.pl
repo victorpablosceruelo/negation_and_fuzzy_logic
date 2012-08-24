@@ -111,15 +111,18 @@ rfuzzy_trans_sent_aux(Sentence, [], FileName) :-
 
 % Extract and Transform (Lists).
 eat_lists(_Index, [], [], []) :- !.	
-eat_lists(Index, [Sent_In | Sents_In], Invalid, [ Sent_Converted | Converted]) :-
+eat_lists(Index, [Sent_In | Sents_In], Invalid, Converted_Out) :-
 	print_msg('debug', 'eat(Index, Sent_In)', (Index, Sent_In)),
 	eat(Index, Sent_In, Sent_Converted), !,
 	print_msg('debug', 'eat(Index, Sent_In, Sent_Converted)', (Index, Sent_In, Sent_Converted)),
 	print_msg_nl('debug'),
-	eat_lists(Index, Sents_In, Invalid, Converted).
+	eat_lists(Index, Sents_In, Invalid, Converted_In), !,
+	add_to_Converted_if_not_empty_list(Sent_Converted, Converted_In, Converted_Out), !.
 eat_lists(Index, [Sent_In | Sents_In], [Sent_In | Invalid], Converted) :-
 	eat_lists(Index, Sents_In, Invalid, Converted).
 
+add_to_Converted_if_not_empty_list([], Converted, Converted) :- !.
+add_to_Converted_if_not_empty_list(Converted_Sent, Converted, [Converted_Sent | Converted]) :- !.
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -168,7 +171,7 @@ eat(1, (Head value X), Fuzzy_Head):-
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
-eat(1, (rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), true) :-
+eat(1, (rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), []) :-
 	!,
 	save_aggregator(Aggregator_Name, Aggregator_Arity), !.
 
@@ -206,29 +209,6 @@ eat(1, rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 	),
 	!. % Backtracking forbidden.
 
-
-% crisp predicates (non-facts).
-eat(2, Other, Other) :-
-	print_msg('debug', 'Test-1 if crisp pred', Other),
-	nonvar(Other), 
-	functor(Other, ':-', 2), !,
-	arg(1, Other, Arg_1), 
-	nonvar(Arg_1), 
-	functor(Arg_1, Name, Arity),
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
-
-% crisp facts.
-eat(2, Other, Other) :-
-	print_msg('debug', 'Test-2 if crisp fact', Other),
-	nonvar(Other), 
-	functor(Other, Name, Arity), 
-	Name \== ':-',
-	Name \== ':~',
-	Name \== ':#',
-	Name \== 'value',
-	Name \== 'fuzzify',
-	save_predicate_info('crisp', Name, Arity, Name, Arity).
-
 % rules:
 eat(3, (Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	!, % If patter matching, backtracking forbiden.
@@ -256,6 +236,28 @@ eat(3, rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Fu
 		!, fail
 	    )
 	).
+
+% crisp predicates (non-facts).
+eat(6, Other, Other) :-
+	print_msg('debug', 'Test-1 if crisp pred', Other),
+	nonvar(Other), 
+	functor(Other, ':-', 2), !,
+	arg(1, Other, Arg_1), 
+	nonvar(Arg_1), 
+	functor(Arg_1, Name, Arity),
+	save_predicate_info('crisp', Name, Arity, Name, Arity).
+
+% crisp facts.
+eat(6, Other, Other) :-
+	print_msg('debug', 'Test-2 if crisp fact', Other),
+	nonvar(Other), 
+	functor(Other, Name, Arity), 
+	Name \== ':-',
+	Name \== ':~',
+	Name \== ':#',
+	Name \== 'value',
+	Name \== 'fuzzify',
+	save_predicate_info('crisp', Name, Arity, Name, Arity).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
