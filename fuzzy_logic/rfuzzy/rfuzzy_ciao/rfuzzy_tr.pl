@@ -86,7 +86,7 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 	nonvar(Pred_Name), % Name can not be a variable.
 
 	functor(H, Pred_Name, Pred_Arity),
-	fuzzify_functor(H, 'default_without_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(H, 'default_without_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_1 is Value, 
 	Fuzzy_Arg_2 is 0,
 	!. % Backtracking forbidden.
@@ -98,25 +98,43 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/P
 %	Conditioned_
 	
 	!, % If patter matching, backtracking forbiden.
-	(
-	    (
-		Pred_Arity = Pred2_Arity,
-		number(Value), % Value must be a number.
-		number(Pred_Arity), % Pred_Arity must be a number.
-		number(Pred2_Arity), % Pred2_Arity must be a number.
-		nonvar(Pred_Name), % Pred_Name cannot be a variable.
-		nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
+	Pred_Arity = Pred2_Arity,
+	number(Value), % Value must be a number.
+	number(Pred_Arity), % Pred_Arity must be a number.
+	number(Pred2_Arity), % Pred2_Arity must be a number.
+	nonvar(Pred_Name), % Pred_Name cannot be a variable.
+	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
+	
+	functor(H, Pred_Name, Pred_Arity),
+	translate_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	Fuzzy_Arg_1 is Value, 
+	Fuzzy_Arg_2 is 0,
+	
+	functor(H_Cond, Pred2_Name, Pred2_Arity),
+	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
 
-		functor(H, Pred_Name, Pred_Arity),
-		fuzzify_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-		Fuzzy_Arg_1 is Value, 
-		Fuzzy_Arg_2 is 0,
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Value)), (Fuzzy_H :- H_Cond)) :-
+%	functor(Conditioned_Default, 'if', 2), 
+	print_msg('debug', 'translate', 'if thershold detected'),
+%	Conditioned_
+	
+	!, % If patter matching, backtracking forbiden.
+	Pred_Arity = Pred2_Arity,
+	number(Value), % Value must be a number.
+	number(Pred_Arity), % Pred_Arity must be a number.
+	number(Pred2_Arity), % Pred2_Arity must be a number.
+	nonvar(Pred_Name), % Pred_Name cannot be a variable.
+	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
+	
+	functor(H, Pred_Name, Pred_Arity),
+	translate_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	Fuzzy_Arg_1 is Value, 
+	Fuzzy_Arg_2 is 0,
+	
+	functor(H_Cond, Pred2_Name, Pred2_Arity),
+	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
 
-		functor(H_Cond, Pred2_Name, Pred2_Arity),
-		copy_args(Pred_Arity, H_Cond, H), !   % Copy args from main functor.
-)
-	;
-	)
+
 
 % Fuzzy facts.
 translate((Head value X), Fuzzy_Head):-
@@ -124,7 +142,7 @@ translate((Head value X), Fuzzy_Head):-
 	print_msg('debug', 'fact conversion :: IN ',(Head value X)),
 	number(X),                    % X must be a number.
 
-	fuzzify_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_1 is X,
 	Fuzzy_Arg_2 is 1,
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
@@ -142,7 +160,7 @@ translate((Head :# List), (Fuzzy_H :- Body)) :-
 
 	functor(Head, Name, 0),
 	functor(H, Name, 1),
-	fuzzify_functor(H, 'function', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(H, 'function', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
 	Fuzzy_Arg_2 is 1,
 
 	arg(1, Fuzzy_H, X),
@@ -160,7 +178,7 @@ translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 		list(Types),
 		
 		functor(H, Pred_Name, Pred_Arity),
-		fuzzify_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
+		translate_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
 		trans_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
 	    )
 	;
@@ -230,7 +248,7 @@ trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
 	nonvar(H), nonvar(Credibility), nonvar(Body),
 
 	% Change head's name.
-	fuzzify_functor(H, 'rule', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(H, 'rule', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
 
 	% Translate all predicates in the body.
 	extract_op2(Body, Op2, Tmp_Body),
@@ -385,7 +403,7 @@ trans_fuzzification(Pred, 2, Crisp_P, 2, Funct_P, 2, Fuzzy_Pred_F, (Crisp_P_F, A
 	test_predicate_has_been_defined('crisp', Crisp_P, 2),
 	test_predicate_has_been_defined('function', Funct_P, 3), % Here arity is 3
 	functor(Pred_F, Pred, 1),
-	fuzzify_functor(Pred_F, 'fuzzification', Fuzzy_Pred_F, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(Pred_F, 'fuzzification', Fuzzy_Pred_F, Fuzzy_Arg_1, Fuzzy_Arg_2),
 
 	% We need to do here as in other translations, so 
 	% it generates aux and main predicates for fuzzifications too.
@@ -475,7 +493,7 @@ retrieve_list_of_defined_predicates(Retrieved) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-fuzzify_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
+translate_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
 	functor(H, Name, Arity),
 	Fuzzy_Arity_1 is Arity + 1, % For truth value.
 	Fuzzy_Arity_2 is Fuzzy_Arity_1 + 1, % For preference.
