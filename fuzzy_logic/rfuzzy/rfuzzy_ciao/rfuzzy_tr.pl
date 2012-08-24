@@ -26,9 +26,24 @@ rfuzzy_trans_sentence(Arg1, Arg2, Arg3) :-
 	print_msg_nl('debug').
 
 rfuzzy_trans_sentence(Arg, Arg, FileName) :- 
-	print_msg('debug', 'rfuzzy_trans_sent: ERROR: Input: ', Arg),
-	print_msg('debug', 'rfuzzy_trans_sent: ERROR: FileName: ', FileName),
+	print_msg('warning', 'rfuzzy_trans_sent: ERROR: Input: ', Arg),
+	print_msg('warning', 'rfuzzy_trans_sent: ERROR: FileName: ', FileName),
+	print_msg_nl('debug'),
+	print_info(Arg), 
+	print_msg_nl('debug'),
 	print_msg_nl('debug').
+
+print_info(Sentence) :-
+	print_msg('info', 'print_info', Sentence),
+	functor(Sentence, Name, Arity),
+	print_msg('info', 'print_info: (Name, Arity)', (Name, Arity)),
+	Sentence=..[Name|Args],
+	print_list_info(Args).
+print_list_info([]) :- !,
+	print_msg('info', 'print_list_info', 'empty list').
+print_list_info([Arg | Args]) :- !,
+	print_info(Arg),
+	print_list_info(Args).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -46,20 +61,8 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Aux_Predicates):-
 rfuzzy_trans_sent_aux(0, []) :- !, nl, nl, nl.
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
 rfuzzy_trans_sent_aux(Sentence, Translation) :-
-%	print_info(Sentence),
 	translate(Sentence, Translation).
 
-%print_info(Sentence) :-
-%	print_msg('info', 'print_info', Sentence),
-%	functor(Sentence, Name, Arity),
-%	print_msg('info', 'print_info: (Name, Arity)', (Name, Arity)),
-%	Sentence=..[Name|Args],
-%	print_list_info(Args).
-%print_list_info([]) :- !,
-%	print_msg('info', 'print_list_info', 'empty list').
-%print_list_info([Arg | Args]) :- !,
-%	print_info(Arg),
-%	print_list_info(Args).
 
 % Deprecated syntax (we just warn about it).
 %deprecated_syntax((:- default(_Name/_Arity,_X))) :-
@@ -90,22 +93,30 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 
 % Conditional default
 translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred2_Arity), (Fuzzy_H :- H_Cond)) :-
+%	functor(Conditioned_Default, 'if', 2), 
+	print_msg('debug', 'translate', 'if detected'),
+%	Conditioned_
+	
 	!, % If patter matching, backtracking forbiden.
-	Pred_Arity = Pred2_Arity,
-	number(Value), % Value must be a number.
-	number(Pred_Arity), % Pred_Arity must be a number.
-	number(Pred2_Arity), % Pred2_Arity must be a number.
-	nonvar(Pred_Name), % Pred_Name cannot be a variable.
-	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
+	(
+	    (
+		Pred_Arity = Pred2_Arity,
+		number(Value), % Value must be a number.
+		number(Pred_Arity), % Pred_Arity must be a number.
+		number(Pred2_Arity), % Pred2_Arity must be a number.
+		nonvar(Pred_Name), % Pred_Name cannot be a variable.
+		nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
 
-	functor(H, Pred_Name, Pred_Arity),
-	fuzzify_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is Value, 
-	Fuzzy_Arg_2 is 0,
+		functor(H, Pred_Name, Pred_Arity),
+		fuzzify_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
+		Fuzzy_Arg_1 is Value, 
+		Fuzzy_Arg_2 is 0,
 
-	functor(H_Cond, Pred2_Name, Pred2_Arity),
-	copy_args(Pred_Arity, H_Cond, H),    % Copy args from main functor.
-	!. % Backtracking forbidden.
+		functor(H_Cond, Pred2_Name, Pred2_Arity),
+		copy_args(Pred_Arity, H_Cond, H), !   % Copy args from main functor.
+)
+	;
+	)
 
 % Fuzzy facts.
 translate((Head value X), Fuzzy_Head):-
@@ -185,26 +196,27 @@ translate(rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P
 	    )
 	).
 
-% crisp predicates (non-facts).
+% crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
-	print_msg('debug', 'Test-1 if crisp pred', Other),
+	print_msg('debug', 'Non-Rfuzzy predicate', Other),
 	nonvar(Other), 
-	functor(Other, ':-', 2), !,
-	arg(1, Other, Arg_1), 
-	nonvar(Arg_1), 
-	functor(Arg_1, Name, Arity),
-	save_predicate_definition('crisp', Name, Arity, Name, Arity).
-
-% crisp facts.
-translate(Other, Other) :-
-	print_msg('debug', 'Test-2 if crisp fact', Other),
-	nonvar(Other), 
-	functor(Other, Name, Arity), 
-	Name \== ':-',
-	Name \== ':~',
-	Name \== ':#',
-	Name \== 'value',
-	Name \== 'fuzzify',
+	(
+	    (
+		functor(Other, ':-', 2), !,
+		arg(1, Other, Arg_1), 
+		nonvar(Arg_1), 
+		functor(Arg_1, Name, Arity)
+	    )
+	;
+	    (
+		functor(Other, Name, Arity), 
+		Name \== ':-',
+		Name \== ':~',
+		Name \== ':#',
+		Name \== 'value',
+		Name \== 'fuzzify'
+	    )
+	),
 	save_predicate_definition('crisp', Name, Arity, Name, Arity).
 
 % ------------------------------------------------------

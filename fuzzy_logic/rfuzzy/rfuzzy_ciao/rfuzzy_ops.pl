@@ -16,7 +16,7 @@
 
 :- op(1200,xfx,':#').      % definition of fuzzy predicate neg agreg etc
 %:- op(1175,xfx,(=>)).      % implicacion fuzzy.
-:- op(1175,xfx,(if)).      % implicacion fuzzy.
+:- op(1175,xfx,'if').      % implicacion fuzzy.
 :- op(1150,fx,'fnot').     % fuzzy negation
 
 %:- op(1150, fx,aggr).      % declared associative aggregator
