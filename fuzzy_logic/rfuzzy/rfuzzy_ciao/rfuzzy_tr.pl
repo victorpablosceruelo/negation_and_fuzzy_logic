@@ -20,7 +20,7 @@ rfuzzy_trans_clause(Arg1, Arg1, _Arg3) :-
 
 rfuzzy_trans_sentence(Arg1, Arg2, Arg3) :- 
 	print_msg('debug', 'rfuzzy_trans_sent: arg1', Arg1),
-	rfuzzy_trans_sent_aux(Arg1, Arg2, Arg3), !,
+	rfuzzy_trans_sent_aux(Arg1, Arg2), !,
 	print_msg('debug', 'rfuzzy_trans_sent: arg2', Arg2),
 	print_msg('debug', 'rfuzzy_trans_sent: arg3', Arg3),
 	print_msg_nl('debug').
@@ -37,44 +37,15 @@ rfuzzy_trans_sentence(Arg, Arg, FileName) :-
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-rfuzzy_trans_sent_aux(end_of_file, Result, FileName):-
+rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Aux_Predicates):-
 	!,
-	findall(Cl,(retract_fact(sentences(Clauses_List, FileName))), Sentences_In),
-	eat_lists(1, Sentences_In, Sentences_In_1, Converted_1),
-	eat_lists(2, Sentences_In_1, Sentences_In_2, Converted_2),
-	eat_lists(3, Sentences_In_2, Sentences_In_3, Converted_3),
-	eat_lists(4, Sentences_In_3, Sentences_In_4, Converted_4),
-	eat_lists(5, Sentences_In_4, Sentences_In_5, Converted_5),
-
-	print_msg_nl('debug'),
-	print_msg_nl('debug'),
-	print_msg('debug', 'Sentences_In_5', Sentences_In_5),
-	print_msg_nl('debug'),
-	print_msg_nl('debug'),
-
-	retrieve_all_predicate_info('defined', To_Build_Fuzzy_Aux_Predicates),
+	retrieve_list_of_defined_predicates(To_Build_Fuzzy_Aux_Predicates),
 	print_msg('debug', 'To_Build_Fuzzy', To_Build_Fuzzy_Aux_Predicates),
-	build_auxiliary_clauses(To_Build_Fuzzy_Aux_Predicates, Fuzzy_Aux_Predicates),  
+	build_auxiliary_clauses(To_Build_Fuzzy_Aux_Predicates, Fuzzy_Aux_Predicates).
 
-	append_local(Sentences_In_5, Fuzzy_Aux_Predicates, Result_1),
-	append_local(Result_1, Converted_5, Result_2),
-	append_local(Result_2, Converted_4, Result_3),
-	append_local(Result_3, Converted_3, Result_4),
-	append_local(Result_4, Converted_2, Result_5),
-	append_local(Result_5, Converted_1, Result_6),
-	append_local(Result_6, [(end_of_file)], Result),
-
-	print_msg_nl('debug'),
-	print_msg_nl('debug'),
-	print_msg_nl('debug'),
-	print_msg('debug', 'OUT', Result),
-	print_msg_nl('debug'),
-	print_msg_nl('debug'),
-	print_msg_nl('debug').
-
-rfuzzy_trans_sent_aux(0, [], _FileName) :- !, nl, nl, nl.
-rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)], _FileName) :- !.
-rfuzzy_trans_sent_aux(Sentence, [], _FileName) :-
+rfuzzy_trans_sent_aux(0, []) :- !, nl, nl, nl.
+rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
+rfuzzy_trans_sent_aux(Sentence, Translation) :-
 %	print_info(Sentence),
 	translate(Sentence, Translation).
 
@@ -450,29 +421,35 @@ kind_translation('rule', "rfuzzy_rule_", 0.5).
 kind_translation('fuzzification', "rfuzzy_fuzzification_", 0.75).
 kind_translation('fact', "rfuzzy_fact_", 1).
 
-kind_translation(_X, "rfuzzy_error_error_error_").
+kind_translation(_X, "rfuzzy_error_error_error_", 0).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
 predicate_definition_contents(predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity), 
-	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !,
-	kind_translation(Kind, _Anything), !,
-	nonvar(Kind), !.
+	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !.
 
 save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
+	kind_translation(Kind, _Anything, _Priority), !,
+	nonvar(Kind), !,
 	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+	save_predicate_definition_aux(Pred_Info),
+	% Now keep a list without repetitions of defined predicates.
+	predicate_definition_contents(Pred_Info2, 'defined', Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+	save_predicate_definition_aux(Pred_Info2).
+
+save_predicate_definition_aux(Pred_Info) :-
 	retract_fact(Pred_Info), !, % Retract last
 	assertz_fact(Pred_Info).
-save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+save_predicate_definition_aux(Pred_Info) :-
 	assertz_fact(Pred_Info).
 
 retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 	predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity).
 
-retrieve_all_predicate_info(Kind, Retrieved) :-
+retrieve_list_of_defined_predicates(Retrieved) :-
+	Kind = 'defined',
 	findall((predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)),
 	(retract_fact(predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity))), Retrieved),
 	 !.
@@ -499,7 +476,7 @@ fuzzify_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
 
 change_name(Prefix, Input, Output) :-
 	atom(Input),
-	kind_translation(Prefix, Real_Prefix),
+	kind_translation(Prefix, Real_Prefix, _Priority),
 	atom_codes(Input, Input_Chars),
 	append_local(Real_Prefix, Input_Chars, Output_Chars),
 	atom_codes(Output, Output_Chars), 
@@ -593,7 +570,7 @@ build_auxiliary_clause(Pred_Info, (true), (true)) :-
 build_functors(Name, Arity, Kind, _On_Error, Functor_In, Functor) :-
 
 	% Do we have saved facts ??
-	remove_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+	retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	!, % Backtracking not allowed.
 
 	% Main functor.
