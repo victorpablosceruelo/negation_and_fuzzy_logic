@@ -497,25 +497,83 @@ retrieve_list_of_defined_predicates(Retrieved) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
+translate_functor(H, Preffix_Term, Fuzzy_H, Fuzzy_Args) :-
 	functor(H, Name, Arity),
-	Fuzzy_Arity_1 is Arity + 1, % For truth value.
-	Fuzzy_Arity_2 is Fuzzy_Arity_1 + 1, % For preference.
-	change_name(Preffix, Name, Fuzzy_Name), % Change name
-	save_predicate_definition(Preffix, Name, Arity, Fuzzy_Name, Fuzzy_Arity_2),
-	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity_2),
-	copy_args(Arity, Fuzzy_H, H),
-	arg(Fuzzy_Arity_1, Fuzzy_H, Fuzzy_Arg_1),
-	arg(Fuzzy_Arity_2, Fuzzy_H, Fuzzy_Arg_2).
+	translation_info(Preffix_Term, Prefix_String, Add_Args, Fix_Priority, Priority),
+	number(Add_Args),
+	Fuzzy_Arity is Arity + Add_Args, % Fuzzy Args.
+	add_preffix_to_name(Name, Prefix_String, Fuzzy_Name), % Change name
+	save_predicate_definition(Preffix_Term, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity),
+	copy_args(Arity, Fuzzy_H, H), !,
+	translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args),
+	translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority).
 
-change_name(Prefix, Input, Output) :-
+translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args) :-
+	number(Add_Args),
+	(
+	    (
+		Add_Args = 0, 
+		Fuzzy_Args = [], !
+	    )
+	;
+	    (
+		Add_Args = 1,
+		arg(Fuzzy_Arity, Fuzzy_H, Fuzzy_Arg1),
+		Fuzzy_Args = [Fuzzy_Arg1], !
+	    )
+	;
+	    (
+		Add_Args = 2,
+		Fuzzy_Arity_Aux = Fuzzy_Arity - 1,
+		arg(Fuzzy_Arity_Aux, Fuzzy_H, Fuzzy_Arg1),
+		arg(Fuzzy_Arity, Fuzzy_H, Fuzzy_Arg2),
+		Fuzzy_Args = [Fuzzy_Arg1, Fuzzy_Arg2], !
+	    )
+	), !.
+
+translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority) :-
+	number(Add_Args),
+	(
+	    (
+		Add_Args \== 2
+	    )
+	;
+	    (
+		Fix_Priority = 'no'
+	    )
+	;
+	    (
+		Fix_Priority = 'yes',
+		get_priority_arg(Fuzzy_Args, Priority) 
+	    )
+	), !.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+get_truth_value_arg([Truth_Value, _Priority], Truth_Value) :- !.
+get_truth_value_arg([Head | Tail], Truth_Value) :-
+	get_truth_value_arg(Tail, Truth_Value).
+
+get_priority_arg([Priority], Priority) :- !.
+get_priority_arg([Head | Tail], Priority) :-
+	get_priority_arg(Tail, Priority).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+
+add_preffix_to_name(Input, Preffix, Output) :-
+	string(Preffix),
 	atom(Input),
-	translation_info(Prefix, Real_Prefix, _Priority),
 	atom_codes(Input, Input_Chars),
 	append_local(Real_Prefix, Input_Chars, Output_Chars),
 	atom_codes(Output, Output_Chars), 
 	atom(Output), !.
-%	print_msg('debug', 'change_name', change_name(Prefix, Input, Output)).
+%	print_msg('debug', 'add_preffix_to_name', add_preffix_to_name(Prefix, Input, Output)).
 
 append_local([], N2, N2).
 append_local([Elto|N1], N2, [Elto|Res]) :-
