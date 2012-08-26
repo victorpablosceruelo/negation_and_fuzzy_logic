@@ -11,6 +11,7 @@ rfuzzy_type_for(preferred_restaurant/2, [restaurant/1, restaurant/1]).
 rfuzzy_type_for(tempting_restaurant/1, [restaurant/1]).
 rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), cheap(R), traditional(R))).
+tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
 
 restaurant(kenzo).
 restaurant(burguer_king).

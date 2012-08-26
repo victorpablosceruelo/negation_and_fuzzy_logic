@@ -100,9 +100,8 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 	nonvar(Pred_Name), % Name can not be a variable.
 
 	functor(H, Pred_Name, Pred_Arity),
-	translate_functor(H, 'default_without_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is Value, 
-	Fuzzy_Arg_2 is 0,
+	translate_functor(H, 'default_without_cond', Fuzzy_H, Fuzzy_Args),
+	get_truth_value_arg(Fuzzy_Args, Value),
 	!. % Backtracking forbidden.
 
 % Conditional default
@@ -120,9 +119,8 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/P
 	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
 	
 	functor(H, Pred_Name, Pred_Arity),
-	translate_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is Value, 
-	Fuzzy_Arg_2 is 0,
+	translate_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Args),
+	get_truth_value_arg(Fuzzy_Args, Value),
 	
 	functor(H_Cond, Pred2_Name, Pred2_Arity),
 	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
@@ -156,14 +154,13 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pr
 	), !.
 
 % Fuzzy facts.
-translate((Head value X), Fuzzy_Head):-
+translate((Head value Value), Fuzzy_Head):-
 	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'fact conversion :: IN ',(Head value X)),
-	number(X),                    % X must be a number.
+	print_msg('debug', 'fact conversion :: IN ',(Head value Value)),
+	number(Value),                    % Value must be a number.
 
-	translate_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is X,
-	Fuzzy_Arg_2 is 1,
+	translate_functor(Head, 'fact', Fuzzy_Head, Fuzzy_Args),
+	get_truth_value_arg(Fuzzy_Args, Value),
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
@@ -179,11 +176,11 @@ translate((Head :# List), (Fuzzy_H :- Body)) :-
 
 	functor(Head, Name, 0),
 	functor(H, Name, 1),
-	translate_functor(H, 'function', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_2 is 1,
+	translate_functor(H, 'function', Fuzzy_H, Fuzzy_Args),
+	get_truth_value_arg(Fuzzy_Args, Value),
 
 	arg(1, Fuzzy_H, X),
-	build_straight_lines(X, Fuzzy_Arg_1, List, Body).
+	build_straight_lines(X, Value, List, Body).
 
 % Predicate's type(s) definition.
 translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
@@ -197,29 +194,25 @@ translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 		list(Types),
 		
 		functor(H, Pred_Name, Pred_Arity),
-		translate_functor(H, 'type', Fuzzy_H, _Fuzzy_Arg_1, _Fuzzy_Arg_2),
-		trans_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
+		translate_functor(H, 'type', Fuzzy_H, _Fuzzy_Args),
+		translate_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
 	    )
 	;
 	    print_msg('error', 'translate_types :: Syntax Error in', rfuzzy_type_for(Pred_Name/Pred_Arity, Types))
 	),
 	!. % Backtracking forbidden.
 
-% rules:
-translate((Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
+% rules with credibility:
+translate(((Head cred (Cred_Op, Cred)) :~ Body), Translation):-
 	!, % If patter matching, backtracking forbiden.
-	print_msg_nl('debug'),
-	print_msg('debug', 'eat(Head :~ Body) ', (Head :~ Body)),
-	(
-	    trans_rule(Head, Body, Fuzzy_H, Fuzzy_Body)
-	;
-	    (
-		print_msg('error', 'translate_rule_syntax :: Error in', (Head :~ Body)),
-		print_msg('error', 'translate_rule_syntax :: Syntax for rules is', '(predicate cred(Op1, Number) :~ Op2(( Body ))'),
-		print_msg('error', 'translate_rule_syntax :: Please note there are 2 parenthesis around the variable Body', ' '),
-		!, fail
-	    )
-	).
+	print_msg('debug', '(Head cred (Cred_Op, Cred)) :~ Body)', ((Head cred (Cred_Op, Cred))  :~ Body)),
+	translate_rule(Head, Cred_Op, Cred, Body, Translation).
+
+% rules without credibility:
+translate((Head :~ Body), Translation):-
+	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
+	translate_rule(Head, 'prod', 1, Body, Translation).
 
 % fuzzification:
 translate(rfuzzy_define_fuzzification(Pred/2, Crisp_P/2, Funct_P/2), (Fuzzy_H :- (Crisp_P_F, Funct_P_F))):-
@@ -269,55 +262,38 @@ translate(Other, Other) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_rule(Head, Body, Fuzzy_Head, (Fuzzy_Body, Fuzzy_Operations)) :-
-	extract_credibility(Head, H, Op1, Credibility),
-	print_msg_nl('debug'),
-	print_msg('debug', 'trans_rule(H, Op1, Credibility, Body) ', (trans_rule(H, Op1, Credibility, Body))),
-	nonvar(H), nonvar(Credibility), nonvar(Body),
+translate_rule(Head, Cred_Op, Cred, Body, (Fuzzy_Head :- Fuzzy_Body)) :-
+	print_msg('debug', 'translate_rule(Head, Cred_Op, Cred, Body) ', (translate_rule(Head, Cred_Op, Cred, Body))),
+	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
 
 	% Change head's name.
-	translate_functor(H, 'rule', Fuzzy_Head, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(Head, 'rule', Fuzzy_Head, Fuzzy_Args),
+	get_truth_value_arg(Fuzzy_Args, Truth_Value),
 
 	% Translate all predicates in the body.
-	extract_op2(Body, Op2, Tmp_Body),
+	extract_aggregator(Body, TV_Aggregator, Tmp_Body),
 
-	print_msg('debug', 'add_auxiliar_parameters(Tmp_Body)',Tmp_Body),
-	add_auxiliar_parameters(Tmp_Body, Fuzzy_Body, [], Fuzzy_Vars_1, [], Fuzzy_Vars_2),
-
-	% Add the capability to compute the rule's truth value.
-	retrieve_aggregator_info(Op1, Operator_1),
-	retrieve_aggregator_info(Op2, Operator_2),
-	Fuzzy_Operations = (
-			       inject(Fuzzy_Vars_1,  Operator_2, Aggregated_V),
-			       Mu .>=. 0, Mu .=<. 1,
-			       inject([Aggregated_V, Credibility], Operator_1, Fuzzy_Arg_1),
-			       Fuzzy_Arg_1  .>=. 0, Fuzzy_Arg_1  .=<. 1,
-			       inject(Fuzzy_Vars_2, 'mean', Fuzzy_Arg_2)
-	      ).
+	print_msg('debug', 'translate_rule_body(Tmp_Body)',Tmp_Body),
+	translate_rule_body(Tmp_Body, TV_Aggregator, Truth_Value, Fuzzy_Body).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_aggregator(Aggregator_Name, 3) :-
-        retract_fact(aggregators(List)), !,
-	assertz_fact(aggregators([Aggregator_Name|List])).
-save_aggregator(Aggregator_Name, 3) :-
-	assertz_fact(aggregators([Aggregator_Name])).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-% extract credibility
-extract_credibility((H cred (Op, D)), H, Op, D) :- !.
-extract_credibility(H, H, 'prod', 1) :- !.
-
-extract_op2(Body, Op2, Tmp_Body) :-
-	functor(Body, Op2, 1),
-	arg(1, Body, Tmp_Body).
-extract_op2(Body, _Op2, 'fail') :-
-	print_msg('debug', 'Cannot understand syntax for', (Body)).	
+extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
+	nonvar(Body),
+	functor(Body, Aggregator_Op, 1),
+	nonvar(Aggregator_Op),
+	defined_aggregators(Aggregators),
+	memberchk(Aggregator_Op, Aggregators),
+	arg(1, Body, Tmp_Body), !.
+extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
+	nonvar(Body),
+	functor(Body, Aggregator_Op, _Unknown_Arity),
+	nonvar(Aggregator_Op),
+	retrieve_predicate_info('crisp', Aggregator_Op, 3, _Fuzzy_Name, _Fuzzy_Arity),
+	arg(1, Body, Tmp_Body), !.
+extract_aggregator(Body, 'null', Body) :- !.
 
 retrieve_aggregator_info(Op, Operator) :-
 %	faggr(Op1, _IAny,  Operator, _FAny),
@@ -336,49 +312,43 @@ retrieve_aggregator_info(Op, 'id') :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Out, Vars_2_In, Vars_2_Out) :-
-	functor(Body, ',', 2), !,
-	arg(1, Body, Body_1),
-	arg(2, Body, Body_2),
-	add_auxiliar_parameters(Body_1, Fuzzy_Body_1, Vars_1_In, Vars_1_Tmp, Vars_2_In, Vars_2_Tmp),
-	add_auxiliar_parameters(Body_2, Fuzzy_Body_2, Vars_1_Tmp, Vars_1_Out, Vars_2_Tmp, Vars_2_Out).
+translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,
+	translate_rule_body(Tmp_Body_1, TV_Aggregator, TV_1, FB_1),
+	translate_rule_body(Tmp_Body_2, TV_Aggregator, TV_2, FB_2),
+	functor(Aggr_F, TV_Aggregator, 3),
+	arg(1, Aggr_F, TV_1), 
+	arg(2, Aggr_F, TV_2), 
+	arg(3, Aggr_F, Truth_Value), !.
 
-% add_auxiliar_parameters(H, Argument, Ret_Cls)
-add_auxiliar_parameters(Body, Fuzzy_Body, Vars_1, [V|Vars_1], Vars_2, [C|Vars_2]) :-
-	functor(Body, Body_Name, Arity),
-	retrieve_predicate_info('crisp', Body_Name, Arity, Fuzzy_Body_Name, _Fuzzy_Arity), !,
-	V_Arity is Arity +1,
-	C_Arity is Arity +2,
-	functor(Fuzzy_Body, Fuzzy_Body_Name, C_Arity),
-	copy_args(Arity, Fuzzy_Body, Body),
-	arg(V_Arity, Fuzzy_Body, V),
-	arg(C_Arity, Fuzzy_Body, C).
-
-add_auxiliar_parameters(Body, Body, Vars_1, Vars_1, Vars_2, Vars_2) :-
-	print_msg('debug', 'ERROR: add_auxiliar_parameters(Body, Cls, Vars) ', (add_auxiliar_parameters(Body,
-	Vars_1, Vars_2))),
-	!, fail.
+% translate_rule_body(H, Argument, Ret_Cls)
+translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
+	functor(Body_F, Pred_Name, Pred_Arity),
+	retrieve_predicate_info('defined', Pred_Name, Pred_Arity, Fuzzy_Pred_Name, Fuzzy_Pred_Arity), !,
+	functor(Fuzzy_F, Fuzzy_Pred_Name, Fuzzy_Pred_Arity),
+	copy_args(Pred_Arity, Fuzzy_F, Body_F),
+	Fuzzy_F=..[ Fuzzy_Pred_Name | Args ],
+	get_truth_value_arg(Args, Truth_Value).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_each_type(H, Arity, Actual, [Type/1], Type_F) :-
-	print_msg('debug', 'trans_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
+translate_each_type(H, Arity, Actual, [Type/1], Type_F) :-
+	print_msg('debug', 'translate_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
 	Actual = Arity, !, % Security conditions.
-	trans_each_type_aux(H, Actual, Type, Type_F),
+	translate_each_type_aux(H, Actual, Type, Type_F),
 	!. % Backtracking not allowed.
 
-trans_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
+translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
 	Actual < Arity, !,  % Security conditions.
-	print_msg('debug', 'trans_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
-	trans_each_type_aux(H, Actual, Type, Type_F),
+	print_msg('debug', 'translate_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
+	translate_each_type_aux(H, Actual, Type, Type_F),
 	NewActual is Actual + 1, % Next values.
 	!,
-	trans_each_type(H, Arity, NewActual, More, More_F),
+	translate_each_type(H, Arity, NewActual, More, More_F),
 	!. % Backtracking not allowed here.
 
-trans_each_type_aux(H, Actual, Type, Type_F) :-
+translate_each_type_aux(H, Actual, Type, Type_F) :-
 
 	functor(Type_F, Type, 1), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
