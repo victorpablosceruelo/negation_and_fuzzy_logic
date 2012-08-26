@@ -88,17 +88,6 @@ rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
 rfuzzy_trans_sent_aux(Sentence, Translation) :-
 	translate(Sentence, Translation).
 
-
-% Deprecated syntax (we just warn about it).
-%deprecated_syntax((:- default(_Name/_Arity,_X))) :-
-%	print_msg('warning', 'deprecated syntax', ':- default(Name/Arity,X)'), !.
-% deprecated_syntax((:- default(_Name/_Arity,_X) => _H_Cond_Name/_Arity)) :-
-%	print_msg('warning', 'deprecated syntax', '(:- default(Name/Arity,X) => H_Cond_Name/Arity)'), !.
-%deprecated_syntax((:- set_prop _Name/_Arity => _Properties_Decl)) :-
-%	print_msg('warning', 'deprecated syntax', '(:- set_prop Name/Arity => Properties_Decl)'), !.
-%deprecated_syntax((:- aggr _Whatever)) :-
-%	print_msg('warning', 'deprecated syntax', '(:- aggr Whatever)'), !.
-
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -157,12 +146,12 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pr
 	(
 	    (
 		Cond = 'over',
-		functor(H_Pred3, '.>.', [Truth_Value_For_Thershold, Thershold_Value), 
+		functor(H_Pred3, '.>.', [Truth_Value_For_Thershold, Thershold_Value]) 
 	    )
 	;
 	    (
 		Cond = 'under',
-		functor(H_Pred3, '.<.', [Truth_Value_For_Thershold, Thershold_Value),
+		functor(H_Pred3, '.<.', [Truth_Value_For_Thershold, Thershold_Value])
 	    )
 	), !.
 
@@ -233,16 +222,25 @@ translate((Head :~ Body), (Fuzzy_H :- Fuzzy_Body)):-
 	).
 
 % fuzzification:
-translate(rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Func_P_Arity), (Fuzzy_H :- Fuzzy_Body)):-
+translate(rfuzzy_define_fuzzification(Pred/2, Crisp_P/2, Funct_P/2), (Fuzzy_H :- (Crisp_P_F, Funct_P_F))):-
 	!, % If patter matching, backtracking forbiden.
-	(
-	    trans_fuzzification(Pred, Arity, Crisp_P, Crisp_P_Arity, Funct_P, Func_P_Arity, Fuzzy_H, Fuzzy_Body)
-	;
-	    (
-		print_msg('error', 'Syntax Error in', rfuzzy_define_fuzzification(Pred/Arity, Crisp_P/Crisp_P_Arity, Funct_P/Func_P_Arity)),
-		!, fail
-	    )
-	).
+	test_predicate_has_been_defined('crisp', Crisp_P, 2),
+	test_predicate_has_been_defined('function', Funct_P, 2),
+	functor(Pred_F, Pred, 1),
+	translate_functor(Pred_F, 'fuzzification', Fuzzy_H, Fuzzy_Args),
+
+	% We need to do here as in other translations, so 
+	% it generates aux and main predicates for fuzzifications too.
+	functor(Crisp_P_F, Crisp_P, 2),
+	functor(Funct_P_F, Funct_P, 2),
+
+	arg(1, Fuzzy_H, Input),
+	arg(1, Crisp_P_F, Input),
+	arg(2, Crisp_P_F, Crisp_Value),
+	arg(1, Auxiliar_Funct_P_F, Crisp_Value),
+	arg(2, Auxiliar_Funct_P_F, Truth_Value),
+	get_truth_value_arg(Fuzzy_Args, Truth_Value),
+	!.
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
@@ -348,7 +346,7 @@ add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Ou
 % add_auxiliar_parameters(H, Argument, Ret_Cls)
 add_auxiliar_parameters(Body, Fuzzy_Body, Vars_1, [V|Vars_1], Vars_2, [C|Vars_2]) :-
 	functor(Body, Body_Name, Arity),
-	retrieve_predicate_info('crisp', Body_Name, Arity, Body_Name, _Fuzzy_Arity), !.
+	retrieve_predicate_info('crisp', Body_Name, Arity, Fuzzy_Body_Name, _Fuzzy_Arity), !,
 	V_Arity is Arity +1,
 	C_Arity is Arity +2,
 	functor(Fuzzy_Body, Fuzzy_Body_Name, C_Arity),
@@ -424,26 +422,6 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
-
-trans_fuzzification(Pred, 2, Crisp_P, 2, Funct_P, 2, Fuzzy_Pred_F, (Fuzzification_F :- )) :-
-
-	test_predicate_has_been_defined('crisp', Crisp_P, 2),
-	test_predicate_has_been_defined('function', Funct_P, 2),
-	functor(Pred_F, Pred, 1),
-	translate_functor(Pred_F, 'fuzzification', Fuzzification_F, Fuzzy_Args),
-
-	% We need to do here as in other translations, so 
-	% it generates aux and main predicates for fuzzifications too.
-	functor(Crisp_P_F, Crisp_P, 2),
-	functor(Funct_P_F, Funct_P, 2),
-
-	arg(1, Fuzzification_F, Input),
-	arg(1, Crisp_P_F, Input),
-	arg(2, Crisp_P_F, Crisp_Value),
-	arg(1, Auxiliar_Funct_P_F, Crisp_Value),
-	arg(2, Auxiliar_Funct_P_F, Truth_Value),
-	get_truth_value_arg(Fuzzy_Args, Truth_Value),
-	!.
 
 test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 	% retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)
@@ -556,13 +534,13 @@ translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority) :-
 % The truth value is almost always there, 
 % so it must be in last place.
 get_truth_value_arg([Truth_Value], Truth_Value) :- !.
-get_truth_value_arg([Head | Tail], Truth_Value) :-
+get_truth_value_arg([_Head | Tail], Truth_Value) :-
 	get_truth_value_arg(Tail, Truth_Value).
 
 % The priority value is not always there, but when 
 % it is there there is always a truth value.
 get_priority_arg([Priority, _Truth_Value], Priority) :- !.
-get_priority_arg([Head | Tail], Priority) :-
+get_priority_arg([_Head | Tail], Priority) :-
 	get_priority_arg(Tail, Priority).
 
 % ------------------------------------------------------
@@ -574,7 +552,7 @@ add_preffix_to_name(Input, Preffix, Output) :-
 	string(Preffix),
 	atom(Input),
 	atom_codes(Input, Input_Chars),
-	append_local(Real_Prefix, Input_Chars, Output_Chars),
+	append_local(Preffix, Input_Chars, Output_Chars),
 	atom_codes(Output, Output_Chars), 
 	atom(Output), !.
 %	print_msg('debug', 'add_preffix_to_name', add_preffix_to_name(Prefix, Input, Output)).
