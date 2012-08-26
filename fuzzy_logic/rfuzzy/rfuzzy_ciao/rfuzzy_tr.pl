@@ -15,6 +15,31 @@
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+% translation_info(To_What, Prefix, Add_Args, Fix_Priority, Priority)
+
+translation_info('type', "rfuzzy_type_", 2, 'no', 0).                  %---|
+translation_info('function', "rfuzzy_function_", 0 'no', 0).       %    |   This are just utils. 
+translation_info('auxiliar', "rfuzzy_aux_", 2, 'no', 0).               %    |
+translation_info('aggregator', "", 0, 'no', 0).                             %    |
+translation_info('quantifier', "", 1, 'noprio', 0).                         %    |   
+translation_info('defuzzification', "", 0, 'noprio', 0).                 %---|
+
+translation_info('sinonym', "rfuzzy_sinonym_", 2, 'no', 0).                  %---|   And this ones rely on the priority
+translation_info('antonym', "rfuzzy_antonym_", 2, 'no', 0).                  %---|   of the defined predicates.
+
+translation_info('default_without_cond', "rfuzzy_default_without_cond_", 2, 'yes', 0). % Lowest priority
+translation_info('default_with_cond', "rfuzzy_default_with_cond_", 2, 'yes', 0.25). 
+translation_info('rule', "rfuzzy_rule_", 2, 'yes', 0.5).
+translation_info('fuzzification', "rfuzzy_fuzzification_", 2, 'yes', 0.75).
+translation_info('fact', "rfuzzy_fact_", 2, 'yes', 1).
+
+translation_info('normal', "", 1, 'yes', 0).
+translation_info(_X, "rfuzzy_error_error_error_", 0, 'no', 0).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 rfuzzy_trans_clause(Arg1, Arg1, _Arg3) :- 
 	print_msg('debug', 'trans_fuzzy_clause: arg1', Arg1).
 
@@ -436,32 +461,11 @@ test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-kind_translation('type', "rfuzzy_type_", 0).                         %---|
-kind_translation('aggregator', "rfuzzy_error_", 0).             %    |
-kind_translation('function', "rfuzzy_function_", 0).             %    |   This are just utils. No priority.
-kind_translation('quantifier', "rfuzzy_error_", 0).                %    |
-kind_translation('auxiliar', "rfuzzy_aux_", 0).                      %---|
-
-kind_translation('sinonym', "rfuzzy_error_", 0).                  %---|   And this ones rely on the priority
-kind_translation('antonym', "rfuzzy_error_", 0).                  %---|   of the defined predicates.
-
-kind_translation('default_without_cond', "rfuzzy_default_without_cond_", 0). % Lowest priority
-kind_translation('default_with_cond', "rfuzzy_default_with_cond_", 0.25). 
-kind_translation('rule', "rfuzzy_rule_", 0.5).
-kind_translation('fuzzification', "rfuzzy_fuzzification_", 0.75).
-kind_translation('fact', "rfuzzy_fact_", 1).
-
-kind_translation(_X, "rfuzzy_error_error_error_", 0).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 predicate_definition_contents(predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity), 
 	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !.
 
 save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	kind_translation(Kind, _Anything, _Priority), !,
+	translation_info(Kind, _Anything, _Priority), !,
 	nonvar(Kind), !,
 	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	save_predicate_definition_aux(Pred_Info),
@@ -506,7 +510,7 @@ translate_functor(H, Preffix, Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2) :-
 
 change_name(Prefix, Input, Output) :-
 	atom(Input),
-	kind_translation(Prefix, Real_Prefix, _Priority),
+	translation_info(Prefix, Real_Prefix, _Priority),
 	atom_codes(Input, Input_Chars),
 	append_local(Real_Prefix, Input_Chars, Output_Chars),
 	atom_codes(Output, Output_Chars), 
@@ -581,14 +585,14 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	(Fuzzy_Cl_Aux = ( 
 			    ( 
 				Fuzzy_Pred_Aux :- ( 
+						      Fuzzy_Pred_Types,
 						      (   Fuzzy_Pred_Fact ; 
 							  Fuzzy_Pred_Function ;
 							  Fuzzy_Pred_Fuzzification ;
 							  Fuzzy_Pred_Rule ;
 							  Fuzzy_Pred_Default_With_Cond ; 
 							  Fuzzy_Pred_Default_Without_Cond
-						      ),
-						      Fuzzy_Pred_Types
+						      )
 						  )
 			    )
 			)
