@@ -18,7 +18,7 @@
 % translation_info(To_What, Prefix, Add_Args, Fix_Priority, Priority)
 
 translation_info('type', "rfuzzy_type_", 2, 'no', 0).                  %---|
-translation_info('function', "rfuzzy_function_", 0 'no', 0).       %    |   This are just utils. 
+translation_info('function', "rfuzzy_function_", 0, 'no', 0).       %    |   This are just utils. 
 translation_info('auxiliar', "rfuzzy_aux_", 2, 'no', 0).               %    |
 translation_info('aggregator', "", 0, 'no', 0).                             %    |
 translation_info('quantifier', "", 1, 'noprio', 0).                         %    |   
@@ -138,28 +138,33 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/P
 	functor(H_Cond, Pred2_Name, Pred2_Arity),
 	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
 
-translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Value)), (Fuzzy_H :- H_Cond)) :-
-%	functor(Conditioned_Default, 'if', 2), 
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value)), (H_Pred :- H_Pred2, H_Pred3)) :-
 	print_msg('debug', 'translate', 'if thershold detected'),
-%	Conditioned_
-	
 	!, % If patter matching, backtracking forbiden.
 	Pred_Arity = Pred2_Arity,
-	number(Value), % Value must be a number.
-	number(Pred_Arity), % Pred_Arity must be a number.
-	number(Pred2_Arity), % Pred2_Arity must be a number.
-	nonvar(Pred_Name), % Pred_Name cannot be a variable.
-	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
+	number(Value), number(Pred_Arity), number(Pred2_Arity), % They must be numbers.
+	nonvar(Pred_Name), nonvar(Pred2_Name), % They cannot be variables.
 	
-	functor(H, Pred_Name, Pred_Arity),
-	translate_functor(H, 'default_with_cond', Fuzzy_H, Fuzzy_Arg_1, Fuzzy_Arg_2),
-	Fuzzy_Arg_1 is Value, 
-	Fuzzy_Arg_2 is 0,
-	
-	functor(H_Cond, Pred2_Name, Pred2_Arity),
-	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
+	functor(H_Pred_Tmp, Pred_Name, Pred_Arity),
+	translate_functor(H, 'default_with_cond', H_Pred, H_Fuzzy_Args1),
+	get_truth_value_arg(H_Fuzzy_Args1, Value),
 
+	functor(H_Pred2_Tmp, Pred2_Name, Pred2_Arity),
+	copy_args(Pred2_Arity, H_Pred_Tmp, H_Pred2_Tmp),
 
+	translate_functor(H, 'normal', H_Pred2, H_Fuzzy_Args2),
+	get_truth_value_arg(H_Fuzzy_Args2, Truth_Value_For_Thershold),
+	(
+	    (
+		Cond = 'over',
+		functor(H_Pred3, '.>.', [Truth_Value_For_Thershold, Thershold_Value), 
+	    )
+	;
+	    (
+		Cond = 'under',
+		functor(H_Pred3, '.<.', [Truth_Value_For_Thershold, Thershold_Value),
+	    )
+	), !.
 
 % Fuzzy facts.
 translate((Head value X), Fuzzy_Head):-
@@ -548,11 +553,15 @@ translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-get_truth_value_arg([Truth_Value, _Priority], Truth_Value) :- !.
+% The truth value is almost always there, 
+% so it must be in last place.
+get_truth_value_arg([Truth_Value], Truth_Value) :- !.
 get_truth_value_arg([Head | Tail], Truth_Value) :-
 	get_truth_value_arg(Tail, Truth_Value).
 
-get_priority_arg([Priority], Priority) :- !.
+% The priority value is not always there, but when 
+% it is there there is always a truth value.
+get_priority_arg([Priority, _Truth_Value], Priority) :- !.
 get_priority_arg([Head | Tail], Priority) :-
 	get_priority_arg(Tail, Priority).
 
