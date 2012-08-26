@@ -329,6 +329,9 @@ retrieve_aggregator_info(Op, Op) :-
 retrieve_aggregator_info(Op, 'id') :-
 	print_msg('error', 'retrieve_aggregator_info :: not a valid agregator operator :: ', Op).
 
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 
 add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Out, Vars_2_In, Vars_2_Out) :-
 	functor(Body, ',', 2), !,
@@ -340,7 +343,7 @@ add_auxiliar_parameters(Body, (Fuzzy_Body_1, Fuzzy_Body_2), Vars_1_In, Vars_1_Ou
 % add_auxiliar_parameters(H, Argument, Ret_Cls)
 add_auxiliar_parameters(Body, Fuzzy_Body, Vars_1, [V|Vars_1], Vars_2, [C|Vars_2]) :-
 	functor(Body, Body_Name, Arity),
-	real_name_and_arity(Body_Name, Arity, Fuzzy_Body_Name),
+	retrieve_predicate_info('crisp', Body_Name, Arity, Body_Name, _Fuzzy_Arity), !.
 	V_Arity is Arity +1,
 	C_Arity is Arity +2,
 	functor(Fuzzy_Body, Fuzzy_Body_Name, C_Arity),
@@ -352,12 +355,6 @@ add_auxiliar_parameters(Body, Body, Vars_1, Vars_1, Vars_2, Vars_2) :-
 	print_msg('debug', 'ERROR: add_auxiliar_parameters(Body, Cls, Vars) ', (add_auxiliar_parameters(Body,
 	Vars_1, Vars_2))),
 	!, fail.
-
-real_name_and_arity(Body_Name, Arity, Body_Name) :-
-	retrieve_predicate_info('crisp', Body_Name, Arity, Body_Name, _Fuzzy_Arity), !.
-
-real_name_and_arity(Body_Name, _Arity, Fuzzy_Body_Name) :-
-	change_name('auxiliar', Body_Name, Fuzzy_Body_Name).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -423,26 +420,24 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-trans_fuzzification(Pred, 2, Crisp_P, 2, Funct_P, 2, Fuzzy_Pred_F, (Crisp_P_F, Auxiliar_Funct_P_F)) :-
+trans_fuzzification(Pred, 2, Crisp_P, 2, Funct_P, 2, Fuzzy_Pred_F, (Fuzzification_F :- )) :-
 
 	test_predicate_has_been_defined('crisp', Crisp_P, 2),
-	test_predicate_has_been_defined('function', Funct_P, 3), % Here arity is 3
+	test_predicate_has_been_defined('function', Funct_P, 2),
 	functor(Pred_F, Pred, 1),
-	translate_functor(Pred_F, 'fuzzification', Fuzzy_Pred_F, Fuzzy_Arg_1, Fuzzy_Arg_2),
+	translate_functor(Pred_F, 'fuzzification', Fuzzification_F, Fuzzy_Args),
 
 	% We need to do here as in other translations, so 
 	% it generates aux and main predicates for fuzzifications too.
 	functor(Crisp_P_F, Crisp_P, 2),
-	change_name('auxiliar', Funct_P, Auxiliar_Funct_P),
-	functor(Auxiliar_Funct_P_F, Auxiliar_Funct_P, 3),
+	functor(Funct_P_F, Funct_P, 2),
 
-	arg(1, Fuzzy_Pred_F, Input),
+	arg(1, Fuzzification_F, Input),
 	arg(1, Crisp_P_F, Input),
 	arg(2, Crisp_P_F, Crisp_Value),
 	arg(1, Auxiliar_Funct_P_F, Crisp_Value),
-	arg(2, Auxiliar_Funct_P_F, Fuzzy_Arg_1),
-	arg(3, Auxiliar_Funct_P_F, Fuzzy_Arg_2),
-
+	arg(2, Auxiliar_Funct_P_F, Truth_Value),
+	get_truth_value_arg(Fuzzy_Args, Truth_Value),
 	!.
 
 test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
@@ -588,19 +583,6 @@ build_auxiliary_clauses([Def_Pred|Def_Preds], [Pred_Main, Pred_Aux | Clauses]) :
 	print_msg('debug', 'build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux)', (Def_Pred, Pred_Main, Pred_Aux)),
 	build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux),
 	build_auxiliary_clauses(Def_Preds, Clauses).
-
-% For crisp predicates we only generate Aux :- Crisp.
-build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
-	retrieve_predicate_info('crisp', Name, Arity, Name, Arity), !, 
-
-	change_name('auxiliar', Name, Fuzzy_Pred_Aux_Name),
-	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Arity),
-        functor(Pred_Main, Name, Arity),
-	copy_args(Arity, Pred_Main, Fuzzy_Pred_Aux),
-
-	Fuzzy_Cl_Main = (Fuzzy_Pred_Aux :- Pred_Main),
-	Fuzzy_Cl_Aux = (Fuzzy_Pred_Aux :- fail).
 
 build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
