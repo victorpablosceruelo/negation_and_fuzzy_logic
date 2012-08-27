@@ -15,7 +15,7 @@
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% translation_info(To_What, Prefix, Add_Args, Fix_Priority, Priority)
+% translation_info(To_What, Preffix_String, Add_Args, Fix_Priority, Priority)
 
 translation_info('type', "rfuzzy_type_", 2, 'no', 0).                  %---|
 translation_info('function', "rfuzzy_function_", 0, 'no', 0).       %    |   This are just utils. 
@@ -164,9 +164,10 @@ translate((Head value Value), Fuzzy_Head):-
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
-translate((rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), []) :-
-	!,
-	save_aggregator(Aggregator_Name, Aggregator_Arity), !.
+% Not needed: aggregators are just crisp predicates of arity 3.
+%translate((rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), []) :-
+%	!,
+%	save_aggregator(Aggregator_Name, Aggregator_Arity), !.
 
 % function definition.
 translate((Head :# List), (Fuzzy_H :- Body)) :-
@@ -285,7 +286,7 @@ extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
 	functor(Body, Aggregator_Op, 1),
 	nonvar(Aggregator_Op),
 	defined_aggregators(Aggregators),
-	memberchk(Aggregator_Op, Aggregators),
+	memberchk_local(Aggregator_Op, Aggregators),
 	arg(1, Body, Tmp_Body), !.
 extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
 	nonvar(Body),
@@ -295,18 +296,18 @@ extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
 	arg(1, Body, Tmp_Body), !.
 extract_aggregator(Body, 'null', Body) :- !.
 
-retrieve_aggregator_info(Op, Operator) :-
+%retrieve_aggregator_info(Op, Operator) :-
 %	faggr(Op1, _IAny,  Operator, _FAny),
-	nonvar(Op),
-	aggregators(Aggregators),
-	print_msg('debug', 'retrieve_aggregator_info :: Op', Op),
-	print_msg('debug', 'retrieve_aggregator_info :: Aggregators', Aggregators),
-	member(faggr(Op, _IAny,  Operator, _FAny), Aggregators), !.
-retrieve_aggregator_info(Op, Op) :-
-	rfuzzy_rt:defined_aggregators(Aggregators), !,
-	member(Op, Aggregators).
-retrieve_aggregator_info(Op, 'id') :-
-	print_msg('error', 'retrieve_aggregator_info :: not a valid agregator operator :: ', Op).
+%	nonvar(Op),
+%	aggregators(Aggregators),
+%	print_msg('debug', 'retrieve_aggregator_info :: Op', Op),
+%	print_msg('debug', 'retrieve_aggregator_info :: Aggregators', Aggregators),
+%	member(faggr(Op, _IAny,  Operator, _FAny), Aggregators), !.
+%retrieve_aggregator_info(Op, Op) :-
+%	rfuzzy_rt:defined_aggregators(Aggregators), !,
+%	member(Op, Aggregators).
+%retrieve_aggregator_info(Op, 'id') :-
+%	print_msg('error', 'retrieve_aggregator_info :: not a valid agregator operator :: ', Op).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -413,7 +414,8 @@ predicate_definition_contents(predicate_definition(Kind, Name, Arity, Fuzzy_Name
 	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !.
 
 save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	translation_info(Kind, _Anything, _Priority), !,
+	% translation_info(To_What, Preffix_String, Add_Args, Fix_Priority, Priority)
+	translation_info(Kind, _Preffix_String, _Add_Args, _Fix_Priority, _Priority), !,
 	nonvar(Kind), !,
 	predicate_definition_contents(Pred_Info, Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	save_predicate_definition_aux(Pred_Info),
@@ -531,6 +533,10 @@ append_local([], N2, N2).
 append_local([Elto|N1], N2, [Elto|Res]) :-
 	append_local(N1, N2, Res).
 
+memberchk_local(Element, [Element | _Tail]) :- !.
+memberchk_local(Element, [_Head | Tail]) :- !,
+	memberchk_local(Element, Tail).
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -549,7 +555,7 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 	Aux_Pred_Fuzzy_Arity is Arity +2,
 	functor(Fuzzy_Pred_Main, Name, Main_Pred_Fuzzy_Arity),
 
-	change_name('auxiliar', Name, Fuzzy_Pred_Aux_Name),
+	add_preffix_to_name(Name, 'auxiliar', Fuzzy_Pred_Aux_Name),
 	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Aux_Pred_Fuzzy_Arity),
 	copy_args(Arity, Fuzzy_Pred_Main, Fuzzy_Pred_Aux),
 	
