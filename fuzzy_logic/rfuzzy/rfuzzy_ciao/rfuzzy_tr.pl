@@ -192,7 +192,6 @@ translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 		number(Pred_Arity), % A must be a number.
 		nonvar(Pred_Name), % Can not be a variable.
 		nonvar(Types),
-		list(Types),
 		
 		functor(H, Pred_Name, Pred_Arity),
 		translate_functor(H, 'type', Fuzzy_H, _Fuzzy_Args),
@@ -335,14 +334,14 @@ translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value 
 % ------------------------------------------------------
 
 translate_each_type(H, Arity, Actual, [Type/1], Type_F) :-
-	print_msg('debug', 'translate_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
+	print_msg('debug', 'translate_each_type(H, Arity, Actual, Type)', (H, Arity, Actual, Type) ),
 	Actual = Arity, !, % Security conditions.
 	translate_each_type_aux(H, Actual, Type, Type_F),
 	!. % Backtracking not allowed.
 
 translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
+	print_msg('debug', 'translate_each_type(H, Arity, Actual, Type)', (H, Arity, Actual, Type) ),
 	Actual < Arity, !,  % Security conditions.
-	print_msg('debug', 'translate_each_type(H, Arity, Actual)', (H, Arity, Actual) ),
 	translate_each_type_aux(H, Actual, Type, Type_F),
 	NewActual is Actual + 1, % Next values.
 	!,
@@ -350,7 +349,7 @@ translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
 	!. % Backtracking not allowed here.
 
 translate_each_type_aux(H, Actual, Type, Type_F) :-
-
+	print_msg('debug', 'translate_each_type_aux(H, Actual, Type)', translate_each_type_aux(H, Actual, Type)),
 	functor(Type_F, Type, 1), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
@@ -414,6 +413,7 @@ predicate_definition_contents(predicate_definition(Kind, Name, Arity, Fuzzy_Name
 	Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :- !.
 
 save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
+	print_msg('debug', 'save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)', save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)),
 	% translation_info(To_What, Preffix_String, Add_Args, Fix_Priority, Priority)
 	translation_info(Kind, _Preffix_String, _Add_Args, _Fix_Priority, _Priority), !,
 	nonvar(Kind), !,
@@ -421,7 +421,8 @@ save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 	save_predicate_definition_aux(Pred_Info),
 	% Now keep a list without repetitions of defined predicates.
 	predicate_definition_contents(Pred_Info2, 'defined', Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-	save_predicate_definition_aux(Pred_Info2).
+	save_predicate_definition_aux(Pred_Info2), 
+	print_msg('debug', 'saved', save_predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)).
 
 save_predicate_definition_aux(Pred_Info) :-
 	retract_fact(Pred_Info), !, % Retract last
@@ -448,16 +449,18 @@ retrieve_list_of_defined_predicates(Retrieved) :-
 % ------------------------------------------------------
 
 translate_functor(H, Preffix_Term, Fuzzy_H, Fuzzy_Args) :-
+	print_msg('debug', 'translate_functor(H, Preffix_Term)', translate_functor(H, Preffix_Term)),
 	functor(H, Name, Arity),
-	translation_info(Preffix_Term, Prefix_String, Add_Args, Fix_Priority, Priority),
+	translation_info(Preffix_Term, Preffix_String, Add_Args, Fix_Priority, Priority),
 	number(Add_Args),
 	Fuzzy_Arity is Arity + Add_Args, % Fuzzy Args.
-	add_preffix_to_name(Name, Prefix_String, Fuzzy_Name), % Change name
+	add_preffix_to_name(Name, Preffix_String, Fuzzy_Name), % Change name
 	save_predicate_definition(Preffix_Term, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity),
 	copy_args(Arity, Fuzzy_H, H), !,
 	translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args),
-	translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority).
+	translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority),
+	print_msg('debug', 'translate_functor(Fuzzy_H, Fuzzy_Args)', translate_functor(Fuzzy_H, Fuzzy_Args)).
 
 translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args) :-
 	number(Add_Args),
