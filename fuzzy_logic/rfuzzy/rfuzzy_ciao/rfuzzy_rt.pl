@@ -14,34 +14,34 @@
 % ---------------------------------------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
 
-% REMOVED: preinject/3,postinject/4, id/2, id/3, 
+% REMOVED: preinject/3,postinject/4, id/2, id/3, id (in defined_aggregators), 
 
-defined_aggregators([id, min, max, luka, dluka, prod, iprod, dprod, complement, mean]).
-
-mean(X, Y, Z) :- Z .=. (X + Y) / 2.
-complement(X, C, Z) :-
-	Temp1 .=. C - X,
-	min(1, Temp1, Temp2),
-	max(0, Temp2, Z).
+defined_aggregators([min, max, prod, iprod, dprod, luka, dluka, complement, mean]).
 
 min(X,Y,Z):- X .=<. Y, X .=. Z .
 min(X,Y,Z):- X .>. Y, Y .=. Z .
 
+max(X,Y,Z):- X .>=. Y, X .=. Z .
+max(X,Y,Z):- Y .>. X, Y .=. Z .
+
 prod(X,Y,M):- M .=. X * Y.
 iprod(X,Y,M):- M .=. 1 - (X * Y).
+dprod(X,Y,M):- M .=. X + Y - (X * Y).
 
 luka(X,Y,M):- 
 	Temp .=. X + Y  - 1, 
 	max(0, Temp, M).
 
-max(X,Y,Z):- X .>=. Y, X .=. Z .
-max(X,Y,Z):- Y .>. X, Y .=. Z .
-
-dprod(X,Y,M):- M .=. X + Y - (X * Y).
-
 dluka(X,Y,M):- 
 	Temp .=. X + Y,
 	min(1, Temp, M).
+
+complement(X, C, Z) :-
+	Temp1 .=. C - X,
+	min(1, Temp1, Temp2),
+	max(0, Temp2, Z).
+
+mean(X, Y, Z) :- Z .=. (X + Y) / 2.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
