@@ -215,9 +215,9 @@ print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, Msg2) :- !,
 % Predicate that really prints.
 print_msg_real(Pre_Msg1, Msg1,  Msg1_Info, Msg2) :-
 	write(Pre_Msg1), 
-	write('['), write(Msg1), 
+	write(Msg1), 
 	print_msg1_info(Msg1_Info),
-	write(']: '),  write(Msg2),
+	write(':  '),  write(Msg2),
 	write('    ').
 
 % Print msg1 Info (in reverse order to show the structure).
