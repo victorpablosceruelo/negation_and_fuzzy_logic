@@ -198,7 +198,7 @@ translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 		translate_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
 	    )
 	;
-	    print_msg('error', 'translate_types :: Syntax Error in', rfuzzy_type_for(Pred_Name/Pred_Arity, Types))
+	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for(Pred_Name/Pred_Arity, Types))
 	),
 	!. % Backtracking forbidden.
 
@@ -273,7 +273,6 @@ translate_rule(Head, Cred_Op, Cred, Body, (Fuzzy_Head :- Fuzzy_Body)) :-
 	% Translate all predicates in the body.
 	extract_aggregator(Body, TV_Aggregator, Tmp_Body),
 
-	print_msg('debug', 'translate_rule_body(Tmp_Body)',Tmp_Body),
 	translate_rule_body(Tmp_Body, TV_Aggregator, Truth_Value, Fuzzy_Body).
 
 % ------------------------------------------------------
@@ -313,6 +312,7 @@ extract_aggregator(Body, 'null', Body) :- !.
 % ------------------------------------------------------
 
 translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,
+	print_msg('debug', 'translate_rule_body(Body, TV_Aggregator, Truth_Value)',((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value)),
 	translate_rule_body(Tmp_Body_1, TV_Aggregator, TV_1, FB_1),
 	translate_rule_body(Tmp_Body_2, TV_Aggregator, TV_2, FB_2),
 	functor(Aggr_F, TV_Aggregator, 3),
@@ -322,8 +322,13 @@ translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1,
 
 % translate_rule_body(H, Argument, Ret_Cls)
 translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
+	print_msg('debug', 'translate_rule_body(Body, TV_Aggregator, Truth_Value)',(Body_F, Truth_Value)),
 	functor(Body_F, Pred_Name, Pred_Arity),
-	retrieve_predicate_info('defined', Pred_Name, Pred_Arity, Fuzzy_Pred_Name, Fuzzy_Pred_Arity), !,
+	(
+	    (   retrieve_predicate_info('defined', Pred_Name, Pred_Arity, Fuzzy_Pred_Name, Fuzzy_Pred_Arity), !   )
+	;
+	    (   print_msg('error', 'Predicate must be defined before use. Predicate name', Pred_Name), !, fail   )
+	),
 	functor(Fuzzy_F, Fuzzy_Pred_Name, Fuzzy_Pred_Arity),
 	copy_args(Pred_Arity, Fuzzy_F, Body_F),
 	Fuzzy_F=..[ Fuzzy_Pred_Name | Args ],
@@ -350,6 +355,7 @@ translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
 
 translate_each_type_aux(H, Actual, Type, Type_F) :-
 	print_msg('debug', 'translate_each_type_aux(H, Actual, Type)', translate_each_type_aux(H, Actual, Type)),
+	retrieve_predicate_info('defined', Type, 1, Type, 1), !,	
 	functor(Type_F, Type, 1), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
@@ -393,18 +399,6 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
-	% retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity)
-	retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity), 
-	% predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
-	!.
-test_predicate_has_been_defined(Kind, Name, FuzzyArity) :-
-	print_msg('info', 'fuzzify: Cannot find predicate defined by (Kind, Name, FuzzyArity) :: ', (Kind, Name, FuzzyArity)),
-	retrieve_predicate_info(Kind_A, Name_A, Arity_A, _FuzzyName_A, FuzzyArity_A), 
-	print_msg('debug', 'retrieve_predicate_info(Kind, Name, _Arity, _FuzzyName, FuzzyArity)', 
-	retrieve_predicate_info(Kind_A, Name_A, Arity_A, _FuzzyName_A, FuzzyArity_A)), 
-	fail, !.
-
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -430,8 +424,19 @@ save_predicate_definition_aux(Pred_Info) :-
 save_predicate_definition_aux(Pred_Info) :-
 	assertz_fact(Pred_Info).
 
-retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-	predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity).
+retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity, Show_Error) :-
+	(
+	    (   
+		predicate_definition(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity), !   
+	    )
+	;
+	    (  
+		nonvar(Show_Error),
+		Show_Error = 'true', 
+		print_msg('error', 'Predicate must be defined before use. Predicate ', Name/Arity), !, 
+		fail
+	    )
+	).
 
 retrieve_list_of_defined_predicates(Retrieved) :-
 	Kind = 'defined',
@@ -458,11 +463,14 @@ translate_functor(H, Preffix_Term, Fuzzy_H, Fuzzy_Args) :-
 	save_predicate_definition(Preffix_Term, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 	functor(Fuzzy_H, Fuzzy_Name, Fuzzy_Arity),
 	copy_args(Arity, Fuzzy_H, H), !,
+	print_msg('debug', 'translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args)', (Fuzzy_H, Fuzzy_Arity, Add_Args)),
 	translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args),
+	print_msg('debug', 'translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority)', (Add_Args, Fuzzy_Args, Fix_Priority)),
 	translate_functor_aux_2(Add_Args, Fuzzy_Args, Fix_Priority, Priority),
 	print_msg('debug', 'translate_functor(Fuzzy_H, Fuzzy_Args)', translate_functor(Fuzzy_H, Fuzzy_Args)).
 
 translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args) :-
+	print_msg('debug', 'translate_functor_1(Fuzzy_H, Fuzzy_Arity, Add_Args)', (Fuzzy_H, Fuzzy_Arity, Add_Args)),
 	number(Add_Args),
 	(
 	    (
@@ -478,7 +486,8 @@ translate_functor_aux_1(Fuzzy_H, Fuzzy_Arity, Add_Args, Fuzzy_Args) :-
 	;
 	    (
 		Add_Args = 2,
-		Fuzzy_Arity_Aux = Fuzzy_Arity - 1,
+		Fuzzy_Arity_Aux is Fuzzy_Arity - 1,
+		% print_msg('debug', 'translate_functor_1 :: Fuzzy_Arity_Aux', Fuzzy_Arity_Aux),
 		arg(Fuzzy_Arity_Aux, Fuzzy_H, Fuzzy_Arg1),
 		arg(Fuzzy_Arity, Fuzzy_H, Fuzzy_Arg2),
 		Fuzzy_Args = [Fuzzy_Arg1, Fuzzy_Arg2], !
