@@ -126,30 +126,33 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/P
 	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
 
 translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value)), (H_Pred :- H_Pred2, H_Pred3)) :-
-	print_msg('debug', 'translate', 'if thershold detected'),
+	print_msg('debug', 'translate :: (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value))', (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value))),
 	!, % If patter matching, backtracking forbiden.
 	Pred_Arity = Pred2_Arity,
 	number(Value), number(Pred_Arity), number(Pred2_Arity), % They must be numbers.
 	nonvar(Pred_Name), nonvar(Pred2_Name), % They cannot be variables.
 	
 	functor(H_Pred_Tmp, Pred_Name, Pred_Arity),
-	translate_functor(H, 'default_with_cond', H_Pred, H_Fuzzy_Args1),
+	translate_functor(H_Pred_Tmp, 'default_with_cond', H_Pred, H_Fuzzy_Args1),
 	get_truth_value_arg(H_Fuzzy_Args1, Value),
 
 	functor(H_Pred2_Tmp, Pred2_Name, Pred2_Arity),
 	copy_args(Pred2_Arity, H_Pred_Tmp, H_Pred2_Tmp),
 
-	translate_functor(H, 'normal', H_Pred2, H_Fuzzy_Args2),
+	translate_functor(H_Pred2_Tmp, 'normal', H_Pred2, H_Fuzzy_Args2),
 	get_truth_value_arg(H_Fuzzy_Args2, Truth_Value_For_Thershold),
+	print_msg('debug', 'translate', 'condition (over | under)'),
 	(
 	    (
 		Cond = 'over',
-		functor(H_Pred3, '.>.', [Truth_Value_For_Thershold, Thershold_Value]) 
+		functor(H_Pred3, '.>.', 2),
+		H_Pred3=..['.>.', Truth_Value_For_Thershold, Thershold_Value]
 	    )
 	;
 	    (
 		Cond = 'under',
-		functor(H_Pred3, '.<.', [Truth_Value_For_Thershold, Thershold_Value])
+		functor(H_Pred3, '.<.', 2),
+		H_Pred3=..['.<.', Truth_Value_For_Thershold, Thershold_Value]
 	    )
 	), !.
 
@@ -217,8 +220,9 @@ translate((Head :~ Body), Translation):-
 % fuzzification:
 translate(rfuzzy_define_fuzzification(Pred/2, Crisp_P/2, Funct_P/2), (Fuzzy_H :- (Crisp_P_F, Funct_P_F))):-
 	!, % If patter matching, backtracking forbiden.
-	test_predicate_has_been_defined('crisp', Crisp_P, 2),
-	test_predicate_has_been_defined('function', Funct_P, 2),
+	% retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity, Show_Error)
+	retrieve_predicate_info('crisp', Crisp_P, 2, _Fuzzy_Name_1, _Fuzzy_Arity_1, 'yes'),
+	retrieve_predicate_info('function', Funct_P, 2, _Fuzzy_Name_2, _Fuzzy_Arity_2, 'yes'),
 	functor(Pred_F, Pred, 1),
 	translate_functor(Pred_F, 'fuzzification', Fuzzy_H, Fuzzy_Args),
 
@@ -290,7 +294,7 @@ extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
 	nonvar(Body),
 	functor(Body, Aggregator_Op, _Unknown_Arity),
 	nonvar(Aggregator_Op),
-	retrieve_predicate_info('crisp', Aggregator_Op, 3, _Fuzzy_Name, _Fuzzy_Arity),
+	retrieve_predicate_info('crisp', Aggregator_Op, 3, _Fuzzy_Name, _Fuzzy_Arity, 'yes'),
 	arg(1, Body, Tmp_Body), !.
 extract_aggregator(Body, 'null', Body) :- !.
 
@@ -324,11 +328,7 @@ translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1,
 translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
 	print_msg('debug', 'translate_rule_body(Body, TV_Aggregator, Truth_Value)',(Body_F, Truth_Value)),
 	functor(Body_F, Pred_Name, Pred_Arity),
-	(
-	    (   retrieve_predicate_info('defined', Pred_Name, Pred_Arity, Fuzzy_Pred_Name, Fuzzy_Pred_Arity), !   )
-	;
-	    (   print_msg('error', 'Predicate must be defined before use. Predicate name', Pred_Name), !, fail   )
-	),
+	retrieve_predicate_info('defined', Pred_Name, Pred_Arity, Fuzzy_Pred_Name, Fuzzy_Pred_Arity, 'yes'), !,
 	functor(Fuzzy_F, Fuzzy_Pred_Name, Fuzzy_Pred_Arity),
 	copy_args(Pred_Arity, Fuzzy_F, Body_F),
 	Fuzzy_F=..[ Fuzzy_Pred_Name | Args ],
@@ -355,7 +355,7 @@ translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
 
 translate_each_type_aux(H, Actual, Type, Type_F) :-
 	print_msg('debug', 'translate_each_type_aux(H, Actual, Type)', translate_each_type_aux(H, Actual, Type)),
-	retrieve_predicate_info('defined', Type, 1, Type, 1), !,	
+	retrieve_predicate_info('defined', Type, 1, Type, 1, 'yes'), !,	
 	functor(Type_F, Type, 1), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
@@ -432,7 +432,7 @@ retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity, Show_Error) 
 	;
 	    (  
 		nonvar(Show_Error),
-		Show_Error = 'true', 
+		Show_Error = 'yes', 
 		print_msg('error', 'Predicate must be defined before use. Predicate ', Name/Arity), !, 
 		fail
 	    )
@@ -619,7 +619,7 @@ build_auxiliary_clause(Pred_Info, (true), (true)) :-
 build_functors(Name, Arity, Kind, _On_Error, Functor_In, Functor) :-
 
 	% Do we have saved facts ??
-	retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+	retrieve_predicate_info(Kind, Name, Arity, Fuzzy_Name, Fuzzy_Arity, 'yes'),
 	!, % Backtracking not allowed.
 
 	% Main functor.

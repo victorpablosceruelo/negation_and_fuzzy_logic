@@ -5,6 +5,20 @@
 % Define the file where we want debug msgs.
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
+restaurant(kenzo).
+restaurant(burguer_king).
+restaurant(pizza_jardin).
+restaurant(subway).
+restaurant(derroscas).
+restaurant(il_tempietto).
+restaurant(kono_pizza).
+restaurant(paellador).
+restaurant(tapasbar).
+restaurant(meson_del_jamon).
+restaurant(museo_del_jamon).
+
+expensive_restaurant(zalacain).
+
 rfuzzy_type_for(traditional/1, [restaurant/1]).
 rfuzzy_default_value_for(traditional/1, 1).
 
@@ -20,7 +34,7 @@ rfuzzy_types_for(cheap/1, [restaurant/1]).
 % before: 
 % :- default(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.5).
-rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/2, over, 0.7).
+rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/1, over, 0.7).
 rfuzzy_default_value_for(cheap/1, 0.1) if expensive_restaurant/1.
 
 cheap(kenzo) value 0.3.
@@ -31,20 +45,6 @@ rfuzzy_type_for(tempting_restaurant/1, [restaurant/1]).
 rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), cheap(R), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
-
-restaurant(kenzo).
-restaurant(burguer_king).
-restaurant(pizza_jardin).
-restaurant(subway).
-restaurant(derroscas).
-restaurant(il_tempietto).
-restaurant(kono_pizza).
-restaurant(paellador).
-restaurant(tapasbar).
-restaurant(meson_del_jamon).
-restaurant(museo_del_jamon).
-
-expensive_restaurant(zalacain).
 
 near_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
 
