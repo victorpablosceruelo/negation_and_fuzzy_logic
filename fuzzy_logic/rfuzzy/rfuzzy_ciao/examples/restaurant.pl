@@ -64,7 +64,7 @@ rfuzzy_define_fuzzification(near_the_city_center/2, distance_to_the_city_center/
 rfuzzy_sinonym(cheap, unexpensive, 1).
 rfuzzy_antonym(cheap, expensive, 1).
 
-rfuzzy_quantifier(very, 0.7, [cheap/1]).
+rfuzzy_quantifier(very, over, 0.7).
 
 rfuzzy_aggregator(max_with_min_a_half(X, Y, Z), [(max(X, Y, W), min(W, 0.5, Z))]).
 
