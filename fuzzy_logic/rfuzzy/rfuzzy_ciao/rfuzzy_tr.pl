@@ -15,24 +15,25 @@
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% translation_info(Category, Status, AddArgsCategory, AddArgsWhenComplete, Fix_Priority, Priority, Preffix_String)
+% translation_info(Category, Forms_Part_Of, Add_Args, Fix_Priority, Priority, Preffix_String)
 
-translation_info('aggregator',        'complete', 0, 0, 'no', 0, "").
-translation_info('function',            'complete', 0, 0, 'no', 0, "").
-translation_info('defuzzification', 'complete', 0, 0, 'no', 0, "").
-translation_info('quantifier',          'complete', 1, 1, 'no', 0, "").
-translation_info('unknown',           'complete', 0, 0, 'no', 0, "").
-% translation_info('auxiliar',          'complete', 2, 'no', 0, "rfuzzy_aux_").
-% translation_info('normal',          'complete', 1, 'yes', 0, "").
+translation_info('aggregator',         '', 0, 'no', 0, "").
+translation_info('function',              '', 0, 'no', 0, "").
+translation_info('defuzzification',   '', 0, 'no', 0, "").
+translation_info('quantifier',           '', 1, 'no', 0, "").
+translation_info('crisp',                   '', 0, 'no', 0, "").
+translation_info('fuzzy_rule',         '', 1, 'no', 0, "").
+% translation_info('auxiliar',           '', 2, 'no', 0, "rfuzzy_aux_").
+% translation_info('normal',           '', 1, 'yes', 0, "").
 
-translation_info('type',                             'incomplete', 2, 1, 'no', 0,          "rfuzzy_type_").
-translation_info('default_without_cond', 'incomplete', 2, 1, 'yes', 0,        "rfuzzy_default_without_cond_").
-translation_info('default_with_cond',      'incomplete', 2, 1, 'yes', 0.25,   "rfuzzy_default_with_cond_"). 
-translation_info('rule',                              'incomplete', 2, 1, 'yes', 0.5,     "rfuzzy_rule_").
-translation_info('fuzzification',                 'incomplete', 2, 1, 'yes', 0.75,  "rfuzzy_fuzzification_").
-translation_info('fact',                              'incomplete', 2, 1, 'yes', 1,       "rfuzzy_fact_").
-translation_info('sinonym',                       'incomplete', 2, 1, 'no', 0,         "rfuzzy_sinonym_").
-translation_info('antonym',                      'incomplete', 2, 1, 'no', 0,         "rfuzzy_antonym_").
+translation_info('type',                             'fuzzy_rule', 2, 'no', 0,          "rfuzzy_type_").
+translation_info('default_without_cond', 'fuzzy_rule', 2, 'yes', 0,        "rfuzzy_default_without_cond_").
+translation_info('default_with_cond',      'fuzzy_rule', 2, 'yes', 0.25,   "rfuzzy_default_with_cond_"). 
+translation_info('rule',                              'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
+translation_info('fuzzification',                 'fuzzy_rule', 2, 'yes', 0.75,  "rfuzzy_fuzzification_").
+translation_info('fact',                               'fuzzy_rule', 2, 'yes', 1,       "rfuzzy_fact_").
+translation_info('sinonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym_").
+translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym_").
 
 % This produces unexpected results.
 % translation_info(_X,                             _Y,               0, 0, 'no', 0,          "rfuzzy_error_error_error_").
@@ -66,7 +67,7 @@ save_predicate_definition(Category, Pred_Name, Pred_Arity, SubPred_Name, SubPred
 
 save_predicate_definition_obtain_category_status(Category, Status) :-
 	(
-	    translation_info(Category, Status, _AddArgsCategory, _AddArgsWhenComplete, _Fix_Priority, _Priority, _Preffix_String), !
+	    translation_info(Category, Status, _Add_Args, _Add_ArgsWhenComplete, _Fix_Priority, _Priority, _Preffix_String), !
 	;
 	    (
 		print_msg('error', 'Unknown Status or Category. (Status, Category)', (Status, Category)),
@@ -487,69 +488,53 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 
 
-translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Fuzzy_Args) :-
-	print_msg('debug', 'translate_functor(Functor, Category)', translate_functor(Functor, Category)),
+translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value) :-
+	print_msg('debug', 'translate_functor(Functor, Category)', translate_functor(Functor, Category, Status)),
 	functor(Functor, Name, Arity),
-	translation_info(Category, _Status, AddArgsCategory, AddArgsWhenComplete, Fix_Priority, Priority, Preffix_String),
-	number(AddArgsCategory),
-	Fuzzy_Arity is Arity + AddArgsCategory, % Fuzzy Args.
+	translation_info(Category, Forms_Part_Of, Add_Args, Fix_Priority, Priority, Preffix_String),
+	number(Add_Args),
+	Fuzzy_Arity is Arity + Add_Args, % Fuzzy Args.
 	add_preffix_to_name(Name, Preffix_String, Fuzzy_Name), % Change name
 	functor(Fuzzy_Functor, Fuzzy_Name, Fuzzy_Arity),
 	copy_args(Arity, Functor, Fuzzy_Functor), !,
-	translate_functor_aux_1(Fuzzy_Functor, Fuzzy_Arity, AddArgsCategory, Fuzzy_Args),
-	translate_functor_aux_2(AddArgsCategory, Fuzzy_Args, Fix_Priority, Priority),
+	translate_functor_aux_1(Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority, Truth_Value),
+	arg(Fuzzy_Arity, Fuzzy_Functor, Truth_Value),
 	print_msg('debug', 'translate_functor(Fuzzy_Functor, Fuzzy_Args)', translate_functor(Fuzzy_Functor, Fuzzy_Args)),
+	translate_functor_save_predicate().
+
+
+translate_functor_aux_1(Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority, Truth_Value) :-
+	print_msg('debug', 'translate_functor_1(Fuzzy_Functor, Fuzzy_Arity, Add_Args)', (Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority)),
+	number(Add_Args),
+	(
+	    (	Add_Args = 0, Truth_Value = 'no_truth_value_argument_added', !  )
+	;
+	    (	Add_Args = 1, arg(Fuzzy_Arity, Fuzzy_Functor, Truth_Value), !,  )
+	;
+	    (	Add_Args = 2,
+		% print_msg('debug', 'translate_functor_1 :: Fuzzy_Arity_Aux', Fuzzy_Arity_Aux),
+		arg(Fuzzy_Arity, Fuzzy_Functor, Truth_Value),
+		(
+		    (	Fix_Priority = 'no'    )
+		;
+		    (
+			Fix_Priority = 'yes',
+			Fuzzy_Arity_Aux is Fuzzy_Arity - 1,
+			arg(Fuzzy_Arity_Aux, Fuzzy_Functor, Priority),
+		    )
+		)
+	    )
+	), !.
+
+translate_functor_save_predicate(HERE) :-
 	(	
 	    (
 		Save_Predicate = 'yes', !,
-		Pred_Arity_When_Complete is Arity + AddArgsWhenComplete,
+		Pred_Arity_When_Complete is Arity + Add_ArgsWhenComplete,
 		save_predicate_definition(Category, Pred_Name, Pred_Arity_When_Complete, Fuzzy_Functor, Fuzzy_Args), !
 	    )
 	;
 	    Save_Predicate = 'no'
-	), !.
-
-translate_functor_aux_1(Fuzzy_Functor, Fuzzy_Arity, AddArgsCategory, Fuzzy_Args) :-
-	print_msg('debug', 'translate_functor_1(Fuzzy_Functor, Fuzzy_Arity, AddArgsCategory)', (Fuzzy_Functor, Fuzzy_Arity, AddArgsCategory)),
-	number(AddArgsCategory),
-	(
-	    (
-		AddArgsCategory = 0, 
-		Fuzzy_Args = [], !
-	    )
-	;
-	    (
-		AddArgsCategory = 1,
-		arg(Fuzzy_Arity, Fuzzy_Functor, Fuzzy_Arg1),
-		Fuzzy_Args = [Fuzzy_Arg1], !
-	    )
-	;
-	    (
-		AddArgsCategory = 2,
-		Fuzzy_Arity_Aux is Fuzzy_Arity - 1,
-		% print_msg('debug', 'translate_functor_1 :: Fuzzy_Arity_Aux', Fuzzy_Arity_Aux),
-		arg(Fuzzy_Arity_Aux, Fuzzy_Functor, Fuzzy_Arg1),
-		arg(Fuzzy_Arity, Fuzzy_Functor, Fuzzy_Arg2),
-		Fuzzy_Args = [Fuzzy_Arg1, Fuzzy_Arg2], !
-	    )
-	), !.
-
-translate_functor_aux_2(AddArgsCategory, Fuzzy_Args, Fix_Priority, Priority) :-
-	print_msg('debug', 'translate_functor_aux_2(AddArgsCategory, Fuzzy_Args, Fix_Priority, Priority)', (AddArgsCategory, Fuzzy_Args, Fix_Priority, Priority)),
-	number(AddArgsCategory),
-	(
-	    (
-		AddArgsCategory \== 2
-	    )
-	;
-	    (
-		Fix_Priority = 'no'
-	    )
-	;
-	    (
-		Fix_Priority = 'yes',
-		get_priority_arg(Fuzzy_Args, Priority) 
-	    )
 	), !.
 
 % ------------------------------------------------------
