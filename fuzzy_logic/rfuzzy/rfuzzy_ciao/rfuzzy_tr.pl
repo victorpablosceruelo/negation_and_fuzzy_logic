@@ -179,11 +179,12 @@ print_list_info([Arg | Args]) :- !,
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_Built):-
+rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules):-
 	!,
 	retrieve_all_predicate_info_with_category('fuzzy_rule', Fuzzy_Rules_To_Build),
 	print_msg('debug', 'fuzzy rules to build', Fuzzy_Rules_To_Build),
-	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built).
+	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built),
+	generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules).
 
 rfuzzy_trans_sent_aux(0, []) :- !, nl, nl, nl.
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
@@ -708,6 +709,22 @@ build_functor_show_error_if_necessary(Category, Pred_Name) :-
 %	functor(H, 'fail', 0).    % Create functor
 
 
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules) :-
+	retrieve_all_predicate_info_with_category(_Any_Category, Retrieved),
+	generate_introspection_predicate_aux(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules_Tmp),
+	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules).
+
+% generate_introspection_predicate_aux(Input_List, Accumulator_List, Result_List),
+generate_introspection_predicate_aux([], Accumulator_List, Accumulator_List) :- !.
+generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Result_List) :-
+	generate_introspection_predicate_real(Input, Output),
+	generate_introspection_predicate_aux(Input_List, [Output|Accumulator_List], Result_List).
+
+generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, Pred_Arity, _List), rfuzzy_introspection(Category, Pred_Name, Pred_Arity)).
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
