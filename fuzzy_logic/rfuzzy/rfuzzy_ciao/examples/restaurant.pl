@@ -28,6 +28,12 @@ traditional(paellador) value 0.87.
 % :- set_prop low_distance_function/1 => restaurant/1.
 rfuzzy_default_value_for(low_distance/1, 0).
 
+distance_to_the_city_center(meson_del_jamon, 100).
+distance_to_the_city_center(museo_del_jamon, 150).
+
+near_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
+rfuzzy_define_fuzzification(near_the_city_center/2, distance_to_the_city_center/2, near_function/2).
+
 % before:
 % :- set_prop cheap/1 => restaurant/1.
 rfuzzy_types_for(cheap/1, [restaurant/1]).
@@ -46,8 +52,6 @@ rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), cheap(R), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
 
-near_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
-
 distance_to_us(kenzo, 150).
 distance_to_us(burguer_king, 500).
 distance_to_us(il_tempietto, 100).
@@ -55,11 +59,6 @@ distance_to_us(pizza_jardin, 250).
 % distance_to(unknown, 800).
 
 rfuzzy_define_fuzzification(near_to_us/2, distance_to_us/2, near_function/2).
-
-distance_to_the_city_center(meson_del_jamon, 100).
-distance_to_the_city_center(museo_del_jamon, 150).
-
-rfuzzy_define_fuzzification(near_the_city_center/2, distance_to_the_city_center/2, near_function/2).
 
 rfuzzy_sinonym(cheap, unexpensive, 1).
 rfuzzy_antonym(cheap, expensive, 1).
