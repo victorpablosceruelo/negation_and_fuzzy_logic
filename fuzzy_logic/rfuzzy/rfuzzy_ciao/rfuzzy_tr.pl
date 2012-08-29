@@ -32,7 +32,7 @@ translation_info('default_with_cond',      'fuzzy_rule', 2, 'yes', 0.25,   "rfuz
 translation_info('rule',                              'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
 translation_info('fuzzification',                 'fuzzy_rule', 2, 'yes', 0.75,  "rfuzzy_fuzzification_").
 translation_info('fact',                               'fuzzy_rule', 2, 'yes', 1,       "rfuzzy_fact_").
-translation_info('sinonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym").
+translation_info('synonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym").
 translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym").
 
 % This produces unexpected results.
@@ -322,10 +322,40 @@ translate((Head :~ Body), Translation):-
 	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
 	translate_rule(Head, 'prod', 1, Body, Translation).
 
-translate(rfuzzy_synonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)), Translation):-
-	!.
+translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred), Translation):-
+	!,
+	print_msg('debug', 'translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred))) ', rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred)),
+	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
+	test_aggregator_is_defined(Cred_Op, _Show_Error),
+
+	functor(New_Predicate_Functor, New_Predicate_Name, Arity), 
+	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(New_Predicate_Functor, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value),
+
+	functor(Credibility_Functor, Cred_Op, 3), 
+	Credibility_Functor=..[Cred_Op, EP_Truth_Value, Cred, Truth_Value],
+
+	Arity_plus_1 is Arity + 1,
+	Arity_plus_2 is Arity_plus_1 + 1,
+
+	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
+	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _List, 'yes')
+
+	add_preffix_to_name(Existing_Predicate_Name, "rfuzzy_aux_", Existing_Predicate_Aux_Name),
+	functor(Existing_Predicate_Aux_Functor, Existing_Predicate_Aux_Name, Arity_plus_2),
+	copy_args(Arity_plus_1, Fuzzy_Pred_Functor, Existing_Predicate_Aux_Functor),
+	arg(Arity_plus_2, Existing_Predicate_Aux_Functor, Truth_Value),
+
+	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, Credibility_Functor).
+
 translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)), Translation):-
+	!,
+	print_msg('debug', 'translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred))) ', rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)),
+	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
+	test_aggregator_is_defined(Cred_Op, _Show_Error),
+
 	!.
+
 
 % fuzzification:
 translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred_Functor :- (Crisp_P_F, Funct_P_F))):-
