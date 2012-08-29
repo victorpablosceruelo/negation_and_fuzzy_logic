@@ -49,20 +49,20 @@ save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pre
 	(
 	    (	 
 		retract_fact(predicate_definition(Category, Pred_Name, Pred_Arity, List)), !, % Retract last
-		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Category, Sub_Pred_Name, Sub_Pred_Arity)|List]))
+		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)|List]))
 	    )
 	;
 	    (
-		retract_fact(predicate_definition(_Category_Aux, Pred_Name, Pred_Arity, List)), !, % Retract last
+		predicate_definition(_Category_Aux, Pred_Name, Pred_Arity, List), !, % Retract last
 		print_msg('error', 'It is not allowed to define again the predicate', (Pred_Name/Pred_Arity)),
 		fail
 	    )
 	;
 	    (
-		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Category, SubPred_Name, SubPred_Arity)]))
+		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)]))
 	    )
 	), 
-	print_msg('debug', 'saved', save_predicate_definition(Category, Pred_Name, Pred_Arity, Category, SubPred_Name, SubPred_Arity)),
+	print_msg('debug', 'saved', save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)),
 	!.		 
 
 retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
