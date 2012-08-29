@@ -32,8 +32,8 @@ translation_info('default_with_cond',      'fuzzy_rule', 2, 'yes', 0.25,   "rfuz
 translation_info('rule',                              'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
 translation_info('fuzzification',                 'fuzzy_rule', 2, 'yes', 0.75,  "rfuzzy_fuzzification_").
 translation_info('fact',                               'fuzzy_rule', 2, 'yes', 1,       "rfuzzy_fact_").
-translation_info('sinonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym_").
-translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym_").
+translation_info('sinonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym").
+translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym").
 
 % This produces unexpected results.
 % translation_info(_X,                             _Y,               0, 0, 'no', 0,          "rfuzzy_error_error_error_").
@@ -322,6 +322,11 @@ translate((Head :~ Body), Translation):-
 	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
 	translate_rule(Head, 'prod', 1, Body, Translation).
 
+translate(rfuzzy_synonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)), Translation):-
+	!.
+translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)), Translation):-
+	!.
+
 % fuzzification:
 translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred_Functor :- (Crisp_P_F, Funct_P_F))):-
 	!, % If patter matching, backtracking forbiden.
@@ -397,32 +402,21 @@ extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
 	
 extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body) :-
 	nonvar(Body),
-	functor(Body, Aggregator_Op, 1),
-	nonvar(Aggregator_Op),
-	defined_aggregators(Aggregators),
-	memberchk_local(Aggregator_Op, Aggregators),
-	arg(1, Body, Tmp_Body), !.
-extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body) :-
-	nonvar(Body),
-	functor(Body, Aggregator_Op, _Unknown_Arity),
-	nonvar(Aggregator_Op),
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Aggregator_Op, 3, _List, 'no'),
+	functor(Body, Aggregator_Name, 1),
+	test_aggregator_is_defined(Aggregator_Name, 'no'),
 	arg(1, Body, Tmp_Body), !.
 extract_aggregator_aux(Body, 'null', Body) :- !.
 
-%retrieve_aggregator_info(Op, Operator) :-
-%	faggr(Op1, _IAny,  Operator, _FAny),
-%	nonvar(Op),
-%	aggregators(Aggregators),
-%	print_msg('debug', 'retrieve_aggregator_info :: Op', Op),
-%	print_msg('debug', 'retrieve_aggregator_info :: Aggregators', Aggregators),
-%	member(faggr(Op, _IAny,  Operator, _FAny), Aggregators), !.
-%retrieve_aggregator_info(Op, Op) :-
-%	rfuzzy_rt:defined_aggregators(Aggregators), !,
-%	member(Op, Aggregators).
-%retrieve_aggregator_info(Op, 'id') :-
-%	print_msg('error', 'retrieve_aggregator_info :: not a valid agregator operator :: ', Op).
+test_aggregator_is_defined(Aggregator_Name, _Show_Error) :-
+	nonvar(Aggregator_Name),
+	defined_aggregators(Aggregators),
+	memberchk_local(Aggregator_Op, Aggregators), !.
+test_aggregator_is_defined(Aggregator_Name, Show_Error) :-
+	nonvar(Aggregator_Name),
+ 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
+	retrieve_predicate_info('crisp', Aggregator_Op, 3, _List, Show_Error), !.
+
+	
 
 % ------------------------------------------------------
 % ------------------------------------------------------
