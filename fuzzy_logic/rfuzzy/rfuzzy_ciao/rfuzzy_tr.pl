@@ -80,6 +80,11 @@ retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
 		fail
 	    )
 	;
+	    (  
+		translation_info(Category, '', _Add_Args, _Fix_Priority, _Priority, _Preffix_String),
+		Show_Error = 'no', !, fail
+	    )
+	;
 	    (
 		print_msg('error', 'Requested category does not exist. Category ', Category), !, 
 		fail
@@ -385,20 +390,25 @@ translate_rule(Head, Cred_Op, Cred, Body, (Fuzzy_Head :- Fuzzy_Body)) :-
 % ------------------------------------------------------
 
 extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
+	print_msg('debug', 'extract_aggregator(Body)', extract_aggregator(Body)),
+	extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body),
+	print_msg('debug', 'extract_aggregator(Body, Aggregator_Op, Tmp_Body)', extract_aggregator(Body, Aggregator_Op, Tmp_Body)).
+	
+extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body) :-
 	nonvar(Body),
 	functor(Body, Aggregator_Op, 1),
 	nonvar(Aggregator_Op),
 	defined_aggregators(Aggregators),
 	memberchk_local(Aggregator_Op, Aggregators),
 	arg(1, Body, Tmp_Body), !.
-extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
+extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body) :-
 	nonvar(Body),
 	functor(Body, Aggregator_Op, _Unknown_Arity),
 	nonvar(Aggregator_Op),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Aggregator_Op, 3, _List, 'yes'),
+	retrieve_predicate_info('crisp', Aggregator_Op, 3, _List, 'no'),
 	arg(1, Body, Tmp_Body), !.
-extract_aggregator(Body, 'null', Body) :- !.
+extract_aggregator_aux(Body, 'null', Body) :- !.
 
 %retrieve_aggregator_info(Op, Operator) :-
 %	faggr(Op1, _IAny,  Operator, _FAny),
@@ -428,16 +438,18 @@ translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1,
 	arg(3, Aggr_F, Truth_Value), !.
 
 % Quantifier.
-translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
+translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - with quantifier',(Body_F, Truth_Value)),
 	functor(Body_F, Pred_Name, 1),
-	Body_F=..[Pred_Name|Pred_Args],
+	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Body_F, 'quantifier', 'no', Fuzzy_Functor, Truth_Value),
+	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('quantifier', Pred_Name, 1, _List, 'yes'), !,
-	functor(Fuzzy_F, Pred_Name, 2),
-	arg(2, Fuzzy_F, Truth_Value),
+	retrieve_predicate_info('quantifier', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _List, 'no'), !,
+
+	Body_F=..[Pred_Name|Pred_Args],
 	translate_rule_body_subcall(Pred_Args, _Truth_Value_Aux, SubCall),
-	arg(1, Fuzzy_F, SubCall).
+	arg(1, Fuzzy_Functor, SubCall).
 
 % Normal.
 translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
@@ -447,7 +459,10 @@ translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value 
 translate_rule_body_subcall(Body_F, Truth_Value, Fuzzy_Functor) :-
 	print_msg('debug', 'translate_rule_body_subcall(Body, Truth_Value)',(Body_F, Truth_Value)),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Body_F, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value).
+	translate_functor(Body_F, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value),
+	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
+	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
+	retrieve_predicate_info('fuzzy_rule', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _List, 'yes'), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
