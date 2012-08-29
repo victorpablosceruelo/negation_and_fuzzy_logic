@@ -44,7 +44,7 @@ translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,     
 
 save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity) :-
 	print_msg('debug', 'save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)', save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)),
-	save_predicate_definition_obtain_category_status(Category, Category), % Only valid values, please.
+	save_predicate_definition_test_categories(Category, Sub_Category), % Only valid values, please.
 	
 	(
 	    (	 
@@ -65,10 +65,14 @@ save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pre
 	print_msg('debug', 'saved', save_predicate_definition(Category, Pred_Name, Pred_Arity, Category, SubPred_Name, SubPred_Arity)),
 	!.
 
-save_predicate_definition_obtain_category_status(Category, Sub_Category_Of) :-
+save_predicate_definition_test_categories(Category, Sub_Category) :-
+	nonvar(Sub_Category), 
+	Category = Sub_Category, !,
+	save_predicate_definition_test_categories('', Category).
+save_predicate_definition_test_categories(Category, Sub_Category) :-
 	(
 	    % translation_info(Category, Sub_Category_Of, Add_Args, Fix_Priority, Priority, Preffix_String)
-	    translation_info(Category, Sub_Category_Of, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
+	    translation_info(Sub_Category, Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
 	;
 	    (
 		print_msg('error', 'Unknown Category or Sub_Category_Of. (Category, Sub_Category_Of)', (Category, Sub_Category_Of)),
@@ -79,10 +83,10 @@ save_predicate_definition_obtain_category_status(Category, Sub_Category_Of) :-
 		 
 
 retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
-	save_predicate_definition_obtain_category_status(Category, Status),
+	save_predicate_definition_test_categories(Category, _Any),
 	(
 	    (   
-		predicate_definition(Status, Name, Arity, List), !   
+		predicate_definition(Category, Name, Arity, List), !   
 	    )
 	;
 	    (  
@@ -98,13 +102,13 @@ retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
 	    )
 	).
 
-retrieve_all_predicate_info_with_status(Status, Retrieved) :-
-	findall((predicate_definition(Status, Name, Arity, List)),
-	(retract_fact(predicate_definition(Status, Name, Arity, List))), Retrieved),
+retrieve_all_predicate_info_with_category(Category, Retrieved) :-
+	findall((predicate_definition(Category, Name, Arity, List)),
+	(retract_fact(predicate_definition(Category, Name, Arity, List))), Retrieved),
 	 !.
 
-%remove_predicate_info(Status, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-%	predicate_definition_contents(Pred_Info, Status, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
+%remove_predicate_info(Category, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
+%	predicate_definition_contents(Pred_Info, Category, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
 %	retract_fact(Pred_Info), !. % Retract 
 
 
@@ -149,11 +153,11 @@ print_list_info([Arg | Args]) :- !,
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Aux_Predicates):-
+rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_Built):-
 	!,
-	retrieve_all_predicate_info_with_status('incomplete', To_Build_Fuzzy_Aux_Predicates),
-	print_msg('debug', 'To_Build_Fuzzy', To_Build_Fuzzy_Aux_Predicates),
-	build_auxiliary_clauses(To_Build_Fuzzy_Aux_Predicates, Fuzzy_Aux_Predicates).
+	retrieve_all_predicate_info_with_category('fuzzy_rule', Fuzzy_Rules_To_Build),
+	print_msg('debug', 'fuzzy rules to build', Fuzzy_Rules_To_Build),
+	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built).
 
 rfuzzy_trans_sent_aux(0, []) :- !, nl, nl, nl.
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
@@ -332,7 +336,7 @@ translate(Other, Other) :-
 		Name \== 'fuzzify'
 	    )
 	),
-	% save_predicate_definition(Status, Pred_Name, Pred_Arity, Category, SubPred_Name, SubPred_Arity)
+	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)
 	save_predicate_definition('crisp', Name, Arity, 'crisp', Name, Arity).
 
 % ------------------------------------------------------
@@ -590,13 +594,13 @@ memberchk_local(Element, [_Head | Tail]) :- !,
 % ------------------------------------------------------
 
 build_auxiliary_clauses([], []) :- !.
-build_auxiliary_clauses([Def_Pred|Def_Preds], [Pred_Main, Pred_Aux | Clauses]) :-
-	print_msg('debug', 'build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux)', (Def_Pred, Pred_Main, Pred_Aux)),
-	build_auxiliary_clause(Def_Pred, Pred_Main, Pred_Aux),
-	build_auxiliary_clauses(Def_Preds, Clauses).
+build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | Clauses]) :-
+	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
+	build_auxiliary_clause(Predicate_Def, Pred_Main, Pred_Aux),
+	print_msg('debug', 'build_auxiliary_clauses OUT (Pred_Main, Pred_Aux)', (Pred_Main, Pred_Aux)),
+	build_auxiliary_clauses(Predicate_Defs, Clauses).
 
-build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
-	predicate_definition_contents(Pred_Info, 'defined', Name, Arity, Name, Arity),
+build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 
 	% Build MAIN functors.
 	Main_Pred_Fuzzy_Arity is Arity + 1,
@@ -649,8 +653,8 @@ build_auxiliary_clause(Pred_Info, Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 			)
 	).
 
-build_auxiliary_clause(Pred_Info, (true), (true)) :-
-	print_msg('info', 'it is impossible to build the auxiliary clause for predicate ', Pred_Info).
+build_auxiliary_clause(Predicate_Definition, true, true) :-
+	print_msg('info', 'it is impossible to build the auxiliary clauses for predicate ', Predicate_Definition).
 	
 build_functors(Name, Arity, Status, _On_Error, Functor_In, Functor) :-
 
