@@ -63,27 +63,11 @@ save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pre
 	    )
 	), 
 	print_msg('debug', 'saved', save_predicate_definition(Category, Pred_Name, Pred_Arity, Category, SubPred_Name, SubPred_Arity)),
-	!.
-
-save_predicate_definition_test_categories(Category, Sub_Category) :-
-	nonvar(Sub_Category), 
-	Category = Sub_Category, !,
-	save_predicate_definition_test_categories('', Category).
-save_predicate_definition_test_categories(Category, Sub_Category) :-
-	(
-	    % translation_info(Category, Sub_Category_Of, Add_Args, Fix_Priority, Priority, Preffix_String)
-	    translation_info(Sub_Category, Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
-	;
-	    (
-		print_msg('error', 'Unknown Category or Sub_Category. (Category, Sub_Category)', (Category, Sub_Category)),
-		!, fail
-	    )
-	), !.
-		    
-		 
+	!.		 
 
 retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
-	save_predicate_definition_test_categories(Category, _Any),
+	print_msg('debug', 'retrieve_predicate_info(Category, Name, Arity, List, Show_Error)', retrieve_predicate_info(Category, Name, Arity, List, Show_Error)),
+	save_predicate_definition_test_categories(_AnyValidCategory, Category),
 	(
 	    (   
 		predicate_definition(Category, Name, Arity, List), !   
@@ -106,6 +90,43 @@ retrieve_all_predicate_info_with_category(Category, Retrieved) :-
 	findall((predicate_definition(Category, Name, Arity, List)),
 	(retract_fact(predicate_definition(Category, Name, Arity, List))), Retrieved),
 	 !.
+	
+save_predicate_definition_test_categories(Category, Sub_Category) :-
+	(
+	    save_predicate_definition_test_categories_aux(Category, Sub_Category)
+	;
+	    (
+		print_msg('error', 'Unknown Category or Sub_Category. (Category, Sub_Category)', (Category, Sub_Category)),
+		!, fail
+	    )
+	), !.
+
+save_predicate_definition_test_categories_aux(Category, Sub_Category) :-
+	(
+	    (	var(Category), var(Sub_Category), !, fail  )
+	;
+	    (   var(Category), nonvar(Sub_Category), !,
+		save_predicate_definition_test_categories_aux(Sub_Category, Sub_Category)
+	    )
+	;
+	    (   nonvar(Category), var(Sub_Category), !, 
+		save_predicate_definition_test_categories_aux(Category, Category)
+	    )
+	).
+
+save_predicate_definition_test_categories_aux(Category, Sub_Category) :-
+	nonvar(Category), nonvar(Sub_Category),
+	Category = Sub_Category, % This case is impossible because it is an infinite loop.
+	(
+	    translation_info(Sub_Category, _Any_Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
+	;
+	    translation_info(_Any_Sub_Category, Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
+	), !.
+
+save_predicate_definition_test_categories_aux(Category, Sub_Category) :-
+	nonvar(Category), nonvar(Sub_Category),
+	% translation_info(Category, Sub_Category_Of, Add_Args, Fix_Priority, Priority, Preffix_String)
+	translation_info(Sub_Category, Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !.
 
 %remove_predicate_info(Category, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
 %	predicate_definition_contents(Pred_Info, Category, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
