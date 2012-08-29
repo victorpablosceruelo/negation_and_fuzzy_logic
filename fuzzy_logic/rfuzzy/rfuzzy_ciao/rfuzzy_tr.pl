@@ -609,8 +609,9 @@ memberchk_local(Element, [_Head | Tail]) :- !,
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_auxiliary_clauses([], []) :- !.
+build_auxiliary_clauses([], [end_of_file]) :- !.
 build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | Clauses]) :-
+	print_msg_nl('debug'),
 	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
 	build_auxiliary_clause(Predicate_Def, Pred_Main, Pred_Aux),
 	print_msg('debug', 'build_auxiliary_clauses OUT (Pred_Main, Pred_Aux)', (Pred_Main, Pred_Aux)),
@@ -622,7 +623,7 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 	% Build MAIN functor.
 	functor(Pred_Functor, Pred_Name, Pred_Arity),
 	% Build AUXILIAR functor
-	add_preffix_to_name(Pred_Name, 'auxiliar', Aux_Pred_Name),
+	add_preffix_to_name(Pred_Name, "rfuzzy_aux_", Aux_Pred_Name),
 	Aux_Pred_Arity is Pred_Arity + 1,
 	functor(Aux_Pred_Functor, Aux_Pred_Name, Aux_Pred_Arity),
 	arg(Aux_Pred_Arity, Aux_Pred_Functor, Aux_Pred_Truth_Value_Arg),
@@ -630,7 +631,8 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 	% Unify crisp args of MAIN and AUXILIAR functors.
 	Pred_Crisp_Arity is Pred_Arity - 1,
 	copy_args(Pred_Crisp_Arity, Pred_Functor, Aux_Pred_Functor),
-	
+
+	print_msg('debug', 'Now building functor from (List, Pred_Name, Aux_Pred_Functor)', (List, Pred_Name, Aux_Pred_Functor)),
 	build_functors(List, 'type',                             'true', Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Types),
 	build_functors(List, 'fact',                              'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Fact),
 %	build_functors(List, 'function',                       'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Function),
