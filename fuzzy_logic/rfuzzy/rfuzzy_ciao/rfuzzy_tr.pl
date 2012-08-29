@@ -420,16 +420,10 @@ translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value 
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
 	translate_rule_body_subcall(Body_F, Truth_Value, Fuzzy_F).
 
-translate_rule_body_subcall(Body_F, Truth_Value, Fuzzy_F) :-
+translate_rule_body_subcall(Body_F, Truth_Value, Fuzzy_Functor) :-
 	print_msg('debug', 'translate_rule_body_subcall(Body, Truth_Value)',(Body_F, Truth_Value)),
-	functor(Body_F, Pred_Name, Pred_Arity_Tmp),
-	Pred_Arity is Pred_Arity_Tmp + 1,
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('fuzzy_rule', Pred_Name, Pred_Arity, _List, 'yes'), !,
-	functor(Fuzzy_F, Pred_Name, Pred_Arity),
-	copy_args(Pred_Arity_Tmp, Fuzzy_F, Body_F),
-	Fuzzy_F=..[ Pred_Name | Args ],
-	get_truth_value_arg(Args, Truth_Value).
+	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Body_F, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -554,23 +548,6 @@ translate_functor_save_predicate_def('yes', Sub_Category_Of, Pred_Name, Pred_Ari
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
-
-% The truth value is almost always there, 
-% so it must be in last place.
-get_truth_value_arg([Truth_Value], Truth_Value) :- !.
-get_truth_value_arg([_Head | Tail], Truth_Value) :-
-	get_truth_value_arg(Tail, Truth_Value).
-
-% The priority value is not always there, but when 
-% it is there there is always a truth value.
-get_priority_arg([Priority, _Truth_Value], Priority) :- !.
-get_priority_arg([_Head | Tail], Priority) :-
-	get_priority_arg(Tail, Priority).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 
 add_preffix_to_name(Input, Preffix, Output) :-
 	string(Preffix),
