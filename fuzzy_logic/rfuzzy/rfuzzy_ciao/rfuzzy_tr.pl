@@ -222,33 +222,35 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/P
 	functor(H_Cond, Pred2_Name, Pred2_Arity),
 	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
 
-translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value)), (H_Pred :- H_Pred2, H_Pred3)) :-
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value)), (Pred_Functor :- Pred2_Functor, Pred3_Functor)) :-
 	print_msg('debug', 'translate :: (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value))', (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Value))),
 	!, % If patter matching, backtracking forbiden.
 	Pred_Arity = Pred2_Arity,
 	number(Value), number(Pred_Arity), number(Pred2_Arity), % They must be numbers.
 	nonvar(Pred_Name), nonvar(Pred2_Name), % They cannot be variables.
 	
-	functor(H_Pred_Tmp, Pred_Name, Pred_Arity),
+	functor(Aux_Pred_Functor, Pred_Name, Pred_Arity),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(H_Pred_Tmp, 'default_with_cond', 'yes', H_Pred, Value),
-	functor(H_Pred2_Tmp, Pred2_Name, Pred2_Arity),
-	copy_args(Pred2_Arity, H_Pred_Tmp, H_Pred2_Tmp),
+	translate_functor(Aux_Pred_Functor, 'default_with_cond', 'yes', Pred_Functor, Value),
+	functor(Aux_Pred2_Functor, Pred2_Name, Pred2_Arity),
+	copy_args(Pred2_Arity, Aux_Pred_Functor, Aux_Pred2_Functor),
 
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(H_Pred2_Tmp, 'normal', 'yes', H_Pred2, Truth_Value_For_Thershold),
+	translate_functor(Aux_Pred2_Functor, 'fuzzy_rule', 'no', Pred2_Functor, Truth_Value_For_Thershold),
+	functor(Pred2_Functor, Pred2_Functor_Name, Pred2_Functor_Arity),
+	retrieve_predicate_info('fuzzy_rule', Pred2_Functor_Name, Pred2_Functor_Arity, _List, 'yes'), !,	
 	print_msg('debug', 'translate', 'condition (over | under)'),
 	(
 	    (
 		Cond = 'over',
 		functor(H_Pred3, '.>.', 2),
-		H_Pred3=..['.>.', Truth_Value_For_Thershold, Thershold_Value]
+		Pred3_Functor=..['.>.', Truth_Value_For_Thershold, Thershold_Value]
 	    )
 	;
 	    (
 		Cond = 'under',
 		functor(H_Pred3, '.<.', 2),
-		H_Pred3=..['.<.', Truth_Value_For_Thershold, Thershold_Value]
+		Pred3_Functor=..['.<.', Truth_Value_For_Thershold, Thershold_Value]
 	    )
 	), !.
 
