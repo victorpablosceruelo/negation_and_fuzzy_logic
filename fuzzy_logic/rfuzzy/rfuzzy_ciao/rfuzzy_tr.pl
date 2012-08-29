@@ -18,10 +18,10 @@
 % translation_info(Category, Sub_Category_Of, Add_Args, Fix_Priority, Priority, Preffix_String)
 
 translation_info('aggregator',         '', 0, 'no', 0, "").
-translation_info('function',              '', 0, 'no', 0, "").
 translation_info('defuzzification',   '', 0, 'no', 0, "").
-translation_info('quantifier',           '', 1, 'no', 0, "").
 translation_info('crisp',                   '', 0, 'no', 0, "").
+translation_info('function',              '', 0, 'no', 0, "").
+translation_info('quantifier',           '', 1, 'no', 0, "").
 translation_info('fuzzy_rule',         '', 1, 'no', 0, "").
 % translation_info('auxiliar',           '', 2, 'no', 0, "rfuzzy_aux_").
 % translation_info('normal',           '', 1, 'yes', 0, "").
@@ -317,21 +317,21 @@ translate((Head :~ Body), Translation):-
 	translate_rule(Head, 'prod', 1, Body, Translation).
 
 % fuzzification:
-translate(rfuzzy_define_fuzzification(Pred/2, Crisp_P/2, Funct_P/2), (Fuzzy_H :- (Crisp_P_F, Funct_P_F))):-
+translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred_Functor :- (Crisp_P_F, Funct_P_F))):-
 	!, % If patter matching, backtracking forbiden.
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
 	retrieve_predicate_info('crisp', Crisp_P, 2, _List_1, 'yes'),
 	retrieve_predicate_info('function', Funct_P, 2, _List_2, 'yes'),
-	functor(Pred_F, Pred, 1),
+	functor(Pred_Functor, Pred, 1),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Pred_F, 'fuzzification', 'yes', Fuzzy_H, Truth_Value),
+	translate_functor(Pred_Functor, 'fuzzification', 'yes', Fuzzy_Pred_Functor, Truth_Value),
 
 	% We need to do here as in other translations, so 
 	% it generates aux and main predicates for fuzzifications too.
 	functor(Crisp_P_F, Crisp_P, 2),
 	functor(Funct_P_F, Funct_P, 2),
 
-	arg(1, Fuzzy_H, Input),
+	arg(1, Fuzzy_Pred_Functor, Input),
 	arg(1, Crisp_P_F, Input),
 	arg(2, Crisp_P_F, Crisp_Value),
 	arg(1, Auxiliar_Funct_P_F, Crisp_Value),
@@ -529,13 +529,12 @@ translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
 	functor(Fuzzy_Functor, Fuzzy_Name, Fuzzy_Arity),
 	copy_args(Arity, Functor, Fuzzy_Functor), !,
 	translate_functor_add_args(Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority, Truth_Value),
-	arg(Fuzzy_Arity, Fuzzy_Functor, Truth_Value),
 	print_msg('debug', 'translate_functor :: Fuzzy_Functor', Fuzzy_Functor),
 	translate_functor_save_predicate_def(Save_Predicate, Sub_Category_Of, Name, Arity, Category, Fuzzy_Name, Fuzzy_Arity).
 
 
 translate_functor_add_args(Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority, Truth_Value) :-
-	print_msg('debug', 'translate_functor_1(Fuzzy_Functor, Fuzzy_Arity, Add_Args)', (Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority)),
+	print_msg('debug', 'translate_functor_add_args(Fuzzy_Functor, Fuzzy_Arity, Add_Args)', (Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority)),
 	number(Add_Args),
 	(
 	    (	Add_Args = 0, Truth_Value = 'no_truth_value_argument_added', !  )

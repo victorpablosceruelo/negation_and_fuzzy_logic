@@ -32,7 +32,7 @@ distance_to_the_city_center(meson_del_jamon, 100).
 distance_to_the_city_center(museo_del_jamon, 150).
 
 near_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
-rfuzzy_define_fuzzification(near_the_city_center/2, distance_to_the_city_center/2, near_function/2).
+rfuzzy_define_fuzzification(near_the_city_center/1, distance_to_the_city_center/2, near_function/2).
 
 % before:
 % :- set_prop cheap/1 => restaurant/1.
