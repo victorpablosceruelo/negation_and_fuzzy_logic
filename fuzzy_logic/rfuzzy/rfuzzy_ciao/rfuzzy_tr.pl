@@ -20,7 +20,7 @@
 translation_info('aggregator',         '', 0, 'no', 0, "").
 translation_info('defuzzification',   '', 0, 'no', 0, "").
 translation_info('crisp',                   '', 0, 'no', 0, "").
-translation_info('function',              '', 0, 'no', 0, "").
+translation_info('function',              '', 1, 'no', 0, "").
 translation_info('quantifier',           '', 1, 'no', 0, "").
 translation_info('fuzzy_rule',         '', 1, 'no', 0, "").
 % translation_info('auxiliar',           '', 2, 'no', 0, "rfuzzy_aux_").
