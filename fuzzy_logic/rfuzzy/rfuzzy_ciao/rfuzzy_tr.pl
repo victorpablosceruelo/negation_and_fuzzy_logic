@@ -75,7 +75,7 @@ save_predicate_definition_test_categories(Category, Sub_Category) :-
 	    translation_info(Sub_Category, Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
 	;
 	    (
-		print_msg('error', 'Unknown Category or Sub_Category_Of. (Category, Sub_Category_Of)', (Category, Sub_Category_Of)),
+		print_msg('error', 'Unknown Category or Sub_Category. (Category, Sub_Category)', (Category, Sub_Category)),
 		!, fail
 	    )
 	), !.
@@ -602,82 +602,85 @@ build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | C
 
 build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 
-	% Build MAIN functors.
-	Main_Pred_Fuzzy_Arity is Arity + 1,
-	Aux_Pred_Fuzzy_Arity is Arity +2,
-	functor(Fuzzy_Pred_Main, Name, Main_Pred_Fuzzy_Arity),
-
-	add_preffix_to_name(Name, 'auxiliar', Fuzzy_Pred_Aux_Name),
-	functor(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux_Name, Aux_Pred_Fuzzy_Arity),
-	copy_args(Arity, Fuzzy_Pred_Main, Fuzzy_Pred_Aux),
+	Category = 'fuzzy_rule',
+	% Build MAIN functor.
+	functor(Pred_Functor, Pred_Name, Pred_Arity),
+	% arg(Pred_Arity, Pred_Functor, Truth_Value_Arg),
+	% Build AUXILIAR functor
+	add_preffix_to_name(Pred_Name, 'auxiliar', Aux_Pred_Name),
+	Aux_Pred_Arity is Pred_Arity + 1,
+	functor(Aux_Pred_Functor, Aux_Pred_Name, Aux_Pred_Arity),
+	% Aux_Pred_Functor=..[Aux_Pred_Name|Aux_Pred_Args],
+	% Unify crisp args of MAIN and AUXILIAR functors.
+	Pred_Crisp_Arity is Pred_Arity - 1,
+	copy_args(Pred_Crisp_Arity, Pred_Functor, Aux_Pred_Functor),
 	
-	build_functors(Name, Arity, 'type', 'true', Fuzzy_Pred_Aux, Fuzzy_Pred_Types),
-	build_functors(Name, Arity, 'fact', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fact),
-	build_functors(Name, Arity, 'function', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Function),
-	build_functors(Name, Arity, 'fuzzification', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Fuzzification),
-	build_functors(Name, Arity, 'rule', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Rule),
-	build_functors(Name, Arity, 'default_with_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_With_Cond),
-	build_functors(Name, Arity, 'default_without_cond', 'fail', Fuzzy_Pred_Aux, Fuzzy_Pred_Default_Without_Cond),
-
-	% Argument's places and values.
-	Arity_Fuzzy_Arg_1 is Arity + 1,
-	% Arity_Fuzzy_Arg_2 is Arity + 2,
-	arg(Arity_Fuzzy_Arg_1, Fuzzy_Pred_Main, Fuzzy_Arg_1),
-	% arg(Arity_Fuzzy_Arg_2, Fuzzy_Pred_Main, Fuzzy_Arg_2),
+	build_functors(List, 'type',                             'true', Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Types),
+	build_functors(List, 'fact',                              'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Fact),
+%	build_functors(List, 'function',                       'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Function),
+	build_functors(List, 'fuzzification',                'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Fuzzification),
+	build_functors(List, 'rule',                              'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Rule),
+	build_functors(List, 'default_with_cond',      'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Default_With_Cond),
+	build_functors(List, 'default_without_cond', 'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Default_Without_Cond),
 
 	(Fuzzy_Cl_Main = (
 			     (
-				 Fuzzy_Pred_Main :- (
-							findall(Fuzzy_Pred_Aux, Fuzzy_Pred_Aux, Results), 
+				 Pred_Functor :- (
+							findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
 							supreme(Results, Result),
-							copy_args(Arity, Fuzzy_Pred_Main, Result),
-							arg(Arity_Fuzzy_Arg_1, Result, Fuzzy_Arg_1_Tmp),
-							Fuzzy_Arg_1 .>=. Fuzzy_Arg_1_Tmp
+							copy_args(Pred_Arity, Result, Pred_Functor)
 						    )		     
 			     ) % Main Fuzzy Pred
 			 )
 	),
 	(Fuzzy_Cl_Aux = ( 
 			    ( 
-				Fuzzy_Pred_Aux :- ( 
+				Aux_Pred_Functor :- ( 
 						      Fuzzy_Pred_Types,
 						      (   Fuzzy_Pred_Fact ; 
-							  Fuzzy_Pred_Function ;
+%							  Fuzzy_Pred_Function ;
 							  Fuzzy_Pred_Fuzzification ;
 							  Fuzzy_Pred_Rule ;
 							  Fuzzy_Pred_Default_With_Cond ; 
 							  Fuzzy_Pred_Default_Without_Cond
-						      )
+						      ),
+						      
 						  )
 			    )
 			)
 	).
 
-build_auxiliary_clause(Predicate_Definition, true, true) :-
-	print_msg('info', 'it is impossible to build the auxiliary clauses for predicate ', Predicate_Definition).
+build_auxiliary_clause(Predicate_Definition, _Fuzzy_Cl_Main, _Fuzzy_Cl_Aux) :-
+	print_msg('error', 'Error building auxiliary clauses for predicate definition', Predicate_Definition),
+	!, fail.
 	
-build_functors(Name, Arity, Status, _On_Error, Functor_In, Functor) :-
+% build_functors(List, Category On_Error, Functor_In, Functor).
+build_functors([], Category, On_Error, Pred_Name, _Functor_In, On_Error) :-
+	build_functor_show_error_if_necessary(Category, Pred_Name).
+	
+build_functors([(Category, Sub_Pred_Name, Sub_Pred_Arity)|_List], Category, _On_Error, Pred_Name, Functor_In, Functor) :-
 
-	% Do we have saved facts ??
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info(Status, Name, Arity, Fuzzy_Name, Fuzzy_Arity, 'yes'),
 	!, % Backtracking not allowed.
+	functor(Functor, Sub_Pred_Name, Sub_Pred_Arity),  % Create functor
+	copy_args(Fuzzy_Arity, Functor_In, Functor).              % Unify args with the auxiliar one.
 
-	% Main functor.
-	functor(Functor, Fuzzy_Name, Fuzzy_Arity),           % Create functor
-	copy_args(Fuzzy_Arity, Functor_In, Functor).  % Copy arguments.
+build_functors([(_Other_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List], Category, On_Error, Pred_Name, Functor_In, Functor) :-
+	build_functors(List, Category, On_Error, Pred_Name, Functor_In, Functor).
 
-build_functors(_Name, _Arity, Status, On_Error, _Functor_In, On_Error) :- 
-	(   % Do not show warnings if the following are missing.
-	    Status == 'fact' ;
-	    Status == 'function' ;
-	    Status == 'fuzzification' ;
-	    Status == 'rule' ;
-	    Status == 'default_with_cond'
+build_functor_show_error_if_necessary(Category, Pred_Name) :-
+	(
+	    (   % Do not show warnings if the following are missing.
+		Category == 'fact' ;
+		Category == 'function' ;
+		Category == 'fuzzification' ;
+		Category == 'rule' ;
+		Category == 'default_with_cond'
+	    )
+	;   
+	    (
+		print_msg('info', 'You have not defined the facility for the predicate :: (Facility, Predicate_Name) ', (Category, Name))
+	    )
 	), !.
-
-build_functors(Name, _Arity, Status, On_Error, _Functor_In, On_Error) :- !,
-	print_msg('info', 'The predicate has not been defined :: (Name, Status) ', (Name, Status)).
 
 %build_fail_functor(H) :-
 %	functor(H, 'fail', 0).    % Create functor
