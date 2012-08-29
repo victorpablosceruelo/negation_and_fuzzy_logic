@@ -605,12 +605,12 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 	Category = 'fuzzy_rule',
 	% Build MAIN functor.
 	functor(Pred_Functor, Pred_Name, Pred_Arity),
-	% arg(Pred_Arity, Pred_Functor, Truth_Value_Arg),
 	% Build AUXILIAR functor
 	add_preffix_to_name(Pred_Name, 'auxiliar', Aux_Pred_Name),
 	Aux_Pred_Arity is Pred_Arity + 1,
 	functor(Aux_Pred_Functor, Aux_Pred_Name, Aux_Pred_Arity),
-	% Aux_Pred_Functor=..[Aux_Pred_Name|Aux_Pred_Args],
+	arg(Aux_Pred_Arity, Aux_Pred_Functor, Aux_Pred_Truth_Value_Arg),
+	arg(Pred_Arity,         Aux_Pred_Functor, Aux_Pred_Priority_Arg),
 	% Unify crisp args of MAIN and AUXILIAR functors.
 	Pred_Crisp_Arity is Pred_Arity - 1,
 	copy_args(Pred_Crisp_Arity, Pred_Functor, Aux_Pred_Functor),
@@ -644,7 +644,11 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 							  Fuzzy_Pred_Default_With_Cond ; 
 							  Fuzzy_Pred_Default_Without_Cond
 						      ),
-						      
+						      % Security conditions.
+						      Aux_Pred_Truth_Value_Arg .>=. 0,
+						      Aux_Pred_Truth_Value_Arg .=<. 1,
+						      Aux_Pred_Priority_Arg .>=. 0,
+						      Aux_Pred_Priority_Arg .=<. 1
 						  )
 			    )
 			)
@@ -658,11 +662,11 @@ build_auxiliary_clause(Predicate_Definition, _Fuzzy_Cl_Main, _Fuzzy_Cl_Aux) :-
 build_functors([], Category, On_Error, Pred_Name, _Functor_In, On_Error) :-
 	build_functor_show_error_if_necessary(Category, Pred_Name).
 	
-build_functors([(Category, Sub_Pred_Name, Sub_Pred_Arity)|_List], Category, _On_Error, Pred_Name, Functor_In, Functor) :-
+build_functors([(Category, Sub_Pred_Name, Sub_Pred_Arity)|_List], Category, _On_Error, _Pred_Name, Functor_In, Functor) :-
 
 	!, % Backtracking not allowed.
 	functor(Functor, Sub_Pred_Name, Sub_Pred_Arity),  % Create functor
-	copy_args(Fuzzy_Arity, Functor_In, Functor).              % Unify args with the auxiliar one.
+	copy_args(Sub_Pred_Arity, Functor_In, Functor).              % Unify args with the auxiliar one.
 
 build_functors([(_Other_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List], Category, On_Error, Pred_Name, Functor_In, Functor) :-
 	build_functors(List, Category, On_Error, Pred_Name, Functor_In, Functor).
@@ -678,7 +682,7 @@ build_functor_show_error_if_necessary(Category, Pred_Name) :-
 	    )
 	;   
 	    (
-		print_msg('info', 'You have not defined the facility for the predicate :: (Facility, Predicate_Name) ', (Category, Name))
+		print_msg('info', 'You have not defined the facility for the predicate :: (Facility, Predicate_Name) ', (Category, Pred_Name))
 	    )
 	), !.
 
