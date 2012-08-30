@@ -19,6 +19,7 @@ restaurant(paellador).
 restaurant(tapasbar).
 restaurant(meson_del_jamon).
 restaurant(museo_del_jamon).
+restaurant(zalacain).
 
 expensive_restaurant(zalacain).
 

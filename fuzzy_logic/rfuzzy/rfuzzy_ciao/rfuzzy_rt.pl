@@ -50,60 +50,76 @@ mean(X, Y, Z) :- Z .=. (X + Y) / 2.
 supreme([], _Element) :- !, 
 	print_msg('debug', 'supreme', 'list is empty. FAIL.'),
 	!, fail.
-supreme(List, Element) :-
-	print_msg('debug', 'supreme', List),
-	filter_out_repeated(List, List_Aux_1), !,
-	print_msg('debug', 'supreme_without_repetitions', List_Aux_1),
-	reorder_elements(List_Aux_1, [], List_Aux_2), !,
-	print_msg('debug', 'supreme_reordered', List_Aux_2),
-	take_an_element(List_Aux_2, Element).
+supreme(List_In, Answer) :-
+	functor(Answer, _Name, Arity), 
+	Arguments_Arity is Arity -1,
+	Truth_Value_Arity is Arity +1,
+	
+	print_msg('debug', 'supreme :: List_In', List_In),
+	supreme_aux_1(List_In, List_Aux_1), !,
+	print_msg('debug', 'supreme :: List_Aux_1', List_Aux_1),
+	reorder_by_truth_value(List_Aux_1, List_Aux_2),
+	print_msg('debug', 'supreme :: List_Aux_2', List_Aux_2),
+	take_an_element(List_Aux_2, Element),
+	print_msg('debug', 'supreme :: element_taken', Element),
 
-reorder_elements([], List_Out, List_Out) :- !.
-reorder_elements([Element|List_In], List_Tmp_1, List_Out) :-
-	get_fuzzy_args_1n2(Element, F1, F2),
-	reorder_elements_aux(Element, F1, F2, List_Tmp_1, List_Tmp_2),
-	reorder_elements(List_In, List_Tmp_2, List_Out).
+	copy_args(Arguments_Arity, Element, Answer),
+	arg(Truth_Value_Arity, Element, Truth_Value),
+	arg(Arity, Answer, Truth_Value).
+	
 
-reorder_elements_aux(Element, _F1, _F2, [], [Element]) :- !.
-reorder_elements_aux(Element, F1, F2, [Current|List_In], [Current|List_Out]) :-
-	get_fuzzy_args_1n2(Current, C1, C2),
+% Head is only kept if it is the supreme.
+supreme_aux_1([], []) :- !.
+supreme_aux_1([Head | Tail_In], [Head | List_Out]) :- 
+	supreme_aux_2(Head, Tail_In, Tail_Out), !,
+	supreme_aux_1(Tail_Out, List_Out).
+supreme_aux_1([_Head | Tail_In], List_Out) :-
+	supreme_aux_1(Tail_In, List_Out).
+
+supreme_aux_2(_Head, [], []) :- !.
+supreme_aux_2(Head, [Next | Tail_In], Tail_Out) :-
+	split_out_fuzzy_functor_args(Head, Prio_1, TV_1, Args_1),
+	split_out_fuzzy_functor_args(Next, Prio_2, TV_2, Args_2),
+
+	Args_1 = Args_2, !, % They are for the same fuzzy values.
 	(
-	    (	C2 .>. F2    )
+	    (	Prio_1 .>. Prio_2  )
 	;
-	    ( 	C2 .=. F2,	C1 .>. F1	    )
+	    (   Prio_1 .=. Prio_2, TV_1 .>=. TV_2  )
 	), !,
-	reorder_elements_aux(Element, F1, F2, List_In, List_Out).
-reorder_elements_aux(Element, _F1, _F2, [Current|List], [Element,Current|List]) :- !.
+	supreme_aux_2(Head, Tail_In, Tail_Out).
+supreme_aux_2(Head, [Next | Tail_In], Tail_Out) :-
+	supreme_aux_2(Head, Tail_In, [Next | Tail_Out]).
 
-filter_out_repeated([], []) :- !.
-filter_out_repeated([Element_1|List_In], [Element_1|List_Out]) :-
-	functor(Element_1, Name, Arity),
-	NewArity is Arity -2,
-	functor(Element_1_Tmp, Name, NewArity),
-	copy_args(NewArity, Element_1, Element_1_Tmp),
-	copy_term(Element_1_Tmp, Element_1_Copy),
-	filter_out_repeated_aux(Element_1_Copy, List_In, List_Tmp),
-	filter_out_repeated(List_Tmp, List_Out).
+reorder_by_truth_value([], []) :- !.
+reorder_by_truth_value([Head], [Head]) :- !.
+reorder_by_truth_value([Head_1 | Tail], List_Out) :-
+	reorder_by_truth_value_aux(Head_1, Tail, NewList), !,
+	reorder_by_truth_value(NewList, List_Out).
+reorder_by_truth_value([Head_1 | Tail], [Head_1 | List_Out]) :- !,
+	reorder_by_truth_value(Tail, List_Out).
+	
+reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail ], [ Head_2, Head_1 | Tail]) :-
+	has_less_truth_value(Head_1, Head_2), !.
 
-filter_out_repeated_aux(_Element_1_Copy, [], []) :- !.
-filter_out_repeated_aux(Element_1_Copy, [Element_2|List_In], List_Tmp) :-
-	functor(Element_2, Name, Arity),
-	NewArity is Arity -2,
-	functor(Element_2_Tmp, Name, NewArity),
-	copy_args(NewArity, Element_2, Element_2_Tmp),
-	copy_term(Element_2_Tmp, Element_2_Copy),
-	Element_1_Copy = Element_2_Copy, !,
-	filter_out_repeated_aux(Element_1_Copy, List_In, List_Tmp).
-filter_out_repeated_aux(Element_1_Copy, [Element_2|List_In], [Element_2|List_Tmp]) :-
-	filter_out_repeated_aux(Element_1_Copy, List_In, List_Tmp).
+has_less_truth_value(Head_1, Head_2) :-
+	functor(Head_1, _Name_1, Arity_1), 
+	functor(Head_2, _Name_2, Arity_2), 
+	arg(Arity_1, Head_1, TV_1),
+	arg(Arity_2, Head_2, TV_2),
+	TV_1 .<. TV_2.
 
+split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args) :-
+	print_msg('debug', 'split_out_fuzzy_functor_args(Head)', split_out_fuzzy_functor_args(Head)),
+	copy_term(Head, Head_Copy),
+	functor(Head_Copy, Name, _Arity), 
+	Head_Copy=..[Name | Functor_Args],
+	split_out_fuzzy_functor_args_aux(Functor_Args, Prio, TV, Other_Args), 
+	print_msg('debug', 'split_out_fuzzy_functor_args(Head, Prio, TV, Args)', split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args)).
 
-get_fuzzy_args_1n2(Element, F1, F2) :-
-	functor(Element, _Name, Arity),
-	arg(Arity, Element, F2),
-	NewArity is Arity -1,
-	arg(NewArity, Element, F1),
-	!.
+split_out_fuzzy_functor_args_aux([Prio, TV], Prio, TV, []) :- !.
+split_out_fuzzy_functor_args_aux([Arg | Args_List_In], Prio, TV, [Arg | Args_List_Out]) :- 
+	split_out_fuzzy_functor_args_aux(Args_List_In, Prio, TV, Args_List_Out).
 
 take_an_element([Element|_List], Element).
 take_an_element([_FirstElement|List], Element) :-

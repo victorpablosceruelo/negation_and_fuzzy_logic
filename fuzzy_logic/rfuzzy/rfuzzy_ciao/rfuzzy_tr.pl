@@ -745,8 +745,7 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 				 Pred_Functor :- (
 						     print_msg('debug', 'Predicate called', Pred_Functor),
 						     findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
-						     supreme(Results, Result),
-						     copy_args(Pred_Arity, Result, Pred_Functor)
+						     supreme(Results, Pred_Functor)
 						 )		     
 			     ) % Main Fuzzy Pred
 			 )
