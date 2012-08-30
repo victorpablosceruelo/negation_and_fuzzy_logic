@@ -58,7 +58,7 @@ supreme(List_In, Answer) :-
 	print_msg('debug', 'supreme :: List_In', List_In),
 	supreme_aux_1(List_In, List_Aux_1), !,
 	print_msg('debug', 'supreme :: List_Aux_1', List_Aux_1),
-	reorder_by_truth_value(List_Aux_1, List_Aux_2),
+	reorder_by_truth_value(List_Aux_1, [], List_Aux_2),
 	print_msg('debug', 'supreme :: List_Aux_2', List_Aux_2),
 	take_an_element(List_Aux_2, Element),
 	print_msg('debug', 'supreme :: element_taken', Element),
@@ -71,6 +71,8 @@ supreme(List_In, Answer) :-
 % Head is only kept if it is the supreme.
 supreme_aux_1([], []) :- !.
 supreme_aux_1([Head | Tail_In], [Head | List_Out]) :- 
+	print_msg_nl('ultradebug'),
+	print_msg('ultradebug', 'supreme_aux_1 :: Head', Head),
 	supreme_aux_2(Head, Tail_In, Tail_Out), !,
 	supreme_aux_1(Tail_Out, List_Out).
 supreme_aux_1([_Head | Tail_In], List_Out) :-
@@ -82,25 +84,27 @@ supreme_aux_2(Head, [Next | Tail_In], Tail_Out) :-
 	split_out_fuzzy_functor_args(Next, Prio_2, TV_2, Args_2),
 
 	Args_1 = Args_2, !, % They are for the same fuzzy values.
+	print_msg('ultradebug', 'supreme_aux_2', 'equal args'),
 	(
 	    (	Prio_1 .>. Prio_2  )
 	;
 	    (   Prio_1 .=. Prio_2, TV_1 .>=. TV_2  )
 	), !,
+	print_msg('ultradebug', 'supreme_aux_2', 'higher Prio or TV.'),
 	supreme_aux_2(Head, Tail_In, Tail_Out).
-supreme_aux_2(Head, [Next | Tail_In], Tail_Out) :-
-	supreme_aux_2(Head, Tail_In, [Next | Tail_Out]).
+supreme_aux_2(Head, [Next | Tail_In], [Next | Tail_Out]) :-
+	supreme_aux_2(Head, Tail_In, Tail_Out).
 
-reorder_by_truth_value([], []) :- !.
-reorder_by_truth_value([Head], [Head]) :- !.
-reorder_by_truth_value([Head_1 | Tail], List_Out) :-
-	reorder_by_truth_value_aux(Head_1, Tail, NewList), !,
-	reorder_by_truth_value(NewList, List_Out).
-reorder_by_truth_value([Head_1 | Tail], [Head_1 | List_Out]) :- !,
-	reorder_by_truth_value(Tail, List_Out).
+reorder_by_truth_value([], List_In, List_In) :- !.
+reorder_by_truth_value([Head_1 | Tail], List_In, List_Out) :-
+	reorder_by_truth_value_aux(Head_1, List_In, List_Aux), !,
+	reorder_by_truth_value(Tail, List_Aux, List_Out).
 	
-reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail ], [ Head_2, Head_1 | Tail]) :-
-	has_less_truth_value(Head_1, Head_2), !.
+reorder_by_truth_value_aux(Head_1, [], [Head_1]) :- !.
+reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail_In ], [ Head_2 | Tail_Out ]) :-
+	has_less_truth_value(Head_1, Head_2), !,
+	reorder_by_truth_value_aux(Head_1, Tail_In, Tail_Out).
+reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail_In ], [ Head_1, Head_2 | Tail_In ]) :- !.
 
 has_less_truth_value(Head_1, Head_2) :-
 	functor(Head_1, _Name_1, Arity_1), 
@@ -110,12 +114,12 @@ has_less_truth_value(Head_1, Head_2) :-
 	TV_1 .<. TV_2.
 
 split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args) :-
-	print_msg('debug', 'split_out_fuzzy_functor_args(Head)', split_out_fuzzy_functor_args(Head)),
+%	print_msg('debug', 'split_out_fuzzy_functor_args(Head)', split_out_fuzzy_functor_args(Head)),
 	copy_term(Head, Head_Copy),
 	functor(Head_Copy, Name, _Arity), 
 	Head_Copy=..[Name | Functor_Args],
 	split_out_fuzzy_functor_args_aux(Functor_Args, Prio, TV, Other_Args), 
-	print_msg('debug', 'split_out_fuzzy_functor_args(Head, Prio, TV, Args)', split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args)).
+	print_msg('ultradebug', 'split_out_fuzzy_functor_args(Head, Prio, TV, Args)', split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args)).
 
 split_out_fuzzy_functor_args_aux([Prio, TV], Prio, TV, []) :- !.
 split_out_fuzzy_functor_args_aux([Arg | Args_List_In], Prio, TV, [Arg | Args_List_Out]) :- 
@@ -124,7 +128,7 @@ split_out_fuzzy_functor_args_aux([Arg | Args_List_In], Prio, TV, [Arg | Args_Lis
 take_an_element([Element|_List], Element).
 take_an_element([_FirstElement|List], Element) :-
 	take_an_element(List, Element).
-	
+
 
 % ---------------------------------------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
