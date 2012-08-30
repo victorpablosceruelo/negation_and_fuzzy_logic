@@ -730,13 +730,15 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 	copy_args(Pred_Crisp_Arity, Pred_Functor, Aux_Pred_Functor),
 
 	print_msg('debug', 'Now building functor from (List, Pred_Name, Aux_Pred_Functor)', (List, Pred_Name, Aux_Pred_Functor)),
-	build_functors(List, 'type',                             'true', Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Types),
-	build_functors(List, 'fact',                              'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Fact),
-%	build_functors(List, 'function',                       'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Function),
-	build_functors(List, 'fuzzification',                'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Fuzzification),
-	build_functors(List, 'rule',                              'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Rule),
-	build_functors(List, 'default_with_cond',      'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Default_With_Cond),
-	build_functors(List, 'default_without_cond', 'fail',  Pred_Name, Aux_Pred_Functor, Fuzzy_Pred_Default_Without_Cond),
+	build_functors(List, 'type',                             'true', Aux_Pred_Functor, Fuzzy_Pred_Types, [], Def_1, [], NDef_1),
+	build_functors(List, 'fact',                              'fail',  Aux_Pred_Functor, Fuzzy_Pred_Fact, Def_1, Def_2, NDef_1, NDef_2),
+	build_functors(List, 'fuzzification',                'fail',  Aux_Pred_Functor, Fuzzy_Pred_Fuzzification, Def_2, Def_3, NDef_2, NDef_3),
+	build_functors(List, 'rule',                              'fail',  Aux_Pred_Functor, Fuzzy_Pred_Rule, Def_3, Def_4, NDef_3, NDef_4),
+	build_functors(List, 'default_with_cond',      'fail',  Aux_Pred_Functor, Fuzzy_Pred_Default_With_Cond, Def_4, Def_5, NDef_4, NDef_5),
+	build_functors(List, 'default_without_cond', 'fail',  Aux_Pred_Functor, Fuzzy_Pred_Default_Without_Cond, Def_5, Def_6, NDef_5, NDef_6),
+	build_functors(List, 'synonym',                     'fail',  Aux_Pred_Functor, Fuzzy_Pred_Synonym, Def_6, Def_7, NDef_6, NDef_7),
+	build_functors(List, 'antonym',                      'fail',  Aux_Pred_Functor, Fuzzy_Pred_Antonym, Def_7, Def, NDef_7, NDef),
+	build_functors_notify_missing_facilities(Pred_Name, Def, NDef),
 
 	(Fuzzy_Cl_Main = (
 			     (
@@ -751,20 +753,22 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 	(Fuzzy_Cl_Aux = ( 
 			    ( 
 				Aux_Pred_Functor :- ( 
-						      Fuzzy_Pred_Types,
-						      (   Fuzzy_Pred_Fact ; 
-%							  Fuzzy_Pred_Function ;
-							  Fuzzy_Pred_Fuzzification ;
-							  Fuzzy_Pred_Rule ;
-							  Fuzzy_Pred_Default_With_Cond ; 
-							  Fuzzy_Pred_Default_Without_Cond
-						      ),
-						      % Security conditions.
-						      Aux_Pred_Truth_Value_Arg .>=. 0,
-						      Aux_Pred_Truth_Value_Arg .=<. 1,
-						      Aux_Pred_Priority_Arg .>=. 0,
-						      Aux_Pred_Priority_Arg .=<. 1
-						  )
+							Fuzzy_Pred_Types,
+							(   
+							    Fuzzy_Pred_Fact ; 
+							    Fuzzy_Pred_Fuzzification ;
+							    Fuzzy_Pred_Rule ;
+							    Fuzzy_Pred_Default_With_Cond ; 
+							    Fuzzy_Pred_Default_Without_Cond ;
+							    Fuzzy_Pred_Synonym ;
+							    Fuzzy_Pred_Antonym 
+							),
+							% Security conditions.
+							Aux_Pred_Truth_Value_Arg .>=. 0,
+							Aux_Pred_Truth_Value_Arg .=<. 1,
+							Aux_Pred_Priority_Arg .>=. 0,
+							Aux_Pred_Priority_Arg .=<. 1
+						    )
 			    )
 			)
 	).
@@ -772,38 +776,41 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 build_auxiliary_clause(Predicate_Definition, _Fuzzy_Cl_Main, _Fuzzy_Cl_Aux) :-
 	print_msg('error', 'Error building auxiliary clauses for predicate definition', Predicate_Definition),
 	!, fail.
+
+build_functors([], Category, On_Error, _Functor_In, On_Error, Def_In, Def_In, NDef_In, [Category | NDef_In]) :- !.
 	
-% build_functors(List, Category On_Error, Functor_In, Functor).
-build_functors([], Category, On_Error, Pred_Name, _Functor_In, On_Error) :-
-	build_functor_show_error_if_necessary(Category, Pred_Name).
-	
-build_functors([(Category, Sub_Pred_Name, Sub_Pred_Arity)|_List], Category, _On_Error, _Pred_Name, Functor_In, Functor) :-
+build_functors([(Category, Sub_Pred_Name, Sub_Pred_Arity)|_List], Category, _On_Error, Functor_In, Functor, Def_In, [Category | Def_In], NDef_In, NDef_In) :-
 
 	!, % Backtracking not allowed.
 	functor(Functor, Sub_Pred_Name, Sub_Pred_Arity),  % Create functor
 	copy_args(Sub_Pred_Arity, Functor_In, Functor).              % Unify args with the auxiliar one.
 
-build_functors([(_Other_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List], Category, On_Error, Pred_Name, Functor_In, Functor) :-
-	build_functors(List, Category, On_Error, Pred_Name, Functor_In, Functor).
+build_functors([(_Other_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List], Category, On_Error, Functor_In, Functor, Def_In, Def_Out, NDef_In, NDef_Out) :-
+	build_functors(List, Category, On_Error, Functor_In, Functor, Def_In, Def_Out, NDef_In, NDef_Out).
 
-build_functor_show_error_if_necessary(Category, Pred_Name) :-
+% build_functors_notify_missing_facilities(Pred_Name, Def, NDef),
+build_functors_notify_missing_facilities(_Pred_Name, Def, _NDef) :- 
 	(
-	    (   % Do not show warnings if the following are missing.
-		Category == 'fact' ;
-		Category == 'function' ;
-		Category == 'fuzzification' ;
-		Category == 'rule' ;
-		Category == 'default_with_cond'
-	    )
-	;   
-	    (
-		print_msg('info', 'You have not defined the facility for the predicate :: (Facility, Predicate_Name) ', (Category, Pred_Name))
-	    )
+	    memberchk_local('synonym', Def)
+	;
+	    memberchk_local('antonym', Def)
+	), !. % No errors.
+
+build_functors_notify_missing_facilities(Pred_Name, _Def, NDef_In) :-
+	% Not an error if the missing information belongs to the following categories:
+	lists_substraction(NDef_In, ['fact', 'function', 'fuzzification', 'rule', 'default_with_cond', 'synonym', 'antonym'], NDef_Out),
+	(
+	    (   NDef_Out = [], !  )
+	;
+	    print_msg('info', 'Facilities not defined for the predicate :: (Predicate_Name, Facilities) ', (Pred_Name, NDef_Out))
 	), !.
 
-%build_fail_functor(H) :-
-%	functor(H, 'fail', 0).    % Create functor
-
+lists_substraction([], _List_2, []) :- !.
+lists_substraction([Head | Tail ], List_2, Result_List) :-
+	memberchk_local(Head, List_2), !, 
+	lists_substraction(Tail, List_2, Result_List).
+lists_substraction([Head | Tail ], List_2, [Head | Result_List]) :-
+	lists_substraction(Tail, List_2, Result_List).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

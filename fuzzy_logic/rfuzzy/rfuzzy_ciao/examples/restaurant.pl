@@ -6,7 +6,7 @@
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
 % Activate/Deactivate debug.
-:- activate_rfuzzy_debug.
+% :- activate_rfuzzy_debug.
 
 restaurant(kenzo).
 restaurant(burguer_king).
@@ -39,7 +39,7 @@ rfuzzy_define_fuzzification(near_the_city_center/1, distance_to_the_city_center/
 
 % before:
 % :- set_prop cheap/1 => restaurant/1.
-rfuzzy_types_for(cheap/1, [restaurant/1]).
+rfuzzy_type_for(cheap/1, [restaurant/1]).
 % before: 
 % :- default(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.5).
