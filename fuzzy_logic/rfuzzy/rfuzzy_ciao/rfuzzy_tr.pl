@@ -185,6 +185,8 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules):-
 	generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules).
 
 rfuzzy_trans_sent_aux(0, []) :- !, nl, nl, nl.
+rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
+	activate_rfuzzy_debug.
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
 rfuzzy_trans_sent_aux(Sentence, Translation) :-
 	translate(Sentence, Translation).

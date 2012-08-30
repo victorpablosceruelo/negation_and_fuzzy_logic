@@ -5,6 +5,9 @@
 % Define the file where we want debug msgs.
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
+% Activate/Deactivate debug.
+% :- activate_rfuzzy_debug.
+
 restaurant(kenzo).
 restaurant(burguer_king).
 restaurant(pizza_jardin).

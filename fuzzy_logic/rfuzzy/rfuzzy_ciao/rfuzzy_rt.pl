@@ -3,7 +3,7 @@
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	mean/3, supreme/2,
 	'=>'/4,
-	print_msg/3, print_msg_nl/1, 
+	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2 ],[hiord]).
 
 :- use_module(library(write),[write/1]).
@@ -182,19 +182,31 @@ rfuzzy_conversion_out(X, X) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% This is to enable/disable debug.
-print_msg_level('debug'). % The lowest level
-print_msg_level('info'). % An intermediate level
-print_msg_level('warning'). % The level printing less
-print_msg_level('error'). % The level printing less
+:- data print_msg_level/1.
+
+activate_all_rfuzzy_print_msg_level :-
+	assertz_fact(print_msg_level('info')), % An intermediate level
+	assertz_fact(print_msg_level('warning')), % The level printing less	
+	assertz_fact(print_msg_level('error')), % The level printing less
+	assertz_fact(print_msg_level('configured')). % The level printing less
+
+% This is to enable debug. Deactivated by default.
+activate_rfuzzy_debug :-	
+	assertz_fact(print_msg_level('debug')). % The lowest level
 
 % Main predicate in charge of printing.
 print_msg(Level, Msg1, Msg2) :- 
+	\+(print_msg_level('configured')), !,
+	activate_all_rfuzzy_print_msg_level,
+	print_msg(Level, Msg1, Msg2).
+print_msg(Level, Msg1, Msg2) :- 
+	print_msg_level('configured'),
 	print_msg_level(Level), !,
 	translate_level_to_pre_msg1(Level, Pre_Msg1),
 	print_msg_aux(Pre_Msg1, Msg1, [], Msg2),
 	print_msg_nl(Level).
-print_msg(_Level, _Msg1, _Msg2) :- !. 
+print_msg(_Level, _Msg1, _Msg2) :- 
+	print_msg_level('configured'), !. 
 
 translate_level_to_pre_msg1('debug', 'DEBUG: ') :- !.
 translate_level_to_pre_msg1('info', 'INFO: ') :- !.
