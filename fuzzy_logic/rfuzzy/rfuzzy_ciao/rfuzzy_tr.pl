@@ -123,11 +123,8 @@ save_predicate_definition_test_categories_aux(Category, Sub_Category) :-
 save_predicate_definition_test_categories_aux(Category, Sub_Category) :-
 	nonvar(Category), nonvar(Sub_Category),
 	Category = Sub_Category, % This case is impossible because it is an infinite loop.
-	(
-	    translation_info(Sub_Category, _Any_Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
-	;
-	    translation_info(_Any_Sub_Category, Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), !
-	), !.
+	translation_info(Sub_Category, _Any_Category, _Add_Args, _Fix_Priority, _Priority, _Preffix_String), 
+	!.
 
 save_predicate_definition_test_categories_aux(Category, Sub_Category) :-
 	nonvar(Category), nonvar(Sub_Category),
@@ -278,15 +275,13 @@ translate((Head value Value), Fuzzy_Head):-
 translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
 	!,
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
-	functor(Aggregator_Functor, Aggregator_Name, Aggregator_Arity),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Aggregator_Functor, 'aggregator', 'yes', _Aggregator_Functor_Aux, _Truth_Value),
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
 	retrieve_predicate_info('crisp', Aggregator_Name, Aggregator_Arity, _List, 'yes'),
 
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, SubCategory, Fuzzy_Name, Fuzzy_Arity), !.
-	save_predicate_definition(Category, Pred_Name, Pred_Arity, SubCategory, Fuzzy_Name, Fuzzy_Arity),
+	save_predicate_definition('aggregator', Aggregator_Name, Aggregator_Arity, 'aggregator', Aggregator_Name, Aggregator_Arity),
+	!.
 
 % function definition.
 translate((Head :# List), (Fuzzy_H :- Body)) :-
@@ -360,9 +355,9 @@ translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 
 	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)).
 
-translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred), Translation):-
+translate(rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred), Translation):-
 	!,
-	print_msg('debug', 'translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred))) ', rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)),
+	print_msg('debug', 'translate(rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred))) ', rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred)),
 	nonvar(Existing_Predicate_Name), nonvar(New_Predicate_Name), nonvar(Cred_Op), number(Cred), number(Arity),
 	test_aggregator_is_defined(Cred_Op, 'yes'),
 
