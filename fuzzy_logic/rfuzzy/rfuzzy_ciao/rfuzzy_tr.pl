@@ -289,7 +289,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
 	!.
 
 % function definition.
-translate((Head :# List), (Fuzzy_H :- Body)) :-
+translate((Head :# List), (Fuzzy_H :- (Body, print_msg('debug', 'function_call', Fuzzy_H)))) :-
 	!, % If patter matching, backtracking forbiden.
 	% list(Lista),
 	print_msg('debug', '(Head :# List) ', (Head :# List)),
@@ -297,10 +297,10 @@ translate((Head :# List), (Fuzzy_H :- Body)) :-
 	functor(Head, Name, 0),
 	functor(H, Name, 1),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(H, 'function', 'yes', Fuzzy_H, Value),
+	translate_functor(H, 'function', 'yes', Fuzzy_H, Truth_Value),
 
 	arg(1, Fuzzy_H, X),
-	build_straight_lines(X, Value, List, Body).
+	build_straight_lines(X, Truth_Value, List, Body).
 
 % Predicate's type(s) definition.
 translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
@@ -743,10 +743,11 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, Lis
 	(Fuzzy_Cl_Main = (
 			     (
 				 Pred_Functor :- (
-							findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
-							supreme(Results, Result),
-							copy_args(Pred_Arity, Result, Pred_Functor)
-						    )		     
+						     print_msg('debug', 'Predicate called', Pred_Functor),
+						     findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
+						     supreme(Results, Result),
+						     copy_args(Pred_Arity, Result, Pred_Functor)
+						 )		     
 			     ) % Main Fuzzy Pred
 			 )
 	),

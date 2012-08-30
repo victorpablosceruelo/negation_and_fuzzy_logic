@@ -47,13 +47,16 @@ mean(X, Y, Z) :- Z .=. (X + Y) / 2.
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+supreme([], _Element) :- !, 
+	print_msg('debug', 'supreme', 'list is empty. FAIL.'),
+	!, fail.
 supreme(List, Element) :-
 	print_msg('debug', 'supreme', List),
-	reorder_elements(List, [], List_Tmp_1), !,
-	print_msg('debug', 'supreme_reordered', List_Tmp_1),
-	filter_out_repeated(List_Tmp_1, List_Tmp_2), !,
-	print_msg('debug', 'supreme_non-repeated', List_Tmp_2),
-	take_an_element(List_Tmp_2, Element).
+	filter_out_repeated(List, List_Aux_1), !,
+	print_msg('debug', 'supreme_without_repetitions', List_Aux_1),
+	reorder_elements(List_Aux_1, [], List_Aux_2), !,
+	print_msg('debug', 'supreme_reordered', List_Aux_2),
+	take_an_element(List_Aux_2, Element).
 
 reorder_elements([], List_Out, List_Out) :- !.
 reorder_elements([Element|List_In], List_Tmp_1, List_Out) :-
