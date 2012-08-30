@@ -32,8 +32,8 @@ translation_info('default_with_cond',      'fuzzy_rule', 2, 'yes', 0.25,   "rfuz
 translation_info('rule',                              'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
 translation_info('fuzzification',                 'fuzzy_rule', 2, 'yes', 0.75,  "rfuzzy_fuzzification_").
 translation_info('fact',                               'fuzzy_rule', 2, 'yes', 1,       "rfuzzy_fact_").
-translation_info('synonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym").
-translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym").
+translation_info('synonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym_").
+translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym_").
 
 % This produces unexpected results.
 % translation_info(_X,                             _Y,               0, 0, 'no', 0,          "rfuzzy_error_error_error_").
