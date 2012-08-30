@@ -1,7 +1,5 @@
 :- module(human_development,_,[rfuzzy, clpr]).
 
-human_development(C) :~ prod((literacy_rate(C),long_life(C),living_standard(C))).
-
 type_Country(japan).
 type_Country(spain).
 type_Country(china).
@@ -43,4 +41,6 @@ long_life(australia) value 0.8.
 long_life(cuba) value 0.77.
 long_life(kenya) value 0.48.
 long_life(senegal) value 0.59.
+
+human_development(C) :~ prod((literacy_rate(C),long_life(C),living_standard(C))).
 

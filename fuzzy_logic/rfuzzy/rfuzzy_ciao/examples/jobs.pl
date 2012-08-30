@@ -1,15 +1,12 @@
 :- module(jobs,_,[rfuzzy, clpr]).
 
-rfuzzy_type_for(job_offer/1, [position/1]).
-(job_offer(J) cred (min,0.8)) :~ prod((interest(J), distance(J), salary(J), future_development(J))).
-
 position(consultant).
 position(systems_analyst).
 position(developer).
 position(programmer).
 position(teacher).
 
-rfuzzy_type_for(interest/1, [position/1].
+rfuzzy_type_for(interest/1, [position/1]).
 rfuzzy_default_value_for(interest/1, 0.1).
 interest(consultant) value 0.6 .
 interest(systems_analyst) value 0.8 .
@@ -40,3 +37,6 @@ future_development(systems_analyst) value 0.3 .
 future_development(developer) value 0.8 .
 future_development(programmer) value 0.7.
 future_development(teacher) value 0.5.
+
+rfuzzy_type_for(job_offer/1, [position/1]).
+(job_offer(J) cred (min,0.8)) :~ prod((interest(J), distance(J), salary(J), future_development(J))).
