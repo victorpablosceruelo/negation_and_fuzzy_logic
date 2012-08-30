@@ -154,7 +154,7 @@ rfuzzy_trans_sentence(Arg, Arg, FileName) :-
 	print_msg('warning', 'rfuzzy_trans_sent: ERROR: Input: ', Arg),
 	print_msg('warning', 'rfuzzy_trans_sent: ERROR: FileName: ', FileName),
 	print_msg_nl('debug'),
-	print_info('warning', Arg), 
+	print_info('debug', Arg), 
 	print_msg_nl('debug'),
 	print_msg_nl('debug').
 
