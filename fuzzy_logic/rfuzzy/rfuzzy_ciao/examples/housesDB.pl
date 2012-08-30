@@ -55,42 +55,42 @@ getHouseType(X,Y):- house(X,Y,_,_,_,_,_).
 
 % FUZZY FUNCTIONS OVER QUANTITATIVE ATTRIBUTES
 %:- set_prop expensive_func/1 => positive_integer/1.
-:- default(expensive_func/1,1).
+rfuzzy_default_value_for(expensive_func/1,1).
 expensive_func :# ([(50000,0),(100000,0.1),(250000,0.2),(350000,0.3),(450000,0.5),(550000,0.6),
 	            (800000,0.7),(1000000,0.8),(1500000,0.9),(2500000,1)]).
 
 %:- set_prop cheap_func/1 => positive_integer/1.
-:- default(cheap_func/1,0).
+rfuzzy_default_value_for(cheap_func/1,0).
 cheap_func :# ([(0,1),(30000,1),(50000,0.8),(100000,0.7),(250000,0.5),(350000,0.3),
 	            (450000,0.1),(550000,0)]).
 
 %:- set_prop big_func/1 => positive_integer/1.
-:- default(big_func/1,1).
+rfuzzy_default_value_for(big_func/1,1).
 big_func :# ([(0,0),(50,0.1),(80,0.2),(120,0.3),(200,0.4),(300,0.5),(500,0.7),(1000,0.8),(1500,0.9),(2500,1)]).
 
 %:- set_prop small_func/1 => positive_integer/1.
-:- default(small_func/1,0).
+rfuzzy_default_value_for(small_func/1,0).
 small_func :# ([(0,1),(50,1),(80,0.9),(100,0.8),(150,0.7),(200,0.5),(300,0.2),(400,0.1),(500,0)]).
 
 %:- set_prop close_to_center_func/1 => positive_integer/1.
-:- default(close_to_center_func/1,0).
+rfuzzy_default_value_for(close_to_center_func/1,0).
 close_to_center_func :# ([(0,1),(2,1),(4,0.8),(7,0.6),(10,0.5),(12,0.3),(15,0.2),(20,0)]).
 
 %:- set_prop far_from_center_func/1 => positive_integer/1.
-:- default(far_from_center_func/1,1).
+rfuzzy_default_value_for(far_from_center_func/1,1).
 far_from_center_func :# ([(0,0),(7,0),(8,0.1),(10,0.3),(14,0.4),(20,0.7),(25,0.8),(30,1)]).
 
 %:- set_prop close_to_beach_func/1 => positive_integer/1.
-:- default(close_to_beach_func/1,0).
+rfuzzy_default_value_for(close_to_beach_func/1,0).
 close_to_beach_func :# ([(0,1),(100,1),(1000,0.5),(2000,0)]).
 
 % QUALIFIERS
 :- set_prop very_func/1 => fraction/1.
-:- default(very_func/1,0.5).
+rfuzzy_default_value_for(very_func/1,0.5).
 very_func :# ([(0,0),(0.5,0),(0.8,0.8),(1,1)]).
 
 :- set_prop little_func/1 => fraction/1.
-:- default(little_func/1,0.5).
+rfuzzy_default_value_for(little_func/1,0.5).
 little_func :# ([(0,1),(0.1,1),(0.4,0),(1,0)]).
 
 % QUALIFIED FUZZY FUNCTIONS
@@ -112,28 +112,28 @@ little_close_to_beach(X,Y):- close_to_beach(X,T),little_func(T,Y).
 
 % Rules
 :- set_prop q1/1 => codetype/1.
-:- default(q1/1,0.5).
+rfuzzy_default_value_for(q1/1,0.5).
 q1(X):~ prod cheap(X), close_to_center(X).
 
 :- set_prop q2/1 => codetype/1.
-:- default(q2/1,0.5).
+rfuzzy_default_value_for(q2/1,0.5).
 q2(X):~ prod cheap(X), little_big(X), close_to_beach(X).
 
 :- set_prop q3/1 => codetype/1.
-:- default(q3/1,0.5).
+rfuzzy_default_value_for(q3/1,0.5).
 q3(X):~ prod close_to_beach(X), very_far_from_center(X).
 t1(X,Y):- getHouseType(X,'apartment'),q3(X,Z), Y = Z ; Y = 0.
 
 :- set_prop q4/1 => codetype/1.
-:- default(q4/1,0.5).
+rfuzzy_default_value_for(q4/1,0.5).
 q4(X):~ prod expensive(X), big(X), very_close_to_beach(X).% missing crisp and not* parts 
 
 :- set_prop q5/1 => codetype/1.
-:- default(q5/1,0.5).
+rfuzzy_default_value_for(q5/1,0.5).
 q5(X):~ prod very_cheap(X). % 2 missing crisp parts
 
 :- set_prop q6/1 => codetype/1.
-:- default(q6/1,0.5).
+rfuzzy_default_value_for(q6/1,0.5).
 q6(X):~ prod close_to_center(X), close_to_beach(X). % 2 missing crisp parts
 
 

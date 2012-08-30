@@ -28,12 +28,12 @@ film('Finding Nemo', 2003, 112, comedy, english).
 
 % modern is an example of a numerical attribute
 %:- set_prop modern/1 => year/1.
-:- default(modern/1, 0).
+rfuzzy_default_value_for(modern/1, 0).
 modern :# ([ (1970, 0), (2000, 1), (2010, 1)]) .
 
 
 % attribute concerning duration of the films
-:- default(mlength/1, 0).
+rfuzzy_default_value_for(mlength/1, 0).
 mlength :# ([ (120, 0), (180, 1), (600, 1)]) .
 
 

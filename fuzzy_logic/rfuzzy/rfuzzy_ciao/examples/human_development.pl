@@ -1,7 +1,5 @@
 :- module(human_development,_,[rfuzzy, clpr]).
 
-:- prop type_Country/1.
-
 human_development(C) :~ prod literacy_rate(C),long_life(C),living_standard(C).
 
 type_Country(japan).
@@ -14,14 +12,14 @@ type_Country(egypt).
 type_Country(kenya).
 type_Country(senegal).
 
-:- set_prop living_standard/1 => type_Country.
-:- set_prop literacy_rate/1 => type_Country.
-:- set_prop long_life/1 => type_Country.
-:- set_prop human_development/1 => type_Country.
+rfuzzy_type_for(living_standard/1, [type_Country/1]).
+rfuzzy_type_for(literacy_rate/1, [type_Country/1]).
+rfuzzy_type_for(long_life/1, [type_Country/1]).
+rfuzzy_type_for(human_development/1, [type_Country/1]).
 
-:- default(living_standard/1, 0.48).
-:- default(literacy_rate/1, 0.99).
-:- default(long_life/1, 0.72).
+rfuzzy_default_value_for(living_standard/1, 0.48).
+rfuzzy_default_value_for(literacy_rate/1, 0.99).
+rfuzzy_default_value_for(long_life/1, 0.72).
 
 living_standard(japan) value 0.95.
 living_standard(spain) value 0.9.

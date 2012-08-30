@@ -12,7 +12,7 @@ city(sydney).
 
 % A city is a good destination with a truth value of 0.1
 % if we can not compute a more accurate value.
-:- default(good_destination/1, 0.3).
+rfuzzy_default_value_for(good_destination/1, 0.3).
 
 % The rule to determine the grade of belonging of 
 % a player to the fuzzy set of good_player has a 
@@ -23,14 +23,14 @@ good_destination(Place) cred (prod,1) :~ prod((nice_weather(Place), many-sights(
 
 
 :- set_prop nice_weather/1 => city/1.
-:- default(nice_weather/1, 0.5).
+rfuzzy_default_value_for(nice_weather/1, 0.5).
 
 nice_weather(madrid, 0.8).
 nice_weather(madrid, 0.7).
 nice_weather(madrid, 0.2).
 
 :- set_prop many_sights/1 => city/1.
-:- default(many_sights/1, 0.2).
+rfuzzy_default_value_for(many_sights/1, 0.2).
 
 many_sights(madrid, 0.6).
 many_sights(istambul, 0.7).

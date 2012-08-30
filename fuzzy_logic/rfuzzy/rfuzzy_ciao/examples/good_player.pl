@@ -15,7 +15,7 @@ player(aito).
 
 % An individual is a good player with a truth value of 0.1
 % if we can not compute a more accurate value.
-:- default(good_player/1, 0.1).
+rfuzzy_default_value_for(good_player/1, 0.1).
 
 % The rule to determine the grade of belonging of 
 % a player to the fuzzy set of good_player has a 
@@ -26,7 +26,7 @@ good_player(J) cred (prod,0.8) :~ prod((swift(J), tall(J), experience(J))).
 
 
 :- set_prop experience/1 => player/1.
-:- default(experience/1, 0.1).
+rfuzzy_default_value_for(experience/1, 0.1).
 
 experience(lebron) value 0.4.
 experience(deron) value 0.3.
@@ -46,7 +46,7 @@ height(lebron, 1950).
 height(deron, 2000).
 
 :- set_prop swift/1 => player/1.
-:- default(swift/1,0.5).
+rfuzzy_default_value_for(swift/1,0.5).
 
 swift(john) value 1.
 swift(karl) value 0.6 .

@@ -10,8 +10,8 @@ expensive_car(vw_caddy) value 0.7 .
 expensive_car(alfa_romeo_gt) value 0.6 .
 
 :- set_prop expensive_car/1 => car/1.
-:- default(expensive_car/1, 0.9) => expensive_type/1.
-:- default(expensive_car/1, 0.5).
+rfuzzy_default_value_for(expensive_car/1, 0.9) if expensive_type/1.
+rfuzzy_default_value_for(expensive_car/1, 0.5).
 
 expensive_type(lamborghini_urraco).
 expensive_type(aston_martin_bulldog).
