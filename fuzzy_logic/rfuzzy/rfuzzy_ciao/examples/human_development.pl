@@ -1,6 +1,6 @@
 :- module(human_development,_,[rfuzzy, clpr]).
 
-human_development(C) :~ prod literacy_rate(C),long_life(C),living_standard(C).
+human_development(C) :~ prod((literacy_rate(C),long_life(C),living_standard(C))).
 
 type_Country(japan).
 type_Country(spain).

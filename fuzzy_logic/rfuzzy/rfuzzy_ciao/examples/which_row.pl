@@ -7,7 +7,7 @@ rows_list(row4).
 
 rfuzzy_type_for(which_row/1, [rows_list/1]).
 rfuzzy_default_value_for(which_row/1, 0.1).
-(which_row(J) cred (luka,0.9)) :~ prod people(J), products_people(J).
+(which_row(J) cred (luka,0.9)) :~ prod((people(J), products_people(J))).
 
 
 rfuzzy_type_for(people/1, [rows_list/1]).

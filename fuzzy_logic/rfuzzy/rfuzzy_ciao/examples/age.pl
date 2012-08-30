@@ -25,11 +25,11 @@ rfuzzy_type_for(young/1, [age/1]).
 rfuzzy_default_value_for(young/1, 0).
 young :# ([ (20, 1), (30, 1) ]) . 
 % I'll be young until 30, rules do not apply to my age ;-)
-young(X) :~ max go_out(X), do_not_have_children(X) .
+young(X) :~ max((go_out(X), do_not_have_children(X))) .
 
 rfuzzy_type_for(adult/1, [age/1]).
 rfuzzy_default_value_for(adult/1, 1).
-adult(X) cred (complement, 1) :~ dluka young(X), child(X) .
+adult(X) cred (complement, 1) :~ dluka((young(X), child(X))) .
 
 rfuzzy_type_for(go_out/1, [age/1]).
 rfuzzy_default_value_for(go_out/1, 0) .

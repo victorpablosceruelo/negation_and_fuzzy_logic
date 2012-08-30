@@ -11,7 +11,7 @@ rfuzzy_default_value_for(successful_team/2, 0.1).
 
 rfuzzy_type_for(prepared_team/2, [type_Candidate/1, type_Candidate/1]).
 rfuzzy_default_value_for(prepared_team/2, 0.1).
-prepared_team(W1,W2) :~ prod efficency(W1),efficency(W2),knowledge(W1),knowledge(W2).
+prepared_team(W1,W2) :~ prod((efficency(W1),efficency(W2),knowledge(W1),knowledge(W2))).
 
 rfuzzy_type_for(get_along/2, [type_Candidate/1, type_Candidate/1]).
 rfuzzy_default_value_for(get_along/2, 0.1).

@@ -1,5 +1,5 @@
 :- module(trains, _, [rfuzzy, clpr]).
-:- use_module(library(write),[write/1]).
+% :- use_module(library(write),[write/1]).
 
 % Do not use this to define valid natural numbers.
 %speed(0). % Units are kilometres per hour
@@ -47,13 +47,13 @@ high_distance :# ([(0, 0),(10, 0), (100, 0.5), (200, 1)]).
 % D is distance, S is speed.
 rfuzzy_type_for(reduce_speed/2, [distance/1, speed/1]).
 rfuzzy_default_value_for(reduce_speed/2, 1) .
-reduce_speed(D, S) :~ prod mid_distance(D), high_speed(S).
+reduce_speed(D, S) :~ prod((mid_distance(D), high_speed(S))).
 rfuzzy_type_for(activate_brakes/2, [distance/1, speed/1]).
 rfuzzy_default_value_for(activate_brakes/2, 0.5) .
-activate_brakes(D, S) :~ max low_distance(D), reduce_speed(D, S).
-disable_brakes(D, S) cred (complement, 1) :~ max activate_brakes(D, S), activate_brakes(D, S).
+activate_brakes(D, S) :~ max((low_distance(D), reduce_speed(D, S))).
+disable_brakes(D, S) cred (complement, 1) :~ max((activate_brakes(D, S), activate_brakes(D, S))).
 rfuzzy_type_for(accelerate/2, [distance/1, speed/1]).
 rfuzzy_default_value_for(accelerate/2, 1) .
-accelerate(D, S)  :~ min disable_brakes(D, S), high_distance(D).
+accelerate(D, S)  :~ min((disable_brakes(D, S), high_distance(D))).
 
 

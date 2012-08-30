@@ -26,7 +26,7 @@ rfuzzy_default_value_for(expensive_parts/1, 0.9) if expensive_type/1.
 rfuzzy_default_value_for(expensive_parts/1, 0.5).
 rfuzzy_type_for(garage_taxes/1, [car/1]).
 rfuzzy_default_value_for(garage_taxes/1, 0.1).
-garage_taxes(Car) :~ prod expensive_car(Car), expensive_parts(Car), expensive_manpower(Car).
+garage_taxes(Car) :~ prod((expensive_car(Car), expensive_parts(Car), expensive_manpower(Car))).
 garage_taxes(ferrari) value 0.9 .
 positive_integer(1).
 positive_integer(X) :-

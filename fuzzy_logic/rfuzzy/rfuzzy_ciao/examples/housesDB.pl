@@ -113,28 +113,28 @@ little_close_to_beach(X,Y):- close_to_beach(X,T),little_func(T,Y).
 % Rules
 rfuzzy_type_for(q1/1, [codetype/1]).
 rfuzzy_default_value_for(q1/1,0.5).
-q1(X):~ prod cheap(X), close_to_center(X).
+q1(X):~ prod((cheap(X), close_to_center(X))).
 
 rfuzzy_type_for(q2/1, [codetype/1]).
 rfuzzy_default_value_for(q2/1,0.5).
-q2(X):~ prod cheap(X), little_big(X), close_to_beach(X).
+q2(X):~ prod((cheap(X), little_big(X), close_to_beach(X))).
 
 rfuzzy_type_for(q3/1, [codetype/1]).
 rfuzzy_default_value_for(q3/1,0.5).
-q3(X):~ prod close_to_beach(X), very_far_from_center(X).
+q3(X):~ prod((close_to_beach(X), very_far_from_center(X))).
 t1(X,Y):- getHouseType(X,'apartment'),q3(X,Z), Y = Z ; Y = 0.
 
 rfuzzy_type_for(q4/1, [codetype/1]).
 rfuzzy_default_value_for(q4/1,0.5).
-q4(X):~ prod expensive(X), big(X), very_close_to_beach(X).% missing crisp and not* parts 
+q4(X):~ prod((expensive(X), big(X), very_close_to_beach(X))).% missing crisp and not* parts 
 
 rfuzzy_type_for(q5/1, [codetype/1]).
 rfuzzy_default_value_for(q5/1,0.5).
-q5(X):~ prod very_cheap(X). % 2 missing crisp parts
+q5(X):~ prod((very_cheap(X))). % 2 missing crisp parts
 
 rfuzzy_type_for(q6/1, [codetype/1]).
 rfuzzy_default_value_for(q6/1,0.5).
-q6(X):~ prod close_to_center(X), close_to_beach(X). % 2 missing crisp parts
+q6(X):~ prod((close_to_center(X), close_to_beach(X))). % 2 missing crisp parts
 
 
 prod(X,Y,M):- M .=. X * Y.

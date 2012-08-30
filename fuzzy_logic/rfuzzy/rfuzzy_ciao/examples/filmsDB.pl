@@ -162,7 +162,7 @@ similar(Title1, Title2, V) :-  film(Title1, Year1, Minutes1, Genre1, Language1),
 
 similarTry(Title1, Title2, V) :- film(Title1, Year1, Minutes1, Genre1, Language1),  film(Title2, Year2, Minutes2, Genre2, Language2), similarFuzzy(Title1, Year1, Minutes1, Genre1, Language1,Title2, Year2, Minutes2, Genre2, Language2,V).
 
-similarFuzzy(_Title1, Year1, Minutes1, Genre1, Language1, _Title2, Year2, Minutes2, Genre2, Language2) :~ prod similarG(Genre1, Genre2), similarL(Language1, Language2),  similarY2(Year1, Year2), similarD2(Minutes1, Minutes2).
+similarFuzzy(_Title1, Year1, Minutes1, Genre1, Language1, _Title2, Year2, Minutes2, Genre2, Language2) :~ prod((similarG(Genre1, Genre2), similarL(Language1, Language2),  similarY2(Year1, Year2), similarD2(Minutes1, Minutes2))).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

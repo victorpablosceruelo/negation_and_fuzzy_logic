@@ -1,7 +1,7 @@
 :- module(jobs,_,[rfuzzy, clpr]).
 
 rfuzzy_type_for(job_offer/1, [position/1]).
-(job_offer(J) cred (min,0.8)) :~ prod interest(J), distance(J), salary(J), future_development(J).
+(job_offer(J) cred (min,0.8)) :~ prod((interest(J), distance(J), salary(J), future_development(J))).
 
 position(consultant).
 position(systems_analyst).
