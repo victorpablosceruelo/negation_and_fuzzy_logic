@@ -184,7 +184,10 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules):-
 	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built),
 	generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules).
 
-rfuzzy_trans_sent_aux(0, []) :- !, nl, nl, nl.
+rfuzzy_trans_sent_aux(0, []) :- !, 
+	print_msg_nl('info'), print_msg_nl('info'), 
+	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
+	print_msg_nl('info').
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
