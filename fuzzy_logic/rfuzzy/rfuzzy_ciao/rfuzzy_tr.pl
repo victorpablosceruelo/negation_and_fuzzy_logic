@@ -51,12 +51,13 @@ save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pre
 		retract_fact(predicate_definition(Category, Pred_Name, Pred_Arity, List)), !, % Retract last
 		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)|List]))
 	    )
-	;
-	    (
-		predicate_definition(_Category_Aux, Pred_Name, Pred_Arity, List), !, % Retract last
-		print_msg('error', 'It is not allowed to define again the predicate', (Pred_Name/Pred_Arity)),
-		fail
-	    )
+% Just try to explain me why it is not allowed ...
+%	;
+%	    (
+%		predicate_definition(_Category_Aux, Pred_Name, Pred_Arity, List), !, % Retract last
+%		print_msg('error', 'It is not allowed to define again the predicate', (Pred_Name/Pred_Arity)),
+%		fail
+%	    )
 	;
 	    (
 		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)]))
@@ -271,10 +272,21 @@ translate((Head value Value), Fuzzy_Head):-
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
-% Not needed: aggregators are just crisp predicates of arity 3.
-%translate((rfuzzy_aggregator(Aggregator_Name, Aggregator_Arity)), []) :-
-%	!,
-%	save_aggregator(Aggregator_Name, Aggregator_Arity), !.
+% Although aggregators are just crisp predicates of arity 3, 
+% we use the following to ensure programmers do not use as aggregators
+% fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
+translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
+	!,
+	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
+	functor(Aggregator_Functor, Aggregator_Name, Aggregator_Arity),
+	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Aggregator_Functor, 'aggregator', 'yes', _Aggregator_Functor_Aux, _Truth_Value),
+
+	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
+	retrieve_predicate_info('crisp', Aggregator_Name, Aggregator_Arity, _List, 'yes'),
+
+	% save_predicate_definition(Category, Pred_Name, Pred_Arity, SubCategory, Fuzzy_Name, Fuzzy_Arity), !.
+	save_predicate_definition(Category, Pred_Name, Pred_Arity, SubCategory, Fuzzy_Name, Fuzzy_Arity),
 
 % function definition.
 translate((Head :# List), (Fuzzy_H :- Body)) :-
@@ -325,36 +337,55 @@ translate((Head :~ Body), Translation):-
 translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred), Translation):-
 	!,
 	print_msg('debug', 'translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred))) ', rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity, Cred_Op, Cred)),
-	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
-	test_aggregator_is_defined(Cred_Op, _Show_Error),
+	nonvar(Existing_Predicate_Name), nonvar(New_Predicate_Name), nonvar(Cred_Op), number(Cred), number(Arity),
+	test_aggregator_is_defined(Cred_Op, 'yes'),
 
 	functor(New_Predicate_Functor, New_Predicate_Name, Arity), 
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(New_Predicate_Functor, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value),
+	translate_functor(New_Predicate_Functor, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value_Out),
 
 	functor(Credibility_Functor, Cred_Op, 3), 
-	Credibility_Functor=..[Cred_Op, EP_Truth_Value, Cred, Truth_Value],
+	Credibility_Functor=..[Cred_Op, Truth_Value_In, Cred, Truth_Value_Out],
 
 	Arity_plus_1 is Arity + 1,
 	Arity_plus_2 is Arity_plus_1 + 1,
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _List, 'yes')
+	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _List, 'yes'),
 
 	add_preffix_to_name(Existing_Predicate_Name, "rfuzzy_aux_", Existing_Predicate_Aux_Name),
 	functor(Existing_Predicate_Aux_Functor, Existing_Predicate_Aux_Name, Arity_plus_2),
 	copy_args(Arity_plus_1, Fuzzy_Pred_Functor, Existing_Predicate_Aux_Functor),
-	arg(Arity_plus_2, Existing_Predicate_Aux_Functor, Truth_Value),
+	arg(Arity_plus_2, Existing_Predicate_Aux_Functor, Truth_Value_In),
 
-	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, Credibility_Functor).
+	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)).
 
-translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)), Translation):-
+translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred), Translation):-
 	!,
 	print_msg('debug', 'translate(rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred))) ', rfuzzy_antonym(Existing_Predicate/Arity, New_Predicate/Arity, Cred_Op, Cred)),
-	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
-	test_aggregator_is_defined(Cred_Op, _Show_Error),
+	nonvar(Existing_Predicate_Name), nonvar(New_Predicate_Name), nonvar(Cred_Op), number(Cred), number(Arity),
+	test_aggregator_is_defined(Cred_Op, 'yes'),
 
-	!.
+	functor(New_Predicate_Functor, New_Predicate_Name, Arity), 
+	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(New_Predicate_Functor, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value_Out),
+
+	functor(Credibility_Functor, Cred_Op, 3), 
+	Credibility_Functor=..[Cred_Op, Truth_Value_Aux, Cred, Truth_Value_Out],
+
+	Arity_plus_1 is Arity + 1,
+	Arity_plus_2 is Arity_plus_1 + 1,
+
+	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
+	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _List, 'yes'),
+
+	add_preffix_to_name(Existing_Predicate_Name, "rfuzzy_aux_", Existing_Predicate_Aux_Name),
+	functor(Existing_Predicate_Aux_Functor, Existing_Predicate_Aux_Name, Arity_plus_2),
+	copy_args(Arity_plus_1, Fuzzy_Pred_Functor, Existing_Predicate_Aux_Functor),
+	arg(Arity_plus_2, Existing_Predicate_Aux_Functor, Truth_Value_In),
+
+	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, (Truth_Value_Aux is 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)).
+
 
 
 % fuzzification:
@@ -430,27 +461,31 @@ extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
 	extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body),
 	print_msg('debug', 'extract_aggregator(Body, Aggregator_Op, Tmp_Body)', extract_aggregator(Body, Aggregator_Op, Tmp_Body)).
 	
-extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body) :-
+extract_aggregator_aux(Body, Aggregator_Op_Name, Tmp_Body) :-
 	nonvar(Body),
-	functor(Body, Aggregator_Name, 1),
-	test_aggregator_is_defined(Aggregator_Name, 'no'),
+	functor(Body, Aggregator_Op_Name, 1),
+	test_aggregator_is_defined(Aggregator_Op_Name, 'no'),
 	arg(1, Body, Tmp_Body), !.
 extract_aggregator_aux(Body, 'null', Body) :- !.
 
-test_aggregator_is_defined(Aggregator_Name, _Show_Error) :-
-	nonvar(Aggregator_Name),
+test_aggregator_is_defined(Aggregator_Op_Name, _Show_Error) :-
+	nonvar(Aggregator_Op_Name),
 	defined_aggregators(Aggregators),
-	memberchk_local(Aggregator_Op, Aggregators), !.
-test_aggregator_is_defined(Aggregator_Name, Show_Error) :-
-	nonvar(Aggregator_Name),
+	memberchk_local(Aggregator_Op_Name, Aggregators), !.
+test_aggregator_is_defined(Aggregator_Op_Name, Show_Error) :-
+	nonvar(Aggregator_Op_Name),
  	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Aggregator_Op, 3, _List, Show_Error), !.
+	retrieve_predicate_info('aggregator', Aggregator_Op_Name, 3, _List, Show_Error), !.
 
 	
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
+
+% Security issues
+translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _FB) :- 
+	var(Body_F), !, fail. % If this is a variable the tranlate rules loop forever !!!
 
 % Conjunction.
 translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,

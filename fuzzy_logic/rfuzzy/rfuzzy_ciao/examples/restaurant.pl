@@ -65,6 +65,7 @@ rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
 rfuzzy_quantifier(very, over, 0.7).
 
-rfuzzy_aggregator(max_with_min_a_half(X, Y, Z), [(max(X, Y, W), min(W, 0.5, Z))]).
+max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
+rfuzzy_aggregator(max_with_min_a_half/3).
 
 rfuzzy_type_for(preferred_restaurant/2, [restaurant/1, restaurant/1]).
