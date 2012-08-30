@@ -2,7 +2,7 @@
 :- use_module(library(write),[write/1]).
 
 
-:- set_prop parallelizing_prog_fuzzy_/3 => rel_ex_time/1,
+rfuzzy_type_for(parallelizing_prog_fuzzy_/3, [rel_ex_time/1]),
                                            rel_ex_time/1,
                                            rel_ex_time/1.
 rfuzzy_default_value_for(parallelizing_prog_fuzzy_/3, 0).

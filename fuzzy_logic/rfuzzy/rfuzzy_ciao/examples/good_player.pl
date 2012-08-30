@@ -1,4 +1,4 @@
-:- module(good_player,_,[rfuzzy, clpr, debugger_pkg]).
+:- module(good_player,_,[rfuzzy, clpr]).
 
 % Define the individuals belonging to the set player.
 player(john).
@@ -11,7 +11,7 @@ player(aito).
 
 % Define that only player are valid individuals for
 % the fuzzy set good_player.
-:- set_prop good_player/1 => player/1.
+rfuzzy_type_for(good_player/1, [player/1]).
 
 % An individual is a good player with a truth value of 0.1
 % if we can not compute a more accurate value.
@@ -25,7 +25,7 @@ rfuzzy_default_value_for(good_player/1, 0.1).
 good_player(J) cred (prod,0.8) :~ prod((swift(J), tall(J), experience(J))).
 
 
-:- set_prop experience/1 => player/1.
+rfuzzy_type_for(experience/1, [player/1]).
 rfuzzy_default_value_for(experience/1, 0.1).
 
 experience(lebron) value 0.4.
@@ -45,7 +45,7 @@ height(karl, 1900).
 height(lebron, 1950).
 height(deron, 2000).
 
-:- set_prop swift/1 => player/1.
+rfuzzy_type_for(swift/1, [player/1]).
 rfuzzy_default_value_for(swift/1,0.5).
 
 swift(john) value 1.

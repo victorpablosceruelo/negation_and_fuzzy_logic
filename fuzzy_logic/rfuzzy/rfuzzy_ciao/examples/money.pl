@@ -27,10 +27,10 @@ valid_integer(X) :- negative_integer(X).
 
 % We define 2 functions: have_money and owe_money
 
-:- set_prop have_money/1 => valid_integer/1.
+rfuzzy_type_for(have_money/1, [valid_integer/1]).
 rfuzzy_default_value_for(have_money/1, 0.9) if positive_integer/1 .
 rfuzzy_default_value_for(have_money/1, 0.1). % Always
 
-:- set_prop owe_money/1 => valid_integer/1.
+rfuzzy_type_for(owe_money/1, [valid_integer/1]).
 rfuzzy_default_value_for(owe_money/1, 0.9) if negative_integer/1 .
 rfuzzy_default_value_for(owe_money/1, 0.1). % Always

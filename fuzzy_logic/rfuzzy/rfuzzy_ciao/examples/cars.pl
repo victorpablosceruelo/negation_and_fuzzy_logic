@@ -8,7 +8,7 @@ car(aston_martin_bulldog).
 car(ford_fiesta).
 
 % expensive_car type definition
-:- set_prop expensive_car/1 => car/1.
+rfuzzy_type_for(expensive_car/1, [car/1]).
 % expensive car default value when car belong to the expensive_
 rfuzzy_default_value_for(expensive_car/1, 0.9) if expensive_type/1.
 rfuzzy_default_value_for(expensive_car/1, 0.5).
@@ -20,18 +20,18 @@ expensive_type(X) :-
 
 expensive_car(ferrari) value 1.0.
 
-:- set_prop better_car/2 => car/1, car/1.
+rfuzzy_type_for(better_car/2, [car/1, car/1]).
 rfuzzy_default_value_for(better_car/2, 0.5).
 
-:- set_prop expensive_manpower/1 => car/1.
+rfuzzy_type_for(expensive_manpower/1, [car/1]).
 rfuzzy_default_value_for(expensive_manpower/1, 0.9) if expensive_type/1.
 rfuzzy_default_value_for(expensive_manpower/1, 0.5).
 
-:- set_prop expensive_parts/1 => car/1.
+rfuzzy_type_for(expensive_parts/1, [car/1]).
 rfuzzy_default_value_for(expensive_parts/1, 0.9) if expensive_type/1.
 rfuzzy_default_value_for(expensive_parts/1, 0.5).
 
-:- set_prop garage_taxes/1 => car/1.
+rfuzzy_type_for(garage_taxes/1,  [car/1]).
 rfuzzy_default_value_for(garage_taxes/1, 0.1).
 garage_taxes(Car) :~ prod((expensive_car(Car), expensive_parts(Car), expensive_manpower(Car))).
 garage_taxes(ferrari) value 0.9 .

@@ -27,7 +27,7 @@ film('Finding Nemo', 2003, 112, comedy, english).
 %%%%%%%%%%%%%%%%%%%%%%%  FUNCTIONS OF ATTRIBUTES%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % modern is an example of a numerical attribute
-%:- set_prop modern/1 => year/1.
+%rfuzzy_type_for(modern/1, [year/1]).
 rfuzzy_default_value_for(modern/1, 0).
 modern :# ([ (1970, 0), (2000, 1), (2010, 1)]) .
 
@@ -38,7 +38,7 @@ mlength :# ([ (120, 0), (180, 1), (600, 1)]) .
 
 
 % funny is an example of a discrete attribute
-:- set_prop funny/1 => genre/1.
+rfuzzy_type_for(funny/1, [genre/1]).
 
 funny('drama') value 0 .
 funny('romance') value 0.4 .
