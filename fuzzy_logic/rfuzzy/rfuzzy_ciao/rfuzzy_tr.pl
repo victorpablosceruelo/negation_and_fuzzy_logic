@@ -381,6 +381,43 @@ translate(rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 
 	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, (Truth_Value_Aux is 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)).
 
+translate(rfuzzy_quantifier(Quantifier_Name/Arity, Condition, TV_Thershold), Translation):-
+	!,
+	nonvar(Quantifier_Name), nonvar(Condition), number(TV_Thershold), number(Arity), Arity = 1,
+	functor(Quantifier_Functor_Aux, Quantifier_Name, Arity),
+	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Quantifier_Functor_Aux, 'quantifier', 'yes', Quantifier_Functor, Truth_Value),
+	arg(1, Quantifier_Functor, Fuzzy_Predicate_Functor_In),
+	
+	(
+	    (   Condition = over, 
+		Formula = (
+			      (Max_In .=. FP_Truth_Value - TV_Thershold), 
+			       max(0, Max_In, Dividend), 
+			       Truth_Value .=. ((Dividend)/(1 - TV_Thershold)))
+	    ) 
+	;
+	    (   Condition = under, 
+		Formula = (
+			      (Min_In .=. FP_Truth_Value - TV_Thershold), 
+			       min(0, Min_In, Dividend), 
+			       Truth_Value .=. ((Dividend)/(0 - TV_Thershold)))
+	    )
+	),
+
+	Translation= (
+			 Quantifier_Functor :-
+		     (
+			 functor(Fuzzy_Predicate_Functor_In, FP_Name, FP_Arity), 
+			 FP_Arity_Aux is FP_Arity - 1,
+			 functor(FP_Functor, FP_Name, FP_Arity), 
+			 copy_args(FP_Arity_Aux, Fuzzy_Predicate_Functor_In, FP_Functor),			 
+			 arg(FP_Arity, FP_Functor, FP_Truth_Value),
+			 FP_Functor,
+			 Formula
+		     )
+		     ).
+
 
 
 % fuzzification:

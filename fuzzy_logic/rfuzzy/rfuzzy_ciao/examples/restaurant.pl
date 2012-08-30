@@ -60,7 +60,7 @@ distance_to_us(pizza_jardin, 250).
 
 rfuzzy_define_fuzzification(near_to_us/2, distance_to_us/2, near_function/2).
 
-rfuzzy_sinonym(cheap/1, unexpensive/1, prod, 1).
+rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
 rfuzzy_quantifier(very, over, 0.7).
