@@ -154,21 +154,21 @@ rfuzzy_trans_sentence(Arg, Arg, FileName) :-
 	print_msg('warning', 'rfuzzy_trans_sent: ERROR: Input: ', Arg),
 	print_msg('warning', 'rfuzzy_trans_sent: ERROR: FileName: ', FileName),
 	print_msg_nl('debug'),
-	print_info(Arg), 
+	print_info('warning', Arg), 
 	print_msg_nl('debug'),
 	print_msg_nl('debug').
 
-print_info(Sentence) :-
-	print_msg('info', 'print_info', Sentence),
+print_info(Level, Sentence) :-
+	print_msg(Level, 'print_info', Sentence),
 	functor(Sentence, Name, Arity),
-	print_msg('info', 'print_info: (Name, Arity)', (Name, Arity)),
+	print_msg(Level, 'print_info: (Name, Arity)', (Name, Arity)),
 	Sentence=..[Name|Args],
-	print_list_info(Args).
-print_list_info([]) :- !,
-	print_msg('info', 'print_list_info', 'empty list').
-print_list_info([Arg | Args]) :- !,
-	print_info(Arg),
-	print_list_info(Args).
+	print_list_info(Level, Args).
+print_list_info(Level, []) :- !,
+	print_msg(Level, 'print_list_info', 'empty list').
+print_list_info(Level, [Arg | Args]) :- !,
+	print_info(Level, Arg),
+	print_list_info(Level, Args).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -212,10 +212,7 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 
 % Conditional default
 translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/Pred2_Arity), (Fuzzy_H :- H_Cond)) :-
-%	functor(Conditioned_Default, 'if', 2), 
 	print_msg('debug', 'translate', 'if detected'),
-%	Conditioned_
-	
 	!, % If patter matching, backtracking forbiden.
 	Pred_Arity = Pred2_Arity,
 	number(Value), % Value must be a number.
@@ -278,7 +275,7 @@ translate((Head value Value), Fuzzy_Head):-
 % we use the following to ensure programmers do not use as aggregators
 % fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
 translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
-	!,
+	!, % If patter matching, backtracking forbiden.
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)

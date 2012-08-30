@@ -35,7 +35,7 @@ rfuzzy_default_value_for(low_distance/1, 0).
 distance_to_the_city_center(meson_del_jamon, 100).
 distance_to_the_city_center(museo_del_jamon, 150).
 
-near_function :# ([ (0, 1), (200, 1), (1000, 0.1) ]) .
+near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
 rfuzzy_define_fuzzification(near_the_city_center/1, distance_to_the_city_center/2, near_function/2).
 
 % before:
@@ -62,12 +62,12 @@ distance_to_us(il_tempietto, 100).
 distance_to_us(pizza_jardin, 250).
 % distance_to(unknown, 800).
 
-rfuzzy_define_fuzzification(near_to_us/2, distance_to_us/2, near_function/2).
+rfuzzy_define_fuzzification(near_to_us/1, distance_to_us/2, near_function/2).
 
 rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
-rfuzzy_quantifier(very, over, 0.7).
+rfuzzy_quantifier(very/1, over, 0.7).
 
 max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
 rfuzzy_aggregator(max_with_min_a_half/3).
