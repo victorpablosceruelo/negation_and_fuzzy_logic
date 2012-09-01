@@ -715,17 +715,18 @@ memberchk_local(Element, [_Head | Tail]) :- !,
 % ------------------------------------------------------
 
 build_auxiliary_clauses([], [end_of_file]) :- !.
+build_auxiliary_clauses([Predicate_Def|Predicate_Defs], Clauses) :-
+	print_msg_nl('debug'),
+	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
+	test_if_list_contains_non_rfuzzy_fuzzy_rule(Predicate_Def), !,
+	print_msg('debug', 'build_auxiliary_clauses OUT', 'nothing'),
+	build_auxiliary_clauses(Predicate_Defs, Clauses).	
 build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | Clauses]) :-
 	print_msg_nl('debug'),
 	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
 	build_auxiliary_clause(Predicate_Def, Pred_Main, Pred_Aux), !,
 	print_msg('debug', 'build_auxiliary_clauses OUT (Pred_Main, Pred_Aux)', (Pred_Main, Pred_Aux)),
-	build_auxiliary_clauses(Predicate_Defs, Clauses).
-build_auxiliary_clauses([_Predicate_Def|Predicate_Defs], Clauses) :-
-	build_auxiliary_clauses(Predicate_Defs, Clauses).
-
-build_auxiliary_clause(predicate_definition(_Category, _Pred_Name, _Pred_Arity, List), _Fuzzy_Cl_Main, _Fuzzy_Cl_Aux) :-
-	test_if_list_contains_non_rfuzzy_fuzzy_rule(List), !.
+	build_auxiliary_clauses(Predicate_Defs, Clauses).	
 
 build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 
@@ -829,9 +830,12 @@ lists_substraction([Head | Tail ], List_2, [Head | Result_List]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-test_if_list_contains_non_rfuzzy_fuzzy_rule([('non_rfuzzy_fuzzy_rule', _Sub_Pred_Name, _Sub_Pred_Arity)|_List]) :- !.
-test_if_list_contains_non_rfuzzy_fuzzy_rule([(_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List]) :-
-	test_if_list_contains_non_rfuzzy_fuzzy_rule(List).
+test_if_list_contains_non_rfuzzy_fuzzy_rule(predicate_definition(_Category, _Pred_Name, _Pred_Arity, List)) :-
+	test_if_list_contains_non_rfuzzy_fuzzy_rule_aux(List).
+
+test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([('non_rfuzzy_fuzzy_rule', _Sub_Pred_Name, _Sub_Pred_Arity)|_List]) :- !.
+test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([(_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List]) :-
+	test_if_list_contains_non_rfuzzy_fuzzy_rule_aux(List).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

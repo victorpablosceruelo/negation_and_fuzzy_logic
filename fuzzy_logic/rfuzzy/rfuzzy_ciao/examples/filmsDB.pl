@@ -3,6 +3,9 @@
 
 :-module(filmsDB,_,[rfuzzy, clpr]).
 
+% Activate/Deactivate debug.
+% :- activate_rfuzzy_debug.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%% POPULATION OF THE DATABASE %%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -28,14 +31,19 @@ film('Finding Nemo', 2003, 112, comedy, english).
 
 % modern is an example of a numerical attribute
 %rfuzzy_type_for(modern/1, [year/1]).
-rfuzzy_default_value_for(modern/1, 0).
+%rfuzzy_default_value_for(modern/1, 0).
 modern :# ([ (1970, 0), (2000, 1), (2010, 1)]) .
 
 
 % attribute concerning duration of the films
-rfuzzy_default_value_for(mlength/1, 0).
+% rfuzzy_default_value_for(mlength/1, 0).
 mlength :# ([ (120, 0), (180, 1), (600, 1)]) .
 
+genre('drama').
+genre('romance').
+genre('western').
+genre('adventure').
+genre('comedy').
 
 % funny is an example of a discrete attribute
 rfuzzy_type_for(funny/1, [genre/1]).
@@ -45,12 +53,6 @@ funny('romance') value 0.4 .
 funny('western') value 0.2 .
 funny('adventure') value 0.2 .
 funny('comedy') value 1 .
-
-genre('drama').
-genre('romance').
-genre('western').
-genre('adventure').
-genre('comedy').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -115,10 +117,12 @@ similar1(X, Y, V) :-  V .=. (abs(X-Y)+1).
 similar2(X, Y, V) :-  V .=. 1 / (abs(X-Y)).
 
 similarD2(X, Y, V) :-  similar1(X, Y, V1), V .=. 1 / V1. % instead of similarD
+rfuzzy_non_rfuzzy_fuzzy_rule(similarD2/3).
 
 similar4(X, Y, V) :-  V .=. ((abs(X-Y)+1)*5).
 
 similarY2(X, Y, V) :-  similar4(X, Y, V1), V .=. 1 / V1. % instead of similarY
+rfuzzy_non_rfuzzy_fuzzy_rule(similarY2/3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
