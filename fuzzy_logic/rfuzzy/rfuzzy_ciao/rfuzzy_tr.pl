@@ -26,14 +26,15 @@ translation_info('fuzzy_rule',         '', 1, 'no', 0, "").
 % translation_info('auxiliar',           '', 2, 'no', 0, "rfuzzy_aux_").
 % translation_info('normal',           '', 1, 'yes', 0, "").
 
-translation_info('type',                             'fuzzy_rule', 2, 'no', 0,          "rfuzzy_type_").
-translation_info('default_without_cond', 'fuzzy_rule', 2, 'yes', 0,        "rfuzzy_default_without_cond_").
-translation_info('default_with_cond',      'fuzzy_rule', 2, 'yes', 0.25,   "rfuzzy_default_with_cond_"). 
-translation_info('rule',                              'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
-translation_info('fuzzification',                 'fuzzy_rule', 2, 'yes', 0.75,  "rfuzzy_fuzzification_").
-translation_info('fact',                               'fuzzy_rule', 2, 'yes', 1,       "rfuzzy_fact_").
+translation_info('type',                               'fuzzy_rule', 2, 'no', 0,          "rfuzzy_type_").
+translation_info('default_without_cond',   'fuzzy_rule', 2, 'yes', 0,        "rfuzzy_default_without_cond_").
+translation_info('default_with_cond',        'fuzzy_rule', 2, 'yes', 0.25,   "rfuzzy_default_with_cond_"). 
+translation_info('rule',                                'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
+translation_info('fuzzification',                   'fuzzy_rule', 2, 'yes', 0.75,  "rfuzzy_fuzzification_").
+translation_info('fact',                                 'fuzzy_rule', 2, 'yes', 1,       "rfuzzy_fact_").
 translation_info('synonym',                        'fuzzy_rule', 2, 'no', 0,         "rfuzzy_sinonym_").
-translation_info('antonym',                       'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym_").
+translation_info('antonym',                         'fuzzy_rule', 2, 'no', 0,         "rfuzzy_antonym_").
+translation_info('non_rfuzzy_fuzzy_rule',  'fuzzy_rule', 0, 'no', 0,         "non_rfuzzy_fuzzy_rule").
 
 % This produces unexpected results.
 % translation_info(_X,                             _Y,               0, 0, 'no', 0,          "rfuzzy_error_error_error_").
@@ -445,6 +446,10 @@ translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred
 	arg(2, Funct_P_F, Truth_Value),
 	!.
 
+translate(rfuzzy_non_rfuzzy_fuzzy_rule(Pred_Name/Pred_Arity), []) :-
+	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)	
+	save_predicate_definition('fuzzy_rule', Pred_Name, Pred_Arity, 'non_rfuzzy_fuzzy_rule', Pred_Name, Pred_Arity).
+
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
 	print_msg('debug', 'Non-Rfuzzy predicate', Other),
@@ -713,9 +718,14 @@ build_auxiliary_clauses([], [end_of_file]) :- !.
 build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | Clauses]) :-
 	print_msg_nl('debug'),
 	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
-	build_auxiliary_clause(Predicate_Def, Pred_Main, Pred_Aux),
+	build_auxiliary_clause(Predicate_Def, Pred_Main, Pred_Aux), !,
 	print_msg('debug', 'build_auxiliary_clauses OUT (Pred_Main, Pred_Aux)', (Pred_Main, Pred_Aux)),
 	build_auxiliary_clauses(Predicate_Defs, Clauses).
+build_auxiliary_clauses([_Predicate_Def|Predicate_Defs], Clauses) :-
+	build_auxiliary_clauses(Predicate_Defs, Clauses).
+
+build_auxiliary_clause(predicate_definition(_Category, _Pred_Name, _Pred_Arity, List), _Fuzzy_Cl_Main, _Fuzzy_Cl_Aux) :-
+	test_if_list_contains_non_rfuzzy_fuzzy_rule(List), !.
 
 build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 
@@ -814,6 +824,14 @@ lists_substraction([Head | Tail ], List_2, Result_List) :-
 	lists_substraction(Tail, List_2, Result_List).
 lists_substraction([Head | Tail ], List_2, [Head | Result_List]) :-
 	lists_substraction(Tail, List_2, Result_List).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+test_if_list_contains_non_rfuzzy_fuzzy_rule([('non_rfuzzy_fuzzy_rule', _Sub_Pred_Name, _Sub_Pred_Arity)|_List]) :- !.
+test_if_list_contains_non_rfuzzy_fuzzy_rule([(_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List]) :-
+	test_if_list_contains_non_rfuzzy_fuzzy_rule(List).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
