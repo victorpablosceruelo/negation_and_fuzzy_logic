@@ -1,5 +1,4 @@
 :- module(ball,_,[rfuzzy, clpr]).
-:- use_module(library(write),[write/1]).
 
 valid_angle(X) :- X .>=. 0, X .=<. 181.
 

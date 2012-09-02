@@ -31,8 +31,8 @@ rfuzzy_type_for(adult/1, [age/1]).
 rfuzzy_default_value_for(adult/1, 1).
 adult(X) cred (complement, 1) :~ dluka((young(X), child(X))) .
 
-rfuzzy_type_for(go_out/1, [age/1]).
-rfuzzy_default_value_for(go_out/1, 0) .
+% rfuzzy_type_for(go_out/1, [age/1]).
+% rfuzzy_default_value_for(go_out/1, 0) .
 go_out :# ([(10, 0), (18, 1), (40, 0.4), (65, 0.4), (70, 0.7), (80, 0)]).
 
 rfuzzy_type_for(do_not_have_children/1, [age/1]).

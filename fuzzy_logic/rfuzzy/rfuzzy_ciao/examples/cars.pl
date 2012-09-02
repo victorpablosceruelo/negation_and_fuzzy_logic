@@ -36,7 +36,7 @@ rfuzzy_default_value_for(garage_taxes/1, 0.1).
 garage_taxes(Car) :~ prod((expensive_car(Car), expensive_parts(Car), expensive_manpower(Car))).
 garage_taxes(ferrari) value 0.9 .
 
-rfuzzy_default_value_for(car_life_is_10_years/1, 1).
+% rfuzzy_default_value_for(car_life_is_10_years/1, 1).
 car_life_is_10_years :# ([(0,0.2),(24000,0.5),(30000,0.7),(50000,0.9),(60000,1)]).
 % First variable is price ...
 

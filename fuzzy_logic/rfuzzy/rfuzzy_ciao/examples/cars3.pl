@@ -33,8 +33,8 @@ positive_integer(X) :-
 positive_integer(Y),
 number(Y),
 X is Y + 1.
-rfuzzy_type_for(car_life_is_10_years/1, [positive_integer/1]).
-rfuzzy_default_value_for(car_life_is_10_years/1, 1).
+% rfuzzy_type_for(car_life_is_10_years/1, [positive_integer/1]).
+% rfuzzy_default_value_for(car_life_is_10_years/1, 1).
 car_life_is_10_years :# ([(0,0.2),(24000,0.5),(30000,0.7),(50000,0.9),(60000,1)]).
 % First variable is price ...
  
