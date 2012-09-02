@@ -12,39 +12,49 @@ age(X) :- X .>=. 0, X .<. 150.
 %	    ( X >= 150, !, fail)
 %	).
 
+age_of(victor, 30).
+age_of(samuel, 32).
+age_of(oscar, 28).
+age_of(alejandro, 12).
+
+amount_of_descendants(victor, 0).
+amount_of_descendants(susana, 2).
+has_children(Person) :- amount_of_descendants(Person, X), X .>. 0.
+
+
+child_age_function :# ([ (0, 1), (10, 1), (20, 0) ]).
+teenager_age_function :# ([ (9, 0), (10, 1) , (19, 1), (20, 0) ]).
+young_age_function :# ([ (20, 1), (30, 0.5) ]). 
+
 rfuzzy_type_for(child/1,  [age/1]).
 rfuzzy_default_value_for(child/1, 0).
-child :# ([ (0, 1), (10, 1), (20, 0) ]) .
-child(26) value 1. % I feel like a child ;-)
+rfuzzy_define_fuzzification(child/1, age_of/2, child_age_function/2).
+child(alejandro) value 1.
 
 rfuzzy_type_for(teenager/1, [age/1]).
 rfuzzy_default_value_for(teenager/1, 0).
-teenager :# ([ (9, 0), (10, 1) , (19, 1), (20, 0) ]) .
+rfuzzy_define_fuzzification(teenager/1, age_of/2, teenager_age_function/2).
 
 rfuzzy_type_for(young/1, [age/1]).
 rfuzzy_default_value_for(young/1, 0).
-young :# ([ (20, 1), (30, 1) ]) . 
-% I'll be young until 30, rules do not apply to my age ;-)
-young(X) :~ max((go_out(X), do_not_have_children(X))) .
+rfuzzy_define_fuzzification(young/1, age_of/2, young_age_function/2).
+% I'll be young forever, rules do not apply to me ... ;-)
+young(victor) value 1.
+% Susana says the same, but she is not as young as me ... ;-)
+young(susana) value 0.9.
 
 rfuzzy_type_for(adult/1, [age/1]).
-rfuzzy_default_value_for(adult/1, 1).
-adult(X) cred (complement, 1) :~ dluka((young(X), child(X))) .
+rfuzzy_default_value_for(adult/1, 0.5).
+rfuzzy_default_value_for(adult/1, 0.7) if has_children/1.
 
-% rfuzzy_type_for(go_out/1, [age/1]).
-% rfuzzy_default_value_for(go_out/1, 0) .
-go_out :# ([(10, 0), (18, 1), (40, 0.4), (65, 0.4), (70, 0.7), (80, 0)]).
-
-rfuzzy_type_for(do_not_have_children/1, [age/1]).
-rfuzzy_default_value_for(do_not_have_children/1, 1) .
-rfuzzy_default_value_for(do_not_have_children/1, 0) if older_than_40/1.
-do_not_have_children :# ([(10, 1), (15, 0.9), (25, 0.5), (35, 0.1), (40, 0)]).
-
-older_than_40(X) :- X .>. 40.
+rfuzzy_type_for(old/1, [age/1]).
+rfuzzy_default_value_for(old/1, 0.5).
+rfuzzy_antonym(young/1, old/1, prod, 1).
 
 test_child :- child(X,V), test_print(X,V).
 test_young :- young(X,V), test_print(X,V).
 test_adult :- adult(X,V), test_print(X,V).
+test_old :- old(X,V), test_print(X,V).
 
 test_print(X, V) :- write(X), write(' -> '), write(V), write('   '), nl, fail.
 
