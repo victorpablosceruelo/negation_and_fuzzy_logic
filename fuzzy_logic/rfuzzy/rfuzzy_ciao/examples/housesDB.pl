@@ -41,12 +41,19 @@ house(lfs1938,'town_house',520,11,1990000,19,80).
 
 % FUZZY FUNCTIONS OVER THE DATABASE
 expensive(X,Y):- house(X,_,_,_,P,_,_),expensive_func(P,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(expensive/2).
 cheap(X,Y):- house(X,_,_,_,P,_,_),cheap_func(P,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(cheap/2).
 big(X,Y):- house(X,_,S,_,_,_,_),big_func(S,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(big/2).
 small(X,Y):- house(X,_,S,_,_,_,_),small_func(S,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(small/2).
 close_to_center(X,Y):- house(X,_,_,_,_,D,_),close_to_center_func(D,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(close_to_center/2).
 far_from_center(X,Y):- house(X,_,_,_,_,D,_),far_from_center_func(D,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(far_from_center/2).
 close_to_beach(X,Y):- house(X,_,_,_,_,_,D),close_to_beach_func(D,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(close_to_beach/2).
 
 % CRISP FUNCTIONS
 equal(X,X).
@@ -55,88 +62,105 @@ getHouseType(X,Y):- house(X,Y,_,_,_,_,_).
 
 % FUZZY FUNCTIONS OVER QUANTITATIVE ATTRIBUTES
 %rfuzzy_type_for(expensive_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(expensive_func/1,1).
+% rfuzzy_default_value_for(expensive_func/1,1).
 expensive_func :# ([(50000,0),(100000,0.1),(250000,0.2),(350000,0.3),(450000,0.5),(550000,0.6),
 	            (800000,0.7),(1000000,0.8),(1500000,0.9),(2500000,1)]).
 
 %rfuzzy_type_for(cheap_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(cheap_func/1,0).
+%rfuzzy_default_value_for(cheap_func/1,0).
 cheap_func :# ([(0,1),(30000,1),(50000,0.8),(100000,0.7),(250000,0.5),(350000,0.3),
 	            (450000,0.1),(550000,0)]).
 
 %rfuzzy_type_for(big_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(big_func/1,1).
+%rfuzzy_default_value_for(big_func/1,1).
 big_func :# ([(0,0),(50,0.1),(80,0.2),(120,0.3),(200,0.4),(300,0.5),(500,0.7),(1000,0.8),(1500,0.9),(2500,1)]).
 
 %rfuzzy_type_for(small_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(small_func/1,0).
+%rfuzzy_default_value_for(small_func/1,0).
 small_func :# ([(0,1),(50,1),(80,0.9),(100,0.8),(150,0.7),(200,0.5),(300,0.2),(400,0.1),(500,0)]).
 
 %rfuzzy_type_for(close_to_center_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(close_to_center_func/1,0).
+%rfuzzy_default_value_for(close_to_center_func/1,0).
 close_to_center_func :# ([(0,1),(2,1),(4,0.8),(7,0.6),(10,0.5),(12,0.3),(15,0.2),(20,0)]).
 
 %rfuzzy_type_for(far_from_center_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(far_from_center_func/1,1).
+%rfuzzy_default_value_for(far_from_center_func/1,1).
 far_from_center_func :# ([(0,0),(7,0),(8,0.1),(10,0.3),(14,0.4),(20,0.7),(25,0.8),(30,1)]).
 
 %rfuzzy_type_for(close_to_beach_func/1, [positive_integer/1]).
-rfuzzy_default_value_for(close_to_beach_func/1,0).
+%rfuzzy_default_value_for(close_to_beach_func/1,0).
 close_to_beach_func :# ([(0,1),(100,1),(1000,0.5),(2000,0)]).
 
 % QUALIFIERS
-rfuzzy_type_for(very_func/1, [fraction/1]).
-rfuzzy_default_value_for(very_func/1,0.5).
+%rfuzzy_type_for(very_func/1, [fraction/1]).
+%rfuzzy_default_value_for(very_func/1,0.5).
 very_func :# ([(0,0),(0.5,0),(0.8,0.8),(1,1)]).
 
-rfuzzy_type_for(little_func/1, [fraction/1]).
-rfuzzy_default_value_for(little_func/1,0.5).
+%rfuzzy_type_for(little_func/1, [fraction/1]).
+%rfuzzy_default_value_for(little_func/1,0.5).
 little_func :# ([(0,1),(0.1,1),(0.4,0),(1,0)]).
 
 % QUALIFIED FUZZY FUNCTIONS
 very_expensive(X,Y):- expensive(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_expensive/2).
 very_cheap(X,Y):- cheap(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_cheap/2).
 very_big(X,Y):- big(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_big/2).
 very_small(X,Y):- small(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_small/2).
 very_close_to_center(X,Y):- close_to_center(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_close_to_center/2).
 very_far_from_center(X,Y):- far_from_center(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_far_from_center/2).
 very_close_to_beach(X,Y):- close_to_beach(X,T),very_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(very_close_to_beach/2).
 
 little_expensive(X,Y):- expensive(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_expensive/2).
 little_cheap(X,Y):- cheap(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_cheap/2).
 little_big(X,Y):- big(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_big/2).
 little_small(X,Y):- small(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_small/2).
 little_close_to_center(X,Y):- close_to_center(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_close_to_center/2).
 little_far_from_center(X,Y):- far_from_center(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_far_from_center/2).
 little_close_to_beach(X,Y):- close_to_beach(X,T),little_func(T,Y).
+rfuzzy_non_rfuzzy_fuzzy_rule(little_close_to_beach/2).
+
+
+my_prod(X,Y,M):- M .=. X * Y.
+test_my_prod(M) :- X .=. 0.7, Y .=. 0.5, my_prod(X, Y, M).
+rfuzzy_aggregator(my_prod/3).
+
 
 % Rules
 rfuzzy_type_for(q1/1, [codetype/1]).
 rfuzzy_default_value_for(q1/1,0.5).
-q1(X):~ prod((cheap(X), close_to_center(X))).
+q1(X):~ my_prod((cheap(X), close_to_center(X))).
 
 rfuzzy_type_for(q2/1, [codetype/1]).
 rfuzzy_default_value_for(q2/1,0.5).
-q2(X):~ prod((cheap(X), little_big(X), close_to_beach(X))).
+q2(X):~ my_prod((cheap(X), little_big(X), close_to_beach(X))).
 
 rfuzzy_type_for(q3/1, [codetype/1]).
 rfuzzy_default_value_for(q3/1,0.5).
-q3(X):~ prod((close_to_beach(X), very_far_from_center(X))).
+q3(X):~ my_prod((close_to_beach(X), very_far_from_center(X))).
 t1(X,Y):- getHouseType(X,'apartment'),q3(X,Z), Y = Z ; Y = 0.
 
 rfuzzy_type_for(q4/1, [codetype/1]).
 rfuzzy_default_value_for(q4/1,0.5).
-q4(X):~ prod((expensive(X), big(X), very_close_to_beach(X))).% missing crisp and not* parts 
+q4(X):~ my_prod((expensive(X), big(X), very_close_to_beach(X))).% missing crisp and not* parts 
 
 rfuzzy_type_for(q5/1, [codetype/1]).
 rfuzzy_default_value_for(q5/1,0.5).
-q5(X):~ prod((very_cheap(X))). % 2 missing crisp parts
+q5(X):~ my_prod((very_cheap(X))). % 2 missing crisp parts
 
 rfuzzy_type_for(q6/1, [codetype/1]).
 rfuzzy_default_value_for(q6/1,0.5).
-q6(X):~ prod((close_to_center(X), close_to_beach(X))). % 2 missing crisp parts
+q6(X):~ my_prod((close_to_center(X), close_to_beach(X))). % 2 missing crisp parts
 
 
-prod(X,Y,M):- M .=. X * Y.
-
-test_prod(M) :- X .=. 0.7, Y .=. 0.5, prod(X, Y, M).
