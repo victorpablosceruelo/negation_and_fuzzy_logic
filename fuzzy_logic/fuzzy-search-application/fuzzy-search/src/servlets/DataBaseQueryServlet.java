@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -16,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 import CiaoJava.PLException;
 import auxiliar.CiaoPrologConnectionClass;
-import auxiliar.CiaoPrologProgramElementInfoClass;
 import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.FoldersUtilsClassException;
@@ -28,7 +26,7 @@ import auxiliar.FoldersUtilsClassException;
 public class DataBaseQueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(DataBaseQueryServlet.class);
-	private CiaoPrologConnectionClass connection = null;
+	
 	// static private FoldersUtilsClass FoldersUtilsObject = null;
 	
     /**
@@ -57,7 +55,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 	}
 	
 
-	public void destroy() {
+	public void destroy(CiaoPrologConnectionClass connection) {
 		LOG.info("Destroy any resoource associated with the Ciao Prolog connection.");
 		if (connection != null) {
 			connection.runQueryTermination();
@@ -110,13 +108,15 @@ public class DataBaseQueryServlet extends HttpServlet {
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
-			connection = new CiaoPrologConnectionClass();
-			connection.changeCiaoPrologWorkingFolder(owner);
+			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
+		
+			if (connection == null) {
+				connection = new CiaoPrologConnectionClass();
+			}
 			connection.selectDatabase(owner, database);
-			ArrayList<CiaoPrologProgramElementInfoClass> programInfo = connection.databaseIntrospectionQuery();
-			
-			request.setAttribute("database", database);
-			request.setAttribute("owner", owner);
+
+			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
+			session.setAttribute("connection", connection);
 
 			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
 	}

@@ -2,7 +2,7 @@ package auxiliar;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,64 +13,79 @@ public class CiaoPrologConnectionClass {
 
 	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
 	static private FoldersUtilsClass FoldersUtilsObject = null;
-	static private String currentWorkingFolder = null;
 	
 	// This one can not be shared between different processes.
-	private PLConnection plServer = null;
+	private PLConnection currentPlConnection = null;
 	private PLGoal currentGoal = null;
+	private String currentDatabase = null;
+	private String currentDatabaseOwner = null;
+	private ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = null;
+	// private String currentWorkingFolder = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
-		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog PLServer");
+		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
 		if (FoldersUtilsObject == null) {
 			FoldersUtilsObject = new FoldersUtilsClass();
 		}
 		
 		String [] argv = new String[1];
 		argv[0] = FoldersUtilsObject.getPlServerPath();
-		if (plServer == null) {
-			plServer = new PLConnection(argv);
+		if (currentPlConnection == null) {
+			currentPlConnection = new PLConnection(argv);
 		}
-		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initializing local objects.");
+		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog server (plServer). Initializing local objects.");
 
 		// changeCiaoPrologWorkingFolder("");
-		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog PLServer. Initialized local objects.");
+		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog server (plServer). Initialized local objects.");
 	}
 	
-	public void changeCiaoPrologWorkingFolder(String newWorkingFolder) 
+	/**
+	 * Changes the Ciao Prolog Working Folder 
+	 * 
+	 * @param     dataBaseOwner It is the owner of the new database, which coincides with the folder that contains the database.
+	 * @exception FoldersUtilsClassException if the folder can not be created
+	 * @exception PLException
+	 * @exception IOException
+	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
+	 */
+	private void changeCiaoPrologWorkingFolder(String dataBaseOwner) 
 			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
 		// Log info
-		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + newWorkingFolder);
+		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + dataBaseOwner);
 		
-		if ((newWorkingFolder == null) || ("".equals(newWorkingFolder))){
-			LOG.info("changeCiaoPrologWorkingFolder: newWorkingFolder is null or empty.");
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is null or empty.");
+		if ((dataBaseOwner == null) || ("".equals(dataBaseOwner))){
+			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
 		}
 		
-		if ((! FoldersUtilsObject.folderExists(newWorkingFolder, true))) {
-			LOG.info("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
+		if ((! FoldersUtilsObject.folderExists(dataBaseOwner, true))) {
+			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is an invalid folder.");
 			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
 		}
 		
-		// Adequate the value of newWorkingFolder (it was relative until here).
-		newWorkingFolder = FoldersUtilsObject.getprogramsPath() + newWorkingFolder;
+		// Adequate the value of dataBaseOwner (it was relative until here).
+		dataBaseOwner = FoldersUtilsObject.getprogramsPath() + dataBaseOwner;
 		
 		// Change it only if necessary.
-		if ((currentWorkingFolder == null) || (! currentWorkingFolder.equals(newWorkingFolder))) { 
+		if ((currentDatabaseOwner == null) || (! currentDatabaseOwner.equals(dataBaseOwner))) { 
 			
 				// Change working folder.
 				PLVariable var1 = new PLVariable();
 				PLStructure query = new PLStructure("working_directory",
-						new PLTerm[]{var1, new PLAtom(newWorkingFolder)}); 
+						new PLTerm[]{var1, new PLAtom(dataBaseOwner)}); 
 				runQueryEvaluation(query);
 				PLTerm queryAnswered = getQueryAnswered();
+				currentDatabaseOwner = dataBaseOwner;
+				
 				LOG.info("changeCiaoPrologWorkingFolder: queryAnswered: " + queryAnswered.toString());
 				LOG.info("changeCiaoPrologWorkingFolder: var1 value: " + var1.toString());
+				LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
 		}
 		else {
-			LOG.info("changeCiaoPrologWorkingFolder: not changing working folder because " + 
-					newWorkingFolder + " = " + currentWorkingFolder);
+			LOG.info("changeCiaoPrologWorkingFolder: not changing current working folder. " + 
+					 "Current working folder: " + currentDatabaseOwner);
 		}
-		LOG.info("changeCiaoPrologWorkingFolder: changed to " + newWorkingFolder);
+		
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,17 +101,25 @@ public class CiaoPrologConnectionClass {
 			throw new FoldersUtilsClassException("ERROR: requested database does not exist.");
 		}
 		String databaseFullPath = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
-		PLStructure query = new PLStructure("use_module", new PLTerm[]{new PLAtom(databaseFullPath)}); 
-		runQueryEvaluation(query);
-		PLTerm queryAnswered = getQueryAnswered();
-		LOG.info("selectDatabase: queryAnswered: " + queryAnswered.toString());
-		LOG.info("selectDatabase: selected owner: " + owner + " database: " + database);
+		if ((currentDatabase == null) || (! currentDatabase.equals(database))) { 
+			changeCiaoPrologWorkingFolder(owner);
+
+			PLStructure query = new PLStructure("use_module", new PLTerm[]{new PLAtom(databaseFullPath)}); 
+			runQueryEvaluation(query);
+			PLTerm queryAnswered = getQueryAnswered();
+			LOG.info("selectDatabase: queryAnswered: " + queryAnswered.toString());
+			LOG.info("selectDatabase: selected database: " + database + " of owner: " + owner);
+			
+			databaseIntrospectionQuery();
+		}
+		else {
+			LOG.info("selectDatabase: not changing current database: " + database);
+		}
 		
 	}
 	
-	public ArrayList<CiaoPrologProgramElementInfoClass> databaseIntrospectionQuery() 
-			throws PLException, IOException {
-		ArrayList<CiaoPrologProgramElementInfoClass> programElements = new ArrayList<CiaoPrologProgramElementInfoClass>();
+	private void databaseIntrospectionQuery() throws PLException, IOException {
+		loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable predicateType = new PLVariable();
 		PLVariable predicateName = new PLVariable();
@@ -109,11 +132,32 @@ public class CiaoPrologConnectionClass {
 			answer.setPredicateType(predicateType.toString());
 			answer.setPredicateName(predicateName.toString());
 			answer.setPredicateArity(predicateArity.toString());
-			programElements.add(answer);
+			answer.log_info();
+			loadedProgramInfo.add(answer);
 		}
-		return programElements;
 	}
 
+	public ArrayList<CiaoPrologProgramElementInfoClass> getDatabaseIntrospectionArrayList() {
+		return loadedProgramInfo;
+	}
+	
+	public Iterator<CiaoPrologProgramElementInfoClass> getDatabaseIntrospectionIterator() {
+		Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = null;
+		try {
+			if ((! (loadedProgramInfo == null)) && (! (loadedProgramInfo.isEmpty()))) {
+				loadedProgramInfoIterator = loadedProgramInfo.iterator(); 
+			}
+		} catch (Exception e) {
+			LOG.info("Exception: " + e);
+			e.printStackTrace();
+			loadedProgramInfoIterator = null;
+		}
+		return loadedProgramInfoIterator;
+	}
+	
+	public String getCurrentDatabase () { return currentDatabase; }
+	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +178,8 @@ public class CiaoPrologConnectionClass {
 		}
 		
 		LOG.info("runQuery: executing query: " + query.toString());
-		if (plServer == null) throw new PLException("runQuery: plServer is null.");
-		currentGoal = new PLGoal(plServer, query);
+		if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
+		currentGoal = new PLGoal(currentPlConnection, query);
 		currentGoal.query();
 		
 		LOG.info("runQuery: executed query: " + query.toString());
@@ -145,6 +189,7 @@ public class CiaoPrologConnectionClass {
 	 * Terminates the evaluation of the current query.
 	 */
 	public void runQueryTermination() {
+		LOG.info("runQueryTermination: start");
 		if (currentGoal != null) {
 			try {
 				currentGoal.terminate();
@@ -152,21 +197,22 @@ public class CiaoPrologConnectionClass {
 				e.printStackTrace();
 			} 
 			currentGoal = null;
-		}	
+		}
+		LOG.info("runQueryTermination: end");
 	}
 	
 	/**
-	 * Destroys the current connection to the plServer, so it should dye. 
+	 * Destroys the current connection to the Ciao Prolog server, so it should dye. 
 	 */
 	public void connectionTermination() {
 		runQueryTermination();
-		if (plServer != null) {
+		if (currentPlConnection != null) {
 			try {
-				plServer.stop();
+				currentPlConnection.stop();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
-			plServer = null;
+			currentPlConnection = null;
 		}
 	}
 	

@@ -25,5 +25,4 @@ public class DataBaseInfoClass {
 	public Boolean canDeleteDataBase(String localUserName) {
 		return dataBaseOwner.equals(localUserName);
 	}
-	
 }

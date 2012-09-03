@@ -6,13 +6,36 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Fuzzy Search App</title>
 </head>
+
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Iterator"%>
+<%@page import="auxiliar.CiaoPrologConnectionClass"%>
+<%@page import="auxiliar.CiaoPrologProgramElementInfoClass"%>
+<%@page import="auxiliar.DataBaseInfoClass"%>
+
+<% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
+
 <body>
 	<h1>Fuzzy search application</h1>
 		<h2><a href="DatabasesMenu">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
 		<jsp:include page="showErrors.jsp" />
-		<h2>Perform your query to the database <%=session.getAttribute("database") %> 
-			property of <%=session.getAttribute("owner") %>.</h2>
+		<h2>Perform your query to the database <%=connection.getCurrentDatabase() %> 
+			property of <%=connection.getCurrentDatabaseOwner() %></h2>
 
+		<h2>Available predicates at database: </h2>
+		<%  Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = connection.getDatabaseIntrospectionIterator();
+			if (loadedProgramInfoIterator != null) {
+				while (loadedProgramInfoIterator.hasNext()) {
+		%>
+					<h3>&nbsp;
+		<%= loadedProgramInfoIterator.next().getPredicateType()	%> &nbsp;
+		<%= loadedProgramInfoIterator.next().getPredicateName()	%> &nbsp;
+		<%= loadedProgramInfoIterator.next().getPredicateArity()	%>
+					</h3>
+		<%
+				}
+			}
+		%>
 		
 
 </body>
