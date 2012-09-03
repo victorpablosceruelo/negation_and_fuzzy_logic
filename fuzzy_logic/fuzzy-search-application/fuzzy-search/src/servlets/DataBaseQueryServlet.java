@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import CiaoJava.PLException;
 import auxiliar.CiaoPrologConnectionClass;
+import auxiliar.CiaoPrologProgramElementInfoClass;
 import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.FoldersUtilsClassException;
@@ -111,7 +113,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 			connection = new CiaoPrologConnectionClass();
 			connection.changeCiaoPrologWorkingFolder(owner);
 			connection.selectDatabase(owner, database);
-			connection.databaseIntrospectionQuery();
+			ArrayList<CiaoPrologProgramElementInfoClass> programInfo = connection.databaseIntrospectionQuery();
 			
 			request.setAttribute("database", database);
 			request.setAttribute("owner", owner);

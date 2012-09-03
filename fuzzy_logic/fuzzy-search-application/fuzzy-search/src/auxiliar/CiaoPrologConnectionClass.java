@@ -1,6 +1,7 @@
 package auxiliar;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -90,10 +91,26 @@ public class CiaoPrologConnectionClass {
 		PLTerm queryAnswered = getQueryAnswered();
 		LOG.info("selectDatabase: queryAnswered: " + queryAnswered.toString());
 		LOG.info("selectDatabase: selected owner: " + owner + " database: " + database);
+		
 	}
 	
-	public List<CiaoPrologProgramElementClass> databaseIntrospectionQuery() {
-		List<CiaoPrologProgramElementClass> programElements = null;
+	public ArrayList<CiaoPrologProgramElementInfoClass> databaseIntrospectionQuery() 
+			throws PLException, IOException {
+		ArrayList<CiaoPrologProgramElementInfoClass> programElements = new ArrayList<CiaoPrologProgramElementInfoClass>();
+		// rfuzzy_introspection(T, PN, PA).
+		PLVariable predicateType = new PLVariable();
+		PLVariable predicateName = new PLVariable();
+		PLVariable predicateArity = new PLVariable();
+		PLStructure query = new PLStructure("rfuzzy_introspection", new PLTerm[]{predicateType, predicateName,predicateArity}); 
+		runQueryEvaluation(query);
+		PLTerm queryAnswered = getQueryAnswered();
+		while (queryAnswered != null) {
+			CiaoPrologProgramElementInfoClass answer = new CiaoPrologProgramElementInfoClass();
+			answer.setPredicateType(predicateType.toString());
+			answer.setPredicateName(predicateName.toString());
+			answer.setPredicateArity(predicateArity.toString());
+			programElements.add(answer);
+		}
 		return programElements;
 	}
 
