@@ -12,6 +12,7 @@ if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ]
 	echo "example: $0 ~/tmp 1.14.2 13646 382"
 	echo "example: $0 ~/tmp 1.15.0 14440 latest"
 	echo "example: $0 ~/tmp 1.15.0 14854 826"
+	echo "example: $0 ~/tmp 1.15.0 14944 922"
 	echo " "
 	exit 0
 else

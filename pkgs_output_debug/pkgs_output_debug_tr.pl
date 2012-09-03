@@ -24,7 +24,7 @@ filename_suffix(".pl").
 %                Consulting a file                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pkgs_output_debug(Input, Output, FileName) :- 
+pkgs_output_debug(Input, Output, FileName) :- !, 
 	pkgs_output_debug_aux(Input, Output, FileName).
 
 pkgs_output_debug_aux(end_of_file, [end_of_file], FileName) :- !,
