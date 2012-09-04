@@ -43,7 +43,7 @@
 					<td>DataBaseOwner</td>
 					<td>DataBaseName</td>
 					<td>Query the database</td>
-					<td>View/Download it</td>
+					<td>View it</td>
 					<td>Remove it</td>
 				</tr>
 	<%
@@ -55,8 +55,8 @@
 					<td><%=dataBaseInfo.getDataBaseName() %></td>
 					<td><a href="DataBaseQueryServlet?op=query&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
 							Query</a></td>
-					<td><a href="FilesMgmtServlet?op=download&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
-							Download</a></td>
+					<td><a href="FilesMgmtServlet?op=view&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
+							View</a></td>
 							
 					<td><a href="FilesMgmtServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
 							Remove</a></td>

@@ -12,5 +12,8 @@
 			out.print("<h3>"+session.getAttribute("msg2")+"</h3>");
 			session.removeAttribute("msg2");
 		}			
-			}
+		}
+		else {
+			out.print("<h3> ERROR: Session is null.</h3>");
+		}
 	%>

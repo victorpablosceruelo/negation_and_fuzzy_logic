@@ -61,20 +61,18 @@ public class LocalUserNameFixesClass {
 	 */
 	private static String fixLocalUserName(String localUserName) 
 			throws LocalUserNameFixesClassException {
-		String fixedLocalUserName = null;
+		String fixedLocalUserName1, fixedLocalUserName2, fixedLocalUserName3;
 		if ((localUserName == null) || "".equals(localUserName)) {
 			throw new LocalUserNameFixesClassException("getWorkingFolder: localUserName can not be null nor empty string.");
 		}
 		else {
-			fixedLocalUserName = localUserName.replaceAll("\\s", "_");
-			LOG.info("fixedLocalUserName step 1: " + fixedLocalUserName);
-			fixedLocalUserName = fixedLocalUserName.replaceAll("\\@", "_at_");
-			LOG.info("fixedLocalUserName step 2: " + fixedLocalUserName);
-			fixedLocalUserName = fixedLocalUserName.replaceAll("\\.", "_");
-			LOG.info("fixedLocalUserName step 3: " + fixedLocalUserName);
+			fixedLocalUserName1 = localUserName.replaceAll("\\s", "_");
+			fixedLocalUserName2 = fixedLocalUserName1.replaceAll("\\@", "_at_");
+			fixedLocalUserName3 = fixedLocalUserName2.replaceAll("\\.", "_");
+			LOG.info("fixedLocalUserName 1: " + fixedLocalUserName1 + " 2: " + fixedLocalUserName2 + " 3: " + fixedLocalUserName3);
 		}
 		// checkValidLocalUserName(fixedLocalUserName);
-		return fixedLocalUserName;
+		return fixedLocalUserName3;
 	}
 	
 	/**

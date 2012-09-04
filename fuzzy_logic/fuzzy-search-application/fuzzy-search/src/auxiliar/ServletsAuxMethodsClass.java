@@ -112,6 +112,7 @@ public class ServletsAuxMethodsClass {
 	public static final int DataBaseQuery_Page = 8;
 	public static final int UserInfoServlet_Page = 9;
 	public static final int UserInfo_Page = 10;
+	public static final int FileView_Page = 11;
 	
 	private static String pagesDatabase(int NickName) {
 		String retVal = null;
@@ -137,7 +138,9 @@ public class ServletsAuxMethodsClass {
 		case UserInfoServlet_Page: retVal = "/UserInfoServlet";
 				break;
 		case UserInfo_Page: retVal = "/WEB-INF/userInfo.jsp";
-				break;				
+				break;
+		case FileView_Page: retVal = "/WEB-INF/fileView.jsp";
+				break;
 		default: retVal = "/error.jsp";
 				break;
 		}

@@ -84,6 +84,14 @@ public class FilesMgmtServlet extends HttpServlet {
 					if ("remove".equals(request_op)) {
 						removeFile(doMethod, session, request, response);
 					}
+					if ("view".equals(request_op)) {
+						String database = request.getParameter("database");
+						String owner = request.getParameter("owner");
+
+						String filePath = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
+						request.setAttribute("filePath", filePath);
+						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileView_Page, request, response, LOG);
+					}
 				}
 			}catch(Exception e) {
 				LOG.error("Exception thrown: ");
@@ -92,12 +100,15 @@ public class FilesMgmtServlet extends HttpServlet {
 				// System.out.println(e);
 			}
 
-			if ((request_op == null) || (! ("upload".equals(request_op))) || 
-					(! ("download".equals(request_op))) || (! ("remove".equals(request_op)))) {
+			if ((request_op == null) || 
+					((! ("upload".equals(request_op))) && (! ("download".equals(request_op))) &&
+				     (! ("remove".equals(request_op))) && (! ("view".equals(request_op))))) {
 				request.setAttribute("msg1", "Strange op in request. op: " + request_op);
 			}
 
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
+			if ((request_op == null) || ((! ("download".equals(request_op))) && (! ("view".equals(request_op))))) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
+			}
 		}
 	}
 	
@@ -216,22 +227,26 @@ public class FilesMgmtServlet extends HttpServlet {
 		LOG.info("--- removeFile invocation ---");
 
 		String database = request.getParameter("database");
+		String owner = (String) request.getParameter("owner");
+		String localUserName = (String) session.getAttribute("localUserName");
 		
-		if (database != null) {
+		if ((database != null) && (owner != null) && (localUserName != null)) {
 		
 			try {
-				String localUserName = (String) session.getAttribute("localUserName");
-				String owner = (String) session.getAttribute("owner");
 				FoldersUtilsObject.removeDataBase(database, owner, localUserName);
 				request.setAttribute("msg1", "The database "+database+" has been removed. ");
+				LOG.info("The database "+database+" has been removed. ");
 			} catch (Exception e) {
-				LOG.info("Exception: " + e);
-				// e.printStackTrace();
+				LOG.info("Exception: " + e +": " + e.getMessage());
+				e.printStackTrace();
 				request.setAttribute("msg1", "The database "+database+" could not be removed. ");
+				LOG.info("The database "+database+" could not be removed. ");
 			}
 		}
 		else {
 			request.setAttribute("msg1", "Sorry. Unknown request.");
+			LOG.info("Sorry. Unknown request.");
+			LOG.info("database: "+database+" owner: "+owner+" localUserName: "+localUserName);
 		}
 	}
 }

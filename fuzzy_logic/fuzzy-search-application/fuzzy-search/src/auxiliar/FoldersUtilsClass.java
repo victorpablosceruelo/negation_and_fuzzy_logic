@@ -22,36 +22,40 @@ public class FoldersUtilsClass {
 	
 	public FoldersUtilsClass() throws FoldersUtilsClassException {
 		
-		LOG.info("looking for a folder for uploading databases ... ");
-		// Configure the programsPath: Try the different options one by one.
-		configureProgramsPathAux("/home/java-apps/fuzzy-search/");
-		configureProgramsPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
-		// configureProgramsPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
-		configureProgramsPathAux("/tmp/java-apps/fuzzy-search/");
-
 		if ((programsPath == null) || (programsPath.equals(""))) {
+			LOG.info("looking for a folder for uploading databases ... ");
+			// Configure the programsPath: Try the different options one by one.
+			configureProgramsPathAux("/home/java-apps/fuzzy-search/");
+			configureProgramsPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
+			// configureProgramsPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
+			configureProgramsPathAux("/tmp/java-apps/fuzzy-search/");
+		}
+		
+		if ((programsPath == null) || ("".equals(programsPath))) {
 			throw new FoldersUtilsClassException("configureProgramsPath: Cannot configure the path for the programs.");
 		}
 		else {
 			LOG.info("choosen folder for uploads: " + programsPath);
 		}
 		
-		LOG.info("looking for the path of plserver ... ");
-		// Configure plServer path
-		// configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
-		// configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
-		// configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
-		configurePlServerPathAux("/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+		if ((plServerPath == null) || ("".equals(plServerPath))) {
+			LOG.info("looking for the path of plserver ... ");
+			// Configure plServer path
+			// configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
+			// configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
+			// configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+			configurePlServerPathAux("/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+
+			// ToDo: Convendria un mecanismo algo más avanzado ... :-(
+			configurePlServerPathAdvanced("/usr/lib/ciao");
+			configurePlServerPathAdvanced("/usr/share/CiaoDE");
+			configurePlServerPathAdvanced("/usr");
+			configurePlServerPathAdvanced("/opt");
+			configurePlServerPathAdvanced("/home");
+			configurePlServerPathAdvanced("/");
+		}
 		
-		// ToDo: Convendria un mecanismo algo más avanzado ... :-(
-		configurePlServerPathAdvanced("/usr/lib/ciao");
-		configurePlServerPathAdvanced("/usr/share/CiaoDE");
-		configurePlServerPathAdvanced("/usr");
-		configurePlServerPathAdvanced("/opt");
-		configurePlServerPathAdvanced("/home");
-		configurePlServerPathAdvanced("/");
-		
-		if (plServerPath == null) {
+		if ((plServerPath == null) || ("".equals(plServerPath))) {
 			throw new FoldersUtilsClassException("lookForPlServer: impossible to find plserver.");
 		}
 		else {
@@ -74,6 +78,7 @@ public class FoldersUtilsClass {
 		LocalUserNameFixesClass.checkValidLocalUserName(owner);
 		String userProgramsPath = programsPath + owner + "/";
 		testOrCreateProgramsPath(userProgramsPath, createIfDoesNotExist);
+		LOG.info("getCompletePathOfOwner: owner: "+owner+" userProgramsPath: "+userProgramsPath);
 		return userProgramsPath ;
 	}
 
@@ -181,31 +186,37 @@ public class FoldersUtilsClass {
 	 * @param     database is the database to remove.
 	 * @param     owner is the database owner and the relative path to the database.
 	 * @param     localUserName is the name of the user that requests its removal.
-	 * @return    true if the database was removed. False otherwise.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
-	 * @exception FoldersUtilsClassException never.
+	 * @exception FoldersUtilsClassException if it cannot be removed.
 	 */
-	public Boolean removeDataBase(String database, String owner, String localUserName) 
+	public void removeDataBase(String database, String owner, String localUserName) 
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
 
-		Boolean retval = false;
-		if (owner == localUserName) {
+		LOG.info("database: "+database+" owner: "+owner+" localUserName: "+localUserName);
+		
+		if (database == null) { throw new FoldersUtilsClassException("database is null"); }
+		if (owner == null) { throw new FoldersUtilsClassException("owner is null"); }
+		if (localUserName == null) { throw new FoldersUtilsClassException("localUserName is null"); }
+		
+		
+		Boolean retVal = false;
+		if (owner.equals(localUserName)) {
 			String ownerProgramsPath = getCompletePathOfOwner(owner, false);
 			String fileToRemove=ownerProgramsPath+database;
 			
-			try {
-				File file = new File(fileToRemove);
-				if (file.exists()) {
-					retval = file.delete();
-				}
-			} 
-			catch (Exception ex) {
-				LOG.info("configureProgramsPathAux: not valid: " + ownerProgramsPath);
-				LOG.info("Exception: " + ex);
+			File file = new File(fileToRemove);
+			retVal = file.exists();
+			if (! retVal) {
+				throw new FoldersUtilsClassException("The database file" + fileToRemove + "does not exist.");
+			}
+			retVal = file.delete();
+			if (! retVal) {
+				throw new FoldersUtilsClassException("The database file" + fileToRemove + "can not be removed.");
 			}
 		}
-
-		return retval;
+		else {
+			throw new FoldersUtilsClassException("You do not own the database file.");
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
