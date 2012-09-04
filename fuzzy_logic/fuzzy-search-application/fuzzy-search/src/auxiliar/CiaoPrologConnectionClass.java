@@ -17,6 +17,7 @@ public class CiaoPrologConnectionClass {
 	// This one can not be shared between different processes.
 	private PLConnection currentPlConnection = null;
 	private PLGoal currentGoal = null;
+	private int answersCounter;
 	private String currentDatabase = null;
 	private String currentDatabaseOwner = null;
 	private ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = null;
@@ -181,6 +182,7 @@ public class CiaoPrologConnectionClass {
 		if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
 		currentGoal = new PLGoal(currentPlConnection, query);
 		currentGoal.query();
+		answersCounter=0;
 		
 		LOG.info("runQuery: executed query: " + query.toString());
 	}
@@ -197,6 +199,7 @@ public class CiaoPrologConnectionClass {
 				e.printStackTrace();
 			} 
 			currentGoal = null;
+			answersCounter=0;
 		}
 		LOG.info("runQueryTermination: end");
 	}
@@ -236,13 +239,15 @@ public class CiaoPrologConnectionClass {
 		} while ((queryAnswered == null) && currentGoal.isStillRunning()); // && (counter < loopCounterMaximum));
 		
 		if (queryAnswered == null) {
-			LOG.info("getAnswer: answer obtained is null.");
+			LOG.info("getAnswer: answer obtained is null. AnswersCounter: " + answersCounter);
 			// throw new PLException("getAnswer: answer obtained is null.");
 		}
 		else {
-			LOG.info("getAnswer: obtained another answer: " + queryAnswered.toString());	
+			LOG.info("getAnswer: obtained another answer. AnswersCounter: "  + answersCounter + " Answer: " + queryAnswered.toString());	
 		}
 		return queryAnswered;
 	}
+	
+	public int getAnswersCounter () { return answersCounter; }
 
 }

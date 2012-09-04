@@ -19,7 +19,7 @@
 	<h2>Please choose between one of the following tasks:</h2>
 	<h3>Upload a new database</h3>
 	<FORM ENCTYPE='multipart/form-data' method='POST'
-		action="UploadServlet">
+		action="FilesMgmtServlet?op=upload">
 		<INPUT TYPE='file' NAME='fuzzy-database' size="50"> <INPUT
 			TYPE='submit' VALUE='Upload File'>
 	</FORM>
@@ -43,7 +43,8 @@
 					<td>DataBaseOwner</td>
 					<td>DataBaseName</td>
 					<td>Query the database</td>
-					<td>Remove</td>
+					<td>View/Download it</td>
+					<td>Remove it</td>
 				</tr>
 	<%
 			while (databasesIterator.hasNext()) {
@@ -54,7 +55,10 @@
 					<td><%=dataBaseInfo.getDataBaseName() %></td>
 					<td><a href="DataBaseQueryServlet?op=query&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
 							Query</a></td>
-					<td><a href="DataBasesMenuServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
+					<td><a href="FilesMgmtServlet?op=download&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
+							Download</a></td>
+							
+					<td><a href="FilesMgmtServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
 							Remove</a></td>
 				</tr>
 				<%

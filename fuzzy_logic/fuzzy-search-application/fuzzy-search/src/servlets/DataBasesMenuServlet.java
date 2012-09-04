@@ -60,8 +60,6 @@ public class DataBasesMenuServlet extends HttpServlet {
 	private void dataBasesMenu(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
-		String database;
-		String operation;
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("no session. logout.");
@@ -69,12 +67,6 @@ public class DataBasesMenuServlet extends HttpServlet {
 		}
 		else {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-			database = request.getParameter("database");
-			operation = request.getParameter("op");
-			if ((database != null) && (operation != null) && ("remove".equals(operation))) {
-				removeDataBase(database, session, request, response);
-			}
-			
 			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBasesMenu.jsp", request, response, LOG);
 		}
 	}
@@ -85,19 +77,5 @@ public class DataBasesMenuServlet extends HttpServlet {
 	}
 	*/
 	
-	private void removeDataBase(String database, HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		FoldersUtilsClass workingFolder;
-		try {
-			workingFolder = new FoldersUtilsClass();
-			String localUserName = (String) session.getAttribute("localUserName");
-			String owner = (String) session.getAttribute("owner");
-			workingFolder.removeDataBase(database, owner, localUserName);
-			request.setAttribute("msg1", "The database "+database+" has been removed. ");
-		} catch (Exception e) {
-			LOG.info("Exception: " + e);
-			// e.printStackTrace();
-			request.setAttribute("msg1", "The database "+database+" could not be removed. ");
-		}
-	}
+
 }
