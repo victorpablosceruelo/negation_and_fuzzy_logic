@@ -26,11 +26,12 @@
 		<%  Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = connection.getDatabaseIntrospectionIterator();
 			if (loadedProgramInfoIterator != null) {
 				while (loadedProgramInfoIterator.hasNext()) {
+					CiaoPrologProgramElementInfoClass element = loadedProgramInfoIterator.next();
 		%>
 					<h3>&nbsp;
-		<%= loadedProgramInfoIterator.next().getPredicateType()	%> &nbsp;
-		<%= loadedProgramInfoIterator.next().getPredicateName()	%> &nbsp;
-		<%= loadedProgramInfoIterator.next().getPredicateArity()	%>
+		<%= element.getPredicateType()	%> &nbsp;
+		<%= element.getPredicateName()	%> &nbsp;
+		<%= element.getPredicateArity()	%>
 					</h3>
 		<%
 				}

@@ -118,8 +118,13 @@ public class CiaoPrologConnectionClass {
 		}
 		
 	}
-	
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	private void databaseIntrospectionQuery() throws PLException, IOException {
+		LOG.info("databaseIntrospectionQuery");
 		loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable predicateType = new PLVariable();
@@ -135,6 +140,7 @@ public class CiaoPrologConnectionClass {
 			answer.setPredicateArity(predicateArity.toString());
 			answer.log_info();
 			loadedProgramInfo.add(answer);
+			queryAnswered = getQueryAnswered();
 		}
 	}
 
@@ -199,7 +205,7 @@ public class CiaoPrologConnectionClass {
 				e.printStackTrace();
 			} 
 			currentGoal = null;
-			answersCounter=0;
+			answersCounter=-1; // Notify that there is no currentGoal.
 		}
 		LOG.info("runQueryTermination: end");
 	}
@@ -243,6 +249,7 @@ public class CiaoPrologConnectionClass {
 			// throw new PLException("getAnswer: answer obtained is null.");
 		}
 		else {
+			answersCounter++;
 			LOG.info("getAnswer: obtained another answer. AnswersCounter: "  + answersCounter + " Answer: " + queryAnswered.toString());	
 		}
 		return queryAnswered;
