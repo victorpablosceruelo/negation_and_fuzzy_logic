@@ -10,32 +10,17 @@
 
 <%@page import="java.util.*"%>
 <%@page import="java.io.*"%>
+<%@page import="java.io.InputStreamReader"%>
 <%
 	String filePath = (String) request.getAttribute("filePath");
 	if ((filePath != null) && ( ! ("".equals(filePath)))) {
-      File sourceFile = new File (filePath);
-      FileReader fr = null;
-      try {
-         fr = new FileReader (sourceFile);
-         int inChar;
-
-         while ( (inChar = fr.read()) != -1 ) {
-        	 out.print(inChar);
-            // System.out.printf ("%c", inChar);
-         }
-      } catch (IOException e) {
-         System.err.printf ("Failure while reading %s: %s\n",
-                            filePath, e.getMessage());
-         e.printStackTrace ();
-      } finally {
-         try {
-            if (fr != null) { fr.close (); }
-         } catch (IOException e) {
-            System.err.printf ("Error closing file reader: %s\n",
-                               e.getMessage());
-            e.printStackTrace ();
-         }
-      }
+		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+		String line;
+		while ((line = reader.readLine()) != null) {
+       		out.println(line);
+       		out.print("<br />\n");
+		}
+		reader.close();
 	}
 %>
 </body>
