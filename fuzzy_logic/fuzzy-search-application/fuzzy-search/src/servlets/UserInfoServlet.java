@@ -44,17 +44,18 @@ public class UserInfoServlet extends HttpServlet {
 			
 			if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 				LOG.info("no session. logout.");
-				ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+				ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 			}
 			else {
 				LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-				ServletsAuxMethodsClass.forward_to("/WEB-INF/userInfo.jsp", request, response, LOG);
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.UserInfo_Page, request, response, LOG);
+				
 			}
 		} catch (Exception e) {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 	}
 }

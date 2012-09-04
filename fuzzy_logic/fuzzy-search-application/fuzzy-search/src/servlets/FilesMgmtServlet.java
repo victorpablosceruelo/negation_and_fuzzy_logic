@@ -65,7 +65,7 @@ public class FilesMgmtServlet extends HttpServlet {
 				
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("session is new. showing index page.");
-			ServletsAuxMethodsClass.goToAppIndex(request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 		else {			
 			String request_op = request.getParameter("op");
@@ -97,7 +97,7 @@ public class FilesMgmtServlet extends HttpServlet {
 				request.setAttribute("msg1", "Strange op in request. op: " + request_op);
 			}
 
-			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
 		}
 	}
 	

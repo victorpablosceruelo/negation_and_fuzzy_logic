@@ -95,7 +95,7 @@ public class SocialAuthServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 	}
 	
@@ -238,7 +238,7 @@ public class SocialAuthServlet extends HttpServlet {
 			}
 			session.invalidate();
 		}
-		ServletsAuxMethodsClass.goToAppIndex(request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
 	}
 	
 	private void socialAuthenticationSigned(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -302,7 +302,7 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			request.setAttribute("msg1", "Welcome to the fuzzy search application !!");
-			ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
 		}
 	}
 
@@ -321,7 +321,7 @@ public class SocialAuthServlet extends HttpServlet {
 				// Determine correct value for variable localUserName
 				String localUserName = LocalUserNameFixesClass.getLocalUserName(null);
 	    		session.setAttribute("localUserName", localUserName);
-	    		ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);		
+	    		ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
 	    	}
 		}
 

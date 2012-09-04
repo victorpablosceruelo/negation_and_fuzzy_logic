@@ -13,7 +13,7 @@ import org.apache.commons.logging.Log;
 //import org.apache.commons.logging.LogFactory;
 
 public class ServletsAuxMethodsClass {
-	
+
 	public static Boolean client_session_is_not_authenticated(HttpSession session) {
 		return ((session == null) || (session.getAttribute("authenticated") == null) || (! (Boolean) session.getAttribute("authenticated")));
 	}
@@ -101,24 +101,55 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
+	public static final int error_Page = 0;
+	public static final int IndexServlet_Page = 1;
+	public static final int Index_Page = 2;
+	public static final int AuthenticationSignin_Page = 3;
+	public static final int AuthenticationSignout_Page = 4;
+	public static final int DataBasesMenuServlet_Page = 5;
+	public static final int DataBasesMenu_Page = 6;
+	public static final int DataBaseQueryServlet_Page = 7;
+	public static final int DataBaseQuery_Page = 8;
+	public static final int UserInfoServlet_Page = 9;
+	public static final int UserInfo_Page = 10;
 	
-	private static String pagesDatabase(String NickName) {
-		if (NickName == null) return "/error.jsp";
-		if ("IndexServlet".equals(NickName)) return "/IndexServlet";
-		if ("signin".equals(NickName)) return "/SocialAuthServlet?mode=signin";
-		if ("signout".equals(NickName)) return "/SocialAuthServlet?mode=signout";
-		if ("DataBasesMenuServlet".equals(NickName)) return "/DataBasesMenuServlet";
-		if ("DataBaseQueryServlet".equals(NickName)) return "/DataBaseQueryServlet";
-		if ("error".equals(NickName)) return "/error.jsp";
-		
-		return "/error.jsp";
+	private static String pagesDatabase(int NickName) {
+		String retVal = null;
+		switch (NickName) {
+		case error_Page: retVal = "/error.jsp";
+				break;
+		case IndexServlet_Page: retVal = "/IndexServlet";
+				break;
+		case Index_Page: retVal = "/WEB-INF/appIndex.jsp";
+				break;
+		case AuthenticationSignin_Page: retVal = "/SocialAuthServlet?mode=signin";
+				break;
+		case AuthenticationSignout_Page: retVal = "/SocialAuthServlet?mode=signout";
+				break;
+		case DataBasesMenuServlet_Page: retVal = "/DataBasesMenuServlet";
+				break;
+		case DataBasesMenu_Page: retVal = "/WEB-INF/dataBasesMenu.jsp";
+				break;
+		case DataBaseQueryServlet_Page: retVal = "/DataBaseQueryServlet";
+				break;
+		case DataBaseQuery_Page: retVal = "/WEB-INF/dataBaseQuery.jsp";
+				break;
+		case UserInfoServlet_Page: retVal = "/UserInfoServlet";
+				break;
+		case UserInfo_Page: retVal = "/WEB-INF/userInfo.jsp";
+				break;				
+		default: retVal = "/error.jsp";
+				break;
+		}
+				
+		return retVal;
 	}
 	
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	
-	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void forward_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
 		String realWebPageName = pagesDatabase(where);
 		if (LOG != null) {
@@ -128,7 +159,7 @@ public class ServletsAuxMethodsClass {
 		dispatcher.forward(request, response);
 	}
 	
-	public static void redirect_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void redirect_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws IOException {
 		String realWebPageName = pagesDatabase(where);
 		

@@ -71,7 +71,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("no session. logout.");
-			ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 		else {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
@@ -79,7 +79,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 			owner = request.getParameter("owner");
 			if ((database == null) || (owner == null)) {
 				LOG.info("database is null.");
-				ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
 			}
 			else {
 				LOG.info("Choosen database and owner are: " + database + " :: " + owner + ".");
@@ -88,7 +88,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 				} catch (Exception e) {
 					e.printStackTrace();
 					request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
-					ServletsAuxMethodsClass.goToDataBasesMenu(request, response, LOG);
+					ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
 				}
 			}
 		}
@@ -118,6 +118,6 @@ public class DataBaseQueryServlet extends HttpServlet {
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
 			session.setAttribute("connection", connection);
 
-			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBaseQuery.jsp", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBaseQuery_Page, request, response, LOG);
 	}
 }

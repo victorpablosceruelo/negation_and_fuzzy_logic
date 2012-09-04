@@ -15,8 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 
 import auxiliar.ServletsAuxMethodsClass;
-import auxiliar.FoldersUtilsClass;
-// import auxiliar.WorkingFolderClassException;
 
 /**
  * Servlet implementation class SearchServlet
@@ -53,7 +51,8 @@ public class DataBasesMenuServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.error_Page, request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 	}
 
@@ -63,11 +62,11 @@ public class DataBasesMenuServlet extends HttpServlet {
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("no session. logout.");
-			ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
+			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 		else {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-			ServletsAuxMethodsClass.forward_to("/WEB-INF/dataBasesMenu.jsp", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenu_Page, request, response, LOG);
 		}
 	}
 	
