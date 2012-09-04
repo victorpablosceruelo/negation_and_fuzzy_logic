@@ -102,36 +102,16 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	
-	public static void goToAppIndex(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/IndexServlet", request, response, LOG);
-	}	
-	
-	public static void goToAuthenticationSignin(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/SocialAuthServlet?mode=signin", request, response, LOG);
-	}	
-	
-	public static void goToAuthenticationSignout(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/SocialAuthServlet?mode=signout", request, response, LOG);
-	}
-
-	public static void goToDataBasesMenu(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		// ServletsAuxMethodsClass.forward_to("/SearchServlet", request, response, LOG);
-		ServletsAuxMethodsClass.redirect_to("/DataBasesMenuServlet", request, response, LOG);
-	}
-	
-	public static void goToDataBaseQuery(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		// ServletsAuxMethodsClass.forward_to("/SearchServlet", request, response, LOG);
-		ServletsAuxMethodsClass.redirect_to("/DataBaseQueryServlet", request, response, LOG);
-	}
-	
-	public static void goToError(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		ServletsAuxMethodsClass.forward_to("/error.jsp", request, response, LOG);
+	private static String pagesDatabase(String NickName) {
+		if (NickName == null) return "/error.jsp";
+		if ("IndexServlet".equals(NickName)) return "/IndexServlet";
+		if ("signin".equals(NickName)) return "/SocialAuthServlet?mode=signin";
+		if ("signout".equals(NickName)) return "/SocialAuthServlet?mode=signout";
+		if ("DataBasesMenuServlet".equals(NickName)) return "/DataBasesMenuServlet";
+		if ("DataBaseQueryServlet".equals(NickName)) return "/DataBaseQueryServlet";
+		if ("error".equals(NickName)) return "/error.jsp";
+		
+		return "/error.jsp";
 	}
 	
 	// ----------------------------------------------------------------------------------------------
@@ -140,21 +120,23 @@ public class ServletsAuxMethodsClass {
 	
 	public static void forward_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
+		String realWebPageName = pagesDatabase(where);
 		if (LOG != null) {
-			LOG.info("forward_to " + where);
+			LOG.info("forward_to " + where + " -> " + realWebPageName);
 		}
-		RequestDispatcher dispatcher = request.getRequestDispatcher(where);
+		RequestDispatcher dispatcher = request.getRequestDispatcher(realWebPageName);
 		dispatcher.forward(request, response);
 	}
 	
 	public static void redirect_to(String where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws IOException 
-		{
+			throws IOException {
+		String realWebPageName = pagesDatabase(where);
+		
 		if (LOG != null) {
-			LOG.info("redirect_to " + where);
+			LOG.info("redirect_to " + where + " -> " + realWebPageName);
 		}
 		String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-		response.sendRedirect( appUrl + where);
+		response.sendRedirect( appUrl + realWebPageName);
 	}
 	
 }
