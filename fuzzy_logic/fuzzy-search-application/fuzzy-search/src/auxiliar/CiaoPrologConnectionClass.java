@@ -83,7 +83,7 @@ public class CiaoPrologConnectionClass {
 
 			currentDatabaseOwner = dataBaseOwner;
 
-			LOG.info("changeCiaoPrologWorkingFolder: variables value: " + variables.toString());
+			LOG.info("changeCiaoPrologWorkingFolder: variables value: " + variables[0].toString());
 			LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
 		}
 		else {
@@ -170,6 +170,8 @@ public class CiaoPrologConnectionClass {
 				if (currentQueryAnswer != null) {
 					LOG.info("performDatabaseQueryAux: goal: " + currentGoal.toString() + " answer: " + currentQueryAnswer.toString());
 					LOG.info("performDatabaseQueryAux: variables: " + variables.toString());
+					for(int i=0; i<variables.length; i++) 
+						LOG.info("performDatabaseQueryAux: variable["+i+"]: " + variables[i].toString());
 					// queryAnswers.add(currentGoal);
 				}
 				else {
