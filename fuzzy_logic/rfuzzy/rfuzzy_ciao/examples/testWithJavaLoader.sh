@@ -16,10 +16,12 @@ java -cp ${CLASSPATH_JAVALL}:./ example0 ${CLASSPATH_JAVALL}/plserver
 
 # /home/vpablos/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/examples/restaurant.pl
 for file in *.pl ; do
+	# moduleToLoad="${PWD}/${file}"
+	moduleToLoad="${file}"
 	echo " "
-	echo " -> Trying with example file ${PWD}/${file} "
+	echo " -> Trying with example file ${moduleToLoad} "
 	echo " "
-	java -cp ${CLASSPATH_JAVALL}:./ javaLoader ${CLASSPATH_JAVALL}/plserver ${PWD}/${file}
+	java -cp ${CLASSPATH_JAVALL}:./ javaLoader ${CLASSPATH_JAVALL}/plserver ${moduleToLoad}
 	echo " "
 	read -p "enter to continue ..."
 done

@@ -30,20 +30,19 @@ public class javaLoader {
 	    System.exit(1);
 	}
 
-	PLGoal goal = null;
+	PLVariable predType = new PLVariable();
+	PLVariable predName = new PLVariable();
+	PLVariable predArity = new PLVariable();
+	PLTerm[] args = {predType, predName, predArity};
+	PLStructure query = new PLStructure("rfuzzy_introspection", args);
+	PLGoal goal = new PLGoal(plServer,query); 
 
 	// Load needed modules.
 	try {
-	    // "library(lists)" // for lists:append/3
 	    if (moduleToLoad != null) {
-		// String realModuleToLoad = ".(" + moduleToLoad + ")";
-		// System.out.println("Loading module: " + realModuleToLoad);
-		// goal.useModule(realModuleToLoad); 
-		PLStructure query1 = new PLStructure("use_module", new PLTerm[]{new PLAtom(moduleToLoad)}); 
-		goal = new PLGoal(plServer,query1); 
-		goalQuery(goal);
-		getTheAnswers(goal, query1);
-
+		String realModuleToLoad = moduleToLoad;
+		System.out.println("Loading module: " + realModuleToLoad);
+		goal.useModule(realModuleToLoad); 
 	    }
 	    else {
 		System.out.println("No module to load ");
@@ -53,28 +52,16 @@ public class javaLoader {
 	    System.exit(1);
 	}
 
-	// The second goal.
-	PLVariable predType = new PLVariable();
-	PLVariable predName = new PLVariable();
-	PLVariable predArity = new PLVariable();
-	PLTerm[] args = {predType, predName, predArity};
-	PLStructure query2 = new PLStructure("rfuzzy_introspection", args);
-
-	goal = new PLGoal(plServer,query2); 
-	goalQuery(goal);
-	getTheAnswers(goal, query2);
-
+	System.out.println("Query: " + goal);
+	// Run the query.
 	try {
-	    plServer.stop();
-	    System.exit(0);
+	    System.out.println("goal.query ... ");
+	    goal.query();
 	} catch (Exception e) {
-	    System.err.println("Problems stopping Prolog server: " + e);
+	    System.err.println("Problems launching goal: " + e);
 	    System.exit(1);
 	}
 
-    }
-
-    private static void getTheAnswers (PLGoal goal, PLStructure query) {
 	if (goal != null) {
 	    // Get the answers.
 	    System.out.println("Getting the answers ... ");
@@ -101,16 +88,12 @@ public class javaLoader {
 	else {
 	    System.out.println("Getting the answers ... ERROR: goal is null. ");
 	}
-    }
 
-    private static void goalQuery (PLGoal goal) {
-	System.out.println("Query: " + goal);
-	// Run the query.
 	try {
-	    System.out.println("goal.query ... ");
-	    goal.query();
+	    plServer.stop();
+	    System.exit(0);
 	} catch (Exception e) {
-	    System.err.println("Problems launching goal: " + e);
+	    System.err.println("Problems stopping Prolog server: " + e);
 	    System.exit(1);
 	}
     }
