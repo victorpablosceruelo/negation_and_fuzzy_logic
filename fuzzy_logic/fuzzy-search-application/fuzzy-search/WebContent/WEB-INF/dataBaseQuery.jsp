@@ -23,10 +23,10 @@
 			property of <%=connection.getCurrentDatabaseOwner() %></h2>
 
 		<h2>Available predicates at database: </h2>
-		<%  Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = connection.getDatabaseIntrospectionIterator();
-			if (loadedProgramInfoIterator != null) {
-				while (loadedProgramInfoIterator.hasNext()) {
-					CiaoPrologProgramElementInfoClass element = loadedProgramInfoIterator.next();
+		<%  Iterator<CiaoPrologProgramElementInfoClass> programInfoIterator = connection.getProgramInfoIterator();
+			if (programInfoIterator != null) {
+				while (programInfoIterator.hasNext()) {
+					CiaoPrologProgramElementInfoClass element = programInfoIterator.next();
 		%>
 					<h3>&nbsp;
 		<%= element.getPredicateType()	%> &nbsp;

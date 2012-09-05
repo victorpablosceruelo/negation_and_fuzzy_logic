@@ -181,6 +181,9 @@ public class CiaoPrologConnectionClass {
 			do { // Get all the answers you can.
 				currentQueryAnswer = null;
 				timesCounter = 0;
+				// Save the current answer.
+				answersCounter ++;
+				LOG.info("performDatabaseQueryAux: getting answer number: "  + answersCounter);
 				do { // Get the current answer.
 					currentQueryAnswer = currentGoal.nextSolution();
 					timesCounter++;
@@ -189,12 +192,12 @@ public class CiaoPrologConnectionClass {
 				if (timesCounter >= maxNumberOfTries)
 					LOG.info("performDatabaseQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
 				
-				// Save the current answer.
-				answersCounter ++;
-				LOG.info("performDatabaseQueryAux: answer obtained: " + currentQueryAnswer.toString() + " -- AnswersCounter: "  + answersCounter);
-				
 				if (currentQueryAnswer != null) {
+					LOG.info("performDatabaseQueryAux: answer obtained: " + currentQueryAnswer.toString());
 					queryAnswers.add(currentQueryAnswer);
+				}
+				else {
+					LOG.info("performDatabaseQueryAux: answer obtained: null ");
 				}
 				
 			} while ((currentQueryAnswer != null) && (answersCounter < maxNumAnswers));
