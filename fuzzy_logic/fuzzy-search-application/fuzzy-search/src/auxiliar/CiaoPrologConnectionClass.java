@@ -67,23 +67,24 @@ public class CiaoPrologConnectionClass {
 		
 		// Change it only if necessary.
 		if ((currentDatabaseOwner == null) || (! currentDatabaseOwner.equals(dataBaseOwner))) { 
-			
-				// Change working folder.
-				PLVariable var1 = new PLVariable();
-				PLStructure query = new PLStructure("working_directory",
-						new PLTerm[]{var1, new PLAtom(dataBaseOwner)}); 
-				
-				ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, null);
-				Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
-				while (queryAnswersIterator.hasNext()) {
-					PLTerm inputAnswer = queryAnswersIterator.next();
-					LOG.info("changeCiaoPrologWorkingFolder: queryAnswer: " + inputAnswer.toString());	
-				}
-				
-				currentDatabaseOwner = dataBaseOwner;
-				
-				LOG.info("changeCiaoPrologWorkingFolder: var1 value: " + var1.toString());
-				LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
+
+			// Change working folder.
+			PLVariable [] variables = new PLVariable[1];
+			variables[0] = new PLVariable();
+			PLStructure query = new PLStructure("working_directory",
+					new PLTerm[]{variables[0], new PLAtom(dataBaseOwner)}); 
+
+			ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, null, variables);
+			Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
+			while (queryAnswersIterator.hasNext()) {
+				PLTerm inputAnswer = queryAnswersIterator.next();
+				LOG.info("changeCiaoPrologWorkingFolder: queryAnswer: " + inputAnswer.toString());	
+			}
+
+			currentDatabaseOwner = dataBaseOwner;
+
+			LOG.info("changeCiaoPrologWorkingFolder: variables value: " + variables.toString());
+			LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
 		}
 		else {
 			LOG.info("changeCiaoPrologWorkingFolder: not changing current working folder. " + 
@@ -103,34 +104,35 @@ public class CiaoPrologConnectionClass {
 		
 		ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
 		// rfuzzy_introspection(T, PN, PA).
-		PLVariable predicateType = new PLVariable();
-		PLVariable predicateName = new PLVariable();
-		PLVariable predicateArity = new PLVariable();
-		PLTerm[] args = {predicateType, predicateName, predicateArity};
+		PLVariable[] variables = new PLVariable[3];
+		variables[0] = new PLVariable(); // predicateType
+		variables[1] = new PLVariable(); // predicateName
+		variables[2] = new PLVariable(); // predicateArity
+		PLTerm[] args = {variables[0], variables[1], variables[2]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database);
+		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database, variables);
 		Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
 		while (queryAnswersIterator.hasNext()) {
 			PLTerm inputAnswer = queryAnswersIterator.next();
-			LOG.info("changeCiaoPrologWorkingFolder: queryAnswer: " + inputAnswer.toString());
+			LOG.info("databaseIntrospectionQuery: queryAnswer: " + inputAnswer.toString());
 			
 			CiaoPrologProgramElementInfoClass answer = new CiaoPrologProgramElementInfoClass();
-			answer.setPredicateType(predicateType.toString());
-			answer.setPredicateName(predicateName.toString());
-			answer.setPredicateArity(predicateArity.toString());
-			answer.log_info();
+			//answer.setPredicateType(predicateType.toString());
+			//answer.setPredicateName(predicateName.toString());
+			//answer.setPredicateArity(predicateArity.toString());
+			//answer.log_info();
 			loadedProgramInfo.add(answer);
 		}
 		loadedProgramInfoIterator = loadedProgramInfo.iterator();
 	}
 	
-	private ArrayList<PLTerm> performDatabaseQuery(PLStructure query, String database) throws PLException, IOException {
-		return performDatabaseQueryAux(query, database, maximumLong, maximumLong);
+	private ArrayList<PLTerm> performDatabaseQuery(PLStructure query, String database, PLVariable [] variables) throws PLException, IOException {
+		return performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong);
 	}
 	
 	
-	private ArrayList<PLTerm> performDatabaseQueryAux(PLStructure query, String database, long maxNumAnswers, long maxNumberOfTries) 
+	private ArrayList<PLTerm> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries) 
 			throws PLException, IOException {
 		
 		ArrayList<PLTerm> queryAnswers = new ArrayList<PLTerm>();
@@ -167,6 +169,7 @@ public class CiaoPrologConnectionClass {
 				
 				if (currentQueryAnswer != null) {
 					LOG.info("performDatabaseQueryAux: goal: " + currentGoal.toString() + " answer: " + currentQueryAnswer.toString());
+					LOG.info("performDatabaseQueryAux: variables: " + variables.toString());
 					// queryAnswers.add(currentGoal);
 				}
 				else {
