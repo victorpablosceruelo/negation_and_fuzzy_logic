@@ -30,11 +30,6 @@ public class javaLoader {
 	    System.exit(1);
 	}
 
-	PLVariable predType = new PLVariable();
-	PLVariable predName = new PLVariable();
-	PLVariable predArity = new PLVariable();
-	PLTerm[] args = {predType, predName, predArity};
-	PLStructure strGoal = new PLStructure("rfuzzy_introspection", args);
 	PLGoal goal = null;
 
 	// Load needed modules.
@@ -44,18 +39,11 @@ public class javaLoader {
 		// String realModuleToLoad = ".(" + moduleToLoad + ")";
 		// System.out.println("Loading module: " + realModuleToLoad);
 		// goal.useModule(realModuleToLoad); 
-		PLStructure useModule = new PLStructure("use_module", new PLTerm[]{new PLAtom(moduleToLoad)}); 
-		System.out.println("Query: " + useModule);
-		// The second goal.
-		goal = new PLGoal(plServer,useModule); 
-		System.out.println("goal.query ... ");
-		goal.query();
-		if (goal.execute()) {
-		    System.out.println("useModule: " + useModule + " ---> ok");
-		}
-		else {
-		    System.out.println("useModule: " + useModule + " ---> fail");
-		}
+		PLStructure query1 = new PLStructure("use_module", new PLTerm[]{new PLAtom(moduleToLoad)}); 
+		goal = new PLGoal(plServer,query1); 
+		goalQuery(goal);
+		getTheAnswers(goal, query1);
+
 	    }
 	    else {
 		System.out.println("No module to load ");
@@ -66,32 +54,15 @@ public class javaLoader {
 	}
 
 	// The second goal.
-	System.out.println("Query: " + strGoal);
-	goal = new PLGoal(plServer,strGoal); 
+	PLVariable predType = new PLVariable();
+	PLVariable predName = new PLVariable();
+	PLVariable predArity = new PLVariable();
+	PLTerm[] args = {predType, predName, predArity};
+	PLStructure query2 = new PLStructure("rfuzzy_introspection", args);
 
-	// Run the query.
-	try {
-	    System.out.println("goal.query ... ");
-	    goal.query();
-	} catch (Exception e) {
-	    System.err.println("Problems launching goal: " + e);
-	    System.exit(1);
-	}
-
-	// Get the answers.
-	System.out.println("Getting the answers ... ");
-	try {	    
-	    PLTerm queryAnswer = null;
-	    do {
-		queryAnswer = goal.nextSolution();
-		System.out.println("Solution: " + strGoal);
-		System.out.println("Query Answer: " + queryAnswer);
-	    } while (queryAnswer != null); 
-	    System.out.println("There are no more solutions");
-	} catch (Exception e) {
-	    System.err.println("Problems getting the answers: " + e);
-	    System.exit(1);
-	}
+	goal = new PLGoal(plServer,query2); 
+	goalQuery(goal);
+	getTheAnswers(goal, query2);
 
 	try {
 	    plServer.stop();
@@ -102,6 +73,55 @@ public class javaLoader {
 	}
 
     }
+
+    private static void getTheAnswers (PLGoal goal, PLStructure query) {
+	if (goal != null) {
+	    // Get the answers.
+	    System.out.println("Getting the answers ... ");
+	    System.out.println("Input goal: " + goal);
+	    System.out.println("Input query: " + query);
+
+	    try {	    
+		PLTerm queryAnswer = null;
+		do {
+		    queryAnswer = null;
+		    queryAnswer = goal.nextSolution();
+		    System.out.println("Solution: ");
+		    System.out.println("Solution goal: " + goal);
+		    System.out.println("Solution query: " + query);
+		    System.out.println("Query Answer: " + queryAnswer);
+		} while (queryAnswer != null); 
+		System.out.println("There are no more solutions");
+		System.out.println(" ");
+	    } catch (Exception e) {
+		System.err.println("Problems getting the answers: " + e);
+		System.exit(1);
+	    }	
+	}
+	else {
+	    System.out.println("Getting the answers ... ERROR: goal is null. ");
+	}
+    }
+
+    private static void goalQuery (PLGoal goal) {
+	System.out.println("Query: " + goal);
+	// Run the query.
+	try {
+	    System.out.println("goal.query ... ");
+	    goal.query();
+	} catch (Exception e) {
+	    System.err.println("Problems launching goal: " + e);
+	    System.exit(1);
+	}
+    }
 }
 /*---------------------------------------------------------------*/
 
+/* -- Does it really work ???
+  if (goal.execute()) {
+  System.out.println("useModule: " + useModule + " ---> ok");
+  }
+  else {
+  System.out.println("useModule: " + useModule + " ---> fail");
+  }
+*/
