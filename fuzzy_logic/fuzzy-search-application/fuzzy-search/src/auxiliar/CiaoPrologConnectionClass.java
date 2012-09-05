@@ -13,15 +13,13 @@ public class CiaoPrologConnectionClass {
 
 	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
 	static private FoldersUtilsClass FoldersUtilsObject = null;
+	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
 	private PLConnection currentPlConnection = null;
-	private PLGoal currentGoal = null;
-	private int answersCounter;
 	private String currentDatabase = null;
 	private String currentDatabaseOwner = null;
-	private ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = null;
-	// private String currentWorkingFolder = null;
+	private Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
@@ -74,11 +72,16 @@ public class CiaoPrologConnectionClass {
 				PLVariable var1 = new PLVariable();
 				PLStructure query = new PLStructure("working_directory",
 						new PLTerm[]{var1, new PLAtom(dataBaseOwner)}); 
-				runQueryEvaluation(query);
-				PLTerm queryAnswered = getQueryAnswered();
+				
+				ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query);
+				Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
+				while (queryAnswersIterator.hasNext()) {
+					PLTerm inputAnswer = queryAnswersIterator.next();
+					LOG.info("changeCiaoPrologWorkingFolder: queryAnswer: " + inputAnswer.toString());	
+				}
+				
 				currentDatabaseOwner = dataBaseOwner;
 				
-				LOG.info("changeCiaoPrologWorkingFolder: queryAnswered: " + queryAnswered.toString());
 				LOG.info("changeCiaoPrologWorkingFolder: var1 value: " + var1.toString());
 				LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
 		}
@@ -106,9 +109,13 @@ public class CiaoPrologConnectionClass {
 			changeCiaoPrologWorkingFolder(owner);
 
 			PLStructure query = new PLStructure("use_module", new PLTerm[]{new PLAtom(databaseFullPath)}); 
-			runQueryEvaluation(query);
-			PLTerm queryAnswered = getQueryAnswered();
-			LOG.info("selectDatabase: queryAnswered: " + queryAnswered.toString());
+			ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query);
+			Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
+			while (queryAnswersIterator.hasNext()) {
+				PLTerm inputAnswer = queryAnswersIterator.next();
+				LOG.info("selectDatabase: queryAnswer: " + inputAnswer.toString());	
+			}
+			
 			LOG.info("selectDatabase: selected database: " + database + " of owner: " + owner);
 			
 			databaseIntrospectionQuery();
@@ -125,40 +132,91 @@ public class CiaoPrologConnectionClass {
 
 	private void databaseIntrospectionQuery() throws PLException, IOException {
 		LOG.info("databaseIntrospectionQuery");
-		loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
+		ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable predicateType = new PLVariable();
 		PLVariable predicateName = new PLVariable();
 		PLVariable predicateArity = new PLVariable();
 		PLStructure query = new PLStructure("rfuzzy_introspection", new PLTerm[]{predicateType, predicateName,predicateArity}); 
-		runQueryEvaluation(query);
-		PLTerm queryAnswered = getQueryAnswered();
-		while (queryAnswered != null) {
+		
+		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query);
+		Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
+		while (queryAnswersIterator.hasNext()) {
+			PLTerm inputAnswer = queryAnswersIterator.next();
+			LOG.info("changeCiaoPrologWorkingFolder: queryAnswer: " + inputAnswer.toString());
+			
 			CiaoPrologProgramElementInfoClass answer = new CiaoPrologProgramElementInfoClass();
 			answer.setPredicateType(predicateType.toString());
 			answer.setPredicateName(predicateName.toString());
 			answer.setPredicateArity(predicateArity.toString());
 			answer.log_info();
 			loadedProgramInfo.add(answer);
-			queryAnswered = getQueryAnswered();
 		}
-	}
-
-	public ArrayList<CiaoPrologProgramElementInfoClass> getDatabaseIntrospectionArrayList() {
-		return loadedProgramInfo;
+		loadedProgramInfoIterator = loadedProgramInfo.iterator();
 	}
 	
-	public Iterator<CiaoPrologProgramElementInfoClass> getDatabaseIntrospectionIterator() {
-		Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = null;
-		try {
-			if ((! (loadedProgramInfo == null)) && (! (loadedProgramInfo.isEmpty()))) {
-				loadedProgramInfoIterator = loadedProgramInfo.iterator(); 
+	private ArrayList<PLTerm> performDatabaseQuery(PLStructure query) throws PLException, IOException {
+		return performDatabaseQueryAux(query, maximumLong, maximumLong);
+	}
+	
+	
+	private ArrayList<PLTerm> performDatabaseQueryAux(PLStructure query, long maxNumAnswers, long maxNumberOfTries) 
+			throws PLException, IOException {
+		
+		ArrayList<PLTerm> queryAnswers = new ArrayList<PLTerm>();
+		
+		if (query != null) {
+			PLGoal currentGoal = null;
+			long answersCounter = 0;
+
+			LOG.info("runQuery: executing query: " + query.toString() + " .... ");
+			if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
+			currentGoal = new PLGoal(currentPlConnection, query);
+			currentGoal.query();
+
+			LOG.info("performDatabaseQueryAux: getting answers ...");
+			PLTerm currentQueryAnswer;
+			long timesCounter;
+			
+			do { // Get all the answers you can.
+				currentQueryAnswer = null;
+				timesCounter = 0;
+				do { // Get the current answer.
+					currentQueryAnswer = currentGoal.nextSolution();
+					timesCounter++;
+				} while ((currentQueryAnswer == null) && (currentGoal.isStillRunning()) && (timesCounter < maxNumberOfTries));
+
+				if (timesCounter >= maxNumberOfTries)
+					LOG.info("performDatabaseQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
+				
+				// Save the current answer.
+				answersCounter ++;
+				LOG.info("performDatabaseQueryAux: answer obtained: " + currentQueryAnswer.toString() + " -- AnswersCounter: "  + answersCounter);
+				
+				if (currentQueryAnswer != null) {
+					queryAnswers.add(currentQueryAnswer);
+				}
+				
+			} while ((currentQueryAnswer != null) && (answersCounter < maxNumAnswers));
+			
+			LOG.info("performDatabaseQueryAux: terminating goal execution ...");
+			if (currentGoal != null) {
+				try {
+					currentGoal.terminate();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+				currentGoal = null;
+				answersCounter=-1; // Notify that there is no currentGoal.
 			}
-		} catch (Exception e) {
-			LOG.info("Exception: " + e);
-			e.printStackTrace();
-			loadedProgramInfoIterator = null;
 		}
+		LOG.info("performDatabaseQueryAux: end.");
+		return queryAnswers;
+	}
+
+
+	
+	public Iterator<CiaoPrologProgramElementInfoClass> getProgramInfoIterator() {
 		return loadedProgramInfoIterator;
 	}
 	
@@ -170,51 +228,9 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Asks the prolog server to evaluate the query.
-	 * 
-	 * @param query is the query to be evaluated.
-	 */
-	public void runQueryEvaluation(PLStructure query) throws PLException, IOException {
-		if (query == null) {
-			LOG.info("runQuery: query is null.");
-			throw new PLException("runQuery: query is null.");
-		}
-		
-		if (currentGoal != null) {
-			runQueryTermination();
-		}
-		
-		LOG.info("runQuery: executing query: " + query.toString());
-		if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
-		currentGoal = new PLGoal(currentPlConnection, query);
-		currentGoal.query();
-		answersCounter=0;
-		
-		LOG.info("runQuery: executed query: " + query.toString());
-	}
-	
-	/**
-	 * Terminates the evaluation of the current query.
-	 */
-	public void runQueryTermination() {
-		LOG.info("runQueryTermination: start");
-		if (currentGoal != null) {
-			try {
-				currentGoal.terminate();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
-			currentGoal = null;
-			answersCounter=-1; // Notify that there is no currentGoal.
-		}
-		LOG.info("runQueryTermination: end");
-	}
-	
-	/**
 	 * Destroys the current connection to the Ciao Prolog server, so it should dye. 
 	 */
 	public void connectionTermination() {
-		runQueryTermination();
 		if (currentPlConnection != null) {
 			try {
 				currentPlConnection.stop();
@@ -224,37 +240,5 @@ public class CiaoPrologConnectionClass {
 			currentPlConnection = null;
 		}
 	}
-	
-	
-	/**
-	 * Obtains the answer to the query, but the answer is contained in the original query.
-	 * This differs from the usual behavior in Prolog interpreters, 
-	 * where we get just the answers to the variables involved.
-	 */
-	public PLTerm getQueryAnswered() throws IOException, PLException {
-		LOG.info("getAnswer: getting another answer");
-		PLTerm queryAnswered = null;
-		Integer counter = new Integer(0);
-		do {
-			queryAnswered = currentGoal.nextSolution();
-			counter++;
-			if (counter.equals(Integer.MAX_VALUE)) {
-				LOG.info("We have waited for the answer for " + counter.toString() + " times.");
-				counter = new Integer(0);
-			}
-		} while ((queryAnswered == null) && currentGoal.isStillRunning()); // && (counter < loopCounterMaximum));
-		
-		if (queryAnswered == null) {
-			LOG.info("getAnswer: answer obtained is null. AnswersCounter: " + answersCounter);
-			// throw new PLException("getAnswer: answer obtained is null.");
-		}
-		else {
-			answersCounter++;
-			LOG.info("getAnswer: obtained another answer. AnswersCounter: "  + answersCounter + " Answer: " + queryAnswered.toString());	
-		}
-		return queryAnswered;
-	}
-	
-	public int getAnswersCounter () { return answersCounter; }
 
 }

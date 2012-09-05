@@ -58,7 +58,6 @@ public class DataBaseQueryServlet extends HttpServlet {
 	public void destroy(CiaoPrologConnectionClass connection) {
 		LOG.info("Destroy any resoource associated with the Ciao Prolog connection.");
 		if (connection != null) {
-			connection.runQueryTermination();
 			connection.connectionTermination();
 		}
 	}
