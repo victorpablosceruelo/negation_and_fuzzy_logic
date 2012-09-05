@@ -96,42 +96,11 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void selectDatabase(String owner, String database) 
-			throws FoldersUtilsClassException, LocalUserNameFixesClassException, PLException, IOException {
-		// Usage example:
-		// use_module('/home/vpablos/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/examples/age.pl').
-		LOG.info("selectDatabase: selecting owner: " + owner + " database: " + database);
-		if (! FoldersUtilsObject.databaseExists(owner, database, true)) {
-			throw new FoldersUtilsClassException("ERROR: requested database does not exist.");
-		}
-		String databaseFullPath = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
-		if ((currentDatabase == null) || (! currentDatabase.equals(database))) { 
-			changeCiaoPrologWorkingFolder(owner);
-
-			PLStructure query = new PLStructure("use_module", new PLTerm[]{new PLAtom(databaseFullPath)}); 
-			ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, null);
-			Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
-			while (queryAnswersIterator.hasNext()) {
-				PLTerm inputAnswer = queryAnswersIterator.next();
-				LOG.info("selectDatabase: queryAnswer: " + inputAnswer.toString());	
-			}
-			
-			LOG.info("selectDatabase: selected database: " + database + " of owner: " + owner);
-			
-			databaseIntrospectionQuery(databaseFullPath);
-		}
-		else {
-			LOG.info("selectDatabase: not changing current database: " + database);
-		}
+	public void databaseIntrospectionQuery(String owner, String database) 
+			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+		LOG.info("databaseIntrospectionQuery: owner: "+owner+" database: "+database);
+		changeCiaoPrologWorkingFolder(owner);
 		
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private void databaseIntrospectionQuery(String databaseFullPath) throws PLException, IOException {
-		LOG.info("databaseIntrospectionQuery");
 		ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable predicateType = new PLVariable();
@@ -140,7 +109,7 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {predicateType, predicateName, predicateArity};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, databaseFullPath);
+		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database);
 		Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
 		while (queryAnswersIterator.hasNext()) {
 			PLTerm inputAnswer = queryAnswersIterator.next();
@@ -156,12 +125,12 @@ public class CiaoPrologConnectionClass {
 		loadedProgramInfoIterator = loadedProgramInfo.iterator();
 	}
 	
-	private ArrayList<PLTerm> performDatabaseQuery(PLStructure query, String databaseFullPath) throws PLException, IOException {
-		return performDatabaseQueryAux(query, databaseFullPath, maximumLong, maximumLong);
+	private ArrayList<PLTerm> performDatabaseQuery(PLStructure query, String database) throws PLException, IOException {
+		return performDatabaseQueryAux(query, database, maximumLong, maximumLong);
 	}
 	
 	
-	private ArrayList<PLTerm> performDatabaseQueryAux(PLStructure query, String databaseFullPath, long maxNumAnswers, long maxNumberOfTries) 
+	private ArrayList<PLTerm> performDatabaseQueryAux(PLStructure query, String database, long maxNumAnswers, long maxNumberOfTries) 
 			throws PLException, IOException {
 		
 		ArrayList<PLTerm> queryAnswers = new ArrayList<PLTerm>();
@@ -172,9 +141,9 @@ public class CiaoPrologConnectionClass {
 
 			LOG.info("runQuery: executing query: " + query.toString() + " .... ");
 			if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
-			currentGoal = new PLGoal(currentPlConnection, query);
-			//if ((databaseFullPath != null) && (! "".equals(databaseFullPath)))
-			//		currentGoal.useModule(databaseFullPath);
+			currentGoal = new PLGoal(currentPlConnection, query); 
+			if ((database != null) && (! "".equals(database)))
+					currentGoal.useModule(database);
 			currentGoal.query();
 
 			LOG.info("performDatabaseQueryAux: getting answers ...");

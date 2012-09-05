@@ -107,16 +107,25 @@ public class DataBaseQueryServlet extends HttpServlet {
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
+			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "databaseIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
 		
 			if (connection == null) {
 				connection = new CiaoPrologConnectionClass();
 			}
-			connection.selectDatabase(owner, database);
+			
+			dbQueryAux_Introspection(owner, database, connection);
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
 			session.setAttribute("connection", connection);
 
 			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBaseQuery_Page, request, response, LOG);
 	}
+	
+	private void dbQueryAux_Introspection(String owner, String database, CiaoPrologConnectionClass connection) 
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+		
+		connection.databaseIntrospectionQuery(owner, database);
+	}
+	
 }
