@@ -1,11 +1,14 @@
 :- module(rfuzzy_rt, [
 	defined_aggregators/1, defined_quantifiers/1,
+	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
+	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2,
+	% Now the aggregators.
 	inject/3, merge/4, prod/3, iprod/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	mean/3, supreme/2,
-	'=>'/4,
-	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
-	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2 ],[hiord]).
+	% Now the quantifiers
+	fnot/2
+		     ],[hiord]).
 
 :- use_module(library(write),[write/1]).
 :- use_package(clpr).
@@ -44,6 +47,20 @@ complement(X, C, Z) :-
 	max(0, Temp2, Z).
 
 mean(X, Y, Z) :- Z .=. (X + Y) / 2.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
+	functor(Fuzzy_Predicate_Functor, FP_Name, FP_Arity), 
+	FP_Arity_Aux is FP_Arity - 1,
+	functor(FP_Functor, FP_Name, FP_Arity), 
+	copy_args(FP_Arity_Aux, Fuzzy_Predicate_Functor, FP_Functor),			 
+	arg(FP_Arity, FP_Functor, FP_Truth_Value),
+	FP_Functor,
+	FP_Truth_Value .>=. 0, FP_Truth_Value .=<. 1,
+	Truth_Value .=. 1 - FP_Truth_Value.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -179,14 +196,14 @@ mergeaux([X|L1],[Y|L2],P,[Z|L]):-
 
 :- meta_predicate =>(pred(3),goal,goal,?).
 
-=>(Formula,X,Y,M):- 
-	functor(X,_,Ax),
-	arg(Ax,X,Mx),
-	functor(Y,_,Ay),
-	arg(Ay,Y,My),
-	call(X),
-	call(Y),
-	call(Formula,Mx,My,M).
+%=>(Formula,X,Y,M):- 
+%	functor(X,_,Ax),
+%	arg(Ax,X,Mx),
+%	functor(Y,_,Ay),
+%	arg(Ay,Y,My),
+%	call(X),
+%	call(Y),
+%	call(Formula,Mx,My,M).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
