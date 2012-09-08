@@ -529,6 +529,8 @@ translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _FB) :-
 % Conjunction.
 translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,
 	print_msg('debug', 'translate_rule_body(Body, TV_Aggregator, Truth_Value)',((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value)),
+	nonvar(TV_Aggregator),
+	\+ ( TV_Aggregator = 'none' ),
 	translate_rule_body(Tmp_Body_1, TV_Aggregator, TV_1, FB_1),
 	translate_rule_body(Tmp_Body_2, TV_Aggregator, TV_2, FB_2),
 	functor(Aggr_F, TV_Aggregator, 3),
@@ -547,21 +549,16 @@ translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
 	retrieve_predicate_info('quantifier', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _List, 'no'), !,
 
-%	Body_F=..[Pred_Name|Pred_Args],
 	arg(1, Body_F_In, SubBody),
-	translate_rule_body_subcall(SubBody, _Truth_Value_Aux, SubCall),
+	translate_rule_body(SubBody, 'none', _SubCall_Truth_Value, SubCall),
 	print_msg('debug', 'translate_rule_body(Fuzzy_Functor) - with quantifier',(Fuzzy_Functor)),
 	arg(1, Fuzzy_Functor, SubCall),
 	Translation = (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
 	print_msg('debug', 'translate_rule_body(Translation) - with quantifier',(Translation)).
 
 % Normal.
-translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_F, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
+translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
-	translate_rule_body_subcall(Body_F, Truth_Value, Fuzzy_F).
-
-translate_rule_body_subcall(Body_F, Truth_Value, Fuzzy_Functor) :-
-	print_msg('debug', 'translate_rule_body_subcall(Body, Truth_Value)',(Body_F, Truth_Value)),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
 	translate_functor(Body_F, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value),
 	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
