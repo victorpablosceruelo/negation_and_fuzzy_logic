@@ -1,4 +1,5 @@
-:- module(rfuzzy_rt, [defined_aggregators/1, 
+:- module(rfuzzy_rt, [
+	defined_aggregators/1, defined_quantifiers/1,
 	inject/3, merge/4, prod/3, iprod/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	mean/3, supreme/2,
@@ -17,6 +18,7 @@
 % REMOVED: preinject/3,postinject/4, id/2, id/3, id (in defined_aggregators), 
 
 defined_aggregators([min, max, prod, iprod, dprod, luka, dluka, complement, mean]).
+defined_quantifiers([fnot]).
 
 min(X,Y,Z):- X .=<. Y, X .=. Z .
 min(X,Y,Z):- X .>. Y, Y .=. Z .

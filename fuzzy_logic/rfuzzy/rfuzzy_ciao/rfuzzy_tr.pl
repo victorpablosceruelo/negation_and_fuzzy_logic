@@ -523,12 +523,13 @@ test_aggregator_is_defined(Aggregator_Op_Name, Show_Error) :-
 % ------------------------------------------------------
 
 % Security issues
-translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _FB) :- 
+translate_rule_body(Body_F, TV_Aggregator, _Truth_Value, _FB) :- 
+	print_msg('debug', 'translate_rule_body(Body_F, TV_Aggregator) - variable problem', (Body_F, TV_Aggregator)),
 	var(Body_F), !, fail. % If this is a variable the tranlate rules loop forever !!!
 
 % Conjunction.
 translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,
-	print_msg('debug', 'translate_rule_body(Body, TV_Aggregator, Truth_Value)',((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value)),
+	print_msg('debug', 'translate_rule_body(Body, TV_Aggregator, Truth_Value) - conjunction',((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value)),
 	nonvar(TV_Aggregator),
 	\+ ( TV_Aggregator = 'none' ),
 	translate_rule_body(Tmp_Body_1, TV_Aggregator, TV_1, FB_1),
@@ -540,14 +541,16 @@ translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1,
 
 % Quantifier.
 translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
-	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - with quantifier',(Body_F, Truth_Value)),
+	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - with quantifier',(Body_F_In, Truth_Value)),
+	nonvar(Body_F_In),
 	functor(Body_F_In, Pred_Name, 1),
 	functor(Body_F, Pred_Name, 1),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
 	translate_functor(Body_F, 'quantifier', 'no', Fuzzy_Functor, Truth_Value),
 	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('quantifier', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _List, 'no'), !,
+	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity)', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
+	test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
+	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity) - YES ', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
 
 	arg(1, Body_F_In, SubBody),
 	translate_rule_body(SubBody, 'none', _SubCall_Truth_Value, SubCall),
@@ -559,12 +562,28 @@ translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
 % Normal.
 translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
+	nonvar(Body_F),
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
 	translate_functor(Body_F, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value),
 	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
 	retrieve_predicate_info('fuzzy_rule', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _List, 'yes'), !,
-	print_msg('debug', 'translate_rule_body_subcall(Body, Truth_Value, Fuzzy_Functor)',(Body_F, Truth_Value, Fuzzy_Functor)).
+	print_msg('debug', 'translate_rule_body(Body, Truth_Value, Fuzzy_Functor)',(Body_F, Truth_Value, Fuzzy_Functor)),
+	print_msg_nl('debug').
+
+translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _Result) :-
+	print_msg('error', 'translate_rule_body(Body)',(Body_F)), !, fail.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+test_quantifier_is_defined(Quantifier_Name, _Quantifier_Arity) :-
+	defined_quantifiers(Quantifiers_List),
+	memberchk_local(Quantifier_Name, Quantifiers_List), !. 
+test_quantifier_is_defined(Quantifier_Name, Quantifier_Arity) :-
+	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
+	retrieve_predicate_info('quantifier', Quantifier_Name, Quantifier_Arity, _List, 'no'), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------

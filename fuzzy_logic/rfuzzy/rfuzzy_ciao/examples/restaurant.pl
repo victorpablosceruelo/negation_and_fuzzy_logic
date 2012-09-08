@@ -6,7 +6,7 @@
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
 % Activate/Deactivate debug.
-% :- activate_rfuzzy_debug.
+:- activate_rfuzzy_debug.
 
 restaurant(kenzo).
 restaurant(burguer_king).
@@ -51,9 +51,14 @@ cheap(kenzo) value 0.3.
 cheap(subway) value 1.
 cheap(derroscas) value 1.
 
+rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
+rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
+
+rfuzzy_quantifier(very/1, over, 0.7).
+
 rfuzzy_type_for(tempting_restaurant/1, [restaurant/1]).
 rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
-tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), cheap(R), traditional(R))).
+tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), fnot(very(expensive(R))), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
 
 distance_to_us(kenzo, 150).
@@ -63,11 +68,6 @@ distance_to_us(pizza_jardin, 250).
 % distance_to(unknown, 800).
 
 rfuzzy_define_fuzzification(near_to_us/1, distance_to_us/2, near_function/2).
-
-rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
-rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
-
-rfuzzy_quantifier(very/1, over, 0.7).
 
 max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
 rfuzzy_aggregator(max_with_min_a_half/3).
