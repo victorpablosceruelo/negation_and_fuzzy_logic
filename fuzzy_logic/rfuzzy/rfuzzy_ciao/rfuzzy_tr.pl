@@ -178,12 +178,13 @@ print_list_info(Level, [Arg | Args]) :- !,
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules):-
+rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 	!,
 	retrieve_all_predicate_info_with_category('fuzzy_rule', Fuzzy_Rules_To_Build),
 	print_msg('debug', 'fuzzy rules to build', Fuzzy_Rules_To_Build),
-	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built),
-	generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules).
+	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_1),
+	generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_1, Fuzzy_Rules_2),
+	add_quantifiers_code(Fuzzy_Rules_2, Fuzzy_Rules_3).
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
 	print_msg_nl('info'), print_msg_nl('info'), 
@@ -869,6 +870,33 @@ generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Resul
 	generate_introspection_predicate_aux(Input_List, [Output|Accumulator_List], Result_List).
 
 generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, Pred_Arity, _List), rfuzzy_introspection(Category, Pred_Name, Pred_Arity)).
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+defined_quantifiers([fnot]).
+
+add_quantifiers_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
+	code_for_quantifier_fnot(Quantifier_Code_Fnot), 
+	append_local(Quantifier_Code_Fnot, Fuzzy_Rules_In, Fuzzy_Rules_Out).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_quantifier_fnot([Code]) :-
+	Code = (
+		   fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
+	       functor(Fuzzy_Predicate_Functor, FP_Name, FP_Arity), 
+	       FP_Arity_Aux is FP_Arity - 1,
+	       functor(FP_Functor, FP_Name, FP_Arity), 
+	       copy_args(FP_Arity_Aux, Fuzzy_Predicate_Functor, FP_Functor),			 
+	       arg(FP_Arity, FP_Functor, FP_Truth_Value),
+	       FP_Functor,
+	       FP_Truth_Value .>=. 0, FP_Truth_Value .=<. 1,
+	       Truth_Value .=. 1 - FP_Truth_Value
+	       ).
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
