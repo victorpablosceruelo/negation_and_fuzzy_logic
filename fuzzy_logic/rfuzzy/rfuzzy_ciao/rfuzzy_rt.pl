@@ -2,10 +2,10 @@
 	defined_aggregators/1, 
 	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2,
+	supreme/2, reorder_by_truth_value/3, take_an_element/2,
 	% Aggregators.
-	inject/3, merge/4, prod/3, iprod/3, 
-	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
-	mean/3, supreme/2
+	inject/3, merge/4, prod/3, iprod/3, mean/3, 
+	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3
 		     ],[hiord]).
 
 :- use_module(library(write),[write/1]).

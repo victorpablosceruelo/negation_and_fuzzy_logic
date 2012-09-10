@@ -888,14 +888,26 @@ code_for_quantifier_fnot([Code]) :-
 	Code = (
 		   fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
 	       functor(Fuzzy_Predicate_Functor, FP_Name, FP_Arity), 
+	       arg(FP_Arity, Fuzzy_Predicate_Functor, Subcall_Truth_Value),
 	       FP_Arity_Aux is FP_Arity - 1,
-	       functor(FP_Functor, FP_Name, FP_Arity), 
-	       copy_args(FP_Arity_Aux, Fuzzy_Predicate_Functor, FP_Functor),			 
-	       arg(FP_Arity, FP_Functor, FP_Truth_Value),
-	       FP_Functor,
-	       FP_Truth_Value .>=. 0, FP_Truth_Value .=<. 1,
-	       Truth_Value .=. 1 - FP_Truth_Value
-	       ).
+
+	       print_msg('debug', 'fnot', 'Computing results list.'),
+	       findall(FP_Functor, 
+	       (Fuzzy_Predicate_Functor, 
+		functor(FP_Functor, FP_Name, FP_Arity), 
+		copy_args(FP_Arity_Aux, Fuzzy_Predicate_Functor, FP_Functor),
+		arg(FP_Arity, Fuzzy_Predicate_Functor, Subcall_Truth_Value),
+		Real_Truth_Value .=. 1 - Subcall_Truth_Value,
+		arg(FP_Arity, FP_Functor, Real_Truth_Value)
+	       ), Results_List), !,
+	       print_msg('debug', 'fnot', Results_List),
+	       reorder_by_truth_value(Results_List, [], Results_List_Aux),
+	       take_an_element(Results_List_Aux, Result_Functor),
+	       copy_args(FP_Arity_Aux, Result_Functor, Fuzzy_Predicate_Functor),
+	       arg(FP_Arity, Result_Functor, Truth_Value),
+	       
+	       Truth_Value .>=. 0, Truth_Value .=<. 1
+).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
