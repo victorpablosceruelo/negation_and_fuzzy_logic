@@ -170,8 +170,10 @@ public class CiaoPrologConnectionClass {
 				if (currentQueryAnswer != null) {
 					LOG.info("performDatabaseQueryAux: goal: " + currentGoal.toString() + " answer: " + currentQueryAnswer.toString());
 					LOG.info("performDatabaseQueryAux: variables: " + variables.toString());
+					String logMsg="";
 					for(int i=0; i<variables.length; i++) 
-						LOG.info("performDatabaseQueryAux: variable["+i+"]: " + variables[i].toString());
+						logMsg += ("   var["+i+"]: " + variables[i].toString() + " bind: " + variables[i].getBinding());
+					LOG.info("performDatabaseQueryAux: " + logMsg + " ");
 					// queryAnswers.add(currentGoal);
 				}
 				else {
