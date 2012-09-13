@@ -222,5 +222,21 @@ public class CiaoPrologConnectionClass {
 			currentPlConnection = null;
 		}
 	}
+	
+	public void testingQuery (String owner, String database) throws PLException, IOException {
+		PLVariable[] variables = new PLVariable[4];
+		variables[0] = new PLVariable(); // X
+		variables[1] = new PLVariable(); // V1
+		variables[2] = new PLVariable(); // V2
+		variables[3] = new PLVariable(); // V3
+		
+		PLTerm[] args_expensive = {variables[0], variables[1]};
+		PLStructure subSubQuery = new PLStructure("expensive", args_expensive);
+		PLTerm[] args_very = {subSubQuery, variables[2]};
+		PLStructure subQuery = new PLStructure("very", args_very);
+		PLTerm[] args_fnot = {subQuery, variables[3]};
+		PLStructure query = new PLStructure("fnot", args_fnot); 
 
+		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database, variables);
+	}
 }

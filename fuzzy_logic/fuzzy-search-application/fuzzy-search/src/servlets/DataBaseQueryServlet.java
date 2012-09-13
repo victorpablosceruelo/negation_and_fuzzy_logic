@@ -126,6 +126,12 @@ public class DataBaseQueryServlet extends HttpServlet {
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
 		connection.databaseIntrospectionQuery(owner, database);
+		LOG.info("------");
+		LOG.info("------");
+		LOG.info("--------> testing query !!! <-----------");
+		LOG.info("------");
+		LOG.info("------");
+		connection.testingQuery(owner, database);
 	}
 	
 }
