@@ -2,7 +2,9 @@
 	defined_aggregators/1, 
 	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2,
-	supreme/2, reorder_by_truth_value/3, take_an_element/2,
+	supreme/2, reorder_by_truth_value/3, 
+	one_by_one_first_head/2, one_by_one_first_tail/2,
+	rfuzzy_process_attribute_dump/4,
 	% Aggregators.
 	inject/3, merge/4, prod/3, iprod/3, mean/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3
@@ -62,7 +64,7 @@ supreme(List_In, Answer) :-
 	print_msg('debug', 'supreme :: List_Aux_1', List_Aux_1),
 	reorder_by_truth_value(List_Aux_1, [], List_Aux_2),
 	print_msg('debug', 'supreme :: List_Aux_2', List_Aux_2),
-	take_an_element(List_Aux_2, Element),
+	one_by_one_first_head(List_Aux_2, Element),
 	print_msg('debug', 'supreme :: element_taken', Element),
 
 	copy_args(Arguments_Arity, Element, Answer),
@@ -109,11 +111,27 @@ reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail_In ], [ Head_2 | Tail_Out ]) 
 reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail_In ], [ Head_1, Head_2 | Tail_In ]) :- !.
 
 has_less_truth_value(Head_1, Head_2) :-
+	print_msg('debug', 'has_less_truth_value(Head_1, Head_2)', (Head_1, Head_2)),
 	functor(Head_1, _Name_1, Arity_1), 
 	functor(Head_2, _Name_2, Arity_2), 
 	arg(Arity_1, Head_1, TV_1),
 	arg(Arity_2, Head_2, TV_2),
-	TV_1 .<. TV_2.
+	has_less_truth_value_aux(TV_1, TV_2).
+
+has_less_truth_value_aux(TV_1, TV_2) :-
+	var(TV_1), var(TV_2),
+	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', (TV_1, TV_2)),
+	TV_1 .<. TV_2,
+	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', 'yes').
+
+has_less_truth_value_aux(TV_1, TV_2) :-
+	var(TV_1), var(TV_2),
+	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', 'no'),
+	!, fail.
+
+has_less_truth_value_aux(TV_1, TV_2) :-
+	print_msg('error', 'has_less_truth_value_aux(TV_1, TV_2)', (TV_1, TV_2)),
+	!, fail.
 
 split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args) :-
 %	print_msg('debug', 'split_out_fuzzy_functor_args(Head)', split_out_fuzzy_functor_args(Head)),
@@ -127,10 +145,14 @@ split_out_fuzzy_functor_args_aux([Prio, TV], Prio, TV, []) :- !.
 split_out_fuzzy_functor_args_aux([Arg | Args_List_In], Prio, TV, [Arg | Args_List_Out]) :- 
 	split_out_fuzzy_functor_args_aux(Args_List_In, Prio, TV, Args_List_Out).
 
-take_an_element([Element|_List], Element).
-take_an_element([_FirstElement|List], Element) :-
-	take_an_element(List, Element).
+one_by_one_first_head([Element|_List], Element).
+one_by_one_first_head([_FirstElement|List], Element) :-
+	one_by_one_first_head(List, Element).
 
+one_by_one_first_tail([Element], Element) :- !.
+one_by_one_first_tail([_FirstElement|List], Element) :-
+	one_by_one_first_tail(List, Element).
+one_by_one_first_tail([Element|_List], Element) :- !.
 
 % ---------------------------------------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
@@ -207,6 +229,21 @@ rfuzzy_conversion_out(X, X) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+rfuzzy_process_attribute_dump([Dump], Var, Condition, Value) :-
+	functor(Dump, Condition, Arity),
+	Arity = 2,
+	arg(1, Dump, Var), 
+	arg(2, Dump, Value), 
+	!. 
+
+rfuzzy_process_attribute_dump(Dump, _Var, _Condition, _Value) :-
+	print_msg('error', 'rfuzzy_process_attribute_dump :: Dump', Dump),
+	!, fail.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 :- data print_msg_level/1.
 
 activate_all_rfuzzy_print_msg_level :-
@@ -239,7 +276,10 @@ translate_level_to_pre_msg1('warning', 'WARNING: ') :- !.
 translate_level_to_pre_msg1('error', 'ERROR: ') :- !.
 translate_level_to_pre_msg1('', '') :- !.
 
-% This gets rid of lists.
+% This gets rid of lists. Be careful with variables !!!
+print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, Var) :- 
+	var(Var), !,
+	print_msg_real(Pre_Msg1, Msg1, Msg1_Info, Var).
 print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, []) :- !,
 	print_msg_real(Pre_Msg1, Msg1, [ ' (list)' | Msg1_Info ], ' (empty)').
 print_msg_aux(Pre_Msg1, Msg1, Msg1_Info, [ Msg2_Head | Msg2_Tail ]) :- !,

@@ -184,7 +184,7 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 	print_msg('debug', 'fuzzy rules to build', Fuzzy_Rules_To_Build),
 	build_auxiliary_clauses(Fuzzy_Rules_To_Build, Fuzzy_Rules_1),
 	generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_1, Fuzzy_Rules_2),
-	add_quantifiers_code(Fuzzy_Rules_2, Fuzzy_Rules_3).
+	add_auxiliar_code(Fuzzy_Rules_2, Fuzzy_Rules_3).
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
 	print_msg_nl('info'), print_msg_nl('info'), 
@@ -876,9 +876,32 @@ generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, 
 
 defined_quantifiers([fnot]).
 
-add_quantifiers_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
+add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 	code_for_quantifier_fnot(Quantifier_Code_Fnot), 
-	append_local(Quantifier_Code_Fnot, Fuzzy_Rules_In, Fuzzy_Rules_Out).
+	code_for_getting_attribute_values(Code_For_Getting_Attribute_Values),
+	append_local(Quantifier_Code_Fnot, Fuzzy_Rules_In, Fuzzy_Rules_Aux),
+	append_local(Code_For_Getting_Attribute_Values, Fuzzy_Rules_Aux, Fuzzy_Rules_Out).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_getting_attribute_values([Code_1, Code_2]) :-
+%	Module = (:-),
+	Code_1 = (
+		     rfuzzy_var_truth_value(Var, Condition, Value) :-
+		 print_msg('debug', 'rfuzzy_var_truth_value :: Var', Var),
+		 var(Var),					 
+		 dump_constraints(Var, Var, Dump), !,
+		 print_msg('debug', 'rfuzzy_var_truth_value :: dump_constraints :: Dump', Dump),
+		 rfuzzy_process_attribute_dump(Dump, Var, Condition, Value)
+		 ),
+%    dump_internal(Var, Var, [cva(Var, Value)])
+
+		 Code_2 = (
+			      rfuzzy_var_truth_value(Var, _Condition, _Value) :-
+			  print_msg('error', 'rfuzzy_var_truth_value :: Var', Var),
+			  !, fail ).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -887,27 +910,25 @@ add_quantifiers_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 code_for_quantifier_fnot([Code]) :-
 	Code = (
 		   fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
-	       functor(Fuzzy_Predicate_Functor, FP_Name, FP_Arity), 
-	       arg(FP_Arity, Fuzzy_Predicate_Functor, Subcall_Truth_Value),
-	       FP_Arity_Aux is FP_Arity - 1,
-
+	       
 	       print_msg('debug', 'fnot', 'Computing results list.'),
-	       findall(FP_Functor, 
-	       (Fuzzy_Predicate_Functor, 
-		functor(FP_Functor, FP_Name, FP_Arity), 
-		copy_args(FP_Arity_Aux, Fuzzy_Predicate_Functor, FP_Functor),
-		arg(FP_Arity, Fuzzy_Predicate_Functor, Subcall_Truth_Value),
-		Real_Truth_Value .=. 1 - Subcall_Truth_Value,
-		arg(FP_Arity, FP_Functor, Real_Truth_Value)
-	       ), Results_List), !,
+	       findall(Fuzzy_Predicate_Functor, Fuzzy_Predicate_Functor, Results_List), !,
 	       print_msg('debug', 'fnot', Results_List),
 	       reorder_by_truth_value(Results_List, [], Results_List_Aux),
-	       take_an_element(Results_List_Aux, Result_Functor),
-	       copy_args(FP_Arity_Aux, Result_Functor, Fuzzy_Predicate_Functor),
-	       arg(FP_Arity, Result_Functor, Truth_Value),
+	       print_msg('debug', 'reorder_by_truth_value', Results_List_Aux),
+	       one_by_one_first_tail(Results_List_Aux, Result_Functor),
+	       print_msg('debug', 'take_an_element', Result_Functor),
 	       
-	       Truth_Value .>=. 0, Truth_Value .=<. 1
-).
+	       functor(Fuzzy_Predicate_Functor, _FP_Name, FP_Arity), 
+	       FP_Arity_Aux is FP_Arity - 1,
+	       copy_args(FP_Arity_Aux, Result_Functor, Fuzzy_Predicate_Functor),
+	       arg(FP_Arity, Result_Functor, SubCall_Truth_Value),
+	       
+	       print_msg('debug', 'fnot :: adjusting Truth_Value', Truth_Value),
+	       Truth_Value .=. 1 - SubCall_Truth_Value,
+	       Truth_Value .>=. 0, Truth_Value .=<. 1,
+	       print_msg('debug', 'fnot :: result', Fuzzy_Predicate_Functor)
+	       ).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

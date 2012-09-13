@@ -226,18 +226,31 @@ public class CiaoPrologConnectionClass {
 	}
 	
 	public void testingQuery (String owner, String database) throws PLException, IOException {
-		PLVariable[] variables = new PLVariable[4];
+		PLVariable[] variables = new PLVariable[6];
 		variables[0] = new PLVariable(); // X
 		variables[1] = new PLVariable(); // V1
 		variables[2] = new PLVariable(); // V2
 		variables[3] = new PLVariable(); // V3
+		variables[4] = new PLVariable(); // V4 - dump_constraints
+		variables[5] = new PLVariable(); // V5 - dump_constraints
 		
 		PLTerm[] args_expensive = {variables[0], variables[1]};
-		PLStructure subSubQuery = new PLStructure("expensive", args_expensive);
-		PLTerm[] args_very = {subSubQuery, variables[2]};
-		PLStructure subQuery = new PLStructure("very", args_very);
-		PLTerm[] args_fnot = {subQuery, variables[3]};
-		PLStructure query = new PLStructure("fnot", args_fnot); 
+		PLStructure query_expensive = new PLStructure("expensive", args_expensive);
+		PLTerm[] args_very = {query_expensive, variables[2]};
+		PLStructure query_very_expensive = new PLStructure("very", args_very);
+		PLTerm[] args_fnot = {query_very_expensive, variables[3]};
+		PLStructure query_not_very_expensive = new PLStructure("fnot", args_fnot);
+		
+		PLTerm[] dump_constraints_vars_java_list = {variables[3]};
+		PLList dump_constraints_vars_list = null;
+		try {
+			dump_constraints_vars_list= new PLList(dump_constraints_vars_java_list);
+        } catch (PLException e) {}
+		PLTerm[] args_dump_constraints = {dump_constraints_vars_list, variables[4], variables[5]};
+		PLStructure query_dump_constraints = new PLStructure("dump_constraints", args_dump_constraints);
+		
+		PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
+		PLStructure query = new PLStructure(",", args_conjunction);
 
 		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database, variables);
 	}
