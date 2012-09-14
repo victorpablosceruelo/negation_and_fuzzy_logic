@@ -76,13 +76,13 @@ public class CiaoPrologConnectionClass {
 			PLStructure query = new PLStructure("working_directory",
 					new PLTerm[]{variables[0], new PLAtom(dataBaseOwner)}); 
 
-			ArrayList<PLVariable []> queryAnswers = performDatabaseQuery(query, null, variables);
-			Iterator<PLVariable []> queryAnswersIterator = queryAnswers.iterator();
-			String msg;
+			ArrayList<String []> queryAnswers = performDatabaseQuery(query, null, variables);
+			Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
+
+			String [] answer;
 			while (queryAnswersIterator.hasNext()) {
-				PLVariable [] inputAnswer = queryAnswersIterator.next();
-				msg = PLVariablesArrayToString(inputAnswer);
-				LOG.info("changeCiaoPrologWorkingFolder: " + msg);
+				answer = queryAnswersIterator.next();
+				LOG.info("changeCiaoPrologWorkingFolder: " + answer[0]);
 			}
 
 			currentDatabaseOwner = dataBaseOwner;
@@ -114,25 +114,17 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<PLVariable []> queryAnswers = performDatabaseQuery(query, database, variables);
-		Iterator<PLVariable []> queryAnswersIterator = queryAnswers.iterator();
+		ArrayList<String []> queryAnswers = performDatabaseQuery(query, database, variables);
+		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
 		
 		// Format and store the answers in the lists.
 		loadedProgramQuantifiers = new ArrayList<String []>();
 		loadedProgramCrispPredicates = new ArrayList<String []>();
 		loadedProgramFuzzyRules = new ArrayList<String []>();
 		
-		String msg;
 		String [] answer;
 		while (queryAnswersIterator.hasNext()) {
-			PLVariable [] inputAnswer = queryAnswersIterator.next();
-			msg = PLVariablesArrayToString(inputAnswer);
-			LOG.info("databaseIntrospectionQuery: " + msg);
-	
-			answer = new String[3];
-			answer[0] = inputAnswer[0].getBinding().toString(); // predicateType
-			answer[1] = inputAnswer[1].getBinding().toString(); // predicateName
-			answer[2] = inputAnswer[2].getBinding().toString(); // predicateArity
+			answer = queryAnswersIterator.next();
 			
 			if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null)) {
 				if ("quantifier".equals(answer[0])) {
