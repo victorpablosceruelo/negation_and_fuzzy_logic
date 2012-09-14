@@ -162,15 +162,15 @@ public class CiaoPrologConnectionClass {
 	
 	
 	
-	private ArrayList<PLVariable []> performDatabaseQuery(PLStructure query, String database, PLVariable [] variables) throws PLException, IOException {
+	private ArrayList<String []> performDatabaseQuery(PLStructure query, String database, PLVariable [] variables) throws PLException, IOException {
 		return performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong);
 	}
 	
 	
-	private ArrayList<PLVariable []> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries) 
+	private ArrayList<String []> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries) 
 			throws PLException, IOException {
 		
-		ArrayList<PLVariable []> queryAnswers = new ArrayList<PLVariable []>();
+		ArrayList<String []> queryAnswers = new ArrayList<String []>();
 		
 		if (query != null) {
 			PLGoal currentGoal = null;
@@ -186,6 +186,7 @@ public class CiaoPrologConnectionClass {
 			LOG.info("performDatabaseQueryAux: getting answers ...");
 			PLTerm currentQueryAnswer;
 			long timesCounter;
+			String [] variablesCopy;
 			
 			do { // Get all the answers you can.
 				currentQueryAnswer = null;
@@ -208,7 +209,11 @@ public class CiaoPrologConnectionClass {
 					logMsg += PLVariablesArrayToString(variables);
 					LOG.info("performDatabaseQueryAux: " + logMsg + " ");
 					
-					queryAnswers.add(variables);
+					variablesCopy = new String [variables.length];
+					for (int i=0; i < variables.length; i++) {
+						variablesCopy[i] = variables[i].getBinding().toString();
+					}
+					queryAnswers.add(variablesCopy);
 				}
 				else {
 					LOG.info("performDatabaseQueryAux: answer obtained: null ");
@@ -299,6 +304,6 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
 		PLStructure query = new PLStructure(",", args_conjunction);
 
-		ArrayList<PLVariable []> queryAnswers = performDatabaseQuery(query, database, variables);
+		ArrayList<String []> queryAnswers = performDatabaseQuery(query, database, variables);
 	}
 }
