@@ -19,7 +19,9 @@ public class CiaoPrologConnectionClass {
 	private PLConnection currentPlConnection = null;
 	private String currentDatabase = null;
 	private String currentDatabaseOwner = null;
-	private Iterator<CiaoPrologProgramElementInfoClass> loadedProgramInfoIterator = null;
+	private ArrayList<String []> loadedProgramQuantifiers = null;
+	private ArrayList<String []> loadedProgramCrispPredicates = null;
+	private ArrayList<String []> loadedProgramFuzzyRules = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
@@ -74,16 +76,18 @@ public class CiaoPrologConnectionClass {
 			PLStructure query = new PLStructure("working_directory",
 					new PLTerm[]{variables[0], new PLAtom(dataBaseOwner)}); 
 
-			ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, null, variables);
-			Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
+			ArrayList<PLVariable []> queryAnswers = performDatabaseQuery(query, null, variables);
+			Iterator<PLVariable []> queryAnswersIterator = queryAnswers.iterator();
+			String msg;
 			while (queryAnswersIterator.hasNext()) {
-				PLTerm inputAnswer = queryAnswersIterator.next();
-				LOG.info("changeCiaoPrologWorkingFolder: queryAnswer: " + inputAnswer.toString());	
+				PLVariable [] inputAnswer = queryAnswersIterator.next();
+				msg = PLVariablesArrayToString(inputAnswer);
+				LOG.info("changeCiaoPrologWorkingFolder: " + msg);
 			}
 
 			currentDatabaseOwner = dataBaseOwner;
 
-			LOG.info("changeCiaoPrologWorkingFolder: variables value: " + variables[0].toString());
+			
 			LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
 		}
 		else {
@@ -102,7 +106,6 @@ public class CiaoPrologConnectionClass {
 		LOG.info("databaseIntrospectionQuery: owner: "+owner+" database: "+database);
 		changeCiaoPrologWorkingFolder(owner);
 		
-		ArrayList<CiaoPrologProgramElementInfoClass> loadedProgramInfo = new ArrayList<CiaoPrologProgramElementInfoClass>();
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable[] variables = new PLVariable[3];
 		variables[0] = new PLVariable(); // predicateType
@@ -111,31 +114,63 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database, variables);
-		Iterator<PLTerm> queryAnswersIterator = queryAnswers.iterator();
+		ArrayList<PLVariable []> queryAnswers = performDatabaseQuery(query, database, variables);
+		Iterator<PLVariable []> queryAnswersIterator = queryAnswers.iterator();
+		
+		// Format and store the answers in the lists.
+		loadedProgramQuantifiers = new ArrayList<String []>();
+		loadedProgramCrispPredicates = new ArrayList<String []>();
+		loadedProgramFuzzyRules = new ArrayList<String []>();
+		
+		String msg;
+		String [] answer;
 		while (queryAnswersIterator.hasNext()) {
-			PLTerm inputAnswer = queryAnswersIterator.next();
-			LOG.info("databaseIntrospectionQuery: queryAnswer: " + inputAnswer.toString());
+			PLVariable [] inputAnswer = queryAnswersIterator.next();
+			msg = PLVariablesArrayToString(inputAnswer);
+			LOG.info("databaseIntrospectionQuery: " + msg);
+	
+			answer = new String[3];
+			answer[0] = inputAnswer[0].getBinding().toString(); // predicateType
+			answer[1] = inputAnswer[1].getBinding().toString(); // predicateName
+			answer[2] = inputAnswer[2].getBinding().toString(); // predicateArity
 			
-			CiaoPrologProgramElementInfoClass answer = new CiaoPrologProgramElementInfoClass();
-			//answer.setPredicateType(predicateType.toString());
-			//answer.setPredicateName(predicateName.toString());
-			//answer.setPredicateArity(predicateArity.toString());
-			//answer.log_info();
-			loadedProgramInfo.add(answer);
+			if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null)) {
+				if ("quantifier".equals(answer[0])) {
+					loadedProgramQuantifiers.add(answer);
+				}
+				if ("fuzzy_rule".equals(answer[0])) {
+					loadedProgramFuzzyRules.add(answer);
+				}
+				if ("crisp".equals(answer[0])) {
+					loadedProgramCrispPredicates.add(answer);
+				}
+			}
+			
 		}
-		loadedProgramInfoIterator = loadedProgramInfo.iterator();
+		LOG.info("databaseIntrospectionQuery: END");
+	}
+
+	public Iterator<String []> getLoadedProgramFuzzyRulesIterator () {
+		return loadedProgramFuzzyRules.iterator();
+	}
+	public Iterator<String []> getLoadedProgramQuantifiersIterator () {
+		return loadedProgramQuantifiers.iterator();
+	}
+	public Iterator<String []> getLoadedProgramCrispPredicatesIterator () {
+		return loadedProgramCrispPredicates.iterator();
 	}
 	
-	private ArrayList<PLTerm> performDatabaseQuery(PLStructure query, String database, PLVariable [] variables) throws PLException, IOException {
+	
+	
+	private ArrayList<PLVariable []> performDatabaseQuery(PLStructure query, String database, PLVariable [] variables) throws PLException, IOException {
 		return performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong);
 	}
 	
 	
-	private ArrayList<PLTerm> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries) 
+	private ArrayList<PLVariable []> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries) 
 			throws PLException, IOException {
 		
-		ArrayList<PLTerm> queryAnswers = new ArrayList<PLTerm>();
+		ArrayList<PLVariable []> queryAnswers = new ArrayList<PLVariable []>();
 		
 		if (query != null) {
 			PLGoal currentGoal = null;
@@ -168,13 +203,12 @@ public class CiaoPrologConnectionClass {
 				}
 				
 				if (currentQueryAnswer != null) {
-					LOG.info("performDatabaseQueryAux: goal: " + currentGoal.toString() + " answer: " + currentQueryAnswer.toString());
-					LOG.info("performDatabaseQueryAux: variables: " + variables.toString());
-					String logMsg="";
-					for(int i=0; i<variables.length; i++) 
-						logMsg += ("   var["+i+"]: " + variables[i].toString() + " bind: " + variables[i].getBinding());
+					String logMsg="\n goal: " + currentGoal.toString();
+					logMsg += ("\n answer: " + currentQueryAnswer.toString());
+					logMsg += PLVariablesArrayToString(variables);
 					LOG.info("performDatabaseQueryAux: " + logMsg + " ");
-					// queryAnswers.add(currentGoal);
+					
+					queryAnswers.add(variables);
 				}
 				else {
 					LOG.info("performDatabaseQueryAux: answer obtained: null ");
@@ -198,14 +232,26 @@ public class CiaoPrologConnectionClass {
 		return queryAnswers;
 	}
 
-
-	
-	public Iterator<CiaoPrologProgramElementInfoClass> getProgramInfoIterator() {
-		return loadedProgramInfoIterator;
-	}
 	
 	public String getCurrentDatabase () { return currentDatabase; }
 	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
+
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** 
+	 * Logs the information in the variables.
+	 * 
+	 * @param variables is an array of PL variables to be logged. 
+	 */
+	private String PLVariablesArrayToString(PLVariable [] variables) {
+		String retVal = "";
+		for(int i=0; i<variables.length; i++) 
+			retVal += ("\n   var["+i+"]: " + variables[i].toString() + " bind: " + variables[i].getBinding());
+		return retVal;
+	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,8 +277,8 @@ public class CiaoPrologConnectionClass {
 		variables[1] = new PLVariable(); // V1
 		variables[2] = new PLVariable(); // V2
 		variables[3] = new PLVariable(); // V3
-		variables[4] = new PLVariable(); // V4 - dump_constraints
-		variables[5] = new PLVariable(); // V5 - dump_constraints
+		variables[4] = new PLVariable(); // Condition - rfuzzy_var_truth_value
+		variables[5] = new PLVariable(); // V - rfuzzy_var_truth_value
 		
 		PLTerm[] args_expensive = {variables[0], variables[1]};
 		PLStructure query_expensive = new PLStructure("expensive", args_expensive);
@@ -241,17 +287,18 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args_fnot = {query_very_expensive, variables[3]};
 		PLStructure query_not_very_expensive = new PLStructure("fnot", args_fnot);
 		
-		PLTerm[] dump_constraints_vars_java_list = {variables[3]};
-		PLList dump_constraints_vars_list = null;
-		try {
-			dump_constraints_vars_list= new PLList(dump_constraints_vars_java_list);
-        } catch (PLException e) {}
-		PLTerm[] args_dump_constraints = {dump_constraints_vars_list, variables[4], variables[5]};
-		PLStructure query_dump_constraints = new PLStructure("dump_constraints", args_dump_constraints);
+		//PLTerm[] dump_constraints_vars_java_list = {variables[3]};
+		//PLList dump_constraints_vars_list = null;
+		//try {
+		//	dump_constraints_vars_list= new PLList(dump_constraints_vars_java_list);
+        //} catch (PLException e) {}
+		
+		PLTerm[] args_rfuzzy_var_truth_value = {variables[3], variables[4], variables[5]};
+		PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
 		
 		PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
 		PLStructure query = new PLStructure(",", args_conjunction);
 
-		ArrayList<PLTerm> queryAnswers = performDatabaseQuery(query, database, variables);
+		ArrayList<PLVariable []> queryAnswers = performDatabaseQuery(query, database, variables);
 	}
 }
