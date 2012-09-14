@@ -14,16 +14,34 @@
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
 
+<!-- 
 <script src="/fuzzy-search/addQueryLine.js" language="Javascript" type="text/javascript"></script>
-
+ -->
+ 
 <%  Iterator<String []> loadedProgramQuantifiersIterator = connection.getLoadedProgramQuantifiersIterator(); %>
 <%  Iterator<String []> loadedProgramCrispPredicatesIterator = connection.getLoadedProgramCrispPredicatesIterator(); %>
 <%  Iterator<String []> loadedProgramFuzzyRulesIterator = connection.getLoadedProgramFuzzyRulesIterator(); %>
 
 <script language="javascript">
+
+	var counter = 1;
+	var limit = 50;
+
+	function addQueryLine(divName, quantifiersArray, fuzzyRulesArray) {
+		if (counter == limit) {
+			alert("You have reached the limit of adding " + counter + " inputs");
+		} else {
+			var newdiv = document.createElement('div');
+			newdiv.innerHTML = "Entry " + (counter + 1)
+					+ " <br><input type='text' name='myInputs[]'>____";
+			document.getElementById(divName).appendChild(newdiv);
+			counter++;
+		}
+	}
+	
 	var quantifiersArray = new Array();
 	quantifiersArray[0] = new Array("-select-");
-	<%
+<%
 	int counter = 0;
 	if (loadedProgramQuantifiersIterator != null) {
 		String [] quantifierInfo;
@@ -31,7 +49,7 @@
 			counter++;
 			quantifierInfo = loadedProgramQuantifiersIterator.next();
 			%>
-			quantifiersArray[<%=counter%>] = <%=quantifierInfo[1]%>;
+			quantifiersArray[<%=counter%>] = "<%=quantifierInfo[1]%>";
 			<%
 		}
 	}
@@ -47,14 +65,14 @@
 			counter++;
 			fuzzyRuleInfo = loadedProgramFuzzyRulesIterator.next();
 			%>
-			fuzzyRulesArray[<%=counter%>] = <%=fuzzyRuleInfo[1]%>;
+			fuzzyRulesArray[<%=counter%>] = "<%=fuzzyRuleInfo[1]%>";
 			<%
 		}
 	}
 	%>
 </script>
 
-<body onload="addQueryLine(dynamicInput, quantifiersArray, fuzzyRulesArray)">
+<body onload="">
 <body>
 	<h1>Fuzzy search application</h1>
 		<h2><a href="DatabasesMenu">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
@@ -67,7 +85,10 @@
      <div id="dynamicInput">
           
      </div>
-     <input type="button" value="Add another text input" onClick="addQueryLine('dynamicInput');">
+     <script type="text/javascript" language="JavaScript">
+     addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);
+	 </script>
+     <input type="button" value="Add another text input" onClick="addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);">
 </form>
 		<h2>Available predicates at database: </h2>
 
