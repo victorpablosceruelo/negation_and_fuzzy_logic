@@ -145,7 +145,13 @@ public class DataBaseQueryServlet extends HttpServlet {
 	
 	private void build_and_execute_query(HttpServletRequest request, HttpServletResponse response) {
 		int counter = 0;
-		while (request.getParameter("fuzzyRule[" + counter + "]" != null) counter++;
+		while (request.getParameter("fuzzyRule[" + counter + "]") != null) counter++;
+		
+		String [][] query = new String [counter][];
+		for (int i=0; i<counter; i++) {
+			query[i] = new String[]
+		}
+		
 	}
 	
 }
