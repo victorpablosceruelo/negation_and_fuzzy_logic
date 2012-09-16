@@ -136,22 +136,24 @@ function init_callback_firebuglite() {
 	}
 	
 	function addFuzzyRuleArgumentBox(index) {
-		html = "teto_" + j + " ";
+		html = "teto_" + index + " ";
 	}
 	
 	function fuzzyRuleChange(comboBox, divName, counter) {
 		var elementId = "";
-		alert(divName + " " + counter);
-		alert('fuzzyRule[' + counter + ']');
+		debug.info("fuzzyRuleChange(comboBox, " + divName + ", " + counter + ")");
 		// var comboBox = document.getElementById('fuzzyRule[' + counter + ']');
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-
+		debug.info("comboBoxValue: " + comboBoxValue);
+		
 		var found = false;
 		var i = 0;
+		var predArity = 0;
 		while ((! found) && (i < fuzzyRulesArray.length)) {
-			if (comboBoxValue == fuzzyRulesArray[i]) {
+			debug.info("fuzzyRulesArray["+i+"]: " + fuzzyRulesArray[i].predName);
+			if (comboBoxValue == fuzzyRulesArray[i].predName) {
 				found = true;
-				var predArity = fuzzyRulesArray[i].predArity;
+				predArity = fuzzyRulesArray[i].predArity;
 			}
 			i++;
 		}
