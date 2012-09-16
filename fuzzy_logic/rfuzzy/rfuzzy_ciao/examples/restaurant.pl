@@ -72,4 +72,5 @@ rfuzzy_define_fuzzification(near_to_us/1, distance_to_us/2, near_function/2).
 max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
 rfuzzy_aggregator(max_with_min_a_half/3).
 
+adequate_restaurant(R) :~ fnot(very(expensive(R))).
 rfuzzy_type_for(preferred_restaurant/2, [restaurant/1, restaurant/1]).

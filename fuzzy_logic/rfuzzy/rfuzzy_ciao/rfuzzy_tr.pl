@@ -864,7 +864,8 @@ generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_
 	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules).
 
 % generate_introspection_predicate_aux(Input_List, Accumulator_List, Result_List),
-generate_introspection_predicate_aux([], Accumulator_List, Accumulator_List) :- !.
+generate_introspection_predicate_aux([], Accumulator_List, [Fnot | Accumulator_List]) :- !,
+	Fnot = (rfuzzy_introspection('quantifier', 'fnot', 2)).
 generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Result_List) :-
 	generate_introspection_predicate_real(Input, Output),
 	generate_introspection_predicate_aux(Input_List, [Output|Accumulator_List], Result_List).
