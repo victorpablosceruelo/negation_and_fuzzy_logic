@@ -104,7 +104,7 @@ function init_callback_firebuglite() {
 		}
 	%>
 
-	var counter = 1;
+	var fuzzyRulesCounter = 1;
 	var limit = 50;
 	var fuzzyVarsCounter = 0;
 
@@ -194,17 +194,17 @@ function init_callback_firebuglite() {
 	}
 	
 	function addQueryLine(divName) {
-		if (counter == limit) {
-			alert("You have reached the limit of adding " + counter + " subqueries.");
+		if (fuzzyRulesCounter == limit) {
+			alert("You have reached the limit of adding " + fuzzyRulesCounter + " subqueries.");
 		} else {
 			var newdiv = document.createElement('div');
-			newdiv.innerHTML = chooseQuantifierCode(quantifiersArray, counter, 0) + " &nbsp; " +
-					chooseQuantifierCode(counter, 1) + " &nbsp; " +
-					chooseFuzzyRuleCode(counter) + " &nbsp; " +
-					fuzzyRuleArgsCode(counter) + " &nbsp; ";
+			newdiv.innerHTML = chooseQuantifierCode(quantifiersArray, fuzzyRulesCounter, 0) + " &nbsp; " +
+					chooseQuantifierCode(fuzzyRulesCounter, 1) + " &nbsp; " +
+					chooseFuzzyRuleCode(fuzzyRulesCounter) + " &nbsp; " +
+					fuzzyRuleArgsCode(fuzzyRulesCounter) + " &nbsp; ";
 			
 			document.getElementById(divName).appendChild(newdiv);
-			counter++;
+			fuzzyRulesCounter++;
 		}
 	}
 </script>

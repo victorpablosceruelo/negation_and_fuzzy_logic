@@ -95,7 +95,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 					}
 				}
 				if ("runquery".equals(operation)) {
-					build_and_execute_query()
+					build_and_execute_query(HttpServletRequest request, HttpServletResponse response);
 				}
 			}
 		}
@@ -142,4 +142,19 @@ public class DataBaseQueryServlet extends HttpServlet {
 		connection.testingQuery(owner, database);
 	}
 	
+	
+	private void build_and_execute_query(HttpServletRequest request, HttpServletResponse response) {
+		int counter = 0;
+		while (request.getParameter("fuzzyRule[" + counter + "]" != null) counter++;
+	}
+	
 }
+
+
+
+
+
+
+
+
+/////
