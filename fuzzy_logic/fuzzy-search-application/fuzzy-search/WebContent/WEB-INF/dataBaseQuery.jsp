@@ -5,6 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Fuzzy Search App</title>
+<script type="text/javascript" src="js/ba-debug.js"></script>
 </head>
 
 <%@page import="java.util.ArrayList"%>
@@ -21,6 +22,51 @@
 <%  Iterator<String []> loadedProgramQuantifiersIterator = connection.getLoadedProgramQuantifiersIterator(); %>
 <%  Iterator<String []> loadedProgramCrispPredicatesIterator = connection.getLoadedProgramCrispPredicatesIterator(); %>
 <%  Iterator<String []> loadedProgramFuzzyRulesIterator = connection.getLoadedProgramFuzzyRulesIterator(); %>
+
+<script language="javascript">
+function init_callback_inpage() {
+  function debug_callback( level ) { 
+    var args = Array.prototype.slice.call( arguments, 1 ); 
+    $('#debug').length || $('<div id="debug"><h2>debug output<\/h2><\/div>').appendTo( 'body' ); 
+    $('<div/>') 
+      .addClass( 'debug-' + level ) 
+      .html( '[' + level + '] ' + args ) 
+      .appendTo( '#debug' ); 
+  };
+  debug.setCallback( debug_callback, true );
+}
+
+function init_callback_firebuglite() {
+  if ( !window.firebug ) {
+    
+    // from firebug lite bookmarklet
+    window.firebug = document.createElement('script');
+    firebug.setAttribute( 'src', 'http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js' );
+    document.body.appendChild( firebug );
+    (function(){
+      if ( window.firebug.version ) {
+        firebug.init();
+      } else {
+        setTimeout( arguments.callee );
+      }
+    })();
+    void( firebug );
+    
+    if ( window.debug && debug.setCallback ) {
+      (function(){
+        if ( window.firebug && window.firebug.version ) {
+          debug.setCallback(function( level ) {
+            var args = Array.prototype.slice.call( arguments, 1 );
+            firebug.d.console.cmd[level].apply( window, args );
+          }, true);
+        } else {
+          setTimeout( arguments.callee, 100);
+        }
+      })();
+    }
+  }
+}
+</script>
 
 <script language="javascript">
 	function predInfo(predName, predArity) {
@@ -136,7 +182,7 @@
 <!--   <body onload=""> -->
 <body>
 	<h1>Fuzzy search application</h1>
-		<h2><a href="DatabasesMenu">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
+		<h2><a href="DataBasesMenuServlet">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
 		<jsp:include page="showErrors.jsp" />
 		<h2>Perform your query to the database <%=connection.getCurrentDatabase() %> 
 			at <%=connection.getCurrentDatabaseOwner() %></h2>
