@@ -14,6 +14,8 @@ import org.apache.commons.logging.Log;
 
 public class ServletsAuxMethodsClass {
 
+	public final static String appPath = "/fuzzy-search/";
+	
 	public static Boolean client_session_is_not_authenticated(HttpSession session) {
 		return ((session == null) || (session.getAttribute("authenticated") == null) || (! (Boolean) session.getAttribute("authenticated")));
 	}

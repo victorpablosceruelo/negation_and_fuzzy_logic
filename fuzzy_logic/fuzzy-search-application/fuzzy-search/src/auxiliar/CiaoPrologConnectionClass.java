@@ -139,6 +139,7 @@ public class CiaoPrologConnectionClass {
 			}
 			
 		}
+		currentDatabase = database;
 		LOG.info("databaseIntrospectionQuery: END");
 	}
 

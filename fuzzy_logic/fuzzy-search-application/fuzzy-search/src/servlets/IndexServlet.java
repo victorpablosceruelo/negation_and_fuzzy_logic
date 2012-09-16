@@ -3,6 +3,7 @@ package servlets;
 import java.io.IOException;
 import java.util.Date;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +20,8 @@ import auxiliar.ServletsAuxMethodsClass;
 /**
  * Servlet implementation class IndexServlet
  */
-@WebServlet("/")
+
+@WebServlet(urlPatterns={"/IndexServlet"})
 public class IndexServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(IndexServlet.class);
@@ -44,26 +46,56 @@ public class IndexServlet extends HttpServlet {
 		LOG.info("--- doPost end ---");
 	}
 	
-	protected void doGetOrDoPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void doGetOrDoPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		counter++;
 		if (counter == Integer.MAX_VALUE) {
 			counter = Integer.valueOf(0);
 		}
+		LOG.info("Query Info: \n" + 
+				 "Request_URL:" + request.getRequestURL().toString() + "\n" +
+		         "Request_URI:" + request.getRequestURI().toString() + " ");
 		
-		// Log info about the server.
-		logServerInfo = new LogServerInfoClass(request);
-		
-		// Create a new session if the client has no session.
-		HttpSession session = request.getSession(true);
-		LOG.info("--- doGetOrDoPost invocation. Counter: "+ counter + " <--> Session ID: "+ session.getId() +" ---");
-		
-		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
-			LOG.info("session is new. showing index page.");
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
+		if (! serveStaticContent(request, response)) {
+			// Log info about the server.
+			logServerInfo = new LogServerInfoClass(request);
+
+			// Create a new session if the client has no session.
+			HttpSession session = request.getSession(true);
+			LOG.info("--- doGetOrDoPost invocation. Counter: "+ counter + " <--> Session ID: "+ session.getId() +" ---");
+
+			if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
+				LOG.info("session is new. showing index page.");
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
+			}
+			else {
+				LOG.info("session is not new. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationSignin_Page,request, response, LOG);
+			}
 		}
-		else {
-			LOG.info("session is not new. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationSignin_Page,request, response, LOG);
+	}
+	
+	private boolean serveStaticContent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if ((request != null) && (request.getRequestURI() != null)) {
+			String requestURI = request.getRequestURI().toString();
+			if ((requestURI != null) && (requestURI.startsWith(ServletsAuxMethodsClass.appPath))) {
+				requestURI = requestURI.substring(ServletsAuxMethodsClass.appPath.length());
+				if (isStaticContent(requestURI)) {
+					RequestDispatcher dispatcher = request.getRequestDispatcher(requestURI);
+					dispatcher.forward(request, response);
+					return true;
+				}
+				else return false;
+			}
+			else return false;
 		}
+		else return false;
+	}
+	private boolean isStaticContent(String requestURI) {
+		if (requestURI == null) return false;
+		if ("".equals(requestURI)) return false;
+		if (requestURI.startsWith("js/")) return true;
+		if (requestURI.startsWith("images/")) return true;
+		if ("error.jsp".equals(requestURI)) return true;
+		return false;
 	}
 }

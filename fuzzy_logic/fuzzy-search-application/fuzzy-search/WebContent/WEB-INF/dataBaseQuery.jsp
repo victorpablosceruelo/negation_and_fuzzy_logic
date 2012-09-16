@@ -62,28 +62,30 @@
 	var limit = 50;
 
 	function chooseQuantifierCode(counter, index) {
-		var html = "<select name=\"quantifiers[" + counter + "][" + index + "]\">";
+		var html = "<select name=\'quantifiers[" + counter + "][" + index + "]\'>";
+		html += "<option name=\'none\' value=\'none\'>none</option>";
 		for (var i=0; i<quantifiersArray.length; i++){
-			html += "<option name=\"" + quantifiersArray[i].predName + 
-						"\" value=\"" + quantifiersArray[i].predName + "\">"+
+			html += "<option name=\'" + quantifiersArray[i].predName + 
+						"\' value=\'" + quantifiersArray[i].predName + "\'>"+
 						quantifiersArray[i].predName + "</option>"
 		}
 		html += "</select>";
 		return html;
 	}
 	function chooseFuzzyRuleCode(counter) {
-		var html = "<select name=\"fuzzyRule[" + counter + 
-		           "]\" onchange=\"fuzzyRuleChange('dynamicArgs[" + counter + "]', " + counter + ");\">";
+		var html = "<select name=\'fuzzyRule[" + counter + 
+		           "]\' onchange=\"fuzzyRuleChange(this, \'dynamicArgs[" + counter + "]\', " + counter + ");\">";
+		html += "<option name=\'none\' value=\'none\''>none</option>";
 		for (var i=0; i<fuzzyRulesArray.length; i++){
-			html += "<option name=\"" + fuzzyRulesArray[i].predName + 
-						"\" value=\"" + fuzzyRulesArray[i].predName + "\">"+
+			html += "<option name=\'" + fuzzyRulesArray[i].predName + 
+						"\' value=\'" + fuzzyRulesArray[i].predName + "\'>"+
 						fuzzyRulesArray[i].predName + "</option>"
 		}
 		html += "</select>";
 		return html;
 	}
 	function fuzzyRuleArgsCode(counter) {
-		var html = "<div id=\"dynamicArgs[" + counter + "]\"> </div>";
+		var html = "<div id=\'dynamicArgs[" + counter + "]\'> </div>";
 		return html;
 	}
 	
@@ -91,8 +93,11 @@
 		html = "teto_" + j + " ";
 	}
 	
-	function fuzzyRuleChange(divName, counter) {
-		var comboBox = document.getElementById("fuzzyRule[" + counter + "]");
+	function fuzzyRuleChange(comboBox, divName, counter) {
+		var elementId = "";
+		alert(divName + " " + counter);
+		alert('fuzzyRule[' + counter + ']');
+		// var comboBox = document.getElementById('fuzzyRule[' + counter + ']');
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 
 		var found = false;
@@ -104,7 +109,7 @@
 			}
 			i++;
 		}
-		
+		debug.info("Predicate Arity: " + predArity);
 		var html = "";
 		for (var j=0; j<predArity; j++){
 			html += addFuzzyRuleArgumentBox(j);
@@ -117,10 +122,10 @@
 			alert("You have reached the limit of adding " + counter + " subqueries.");
 		} else {
 			var newdiv = document.createElement('div');
-			newdiv.innerHTML = chooseQuantifierCode(quantifiersArray, counter, 0) + 
-					chooseQuantifierCode(counter, 1) +
-					chooseFuzzyRuleCode(counter) + 
-					fuzzyRuleArgsCode(counter);
+			newdiv.innerHTML = chooseQuantifierCode(quantifiersArray, counter, 0) + " &nbsp; " +
+					chooseQuantifierCode(counter, 1) + " &nbsp; " +
+					chooseFuzzyRuleCode(counter) + " &nbsp; " +
+					fuzzyRuleArgsCode(counter) + " &nbsp; ";
 			
 			document.getElementById(divName).appendChild(newdiv);
 			counter++;
@@ -134,7 +139,7 @@
 		<h2><a href="DatabasesMenu">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
 		<jsp:include page="showErrors.jsp" />
 		<h2>Perform your query to the database <%=connection.getCurrentDatabase() %> 
-			property of <%=connection.getCurrentDatabaseOwner() %></h2>
+			at <%=connection.getCurrentDatabaseOwner() %></h2>
 
 		
 <form method="POST">
@@ -144,7 +149,8 @@
      <script type="text/javascript" language="JavaScript">
      addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);
 	 </script>
-     <input type="button" value="Add another text input" onClick="addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);">
+	 <br />
+     <input type="button" value="Add more conditions to the query" onClick="addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);">
 </form>
 		<h2>Available predicates at database: </h2>
 
