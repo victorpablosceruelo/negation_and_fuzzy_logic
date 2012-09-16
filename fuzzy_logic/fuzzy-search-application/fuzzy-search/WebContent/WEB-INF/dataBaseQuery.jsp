@@ -106,6 +106,7 @@ function init_callback_firebuglite() {
 
 	var counter = 1;
 	var limit = 50;
+	var fuzzyVarsCounter = 0;
 
 	function chooseQuantifierCode(counter, index) {
 		var html = "<select name=\'quantifiers[" + counter + "][" + index + "]\'>";
@@ -120,23 +121,46 @@ function init_callback_firebuglite() {
 	}
 	function chooseFuzzyRuleCode(counter) {
 		var html = "<select name=\'fuzzyRule[" + counter + 
-		           "]\' onchange=\"fuzzyRuleChange(this, \'dynamicArgs[" + counter + "]\', " + counter + ");\">";
+		           "]\' onchange=\"fuzzyRuleChange(this, \'fuzzyRuleArgs[" + counter + "]\', " + counter + ");\">";
 		html += "<option name=\'none\' value=\'none\''>none</option>";
 		for (var i=0; i<fuzzyRulesArray.length; i++){
 			html += "<option name=\'" + fuzzyRulesArray[i].predName + 
 						"\' value=\'" + fuzzyRulesArray[i].predName + "\'>"+
-						fuzzyRulesArray[i].predName + "</option>"
+						fuzzyRulesArray[i].predName + "</option>";
 		}
 		html += "</select>";
 		return html;
 	}
 	function fuzzyRuleArgsCode(counter) {
-		var html = "<div id=\'dynamicArgs[" + counter + "]\'> </div>";
-		return html;
+		return "<div id=\'fuzzyRuleArgs[" + counter + "]\'> </div>";
 	}
 	
-	function addFuzzyRuleArgumentBox(index) {
-		html = "teto_" + index + " ";
+	function addFuzzyRuleArgumentFields(indexI, indexJ, fuzzyVarsIndex) {
+		debug.info("addFuzzyRuleArgumentFields: indexI:" + indexI + " indexJ:" + indexJ);
+		var html = "";
+		html += "<select name=\'fuzzyRuleArgument[" + indexI + "]["+ indexJ+"]\'" + 
+				"onchange=\"fuzzyRuleArgumentChange(this, " + indexI + ", " + indexJ +");\">";
+		for (var k=fuzzyVarsIndex; k<=fuzzyVarsCounter; k++){
+			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>"+ k + "</option>";
+		}
+		for (var k=1; k<fuzzyVarsIndex; k++){
+			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>"+ k + "</option>";
+		}
+		html += "<option name=\'constant' value=\'constant\'>constant</option>";
+		html += "</select>";
+		html += "<div id=\'fuzzyRuleArgumentConstant[" + indexI + "]["+ indexJ+"]\'> </div>";
+		return html;
+	}
+	function fuzzyRuleArgumentChange(comboBox, indexI, indexJ) {
+		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+		var divName = "fuzzyRuleArgumentConstant[" + indexI + "]["+ indexJ+"]";
+		if (comboBoxValue == "constant") {
+			var html = "<input type=\'text\' name=\'fuzzyRuleArgumentConstant["+ indexI + "][" + indexJ + "]\'>";
+			document.getElementById(divName).innerHTML = html;
+		}
+		else {
+			document.getElementById(divName).innerHTML = "";
+		}
 	}
 	
 	function fuzzyRuleChange(comboBox, divName, counter) {
@@ -158,9 +182,12 @@ function init_callback_firebuglite() {
 			i++;
 		}
 		debug.info("Predicate Arity: " + predArity);
+		var fuzzyVarsIndex = fuzzyVarsCounter + 1;
+		fuzzyVarsCounter += predArity;
 		var html = "";
 		for (var j=0; j<predArity; j++){
-			html += addFuzzyRuleArgumentBox(j);
+			html += addFuzzyRuleArgumentFields(i, j, fuzzyVarsIndex);
+			fuzzyVarsIndex += 1;
 		}
 		document.getElementById(divName).innerHTML = html;
 	}
@@ -191,14 +218,14 @@ function init_callback_firebuglite() {
 
 		
 <form method="POST">
-     <div id="dynamicInput">
+     <div id="queryLines">
           
      </div>
      <script type="text/javascript" language="JavaScript">
-     addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);
+     addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);
 	 </script>
 	 <br />
-     <input type="button" value="Add more conditions to the query" onClick="addQueryLine('dynamicInput', quantifiersArray, fuzzyRulesArray);">
+     <input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
 </form>
 		<h2>Available predicates at database: </h2>
 
