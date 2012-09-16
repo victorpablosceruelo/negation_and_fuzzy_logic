@@ -19,6 +19,7 @@ public class CiaoPrologConnectionClass {
 	private PLConnection currentPlConnection = null;
 	private String currentDatabase = null;
 	private String currentDatabaseOwner = null;
+	private String currentDatabaseOwnerWithPath = null;
 	private ArrayList<String []> loadedProgramQuantifiers = null;
 	private ArrayList<String []> loadedProgramCrispPredicates = null;
 	private ArrayList<String []> loadedProgramFuzzyRules = null;
@@ -65,7 +66,7 @@ public class CiaoPrologConnectionClass {
 		}
 		
 		// Adequate the value of dataBaseOwner (it was relative until here).
-		dataBaseOwner = FoldersUtilsObject.getprogramsPath() + dataBaseOwner;
+		String dataBaseOwnerWithPath = FoldersUtilsObject.getprogramsPath() + dataBaseOwner;
 		
 		// Change it only if necessary.
 		if ((currentDatabaseOwner == null) || (! currentDatabaseOwner.equals(dataBaseOwner))) { 
@@ -74,7 +75,7 @@ public class CiaoPrologConnectionClass {
 			PLVariable [] variables = new PLVariable[1];
 			variables[0] = new PLVariable();
 			PLStructure query = new PLStructure("working_directory",
-					new PLTerm[]{variables[0], new PLAtom(dataBaseOwner)}); 
+					new PLTerm[]{variables[0], new PLAtom(dataBaseOwnerWithPath)}); 
 
 			ArrayList<String []> queryAnswers = performDatabaseQuery(query, null, variables);
 			Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
@@ -84,15 +85,13 @@ public class CiaoPrologConnectionClass {
 				answer = queryAnswersIterator.next();
 				LOG.info("changeCiaoPrologWorkingFolder: " + answer[0]);
 			}
-
+			currentDatabaseOwnerWithPath = dataBaseOwnerWithPath;
 			currentDatabaseOwner = dataBaseOwner;
-
-			
-			LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner);
+			LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner + " at " + currentDatabaseOwnerWithPath);
 		}
 		else {
 			LOG.info("changeCiaoPrologWorkingFolder: not changing current working folder. " + 
-					 "Current working folder: " + currentDatabaseOwner);
+					 "Current working folder: " + currentDatabaseOwner + " at " + currentDatabaseOwnerWithPath);
 		}
 		
 	}
@@ -233,6 +232,7 @@ public class CiaoPrologConnectionClass {
 	
 	public String getCurrentDatabase () { return currentDatabase; }
 	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
+	public String getCurrentDatabaseOwnerWithPath () { return currentDatabaseOwnerWithPath; }
 
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////

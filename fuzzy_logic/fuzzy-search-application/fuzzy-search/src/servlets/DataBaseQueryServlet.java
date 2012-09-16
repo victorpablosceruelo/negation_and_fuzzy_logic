@@ -67,6 +67,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		String database = null;
 		String owner = null;
+		String operation = null;
 		
 		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
 			LOG.info("no session. logout.");
@@ -76,18 +77,25 @@ public class DataBaseQueryServlet extends HttpServlet {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
 			database = request.getParameter("database");
 			owner = request.getParameter("owner");
-			if ((database == null) || (owner == null)) {
+			operation = request.getParameter("op");
+			if ((database == null) || (owner == null) || (operation == null) ||
+					((! "query".equals(operation)) && (! "runquery".equals(operation)))) {
 				LOG.info("database is null.");
 				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
 			}
 			else {
-				LOG.info("Choosen database and owner are: " + database + " :: " + owner + ".");
-				try {
-					dbQueryAux(owner, database, session, request, response);
-				} catch (Exception e) {
-					e.printStackTrace();
-					request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
-					ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
+				LOG.info("Choosen database, owner and op are: " + database + " :: " + owner + " :: " + operation + " ");
+				if ("query".equals(operation)) {
+					try {
+						dbQueryAux(owner, database, session, request, response);
+					} catch (Exception e) {
+						e.printStackTrace();
+						request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
+						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
+					}
+				}
+				if ("runquery".equals(operation)) {
+					build_and_execute_query()
 				}
 			}
 		}

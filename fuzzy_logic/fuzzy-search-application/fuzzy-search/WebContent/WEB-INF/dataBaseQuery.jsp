@@ -141,10 +141,10 @@ function init_callback_firebuglite() {
 		html += "<select name=\'fuzzyRuleArgument[" + indexI + "]["+ indexJ+"]\'" + 
 				"onchange=\"fuzzyRuleArgumentChange(this, " + indexI + ", " + indexJ +");\">";
 		for (var k=fuzzyVarsIndex; k<=fuzzyVarsCounter; k++){
-			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>"+ k + "</option>";
+			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
 		}
 		for (var k=1; k<fuzzyVarsIndex; k++){
-			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>"+ k + "</option>";
+			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
 		}
 		html += "<option name=\'constant' value=\'constant\'>constant</option>";
 		html += "</select>";
@@ -186,6 +186,7 @@ function init_callback_firebuglite() {
 		fuzzyVarsCounter += predArity;
 		var html = "";
 		for (var j=0; j<predArity; j++){
+			if (j+1 == predArity) html+= "result: ";
 			html += addFuzzyRuleArgumentFields(i, j, fuzzyVarsIndex);
 			fuzzyVarsIndex += 1;
 		}
@@ -214,10 +215,10 @@ function init_callback_firebuglite() {
 		<h2><a href="DataBasesMenuServlet">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
 		<jsp:include page="showErrors.jsp" />
 		<h2>Perform your query to the database <%=connection.getCurrentDatabase() %> 
-			at <%=connection.getCurrentDatabaseOwner() %></h2>
+			with owner <%=connection.getCurrentDatabaseOwner() %></h2>
 
 		
-<form method="POST">
+<form action="DataBaseQueryServlet?op=runquery&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>"" method="POST">
      <div id="queryLines">
           
      </div>
@@ -226,9 +227,9 @@ function init_callback_firebuglite() {
 	 </script>
 	 <br />
      <input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
+     <INPUT type="submit" value="Execute Query">
 </form>
-		<h2>Available predicates at database: </h2>
-
+<br /><br /><br /><br /><br />
 		
 
 </body>
