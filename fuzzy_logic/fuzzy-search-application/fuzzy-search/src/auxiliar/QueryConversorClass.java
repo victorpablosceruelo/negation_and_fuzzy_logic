@@ -10,6 +10,7 @@ public class QueryConversorClass {
 	CiaoPrologVarsMappingClass varsMapping = null; 
 	PLStructure [] subqueries = null;
 	PLVariable [] finalQueryVariables = null;
+	int finalQueryVariablesCounter = 0;
 	int subQueryCounter = 0;
 	
 	public QueryConversorClass(int queryLinesCounter, int fuzzyVarsCounter) {
@@ -90,7 +91,8 @@ public class QueryConversorClass {
 		PLStructure accumulator = null;
 		
 		finalQueryVariables = new PLVariable[varsMapping.getRealSize()];
-		int j=0;
+		for (int i=0; i<varsMapping.getRealSize(); i++) finalQueryVariables[i] = null;
+		finalQueryVariablesCounter=0;
 		
 		for (int i=(varsMapping.getRealSize() -1); i>=0; i--) {
 			CiaoPrologVarMappingClass varMapping = varsMapping.getMappingWithIndex(i);
@@ -101,8 +103,8 @@ public class QueryConversorClass {
 				plArguments[2] = varMapping.realVariable;
 				subquery = new PLStructure("rfuzzy_var_truth_value", plArguments);
 				
-				finalQueryVariables[j] = varMapping.realVariable;
-				j++;
+				finalQueryVariables[finalQueryVariablesCounter] = varMapping.realVariable;
+				finalQueryVariablesCounter++;
 			}
 			accumulator = getConjunctiveQuery(subquery, accumulator);
 			subquery = null;
@@ -119,8 +121,14 @@ public class QueryConversorClass {
 		return result;
 	}
 	
-	public PLVariable [] getFinalQueryVariables () {  
-		return finalQueryVariables;
+	public PLVariable [] getFinalQueryVariables () { 
+		PLVariable [] filteredFinalQueryVariables = new PLVariable [finalQueryVariablesCounter];
+		for (int i=0; i<finalQueryVariablesCounter; i++) {
+			if (finalQueryVariables[i] != null) {
+				filteredFinalQueryVariables[i] = finalQueryVariables[i];
+			}
+		}
+		return filteredFinalQueryVariables;
 	}
 	
 }

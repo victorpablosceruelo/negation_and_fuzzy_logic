@@ -250,8 +250,15 @@ public class CiaoPrologConnectionClass {
 	 */
 	private String PLVariablesArrayToString(PLVariable [] variables) {
 		String retVal = "";
-		for(int i=0; i<variables.length; i++) 
-			retVal += ("\n   var["+i+"]: " + variables[i].toString() + " bind: " + variables[i].getBinding());
+		for(int i=0; i<variables.length; i++) {
+			retVal += ("\n   var["+i+"]: ");
+			if (variables[i] != null) {
+				retVal += (variables[i].toString() + " bind: " + variables[i].getBinding());
+			}
+			else {
+				retVal += "null ";
+			}
+		}
 		return retVal;
 	}
 	
