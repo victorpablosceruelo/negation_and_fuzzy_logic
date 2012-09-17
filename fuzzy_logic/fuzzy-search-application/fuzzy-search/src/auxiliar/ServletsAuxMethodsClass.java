@@ -112,9 +112,11 @@ public class ServletsAuxMethodsClass {
 	public static final int DataBasesMenu_Page = 6;
 	public static final int DataBaseQueryServlet_Page = 7;
 	public static final int DataBaseQuery_Page = 8;
-	public static final int UserInfoServlet_Page = 9;
-	public static final int UserInfo_Page = 10;
-	public static final int FileView_Page = 11;
+	public static final int DataBaseQueryResults_Page = 9;
+	public static final int UserInfoServlet_Page = 10;
+	public static final int UserInfo_Page = 11;
+	public static final int FileView_Page = 12;
+	
 	
 	private static String pagesDatabase(int NickName) {
 		String retVal = null;
@@ -136,6 +138,8 @@ public class ServletsAuxMethodsClass {
 		case DataBaseQueryServlet_Page: retVal = "/DataBaseQueryServlet";
 				break;
 		case DataBaseQuery_Page: retVal = "/WEB-INF/dataBaseQuery.jsp";
+				break;
+		case DataBaseQueryResults_Page: retVal = "/WEB-INF/dataBaseQueryResults.jsp";
 				break;
 		case UserInfoServlet_Page: retVal = "/UserInfoServlet";
 				break;

@@ -2,6 +2,7 @@ package servlets;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -85,17 +86,13 @@ public class DataBaseQueryServlet extends HttpServlet {
 			}
 			else {
 				LOG.info("Choosen database, owner and op are: " + database + " :: " + owner + " :: " + operation + " ");
-				if ("query".equals(operation)) {
-					try {
-						dbQueryAux(owner, database, session, request, response);
-					} catch (Exception e) {
-						e.printStackTrace();
-						request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
-						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
-					}
-				}
-				if ("runquery".equals(operation)) {
-					build_and_execute_query(HttpServletRequest request, HttpServletResponse response);
+
+				try {
+					dbQueryAux(owner, database, operation, session, request, response);
+				} catch (Exception e) {
+					e.printStackTrace();
+					request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
+					ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
 				}
 			}
 		}
@@ -111,7 +108,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 	 * and shows the results in a web page.
 	 * Offers to the jsp all the collected information.
 	 */
-	private void dbQueryAux(String owner, String database, 
+	private void dbQueryAux(String owner, String database, String operation, 
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
@@ -122,12 +119,22 @@ public class DataBaseQueryServlet extends HttpServlet {
 				connection = new CiaoPrologConnectionClass();
 			}
 			
-			dbQueryAux_Introspection(owner, database, connection);
+			if ("query".equals(operation)) {
+				dbQueryAux_Introspection(owner, database, connection);
+			}
+			if ("runquery".equals(operation)) {
+				build_and_execute_query(request, response);
+			}
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
 			session.setAttribute("connection", connection);
 
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBaseQuery_Page, request, response, LOG);
+			if ("query".equals(operation)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBaseQuery_Page, request, response, LOG);
+			}
+			if ("runquery".equals(operation)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBaseQueryResults_Page, request, response, LOG);
+			}
 	}
 	
 	private void dbQueryAux_Introspection(String owner, String database, CiaoPrologConnectionClass connection) 
@@ -143,14 +150,31 @@ public class DataBaseQueryServlet extends HttpServlet {
 	}
 	
 	
-	private void build_and_execute_query(HttpServletRequest request, HttpServletResponse response) {
+	private void build_and_execute_query(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
 		int counter = 0;
-		while (request.getParameter("fuzzyRule[" + counter + "]") != null) counter++;
+		LOG.info("build_and_execute_query call.");
+		while (request.getParameter("fuzzyRule[" + counter + "]") != null) {
+			LOG.info("fuzzyRule[" + counter + "]:" + request.getParameter("fuzzyRule[" + counter + "]"));
+			counter++;
+		}
 		
+		String formParameters = " --- \n";
+	    Enumeration<String> paramNames = request.getParameterNames();
+	    while(paramNames.hasMoreElements()) {
+	    	String paramName = (String)paramNames.nextElement();
+	    	String[] paramValues = request.getParameterValues(paramName);
+	    	for(int i=0; i<paramValues.length; i++) {
+	    		formParameters += "paramName: " + paramName + " paramValue: " + paramValues[i] + " \n";
+	    	}
+	    }
+	    LOG.info(formParameters);
+	    
+		/*
 		String [][] query = new String [counter][];
 		for (int i=0; i<counter; i++) {
 			query[i] = new String[]
-		}
+		}*/
 		
 	}
 	

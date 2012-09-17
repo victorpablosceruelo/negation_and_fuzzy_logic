@@ -23,50 +23,8 @@
 <%  Iterator<String []> loadedProgramCrispPredicatesIterator = connection.getLoadedProgramCrispPredicatesIterator(); %>
 <%  Iterator<String []> loadedProgramFuzzyRulesIterator = connection.getLoadedProgramFuzzyRulesIterator(); %>
 
-<script language="javascript">
-function init_callback_inpage() {
-  function debug_callback( level ) { 
-    var args = Array.prototype.slice.call( arguments, 1 ); 
-    $('#debug').length || $('<div id="debug"><h2>debug output<\/h2><\/div>').appendTo( 'body' ); 
-    $('<div/>') 
-      .addClass( 'debug-' + level ) 
-      .html( '[' + level + '] ' + args ) 
-      .appendTo( '#debug' ); 
-  };
-  debug.setCallback( debug_callback, true );
-}
-
-function init_callback_firebuglite() {
-  if ( !window.firebug ) {
-    
-    // from firebug lite bookmarklet
-    window.firebug = document.createElement('script');
-    firebug.setAttribute( 'src', 'http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js' );
-    document.body.appendChild( firebug );
-    (function(){
-      if ( window.firebug.version ) {
-        firebug.init();
-      } else {
-        setTimeout( arguments.callee );
-      }
-    })();
-    void( firebug );
-    
-    if ( window.debug && debug.setCallback ) {
-      (function(){
-        if ( window.firebug && window.firebug.version ) {
-          debug.setCallback(function( level ) {
-            var args = Array.prototype.slice.call( arguments, 1 );
-            firebug.d.console.cmd[level].apply( window, args );
-          }, true);
-        } else {
-          setTimeout( arguments.callee, 100);
-        }
-      })();
-    }
-  }
-}
-</script>
+<!-- JavaScript Debugging Code and more -->
+<jsp:include page="commonHeader.jsp" />
 
 <script language="javascript">
 	function predInfo(predName, predArity) {
@@ -104,12 +62,12 @@ function init_callback_firebuglite() {
 		}
 	%>
 
-	var fuzzyRulesCounter = 1;
+	var fuzzyRulesCounter = 0;
 	var limit = 50;
 	var fuzzyVarsCounter = 0;
 
-	function chooseQuantifierCode(counter, index) {
-		var html = "<select name=\'quantifiers[" + counter + "][" + index + "]\'>";
+	function chooseQuantifierCode(fuzzyRuleIndex, fuzzyRuleQuantifierIndex) {
+		var html = "<select name=\'fuzzyRuleQuantifier[" + fuzzyRuleIndex + "][" + fuzzyRuleQuantifierIndex + "]\'>";
 		html += "<option name=\'none\' value=\'none\'>none</option>";
 		for (var i=0; i<quantifiersArray.length; i++){
 			html += "<option name=\'" + quantifiersArray[i].predName + 
@@ -119,9 +77,9 @@ function init_callback_firebuglite() {
 		html += "</select>";
 		return html;
 	}
-	function chooseFuzzyRuleCode(counter) {
-		var html = "<select name=\'fuzzyRule[" + counter + 
-		           "]\' onchange=\"fuzzyRuleChange(this, \'fuzzyRuleArgs[" + counter + "]\', " + counter + ");\">";
+	function chooseFuzzyRuleCode(fuzzyRuleIndex) {
+		var html = "<select name=\'fuzzyRule[" + fuzzyRuleIndex + 
+		           "]\' onchange=\"fuzzyRuleChange(this, " + fuzzyRuleIndex + ");\">";
 		html += "<option name=\'none\' value=\'none\''>none</option>";
 		for (var i=0; i<fuzzyRulesArray.length; i++){
 			html += "<option name=\'" + fuzzyRulesArray[i].predName + 
@@ -131,31 +89,31 @@ function init_callback_firebuglite() {
 		html += "</select>";
 		return html;
 	}
-	function fuzzyRuleArgsCode(counter) {
-		return "<div id=\'fuzzyRuleArgs[" + counter + "]\'> </div>";
+	function fuzzyRuleArgsCode(fuzzyRuleIndex) {
+		return "<div id=\'fuzzyRuleArgs[" + fuzzyRuleIndex + "]\'> </div>";
 	}
 	
-	function addFuzzyRuleArgumentFields(indexI, indexJ, fuzzyVarsIndex) {
-		debug.info("addFuzzyRuleArgumentFields: indexI:" + indexI + " indexJ:" + indexJ);
+	function addFuzzyRuleArgumentFields(fuzzyRuleIndex, fuzzyVarIndex) {
+		debug.info("addFuzzyRuleArgumentFields: fuzzyRuleIndex:" + fuzzyRuleIndex + " fuzzyVarIndex:" + fuzzyVarIndex);
 		var html = "";
-		html += "<select name=\'fuzzyRuleArgument[" + indexI + "]["+ indexJ+"]\'" + 
-				"onchange=\"fuzzyRuleArgumentChange(this, " + indexI + ", " + indexJ +");\">";
-		for (var k=fuzzyVarsIndex; k<=fuzzyVarsCounter; k++){
+		html += "<select name=\'fuzzyRuleArgument[" + fuzzyRuleIndex + "]["+ fuzzyVarIndex+"]\'" + 
+				"onchange=\"fuzzyRuleArgumentChange(this, " + fuzzyRuleIndex + ", " + fuzzyVarIndex +");\">";
+		for (var k=fuzzyVarIndex; k<fuzzyVarsCounter; k++){
 			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
 		}
-		for (var k=1; k<fuzzyVarsIndex; k++){
+		for (var k=0; k<fuzzyVarIndex; k++){
 			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
 		}
 		html += "<option name=\'constant' value=\'constant\'>constant</option>";
 		html += "</select>";
-		html += "<div id=\'fuzzyRuleArgumentConstant[" + indexI + "]["+ indexJ+"]\'> </div>";
+		html += "<div id=\'fuzzyRuleArgumentConstant[" + fuzzyRuleIndex + "]["+ fuzzyVarIndex+"]\'> </div>";
 		return html;
 	}
-	function fuzzyRuleArgumentChange(comboBox, indexI, indexJ) {
+	function fuzzyRuleArgumentChange(comboBox, fuzzyRuleIndex, fuzzyVarIndex) {
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-		var divName = "fuzzyRuleArgumentConstant[" + indexI + "]["+ indexJ+"]";
+		var divName = "fuzzyRuleArgumentConstant[" + fuzzyRuleIndex + "]["+ fuzzyVarIndex+"]";
 		if (comboBoxValue == "constant") {
-			var html = "<input type=\'text\' name=\'fuzzyRuleArgumentConstant["+ indexI + "][" + indexJ + "]\'>";
+			var html = "<input type=\'text\' name=\'fuzzyRuleArgumentConstant["+ fuzzyRuleIndex + "][" + fuzzyVarIndex + "]\'>";
 			document.getElementById(divName).innerHTML = html;
 		}
 		else {
@@ -163,10 +121,11 @@ function init_callback_firebuglite() {
 		}
 	}
 	
-	function fuzzyRuleChange(comboBox, divName, counter) {
+	function fuzzyRuleChange(comboBox, fuzzyRuleIndex) {
 		var elementId = "";
-		debug.info("fuzzyRuleChange(comboBox, " + divName + ", " + counter + ")");
-		// var comboBox = document.getElementById('fuzzyRule[' + counter + ']');
+		var divName = "fuzzyRuleArgs[" + fuzzyRuleIndex + "]";
+		debug.info("fuzzyRuleChange(comboBox, " + fuzzyRuleIndex + ") -> divName: " + divName);
+		// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 		debug.info("comboBoxValue: " + comboBoxValue);
 		
@@ -182,13 +141,14 @@ function init_callback_firebuglite() {
 			i++;
 		}
 		debug.info("Predicate Arity: " + predArity);
-		var fuzzyVarsIndex = fuzzyVarsCounter + 1;
+		
+		var fuzzyVarIndex = fuzzyVarsCounter;
 		fuzzyVarsCounter += predArity;
 		var html = "";
-		for (var j=0; j<predArity; j++){
-			if (j+1 == predArity) html+= "result: ";
-			html += addFuzzyRuleArgumentFields(i, j, fuzzyVarsIndex);
-			fuzzyVarsIndex += 1;
+		while (fuzzyVarIndex < fuzzyVarsCounter) {
+			if (fuzzyVarIndex +1 == fuzzyVarsCounter) html+= "result: ";
+			html += addFuzzyRuleArgumentFields(fuzzyRuleIndex, fuzzyVarIndex);
+			fuzzyVarIndex += 1;
 		}
 		document.getElementById(divName).innerHTML = html;
 	}
@@ -198,7 +158,8 @@ function init_callback_firebuglite() {
 			alert("You have reached the limit of adding " + fuzzyRulesCounter + " subqueries.");
 		} else {
 			var newdiv = document.createElement('div');
-			newdiv.innerHTML = chooseQuantifierCode(quantifiersArray, fuzzyRulesCounter, 0) + " &nbsp; " +
+			newdiv.innerHTML = " " +  
+					chooseQuantifierCode(fuzzyRulesCounter, 0) + " &nbsp; " +
 					chooseQuantifierCode(fuzzyRulesCounter, 1) + " &nbsp; " +
 					chooseFuzzyRuleCode(fuzzyRulesCounter) + " &nbsp; " +
 					fuzzyRuleArgsCode(fuzzyRulesCounter) + " &nbsp; ";
