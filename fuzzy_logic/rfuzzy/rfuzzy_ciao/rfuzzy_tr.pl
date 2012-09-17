@@ -263,13 +263,16 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pr
 	), !.
 
 % Fuzzy facts.
-translate((Head value Value), Fuzzy_Head):-
+translate((Head value Value), Fuzzy_Head :- Fuzzy_Body):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'fact conversion :: IN ',(Head value Value)),
 	number(Value),                    % Value must be a number.
 
 	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Head, 'fact', 'yes', Fuzzy_Head, Value),
+	translate_functor(Head, 'fact', 'yes', Fuzzy_Head, Truth_Value),
+	functor(Fuzzy_Body, ".=.", 2),
+	arg(1, Fuzzy_Body, Truth_Value),
+	arg(2, Fuzzy_Body, Value),
 	print_msg('debug', 'fact conversion :: OUT ',(Fuzzy_Head)),
 	!. % Backtracking forbidden.
 
