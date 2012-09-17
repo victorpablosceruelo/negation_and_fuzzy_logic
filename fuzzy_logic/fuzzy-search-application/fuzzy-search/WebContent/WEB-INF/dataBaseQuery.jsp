@@ -14,11 +14,6 @@
 <%@page import="auxiliar.DataBaseInfoClass"%>
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
-
-<!-- 
-<script src="/fuzzy-search/addQueryLine.js" language="Javascript" type="text/javascript"></script>
- -->
- 
 <%  Iterator<String []> loadedProgramQuantifiersIterator = connection.getLoadedProgramQuantifiersIterator(); %>
 <%  Iterator<String []> loadedProgramCrispPredicatesIterator = connection.getLoadedProgramCrispPredicatesIterator(); %>
 <%  Iterator<String []> loadedProgramFuzzyRulesIterator = connection.getLoadedProgramFuzzyRulesIterator(); %>

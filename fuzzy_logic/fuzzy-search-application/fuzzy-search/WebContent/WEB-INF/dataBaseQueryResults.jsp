@@ -7,7 +7,7 @@
 <title>Fuzzy Search App</title>
 <script type="text/javascript" src="js/ba-debug.js"></script>
 </head>
-
+<body>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
@@ -24,6 +24,17 @@
 
 <!-- JavaScript Debugging Code and more -->
 <jsp:include page="commonHeader.jsp" />
+
+	<h1>Fuzzy search application</h1>
+		<h2><a href="DataBaseQueryServlet?op=query&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>">Query again the database</a>.
+			<a href="DataBasesMenuServlet">Back to the databases menu</a>. 
+			<a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
+		<jsp:include page="showErrors.jsp" />
+		<h2>This are the results to your query <br />
+			<%=connection.getLastQuery() %>
+			<br /> 
+		 	to the database <%=connection.getCurrentDatabase() %> 
+			with owner <%=connection.getCurrentDatabaseOwner() %></h2>
 
 <br /><br /><br /><br /><br />
 

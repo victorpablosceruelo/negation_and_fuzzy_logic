@@ -23,6 +23,7 @@ public class CiaoPrologConnectionClass {
 	private ArrayList<String []> loadedProgramQuantifiers = null;
 	private ArrayList<String []> loadedProgramCrispPredicates = null;
 	private ArrayList<String []> loadedProgramFuzzyRules = null;
+	private String lastQuery = null;
 	private ArrayList<String []> lastAnswers = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
@@ -172,10 +173,14 @@ public class CiaoPrologConnectionClass {
 			long answersCounter = 0;
 
 			LOG.info("runQuery: executing query: " + query.toString() + " .... ");
+			lastQuery = query.toString();
+			
 			if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
 			currentGoal = new PLGoal(currentPlConnection, query); 
-			if ((database != null) && (! "".equals(database)))
-					currentGoal.useModule(database);
+			if ((database != null) && (! "".equals(database))) {
+				LOG.info("runQuery: changing database to: " + database + ".");
+				currentGoal.useModule(database);
+			}
 			currentGoal.query();
 
 			LOG.info("performDatabaseQueryAux: getting answers ...");
@@ -237,6 +242,7 @@ public class CiaoPrologConnectionClass {
 	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
 	public String getCurrentDatabaseOwnerWithPath () { return currentDatabaseOwnerWithPath; }
 	public ArrayList<String []> getLastAnswers () { return lastAnswers; } 
+	public String getLastQuery() { return lastQuery; }
 
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
