@@ -888,22 +888,18 @@ add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 % ------------------------------------------------------
 
 code_for_getting_attribute_values([Code_1, Code_2]) :-
-%	Module = (:-),
-	Code_1 = (
-		     rfuzzy_var_truth_value(Var, Condition, Value) :-
+	Code_1 = (rfuzzy_var_truth_value_aux(Var, Condition, Value) :-
 		 print_msg('debug', 'rfuzzy_var_truth_value :: Var', Var),
 		 var(Var),					 
 		 dump_constraints(Var, Var, Dump), !,
 		 print_msg('debug', 'rfuzzy_var_truth_value :: dump_constraints :: Dump', Dump),
-		 rfuzzy_process_attribute_dump(Dump, Var, Condition, Value)
-		 ),
-%    dump_internal(Var, Var, [cva(Var, Value)])
-
-		 Code_2 = (
-			      rfuzzy_var_truth_value(Var, _Condition, _Value) :-
+		 rfuzzy_process_attribute_dump(Dump, Var, Condition, Value),
+		 !),
+		 Code_2 = (rfuzzy_var_truth_value_aux(Var, 'error', 0) :-
 			  print_msg('error', 'rfuzzy_var_truth_value :: Var', Var),
-			  !, fail ).
+			  !).
 
+%    dump_internal(Var, Var, [cva(Var, Value)])
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
