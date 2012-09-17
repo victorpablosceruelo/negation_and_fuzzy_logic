@@ -119,19 +119,29 @@ has_less_truth_value(Head_1, Head_2) :-
 	has_less_truth_value_aux(TV_1, TV_2).
 
 has_less_truth_value_aux(TV_1, TV_2) :-
-	var(TV_1), var(TV_2),
+%	var(TV_1), var(TV_2),
 	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', (TV_1, TV_2)),
-	TV_1 .<. TV_2,
-	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', 'yes').
+	TV_1 .<. TV_2, !,
+	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', 'yes'), !.
 
 has_less_truth_value_aux(TV_1, TV_2) :-
-	var(TV_1), var(TV_2),
+%	var(TV_1), var(TV_2),
+	TV_1 .>=. TV_2, !,
 	print_msg('debug', 'has_less_truth_value_aux(TV_1, TV_2)', 'no'),
 	!, fail.
 
 has_less_truth_value_aux(TV_1, TV_2) :-
 	print_msg('error', 'has_less_truth_value_aux(TV_1, TV_2)', (TV_1, TV_2)),
-	!, fail.
+	(   (   nonvar(TV_1), print_msg('error', 'Dump_TV_1', 'nonvar'))
+	;
+	    (   dump_constraints(TV_1, TV_1, Dump_TV_1),
+		print_msg('error', 'Dump_TV_1', (Dump_TV_1)))
+	),
+	(   (   nonvar(TV_2), print_msg('error', 'Dump_TV_2', 'nonvar'))
+	;
+	    (   dump_constraints(TV_2, TV_2, Dump_TV_2),
+		print_msg('error', 'Dump_TV_2', (Dump_TV_2)))
+	), !, fail.
 
 split_out_fuzzy_functor_args(Head, Prio, TV, Other_Args) :-
 %	print_msg('debug', 'split_out_fuzzy_functor_args(Head)', split_out_fuzzy_functor_args(Head)),
