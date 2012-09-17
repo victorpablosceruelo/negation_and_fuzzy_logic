@@ -59,14 +59,6 @@ public class DataBaseQueryServlet extends HttpServlet {
 		LOG.info("--- doPost end ---");
 	}
 	
-
-	public void destroy(CiaoPrologConnectionClass connection) {
-		LOG.info("Destroy any resoource associated with the Ciao Prolog connection.");
-		if (connection != null) {
-			connection.connectionTermination();
-		}
-	}
-	
 	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);

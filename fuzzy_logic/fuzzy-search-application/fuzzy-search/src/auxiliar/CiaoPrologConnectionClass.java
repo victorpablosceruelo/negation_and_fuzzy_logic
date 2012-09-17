@@ -16,7 +16,6 @@ public class CiaoPrologConnectionClass {
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
-	private PLConnection currentPlConnection = null;
 	private String currentDatabase = null;
 	private String currentDatabaseOwner = null;
 	private String currentDatabaseOwnerWithPath = null;
@@ -26,78 +25,17 @@ public class CiaoPrologConnectionClass {
 	private String lastQuery = null;
 	private ArrayList<String []> lastAnswers = null;
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
 		if (FoldersUtilsObject == null) {
 			FoldersUtilsObject = new FoldersUtilsClass();
 		}
-		
-		String [] argv = new String[1];
-		argv[0] = FoldersUtilsObject.getPlServerPath();
-		if (currentPlConnection == null) {
-			currentPlConnection = new PLConnection(argv);
-		}
-		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog server (plServer). Initializing local objects.");
-
-		// changeCiaoPrologWorkingFolder("");
-		LOG.info("CiaoPrologConnectionClass: Connected to Ciao Prolog server (plServer). Initialized local objects.");
 	}
 	
-	/**
-	 * Changes the Ciao Prolog Working Folder 
-	 * 
-	 * @param     dataBaseOwner It is the owner of the new database, which coincides with the folder that contains the database.
-	 * @exception FoldersUtilsClassException if the folder can not be created
-	 * @exception PLException
-	 * @exception IOException
-	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
-	 */
-	private void changeCiaoPrologWorkingFolder(String dataBaseOwner) 
-			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
-		// Log info
-		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + dataBaseOwner);
-		
-		if ((dataBaseOwner == null) || ("".equals(dataBaseOwner))){
-			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
-		}
-		
-		if ((! FoldersUtilsObject.folderExists(dataBaseOwner, true))) {
-			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is an invalid folder.");
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
-		}
-		
-		// Adequate the value of dataBaseOwner (it was relative until here).
-		String dataBaseOwnerWithPath = FoldersUtilsObject.getprogramsPath() + dataBaseOwner;
-		
-		// Change it only if necessary.
-		if ((currentDatabaseOwner == null) || (! currentDatabaseOwner.equals(dataBaseOwner))) { 
-
-			// Change working folder.
-			PLVariable [] variables = new PLVariable[1];
-			variables[0] = new PLVariable();
-			PLStructure query = new PLStructure("working_directory",
-					new PLTerm[]{variables[0], new PLAtom(dataBaseOwnerWithPath)}); 
-
-			ArrayList<String []> queryAnswers = performDatabaseQueryAux(query, null, variables, maximumLong, maximumLong);
-			Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
-
-			String [] answer;
-			while (queryAnswersIterator.hasNext()) {
-				answer = queryAnswersIterator.next();
-				LOG.info("changeCiaoPrologWorkingFolder: " + answer[0]);
-			}
-			currentDatabaseOwnerWithPath = dataBaseOwnerWithPath;
-			currentDatabaseOwner = dataBaseOwner;
-			LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner + " at " + currentDatabaseOwnerWithPath);
-		}
-		else {
-			LOG.info("changeCiaoPrologWorkingFolder: not changing current working folder. " + 
-					 "Current working folder: " + currentDatabaseOwner + " at " + currentDatabaseOwnerWithPath);
-		}
-		
-	}
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +81,10 @@ public class CiaoPrologConnectionClass {
 		LOG.info("databaseIntrospectionQuery: END");
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public Iterator<String []> getLoadedProgramFuzzyRulesIterator () {
 		return loadedProgramFuzzyRules.iterator();
 	}
@@ -153,17 +95,88 @@ public class CiaoPrologConnectionClass {
 		return loadedProgramCrispPredicates.iterator();
 	}
 	
+	public String getCurrentDatabase () { return currentDatabase; }
+	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
+	public String getCurrentDatabaseOwnerWithPath () { return currentDatabaseOwnerWithPath; }
+	public ArrayList<String []> getLastAnswers () { return lastAnswers; } 
+	public String getLastQuery() { return lastQuery; }
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public ArrayList<String []> performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
-		changeCiaoPrologWorkingFolder(owner);
-		lastAnswers = performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong);
+
+		// Connect to the Ciao Prolog Server.
+		String [] argv = new String[1];
+		argv[0] = FoldersUtilsObject.getPlServerPath();
+		PLConnection plConnection = new PLConnection(argv);
+		LOG.info("performDatabaseQuery: Connected to Ciao Prolog server (plServer). ");
+
+		// Change working folder and run the query.
+		changeCiaoPrologWorkingFolder(owner, plConnection);
+		lastAnswers = performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong, plConnection);
+		
+		if (plConnection != null) {
+			try {
+				plConnection.stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		}
+		
 		return lastAnswers;
 	}
 	
+	/**
+	 * Changes the Ciao Prolog Working Folder 
+	 * 
+	 * @param     dataBaseOwner It is the owner of the new database, which coincides with the folder that contains the database.
+	 * @exception FoldersUtilsClassException if the folder can not be created
+	 * @exception PLException
+	 * @exception IOException
+	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
+	 */
+	private void changeCiaoPrologWorkingFolder(String dataBaseOwner, PLConnection plConnection) 
+			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
+		// Log info
+		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + dataBaseOwner);
+		
+		if ((dataBaseOwner == null) || ("".equals(dataBaseOwner))){
+			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
+		}
+		
+		if ((! FoldersUtilsObject.folderExists(dataBaseOwner, true))) {
+			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is an invalid folder.");
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
+		}
+		
+		// Adequate the value of dataBaseOwner (it was relative until here).
+		String dataBaseOwnerWithPath = FoldersUtilsObject.getprogramsPath() + dataBaseOwner;
+		
+		// Change working folder.
+		PLVariable [] variables = new PLVariable[1];
+		variables[0] = new PLVariable();
+		PLStructure query = new PLStructure("working_directory",
+				new PLTerm[]{variables[0], new PLAtom(dataBaseOwnerWithPath)}); 
+
+		ArrayList<String []> queryAnswers = performDatabaseQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
+		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
+
+		String [] answer;
+		while (queryAnswersIterator.hasNext()) {
+			answer = queryAnswersIterator.next();
+			LOG.info("changeCiaoPrologWorkingFolder: " + answer[0]);
+		}
+		currentDatabaseOwnerWithPath = dataBaseOwnerWithPath;
+		currentDatabaseOwner = dataBaseOwner;
+		LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner + " at " + currentDatabaseOwnerWithPath);
+		
+	}
 	
-	private ArrayList<String []> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries) 
+	private ArrayList<String []> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries, PLConnection plConnection) 
 			throws PLException, IOException {
 		
 		ArrayList<String []> queryAnswers = new ArrayList<String []>();
@@ -175,8 +188,8 @@ public class CiaoPrologConnectionClass {
 			LOG.info("runQuery: executing query: " + query.toString() + " .... ");
 			lastQuery = query.toString();
 			
-			if (currentPlConnection == null) throw new PLException("runQuery: plConnection is null.");
-			currentGoal = new PLGoal(currentPlConnection, query); 
+			if (plConnection == null) throw new PLException("runQuery: plConnection is null.");
+			currentGoal = new PLGoal(plConnection, query); 
 			if ((database != null) && (! "".equals(database))) {
 				LOG.info("runQuery: changing database to: " + database + ".");
 				currentGoal.useModule(database);
@@ -236,14 +249,6 @@ public class CiaoPrologConnectionClass {
 		LOG.info("performDatabaseQueryAux: end.");
 		return queryAnswers;
 	}
-
-	
-	public String getCurrentDatabase () { return currentDatabase; }
-	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
-	public String getCurrentDatabaseOwnerWithPath () { return currentDatabaseOwnerWithPath; }
-	public ArrayList<String []> getLastAnswers () { return lastAnswers; } 
-	public String getLastQuery() { return lastQuery; }
-
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,20 +278,10 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Destroys the current connection to the Ciao Prolog server, so it should dye. 
-	 */
-	public void connectionTermination() {
-		if (currentPlConnection != null) {
-			try {
-				currentPlConnection.stop();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
-			currentPlConnection = null;
-		}
-	}
-	
+	 * Serves for testing the query system, but has no use at all. 
+	 */	
 	public void testingQuery (String owner, String database) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+		LOG.info("testingQuery ...");
 		if ("restaurant.pl".equals(database)) {
 			PLVariable[] variables = new PLVariable[6];
 			variables[0] = new PLVariable(); // X
@@ -316,6 +311,7 @@ public class CiaoPrologConnectionClass {
 			PLStructure query = new PLStructure(",", args_conjunction);
 
 			ArrayList<String []> queryAnswers = performDatabaseQuery(query, owner, database, variables);
+			LOG.info("testingQuery ... num of answers: " + queryAnswers.size());
 		}
 	}
 }
