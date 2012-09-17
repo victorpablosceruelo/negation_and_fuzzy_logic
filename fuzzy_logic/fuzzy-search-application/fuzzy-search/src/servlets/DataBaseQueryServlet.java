@@ -18,9 +18,9 @@ import CiaoJava.PLException;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import auxiliar.CiaoPrologConnectionClass;
-import auxiliar.CiaoPrologVarsMappingClass;
 import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.QueryConversorClass;
+import auxiliar.QueryConversorExceptionClass;
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.FoldersUtilsClassException;
 
@@ -111,10 +111,11 @@ public class DataBaseQueryServlet extends HttpServlet {
 	 * asks the database for the available predicates via introspection
 	 * and shows the results in a web page.
 	 * Offers to the jsp all the collected information.
+	 * @throws QueryConversorExceptionClass 
 	 */
 	private void dbQueryAux(String owner, String database, String operation, 
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
 		
 			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "databaseIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
@@ -155,7 +156,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 	
 	
 	private void build_and_execute_query(String owner, String database, CiaoPrologConnectionClass connection, HttpServletRequest request) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
 		int queryLinesCounter = 0;
 		LOG.info("build_and_execute_query call.");
 		while (request.getParameter("fuzzyRule[" + queryLinesCounter + "]") != null) {
@@ -192,21 +193,21 @@ public class DataBaseQueryServlet extends HttpServlet {
 	    	arguments = new String[numOfArguments][];
 	    	for (int j=0; j<numOfArguments; j++) {
 	    		arguments[j] = new String[2];
-	    		if ("constant".equals(request.getParameter("fuzzyRuleArgument["+i+"]["+numOfArguments+"]"))) {
+	    		if ("constant".equals(request.getParameter("fuzzyRuleArgument["+i+"]["+j+"]"))) {
 	    			arguments[j][0] = "constant";
-	    			arguments[j][1] = request.getParameter("fuzzyRuleArgumentConstant["+i+"]["+numOfArguments+"]");
+	    			arguments[j][1] = request.getParameter("fuzzyRuleArgumentConstant["+i+"]["+j+"]");
 	    		}
 	    		else {
 	    			arguments[j][0] = "variable";
-	    			arguments[j][1] = request.getParameter("fuzzyRuleArgument["+i+"]["+numOfArguments+"]");
+	    			arguments[j][1] = request.getParameter("fuzzyRuleArgument["+i+"]["+j+"]");
 	    		}
 	    	}
 	    	
 	    	conversor.addSubQuery(quantifier0, quantifier1, fuzzyPredicate, arguments);
 	    }
 	    
-	    PLStructure query = conversor.returnQuery();
-	    PLVariable [] variables = conversor.getVarsMapping().returnVariablesArray();
+	    PLStructure query = conversor.getFinalQuery();
+	    PLVariable [] variables = conversor.getFinalQueryVariables();
 
 	    connection.performDatabaseQuery(query, owner, database, variables);
 	    // performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables)
