@@ -20,6 +20,7 @@ import CiaoJava.PLVariable;
 import auxiliar.CiaoPrologConnectionClass;
 import auxiliar.CiaoPrologVarsMappingClass;
 import auxiliar.LocalUserNameFixesClassException;
+import auxiliar.QueryConversorClass;
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.FoldersUtilsClassException;
 
@@ -174,10 +175,38 @@ public class DataBaseQueryServlet extends HttpServlet {
 	    LOG.info(formParameters);
 	    
 	    int fuzzyVarsCounter = Integer.parseInt(request.getParameter("fuzzyVarsCounter"));
-	    CiaoPrologVarsMappingClass varsMapping = new CiaoPrologVarsMappingClass(fuzzyVarsCounter);
+	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter, fuzzyVarsCounter);
 	    
-	    PLStructure query = null;
-	    PLVariable [] variables = varsMapping.returnVariablesArray();
+	    int numOfArguments;
+	    String [][] arguments;
+	    String quantifier0, quantifier1, fuzzyPredicate;
+	    for (int i=0; i<queryLinesCounter; i++) {
+	    	quantifier0 = request.getParameter("fuzzyRuleQuantifier["+i+"][0]");
+	    	quantifier1 = request.getParameter("fuzzyRuleQuantifier["+i+"][1]");
+	    	fuzzyPredicate = request.getParameter("fuzzyRule["+i+"]");
+	    
+	    	numOfArguments = 0;
+	    	while (request.getParameter("fuzzyRuleArgument["+i+"]["+numOfArguments+"]") != null) {
+	    		numOfArguments++;
+	    	}
+	    	arguments = new String[numOfArguments][];
+	    	for (int j=0; j<numOfArguments; j++) {
+	    		arguments[j] = new String[2];
+	    		if ("constant".equals(request.getParameter("fuzzyRuleArgument["+i+"]["+numOfArguments+"]"))) {
+	    			arguments[j][0] = "constant";
+	    			arguments[j][1] = request.getParameter("fuzzyRuleArgumentConstant["+i+"]["+numOfArguments+"]");
+	    		}
+	    		else {
+	    			arguments[j][0] = "variable";
+	    			arguments[j][1] = request.getParameter("fuzzyRuleArgument["+i+"]["+numOfArguments+"]");
+	    		}
+	    	}
+	    	
+	    	conversor.addSubQuery(quantifier0, quantifier1, fuzzyPredicate, arguments);
+	    }
+	    
+	    PLStructure query = conversor.returnQuery();
+	    PLVariable [] variables = conversor.getVarsMapping().returnVariablesArray();
 
 	    connection.performDatabaseQuery(query, owner, database, variables);
 	    // performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables)
