@@ -23,6 +23,7 @@ public class CiaoPrologConnectionClass {
 	private ArrayList<String []> loadedProgramQuantifiers = null;
 	private ArrayList<String []> loadedProgramCrispPredicates = null;
 	private ArrayList<String []> loadedProgramFuzzyRules = null;
+	private ArrayList<String []> lastAnswers = null;
 	
 	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
@@ -77,7 +78,7 @@ public class CiaoPrologConnectionClass {
 			PLStructure query = new PLStructure("working_directory",
 					new PLTerm[]{variables[0], new PLAtom(dataBaseOwnerWithPath)}); 
 
-			ArrayList<String []> queryAnswers = performDatabaseQuery(query, null, variables);
+			ArrayList<String []> queryAnswers = performDatabaseQueryAux(query, null, variables, maximumLong, maximumLong);
 			Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
 
 			String [] answer;
@@ -103,7 +104,6 @@ public class CiaoPrologConnectionClass {
 	public void databaseIntrospectionQuery(String owner, String database) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		LOG.info("databaseIntrospectionQuery: owner: "+owner+" database: "+database);
-		changeCiaoPrologWorkingFolder(owner);
 		
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable[] variables = new PLVariable[3];
@@ -113,7 +113,7 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<String []> queryAnswers = performDatabaseQuery(query, database, variables);
+		ArrayList<String []> queryAnswers = performDatabaseQuery(query, owner, database, variables);
 		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
 		
 		// Format and store the answers in the lists.
@@ -154,8 +154,11 @@ public class CiaoPrologConnectionClass {
 	
 	
 	
-	private ArrayList<String []> performDatabaseQuery(PLStructure query, String database, PLVariable [] variables) throws PLException, IOException {
-		return performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong);
+	public ArrayList<String []> performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables) 
+			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+		changeCiaoPrologWorkingFolder(owner);
+		lastAnswers = performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong);
+		return lastAnswers;
 	}
 	
 	
@@ -233,6 +236,7 @@ public class CiaoPrologConnectionClass {
 	public String getCurrentDatabase () { return currentDatabase; }
 	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
 	public String getCurrentDatabaseOwnerWithPath () { return currentDatabaseOwnerWithPath; }
+	public ArrayList<String []> getLastAnswers () { return lastAnswers; } 
 
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,34 +273,36 @@ public class CiaoPrologConnectionClass {
 		}
 	}
 	
-	public void testingQuery (String owner, String database) throws PLException, IOException {
-		PLVariable[] variables = new PLVariable[6];
-		variables[0] = new PLVariable(); // X
-		variables[1] = new PLVariable(); // V1
-		variables[2] = new PLVariable(); // V2
-		variables[3] = new PLVariable(); // V3
-		variables[4] = new PLVariable(); // Condition - rfuzzy_var_truth_value
-		variables[5] = new PLVariable(); // V - rfuzzy_var_truth_value
-		
-		PLTerm[] args_expensive = {variables[0], variables[1]};
-		PLStructure query_expensive = new PLStructure("expensive", args_expensive);
-		PLTerm[] args_very = {query_expensive, variables[2]};
-		PLStructure query_very_expensive = new PLStructure("very", args_very);
-		PLTerm[] args_fnot = {query_very_expensive, variables[3]};
-		PLStructure query_not_very_expensive = new PLStructure("fnot", args_fnot);
-		
-		//PLTerm[] dump_constraints_vars_java_list = {variables[3]};
-		//PLList dump_constraints_vars_list = null;
-		//try {
-		//	dump_constraints_vars_list= new PLList(dump_constraints_vars_java_list);
-        //} catch (PLException e) {}
-		
-		PLTerm[] args_rfuzzy_var_truth_value = {variables[3], variables[4], variables[5]};
-		PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
-		
-		PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
-		PLStructure query = new PLStructure(",", args_conjunction);
+	public void testingQuery (String owner, String database) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+		if ("restaurant.pl".equals(database)) {
+			PLVariable[] variables = new PLVariable[6];
+			variables[0] = new PLVariable(); // X
+			variables[1] = new PLVariable(); // V1
+			variables[2] = new PLVariable(); // V2
+			variables[3] = new PLVariable(); // V3
+			variables[4] = new PLVariable(); // Condition - rfuzzy_var_truth_value
+			variables[5] = new PLVariable(); // V - rfuzzy_var_truth_value
 
-		ArrayList<String []> queryAnswers = performDatabaseQuery(query, database, variables);
+			PLTerm[] args_expensive = {variables[0], variables[1]};
+			PLStructure query_expensive = new PLStructure("expensive", args_expensive);
+			PLTerm[] args_very = {query_expensive, variables[2]};
+			PLStructure query_very_expensive = new PLStructure("very", args_very);
+			PLTerm[] args_fnot = {query_very_expensive, variables[3]};
+			PLStructure query_not_very_expensive = new PLStructure("fnot", args_fnot);
+
+			//PLTerm[] dump_constraints_vars_java_list = {variables[3]};
+			//PLList dump_constraints_vars_list = null;
+			//try {
+			//	dump_constraints_vars_list= new PLList(dump_constraints_vars_java_list);
+			//} catch (PLException e) {}
+
+			PLTerm[] args_rfuzzy_var_truth_value = {variables[3], variables[4], variables[5]};
+			PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
+
+			PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
+			PLStructure query = new PLStructure(",", args_conjunction);
+
+			ArrayList<String []> queryAnswers = performDatabaseQuery(query, owner, database, variables);
+		}
 	}
 }

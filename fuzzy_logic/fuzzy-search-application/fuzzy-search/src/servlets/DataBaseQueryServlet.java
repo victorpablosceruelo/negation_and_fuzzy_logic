@@ -15,7 +15,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import CiaoJava.PLException;
+import CiaoJava.PLStructure;
+import CiaoJava.PLVariable;
 import auxiliar.CiaoPrologConnectionClass;
+import auxiliar.CiaoPrologVarsMappingClass;
 import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.ServletsAuxMethodsClass;
 import auxiliar.FoldersUtilsClassException;
@@ -123,7 +126,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 				dbQueryAux_Introspection(owner, database, connection);
 			}
 			if ("runquery".equals(operation)) {
-				build_and_execute_query(request, response);
+				build_and_execute_query(owner, database, connection, request);
 			}
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
@@ -150,13 +153,13 @@ public class DataBaseQueryServlet extends HttpServlet {
 	}
 	
 	
-	private void build_and_execute_query(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
-		int counter = 0;
+	private void build_and_execute_query(String owner, String database, CiaoPrologConnectionClass connection, HttpServletRequest request) 
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+		int queryLinesCounter = 0;
 		LOG.info("build_and_execute_query call.");
-		while (request.getParameter("fuzzyRule[" + counter + "]") != null) {
-			LOG.info("fuzzyRule[" + counter + "]:" + request.getParameter("fuzzyRule[" + counter + "]"));
-			counter++;
+		while (request.getParameter("fuzzyRule[" + queryLinesCounter + "]") != null) {
+			LOG.info("fuzzyRule[" + queryLinesCounter + "]:" + request.getParameter("fuzzyRule[" + queryLinesCounter + "]"));
+			queryLinesCounter++;
 		}
 		
 		String formParameters = " --- \n";
@@ -170,11 +173,14 @@ public class DataBaseQueryServlet extends HttpServlet {
 	    }
 	    LOG.info(formParameters);
 	    
-		/*
-		String [][] query = new String [counter][];
-		for (int i=0; i<counter; i++) {
-			query[i] = new String[]
-		}*/
+	    int fuzzyVarsCounter = Integer.parseInt(request.getParameter("fuzzyVarsCounter"));
+	    CiaoPrologVarsMappingClass varsMapping = new CiaoPrologVarsMappingClass(fuzzyVarsCounter);
+	    
+	    PLStructure query = null;
+	    PLVariable [] variables = varsMapping.returnVariablesArray();
+
+	    connection.performDatabaseQuery(query, owner, database, variables);
+	    // performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables)
 		
 	}
 	

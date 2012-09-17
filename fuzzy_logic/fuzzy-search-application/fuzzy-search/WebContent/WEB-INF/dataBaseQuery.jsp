@@ -151,6 +151,8 @@
 			fuzzyVarIndex += 1;
 		}
 		document.getElementById(divName).innerHTML = html;
+		document.getElementById('hiddenNumOfVariables').innerHTML = " " + 
+					"<input type=\"hidden\" name=\"fuzzyVarsCounter\" id=\"fuzzyVarsCounter\" value=\""+ fuzzyVarsCounter + "\" />";
 	}
 	
 	function addQueryLine(divName) {
@@ -187,6 +189,7 @@
      addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);
 	 </script>
 	 <br />
+	 <div id="hiddenNumOfVariables"></div>
      <input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
      <INPUT type="submit" value="Execute Query">
 </form>
