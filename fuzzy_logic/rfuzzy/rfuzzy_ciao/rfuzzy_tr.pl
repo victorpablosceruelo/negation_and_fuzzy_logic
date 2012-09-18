@@ -386,7 +386,7 @@ translate(rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 	copy_args(Arity_plus_1, Fuzzy_Pred_Functor, Existing_Predicate_Aux_Functor),
 	arg(Arity_plus_2, Existing_Predicate_Aux_Functor, Truth_Value_In),
 
-	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, (Truth_Value_Aux is 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)).
+	Translation = (Fuzzy_Pred_Functor :- Existing_Predicate_Aux_Functor, (Truth_Value_Aux .=. 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)).
 
 translate(rfuzzy_quantifier(Quantifier_Name/Arity, Condition, TV_Thershold), Translation):-
 	!,

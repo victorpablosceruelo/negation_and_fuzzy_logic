@@ -230,8 +230,7 @@ rfuzzy_conversion_in(X, Y) :-
 rfuzzy_conversion_in(X, _Y) :-
 	\+(nonvar(X)).
 
-rfuzzy_conversion_out(rat(X, Y), Z) :-
-	Z is X/Y.
+rfuzzy_conversion_out(rat(X, Y), (X/Y)) :- !.
 rfuzzy_conversion_out(X, X) :-
 	number(X).
 
