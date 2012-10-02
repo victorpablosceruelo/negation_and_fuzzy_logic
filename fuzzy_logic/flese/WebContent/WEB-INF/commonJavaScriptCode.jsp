@@ -1,5 +1,5 @@
 
-<script language="javascript">
+<script type="text/javascript">
 function init_callback_inpage() {
   function debug_callback( level ) { 
     var args = Array.prototype.slice.call( arguments, 1 ); 
