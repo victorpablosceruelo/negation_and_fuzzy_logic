@@ -1,28 +1,18 @@
+<jsp:include page="commonHead.jsp" />
+<!-- JavaScript Debugging Code and more -->
+<jsp:include page="commonJavaScriptCode.jsp" />
+
 <%@page import="servlets.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.FoldersUtilsClass"%>
 <%@page import="auxiliar.DataBaseInfoClass"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Fuzzy Search App</title>
-</head>
 <body>
+    <div id="body">
+    	<jsp:include page="commonBody.jsp" />
 	
-	<h1>Fuzzy search application</h1>
-	<h2>Check your user information <a href="UserInfoServlet">here</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
-	<jsp:include page="showErrors.jsp" />
-	<h2>Please choose between one of the following tasks:</h2>
-	<h3>Upload a new database</h3>
-	<FORM ENCTYPE='multipart/form-data' method='POST'
-		action="FilesMgmtServlet?op=upload">
-		<INPUT TYPE='file' NAME='fuzzy-database' size="50"> <INPUT
-			TYPE='submit' VALUE='Upload File'>
-	</FORM>
 	<%
 		String localUserName = (String) session.getAttribute("localUserName");
 
@@ -37,35 +27,48 @@
 			}*/
 			if (databasesIterator != null) {
 	%>
-	<h3>Choose an existing database for querying, viewing or remove</h3>
+	<h3>Choose an existing program file for querying, viewing or remove</h3>
+	<div id="infoBox">&nbsp;</div>
+	<br />
 		<table>
 				<tr>
-					<td>DataBaseOwner</td>
-					<td>DataBaseName</td>
-					<td>Query the database</td>
-					<td>View it</td>
-					<td>Remove it</td>
+					<td>File Name</td>
+					<td>File Owner</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
 				</tr>
 	<%
 			while (databasesIterator.hasNext()) {
 				DataBaseInfoClass dataBaseInfo = databasesIterator.next();
 				%>
 				<tr>
+					<td>
+						<a onmouseover='showInfoMessage("infoBox", "view program file <%=dataBaseInfo.getDataBaseName() %>")'
+							onmouseout='showInfoMessage("infoBox", "")'
+							href="FilesMgmtServlet?op=view&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
+						<%=dataBaseInfo.getDataBaseName() %></a>
+					</td>
 					<td><%=dataBaseInfo.getDataBaseOwner() %></td>
-					<td><%=dataBaseInfo.getDataBaseName() %></td>
-					<td><a href="DataBaseQueryServlet?op=query&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
+					<td><a onmouseover='showInfoMessage("infoBox", "remove program file <%=dataBaseInfo.getDataBaseName() %>")'
+							onmouseout='showInfoMessage("infoBox", "")'
+							href="FilesMgmtServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
+							<img src="remove-file.gif" alt="remove" width="20"></img></a></td>
+					<td><a onmouseover='showInfoMessage("infoBox", "query program file <%=dataBaseInfo.getDataBaseName() %>")'
+							onmouseout='showInfoMessage("infoBox", "")'
+							href="DataBaseQueryServlet?op=query&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
 							Query</a></td>
-					<td><a href="FilesMgmtServlet?op=view&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
-							View</a></td>
-							
-					<td><a href="FilesMgmtServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
-							Remove</a></td>
 				</tr>
 				<%
 			}
 	%>
 		</table>
 	<% } %>
-	
+
+		<h3>Upload a new database</h3>
+		<FORM ENCTYPE='multipart/form-data' method='POST' action="FilesMgmtServlet?op=upload">
+			<INPUT TYPE='file' NAME='fuzzy-database' size="50"> 
+			<INPUT TYPE='submit' VALUE='Upload File'>
+		</FORM>
+	</div>	
 </body>
 </html>

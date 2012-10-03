@@ -52,27 +52,27 @@
 <jsp:include page="dataBaseQueryJavaScriptCode.jsp" />
 
 <body>
-	<h1>Fuzzy search application</h1>
-		<h2><a href="DataBasesMenuServlet">Back to the databases menu</a>. <a href="SocialAuthServlet?mode=signout">Signout</a>.</h2>
-		<jsp:include page="showErrors.jsp" />
+    <div id="body">
+    	<jsp:include page="commonBody.jsp" />
+    	
+		<h2><a href="DataBasesMenuServlet">Back to the databases menu</a></h2>
 		<h2>Perform your query to the database <%=connection.getCurrentDatabase() %> 
 			with owner <%=connection.getCurrentDatabaseOwner() %></h2>
 
 		
-<form action="DataBaseQueryServlet?op=runquery&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>" method="POST">
-     <div id="queryLines">
+		<form action="DataBaseQueryServlet?op=runquery&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>" method="POST">
+     		<div id="queryLines">
           
-     </div>
-     <script type="text/javascript">
-     	addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);
-	 </script>
-	 <br />
-	 <div id="hiddenNumOfVariables"></div>
-     <input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
-     <INPUT type="submit" value="Execute Query">
-</form>
-<br /><br /><br /><br /><br />
-		
-
+     		</div>
+     		<script type="text/javascript">
+     			addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);
+	 		</script>
+	 		<br />
+	 		<div id="hiddenNumOfVariables"></div>
+     		<input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
+     		<INPUT type="submit" value="Execute Query">
+		</form>
+		<br /><br /><br /><br /><br />
+	</div>
 </body>
 </html>

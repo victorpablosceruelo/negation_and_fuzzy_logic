@@ -21,8 +21,9 @@ html {
 body {
     background-color: #fff;
     color: #000;
-    margin: 0;
-    padding: 0;
+    margin: 0.5em;
+    padding: 0.5em;
+    width:80%;
 }
 
 /* Encabezamientos y p�rrafos */
@@ -30,18 +31,18 @@ h1 {
     color: #000;
     font-size: large;
     font-weight:600;
-    margin: 0;
-    padding:0;
-    border-top: 3px #f00 solid;
+    margin: 0em;
+    padding:0em;
+    /* border-top: 3px #f00 solid; */
     text-align:left;
 }
 
 h2 {
     color: #000;
     font-size: larger;
-    font-weight:600;
+    font-weight:500;
     text-align:left;
-    border-bottom: 1px solid #fbb;
+    /* border-bottom: 1px solid #fbb; */
     width: 80%;
     margin-left: 0.2em;
 /*     background-color: #fff8ec; */
@@ -405,6 +406,30 @@ h3 {
 
 }
 
+#bodyHead {
+	width:90%;
+}
+
+#bodyHeadTitle {
+	border:1px solid black;
+	text-align:center;
+	width:70%;
+	padding:1em;
+}
+
+#bodyHeadLogged {
+	border:1px solid black;
+	text-align:center;
+	width:20%;
+	padding:0.5em;
+}
+
+#bodyHeadLogout {
+	border:1px solid black;
+	text-align:center;
+	width:10%;
+	padding:0.5em;
+}
 
 /* Super obsolete code */
 /* h1 a, h1 a:link, h1 a:visited {  */
