@@ -95,6 +95,7 @@ public class SocialAuthServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
+			request.setAttribute("msg1", e);
 			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
 		}
 	}
@@ -176,6 +177,7 @@ public class SocialAuthServlet extends HttpServlet {
 					LOG.info("INFO: creating a new manager because it was null. ");
 					//Create an instance of SocialAuthConfgi object
 					SocialAuthConfig config = SocialAuthConfig.getDefault();
+					// config.setApplicationProperties()
 
 					//load configuration. By default load the configuration from oauth_consumer.properties. 
 					//You can also pass input stream, properties object or properties file name.
@@ -227,6 +229,7 @@ public class SocialAuthServlet extends HttpServlet {
 		
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
+		String msg1, msg2;
 
 		if (session != null) {
 			String id = (String)session.getAttribute("id");
@@ -236,8 +239,15 @@ public class SocialAuthServlet extends HttpServlet {
 					manager.disconnectProvider(id);
 				}
 			}
+
+			msg1 = (String) session.getAttribute("msg1");
+			msg2 = (String) session.getAttribute("msg2");
 			session.invalidate();
+			session = request.getSession(true);
+			session.setAttribute("msg1", msg1);
+			session.setAttribute("msg2", msg2);
 		}
+		
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
 	}
 	
@@ -306,7 +316,7 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 	}
 
-	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		Boolean retval = false;
