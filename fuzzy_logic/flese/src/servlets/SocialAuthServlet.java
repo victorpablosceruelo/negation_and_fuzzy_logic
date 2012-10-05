@@ -96,7 +96,7 @@ public class SocialAuthServlet extends HttpServlet {
 			LOG.error(e);
 			e.printStackTrace();
 			request.setAttribute("msg1", e);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
 		}
 	}
 	
@@ -218,7 +218,8 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			LOG.info("Redirecting to: " + athenticationUrl);
-			response.sendRedirect( athenticationUrl );
+			// response.sendRedirect( athenticationUrl );
+			response.encodeRedirectURL( athenticationUrl );
 		}
 	}
 	
@@ -312,11 +313,11 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			request.setAttribute("msg1", "Welcome to the fuzzy search application !!");
-			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
 		}
 	}
 
-	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		Boolean retval = false;
@@ -331,7 +332,7 @@ public class SocialAuthServlet extends HttpServlet {
 				// Determine correct value for variable localUserName
 				String localUserName = LocalUserNameFixesClass.getLocalUserName(null);
 	    		session.setAttribute("localUserName", localUserName);
-	    		ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
+	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
 	    	}
 		}
 

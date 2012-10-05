@@ -20,7 +20,6 @@
 	
 <body>
     <div id="body">
-    
     	<jsp:include page="commonBody.jsp" />
 			
 		<h2>

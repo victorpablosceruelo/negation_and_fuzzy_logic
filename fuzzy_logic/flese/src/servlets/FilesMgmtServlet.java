@@ -62,12 +62,8 @@ public class FilesMgmtServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
-				
-		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
-			LOG.info("session is new. showing index page.");
-			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
-		}
-		else {			
+		
+		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
 			String request_op = request.getParameter("op");
 			LOG.info("op: " + request_op);
 			try{

@@ -1,14 +1,12 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,22 +38,14 @@ public class UserInfoServlet extends HttpServlet {
 
 	protected void doGetOrDoPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
-			HttpSession session = request.getSession(false);
-			
-			if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
-				LOG.info("no session. logout.");
-				ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
-			}
-			else {
-				LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.UserInfo_Page, request, response, LOG);
-				
+			if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.UserInfo_Page, request, response, LOG);				
 			}
 		} catch (Exception e) {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
 		}
 	}
 }

@@ -66,11 +66,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 		String owner = null;
 		String operation = null;
 		
-		if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
-			LOG.info("no session. logout.");
-			ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.AuthenticationSignout_Page, request, response, LOG);
-		}
-		else {
+		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
 			database = request.getParameter("database");
 			owner = request.getParameter("owner");

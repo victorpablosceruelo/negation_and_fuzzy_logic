@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -63,13 +62,8 @@ public class IndexServlet extends HttpServlet {
 			HttpSession session = request.getSession(true);
 			LOG.info("--- doGetOrDoPost invocation. Counter: "+ counter + " <--> Session ID: "+ session.getId() +" ---");
 
-			if (ServletsAuxMethodsClass.client_session_is_not_authenticated(session)) {
-				LOG.info("session is new. showing index page.");
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
-			}
-			else {
-				LOG.info("session is not new. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationSignin_Page,request, response, LOG);
+			if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignin,request, response, LOG);
 			}
 		}
 	}
