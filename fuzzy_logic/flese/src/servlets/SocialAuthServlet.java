@@ -218,8 +218,8 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			LOG.info("Redirecting to: " + athenticationUrl);
-			// response.sendRedirect( athenticationUrl );
-			response.encodeRedirectURL( athenticationUrl );
+			response.sendRedirect( athenticationUrl );
+			// response.encodeRedirectURL( athenticationUrl );
 		}
 	}
 	
