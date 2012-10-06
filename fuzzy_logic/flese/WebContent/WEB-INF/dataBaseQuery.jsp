@@ -58,10 +58,33 @@
     	<h3><a href="DataBasesMenuServlet">Program Files Menu</a> &gt; Perform a query </h3>
 		<br /><br />
     	
-		<h3>Perform your query to the database <%=connection.getCurrentDatabase() %> 
-			with owner <%=connection.getCurrentDatabaseOwner() %></h3>
-
-		
+    	<table class="programFileChosen">
+    		<thead>
+    			<tr>
+    				<th colspan="2">
+    					Information about program file choosen 
+    				</th>
+    			</tr>
+    		</thead>
+    		<tr>
+    			<td>
+    				Program file name
+    			</td>
+    			<td>
+    				<%=connection.getCurrentDatabase() %>
+    			</td>
+    		</tr>
+    		<tr>
+    			<td>
+    				Owner
+    			</td>
+    			<td>
+    				<%=connection.getCurrentDatabaseOwner() %>
+    			</td>
+    		</tr>
+    	</table>
+    	<br />
+		<h3>Perform your query to the program file </h3>		
 		<form action="DataBaseQueryServlet?op=runquery&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>" method="POST">
      		<div id="queryLines">
           

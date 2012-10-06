@@ -436,6 +436,12 @@ h3 {
 	padding:1em;
 }
 
+.programFileChosen td {
+	border:0.1em solid #cccccc;
+	margin:0.2em;
+	padding:0.2em;
+}
+
 /* Super obsolete code */
 /* h1 a, h1 a:link, h1 a:visited {  */
 /*     color: #000;  */
