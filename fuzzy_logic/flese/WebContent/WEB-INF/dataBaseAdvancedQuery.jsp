@@ -9,7 +9,7 @@
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
     	<jsp:include page="commonBodyProgramQuery.jsp" />
-
+    	
 		<h3>Perform your query to the program file </h3>		
 		<form id="submitQuery" action="" method="POST">
      		<div id="queryLines">
