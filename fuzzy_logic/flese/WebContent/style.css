@@ -431,6 +431,11 @@ h3 {
 	padding:0.5em;
 }
 
+.providersIcons td {
+	border:1em;
+	padding:1em;
+}
+
 /* Super obsolete code */
 /* h1 a, h1 a:link, h1 a:visited {  */
 /*     color: #000;  */

@@ -28,49 +28,61 @@
 			Please choose one of the following or provide an OpenId url.
 		</h2 >
 
-		<a href="SocialAuthServlet?id=facebook&mode=signin">
-		<img src="http://upload.wikimedia.org/wikipedia/commons/0/06/Facebook.svg" alt="Facebook" title="Facebook" border="0" width="100"></img>
-		</a> <br /> <br />
-								
-		<a href="SocialAuthServlet?id=twitter&mode=signin">
-		<img src="https://twitter.com/images/resources/twitter-bird-blue-on-white.png" alt="Twitter" title="Twitter" border="0" width="75"></img></a> 
-			<br /><br /> 
-				
-		<a href="SocialAuthServlet?id=google&mode=signin">
-		<img src="https://ssl.gstatic.com/images/logos/google_logo_41.png" alt="Gmail" title="Gmail" border="0" width="100"></img></a> 
-			<br /> <br />
-				
-		<a href="SocialAuthServlet?id=yahoo&mode=signin">
-		<img src="http://upload.wikimedia.org/wikipedia/commons/c/c6/YahooMailLogo.svg" alt="YahooMail" title="YahooMail" border="0" width="100"></img></a> 
-			<br /> <br /> 
-				
-		<a href="SocialAuthServlet?id=hotmail&mode=signin">
-		<img src="https://secure.shared.live.com/~Live.SiteContent.Explore/~15.40.70/header/logo_mai.png" alt="HotMail" title="HotMail" border="0" width="100"></img></a> 
-			<br /> <br /> 
-				
-		<a href="SocialAuthServlet?id=linkedin&mode=signin">
-		<img src="http://press.linkedin.com/sites/all/themes/presslinkedin/images/follow_linkedin.gif" alt="Linked In" title="Linked In" border="0" width="50"></img></a> 
-			<br /> <br />
-				
-		<br /> <a href="SocialAuthServlet?id=foursquare&mode=signin">
-		<img src="images/foursquare.jpeg" alt="FourSquare" title="FourSquare" border="0" width="75"></img></a> 
-			<br /> <br />
-					 
-		<a href="SocialAuthServlet?id=myspace&mode=signin">
-		<img src="images/myspace.jpeg" alt="MySpace" title="MySpace" border="0"></img></a>
-			<br /> <br /> 
-				
-		<a href="SocialAuthServlet?id=mendeley&mode=signin">
-		<img src="images/mendeley.jpg" alt="Mendeley" title="Mendeley" border="0"></img></a> <br /> <br /> 
-
+		<table class="providersIcons">
+			<tr>
+				<td>
+					<a href="SocialAuthServlet?id=facebook&mode=signin">
+					<img src="facebook_icon.png" alt="Facebook" title="Facebook" border="0" width="50"></img>
+					</a>
+				</td>
+				<td>			
+					<a href="SocialAuthServlet?id=twitter&mode=signin">
+					<img src="twitter_icon.png" alt="Twitter" title="Twitter" border="0" width="50"></img></a> 
+				</td> 
+				<td>
+					<a href="SocialAuthServlet?id=google&mode=signin">
+					<img src="gmail_icon.png" alt="Gmail" title="Gmail" border="0" width="50"></img></a> 
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a href="SocialAuthServlet?id=yahoo&mode=signin">
+					<img src="yahoomail_icon.png" alt="YahooMail" title="YahooMail" border="0" width="50"></img></a> 
+				</td> 
+				<td>
+					<a href="SocialAuthServlet?id=hotmail&mode=signin">
+					<img src="hotmail_icon.jpeg" alt="HotMail" title="HotMail" border="0" width="50"></img></a> 
+				</td> 
+				<td>
+					<a href="SocialAuthServlet?id=linkedin&mode=signin">
+					<img src="linkedin_icon.gif" alt="Linked In" title="Linked In" border="0" width="50"></img></a> 
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a href="SocialAuthServlet?id=foursquare&mode=signin">
+					<img src="foursquare_icon.jpeg" alt="FourSquare" title="FourSquare" border="0" width="50"></img></a> 
+				</td>
+				<td>
+					<a href="SocialAuthServlet?id=myspace&mode=signin">
+					<img src="myspace_icon.jpeg" alt="MySpace" title="MySpace" border="0" width="50"></img></a>
+				</td> 
+				<td>
+					<a href="SocialAuthServlet?id=mendeley&mode=signin">
+					<img src="mendeley_icon.jpg" alt="Mendeley" title="Mendeley" border="0" width="50"></img>
+					</a> 
+				</td>
+			</tr>
 		<!--  Yammer is a Private Social Network for Your Company					
 		<a href="SocialAuthServlet?id=yammer&mode=signin"><img
 			src="images/yammer.jpg" alt="Yammer" title="Yammer" border="0"></img></a>
 		<br /> <br /> 
 		 -->
-
+		</table>
+			
+		<br />
+		<h2>or enter OpenID url: </h2>	
 		<form action="SocialAuthServlet" onsubmit="return validate(this);">
-			or enter OpenID url: 
 			<input type="text" value="" name="id" /> 
 			<input type="submit" value="Submit" />
 		</form>
