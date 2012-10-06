@@ -28,16 +28,16 @@
 <div class="bodyToUserMsgs">
 	<%
 		if (session != null) {
-			if ((session.getAttribute("msg1") != null) || (session.getAttribute("msg2") != null)) {
-				%><h2>Messages to the user</h2><%
-			}
-			if (session.getAttribute("msg1") != null) {
-				%><h3><%=session.getAttribute("msg1")%></h3><%
-				session.removeAttribute("msg1");
-			}
-			if (session.getAttribute("msg2") != null) {
-				%><h3><%=session.getAttribute("msg2")%></h3><%
-				session.removeAttribute("msg2");
+			if (session.getAttribute("msgs") != null) {
+				%><h3>Messages to the user:</h3>
+					<ul>
+				<%
+				String [] msgs = (String []) session.getAttribute("msgs");
+				for (int i=0; i<msgs.length; i++) {
+					%><li><%=msgs[i]%></li><%
+				}
+				%></ul><%
+				session.removeAttribute("msgs");
 			}			
 		}
 		else {

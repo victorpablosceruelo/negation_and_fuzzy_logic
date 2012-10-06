@@ -83,7 +83,7 @@ public class DataBaseQueryServlet extends HttpServlet {
 					dbQueryAux(owner, database, operation, session, request, response);
 				} catch (Exception e) {
 					e.printStackTrace();
-					request.setAttribute("msg1", "Exception in dbQuery. Message: \n" + e.getMessage());
+					ServletsAuxMethodsClass.addMessageToTheUser(request, "Exception in dbQuery. Message: \n" + e.getMessage(), LOG);
 					ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
 				}
 			}

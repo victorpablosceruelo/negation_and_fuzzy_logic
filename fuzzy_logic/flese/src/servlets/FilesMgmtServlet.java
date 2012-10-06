@@ -100,7 +100,7 @@ public class FilesMgmtServlet extends HttpServlet {
 			if ((request_op == null) || 
 					((! ("upload".equals(request_op))) && (! ("download".equals(request_op))) &&
 				     (! ("remove".equals(request_op))) && (! ("view".equals(request_op))))) {
-				request.setAttribute("msg1", "Strange op in request. op: " + request_op);
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "Strange op in request. op: " + request_op, LOG);
 			}
 
 			if ((request_op == null) || ((! ("download".equals(request_op))) && (! ("view".equals(request_op))))) {
@@ -119,7 +119,7 @@ public class FilesMgmtServlet extends HttpServlet {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if( !isMultipart ){
-			session.setAttribute("msg1", "ERROR. No file uploaded.");
+			ServletsAuxMethodsClass.addMessageToTheUser(request, "ERROR. No file uploaded.", LOG);
 		}
 		else {
 
@@ -153,8 +153,8 @@ public class FilesMgmtServlet extends HttpServlet {
 					// Get the uploaded file parameters
 					//	            String fieldName = fi.getFieldName();
 					String fileName = fileItem.getName();
-					if ((fileName == null) || ("".equals(fileName))) {
-						session.setAttribute("msg1", "Please choose a correct fuzzy database file.");
+					if ((fileName == null) || ("".equals(fileName)) || (! fileName.endsWith(".pl"))) {
+						ServletsAuxMethodsClass.addMessageToTheUser(request, "Please choose a correct program file. Allowed file extension is \'.pl\'", LOG);
 					}
 					else {
 						String fileNameReal = ""; 
@@ -170,7 +170,7 @@ public class FilesMgmtServlet extends HttpServlet {
 						}
 						File file = new File( fileNameReal ) ;
 						fileItem.write( file );
-						session.setAttribute("msg1", "Uploaded Filename: " + fileName + " to " + fileNameReal);
+						ServletsAuxMethodsClass.addMessageToTheUser(request, "Uploaded Filename: " + fileName + " to " + fileNameReal, LOG);
 					}
 				}
 			}
@@ -231,19 +231,15 @@ public class FilesMgmtServlet extends HttpServlet {
 		
 			try {
 				FoldersUtilsObject.removeDataBase(database, owner, localUserName);
-				request.setAttribute("msg1", "The database "+database+" has been removed. ");
-				LOG.info("The database "+database+" has been removed. ");
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+database+" has been removed. ", LOG);
 			} catch (Exception e) {
 				LOG.info("Exception: " + e +": " + e.getMessage());
 				e.printStackTrace();
-				request.setAttribute("msg1", "The database "+database+" could not be removed. ");
-				LOG.info("The database "+database+" could not be removed. ");
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+database+" could not be removed. ", LOG);
 			}
 		}
 		else {
-			request.setAttribute("msg1", "Sorry. Unknown request.");
-			LOG.info("Sorry. Unknown request.");
-			LOG.info("database: "+database+" owner: "+owner+" localUserName: "+localUserName);
+			ServletsAuxMethodsClass.addMessageToTheUser(request, "Sorry. Unknown request. database: "+database+" owner: "+owner+" localUserName: "+localUserName, LOG);
 		}
 	}
 }

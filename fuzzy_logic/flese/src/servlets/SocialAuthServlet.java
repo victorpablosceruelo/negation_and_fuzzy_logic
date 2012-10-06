@@ -95,7 +95,7 @@ public class SocialAuthServlet extends HttpServlet {
 			LOG.error("Exception thrown: ");
 			LOG.error(e);
 			e.printStackTrace();
-			request.setAttribute("msg1", e);
+			ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
 			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
 		}
 	}
@@ -212,7 +212,7 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		
 		if (error) {
-			request.setAttribute("msg1", msg);
+			ServletsAuxMethodsClass.addMessageToTheUser(request, msg, LOG);
 			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 			socialAuthenticationSignOut(request, response);
 		}
@@ -230,7 +230,7 @@ public class SocialAuthServlet extends HttpServlet {
 		
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
-		String msg1, msg2;
+		String [] msgs;
 
 		if (session != null) {
 			String id = (String)session.getAttribute("id");
@@ -241,12 +241,10 @@ public class SocialAuthServlet extends HttpServlet {
 				}
 			}
 
-			msg1 = (String) session.getAttribute("msg1");
-			msg2 = (String) session.getAttribute("msg2");
+			msgs = (String []) session.getAttribute("msgs");
 			session.invalidate();
 			session = request.getSession(true);
-			session.setAttribute("msg1", msg1);
-			session.setAttribute("msg2", msg2);
+			session.setAttribute("msgs", msgs);
 		}
 		
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
@@ -307,12 +305,12 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		
 		if (error) {
-			request.setAttribute("msg1", msg);
+			ServletsAuxMethodsClass.addMessageToTheUser(request, msg, LOG);
 			socialAuthenticationSignOut(request, response);
 			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
 		}
 		else {
-			request.setAttribute("msg1", "Welcome to the fuzzy search application !!");
+			ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
 			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
 		}
 	}
@@ -332,9 +330,11 @@ public class SocialAuthServlet extends HttpServlet {
 				// Determine correct value for variable localUserName
 				String localUserName = LocalUserNameFixesClass.getLocalUserName(null);
 	    		session.setAttribute("localUserName", localUserName);
+	    		ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
 	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
 	    	}
 		}
+	    
 
 	    return retval;
 	}

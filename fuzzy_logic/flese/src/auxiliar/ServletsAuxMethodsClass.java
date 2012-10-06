@@ -17,23 +17,73 @@ public class ServletsAuxMethodsClass {
 
 	public final static String appPath = "/fuzzy-search/";
 
+	/**
+	 * Tests if the client session has been authenticated.
+	 * If it has not been then redirects the user client to the logout servlet.
+	 * 
+	 * @param request is the HttpServletRequest
+	 * @param response is the HttpServletResponse
+	 * @param LOG is the servlet logging facility. Can be null (but it is not recommended).
+	 * @return true if it has been authenticated; false if not.
+	 * @throws IOException if forward_to launches it.
+	 * @throws ServletException if forward_to launches it.
+	 */
 	public static boolean clientSessionIsAuthenticated(HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws IOException, ServletException {
-		HttpSession session = request.getSession(false);
-		
-		if ((session == null) || (session.getAttribute("authenticated") == null) || 
-				(! (Boolean) session.getAttribute("authenticated"))) {
-			
-			LOG.info("no session. logout.");
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
-			return false;
-		}
-		else
-			LOG.info("valid session. Session id: " + session.getId() + 
+		if ((request != null) && (response != null)) {
+			HttpSession session = request.getSession(false);
+
+			if ((session == null) || (session.getAttribute("authenticated") == null) || 
+					(! (Boolean) session.getAttribute("authenticated"))) {
+
+				if (LOG != null) LOG.info("no session. logout.");
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
+				return false;
+			}
+			else {
+				if (LOG != null) LOG.info("valid session. Session id: " + session.getId() + 
 						" Creation Time" + new Date(session.getCreationTime()) + 
 						" Time of Last Access" + new Date(session.getLastAccessedTime()));
-			return true;
+				return true;
+			}
+		}
+		else {
+			LOG.error("request or response is null. ERROR");
+			return false;
+		}
 	}
+	
+	/**
+	 * Adds a msg to the request session attribute msgs.
+	 * 
+	 * @param request is the HttpServletRequest
+	 * @param msg is the message to be added. Cannot be null.
+	 * @param LOG is the servlet logging facility. Can be null (but it is not recommended).
+	 */
+	public static void addMessageToTheUser(HttpServletRequest request, String msg, Log LOG) {
+		if (request != null) {
+			HttpSession session = request.getSession(false);
+			String [] currentMsgs = (String []) session.getAttribute("msgs");
+			String [] newMsgs;
+			if (currentMsgs != null) {
+				newMsgs = new String[currentMsgs.length +1];
+				for (int i=0; i<currentMsgs.length; i++) {
+					newMsgs[i] = currentMsgs[i];
+				}
+				newMsgs[currentMsgs.length] = msg;
+			}
+			else {
+				newMsgs = new String[1];
+				newMsgs[0] = msg;
+			}
+			session.setAttribute("msgs", newMsgs);
+			if (LOG != null) LOG.error("Added to the msgs session attribute in the request the msg \'" + msg + "\'");
+		}
+		else {
+			if (LOG != null) LOG.error("request is null. ERROR");
+		}
+	}
+	
 
 	public static void log_request_parameters(HttpServletRequest request, Log LOG) throws IOException {
 		// Get the values of all request parameters
