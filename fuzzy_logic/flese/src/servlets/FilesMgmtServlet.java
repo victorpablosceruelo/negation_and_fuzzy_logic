@@ -85,6 +85,7 @@ public class FilesMgmtServlet extends HttpServlet {
 						String owner = request.getParameter("owner");
 
 						String filePath = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
+						request.setAttribute("fileName", database);
 						request.setAttribute("filePath", filePath);
 						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileView_Page, request, response, LOG);
 					}

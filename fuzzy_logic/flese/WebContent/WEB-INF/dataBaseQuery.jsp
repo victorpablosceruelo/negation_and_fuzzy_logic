@@ -55,9 +55,11 @@
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
     	
-		<h2><a href="DataBasesMenuServlet">Back to the databases menu</a></h2>
-		<h2>Perform your query to the database <%=connection.getCurrentDatabase() %> 
-			with owner <%=connection.getCurrentDatabaseOwner() %></h2>
+    	<h3><a href="DataBasesMenuServlet">Program Files Menu</a> &gt; Perform a query </h3>
+		<br /><br />
+    	
+		<h3>Perform your query to the database <%=connection.getCurrentDatabase() %> 
+			with owner <%=connection.getCurrentDatabaseOwner() %></h3>
 
 		
 		<form action="DataBaseQueryServlet?op=runquery&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>" method="POST">

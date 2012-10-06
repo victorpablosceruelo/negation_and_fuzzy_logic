@@ -55,18 +55,31 @@
 			if (contactsList != null) {
 				Iterator<Contact> contactsIterator = contactsList.iterator();
 				if (contactsIterator != null) {
-					out.print("<h3>User contacts information</h3>");
+		%>
+					<h3>User contacts information</h3>
+							<table>
+							<thead>
+								<tr>
+									<th>Display Name</th>
+									<th>Field</th>
+									<th>Value</th>
+								</tr>
+							</thead>
+		<%			
 					while (contactsIterator.hasNext()) {
 						Contact contact = contactsIterator.next();
-						out.print("<tr><td colspan=7>"+"DisplayName"+"</td><td>"+contact.getDisplayName()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"Email"+"</td><td>"+contact.getEmail()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"EmailHash"+"</td><td>"+contact.getEmailHash()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"FirstName"+"</td><td>"+contact.getFirstName()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"Id"+"</td><td>"+contact.getId()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"LastName"+"</td><td>"+contact.getLastName()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"ProfileUrl"+"</td><td>"+contact.getProfileUrl()+"</td></tr>");
-						out.print("<tr><td></td><td>"+"OtherEmails"+"</td><td>"+contact.getOtherEmails()+"</td></tr>");
+						out.print("<tr><td rowspan=7>"+contact.getDisplayName()+"</td>");
+						out.print("<td>"+"Email"+"</td><td>"+contact.getEmail()+"</td></tr>");
+						out.print("<tr><td>"+"EmailHash"+"</td><td>"+contact.getEmailHash()+"</td></tr>");
+						out.print("<tr><td>"+"FirstName"+"</td><td>"+contact.getFirstName()+"</td></tr>");
+						out.print("<tr><td>"+"Id"+"</td><td>"+contact.getId()+"</td></tr>");
+						out.print("<tr><td>"+"LastName"+"</td><td>"+contact.getLastName()+"</td></tr>");
+						out.print("<tr><td>"+"ProfileUrl"+"</td><td>"+contact.getProfileUrl()+"</td></tr>");
+						out.print("<tr><td>"+"OtherEmails"+"</td><td>"+contact.getOtherEmails()+"</td></tr>");
 					}
+		%>
+							</table>
+		<%
 				}
 			}
 		}

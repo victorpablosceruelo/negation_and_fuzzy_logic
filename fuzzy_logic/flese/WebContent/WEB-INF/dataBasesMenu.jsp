@@ -64,10 +64,18 @@
 		</table>
 	<% } %>
 
+		<script type="text/javascript">
+			function unhideUpload() {
+				var html = "<INPUT TYPE=\'submit\' VALUE=\'Upload File\'>"
+				document.getElementById('uploadButton').innerHTML = html;	
+			}
+		</script>
+
 		<h3>Upload a new database</h3>
 		<FORM ENCTYPE='multipart/form-data' method='POST' action="FilesMgmtServlet?op=upload">
-			<INPUT TYPE='file' NAME='fuzzy-database' size="50"> 
-			<INPUT TYPE='submit' VALUE='Upload File'>
+			<INPUT TYPE='file' NAME='fuzzy-database' size="50" onchange="unhideUpload('uploadButton');">
+			<DIV id='uploadButton'> 
+			</DIV>
 		</FORM>
 	</div>	
 </body>

@@ -16,17 +16,17 @@
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
     	
-		<h2>
-			<a href="DataBasesMenuServlet">Back to the databases menu</a>.
-			<br>
-			<a href="DataBaseQueryServlet?op=query&database=<%=connection.getCurrentDatabase()%>&owner=<%=connection.getCurrentDatabaseOwner()%>">Query again the database</a>.
-		</h2>
-		<h2>This are the results to your query <br />
+    	<h3><a href="DataBasesMenuServlet">Program Files Menu</a> &gt; 
+    		<a href="DataBaseQueryServlet?op=query&database=<%=connection.getCurrentDatabase() %>&owner=<%=connection.getCurrentDatabaseOwner() %>">Perform a query</a> &gt; 
+    		Results after evaluating the query </h3>
+		<br /><br />
+    	
+		<h3>This are the results to your query <br />
 			<%=connection.getLastQuery() %>
 			<br /> 
 		 	to the database <%=connection.getCurrentDatabase() %> 
 			with owner <%=connection.getCurrentDatabaseOwner() %>
-		</h2>
+		</h3>
 
 		<br /><br /><br /><br /><br />
 
