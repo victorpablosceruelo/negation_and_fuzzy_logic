@@ -16,7 +16,7 @@
 			Program file name
 		</td>
 		<td>
-			<script type="text/javascript">currentProgramFileName</script>
+			<script type="text/javascript">currentProgramFileName;</script>
 		</td>
 	</tr>
 	<tr>
@@ -24,7 +24,7 @@
 			Owner
 		</td>
 		<td>
-			<script type="text/javascript">currentProgramFileOwner</script>
+			<script type="text/javascript">currentProgramFileOwner;</script>
 		</td>
 	</tr>
 </table>

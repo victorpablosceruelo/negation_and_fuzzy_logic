@@ -10,7 +10,7 @@
 		for (var i=0; i<quantifiersArray.length; i++){
 			html += "<option name=\'" + quantifiersArray[i].predName + 
 						"\' value=\'" + quantifiersArray[i].predName + "\'>"+
-						quantifiersArray[i].predName + "</option>"
+						quantifiersArray[i].predName + "</option>";
 		}
 		html += "</select>";
 		return html;
@@ -60,7 +60,7 @@
 	}
 	
 	function fuzzyRuleChange(comboBox, fuzzyRuleIndex) {
-		var elementId = "";
+		// var elementId = "";
 		var divName = "fuzzyRuleArgs[" + fuzzyRuleIndex + "]";
 		debug.info("fuzzyRuleChange(comboBox, " + fuzzyRuleIndex + ") -> divName: " + divName);
 		// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');

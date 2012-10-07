@@ -45,15 +45,19 @@
 		}
 	%>
 	
-	var currentProgramFileName = <%=connection.getCurrentDatabase() %>;
-	var currentProgramFileOwner = <%=connection.getCurrentDatabaseOwner() %>;
+	var currentProgramFileName = "<%=connection.getCurrentDatabase() %>";
+	var currentProgramFileOwner = "<%=connection.getCurrentDatabaseOwner() %>";
 	
 	function changeFormAction(formId, url) {
+		debug.info("Adding to the form with id " + formId + " the action url ");
+		debug.info(url);
 		document.getElementById(formId).action = url;
 	}
 	
 	function changeAHrefLink(linkId, url) {
-		document.getElementById(formId).href = url;
+		debug.info("Adding to the a href with id " + linkId + " the href url " + url);
+		debug.info(url);
+		document.getElementById(linkId).href = url;
 	}
 	
 </script>
