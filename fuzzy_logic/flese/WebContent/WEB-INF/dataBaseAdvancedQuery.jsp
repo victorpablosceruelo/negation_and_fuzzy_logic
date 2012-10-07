@@ -11,7 +11,7 @@
     	<jsp:include page="commonBodyProgramQuery.jsp" />
     	
 		<h3>Perform your query to the program file </h3>		
-		<form id="submitQuery" action="" method="POST">
+		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
      		<div id="queryLines">
           
      		</div>
