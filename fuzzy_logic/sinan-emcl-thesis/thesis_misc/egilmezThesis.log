@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2012.9.17)  8 OCT 2012 19:14
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2012.9.17)  8 OCT 2012 19:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1678,17 +1678,16 @@ File: misc/colorTable.png Graphic file (type png)
 
 <use misc/colorTable.png>
 Package pdftex.def Info: misc/colorTable.png used on input line 13.
-(pdftex.def)             Requested size: 446.70818pt x 772.52232pt.
+(pdftex.def)             Requested size: 379.70467pt x 656.6334pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [63
 
 ]
-Overfull \vbox (112.41849pt too high) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-[64 <./misc/colorTable.png (PNG copy)>]
+ [64 <./misc/colorTable.png (PNG copy)>]
 Missing character: There is no ) in font nullfont!
 Missing character: There is no ; in font nullfont!
  [65pdfTeX warning (ext4): destination with the same identifier (name{figure.6.
@@ -1860,7 +1859,7 @@ f-dist/fonts/type1/public/mathpazo/fplmri.pfb></usr/share/texlive/texmf-dist/fo
 nts/type1/urw/helvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/ur
 w/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/u
 plri8a.pfb>
-Output written on egilmezThesis.pdf (93 pages, 809594 bytes).
+Output written on egilmezThesis.pdf (93 pages, 809604 bytes).
 PDF statistics:
  1822 PDF objects out of 2073 (max. 8388607)
  1680 compressed objects within 17 object streams
