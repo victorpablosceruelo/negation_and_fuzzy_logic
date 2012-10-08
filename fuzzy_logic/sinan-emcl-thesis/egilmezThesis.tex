@@ -1185,18 +1185,6 @@ MCL
 %\label{chap:conclusion}
 \subfile{Conclusion}
 
-
-\nocite{*}
-\bibliographystyle{alpha}
-\bibliography{medium-string,Thesis}
-
-%\chapter*{Appendix}
-%\subfile{Appendix}
-
-
-%%%%%%%%%
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Bibliography and references.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1210,22 +1198,34 @@ MCL
 \phantomsection
 \addcontentsline{toc}{chapter}{References}
 \printindex
-\bibliography{thesis-bib}
+%%\bibliography{thesis-bib}
 
 %\bibliography{externals/babylon/publications,externals/intneg-papers/tags/ngc/bibliography.bib}
 % \input{bibliografia}
 % \clearemptydoublepage{}
 % \input{apendices}
 
-\end{document}
+
+\nocite{*}
+%\bibliographystyle{alpha}
+\bibliography{medium-string,Thesis}
+
+%\chapter*{Appendix}
+\subfile{Appendix}
+
+
+%%%%%%%%%
+
+
+%\end{document}
 
 
 
-\begin{comment}
-\label{Bibliography}
-\lhead{\emph{Bibliography}}  % Change the left side page header to "Bibliography"
-\bibliographystyle{unsrtnat}  % Use the "unsrtnat" BibTeX style for formatting the Bibliography
-\bibliography{Bibliography}  % The references (bibliography) information are stored in the file named "Bibliography.bib"
-\end{comment}
+%\begin{comment}
+%\label{Bibliography}
+%\lhead{\emph{Bibliography}}  % Change the left side page header to "Bibliography"
+%\bibliographystyle{unsrtnat}  % Use the "unsrtnat" BibTeX style for formatting the Bibliography
+%\bibliography{Bibliography}  % The references (bibliography) information are stored in the file named "Bibliography.bib"
+%\end{comment}
 
 \end{document}
