@@ -677,6 +677,8 @@
 % H: Header
 % F: Footer
 
+\setcounter{secnumdepth}{4}
+
 % Each time we select fancy format we need 
 % to establish again all the parameters.
 % this auxiliary macro is for that.
@@ -939,29 +941,25 @@
 %\chapter{Introduction}
 %\label{chap:Introduction}
 
-\newpage \thispagestyle{plain} \mbox{}
+\clearemptydoublepage
 \subfile{Preliminaries}
  
-
-%\emptypage
-\newpage
+\clearemptydoublepage
 \subfile{Justification}
 %\chapter{Justification}
 %\label{chap:Justification}
 
-\newpage \thispagestyle{plain} \mbox{}
+\clearemptydoublepage
+% \newpage \thispagestyle{plain} \mbox{}
 \subfile{MyApproach}
 
-
-\newpage \thispagestyle{plain} \mbox{}
+\clearemptydoublepage
 \subfile{Error}
 
+\clearemptydoublepage
 \subfile{Example}
 
-
-\newpage \thispagestyle{plain} \mbox{}
-%\chapter{Conclusion}
-%\label{chap:conclusion}
+\clearemptydoublepage
 \subfile{Conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2012.9.17)  8 OCT 2012 18:06
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2012.9.17)  8 OCT 2012 19:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1040,21 +1040,21 @@ LaTeX Warning: Label `prem' multiply defined.
 )
 \openout1 = `egilmezThesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 794.
-LaTeX Font Info:    ... okay on input line 794.
-LaTeX Font Info:    Try loading font information for OT1+bch on input line 794.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 796.
+LaTeX Font Info:    ... okay on input line 796.
+LaTeX Font Info:    Try loading font information for OT1+bch on input line 796.
 
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1bch.fd
 File: ot1bch.fd 2004/10/18 font definitions for OT1/bch.
@@ -1092,7 +1092,7 @@ e
 ))
 \c@lstlisting=\count192
 \AtBeginShipoutBox=\box110
-Package hyperref Info: Link coloring ON on input line 794.
+Package hyperref Info: Link coloring ON on input line 796.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
@@ -1102,9 +1102,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count193
 )
-LaTeX Info: Redefining \ref on input line 794.
-LaTeX Info: Redefining \pageref on input line 794.
-LaTeX Info: Redefining \nameref on input line 794.
+LaTeX Info: Redefining \ref on input line 796.
+LaTeX Info: Redefining \pageref on input line 796.
+LaTeX Info: Redefining \nameref on input line 796.
 
 (./egilmezThesis.out) (./egilmezThesis.out)
 \@outlinefile=\write6
@@ -1112,7 +1112,7 @@ LaTeX Info: Redefining \nameref on input line 794.
 
 
 ABD: EveryShipout initializing macros ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 794.
+LaTeX Info: Redefining \selectfont on input line 796.
 
 (./title.tex <erasmusMundus.png, id=252, 270.00874pt x 110.4125pt>
 File: erasmusMundus.png Graphic file (type png)
@@ -1140,7 +1140,7 @@ gofi.png>] [2
 (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.824 \clearemptydoublepage
+l.826 \clearemptydoublepage
                             [1
 
 
@@ -1148,7 +1148,7 @@ l.824 \clearemptydoublepage
  been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.824 \clearemptydoublepage
+l.826 \clearemptydoublepage
                             [2
 
 ] (./newContent/Acknowledgements.tex) [3
@@ -1234,7 +1234,9 @@ File: omsbch.fd
 LaTeX Font Info:    Font shape `OMS/bch/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 28.
 ) [10] [11]
-(./Preliminaries.tex [12]
+[12
+
+] (./Preliminaries.tex
 Chapter 2.
 (./Content/Background/Background.tex
 (./Content/Background/Sub/Lattice/Lattice.tex [13
@@ -1267,6 +1269,7 @@ Chapter 3.
 Underfull \vbox (badness 4108) has occurred while \output is active []
 
  [25
+
 
 ]
 [26])
@@ -1532,28 +1535,29 @@ Missing character: There is no ; in font nullfont!
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.952 \newpage
-               \thispagestyle{plain} \mbox{}] (./MyApproach.tex [45] [46
+l.952 \clearemptydoublepage
+                           ] (./MyApproach.tex
+Chapter 4.
+[45
+
 
 ]
-Chapter 4.
-[47]
 Underfull \hbox (badness 10000) in paragraph at lines 52--52
 
  []
 
-[48] [49] (./newContent/examplesMA.tex
+[46] [47] (./newContent/examplesMA.tex
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[50]
+[48]
 Underfull \hbox (badness 1286) in paragraph at lines 136--137
 []\OT1/bch/m/n/10.95 So on con-trary to what was ex-pected, \OT1/bch/m/it/10.95
  SBM \OT1/bch/m/n/10.95 cal-cu-lated \OT1/bch/m/it/10.95 good[]basketball[]play
 er \OT1/bch/m/n/10.95 and
  []
 
-[51pdfTeX warning (ext4): destination with the same identifier (name{figure.4.1
+[49pdfTeX warning (ext4): destination with the same identifier (name{figure.4.1
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
@@ -1572,7 +1576,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 Missing character: There is no ) in font nullfont!
 Missing character: There is no ; in font nullfont!
-[52] [53pdfTeX warning (ext4): destination with the same identifier (name{figur
+[50] [51pdfTeX warning (ext4): destination with the same identifier (name{figur
 e.4.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
@@ -1593,7 +1597,7 @@ Missing character: There is no ; in font nullfont!
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[54]
+[52]
 Underfull \hbox (badness 1112) in paragraph at lines 724--725
 []$\OML/zplm/m/it/10.95 cred[]$ \OT1/bch/m/n/10.95 = 0.7 , $\OML/zplm/m/it/10.9
 5 cred[]$ \OT1/bch/m/n/10.95 = 0.8, \OT1/bch/m/it/10.95 OP \OT1/bch/m/n/10.95 =
@@ -1610,7 +1614,7 @@ f), (lit-er-acy[]rate, so-cial[]welfare),
 
 Missing character: There is no ) in font nullfont!
 Missing character: There is no ; in font nullfont!
-[55pdfTeX warning (ext4): destination with the same identifier (name{figure.4.4
+[53pdfTeX warning (ext4): destination with the same identifier (name{figure.4.4
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
@@ -1625,7 +1629,7 @@ l.842
       ]
 Missing character: There is no ) in font nullfont!
 Missing character: There is no ; in font nullfont!
- [56pdfTeX warning (ext4): destination with the same identifier (name{figure.4.
+ [54pdfTeX warning (ext4): destination with the same identifier (name{figure.4.
 6}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
@@ -1636,7 +1640,7 @@ Missing character: There is no ] in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ) in font nullfont!
 Missing character: There is no ; in font nullfont!
- [57pdfTeX warning (ext4): destination with the same identifier (name{figure.4.
+ [55pdfTeX warning (ext4): destination with the same identifier (name{figure.4.
 7}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
@@ -1647,14 +1651,15 @@ Overfull \hbox (25.87015pt too wide) in paragraph at lines 1259--1267
 [] 
  []
 
-)) [58] (./Error.tex [59] [60
-
-]
+)) [56] (./Error.tex
 Chapter 5.
 
 Underfull \vbox (badness 4940) has occurred while \output is active []
 
- [61]
+ [57
+
+
+]
 Underfull \hbox (badness 10000) in paragraph at lines 56--57
 []\OT1/bch/m/n/10.95 When the prox-im-ity of sim-i-lar-ity be-tween the pred-i-
 cates \OT1/bch/m/it/10.95 de-cent[]child \OT1/bch/m/n/10.95 and
@@ -1664,11 +1669,11 @@ cates \OT1/bch/m/it/10.95 de-cent[]child \OT1/bch/m/n/10.95 and
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
 (hyperref)                than one, level fixed on input line 80.
 
-[62] [63] [64]) (./Example.tex [65] [66
+[58] [59] [60]) [61] [62
 
-]
+] (./Example.tex
 Chapter 6.
-<misc/colorTable.png, id=877, 800.9925pt x 1385.175pt>
+<misc/colorTable.png, id=860, 800.9925pt x 1385.175pt>
 File: misc/colorTable.png Graphic file (type png)
 
 <use misc/colorTable.png>
@@ -1677,14 +1682,16 @@ Package pdftex.def Info: misc/colorTable.png used on input line 13.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [67]
+ [63
+
+]
 Overfull \vbox (112.41849pt too high) has occurred while \output is active []
 
 
-[68 <./misc/colorTable.png (PNG copy)>]
+[64 <./misc/colorTable.png (PNG copy)>]
 Missing character: There is no ) in font nullfont!
 Missing character: There is no ; in font nullfont!
- [69pdfTeX warning (ext4): destination with the same identifier (name{figure.6.
+ [65pdfTeX warning (ext4): destination with the same identifier (name{figure.6.
 1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
@@ -1703,31 +1710,25 @@ File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
-) [70]
+) [66]
 Underfull \hbox (badness 10000) in paragraph at lines 162--164
 
  []
 
-[71] [72] [73] <console.jpg, id=938, 320.69812pt x 642.90187pt>
+[67] [68] [69] <console.jpg, id=921, 320.69812pt x 642.90187pt>
 File: console.jpg Graphic file (type jpg)
 
 <use console.jpg>
 Package pdftex.def Info: console.jpg used on input line 268.
-(pdftex.def)             Requested size: 357.36789pt x 716.43515pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [74]
-Overfull \vbox (56.33131pt too high) has occurred while \output is active []
-
-
-[75 <./console.jpg>]) (./Conclusion.tex [76]
+(pdftex.def)             Requested size: 326.09505pt x 653.7402pt.
+) [70 <./console.jpg>] (./Conclusion.tex
 Chapter 7.
-[77
+[71
 
-] [78] [79])
+
+] [72] [73])
 No file egilmezThesis.ind.
-(./egilmezThesis.bbl [80]
+(./egilmezThesis.bbl [74]
 (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-32.def
 File: uni-32.def 2012/04/20 UCS: Unicode data U+2000..U+20FF
 )
@@ -1736,12 +1737,12 @@ Underfull \hbox (badness 1783) in paragraph at lines 54--60
 os A. Romero-D[]^^Paz.
  []
 
-[81
+[75
 
 ] (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-0.def
 File: uni-0.def 2012/04/20 UCS: Unicode data U+0000..U+00FF
-) [82] [83])
-[84]
+) [76] [77])
+[78]
 No file egilmezThesis.ind.
 (./Appendix.tex
 Underfull \hbox (badness 10000) in paragraph at lines 14--18
@@ -1753,30 +1754,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--18
 
  []
 
-[85
+[79
 
 
-] [86]
+] [80]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [87]
+ [81]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [88]
-[89]
+ [82]
 LaTeX Font Info:    Try loading font information for OML+bch on input line 202.
 
- (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omlbch.fd
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/omlbch.fd
 File: omlbch.fd 
 )
 LaTeX Font Info:    Font shape `OML/bch/m/n' in size <10> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 202.
 LaTeX Font Info:    Font shape `OMS/bch/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 211.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [90]
+ [83]
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
 (Font)              scaled to size 10.42007pt on input line 248.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
@@ -1788,7 +1786,7 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [91]
+ [84]
 Overfull \hbox (11.29628pt too wide) in paragraph at lines 282--283
 [][] 
  []
@@ -1801,13 +1799,13 @@ Overfull \hbox (11.29628pt too wide) in paragraph at lines 284--285
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [92]
+ [85]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [93]
+ [86]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [94]
+ [87]
 LaTeX Font Info:    Font shape `OMS/bch/m/it' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 427.
 LaTeX Font Info:    Font shape `OML/bch/m/it' in size <10> not available
@@ -1815,34 +1813,34 @@ LaTeX Font Info:    Font shape `OML/bch/m/it' in size <10> not available
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [95]
+ [88]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [96]
+ [89]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [97])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1026.
+ [90])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1024.
 
-[98]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1026.
+[91]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1024.
  (./egilmezThesis.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1026.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1026.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1024.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1024.
 
 Package rerunfilecheck Info: File `egilmezThesis.out' has not changed.
-(rerunfilecheck)             Checksum: 1C28B525DCCFB70E5D4CB37D8470FE36;4427.
+(rerunfilecheck)             Checksum: F73A9F543EE32225C3AA6EFA410E43C6;4482.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1026.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1024.
  ) 
 Here is how much of TeX's memory you used:
- 24731 strings out of 493485
- 433329 string characters out of 3143526
- 831254 words of memory out of 3000000
- 26370 multiletter control sequences out of 15000+200000
+ 24725 strings out of 493485
+ 433408 string characters out of 3143526
+ 836763 words of memory out of 3000000
+ 26371 multiletter control sequences out of 15000+200000
  99808 words of font info for 224 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  56i,21n,61p,1330b,1963s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1862,10 +1860,10 @@ f-dist/fonts/type1/public/mathpazo/fplmri.pfb></usr/share/texlive/texmf-dist/fo
 nts/type1/urw/helvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/ur
 w/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/u
 plri8a.pfb>
-Output written on egilmezThesis.pdf (100 pages, 811395 bytes).
+Output written on egilmezThesis.pdf (93 pages, 809594 bytes).
 PDF statistics:
- 1855 PDF objects out of 2073 (max. 8388607)
- 1705 compressed objects within 18 object streams
- 870 named destinations out of 1000 (max. 500000)
+ 1822 PDF objects out of 2073 (max. 8388607)
+ 1680 compressed objects within 17 object streams
+ 863 named destinations out of 1000 (max. 500000)
  521 words of extra memory for PDF output out of 10000 (max. 10000000)
 
