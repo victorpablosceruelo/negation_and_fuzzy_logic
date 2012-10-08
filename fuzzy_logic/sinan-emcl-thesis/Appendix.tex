@@ -4,9 +4,6 @@
 
 \chapter*{\centering Appendix}
 \label{chap:Appendix}
-\phantomsection
-\addcontentsline{toc}{chapter}{Appendix}
-\printindex
 
 Here we display the implementation of the methodology that is discussed in detail in chapter \ref{chap:example}.
 
@@ -199,7 +196,7 @@ Black 0   0   0
 %\begin{comment}
 
 \newpage
-\lstset{language=C++,basicstyle=\footnotesize}
+\lstset{language=C++,basicstyle=\footnotesize,showstringspaces=false}
 \begin{lstlisting}[caption=The C++ implementation of the application concerning colors, breaklines=true]
 
 #include<iostream>
@@ -257,7 +254,7 @@ int main()
 					weightMin = weight;
 
 				cout<<"Color_pair["<<i<<"], "<<colorNames[i*2]<<" and "<<colorNames[i*2+1]<<": "<<endl;
-				cout<<"_________________________________________"<<endl;
+				cout<<"________________"<<endl;
 				cout<<"sim1:\t"<<sim1<<"\tsim2:\t"<<sim2<<"\ncred2:\t"<<cred2<<" \tweight:\t"<<weight<<"\n\n\n";
 		}
 
@@ -274,7 +271,7 @@ int main()
 			float sim1 = simByAlg(colorPairs[t][0], colorPairs[t][1], colorPairs[t][2], colorPairs[t][3], colorPairs[t][4], colorPairs[t][5]);
 			float sim2 = simByED(euqDist(colorPairs[t][0], colorPairs[t][1], colorPairs[t][2], colorPairs[t][3], colorPairs[t][4], colorPairs[t][5]));
 			cout<<"Color_pair["<<t<<"], "<<colorNames[t*2]<<" and "<<colorNames[t*2+1]<<": "<<endl;
-			cout<<"_________________________________________"<<endl;
+			cout<<"___________________"<<endl;
 			cout<<"sim1:\t"<<sim1<<" \tsim2:\t"<<sim2<<"\n\n";
 
 			float cred1 = credEval(weightMin);	//global weight is used for finding the final credibility value
@@ -347,7 +344,7 @@ int main()
 						weightGlo = weight;
 
 					cout<<"Color_pair["<<pn<<"], "<<col[i].c<<" and "<<col[j].c<<": "<<endl;
-					cout<<"_________________________________________"<<endl;
+					cout<<"___________"<<endl;
 					cout<<"sim1:\t"<<sim1<<"\tsim2:\t"<<sim2<<"\ncred2:\t"<<cred2<<" \tweight:\t"<<weight<<"\n\n\n";
 					pn++;
 				}
@@ -367,7 +364,7 @@ int main()
 					weights.push_back(weight);
 
 					cout<<"Color_pair["<<pn<<"], "<<col[i].c<<" and "<<col[j].c<<": "<<endl;
-					cout<<"_________________________________________"<<endl;
+					cout<<"_____________"<<endl;
 					cout<<"sim1:\t"<<sim1<<"\tsim2:\t"<<sim2<<"\ncred2:\t"<<cred2<<" \tweight:\t"<<weight<<"\n\n\n";
 					pn++;
 				}

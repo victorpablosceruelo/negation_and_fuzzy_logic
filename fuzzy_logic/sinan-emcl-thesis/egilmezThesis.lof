@@ -2,35 +2,35 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Predicate Tree}}{32}{figure.3.1}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Atomic predicate tree with equivalence}}{35}{figure.3.2}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces two equivalent predicate trees for has\_tasty\_food}}{36}{figure.3.3}
-\contentsline {figure}{\numberline {3.4}{\ignorespaces predicate tree for tasty\_restaurant}}{36}{figure.3.4}
-\contentsline {figure}{\numberline {3.5}{\ignorespaces predicate tree for tasty\_restaurant with equivalence extension}}{37}{figure.3.5}
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Comparison between two atomic predicates}}{37}{figure.3.6}
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Comparison between atomic and complex predicates}}{38}{figure.3.7}
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Comparison between two complex predicates}}{39}{figure.3.8}
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Similarity between tr and htf}}{41}{figure.3.9}
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Expansion of tr and htf}}{41}{figure.3.10}
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Similarity between tr and gr}}{42}{figure.3.11}
-\contentsline {figure}{\numberline {3.12}{\ignorespaces Expansion of gr}}{42}{figure.3.12}
-\contentsline {figure}{\numberline {3.13}{\ignorespaces Expansion of tr}}{43}{figure.3.13}
-\contentsline {figure}{\numberline {3.14}{\ignorespaces Predicate trees for \textit {good\_basketball\_player} and \textit {bad\_basketball\_player}}}{44}{figure.3.14}
-\contentsline {figure}{\numberline {3.15}{\ignorespaces Predicate trees in expanded form for \textit {SBM}}}{45}{figure.3.15}
-\contentsline {figure}{\numberline {3.16}{\ignorespaces Predicate trees of \textit {livable\_city} and \textit {modern\_city} in original form}}{48}{figure.3.16}
-\contentsline {figure}{\numberline {3.17}{\ignorespaces Predicate trees after one level of expansion in \textit {SBM}}}{48}{figure.3.17}
-\contentsline {figure}{\numberline {3.18}{\ignorespaces Predicate trees after two levels of expansion in \textit {SBM}}}{49}{figure.3.18}
-\contentsline {figure}{\numberline {3.19}{\ignorespaces Predicate trees for \textit {nice\_destination} and \textit {touristic\_place}}}{50}{figure.3.19}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Predicate Tree}}{28}{figure.3.1}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Atomic predicate tree with equivalence}}{30}{figure.3.2}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces two equivalent predicate trees for has\_tasty\_food}}{31}{figure.3.3}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces predicate tree for tasty\_restaurant}}{32}{figure.3.4}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces predicate tree for tasty\_restaurant with equivalence extension}}{32}{figure.3.5}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Comparison between two atomic predicates}}{33}{figure.3.6}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Comparison between atomic and complex predicates}}{33}{figure.3.7}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Comparison between two complex predicates}}{34}{figure.3.8}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Similarity between tr and htf}}{36}{figure.3.9}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Expansion of tr and htf}}{36}{figure.3.10}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Similarity between tr and gr}}{37}{figure.3.11}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Expansion of gr}}{37}{figure.3.12}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Expansion of tr}}{37}{figure.3.13}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Predicate trees for \textit {good\_basketball\_player} and \textit {bad\_basketball\_player}}}{39}{figure.3.14}
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Predicate trees in expanded form for \textit {SBM}}}{40}{figure.3.15}
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Predicate trees of \textit {livable\_city} and \textit {modern\_city} in original form}}{42}{figure.3.16}
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Predicate trees after one level of expansion in \textit {SBM}}}{42}{figure.3.17}
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Predicate trees after two levels of expansion in \textit {SBM}}}{43}{figure.3.18}
+\contentsline {figure}{\numberline {3.19}{\ignorespaces Predicate trees for \textit {nice\_destination} and \textit {touristic\_place}}}{44}{figure.3.19}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Predicate trees for \textit {good\_basketball\_player} and \textit {bad\_basketball\_player}}}{57}{figure.4.1}
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Predicate trees in original form}}{59}{figure.4.2}
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Predicate trees in expanded form for \textit {SBM}}}{60}{figure.4.3}
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Predicate trees of \textit {livable\_city} and \textit {modern\_city} in original form}}{62}{figure.4.4}
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Predicate trees after one level of expansion in \textit {SBM}}}{62}{figure.4.5}
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Predicate trees after two levels of expansion in \textit {SBM}}}{63}{figure.4.6}
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Predicate trees for \textit {nice\_destination} and \textit {touristic\_place}}}{64}{figure.4.7}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Predicate trees for \textit {good\_basketball\_player} and \textit {bad\_basketball\_player}}}{51}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Predicate trees in original form}}{53}{figure.4.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Predicate trees in expanded form for \textit {SBM}}}{53}{figure.4.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Predicate trees of \textit {livable\_city} and \textit {modern\_city} in original form}}{55}{figure.4.4}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Predicate trees after one level of expansion in \textit {SBM}}}{55}{figure.4.5}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Predicate trees after two levels of expansion in \textit {SBM}}}{56}{figure.4.6}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Predicate trees for \textit {nice\_destination} and \textit {touristic\_place}}}{57}{figure.4.7}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Example of a color predicate tree}}{76}{figure.6.1}
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Example of a color predicate tree}}{69}{figure.6.1}
 \addvspace {10\p@ }
 \contentsfinish 

@@ -6,16 +6,7 @@
 %% BASIC CONFIG PARAMETERS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\renewcommand{\title}{NEGATIVE NON-GROUND QUERIES \\ IN WELL FOUNDED SEMANTICS}
-% \\ BY MEANS OF \\ THE DUAL PROGRAM APPROACH
-\newcommand{\runningtitle}{Negative non-ground queries in Well Founded Semantics}
-% by means of the dual program approach}
-\renewcommand{\author}{V\'{i}ctor Pablos Ceruelo}
-\newcommand{\supervisor}{Jos\'{e} J\'{u}lio Alves Alferes}
-\newcommand{\place}{Lisbon}
-\renewcommand{\date}{July 2009}
-\newcommand{\dedication}{To my girlfriend, \\ Sara, \\ with love.}
-\newcommand{\eachPageMsg}{EMCL Thesis: Negative non-ground queries in WFS - \today}
+\newcommand{\eachPageMsg}{EMCL Thesis: WTF.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% - July 26, 2009} % Example.
 
 %% Macros, Packages and so on.
@@ -371,26 +362,6 @@
 %  \lstinputlisting[label=#2, caption=#3]{#1}
 }
 
-\newcommand{\sourceCode}[3]
-{ 
-  % \begin{figure}[ht!]
-  \label{#1}
-  \horizontalLine
-  \vspace{-20pt}
-  \caption{#2}
-  \vspace{-30pt}
-  \horizontalLine
-  \vspace{-10pt}
-  % \horizontalLineText{ Figure \ref{#1}: #2 }
-  % \line(1,0){400}
-  #3
-  % This is the end code
-  \vspace{-30pt}
-  \horizontalLine
-  % \end{figure}
-}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Esto es un folclore :)
@@ -405,40 +376,25 @@
 %% Let's see if they work ...
 
 
-\lstdefinestyle{listing}{
-  basicstyle=\ttfamily\small, 
-  commentstyle=\fontshape{it}\selectfont,%
-  breaklines=true,%
-  breakatwhitespace=true,%
-  prebreak={\mbox{\hfill$\hookleftarrow$}},%
-  numbers=right,
-  extendedchars=true,%
-  literate={->}{{$\to$}}2 {=>}{{$\Rightarrow$}}2%
-  {||}{{$\where$}}1%
-  {:-}{{$\neck~$}}2%
-  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1,%
-  resetmargins=true,
-  xrightmargin=1cm,
-  mathescape=true %
+%\lstdefinestyle{listing}{
+%  basicstyle=\ttfamily\small, 
+%  commentstyle=\fontshape{it}\selectfont,%
+%  breaklines=true,%
+%  breakatwhitespace=true,%
+%  prebreak={\mbox{\hfill$\hookleftarrow$}},%
+%  numbers=none,
+%  extendedchars=true,%
+%  literate={->}{{$\to$}}2 {=>}{{$\Rightarrow$}}2%
+%  {||}{{$\where$}}1%
+%  {:-}{{$\neck~$}}2%
+%  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1,%
+%  resetmargins=true,
+%  xrightmargin=0cm,
+%  mathescape=true %
 %  resetmargins=true, %
 %  xleftmargin=50pt
 %  lineskip=-0.3ex,%
-}
-
-\lstset{
-  language=prolog,
-  style=listing
-}
-
-% Do not use multicols=2. It does not work well.
-\lstnewenvironment{prolog-code}[1]
-   {\lstset{language=prolog,style=listing, #1}}
-   {}   % Example: firstnumber=5, numbers=none
-
-% Do not use multicols=2. It does not work well.
-\lstnewenvironment{prolog-code-labelled}[3]
-   {\lstset{language=prolog,style=listing,caption=#2,#3}}
-   {\label{#1}}
+%}
 
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\neck}{\leftarrow}
@@ -495,7 +451,7 @@
 % VPC NO -> mathbf
 \newcommand{\true}{\textbf{t}}
 \newcommand{\false}{\textbf{f}}
-\newcommand{\undef}{\textbf{u}}
+%\newcommand{\undef}{\textbf{u}}
 \newcommand{\setTrue}{\mathit{T}}
 \newcommand{\setFalse}{\mathit{F}}
 \newcommand{\setUndef}{\mathit{U}}
@@ -665,6 +621,8 @@
 %	minus .4\baselineskip
 %}
 
+\usepackage{etoolbox}
+
 \fancypagestyle{plain}{%
   \fancyhead{} % get rid of the headers on plain pages
   \renewcommand{\headrulewidth}{0pt} % and the line
@@ -741,6 +699,20 @@
 \renewcommand{\footrulewidth}{0.5pt}
 }
 
+%\newif\ifbiblio
+%\renewcommand{\backmatter}{%
+%  \fancyhead[C]{\ifbiblio \bibname\else\appendixname\ \thechapter\fi}%
+%  \bibliotrue
+%}
+%\appto\appendix{\clearpage\bibliofalse}
+%\preptocmd{\bibliography}{\cleardoublepage \fancyhead[C]{\bibname}}{}{}
+%\preptocmd{\appendix}{\cleardoublepage \fancyhead[C]{\appendixname\ \thechapter}}{}{}
+%\renewcommand{\backmatter}{
+%    \fancyhdr[C]{\ifstrequal{\leftmark}{\MakeUppercase{\bibname}}
+%        {\bibname}{\appendixname\ \thechapter}}
+%}
+
+
 % \renewcommand{\chaptermark}[1]{\markleft{#1}{}}
 % \renewcommand{\sectionmark}[1]{\markright{#1}{}}
 % \renewcommand{\leftmark}[0]{\chaptertitlename}
@@ -754,6 +726,9 @@
 % \rfoot{\thepage}
 % \renewcommand{\headrulewidth}{0.4pt}
 % \renewcommand{\footrulewidth}{0.4pt}
+
+% \preptocmd{\thebibliography}{\cleardoublepage \fancyhead[C]{\bibname}}{}{}
+% \preptocmd{\appendix}{\cleardoublepage \fancyhead[C]{\appendixname\ \thechapter}}{}{}
 
 % \renewcommand{\chaptermark}[1]{%
 %  \markboth{#1}{}}
@@ -824,133 +799,9 @@
 
 \pagestyle{empty}
 
-\vspace{1cm}
-\begin{center}
-  \begin{huge}
-    \author \\
-    \vspace{9cm}
-    \title \\
-    \vspace{9cm}
-    Lisboa \\
-    \vspace{0.5cm}
-    2009
-  \end{huge}
-\end{center}
+\input{title.tex}
 
-\clearpage
-
-\pagestyle{empty}
-\begin{tabular}{|c|}\hline
-
-\hline
-\\
-MCL
-% European \\
-% Master in \\
-% Computational \\
-% Logic
-\\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\  
-
-\begin{sideways}
-\begin{large}
-\author
-\end{large}
-\end{sideways}
-\\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ 
-
-\\ \\
-2009 
-\\
-\\
-\hline
-\end{tabular}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\clearemptydoublepage{}
-\pagestyle{empty}
-
-\vspace{1cm}
-\begin{center}
-  \begin{Large}
-    \vspace{3cm}
-    UNIVERSIDADE NOVA DE LISBOA \\
-    Facultade de Ciências e Tecnologia\\
-    Departamento de Informática \\
-    \vspace{4cm}
-    \title \\
-    \vspace{4cm}
-    Por \\
-    \author \\
-  \end{Large}
-  \begin{large}
-    \vspace{3cm}
-%    \parbox[c][8cm}{
-%      \justifying
-      Dissertaçao apresentada na Facultade de Ciências e Tecnologia \\
-      da Universidade Nova de Lisboa para obtençao do grau de \\
-      Mestre em Computational Logic \\
-%    } \\
-    \vspace{1cm}
-    Orientador: \supervisor \\
-  \end{large}
-  \vspace{1cm}
-  \begin{Large}
-    Lisboa \\
-    \vspace{0.5cm}
-    2009
-  \end{Large}
-\end{center}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% \clearemptydoublepage
-% \pagestyle{empty}
-
-% % Centered, left and right aligned text.
-% % \begin{center} text \end{center}
-% % \begin{flushleft} text \end{flushleft}
-% % \begin{flushright} text \end{flushright}
-
-% \vspace{1cm}
-% \begin{Large}
-%   \vspace{3cm}
-%   \noindent
-%   Facultade de Ciências e Tecnologia\\
-%   \\
-%   Universidade Nova de Lisboa \\
-%   \\
-%   Departamento de Informática \\
-%   \\
-%   \runningtitle \\
-%   \\
-%   \author \\
-%   \\
-%   ``Dissertaçao apresentada na Facultade de Ciências e Tecnologia 
-%   da Universidade Nova de Lisboa para obtençao do grau de 
-%   Mestre em Computational Logic''. \\
-%   \\
-%   (a presente dissertaç\~{a}o foi preparada no \~{a}mbito do
-%   Dual Distributed European Master Program
-%   existente entre Universidad Politécnica de Madrid e
-%   Universidade Nova de Lisboa) \\
-% %
-% %   \begin{tabular}{l}
-% %     (~) - especificaç\~ao obrigatoria \\
-% %     (~) - especificaç\~ao opcional ou inaplicável
-% %   \end{tabular}
-
-%   \noindent
-%   Orientador: \supervisor \\
-
-%   \noindent
-%   Lisboa, 2009
-% \end{Large}
+% \clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -960,73 +811,11 @@ MCL
 \pagenumbering{arabic}
 \pagestyle{plain}
 
-\chapter*{Abstract}
+%\chapter*{Abstract}
 
 % \begin{abstract}
-
+\input{Abstract.tex}
 % \end{abstract}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% \clearemptydoublepage
-%% cabeceras, pies de página y numeración de la portada
-%% (no tocar)
-% \pagestyle{empty}
-
-% \vspace{1cm}
-
-% \begin{center}
-%   \begin{Large}
-%     \includegraphics[width=3cm]{images/fctlogo} \\
-%     UNIVERSIDADE NOVA DE LISBOA \\
-% %    FACULTADE DE CIÊNCIAS E TECNOLOGIA
-%     Facultade de Ciências e Tecnologia
-%   \end{Large}  
-
-%   \vspace{1cm}
-
-%   \begin{Large}
-%     \includegraphics[width=3cm]{images/politecnica} \\
-%     UNIVERSIDAD POLITÉCNICA DE MADRID \\
-%     FACULTAD DE INFORMÁTICA
-%   \end{Large}  
-
-%   \vspace{2cm}
-
-%   \begin{large}
-%     EUROPEAN MASTER'S PROGRAM IN COMPUTATIONAL LOGIC \\
-%     MASTER'S THESIS
-%   \end{large}
-
-%   \vspace{1cm}
-
-%   \begin{large}
-%     \textbf{\title}
-%   \end{large}
-
-%   \vspace{3cm}
-
-%   \begin{tabular}{ll}
-% %    \textbf{
-%       AUTHOR:%}
-%       &
-% %     \textbf{
-%       \author%}
-%       \\
-% %    \textbf{
-%       SUPERVISOR:%}
-%       &
-% %     \textbf{
-%       \supervisor%}
-%   \end{tabular}
-  
-%   \vspace{0.5cm}
-
-%   \place,~\date{}
-
-% \end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1047,17 +836,7 @@ MCL
 
 %% página con la dedicatoria
 \pagestyle{empty}
-\hfill
-\begin{flushright}
-%  \begin{doublespace} 
-    \begin{Large}
-      \begin{textit}
-        \dedication
-        \\
-      \end{textit}
-    \end{Large}
-%  \end{doublespace} 
-\end{flushright}
+\input{newContent/Acknowledgements}
 \clearemptydoublepage
 
 %% agradecimientos
@@ -1139,20 +918,20 @@ MCL
 %\newcommand{\clearemptydoublepage}
 %{\newpage{\pagestyle{empty}\cleardoublepage}}
 
-\input{title}
+%\input{title}
 
-\newpage \thispagestyle{plain} \mbox{}
-\subfile{Abstract}
+%\newpage \thispagestyle{plain} \mbox{}
+%\subfile{Abstract}
 
 %\newpage \thispagestyle{plain} \mbox{}
 
 
-\newpage \thispagestyle{plain} \mbox{}
-\subfile{newContent/Acknowledgements}
+%\newpage \thispagestyle{plain} \mbox{}
+%\subfile{newContent/Acknowledgements}
 
-\newpage \thispagestyle{plain} \mbox{}
+%\newpage \thispagestyle{plain} \mbox{}
 %\clearemptydoublepage
-\tableofcontents
+%\tableofcontents
 
 
 %\newpage
@@ -1206,10 +985,26 @@ MCL
 % \input{apendices}
 
 
-\nocite{*}
+%\nocite{*}
 %\bibliographystyle{alpha}
 \bibliography{medium-string,Thesis}
 
+\clearemptydoublepage{}
+% \clearpage 
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendix}
+\printindex
+\chaptermark{Appendix}
+
+% Odd (impar)
+\fancyhead[OL]{\slshape APPENDIX}
+\fancyhead[OR]{}
+% Even (par)
+\fancyhead[EL]{}
+\fancyhead[ER]{\slshape APPENDIX}
+
+
+\appendix
 %\chapter*{Appendix}
 \subfile{Appendix}
 
