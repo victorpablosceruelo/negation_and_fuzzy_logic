@@ -1,0 +1,61 @@
+\subsubsection{Transforming RFuzzy program}
+\label{sec:TransformRFuzzy}
+In an \textit{RFuzzy program} $P=(R,D,T)$, $R$ is a set of \textit{fuzzy clauses}, $D$ is a set of \textit{default value declarations} and $T$ is a set of \textit{type declarations}. In order to construct a tree for each predicate in $P$, there is the need of filtering and reforming some parts of $P$. This procedure is called \textit{transformation}, in which two steps are taken, one is filtering and the other is reforming. In this section, the details \textit{how} and \textit{why} are presented \cite{Lu}. 
+
+The result of first step \textit{filtering} is a tuple $P'=(R',D',T')$, which is generated from $P$ by following constrains,
+\begin{enumerate}
+ \item Refined $R'$
+
+    $R$ as a set of \textit{fuzzy clauses}, includes fuzzy clauses, which are written as, \[A \stackrel{c,F_c}{\longleftarrow}F(B_1,...,B_n)\]
+    where $A \in TB_{\Pi,\Sigma,V}$ is called the head, $B_1,...,B_n \in TB_{\Pi,\Sigma,V}$ is called the body, $c\in[0,1]$ is the credibility value, and $F_c\in\{\&_1,...,\&_k\}\subset\Omega^{(2)}$ and $F\in\Omega^{(n)}$ are connectives symbols. $F_c$ is to combine the credibility of the rule and the truth value of the body. $F$ is to combine the truth values of the subgoals in the body.
+   
+    A \textit{fuzzy fact} is a special case where $c=1$, $F_c$ is the usual product of real numbers  `` . ''  , $n=0$, $F\in\Omega^{(0)}$. It is written as \[A \longleftarrow v\]
+    where $c$ and $F_c$ are omitted. 
+
+    The similarity between predicates is a relevant value of comparison between two predicates, rather than the absolute value described in \textit{fuzzy facts}. Therefore, \textit{fuzzy facts} is out of consideration of similarity between predicates.
+    
+    As a result, $R'$ is a set of all \textit{fuzzy clauses}, but not \textit{fuzzy facts}, notated as, $R'=R\backslash R_{facts}$.
+ \item Refined $D'$
+
+    A \textit{default value declaration} for a predicate $p \in \Pi ^{(n)}$ is written as 
+    \begin{center}
+       $default(p/n)=[\delta_1$ if $\varphi_1$, ..., $\delta_m$ if $\varphi_m]$
+    \end{center}
+    where $\delta_i\in[0,1]$ for all $i$. The $\varphi_i$ are first-order formulas restricted to terms in $p$ from $TU_{\Sigma,V_p}$, the predicates $=$ and $\neq$, the symbol true and the junctors $\wedge$ and $\vee$ in their usual meaning, which are \textit{`and'}, \textit{ `or'}.
+
+    There is a special case called \textit{unconditional} default value declaration where $m=1$ and $\varphi_1=true$ in the default value declarations. In this case, the predicate $p/n$ is not related to any other predicates,  and therefore it is out of consideration in similarity.
+
+    All in all, $D'$ is all the \textit{conditional} default value declarations, notated as, $D'=D\backslash D_{unconditional}$.
+
+ \item Refined $T'$
+    
+    \[T=T_{term} \cup T_{predicate}\]
+    $T_{term}$ is a set of all \textit{term type declarations}, which assign a type $\tau \in \mathcal{T}$ to a term $t \in \mathbb{HU}$ and is written as $t : \tau$. $T_{predicate}$ is a set of all predicate type declarations. A \textit{predicate type declaration} assigns a type $(\tau_1,...,\tau_n) \in \mathcal{T}^n$ to predicate $p\in\Pi^n$ and is written as $p : (\tau_1,...,\tau_n)$, where $\tau_i$ is the type of $p$'s $i$-th argument.
+
+    The $T_{term}$ is not related to predicates at all, so it is not taken into account of the similarity between predicates.
+
+    Therefore, $T'=T_{predicate}$.
+ \end{enumerate}
+
+After filtering the RFuzzy program $P=(R,D,T)$ into $P'=(R',D',T')$, the second step is taken to reform $D'$ into $D_{new}$. A \textit{default value declarations} in $D'$ is
+\begin{center}
+ $default(p/n)=[\delta_1$ if $\varphi_1$,..., $\delta_m$ if $\varphi_m]$ 
+\end{center}
+
+Since $\varphi_i$ are FOL formulas, it always could be in a DNF(Disjunctive Normal Form), $\varphi_i^1 \vee ... \vee \varphi_i^{k_i}$, then $default(p/n) = \delta_i$ if $\varphi_i$ is written in the \textit{fuzzy clauses} format $A \stackrel{c,F_c}{\longleftarrow}F(B_1,...,B_n)$.
+
+\[p(\vec{x}) \stackrel{\delta_i,.}{\longleftarrow} \varphi_i^1\]
+\[\vdots\]
+\[p(\vec{x}) \stackrel{\delta_i,.}{\longleftarrow} \varphi_i^{k_i}\]
+
+Then $default(p/n)=[\delta_1$ if $\varphi_1$,..., $\delta_m$ if $\varphi_m]$ could be reformed as,
+
+\[p(\vec{x}) \stackrel{\delta_1,.}{\longleftarrow} \varphi_1^1\]
+\[\vdots\]
+\[p(\vec{x}) \stackrel{\delta_1,.}{\longleftarrow} \varphi_1^{k_1}\]
+\[\vdots\]
+\[p(\vec{x}) \stackrel{\delta_m,.}{\longleftarrow} \varphi_m^1\]
+\[\vdots\]
+\[p(\vec{x}) \stackrel{\delta_m,.}{\longleftarrow} \varphi_m^{k_m}\]
+
+Apparently, the reforming procedure from $D'$ into $D_{new}$ preserves the semantic equivalence. The result of \textit{reforming} functioning over $P'$ is $P_{new}=(R_{new},T_{new})$, where $R_{new} = R' \cup D_{new}$ a union of the \textit{fuzzy clauses} and \textit{default value declarations} in the same form of \textit{fuzzy clauses}'s, $T_{new}=T'$. 

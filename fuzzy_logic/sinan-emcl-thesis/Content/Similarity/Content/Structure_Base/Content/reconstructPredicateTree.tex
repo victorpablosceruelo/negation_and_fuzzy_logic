@@ -1,0 +1,69 @@
+\subsubsection{Reconstructing predicate trees with equivalence}
+\label{sec:ReConstruct}
+In this section, the approach of constructing predicates tree with equivalence is displayed, which is used for expanding two comparing nodes with the same structure in the algorithm introduced in section \ref{sec:Algorithm}.
+
+%\input{Graph/G2}
+
+\begin{itemize}
+ \item \textit{Atomic predicate}
+
+Suppose that $p_a$ is a \textit{atomic predicate}. Its type is $\tau$. The identity for some $OP$ associated with $p_a$ is $\beta$. 
+
+The corresponding tree of it is a node $N_{p_a}$ with information, which are $\tau$ of $p_a$ and a number $0$, indicating that $p_a$ is atomic predicate. There are no branches for the node $N_{p_a}$. 
+
+With the equivalence extension, the corresponding tree is presented in figure \ref{fig:APT}. The root is a node $N_{p_a}$ with information, which are the \textit{type} of $p_a$ $\tau$, the operation $OP$ and atomic mark $0$. The branches are a node $N'_{p_a}$ and several nodes $N_{\beta}$.  $N'_{p_a}$ carries information $\tau$, which is $p_a$«s type and atomic mark $0$. $N_{\beta}$ carries information of identity $\beta$ and identity mark $id$, the number of such nodes depends on two comparing predicates.
+
+% pictures
+\input{Content/Similarity/Content/Structure_Base/Graph/G3}
+
+ \item \textit{Complex predicate}
+
+For \textit{complex predicate}, there would be at least one rule defining it as,
+\[p_c(\vec{t}) \stackrel{c,F_c}{\longleftarrow}F(p_1(\vec{t_1}),...,p_n(\vec{t_n}))\]
+and for $OP=(\hat{F_c},\hat{F})$, there exists an identity $\alpha$.  $\tau$, and $\tau_{i}$ are represented types of $p_c$ and $p_{i}$ respectively.
+
+The corresponding tree for $p_c$ is
+
+% pciture
+\input{Content/Similarity/Content/Structure_Base/Graph/G4}
+
+where $N_{p_c}$ is the root with information which are $\tau$, $OP$ and credit value $c$. $N_{p_i}$s are the branches carrying their \textit{types} as information.
+
+With the equivalence extension, the tree is 
+
+% pictures
+\input{Content/Similarity/Content/Structure_Base/Graph/G5}
+ $N_{p_c}$ is the root with information which are $\tau$, $OP$ and credit value $c$. $N_{p_i}$s are the branches with their \textit{types} as information, and several nodes $N_{\alpha}$ carrying information of identities $\alpha$ with identity mark $id$ are added as extra branches depending on two comparing predicates.
+\end{itemize}
+
+\begin{ex}
+Continuation of the example \ref{ConstructPredicateTree}, reconstruct predicate trees with equivalence.
+
+\begin{center}
+\begin{tabular}{l l}
+$has\_tasty\_food:$  & $(Restaurant)$\\
+
+$has\_healthy\_food:$ &  $(Restaurant)$\\
+
+$has\_good\_service:$  & $(Restaurant)$\\
+
+$tasty\_restaurant:$  & $(Restaurant)$\\
+
+$good\_restaurant:$  & $(Restaurant)$\\
+\end{tabular}
+\end{center}
+\begin{tabular}{l l l}
+$tasty\_restaurant(X)$ & $\stackrel{1.0,.}{\longleftarrow} prod$ & $has\_tasty\_food(X)$\\
+
+$good\_restaurant(X)$ & $\stackrel{0.8,.}{\longleftarrow} prod$ & $has\_healthy\_food(X), has\_good\_service(X)$ \\
+\end{tabular}
+
+The predicate tree for \textit{has\_tasty\_food} is represented in figure \ref{fig:ex1}.
+\input{Content/Similarity/Content/Structure_Base/Graph/GE4}
+
+The predicate tree for \textit{tasty\_restaurant} is represented in figure \ref{fig:ex2.1}, and \ref{fig:ex2.2} which is extended with equivalence.
+\input{Content/Similarity/Content/Structure_Base/Graph/GE5}
+\newpage
+\input{Content/Similarity/Content/Structure_Base/Graph/GE6}
+\end{ex}
+

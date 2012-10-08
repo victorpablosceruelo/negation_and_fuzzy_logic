@@ -1,0 +1,300 @@
+\subsection{Lattice Theory}
+\label{sec: LatticeTheory}
+The definition of lattice is given by starting from set theory, followed by some important theorems and propositions as well as their proofs. Those theorems and propositions are used in chapter 3 to bridge fuzzy set/relation and fuzzy logic.
+ 
+\begin{defin} \textbf{Relation over multiple sets.}
+\label{def:ROverMultiSets}
+Let $S_i$ be sets, where $i \in [1,n]$, a relation $R$ over all the sets $S_i$ is a subset of \textbf{Cartesian product} of the sets $S_i$, that is, $R \subseteq \Pi_{i \in [1,n]} S_i$.
+\end{defin}
+
+\begin{defin} \textbf{Relation over single set.}
+\label{def:ROverSingleSet}
+A relation $R$ with arity n over a set $S$ is a subset of \textbf{Cartesian product} $S^n$, that is,  $R \subseteq S^n$.
+\end{defin}
+ 
+\begin{defin} \textbf{Binary relation over single set.}
+\label{def:BinROverSingleSet}
+A binary relation $R$ over a set $S$ is subset of \textbf{Cartesian product} $S \times S$, that is,
+$R \subseteq S \times S$. 
+\end{defin}
+
+With respect to the binary relation, there are several interesting properties over it, such as reflexivity, antisymmetry, transitivity. Let $R$ be a binary relation over $S$, and suppose $x,y,z$ are elements in S. 
+
+\begin{defin} \textbf{Partial order.}
+\label{def:PartialOrder}
+A binary relation $R$ over $S$ is called a partial order iff it satisfies the properties below,
+\begin{itemize}
+\item \textbf{Reflexivity} $\forall x$, if $x \in S$, then the pair $(x,x) \in R$
+\item \textbf{Antisymmetry} if $(x,y) \in R$, and $(y,x) \in R$, then $x=y$
+\item \textbf{Transitivity} if $(x,y) \in R$ and $(y,z) \in R$, then $(x,z) \in R$
+\end{itemize}
+\end{defin}
+
+\begin{defin} \textbf{Partial ordered set.}
+\label{def:PartialOrderSet}
+A partial ordered set is a pair $(U,\preceq)$, where $U$ is a set, and $\preceq$ is a partial order over $U$.
+\end{defin}
+
+\begin{ex}
+\label{ex:PartialOrder}
+$(\mathbb{N},\leq)$ is partial order set, and so is $(\mathcal{P}(U),\subseteq)$, where $\mathcal{P}(U)$ is the power set of U, that is, $\mathcal{P}(U)$ is the set of all subsets of $U$.  
+\end{ex}
+
+\begin{defin} \textbf{Supremum.}
+\label{def:Sup}
+For subsets $S$ of arbitrary partially ordered sets $(P,\preceq)$, a supremum or least upper bound of $S$ is an element u in $P$ such that
+\begin{itemize}
+\item $u$ is a upper bound of $S$, notated as,
+
+$\forall x \in S.$  $x \preceq u$
+
+\item  $u$ is a least upper bound of $S$, notated as,
+
+$\forall v \in P$ such that $x \preceq v$ for all x in S, it holds that $u \preceq v$
+
+\end{itemize}
+\end{defin}
+
+The special case is that a subset of $(P,\preceq)$ only with two elements, the supremum of such set is notated as $sup\{x,y\}$, which is used for the operations over fuzzy sets as their \textbf{join} and written as $x \vee y$.
+
+\begin{defin} \textbf{Infimum.}
+\label{def:Inf}
+Formally, the infimum or greatest lower bound of a subset $S$ of a partially ordered set 
+$(P,\preceq)$ is an element $m$ of $P$ such that
+\begin{itemize}
+\item $m$ is a lower bound of $S$, notated as,
+
+$\forall x \in S.$  $m \preceq x$
+
+\item $m$ is a greatest lower bound of $S$, notated as,
+
+$\forall v \in P$ such that $v \preceq x$ for all x in S, it holds that $v \preceq m$
+
+\end{itemize}
+\end{defin}
+
+The special case is that a subset of $(P,\preceq)$ only with two elements, the supremum of such set is notated as $inf\{x,y\}$, which is used for the operations over fuzzy sets as their \textbf{meet} and written as $x \wedge y$.
+
+\begin{defin} \textbf{Lattice.}
+\label{def:Lattice}
+A lattice is a partially ordered set $(P,\preceq)$ if every pair of elements of $P$ has a sup and an inf in $P$.
+\end{defin}
+
+\begin{ex}
+\label{ex:Lattice}
+The partially ordered set $(\mathcal{P}(U),\subseteq)$ is a lattice. The $sup$\\
+(supremum) of two elements in $\mathcal{P}(U)$ is their union, and $inf$(infimum) is their intersection. The interval $[0,1]$ is a lattice, with $inf\{x,y\} = min\{x,y\}$ and $sup\{x,y\} = max\{x,y\}$. 
+\end{ex}
+
+From the definition of lattice, if $(U,\preceq)$ is a lattice, then it comes equipped with the two binary operations \textbf{join}($\vee$) and \textbf{meet}($\wedge$) described above. From either of these binary operations, $\preceq$ can be reconstructed. In fact, $a \preceq b$ if and only if $a \wedge b = a$ if and only if $a \vee b = b$. These two binary operations satisfy a number of properties exposed in Theorem \ref{thm:latticetheorem1}.
+
+\begin{thm}
+\label{thm:latticetheorem1}
+If $(U,\preceq)$ is a lattice, then for all $a, b, c \in U$.
+\begin{itemize}
+
+\item $a \vee a = a$ and $a \wedge a = a$. ($\vee$ and $\wedge$ are \textbf{idempotent}.)
+\item $a \vee b = b \vee a$ and $a \wedge b = b \wedge a$. ($\vee$ and $\wedge$ are \textbf{commutative}.)
+\item $(a \vee b) \vee c = a \vee (b \vee c)$ and $(a \wedge b) \wedge c = a \wedge (b \wedge c)$. ($\vee$ and $\wedge$ are \textbf{associative}.)
+\item $a \vee (a \wedge b) = a$ and $a \wedge (a \vee b) = a$. (These are the \textbf{absorption identities}.)
+\end{itemize}
+\end{thm}
+
+\begin{thm}
+\label{thm:latticetheorem2}
+If $U$ is a set with binary operations $\vee$ and $\wedge$ which satisfy the properties of Theorem \ref{thm:latticetheorem1}, then defining $a \preceq b$ if $a \wedge b = a$ makes $(U,\preceq)$ a lattice whose \textbf{sup} and \textbf{inf} operations are $\vee$ and $\wedge$.
+\end{thm}
+
+\begin{proof}
+\label{prf:latticeTheorem2}
+We first show that $a \wedge b = a$ \textbf{iff} $a \vee b = b$. Thus defining $a \preceq b$ if $a \wedge b = a$ is equivalent to defining $a \preceq b$ if $a \vee b = b$.
+\begin{itemize}
+
+\item To prove ``If $a \wedge b = a$, then $a \vee b = b$.''
+
+If $a \wedge b = a$, then 
+
+\begin{tabular}{l l l l}
+$a \vee b$ & $ = $ & $(a \wedge b) \vee b$ & \\
+           & $ = $ & $b \vee (b \wedge a)$ & (\textbf{commutative})\\
+           & $ = $ & $b$ & (\textbf{absorption identities})  
+\end{tabular}
+
+\item To prove ``If $a \vee b = b$, then $a \wedge b = a$.''
+
+If $a \vee b = b$, then
+
+\begin{tabular}{l l l l}
+$a \wedge b$ & $ = $ & $a \wedge (a \vee b)$ & \\
+             & $ = $ & $a$ & (\textbf{absorption identities})
+\end{tabular}
+\end{itemize}
+
+$(U,\vee,\wedge)$ with the definition of $\preceq$ that $a \preceq b$ iff $a \wedge b = a$ makes $(U,\preceq)$ into a partial order set. We specify this point from the definition of partial order set and describe $\preceq$ with three properties over set $U \times U$.
+\begin{itemize}
+
+\item \textit{reflexivity}
+ 
+It shows that $a \wedge a = a$ by \textbf{idempotent} rule, then from the definition of $a \preceq b$, which is ``if $a \wedge b = a$, then $a \preceq b$'', $a \preceq a$ is drawn.
+
+\item \textit{antisymmetry}
+
+If $a \preceq b$, then $a \vee b = a$  and $b \preceq a$ implies $b \vee a = b$ by the definition of $\preceq$. since $a \vee b = b \vee a$ by \textbf{commutative}, it is drawn that $a=b$. Thus, If 
+$a \preceq b$ and $b \preceq a$, then $a=b$.
+
+\item \textit{transitivity}
+If $a \preceq b$ and $b \preceq c$, since $a \preceq b$ implies $a \wedge b = a$, while $b \preceq c$ implies $b \wedge c = b$, Then, 
+
+\begin{tabular}{l l l l}
+$a \wedge c$ & = & $(a \wedge b) \wedge c$ & \\
+             & = & $a \wedge (b \wedge c)$ & (\textbf{associative}) \\
+             & = & $a \wedge b$ & \\
+             & = & $a$ &
+\end{tabular}
+
+$a \wedge c = a$ implies that $a \preceq c$. Therefore, if $a \preceq b$ and $b \preceq c$, then 
+$a \preceq c$.
+\end{itemize}
+
+The binary relation $\preceq$ built on $\vee$ and $\wedge$ satisfies \textit{reflexivity}, \textit{antisymmetry} and \textit{transitivity}, which makes $\preceq$ a partial order. Thus, $(U,\preceq)$ is partial order set. 
+
+Next, to show the existence of sups, we claim that $sup\{a,b\}=a \vee b$. The proof is as follows,
+since we define $a \preceq b$ if $a \wedge b = a$, and $a \wedge (a \vee b) = a$ by the absorption identities, then $a \preceq a \vee b$ is drawn. While, $b \wedge (a \vee b) = b \wedge (b \vee a) = b$ by commutative and absorption rules, therefore $b \preceq a \vee b$. Since $a \preceq a\vee b$ and $b \preceq a \vee b$, $a \vee b$ is an upper bound of $a$ and $b$. For any upper bound $x$, 
+$a \vee x = x$ and $b \vee x = x$. $x = x \vee x = (a \vee x) \vee (b \vee x) = (a \vee b) \vee x$, makes $a \vee b \preceq x$. Thus, $a \vee b$ is a smallest upper bound of $a$ and $b$, that is, 
+$sup\{a,b\} = a \vee b$.
+
+Claiming that $inf\{a,b\}=a \wedge b$, it will be proved as the existence of infs. $(a \wedge b) \wedge a = a \wedge (a \wedge b) = (a \wedge a) \wedge b = a \wedge b$, by the definition of 
+$\preceq$, $a \wedge b \preceq a$. 
+While $(a \wedge b) \wedge b = a \wedge (b \wedge b) = a \wedge b$, implies $a \wedge b \preceq b$.
+Since $a \wedge b \preceq a$ and $a \wedge b \preceq b$, $a \wedge b$ is a lower bound of $a$ and 
+$b$. For any lower bound $x$, $x \wedge a = x$ and $x \wedge b = x$. 
+$x = x \wedge x = (x \wedge a) \wedge (x \wedge b) = x \wedge (a \wedge b)$ implies 
+$x \preceq a \wedge b$, therefore, $a \wedge b$ is the largest lower bound of $a$ and $b$, that is,
+$inf\{a,b\} = a \wedge b$.
+
+\end{proof}
+
+The Theorem \ref{thm:latticetheorem2} shows different approaches to define lattice, as well as the point of view. A lattice could be seen as a partial order in which every pair of elements has an inf and a sup, or a set with a pair of operations which satisfy the properties mentioned in Theorem \ref{thm:latticetheorem1}. In general case, $(U,\preceq)$ is a lattice and so is $(U,\vee,\wedge)$ with the properties in Theorem \ref{thm:latticetheorem1}.
+
+%additional properties of lattice
+
+Some pertinent additional properties of a lattice $(U,\preceq)$ may have,
+
+\begin{itemize}
+ 
+\item \textit{property 1:} $0$ and $1$ are \textbf{identities} for $\vee$ and $\wedge$ respectively.
+
+There is an element $0$ in $U$ such that $0 \vee a = a$ for all $a \in U$. There is an element $1 \in U$ such that $1 \wedge a = a$ for all $a \in U$.
+
+\item \textit{property 2:} Each element in U has a \textbf{complement}
+
+Let $U$ have identities, and for each element $a$ in A, there is an element $a^{'}$ in $U$ such that 
+$a \wedge a^{'} = 0$ and $a \vee a^{'} = 1$.
+
+\item \textit{property 3:} The binary operations $\vee$ and $\wedge$ \textbf{distribute} over each other.
+
+$a \vee (b \wedge c) = (a \vee b) \wedge (a \vee c)$ and $a \wedge (b \vee c) = (a \wedge b) \vee (a \wedge c)$.
+
+\item \textit{property 4:} Every subset $T$ of $U$ has a sup.
+
+\item \textit{property 5:} Every subset $T$ of $U$ has an inf.
+
+\end{itemize}
+ 
+If a lattice has an identity for $\vee$ and an identity for $\wedge$, then it is a \textbf{bounded lattice}. A bounded lattice satisfying \textit{property 2} is a \textbf{complemented lattice}.
+A lattice satisfying both distributive laws for $\vee$ and $\wedge$ in \textit{property 3} is a \textbf{distributive lattice}. A bounded distributive lattice that is complemented is a \textbf{Boolean lattice}, or \textbf{Boolean Algebra}. A lattice satisfying \textit{property 4} and \textit{property 5} is a \textbf{complete lattice}.
+
+The interval $[0,1]$ is a complete lattice, and so is $(\mathcal{P}(U),\subseteq)$.
+
+There is an operation denoted as $'$ with the following properties,
+
+\begin{enumerate}
+
+\item $(x^{'})^{'} = x$
+\item $x \leq y$ implies that $y^{'} \leq x^{'}$
+
+\end{enumerate}
+
+The operation `` ' " on a bounded lattice is called an \textbf{involution}, or \textbf{duality}. If $'$ is an involution, the equations
+
+\[(x \vee y)^{'} = x^{'} \wedge y^{'}\]
+\[(x \wedge y)^{'} = x^{'} \vee y^{'}\]
+are called the \textbf{De Morgan laws}, and may or may not hold. A system satisfying \textbf{De Morgan laws} $(V,\vee,\wedge,',0,1)$ is a \textbf{De Morgan algebra}.
+
+The lattice $([0,1], \leq)$ is a De Morgan algebra, where its $'$ operation is $[0,1] \rightarrow [0,1]: x \rightarrow 1-x$. The lattice $(\mathcal{P}(U), \subseteq, ', \emptyset, U)$ is also a De Morgan algebra, with $'$ as a complement operation on a subset of $U$.
+
+%corresponding theorem in general case (the key)
+\begin{thm}
+\label{thm:correspondingtheorem}
+Let $(V,\vee,\wedge,',0,1)$ be a De Morgan algebra and let U be any set. Let f and g be mappings from U into V. We define
+
+\begin{itemize}
+
+\item \textit{Rule 1:} $(f \vee g)(x) = f(x) \vee g(x)$
+\item \textit{Rule 2:} $(f \wedge g)(x) = f(x) \wedge g(x)$
+\item \textit{Rule 3:} $f^{'}(x) = (f(x))^{'}$
+\item \textit{Rule 4:} $0(x) = 0$
+\item \textit{Rule 5:} $1(x) = 1$
+
+\end{itemize}
+
+Let $V^{U}$ be the set of all mappings from $U$ into $V$. Then $(V^{U},\vee,\wedge,',0,1)$ is a De Morgan algebra. If $V$ is a complete lattice, then so is $V^{U}$.
+\end{thm}
+
+\begin{proof}
+Let $f$, $g$ and $h$ be arbitrary mappings from $U$ to $V$, so they are elements in $V^{U}$. The lattice could be considered in two different ways, which are introduced in Theorem \ref{thm:latticetheorem2}. One is, a lattice could be seen as a partial order in which every pair of elements has a \textbf{sup} and a \textbf{inf}. The other is, a lattice is viewed as a set with a pair of operations satisfying the properties in Theorem \ref{thm:latticetheorem1}, where $\vee$, $\wedge$ have properties \textbf{idempotency}, \textbf{commutativity}, \textbf{associativity} and \textbf{identity absorption}. In order to prove that $V^{U}$ is a complete lattice, there are two points to be demonstrated, one is that $(V^{U},\vee,\wedge)$ is a lattice and the other is that each subset of $V^{U}$ has an inf and a sup.
+
+\begin{itemize}
+
+\item $(V^{U},\vee,\wedge)$ is a lattice.
+
+\begin{itemize}
+
+\item \textbf{idempotency}
+
+$(f \vee f)(x) = f(x) \vee f(x)$ by \textbf{rule 1}, $f(x) \in V$ since $f : U \rightarrow V$, and $(V,\vee,\wedge)$ is a complete lattice. Therefore, $f(x) \vee f(x) = f(x)$ by using idempotency over $V$. Thus, $(f \vee f)(x) = f(x)$, that is idempotent holds in $V^{U}$. $(f \wedge f)(x) = f(x)$ could be proved in a similar way.
+
+\item \textbf{commutativity}
+
+\begin{tabular}{l l l l}
+$(f \vee g)(x)$ & $=$ & $f(x) \vee g(x)$ & (\textbf{Rule 1}) \\
+                & $=$ & $g(x) \vee f(x)$ & (\textbf{Commutative Rule} over $V$) \\
+                & $=$ & $(g \vee f)(x)$ & (\textbf{Rule 1}) \\
+\end{tabular}
+
+$(f \wedge g)(x) = f(x) \wedge g(x)$ could be proved in the same way.
+ 
+\item \textbf{associativity}
+
+\begin{tabular}{l l l l}
+
+$((f \vee g) \vee h)(x)$ &$=$&$(f \vee g)(x) \vee h(x)$&(\textbf{Rule 1}) \\
+                         &$=$&$(f(x) \vee g(x)) \vee h(x)$&(\textbf{Rule 1}) \\
+                         &$=$&$f(x) \vee (g(x) \vee h(x))$& \\
+                         &   &\multicolumn{2}{r}(\textbf{Associative Rule} over $V$) \\
+                         &$=$&$f(x) \vee ((g \vee h)(x))$&(\textbf{Rule 1}) \\
+                         &$=$&$(f \vee (g \vee h))(x)$&(\textbf{Rule 1})
+\end{tabular}
+
+$((f \wedge g) \wedge h)(x) = (f \wedge (g \wedge h))(x)$ could be proved in the same way.
+
+\item \textbf{absorption identities}
+
+\begin{tabular}{l l l l}
+$(f \vee (f \wedge g))(x)$&$=$&$f(x) \vee (f(x) \wedge g(x))$&(\textbf{Rule 1})\\
+                          &$=$&$f(x)$& \\
+                          & & \multicolumn{2}{r}(\textbf{Absorption identities} over $V$)\\
+\end{tabular}
+
+$(f \wedge (f \vee g))(x) = f(x)$ could be proved in the same way.
+\end{itemize}
+
+\item Each subset of $V^{U}$ has an inf and a sup.
+
+Since $(V^{U},\vee,\wedge)$ is a lattice, then every pair of elements in $V^{U}$ has an inf and a sup. It implies that each subset of $V^{U}$ also has an inf and a sup, the proof can be done inductively, and can be found in \cite{DP03}.
+\end{itemize}
+\end{proof}
+
+
+
+

@@ -1,0 +1,26 @@
+\subsubsection{Psychology}
+The importance of similarity in psychological theory was indicated by Attneave \cite{A50} who stated that `` It is obvious that when things are similar they are similar with respect to something. The characteristics with respect to which objects are similar may be conceptualized either as more or less discrete and common elements or as dimensions on which the objects have some degree of proximity.'' In psychological literature, these two approaches have been categorized as \textit{content models} and \textit{distance models} of similarity, respectively.
+
+Numerous set-theoretical measures. referred to as \textit{content models} of similarity have been proposed. Several of these are generalized by the ratio model of similarity \cite{T77}, as
+\begin{equation}\label{generalized similarity}
+S_{\alpha,\beta}(X,Y)=\frac{f(X \cap Y)}{f(X \cap Y)+\alpha f(X \cap \overline{Y})+\beta f(Y \cap \overline{X})}
+\end{equation}
+Typically, the function $f$ is taken to be the cardinality. 
+
+With $\alpha=\beta=1$ \cite{J08}, 
+\begin{equation}
+S_{1,1}=\frac{f(X \cap Y)}{f(X \cup Y)}
+\end{equation}
+which is the same as \textit{Jaccard index}. 
+
+With $\alpha=\beta=\frac{1}{2}$,
+\begin{equation}
+S_{\frac{1}{2},\frac{1}{2}}=\frac{2f(X \cap Y)}{f(X) + f(Y)}
+\end{equation}
+
+The common feature of \textit{distance models} in psychology is that similarity is considered to be the complement of distance with respect to a given space. In the traditional approaches, the distance was measured in Euclidean space \cite{G46,R38,T65,YH59}. The familiar Euclidean distance between two points $X=[x_1, x_2, \dots, x_n]$ and $Y=[y_1, y_2, \dots, y_n]$ in n-dimensional space called \textit{p-norm} is
+\begin{equation}\label{p-norm distance}
+d_p (X,Y) = (\sum_{i=1}^{n}\lvert x_i - y_i \rvert ^p)^{1/p}
+\end{equation}
+ 
+\textit{1-norm distance} $= \sum_{i=1}^{n} \lvert x_i - y_i \rvert$ is also called \textit{taxicab norm} or \textit{Manhattan distance}. \textit{2-norm distance} $= (\sum_{i=1}^{n}\lvert x_i - y_i \rvert ^2)^{1/2}$ is the \textit{Euclidean distance}, where $p=2$.

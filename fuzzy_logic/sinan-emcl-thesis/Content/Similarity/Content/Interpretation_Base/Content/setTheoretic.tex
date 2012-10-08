@@ -1,0 +1,44 @@
+\subsubsection{Set-Theoretic Measurement}
+\label{sec:Set Theory}
+In classical set theory \cite{ST80}, several properties of set such as full set, empty set, and also operations over it are defined, such as subsumption, equality, intersection, union and disjoin over two sets. But, as far as we know, there is no definition of similarity over two sets given by mathematicians. Let $A$ and $B$ be two sets, from those properties and operations given, the equality of two sets could described as,
+\begin{center}
+$A = B$ \textbf{iff} $A \subseteq B$ and $B \subseteq A$
+\end{center}
+And similarity of $A$ and $B$ could be understood by intuition that $A$ and $B$ share as many as possible identical elements in their sets. A extreme case is $A$ and $B$ have all the same elements, which means they are equal, $A = B$.
+
+Let $U$ be universe of discourse, which is a set including all the entities we are interested in. $A$ and $B$ are subsets of $U$, with their \textit{characteristic functions} or \textit{indicator functions} $\chi_{A}$ and $\chi_{B}$, respectively.
+In our proposal, similarity between $A$ and $B$ considers not only \textit{positive commonality}, same elements in $A$ and $B$, 
+but also \textit{negative commonality}, same elements in $\overline{A}$ and $\overline{B}$. We extend the formula \eqref{simple matching coefficient} into crisp set using \textit{characteristic function}. Operations over sets such as \textit{complement} and \textit{union} are represented as follows.
+\[\chi_{\overline{S}}(e)=1-\chi_{S}(e)\]
+\[\chi_{S1 \cap S2}(e)=min\{\chi_{S1}(e), \chi_{S2}(e)\}\]
+$A \cap B$ and $\overline{A} \cap \overline{B}$ could be represented as follows.
+\[\chi_{A \cap B}(x)=min\{\chi_{A}(x), \chi_{B}(x)\}\]
+\[\chi_{\overline{A} \cap \overline{B}}(x)=min\{1-\chi_{A}(x), 1-\chi_{B}(x)\}=1-max\{\chi_{A}(x), \chi_{B}(x)\}\]
+According to the definition of \textit{cardinality}, set could be distributed into \textit{finite set} and \textit{infinite set}.  
+
+The cardinality of $A \cap B$ and $\overline{A} \cap \overline{B}$ are represented as,
+\[\lvert A \cap B \rvert = \sum_{i=1}^{n} \chi_{A \cap B}(e_i)\]
+\[\lvert \overline{A} \cap \overline{B} \rvert = \sum_{i=1}^{n} \chi_{\overline{A} \cap \overline{B}}(e_i)\]
+when $U$ is \textit{finite set} with cardinality $n$, which makes,
+\begin{equation}\label{positive}
+\lvert A \cap B \rvert = \sum_{i=1}^{n} min\{\chi_{A}(e_i), \chi_{B}(e_i)\}
+\end{equation}
+\begin{equation}\label{negative}
+\lvert A \cap B \rvert = \sum_{i=1}^{n} 1-max\{\chi_{A}(e_i), \chi_{B}(e_i)\}=n-\sum_{i=1}^{n} max\{\chi_{A}(e_i), \chi_{B}(e_i)\}
+\end{equation}
+
+By substituting  the set $\lvert A \cap B \rvert$ and $\lvert \overline{A} \cap \overline{B} \rvert$ in \textit{simple matching coefficient} formula \eqref{simple matching coefficient} with \eqref{positive} and \eqref{negative}, we obtain formula of similarity between two crisp sets,
+
+\begin{align}
+Sim(A,B) & = \frac{\sum_{i=1}^{n} min\{\chi_{A}(e_i), \chi_{B}(e_i)\}+n-\sum_{i=1}^{n} max\{\chi_{A}(e_i), \chi_{B}(e_i)\}}{n}\}\notag \\
+&=1-\frac{\sum_{i=1}^{n} (max\{\chi_{A}(e_i), \chi_{B}(e_i)\}- min\{\chi_{A}(e_i), \chi_{B}(e_i)\})}{n}\notag \\
+&=1-\frac{\sum_{i=1}^{n} \lvert \chi_{A}(e_i) - \chi_{B}(e_i) \rvert}{n}\notag \label{FiniteSimSetTheory}\\
+\end{align}
+
+When the set $U$ is \textit{infinite}, for instance, a set of real numbers \textbf{R}, we generalized the similarity between two \textit{inifinite sets} from formula \eqref{FiniteSimSetTheory} as:
+\begin{equation}\label{InfiniteSimSetTheory}
+Sim(A,B)=1- \frac{\int_{x_{low}}^{x_{up}}\lvert \chi_{A}(x) - \chi_{B}(x) \rvert\, \mathrm{d}x}{\int_{x_{low}}^{x_{up}}\mathrm{d}x}
+\end{equation}
+where $x_{low}$ and $x_{up}$ are the \textit{lower bound} and \textit{upper bound} of set $U$, respectively.
+
+ 

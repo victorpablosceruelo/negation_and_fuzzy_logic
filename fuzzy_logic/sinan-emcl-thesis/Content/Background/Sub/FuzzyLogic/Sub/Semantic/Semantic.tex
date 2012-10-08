@@ -1,0 +1,13 @@
+\subsubsection{Semantics}
+\label{sec:FLSemantics}
+In classical logic, the interpretation of formula only could be $0$ or $1$, but in fuzzy interpretation, the real number $v \in [0,1]$ is assigned to an \textit{atom}.
+
+Let $\mathbb{T}$ be an interval $[0,1]$, which is a value pool the atoms will be assigned to. 
+$(\mathbb{T},\leq)$ is a complete lattice as we know from lattice section.
+A \textit{valuation} $\sigma : V \rightarrow \mathbb{HU}$ is an assignment of ground terms to variables. Each valuation $\sigma$ uniquely constitutes a mapping 
+$\hat{\sigma} : TU_{\Pi,\Sigma,V} \rightarrow \mathbb{HB}$ that is defined in the obvious way.
+A \textit{fuzzy Herbrand interpretation} of a fuzzy logic is a mapping 
+$I: \mathbb{HB} \rightarrow \mathbb{T}$ that assigns truth values to ground atoms.
+
+For two interpretations $I$ and $J$, we say $I$ \textit{is less than or equal to} $J$, written $I \sqsubseteq J$, iff $I(A) \preceq J(A)$ for all $A \in \mathbb{HB}$. Two interpretations $I$ and $J$ are equal, written $I = J$, iff $I \sqsubseteq J$ and $J \sqsubseteq I$. Minimum and maximum for interpretations are defined from $\preceq$ as usual.
+Accordingly, the infimum and supremum of interpretation are, for all $A \in \mathbb{HB}$, defined as $(I \sqcap J)(A) = min(I(A),J(A))$ and $(I \sqcup J)(A) = max(I(A),J(A))$.

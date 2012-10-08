@@ -1,0 +1,20 @@
+\subsection{Intuition}
+\label{sec:intuition}
+Dropping all the possible mathematical symbols, returning to the intuition as human beings, let us ask ourselves what the similarity is. We could say, I am similar to my parents, since I get the genes from both of them, live with them for a long time, am educated by them, we like the similar food, movies and even do the similar work. Also we would say, I am similar to my friends, we make friends of each other because we have the same hobbies or like the same football stars. Taking Facebook as an example, your friends on it are probably someone you know in the real life, such as your classmates, your professors, and your relatives. Also, if you like cats, your friends on Facebook could be people who also like cats. Facebook is so warm-hearted that it even tries to find you new friends according to the characteristics you have in common with others. The warm-hearted could be considered to be an application of similarity, also the intuition of it. Facebook calculates the intersection of friend group of yours and your friends', then it supposes that friends of most your friends« but not in your friend circle are highly your friends too. Here is an example.
+\begin{ex}
+% Picture of phoenix's friends
+Each point represents one person, the ``friendship" is a binary relation over the set of persons. Using mathematical representation, it will be formalized as follows: the set $U$ consists of all the persons, and $p$ represents `Phoenix', and $f_a$, $f_b$, $f_c$, $f_d$ are friends of Phoenix's. The $newGuy$ is a common friend of $f_a$, $f_b$, $f_c$, $f_d$'s, but not Phoenix's. When we pose the query `` Who are Phoenix's friends ?'', we are actually asking ``who are the persons connected to Phoenix by the relation friendship ?''. Answering it, $f_a$, $f_b$, $f_c$, $f_d$ will be returned, however it is not sure about whether $newGuy$ is in Phoenix's friend circle under open world assumption (OWA). The information of this example is shown in the graph \ref{fig: Phoenix«s friend}, 
+\input{Content/Similarity/Content/Interpretation_Base/Content/G0}
+
+Let $F_{i}$ be a set of $i$'s friends, we consider each element is a friend of itself.
+\[F_{f_a}=\{p,f_a,f_b,f_c,f_d,newGuy\}\]
+\[F_{f_b}=\{p,f_a,f_b,f_c,f_d,newGuy\}\]
+\[F_{f_c}=\{p,f_a,f_b,f_c,f_d,newGuy\}\]
+\[F_{f_d}=\{p,f_a,f_b,f_c,f_d,newGuy\}\]
+grouped by the red circle.
+\[F_{p}=\{p,f_a,f_b,f_c,f_d\}\]
+grouped by the green circle. $F_{p}$ possibly have one more element, ``newGuy". Since for every element $i$ in $F_{p}$ except $p$ itself, the set $F_{i}$ includes $newGuy$ and all the elements in $F_{p}$.
+
+It makes sense in reality, suppose that all your friends know Bill, so at least one of your friends probably will introduce you to Bill, then you and Bill will know each other and make friends. That is exactly what Facebook does when searching automatically for your new potential friends.
+\end{ex}
+As we have seen in the previous example, the similarity could be drawn by interpreting the knowledge base, and used as a training system to predicate possible results. Before we start to discuss the similarity between predicates, some related research work based on this intuition is presented in the next section.

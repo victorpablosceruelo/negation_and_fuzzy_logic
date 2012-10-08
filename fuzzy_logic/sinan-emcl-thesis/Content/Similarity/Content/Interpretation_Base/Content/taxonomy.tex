@@ -1,0 +1,29 @@
+\subsubsection{Taxonomy}
+In taxonomy an object is characterized by the possession or nonpossession of certain attributes. Normally, a domain $U$ represents the set of attributes used in the taxonomic classification. Using this characterization, a comparison of two objects can be based upon the commonality of the attributes.
+
+Let $X$ and $Y$ be two objects. For each attribute there are four possibilities : present in $X$ and $Y$, present in $X$ and absent in $Y$ , absent in $X$ and present in $Y$, and absent in $X$ and $Y$. The number of attributes satisfying each of those combinations is $\lvert X \cap Y \rvert$, $\lvert X \cap \overline{Y} \rvert$, $\lvert \overline{X} \cap Y \rvert$, $\lvert \overline{X} \cap \overline{Y} \rvert$ respectively, where $\lvert Z \rvert$ is the cardinality of the set $Z$.
+Using the commonality of attributes as the foundation, Jaccard \cite{J08} proposed 
+\begin{align}
+S_{XY}  & = \frac{\lvert X \cap Y \rvert}{\lvert X \cap Y \rvert + \lvert X \cap \overline{Y} \rvert + \rvert \overline{X} \cap Y \lvert} \notag \\
+	      & = \frac{\lvert X \cap Y \rvert}{\lvert X \cup Y \rvert} \notag \label{Jaccard index}\\	
+\end{align}
+which is called \textit{Jaccard Index}. It is an unparameterized ratio model of similarity.
+
+The number of common deficiencies in two objects, $\lvert \overline{X} \cap \overline{Y} \rvert$, is not included in the \textit{Jaccard index}.  However, in some cases where two objects do not possess certain attributes also contributes to the similarity value between them. Another form of the ratio model, called the \textit{simple matching coefficient} \cite{SS63}, includes the common deficiencies and is written 
+\begin{align}
+\hat{S}_{XY} & = \frac{\lvert X \cap Y \rvert + \lvert \overline{X} \cap \overline{Y} \rvert}{\lvert X \cap Y \rvert + \lvert X \cap \overline{Y} \rvert + \lvert \overline{X} \cap Y \rvert + \lvert \overline{X} \cap \overline{Y} \rvert} \notag \\
+	              & =  \frac{\lvert X \cap Y \rvert + \lvert \overline{X} \cap \overline{Y} \rvert}{\lvert U \rvert} \notag \label{simple matching coefficient}\\
+\end{align}
+
+The main distinction between $S_{XY}$ and $\hat{S}_{XY}$ is that similarity measured by $S_{XY}$ is solely based on the number of \textit{positive matches} for the attributes, while $\hat{S}_{XY}$ considers both $\textit{positive matches}$ and $\textit{negative matches}$ over the complete set of attributes.
+
+Another approach used in numerical taxonomy represents an object as a vector of attribute values represented as real numbers \cite{B69}. An object $X$ defined by $n$ attributes is represented as a vector $[x_1, x_2, \dots, x_n]$ where $x_i$ is the value of the $i$th attribute. The similarity between objects $X=[x_1, x_2, \dots, x_n]$ and $Y=[y_1, y_2, \dots, y_n]$ is obtained from the cosine of the angle $\theta$ between the two vectors from the origin of the n-space describing the objects,
+\begin{equation}\label{consine measurement}
+\cos \theta = \frac{\sum_{i=1}^{n}(x_i.y_i)}{((\sum x_i^2)^{0.5}.(\sum y_i^2)^{0.5})}
+\end{equation}
+
+The mean character difference (Hamming or city-block distance),
+\begin{equation}\label{Hamming distance}
+d_{CMD} = \frac{1}{n}\sum \lvert x_i - y_i \rvert
+\end{equation}
+has been proposed as a measure of taxonomic resemblance \cite{JH58} when the objects are represented by real-value vectors. When basing a similarity assessment on a metric analysis, a value $0$ represents maximal similarity and similarity decreases with the distance between the objects.
