@@ -152,15 +152,10 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			// Get the value of the parameter; the name is case-sensitive
-			String id = (String) session.getAttribute("id");
+			String id = (String) request.getParameter("id");
+			// Only if parameter does not contain the id we try with the one saved in session.
 			if ((id == null) || ("".equals(id))) {
-				id = request.getParameter("id");
-			}
-			else {
-				if ((request.getParameter("id") != null) &&
-					(! request.getParameter("id").equals(id))) {
-					LOG.info("INFO: user has tried to authenticate with a different provider. Strange. ");
-				}
+				id = (String) session.getAttribute("id");
 			}
 				
 			if ((id == null) || ("".equals(id))) {
