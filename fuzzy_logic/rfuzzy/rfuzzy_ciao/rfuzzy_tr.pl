@@ -7,7 +7,7 @@
 :- include(library('rfuzzy/rfuzzy_ops')).
 
 % Important info to be saved.
-:- data predicate_definition/4.
+:- data predicate_definition/5.
 :- data aggregators/1.
 :- data sentences/2.
 
@@ -43,14 +43,14 @@ translation_info('non_rfuzzy_fuzzy_rule',  'fuzzy_rule', 0, 'no', 0,         "no
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity) :-
-	print_msg('debug', 'save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)', save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)),
+save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity) :-
+	print_msg('debug', 'save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)', save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)),
 	save_predicate_definition_test_categories(Category, Sub_Category), % Only valid values, please.
 	
 	(
 	    (	 
-		retract_fact(predicate_definition(Category, Pred_Name, Pred_Arity, List)), !, % Retract last
-		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)|List]))
+		retract_fact(predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, List)), !, % Retract last
+		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)|List]))
 	    )
 % Just try to explain me why it is not allowed ...
 %	;
@@ -61,18 +61,18 @@ save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pre
 %	    )
 	;
 	    (
-		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)]))
+		assertz_fact(predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, [(Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)]))
 	    )
 	), 
-	print_msg('debug', 'saved', save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)),
+	print_msg('debug', 'saved', save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)),
 	!.		 
 
-retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
-	print_msg('debug', 'retrieve_predicate_info(Category, Name, Arity, List, Show_Error)', retrieve_predicate_info(Category, Name, Arity, List, Show_Error)),
+retrieve_predicate_info(Category, Name, Arity, Pred_Type, List, Show_Error) :-
+	print_msg('debug', 'retrieve_predicate_info(Category, Name, Arity, Pred_Type, List, Show_Error)', retrieve_predicate_info(Category, Name, Arity, Pred_Type, List, Show_Error)),
 	save_predicate_definition_test_categories(_AnyValidCategory, Category),
 	(
 	    (   
-		predicate_definition(Category, Name, Arity, List), !   
+		predicate_definition(Category, Name, Arity, Pred_Type, List), !   
 	    )
 	;
 	    (  
@@ -94,8 +94,8 @@ retrieve_predicate_info(Category, Name, Arity, List, Show_Error) :-
 	).
 
 retrieve_all_predicate_info_with_category(Category, Retrieved) :-
-	findall((predicate_definition(Category, Name, Arity, List)),
-	(retract_fact(predicate_definition(Category, Name, Arity, List))), Retrieved),
+	findall((predicate_definition(Category, Name, Arity, Pred_Type, List)),
+	(retract_fact(predicate_definition(Category, Name, Arity, Pred_Type, List))), Retrieved),
 	 !.
 	
 save_predicate_definition_test_categories(Category, Sub_Category) :-
@@ -208,8 +208,8 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value)), (Fuzzy_H)) :-
 	nonvar(Pred_Name), % Name can not be a variable.
 
 	functor(H, Pred_Name, Pred_Arity),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(H, 'default_without_cond', 'yes', Fuzzy_H, Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(H, _H_Type, 'default_without_cond', 'yes', Fuzzy_H, Value),
 	!. % Backtracking forbidden.
 
 % Conditional default
@@ -224,8 +224,8 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if Pred2_Name/P
 	nonvar(Pred2_Name), % Pred2_Name cannot be a variable.
 	
 	functor(H, Pred_Name, Pred_Arity),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(H, 'default_with_cond', 'yes', Fuzzy_H, Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(H, _H_Type, 'default_with_cond', 'yes', Fuzzy_H, Value),
 	
 	functor(H_Cond, Pred2_Name, Pred2_Arity),
 	copy_args(Pred_Arity, H_Cond, H), !.   % Copy args from main functor.
@@ -238,15 +238,15 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Value) if thershold(Pr
 	nonvar(Pred_Name), nonvar(Pred2_Name), % They cannot be variables.
 	
 	functor(Aux_Pred_Functor, Pred_Name, Pred_Arity),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Aux_Pred_Functor, 'default_with_cond', 'yes', Pred_Functor, Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Aux_Pred_Functor, _Aux_Pred_Type, 'default_with_cond', 'yes', Pred_Functor, Value),
 	functor(Aux_Pred2_Functor, Pred2_Name, Pred2_Arity),
 	copy_args(Pred2_Arity, Aux_Pred_Functor, Aux_Pred2_Functor),
 
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Aux_Pred2_Functor, 'fuzzy_rule', 'no', Pred2_Functor, Truth_Value_For_Thershold),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Aux_Pred2_Functor, _Aux_Pred2_Type, 'fuzzy_rule', 'no', Pred2_Functor, Truth_Value_For_Thershold),
 	functor(Pred2_Functor, Pred2_Functor_Name, Pred2_Functor_Arity),
-	retrieve_predicate_info('fuzzy_rule', Pred2_Functor_Name, Pred2_Functor_Arity, _List, 'yes'), !,	
+	retrieve_predicate_info('fuzzy_rule', Pred2_Functor_Name, Pred2_Functor_Arity, _Pred2_Functor_Type, _List, 'yes'), !,	
 	print_msg('debug', 'translate', 'condition (over | under)'),
 	(
 	    (
@@ -268,8 +268,8 @@ translate((Head value Value), (Fuzzy_Head :- Fuzzy_Body)):-
 	print_msg('debug', 'fact conversion :: IN ',(Head value Value)),
 	number(Value),                    % Value must be a number.
 
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Head, 'fact', 'yes', Fuzzy_Head, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Head, _Head_Type, 'fact', 'yes', Fuzzy_Head, Truth_Value),
 	functor(Fuzzy_Body, '.=.', 2),
 	arg(1, Fuzzy_Body, Truth_Value),
 	arg(2, Fuzzy_Body, Value),
@@ -284,10 +284,10 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Aggregator_Name, Aggregator_Arity, _List, 'yes'),
+	retrieve_predicate_info('crisp', Aggregator_Name, Aggregator_Arity, Aggregator_Type, _List, 'yes'),
 
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, SubCategory, Fuzzy_Name, Fuzzy_Arity), !.
-	save_predicate_definition('aggregator', Aggregator_Name, Aggregator_Arity, 'aggregator', Aggregator_Name, Aggregator_Arity),
+	save_predicate_definition('aggregator', Aggregator_Name, Aggregator_Arity, Aggregator_Type, 'aggregator', Aggregator_Name, Aggregator_Arity),
 	!.
 
 % function definition.
@@ -298,8 +298,8 @@ translate((Head :# List), (Fuzzy_H :- (Body, print_msg('debug', 'function_call',
 
 	functor(Head, Name, 0),
 	functor(H, Name, 1),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(H, 'function', 'yes', Fuzzy_H, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(H, _H_Type, 'function', 'yes', Fuzzy_H, Truth_Value),
 
 	arg(1, Fuzzy_H, X),
 	build_straight_lines(X, Truth_Value, List, Body).
@@ -315,8 +315,8 @@ translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
 		nonvar(Types),
 		
 		functor(H, Pred_Name, Pred_Arity),
-		% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-		translate_functor(H, 'type', 'yes', Fuzzy_H, _Unused_Truth_Value),
+		% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+		translate_functor(H, Types, 'type', 'yes', Fuzzy_H, _Unused_Truth_Value),
 		translate_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
 	    )
 	;
@@ -343,8 +343,8 @@ translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 	test_aggregator_is_defined(Cred_Op, 'yes'),
 
 	functor(New_Predicate_Functor, New_Predicate_Name, Arity), 
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(New_Predicate_Functor, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value_Out),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(New_Predicate_Functor, _NPF_Type, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value_Out),
 
 	functor(Credibility_Functor, Cred_Op, 3), 
 	Credibility_Functor=..[Cred_Op, Truth_Value_In, Cred, Truth_Value_Out],
@@ -353,7 +353,7 @@ translate(rfuzzy_synonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 	Arity_plus_2 is Arity_plus_1 + 1,
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _List, 'yes'),
+	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _Existing_Pred_Type, _List, 'yes'),
 
 	add_preffix_to_name(Existing_Predicate_Name, "rfuzzy_aux_", Existing_Predicate_Aux_Name),
 	functor(Existing_Predicate_Aux_Functor, Existing_Predicate_Aux_Name, Arity_plus_2),
@@ -369,8 +369,8 @@ translate(rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 	test_aggregator_is_defined(Cred_Op, 'yes'),
 
 	functor(New_Predicate_Functor, New_Predicate_Name, Arity), 
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(New_Predicate_Functor, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value_Out),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(New_Predicate_Functor, _NPF_Type, 'synonym', 'yes', Fuzzy_Pred_Functor, Truth_Value_Out),
 
 	functor(Credibility_Functor, Cred_Op, 3), 
 	Credibility_Functor=..[Cred_Op, Truth_Value_Aux, Cred, Truth_Value_Out],
@@ -379,7 +379,7 @@ translate(rfuzzy_antonym(Existing_Predicate_Name/Arity, New_Predicate_Name/Arity
 	Arity_plus_2 is Arity_plus_1 + 1,
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _List, 'yes'),
+	retrieve_predicate_info('fuzzy_rule', Existing_Predicate_Name, Arity_plus_1, _Existing_Pred_Type, _List, 'yes'),
 
 	add_preffix_to_name(Existing_Predicate_Name, "rfuzzy_aux_", Existing_Predicate_Aux_Name),
 	functor(Existing_Predicate_Aux_Functor, Existing_Predicate_Aux_Name, Arity_plus_2),
@@ -392,8 +392,8 @@ translate(rfuzzy_quantifier(Quantifier_Name/Arity, Condition, TV_Thershold), Tra
 	!,
 	nonvar(Quantifier_Name), nonvar(Condition), number(TV_Thershold), number(Arity), Arity = 1,
 	functor(Quantifier_Functor_Aux, Quantifier_Name, Arity),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Quantifier_Functor_Aux, 'quantifier', 'yes', Quantifier_Functor, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Quantifier_Functor_Aux, _QF_Type, 'quantifier', 'yes', Quantifier_Functor, Truth_Value),
 	arg(1, Quantifier_Functor, Fuzzy_Predicate_Functor_In),
 	
 	(
@@ -432,11 +432,11 @@ translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'translate: rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2)', rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2)),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Crisp_P, 2, _List_1, 'yes'),
-	retrieve_predicate_info('function', Funct_P, 2, _List_2, 'yes'),
+	retrieve_predicate_info('crisp', Crisp_P, 2, _Pred_Type_1, _List_1, 'yes'),
+	retrieve_predicate_info('function', Funct_P, 2, _Pred_Type_2, _List_2, 'yes'),
 	functor(Pred_Functor, Pred, 1),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Pred_Functor, 'fuzzification', 'yes', Fuzzy_Pred_Functor, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Pred_Functor, _PF_Type, 'fuzzification', 'yes', Fuzzy_Pred_Functor, Truth_Value),
 
 	% We need to do here as in other translations, so 
 	% it generates aux and main predicates for fuzzifications too.
@@ -452,7 +452,7 @@ translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred
 
 translate(rfuzzy_non_rfuzzy_fuzzy_rule(Pred_Name/Pred_Arity), []) :-
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)	
-	save_predicate_definition('fuzzy_rule', Pred_Name, Pred_Arity, 'non_rfuzzy_fuzzy_rule', Pred_Name, Pred_Arity).
+	save_predicate_definition('fuzzy_rule', Pred_Name, Pred_Arity, _Pred_Type, 'non_rfuzzy_fuzzy_rule', Pred_Name, Pred_Arity).
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
@@ -476,7 +476,7 @@ translate(Other, Other) :-
 	    )
 	),
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)
-	save_predicate_definition('crisp', Name, Arity, 'crisp', Name, Arity).
+	save_predicate_definition('crisp', Name, Arity, _Pred_Type, 'crisp', Name, Arity).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -487,8 +487,8 @@ translate_rule(Head, Cred_Op, Cred, Body, (Fuzzy_Head :- Fuzzy_Body)) :-
 	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
 
 	% Change head's name.
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Head, 'rule', 'yes', Fuzzy_Head, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Head, _H_Type, 'rule', 'yes', Fuzzy_Head, Truth_Value),
 
 	% Translate all predicates in the body.
 	extract_aggregator(Body, TV_Aggregator, Tmp_Body),
@@ -518,7 +518,7 @@ test_aggregator_is_defined(Aggregator_Op_Name, _Show_Error) :-
 test_aggregator_is_defined(Aggregator_Op_Name, Show_Error) :-
 	nonvar(Aggregator_Op_Name),
  	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('aggregator', Aggregator_Op_Name, 3, _List, Show_Error), !.
+	retrieve_predicate_info('aggregator', Aggregator_Op_Name, 3, _Pred_Type, _List, Show_Error), !.
 
 	
 
@@ -549,8 +549,8 @@ translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
 	nonvar(Body_F_In),
 	functor(Body_F_In, Pred_Name, 1),
 	functor(Body_F, Pred_Name, 1),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Body_F, 'quantifier', 'no', Fuzzy_Functor, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Body_F, _BF_Type, 'quantifier', 'no', Fuzzy_Functor, Truth_Value),
 	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
 	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity)', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
 	test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
@@ -567,11 +567,11 @@ translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
 translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
 	nonvar(Body_F),
-	% translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_functor(Body_F, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value),
+	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+	translate_functor(Body_F, _BF_Type, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value),
 	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('fuzzy_rule', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _List, 'yes'), !,
+	retrieve_predicate_info('fuzzy_rule', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _Pred_Type, _List, 'yes'), !,
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value, Fuzzy_Functor)',(Body_F, Truth_Value, Fuzzy_Functor)),
 	print_msg_nl('debug').
 
@@ -587,7 +587,7 @@ test_quantifier_is_defined(Quantifier_Name, _Quantifier_Arity) :-
 	memberchk_local(Quantifier_Name, Quantifiers_List), !. 
 test_quantifier_is_defined(Quantifier_Name, Quantifier_Arity) :-
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('quantifier', Quantifier_Name, Quantifier_Arity, _List, 'no'), !.
+	retrieve_predicate_info('quantifier', Quantifier_Name, Quantifier_Arity, _Pred_Type, _List, 'no'), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -611,7 +611,7 @@ translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
 translate_each_type_aux(H, Actual, Type, Type_F) :-
 	print_msg('debug', 'translate_each_type_aux(H, Actual, Type)', translate_each_type_aux(H, Actual, Type)),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Type, 1, _List, 'yes'), !,	
+	retrieve_predicate_info('crisp', Type, 1, _Pred_Type, _List, 'yes'), !,	
 	functor(Type_F, Type, 1), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
@@ -660,7 +660,7 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 % ------------------------------------------------------
 
 
-translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value) :-
+translate_functor(Functor, Pred_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value) :-
 	print_msg('debug', 'translate_functor(Functor, Category)', translate_functor(Functor, Category)),
 	functor(Functor, Name, Arity),
 	translation_info(Category, Sub_Category_Of, Add_Args, Fix_Priority, Priority, Preffix_String),
@@ -671,7 +671,7 @@ translate_functor(Functor, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
 	copy_args(Arity, Functor, Fuzzy_Functor), !,
 	translate_functor_add_args(Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, Priority, Truth_Value),
 	print_msg('debug', 'translate_functor :: added args: Fuzzy_Functor', Fuzzy_Functor),
-	translate_functor_save_predicate_def(Save_Predicate, Sub_Category_Of, Name, Arity, Category, Fuzzy_Name, Fuzzy_Arity),
+	translate_functor_save_predicate_def(Save_Predicate, Sub_Category_Of, Name, Arity, Pred_Type, Category, Fuzzy_Name, Fuzzy_Arity),
 	print_msg('debug', 'translate_functor :: result: (Fuzzy_Functor, Truth_Value)', (Fuzzy_Functor, Truth_Value)).
 
 
@@ -699,15 +699,15 @@ translate_functor_add_args(Fuzzy_Functor, Fuzzy_Arity, Add_Args, Fix_Priority, P
 	), !.
 
 % translate_functor_save_predicate(Save_Predicate, Sub_Category_Of, Category, Name, Arity).
-translate_functor_save_predicate_def('no', _Sub_Category_Of, _Pred_Name, _Pred_Arity, _Category, _Fuzzy_Name, _Fuzzy_Arity) :- !.
-translate_functor_save_predicate_def('yes', '', Pred_Name, Pred_Arity_In, Category, Fuzzy_Name, Fuzzy_Arity) :- !,
+translate_functor_save_predicate_def('no', _Sub_Category_Of, _Pred_Name, _Pred_Arity, _Pred_Type, _Category, _Fuzzy_Name, _Fuzzy_Arity) :- !.
+translate_functor_save_predicate_def('yes', '', Pred_Name, Pred_Arity_In, Pred_Type, Category, Fuzzy_Name, Fuzzy_Arity) :- !,
 	translation_info(Category, '', Add_Args, _Fix_Priority, _Priority, _Preffix_String),
 	Pred_Arity is Pred_Arity_In + Add_Args,
-	save_predicate_definition(Category, Pred_Name, Pred_Arity, Category, Fuzzy_Name, Fuzzy_Arity), !.
-translate_functor_save_predicate_def('yes', Sub_Category_Of, Pred_Name, Pred_Arity_In, Category, Fuzzy_Name, Fuzzy_Arity) :- !,
+	save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Category, Fuzzy_Name, Fuzzy_Arity), !.
+translate_functor_save_predicate_def('yes', Sub_Category_Of, Pred_Name, Pred_Arity_In, Pred_Type, Category, Fuzzy_Name, Fuzzy_Arity) :- !,
 	translation_info(Sub_Category_Of, '', Add_Args, _Fix_Priority, _Priority, _Preffix_String),
 	Pred_Arity is Pred_Arity_In + Add_Args,
-	save_predicate_definition(Sub_Category_Of, Pred_Name, Pred_Arity, Category, Fuzzy_Name, Fuzzy_Arity), !.
+	save_predicate_definition(Sub_Category_Of, Pred_Name, Pred_Arity, Pred_Type, Category, Fuzzy_Name, Fuzzy_Arity), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -748,7 +748,7 @@ build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | C
 	print_msg('debug', 'build_auxiliary_clauses OUT (Pred_Main, Pred_Aux)', (Pred_Main, Pred_Aux)),
 	build_auxiliary_clauses(Predicate_Defs, Clauses).	
 
-build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
+build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, _Pred_Type, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
 
 	Category = 'fuzzy_rule',
 	% Build MAIN functor.
@@ -850,7 +850,7 @@ lists_substraction([Head | Tail ], List_2, [Head | Result_List]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-test_if_list_contains_non_rfuzzy_fuzzy_rule(predicate_definition(_Category, _Pred_Name, _Pred_Arity, List)) :-
+test_if_list_contains_non_rfuzzy_fuzzy_rule(predicate_definition(_Category, _Pred_Name, _Pred_Arity, _Pred_Type, List)) :-
 	test_if_list_contains_non_rfuzzy_fuzzy_rule_aux(List).
 
 test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([('non_rfuzzy_fuzzy_rule', _Sub_Pred_Name, _Sub_Pred_Arity)|_List]) :- !.
@@ -861,19 +861,19 @@ test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([(_Category, _Sub_Pred_Name, _Su
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules) :-
+generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, [Fnot | Fuzzy_Rules]) :-
 	retrieve_all_predicate_info_with_category(_Any_Category, Retrieved),
 	generate_introspection_predicate_aux(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules_Tmp),
-	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules).
+	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules),
+	Fnot = (rfuzzy_introspection('quantifier', 'fnot', 2, _HasNoDefinedType)).
 
 % generate_introspection_predicate_aux(Input_List, Accumulator_List, Result_List),
-generate_introspection_predicate_aux([], Accumulator_List, [Fnot | Accumulator_List]) :- !,
-	Fnot = (rfuzzy_introspection('quantifier', 'fnot', 2)).
+generate_introspection_predicate_aux([], Accumulator_List, Accumulator_List) :- !.
 generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Result_List) :-
 	generate_introspection_predicate_real(Input, Output),
 	generate_introspection_predicate_aux(Input_List, [Output|Accumulator_List], Result_List).
 
-generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, Pred_Arity, _List), rfuzzy_introspection(Category, Pred_Name, Pred_Arity)).
+generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, _List), rfuzzy_introspection(Category, Pred_Name, Pred_Arity, Pred_Type)).
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
