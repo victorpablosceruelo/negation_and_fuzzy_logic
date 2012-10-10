@@ -64,21 +64,27 @@ public class ServletsAuxMethodsClass {
 	public static void addMessageToTheUser(HttpServletRequest request, String msg, Log LOG) {
 		if (request != null) {
 			HttpSession session = request.getSession(false);
-			String [] currentMsgs = (String []) session.getAttribute("msgs");
-			String [] newMsgs;
-			if (currentMsgs != null) {
-				newMsgs = new String[currentMsgs.length +1];
-				for (int i=0; i<currentMsgs.length; i++) {
-					newMsgs[i] = currentMsgs[i];
+			if (session != null) {
+				String [] currentMsgs = (String []) session.getAttribute("msgs");
+				String [] newMsgs;
+				if (currentMsgs != null) {
+					newMsgs = new String[currentMsgs.length +1];
+					for (int i=0; i<currentMsgs.length; i++) {
+						newMsgs[i] = currentMsgs[i];
+					}
+					newMsgs[currentMsgs.length] = msg;
 				}
-				newMsgs[currentMsgs.length] = msg;
+				else {
+					newMsgs = new String[1];
+					newMsgs[0] = msg;
+				}
+				session.removeAttribute("msgs");
+				session.setAttribute("msgs", newMsgs);
+				if (LOG != null) LOG.error("Added to the msgs session attribute in the request the msg \'" + msg + "\'");
 			}
 			else {
-				newMsgs = new String[1];
-				newMsgs[0] = msg;
+				if (LOG != null) LOG.error("Session is null.");
 			}
-			session.setAttribute("msgs", newMsgs);
-			if (LOG != null) LOG.error("Added to the msgs session attribute in the request the msg \'" + msg + "\'");
 		}
 		else {
 			if (LOG != null) LOG.error("request is null. ERROR");
