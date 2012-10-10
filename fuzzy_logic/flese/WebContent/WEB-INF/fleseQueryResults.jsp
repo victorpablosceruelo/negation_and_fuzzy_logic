@@ -17,15 +17,15 @@
     	<jsp:include page="commonBody.jsp" />
     	
     	<h3><a href="DataBasesMenuServlet">Program Files Menu</a> &gt; 
-    		<a href="DataBaseQueryServlet?op=query&database=<%=connection.getCurrentDatabase() %>&owner=<%=connection.getCurrentDatabaseOwner() %>">Perform a query</a> &gt; 
+    		<a href="DataBaseQueryServlet?op=query&database=<%=connection.getCurrentProgramFileName() %>&owner=<%=connection.getCurrentProgramFileOwner() %>">Perform a query</a> &gt; 
     		Results after evaluating the query </h3>
 		<br /><br />
     	
 		<h3>This are the results to your query <br />
 			<%=connection.getLastQuery() %>
 			<br /> 
-		 	to the database <%=connection.getCurrentDatabase() %> 
-			with owner <%=connection.getCurrentDatabaseOwner() %>
+		 	to the program file <%=connection.getCurrentProgramFileName() %> 
+			with owner <%=connection.getCurrentProgramFileOwner() %>
 		</h3>
 
 		<br /><br /><br /><br /><br />
