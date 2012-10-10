@@ -112,24 +112,20 @@ public class SocialAuthServlet extends HttpServlet {
 			request_mode = "signin";
 		}
 		
-		if ("signed".equals(request_mode)) {
-			socialAuthenticationSigned(request, response);
+		if ("signed".equals(request_mode)) socialAuthenticationSigned(request, response);
+		if ("signout".equals(request_mode)) socialAuthenticationSignOut(request, response);
+		if ("userInfo".equals(request_mode)) socialAuthenticationUserInfo(request, response);
+
+		if ("signin".equals(request_mode)) {
+			if (! socialAuthenticationInTestingMode(request, response)) {
+				socialAuthenticationSignIn(request, response);
+			}
 		}
-		else {
-			if ("signin".equals(request_mode)) {
-				if (! socialAuthenticationInTestingMode(request, response)) {
-					socialAuthenticationSignIn(request, response);
-				}
-			}
-			else {
-				if ("signout".equals(request_mode)) {
-					socialAuthenticationSignOut(request, response);
-				}
-				else {
-					LOG.info("ERROR: erroneous request_mode: " + request_mode);
-					socialAuthenticationSignOut(request, response);
-				}
-			}
+
+		if ((! "signed".equals(request_mode)) && (! "signin".equals(request_mode)) &&
+			(! "signout".equals(request_mode)) && (! "userInfo".equals(request_mode))) {
+			LOG.info("ERROR: erroneous request_mode: " + request_mode);
+			socialAuthenticationSignOut(request, response);
 		}
 	}
 		
@@ -186,8 +182,7 @@ public class SocialAuthServlet extends HttpServlet {
 
 			if (! error) {
 				// URL of YOUR application which will be called after authentication
-				String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-				String successUrl= appUrl + "/SocialAuthServlet?mode=signed";
+				String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSigned, request, LOG);
 
 				// get Provider URL to which you should redirect for authentication.
 				// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
@@ -333,6 +328,17 @@ public class SocialAuthServlet extends HttpServlet {
 
 	    return retval;
 	}
+	
+	private void socialAuthenticationUserInfo(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
+		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.UserInfo_Page, request, response, LOG);
+		}
+		else {
+			socialAuthenticationSignOut(request, response);
+		}
+	}
+	
 }
 
 

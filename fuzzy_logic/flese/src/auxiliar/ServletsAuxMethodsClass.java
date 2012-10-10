@@ -85,7 +85,7 @@ public class ServletsAuxMethodsClass {
 	}
 	
 
-	public static void log_request_parameters(HttpServletRequest request, Log LOG) throws IOException {
+	public static void logRequestParameters(HttpServletRequest request, Log LOG) throws IOException {
 		// Get the values of all request parameters
 		Enumeration<String> parametersEnum = request.getParameterNames();
 		String parameterName;
@@ -98,16 +98,12 @@ public class ServletsAuxMethodsClass {
 			String[] values = request.getParameterValues(parameterName);
 			for (int i=0; i<values.length; i++) {
 				LOG.info("Parameter name and value: " + parameterName + "[" + i + "]: " + values[i]);
-//				System.out.print(values[i]);
-//				System.out.print(", ");
 			}
-
-			// LOG.info(to_be_printed);
 		}
 		LOG.info("<end of attributes list>");
 	}
 	
-	public static String request_parameters(HttpServletRequest request, Log LOG) {
+	public static String requestParametersToString (HttpServletRequest request, Log LOG) {
 		Enumeration<String> parametersEnum = request.getParameterNames();
 		String parameterName;
 		String retString = "";
@@ -129,36 +125,26 @@ public class ServletsAuxMethodsClass {
 				}
 				retString += parameterName+"="+values[i];
 				counter++;
-//				System.out.print(values[i]);
-//				System.out.print(", ");
 			}
-
-			// LOG.info(to_be_printed);
 		}
 		LOG.info("<end of attributes list>");
 		return retString;
 	}
 	
-	public static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
+	private static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
 	    String requestUrl = request.getRequestURL().toString();
 	    String queryString = request.getQueryString();   // d=789
 	    
 	    if (LOG != null) {
-	    	if (requestUrl != null) {
-	    		LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
-	    	}
-	    	if (queryString != null) {
-	    		LOG.info("getUrlFromRequest: queryString: " + queryString);
-	    	}
+	    	if (requestUrl != null) LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
+	    	if (queryString != null) LOG.info("getUrlFromRequest: queryString: " + queryString);
 	    }
 	    
 	    if (requestUrl != null) {
 	    	Integer index = requestUrl.lastIndexOf("/"); // http:// ... /page
 	    	String appUrl = requestUrl.substring(0, index);
 	    	if (appUrl != null) {
-	    		if (LOG != null) {
-	    			LOG.info("getUrlFromRequest: appUrl: " + appUrl);
-	    		}
+	    		if (LOG != null) LOG.info("getUrlFromRequest: appUrl: " + appUrl);
 	    		return appUrl;
 	    	}
 	    }
@@ -169,38 +155,43 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	public static final int error_Page = 0;
-	public static final int IndexServlet_Page = 1;
-	public static final int Index_Page = 2;
+	public static final int IndexServlet = 1;
+	public static final int IndexPage = 2;
 	public static final int AuthenticationServletSignin = 3;
 	public static final int AuthenticationServletSignout = 4;
-	public static final int DataBasesMenuServlet_Page = 5;
-	public static final int DataBasesMenu_Page = 6;
-	public static final int DataBaseQueryServlet_Page = 7;
-	public static final int DataBaseQuery_Page = 8;
-	public static final int DataBaseQueryResults_Page = 9;
-	public static final int UserInfoServlet_Page = 10;
-	public static final int UserInfo_Page = 11;
-	public static final int FileView_Page = 12;
+	public static final int AuthenticationServletSigned = 5;
+	public static final int FilesMgmtServlet = 6;
+	public static final int DataBasesMenu_Page = 7;
+	public static final int DataBaseQueryServlet_Page = 8;
+	public static final int DataBaseQuery_Page = 9;
+	public static final int DataBaseQueryResults_Page = 10;
+	public static final int UserInfoServlet_Page = 11;
+	public static final int UserInfo_Page = 12;
+	public static final int FileView_Page = 13;
 	
 	
-	private static String pagesDatabase(int NickName) {
+	private static String appMappingForUriNickName(int UriNickName, Log LOG) {
 		String retVal = null;
-		switch (NickName) {
+		switch (UriNickName) {
 		case error_Page: retVal = "/error.jsp";
 				break;
 		case IndexServlet_Page: retVal = "/IndexServlet";
 				break;
 		case Index_Page: retVal = "/WEB-INF/appIndex.jsp";
 				break;
-		case AuthenticationServletSignin: retVal = "/SocialAuthServlet?mode=signin";
+		case AuthenticationServletSignin: retVal = "/SocialAuthServlet?op=signin";
 				break;
-		case AuthenticationServletSignout: retVal = "/SocialAuthServlet?mode=signout";
+		case AuthenticationServletSignout: retVal = "/SocialAuthServlet?op=signout";
+				break;
+		case AuthenticationServletSigned: retVal = "/SocialAuthServlet?op=signed";
 				break;
 		case DataBasesMenuServlet_Page: retVal = "/DataBasesMenuServlet";
 				break;
 		case DataBasesMenu_Page: retVal = "/WEB-INF/dataBasesMenu.jsp";
 				break;
-		case DataBaseQueryServlet_Page: retVal = "/DataBaseQueryServlet";
+		case QueryServlet: retVal = "/DataBaseQueryServlet";
+				break;
+		case NormalQuery_Page: retVal = "/DataBaseQueryServlet";
 				break;
 		case DataBaseQuery_Page: retVal = "/WEB-INF/dataBaseQuery.jsp";
 				break;
@@ -215,8 +206,20 @@ public class ServletsAuxMethodsClass {
 		default: retVal = "/error.jsp";
 				break;
 		}
-				
+		if (LOG != null) LOG.info("appURIsMappingFor " + UriNickName + " is " + retVal);
 		return retVal;
+	}
+	
+	/**
+	 * Returns the full url for the nickname introduced.
+	 * @param UriNickName
+	 * @param request is the HttpServletRequest
+	 * @param LOG is the Log facility (can be null).
+	 * @return the full url for the nickname introduced.
+	 */
+	public static String getFullPathForUriNickName(int UriNickName, HttpServletRequest request, Log LOG) {
+		String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
+		return appUrl + appMappingForUriNickName(UriNickName, LOG);
 	}
 	
 	// ----------------------------------------------------------------------------------------------
@@ -236,11 +239,9 @@ public class ServletsAuxMethodsClass {
 	 */
 	public static void forward_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws ServletException, IOException {
-		String realWebPageName = pagesDatabase(where);
-		if (LOG != null) {
-			LOG.info("forward_to " + where + " -> " + realWebPageName);
-		}
-		RequestDispatcher dispatcher = request.getRequestDispatcher(realWebPageName);
+		String url = appMappingForUriNickName(where, LOG);
+		if (LOG != null) LOG.info("forward_to: " + url);
+		RequestDispatcher dispatcher = request.getRequestDispatcher(url);
 		dispatcher.forward(request, response);
 	}
 	
@@ -256,13 +257,9 @@ public class ServletsAuxMethodsClass {
 	 */
 	public static void redirect_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws IOException {
-		String realWebPageName = pagesDatabase(where);
-		
-		if (LOG != null) {
-			LOG.info("redirect_to " + where + " -> " + realWebPageName);
-		}
-		String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-		response.sendRedirect( appUrl + realWebPageName);
+		String url = getFullPathForUriNickName(where, request, LOG);
+		if (LOG != null) LOG.info("redirect_to: " + url);
+		response.sendRedirect( url );
 	}
 	
 	/**
@@ -277,14 +274,10 @@ public class ServletsAuxMethodsClass {
 	 */
 	public static void redirect_to_with_session(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws IOException {
-		String realWebPageName = pagesDatabase(where);
+		String url = getFullPathForUriNickName(where, request, LOG);
 		
-		if (LOG != null) {
-			LOG.info("redirect_to " + where + " -> " + realWebPageName);
-		}
-		String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-		response.encodeRedirectURL( appUrl + realWebPageName );
-		// response.sendRedirect( appUrl + realWebPageName);
+		if (LOG != null) LOG.info("encodeRedirectURL: " + url);
+		response.encodeRedirectURL( url );
 	}
 	
 }
