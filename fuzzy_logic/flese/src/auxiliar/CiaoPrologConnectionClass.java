@@ -53,29 +53,35 @@ public class CiaoPrologConnectionClass {
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
 		ArrayList<String []> queryAnswers = performQuery(query, owner, programFile, variables);
-		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
+		Iterator<String []> queryAnswersIterator;
+		if (queryAnswers == null) {
+			queryAnswersIterator = null;
+		}
+		else {
+			queryAnswersIterator = queryAnswers.iterator();
 		
-		// Format and store the answers in the lists.
-		loadedProgramQuantifiers = new ArrayList<String []>();
-		loadedProgramCrispPredicates = new ArrayList<String []>();
-		loadedProgramFuzzyRules = new ArrayList<String []>();
-		
-		String [] answer;
-		while (queryAnswersIterator.hasNext()) {
-			answer = queryAnswersIterator.next();
-			
-			if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null)) {
-				if ("quantifier".equals(answer[0])) {
-					loadedProgramQuantifiers.add(answer);
+			// Format and store the answers in the lists.
+			loadedProgramQuantifiers = new ArrayList<String []>();
+			loadedProgramCrispPredicates = new ArrayList<String []>();
+			loadedProgramFuzzyRules = new ArrayList<String []>();
+
+			String [] answer;
+			while (queryAnswersIterator.hasNext()) {
+				answer = queryAnswersIterator.next();
+
+				if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null)) {
+					if ("quantifier".equals(answer[0])) {
+						loadedProgramQuantifiers.add(answer);
+					}
+					if ("fuzzy_rule".equals(answer[0])) {
+						loadedProgramFuzzyRules.add(answer);
+					}
+					if ("crisp".equals(answer[0])) {
+						loadedProgramCrispPredicates.add(answer);
+					}
 				}
-				if ("fuzzy_rule".equals(answer[0])) {
-					loadedProgramFuzzyRules.add(answer);
-				}
-				if ("crisp".equals(answer[0])) {
-					loadedProgramCrispPredicates.add(answer);
-				}
+
 			}
-			
 		}
 		currentProgramFileName = programFile;
 		LOG.info("programFileIntrospectionQuery: END");
@@ -86,13 +92,16 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public Iterator<String []> getLoadedProgramFuzzyRulesIterator () {
-		return loadedProgramFuzzyRules.iterator();
+		if (loadedProgramFuzzyRules == null) return null;
+		else return loadedProgramFuzzyRules.iterator();
 	}
 	public Iterator<String []> getLoadedProgramQuantifiersIterator () {
-		return loadedProgramQuantifiers.iterator();
+		if (loadedProgramQuantifiers == null) return null;
+		else return loadedProgramQuantifiers.iterator();
 	}
 	public Iterator<String []> getLoadedProgramCrispPredicatesIterator () {
-		return loadedProgramCrispPredicates.iterator();
+		if (loadedProgramCrispPredicates == null) return null;
+		else return loadedProgramCrispPredicates.iterator();
 	}
 	
 	public String getCurrentProgramFileName () { return currentProgramFileName; }

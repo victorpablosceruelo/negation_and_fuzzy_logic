@@ -44,7 +44,7 @@
 				
 				var cell4 = row.insertCell(3);
 				cell4.innerHTML = "<a href='"+queryServlet+
-						"?op=query&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
+						"&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"onmouseover='showInfoMessage(\"infoBox\", \"query program file "+fileName+"\")' "+
 						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'>Query</a> ";
 			}

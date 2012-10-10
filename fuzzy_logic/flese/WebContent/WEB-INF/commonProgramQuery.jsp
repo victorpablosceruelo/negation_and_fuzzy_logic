@@ -45,8 +45,8 @@
 		}
 	%>
 	
-	var currentProgramFileName = "<%=connection.getCurrentDatabase() %>";
-	var currentProgramFileOwner = "<%=connection.getCurrentDatabaseOwner() %>";
+	var currentProgramFileName = "<%=connection.getCurrentProgramFileName() %>";
+	var currentProgramFileOwner = "<%=connection.getCurrentProgramFileOwner() %>";
 	
 	function changeFormAction(formId, url) {
 		debug.info("Adding to the form with id " + formId + " the action url ");

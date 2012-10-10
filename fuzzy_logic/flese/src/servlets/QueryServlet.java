@@ -62,26 +62,27 @@ public class QueryServlet extends HttpServlet {
 	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
-		String database = null;
-		String owner = null;
+		String fileName = null;
+		String fileOwner = null;
 		String operation = null;
 		
 		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
 			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-			database = request.getParameter("database");
-			owner = request.getParameter("owner");
+			fileName = request.getParameter("fileName");
+			fileOwner = request.getParameter("fileOwner");
 			operation = request.getParameter("op");
-			if ((database == null) || (owner == null) || (operation == null) ||
-					((! "query".equals(operation)) && (! "advQuery".equals(operation)) && (! "runquery".equals(operation)))) {
-				LOG.info("database is null.");
+			if ((fileName == null) || (fileOwner == null) || (operation == null) ||
+					((! "simpleQuery".equals(operation)) && (! "advancedQuery".equals(operation)) && 
+							(! "runQuery".equals(operation)))) {
+				LOG.info("operation: "+operation+" fileName: "+fileName+" fileOwner: "+fileOwner);
 				ServletsAuxMethodsClass.addMessageToTheUser(request, "Incorrect arguments for request.", LOG);
 				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);
 			}
 			else {
-				LOG.info("Choosen database, owner and op are: " + database + " :: " + owner + " :: " + operation + " ");
+				LOG.info("Choosen fileName, fileOwner and op are: " + fileName + " :: " + fileOwner + " :: " + operation + " ");
 
 				try {
-					dbQueryAux(owner, database, operation, session, request, response);
+					dbQueryAux(fileOwner, fileName, operation, session, request, response);
 				} catch (Exception e) {
 					e.printStackTrace();
 					ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
@@ -97,34 +98,34 @@ public class QueryServlet extends HttpServlet {
 	
 	/**
 	 * Connects to prolog server plserver, 
-	 * changes the current folder to the one owned by the owner of the database,
-	 * asks the database for the available predicates via introspection
+	 * changes the current folder to the one owned by the fileOwner of the fileName,
+	 * asks the fileName for the available predicates via introspection
 	 * and shows the results in a web page.
 	 * Offers to the jsp all the collected information.
 	 * @throws QueryConversorExceptionClass 
 	 */
-	private void dbQueryAux(String owner, String database, String operation, 
+	private void dbQueryAux(String fileOwner, String fileName, String operation, 
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
 		
-			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "databaseIntrospectionQuery"
+			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
 		
 			if (connection == null) {
 				connection = new CiaoPrologConnectionClass();
 			}
 			
-			if ("query".equals(operation) || "advQuery".equals(operation)) {
-				dbQueryAux_Introspection(owner, database, connection);
+			if ("simpleQuery".equals(operation) || "advancedQuery".equals(operation)) {
+				dbQueryAux_Introspection(fileOwner, fileName, connection);
 			}
-			if ("runquery".equals(operation)) {
-				build_and_execute_query(owner, database, connection, request);
+			if ("runQuery".equals(operation)) {
+				build_and_execute_query(fileOwner, fileName, connection, request);
 			}
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
 			session.setAttribute("connection", connection);
 
-			if ("normalQuery".equals(operation)) {
+			if ("simpleQuery".equals(operation)) {
 				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SimpleQueryPage, request, response, LOG);
 			}
 			if ("advancedQuery".equals(operation)) {
@@ -135,22 +136,22 @@ public class QueryServlet extends HttpServlet {
 			}
 	}
 	
-	private void dbQueryAux_Introspection(String owner, String database, CiaoPrologConnectionClass connection) 
+	private void dbQueryAux_Introspection(String fileOwner, String fileName, CiaoPrologConnectionClass connection) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
-		connection.programFileIntrospectionQuery(owner, database);
+		connection.programFileIntrospectionQuery(fileOwner, fileName);
 		/*
 		LOG.info("------");
 		LOG.info("------");
 		LOG.info("--------> testing query !!! <-----------");
 		LOG.info("------");
 		LOG.info("------");
-		connection.testingQuery(owner, database);
+		connection.testingQuery(fileOwner, fileName);
 		*/
 	}
 	
 	
-	private void build_and_execute_query(String owner, String database, CiaoPrologConnectionClass connection, HttpServletRequest request) 
+	private void build_and_execute_query(String fileOwner, String fileName, CiaoPrologConnectionClass connection, HttpServletRequest request) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
 		int queryLinesCounter = 0;
 		LOG.info("build_and_execute_query call.");
@@ -204,8 +205,8 @@ public class QueryServlet extends HttpServlet {
 	    PLStructure query = conversor.getFinalQuery();
 	    PLVariable [] variables = conversor.getFinalQueryVariables();
 
-	    connection.performQuery(query, owner, database, variables);
-	    // performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables)
+	    connection.performQuery(query, fileOwner, fileName, variables);
+	    // performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)
 		
 	}
 	
