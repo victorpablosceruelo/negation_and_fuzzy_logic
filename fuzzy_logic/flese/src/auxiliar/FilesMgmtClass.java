@@ -155,16 +155,16 @@ public class FilesMgmtClass {
 		if ((fileName != null) && (fileOwner != null) && (localUserName != null)) {
 		
 			try {
-				FoldersUtilsObject.removeDataBase(fileName, fileOwner, localUserName);
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+fileName+" has been removed. ", LOG);
+				FoldersUtilsObject.removeProgramFile(fileName, fileOwner, localUserName);
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" has been removed. ", LOG);
 			} catch (Exception e) {
 				LOG.info("Exception: " + e +": " + e.getMessage());
 				e.printStackTrace();
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+fileName+" could not be removed. ", LOG);
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" could not be removed. ", LOG);
 			}
 		}
 		else {
-			ServletsAuxMethodsClass.addMessageToTheUser(request, "Sorry. Unknown request. database: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName, LOG);
+			ServletsAuxMethodsClass.addMessageToTheUser(request, "Sorry. Unknown request. Program file name: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName, LOG);
 		}
 	}
 	

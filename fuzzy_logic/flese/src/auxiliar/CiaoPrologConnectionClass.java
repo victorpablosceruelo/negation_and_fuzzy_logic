@@ -16,9 +16,9 @@ public class CiaoPrologConnectionClass {
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
-	private String currentDatabase = null;
-	private String currentDatabaseOwner = null;
-	private String currentDatabaseOwnerWithPath = null;
+	private String currentProgramFileName = null;
+	private String currentProgramFileOwner = null;
+	private String currentProgramFileOwnerWithPath = null;
 	private ArrayList<String []> loadedProgramQuantifiers = null;
 	private ArrayList<String []> loadedProgramCrispPredicates = null;
 	private ArrayList<String []> loadedProgramFuzzyRules = null;
@@ -40,9 +40,9 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void databaseIntrospectionQuery(String owner, String database) 
+	public void programFileIntrospectionQuery(String owner, String programFile) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
-		LOG.info("databaseIntrospectionQuery: owner: "+owner+" database: "+database);
+		LOG.info("programFileIntrospectionQuery: owner: "+owner+" programFile: "+programFile);
 		
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable[] variables = new PLVariable[3];
@@ -52,7 +52,7 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<String []> queryAnswers = performDatabaseQuery(query, owner, database, variables);
+		ArrayList<String []> queryAnswers = performQuery(query, owner, programFile, variables);
 		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
 		
 		// Format and store the answers in the lists.
@@ -77,8 +77,8 @@ public class CiaoPrologConnectionClass {
 			}
 			
 		}
-		currentDatabase = database;
-		LOG.info("databaseIntrospectionQuery: END");
+		currentProgramFileName = programFile;
+		LOG.info("programFileIntrospectionQuery: END");
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,9 +95,9 @@ public class CiaoPrologConnectionClass {
 		return loadedProgramCrispPredicates.iterator();
 	}
 	
-	public String getCurrentDatabase () { return currentDatabase; }
-	public String getCurrentDatabaseOwner () { return currentDatabaseOwner; }
-	public String getCurrentDatabaseOwnerWithPath () { return currentDatabaseOwnerWithPath; }
+	public String getCurrentProgramFileName () { return currentProgramFileName; }
+	public String getCurrentProgramFileOwner () { return currentProgramFileOwner; }
+	public String getCurrentProgramFileOwnerWithPath () { return currentProgramFileOwnerWithPath; }
 	public ArrayList<String []> getLastAnswers () { return lastAnswers; } 
 	public String getLastQuery() { return lastQuery; }
 	
@@ -105,18 +105,17 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public ArrayList<String []> performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables) 
+	public ArrayList<String []> performQuery(PLStructure query, String owner, String programFile, PLVariable [] variables) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 
 		// Connect to the Ciao Prolog Server.
 		String [] argv = new String[1];
 		argv[0] = FoldersUtilsObject.getPlServerPath();
 		PLConnection plConnection = new PLConnection(argv);
-		LOG.info("performDatabaseQuery: Connected to Ciao Prolog server (plServer). ");
+		LOG.info("performQuery: Connected to Ciao Prolog server (plServer). ");
 
 		// Change working folder and run the query.
 		changeCiaoPrologWorkingFolder(owner, plConnection);
-		lastAnswers = performDatabaseQueryAux(query, database, variables, maximumLong, maximumLong, plConnection);
 		
 		if (plConnection != null) {
 			try {
@@ -132,37 +131,37 @@ public class CiaoPrologConnectionClass {
 	/**
 	 * Changes the Ciao Prolog Working Folder 
 	 * 
-	 * @param     dataBaseOwner It is the owner of the new database, which coincides with the folder that contains the database.
+	 * @param     programFileOwner It is the owner of the new program file, which coincides with the folder that contains the file.
 	 * @exception FoldersUtilsClassException if the folder can not be created
 	 * @exception PLException
 	 * @exception IOException
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
 	 */
-	private void changeCiaoPrologWorkingFolder(String dataBaseOwner, PLConnection plConnection) 
+	private void changeCiaoPrologWorkingFolder(String programFileOwner, PLConnection plConnection) 
 			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
 		// Log info
-		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + dataBaseOwner);
+		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + programFileOwner);
 		
-		if ((dataBaseOwner == null) || ("".equals(dataBaseOwner))){
-			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: dataBaseOwner is null or empty.");
+		if ((programFileOwner == null) || ("".equals(programFileOwner))){
+			LOG.info("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
+			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
 		}
 		
-		if ((! FoldersUtilsObject.folderExists(dataBaseOwner, true))) {
-			LOG.info("changeCiaoPrologWorkingFolder: dataBaseOwner is an invalid folder.");
+		if ((! FoldersUtilsObject.folderExists(programFileOwner, true))) {
+			LOG.info("changeCiaoPrologWorkingFolder: programFileOwner is an invalid folder.");
 			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
 		}
 		
-		// Adequate the value of dataBaseOwner (it was relative until here).
-		String dataBaseOwnerWithPath = FoldersUtilsObject.getprogramsPath() + dataBaseOwner;
+		// Adequate the value of programFileOwner (it was relative until here).
+		String programFileOwnerWithPath = FoldersUtilsObject.getProgramFilesPath() + programFileOwner;
 		
 		// Change working folder.
 		PLVariable [] variables = new PLVariable[1];
 		variables[0] = new PLVariable();
 		PLStructure query = new PLStructure("working_directory",
-				new PLTerm[]{variables[0], new PLAtom(dataBaseOwnerWithPath)}); 
+				new PLTerm[]{variables[0], new PLAtom(programFileOwnerWithPath)}); 
 
-		ArrayList<String []> queryAnswers = performDatabaseQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
+		ArrayList<String []> queryAnswers = performQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
 		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
 
 		String [] answer;
@@ -170,13 +169,13 @@ public class CiaoPrologConnectionClass {
 			answer = queryAnswersIterator.next();
 			LOG.info("changeCiaoPrologWorkingFolder: " + answer[0]);
 		}
-		currentDatabaseOwnerWithPath = dataBaseOwnerWithPath;
-		currentDatabaseOwner = dataBaseOwner;
-		LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentDatabaseOwner + " at " + currentDatabaseOwnerWithPath);
+		currentProgramFileOwnerWithPath = programFileOwnerWithPath;
+		currentProgramFileOwner = programFileOwner;
+		LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentProgramFileOwner + " at " + currentProgramFileOwnerWithPath);
 		
 	}
 	
-	private ArrayList<String []> performDatabaseQueryAux(PLStructure query, String database, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries, PLConnection plConnection) 
+	private ArrayList<String []> performQueryAux(PLStructure query, String programFile, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries, PLConnection plConnection) 
 			throws PLException, IOException {
 		
 		ArrayList<String []> queryAnswers = new ArrayList<String []>();
@@ -190,13 +189,13 @@ public class CiaoPrologConnectionClass {
 			
 			if (plConnection == null) throw new PLException("runQuery: plConnection is null.");
 			currentGoal = new PLGoal(plConnection, query); 
-			if ((database != null) && (! "".equals(database))) {
-				LOG.info("runQuery: changing database to: " + database + ".");
-				currentGoal.useModule(database);
+			if ((programFile != null) && (! "".equals(programFile))) {
+				LOG.info("runQuery: changing programFile to: " + programFile + ".");
+				currentGoal.useModule(programFile);
 			}
 			currentGoal.query();
 
-			LOG.info("performDatabaseQueryAux: getting answers ...");
+			LOG.info("performQueryAux: getting answers ...");
 			PLTerm currentQueryAnswer;
 			long timesCounter;
 			String [] variablesCopy;
@@ -206,21 +205,21 @@ public class CiaoPrologConnectionClass {
 				timesCounter = 0;
 				// Save the current answer.
 				answersCounter ++;
-				LOG.info("performDatabaseQueryAux: getting answer number: "  + answersCounter);
+				LOG.info("performQueryAux: getting answer number: "  + answersCounter);
 				do { // Get the current answer.
 					currentQueryAnswer = currentGoal.nextSolution();
 					timesCounter++;
 				} while ((currentQueryAnswer == null) && (currentGoal.isStillRunning()) && (timesCounter < maxNumberOfTries));
 
 				if (timesCounter >= maxNumberOfTries){
-					LOG.info("performDatabaseQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
+					LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
 				}
 				
 				if (currentQueryAnswer != null) {
 					String logMsg="\n goal: " + currentGoal.toString();
 					logMsg += ("\n answer: " + currentQueryAnswer.toString());
 					logMsg += PLVariablesArrayToString(variables);
-					LOG.info("performDatabaseQueryAux: " + logMsg + " ");
+					LOG.info("performQueryAux: " + logMsg + " ");
 					
 					variablesCopy = new String [variables.length];
 					for (int i=0; i < variables.length; i++) {
@@ -229,12 +228,12 @@ public class CiaoPrologConnectionClass {
 					queryAnswers.add(variablesCopy);
 				}
 				else {
-					LOG.info("performDatabaseQueryAux: answer obtained: null ");
+					LOG.info("performQueryAux: answer obtained: null ");
 				}
 				
 			} while ((currentQueryAnswer != null) && (answersCounter < maxNumAnswers));
 			
-			LOG.info("performDatabaseQueryAux: terminating goal execution ...");
+			LOG.info("performQueryAux: terminating goal execution ...");
 			if (currentGoal != null) {
 				try {
 					currentGoal.terminate();
@@ -246,7 +245,7 @@ public class CiaoPrologConnectionClass {
 			}
 		}
 		
-		LOG.info("performDatabaseQueryAux: end.");
+		LOG.info("performQueryAux: end.");
 		return queryAnswers;
 	}
 	
@@ -280,9 +279,9 @@ public class CiaoPrologConnectionClass {
 	/**
 	 * Serves for testing the query system, but has no use at all. 
 	 */	
-	public void testingQuery (String owner, String database) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+	public void testingQuery (String owner, String programFile) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		LOG.info("testingQuery ...");
-		if ("restaurant.pl".equals(database)) {
+		if ("restaurant.pl".equals(programFile)) {
 			PLVariable[] variables = new PLVariable[6];
 			variables[0] = new PLVariable(); // X
 			variables[1] = new PLVariable(); // V1
@@ -310,7 +309,7 @@ public class CiaoPrologConnectionClass {
 			PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
 			PLStructure query = new PLStructure(",", args_conjunction);
 
-			ArrayList<String []> queryAnswers = performDatabaseQuery(query, owner, database, variables);
+			ArrayList<String []> queryAnswers = performQuery(query, owner, programFile, variables);
 			LOG.info("testingQuery ... num of answers: " + queryAnswers.size());
 		}
 	}

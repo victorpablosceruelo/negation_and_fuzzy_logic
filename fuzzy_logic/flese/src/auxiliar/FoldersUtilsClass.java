@@ -85,11 +85,11 @@ public class FoldersUtilsClass {
 	/**
 	 * Obtains the complete path of the program file. 
 	 * 
-	 * @param    owner It is the owner of the database.
-	 * @param    database It is the database for which we are computing the path.
-	 * @return   the complete path where the owner can read/store his/her databases.
+	 * @param    fileOwner It is the owner of the program file.
+	 * @param    fileName It is the name of the file for which we are computing the path.
+	 * @return   the complete path where the owner can read/store his/her files.
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
-	 * @exception FoldersUtilsClassException if the folder or the database do not exist or are invalid.
+	 * @exception FoldersUtilsClassException if the folder or the program file do not exist or are invalid.
 	 */
 	public String getCompletePathOfProgramFile(String fileOwner, String fileName) 
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
@@ -97,12 +97,12 @@ public class FoldersUtilsClass {
 		LocalUserNameFixesClass.checkValidLocalUserName(fileOwner);
 		String ownerPath = programFilesPath + fileOwner + "/";
 		testOrCreateProgramFilesPath(ownerPath, false);
-		String databasePath = ownerPath + fileName;
-		File file = new File(databasePath);
+		String programFilePath = ownerPath + fileName;
+		File file = new File(programFilePath);
 		if ((! file.exists()) || (! file.isFile()) || (! file.canRead())) {
-			throw new FoldersUtilsClassException("getCompletePathOfDatabase: database does not exist or is invalid.");
+			throw new FoldersUtilsClassException("getCompletePathOfProgramFile: file does not exist or is invalid.");
 		}
-		return databasePath;
+		return programFilePath;
 	}
 
 	
@@ -181,41 +181,41 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Removes the database only if its owner is the localUserName.
+	 * Removes the program file, but only if its fileOwner is the localUserName.
 	 * 
-	 * @param     database is the database to remove.
-	 * @param     owner is the database owner and the relative path to the database.
+	 * @param     fileName is the name of the file to remove.
+	 * @param     fileOwner is the owner of the file to be removed, and its relative path.
 	 * @param     localUserName is the name of the user that requests its removal.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
 	 * @exception FoldersUtilsClassException if it cannot be removed.
 	 */
-	public void removeDataBase(String database, String owner, String localUserName) 
+	public void removeProgramFile(String fileName, String fileOwner, String localUserName) 
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
 
-		LOG.info("database: "+database+" owner: "+owner+" localUserName: "+localUserName);
+		LOG.info("programFileName: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName);
 		
-		if (database == null) { throw new FoldersUtilsClassException("database is null"); }
-		if (owner == null) { throw new FoldersUtilsClassException("owner is null"); }
+		if (fileName == null) { throw new FoldersUtilsClassException("fileName is null"); }
+		if (fileOwner == null) { throw new FoldersUtilsClassException("fileOwner is null"); }
 		if (localUserName == null) { throw new FoldersUtilsClassException("localUserName is null"); }
 		
 		
 		Boolean retVal = false;
-		if (owner.equals(localUserName)) {
-			String ownerProgramFilesPath = getCompletePathOfOwner(owner, false);
-			String fileToRemove=ownerProgramFilesPath+database;
+		if (fileOwner.equals(localUserName)) {
+			String ownerProgramFilesPath = getCompletePathOfOwner(fileOwner, false);
+			String fileToRemove=ownerProgramFilesPath+fileName;
 			
 			File file = new File(fileToRemove);
 			retVal = file.exists();
 			if (! retVal) {
-				throw new FoldersUtilsClassException("The database file" + fileToRemove + "does not exist.");
+				throw new FoldersUtilsClassException("The program file" + fileToRemove + "does not exist.");
 			}
 			retVal = file.delete();
 			if (! retVal) {
-				throw new FoldersUtilsClassException("The database file" + fileToRemove + "can not be removed.");
+				throw new FoldersUtilsClassException("The program file" + fileToRemove + "can not be removed.");
 			}
 		}
 		else {
-			throw new FoldersUtilsClassException("You do not own the database file.");
+			throw new FoldersUtilsClassException("You do not own the program file.");
 		}
 	}
 	
@@ -224,31 +224,31 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Gets an iterator to iterate on the existing databases.
+	 * Gets an iterator to iterate on the existing program files.
 	 * 
 	 * @param     localUserName is the name of the user that is logged in.
-	 * @return    the databases iterator, null if there are no databases to iterate.
+	 * @return    the program files iterator, null if there are no program files to iterate.
 	 */
 	public Iterator<FileInfoClass> returnFilesIterator(String localUserName) {
-		Iterator<FileInfoClass> databasesIterator = null;
+		Iterator<FileInfoClass> programFilesIterator = null;
 		try {
-			ArrayList<FileInfoClass> databasesList = listProgramFiles(localUserName);
-			if (!databasesList.isEmpty()) {
-				databasesIterator = databasesList.iterator(); 
+			ArrayList<FileInfoClass> programFilesList = listProgramFiles(localUserName);
+			if (!programFilesList.isEmpty()) {
+				programFilesIterator = programFilesList.iterator(); 
 			}
 		} catch (Exception e) {
 			LOG.info("Exception: " + e);
 			e.printStackTrace();
-			databasesIterator = null;
+			programFilesIterator = null;
 		}
-		return databasesIterator;
+		return programFilesIterator;
 	}
 	
 	/**
-	 * Gets a list with the existing databases.
+	 * Gets a list with the existing program files.
 	 * 
 	 * @param     localUserName is the name of the user that is logged in.
-	 * @return    the databases iterator, null if there are no databases to iterate.
+	 * @return    the program files iterator, null if there are no program files to iterate.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
 	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
 	 */
@@ -261,7 +261,7 @@ public class FoldersUtilsClass {
 		FilenameFilter filter;
 		String[] subDirs;
 		
-		// We list first the localUserName databases.
+		// We list first the localUserName program files.
 		LocalUserNameFixesClass.checkValidLocalUserName(localUserName);
 		filter = (FilenameFilter) new OnlyLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
@@ -273,7 +273,7 @@ public class FoldersUtilsClass {
 		    }
 		}
 
-		// We list in second (and last) place the other databases.
+		// We list in second (and last) place the other program files.
 		LocalUserNameFixesClass.checkValidLocalUserName(localUserName);
 		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
@@ -289,19 +289,19 @@ public class FoldersUtilsClass {
 	}
 
 	/**
-	 * Gets a list with the existing databases.
+	 * Gets a list with the existing program files.
 	 * 
 	 * @param     subDir is the full path of the subdirectory we are listing.
-	 * @return    the databases iterator, null if there are no databases to iterate.
+	 * @return    the program files iterator, null if there are no program files to iterate.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
 	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
 	 */
 	private ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) 
 			throws FoldersUtilsClassException {
 
-		LOG.info("listDatabasesInSubDir: subDir: " + subDir);
+		LOG.info("listProgramFilesInSubDir: subDir: " + subDir);
 		if ((subDir == null) || ("".equals(subDir))) {
-			throw new FoldersUtilsClassException("listDatabasesInSubDir: subDir cannot be null nor empty string.");
+			throw new FoldersUtilsClassException("listProgramFilesInSubDir: subDir cannot be null nor empty string.");
 		}
 		String realPathSubDir = programFilesPath + subDir + "/";
 		File dir = new File(realPathSubDir);
@@ -435,19 +435,19 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Boolean programFileExists(String owner, String database, Boolean relativePath) throws FoldersUtilsClassException {
+	public Boolean programFileExists(String fileOwner, String fileName, Boolean relativePath) throws FoldersUtilsClassException {
 		
-		LOG.info("databaseExists: owner: " + owner + " database: " + database);
-		if ((owner == null) || ("".equals(owner))) {
-			throw new FoldersUtilsClassException("databaseExists: owner is empty string or null.");
+		LOG.info("programFileExists: fileOwner: " + fileOwner + " fileName: " + fileName);
+		if ((fileOwner == null) || ("".equals(fileOwner))) {
+			throw new FoldersUtilsClassException("programFileExists: fileOwner is empty string or null.");
 		}
-		if ((database == null) || ("".equals(database))) {
-			throw new FoldersUtilsClassException("databaseExists: database is empty string or null.");
+		if ((fileName == null) || ("".equals(fileName))) {
+			throw new FoldersUtilsClassException("programFileExists: fileName is empty string or null.");
 		}
 		
 		String fullPath = null;
 		if (relativePath) {
-			fullPath = programFilesPath + owner + "/" + database;
+			fullPath = programFilesPath + fileOwner + "/" + fileName;
 		}
 		File file = new File(fullPath);
 		Boolean retVal = ((file.exists()) && (file.isFile()) && (file.canRead()));
