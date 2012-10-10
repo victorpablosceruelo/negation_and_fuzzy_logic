@@ -22,6 +22,7 @@ public class CiaoPrologConnectionClass {
 	private ArrayList<String []> loadedProgramQuantifiers = null;
 	private ArrayList<String []> loadedProgramCrispPredicates = null;
 	private ArrayList<String []> loadedProgramFuzzyRules = null;
+	private ArrayList<String []> loadedProgramAggregators = null;
 	private String lastQuery = null;
 	private ArrayList<String []> lastAnswers = null;
 	
@@ -44,7 +45,8 @@ public class CiaoPrologConnectionClass {
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
-		// rfuzzy_introspection(T, PN, PA).
+		// Prepare the query structure.
+		// rfuzzy_introspection(PClass, PName, PArity, PType).
 		PLVariable[] variables = new PLVariable[4];
 		variables[0] = new PLVariable(); // predicateType
 		variables[1] = new PLVariable(); // predicateName
@@ -53,37 +55,57 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2], variables[3]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<String []> queryAnswers = performQuery(query, fileOwner, fileName, variables);
-		Iterator<String []> queryAnswersIterator;
-		if (queryAnswers == null) {
-			queryAnswersIterator = null;
-		}
-		else {
+		// Initialize the variables we need.
+		ArrayList<String []> queryAnswers = null;
+		Iterator<String []> queryAnswersIterator = null;
+		loadedProgramQuantifiers = new ArrayList<String []>();
+		loadedProgramAggregators = new ArrayList<String []>();
+		loadedProgramCrispPredicates = new ArrayList<String []>();
+		loadedProgramFuzzyRules = new ArrayList<String []>();
+		
+		// Run the query and get the results.
+		queryAnswers = performQuery(query, fileOwner, fileName, variables);
+		if (queryAnswers != null) {
 			queryAnswersIterator = queryAnswers.iterator();
 		
 			// Format and store the answers in the lists.
-			loadedProgramQuantifiers = new ArrayList<String []>();
-			loadedProgramCrispPredicates = new ArrayList<String []>();
-			loadedProgramFuzzyRules = new ArrayList<String []>();
+
 
 			String [] answer;
+			int examinedAnswersCounter = 0;
+			int validatedAnswersCounter = 0;
 			while (queryAnswersIterator.hasNext()) {
 				answer = queryAnswersIterator.next();
+				examinedAnswersCounter++;
 
-				if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null)) {
+				if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null) && (answer[3] != null)) {
 					if ("quantifier".equals(answer[0])) {
 						loadedProgramQuantifiers.add(answer);
+						validatedAnswersCounter++;
 					}
 					if ("fuzzy_rule".equals(answer[0])) {
 						loadedProgramFuzzyRules.add(answer);
+						validatedAnswersCounter++;
 					}
 					if ("crisp".equals(answer[0])) {
 						loadedProgramCrispPredicates.add(answer);
+						validatedAnswersCounter++;
+					}
+					if ("aggregator".equals(answer[0])) {
+						loadedProgramAggregators.add(answer);
+						validatedAnswersCounter++;
+					}
+					if ((! "quantifier".equals(answer[0])) && (! "fuzzy_rule".equals(answer[0])) && 
+							(! "crisp".equals(answer[0]))) {
+						LOG.info("Unused answer: 0: "+answer[0]+" 1: "+answer[1]+" 2: "+answer[2]+" 3: "+answer[3]);
 					}
 				}
-
+				else LOG.info("Invalid answer: 0: "+answer[0]+" 1: "+answer[1]+" 2: "+answer[2]+" 3: "+answer[3]);
 			}
+			LOG.info("Examined a total of "+examinedAnswersCounter+" answers.");
+			LOG.info("Validated a total of "+validatedAnswersCounter+" answers.");
 		}
+		else LOG.info("ERROR: no answers for the query.");
 		currentProgramFileName = fileName;
 		LOG.info("programFileIntrospectionQuery: END");
 	}
@@ -103,6 +125,10 @@ public class CiaoPrologConnectionClass {
 	public Iterator<String []> getLoadedProgramCrispPredicatesIterator () {
 		if (loadedProgramCrispPredicates == null) return null;
 		else return loadedProgramCrispPredicates.iterator();
+	}
+	public Iterator<String []> getLoadedProgramAggregatorsIterator () {
+		if (loadedProgramAggregators == null) return null;
+		else return loadedProgramAggregators.iterator();
 	}
 	
 	public String getCurrentProgramFileName () { return currentProgramFileName; }
@@ -126,7 +152,7 @@ public class CiaoPrologConnectionClass {
 
 		// Change working folder and run the query.
 		changeCiaoPrologWorkingFolder(fileOwner, plConnection);
-		performQueryAux(query, fileName, variables, maximumLong, maximumLong, plConnection);
+		lastAnswers = performQueryAux(query, fileName, variables, maximumLong, maximumLong, plConnection);
 		
 		if (plConnection != null) {
 			try {

@@ -29,6 +29,7 @@
 			}
 		}
 	%>
+	debug.info("Added a total of <%=counter%> program quantifiers.");
 		
 	var fuzzyRulesArray = new Array();
 	<%
@@ -44,6 +45,7 @@
 			}
 		}
 	%>
+	debug.info("Added a total of <%=counter%> program rules.");
 	
 	var currentProgramFileName = "<%=connection.getCurrentProgramFileName() %>";
 	var currentProgramFileOwner = "<%=connection.getCurrentProgramFileOwner() %>";
