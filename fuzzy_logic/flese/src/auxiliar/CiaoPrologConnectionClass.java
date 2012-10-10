@@ -40,9 +40,9 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void programFileIntrospectionQuery(String owner, String programFile) 
+	public void programFileIntrospectionQuery(String fileOwner, String fileName) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
-		LOG.info("programFileIntrospectionQuery: owner: "+owner+" programFile: "+programFile);
+		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
 		// rfuzzy_introspection(T, PN, PA).
 		PLVariable[] variables = new PLVariable[3];
@@ -52,7 +52,7 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		ArrayList<String []> queryAnswers = performQuery(query, owner, programFile, variables);
+		ArrayList<String []> queryAnswers = performQuery(query, fileOwner, fileName, variables);
 		Iterator<String []> queryAnswersIterator;
 		if (queryAnswers == null) {
 			queryAnswersIterator = null;
@@ -83,7 +83,7 @@ public class CiaoPrologConnectionClass {
 
 			}
 		}
-		currentProgramFileName = programFile;
+		currentProgramFileName = fileName;
 		LOG.info("programFileIntrospectionQuery: END");
 	}
 
@@ -114,7 +114,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public ArrayList<String []> performQuery(PLStructure query, String owner, String programFile, PLVariable [] variables) 
+	public ArrayList<String []> performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 
 		// Connect to the Ciao Prolog Server.
@@ -124,7 +124,7 @@ public class CiaoPrologConnectionClass {
 		LOG.info("performQuery: Connected to Ciao Prolog server (plServer). ");
 
 		// Change working folder and run the query.
-		changeCiaoPrologWorkingFolder(owner, plConnection);
+		changeCiaoPrologWorkingFolder(fileOwner, plConnection);
 		
 		if (plConnection != null) {
 			try {
