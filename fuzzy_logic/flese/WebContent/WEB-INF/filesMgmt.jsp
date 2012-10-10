@@ -15,7 +15,9 @@
     	<jsp:include page="commonBody.jsp" />
 	
 		<script type="text/javascript">
-			var servlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
+			var filesMgmtServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
+			var queryServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletSimpleQuery, request, null)%>";
+			
 			function lineForProgramFile(tableId, fileName, fileOwner) {
 				debug.info("lineForProgramFile: fileName: " + fileName);
 				debug.info("lineForProgramFile: fileOwner: " + fileOwner);
@@ -24,7 +26,8 @@
 				var row = table.insertRow(rowCount);
 
 				var cell1 = row.insertCell(0);
-				cell1.innerHTML = "<a href='"+servlet+"?op=view&fileName="+fileName+"&owner="+fileOwner+"' "+
+				cell1.innerHTML = "<a href='"+filesMgmtServlet+
+						"?op=view&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"onmouseover='showInfoMessage(\"infoBox\", \"view program file "+fileName+"\")' "+
 						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'>"+fileName+"</a> ";
 				
@@ -32,16 +35,18 @@
 				cell2.innerHTML=fileOwner;
 				
 				var cell3 = row.insertCell(2);
-				cell3.innerHTML = "<a href='"+servlet+"?op=remove&fileName="+fileName+"&owner="+fileOwner+"' "+
+				cell3.innerHTML = "<a href='"+filesMgmtServlet+
+						"?op=remove&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"onmouseover='showInfoMessage(\"infoBox\", \"remove program file "+fileName+"\")' "+
 						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'"+
 						"onclick='return confirm(\"Are you sure you want to delete program file "+fileName+"?\")'>"+
 						"<img src=\"remove-file.gif\" alt=\"remove\" width=\"20\"></img></a> ";
 				
 				var cell4 = row.insertCell(3);
-				cell4.innerHTML = "<a href='"+servlet+"?op=query&fileName="+fileName+"&owner="+fileOwner+"' "+
+				cell4.innerHTML = "<a href='"+queryServlet+
+						"?op=query&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"onmouseover='showInfoMessage(\"infoBox\", \"query program file "+fileName+"\")' "+
-						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'>"+Query+"</a> ";
+						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'>Query</a> ";
 			}
 		</script>
 	<%
@@ -75,7 +80,7 @@
 				FileInfoClass fileInfo = filesIterator.next();
 	%>
 				<script type="text/javascript">
-					lineForProgramFile('files', "<%=fileInfo.getDataBaseName()%>", "<%=fileInfo.getDataBaseOwner()%>");
+					lineForProgramFile('files', "<%=fileInfo.getFileName()%>", "<%=fileInfo.getFileOwner()%>");
 				</script>
 
 				<%

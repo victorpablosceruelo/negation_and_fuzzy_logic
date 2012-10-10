@@ -16,13 +16,13 @@ public class FileInfoClass {
 		this.fileOwner = fileOwner;
 	}
 	
-	public String getfileName() {
+	public String getFileName() {
 		return fileName;
 	}
-	public String getfileOwner() {
+	public String getFileOwner() {
 		return fileOwner;
 	}
-	public Boolean canDeletefile(String localUserName) {
+	public Boolean canDeleteFile(String localUserName) {
 		return fileOwner.equals(localUserName);
 	}
 }

@@ -173,10 +173,15 @@ public class FilesMgmtClass {
 		String fileName = request.getParameter("fileName");
 		String fileOwner = request.getParameter("fileOwner");
 
-		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
-		request.setAttribute("fileName", fileName);
-		request.setAttribute("filePath", filePath);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, request, response, LOG);
+		if ((fileName != null) && (fileOwner != null)) {
+			String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+			request.setAttribute("fileName", fileName);
+			request.setAttribute("filePath", filePath);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, request, response, LOG);
+		}
+		else {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, request, response, LOG);
+		}
 	}
 }
 

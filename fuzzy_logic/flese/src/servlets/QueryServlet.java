@@ -27,7 +27,7 @@ import auxiliar.FoldersUtilsClassException;
 /**
  * Servlet implementation class DbQueryServlet
  */
-@WebServlet("/DataBaseQueryServlet")
+@WebServlet("/QueryServlet")
 public class QueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(QueryServlet.class);
@@ -138,7 +138,7 @@ public class QueryServlet extends HttpServlet {
 	private void dbQueryAux_Introspection(String owner, String database, CiaoPrologConnectionClass connection) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		
-		connection.databaseIntrospectionQuery(owner, database);
+		connection.programFileIntrospectionQuery(owner, database);
 		/*
 		LOG.info("------");
 		LOG.info("------");
@@ -204,7 +204,7 @@ public class QueryServlet extends HttpServlet {
 	    PLStructure query = conversor.getFinalQuery();
 	    PLVariable [] variables = conversor.getFinalQueryVariables();
 
-	    connection.performDatabaseQuery(query, owner, database, variables);
+	    connection.performQuery(query, owner, database, variables);
 	    // performDatabaseQuery(PLStructure query, String owner, String database, PLVariable [] variables)
 		
 	}
