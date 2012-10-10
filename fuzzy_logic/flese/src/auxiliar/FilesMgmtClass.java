@@ -108,17 +108,17 @@ public class FilesMgmtClass {
 			throws IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 		LOG.info("--- downloadFile invocation ---");
 		
-		String database = request.getParameter("database");
-		String owner = request.getParameter("owner");
+		String fileName = request.getParameter("fileName");
+		String fileOwner = request.getParameter("fileOwner");
 
-		String filename = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
+		String FileNameWithPath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		// request.getParameter("filename");
-		String browser_filename = database;
+		String browser_filename = fileName;
 
-		File                f        = new File(filename);
+		File                f        = new File(FileNameWithPath);
 		int                 length   = 0;
 		ServletOutputStream op       = response.getOutputStream();
-		String              mimetype = servletContext.getMimeType( filename );
+		String              mimetype = servletContext.getMimeType( FileNameWithPath );
 
 		//
 		//  Set the response and go!
@@ -148,33 +148,33 @@ public class FilesMgmtClass {
 			throws ServletException, IOException {
 		LOG.info("--- removeFile invocation ---");
 
-		String database = request.getParameter("database");
-		String owner = (String) request.getParameter("owner");
+		String fileName = request.getParameter("fileName");
+		String fileOwner = (String) request.getParameter("fileOwner");
 		String localUserName = (String) session.getAttribute("localUserName");
 		
-		if ((database != null) && (owner != null) && (localUserName != null)) {
+		if ((fileName != null) && (fileOwner != null) && (localUserName != null)) {
 		
 			try {
-				FoldersUtilsObject.removeDataBase(database, owner, localUserName);
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+database+" has been removed. ", LOG);
+				FoldersUtilsObject.removeDataBase(fileName, fileOwner, localUserName);
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+fileName+" has been removed. ", LOG);
 			} catch (Exception e) {
 				LOG.info("Exception: " + e +": " + e.getMessage());
 				e.printStackTrace();
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+database+" could not be removed. ", LOG);
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "The database "+fileName+" could not be removed. ", LOG);
 			}
 		}
 		else {
-			ServletsAuxMethodsClass.addMessageToTheUser(request, "Sorry. Unknown request. database: "+database+" owner: "+owner+" localUserName: "+localUserName, LOG);
+			ServletsAuxMethodsClass.addMessageToTheUser(request, "Sorry. Unknown request. database: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName, LOG);
 		}
 	}
 	
 	public void viewFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response) 
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException, ServletException, IOException {
-		String database = request.getParameter("database");
-		String owner = request.getParameter("owner");
+		String fileName = request.getParameter("fileName");
+		String fileOwner = request.getParameter("fileOwner");
 
-		String filePath = FoldersUtilsObject.getCompletePathOfDatabase(owner, database);
-		request.setAttribute("fileName", database);
+		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		request.setAttribute("fileName", fileName);
 		request.setAttribute("filePath", filePath);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, request, response, LOG);
 	}

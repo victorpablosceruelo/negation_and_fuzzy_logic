@@ -17,25 +17,25 @@ public class FoldersUtilsClass {
 
 	// private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(FoldersUtilsClass.class);
-	private static String programsPath = null;
+	private static String programFilesPath = null;
 	private static String plServerPath = null;
 	
 	public FoldersUtilsClass() throws FoldersUtilsClassException {
 		
-		if ((programsPath == null) || (programsPath.equals(""))) {
-			LOG.info("looking for a folder for uploading databases ... ");
-			// Configure the programsPath: Try the different options one by one.
-			configureProgramsPathAux("/home/java-apps/fuzzy-search/");
-			configureProgramsPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
-			// configureProgramsPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
-			configureProgramsPathAux("/tmp/java-apps/fuzzy-search/");
+		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
+			LOG.info("looking for a folder for uploading program files ... ");
+			// Configure the programFilesPath: Try the different options one by one.
+			configureProgramFilesPathAux("/home/java-apps/fuzzy-search/");
+			configureProgramFilesPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
+			// configureProgramFilesPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
+			configureProgramFilesPathAux("/tmp/java-apps/fuzzy-search/");
 		}
 		
-		if ((programsPath == null) || ("".equals(programsPath))) {
-			throw new FoldersUtilsClassException("configureProgramsPath: Cannot configure the path for the programs.");
+		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
+			throw new FoldersUtilsClassException("configureProgramFilesPath: Cannot configure the path for the programs.");
 		}
 		else {
-			LOG.info("choosen folder for uploads: " + programsPath);
+			LOG.info("choosen folder for uploads: " + programFilesPath);
 		}
 		
 		if ((plServerPath == null) || ("".equals(plServerPath))) {
@@ -68,7 +68,7 @@ public class FoldersUtilsClass {
 	 * 
 	 * @param    owner It is the user for which we compute the path.
 	 * @param 	 createIfDoesNotExist If yes and the whole path does not exists the method creates it.
-	 * @return   the complete path where the owner can read/store his/her databases.
+	 * @return   the complete path where the owner can read/store his/her program files.
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
 	 * @exception FoldersUtilsClassException if the folder can not be created
 	 */
@@ -76,14 +76,14 @@ public class FoldersUtilsClass {
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
 
 		LocalUserNameFixesClass.checkValidLocalUserName(owner);
-		String userProgramsPath = programsPath + owner + "/";
-		testOrCreateProgramsPath(userProgramsPath, createIfDoesNotExist);
-		LOG.info("getCompletePathOfOwner: owner: "+owner+" userProgramsPath: "+userProgramsPath);
-		return userProgramsPath ;
+		String userProgramFilesPath = programFilesPath + owner + "/";
+		testOrCreateProgramFilesPath(userProgramFilesPath, createIfDoesNotExist);
+		LOG.info("getCompletePathOfOwner: owner: "+owner+" userProgramFilesPath: "+userProgramFilesPath);
+		return userProgramFilesPath ;
 	}
 
 	/**
-	 * Obtains the complete path of the database. 
+	 * Obtains the complete path of the program file. 
 	 * 
 	 * @param    owner It is the owner of the database.
 	 * @param    database It is the database for which we are computing the path.
@@ -91,13 +91,13 @@ public class FoldersUtilsClass {
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
 	 * @exception FoldersUtilsClassException if the folder or the database do not exist or are invalid.
 	 */
-	public String getCompletePathOfDatabase(String owner, String database) 
+	public String getCompletePathOfProgramFile(String fileOwner, String fileName) 
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
 
-		LocalUserNameFixesClass.checkValidLocalUserName(owner);
-		String ownerPath = programsPath + owner + "/";
-		testOrCreateProgramsPath(ownerPath, false);
-		String databasePath = ownerPath + database;
+		LocalUserNameFixesClass.checkValidLocalUserName(fileOwner);
+		String ownerPath = programFilesPath + fileOwner + "/";
+		testOrCreateProgramFilesPath(ownerPath, false);
+		String databasePath = ownerPath + fileName;
 		File file = new File(databasePath);
 		if ((! file.exists()) || (! file.isFile()) || (! file.canRead())) {
 			throw new FoldersUtilsClassException("getCompletePathOfDatabase: database does not exist or is invalid.");
@@ -112,24 +112,24 @@ public class FoldersUtilsClass {
 	 *  
 	 * @return the path in which programs can be found and/or stored.
 	 */
-	public String getprogramsPath() throws FoldersUtilsClassException {
-		return programsPath;
+	public String getProgramFilesPath() throws FoldersUtilsClassException {
+		return programFilesPath;
 	}
 
 	/**
-	 * If the programsPath attribute is null or an empty string 
-	 * checks if the path proposed in newProgramsPath
-	 * serves for this purpose, and if so it modifies programsPath
+	 * If the programFilesPath attribute is null or an empty string 
+	 * checks if the path proposed in newProgramFilesPath
+	 * serves for this purpose, and if so it modifies programFilesPath
 	 * with its value.
 	 * 
-	 * @param newProgramsPath is the new path to test.
+	 * @param newProgramFilesPath is the new path to test.
 	 */
-	private void configureProgramsPathAux(String newProgramsPath) throws FoldersUtilsClassException {
-		LOG.info("configureProgramsPathAux: testing: " + newProgramsPath);
+	private void configureProgramFilesPathAux(String newProgramFilesPath) throws FoldersUtilsClassException {
+		LOG.info("configureProgramFilesPathAux: testing: " + newProgramFilesPath);
 		
-		if ((programsPath == null) || (programsPath.equals(""))) {
-			if (testOrCreateProgramsPath(newProgramsPath, true)) {
-				programsPath = newProgramsPath;
+		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
+			if (testOrCreateProgramFilesPath(newProgramFilesPath, true)) {
+				programFilesPath = newProgramFilesPath;
 			}
 		}
 	}
@@ -138,24 +138,24 @@ public class FoldersUtilsClass {
 	 * Tests whether the folder exists or not. If not and createIfDoesNotExist is true 
 	 * the it creates it.
 	 * 
-	 * @param     newProgramsPath is the path we are checking.
+	 * @param     newProgramFilesPath is the path we are checking.
 	 * @param 	  createIfDoesNotExist If yes and the whole path does not exists the method creates it.
 	 * @return    true if the folder was there or has been created. False otherwise. 
 	 * @exception FoldersUtilsClassException if the folder can not be created
 	 */
-	public Boolean testOrCreateProgramsPath(String newProgramsPath, Boolean createIfDoesNotExist) 
+	public Boolean testOrCreateProgramFilesPath(String newProgramFilesPath, Boolean createIfDoesNotExist) 
 			throws FoldersUtilsClassException {
 		
-		LOG.info("testOrCreateuserProgramsPath: newProgramsPath: " + newProgramsPath + " createIfDoesNotExist: " +
+		LOG.info("testOrCreateuserProgramFilesPath: newProgramFilesPath: " + newProgramFilesPath + " createIfDoesNotExist: " +
 				createIfDoesNotExist);
 		boolean retval = false;
 		
-		if ((newProgramsPath==null) || (newProgramsPath.equals(""))){
-			throw new FoldersUtilsClassException("testOrCreateuserProgramsPath: newProgramsPath cannot be null nor empty string.");
+		if ((newProgramFilesPath==null) || (newProgramFilesPath.equals(""))){
+			throw new FoldersUtilsClassException("testOrCreateuserProgramFilesPath: newProgramFilesPath cannot be null nor empty string.");
 		}
 		else {
 			
-			File dir = new File(newProgramsPath); 
+			File dir = new File(newProgramFilesPath); 
 			if (dir.exists()) {
 				if (dir.isDirectory() && dir.canRead() && dir.canWrite() && dir.canExecute()) {
 					retval = true;	
@@ -167,7 +167,7 @@ public class FoldersUtilsClass {
 						retval = dir.mkdirs();
 					} 
 					catch (Exception ex) {
-						LOG.info("configureProgramsPathAux: not valid: " + newProgramsPath);
+						LOG.info("configureProgramFilesPathAux: not valid: " + newProgramFilesPath);
 						LOG.info("Exception: " + ex);
 					}
 				}
@@ -201,8 +201,8 @@ public class FoldersUtilsClass {
 		
 		Boolean retVal = false;
 		if (owner.equals(localUserName)) {
-			String ownerProgramsPath = getCompletePathOfOwner(owner, false);
-			String fileToRemove=ownerProgramsPath+database;
+			String ownerProgramFilesPath = getCompletePathOfOwner(owner, false);
+			String fileToRemove=ownerProgramFilesPath+database;
 			
 			File file = new File(fileToRemove);
 			retVal = file.exists();
@@ -229,10 +229,10 @@ public class FoldersUtilsClass {
 	 * @param     localUserName is the name of the user that is logged in.
 	 * @return    the databases iterator, null if there are no databases to iterate.
 	 */
-	public Iterator<DataBaseInfoClass> returnDatabasesIterator(String localUserName) {
-		Iterator<DataBaseInfoClass> databasesIterator = null;
+	public Iterator<FileInfoClass> returnFilesIterator(String localUserName) {
+		Iterator<FileInfoClass> databasesIterator = null;
 		try {
-			ArrayList<DataBaseInfoClass> databasesList = listDatabases(localUserName);
+			ArrayList<FileInfoClass> databasesList = listProgramFiles(localUserName);
 			if (!databasesList.isEmpty()) {
 				databasesIterator = databasesList.iterator(); 
 			}
@@ -252,11 +252,11 @@ public class FoldersUtilsClass {
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
 	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
 	 */
-	private ArrayList<DataBaseInfoClass> listDatabases(String localUserName) 
+	private ArrayList<FileInfoClass> listProgramFiles(String localUserName) 
 			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
 				
-		File dir = new File(programsPath);
-		ArrayList<DataBaseInfoClass> currentList = new ArrayList<DataBaseInfoClass>();
+		File dir = new File(programFilesPath);
+		ArrayList<FileInfoClass> currentList = new ArrayList<FileInfoClass>();
 
 		FilenameFilter filter;
 		String[] subDirs;
@@ -269,7 +269,7 @@ public class FoldersUtilsClass {
 		if (subDirs != null) {
 		    for (int i=0; i<subDirs.length; i++) {
 		        // Get filename of file or directory
-		    	currentList= listDatabasesInSubDir(subDirs[i], currentList);
+		    	currentList= listProgramFilesInSubDir(subDirs[i], currentList);
 		    }
 		}
 
@@ -281,7 +281,7 @@ public class FoldersUtilsClass {
 		if (subDirs != null) {
 		    for (int i=0; i<subDirs.length; i++) {
 		        // Get filename of file or directory
-		    	currentList= listDatabasesInSubDir(subDirs[i], currentList);
+		    	currentList= listProgramFilesInSubDir(subDirs[i], currentList);
 		    }
 		}
 		
@@ -296,14 +296,14 @@ public class FoldersUtilsClass {
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
 	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
 	 */
-	private ArrayList<DataBaseInfoClass> listDatabasesInSubDir(String subDir, ArrayList<DataBaseInfoClass> currentList) 
+	private ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) 
 			throws FoldersUtilsClassException {
 
 		LOG.info("listDatabasesInSubDir: subDir: " + subDir);
 		if ((subDir == null) || ("".equals(subDir))) {
 			throw new FoldersUtilsClassException("listDatabasesInSubDir: subDir cannot be null nor empty string.");
 		}
-		String realPathSubDir = programsPath + subDir + "/";
+		String realPathSubDir = programFilesPath + subDir + "/";
 		File dir = new File(realPathSubDir);
 		FilenameFilter filter = (FilenameFilter) new OnlyCiaoPrologFilesFilterClass();
 		String[] files = dir.list(filter);
@@ -311,7 +311,7 @@ public class FoldersUtilsClass {
 		if (files != null) {
 		    for (int i=0; i<files.length; i++) {
 		        // Get filename of file or directory
-		    	currentList.add(new DataBaseInfoClass(files[i], subDir));
+		    	currentList.add(new FileInfoClass(files[i], subDir));
 		    }
 		}
 		return currentList;
@@ -411,7 +411,7 @@ public class FoldersUtilsClass {
 	 * and the files inside can be accessed. 
 	 * 
 	 * @param folderPath is the path of the folder.
-	 * @param relativePath if true then programsPath + relativePath will be used instead.
+	 * @param relativePath if true then programFilesPath + relativePath will be used instead.
 	 * @throws FoldersUtilsClassException when folderPath is empty string or null.
 	 * 
 	 */
@@ -422,7 +422,7 @@ public class FoldersUtilsClass {
 			throw new FoldersUtilsClassException("folderExists: folderPath is empty string or null.");
 		}
 		if (relativePath) {
-			folderPath = programsPath + folderPath;
+			folderPath = programFilesPath + folderPath;
 		}
 		File dir = new File(folderPath);
 		Boolean retVal = ((dir.exists()) && (dir.isDirectory()) && (dir.canRead()) && (dir.canExecute()));
@@ -435,7 +435,7 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Boolean databaseExists(String owner, String database, Boolean relativePath) throws FoldersUtilsClassException {
+	public Boolean programFileExists(String owner, String database, Boolean relativePath) throws FoldersUtilsClassException {
 		
 		LOG.info("databaseExists: owner: " + owner + " database: " + database);
 		if ((owner == null) || ("".equals(owner))) {
@@ -447,7 +447,7 @@ public class FoldersUtilsClass {
 		
 		String fullPath = null;
 		if (relativePath) {
-			fullPath = programsPath + owner + "/" + database;
+			fullPath = programFilesPath + owner + "/" + database;
 		}
 		File file = new File(fullPath);
 		Boolean retVal = ((file.exists()) && (file.isFile()) && (file.canRead()));

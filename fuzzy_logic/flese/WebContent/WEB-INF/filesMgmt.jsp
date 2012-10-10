@@ -6,7 +6,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.FoldersUtilsClass"%>
-<%@page import="auxiliar.DataBaseInfoClass"%>
+<%@page import="auxiliar.FileInfoClass"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
@@ -15,7 +15,7 @@
     	<jsp:include page="commonBody.jsp" />
 	
 		<script type="text/javascript">
-			var servlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>";
+			var servlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
 			function lineForProgramFile(tableId, fileName, fileOwner) {
 				debug.info("lineForProgramFile: fileName: " + fileName);
 				debug.info("lineForProgramFile: fileOwner: " + fileOwner);
@@ -24,52 +24,42 @@
 				var row = table.insertRow(rowCount);
 
 				var cell1 = row.insertCell(0);
-				var element1 = document.createElement('a');
-				element1.setAttribute('href', servlet + "?op=view&database=" + fileName + "&owner=" + fileOwner);
-				element1.setAttribute('title', fileName);
-				element1.setAttribute('onmouseover', showInfoMessage('infoBox', 'view program file ' + fileName));
-				element1.setAttribute('onmouseout', showInfoMessage('infoBox', ''));
-				cell1.appendChild(element1);
+				cell1.innerHTML = "<a href='"+servlet+"?op=view&fileName="+fileName+"&owner="+fileOwner+"' "+
+						"onmouseover='showInfoMessage(\"infoBox\", \"view program file "+fileName+"\")' "+
+						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'>"+fileName+"</a> ";
 				
 				var cell2 = row.insertCell(1);
 				cell2.innerHTML=fileOwner;
 				
 				var cell3 = row.insertCell(2);
-				var element2 = document.createElement('a');
-				element2.setAttribute('href', servlet + "?op=remove&database=" + fileName + "&owner=" + fileOwner);
-				var element3 = document.createElement("image");
-				element3.setAttribute('src', 'remove-file.gif');
-				element3.setAttribute('alt', 'remove');
-				element3.setAttribute('width', '20');
-				element2.setAttribute('title', element3);
-				element2.setAttribute('onmouseover', showInfoMessage('infoBox', 'remove program file ' + fileName));
-				element2.setAttribute('onmouseout', showInfoMessage('infoBox', ''));
-				cell3.appendChild(element2);
+				cell3.innerHTML = "<a href='"+servlet+"?op=remove&fileName="+fileName+"&owner="+fileOwner+"' "+
+						"onmouseover='showInfoMessage(\"infoBox\", \"remove program file "+fileName+"\")' "+
+						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'"+
+						"onclick='return confirm(\"Are you sure you want to delete program file "+fileName+"?\")'>"+
+						"<img src=\"remove-file.gif\" alt=\"remove\" width=\"20\"></img></a> ";
 				
 				var cell4 = row.insertCell(3);
-				var element4 = document.createElement('a');
-				element4.setAttribute('href', servlet + "?op=query&database=" + fileName + "&owner=" + fileOwner);
-				element4.setAttribute('title', 'Query');
-				element4.setAttribute('onmouseover', showInfoMessage('infoBox', 'query program file ' + fileName));
-				element4.setAttribute('onmouseout', showInfoMessage('infoBox', ''));
-				cell4.appendChild(element4);
+				cell4.innerHTML = "<a href='"+servlet+"?op=query&fileName="+fileName+"&owner="+fileOwner+"' "+
+						"onmouseover='showInfoMessage(\"infoBox\", \"query program file "+fileName+"\")' "+
+						"onmouseout='showInfoMessage(\"infoBox\", \"&nbsp;\")'>"+Query+"</a> ";
 			}
 		</script>
 	<%
 		String localUserName = (String) session.getAttribute("localUserName");
 
-		FoldersUtilsClass workingFolder = new FoldersUtilsClass();
-			Iterator<DataBaseInfoClass> databasesIterator = null;
-			if (workingFolder != null) {
-		databasesIterator = workingFolder.returnDatabasesIterator(localUserName);
-			}
-			/*
-			else {
-		out.print("<h4>Error in application: working folder should not be null</h4>");
-			}*/
-			if (databasesIterator != null) {
+			FoldersUtilsClass workingFolder = new FoldersUtilsClass();
+		Iterator<FileInfoClass> filesIterator = null;
+		if (workingFolder != null) {
+			filesIterator = workingFolder.returnFilesIterator(localUserName);
+		}
+		/*
+		else {
+			out.print("<h4>Error in application: working folder should not be null</h4>");
+		}*/
+		if (filesIterator != null) {
 	%>
 	<h3>Choose an existing program file for querying, viewing or remove</h3>
+	<br />
 	<div id="infoBox">&nbsp;</div>
 	<br />
 		<table id='files'>
@@ -80,11 +70,12 @@
 					<td>&nbsp;</td>
 				</tr>
 		</table>
-	<%			while (databasesIterator.hasNext()) {
-					DataBaseInfoClass dataBaseInfo = databasesIterator.next();
-				%>
+	<%
+		while (filesIterator.hasNext()) {
+				FileInfoClass fileInfo = filesIterator.next();
+	%>
 				<script type="text/javascript">
-					lineForProgramFile('files', "<%=dataBaseInfo.getDataBaseName()%>", "<%=dataBaseInfo.getDataBaseOwner()%>");
+					lineForProgramFile('files', "<%=fileInfo.getDataBaseName()%>", "<%=fileInfo.getDataBaseOwner()%>");
 				</script>
 
 				<%
@@ -99,7 +90,7 @@
 			}
 		</script>
 
-		<h3>Upload a new database</h3>
+		<h3>Upload a new program file</h3>
 		<FORM ENCTYPE='multipart/form-data' method='POST' action="FilesMgmtServlet?op=upload">
 			<INPUT TYPE='file' NAME='fuzzy-database' size="50" onchange="unhideUpload('uploadButton');">
 			<DIV id='uploadButton'> 

@@ -2,7 +2,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
-<%@page import="auxiliar.DataBaseInfoClass"%>
+<%@page import="auxiliar.FileInfoClass"%>
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
 <%  Iterator<String []> loadedProgramQuantifiersIterator = connection.getLoadedProgramQuantifiersIterator(); %>
