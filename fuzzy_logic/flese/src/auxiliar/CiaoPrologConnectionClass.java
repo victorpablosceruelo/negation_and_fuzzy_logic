@@ -45,11 +45,12 @@ public class CiaoPrologConnectionClass {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
 		// rfuzzy_introspection(T, PN, PA).
-		PLVariable[] variables = new PLVariable[3];
+		PLVariable[] variables = new PLVariable[4];
 		variables[0] = new PLVariable(); // predicateType
 		variables[1] = new PLVariable(); // predicateName
 		variables[2] = new PLVariable(); // predicateArity
-		PLTerm[] args = {variables[0], variables[1], variables[2]};
+		variables[3] = new PLVariable(); // predicateType
+		PLTerm[] args = {variables[0], variables[1], variables[2], variables[3]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
 		ArrayList<String []> queryAnswers = performQuery(query, fileOwner, fileName, variables);
