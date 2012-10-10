@@ -125,6 +125,7 @@ public class CiaoPrologConnectionClass {
 
 		// Change working folder and run the query.
 		changeCiaoPrologWorkingFolder(fileOwner, plConnection);
+		performQueryAux(query, fileName, variables, maximumLong, maximumLong, plConnection);
 		
 		if (plConnection != null) {
 			try {
