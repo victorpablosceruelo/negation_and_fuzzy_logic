@@ -16,21 +16,43 @@
 	
 		<script type="text/javascript">
 			var servlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>";
-			function lineForProgramFile(fileName, fileOwner) {
-				debug.info("lineForProgramFile: fileName: " + fileName + " fileOwner:" + fileOwner);
-				return "<tr><td>"+
-						"<a onmouseover='showInfoMessage('infoBox', 'view program file " + fileName + "')'"+
-						"onmouseout='showInfoMessage('infoBox', '')'"+
-						"href=\"" + servlet + "?op=view&database=" + fileName + "&owner=" + fileOwner + ">" + fileName + "</a></td>" +
-						"<td>" + fileName + "</td>" + 
-						"<td><a onmouseover='showInfoMessage('infoBox', 'remove program file "+ fileName +")'"+
-						"onmouseout='showInfoMessage('infoBox', '')'" + 
-						"href='" + servlet + "?op=remove&database=" + fileName + "&owner=" + fileOwner + "'>" +
-						"<img src='remove-file.gif' alt='remove' width='20'></img></a></td>" +
-						"<td><a onmouseover='showInfoMessage('infoBox', 'query program file " + fileName + ")'" +
-						"onmouseout='showInfoMessage('infoBox', '')'"+
-						"href='" + servlet + "?op=query&database=" + fileName + "&owner=" + fileOwner + "'>" + 
-						"Query</a></td></tr>";				
+			function lineForProgramFile(tableId, fileName, fileOwner) {
+				debug.info("lineForProgramFile: fileName: " + fileName);
+				debug.info("lineForProgramFile: fileOwner: " + fileOwner);
+				var table = document.getElementById(tableId);
+				var rowCount = table.rows.length;
+				var row = table.insertRow(rowCount);
+
+				var cell1 = row.insertCell(0);
+				var element1 = document.createElement('a');
+				element1.setAttribute('href', servlet + "?op=view&database=" + fileName + "&owner=" + fileOwner);
+				element1.setAttribute('title', fileName);
+				element1.setAttribute('onmouseover', showInfoMessage('infoBox', 'view program file ' + fileName));
+				element1.setAttribute('onmouseout', showInfoMessage('infoBox', ''));
+				cell1.appendChild(element1);
+				
+				var cell2 = row.insertCell(1);
+				cell2.innerHTML=fileOwner;
+				
+				var cell3 = row.insertCell(2);
+				var element2 = document.createElement('a');
+				element2.setAttribute('href', servlet + "?op=remove&database=" + fileName + "&owner=" + fileOwner);
+				var element3 = document.createElement("image");
+				element3.setAttribute('src', 'remove-file.gif');
+				element3.setAttribute('alt', 'remove');
+				element3.setAttribute('width', '20');
+				element2.setAttribute('title', element3);
+				element2.setAttribute('onmouseover', showInfoMessage('infoBox', 'remove program file ' + fileName));
+				element2.setAttribute('onmouseout', showInfoMessage('infoBox', ''));
+				cell3.appendChild(element2);
+				
+				var cell4 = row.insertCell(3);
+				var element4 = document.createElement('a');
+				element4.setAttribute('href', servlet + "?op=query&database=" + fileName + "&owner=" + fileOwner);
+				element4.setAttribute('title', 'Query');
+				element4.setAttribute('onmouseover', showInfoMessage('infoBox', 'query program file ' + fileName));
+				element4.setAttribute('onmouseout', showInfoMessage('infoBox', ''));
+				cell4.appendChild(element4);
 			}
 		</script>
 	<%
@@ -50,27 +72,26 @@
 	<h3>Choose an existing program file for querying, viewing or remove</h3>
 	<div id="infoBox">&nbsp;</div>
 	<br />
-		<table>
+		<table id='files'>
 				<tr>
 					<td>File Name</td>
 					<td>File Owner</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>
-	<%
-			while (databasesIterator.hasNext()) {
-				DataBaseInfoClass dataBaseInfo = databasesIterator.next();
+		</table>
+	<%			while (databasesIterator.hasNext()) {
+					DataBaseInfoClass dataBaseInfo = databasesIterator.next();
 				%>
 				<script type="text/javascript">
-					lineForProgramFile("<%=dataBaseInfo.getDataBaseName()%>", "<%=dataBaseInfo.getDataBaseOwner()%>");
+					lineForProgramFile('files', "<%=dataBaseInfo.getDataBaseName()%>", "<%=dataBaseInfo.getDataBaseOwner()%>");
 				</script>
 
 				<%
+				}
 			}
 	%>
-		</table>
-	<% } %>
-
+	
 		<script type="text/javascript">
 			function unhideUpload() {
 				var html = "<INPUT TYPE=\'submit\' VALUE=\'Upload File\'>"
