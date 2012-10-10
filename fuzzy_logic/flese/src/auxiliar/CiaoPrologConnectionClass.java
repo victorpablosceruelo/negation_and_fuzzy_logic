@@ -258,6 +258,7 @@ public class CiaoPrologConnectionClass {
 					logMsg += PLVariablesArrayToString(variables);
 					LOG.info("performQueryAux: " + logMsg + " ");
 					
+					variables[i].isList()
 					variablesCopy = new String [variables.length];
 					for (int i=0; i < variables.length; i++) {
 						variablesCopy[i] = variables[i].getBinding().toString();

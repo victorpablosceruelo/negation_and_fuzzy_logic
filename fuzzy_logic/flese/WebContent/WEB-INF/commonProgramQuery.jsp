@@ -10,9 +10,10 @@
 <%  Iterator<String []> loadedProgramFuzzyRulesIterator = connection.getLoadedProgramFuzzyRulesIterator(); %>
 
 <script type="text/javascript">
-	function predInfo(predName, predArity) {
+	function predInfo(predName, predArity, predType) {
 		this.predName = predName;
 		this.predArity = predArity;
+		this.predType = predType;
 	}
 	
 	var quantifiersArray = new Array();
@@ -23,7 +24,7 @@
 			while (loadedProgramQuantifiersIterator.hasNext()) {
 				quantifierInfo = loadedProgramQuantifiersIterator.next();
 				%>
-				quantifiersArray[<%=counter%>] = new predInfo("<%=quantifierInfo[1]%>", <%=quantifierInfo[2]%>);
+				quantifiersArray[<%=counter%>] = new predInfo("<%=quantifierInfo[1]%>", <%=quantifierInfo[2]%>, <%=quantifierInfo[3]%>);
 				<%
 				counter++;
 			}
@@ -39,7 +40,7 @@
 			while (loadedProgramFuzzyRulesIterator.hasNext()) {
 				fuzzyRuleInfo = loadedProgramFuzzyRulesIterator.next();
 				%>
-				fuzzyRulesArray[<%=counter%>] = new predInfo("<%=fuzzyRuleInfo[1]%>", <%=fuzzyRuleInfo[2]%>);
+				fuzzyRulesArray[<%=counter%>] = new predInfo("<%=fuzzyRuleInfo[1]%>", <%=fuzzyRuleInfo[2]%>, <%=fuzzyRuleInfo[3]%>);
 				<%
 				counter++;
 			}
