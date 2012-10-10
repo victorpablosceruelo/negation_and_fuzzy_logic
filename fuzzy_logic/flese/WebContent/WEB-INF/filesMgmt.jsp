@@ -7,6 +7,7 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.FoldersUtilsClass"%>
 <%@page import="auxiliar.DataBaseInfoClass"%>
+<%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <body>
@@ -41,6 +42,9 @@
 			while (databasesIterator.hasNext()) {
 				DataBaseInfoClass dataBaseInfo = databasesIterator.next();
 				%>
+				<script type="text/javascript">
+					lineForDatabase("<%=dataBaseInfo.getDataBaseName()%>", "<%=dataBaseInfo.getDataBaseOwner()%>");
+				</script>
 				<tr>
 					<td>
 						<a onmouseover='showInfoMessage("infoBox", "view program file <%=dataBaseInfo.getDataBaseName() %>")'

@@ -15,7 +15,8 @@ import org.apache.commons.logging.Log;
 
 public class ServletsAuxMethodsClass {
 
-	public final static String appPath = "/fuzzy-search/";
+	private final static String appPath = "flese/";
+	private static String appUrl = null;
 
 	/**
 	 * Tests if the client session has been authenticated.
@@ -132,78 +133,89 @@ public class ServletsAuxMethodsClass {
 	}
 	
 	private static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
-	    String requestUrl = request.getRequestURL().toString();
-	    String queryString = request.getQueryString();   // d=789
-	    
-	    if (LOG != null) {
-	    	if (requestUrl != null) LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
-	    	if (queryString != null) LOG.info("getUrlFromRequest: queryString: " + queryString);
-	    }
-	    
-	    if (requestUrl != null) {
-	    	Integer index = requestUrl.lastIndexOf("/"); // http:// ... /page
-	    	String appUrl = requestUrl.substring(0, index);
-	    	if (appUrl != null) {
-	    		if (LOG != null) LOG.info("getUrlFromRequest: appUrl: " + appUrl);
-	    		return appUrl;
+	    if (appUrl == null) {
+		    String requestUrl = request.getRequestURL().toString();
+		    String queryString = request.getQueryString();   // d=789
+		    
+		    if (LOG != null) {
+		    	if (requestUrl != null) LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
+		    	if (queryString != null) LOG.info("getUrlFromRequest: queryString: " + queryString);
+		    }
+		    
+	    	if (requestUrl != null) {
+	    		Integer index = requestUrl.lastIndexOf(appPath); // http:// ... /page
+	    		appUrl = requestUrl.substring(0, index + appPath.length());
+	    		if (appUrl != null) {
+	    			if (LOG != null) LOG.info("getUrlFromRequest: appUrl: " + appUrl);
+	    			return appUrl;
+	    		}
 	    	}
 	    }
+	    else return appUrl;
+	    
 	    return ""; // Better an empty stream than a null pointer !!!
 	}
 	
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
-	public static final int error_Page = 0;
-	public static final int IndexServlet = 1;
-	public static final int IndexPage = 2;
-	public static final int AuthenticationServletSignin = 3;
-	public static final int AuthenticationServletSignout = 4;
-	public static final int AuthenticationServletSigned = 5;
-	public static final int FilesMgmtServlet = 6;
-	public static final int DataBasesMenu_Page = 7;
-	public static final int DataBaseQueryServlet_Page = 8;
-	public static final int DataBaseQuery_Page = 9;
-	public static final int DataBaseQueryResults_Page = 10;
-	public static final int UserInfoServlet_Page = 11;
-	public static final int UserInfo_Page = 12;
-	public static final int FileView_Page = 13;
+	public static final int errorPage = 0;
+	public static final int IndexPage = 1;
+	public static final int AuthenticationServletSignin = 2;
+	public static final int AuthenticationServletSignout = 3;
+	public static final int AuthenticationServletSigned = 4;
+	public static final int AuthenticationServletUserInfo = 5;
+	public static final int AuthenticationPage = 6;
+	public static final int AuthenticatedUserInfoPage = 7;
+	public static final int FilesMgmtServlet = 8;
+	public static final int FilesMgmtIndexPage = 9;
+	public static final int FilesMgmtFileViewPage = 10;
+	public static final int QueryServletSimpleQuery = 11;
+	public static final int QueryServletAdvancedQuery = 12;
+	public static final int QueryServletRunQuery = 13;
+	public static final int SimpleQueryPage = 14;
+	public static final int AdvancedQueryPage = 15;
+	public static final int QueryResultsPage = 16;
 	
 	
 	private static String appMappingForUriNickName(int UriNickName, Log LOG) {
 		String retVal = null;
 		switch (UriNickName) {
-		case error_Page: retVal = "/error.jsp";
+		case errorPage: retVal = "error.jsp";
 				break;
-		case IndexServlet_Page: retVal = "/IndexServlet";
+		case IndexPage: retVal = "index.jsp";
 				break;
-		case Index_Page: retVal = "/WEB-INF/appIndex.jsp";
+		case AuthenticationServletSignin: retVal = "SocialAuthServlet?op=signin";
 				break;
-		case AuthenticationServletSignin: retVal = "/SocialAuthServlet?op=signin";
+		case AuthenticationServletSignout: retVal = "SocialAuthServlet?op=signout";
 				break;
-		case AuthenticationServletSignout: retVal = "/SocialAuthServlet?op=signout";
+		case AuthenticationServletSigned: retVal = "SocialAuthServlet?op=signed";
 				break;
-		case AuthenticationServletSigned: retVal = "/SocialAuthServlet?op=signed";
+		case AuthenticationServletUserInfo: retVal = "SocialAuthServlet?op=userInfo";
 				break;
-		case DataBasesMenuServlet_Page: retVal = "/DataBasesMenuServlet";
+		case AuthenticationPage: retVal = "WEB-INF/authentication.jsp";
 				break;
-		case DataBasesMenu_Page: retVal = "/WEB-INF/dataBasesMenu.jsp";
+		case AuthenticatedUserInfoPage: retVal = "WEB-INF/authenticatedUserInfo.jsp";
 				break;
-		case QueryServlet: retVal = "/DataBaseQueryServlet";
+		case FilesMgmtServlet: retVal = "FilesMgmtServlet";
 				break;
-		case NormalQuery_Page: retVal = "/DataBaseQueryServlet";
+		case FilesMgmtIndexPage: retVal = "WEB-INF/filesMgmt.jsp";
 				break;
-		case DataBaseQuery_Page: retVal = "/WEB-INF/dataBaseQuery.jsp";
+		case FilesMgmtFileViewPage: retVal = "WEB-INF/filesMgmtFileView.jsp";
 				break;
-		case DataBaseQueryResults_Page: retVal = "/WEB-INF/dataBaseQueryResults.jsp";
+		case QueryServletSimpleQuery: retVal = "QueryServlet?op=simpleQuery";
 				break;
-		case UserInfoServlet_Page: retVal = "/UserInfoServlet";
+		case QueryServletAdvancedQuery: retVal = "QueryServlet?op=advancedQuery";
 				break;
-		case UserInfo_Page: retVal = "/WEB-INF/userInfo.jsp";
+		case QueryServletRunQuery: retVal = "QueryServlet?op=runQuery";
 				break;
-		case FileView_Page: retVal = "/WEB-INF/fileView.jsp";
+		case SimpleQueryPage: retVal = "WEB-INF/fleseSimpleQuery.jsp";
 				break;
-		default: retVal = "/error.jsp";
+		case AdvancedQueryPage: retVal = "WEB-INF/fleseAdvancedQuery.jsp";
+				break;
+		case QueryResultsPage: retVal = "WEB-INF/fleseQueryResults.jsp";
+				break;
+		default: retVal = "error.jsp";
 				break;
 		}
 		if (LOG != null) LOG.info("appURIsMappingFor " + UriNickName + " is " + retVal);

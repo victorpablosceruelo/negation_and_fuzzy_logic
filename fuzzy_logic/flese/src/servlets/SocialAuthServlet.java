@@ -106,25 +106,27 @@ public class SocialAuthServlet extends HttpServlet {
 		LOG.info("socialAuthentication method call. ");
 		// AuxMethodsClass.log_request_parameters(request, LOG);
 		
-		String request_mode = request.getParameter("mode");
-		if ((request_mode == null) || ("".equals(request_mode))	) { 
-			LOG.info("ERROR: erroneous request_mode (empty or null). ");
-			request_mode = "signin";
+		String request_op = request.getParameter("op");
+		if (! (request_op == null)) request.removeAttribute("op");
+		
+		if ((request_op == null) || ("".equals(request_op))	) { 
+			LOG.info("ERROR: erroneous request_op (empty or null). ");
+			request_op = "signin";
 		}
 		
-		if ("signed".equals(request_mode)) socialAuthenticationSigned(request, response);
-		if ("signout".equals(request_mode)) socialAuthenticationSignOut(request, response);
-		if ("userInfo".equals(request_mode)) socialAuthenticationUserInfo(request, response);
+		if ("signed".equals(request_op)) socialAuthenticationSigned(request, response);
+		if ("signout".equals(request_op)) socialAuthenticationSignOut(request, response);
+		if ("userInfo".equals(request_op)) socialAuthenticationUserInfo(request, response);
 
-		if ("signin".equals(request_mode)) {
+		if ("signin".equals(request_op)) {
 			if (! socialAuthenticationInTestingMode(request, response)) {
 				socialAuthenticationSignIn(request, response);
 			}
 		}
 
-		if ((! "signed".equals(request_mode)) && (! "signin".equals(request_mode)) &&
-			(! "signout".equals(request_mode)) && (! "userInfo".equals(request_mode))) {
-			LOG.info("ERROR: erroneous request_mode: " + request_mode);
+		if ((! "signed".equals(request_op)) && (! "signin".equals(request_op)) &&
+			(! "signout".equals(request_op)) && (! "userInfo".equals(request_op))) {
+			LOG.info("ERROR: erroneous request_op: " + request_op);
 			socialAuthenticationSignOut(request, response);
 		}
 	}
@@ -237,7 +239,7 @@ public class SocialAuthServlet extends HttpServlet {
 			session.setAttribute("msgs", msgs);
 		}
 		
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.Index_Page, request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationPage, request, response, LOG);
 	}
 	
 	private void socialAuthenticationSigned(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -301,7 +303,7 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		else {
 			ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
 		}
 	}
 
@@ -321,7 +323,7 @@ public class SocialAuthServlet extends HttpServlet {
 				String localUserName = LocalUserNameFixesClass.getLocalUserName(null);
 	    		session.setAttribute("localUserName", localUserName);
 	    		ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
-	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);	
+	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
 	    	}
 		}
 	    
@@ -332,7 +334,7 @@ public class SocialAuthServlet extends HttpServlet {
 	private void socialAuthenticationUserInfo(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
 		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.UserInfo_Page, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticatedUserInfoPage, request, response, LOG);
 		}
 		else {
 			socialAuthenticationSignOut(request, response);

@@ -5,7 +5,8 @@
 <body>
 <H1>FleSe : <u>Fle</u>xible <u>Se</u>arches in Databases</H1>
 
-<a href="IndexServlet">Go to the application</a>
+<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Go to the application</a>
 <br />
 <br />
 This application has been developed by

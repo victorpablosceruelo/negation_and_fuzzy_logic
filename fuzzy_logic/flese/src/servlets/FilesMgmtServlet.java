@@ -21,7 +21,7 @@ import auxiliar.ServletsAuxMethodsClass;
 /**
  * Servlet implementation class SearchServlet
  */
-@WebServlet("/DataBasesMenuServlet")
+@WebServlet("/FilesMgmtServlet")
 public class FilesMgmtServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(FilesMgmtServlet.class);
@@ -87,12 +87,12 @@ public class FilesMgmtServlet extends HttpServlet {
 				
 				if ((! "upload".equals(request_op)) && (! ("download".equals(request_op))) &&
 					     (! ("remove".equals(request_op))) && (! ("view".equals(request_op)))) {
-					ServletsAuxMethodsClass.addMessageToTheUser(request, "Strange op in request. op: " + request_op, LOG);
+					LOG.info("Strange op in request. op: " + request_op);
 				}
 			}
 
 			if ((request_op == null) || ((! ("download".equals(request_op))) && (! ("view".equals(request_op))))) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.DataBasesMenuServlet_Page, request, response, LOG);
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, request, response, LOG);
 			}
 		}
 	}

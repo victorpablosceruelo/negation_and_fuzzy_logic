@@ -1,4 +1,5 @@
 
+<%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
 <%
 	String localUserName = (String) session.getAttribute("localUserName");
@@ -13,13 +14,13 @@
 				<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
 				logged as <%=localUserName %>
 				<br>
-				<a href="UserInfoServlet">user profile</a>
+				<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletUserInfo, request, null) %>">user profile</a>
 				<% } else { %>
 				Not logged in
 				<% } %>
 			</td>
 			<td id="bodyHeadLogout">
-				<a href="SocialAuthServlet?mode=signout">Signout</a>
+				<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Signout</a>
 			</td>
 		</tr>
 	</table>

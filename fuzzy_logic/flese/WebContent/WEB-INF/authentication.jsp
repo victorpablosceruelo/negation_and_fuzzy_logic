@@ -2,6 +2,8 @@
 <!-- JavaScript Debugging Code and more -->
 <jsp:include page="commonJavaScriptCode.jsp" />
 
+<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+
 	<script type="text/javascript">
 		function validate(obj){
 			var val = obj.id.value;
@@ -31,50 +33,50 @@
 		<table class="providersIcons">
 			<tr>
 				<td>
-					<a href="SocialAuthServlet?id=facebook&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=facebook">
 					<img src="facebook_icon.png" alt="Facebook" title="Facebook" border="0" width="50"></img>
 					</a>
 				</td>
 				<td>			
-					<a href="SocialAuthServlet?id=twitter&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=twitter">
 					<img src="twitter_icon.png" alt="Twitter" title="Twitter" border="0" width="50"></img></a> 
 				</td> 
 				<td>
-					<a href="SocialAuthServlet?id=google&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=google">
 					<img src="gmail_icon.png" alt="Gmail" title="Gmail" border="0" width="50"></img></a> 
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href="SocialAuthServlet?id=yahoo&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=yahoo">
 					<img src="yahoomail_icon.png" alt="YahooMail" title="YahooMail" border="0" width="50"></img></a> 
 				</td> 
 				<td>
-					<a href="SocialAuthServlet?id=hotmail&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=hotmail">
 					<img src="hotmail_icon.jpeg" alt="HotMail" title="HotMail" border="0" width="50"></img></a> 
 				</td> 
 				<td>
-					<a href="SocialAuthServlet?id=linkedin&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=linkedin">
 					<img src="linkedin_icon.gif" alt="Linked In" title="Linked In" border="0" width="50"></img></a> 
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a href="SocialAuthServlet?id=foursquare&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=foursquare">
 					<img src="foursquare_icon.jpeg" alt="FourSquare" title="FourSquare" border="0" width="50"></img></a> 
 				</td>
 				<td>
-					<a href="SocialAuthServlet?id=myspace&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=myspace">
 					<img src="myspace_icon.jpeg" alt="MySpace" title="MySpace" border="0" width="50"></img></a>
 				</td> 
 				<td>
-					<a href="SocialAuthServlet?id=mendeley&mode=signin">
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=mendeley">
 					<img src="mendeley_icon.jpg" alt="Mendeley" title="Mendeley" border="0" width="50"></img>
 					</a> 
 				</td>
 			</tr>
 		<!--  Yammer is a Private Social Network for Your Company					
-		<a href="SocialAuthServlet?id=yammer&mode=signin"><img
+		<a href="SocialAuthServlet?id=yammer&op=signin"><img
 			src="images/yammer.jpg" alt="Yammer" title="Yammer" border="0"></img></a>
 		<br /> <br /> 
 		 -->
