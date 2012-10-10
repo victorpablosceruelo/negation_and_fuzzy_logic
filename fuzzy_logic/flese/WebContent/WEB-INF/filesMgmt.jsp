@@ -14,6 +14,25 @@
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
 	
+		<script type="text/javascript">
+			var servlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>";
+			function lineForProgramFile(fileName, fileOwner) {
+				debug.info("lineForProgramFile: fileName: " + fileName + " fileOwner:" + fileOwner);
+				return "<tr><td>"+
+						"<a onmouseover='showInfoMessage('infoBox', 'view program file " + fileName + "')'"+
+						"onmouseout='showInfoMessage('infoBox', '')'"+
+						"href=\"" + servlet + "?op=view&database=" + fileName + "&owner=" + fileOwner + ">" + fileName + "</a></td>" +
+						"<td>" + fileName + "</td>" + 
+						"<td><a onmouseover='showInfoMessage('infoBox', 'remove program file "+ fileName +")'"+
+						"onmouseout='showInfoMessage('infoBox', '')'" + 
+						"href='" + servlet + "?op=remove&database=" + fileName + "&owner=" + fileOwner + "'>" +
+						"<img src='remove-file.gif' alt='remove' width='20'></img></a></td>" +
+						"<td><a onmouseover='showInfoMessage('infoBox', 'query program file " + fileName + ")'" +
+						"onmouseout='showInfoMessage('infoBox', '')'"+
+						"href='" + servlet + "?op=query&database=" + fileName + "&owner=" + fileOwner + "'>" + 
+						"Query</a></td></tr>";				
+			}
+		</script>
 	<%
 		String localUserName = (String) session.getAttribute("localUserName");
 
@@ -43,25 +62,9 @@
 				DataBaseInfoClass dataBaseInfo = databasesIterator.next();
 				%>
 				<script type="text/javascript">
-					lineForDatabase("<%=dataBaseInfo.getDataBaseName()%>", "<%=dataBaseInfo.getDataBaseOwner()%>");
+					lineForProgramFile("<%=dataBaseInfo.getDataBaseName()%>", "<%=dataBaseInfo.getDataBaseOwner()%>");
 				</script>
-				<tr>
-					<td>
-						<a onmouseover='showInfoMessage("infoBox", "view program file <%=dataBaseInfo.getDataBaseName() %>")'
-							onmouseout='showInfoMessage("infoBox", "")'
-							href="FilesMgmtServlet?op=view&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
-						<%=dataBaseInfo.getDataBaseName() %></a>
-					</td>
-					<td><%=dataBaseInfo.getDataBaseOwner() %></td>
-					<td><a onmouseover='showInfoMessage("infoBox", "remove program file <%=dataBaseInfo.getDataBaseName() %>")'
-							onmouseout='showInfoMessage("infoBox", "")'
-							href="FilesMgmtServlet?op=remove&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
-							<img src="remove-file.gif" alt="remove" width="20"></img></a></td>
-					<td><a onmouseover='showInfoMessage("infoBox", "query program file <%=dataBaseInfo.getDataBaseName() %>")'
-							onmouseout='showInfoMessage("infoBox", "")'
-							href="DataBaseQueryServlet?op=query&database=<%=dataBaseInfo.getDataBaseName()%>&owner=<%=dataBaseInfo.getDataBaseOwner()%>">
-							Query</a></td>
-				</tr>
+
 				<%
 			}
 	%>
