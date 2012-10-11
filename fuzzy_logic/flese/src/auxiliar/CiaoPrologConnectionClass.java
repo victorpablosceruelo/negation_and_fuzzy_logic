@@ -16,15 +16,12 @@ public class CiaoPrologConnectionClass {
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
-	private String currentProgramFileName = null;
-	private String currentProgramFileOwner = null;
-	private String currentProgramFileOwnerWithPath = null;
-	private ArrayList<String []> loadedProgramQuantifiers = null;
-	private ArrayList<String []> loadedProgramCrispPredicates = null;
-	private ArrayList<String []> loadedProgramFuzzyRules = null;
-	private ArrayList<String []> loadedProgramAggregators = null;
-	private String lastQuery = null;
-	private ArrayList<String []> lastAnswers = null;
+	private ArrayList<PLVariable []> latestEvaluatedQueryAnswers = null;
+	private ArrayList<PLVariable []> programIntrospection = null;
+	private String latestEvaluatedQueryProgramFileName = null;
+	private String latestEvaluatedQueryProgramFileOwner = null;
+	private String latestEvaluatedQueryProgramFileOwnerWithPath = null;
+	private String latestEvaluatedQuery = null;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,58 +52,11 @@ public class CiaoPrologConnectionClass {
 		PLTerm[] args = {variables[0], variables[1], variables[2], variables[3]};
 		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 		
-		// Initialize the variables we need.
-		ArrayList<String []> queryAnswers = null;
-		Iterator<String []> queryAnswersIterator = null;
-		loadedProgramQuantifiers = new ArrayList<String []>();
-		loadedProgramAggregators = new ArrayList<String []>();
-		loadedProgramCrispPredicates = new ArrayList<String []>();
-		loadedProgramFuzzyRules = new ArrayList<String []>();
+		// Run the query and save the results in programIntrospection
+		performQuery(query, fileOwner, fileName, variables);
+		programIntrospection = latestEvaluatedQueryAnswers;
 		
-		// Run the query and get the results.
-		queryAnswers = performQuery(query, fileOwner, fileName, variables);
-		if (queryAnswers != null) {
-			queryAnswersIterator = queryAnswers.iterator();
-		
-			// Format and store the answers in the lists.
-
-
-			String [] answer;
-			int examinedAnswersCounter = 0;
-			int validatedAnswersCounter = 0;
-			while (queryAnswersIterator.hasNext()) {
-				answer = queryAnswersIterator.next();
-				examinedAnswersCounter++;
-
-				if ((answer[0] != null) && (answer[1] != null) && (answer[2] != null) && (answer[3] != null)) {
-					if ("quantifier".equals(answer[0])) {
-						loadedProgramQuantifiers.add(answer);
-						validatedAnswersCounter++;
-					}
-					if ("fuzzy_rule".equals(answer[0])) {
-						loadedProgramFuzzyRules.add(answer);
-						validatedAnswersCounter++;
-					}
-					if ("crisp".equals(answer[0])) {
-						loadedProgramCrispPredicates.add(answer);
-						validatedAnswersCounter++;
-					}
-					if ("aggregator".equals(answer[0])) {
-						loadedProgramAggregators.add(answer);
-						validatedAnswersCounter++;
-					}
-					if ((! "quantifier".equals(answer[0])) && (! "fuzzy_rule".equals(answer[0])) && 
-							(! "crisp".equals(answer[0]))) {
-						LOG.info("Unused answer: 0: "+answer[0]+" 1: "+answer[1]+" 2: "+answer[2]+" 3: "+answer[3]);
-					}
-				}
-				else LOG.info("Invalid answer: 0: "+answer[0]+" 1: "+answer[1]+" 2: "+answer[2]+" 3: "+answer[3]);
-			}
-			LOG.info("Examined a total of "+examinedAnswersCounter+" answers.");
-			LOG.info("Validated a total of "+validatedAnswersCounter+" answers.");
-		}
-		else LOG.info("ERROR: no answers for the query.");
-		currentProgramFileName = fileName;
+		if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
 		LOG.info("programFileIntrospectionQuery: END");
 	}
 
@@ -114,34 +64,27 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Iterator<String []> getLoadedProgramFuzzyRulesIterator () {
-		if (loadedProgramFuzzyRules == null) return null;
-		else return loadedProgramFuzzyRules.iterator();
-	}
-	public Iterator<String []> getLoadedProgramQuantifiersIterator () {
-		if (loadedProgramQuantifiers == null) return null;
-		else return loadedProgramQuantifiers.iterator();
-	}
-	public Iterator<String []> getLoadedProgramCrispPredicatesIterator () {
-		if (loadedProgramCrispPredicates == null) return null;
-		else return loadedProgramCrispPredicates.iterator();
-	}
-	public Iterator<String []> getLoadedProgramAggregatorsIterator () {
-		if (loadedProgramAggregators == null) return null;
-		else return loadedProgramAggregators.iterator();
+	public Iterator<PLVariable []> getProgramIntrospectionIterator() {
+		if (programIntrospection == null) return null;
+		else return programIntrospection.iterator();
 	}
 	
-	public String getCurrentProgramFileName () { return currentProgramFileName; }
-	public String getCurrentProgramFileOwner () { return currentProgramFileOwner; }
-	public String getCurrentProgramFileOwnerWithPath () { return currentProgramFileOwnerWithPath; }
-	public ArrayList<String []> getLastAnswers () { return lastAnswers; } 
-	public String getLastQuery() { return lastQuery; }
+	public String getLatestEvaluatedQueryProgramFileName () { 
+		return latestEvaluatedQueryProgramFileName; }
+	public String getLatestEvaluatedQueryProgramFileOwner () { 
+		return latestEvaluatedQueryProgramFileOwner; }
+	public String getLatestEvaluatedQueryProgramFileOwnerWithPath () { 
+		return latestEvaluatedQueryProgramFileOwnerWithPath; }
+	public ArrayList<PLVariable []> getLatestEvaluatedQueryAnswers () { 
+		return latestEvaluatedQueryAnswers; } 
+	public String getLatestEvaluatedQuery() { 
+		return latestEvaluatedQuery; }
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public ArrayList<String []> performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
+	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
 
 		// Connect to the Ciao Prolog Server.
@@ -152,7 +95,7 @@ public class CiaoPrologConnectionClass {
 
 		// Change working folder and run the query.
 		changeCiaoPrologWorkingFolder(fileOwner, plConnection);
-		lastAnswers = performQueryAux(query, fileName, variables, maximumLong, maximumLong, plConnection);
+		performQueryAux(query, fileName, variables, maximumLong, maximumLong, plConnection);
 		
 		if (plConnection != null) {
 			try {
@@ -161,8 +104,6 @@ public class CiaoPrologConnectionClass {
 				e.printStackTrace();
 			} 
 		}
-		
-		return lastAnswers;
 	}
 	
 	/**
@@ -198,118 +139,92 @@ public class CiaoPrologConnectionClass {
 		PLStructure query = new PLStructure("working_directory",
 				new PLTerm[]{variables[0], new PLAtom(programFileOwnerWithPath)}); 
 
-		ArrayList<String []> queryAnswers = performQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
-		Iterator<String []> queryAnswersIterator = queryAnswers.iterator();
+		performQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
+		Iterator<PLVariable []> queryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
 
-		String [] answer;
+		// Log results
 		while (queryAnswersIterator.hasNext()) {
-			answer = queryAnswersIterator.next();
-			LOG.info("changeCiaoPrologWorkingFolder: " + answer[0]);
+			LOG.info("changeCiaoPrologWorkingFolder: " + queryAnswersIterator.next().toString());
 		}
-		currentProgramFileOwnerWithPath = programFileOwnerWithPath;
-		currentProgramFileOwner = programFileOwner;
-		LOG.info("changeCiaoPrologWorkingFolder: changed current working folder to " + currentProgramFileOwner + " at " + currentProgramFileOwnerWithPath);
+		latestEvaluatedQueryProgramFileOwnerWithPath = programFileOwnerWithPath;
+		latestEvaluatedQueryProgramFileOwner = programFileOwner;
+		LOG.info("changeCiaoPrologWorkingFolder: changed working folder to " + latestEvaluatedQueryProgramFileOwner + " at " + latestEvaluatedQueryProgramFileOwnerWithPath);
 		
 	}
 	
-	private ArrayList<String []> performQueryAux(PLStructure query, String programFile, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries, PLConnection plConnection) 
+	private void performQueryAux(PLStructure query, String programFileName, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries, PLConnection plConnection) 
 			throws PLException, IOException {
 		
-		ArrayList<String []> queryAnswers = new ArrayList<String []>();
+		// Initialize ...
+		latestEvaluatedQuery = null;
+		latestEvaluatedQueryProgramFileName = null;
+		latestEvaluatedQueryAnswers = new ArrayList<PLVariable []>();
 		
-		if (query != null) {
-			PLGoal currentGoal = null;
-			long answersCounter = 0;
+		if (query == null) throw new PLException("query is null.");
+		if (plConnection == null) throw new PLException("runQuery: plConnection is null.");
+		
+		PLGoal currentGoal = null;
+		long answersCounter = 0;
 
-			LOG.info("runQuery: executing query: " + query.toString() + " .... ");
-			lastQuery = query.toString();
-			
-			if (plConnection == null) throw new PLException("runQuery: plConnection is null.");
-			currentGoal = new PLGoal(plConnection, query); 
-			if ((programFile != null) && (! "".equals(programFile))) {
-				LOG.info("runQuery: changing programFile to: " + programFile + ".");
-				currentGoal.useModule(programFile);
+		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
+		latestEvaluatedQuery = query.toString();
+
+		currentGoal = new PLGoal(plConnection, query); 
+		if ((programFileName != null) && (! "".equals(programFileName))) {
+			LOG.info("runQuery: changing programFile to: " + programFileName + ".");
+			latestEvaluatedQueryProgramFileName = programFileName;
+			currentGoal.useModule(programFileName);
+		}
+		currentGoal.query();
+
+		LOG.info("performQueryAux: getting answers ...");
+		PLTerm prologQueryAnswer;
+		PLVariable [] variablesCopy = new PLVariable [variables.length];
+		long timesCounter;
+
+		do { // Get all the answers you can.
+			prologQueryAnswer = null;
+			timesCounter = 0;
+			// Save the current answer.
+			answersCounter ++;
+			LOG.info("performQueryAux: getting answer number: "  + answersCounter);
+			do { // Get the current answer.
+				prologQueryAnswer = currentGoal.nextSolution();
+				timesCounter++;
+			} while ((prologQueryAnswer == null) && (currentGoal.isStillRunning()) && (timesCounter < maxNumberOfTries));
+
+			if (timesCounter >= maxNumberOfTries){
+				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
 			}
-			currentGoal.query();
 
-			LOG.info("performQueryAux: getting answers ...");
-			PLTerm currentQueryAnswer;
-			long timesCounter;
-			String [] variablesCopy;
-			
-			do { // Get all the answers you can.
-				currentQueryAnswer = null;
-				timesCounter = 0;
-				// Save the current answer.
-				answersCounter ++;
-				LOG.info("performQueryAux: getting answer number: "  + answersCounter);
-				do { // Get the current answer.
-					currentQueryAnswer = currentGoal.nextSolution();
-					timesCounter++;
-				} while ((currentQueryAnswer == null) && (currentGoal.isStillRunning()) && (timesCounter < maxNumberOfTries));
-
-				if (timesCounter >= maxNumberOfTries){
-					LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
-				}
-				
-				if (currentQueryAnswer != null) {
-					String logMsg="\n goal: " + currentGoal.toString();
-					logMsg += ("\n answer: " + currentQueryAnswer.toString());
-					logMsg += PLVariablesArrayToString(variables);
-					LOG.info("performQueryAux: " + logMsg + " ");
-					
-					variables[i].isList()
-					variablesCopy = new String [variables.length];
-					for (int i=0; i < variables.length; i++) {
-						variablesCopy[i] = variables[i].getBinding().toString();
-					}
-					queryAnswers.add(variablesCopy);
-				}
-				else {
-					LOG.info("performQueryAux: answer obtained: null ");
-				}
-				
-			} while ((currentQueryAnswer != null) && (answersCounter < maxNumAnswers));
-			
-			LOG.info("performQueryAux: terminating goal execution ...");
-			if (currentGoal != null) {
-				try {
-					currentGoal.terminate();
-				} catch (Exception e) {
-					e.printStackTrace();
-				} 
-				currentGoal = null;
-				answersCounter=-1; // Notify that there is no currentGoal.
+			String preMsg = "\n goal: " + currentGoal.toString();
+			if (prologQueryAnswer != null) {
+				preMsg = PLVariablesToString(variables);
+				for (int i=0; i<variables.length; i++)
+					variablesCopy[i] = (PLVariable) variables[i].copy();
+				latestEvaluatedQueryAnswers.add(variablesCopy);
+				LOG.info(preMsg);
 			}
+			else {
+				LOG.info("performQueryAux: answer obtained: null ");
+			}
+
+		} while ((prologQueryAnswer != null) && (answersCounter < maxNumAnswers));
+
+		LOG.info("performQueryAux: terminating goal execution ...");
+		if (currentGoal != null) {
+			try {
+				currentGoal.terminate();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			currentGoal = null;
+			answersCounter=-1; // Notify that there is no currentGoal.
 		}
 		
 		LOG.info("performQueryAux: end.");
-		return queryAnswers;
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** 
-	 * Logs the information in the variables.
-	 * 
-	 * @param variables is an array of PL variables to be logged. 
-	 */
-	private String PLVariablesArrayToString(PLVariable [] variables) {
-		String retVal = "";
-		for(int i=0; i<variables.length; i++) {
-			retVal += ("\n   var["+i+"]: ");
-			if (variables[i] != null) {
-				retVal += (variables[i].toString() + " bind: " + variables[i].getBinding());
-			}
-			else {
-				retVal += "null ";
-			}
-		}
-		return retVal;
-	}
-	
+		
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -347,8 +262,31 @@ public class CiaoPrologConnectionClass {
 			PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
 			PLStructure query = new PLStructure(",", args_conjunction);
 
-			ArrayList<String []> queryAnswers = performQuery(query, owner, programFile, variables);
-			LOG.info("testingQuery ... num of answers: " + queryAnswers.size());
+			performQuery(query, owner, programFile, variables);
+			LOG.info("testingQuery ... num of answers: " + latestEvaluatedQueryAnswers.size());
 		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** 
+	 * Logs the information in the variables.
+	 * 
+	 * @param variables is an array of PL variables to be logged. 
+	 */
+	private String PLVariablesToString(PLVariable [] variables) {
+		String msg = "";
+		for(int i=0; i<variables.length; i++) {
+			msg += ("\n   var["+i+"]: ");
+			if (variables[i] != null) {
+				msg += (variables[i].toString() + " bind: " + variables[i].getBinding());
+			}
+			else {
+				msg += "null ";
+			}
+		}
+		return msg;
 	}
 }
