@@ -1,5 +1,7 @@
 package auxiliar;
 
+import CiaoJava.PLAtom;
+import CiaoJava.PLFloat;
 import CiaoJava.PLInteger;
 import CiaoJava.PLList;
 import CiaoJava.PLString;
@@ -16,13 +18,14 @@ public class AnswerTermInJava {
 	private PLTerm prologQueryAnswer = null;
 	private String creationMsgs = "";
 	
-	public AnswerTermInJava(PLTerm term, PLTerm prologQueryAnswer) throws Exception{
+	public AnswerTermInJava(PLTerm term, PLTerm prologQueryAnswer) {
+		creationMsgs += " ";
 		conversion(term, prologQueryAnswer);
 	}
 	
-	private void conversion(PLTerm term, PLTerm prologQueryAnswer) throws Exception {
+	private void conversion(PLTerm term, PLTerm prologQueryAnswer) {
 		// Log ...
-		creationMsgs += "\nTerm: " + term.toString() + " \n";
+		creationMsgs += "\nTerm: " + term.toString() + " ";
 		// For variables.
 		if (term.isVariable()) {
 			PLVariable prologVariable = (PLVariable) term;
@@ -46,7 +49,11 @@ public class AnswerTermInJava {
 				compositeAnswerTerm = new AnswerTermInJava [listLength];
 				for (int i=0; i<listLength; i++) {
 					compositeAnswerTerm[i] = new AnswerTermInJava(prologList.getHead(), prologQueryAnswer);
-					prologList = (PLList) prologList.getTail();
+					creationMsgs += compositeAnswerTerm[i].getCreationMsgs();
+					if ((prologList.getTail() != null) && (prologList.getTail().isList())) {
+						prologList = (PLList) prologList.getTail();
+					}
+					else creationMsgs += "\nRemaining list: " + prologList.getTail().toString() + " ";
 				}
 			}
 		}
@@ -56,8 +63,19 @@ public class AnswerTermInJava {
 			PLInteger prologInteger = (PLInteger) term;
 			singleAnswerTerm = prologInteger.toString();
 		}
-		// For float ???
+		// For float
+		if (term.isFloat()) {
+			creationMsgs += " is a float. ";
+			PLFloat prologInteger = (PLFloat) term;
+			singleAnswerTerm = prologInteger.toString();
+		}
 		// For atom ???
+		if (term.isAtom()) {
+			creationMsgs += " is an atom. ";
+			PLAtom prologInteger = (PLAtom) term;
+			singleAnswerTerm = prologInteger.toString();
+		}
+		
 		// For structure
 		if (term.isStructure()) {
 			creationMsgs += " is an structure. ";
@@ -71,7 +89,8 @@ public class AnswerTermInJava {
 			singleAnswerTerm = prologInteger.toString();			
 		}
 		
-		if (! (term.isVariable() || term.isList() || term.isInteger() || term.isStructure() || term.isString())) {
+		if (! (term.isVariable() || term.isList() || term.isInteger() || term.isStructure() || 
+				term.isString() || term.isAtom() || term.isFloat())) {
 			creationMsgs += " -- what the hell is this??? ";
 			singleAnswerTerm = term.toString();
 		}

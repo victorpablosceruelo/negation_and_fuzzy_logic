@@ -16,8 +16,8 @@ public class CiaoPrologConnectionClass {
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
-	private ArrayList<PLVariable []> latestEvaluatedQueryAnswers = null;
-	private ArrayList<PLVariable []> programIntrospection = null;
+	private ArrayList<AnswerTermInJava []> latestEvaluatedQueryAnswers = null;
+	private ArrayList<AnswerTermInJava []> programIntrospection = null;
 	private String latestEvaluatedQueryProgramFileName = null;
 	private String latestEvaluatedQueryProgramFileOwner = null;
 	private String latestEvaluatedQueryProgramFileOwnerWithPath = null;
@@ -58,11 +58,11 @@ public class CiaoPrologConnectionClass {
 		
 		if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
 		else {
-			Iterator<PLVariable []> test = getProgramIntrospectionIterator();
+			Iterator<AnswerTermInJava []> test = getProgramIntrospectionIterator();
 			String testMsg = " ";
 			while (test.hasNext()) {
-				PLVariable [] subTest = test.next();
-				testMsg += PLVariablesToString(subTest);
+				AnswerTermInJava [] subTest = test.next();
+				testMsg += subTest.toString() + "\n";
 			}
 			LOG.info(testMsg);
 		}
@@ -73,11 +73,11 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Iterator<PLVariable []> getProgramIntrospectionIterator() {
+	public Iterator<AnswerTermInJava []> getProgramIntrospectionIterator() {
 		if (programIntrospection == null) return null;
 		else return programIntrospection.iterator();
 	}
-	public Iterator<PLVariable []> getLatestEvaluatedQueryAnswersIterator() {
+	public Iterator<AnswerTermInJava []> getLatestEvaluatedQueryAnswersIterator() {
 		if (latestEvaluatedQueryAnswers == null) return null;
 		else return latestEvaluatedQueryAnswers.iterator();
 	}
@@ -88,7 +88,7 @@ public class CiaoPrologConnectionClass {
 		return latestEvaluatedQueryProgramFileOwner; }
 	public String getLatestEvaluatedQueryProgramFileOwnerWithPath () { 
 		return latestEvaluatedQueryProgramFileOwnerWithPath; }
-	public ArrayList<PLVariable []> getLatestEvaluatedQueryAnswers () { 
+	public ArrayList<AnswerTermInJava []> getLatestEvaluatedQueryAnswers () { 
 		return latestEvaluatedQueryAnswers; } 
 	public String getLatestEvaluatedQuery() { 
 		return latestEvaluatedQuery; }
@@ -153,7 +153,7 @@ public class CiaoPrologConnectionClass {
 				new PLTerm[]{variables[0], new PLAtom(programFileOwnerWithPath)}); 
 
 		performQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
-		Iterator<PLVariable []> queryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
+		Iterator<AnswerTermInJava []> queryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
 
 		// Log results
 		while (queryAnswersIterator.hasNext()) {
@@ -171,7 +171,7 @@ public class CiaoPrologConnectionClass {
 		// Initialize ...
 		latestEvaluatedQuery = null;
 		latestEvaluatedQueryProgramFileName = null;
-		latestEvaluatedQueryAnswers = new ArrayList<PLVariable []>();
+		latestEvaluatedQueryAnswers = new ArrayList<AnswerTermInJava []>();
 		
 		if (query == null) throw new PLException("query is null.");
 		if (plConnection == null) throw new PLException("runQuery: plConnection is null.");
@@ -192,7 +192,7 @@ public class CiaoPrologConnectionClass {
 
 		LOG.info("performQueryAux: getting answers ...");
 		PLTerm prologQueryAnswer;
-		PLVariable [] variablesCopy = new PLVariable [variables.length];
+		AnswerTermInJava [] answerTermInJava = new AnswerTermInJava [variables.length];
 		long timesCounter;
 
 		do { // Get all the answers you can.
@@ -213,10 +213,16 @@ public class CiaoPrologConnectionClass {
 			String preMsg = "\n goal: " + currentGoal.toString();
 			if (prologQueryAnswer != null) {
 				preMsg += PLVariablesToString(variables);
-				for (int i=0; i<variables.length; i++)
-					variablesCopy[i] = (PLVariable) variables[i].copy();
-				preMsg += PLVariablesToString(variablesCopy);
-				latestEvaluatedQueryAnswers.add(variablesCopy);
+				preMsg += "\n   result: ";
+				for (int i=0; i<variables.length; i++) {
+					answerTermInJava[i] = new AnswerTermInJava(variables[i], prologQueryAnswer);
+					preMsg += answerTermInJava[i].toString() + " ";
+				}
+				preMsg += "\n   Creation MSGS: ";
+				for (int i=0; i<variables.length; i++) {
+					preMsg += answerTermInJava[i].getCreationMsgs(); 
+				}
+				latestEvaluatedQueryAnswers.add(answerTermInJava);
 				LOG.info(preMsg);
 			}
 			else {
