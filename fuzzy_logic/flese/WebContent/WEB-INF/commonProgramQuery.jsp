@@ -3,53 +3,37 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
+<%@page import="CiaoJava.PLVariable"%>
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
-<%  Iterator<String []> loadedProgramQuantifiersIterator = connection.getLoadedProgramQuantifiersIterator(); %>
-<%  Iterator<String []> loadedProgramCrispPredicatesIterator = connection.getLoadedProgramCrispPredicatesIterator(); %>
-<%  Iterator<String []> loadedProgramFuzzyRulesIterator = connection.getLoadedProgramFuzzyRulesIterator(); %>
+<% Iterator<PLVariable []> loadedProgramIntrospectionIterator = connection.getProgramIntrospectionIterator(); %>
 
 <script type="text/javascript">
-	function predInfo(predName, predArity, predType) {
+	function predInfo(predClass, predName, predArity, predType) {
+		this.predClass = predClass;
 		this.predName = predName;
 		this.predArity = predArity;
 		this.predType = predType;
 	}
 	
-	var quantifiersArray = new Array();
+	var programIntrospectionArray = new Array();
 	<%
 		int counter = 0;
-		if (loadedProgramQuantifiersIterator != null) {
-			String [] quantifierInfo;
-			while (loadedProgramQuantifiersIterator.hasNext()) {
-				quantifierInfo = loadedProgramQuantifiersIterator.next();
+		if (loadedProgramIntrospectionIterator != null) {
+			PLVariable [] predInfo;
+			while (loadedProgramIntrospectionIterator.hasNext()) {
+				predInfo = loadedProgramIntrospectionIterator.next();
 				%>
-				quantifiersArray[<%=counter%>] = new predInfo("<%=quantifierInfo[1]%>", <%=quantifierInfo[2]%>, <%=quantifierInfo[3]%>);
+				programIntrospectionArray[<%=counter%>] = new predInfo("<%=predInfo[0].toString()%>", "<%=predInfo[1].toString()%>", "<%=predInfo[2].toString()%>", "<%=predInfo[3].toString()%>");
 				<%
 				counter++;
 			}
 		}
 	%>
-	debug.info("Added a total of <%=counter%> program quantifiers.");
-		
-	var fuzzyRulesArray = new Array();
-	<%
-		counter = 0;
-		if (loadedProgramFuzzyRulesIterator != null) {
-			String [] fuzzyRuleInfo;
-			while (loadedProgramFuzzyRulesIterator.hasNext()) {
-				fuzzyRuleInfo = loadedProgramFuzzyRulesIterator.next();
-				%>
-				fuzzyRulesArray[<%=counter%>] = new predInfo("<%=fuzzyRuleInfo[1]%>", <%=fuzzyRuleInfo[2]%>, <%=fuzzyRuleInfo[3]%>);
-				<%
-				counter++;
-			}
-		}
-	%>
-	debug.info("Added a total of <%=counter%> program rules.");
+	debug.info("Added a total of <%=counter%> elements from program introspection.");
 	
-	var currentProgramFileName = "<%=connection.getCurrentProgramFileName() %>";
-	var currentProgramFileOwner = "<%=connection.getCurrentProgramFileOwner() %>";
+	var currentProgramFileName = "<%=connection.getLatestEvaluatedQueryProgramFileName() %>";
+	var currentProgramFileOwner = "<%=connection.getLatestEvaluatedQueryProgramFileOwner() %>";
 	
 	function changeFormAction(formId, url) {
 		debug.info("Adding to the form with id " + formId + " the action url ");

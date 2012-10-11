@@ -57,6 +57,15 @@ public class CiaoPrologConnectionClass {
 		programIntrospection = latestEvaluatedQueryAnswers;
 		
 		if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
+		else {
+			Iterator<PLVariable []> test = getProgramIntrospectionIterator();
+			String testMsg = " ";
+			while (test.hasNext()) {
+				PLVariable [] subTest = test.next();
+				testMsg += PLVariablesToString(subTest);
+			}
+			LOG.info(testMsg);
+		}
 		LOG.info("programFileIntrospectionQuery: END");
 	}
 
@@ -67,6 +76,10 @@ public class CiaoPrologConnectionClass {
 	public Iterator<PLVariable []> getProgramIntrospectionIterator() {
 		if (programIntrospection == null) return null;
 		else return programIntrospection.iterator();
+	}
+	public Iterator<PLVariable []> getLatestEvaluatedQueryAnswersIterator() {
+		if (latestEvaluatedQueryAnswers == null) return null;
+		else return latestEvaluatedQueryAnswers.iterator();
 	}
 	
 	public String getLatestEvaluatedQueryProgramFileName () { 
@@ -199,9 +212,10 @@ public class CiaoPrologConnectionClass {
 
 			String preMsg = "\n goal: " + currentGoal.toString();
 			if (prologQueryAnswer != null) {
-				preMsg = PLVariablesToString(variables);
+				preMsg += PLVariablesToString(variables);
 				for (int i=0; i<variables.length; i++)
 					variablesCopy[i] = (PLVariable) variables[i].copy();
+				preMsg += PLVariablesToString(variablesCopy);
 				latestEvaluatedQueryAnswers.add(variablesCopy);
 				LOG.info(preMsg);
 			}
