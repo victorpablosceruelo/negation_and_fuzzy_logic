@@ -3,10 +3,10 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
-<%@page import="CiaoJava.PLVariable"%>
+<%@page import="auxiliar.AnswerTermInJava"%>
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
-<% Iterator<PLVariable []> loadedProgramIntrospectionIterator = connection.getProgramIntrospectionIterator(); %>
+<% Iterator<AnswerTermInJava []> loadedProgramIntrospectionIterator = connection.getProgramIntrospectionIterator(); %>
 
 <script type="text/javascript">
 	function predInfo(predClass, predName, predArity, predType) {
@@ -20,7 +20,7 @@
 	<%
 		int counter = 0;
 		if (loadedProgramIntrospectionIterator != null) {
-			PLVariable [] predInfo;
+			AnswerTermInJava [] predInfo;
 			while (loadedProgramIntrospectionIterator.hasNext()) {
 				predInfo = loadedProgramIntrospectionIterator.next();
 				%>
