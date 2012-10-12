@@ -59,12 +59,14 @@ public class CiaoPrologConnectionClass {
 		if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
 		else {
 			Iterator<AnswerTermInJava []> test = getProgramIntrospectionIterator();
-			String testMsg = " ";
+			String testMsg = " - ProgramIntrospection - ";
 			while (test.hasNext()) {
 				AnswerTermInJava [] subTest = test.next();
-				testMsg += subTest.toString() + "\n";
+				for (int i=0; i<subTest.length; i++) {
+					testMsg += "\n[" + i + "]: " + subTest[i].toString();
+				}
 			}
-			LOG.info(testMsg);
+			LOG.info(testMsg + "\n");
 		}
 		LOG.info("programFileIntrospectionQuery: END");
 	}
@@ -192,11 +194,12 @@ public class CiaoPrologConnectionClass {
 
 		LOG.info("performQueryAux: getting answers ...");
 		PLTerm prologQueryAnswer;
-		AnswerTermInJava [] answerTermInJava = new AnswerTermInJava [variables.length];
+		AnswerTermInJava [] answerTermInJava = null;
 		long timesCounter;
 
 		do { // Get all the answers you can.
 			prologQueryAnswer = null;
+			answerTermInJava = null;
 			timesCounter = 0;
 			// Save the current answer.
 			answersCounter ++;
@@ -214,6 +217,7 @@ public class CiaoPrologConnectionClass {
 			if (prologQueryAnswer != null) {
 				preMsg += PLVariablesToString(variables);
 				preMsg += "\n   result: ";
+				answerTermInJava = new AnswerTermInJava [variables.length];
 				for (int i=0; i<variables.length; i++) {
 					answerTermInJava[i] = new AnswerTermInJava(variables[i], prologQueryAnswer);
 					preMsg += answerTermInJava[i].toString() + " ";
