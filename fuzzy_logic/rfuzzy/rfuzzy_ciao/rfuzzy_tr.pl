@@ -19,14 +19,15 @@
 
 translation_info('aggregator',         '', 0, 'no', 0, "").
 translation_info('defuzzification',   '', 0, 'no', 0, "").
-translation_info('crisp',                   '', 0, 'no', 0, "").
+translation_info('crisp_rule',           '', 0, 'no', 0, "").
 translation_info('function',              '', 1, 'no', 0, "").
 translation_info('quantifier',           '', 1, 'no', 0, "").
 translation_info('fuzzy_rule',         '', 1, 'no', 0, "").
+%translation_info('type_for_cp',              '', 0, 'no', 0, "rfuzzy_type_for_cp_"). % Type of a crisp predicate
 % translation_info('auxiliar',           '', 2, 'no', 0, "rfuzzy_aux_").
 % translation_info('normal',           '', 1, 'yes', 0, "").
 
-translation_info('type',                               'fuzzy_rule', 2, 'no', 0,          "rfuzzy_type_").
+translation_info('type_for_fp',                          'fuzzy_rule', 2, 'no', 0,          "rfuzzy_type_for_fp_").
 translation_info('default_without_cond',   'fuzzy_rule', 2, 'yes', 0,        "rfuzzy_default_without_cond_").
 translation_info('default_with_cond',        'fuzzy_rule', 2, 'yes', 0.25,   "rfuzzy_default_with_cond_"). 
 translation_info('rule',                                'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
@@ -189,7 +190,12 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 rfuzzy_trans_sent_aux(0, []) :- !, 
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
-	print_msg_nl('info').
+	print_msg_nl('info'),
+	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)
+	save_predicate_definition('crisp_rule', 'rfuzzy_truth_value_type', 1, _Pred_Type, 'crisp_rule', 'rfuzzy_truth_value_type', 1),
+	save_predicate_definition('crisp_rule', 'rfuzzy_predicate_type', 1, _Pred_Type, 'crisp_rule', 'rfuzzy_predicate_type', 1),
+	save_predicate_definition('quantifier', 'fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], 'quantifier', 'fnot', 2).
+
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
 rfuzzy_trans_sent_aux((:-Whatever), [(:-Whatever)]) :- !.
@@ -284,7 +290,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
 
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Aggregator_Name, Aggregator_Arity, Aggregator_Type, _List, 'yes'),
+	retrieve_predicate_info('crisp_rule', Aggregator_Name, Aggregator_Arity, Aggregator_Type, _List, 'yes'),
 
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, SubCategory, Fuzzy_Name, Fuzzy_Arity), !.
 	save_predicate_definition('aggregator', Aggregator_Name, Aggregator_Arity, Aggregator_Type, 'aggregator', Aggregator_Name, Aggregator_Arity),
@@ -304,23 +310,50 @@ translate((Head :# List), (Fuzzy_H :- (Body, print_msg('debug', 'function_call',
 	arg(1, Fuzzy_H, X),
 	build_straight_lines(X, Truth_Value, List, Body).
 
-% Predicate's type(s) definition.
-translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Types),(Fuzzy_H :- Cls)):-
+% Fuzzy Predicate's type(s) definition.
+translate(rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, Types_In),(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'rfuzzy_type_for(Pred_Name/Pred_Arity, Types)', rfuzzy_type_for(Pred_Name/Pred_Arity, Types)),
+	print_msg('debug', 'rfuzzy_type_for(\'fuzzy_rule\', Pred_Name/Pred_Arity, Types_In)', rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, Types_In)),
 	(
 	    (   % Types has the form [restaurant/1]
 		number(Pred_Arity), % A must be a number.
 		nonvar(Pred_Name), % Can not be a variable.
-		nonvar(Types),
+		nonvar(Types_In),
 		
 		functor(H, Pred_Name, Pred_Arity),
+		append_local(Types_In, ['rfuzzy_truth_value_type'/1], Types_Aux),
+		print_msg('debug', 'rfuzzy_type_for_fp :: Types_Aux', Types_Aux),
+		remove_arity_from_pred_with_arity_list(Types_Aux, Types_Out),
+		print_msg('debug', 'rfuzzy_type_for_fp :: Types_Out', Types_Out),
 		% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-		translate_functor(H, Types, 'type', 'yes', Fuzzy_H, _Unused_Truth_Value),
-		translate_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
+		translate_functor(H, Types_Out, 'type_for_fp', 'yes', Fuzzy_H, _Unused_Truth_Value),
+		New_Pred_Arity is Pred_Arity + 1,
+		translate_each_type(Fuzzy_H, New_Pred_Arity, 1, Types_Aux, Cls)
 	    )
 	;
-	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for(Pred_Name/Pred_Arity, Types))
+	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, Types_In))
+	),
+	!. % Backtracking forbidden.
+
+% Non-fuzzy rules Predicate's type(s) definition.
+translate(rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In),[]):-
+	Class \== 'fuzzy_rule', 
+	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In)', rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In)),
+	(
+	    (   % Types has the form [restaurant/1]
+		number(Pred_Arity), % A must be a number.
+		nonvar(Pred_Name), % Can not be a variable.
+		nonvar(Types_In),
+		nonvar(Class), 
+		
+		functor(H, Pred_Name, Pred_Arity),
+		remove_arity_from_pred_with_arity_list(Types_In, Types_Out),
+		% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
+		translate_functor(H, Types_Out, Class, 'yes', _Fuzzy_H, _Unused_Truth_Value)
+	    )
+	;
+	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In))
 	),
 	!. % Backtracking forbidden.
 
@@ -432,7 +465,7 @@ translate(rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2), (Fuzzy_Pred
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'translate: rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2)', rfuzzy_define_fuzzification(Pred/1, Crisp_P/2, Funct_P/2)),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Crisp_P, 2, _Pred_Type_1, _List_1, 'yes'),
+	retrieve_predicate_info('crisp_rule', Crisp_P, 2, _Pred_Type_1, _List_1, 'yes'),
 	retrieve_predicate_info('function', Funct_P, 2, _Pred_Type_2, _List_2, 'yes'),
 	functor(Pred_Functor, Pred, 1),
 	% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
@@ -476,7 +509,7 @@ translate(Other, Other) :-
 	    )
 	),
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)
-	save_predicate_definition('crisp', Name, Arity, _Pred_Type, 'crisp', Name, Arity).
+	save_predicate_definition('crisp_rule', Name, Arity, _Pred_Type, 'crisp_rule', Name, Arity).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -553,7 +586,7 @@ translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
 	translate_functor(Body_F, _BF_Type, 'quantifier', 'no', Fuzzy_Functor, Truth_Value),
 	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
 	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity)', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
-	test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
+	retrieve_predicate_info('quantifier', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _Quantifier_Pred_Type, _Quantifier_List, 'no'), !,
 	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity) - YES ', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
 
 	arg(1, Body_F_In, SubBody),
@@ -582,17 +615,6 @@ translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _Result) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-test_quantifier_is_defined(Quantifier_Name, _Quantifier_Arity) :-
-	defined_quantifiers(Quantifiers_List),
-	memberchk_local(Quantifier_Name, Quantifiers_List), !. 
-test_quantifier_is_defined(Quantifier_Name, Quantifier_Arity) :-
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('quantifier', Quantifier_Name, Quantifier_Arity, _Pred_Type, _List, 'no'), !.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 translate_each_type(H, Arity, Actual, [Type/1], Type_F) :-
 	print_msg('debug', 'translate_each_type(H, Arity, Actual, Type)', (H, Arity, Actual, Type) ),
 	Actual = Arity, !, % Security conditions.
@@ -608,10 +630,14 @@ translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
 	translate_each_type(H, Arity, NewActual, More, More_F),
 	!. % Backtracking not allowed here.
 
+translate_each_type(H, Arity, Actual, Types, _Type_F) :-
+	print_msg('error', 'translate_each_type(H, Arity, Actual, Types)', translate_each_type(H, Arity, Actual, Types)),
+	!, fail.
+
 translate_each_type_aux(H, Actual, Type, Type_F) :-
 	print_msg('debug', 'translate_each_type_aux(H, Actual, Type)', translate_each_type_aux(H, Actual, Type)),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp', Type, 1, _Pred_Type, _List, 'yes'), !,	
+	retrieve_predicate_info('crisp_rule', Type, 1, _Pred_Type, _List, 'yes'), !,	
 	functor(Type_F, Type, 1), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
@@ -619,6 +645,17 @@ translate_each_type_aux(H, Actual, Type, Type_F) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
+
+% remove_arity_from_pred_with_arity_list(Types, Real_Types) 
+remove_arity_from_pred_with_arity_list([Type/Arity], [Type]) :- Arity = 1, !.
+remove_arity_from_pred_with_arity_list([Type/Arity|More_With_Arity], [Type|More]) :- 
+	Arity = 1, !,
+	remove_arity_from_pred_with_arity_list(More_With_Arity, More).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 
 build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1 ; Line ; Point2)) :-
 	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1, Line, Point2)))),
@@ -764,7 +801,7 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, _Pr
 	copy_args(Pred_Crisp_Arity, Pred_Functor, Aux_Pred_Functor),
 
 	print_msg('debug', 'Now building functor from (List, Pred_Name, Aux_Pred_Functor)', (List, Pred_Name, Aux_Pred_Functor)),
-	build_functors(List, 'type',                             'true', Aux_Pred_Functor, Fuzzy_Pred_Types, [], Def_1, [], NDef_1),
+	build_functors(List, 'type_for_fp',                 'true', Aux_Pred_Functor, Fuzzy_Pred_Types, [], Def_1, [], NDef_1),
 	build_functors(List, 'fact',                              'fail',  Aux_Pred_Functor, Fuzzy_Pred_Fact, Def_1, Def_2, NDef_1, NDef_2),
 	build_functors(List, 'fuzzification',                'fail',  Aux_Pred_Functor, Fuzzy_Pred_Fuzzification, Def_2, Def_3, NDef_2, NDef_3),
 	build_functors(List, 'rule',                              'fail',  Aux_Pred_Functor, Fuzzy_Pred_Rule, Def_3, Def_4, NDef_3, NDef_4),
@@ -861,11 +898,10 @@ test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([(_Category, _Sub_Pred_Name, _Su
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, [Fnot | Fuzzy_Rules]) :-
+generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules) :-
 	retrieve_all_predicate_info_with_category(_Any_Category, Retrieved),
 	generate_introspection_predicate_aux(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules_Tmp),
-	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules),
-	Fnot = (rfuzzy_introspection('quantifier', 'fnot', 2, _HasNoDefinedType)).
+	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules).
 
 % generate_introspection_predicate_aux(Input_List, Accumulator_List, Result_List),
 generate_introspection_predicate_aux([], Accumulator_List, Accumulator_List) :- !.
@@ -878,19 +914,16 @@ generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, 
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-defined_quantifiers([fnot]).
-
 add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
-	code_for_quantifier_fnot(Quantifier_Code_Fnot), 
-	code_for_getting_attribute_values(Code_For_Getting_Attribute_Values),
-	append_local(Quantifier_Code_Fnot, Fuzzy_Rules_In, Fuzzy_Rules_Aux),
-	append_local(Code_For_Getting_Attribute_Values, Fuzzy_Rules_Aux, Fuzzy_Rules_Out).
+	code_for_quantifier_fnot(Fuzzy_Rules_In, Fuzzy_Rules_Aux_1), 
+	code_for_getting_attribute_values(Fuzzy_Rules_Aux_1, Fuzzy_Rules_Aux_2), 
+	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_getting_attribute_values([Code_1, Code_2, Code_3]) :-
+code_for_getting_attribute_values(In, [Code_1, Code_2, Code_3|In]) :-
 	Code_1 = (rfuzzy_var_truth_value(Var, Condition, Value) :-
 		 print_msg('debug', 'rfuzzy_var_truth_value :: Var', Var),
 		 var(Var),					 
@@ -908,7 +941,7 @@ code_for_getting_attribute_values([Code_1, Code_2, Code_3]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_quantifier_fnot([Code]) :-
+code_for_quantifier_fnot(In, [Code | In]) :-
 	Code = (
 		   fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
 	       
@@ -930,6 +963,16 @@ code_for_quantifier_fnot([Code]) :-
 	       Truth_Value .>=. 0, Truth_Value .=<. 1,
 	       print_msg('debug', 'fnot :: result', Fuzzy_Predicate_Functor)
 	       ).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_predefined_types(In, [Type_1, Type_2, Type_3|In]) :-
+	Type_1 = (rfuzzy_predicate_type(_Any)), 
+	Type_2 = (rfuzzy_truth_value_type(_Any)), 
+	Type_3 = (rfuzzy_number_type(_Any)), 
+	!.
 
 % ------------------------------------------------------
 % ------------------------------------------------------

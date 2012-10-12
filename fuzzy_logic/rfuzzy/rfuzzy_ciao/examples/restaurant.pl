@@ -23,7 +23,7 @@ restaurant(zalacain).
 
 expensive_restaurant(zalacain).
 
-rfuzzy_type_for(traditional/1, [restaurant/1]).
+rfuzzy_type_for('fuzzy_rule', traditional/1, [restaurant/1]).
 rfuzzy_default_value_for(traditional/1, 1).
 
 traditional(kenzo) value 0.5.
@@ -32,6 +32,7 @@ traditional(paellador) value 0.87.
 % :- set_prop low_distance_function/1 => restaurant/1.
 rfuzzy_default_value_for(low_distance/1, 0).
 
+rfuzzy_type_for('crisp_rule', distance_to_the_city_center/2, [restaurant/1, rfuzzy_truth_value_type/1]).
 distance_to_the_city_center(meson_del_jamon, 100).
 distance_to_the_city_center(museo_del_jamon, 150).
 
@@ -41,7 +42,7 @@ near_the_city_center(burguer_king) value 1.
 
 % before:
 % :- set_prop cheap/1 => restaurant/1.
-rfuzzy_type_for(cheap/1, [restaurant/1]).
+rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant/1]).
 % before: 
 % :- default(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.5).
@@ -57,7 +58,7 @@ rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
 rfuzzy_quantifier(very/1, over, 0.7).
 
-rfuzzy_type_for(tempting_restaurant/1, [restaurant/1]).
+rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant/1]).
 rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), fnot(very(expensive(R))), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
@@ -74,4 +75,4 @@ max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
 rfuzzy_aggregator(max_with_min_a_half/3).
 
 adequate_restaurant(R) :~ fnot(very(expensive(R))).
-rfuzzy_type_for(preferred_restaurant/2, [restaurant/1, restaurant/1]).
+rfuzzy_type_for('fuzzy_rule', preferred_restaurant/2, [restaurant/1, restaurant/1]).
