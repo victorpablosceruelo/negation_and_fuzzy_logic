@@ -23,9 +23,12 @@
 			AnswerTermInJava [] predInfo;
 			while (loadedProgramIntrospectionIterator.hasNext()) {
 				predInfo = loadedProgramIntrospectionIterator.next();
-				%>
-				programIntrospectionArray[<%=counter%>] = new predInfo("<%=predInfo[0].toString()%>", "<%=predInfo[1].toString()%>", "<%=predInfo[2].toString()%>", "<%=predInfo[3].toString()%>");
-				<%
+				out.print("    programIntrospectionArray["+counter+"] = new predInfo(");
+				for (int i=0; i<predInfo.length; i++) {
+					out.print(predInfo[i].toJavaScript(true));
+					if (i+1 < predInfo.length) out.print(",");
+				}
+				out.print(");\n");
 				counter++;
 			}
 		}

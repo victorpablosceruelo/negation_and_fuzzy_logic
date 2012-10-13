@@ -117,6 +117,51 @@ public class AnswerTermInJava {
 	public String getCreationMsgs () {
 		return creationMsgs;
 	}
+	
+	public boolean isList() {
+		return ((singleAnswerTerm == null) && (compositeAnswerTerm != null));
+	}
+	public int length() {
+		if (! isList()) return 0;
+		else
+			return compositeAnswerTerm.length;
+	}
+	public AnswerTermInJava atPosition(int i) {
+		if (isList() && (i > 0) && (i < length())) {
+			return compositeAnswerTerm[i];
+		}
+		else return null;
+	}
+	public String toJavaScript(boolean withCommasAround) {
+		String retVal="";
+		boolean subTermWithCommasAround = false;
+		if ((compositeAnswerTerm == null) && (singleAnswerTerm == null)) { 
+			withCommasAround=false;
+			retVal="null";
+		}
+		
+		// An atom or a structure.
+		if (singleAnswerTerm != null) {
+			if (withCommasAround) retVal += "\'";
+			retVal += singleAnswerTerm;
+		}
+		// A list or a structure.
+		if (compositeAnswerTerm != null) {
+			if (singleAnswerTerm == null) {
+				retVal+="new Array("; // A list
+				subTermWithCommasAround = true;
+			}
+			else retVal+="("; // A structure
+			
+			for (int i=0; i<compositeAnswerTerm.length; i++) {
+				retVal+=compositeAnswerTerm[i].toJavaScript(subTermWithCommasAround);
+				if (i+1 < compositeAnswerTerm.length) retVal+=",";
+			}
+			retVal += ")";
+		}
+		if ((singleAnswerTerm != null) && (withCommasAround)) retVal += "\'";
+		return retVal;
+	}
 }
 
 
