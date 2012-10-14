@@ -3,22 +3,22 @@
 <jsp:include page="commonJavaScriptCode.jsp" />
 
 <jsp:include page="commonProgramQuery.jsp" />
-<jsp:include page="dataBaseQueryJavaScriptCode.jsp" />
+<jsp:include page="commonProgramQueryJavaScriptCode.jsp" />
 
 <body>
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
     	<jsp:include page="commonBodyProgramQuery.jsp" />
 
-		<h3>Perform your query to the program file </h3>		
+		<table id="queryStartTable">
+			<tr>
+				<td><h3>Your query: I'm looking for a </h3></td>
+				<td id="queryStart"></td>
+			</tr>
+		</table>		
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
 			<div id="simpleOrAdvancedQuery"></div>
-     		<div id="queryLines">
-          
-     		</div>
-     		<script type="text/javascript">
-     			addQueryLine('queryLines', 'simpleOrAdvancedQuery', programIntrospectionArray);
-	 		</script>
+     		<div id="queryLines"></div>
 	 		<br />
 	 		<div id="hiddenNumOfVariables"></div>
      		<input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
@@ -30,6 +30,7 @@
 	</div>
 
 	<script type="text/javascript">
+		fillQueryStartupValues("queryStart");
 		changeFormAction("submitQuery", "DataBaseQueryServlet?op=runquery&database="+currentProgramFileName+"&owner="+currentProgramFileOwner);
 		changeAHrefLink("complexQuery", "DataBaseQueryServlet?op=advancedQuery&database="+currentProgramFileName+"&owner="+currentProgramFileOwner);
 	</script>
