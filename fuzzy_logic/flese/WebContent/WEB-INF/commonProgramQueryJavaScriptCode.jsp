@@ -22,13 +22,19 @@
 		html += "</select>";
 		return html;
 	}
-	function chooseRuleCode(fuzzyRuleIndex) {
+	
+	function startupTypeIsValid(startupType, predType) {
+		return (predType[0] == startupType);
+	}
+	
+	function chooseRuleCode(fuzzyRuleIndex, startupType) {
 		var html = "<select name=\'fuzzyRule[" + fuzzyRuleIndex + 
 		           "]\' onchange=\"fuzzyRuleChange(this, " + fuzzyRuleIndex + ");\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
-			if ((programIntrospectionArray[i].predClass == "crisp_rule") ||
-					(programIntrospectionArray[i].predClass == "fuzzy_rule")) {
+			if (((programIntrospectionArray[i].predClass == "crisp_rule") ||
+					(programIntrospectionArray[i].predClass == "fuzzy_rule")) &&
+					startupTypeIsValid(startupType, programIntrospectionArray[i].predType)) {
 				html += "<option name=\'" + programIntrospectionArray[i].predName + 
 							"\' value=\'" + programIntrospectionArray[i].predName + "\'>"+
 							programIntrospectionArray[i].predName + "</option>";
@@ -112,7 +118,7 @@
 			newDiv.innerHTML = "<table id=\'queryLineTable_"+queryLinesCounter+"\'><tr><td>" +  
 					chooseQuantifierCode(queryLinesCounter, 0) + "</td><td>" +
 					chooseQuantifierCode(queryLinesCounter, 1) + "</td><td>" +
-					chooseRuleCode(queryLinesCounter) + 
+					chooseRuleCode(queryLinesCounter, startupType) + 
 					fuzzyRuleArgsCode(queryLinesCounter) + "</td></tr></table>";
 			
 			document.getElementById(queryLinesDivId).appendChild(newDiv);
