@@ -6,8 +6,10 @@
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
 % Activate/Deactivate debug.
-% :- activate_rfuzzy_debug.
+:- activate_rfuzzy_debug.
 
+rfuzzy_type_for('crisp_rule', restaurant/7, [rfuzzy_id_type, rfuzzy_truth_value_type, rfuzzy_truth_value_type, 
+	rfuzzy_number_type, rfuzzy_truth_value_type, rfuzzy_truth_value_type, rfuzzy_number_type]).
 % restaurant 2 -> traditional
 % restaurant 3 -> low_distance
 % restaurant 4 -> distance_to_the_city_center

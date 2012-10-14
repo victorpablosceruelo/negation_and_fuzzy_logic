@@ -23,11 +23,10 @@ translation_info('crisp_rule',           '', 0, 'no', 0, "").
 translation_info('function',              '', 1, 'no', 0, "").
 translation_info('quantifier',           '', 1, 'no', 0, "").
 translation_info('fuzzy_rule',         '', 1, 'no', 0, "").
-%translation_info('type_for_cp',              '', 0, 'no', 0, "rfuzzy_type_for_cp_"). % Type of a crisp predicate
+translation_info('type',                    '', 0, 'no', 0, "rfuzzy_type_for_").
 % translation_info('auxiliar',           '', 2, 'no', 0, "rfuzzy_aux_").
 % translation_info('normal',           '', 1, 'yes', 0, "").
 
-translation_info('type_for_fp',                          'fuzzy_rule', 2, 'no', 0,          "rfuzzy_type_for_fp_").
 translation_info('default_without_cond',   'fuzzy_rule', 2, 'yes', 0,        "rfuzzy_default_without_cond_").
 translation_info('default_with_cond',        'fuzzy_rule', 2, 'yes', 0.25,   "rfuzzy_default_with_cond_"). 
 translation_info('rule',                                'fuzzy_rule', 2, 'yes', 0.5,     "rfuzzy_rule_").
@@ -192,7 +191,9 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
 	% save_predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, Sub_Category, Sub_Pred_Name, Sub_Pred_Arity)
+	save_predicate_definition('crisp_rule', 'rfuzzy_id_type', 1, _Pred_Type, 'crisp_rule', 'rfuzzy_id_type', 1),
 	save_predicate_definition('crisp_rule', 'rfuzzy_truth_value_type', 1, _Pred_Type, 'crisp_rule', 'rfuzzy_truth_value_type', 1),
+	save_predicate_definition('crisp_rule', 'rfuzzy_number_type', 1, _Pred_Type, 'crisp_rule', 'rfuzzy_number_type', 1),
 	save_predicate_definition('crisp_rule', 'rfuzzy_predicate_type', 1, _Pred_Type, 'crisp_rule', 'rfuzzy_predicate_type', 1),
 	save_predicate_definition('quantifier', 'fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], 'quantifier', 'fnot', 2).
 
@@ -310,50 +311,33 @@ translate((Head :# List), (Fuzzy_H :- (Body, print_msg('debug', 'function_call',
 	arg(1, Fuzzy_H, X),
 	build_straight_lines(X, Truth_Value, List, Body).
 
-% Fuzzy Predicate's type(s) definition.
-translate(rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, Types_In),(Fuzzy_H :- Cls)):-
+% Predicate type(s) definition.
+translate(rfuzzy_type_for(Class, Pred_Name/Pred_Arity_In, Types_In),(Fuzzy_H :- Cls)):-
 	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'rfuzzy_type_for(\'fuzzy_rule\', Pred_Name/Pred_Arity, Types_In)', rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, Types_In)),
+	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In)', rfuzzy_type_for(Class, Pred_Name/Pred_Arity_In, Types_In)),
 	(
-	    (   % Types has the form [restaurant/1]
-		number(Pred_Arity), % A must be a number.
-		nonvar(Pred_Name), % Can not be a variable.
-		nonvar(Types_In),
-		
+	    (   nonvar(Pred_Name), number(Pred_Arity_In), nonvar(Types_In), nonvar(Class),
+		(
+		    (Class = 'fuzzy_rule', 
+		     append_local(Types_In, ['rfuzzy_truth_value_type'], Types),
+		     Pred_Arity is Pred_Arity_In + 1
+		    )
+		;
+		    (Class = 'crisp_rule',
+		     Types = Types_In,
+		     Pred_Arity = Pred_Arity_In
+		    )
+		),
+		print_msg('debug', 'rfuzzy_type_for :: (Pred_Name, Pred_Arity)', (Pred_Name, Pred_Arity)),
 		functor(H, Pred_Name, Pred_Arity),
-		append_local(Types_In, ['rfuzzy_truth_value_type'/1], Types_Aux),
-		print_msg('debug', 'rfuzzy_type_for_fp :: Types_Aux', Types_Aux),
-		remove_arity_from_pred_with_arity_list(Types_Aux, Types_Out),
-		print_msg('debug', 'rfuzzy_type_for_fp :: Types_Out', Types_Out),
-		% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-		translate_functor(H, Types_Out, 'type_for_fp', 'yes', Fuzzy_H, _Unused_Truth_Value),
-		New_Pred_Arity is Pred_Arity + 1,
-		translate_each_type(Fuzzy_H, New_Pred_Arity, 1, Types_Aux, Cls)
-	    )
-	;
-	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, Types_In))
-	),
-	!. % Backtracking forbidden.
 
-% Non-fuzzy rules Predicate's type(s) definition.
-translate(rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In),[]):-
-	Class \== 'fuzzy_rule', 
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In)', rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In)),
-	(
-	    (   % Types has the form [restaurant/1]
-		number(Pred_Arity), % A must be a number.
-		nonvar(Pred_Name), % Can not be a variable.
-		nonvar(Types_In),
-		nonvar(Class), 
-		
-		functor(H, Pred_Name, Pred_Arity),
-		remove_arity_from_pred_with_arity_list(Types_In, Types_Out),
+		print_msg('debug', 'rfuzzy_type_for :: Types', Types),
 		% translate_functor(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-		translate_functor(H, Types_Out, Class, 'yes', _Fuzzy_H, _Unused_Truth_Value)
+		translate_functor(H, Types, 'type', 'yes', Fuzzy_H, _Unused_Truth_Value),
+		translate_each_type(Fuzzy_H, Pred_Arity, 1, Types, Cls)
 	    )
 	;
-	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Types_In))
+	    print_msg('error', 'translate :: Syntax Error in type definition', rfuzzy_type_for(Class, Pred_Name/Pred_Arity_In, Types_In))
 	),
 	!. % Backtracking forbidden.
 
@@ -615,13 +599,13 @@ translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _Result) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_each_type(H, Arity, Actual, [Type/1], Type_F) :-
+translate_each_type(H, Arity, Actual, [Type], Type_F) :-
 	print_msg('debug', 'translate_each_type(H, Arity, Actual, Type)', (H, Arity, Actual, Type) ),
 	Actual = Arity, !, % Security conditions.
 	translate_each_type_aux(H, Actual, Type, Type_F),
 	!. % Backtracking not allowed.
 
-translate_each_type(H, Arity, Actual, [Type/1 | More], (Type_F, More_F)) :-
+translate_each_type(H, Arity, Actual, [Type | More], (Type_F, More_F)) :-
 	print_msg('debug', 'translate_each_type(H, Arity, Actual, Type)', (H, Arity, Actual, Type) ),
 	Actual < Arity, !,  % Security conditions.
 	translate_each_type_aux(H, Actual, Type, Type_F),
@@ -637,25 +621,14 @@ translate_each_type(H, Arity, Actual, Types, _Type_F) :-
 translate_each_type_aux(H, Actual, Type, Type_F) :-
 	print_msg('debug', 'translate_each_type_aux(H, Actual, Type)', translate_each_type_aux(H, Actual, Type)),
 	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('crisp_rule', Type, 1, _Pred_Type, _List, 'yes'), !,	
-	functor(Type_F, Type, 1), % Build functor.
+	retrieve_predicate_info('crisp_rule', Type, Arity, _Pred_Type, _List, 'yes'), !,	
+	functor(Type_F, Type, Arity), % Build functor.
 	arg(1, Type_F, X),       % Argument of functor is X.
 	arg(Actual, H, X). % Unify with Argument of functor.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
-
-% remove_arity_from_pred_with_arity_list(Types, Real_Types) 
-remove_arity_from_pred_with_arity_list([Type/Arity], [Type]) :- Arity = 1, !.
-remove_arity_from_pred_with_arity_list([Type/Arity|More_With_Arity], [Type|More]) :- 
-	Arity = 1, !,
-	remove_arity_from_pred_with_arity_list(More_With_Arity, More).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 
 build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1 ; Line ; Point2)) :-
 	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1, Line, Point2)))),
