@@ -46,27 +46,6 @@ translation_info('fuzzy_rule_antonym',                        2, -1,       "rfuz
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-test_pred_class(Pred_Class) :-
-	(
-	    (   % We asked in the correct way.
-		translation_info(Pred_Class, _Add_Args, _Priority, _Preffix_String)
-	    )
-	;
-	    (
-		print_msg('error', 'Error testing predicate class. (Pred_Class)', (Pred_Class)),
-		!, fail
-	    )
-	), !.
-
-%remove_predicate_info(Category, Name, Arity, Fuzzy_Name, Fuzzy_Arity) :-
-%	predicate_definition_contents(Pred_Info, Category, Name, Arity, Fuzzy_Name, Fuzzy_Arity),
-%	retract_fact(Pred_Info), !. % Retract 
-
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class) :-
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, 'fuzzy_rule', Real_Pred_Name, Real_Pred_Arity),
@@ -345,10 +324,10 @@ translate(rfuzzy_type_for(Class, Pred_Name/Pred_Arity_In, Types_In), Cls):-
 
 % Predicate type(s) definition (Class \== database).
 translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity_In, Pred_Type_In),(Pred_Functor :- Cls)):-
-	Class \== 'database',
+	Pseudo_Class \== 'database',
 	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Pred_Type)', (Class, Pred_Name/Pred_Arity_In, Pred_Type_In)),
-	nonvar(Class), nonvar(Pred_Name), number(Pred_Arity_In), nonvar(Pred_Type_In), 
+	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Pred_Type)', (Pseudo_Class, Pred_Name/Pred_Arity_In, Pred_Type_In)),
+	nonvar(Pseudo_Class), nonvar(Pred_Name), number(Pred_Arity_In), nonvar(Pred_Type_In), 
 	(
 	    (Pseudo_Class = 'fuzzy_rule', Pred_Class = 'fuzzy_rule_type', Needs_Head_Building='true',
 	    append_local(Pred_Type_In, ['rfuzzy_credibility_value_type', 'rfuzzy_truth_value_type'], Pred_Type),
