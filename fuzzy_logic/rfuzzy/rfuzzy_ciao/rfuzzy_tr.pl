@@ -463,7 +463,6 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'translate: rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Name)', rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Name)),
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error) 
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
 	retrieve_predicate_info(Crisp_Pred_Name,  2, Pred_Type_1, _MI_1, _NHB_1, 'yes'),
 	retrieve_predicate_info(Funct_Pred_Name, 2, Pred_Type_2, _MI_2, _NBH_2, 'yes'),
 
@@ -588,41 +587,52 @@ translate_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value, (FB_1,
 	arg(3, Aggr_F, Truth_Value), !.
 
 % Quantifier.
-translate_rule_body(Body_F_In, _TV_Aggregator, Truth_Value, Translation) :-
-	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - with quantifier',(Body_F_In, Truth_Value)),
-	nonvar(Body_F_In),
-	functor(Body_F_In, Pred_Name, 1),
+translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, Translation) :-
+	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - with quantifier',(Body_F, Truth_Value)),
+	nonvar(Body_F),
 	functor(Body_F, Pred_Name, 1),
 
-	% translate_predicate(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_predicate(Body_F, _BF_Type, 'quantifier', 'no', Fuzzy_Functor, Truth_Value),
+	Pred_Arity = 1, Pred_Class = 'quantifier',
+	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
+	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
+	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
+	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
 
-	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
-	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity)', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
-	retrieve_predicate_info('quantifier', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _Quantifier_Pred_Type, _Quantifier_List, 'no'), !,
-	print_msg('debug', 'test_quantifier_is_defined(Fuzzy_Functor_Name, Fuzzy_Functor_Arity) - YES ', (Fuzzy_Functor_Name, Fuzzy_Functor_Arity)),
+	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error) 
+	retrieve_predicate_info(New_Pred_Name, New_Pred_Arity, Pred_Type, _MI, _NHB, 'yes'), 
+	nonvar(Pred_Type), Pred_Type = ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'],
 
-	arg(1, Body_F_In, SubBody),
+	arg(1, Body_F, SubBody),
+	print_msg('debug', 'translate_rule_body(SubBody)',(SubBody)),
 	translate_rule_body(SubBody, 'none', _SubCall_Truth_Value, SubCall),
-	print_msg('debug', 'translate_rule_body(Fuzzy_Functor) - with quantifier',(Fuzzy_Functor)),
-	arg(1, Fuzzy_Functor, SubCall),
-	Translation = (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
+	print_msg('debug', 'translate_rule_body(SubBody, SubCall)',(SubBody, SubCall)),
+	arg(1, Pred_Functor, SubCall),
+	Translation = (Pred_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
 	print_msg('debug', 'translate_rule_body(Translation) - with quantifier',(Translation)).
 
 % Normal.
-translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, (Fuzzy_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1))) :-
+translate_rule_body(Body_F, _TV_Aggregator, Truth_Value, Translation) :-
 	print_msg('debug', 'translate_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
 	nonvar(Body_F),
-	% translate_predicate(Functor, Functor_Type, Category, Save_Predicate, Fuzzy_Functor, Truth_Value)
-	translate_predicate(Body_F, _BF_Type, 'fuzzy_rule', 'no', Fuzzy_Functor, Truth_Value),
-	functor(Fuzzy_Functor, Fuzzy_Functor_Name, Fuzzy_Functor_Arity),
-	% retrieve_predicate_info(Category, Name, Arity, List, Show_Error)
-	retrieve_predicate_info('fuzzy_rule', Fuzzy_Functor_Name, Fuzzy_Functor_Arity, _Pred_Type, _List, 'yes'), !,
-	print_msg('debug', 'translate_rule_body(Body, Truth_Value, Fuzzy_Functor)',(Body_F, Truth_Value, Fuzzy_Functor)),
+	functor(Body_F, Pred_Name, Pred_Arity),
+
+	Pred_Class = 'fuzzy_rule',
+	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
+	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
+	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
+	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
+
+	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error) 
+	retrieve_predicate_info(New_Pred_Name, New_Pred_Arity, Pred_Type, _MI, _NHB, 'yes'), 
+	nonvar(Pred_Type),
+	get_nth_element_from_list(New_Pred_Arity, Pred_Type, 'rfuzzy_truth_value_type'),
+
+	Translation = (Pred_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
+	print_msg('debug', 'translate_rule_body(Body, Translation)',(Body_F, Translation)),
 	print_msg_nl('debug').
 
 translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _Result) :-
-	print_msg('error', 'translate_rule_body(Body)',(Body_F)), !, fail.
+	print_msg('error', 'translating the rule subbody',(Body_F)), !, fail.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -919,7 +929,7 @@ test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([(_Category, _Sub_Pred_Name, _Su
 % ------------------------------------------------------
 
 generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules) :-
-	retrieve_all_predicate_info_with_category(_Any_Category, Retrieved),
+	retrieve_all_predicate_infos(Retrieved),
 	generate_introspection_predicate_aux(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules_Tmp),
 	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules).
 
