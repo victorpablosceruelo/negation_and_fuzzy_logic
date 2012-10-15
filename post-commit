@@ -42,12 +42,6 @@ pushd /srv/svn/checkouts/negation_and_fuzzy_logic
 svn up post-commit
 popd
 
-
-# Mail log.
-$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -s "[neg&fl] commit" vpablos@babel.ls.fi.upm.es
-# $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "phoenix-emcl" -s "[neg&fl] commit" phoenixlv0108@gmail.com
-$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "jose_manuel-ssii" -s "[neg&fl] commit" jmhernandoc@gmail.com
-
 #./commit-email.pl "$REPOS" "$REV" -h -m .
 #log-commit.py --repository "$REPOS" --revision "$REV"
 
@@ -58,3 +52,13 @@ AUTHOR=`/usr/bin/svnlook author -r $REV $REPOS`
 TRAC_ENV='/srv/trac/pname'
 
 #$UTIL_PATH/trac-post-commit-hook -p "$TRAC_ENV" -r "$REV" -u "$AUTHOR" -m "$LOG"
+
+# Mail log.
+# Correos de lo que yo mismo hago no, please.
+if [ -z "$AUTHOR" ] || [ ! "$AUTHOR" == "vpablos" ]; then 
+	$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -s "[neg&fl] commit" vpablos@babel.ls.fi.upm.es
+fi
+
+# $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "phoenix-emcl" -s "[neg&fl] commit" phoenixlv0108@gmail.com
+# $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "jose_manuel-ssii" -s "[neg&fl] commit" jmhernandoc@gmail.com
+
