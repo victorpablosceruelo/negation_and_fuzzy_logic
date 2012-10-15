@@ -8,7 +8,7 @@
 % Activate/Deactivate debug.
 :- activate_rfuzzy_debug.
 
-rfuzzy_type_for('crisp_rule', restaurant/7, [rfuzzy_id_type, rfuzzy_truth_value_type, rfuzzy_truth_value_type, 
+rfuzzy_type_for('database', restaurant/7, [rfuzzy_id_type, rfuzzy_truth_value_type, rfuzzy_truth_value_type, 
 	rfuzzy_number_type, rfuzzy_truth_value_type, rfuzzy_truth_value_type, rfuzzy_number_type]).
 % restaurant 2 -> traditional
 % restaurant 3 -> low_distance
@@ -39,13 +39,13 @@ rfuzzy_db_value_for(distance_to_the_city_center/1, restaurant, 4, rfuzzy_number_
 
 near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
 
-rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
+% rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
 rfuzzy_define_fuzzification(near_the_city_center/1, distance_to_the_city_center, near_function).
-rfuzzy_db_value_for(near_the_city_center/1, restaurant, 5, rfuzzy_truth_value_type).
+rfuzzy_db_value_for(near_the_city_center/1, restaurant, 5).
 
 is_zalacain(zalacain).
 
-rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant/1]).
+rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant]).
 rfuzzy_default_value_for(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/1, over, 0.7).
 rfuzzy_default_value_for(cheap/1, 0.1) if is_zalacain/1.
@@ -53,9 +53,19 @@ rfuzzy_db_value_for(cheap/1, restaurant, 6, rfuzzy_truth_value_type).
 
 rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
-rfuzzy_quantifier(very/1, over, 0.7).
 
-rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant/1]).
+very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
+	functor(Fuzzy_Predicate_Functor_In, FP_Name, FP_Arity), 
+	arg(FP_Arity, Fuzzy_Predicate_Functor_In, FP_Truth_Value),
+	Fuzzy_Predicate_Functor_In,
+	Thershold .=. 0.7,
+	Min_In .=. FP_Truth_Value - Thershold, 
+	min(0, Min_In, Dividend), 
+	Truth_Value .=. ((Dividend)/(0 - Thershold)).
+
+rfuzzy_quantifier(very/2).
+
+rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant]).
 rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), fnot(very(expensive(R))), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
