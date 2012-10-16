@@ -334,7 +334,7 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 	print_msg('debug', 'rfuzzy_db_value_for(Type)', rfuzzy_db_value_for(Type)),
 	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
 	arg(Position, DB_Pred_Functor, Value),
-
+	Pred_Type = [Database_Pred_Name, Type],
 	(
 	    (
 		nonvar(Type), Type = 'rfuzzy_truth_value_type', !, 
@@ -349,7 +349,6 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 		functor(Test, '\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
 		functor(Convert, '.=.', 2), arg(1, Convert, Value), arg(2, Convert, Truth_Value),
 		Cls = (Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Convert)),
-		Pred_Type = [Database_Pred_Name, 'rfuzzy_credibility_value_type', Type],
 		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
 		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
 	    )
@@ -361,7 +360,6 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
 		functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
 		Cls = (Pred_Functor :- ((Mapping, DB_Pred_Functor), Test)),
-		Pred_Type = [Database_Pred_Name, Type],
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no')
 	    )
@@ -504,8 +502,18 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error) 
 	retrieve_predicate_info(Crisp_Pred_Name,  2, Pred_Type_1, _MI_1, _NHB_1, 'true'),
 	retrieve_predicate_info(Funct_Pred_Name, 2, Pred_Type_2, _MI_2, _NBH_2, 'true'),
+	(
+	    (
+		nonvar(Pred_Type_1), nonvar(Pred_Type_2)
+	    )
+	;
+	    (
+		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Crisp_Pred_Name, Funct_Pred_Name)), 
+		!, fail     
+	    )
+	),
 
-	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 0,
+	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 1,
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
 	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
@@ -524,7 +532,7 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 
 	Cls = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
 	get_nth_element_from_list(1, Pred_Type_1, Type_1),
- 	get_nth_element_from_list(1, Pred_Type_2, Type_2),
+ 	get_nth_element_from_list(2, Pred_Type_2, Type_2),
 	Pred_Type = [Type_1, Type_2],
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
 	!.
