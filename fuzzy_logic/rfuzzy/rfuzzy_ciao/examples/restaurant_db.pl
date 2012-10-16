@@ -40,7 +40,7 @@ rfuzzy_db_value_for(distance_to_the_city_center/1, restaurant, 4, rfuzzy_number_
 near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
 
 % rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
-rfuzzy_define_fuzzification(near_the_city_center/1, distance_to_the_city_center, near_function).
+rfuzzy_define_fuzzification(near_the_city_center, distance_to_the_city_center, near_function).
 rfuzzy_db_value_for(near_the_city_center/1, restaurant, 5).
 
 is_zalacain(zalacain).
