@@ -380,7 +380,7 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pre
 	nonvar(Pseudo_Class), nonvar(Pred_Name), number(Pred_Arity), nonvar(Pred_Type_In), 
 	(
 	    (Pseudo_Class = 'fuzzy_rule', Pred_Class = 'fuzzy_rule_type', Needs_Head_Building='true',
-	    append_local(Pred_Type_In, ['rfuzzy_credibility_value_type', 'rfuzzy_truth_value_type'], Pred_Type)
+	    append_local(Pred_Type_In, ['rfuzzy_truth_value_type'], Pred_Type)
 	    )
 	;
 	    (Pseudo_Class = 'crisp_rule', Pred_Class = 'crisp_rule_type', Needs_Head_Building='no',
@@ -394,7 +394,7 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pre
 	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
 	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, _Truth_Value),
 
-	fix_functor_type(Pred_Functor, New_Pred_Arity, 1, Pred_Type, Cls),
+	fix_functor_type(Pred_Functor, Pred_Arity, 1, Pred_Type_In, Cls),
 	nonvar(Pred_Type),
 	
 	(
