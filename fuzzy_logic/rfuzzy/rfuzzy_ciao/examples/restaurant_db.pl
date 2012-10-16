@@ -55,7 +55,7 @@ rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
 very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
-	functor(Fuzzy_Predicate_Functor_In, FP_Name, FP_Arity), 
+	functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
 	arg(FP_Arity, Fuzzy_Predicate_Functor_In, FP_Truth_Value),
 	Fuzzy_Predicate_Functor_In,
 	Thershold .=. 0.7,

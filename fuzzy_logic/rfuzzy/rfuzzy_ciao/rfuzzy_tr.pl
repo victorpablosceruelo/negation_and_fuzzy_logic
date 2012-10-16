@@ -47,6 +47,11 @@ translation_info('fuzzy_rule_antonym',                        2, -1,       "rfuz
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+save_predicates_definition_list([], _Pred_Arity, _Pred_Type, _More_Info, _Needs_Head_Building) :- !.
+save_predicates_definition_list([Pred_Name | Pred_List], Pred_Arity, Pred_Type, More_Info, Needs_Head_Building) :-
+	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building), !,
+	save_predicates_definition_list(Pred_List, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building).
+
 save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class) :-
 	print_msg('debug', 'save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Type, Pred_Class)),
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
@@ -178,10 +183,14 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 	save_predicate_definition('rfuzzy_id_type', 1, _Pred_Type1, [], 'no'),
 	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], 'no').
+	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type3, [], 'no'),
+	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type4, [], 'no'),
+	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type5, [], 'no'),
+	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], 'no'),
+
+	defined_aggregators(Aggregators_List),
+	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
+	save_predicates_definition_list(Aggregators_List, 3, Aggregators_Type, [], 'no').
 
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
