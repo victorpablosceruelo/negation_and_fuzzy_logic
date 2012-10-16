@@ -4,10 +4,22 @@
 	var queryLinesCounterLimit = 50;
 	var fuzzyVarsCounter = 0;
 
+	function isQuantifierPredicate(programIntrospectionElement) {
+		
+		if ((programIntrospectionElement.predArity == 2) &&
+			(programIntrospectionElement.predType != "-variable-")){
+			var types = programIntrospectionElement.predType;
+				return ((types[0] == "rfuzzy_predicate_type") &&
+						(types[1] == "rfuzzy_truth_value_type"));
+		}
+		else return false;
+	}
+	
 	function chooseQuantifierCode(fuzzyRuleIndex, fuzzyRuleQuantifierIndex) {
 		var html = "<select name=\'fuzzyRuleQuantifier[" + fuzzyRuleIndex + "][" + fuzzyRuleQuantifierIndex + "]\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
+			if (isQuantifierPredicate(programIntrospectionArray[i])) {
 				if (((fuzzyRuleQuantifierIndex == 0) && (programIntrospectionArray[i].predName == "fnot")) ||
 						((fuzzyRuleQuantifierIndex == 1) && (programIntrospectionArray[i].predName != "fnot"))) {
 					html += "<option name=\'" + programIntrospectionArray[i].predName + 
@@ -16,6 +28,7 @@
 					else html += programIntrospectionArray[i].predName;
 					html += "</option>";
 				}
+			}
 			
 		}
 		html += "</select>";
