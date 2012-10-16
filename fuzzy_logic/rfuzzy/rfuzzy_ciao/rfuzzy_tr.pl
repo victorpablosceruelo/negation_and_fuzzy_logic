@@ -1075,10 +1075,12 @@ code_for_quantifier_fnot(In, [Code | In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_predefined_types(In, [Type_1, Type_2, Type_3|In]) :-
-	Type_1 = (rfuzzy_predicate_type(_Any)), 
-	Type_2 = (rfuzzy_truth_value_type(_Any)), 
-	Type_3 = (rfuzzy_number_type(_Any)), 
+code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_4, Type_5|In]) :-
+	Type_1 = (rfuzzy_predicate_type(_Any_1)), 
+	Type_2 = (rfuzzy_truth_value_type(_Any_2)), 
+	Type_3 = (rfuzzy_number_type(_Any_3)), 
+	Type_4 = (rfuzzy_id_type(_Any_4)), 
+	Type_5 = (rfuzzy_credibility_value_type(_Any_5)), 
 	!.
 
 % ------------------------------------------------------
