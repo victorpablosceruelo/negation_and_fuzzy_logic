@@ -15,7 +15,8 @@
 				<td><h3>Your query: I'm looking for a </h3></td>
 				<td id="queryStart"></td>
 			</tr>
-		</table>		
+		</table>
+		<br />		
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
 			<div id="simpleOrAdvancedQuery"></div>
      		<div id="queryLines"></div>

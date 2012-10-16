@@ -53,9 +53,6 @@
 		html += "</select>";
 		return html;
 	}
-	function fuzzyRuleArgsCode(fuzzyRuleIndex) {
-		return "<div class='ruleArgs'><div id=\'ruleArgs[" + fuzzyRuleIndex + "]\'></div></div>";
-	}
 	
 	function addFuzzyRuleArgumentFields(fuzzyRuleIndex, fuzzyVarIndex) {
 		debug.info("addFuzzyRuleArgumentFields: fuzzyRuleIndex:" + fuzzyRuleIndex + " fuzzyVarIndex:" + fuzzyVarIndex);
@@ -85,6 +82,10 @@
 		}
 	}
 	
+	function fuzzyRuleArgsCode(fuzzyRuleIndex) {
+		return "<td id=\'fuzzyRuleArgs[" + fuzzyRuleIndex + "]\' class='hidden'></td>";
+	}
+	
 	function fuzzyRuleChange(comboBox, fuzzyRuleIndex) {
 		// var elementId = "";
 		var divName = "fuzzyRuleArgs[" + fuzzyRuleIndex + "]";
@@ -94,29 +95,35 @@
 		debug.info("comboBoxValue: " + comboBoxValue);
 		
 		var found = false;
-		var i = 0;
+		var index = 0;
 		var predArity = 0;
-		while ((! found) && (i < programIntrospectionArray.length)) {
-			debug.info("programIntrospectionArray["+i+"]: " + programIntrospectionArray[i].predName);
-			if (comboBoxValue == programIntrospectionArray[i].predName) {
+		debug.info("fuzzyRuleChange: looking ... ");
+		while ((! found) && (index < programIntrospectionArray.length)) {
+			debug.info("programIntrospectionArray["+index+"]: " + programIntrospectionArray[index].predName);
+			if (comboBoxValue == programIntrospectionArray[index].predName) {
 				found = true;
-				foundPredInfo = programIntrospectionArray[i];
+				foundPredInfo = programIntrospectionArray[index];
 			}
-			i++;
+			else index++;
 		}
 		
-		// HERE !!!
-		var fuzzyVarIndex = fuzzyVarsCounter;
-		fuzzyVarsCounter += predArity;
-		var html = "";
-		while (fuzzyVarIndex < fuzzyVarsCounter) {
-			if (fuzzyVarIndex +1 == fuzzyVarsCounter) html+= "result: ";
-			html += addFuzzyRuleArgumentFields(fuzzyRuleIndex, fuzzyVarIndex);
-			fuzzyVarIndex += 1;
+		if (found) {
+			debug.info("fuzzyRuleChange: found");
+			var fuzzyVarIndex = fuzzyVarsCounter;
+			fuzzyVarsCounter += predArity;
+			var html = "";
+			while (fuzzyVarIndex < fuzzyVarsCounter) {
+				if (fuzzyVarIndex +1 == fuzzyVarsCounter) html+= "result: ";
+				html += addFuzzyRuleArgumentFields(fuzzyRuleIndex, fuzzyVarIndex);
+				fuzzyVarIndex += 1;
+			}
+			debug.info("fuzzyRuleChange: adding contents to divName: " + divName);
+			document.getElementById(divName).innerHTML = html;
+			debug.info("fuzzyRuleChange: adding contents to divName: " + 'hiddenNumOfVariables');
+			document.getElementById('hiddenNumOfVariables').innerHTML = " " + 
+						"<input type=\"hidden\" name=\"fuzzyVarsCounter\" id=\"fuzzyVarsCounter\" value=\""+ 
+						fuzzyVarsCounter + "\" />";
 		}
-		document.getElementById(divName).innerHTML = html;
-		document.getElementById('hiddenNumOfVariables').innerHTML = " " + 
-					"<input type=\"hidden\" name=\"fuzzyVarsCounter\" id=\"fuzzyVarsCounter\" value=\""+ fuzzyVarsCounter + "\" />";
 	}
 	
 	function addQueryLine(queryLinesDivId, startupType) {
@@ -128,8 +135,8 @@
 			newDiv.innerHTML = "<table id=\'queryLineTable_"+queryLinesCounter+"\'><tr><td>" +  
 					chooseQuantifierCode(queryLinesCounter, 0) + "</td><td>" +
 					chooseQuantifierCode(queryLinesCounter, 1) + "</td><td>" +
-					chooseRuleCode(queryLinesCounter, startupType) + 
-					fuzzyRuleArgsCode(queryLinesCounter) + "</td></tr></table>";
+					chooseRuleCode(queryLinesCounter, startupType) + "</td>" +
+					fuzzyRuleArgsCode(queryLinesCounter) + "</tr></table>";
 			
 			document.getElementById(queryLinesDivId).appendChild(newDiv);
 			// document.getElementById(queryLinesDivId).innerHTML += newDiv;
