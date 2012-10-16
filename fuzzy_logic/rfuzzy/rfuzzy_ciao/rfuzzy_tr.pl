@@ -425,7 +425,7 @@ translate((Head :~ Body), Translation):-
 translate(rfuzzy_synonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred), Cls):-
 	!,
 	print_msg('debug', 'translate(rfuzzy_synonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred))) ', rfuzzy_synonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred)),
-	nonvar(Pred2_Name), nonvar(Pred_Name), nonvar(Cred_Op), nonvar(Cred), number(Cred), nonvar(Arity), number(Arity),
+	nonvar(Pred2_Name), nonvar(Pred_Name), nonvar(Cred_Op), nonvar(Cred), number(Cred), nonvar(Pred_Arity), number(Pred_Arity),
 	test_aggregator_is_defined(Cred_Op, 'true'),
 
 	Pred_Class = 'fuzzy_rule_synonym',
@@ -437,16 +437,16 @@ translate(rfuzzy_synonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, C
 	functor(Credibility_Functor, Cred_Op, 3), 
 	Credibility_Functor=..[Cred_Op, Truth_Value_In, Cred, Truth_Value_Out],
 
-	Arity_plus_1 is Arity + 1,
-	Arity_plus_2 is Arity_plus_1 + 1,
+	Pred_Arity_Plus_1 is Pred_Arity + 1,
+	Pred_Arity_Plus_2 is Pred_Arity_Plus_1 + 1,
 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error),
-	retrieve_predicate_info(Pred2_Name, Arity_plus_1, Pred2_Type, _MI_2, _NHB_2, 'true'),
+	retrieve_predicate_info(Pred2_Name, Pred_Arity_Plus_1, Pred2_Type, _MI_2, _NHB_2, 'true'),
 
 	add_preffix_to_name(Pred2_Name, "rfuzzy_aux_", Pred2_Name_Aux),
-	functor(Pred2_Functor_Aux, Pred2_Name_Aux, Arity_plus_2),
-	copy_args(Arity_plus_1, Pred_Functor, Pred2_Functor_Aux),
-	arg(Arity_plus_2, Pred2_Functor_Aux, Truth_Value_In),
+	functor(Pred2_Functor_Aux, Pred2_Name_Aux, Pred_Arity_Plus_2),
+	copy_args(Pred_Arity_Plus_1, Pred_Functor, Pred2_Functor_Aux),
+	arg(Pred_Arity_Plus_2, Pred2_Functor_Aux, Truth_Value_In),
 
 	Cls = (Pred_Functor :- Pred2_Functor_Aux, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
@@ -457,7 +457,7 @@ translate(rfuzzy_synonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, C
 translate(rfuzzy_antonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred), Cls):-
 	!,
 	print_msg('debug', 'translate(rfuzzy_antonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred)) ', rfuzzy_antonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred)),
-	nonvar(Pred_Name), nonvar(Pred2_Name), nonvar(Cred_Op), nonvar(Cred), number(Cred), nonvar(Arity), number(Arity),
+	nonvar(Pred_Name), nonvar(Pred2_Name), nonvar(Cred_Op), nonvar(Cred), number(Cred), nonvar(Pred_Arity), number(Pred_Arity),
 	test_aggregator_is_defined(Cred_Op, 'true'),
 
 	Pred_Class = 'fuzzy_rule_antonym',
@@ -469,16 +469,16 @@ translate(rfuzzy_antonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, C
 	functor(Credibility_Functor, Cred_Op, 3), 
 	Credibility_Functor=..[Cred_Op, Truth_Value_Aux, Cred, Truth_Value_Out],
 
-	Arity_plus_1 is Arity + 1,
-	Arity_plus_2 is Arity_plus_1 + 1,
+	Pred_Arity_Plus_1 is Pred_Arity + 1,
+	Pred_Arity_Plus_2 is Pred_Arity_Plus_1 + 1,
 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error),
-	retrieve_predicate_info(Pred2_Name, Arity_plus_1, Pred2_Type, _MI_2, _NHB_2, 'true'),
+	retrieve_predicate_info(Pred2_Name, Pred_Arity_Plus_1, Pred2_Type, _MI_2, _NHB_2, 'true'),
 
 	add_preffix_to_name(Pred2_Name, "rfuzzy_aux_", Pred2_Name_Aux),
-	functor(Pred2_Functor_Aux, Pred2_Name_Aux, Arity_plus_2),
-	copy_args(Arity_plus_1, Pred_Functor, Pred2_Functor_Aux),
-	arg(Arity_plus_2, Pred2_Functor_Aux, Truth_Value_In),
+	functor(Pred2_Functor_Aux, Pred2_Name_Aux, Pred_Arity_Plus_2),
+	copy_args(Pred_Arity_Plus_1, Pred_Functor, Pred2_Functor_Aux),
+	arg(Pred_Arity_Plus_2, Pred2_Functor_Aux, Truth_Value_In),
 
 	Cls = (Pred_Functor :- Pred2_Functor_Aux, (Truth_Value_Aux .=. 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
