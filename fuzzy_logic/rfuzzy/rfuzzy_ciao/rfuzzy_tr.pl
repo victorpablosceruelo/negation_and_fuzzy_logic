@@ -48,6 +48,7 @@ translation_info('fuzzy_rule_antonym',                        2, -1,       "rfuz
 % ------------------------------------------------------
 
 save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class) :-
+	print_msg('debug', 'save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Type, Pred_Class)),
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, 'fuzzy_rule', Real_Pred_Name, Real_Pred_Arity),
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
@@ -63,19 +64,18 @@ save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Hea
 	    (	 
 		list(More_Info),
 		retract_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Old_More_Info, Old_Needs_Head_Building)), !, % Retract last
-		print_msg('debug', 'save_predicate_definition', (Pred_Name, Pred_Arity, Pred_Type, Old_More_Info, Old_Needs_Head_Building)),
+		print_msg('debug', 'save_predicate_definition :: current', (Pred_Name, Pred_Arity, Pred_Type, Old_More_Info, Old_Needs_Head_Building)),
 		append_local(More_Info, Old_More_Info, New_More_Info),
-		boolean_or(Old_Needs_Head_Building, Needs_Head_Building, New_Needs_Head_Building),
-		assertz_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building))
+		boolean_or(Old_Needs_Head_Building, Needs_Head_Building, New_Needs_Head_Building)
 	    )
 	;
 	    (
 		list(More_Info),
 		New_More_Info = More_Info, 
-		New_Needs_Head_Building = Needs_Head_Building,
-		assertz_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building))
+		New_Needs_Head_Building = Needs_Head_Building
 	    )
 	), 
+	assertz_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)),
 	print_msg('debug', 'saved', save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)),
 	!.
 
@@ -293,7 +293,7 @@ translate((Head :# List), (Pred_Functor :- (Body, print_msg('debug', 'function_c
 
 	Pred_Type = ['rfuzzy_number_type', 'rfuzzy_truth_value_type'],
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'false').
+	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'no').
 
 translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 	print_msg('debug', 'rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)', rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)),
@@ -302,24 +302,21 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 	retrieve_predicate_info(Database_Pred_Name, Database_Pred_Arity, Database_Pred_Type, _List, _NHB, 'true'), !,
 	print_msg('debug', 'rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)', rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)),	
 	(
-	    (
-		nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type)
-	    )
+	    (	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type)     )
 	;
-	    (
-		print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail
-	    )
+	    (	print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail     )
 	),
 	Position < Database_Pred_Arity, 
 	get_nth_element_from_list(Position, Database_Pred_Type, Type),
-
+	print_msg('debug', 'rfuzzy_db_value_for(Type)', rfuzzy_db_value_for(Type)),
 	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
 	arg(Position, DB_Pred_Functor, Value),
 
 	(
 	    (
-		nonvar(Type), Type = 'rfuzzy_truth_value_type', !,
-		Pred_Class = 'fuzzy_rule_db_value',
+		nonvar(Type), Type = 'rfuzzy_truth_value_type', !, 
+		Pred_Class = 'fuzzy_rule_db_value', Pred_Arity=1,
+		print_msg('debug', 'rfuzzy_db_value_for(Pred_Class)', rfuzzy_db_value_for(Pred_Class)),	
 		% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 		translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
 		% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
@@ -343,7 +340,7 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 		Cls = (Pred_Functor :- ((Mapping, DB_Pred_Functor), Test)),
 		Pred_Type = [Database_Pred_Name, Type],
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'false')
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no')
 	    )
 	),
 	print_msg('debug', 'rfuzzy_db_value_for', (Pred_Name, Cls)).
@@ -355,19 +352,18 @@ translate(rfuzzy_type_for(Class, Pred_Name/Pred_Arity_In, Types_In), Cls):-
 	translate(rfuzzy_type_for('crisp_rule', Pred_Name/Pred_Arity_In, Types_In), Cls).
 
 % Predicate type(s) definition (Class \== database).
-translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity_In, Pred_Type_In),(Pred_Functor :- Cls)):-
+translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pred_Functor :- Cls)):-
 	Pseudo_Class \== 'database',
 	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Pred_Type)', (Pseudo_Class, Pred_Name/Pred_Arity_In, Pred_Type_In)),
-	nonvar(Pseudo_Class), nonvar(Pred_Name), number(Pred_Arity_In), nonvar(Pred_Type_In), 
+	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Pred_Type)', (Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In)),
+	nonvar(Pseudo_Class), nonvar(Pred_Name), number(Pred_Arity), nonvar(Pred_Type_In), 
 	(
 	    (Pseudo_Class = 'fuzzy_rule', Pred_Class = 'fuzzy_rule_type', Needs_Head_Building='true',
-	    append_local(Pred_Type_In, ['rfuzzy_credibility_value_type', 'rfuzzy_truth_value_type'], Pred_Type),
-	    Pred_Arity is Pred_Arity_In + 1
+	    append_local(Pred_Type_In, ['rfuzzy_credibility_value_type', 'rfuzzy_truth_value_type'], Pred_Type)
 	    )
 	;
-	    (Pseudo_Class = 'crisp_rule', Pred_Class = 'crisp_rule_type', Needs_Head_Building='false',
-	     Pred_Type = Pred_Type_In, Pred_Arity = Pred_Arity_In
+	    (Pseudo_Class = 'crisp_rule', Pred_Class = 'crisp_rule_type', Needs_Head_Building='no',
+	     Pred_Type = Pred_Type_In 
 	    )
 	),
 	print_msg('debug', 'rfuzzy_type_for :: (Pred_Name, Pred_Arity, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Class)),
@@ -378,10 +374,19 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity_In, Pred_Type_In),(
 	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, _Truth_Value),
 
 	fix_functor_type(Pred_Functor, New_Pred_Arity, 1, Pred_Type, Cls),
+	nonvar(Pred_Type),
 	
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], Needs_Head_Building),
-	
+	(
+	    (	Pred_Class = 'fuzzy_rule_type',
+		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+	    )
+	;
+	    (	Pred_Class = 'crisp_rule_type',
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], Needs_Head_Building)
+	    )
+	),
 	!. % Backtracking forbidden.
 
 % rules with credibility:
@@ -647,13 +652,13 @@ translate_rule_body(Body_F, _TV_Aggregator, _Truth_Value, _Result) :-
 % ------------------------------------------------------
 
 fix_functor_type(Functor, Arity, Actual, [Type], Type_F) :-
-	print_msg('debug', 'fix_functor_type(Functor, Arity, Actual, Type)', (Functor, Arity, Actual, Type) ),
+	print_msg('debug', 'fix_functor_type(Functor, Arity, Actual, Type)', (Functor, Arity, Actual, [Type]) ),
 	Actual = Arity, !, % Security conditions.
 	fix_functor_type_aux(Functor, Actual, Type, Type_F),
 	!. % Backtracking not allowed.
 
 fix_functor_type(Functor, Arity, Actual, [Type | More], (Type_F, More_F)) :-
-	print_msg('debug', 'fix_functor_type(Functor, Arity, Actual, Type)', (Functor, Arity, Actual, Type) ),
+	print_msg('debug', 'fix_functor_type(Functor, Arity, Actual, Type)', (Functor, Arity, Actual, [Type|More]) ),
 	Actual < Arity, !,  % Security conditions.
 	fix_functor_type_aux(Functor, Actual, Type, Type_F),
 	NewActual is Actual + 1, % Next values.
@@ -723,8 +728,15 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 
 
 translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity) :-
-	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Class),
 	print_msg('debug', 'translate_predicate(Pred_Name, Pred_Arity, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Class)),
+	(
+	    (	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Class)    )
+	;
+	    (
+		print_msg('error', 'translate_predicate(Pred_Name, Pred_Arity, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Class)),
+		!, fail
+	    )
+	),
 	translation_info(Pred_Class, Add_Args, Priority, Preffix_String),
 	number(Add_Args), number(Priority), 
 	New_Pred_Arity is Pred_Arity + Add_Args, 
@@ -901,6 +913,9 @@ lists_substraction([Head | Tail ], List_2, [Head | Result_List]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+get_nth_element_from_list(Position, [Head], Head) :-
+	nonvar(Position), 
+	Position = 1, !.
 get_nth_element_from_list(Position, [Head | _Tail], Head) :-
 	nonvar(Position), 
 	Position = 1, !.
