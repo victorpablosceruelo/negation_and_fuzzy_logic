@@ -8,7 +8,6 @@
 		var html = "<select name=\'fuzzyRuleQuantifier[" + fuzzyRuleIndex + "][" + fuzzyRuleQuantifierIndex + "]\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
-			if (programIntrospectionArray[i].predClass == "quantifier") {
 				if (((fuzzyRuleQuantifierIndex == 0) && (programIntrospectionArray[i].predName == "fnot")) ||
 						((fuzzyRuleQuantifierIndex == 1) && (programIntrospectionArray[i].predName != "fnot"))) {
 					html += "<option name=\'" + programIntrospectionArray[i].predName + 
@@ -17,7 +16,7 @@
 					else html += programIntrospectionArray[i].predName;
 					html += "</option>";
 				}
-			}
+			
 		}
 		html += "</select>";
 		return html;
@@ -32,9 +31,7 @@
 		           "]\' onchange=\"fuzzyRuleChange(this, " + fuzzyRuleIndex + ");\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
-			if (((programIntrospectionArray[i].predClass == "crisp_rule") ||
-					(programIntrospectionArray[i].predClass == "fuzzy_rule")) &&
-					startupTypeIsValid(startupType, programIntrospectionArray[i].predType)) {
+			if (startupTypeIsValid(startupType, programIntrospectionArray[i].predType)) {
 				html += "<option name=\'" + programIntrospectionArray[i].predName + 
 							"\' value=\'" + programIntrospectionArray[i].predName + "\'>"+
 							programIntrospectionArray[i].predName + "</option>";
