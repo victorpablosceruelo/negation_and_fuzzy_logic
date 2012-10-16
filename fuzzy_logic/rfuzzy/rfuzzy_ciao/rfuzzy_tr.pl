@@ -60,6 +60,7 @@ save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Clas
 
 save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building) :-
 	print_msg('debug', 'save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)', (Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)),
+	check_pred_type(Pred_Arity, Pred_Type),
 	(
 	    (	 
 		list(More_Info),
@@ -96,9 +97,31 @@ retrieve_all_predicate_infos(Retrieved) :-
 	findall((predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)),
 	(retract_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building))), Retrieved),
 	 !.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 	
+check_pred_type(Pred_Arity, Pred_Type) :-
+	( var(Pred_Arity) ; var(Pred_Type)  ), !.
+check_pred_type(Pred_Arity, Pred_Type) :-
+	nonvar(Pred_Arity), nonvar(Pred_Type), 
+	(
+	    (
+		check_pred_type_aux(Pred_Arity, Pred_Type), !
+	    )
+	;
+	    (
+		print_msg('error', 'Predicate types are not valid for arity. (Pred_Arity, Pred_Type)', (Pred_Arity, Pred_Type)), 
+		!, fail
+	    )
+	).
 
-
+check_pred_type_aux(1, [_Pred_Type]) :- !.
+check_pred_type_aux(Pred_Arity, [_Pred_Type|More]) :-
+	New_Pred_Arity is Pred_Arity -1,
+	check_pred_type_aux(New_Pred_Arity, More).
+	
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -326,9 +349,9 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 		functor(Test, '\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
 		functor(Convert, '.=.', 2), arg(1, Convert, Value), arg(2, Convert, Truth_Value),
 		Cls = (Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Convert)),
-		Pred_Type = [Database_Pred_Name, Type],
+		Pred_Type = [Database_Pred_Name, 'rfuzzy_credibility_value_type', Type],
 		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-		save_fuzzy_rule_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, Pred_Class)
+		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
 	    )
 	;
 	    (
