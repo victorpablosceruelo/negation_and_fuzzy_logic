@@ -9,11 +9,11 @@
 <% Iterator<AnswerTermInJava []> loadedProgramIntrospectionIterator = connection.getProgramIntrospectionIterator(); %>
 
 <script type="text/javascript">
-	function predInfo(predClass, predName, predArity, predType) {
-		this.predClass = predClass;
+	function predInfo(predName, predArity, predType, predFacilities) {
 		this.predName = predName;
 		this.predArity = predArity;
 		this.predType = predType;
+		this.predFacilities = predFacilities;
 	}
 	
 	var programIntrospectionArray = new Array();
