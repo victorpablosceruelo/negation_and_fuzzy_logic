@@ -33,9 +33,9 @@ restaurant(zalacain,                         null,     null,    null,      null,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-rfuzzy_db_value_for(traditional/1, restaurant, 2, rfuzzy_truth_value_type).
-rfuzzy_db_value_for(low_distance/1, restaurant, 3, rfuzzy_truth_value_type).
-rfuzzy_db_value_for(distance_to_the_city_center/1, restaurant, 4, rfuzzy_number_type).
+rfuzzy_db_value_for(traditional, restaurant, 2).
+rfuzzy_db_value_for(low_distance, restaurant, 3).
+rfuzzy_db_value_for(distance_to_the_city_center, restaurant, 4).
 
 near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
 

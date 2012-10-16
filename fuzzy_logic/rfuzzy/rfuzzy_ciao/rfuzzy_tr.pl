@@ -296,29 +296,51 @@ translate((Head :# List), (Pred_Functor :- (Body, print_msg('debug', 'function_c
 	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'false').
 
 translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
-	print_msg('debug', 'rfuzzy_db_value_for(Pred_Name/Pred_Arity, Database_Pred_Name, Position)', rfuzzy_db_value_for(Pred_Name/Pred_Arity, Database_Pred_Name, Position)),	
+	print_msg('debug', 'rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)', rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)),
 	nonvar(Pred_Name), nonvar(Database_Pred_Name), nonvar(Position), 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error)
 	retrieve_predicate_info(Database_Pred_Name, Database_Pred_Arity, Database_Pred_Type, _List, _NHB, 'true'), !,
-	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type),
+	print_msg('debug', 'rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)', rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)),	
+	(
+	    (
+		nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type)
+	    )
+	;
+	    (
+		print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail
+	    )
+	),
 	Position < Database_Pred_Arity, 
 	get_nth_element_from_list(Position, Database_Pred_Type, Type),
 
 	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
-	arg(1, DB_Pred_Functor, DB_Index),
 	arg(Position, DB_Pred_Functor, Value),
 
 	(
 	    (
-		nonvar(Type), Type = 'rfuzzy_truth_value_type',
-		Pred_Class = 'fuzzy_rule_db_value'
+		nonvar(Type), Type = 'rfuzzy_truth_value_type', !,
+		Pred_Class = 'fuzzy_rule_db_value',
+		% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
+		translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
+		% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
+		predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
+		arg(1, Pred_Functor, Input),
+		functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
+		functor(Test, '\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
+		functor(Convert, '.=.', 2), arg(1, Convert, Value), arg(2, Convert, Truth_Value),
+		Cls = (Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Convert)),
+		Pred_Type = [Database_Pred_Name, Type],
+		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+		save_fuzzy_rule_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, Pred_Class)
 	    )
 	;
 	    (
-		nonvar(Type), Type = 'rfuzzy_number_type', Pred_Arity = 2,
+		nonvar(Type), Type = 'rfuzzy_number_type', !, Pred_Arity = 2,
 		functor(Pred_Functor, Pred_Name, Pred_Arity),
 		functor(Test, '\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
-		Cls = (Pred_Functor :- (DB_Pred_Functor, Test)),
+		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
+		functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
+		Cls = (Pred_Functor :- ((Mapping, DB_Pred_Functor), Test)),
 		Pred_Type = [Database_Pred_Name, Type],
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'false')
