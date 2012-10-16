@@ -203,7 +203,8 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 
 % Unconditional default
-translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value)), (Pred_Functor :- Truth_Value_Functor)) :- 
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value)), Cls) :- 
+	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Name/Pred_Arity, Truth_Value) ', rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value)),
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), nonvar(Pred_Arity), 
 	number(Pred_Arity), nonvar(Pred_Name), 
@@ -215,10 +216,13 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value)), (
 	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
 
 	generate_truth_value_equal_to_functor(Fixed_Truth_Value, Truth_Value, Truth_Value_Functor),
+	Cls = (Pred_Functor :- Truth_Value_Functor),
+	print_msg('debug', 'translate :: Cls ', Cls),
 	!. % Backtracking forbidden.
 
 % Conditional default
-translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if Pred2_Name/Pred2_Arity), (Pred_Functor :- (Pred2_Functor, Truth_Value_Functor))) :-
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if Pred2_Name/Pred2_Arity), Cls) :-
+	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Name/Pred_Arity, Truth_Value) if Pred2_Name/Pred2_Arity', (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if Pred2_Name/Pred2_Arity)),
 	print_msg('debug', 'translate', 'if detected'),
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), nonvar(Pred_Arity), number(Pred_Arity),
@@ -234,9 +238,11 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if 
 	functor(Pred2_Functor, Pred2_Name, Pred2_Arity),
 	copy_args(Pred_Arity, Pred_Functor, Pred2_Functor),    % Copy args from main functor.
 	generate_truth_value_equal_to_functor(Fixed_Truth_Value, Truth_Value, Truth_Value_Functor),
+	Cls = (Pred_Functor :- (Pred2_Functor, Truth_Value_Functor)),
+	print_msg('debug', 'translate :: Cls ', Cls),
 	!.
 
-translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Truth_Value)), (Pred_Functor :- ((Pred2_Functor, Pred3_Functor), Truth_Value_Functor))) :-
+translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Truth_Value)), Cls) :-
 	print_msg('debug', 'translate :: (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Truth_Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Truth_Value))', (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Truth_Value))),
 	!, % If patter matching, backtracking forbiden.
 	Pred_Arity = Pred2_Arity,
@@ -273,8 +279,11 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if 
 	generate_truth_value_equal_to_functor(Fixed_Truth_Value, Truth_Value, Truth_Value_Functor),
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error)
 	retrieve_predicate_info(New_Pred2_Name, New_Pred2_Arity, _Pred2_Functor_Type, _List, _NHB, 'true'), 
+	Cls = (Pred_Functor :- ((Pred2_Functor, Pred3_Functor), Truth_Value_Functor)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(New_Pred_Name, New_Pred_Arity, _Pred_Type, Pred_Class), !.
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, Pred_Class), !,
+	print_msg('debug', 'translate :: (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Truth_Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Truth_Value))', (rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value) if thershold(Pred2_Name/Pred2_Arity, Cond, Thershold_Truth_Value))),
+	print_msg('debug', 'translate :: (Cls)', Cls).
 
 % Fuzzy facts.
 translate((Head value Fixed_Truth_Value), (Pred_Functor :- Truth_Value_Functor)):-
@@ -837,7 +846,7 @@ build_auxiliary_clauses([], [end_of_file]) :- !.
 build_auxiliary_clauses([Predicate_Def|Predicate_Defs], Clauses) :-
 	print_msg_nl('debug'),
 	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
-	test_if_list_contains_non_rfuzzy_fuzzy_rule(Predicate_Def), !,
+	predicate_definition_does_not_need_auxiliar(Predicate_Def), !,
 	print_msg('debug', 'build_auxiliary_clauses OUT', 'nothing'),
 	build_auxiliary_clauses(Predicate_Defs, Clauses).	
 build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | Clauses]) :-
@@ -847,9 +856,17 @@ build_auxiliary_clauses([Predicate_Def|Predicate_Defs], [Pred_Main, Pred_Aux | C
 	print_msg('debug', 'build_auxiliary_clauses OUT (Pred_Main, Pred_Aux)', (Pred_Main, Pred_Aux)),
 	build_auxiliary_clauses(Predicate_Defs, Clauses).	
 
-build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, _Pred_Type, List), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+predicate_definition_does_not_need_auxiliar(predicate_definition(_Pred_Name, _Pred_Arity, _Pred_Type, _List, 'no')).
 
-	Category = 'fuzzy_rule',
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+build_auxiliary_clause(predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, List, 'true'), Fuzzy_Cl_Main, Fuzzy_Cl_Aux) :-
+
 	% Build MAIN functor.
 	functor(Pred_Functor, Pred_Name, Pred_Arity),
 	% Build AUXILIAR functor
@@ -870,7 +887,8 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, _Pr
 	build_functors(List, 'default_with_cond',      'fail',  Aux_Pred_Functor, Fuzzy_Pred_Default_With_Cond, Def_4, Def_5, NDef_4, NDef_5),
 	build_functors(List, 'default_without_cond', 'fail',  Aux_Pred_Functor, Fuzzy_Pred_Default_Without_Cond, Def_5, Def_6, NDef_5, NDef_6),
 	build_functors(List, 'synonym',                     'fail',  Aux_Pred_Functor, Fuzzy_Pred_Synonym, Def_6, Def_7, NDef_6, NDef_7),
-	build_functors(List, 'antonym',                      'fail',  Aux_Pred_Functor, Fuzzy_Pred_Antonym, Def_7, Def, NDef_7, NDef),
+	build_functors(List, 'antonym',                      'fail',  Aux_Pred_Functor, Fuzzy_Pred_Antonym, Def_7, Def_8, NDef_7, NDef_8),
+	build_functors(List, 'fuzzy_rule_db_value',  'fail',  Aux_Pred_Functor, Fuzzy_Pred_DB_Value, Def_8, Def, NDef_8, NDef),
 	build_functors_notify_missing_facilities(Pred_Name, Def, NDef),
 
 	(Fuzzy_Cl_Main = (
@@ -894,7 +912,8 @@ build_auxiliary_clause(predicate_definition(Category, Pred_Name, Pred_Arity, _Pr
 							    Fuzzy_Pred_Default_With_Cond ; 
 							    Fuzzy_Pred_Default_Without_Cond ;
 							    Fuzzy_Pred_Synonym ;
-							    Fuzzy_Pred_Antonym 
+							    Fuzzy_Pred_Antonym ;
+							    Fuzzy_Pred_DB_Value
 							),
 							% Security conditions.
 							Aux_Pred_Truth_Value_Arg .>=. 0,
@@ -981,17 +1000,6 @@ generate_truth_value_equal_to_functor(Fixed_Truth_Value, Truth_Value, Truth_Valu
 	functor(Truth_Value_Functor, '.=.', 2),
 	arg(1, Truth_Value_Functor, Truth_Value),
 	arg(2, Truth_Value_Functor, Fixed_Truth_Value), !.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-test_if_list_contains_non_rfuzzy_fuzzy_rule(predicate_definition(_Category, _Pred_Name, _Pred_Arity, _Pred_Type, List)) :-
-	test_if_list_contains_non_rfuzzy_fuzzy_rule_aux(List).
-
-test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([('non_rfuzzy_fuzzy_rule', _Sub_Pred_Name, _Sub_Pred_Arity)|_List]) :- !.
-test_if_list_contains_non_rfuzzy_fuzzy_rule_aux([(_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List]) :-
-	test_if_list_contains_non_rfuzzy_fuzzy_rule_aux(List).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
