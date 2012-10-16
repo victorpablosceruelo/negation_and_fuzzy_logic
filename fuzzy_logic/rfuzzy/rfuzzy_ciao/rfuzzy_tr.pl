@@ -334,11 +334,11 @@ translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
 	retrieve_predicate_info(Database_Pred_Name, Database_Pred_Arity, Database_Pred_Type, _List, _NHB, 'true'), !,
 	print_msg('debug', 'rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)', rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)),	
 	(
-	    (	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type)     )
+	    (	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type), !     )
 	;
 	    (	print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail     )
 	),
-	Position < Database_Pred_Arity, 
+	Position =< Database_Pred_Arity, 
 	get_nth_element_from_list(Position, Database_Pred_Type, Type),
 	print_msg('debug', 'rfuzzy_db_value_for(Type)', rfuzzy_db_value_for(Type)),
 	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
@@ -770,7 +770,7 @@ evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X
 translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity) :-
 	print_msg('debug', 'translate_predicate(Pred_Name, Pred_Arity, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Class)),
 	(
-	    (	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Class)    )
+	    (	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Class), !    )
 	;
 	    (
 		print_msg('error', 'translate_predicate(Pred_Name, Pred_Arity, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Class)),

@@ -49,7 +49,7 @@ rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant]).
 rfuzzy_default_value_for(cheap/1, 0.5).
 rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/1, over, 0.7).
 rfuzzy_default_value_for(cheap/1, 0.1) if is_zalacain/1.
-rfuzzy_db_value_for(cheap/1, restaurant, 6, rfuzzy_truth_value_type).
+rfuzzy_db_value_for(cheap, restaurant, 6).
 
 rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
@@ -70,8 +70,8 @@ rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), fnot(very(expensive(R))), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
 
-rfuzzy_db_value_for(distance_to_us/1, restaurant, 7, rfuzzy_number_type).
-rfuzzy_define_fuzzification(near_to_us/1, distance_to_us/2, near_function/2).
+rfuzzy_db_value_for(distance_to_us, restaurant, 7).
+rfuzzy_define_fuzzification(near_to_us, distance_to_us, near_function).
 
 % More tests (maybe not needed in this DB).
 not_very_expensive_restaurant(R) :~ fnot(very(expensive(R))).
