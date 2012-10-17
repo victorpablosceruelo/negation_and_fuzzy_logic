@@ -190,8 +190,8 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type6, [], 'no'),
 	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type7, [], 'no'),
 	save_predicate_definition('rfuzzy_enum_type', 2, _Pred_Type8, [], 'no'),
-	save_predicate_definition('rfuzzy_boolean_type', 2, _Pred_Type9, [], 'no'),
-	save_predicate_definition('rfuzzy_datetime_type', 2, _Pred_Type10, [], 'no'),
+	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type9, [], 'no'),
+	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type10, [], 'no'),
 
 	defined_aggregators(Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
@@ -342,7 +342,7 @@ translate((Head :# List), (Pred_Functor :- (Body, print_msg('debug', 'function_c
 	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'no').
 
 % Predicate type(s) definition (Class = database).
-translate(rfuzzy_db_description(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls_2]):- !,
+translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls_2]):- !,
 	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
 	print_msg('debug', 'rfuzzy_db_description(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
 	translate_db_description(Description, 1, Pred_Arity, Types, DB_Fields),
@@ -516,6 +516,18 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
 	!.
 
+translate(rfuzzy_define_enum_type(Pred_Name, List), Cls) :-
+	nonvar(Pred_Name), nonvar(List), 
+	(
+	    (
+		List = [], !,
+		functor(Pred_Functor, Pred_Name, 1), 
+		translate(Pred_Functor, Cls)
+	    )
+	;
+	    translate_enum_type_definition(List, Pred_Name, Cls)
+	), !.
+
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
 	print_msg('debug', 'Non-Rfuzzy predicate', Other),
@@ -539,6 +551,18 @@ translate(Other, Other) :-
 	),
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 	save_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, [], 'no').
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+% translate_enum_type_definition(List, Pred_Name, Cls)
+translate_enum_type_definition([], _Pred_Name, []) :- !.
+translate_enum_type_definition([Element | List], Pred_Name, [Cl | Cls]) :-
+	functor(Pred_Functor, Pred_Name, 1), 
+	arg(1, Pred_Functor, Element),
+	translate(Pred_Functor, Cl),
+	translate_enum_type_definition(List, Pred_Name, Cls).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -775,17 +799,24 @@ fix_functor_type(Functor, Arity, Actual, Types, _Type_F) :-
 
 fix_functor_type_aux(Functor, Actual, Type, (Cl1, Cl2)) :-
 	print_msg('debug', 'fix_functor_type_aux(Functor, Actual, Type)', fix_functor_type_aux(Functor, Actual, Type)),
-	Pred_Name = Type,
+	fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name),
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error),
 	retrieve_predicate_info(Pred_Name, Pred_Arity, _Pred_Type, _More_Info, _Needs_Head_Building, 'true'),
 	functor(Type_F, Type, Pred_Arity), % Build functor.
-	arg(1, Type_F, X),       % Argument of functor is X.
+	arg(1, Type_F, X), % Arguments of functor.
 	arg(Actual, Functor, X), % Unify with Argument of functor.
 	functor(Cl1, '=', 2), 
 	arg(1, Cl1, X), 
 	arg(2, Cl1, Type_F),
 	Cl2 = Type_F.
 
+fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
+	functor(Type, _Name, 0),
+	Pred_Name = Type.
+
+fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
+	functor(Type, 'rfuzzy_enum_type', 1),
+	arg(1, Type, Pred_Name).
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------

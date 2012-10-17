@@ -8,29 +8,32 @@
 % Activate/Deactivate debug.
 % :- activate_rfuzzy_debug.
 
-rfuzzy_db_description(restaurant/7, 
+rfuzzy_define_enum_type(restaurant_type, [fast_food, fast_casual, fine_dining]).
+rfuzzy_define_enum_type(food_type, []).
+
+rfuzzy_define_database(restaurant/7, 
 	[(restaurant_id, rfuzzy_string_type), 
-	  (traditional, rfuzzy_truth_value_type), 
-	   (low_distance, rfuzzy_truth_value_type), 
-	    (distance_to_the_city_center, rfuzzy_integer_type), 
-	     (near_the_city_center, rfuzzy_truth_value_type), 
-	      (cheap, rfuzzy_truth_value_type), 
-	       (distance_to_us, rfuzzy_integer_type)]).
+	  (type, rfuzzy_enum_type(restaurant_type)), 
+	   (food_type, rfuzzy_enum_type(food_type)),
+	    (years_since_opening, rfuzzy_integer_type), 
+	     (distance_to_the_city_center, rfuzzy_integer_type), 
+	      (price_average, rfuzzy_integer_type), 
+	       (menu_price, rfuzzy_integer_type)]).
 
 % restaurant(restaurant_id,                        2,        3,      4,          5,         6,        7, ).
-restaurant(rfuzzy_default_values, 1,        0,       null,      null,     null,       800).
-restaurant(kenzo,                            0.5,    null,    null,      1,         0.3,       150).
-restaurant(burguer_king,                null,    null,    null,      null,     null,      500).
-restaurant(pizza_jardin,                  null,    null,    null,      null,     null,      250).
-restaurant(subway,                          null,    null,    null,      null,    1,          null).
-restaurant(derroscas,                       null,    null,   null,      null,     1,          null).
-restaurant(il_tempietto,                   null,     null,   null,      null,     null,     100).
-restaurant(kono_pizza,                    null,    null,    null,      null,     null,      null).
-restaurant(paellador,                       0.87,    null,   null,      null,     null,      null).
-restaurant(tapasbar,                        null,     null,   null,      null,     null,      null).
-restaurant(meson_del_jamon,        null,     null,   100,      null,     null,      null).
-restaurant(museo_del_jamon,        null,     null,   150,      null,     null,      null).
-restaurant(zalacain,                         null,     null,    null,      null,     null,      null).
+%restaurant(rfuzzy_default_values, 1,        0,       null,      null,     null,       800).  <- nonsense ??
+restaurant(kenzo,                           fast_casual,     japanese,           5,    null,       50,     null).
+restaurant(burguer_king,               fast_food,        american,         10,    null,       10,     5).
+restaurant(pizza_jardin,                 fast_casual,     italian,                5,    null,       15,     null).
+restaurant(subway,                         fast_food,       sandwiches,        5,    null,      15,      10).
+restaurant(derroscas,                     fast_food,        mediterranean,   3,    null,      25,      null).
+restaurant(il_tempietto,                  fast_casusal,   italian,                5,    null,       20,     null).
+restaurant(kono_pizza,                   fast_food,       pizza,                  4,    null,      15,      null).
+restaurant(paellador,                       fast_food,       paella,                8,     null,      40,     null).
+restaurant(tapasbar,                        fast_food,       tapas,                 3,     null,      10,     null).
+restaurant(meson_del_jamon,        fast_food,       spanish,              8,     100,      20,     15).
+restaurant(museo_del_jamon,        fast_food,       spanish,              8,     150,      20,     15).
+restaurant(zalacain,                         fine_dining,    basque,             15,     null,      60,     50).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,6 +41,9 @@ near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
 
 % rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
 rfuzzy_define_fuzzification(near_the_city_center, distance_to_the_city_center, near_function).
+
+traditional_function :# ([ (0, 1), (5, 0.2), (10, 0.8), (15, 1) ]) .
+rfuzzy_define_fuzzification(traditional, years_since_opening, traditional_function).
 
 is_zalacain(zalacain).
 
