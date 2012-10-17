@@ -181,12 +181,17 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition('rfuzzy_id_type', 1, _Pred_Type1, [], 'no'),
-	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type3, [], 'no'),
-	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type4, [], 'no'),
-	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type5, [], 'no'),
+	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type1, [], 'no'),
+	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type2, [], 'no'),
+	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type3, [], 'no'),
 	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], 'no'),
+
+	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type5, [], 'no'),
+	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type6, [], 'no'),
+	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type7, [], 'no'),
+	save_predicate_definition('rfuzzy_enum_type', 2, _Pred_Type8, [], 'no'),
+	save_predicate_definition('rfuzzy_boolean_type', 2, _Pred_Type9, [], 'no'),
+	save_predicate_definition('rfuzzy_datetime_type', 2, _Pred_Type10, [], 'no'),
 
 	defined_aggregators(Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
@@ -336,59 +341,15 @@ translate((Head :# List), (Pred_Functor :- (Body, print_msg('debug', 'function_c
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'no').
 
-translate(rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position), Cls):-
-	print_msg('debug', 'rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)', rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)),
-	nonvar(Pred_Name), nonvar(Database_Pred_Name), nonvar(Position), 
-	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error)
-	retrieve_predicate_info(Database_Pred_Name, Database_Pred_Arity, Database_Pred_Type, _List, _NHB, 'true'), !,
-	print_msg('debug', 'rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)', rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)),	
-	(
-	    (	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type), !     )
-	;
-	    (	print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail     )
-	),
-	Position =< Database_Pred_Arity, 
-	get_nth_element_from_list(Position, Database_Pred_Type, Type),
-	print_msg('debug', 'rfuzzy_db_value_for(Type)', rfuzzy_db_value_for(Type)),
-	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
-	arg(Position, DB_Pred_Functor, Value),
-	Pred_Type = [Database_Pred_Name, Type],
-	(
-	    (
-		nonvar(Type), Type = 'rfuzzy_truth_value_type', !, 
-		Pred_Class = 'fuzzy_rule_db_value', Pred_Arity=1,
-		print_msg('debug', 'rfuzzy_db_value_for(Pred_Class)', rfuzzy_db_value_for(Pred_Class)),	
-		% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
-		translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
-		% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
-		predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
-		arg(1, Pred_Functor, Input),
-		functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
-		functor(Test, '\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
-		functor(Convert, '.=.', 2), arg(1, Convert, Value), arg(2, Convert, Truth_Value),
-		Cls = (Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Convert)),
-		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	    )
-	;
-	    (
-		nonvar(Type), Type = 'rfuzzy_number_type', !, Pred_Arity = 2,
-		functor(Pred_Functor, Pred_Name, Pred_Arity),
-		functor(Test, '\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
-		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
-		functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
-		Cls = (Pred_Functor :- ((Mapping, DB_Pred_Functor), Test)),
-		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no')
-	    )
-	),
-	print_msg('debug', 'rfuzzy_db_value_for', (Pred_Name, Cls)).
-
 % Predicate type(s) definition (Class = database).
-translate(rfuzzy_type_for(Class, Pred_Name/Pred_Arity_In, Types_In), Cls):-
-	nonvar(Class), 
-	Class = 'database',
-	translate(rfuzzy_type_for('crisp_rule', Pred_Name/Pred_Arity_In, Types_In), Cls).
+translate(rfuzzy_db_description(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls_2]):- !,
+	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
+	print_msg('debug', 'rfuzzy_db_description(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
+	translate_db_description(Description, 1, Pred_Arity, Types, DB_Fields),
+	translate(rfuzzy_type_for('crisp_rule', Pred_Name/Pred_Arity, Types), Cl_1),
+	translate_db_fields(DB_Fields, 1, Pred_Arity, Pred_Name, Cls_2),
+	print_msg('debug', 'rfuzzy_db_description :: Cls_1', Cl_1),
+	print_msg('debug', 'rfuzzy_db_description :: Cls_2', Cls_2).
 
 % Predicate type(s) definition (Class \== database).
 translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pred_Functor :- Cls)):-
@@ -578,6 +539,99 @@ translate(Other, Other) :-
 	),
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 	save_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, [], 'no').
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+% translate_db_description(Description, Index, Max_Index, Types, DB_Fields) 
+translate_db_description([(Field_Name, Field_Type)], Index, Index, [Field_Type], [Field_Name]) :- nonvar(Index), !.
+translate_db_description([(Field_Name, Field_Type) | Description], Index, Max_Index, [Field_Type|Types], [Field_Name|DB_Fields]) :-
+	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
+	New_Index is Index + 1,
+	translate_db_description(Description, New_Index, Max_Index, Types, DB_Fields).
+% translate_db_fields(DB_Fields, Index, Max_Index, DB_Pred_Name, Cls) 
+translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name, [Cl]) :- 
+	nonvar(Index), !,
+	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cl).
+translate_db_fields([Pred_Name|DB_Fields], Index, Max_Index, DB_Pred_Name, [Cl | Cls]) :-
+	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
+	New_Index is Index + 1,
+	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cl),
+	translate_db_fields(DB_Fields, New_Index, Max_Index, DB_Pred_Name, Cls).
+
+translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position, Cl) :-
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)', (Pred_Name, Database_Pred_Name, Position)),
+	nonvar(Pred_Name), nonvar(Database_Pred_Name), nonvar(Position), 
+	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error)
+	retrieve_predicate_info(Database_Pred_Name, Database_Pred_Arity, Database_Pred_Type, _List, _NHB, 'true'), !,
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)', (Database_Pred_Arity, Database_Pred_Type)),	
+	(
+	    (	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type), !     )
+	;
+	    (	print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail     )
+	),
+	Position =< Database_Pred_Arity, 
+	get_nth_element_from_list(Position, Database_Pred_Type, Type),
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Position, Type, Pred_Name)', (Position, Type, Pred_Name)),
+
+	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
+	arg(Position, DB_Pred_Functor, Value),
+	functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
+	functor(Test, '\\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
+
+	Pred_Type = [Database_Pred_Name, Type],
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Pred_Type)', (Pred_Name, Pred_Type)),
+	(
+	    (	translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion), !    )
+	;
+	    (	print_msg('error', 'Error translating db definition for (Pred_Name, Pred_Type)', (Pred_Name, Pred_Type)), !, fail    )
+	),
+	
+	Cl = (Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Conversion)),
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Cl)', (Pred_Name, Cl)).
+
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+	
+		nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_truth_value_type'), !, 
+		Pred_Class = 'fuzzy_rule_db_value', Pred_Arity=1,
+		% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
+		translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
+		% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
+		predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
+		arg(1, Pred_Functor, Input),
+		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Truth_Value),
+		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class).
+
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+		nonvar(Type), nonvar(Pred_Name), 
+		(Type = 'rfuzzy_string_type' ; Type = 'rfuzzy_integer_type' ; 
+		    Type = 'rfuzzy_boolean_type' ; Type = 'rfuzzy_datetime_type'), !, 
+		Pred_Arity = 2,
+		functor(Pred_Functor, Pred_Name, Pred_Arity),
+		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
+		Conversion = 'true',
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no').
+
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+		nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_float_type'), !, 
+		Pred_Arity = 2,
+		functor(Pred_Functor, Pred_Name, Pred_Arity),
+		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value_Out),
+		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Value_Out),
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no').
+
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+		nonvar(Type), nonvar(Pred_Name), functor(Type, 'rfuzzy_enum_type', 1), !, 
+		Pred_Arity = 2,
+		functor(Pred_Functor, Pred_Name, Pred_Arity),
+		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
+		Conversion = 'true',
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no').
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1075,12 +1129,18 @@ code_for_quantifier_fnot(In, [Code | In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_4, Type_5|In]) :-
-	Type_1 = (rfuzzy_predicate_type(_Any_1)), 
-	Type_2 = (rfuzzy_truth_value_type(_Any_2)), 
-	Type_3 = (rfuzzy_number_type(_Any_3)), 
-	Type_4 = (rfuzzy_id_type(_Any_4)), 
-	Type_5 = (rfuzzy_credibility_value_type(_Any_5)), 
+code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_5, Type_6, Type_7, Type_8, Type_9, Type_10|In]) :-
+	Type_1 = (rfuzzy_truth_value_type(_Any_1)), 
+	Type_2 = (rfuzzy_credibility_value_type(_Any_2)), 
+	Type_3 = (rfuzzy_predicate_type(_Any_3)), 
+
+	Type_5 = (rfuzzy_string_type(_Any_5)), 
+	Type_6 = (rfuzzy_integer_type(_Any_6)), 
+	Type_7 = (rfuzzy_float_type(_Any_7)), 
+	Type_8 = (rfuzzy_enum_type(_Any_8)), 
+	Type_9 = (rfuzzy_boolean_type(_Any_9)), 
+	Type_10 = (rfuzzy_datetime_type(_Any_10)), 
+
 	!.
 
 % ------------------------------------------------------
