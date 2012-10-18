@@ -393,7 +393,7 @@ translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls
 	print_msg('debug', 'rfuzzy_db_description :: Cls_2', Cls_2).
 
 % Predicate type(s) definition (Class \== database).
-translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pred_Functor :- Cls)):-
+translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In), Cls):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Pred_Type)', (Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In)),
 	nonvar(Pseudo_Class), nonvar(Pred_Name), number(Pred_Arity), nonvar(Pred_Type_In), 
@@ -413,18 +413,42 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pre
 	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
 	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, _Truth_Value),
 
-	fix_functor_type(Pred_Functor, Pred_Arity, 1, Pred_Type_In, Cls),
+	fix_functor_type(Pred_Functor, Pred_Arity, 1, Pred_Type_In, Body),
+	Cl = (Pred_Functor :- Body),
 	nonvar(Pred_Type),
 	
 	(
 	    (	Pred_Class = 'fuzzy_rule_type',
-		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+		(   % Generate cls only if necessary.
+		    (   % It has been defined before.
+			retrieve_predicate_info(Pred_Name, 2, Pred_Type, MI_3, _NBH_3, 'no'),	
+			print_msg('debug', 'rfuzzy_define_fuzzification :: MI_3', MI_3),
+			memberchk_local(('fuzzy_rule_type', _Ignored_Name, _Ignored_Arity), MI_3), !,
+			Cls = []
+		    )
+		;
+		    (   % Define it !!!
+			% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+			save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
+			Cls = [Cl]
+		    )
+		)
 	    )
 	;
 	    (	Pred_Class = 'crisp_rule_type',
-		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], Needs_Head_Building)
+		(   % Generate cls only if necessary.
+		    (   % it has been defined before.
+			retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type_Retrieved, MI_3, _NBH_3, 'no'),	
+			nonvar(Pred_Type_Retrieved), !,
+			Cls = []
+		    )
+		;
+		    (   % Define it !!!
+			% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
+			save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], Needs_Head_Building),
+			Cls = [Cl]
+		    )
+		)
 	    )
 	),
 	!. % Backtracking forbidden.
