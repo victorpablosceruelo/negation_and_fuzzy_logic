@@ -1,11 +1,12 @@
 :- module(rfuzzy_rt, [
-	defined_aggregators/1, 
 	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2,
 	supreme/2, reorder_by_truth_value/3, 
 	one_by_one_first_head/2, one_by_one_first_tail/2,
 	rfuzzy_process_attribute_dump/4,
+	append_local/3, memberchk_local/2, remove_list_dupplicates/3,
 	% Aggregators.
+	defined_aggregators/1, 
 	inject/3, merge/4, prod/3, iprod/3, mean/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3
 		     ],[hiord]).
@@ -248,6 +249,26 @@ rfuzzy_process_attribute_dump([Dump], Var, Condition, Value) :-
 rfuzzy_process_attribute_dump(Dump, _Var, _Condition, _Value) :-
 	print_msg('error', 'rfuzzy_process_attribute_dump :: Dump', Dump),
 	!, fail.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+append_local([], N2, N2).
+append_local([Elto|N1], N2, [Elto|Res]) :-
+	append_local(N1, N2, Res).
+
+memberchk_local(Element, [Element | _Tail]) :- !.
+memberchk_local(Element, [_Head | Tail]) :- !,
+	memberchk_local(Element, Tail).
+
+% remove_list_dupplicates(List_In, List_Aux, List_Out)
+remove_list_dupplicates([], List_Aux, List_Aux) :- !.
+remove_list_dupplicates([Element|List_In], List_Aux, List_Out) :-
+	memberchk_local(Element, List_Aux), !,
+	remove_list_dupplicates(List_In, List_Aux, List_Out).
+remove_list_dupplicates([Element|List_In], List_Aux, List_Out) :-
+	remove_list_dupplicates(List_In, [Element|List_Aux], List_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

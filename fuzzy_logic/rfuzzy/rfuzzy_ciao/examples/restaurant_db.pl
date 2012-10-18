@@ -10,8 +10,8 @@
 
 rfuzzy_define_database(restaurant/7, 
 	[(restaurant_id, rfuzzy_string_type), 
-	  (restaurant_type, rfuzzy_enum_type(restaurant_type)), 
-	   (food_type, rfuzzy_enum_type(food_type)),
+	  (restaurant_type, rfuzzy_enum_type), 
+	   (food_type, rfuzzy_enum_type),
 	    (years_since_opening, rfuzzy_integer_type), 
 	     (distance_to_the_city_center, rfuzzy_integer_type), 
 	      (price_average, rfuzzy_integer_type), 
@@ -40,10 +40,11 @@ near_function :# (0, [ (0, 1), (100, 1), (1000, 0.1) ], 1000) .
 rfuzzy_default_value_for(near_the_city_center, 0).
 rfuzzy_define_fuzzification(near_the_city_center, distance_to_the_city_center, near_function).
 
-traditional_function :# ([ (0, 1), (5, 0.2), (10, 0.8), (15, 1) ]) .
+traditional_function :# (0, [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ], 100) .
 rfuzzy_define_fuzzification(traditional, years_since_opening, traditional_function).
 
-is_zalacain(zalacain).
+rfuzzy_type_for('crisp_rule', is_zalacain/1, [restaurant]).
+is_zalacain(Restaurant) :- restaurant_id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.
 
 rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant]).
 rfuzzy_default_value_for(cheap/1, 0.5).
@@ -66,10 +67,8 @@ rfuzzy_quantifier(very/2).
 
 rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant]).
 rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
-tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), fnot(very(expensive(R))), traditional(R))).
-tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
-
-rfuzzy_define_fuzzification(near_to_us, distance_to_us, near_function).
+tempting_restaurant(R) cred (min, 0.7) :~ min((near_the_city_center(R), fnot(very(expensive(R))), traditional(R))).
+tempting_restaurant(R) cred (min, 0.5) :~ near_the_city_center(R).
 
 % More tests (maybe not needed in this DB).
 not_very_expensive_restaurant(R) :~ fnot(very(expensive(R))).

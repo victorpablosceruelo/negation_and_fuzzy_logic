@@ -192,7 +192,7 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type5, [], 'no'),
 	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type6, [], 'no'),
 	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type7, [], 'no'),
-	save_predicate_definition('rfuzzy_enum_type', 2, _Pred_Type8, [], 'no'),
+	save_predicate_definition('rfuzzy_enum_type', 1, _Pred_Type8, [], 'no'),
 	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type9, [], 'no'),
 	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type10, [], 'no'),
 
@@ -226,6 +226,8 @@ translate((rfuzzy_default_value_for(Pred_Name/Pred_Arity, Fixed_Truth_Value)), C
 	generate_truth_value_equal_to_functor(Fixed_Truth_Value, Truth_Value, Truth_Value_Functor),
 	Cls = (Pred_Functor :- Truth_Value_Functor),
 	print_msg('debug', 'translate :: Cls ', Cls),
+	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
 	!. % Backtracking forbidden.
 
 % Conditional default
@@ -521,18 +523,6 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
 	!.
 
-translate(rfuzzy_declare_enum_type(Pred_Name, List), Cls) :-
-	nonvar(Pred_Name), nonvar(List), 
-	(
-	    (
-		List = [], !,
-		functor(Pred_Functor, Pred_Name, 1), 
-		translate(Pred_Functor, Cls)
-	    )
-	;
-	    translate_enum_type_definition(List, Pred_Name, Cls)
-	), !.
-
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
 	print_msg('debug', 'Non-Rfuzzy predicate', Other),
@@ -556,18 +546,6 @@ translate(Other, Other) :-
 	),
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 	save_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, [], 'no').
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-% translate_enum_type_definition(List, Pred_Name, Cls)
-translate_enum_type_definition([], _Pred_Name, []) :- !.
-translate_enum_type_definition([Element | List], Pred_Name, [Cl | Cls]) :-
-	functor(Pred_Functor, Pred_Name, 1), 
-	arg(1, Pred_Functor, Element),
-	translate(Pred_Functor, Cl),
-	translate_enum_type_definition(List, Pred_Name, Cls).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -637,14 +615,14 @@ translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Fun
 
 translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
 		nonvar(Type), nonvar(Pred_Name), 
-		(Type = 'rfuzzy_string_type' ; Type = 'rfuzzy_integer_type' ; 
+		(Type = 'rfuzzy_string_type' ; Type = 'rfuzzy_integer_type' ; Type = 'rfuzzy_enum_type' ;
 		    Type = 'rfuzzy_boolean_type' ; Type = 'rfuzzy_datetime_type'), !, 
 		Pred_Arity = 2,
 		functor(Pred_Functor, Pred_Name, Pred_Arity),
 		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
 		Conversion = 'true',
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no').
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], 'no').
 
 translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
 		nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_float_type'), !, 
@@ -653,16 +631,13 @@ translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Fun
 		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value_Out),
 		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Value_Out),
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no').
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], 'no').
 
-translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
-		nonvar(Type), nonvar(Pred_Name), functor(Type, 'rfuzzy_enum_type', 1), !, 
-		Pred_Arity = 2,
-		functor(Pred_Functor, Pred_Name, Pred_Arity),
-		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
-		Conversion = 'true',
-		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no').
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+translate_rfuzzy_default_value_for
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -942,14 +917,6 @@ add_preffix_to_name(Input, Preffix, Output) :-
 	atom(Output), !.
 %	print_msg('debug', 'add_preffix_to_name', add_preffix_to_name(Prefix, Input, Output)).
 
-append_local([], N2, N2).
-append_local([Elto|N1], N2, [Elto|Res]) :-
-	append_local(N1, N2, Res).
-
-memberchk_local(Element, [Element | _Tail]) :- !.
-memberchk_local(Element, [_Head | Tail]) :- !,
-	memberchk_local(Element, Tail).
-
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1128,7 +1095,21 @@ generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Resul
 	generate_introspection_predicate_real(Input, Output),
 	generate_introspection_predicate_aux(Input_List, [Output|Accumulator_List], Result_List).
 
-generate_introspection_predicate_real(predicate_definition(Category, Pred_Name, Pred_Arity, Pred_Type, _List), rfuzzy_introspection(Category, Pred_Name, Pred_Arity, Pred_Type)).
+% INFO: predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)
+
+generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info_List, _NHB), Cl) :-
+	Pred_Type = [_Whatever, 'rfuzzy_enum_type'], 
+	More_Info_List = [('rfuzzy_enum_type', Pred_Name, Pred_Arity)], !,
+
+	functor(Pred_Functor, Pred_Name, Pred_Arity),
+	arg(2, Pred_Functor, Enum_Value),
+	Generator= (findall(Enum_Value, Pred_Functor, Enum_Values_List), 
+	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
+	Cl = (rfuzzy_introspection(Pred_Name, Pred_Arity, Pred_Type, New_Enum_Values_List) :- Generator).
+
+generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, _More_Info_List, _NHB), Cl) :-
+	Cl = (rfuzzy_introspection(Pred_Name, Pred_Arity, Pred_Type, [])).
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
