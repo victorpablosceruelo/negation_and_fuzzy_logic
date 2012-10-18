@@ -8,12 +8,9 @@
 % Activate/Deactivate debug.
 :- activate_rfuzzy_debug.
 
-rfuzzy_define_enum_type(restaurant_type, [fast_food, fast_casual, fine_dining]).
-rfuzzy_define_enum_type(food_type, []).
-
 rfuzzy_define_database(restaurant/7, 
 	[(restaurant_id, rfuzzy_string_type), 
-	  (type, rfuzzy_enum_type(restaurant_type)), 
+	  (restaurant_type, rfuzzy_enum_type(restaurant_type)), 
 	   (food_type, rfuzzy_enum_type(food_type)),
 	    (years_since_opening, rfuzzy_integer_type), 
 	     (distance_to_the_city_center, rfuzzy_integer_type), 
