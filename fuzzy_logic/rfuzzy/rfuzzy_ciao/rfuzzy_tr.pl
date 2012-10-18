@@ -88,9 +88,12 @@ save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Hea
 retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error) :-
 	print_msg('debug', 'retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error)', retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error)),
 	(
-	    (   predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building), !   )
+	    (   predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building), !,
+		print_msg('debug', 'retrieved', retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building))   
+	    )
 	;
-	    (   Show_Error = 'no', !, fail  )
+	    (   Show_Error = 'no', !, 
+		print_msg('debug', 'not retrieved', 'not showing error'),   fail  )
 	;
 	    (	Show_Error = 'true', !,
 		print_msg('error', 'Predicate must be defined before use. Predicate ', Pred_Name/Pred_Arity), !, 
@@ -320,11 +323,11 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
 	!.
 
 % function definition.
-translate((Head :# List), (Pred_Functor :- (Body, print_msg('debug', 'function_call', Pred_Functor)))) :-
+translate((Head :# (Lower_Bound, List, Upper_Bound)), Cls) :-
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Head), nonvar(List),
 	% list(Lista),
-	print_msg('debug', '(Head :# List) ', (Head :# List)),
+	print_msg('debug', '(Head :# (Lower_Bound, List, Upper_Bound)) ', (Head :# (Lower_Bound, List, Upper_Bound))),
 
 	functor(Head, Pred_Name, 0),
 	Pred_Arity = 1,
@@ -335,11 +338,14 @@ translate((Head :# List), (Pred_Functor :- (Body, print_msg('debug', 'function_c
 	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
 
 	arg(1, Pred_Functor, X),
-	build_straight_lines(X, Truth_Value, List, Body),
+	build_straight_lines(X, Truth_Value, Lower_Bound, List, Upper_Bound, Body),
 
 	Pred_Type = ['rfuzzy_number_type', 'rfuzzy_truth_value_type'],
+	Other_Info = [('lower_bound', Lower_Bound), ('upper_bound', Upper_Bound)],
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'no').
+	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, Other_Info, 'no'), 
+	Cls = (Pred_Functor :- (Body, print_msg('debug', 'function_call', Pred_Functor))),
+	print_msg('debug', '(Head :# (Lower_Bound, List, Upper_Bound)) -> Cls', Cls).
 
 % Predicate type(s) definition (Class = database).
 translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls_2]):- !,
@@ -353,7 +359,6 @@ translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls
 
 % Predicate type(s) definition (Class \== database).
 translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In),(Pred_Functor :- Cls)):-
-	Pseudo_Class \== 'database',
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'rfuzzy_type_for(Class, Pred_Name/Pred_Arity, Pred_Type)', (Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In)),
 	nonvar(Pseudo_Class), nonvar(Pred_Name), number(Pred_Arity), nonvar(Pred_Type_In), 
@@ -516,7 +521,7 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
 	!.
 
-translate(rfuzzy_define_enum_type(Pred_Name, List), Cls) :-
+translate(rfuzzy_declare_enum_type(Pred_Name, List), Cls) :-
 	nonvar(Pred_Name), nonvar(List), 
 	(
 	    (
@@ -576,9 +581,11 @@ translate_db_description([(Field_Name, Field_Type) | Description], Index, Max_In
 	translate_db_description(Description, New_Index, Max_Index, Types, DB_Fields).
 % translate_db_fields(DB_Fields, Index, Max_Index, DB_Pred_Name, Cls) 
 translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name, [Cl]) :- 
+	print_msg('debug', 'translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name)', ([Pred_Name], Index, Index, DB_Pred_Name)),
 	nonvar(Index), !,
 	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cl).
 translate_db_fields([Pred_Name|DB_Fields], Index, Max_Index, DB_Pred_Name, [Cl | Cls]) :-
+	print_msg('debug', 'translate_db_fields([Pred_Name], Index, Max_Index, DB_Pred_Name)', ([Pred_Name], Index, Max_Index, DB_Pred_Name)),
 	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
 	New_Index is Index + 1,
 	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cl),
@@ -797,18 +804,14 @@ fix_functor_type(Functor, Arity, Actual, Types, _Type_F) :-
 	print_msg('error', 'fix_functor_type(Functor, Arity, Actual, Types)', fix_functor_type(Functor, Arity, Actual, Types)),
 	!, fail.
 
-fix_functor_type_aux(Functor, Actual, Type, (Cl1, Cl2)) :-
+fix_functor_type_aux(Functor, Actual, Type, (Type_F)) :-
 	print_msg('debug', 'fix_functor_type_aux(Functor, Actual, Type)', fix_functor_type_aux(Functor, Actual, Type)),
 	fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name),
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error),
 	retrieve_predicate_info(Pred_Name, Pred_Arity, _Pred_Type, _More_Info, _Needs_Head_Building, 'true'),
-	functor(Type_F, Type, Pred_Arity), % Build functor.
+	functor(Type_F, Pred_Name, Pred_Arity), % Build functor.
 	arg(1, Type_F, X), % Arguments of functor.
-	arg(Actual, Functor, X), % Unify with Argument of functor.
-	functor(Cl1, '=', 2), 
-	arg(1, Cl1, X), 
-	arg(2, Cl1, Type_F),
-	Cl2 = Type_F.
+	arg(Actual, Functor, X). % Unify with Argument of functor.
 
 fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 	functor(Type, _Name, 0),
@@ -821,26 +824,50 @@ fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1 ; Line ; Point2)) :-
+build_straight_lines(X, V, Lower_Bound, [(X1,V1) | List], Upper_Bound, Cls) :-
+	(
+	    (
+		nonvar(Lower_Bound), nonvar(X1),
+		Lower_Bound = X1, !,
+		build_straight_lines_aux(X, V, [(X1,V1) | List], Upper_Bound, Cls)
+	    )
+	;
+	    (
+		print_msg('error', 'function: Lower_Bound =/= first element in list.', (Lower_Bound, X1)), !, fail
+	    )
+	), !.
+
+build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)], Upper_Bound, (Point1 ; Line ; Point2)) :- !,
 	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1, Line, Point2)))),
 	build_point(X, V, X1, V1, Point1),
 	build_line(X, V, X1, V1, X2, V2, Line),
-	build_point(X, V, X2, V2, Point2).
+	build_point(X, V, X2, V2, Point2), !,
+	(
+	    (
+		nonvar(Upper_Bound), nonvar(X2),
+		Upper_Bound = X2, !
+	    )
+	;
+	    (
+		print_msg('error', 'function: Lower_Bound =/= last element in list.', (Upper_Bound, X2)), !, fail
+	    )
+	), !.
 
-build_straight_lines(X, V, [(X1,V1),(X2,V2)|List], (Point ; Line ; More)) :-
+build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)|List], Upper_Bound, (Point ; Line ; More)) :-
 	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)|List], (Point, Line, More)))),
 	build_point(X, V, X1, V1, Point),
 	build_line(X, V, X1, V1, X2, V2, Line),
-	build_straight_lines(X, V, [(X2,V2)|List], More).
+	build_straight_lines_aux(X, V, [(X2,V2)|List], Upper_Bound, More).
 
 build_point(X, V, X1, V1, (X .=. X1, V .=. V1)) :-
-	print_msg('debug', 'build_point', build_point(X, V, X, V, (H :- (H :- X1 .=. X, V1 .=. V)))).
+	print_msg('debug', 'build_point', build_point(X, V, X, V, (H :- (H :- X1 .=. X, V1 .=. V)))),
+	nonvar(X1), nonvar(V1).
 
 build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)) :-
 	print_msg('debug', 'build_line', (build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)))),
 
-	number(X1), number(X2),
-	number(V1), number(V2),
+	nonvar(X1), nonvar(X2), nonvar(V1), nonvar(V2), 
+	number(X1), number(X2), number(V1), number(V2),
 	X1 < X2, 
 
 	!, % Backtracking is not allowed here.

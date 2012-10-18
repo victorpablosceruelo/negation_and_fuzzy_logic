@@ -6,7 +6,7 @@
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
 % Activate/Deactivate debug.
-% :- activate_rfuzzy_debug.
+:- activate_rfuzzy_debug.
 
 rfuzzy_define_enum_type(restaurant_type, [fast_food, fast_casual, fine_dining]).
 rfuzzy_define_enum_type(food_type, []).
@@ -37,9 +37,10 @@ restaurant(zalacain,                         fine_dining,    basque,            
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
+near_function :# (0, [ (0, 1), (100, 1), (1000, 0.1) ], 1000) .
 
 % rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
+rfuzzy_default_value_for(near_the_city_center, 0).
 rfuzzy_define_fuzzification(near_the_city_center, distance_to_the_city_center, near_function).
 
 traditional_function :# ([ (0, 1), (5, 0.2), (10, 0.8), (15, 1) ]) .
