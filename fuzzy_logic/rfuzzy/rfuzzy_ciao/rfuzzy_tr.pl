@@ -52,8 +52,9 @@ save_predicates_definition_list([Pred_Name | Pred_List], Pred_Arity, Pred_Type, 
 	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building), !,
 	save_predicates_definition_list(Pred_List, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building).
 
-save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class) :-
+save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls) :-
 	print_msg('debug', 'save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)', (Pred_Name, Pred_Arity, Pred_Type, Pred_Class)),
+	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Class),
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, 'fuzzy_rule', Real_Pred_Name, Real_Pred_Arity),
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
@@ -61,7 +62,22 @@ save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Clas
 	
 	More_Info = [(Pred_Class, New_Pred_Name, New_Pred_Arity)],
 	Needs_Head_Building = 'true',
-	save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, More_Info, Needs_Head_Building).
+	save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, More_Info, Needs_Head_Building),
+
+	(
+	    (   % Pred_Type is still undefined.  
+		var(Pred_Type), !, Cls = []
+	    )
+	;
+	    (   % Pred_Type is defined but we are in a loop.
+		nonvar(Pred_Type), Pred_Class ='fuzzy_rule_type', !, Cls = []
+	    )
+	;
+	    (
+		nonvar(Pred_Type), Pred_Class \=='fuzzy_rule_type',
+		translate(rfuzzy_type_for('fuzzy_rule', Real_Pred_Name/Real_Pred_Arity, Pred_Type), Cls)
+	    )
+	), !.
 
 save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building) :-
 	print_msg('debug', 'save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)', (Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)),
@@ -249,7 +265,7 @@ translate((rfuzzy_default_value_for(Pred_Name, Fixed_Truth_Value)), Cls) :-
 	Cls = (Pred_Functor :- Truth_Value_Functor),
 	print_msg('debug', 'translate :: Cls ', Cls),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, _Cls_Unused),
 	!. % Backtracking forbidden.
 
 % Conditional default
@@ -277,7 +293,7 @@ translate((rfuzzy_default_value_for(Pred_Name, Fixed_Truth_Value) if Pred2_Name/
 	print_msg('debug', 'translate :: Cls ', Cls),
 
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, _Cls_Unused),
 	!.
 
 translate((rfuzzy_default_value_for(Pred_Name, Fixed_Truth_Value) if thershold(Pred2_Name, Cond, Thershold_Truth_Value)), Cls) :-
@@ -324,7 +340,7 @@ translate((rfuzzy_default_value_for(Pred_Name, Fixed_Truth_Value) if thershold(P
 
 	Cls = (Pred_Functor :- ((Pred2_Functor, Pred3_Functor), Truth_Value_Functor)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class), !,
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, _Cls_Unused), !,
 	print_msg('debug', 'translate :: (rfuzzy_default_value_for(Pred_Name, Truth_Value) if thershold(Pred2_Name, Cond, Thershold_Truth_Value))', (rfuzzy_default_value_for(Pred_Name, Fixed_Truth_Value) if thershold(Pred2_Name, Cond, Thershold_Truth_Value))),
 	print_msg('debug', 'translate :: (Cls)', Cls).
 
@@ -429,7 +445,7 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type_In), Cls
 		;
 		    (   % Define it !!!
 			% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-			save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
+			save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, _Cls_Unused),
 			Cls = [Cl]
 		    )
 		)
@@ -491,11 +507,11 @@ translate(rfuzzy_synonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, C
 	copy_args(Pred_Arity_Plus_1, Pred_Functor, Pred2_Functor_Aux),
 	arg(Pred_Arity_Plus_2, Pred2_Functor_Aux, Truth_Value_In),
 
-	Cls = (Pred_Functor :- Pred2_Functor_Aux, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
+	Cl = (Pred_Functor :- Pred2_Functor_Aux, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred2_Type, Pred_Class).
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	% save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, [], 'true').
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred2_Type, Pred_Class, Cls_Aux),
+	Cls = [ Cl | Cls_Aux ], 
+	!.
 
 translate(rfuzzy_antonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, Cred), Cls):-
 	!,
@@ -523,9 +539,11 @@ translate(rfuzzy_antonym(Pred2_Name/Pred_Arity, Pred_Name/Pred_Arity, Cred_Op, C
 	copy_args(Pred_Arity_Plus_1, Pred_Functor, Pred2_Functor_Aux),
 	arg(Pred_Arity_Plus_2, Pred2_Functor_Aux, Truth_Value_In),
 
-	Cls = (Pred_Functor :- Pred2_Functor_Aux, (Truth_Value_Aux .=. 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
+	Cl = (Pred_Functor :- Pred2_Functor_Aux, (Truth_Value_Aux .=. 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred2_Type, Pred_Class).
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred2_Type, Pred_Class, Cls_Aux),
+	Cls = [ Cl | Cls_Aux ], 
+	!.
 
 translate(rfuzzy_quantifier(Pred_Name/Pred_Arity), []):-
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)),
@@ -581,9 +599,7 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	get_nth_element_from_list(1, Pred_Type_1, Type_1),
  	get_nth_element_from_list(2, Pred_Type_2, Type_2),
 	Pred_Type = [Type_1, Type_2],
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
-
-	translate(rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, [Type_1]), Cls_Aux),
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_Aux),
 	Cls = [ Cl | Cls_Aux ], 
 	!.
 
@@ -675,7 +691,7 @@ translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Fun
 		arg(1, Pred_Functor, Input),
 		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Truth_Value),
 		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class).
+		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_Unused).
 
 translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
 		nonvar(Type), nonvar(Pred_Name), 
@@ -718,7 +734,7 @@ translate_rule(Head, Cred_Op, Cred, Body, Cls) :-
 	translate_rule_body(Tmp_Body, TV_Aggregator, Truth_Value, Fuzzy_Body), 
 	Cls = (Pred_Functor :- Fuzzy_Body),
 
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, Pred_Class),
+%	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, Pred_Class, _Cls_Unused),
 	print_msg('debug', 'translate_rule(Cls) ', (translate_rule(Cls))).
 
 % ------------------------------------------------------
