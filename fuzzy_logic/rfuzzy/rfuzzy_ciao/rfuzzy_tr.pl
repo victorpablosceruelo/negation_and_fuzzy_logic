@@ -138,7 +138,7 @@ check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type) :-
 	;
 	    (
 		nonvar(Pred_Type),
-		print_msg('error', 'Predicate arity is different in its type definition. (Pred_Arity, Pred_Type)', (Pred_Arity, Pred_Type)), 
+		print_msg('error', 'Types in type definition do not sum up the arity value. (Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)), 
 		!, fail
 	    )
 	).
@@ -156,6 +156,7 @@ rfuzzy_trans_clause(Arg1, Arg1, _Arg3) :-
 	print_msg('debug', 'trans_fuzzy_clause: arg1', Arg1).
 
 rfuzzy_trans_sentence(Arg1, Arg2, Arg3) :- 
+	print_msg_nl('debug'),
 	print_msg('debug', 'rfuzzy_trans_sent: arg1', Arg1),
 	rfuzzy_trans_sent_aux(Arg1, Arg2), !,
 	print_msg('debug', 'rfuzzy_trans_sent: arg2', Arg2),
@@ -163,8 +164,8 @@ rfuzzy_trans_sentence(Arg1, Arg2, Arg3) :-
 	print_msg_nl('debug').
 
 rfuzzy_trans_sentence(Arg, Arg, FileName) :- 
-	print_msg('warning', 'rfuzzy_trans_sent: ERROR: Input: ', Arg),
-	print_msg('warning', 'rfuzzy_trans_sent: ERROR: FileName: ', FileName),
+	print_msg('error', 'Impossible to translate input. Input', Arg),
+	print_msg('error', 'in FileName', FileName),
 	print_msg_nl('debug'),
 	print_info('debug', Arg), 
 	print_msg_nl('debug'),
@@ -521,14 +522,18 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	retrieve_predicate_info(Crisp_Pred_Name,  2, Pred_Type_1, _MI_1, _NHB_1, 'true'),
 	retrieve_predicate_info(Funct_Pred_Name, 2, Pred_Type_2, _MI_2, _NBH_2, 'true'),
 	(
-	    (
-		nonvar(Pred_Type_1), nonvar(Pred_Type_2)
-	    )
+	    (	var(Pred_Type_1), 
+		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Crisp_Pred_Name)), 
+		!, fail    )
 	;
-	    (
-		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Crisp_Pred_Name, Funct_Pred_Name)), 
-		!, fail     
-	    )
+	    nonvar(Pred_Type_1)
+	),
+	(
+	    (	var(Pred_Type_2), 
+		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Funct_Pred_Name)), 
+		!, fail    )
+	;	
+	    nonvar(Pred_Type_2)
 	),
 
 	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 1,
@@ -548,12 +553,25 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	arg(1, Funct_Pred_Functor, Crisp_Value),
 	arg(2, Funct_Pred_Functor, Truth_Value),
 
-	Cls = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
+	Cl_2 = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
 	get_nth_element_from_list(1, Pred_Type_1, Type_1),
  	get_nth_element_from_list(2, Pred_Type_2, Type_2),
 	Pred_Type = [Type_1, Type_2],
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
-	!.
+
+	(   % Generate its type only if necessary.
+	    (
+		retrieve_predicate_info(Pred_Name, 2, Pred_Type, MI_3, _NBH_3, 'no'),	
+		print_msg('debug', 'rfuzzy_define_fuzzification :: MI_3', MI_3),
+		memberchk_local(('fuzzy_rule_type', _Ignored_Name, _Ignored_Arity), MI_3), !,
+		Cls = Cl_2
+	    )
+	;
+	    (
+		translate(rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, [Type_1]), Cl_1),
+		Cls = [Cl_1, Cl_2]
+	    )
+	), !.
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
@@ -1055,7 +1073,8 @@ build_functors_notify_missing_facilities(_Pred_Name, Def, _NDef) :-
 
 build_functors_notify_missing_facilities(Pred_Name, _Def, NDef_In) :-
 	% Not an error if the missing information belongs to the following categories:
-	lists_substraction(NDef_In, ['fact', 'function', 'fuzzification', 'rule', 'default_with_cond', 'synonym', 'antonym'], NDef_Out),
+	NDef_Ignore=['fact', 'function', 'fuzzification', 'rule', 'default_with_cond', 'synonym', 'antonym', 'fuzzy_rule_db_value'],
+	lists_substraction(NDef_In, NDef_Ignore, NDef_Out),
 	(
 	    (   NDef_Out = [], !  )
 	;
