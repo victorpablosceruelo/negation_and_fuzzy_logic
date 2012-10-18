@@ -577,25 +577,15 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	arg(1, Funct_Pred_Functor, Crisp_Value),
 	arg(2, Funct_Pred_Functor, Truth_Value),
 
-	Cl_2 = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
+	Cl = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
 	get_nth_element_from_list(1, Pred_Type_1, Type_1),
  	get_nth_element_from_list(2, Pred_Type_2, Type_2),
 	Pred_Type = [Type_1, Type_2],
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class),
 
-	(   % Generate its type only if necessary.
-	    (
-		retrieve_predicate_info(Pred_Name, 2, Pred_Type, MI_3, _NBH_3, 'no'),	
-		print_msg('debug', 'rfuzzy_define_fuzzification :: MI_3', MI_3),
-		memberchk_local(('fuzzy_rule_type', _Ignored_Name, _Ignored_Arity), MI_3), !,
-		Cls = Cl_2
-	    )
-	;
-	    (
-		translate(rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, [Type_1]), Cl_1),
-		Cls = [Cl_1, Cl_2]
-	    )
-	), !.
+	translate(rfuzzy_type_for('fuzzy_rule', Pred_Name/Pred_Arity, [Type_1]), Cls_Aux),
+	Cls = [ Cl | Cls_Aux ], 
+	!.
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
