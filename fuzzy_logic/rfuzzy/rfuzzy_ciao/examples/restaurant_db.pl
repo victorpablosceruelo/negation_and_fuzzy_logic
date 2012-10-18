@@ -36,7 +36,7 @@ restaurant(zalacain,                         fine_dining,    basque,            
 
 near_function :# (0, [ (0, 1), (100, 1), (1000, 0.1) ], 1000) .
 
-% rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
+rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
 rfuzzy_default_value_for(near_the_city_center, 0).
 rfuzzy_define_fuzzification(near_the_city_center, distance_to_the_city_center, near_function).
 
@@ -47,9 +47,9 @@ rfuzzy_type_for('crisp_rule', is_zalacain/1, [restaurant]).
 is_zalacain(Restaurant) :- restaurant_id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.
 
 rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant]).
-rfuzzy_default_value_for(cheap/1, 0.5).
-rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/1, over, 0.7).
-rfuzzy_default_value_for(cheap/1, 0.1) if is_zalacain/1.
+rfuzzy_default_value_for(cheap, 0.5).
+rfuzzy_default_value_for(cheap, 0.2) if thershold(near_the_city_center, over, 0.7).
+rfuzzy_default_value_for(cheap, 0.1) if is_zalacain/1.
 
 rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
@@ -66,7 +66,7 @@ very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
 rfuzzy_quantifier(very/2).
 
 rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant]).
-rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
+rfuzzy_default_value_for(tempting_restaurant, 0.1).
 tempting_restaurant(R) cred (min, 0.7) :~ min((near_the_city_center(R), fnot(very(expensive(R))), traditional(R))).
 tempting_restaurant(R) cred (min, 0.5) :~ near_the_city_center(R).
 
