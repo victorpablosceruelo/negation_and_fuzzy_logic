@@ -1161,13 +1161,6 @@ build_functors([(_Other_Category, _Sub_Pred_Name, _Sub_Pred_Arity)|List], Catego
 	build_functors(List, Category, On_Error, Functor_In, Functor, Def_In, Def_Out, NDef_In, NDef_Out).
 
 % build_functors_notify_missing_facilities(Pred_Name, Def, NDef),
-build_functors_notify_missing_facilities(_Pred_Name, Def, _NDef) :- 
-	(
-	    memberchk_local('synonym', Def)
-	;
-	    memberchk_local('antonym', Def)
-	), !. % No errors.
-
 build_functors_notify_missing_facilities(Pred_Name, _Def, NDef_In) :-
 	% Not an error if the missing information belongs to the following categories:
 	NDef_Ignore=['fact', 'function', 'fuzzification', 'rule', 'default_with_cond', 'synonym', 'antonym', 'fuzzy_rule_db_value'],
