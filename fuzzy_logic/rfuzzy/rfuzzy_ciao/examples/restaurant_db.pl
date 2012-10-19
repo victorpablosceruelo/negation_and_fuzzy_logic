@@ -6,7 +6,7 @@
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
 % Activate/Deactivate debug.
-% :- activate_rfuzzy_debug.
+:- activate_rfuzzy_debug.
 
 rfuzzy_define_database(restaurant/7, 
 	[(restaurant_id, rfuzzy_string_type), 
@@ -52,7 +52,7 @@ rfuzzy_default_value_for(cheap, 0.2) if thershold(near_the_city_center, over, 0.
 rfuzzy_default_value_for(cheap, 0.1) if is_zalacain/1.
 
 rfuzzy_synonym(cheap, unexpensive, prod, 1).
-rfuzzy_antonym(cheap, expensive, prod, 1).
+rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
 very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
 	functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
