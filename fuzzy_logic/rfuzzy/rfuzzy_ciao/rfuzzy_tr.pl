@@ -92,7 +92,7 @@ save_fuzzy_rule_predicate_definition_gen_type_cls(Pred_Name, Pred_Arity, Pred_Ty
 	(   % Generate cls only if necessary.
 	    (   % It has been defined before.
 		retrieve_predicate_info(Real_Pred_Name, Real_Pred_Arity, Pred_Type, More_Info_Aux, _NBH_3, 'no'),
-		print_msg('debug', 'rfuzzy_define_fuzzification :: More_Info_Aux', More_Info_Aux),
+		print_msg('debug', 'save_fuzzy_rule_predicate_definition_gen_type_cls :: More_Info_Aux', More_Info_Aux),
 		memberchk_local(('fuzzy_rule_type', _Ignored_Name, _Ignored_Arity), More_Info_Aux), !,
 		Cls = []
 	    )
@@ -270,14 +270,15 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type1, [], 'no'),
 	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type2, [], 'no'),
 	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type3, [], 'no'),
+	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type4, [], 'no'),
 	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], 'no'),
 
-	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type5, [], 'no'),
-	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type6, [], 'no'),
-	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type7, [], 'no'),
-	save_predicate_definition('rfuzzy_enum_type', 1, _Pred_Type8, [], 'no'),
-	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type9, [], 'no'),
-	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type10, [], 'no'),
+	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type6, [], 'no'),
+	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type7, [], 'no'),
+	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type8, [], 'no'),
+	save_predicate_definition('rfuzzy_enum_type', 1, _Pred_Type9, [], 'no'),
+	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type10, [], 'no'),
+	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type11, [], 'no'),
 
 	defined_aggregators(Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
@@ -585,6 +586,32 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	    nonvar(Pred_Type_2)
 	),
 
+	get_nth_element_from_list(1, Pred_Type_1, Type_1),
+ 	get_nth_element_from_list(2, Pred_Type_1, Type_2_Pred_1),
+ 	get_nth_element_from_list(1, Pred_Type_2, Type_2_Pred_2),
+ 	get_nth_element_from_list(2, Pred_Type_2, Type_3),
+	(
+	    Type_2_Pred_1 = 'rfuzzy_integer_type'
+	;
+	    Type_2_Pred_1 = 'rfuzzy_float_type'
+	;
+	    (
+		print_msg('error', 'Type of predicate is not suitable for fuzzification', Crisp_Pred_Name), 
+		!, fail    
+	    )
+	),
+	(
+	    (
+		Type_2_Pred_2 = 'rfuzzy_number_type',
+		Type_3 = 'rfuzzy_truth_value_type'
+	    )
+	;
+	    (
+		print_msg('error', 'Type of predicate is not suitable for fuzzification', Funct_Pred_Name), 
+		!, fail    
+	    )
+	),
+
 	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 1,
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
@@ -603,9 +630,8 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	arg(2, Funct_Pred_Functor, Truth_Value),
 
 	Cl = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
-	get_nth_element_from_list(1, Pred_Type_1, Type_1),
- 	get_nth_element_from_list(2, Pred_Type_2, Type_2),
-	Pred_Type = [Type_1, Type_2],
+
+	Pred_Type = [Type_1],
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, 'true', Cls_Aux),
 	Cls = [ Cl | Cls_Aux ], 
 	!.
@@ -1284,17 +1310,18 @@ code_for_quantifier_fnot(In, [Code | In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_5, Type_6, Type_7, Type_8, Type_9, Type_10|In]) :-
+code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_4, Type_6, Type_7, Type_8, Type_9, Type_10, Type_11|In]) :-
 	Type_1 = (rfuzzy_truth_value_type(_Any_1)), 
 	Type_2 = (rfuzzy_credibility_value_type(_Any_2)), 
 	Type_3 = (rfuzzy_predicate_type(_Any_3)), 
+	Type_4 = (rfuzzy_number_type(_Any_4)),
 
-	Type_5 = (rfuzzy_string_type(_Any_5)), 
-	Type_6 = (rfuzzy_integer_type(_Any_6)), 
-	Type_7 = (rfuzzy_float_type(_Any_7)), 
-	Type_8 = (rfuzzy_enum_type(_Any_8)), 
-	Type_9 = (rfuzzy_boolean_type(_Any_9)), 
-	Type_10 = (rfuzzy_datetime_type(_Any_10)), 
+	Type_6 = (rfuzzy_string_type(_Any_6)), 
+	Type_7 = (rfuzzy_integer_type(_Any_7)), 
+	Type_8 = (rfuzzy_float_type(_Any_8)), 
+	Type_9 = (rfuzzy_enum_type(_Any_9)), 
+	Type_10 = (rfuzzy_boolean_type(_Any_10)), 
+	Type_11 = (rfuzzy_datetime_type(_Any_11)), 
 
 	!.
 
