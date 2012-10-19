@@ -51,7 +51,7 @@ rfuzzy_default_value_for(cheap, 0.5).
 rfuzzy_default_value_for(cheap, 0.2) if thershold(near_the_city_center, over, 0.7).
 rfuzzy_default_value_for(cheap, 0.1) if is_zalacain/1.
 
-rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
+rfuzzy_synonym(cheap, unexpensive, prod, 1).
 rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
 
 very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
