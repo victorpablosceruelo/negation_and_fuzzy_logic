@@ -34,6 +34,9 @@ restaurant(zalacain,                         fine_dining,    basque,            
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%rfuzzy_similarity(mediterranean, spanish, 0.6) cred 0.8.
+%rfuzzy_similarity(mediterranean, italian, 0.6) cred 0.8.
+
 near_function :# (0, [ (0, 1), (100, 1), (1000, 0.1) ], 1000) .
 
 rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
@@ -77,4 +80,6 @@ max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
 rfuzzy_aggregator(max_with_min_a_half/3).
 
 
-
+test1(A, B) :- A .=. B.
+test2(A, B) :- A .>. B.
+test3(A, B, C) :- C .=. A + B.
