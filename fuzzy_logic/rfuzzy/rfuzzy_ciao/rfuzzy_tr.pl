@@ -421,9 +421,15 @@ translate((Head value Fixed_Truth_Value), (Pred_Functor :- Truth_Value_Functor))
 % Although aggregators are just crisp predicates of arity 3, 
 % we use the following to ensure programmers do not use as aggregators
 % fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
-translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity)), []) :-
+translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
+
+	functor(Aggregator, Aggregator_Name, Aggregator_Arity),
+	arg(1, Aggregator, TV_In_1),
+	arg(2, Aggregator, TV_In_2),
+	arg(3, Aggregator, TV_Out),
+	Translation = (Aggregator :- Code),
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)

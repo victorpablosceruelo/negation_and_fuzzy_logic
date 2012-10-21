@@ -68,14 +68,14 @@ rfuzzy_quantifier(my_very/2, TV_In, TV_Out) :-
 
 rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant]).
 rfuzzy_default_value_for(tempting_restaurant, 0.1).
-tempting_restaurant(R) cred (min, 0.7) :~ min((near_the_city_center(R), fnot(very(expensive(R))), traditional(R))).
+tempting_restaurant(R) cred (min, 0.7) :~ min((near_the_city_center(R), fnot(my_very(expensive(R))), very(traditional(R)))).
 tempting_restaurant(R) cred (min, 0.5) :~ near_the_city_center(R).
 
 % More tests (maybe not needed in this DB).
 not_very_expensive_restaurant(R) :~ fnot(very(expensive(R))).
 
-max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
-rfuzzy_aggregator(max_with_min_a_half/3).
+rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
+	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).
 
 
 test1(A, B) :- A .=. B.
