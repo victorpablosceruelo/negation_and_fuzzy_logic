@@ -10,7 +10,7 @@
 :- data predicate_definition/5.
 :- data aggregators/1.
 :- data sentences/2.
-
+:- data defined_quantifiers_code/1.
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -289,7 +289,8 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicate_definition('rfuzzy_compute_defined_operators', 0, _Rfuzzy_Compute_Type, Compute_Defined_Operators, 'no'),
 
 	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
-	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List).
+	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
+	assertz_fact(defined_quantifiers_code(Defined_Quantifiers_Code)).
 
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
@@ -574,9 +575,9 @@ translate(rfuzzy_antonym(Pred2_Name, Pred_Name, Cred_Op, Cred), Cls):-
 	Cls = [ Cl | Cls_Aux ], 
 	!.
 
-translate(rfuzzy_quantifier(Pred_Name/Pred_Arity), []) :- !,
+translate((rfuzzy_quantifier(Pred_Name/Pred_Arity, Var_In, Var_Out) :- Code), Translation) :- !,
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)),
-	save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity)]),
+	save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Var_In, Var_Out, Code)], Translation),
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)).
 
 % fuzzification:
@@ -812,15 +813,26 @@ translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_rfuzzy_quantifiers_list([]) :- !.
-save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity) | More]) :-
+save_rfuzzy_quantifiers_list([], []) :- !.
+save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Truth_Value_In, Truth_Value_Out, Code) | More], [Translation | Translations]) :-
 	nonvar(Pred_Name), nonvar(Pred_Arity), number(Pred_Arity), Pred_Arity = 2,
+
+	functor(Quantifier, Pred_Name, Pred_Arity),
+	arg(1, Quantifier, Fuzzy_Predicate_Functor_In),
+	arg(2, Quantifier, Truth_Value_Out),
+
+	Translation = ( Quantifier :-	
+		      functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
+		      arg(FP_Arity, Fuzzy_Predicate_Functor_In, Truth_Value_In),
+		      Fuzzy_Predicate_Functor_In,
+		      Code
+		      ),
 
 	Pred_Type = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no'), !,
 
-	save_rfuzzy_quantifiers_list(More).
+	save_rfuzzy_quantifiers_list(More, Translations).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1295,7 +1307,8 @@ add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 	code_for_quantifier_fnot(Fuzzy_Rules_In, Fuzzy_Rules_Aux_1), 
 	code_for_getting_attribute_values(Fuzzy_Rules_Aux_1, Fuzzy_Rules_Aux_2), 
 	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Aux_3),
-	code_for_rfuzzy_compute(Fuzzy_Rules_Aux_3, Fuzzy_Rules_Out).
+	code_for_defined_quantifiers(Fuzzy_Rules_Aux_3, Fuzzy_Rules_Aux_4),
+	code_for_rfuzzy_compute(Fuzzy_Rules_Aux_4, Fuzzy_Rules_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1341,6 +1354,14 @@ code_for_quantifier_fnot(In, [Code | In]) :-
 	       Truth_Value .>=. 0, Truth_Value .=<. 1,
 	       print_msg('debug', 'fnot :: result', Fuzzy_Predicate_Functor)
 	       ).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_defined_quantifiers(Code_In, Code_Out) :-
+	retract_fact(defined_quantifiers_code(Defined_Quantifiers_Code)),
+	append_local(Defined_Quantifiers_Code, Code_In, Code_Out), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
