@@ -465,8 +465,8 @@ translate((Head :# (Lower_Bound, List, Upper_Bound)), Cls) :-
 translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls_2]):- !,
 	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
 	print_msg('debug', 'rfuzzy_db_description(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
-	translate_db_description(Description, 1, Pred_Arity, Types, DB_Fields),
-	translate(rfuzzy_type_for('crisp_rule', Pred_Name/Pred_Arity, Types), Cl_1),
+	translate_db_description(Description, 1, Pred_Arity, Pred_Type, DB_Fields),
+	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, ['database'], Cl_1),
 	translate_db_fields(DB_Fields, 1, Pred_Arity, Pred_Name, Cls_2),
 	print_msg('debug', 'rfuzzy_db_description :: Cls_1', Cl_1),
 	print_msg('debug', 'rfuzzy_db_description :: Cls_2', Cls_2).
@@ -479,7 +479,7 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type), Cls):-
 	(
 	    (
 		Pseudo_Class = 'crisp_rule', !, 
-		translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Cls)
+		translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, [], Cls)
 	    )
 	;
 	    (
@@ -691,7 +691,7 @@ translate(Other, Other) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Cls) :-
+translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Pred_More_Info, Cls) :-
 	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Type),
 	print_msg('debug', 'rfuzzy_type_for :: (Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
 	
@@ -716,7 +716,7 @@ translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Cls) :-
 	;
 	    (   % Define it !!!
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, [], 'no'),
+		save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, Pred_More_Info, 'no'),
 		Cls = [Cl]
 	    )
 	), !.
@@ -1293,6 +1293,8 @@ generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Resul
 % INFO: predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)
 
 generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info_List, _NHB), Cl) :-
+	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Type), 
+	Pred_Arity = 2,
 	Pred_Type = [_Whatever, 'rfuzzy_enum_type'], 
 	More_Info_List = [('rfuzzy_enum_type', Pred_Name, Pred_Arity)], !,
 
@@ -1302,8 +1304,8 @@ generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity
 	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
 	Cl = (rfuzzy_introspection(Pred_Name, Pred_Arity, Pred_Type, New_Enum_Values_List) :- Generator).
 
-generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, _More_Info_List, _NHB), Cl) :-
-	Cl = (rfuzzy_introspection(Pred_Name, Pred_Arity, Pred_Type, [])).
+generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_More_Info_List, _NHB), Cl) :-
+	Cl = (rfuzzy_introspection(Pred_Name, Pred_Arity, Pred_Type, Pred_More_Info_List)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
