@@ -267,22 +267,29 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type1, [], 'no'),
-	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type3, [], 'no'),
-	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type4, [], 'no'),
+	save_predicate_definition('rfuzzy_any_type', 1, _Pred_Type1, [], 'no'),
+	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type2, [], 'no'),
+	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type3, [], 'no'),
+	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type4, [], 'no'),
+	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type5, [], 'no'),
 	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], 'no'),
 
-	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type6, [], 'no'),
-	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type7, [], 'no'),
-	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type8, [], 'no'),
-	save_predicate_definition('rfuzzy_enum_type', 1, _Pred_Type9, [], 'no'),
-	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type10, [], 'no'),
-	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type11, [], 'no'),
+	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type11, [], 'no'),
+	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type12, [], 'no'),
+	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type13, [], 'no'),
+	save_predicate_definition('rfuzzy_enum_type', 1, _Pred_Type14, [], 'no'),
+	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type15, [], 'no'),
+	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type16, [], 'no'),
 
-	defined_aggregators(Aggregators_List),
+	rfuzzy_defined_aggregators(Defined_Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	save_predicates_definition_list(Aggregators_List, 3, Aggregators_Type, [], 'no').
+	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, [], 'no'),
+	
+	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
+	save_predicate_definition('rfuzzy_compute_defined_operators', 0, _Rfuzzy_Compute_Type, Compute_Defined_Operators, 'no'),
+
+	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
+	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List).
 
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
@@ -567,15 +574,9 @@ translate(rfuzzy_antonym(Pred2_Name, Pred_Name, Cred_Op, Cred), Cls):-
 	Cls = [ Cl | Cls_Aux ], 
 	!.
 
-translate(rfuzzy_quantifier(Pred_Name/Pred_Arity), []):-
+translate(rfuzzy_quantifier(Pred_Name/Pred_Arity), []) :- !,
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)),
-	!,
-	nonvar(Pred_Name), nonvar(Pred_Arity), number(Pred_Arity), Pred_Arity = 2,
-
-	Pred_Type = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no'),
-
+	save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity)]),
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)).
 
 % fuzzification:
@@ -649,6 +650,11 @@ translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Nam
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, 'true', Cls_Aux),
 	Cls = [ Cl | Cls_Aux ], 
 	!.
+
+translate((rfuzzy_similarity_between(Element1, Element2, Truth_Value)), Translation) :-
+	translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, 'prod', 1, Translation).
+translate((rfuzzy_similarity_between(Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
+	translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
@@ -793,6 +799,28 @@ translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Fun
 		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Value_Out),
 		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
 		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], 'no').
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+% translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
+translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
+	Translation = rfuzzy_computed_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+save_rfuzzy_quantifiers_list([]) :- !.
+save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity) | More]) :-
+	nonvar(Pred_Name), nonvar(Pred_Arity), number(Pred_Arity), Pred_Arity = 2,
+
+	Pred_Type = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
+	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no'), !,
+
+	save_rfuzzy_quantifiers_list(More).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1266,7 +1294,8 @@ generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity
 add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 	code_for_quantifier_fnot(Fuzzy_Rules_In, Fuzzy_Rules_Aux_1), 
 	code_for_getting_attribute_values(Fuzzy_Rules_Aux_1, Fuzzy_Rules_Aux_2), 
-	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Out).
+	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Aux_3),
+	code_for_rfuzzy_compute(Fuzzy_Rules_Aux_3, Fuzzy_Rules_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1317,18 +1346,31 @@ code_for_quantifier_fnot(In, [Code | In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_4, Type_6, Type_7, Type_8, Type_9, Type_10, Type_11|In]) :-
-	Type_1 = (rfuzzy_truth_value_type(_Any_1)), 
-	Type_2 = (rfuzzy_credibility_value_type(_Any_2)), 
-	Type_3 = (rfuzzy_predicate_type(_Any_3)), 
-	Type_4 = (rfuzzy_number_type(_Any_4)),
+code_for_rfuzzy_compute(In, [Code | In]) :-
+	Code = (rfuzzy_compute(Operator, Elt1, Elt2, Truth_Value) :- 
+	       findall(rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
+	       rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
+	       Computed_Similarities),
+		rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value)
+	       ).
 
-	Type_6 = (rfuzzy_string_type(_Any_6)), 
-	Type_7 = (rfuzzy_integer_type(_Any_7)), 
-	Type_8 = (rfuzzy_float_type(_Any_8)), 
-	Type_9 = (rfuzzy_enum_type(_Any_9)), 
-	Type_10 = (rfuzzy_boolean_type(_Any_10)), 
-	Type_11 = (rfuzzy_datetime_type(_Any_11)), 
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_predefined_types(In, [Type_1, Type_2, Type_3, Type_4, Type_5, Type_11, Type_12, Type_13, Type_14, Type_15, Type_16|In]) :-
+	Type_1 = (rfuzzy_any_type(_Any_1)),
+	Type_2 = (rfuzzy_truth_value_type(_Any_2)), 
+	Type_3 = (rfuzzy_credibility_value_type(_Any_3)), 
+	Type_4 = (rfuzzy_predicate_type(_Any_4)), 
+	Type_5 = (rfuzzy_number_type(_Any_4)),
+
+	Type_11 = (rfuzzy_string_type(_Any_11)), 
+	Type_12 = (rfuzzy_integer_type(_Any_12)), 
+	Type_13 = (rfuzzy_float_type(_Any_13)), 
+	Type_14 = (rfuzzy_enum_type(_Any_14)), 
+	Type_15 = (rfuzzy_boolean_type(_Any_15)), 
+	Type_16 = (rfuzzy_datetime_type(_Any_16)), 
 
 	!.
 

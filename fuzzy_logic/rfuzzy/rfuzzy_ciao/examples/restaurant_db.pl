@@ -24,7 +24,7 @@ restaurant(burguer_king,               fast_food,        american,         10,  
 restaurant(pizza_jardin,                 fast_casual,     italian,                5,    null,       15,     null).
 restaurant(subway,                         fast_food,       sandwiches,        5,    null,      15,      10).
 restaurant(derroscas,                     fast_food,        mediterranean,   3,    null,      25,      null).
-restaurant(il_tempietto,                  fast_casusal,   italian,                5,    null,       20,     null).
+restaurant(il_tempietto,                  fast_casual,    italian,                5,    null,       20,     null).
 restaurant(kono_pizza,                   fast_food,       pizza,                  4,    null,      15,      null).
 restaurant(paellador,                       fast_food,       paella,                8,     null,      40,     null).
 restaurant(tapasbar,                        fast_food,       tapas,                 3,     null,      10,     null).
@@ -34,8 +34,9 @@ restaurant(zalacain,                         fine_dining,    basque,            
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%rfuzzy_similarity(mediterranean, spanish, 0.6) cred 0.8.
-%rfuzzy_similarity(mediterranean, italian, 0.6) cred 0.8.
+rfuzzy_similarity_between(spanish, tapas, 0.6).
+rfuzzy_similarity_between(mediterranean, spanish, 0.6) cred (prod, 0.8).
+rfuzzy_similarity_between(mediterranean, italian, 0.6) cred (prod, 0.8).
 
 near_function :# (0, [ (0, 1), (100, 1), (1000, 0.1) ], 1000) .
 
@@ -49,10 +50,12 @@ rfuzzy_define_fuzzification(traditional, years_since_opening, traditional_functi
 rfuzzy_type_for('crisp_rule', is_zalacain/1, [restaurant]).
 is_zalacain(Restaurant) :- restaurant_id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.
 
+cheap_function :# (0, [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ], 100) .
 rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant]).
 rfuzzy_default_value_for(cheap, 0.5).
 rfuzzy_default_value_for(cheap, 0.2) if thershold(near_the_city_center, over, 0.7).
 rfuzzy_default_value_for(cheap, 0.1) if is_zalacain/1.
+rfuzzy_define_fuzzification(cheap, price_average, cheap_function).
 
 rfuzzy_synonym(cheap, unexpensive, prod, 1).
 rfuzzy_antonym(cheap, expensive, prod, 1).

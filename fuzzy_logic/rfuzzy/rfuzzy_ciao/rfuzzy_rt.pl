@@ -1,14 +1,20 @@
 :- module(rfuzzy_rt, [
+	% Rfuzzy Computations.
+	rfuzzy_compute_defined_operators/1,
+	rfuzzy_compute_aux/5,	
+	% Aggregators.
+	rfuzzy_defined_aggregators/1, 
+	inject/3, merge/4, prod/3, iprod/3, mean/3, 
+	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
+	% Quantifiers.
+	rfuzzy_defined_quantifiers/1,
+	% Auxiliar predicates.
 	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2,
 	supreme/2, reorder_by_truth_value/3, 
 	one_by_one_first_head/2, one_by_one_first_tail/2,
 	rfuzzy_process_attribute_dump/4,
-	append_local/3, memberchk_local/2, remove_list_dupplicates/3,
-	% Aggregators.
-	defined_aggregators/1, 
-	inject/3, merge/4, prod/3, iprod/3, mean/3, 
-	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3
+	append_local/3, memberchk_local/2, remove_list_dupplicates/3
 		     ],[hiord]).
 
 :- use_module(library(write),[write/1]).
@@ -21,7 +27,7 @@
 
 % REMOVED: preinject/3,postinject/4, id/2, id/3, id (in defined_aggregators), 
 
-defined_aggregators([min, max, prod, iprod, dprod, luka, dluka, complement, mean]).
+rfuzzy_defined_aggregators([min, max, prod, iprod, dprod, luka, dluka, complement, mean]).
 
 min(X,Y,Z):- X .=<. Y, X .=. Z .
 min(X,Y,Z):- X .>. Y, Y .=. Z .
@@ -249,6 +255,46 @@ rfuzzy_process_attribute_dump([Dump], Var, Condition, Value) :-
 rfuzzy_process_attribute_dump(Dump, _Var, _Condition, _Value) :-
 	print_msg('error', 'rfuzzy_process_attribute_dump :: Dump', Dump),
 	!, fail.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+rfuzzy_compute_defined_operators([('=~=', 'rfuzzy_enum_type'), ('=', 'rfuzzy_any_type'), ('=/=', 'rfuzzy_any_type'), ('>', 'rfuzzy_number_type'), ('<', 'rfuzzy_number_type'), ('>=', 'rfuzzy_number_type'), ('=<', 'rfuzzy_number_type')]).
+rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
+	Operator = '=', !,
+	(
+	    (
+		Elt1 .=. Elt2, !,
+		Truth_Value = 1
+	    )
+	;
+	    (
+		Truth_Value = 0
+	    )
+	).
+
+rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
+	Operator = '=/=', !,
+	(
+	    (
+		Elt1 .=. Elt2, !,
+		Truth_Value = 0
+	    )
+	;
+	    (
+		Truth_Value = 1
+	    )
+	).
+
+rfuzzy_compute_aux(_Operator, _Elt1, _Elt2, _Computed_Similarities, 0) :- !.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+rfuzzy_defined_quantifiers([]).
+% rfuzzy_defined_quantifiers([(very, 2)]).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
