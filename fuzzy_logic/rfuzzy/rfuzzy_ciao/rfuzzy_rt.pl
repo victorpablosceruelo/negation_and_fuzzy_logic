@@ -293,8 +293,14 @@ rfuzzy_compute_aux(_Operator, _Elt1, _Elt2, _Computed_Similarities, 0) :- !.
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-rfuzzy_defined_quantifiers([]).
-% rfuzzy_defined_quantifiers([(very, 2)]).
+% rfuzzy_defined_quantifiers([]).
+rfuzzy_defined_quantifiers([(very, 2)]).
+
+very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
+	functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
+	arg(FP_Arity, Fuzzy_Predicate_Functor_In, FP_Truth_Value),
+	Fuzzy_Predicate_Functor_In,
+	Truth_Value .=. (FP_Truth_Value * FP_Truth_Value).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

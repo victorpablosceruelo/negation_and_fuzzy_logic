@@ -60,7 +60,7 @@ rfuzzy_define_fuzzification(cheap, price_average, cheap_function).
 rfuzzy_synonym(cheap, unexpensive, prod, 1).
 rfuzzy_antonym(cheap, expensive, prod, 1).
 
-very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
+my_very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
 	functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
 	arg(FP_Arity, Fuzzy_Predicate_Functor_In, FP_Truth_Value),
 	Fuzzy_Predicate_Functor_In,
@@ -69,7 +69,7 @@ very(Fuzzy_Predicate_Functor_In, Truth_Value) :-
 	min(0, Min_In, Dividend), 
 	Truth_Value .=. ((Dividend)/(0 - Thershold)).
 
-rfuzzy_quantifier(very/2).
+rfuzzy_quantifier(my_very/2).
 
 rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant]).
 rfuzzy_default_value_for(tempting_restaurant, 0.1).
