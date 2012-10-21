@@ -176,12 +176,10 @@ public class ServletsAuxMethodsClass {
 	public static final int FilesMgmtServlet = 8;
 	public static final int FilesMgmtIndexPage = 9;
 	public static final int FilesMgmtFileViewPage = 10;
-	public static final int QueryServletSimpleQuery = 11;
-	public static final int QueryServletAdvancedQuery = 12;
-	public static final int QueryServletRunQuery = 13;
-	public static final int SimpleQueryPage = 14;
-	public static final int AdvancedQueryPage = 15;
-	public static final int QueryResultsPage = 16;
+	public static final int QueryServletBuildQuery = 11;
+	public static final int QueryServletRunQuery = 12;
+	public static final int BuildQueryPage = 13;
+	public static final int RunQueryPage = 15;
 	
 	
 	private static String appMappingForUriNickName(int UriNickName, Log LOG) {
@@ -209,17 +207,13 @@ public class ServletsAuxMethodsClass {
 				break;
 		case FilesMgmtFileViewPage: retVal = "WEB-INF/filesMgmtFileView.jsp";
 				break;
-		case QueryServletSimpleQuery: retVal = "QueryServlet?op=simpleQuery";
-				break;
-		case QueryServletAdvancedQuery: retVal = "QueryServlet?op=advancedQuery";
+		case QueryServletBuildQuery: retVal = "QueryServlet?op=buildQuery";
 				break;
 		case QueryServletRunQuery: retVal = "QueryServlet?op=runQuery";
 				break;
-		case SimpleQueryPage: retVal = "WEB-INF/fleseSimpleQuery.jsp";
+		case BuildQueryPage: retVal = "WEB-INF/fleseBuildQuery.jsp";
 				break;
-		case AdvancedQueryPage: retVal = "WEB-INF/fleseAdvancedQuery.jsp";
-				break;
-		case QueryResultsPage: retVal = "WEB-INF/fleseQueryResults.jsp";
+		case RunQueryPage: retVal = "WEB-INF/fleseRunQuery.jsp";
 				break;
 		default: retVal = "error.jsp";
 				break;

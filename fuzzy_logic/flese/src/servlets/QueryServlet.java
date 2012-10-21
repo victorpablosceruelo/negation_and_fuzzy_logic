@@ -72,8 +72,7 @@ public class QueryServlet extends HttpServlet {
 			fileOwner = request.getParameter("fileOwner");
 			operation = request.getParameter("op");
 			if ((fileName == null) || (fileOwner == null) || (operation == null) ||
-					((! "simpleQuery".equals(operation)) && (! "advancedQuery".equals(operation)) && 
-							(! "runQuery".equals(operation)))) {
+					((! "buildQuery".equals(operation)) && (! "runQuery".equals(operation)))) {
 				LOG.info("operation: "+operation+" fileName: "+fileName+" fileOwner: "+fileOwner);
 				ServletsAuxMethodsClass.addMessageToTheUser(request, "Incorrect arguments for request.", LOG);
 				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);
@@ -115,7 +114,7 @@ public class QueryServlet extends HttpServlet {
 				connection = new CiaoPrologConnectionClass();
 			}
 			
-			if ("simpleQuery".equals(operation) || "advancedQuery".equals(operation)) {
+			if ("buildQuery".equals(operation)) {
 				dbQueryAux_Introspection(fileOwner, fileName, connection);
 			}
 			if ("runQuery".equals(operation)) {
@@ -125,14 +124,11 @@ public class QueryServlet extends HttpServlet {
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
 			session.setAttribute("connection", connection);
 
-			if ("simpleQuery".equals(operation)) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SimpleQueryPage, request, response, LOG);
-			}
-			if ("advancedQuery".equals(operation)) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AdvancedQueryPage, request, response, LOG);
+			if ("buildQuery".equals(operation)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.BuildQueryPage, request, response, LOG);
 			}
 			if ("runQuery".equals(operation)) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.QueryResultsPage, request, response, LOG);
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryPage, request, response, LOG);
 			}
 	}
 	

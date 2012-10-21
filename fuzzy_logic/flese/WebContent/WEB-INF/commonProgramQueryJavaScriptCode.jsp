@@ -155,19 +155,27 @@
 	function fillQueryStartupValues(queryStartId) {
 		var validTypesArray = new Array();
 		var validTypesArrayCounter = 0;
+		var valid = false;
 		for (var i=0; i<programIntrospectionArray.length; i++) {
-			if (programIntrospectionArray[i].predType != '-variable-') {
-				for (var j=0; j<programIntrospectionArray[i].predType.length; j++) {
-					var k=0;
-					var found=false;
-					while ((k < validTypesArrayCounter) && (! found)) {
-						if (validTypesArray[k] == programIntrospectionArray[i].predType[j])	found = true;
-						else k++;
+			valid = false;
+			if (programIntrospectionArray[i].predOtherInfo != '[]') {
+				for (var j=0; j<programIntrospectionArray[i].predOtherInfo.length; j++) {
+					if (programIntrospectionArray[i].predOtherInfo[j] == 'database') {
+						valid = true;
 					}
-					if (! found) {
-						validTypesArray[validTypesArrayCounter] = programIntrospectionArray[i].predType[j];
-						validTypesArrayCounter++;
-					}
+				}
+			}
+			
+			if (valid) {
+				var k=0;
+				var found=false;
+				while ((k < validTypesArrayCounter) && (! found)) {
+					if (validTypesArray[k] == programIntrospectionArray[i].predName)	found = true;
+					else k++;
+				}
+				if (! found) {
+					validTypesArray[validTypesArrayCounter] = programIntrospectionArray[i].predName;
+					validTypesArrayCounter++;
 				}
 			}
 		}

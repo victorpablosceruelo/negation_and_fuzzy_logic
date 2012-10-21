@@ -1,6 +1,4 @@
 
-<%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; Perform a query </h3>
 <br />
     	
 <table class="programFileChosen">

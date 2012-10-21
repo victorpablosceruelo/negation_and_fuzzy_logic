@@ -8,6 +8,8 @@
 <body>
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
+    	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+		<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; Perform a query </h3>
     	<jsp:include page="commonBodyProgramQuery.jsp" />
 
 		<table id="queryStartTable">
@@ -32,8 +34,8 @@
 
 	<script type="text/javascript">
 		fillQueryStartupValues("queryStart");
-		changeFormAction("submitQuery", "DataBaseQueryServlet?op=runquery&database="+currentProgramFileName+"&owner="+currentProgramFileOwner);
-		changeAHrefLink("complexQuery", "DataBaseQueryServlet?op=advancedQuery&database="+currentProgramFileName+"&owner="+currentProgramFileOwner);
+		changeFormAction("submitQuery", "QueryServlet?op=runQuery&fileName="+currentProgramFileName+"&fileOwner="+currentProgramFileOwner);
+		changeAHrefLink("complexQuery", "QueryServlet?op=advancedQuery&fileName="+currentProgramFileName+"&fileOwner="+currentProgramFileOwner);
 	</script>
 </body>
 </html>

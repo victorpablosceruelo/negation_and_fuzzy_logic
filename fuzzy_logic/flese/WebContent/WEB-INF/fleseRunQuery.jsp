@@ -7,33 +7,28 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
+<%@page import="auxiliar.AnswerTermInJava"%>
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
-<%  ArrayList<String []> answers = connection.getLastAnswers(); %>
-<%  Iterator<String []> answersIterator = answers.iterator(); %>
+<%  Iterator<AnswerTermInJava []> answersIterator = connection.getLatestEvaluatedQueryAnswersIterator(); %>
 
 <body>
     <div id="body">
     	<jsp:include page="commonBody.jsp" />
-    	
-    	<h3><a href="DataBasesMenuServlet">Program Files Menu</a> &gt; 
-    		<a href="DataBaseQueryServlet?op=query&database=<%=connection.getCurrentProgramFileName() %>&owner=<%=connection.getCurrentProgramFileOwner() %>">Perform a query</a> &gt; 
-    		Results after evaluating the query </h3>
-		<br /><br />
-    	
-		<h3>This are the results to your query <br />
-			<%=connection.getLastQuery() %>
-			<br /> 
-		 	to the program file <%=connection.getCurrentProgramFileName() %> 
-			with owner <%=connection.getCurrentProgramFileOwner() %>
+    	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+		<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
+			&gt; 
+			<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null) %>&fileName=<%=connection.getLatestEvaluatedQueryProgramFileName()%>&fileOwner=<%=connection.getLatestEvaluatedQueryProgramFileOwner() %>"></a>
 		</h3>
-
+    	<jsp:include page="commonBodyProgramQuery.jsp" />
+    	
+    	<h3>Query Results for the query &nbsp;&nbsp; <%=connection.getLatestEvaluatedQuery() %> </h3>
 		<br /><br /><br /><br /><br />
 
 <%
 	if (answersIterator != null) {
 		%><table><%
-		String [] answer;
+		AnswerTermInJava [] answer;
 		while (answersIterator.hasNext()) {
 			%><tr><%
 			answer = answersIterator.next();
