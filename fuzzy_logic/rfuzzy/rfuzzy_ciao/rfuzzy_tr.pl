@@ -995,7 +995,7 @@ fix_functor_type_aux(Functor, Actual, Type, (Type_F)) :-
 	arg(Actual, Functor, X), % Unify with Argument of functor.
 	!.
 fix_functor_type_aux(_Functor, _Actual, Type, (_Type_F)) :-
-	print_msg('error', 'Not an adequate type', Type), !, fail.
+	print_msg('error', 'Not an adequate type name', Type), !, fail.
 
 fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 	functor(Type, _Name, 0),
