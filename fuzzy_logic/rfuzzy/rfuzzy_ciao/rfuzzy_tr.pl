@@ -462,14 +462,15 @@ translate((Head :# (Lower_Bound, List, Upper_Bound)), Cls) :-
 	print_msg('debug', '(Head :# (Lower_Bound, List, Upper_Bound)) -> Cls', Cls).
 
 % Predicate type(s) definition (Class = database).
-translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), [Cl_1 | Cls_2]):- !,
+translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), Cls):- !,
 	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
 	print_msg('debug', 'rfuzzy_db_description(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
 	translate_db_description(Description, 1, Pred_Arity, Pred_Type, DB_Fields),
-	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, ['database'], Cl_1),
+	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, ['database'], Cls_1),
 	translate_db_fields(DB_Fields, 1, Pred_Arity, Pred_Name, Cls_2),
-	print_msg('debug', 'rfuzzy_db_description :: Cls_1', Cl_1),
-	print_msg('debug', 'rfuzzy_db_description :: Cls_2', Cls_2).
+	print_msg('debug', 'rfuzzy_db_description :: Cls_1', Cls_1),
+	print_msg('debug', 'rfuzzy_db_description :: Cls_2', Cls_2),
+	append_local(Cls_1, Cls_2, Cls).
 
 % Predicate type(s) definition (Class \== database).
 translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type), Cls):-
@@ -486,6 +487,10 @@ translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type), Cls):-
 		Pseudo_Class = 'fuzzy_rule', !,
 		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Gen_Type_Cls, Cls)
 		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, 'fuzzy_rule_type', 'true', Cls)
+	    )
+	;
+	    (
+		print_msg('error', 'Valid classes: crisp_rule or fuzzy_rule. Not a valid class', Pseudo_Class), !, fail
 	    )
 	),
 	print_msg('debug', 'translate_rfuzzy_type_for(Class, Pred_Name, Pred_Arity, Pred_Type)', (Pseudo_Class, Pred_Name, Pred_Arity, Pred_Type)),
@@ -987,7 +992,10 @@ fix_functor_type_aux(Functor, Actual, Type, (Type_F)) :-
 	retrieve_predicate_info(Pred_Name, Pred_Arity, _Pred_Type, _More_Info, _Needs_Head_Building, 'true'),
 	functor(Type_F, Pred_Name, Pred_Arity), % Build functor.
 	arg(1, Type_F, X), % Arguments of functor.
-	arg(Actual, Functor, X). % Unify with Argument of functor.
+	arg(Actual, Functor, X), % Unify with Argument of functor.
+	!.
+fix_functor_type_aux(_Functor, _Actual, Type, (_Type_F)) :-
+	print_msg('error', 'Not an adequate type', Type), !, fail.
 
 fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 	functor(Type, _Name, 0),
