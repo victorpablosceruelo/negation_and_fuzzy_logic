@@ -1,4 +1,4 @@
-:- module(restaurant,_,[rfuzzy, pkgs_output_debug, clpr]).
+:- module(database,_,[rfuzzy, clpr]).
 % or clpq. We can use clpr or clpq.
 % debug with pkgs_output_debug, 
 
@@ -8,78 +8,90 @@
 % Activate/Deactivate debug.
 % :- activate_rfuzzy_debug.
 
-restaurant(kenzo).
-restaurant(burguer_king).
-restaurant(pizza_jardin).
-restaurant(subway).
-restaurant(derroscas).
-restaurant(il_tempietto).
-restaurant(kono_pizza).
-restaurant(paellador).
-restaurant(tapasbar).
-restaurant(meson_del_jamon).
-restaurant(museo_del_jamon).
-restaurant(zalacain).
+rfuzzy_define_database(restaurant/7, 
+	[(restaurant_id, rfuzzy_string_type), 
+	  (restaurant_type, rfuzzy_enum_type), 
+	   (food_type, rfuzzy_enum_type),
+	    (years_since_opening, rfuzzy_integer_type), 
+	     (distance_to_the_city_center, rfuzzy_integer_type), 
+	      (price_average, rfuzzy_integer_type), 
+	       (menu_price, rfuzzy_integer_type)]).
 
-expensive_restaurant(zalacain).
+% restaurant(restaurant_id,                        2,        3,      4,          5,         6,        7, ).
+%restaurant(rfuzzy_default_values, 1,        0,       null,      null,     null,       800).  <- nonsense ??
+restaurant(kenzo,                           fast_casual,     japanese,           5,    null,       50,     null).
+restaurant(burguer_king,               fast_food,        american,         10,    null,       10,     5).
+restaurant(pizza_jardin,                 fast_casual,     italian,                5,    null,       15,     null).
+restaurant(subway,                         fast_food,       sandwiches,        5,    null,      15,      10).
+restaurant(derroscas,                     fast_food,        mediterranean,   3,    null,      25,      null).
+restaurant(il_tempietto,                  fast_casual,    italian,                5,    null,       20,     null).
+restaurant(kono_pizza,                   fast_food,       pizza,                  4,    null,      15,      null).
+restaurant(paellador,                       fast_food,       paella,                8,     null,      40,     null).
+restaurant(tapasbar,                        fast_food,       tapas,                 3,     null,      10,     null).
+restaurant(meson_del_jamon,        fast_food,       spanish,              8,     100,      20,     15).
+restaurant(museo_del_jamon,        fast_food,       spanish,              8,     150,      20,     15).
+restaurant(zalacain,                         fine_dining,    basque,             15,     null,      60,     50).
 
-rfuzzy_type_for('fuzzy_rule', traditional/1, [restaurant/1]).
-rfuzzy_default_value_for(traditional/1, 1).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-traditional(kenzo) value 0.5.
-traditional(paellador) value 0.87.
+rfuzzy_similarity_between(spanish, tapas, 0.6).
+rfuzzy_similarity_between(mediterranean, spanish, 0.6) cred (prod, 0.8).
+rfuzzy_similarity_between(mediterranean, italian, 0.6) cred (prod, 0.8).
 
-% :- set_prop low_distance_function/1 => restaurant/1.
-rfuzzy_default_value_for(low_distance/1, 0).
+near_function :# (0, [ (0, 1), (100, 1), (1000, 0.1) ], 1000) .
 
-rfuzzy_type_for('crisp_rule', distance_to_the_city_center/2, [restaurant/1, rfuzzy_truth_value_type/1]).
-distance_to_the_city_center(meson_del_jamon, 100).
-distance_to_the_city_center(museo_del_jamon, 150).
+rfuzzy_type_for('fuzzy_rule', near_the_city_center/1, [restaurant]).
+rfuzzy_default_value_for(near_the_city_center, 0).
+rfuzzy_define_fuzzification(near_the_city_center, distance_to_the_city_center, near_function).
 
-near_function :# ([ (0, 1), (100, 1), (1000, 0.1) ]) .
-rfuzzy_define_fuzzification(near_the_city_center/1, distance_to_the_city_center/2, near_function/2).
-near_the_city_center(burguer_king) value 1.
+traditional_function :# (0, [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ], 100) .
+rfuzzy_define_fuzzification(traditional, years_since_opening, traditional_function).
 
-% before:
-% :- set_prop cheap/1 => restaurant/1.
-rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant/1]).
-% before: 
-% :- default(cheap/1, 0.5).
-rfuzzy_default_value_for(cheap/1, 0.5).
-rfuzzy_default_value_for(cheap/1, 0.2) if thershold(near_the_city_center/1, over, 0.7).
-rfuzzy_default_value_for(cheap/1, 0.1) if expensive_restaurant/1.
+rfuzzy_type_for('crisp_rule', is_zalacain/1, [restaurant]).
+is_zalacain(Restaurant) :- restaurant_id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.
 
-cheap(kenzo) value 0.3.
-cheap(subway) value 1.
-cheap(derroscas) value 1.
+cheap_function :# (0, [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ], 100) .
+rfuzzy_type_for('fuzzy_rule', cheap/1, [restaurant]).
+rfuzzy_default_value_for(cheap, 0.5).
+rfuzzy_default_value_for(cheap, 0.2) if thershold(near_the_city_center, over, 0.7).
+rfuzzy_default_value_for(cheap, 0.1) if is_zalacain/1.
+rfuzzy_define_fuzzification(cheap, price_average, cheap_function).
 
-rfuzzy_synonym(cheap/1, unexpensive/1, prod, 1).
-rfuzzy_antonym(cheap/1, expensive/1, prod, 1).
+rfuzzy_synonym(cheap, unexpensive, prod, 1).
+rfuzzy_antonym(cheap, expensive, prod, 1).
 
-rfuzzy_quantifier(very/1, over, 0.7).
+rfuzzy_quantifier(my_very/2, TV_In, TV_Out) :-
+ 	Thershold .=. 0.7,
+	Min_In .=. TV_In - Thershold, 
+	min(0, Min_In, Dividend), 
+	TV_Out .=. ((Dividend)/(0 - Thershold)).
 
-rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant/1]).
-rfuzzy_default_value_for(tempting_restaurant/1, 0.1).
-tempting_restaurant(R) cred (min, 0.7) :~ min((low_distance(R), fnot(very(expensive(R))), traditional(R))).
-tempting_restaurant(R) cred (min, 0.5) :~ low_distance(R).
+rfuzzy_type_for('fuzzy_rule', tempting_restaurant/1, [restaurant]).
+rfuzzy_default_value_for(tempting_restaurant, 0.1).
+tempting_restaurant(R) cred (min, 0.7) :~ min((near_the_city_center(R), fnot(my_very(expensive(R))), very(traditional(R)))).
+tempting_restaurant(R) cred (min, 0.5) :~ near_the_city_center(R).
 
-distance_to_us(kenzo, 150).
-distance_to_us(burguer_king, 500).
-distance_to_us(il_tempietto, 100).
-distance_to_us(pizza_jardin, 250).
-% distance_to(unknown, 800).
+% More tests (maybe not needed in this DB).
+not_very_expensive_restaurant(R) :~ fnot(very(expensive(R))).
 
-rfuzzy_define_fuzzification(near_to_us/1, distance_to_us/2, near_function/2).
+rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
+	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).
 
-max_with_min_a_half(X, Y, Z) :- max(X, Y, W), min(W, 0.5, Z).
-rfuzzy_aggregator(max_with_min_a_half/3).
 
-adequate_restaurant(R) :~ fnot(very(expensive(R))).
-rfuzzy_type_for('fuzzy_rule', preferred_restaurant/2, [restaurant/1, restaurant/1]).
-:- module(housesDB,_,[rfuzzy,clpr]).
+test1(A, B) :- A .=. B.
+test2(A, B) :- A .>. B.
+test3(A, B, C) :- C .=. A + B.
 
 % TYPE DECLARATION
 %rfuzzy_type_for(house/7, [codetype/1,housetype/1,positive_integer/1,positive_integer/1,positive_integer/1,positive_integer/1,positive_integer/1]).
+rfuzzy_define_database(house/7, 
+	[(house_code, rfuzzy_enum_type), 
+	  (house_type, rfuzzy_enum_type), 
+	   (house_size, rfuzzy_integer_type),
+	    (house_rooms_number, rfuzzy_integer_type), 
+	     (house_price, rfuzzy_integer_type), 
+	      (house_distance_to_the_center, rfuzzy_integer_type), 
+	       (house_distance_to_the_beach, rfuzzy_integer_type)]).
 
 % TYPE DEFINITION
 housetype(apartment). housetype(villa). housetype(town_house).
@@ -141,42 +153,42 @@ getHouseType(X,Y):- house(X,Y,_,_,_,_,_).
 % FUZZY FUNCTIONS OVER QUANTITATIVE ATTRIBUTES
 %rfuzzy_type_for(expensive_func/1, [positive_integer/1]).
 % rfuzzy_default_value_for(expensive_func/1,1).
-expensive_func :# ([(50000,0),(100000,0.1),(250000,0.2),(350000,0.3),(450000,0.5),(550000,0.6),
-	            (800000,0.7),(1000000,0.8),(1500000,0.9),(2500000,1)]).
+expensive_func :# (50000, [(50000,0),(100000,0.1),(250000,0.2),(350000,0.3),(450000,0.5),(550000,0.6),
+	            (800000,0.7),(1000000,0.8),(1500000,0.9),(2500000,1)], 2500000).
 
 %rfuzzy_type_for(cheap_func/1, [positive_integer/1]).
 %rfuzzy_default_value_for(cheap_func/1,0).
 cheap_func :# ([(0,1),(30000,1),(50000,0.8),(100000,0.7),(250000,0.5),(350000,0.3),
-	            (450000,0.1),(550000,0)]).
+	            (450000,0.1),(550000,0)], 550000).
 
 %rfuzzy_type_for(big_func/1, [positive_integer/1]).
 %rfuzzy_default_value_for(big_func/1,1).
-big_func :# ([(0,0),(50,0.1),(80,0.2),(120,0.3),(200,0.4),(300,0.5),(500,0.7),(1000,0.8),(1500,0.9),(2500,1)]).
+big_func :# (0, [(0,0),(50,0.1),(80,0.2),(120,0.3),(200,0.4),(300,0.5),(500,0.7),(1000,0.8),(1500,0.9),(2500,1)], 2500).
 
 %rfuzzy_type_for(small_func/1, [positive_integer/1]).
 %rfuzzy_default_value_for(small_func/1,0).
-small_func :# ([(0,1),(50,1),(80,0.9),(100,0.8),(150,0.7),(200,0.5),(300,0.2),(400,0.1),(500,0)]).
+small_func :# (0, [(0,1),(50,1),(80,0.9),(100,0.8),(150,0.7),(200,0.5),(300,0.2),(400,0.1),(500,0)], 500).
 
 %rfuzzy_type_for(close_to_center_func/1, [positive_integer/1]).
 %rfuzzy_default_value_for(close_to_center_func/1,0).
-close_to_center_func :# ([(0,1),(2,1),(4,0.8),(7,0.6),(10,0.5),(12,0.3),(15,0.2),(20,0)]).
+close_to_center_func :# (0, [(0,1),(2,1),(4,0.8),(7,0.6),(10,0.5),(12,0.3),(15,0.2),(20,0)], 20).
 
 %rfuzzy_type_for(far_from_center_func/1, [positive_integer/1]).
 %rfuzzy_default_value_for(far_from_center_func/1,1).
-far_from_center_func :# ([(0,0),(7,0),(8,0.1),(10,0.3),(14,0.4),(20,0.7),(25,0.8),(30,1)]).
+far_from_center_func :# (0, [(0,0),(7,0),(8,0.1),(10,0.3),(14,0.4),(20,0.7),(25,0.8),(30,1)], 30).
 
 %rfuzzy_type_for(close_to_beach_func/1, [positive_integer/1]).
 %rfuzzy_default_value_for(close_to_beach_func/1,0).
-close_to_beach_func :# ([(0,1),(100,1),(1000,0.5),(2000,0)]).
+close_to_beach_func :# (0, [(0,1),(100,1),(1000,0.5),(2000,0)], 2000).
 
 % QUALIFIERS
 %rfuzzy_type_for(very_func/1, [fraction/1]).
 %rfuzzy_default_value_for(very_func/1,0.5).
-very_func :# ([(0,0),(0.5,0),(0.8,0.8),(1,1)]).
+very_func :# (0, [(0,0),(0.5,0),(0.8,0.8),(1,1)], 1).
 
 %rfuzzy_type_for(little_func/1, [fraction/1]).
 %rfuzzy_default_value_for(little_func/1,0.5).
-little_func :# ([(0,1),(0.1,1),(0.4,0),(1,0)]).
+little_func :# (0, [(0,1),(0.1,1),(0.4,0),(1,0)], 1).
 
 % QUALIFIED FUZZY FUNCTIONS
 very_expensive(X,Y):- expensive(X,T),very_func(T,Y).
