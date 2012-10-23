@@ -66,27 +66,41 @@ public class AnswerTermInJava {
 		// For float
 		if (term.isFloat()) {
 			creationMsgs += " is a float. ";
-			PLFloat prologInteger = (PLFloat) term;
-			singleAnswerTerm = prologInteger.toString();
+			PLFloat prologFloat = (PLFloat) term;
+			singleAnswerTerm = prologFloat.toString();
 		}
 		// For atom ???
 		if (term.isAtom()) {
 			creationMsgs += " is an atom. ";
-			PLAtom prologInteger = (PLAtom) term;
-			singleAnswerTerm = prologInteger.toString();
+			PLAtom prologAtom = (PLAtom) term;
+			singleAnswerTerm = prologAtom.toString();
 		}
 		
 		// For structure
 		if (term.isStructure()) {
 			creationMsgs += " is an structure. ";
-			PLStructure prologInteger = (PLStructure) term;
-			singleAnswerTerm = prologInteger.toString();			
+			PLStructure prologStructure = (PLStructure) term;
+			String functor = prologStructure.getFunctor();
+			if (! (",".equals(functor))) {
+				singleAnswerTerm = functor;
+			}
+			
+			int listLength = prologStructure.getArity();
+			if (listLength > 0) {
+				compositeAnswerTerm = new AnswerTermInJava [listLength];
+
+				for (int i=0; i<listLength; i++) {
+					compositeAnswerTerm[i] = new AnswerTermInJava(prologStructure.getArg(i), prologQueryAnswer);
+					creationMsgs += compositeAnswerTerm[i].getCreationMsgs();
+				}
+			}
+			// singleAnswerTerm = prologStructure.toString();			
 		}		
 		// For string
 		if (term.isString()) {
 			creationMsgs += " is an string. ";
-			PLString prologInteger = (PLString) term;
-			singleAnswerTerm = prologInteger.toString();			
+			PLString prologString = (PLString) term;
+			singleAnswerTerm = prologString.toString();			
 		}
 		
 		if (! (term.isVariable() || term.isList() || term.isInteger() || term.isStructure() || 
