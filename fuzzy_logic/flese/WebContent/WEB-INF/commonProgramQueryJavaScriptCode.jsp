@@ -11,6 +11,40 @@
 		return firstCharacter + lastCharacters; 
 	}
 	
+	function addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfo) {
+		var index = 0;
+		var predInfo = null;
+		while (index<programIntrospectionArray.length && predInfo == null){
+			if (programIntrospectionArray[index].predName == 'rfuzzy_compute_defined_operators') {
+				predInfo = programIntrospectionArray[index];
+			}
+			else index++;
+		}
+		
+		var row = document.getElementById(rowId);
+		var cell = row.insertCell(-1);
+		cell.id = queryLineGeneralId + ".rfuzzyComputeOperator";
+		
+		var rfuzzyComputeOperatorId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
+		html="<select name=\'" + rfuzzyComputeOperatorId + "\'>";;
+		html += "<option name=\'----\' value=\'----\'>----</option>";
+		
+		var operators = predInfo.predOtherInfo;
+		for (var i=0; i<operators.length; i++) {
+			html+= "<option name=\'" + operators[i].predName + 
+			"\' value=\'" + operators[i].predName + "\'>";
+			html += operators[i].predName
+			html += "</option>";
+		}
+		html += "</select>";
+		cell.innerHTML = html;	
+		
+	}
+	function addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfo) {
+		
+	}
+
+	
 	function isQuantifierPredicate(programIntrospectionElement) {
 		
 		if ((programIntrospectionElement.predArity == 2) &&
@@ -22,12 +56,13 @@
 		else return false;
 	}
 	
-	function addQuantifier(queryLineGeneralId, chooseRuleDivId, quantifierIndex) {
-		var queryLineQuantifierGeneralId = queryLineGeneralId + ".quantifier_" + quantifierIndex;
-		var quantifierDiv = document.createElement('div');
-		quantifierDiv.id= queryLineQuantifierGeneralId + ".divContainer";
+	function addQuantifier(queryLineGeneralId, rowId, quantifierIndex) {
+		var row = document.getElementById(rowId);
+		var cell = row.insertCell(0);
+		cell.id = queryLineGeneralId + ".quantifier_" + quantifierIndex;
+		var quantifierId = queryLineGeneralId + ".selectQuantifier_" + quantifierIndex;
 
-		var html = "<select name=\'" + queryLineQuantifierGeneralId + "\'>";
+		var html = "<select name=\'" + quantifierId + "\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
 			if (isQuantifierPredicate(programIntrospectionArray[i])) {
@@ -40,16 +75,12 @@
 					html += "</option>";
 				}
 			}
-			
 		}
 		html += "</select>";
-		quantifierDiv.innerHTML = html;
-		chooseRuleDiv = document.getElementById(chooseRuleDivId);
-		document.getElementById(queryLineGeneralId + ".divContainer").insertBefore(quantifierDiv, chooseRuleDiv);
-		
+		cell.innerHTML = html;	
 	}
 	
-	function changeInChooseRule(comboBox, queryLineGeneralId, chooseRuleDivId) {
+	function changeInChooseRule(comboBox, queryLineGeneralId, rowId) {
 		// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 		debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
@@ -66,13 +97,28 @@
 			else index++;
 		}
 		
+		var row = document.getElementById(rowId);
+		var cell = null;
+		debug.info("row.cells.lenght = " + row.cells.length);
+		if ((row.cells.length != 1) && (row.cells.length != 'undefined')) {	
+			for (i=row.cells.length -1; i>=0; i--) {
+				cell = row.cells[i];
+				debug.info("row.cells["+i+"].id = " + row.cells[i].id);
+				if (cell.id != (queryLineGeneralId + ".predicate")) {
+					row.deleteCell(i);
+					debug.info("row.cell removed");
+				}
+			}
+		}
+		
 		if (foundPredInfo != null) {
 			if (foundPredInfo.predType[foundPredInfo.predType.length -1] == 'rfuzzy_truth_value_type') {
-				addQuantifier(queryLineGeneralId, chooseRuleDivId, 0)
-				addQuantifier(queryLineGeneralId, chooseRuleDivId, 1)
+				addQuantifier(queryLineGeneralId, rowId, 1)
+				addQuantifier(queryLineGeneralId, rowId, 0)
 			}
 			else {
-				addRfuzzyComputeArguments()
+				addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfo);
+				addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfo);
 			}
 		}
 	}
@@ -81,13 +127,15 @@
 		return (predType[0] == startupType);
 	}
 	
-	function addChooseRule(queryLineDivContainerId, queryLineGeneralId, startupType) {
-		var queryLinePredicateGeneralId = queryLineGeneralId + ".rule";
-		var chooseRuleDiv = document.createElement('div');
-		chooseRuleDiv.id= queryLinePredicateGeneralId + ".divContainer";
+	function addChooseRule(rowId, queryLineGeneralId, startupType) {
 		
-		var html = "<select name=\'"+queryLinePredicateGeneralId + "\'"+
-					"onchange=\"changeInChooseRule(this, \'" + queryLineGeneralId + "\', \'"+chooseRuleDiv.id+"\');\">";
+		var row = document.getElementById(rowId);
+		var cell = row.insertCell(0);
+		cell.id = queryLineGeneralId + ".predicate";
+		
+		var queryLineSelectPredicateId = queryLineGeneralId + ".selectPredicate";
+		var html = "<select name=\'"+queryLineSelectPredicateId+"\'"+
+					"onchange=\"changeInChooseRule(this, \'" + queryLineGeneralId + "\', \'"+rowId+"\');\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
 			if (startupTypeIsValid(startupType, programIntrospectionArray[i].predType)) {
@@ -98,8 +146,7 @@
 		}
 		html += "</select>";
 		
-		chooseRuleDiv.innerHTML = html;
-		document.getElementById(queryLineDivContainerId).appendChild(chooseRuleDiv);
+		cell.innerHTML = html;
 	}
 	
 	function addQueryLine(queryLinesDivId, startupType) {
