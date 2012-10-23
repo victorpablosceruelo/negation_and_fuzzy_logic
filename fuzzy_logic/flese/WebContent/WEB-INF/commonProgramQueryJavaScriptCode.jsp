@@ -29,12 +29,26 @@
 		html="<select name=\'" + rfuzzyComputeOperatorId + "\'>";;
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		
+		debug.info("foundPredInfo: "+foundPredInfo);
+		debug.info("foundPredInfo.predName: "+foundPredInfo.predName);
+		debug.info("foundPredInfo.predArity: "+foundPredInfo.predArity);
+		debug.info("foundPredInfo.predType: "+foundPredInfo.predType);
+		debug.info("foundPredInfo.predOtherInfo: "+foundPredInfo.predOtherInfo);
+		
 		var operators = predInfo.predOtherInfo;
 		for (var i=0; i<operators.length; i++) {
-			html+= "<option name=\'" + operators[i].predName + 
-			"\' value=\'" + operators[i].predName + "\'>";
-			html += operators[i].predName
-			html += "</option>";
+			debug.info("foundPredType: "+foundPredInfo.predType[foundPredInfo.predType.length-1]);
+			debug.info("operatorType: "+operators[i][1]);
+			var case1 = ((foundPredInfo.predType[foundPredInfo.predType.length-1] == 'rfuzzy_enum_type') && 
+					((operators[i][1] == 'rfuzzy_enum_type') || (operators[i][1] == 'rfuzzy_any_type')));
+			var case2 = ((foundPredInfo.predType[foundPredInfo.predType.length-1] != 'rfuzzy_enum_type') &&
+					(operators[i][1] != 'rfuzzy_enum_type'));
+			if (case1 || case2) {
+				html+= "<option name=\'" + operators[i][0] + 
+						"\' value=\'" + operators[i][0] + "\'>";
+				html += operators[i][0]
+				html += "</option>";
+			}
 		}
 		html += "</select>";
 		cell.innerHTML = html;	
