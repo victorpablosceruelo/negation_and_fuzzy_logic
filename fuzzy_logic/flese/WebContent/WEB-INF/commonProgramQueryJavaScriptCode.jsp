@@ -83,7 +83,7 @@
 		html += "<select name=\'"+variableGeneralId+".variable\'" + 
 				"onchange=\"variableChange(this, " + constantDivId +");\">";
 		if (variableName != "-variable-") {
-			html += "<option name=\'"+variableName+ "\' value=\'"+variableName+_"\'>"+ variableName + "</option>";
+			html += "<option name=\'"+variableName+ "\' value=\'"+variableName+"\'>"+ variableName + "</option>";
 		}
 		for (var k=variablesIndex; k<variablesCounter; k++){
 			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
@@ -114,31 +114,25 @@
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 		debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
 		
-		var found = false;
+		var foundPredInfo = null;
 		var index = 0;
 		debug.info("changeInChooseRule: searching ... ");
-		while ((! found) && (index < programIntrospectionArray.length)) {
+		while ((foundPredInfo == null) && (index < programIntrospectionArray.length)) {
 			debug.info("programIntrospectionArray["+index+"]: " + programIntrospectionArray[index].predName);
 			if (comboBoxValue == programIntrospectionArray[index].predName) {
-				found = true;
 				foundPredInfo = programIntrospectionArray[index];
 				debug.info("changeInChooseRule: found");
 			}
 			else index++;
 		}
 		
-		if (found) {
-			
-			
-			// remove variables arguments(chooseRuleDivId);
-			addVariablesArguments(foundPredInfo, queryLineGeneralId, chooseRuleDivId);
-
-			debug.info("fuzzyRuleChange: adding contents to divName: " + divName);
-			document.getElementById(divName).innerHTML = html;
-			debug.info("fuzzyRuleChange: adding contents to divName: " + 'hiddenNumOfVariables');
-			document.getElementById('hiddenNumOfVariables').innerHTML = " " + 
-						"<input type=\"hidden\" name=\"variablesCounter\" id=\"variablesCounter\" value=\""+ 
-						variablesCounter + "\" />";
+		if (foundPredInfo != null) {
+			if (foundPredInfo.predType[foundPredInfo.predType.length -1] == 'rfuzzy_truth_value_type') {
+				addQuantifiers()
+			}
+			else {
+				addRfuzzyComputeArguments()
+			}
 		}
 	}
 	
@@ -146,12 +140,13 @@
 		return (predType[0] == startupType);
 	}
 	
-	function addChooseRule(divId, queryLineGeneralId, startupType) {
+	function addChooseRule(queryLineDivContainerId, queryLineGeneralId, startupType) {
+		var queryLinePredicateGeneralId = queryLineGeneralId + ".rule";
 		var chooseRuleDiv = document.createElement('div');
-		chooseRuleDiv.id= divId + "_rule";
+		chooseRuleDiv.id= queryLinePredicateGeneralId + ".divContainer";
 		
-		var html = "<select name=\'"+queryLineGeneralId+".predicate\'"+
-					"onchange=\"changeInChooseRule(this, " + queryLineGeneralId + ", "+chooseRuleDiv.id+");\">";
+		var html = "<select name=\'"+queryLinePredicateGeneralId"\'"+
+					"onchange=\"changeInChooseRule(this, \'" + queryLineGeneralId + "\', \'"+chooseRuleDiv.id+"\');\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
 			if (startupTypeIsValid(startupType, programIntrospectionArray[i].predType)) {
@@ -163,7 +158,7 @@
 		html += "</select>";
 		
 		chooseRuleDiv.innerHTML = html;
-		document.getElementById(divId).appendChild(chooseRuleDiv);
+		document.getElementById(queryLineDivContainerId).appendChild(chooseRuleDiv);
 	}
 	
 	function addQueryLine(queryLinesDivId, startupType) {
@@ -171,16 +166,16 @@
 			alert("You have reached the limit of adding " + queryLinesCounter + " subqueries.");
 		} else {
 			var queryLineGeneralId = "queryLine[" + queryLinesCounter + "]";
-			var newDiv = document.createElement('div');
-			newDiv.id=queryLineGeneralId+".line";
+			var queryLineDivContainer = document.createElement('div');
+			queryLineDivContainer.id=queryLineGeneralId+".divContainer";
 			//newDiv.innerHTML = "<table id=\'queryLineTable_"+queryLinesCounter+"\'><tr><td>" +  
 			//		chooseQuantifierCode(queryLinesCounter, 0) + "</td><td>" +
 			//		chooseQuantifierCode(queryLinesCounter, 1) + "</td><td>" +
 			//		chooseRuleCode(queryLinesCounter, startupType) + "</td>" +
 			//		fuzzyRuleArgsCode(queryLinesCounter) + "</tr></table>";
 			
-			document.getElementById(queryLinesDivId).appendChild(newDiv);			
-			addChooseRule(newDiv.id, queryLineGeneralId, startupType);
+			document.getElementById(queryLinesDivId).appendChild(queryLineDivContainer);			
+			addChooseRule(queryLineDivContainer.id, queryLineGeneralId, startupType);
 			
 			queryLinesCounter++;
 		}
