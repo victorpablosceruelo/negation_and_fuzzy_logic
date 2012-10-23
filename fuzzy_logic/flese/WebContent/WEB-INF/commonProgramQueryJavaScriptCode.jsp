@@ -22,13 +22,17 @@
 		else return false;
 	}
 	
-	function chooseQuantifierCode(fuzzyRuleIndex, fuzzyRuleQuantifierIndex) {
-		var html = "<select name=\'fuzzyRuleQuantifier[" + fuzzyRuleIndex + "][" + fuzzyRuleQuantifierIndex + "]\'>";
+	function addQuantifier(queryLineGeneralId, chooseRuleDivId, quantifierIndex) {
+		var queryLineQuantifierGeneralId = queryLineGeneralId + ".quantifier_" + quantifierIndex;
+		var quantifierDiv = document.createElement('div');
+		quantifierDiv.id= queryLineQuantifierGeneralId + ".divContainer";
+
+		var html = "<select name=\'" + queryLineQuantifierGeneralId + "\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
 			if (isQuantifierPredicate(programIntrospectionArray[i])) {
-				if (((fuzzyRuleQuantifierIndex == 0) && (programIntrospectionArray[i].predName == "fnot")) ||
-						((fuzzyRuleQuantifierIndex == 1) && (programIntrospectionArray[i].predName != "fnot"))) {
+				if (((quantifierIndex == 0) && (programIntrospectionArray[i].predName == "fnot")) ||
+						((quantifierIndex == 1) && (programIntrospectionArray[i].predName != "fnot"))) {
 					html += "<option name=\'" + programIntrospectionArray[i].predName + 
 								"\' value=\'" + programIntrospectionArray[i].predName + "\'>";
 					if (programIntrospectionArray[i].predName == "fnot") html += "not";
@@ -39,74 +43,10 @@
 			
 		}
 		html += "</select>";
-		return html;
-	}
-	
-	function fuzzyRuleArgsCode(fuzzyRuleIndex) {
-		return "<td id=\'fuzzyRuleArgs[" + fuzzyRuleIndex + "]\' class='hidden'></td>";
-	}
-	
-	function addVariablesArguments(predInfo, queryLineGeneralId, chooseRuleDivId) {
-		var variablesIndex = variablesCounter;
-		variablesCounter += foundPredInfo.predArity;
+		quantifierDiv.innerHTML = html;
+		chooseRuleDiv = document.getElementById(chooseRuleDivId);
+		document.getElementById(queryLineGeneralId + ".divContainer").insertBefore(quantifierDiv, chooseRuleDiv);
 		
-		convertTypeNameToVarName
-		var variableDiv;
-		var variableName;
-		var variableGeneralId;
-		var index = 0;
-		var chooseRuleDiv=getElementById(chooseRuleDivId);
-
-		while ((variablesIndex + index) < variablesCounter) {
-			variableDiv = document.createElement('div');
-			variableGeneralId = queryLineGeneralId + ".variable["+variablesIndex+"]";
-			variableDiv.id= variableGeneralId + ".div";
-			
-			if (predInfo.predType == '-variable-') {
-				variableName = '-variable-';
-			}
-			else {
-				variableName = predInfo.predType[index];
-			}
-
-			variableDiv.innerHTML = addVariableArgument(variableGeneralId, variablesIndex, index, variableName);
-			
-			chooseRuleDiv.appendChild(variableDiv);
-			variablesIndex += 1;
-		}
-	}
-	
-	function addVariableArgument(variableGeneralId, variablesIndex, index, variableName) {
-		debug.info("addVariableArgument: ");
-		var constantDivId = variableGeneralId + ".constant";
-		var html = "";
-		html += "<select name=\'"+variableGeneralId+".variable\'" + 
-				"onchange=\"variableChange(this, " + constantDivId +");\">";
-		if (variableName != "-variable-") {
-			html += "<option name=\'"+variableName+ "\' value=\'"+variableName+"\'>"+ variableName + "</option>";
-		}
-		for (var k=variablesIndex; k<variablesCounter; k++){
-			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
-		}
-		for (var k=0; k<variablesIndex; k++){
-			html += "<option name=\'var_" + k + "\' value=\'var_" + k + "\'>variable_"+ k + "</option>";
-		}
-		html += "<option name=\'constant' value=\'constant\'>constant</option>";
-		html += "</select>";
-		html += "<div id=\'" + constantDivId + "\'> </div>";
-		return html;
-	}
-	
-	function variableChange(comboBox, fuzzyRuleIndex, variablesIndex) {
-		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-		var divName = "fuzzyRuleArgumentConstant[" + fuzzyRuleIndex + "]["+ variablesIndex+"]";
-		if (comboBoxValue == "constant") {
-			var html = "<input type=\'text\' name=\'fuzzyRuleArgumentConstant["+ fuzzyRuleIndex + "][" + variablesIndex + "]\'>";
-			document.getElementById(divName).innerHTML = html;
-		}
-		else {
-			document.getElementById(divName).innerHTML = "";
-		}
 	}
 	
 	function changeInChooseRule(comboBox, queryLineGeneralId, chooseRuleDivId) {
@@ -128,7 +68,8 @@
 		
 		if (foundPredInfo != null) {
 			if (foundPredInfo.predType[foundPredInfo.predType.length -1] == 'rfuzzy_truth_value_type') {
-				addQuantifiers()
+				addQuantifier(queryLineGeneralId, chooseRuleDivId, 0)
+				addQuantifier(queryLineGeneralId, chooseRuleDivId, 1)
 			}
 			else {
 				addRfuzzyComputeArguments()
@@ -145,7 +86,7 @@
 		var chooseRuleDiv = document.createElement('div');
 		chooseRuleDiv.id= queryLinePredicateGeneralId + ".divContainer";
 		
-		var html = "<select name=\'"+queryLinePredicateGeneralId"\'"+
+		var html = "<select name=\'"+queryLinePredicateGeneralId + "\'"+
 					"onchange=\"changeInChooseRule(this, \'" + queryLineGeneralId + "\', \'"+chooseRuleDiv.id+"\');\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
@@ -166,16 +107,21 @@
 			alert("You have reached the limit of adding " + queryLinesCounter + " subqueries.");
 		} else {
 			var queryLineGeneralId = "queryLine[" + queryLinesCounter + "]";
+			var queryLineDivContainerId = queryLineGeneralId+".divContainer"; 
 			var queryLineDivContainer = document.createElement('div');
-			queryLineDivContainer.id=queryLineGeneralId+".divContainer";
-			//newDiv.innerHTML = "<table id=\'queryLineTable_"+queryLinesCounter+"\'><tr><td>" +  
-			//		chooseQuantifierCode(queryLinesCounter, 0) + "</td><td>" +
-			//		chooseQuantifierCode(queryLinesCounter, 1) + "</td><td>" +
-			//		chooseRuleCode(queryLinesCounter, startupType) + "</td>" +
-			//		fuzzyRuleArgsCode(queryLinesCounter) + "</tr></table>";
+			queryLineDivContainer.id = queryLineDivContainerId;
+			document.getElementById(queryLinesDivId).appendChild(queryLineDivContainer);
 			
-			document.getElementById(queryLinesDivId).appendChild(queryLineDivContainer);			
-			addChooseRule(queryLineDivContainer.id, queryLineGeneralId, startupType);
+			var queryLineTableId = queryLineGeneralId + ".table";
+			var queryLineTable = document.createElement('table');
+			queryLineTable.id = queryLineTableId;
+			document.getElementById(queryLineDivContainerId).appendChild(queryLineTable);
+			
+			rowId = queryLineGeneralId + ".row";
+			var row = queryLineTable.insertRow(0);
+			row.id = rowId;
+						
+			addChooseRule(rowId, queryLineGeneralId, startupType);
 			
 			queryLinesCounter++;
 		}
