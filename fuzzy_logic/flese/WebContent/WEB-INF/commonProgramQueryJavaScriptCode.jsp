@@ -44,10 +44,8 @@
 			var case2 = ((foundPredInfo.predType[foundPredInfo.predType.length-1] != 'rfuzzy_enum_type') &&
 					(operators[i][1] != 'rfuzzy_enum_type'));
 			if (case1 || case2) {
-				html+= "<option name=\'" + operators[i][0] + 
-						"\' value=\'" + operators[i][0] + "\'>";
-				html += operators[i][0]
-				html += "</option>";
+				html+= "<option name=\'" + operators[i][0] + "\' value=\'" + operators[i][0] + "\'>" +
+						operators[i][0] + "</option>";
 			}
 		}
 		html += "</select>";
@@ -55,7 +53,28 @@
 		
 	}
 	function addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfo) {
+		var row = document.getElementById(rowId);
+		var cell = row.insertCell(-1);
+		cell.id = queryLineGeneralId + ".rfuzzyComputeArgument";
 		
+		var rfuzzyComputeArgumentId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
+		debug.info("foundPredType: "+foundPredInfo.predType[foundPredInfo.predType.length-1]);
+		var html = "";
+		if (foundPredInfo.predType[foundPredInfo.predType.length-1] == 'rfuzzy_enum_type') {
+			html += "<select name=\'" + rfuzzyComputeArgumentId + "\'>";;
+			html += "<option name=\'----\' value=\'----\'>----</option>";
+			var values = foundPredInfo.predOtherInfo;
+			var valuesLength = values.length;
+			for (var i=0; i<valuesLength; i++) {
+				html+= "<option name=\'" + values[i] + "\' value=\'" + values[i] + "\'>" +
+				values[i] + "</option>";
+			}
+			html += "</select>";
+		}
+		else {
+			html += "<input type='text' value='' name='"+rfuzzyComputeArgumentId+"'/>"
+		}
+		cell.innerHTML = html;
 	}
 
 	
