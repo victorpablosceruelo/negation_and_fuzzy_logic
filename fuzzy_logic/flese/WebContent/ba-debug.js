@@ -191,9 +191,11 @@ window.debug = (function(){
   
   // Execute the callback function if set.
   function exec_callback( args ) {
-    if ( callback_func && (callback_force || !con || !con.log) ) {
-      callback_func.apply( window, args );
-    }
+	  if ((typeof(callback_func) != 'undefined') && (callback_func != null)) {
+		  if ( callback_func && (callback_force || !con || !con.log) ) {
+			  callback_func.apply( window, args );
+		  }
+	  }
   };
   
   // Method: debug.setLevel
