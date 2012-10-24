@@ -16,7 +16,7 @@
 	
 		<script type="text/javascript">
 			var filesMgmtServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
-			var queryServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletSimpleQuery, request, null)%>";
+			var queryServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null)%>";
 			
 			function lineForProgramFile(tableId, fileName, fileOwner) {
 				debug.info("lineForProgramFile: fileName: " + fileName);
