@@ -36,7 +36,7 @@
 		cell.id = queryLineGeneralId + ".rfuzzyComputeOperator";
 		
 		var rfuzzyComputeOperatorId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
-		html="<select name=\'" + rfuzzyComputeOperatorId + "\'>";;
+		html="<select name=\'" + rfuzzyComputeOperatorId + "\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";		
 		
 
@@ -79,7 +79,7 @@
 			html += "</select>";
 		}
 		else {
-			html += "<input type='text' value='' name='"+rfuzzyComputeArgumentId+"'/>"
+			html += "<input type='text' value='' name='"+rfuzzyComputeArgumentId+"'/>";
 		}
 		cell.innerHTML = html;
 	}
@@ -141,7 +141,7 @@
 		var cell = null;
 		debug.info("row.cells.lenght = " + row.cells.length);
 		if ((row.cells.length != 1) && (row.cells.length != 'undefined')) {	
-			for (i=row.cells.length -1; i>=0; i--) {
+			for (var i=(row.cells.length -1); i>=0; i--) {
 				cell = row.cells[i];
 				debug.info("row.cells["+i+"].id = " + row.cells[i].id);
 				if (cell.id != (queryLineGeneralId + ".predicate")) {
@@ -153,8 +153,8 @@
 		
 		if (foundPredInfo != null) {
 			if (foundPredInfo.predType[foundPredInfo.predType.length -1] == 'rfuzzy_truth_value_type') {
-				addQuantifier(queryLineGeneralId, rowId, 1)
-				addQuantifier(queryLineGeneralId, rowId, 0)
+				addQuantifier(queryLineGeneralId, rowId, 1);
+				addQuantifier(queryLineGeneralId, rowId, 0);
 			}
 			else {
 				addRfuzzyComputeOperator(queryLineGeneralId, rowId, index);

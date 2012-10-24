@@ -20,7 +20,7 @@
 		</table>
 		<br />		
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
-			<input type="hidden" name="queryLinesCounter" value="0"> 
+			<input type="hidden" name="queryLinesCounter" value="0" id="queryLinesCounter"> 
 			<div id="queryLinesDiv"></div>
 	 		<br />
      		<INPUT type="submit" value="Execute Query">

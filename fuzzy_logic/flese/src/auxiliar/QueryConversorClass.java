@@ -1,25 +1,108 @@
 package auxiliar;
 
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import servlets.FilesMgmtServlet;
+
 import CiaoJava.PLAtom;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 
 public class QueryConversorClass {
+	
+	final Log LOG = LogFactory.getLog(QueryConversorClass.class);
+	
+    // Parameters to be retrieved, converted and saved:
+    // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
+	
+	public static final int quantifier0 = 0;
+	public static final int quantifier1 = 1;
+	public static final int predicate = 2;
+	public static final int rfuzzyComputeOperator = 3;
+	public static final int rfuzzyComputeValue = 4;
+	public static final int aggregator = 5;
+	
+	private String tmpQuantifier0 = null;
+	private String tmpQuantifier1 = null;
+	private String tmpPredicate = null;
+	private String tmpRfuzzyComputeOperator = null;
+	private String tmpRfuzzyComputeValue = null;
+	private String tmpAggregator = null;
 
-	CiaoPrologVarsMappingClass varsMapping = null; 
+	private CiaoPrologConnectionClass connection = null;
+	private ArrayList<CiaoPrologVarMappingClass> varsMappings = null; 
 	PLStructure [] subqueries = null;
 	PLVariable [] finalQueryVariables = null;
 	int finalQueryVariablesCounter = 0;
-	int subQueryCounter = 0;
+	int subQueriesCounter = 0;
 	
-	public QueryConversorClass(int queryLinesCounter) {
-		varsMapping = new CiaoPrologVarsMappingClass(fuzzyVarsCounter);
+	public QueryConversorClass(int queryLinesCounter, CiaoPrologConnectionClass connection) {
+		varsMappings = new ArrayList<CiaoPrologVarMappingClass>();
+		this.connection = connection;
+		
 		subqueries = new PLStructure [queryLinesCounter+1];
-		subQueryCounter = 0;
+		subQueriesCounter = 0;
 		for (int i=0; i<=queryLinesCounter; i++) {
 			subqueries[i] = null; // Initialization.
 		}
+	}
+	
+	public void retrieveAndSave(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
+		boolean error=false;
+		if ((paramName == null) || ("".equals(paramName))) {
+			throw new QueryConversorExceptionClass("paramName is null or empty string.");
+		}
+		String retrieved = request.getParameter(paramName);
+		if ((retrieved != null) && (retrieved != "----")){
+			LOG.info("type: "+type+" for paramName: "+paramName+" -> "+retrieved + " ");
+			switch (type) {
+			case quantifier0: tmpQuantifier0 = retrieved;
+				break; 
+			case quantifier1: tmpQuantifier1 = retrieved;
+				break;
+			case predicate: tmpPredicate = retrieved;
+				break;
+			case rfuzzyComputeOperator: tmpRfuzzyComputeOperator = retrieved;
+				break;
+			case rfuzzyComputeValue: tmpRfuzzyComputeValue= retrieved;
+				break;
+			case aggregator: tmpAggregator= retrieved;
+				break;
+			default: error=true;
+				break;
+			}
+			if (error) throw new QueryConversorExceptionClass("Unknown type.");
+		}
+	}
+	
+	public void newSubquery() throws QueryConversorExceptionClass {
+		if ((tmpQuantifier0 != null) || (tmpQuantifier1 != null) ||
+			(tmpPredicate != null) || 
+			(tmpRfuzzyComputeOperator != null) || (tmpRfuzzyComputeValue != null)) {
+			if (tmpPredicate == null) {
+				throw new QueryConversorExceptionClass("Cannot build a query without a predicate.");
+			}
+			if (((tmpRfuzzyComputeOperator != null) || (tmpRfuzzyComputeValue != null)) &&
+				((tmpQuantifier0 != null) || (tmpQuantifier1 != null))) {
+				throw new QueryConversorExceptionClass("Cannot build a so complex query.");
+			}
+			
+			
+		}
+		
+		// Re-initialize the values for the next subQuery.
+		tmpQuantifier0 = null;
+		tmpQuantifier1 = null;
+		tmpPredicate = null;
+		tmpRfuzzyComputeOperator = null;
+		tmpRfuzzyComputeValue = null;
+		
 	}
 	
 	public void addSubQuery (String quantifier1, String quantifier2, String fuzzyPredicate, String [] [] arguments) 

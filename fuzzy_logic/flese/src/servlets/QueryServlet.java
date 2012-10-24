@@ -109,12 +109,15 @@ public class QueryServlet extends HttpServlet {
 		
 			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
-		
+			boolean justUpdatedIntrospection = false;
+			
 			if (connection == null) {
 				connection = new CiaoPrologConnectionClass();
+				dbQueryAux_Introspection(fileOwner, fileName, connection);
+				justUpdatedIntrospection = true;
 			}
 			
-			if ("buildQuery".equals(operation)) {
+			if (("buildQuery".equals(operation)) && (! justUpdatedIntrospection)) {
 				dbQueryAux_Introspection(fileOwner, fileName, connection);
 			}
 			if ("runQuery".equals(operation)) {
@@ -163,34 +166,23 @@ public class QueryServlet extends HttpServlet {
 	    LOG.info(formParameters);
 	    
 	    int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
-	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter);
+	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter +1, connection);
 	    
-	    int numOfArguments;
-	    String [][] arguments;
-	    String quantifier0, quantifier1, fuzzyPredicate;
+	    // Parameters to be retrieved and saved:
+	    // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
+	    
+	    conversor.newSubquery();
+	    conversor.retrieveAndSave("startupType", request, QueryConversorClass.predicate);
+	    conversor.retrieveAndSave("", request, QueryConversorClass.aggregator);
+	    	    
 	    for (int i=0; i<queryLinesCounter; i++) {
-	    	quantifier0 = request.getParameter("fuzzyRuleQuantifier["+i+"][0]");
-	    	quantifier1 = request.getParameter("fuzzyRuleQuantifier["+i+"][1]");
-	    	fuzzyPredicate = request.getParameter("fuzzyRule["+i+"]");
+	    	conversor.newSubquery();
 	    
-	    	numOfArguments = 0;
-	    	while (request.getParameter("fuzzyRuleArgument["+i+"]["+numOfArguments+"]") != null) {
-	    		numOfArguments++;
-	    	}
-	    	arguments = new String[numOfArguments][];
-	    	for (int j=0; j<numOfArguments; j++) {
-	    		arguments[j] = new String[2];
-	    		if ("constant".equals(request.getParameter("fuzzyRuleArgument["+i+"]["+j+"]"))) {
-	    			arguments[j][0] = "constant";
-	    			arguments[j][1] = request.getParameter("fuzzyRuleArgumentConstant["+i+"]["+j+"]");
-	    		}
-	    		else {
-	    			arguments[j][0] = "variable";
-	    			arguments[j][1] = request.getParameter("fuzzyRuleArgument["+i+"]["+j+"]");
-	    		}
-	    	}
-	    	
-	    	conversor.addSubQuery(quantifier0, quantifier1, fuzzyPredicate, arguments);
+	    	conversor.retrieveAndSave("", request, QueryConversorClass.quantifier0);
+	    	conversor.retrieveAndSave("", request, QueryConversorClass.quantifier1);
+	    	conversor.retrieveAndSave("", request, QueryConversorClass.predicate);
+	    	conversor.retrieveAndSave("", request, QueryConversorClass.rfuzzyComputeOperator);
+	    	conversor.retrieveAndSave("", request, QueryConversorClass.rfuzzyComputeValue);
 	    }
 	    
 	    PLStructure query = conversor.getFinalQuery();
