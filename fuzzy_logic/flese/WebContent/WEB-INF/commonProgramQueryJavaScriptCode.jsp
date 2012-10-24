@@ -229,7 +229,7 @@
 		
 		addQueryLine(cell1.id, comboBoxValue);
 		cell2.innerHTML = "<input type='button' value='Add more conditions to the query' "+
-							"onClick='addQueryLine('queryLinesDiv', quantifiersArray, fuzzyRulesArray);'>";
+							"onClick='addQueryLine(\"queryLinesDiv\", quantifiersArray, fuzzyRulesArray);'>";
 	}
 	
 	function fillQueryStartupValues(queryStartId) {
