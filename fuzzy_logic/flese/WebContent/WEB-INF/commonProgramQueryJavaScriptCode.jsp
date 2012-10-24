@@ -11,12 +11,22 @@
 		return firstCharacter + lastCharacters; 
 	}
 	
-	function addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfo) {
+	function addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoIndex) {
+		
+		foundPredInfo = programIntrospectionArray[foundPredInfoIndex];
+		debug.info("foundPredInfo: "+foundPredInfo);
+		debug.info("foundPredInfo.predName: "+foundPredInfo.predName);
+		debug.info("foundPredInfo.predArity: "+foundPredInfo.predArity);
+		debug.info("foundPredInfo.predType: "+foundPredInfo.predType);
+		debug.info("foundPredInfo.predOtherInfo: "+foundPredInfo.predOtherInfo);
+		var foundPredInfoLastType = foundPredInfo.predType[foundPredInfo.predType.length -1];
+		debug.info("foundPredInfoLastType: "+foundPredInfoLastType);
+		
 		var index = 0;
-		var predInfo = null;
-		while (index<programIntrospectionArray.length && predInfo == null){
+		var operatorsPredInfo = null;
+		while (index<programIntrospectionArray.length && operatorsPredInfo == null){
 			if (programIntrospectionArray[index].predName == 'rfuzzy_compute_defined_operators') {
-				predInfo = programIntrospectionArray[index];
+				operatorsPredInfo = programIntrospectionArray[index];
 			}
 			else index++;
 		}
@@ -27,21 +37,16 @@
 		
 		var rfuzzyComputeOperatorId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
 		html="<select name=\'" + rfuzzyComputeOperatorId + "\'>";;
-		html += "<option name=\'----\' value=\'----\'>----</option>";
+		html += "<option name=\'----\' value=\'----\'>----</option>";		
 		
-		debug.info("foundPredInfo: "+foundPredInfo);
-		debug.info("foundPredInfo.predName: "+foundPredInfo.predName);
-		debug.info("foundPredInfo.predArity: "+foundPredInfo.predArity);
-		debug.info("foundPredInfo.predType: "+foundPredInfo.predType);
-		debug.info("foundPredInfo.predOtherInfo: "+foundPredInfo.predOtherInfo);
-		
-		var operators = predInfo.predOtherInfo;
+
+		var operators = operatorsPredInfo.predOtherInfo;
 		for (var i=0; i<operators.length; i++) {
-			debug.info("foundPredType: "+foundPredInfo.predType[foundPredInfo.predType.length-1]);
+			
 			debug.info("operatorType: "+operators[i][1]);
-			var case1 = ((foundPredInfo.predType[foundPredInfo.predType.length-1] == 'rfuzzy_enum_type') && 
+			var case1 = ((foundPredInfoLastType == 'rfuzzy_enum_type') && 
 					((operators[i][1] == 'rfuzzy_enum_type') || (operators[i][1] == 'rfuzzy_any_type')));
-			var case2 = ((foundPredInfo.predType[foundPredInfo.predType.length-1] != 'rfuzzy_enum_type') &&
+			var case2 = ((foundPredInfoLastType != 'rfuzzy_enum_type') &&
 					(operators[i][1] != 'rfuzzy_enum_type'));
 			if (case1 || case2) {
 				html+= "<option name=\'" + operators[i][0] + "\' value=\'" + operators[i][0] + "\'>" +
@@ -52,7 +57,9 @@
 		cell.innerHTML = html;	
 		
 	}
-	function addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfo) {
+	function addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoIndex) {
+		foundPredInfo = programIntrospectionArray[foundPredInfoIndex];
+		
 		var row = document.getElementById(rowId);
 		var cell = row.insertCell(-1);
 		cell.id = queryLineGeneralId + ".rfuzzyComputeArgument";
@@ -150,8 +157,8 @@
 				addQuantifier(queryLineGeneralId, rowId, 0)
 			}
 			else {
-				addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfo);
-				addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfo);
+				addRfuzzyComputeOperator(queryLineGeneralId, rowId, index);
+				addRfuzzyComputeArgument(queryLineGeneralId, rowId, index);
 			}
 		}
 	}
@@ -209,6 +216,54 @@
 		}
 	}
 	
+	function addQueryLineAndAggregatorChoose(queryLinesCellId, chooseAgregatorCellId, comboBoxValue) {
+		addQueryLine(queryLinesCellId, comboBoxValue);
+		queryLinesSelectAggregatorId = "queryLines.selectAggregator";
+		var chooseAgregatorCell = document.getElementById(chooseAgregatorCellId);
+		if ((chooseAgregatorCell.innerHTML == null) || (chooseAgregatorCell.innerHTML == "")) {
+			debug.info("null nor empty chooseAgregatorCell.innerHTML");
+			var predInfo = null;
+			var html = "";
+			html += "Truth values combined by: <br />";
+			html += "<select name=\'"+queryLinesSelectAggregatorId+"\'>";
+			for (var i=0; i<programIntrospectionArray.length; i++){
+				predInfo = programIntrospectionArray[i];
+				if ((predInfo.predType.length == 3) &&
+					(predInfo.predType[0] == 'rfuzzy_truth_value_type') &&
+					(predInfo.predType[1] == 'rfuzzy_truth_value_type') &&
+					(predInfo.predType[2] == 'rfuzzy_truth_value_type')) {
+					html += "<option name=\'" + predInfo.predName + 
+							"\' value=\'" + predInfo.predName + "\'>"+predInfo.predName + "</option>";
+				}
+			}
+			html += "</select>";
+			chooseAgregatorCell.innerHTML = html;
+		}
+		else debug.info("not null nor empty chooseAgregatorCell.innerHTML");
+		return false;
+	}
+	
+	function addMoreQueryLines(queryLinesCellId, aggregatorCellId, comboBoxValue) {
+
+		var aggregatorCell = document.getElementById(aggregatorCellId);
+		var aggregatorTable = document.createElement('table');
+		aggregatorTable.id = "queryLines.aggregatorTable";
+		aggregatorTable.className = "queryLineAggregatorTable";
+		aggregatorCell.appendChild(aggregatorTable);
+		
+		var row1 = aggregatorTable.insertRow(-1);
+		var row2 = aggregatorTable.insertRow(-1);
+		var addMoreQueryLinesButtonCell = row1.insertCell(-1);
+		var chooseAgregatorCell = row2.insertCell(-1);
+		chooseAgregatorCell.id = "queryLines.chooseAgregatorCell";
+		
+		var html = "<a href=\"\" onClick='return addQueryLineAndAggregatorChoose"+
+					"(\""+queryLinesCellId+"\", \""+chooseAgregatorCell.id+"\", \""+comboBoxValue+"\");' >" +
+					"<img src=\"add.png\" width=\"20\" alt=\"Add more conditions to the query\" /></a>";
+		addMoreQueryLinesButtonCell.innerHTML = html;
+		return false;
+	}
+	
 	function startupChange(comboBox, queryLinesDivId, queryTypeDivId) {
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 		debug.info("comboBoxValue: " + comboBoxValue);
@@ -228,8 +283,7 @@
 		cell2.id = "queryLines.cell2";
 		
 		addQueryLine(cell1.id, comboBoxValue);
-		cell2.innerHTML = "<input type='button' value='Add more conditions to the query' "+
-							"onClick='addQueryLine(\""+cell1.id+"\", \""+comboBoxValue+"\");'>";
+		addMoreQueryLines(cell1.id, cell2.id, comboBoxValue);
 	}
 	
 	function fillQueryStartupValues(queryStartId) {

@@ -409,11 +409,25 @@ h3 {
 .queryLineTable table, 
 .queryLineTable th, 
 .queryLineTable td {
-	border: 0em solid white;
-	margin: 0em;
+	border:0em solid white;
+	margin:0em;
 	border-collapse:collapse;
 }
 
+.queryLineAggregatorTable table,
+.queryLineAggregatorTable tr,
+.queryLineAggregatorTable td {
+	border:none;
+	margin:none;
+	/* border-collapse:collapse; */
+	border-style:hidden;
+	/* border-color:transparent; */
+	border-width:0px;
+	/* color:white; */
+	align:center;
+	vertical-align:center;
+	text-align:center;
+}
 
 #bodyHead {
 	width:90%;
