@@ -153,13 +153,28 @@ public class ServletsAuxMethodsClass {
 	    		appUrl = requestUrl.substring(0, index + appPath.length());
 	    		if (appUrl != null) {
 	    			if (LOG != null) LOG.info("getUrlFromRequest: appUrl: " + appUrl);
-	    			return appUrl;
+	    		}
+	    	}
+	    	
+	    	if ((request.getServerName() == null) || (! ("localhost".equals(request.getServerName())))) {
+	    		String httpsPrefix = "https://";
+	    		String httpPrefix = "http://";
+	    		if (! appUrl.startsWith(httpsPrefix)) {
+	    			if (appUrl.startsWith(httpPrefix)) {
+	    				appUrl = appUrl.substring(httpPrefix.length());
+	    			}
+	    			
+	    			while (appUrl.startsWith("/")) {
+	    				appUrl = appUrl.substring(1);
+	    			}
+	    			
+	    			appUrl = httpsPrefix + appUrl;
 	    		}
 	    	}
 	    }
-	    else return appUrl;
 	    
-	    return ""; // Better an empty stream than a null pointer !!!
+	    if (appUrl == null) return ""; // Better an empty stream than a null pointer !!!
+	    else return appUrl;
 	}
 	
 	// ----------------------------------------------------------------------------------------------

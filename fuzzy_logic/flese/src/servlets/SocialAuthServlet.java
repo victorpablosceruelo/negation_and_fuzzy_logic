@@ -185,6 +185,7 @@ public class SocialAuthServlet extends HttpServlet {
 			if (! error) {
 				// URL of YOUR application which will be called after authentication
 				String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSigned, request, LOG);
+				LOG.info("successUrl: " + successUrl);
 
 				// get Provider URL to which you should redirect for authentication.
 				// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
