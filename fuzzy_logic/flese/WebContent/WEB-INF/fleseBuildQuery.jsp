@@ -21,21 +21,17 @@
 		<br />		
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
 			<div id="simpleOrAdvancedQuery"></div>
-     		<div id="queryLines"></div>
+			<div id="queryLinesDiv"></div>
 	 		<br />
 	 		<div id="hiddenNumOfVariables"></div>
-     		<input type="button" value="Add more conditions to the query" onClick="addQueryLine('queryLines', quantifiersArray, fuzzyRulesArray);">
      		<INPUT type="submit" value="Execute Query">
 		</form>
-		<br /><br />
-		<h3><a id="complexQuery" href="">Advanced query form</a></h3>
 		<br /><br /><br /><br /><br />
 	</div>
 
 	<script type="text/javascript">
 		fillQueryStartupValues("queryStart");
 		changeFormAction("submitQuery", "QueryServlet?op=runQuery&fileName="+currentProgramFileName+"&fileOwner="+currentProgramFileOwner);
-		changeAHrefLink("complexQuery", "QueryServlet?op=advancedQuery&fileName="+currentProgramFileName+"&fileOwner="+currentProgramFileOwner);
 	</script>
 </body>
 </html>

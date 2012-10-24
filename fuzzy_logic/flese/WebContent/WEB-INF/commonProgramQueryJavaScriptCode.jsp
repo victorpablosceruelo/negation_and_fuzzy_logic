@@ -182,7 +182,7 @@
 		cell.innerHTML = html;
 	}
 	
-	function addQueryLine(queryLinesDivId, startupType) {
+	function addQueryLine(queryLinesCellId, startupType) {
 		if (queryLinesCounter == queryLinesCounterLimit) {
 			alert("You have reached the limit of adding " + queryLinesCounter + " subqueries.");
 		} else {
@@ -190,7 +190,7 @@
 			var queryLineDivContainerId = queryLineGeneralId+".divContainer"; 
 			var queryLineDivContainer = document.createElement('div');
 			queryLineDivContainer.id = queryLineDivContainerId;
-			document.getElementById(queryLinesDivId).appendChild(queryLineDivContainer);
+			document.getElementById(queryLinesCellId).appendChild(queryLineDivContainer);
 			
 			var queryLineTableId = queryLineGeneralId + ".table";
 			var queryLineTable = document.createElement('table');
@@ -213,7 +213,21 @@
 		queryLinesCounter=0;
 		document.getElementById(queryLinesDivId).innerHTML="";
 		
-		addQueryLine(queryLinesDivId, comboBoxValue);
+		var queryLinesTableId = "queryLines.table";
+		var queryLinesTable = document.createElement('table');
+		queryLinesTable.id = queryLinesTableId;
+		document.getElementById(queryLinesDivId).appendChild(queryLinesTable);
+		
+		row = queryLinesTable.insertRow(0);
+		row.id = "queryLines.row";
+		var cell1 = row.insertCell(-1);
+		cell1.id = "queryLines.cell1";
+		var cell2 = row.insertCell(-1);
+		cell2.id = "queryLines.cell2";
+		
+		addQueryLine(cell1.id, comboBoxValue);
+		cell2.innerHTML = "<input type='button' value='Add more conditions to the query' "+
+							"onClick='addQueryLine('queryLinesDiv', quantifiersArray, fuzzyRulesArray);'>";
 	}
 	
 	function fillQueryStartupValues(queryStartId) {
@@ -244,7 +258,7 @@
 			}
 		}
 		
-		var html = "<select name=\'startupType' onchange=\"startupChange(this, \'queryLines\', \'simpleOrAdvancedQuery\');\">";
+		var html = "<select name=\'startupType' onchange=\"startupChange(this, \'queryLinesDiv\', \'simpleOrAdvancedQuery\');\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
 		for (var i=0; i<validTypesArrayCounter; i++) {
 			html += "<option name=\'"+validTypesArray[i]+"\' value=\'"+validTypesArray[i]+"\''>"+validTypesArray[i]+"</option>";
