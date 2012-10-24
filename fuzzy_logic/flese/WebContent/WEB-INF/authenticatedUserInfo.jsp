@@ -15,8 +15,11 @@
 
 <body>
     <div id="body">
-    	<jsp:include page="commonBody.jsp" />
-    	<h3><a href="DataBasesMenuServlet">Program Files Menu</a> &gt; User Info </h3>
+     	<jsp:include page="commonBody.jsp" />
+    	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+    	<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
+    	&gt; 
+    	User Info </h3>
 
 		<h3>User information</h3>
 		<table>
