@@ -81,6 +81,10 @@ public class QueryConversorClass {
 		}
 	}
 	
+	private  getPredicateInfo (String predicateName) {
+		connection.getProgramIntrospectionIterator()
+	}
+	
 	public void newSubquery() throws QueryConversorExceptionClass {
 		if ((tmpQuantifier0 != null) || (tmpQuantifier1 != null) ||
 			(tmpPredicate != null) || 
@@ -92,6 +96,7 @@ public class QueryConversorClass {
 				((tmpQuantifier0 != null) || (tmpQuantifier1 != null))) {
 				throw new QueryConversorExceptionClass("Cannot build a so complex query.");
 			}
+			
 			
 			
 		}
