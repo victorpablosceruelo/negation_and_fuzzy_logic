@@ -406,6 +406,15 @@ h3 {
 
 }
 
+.queryLineTable table, 
+.queryLineTable th, 
+.queryLineTable td {
+	border: 0em solid white;
+	margin: 0em;
+	border-collapse:collapse;
+}
+
+
 #bodyHead {
 	width:90%;
 }

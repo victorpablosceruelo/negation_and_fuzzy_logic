@@ -186,16 +186,18 @@
 		if (queryLinesCounter == queryLinesCounterLimit) {
 			alert("You have reached the limit of adding " + queryLinesCounter + " subqueries.");
 		} else {
-			var queryLineGeneralId = "queryLine[" + queryLinesCounter + "]";
-			var queryLineDivContainerId = queryLineGeneralId+".divContainer"; 
-			var queryLineDivContainer = document.createElement('div');
-			queryLineDivContainer.id = queryLineDivContainerId;
-			document.getElementById(queryLinesCellId).appendChild(queryLineDivContainer);
-			
+			var queryLineGeneralId = "queryLine[" + queryLinesCounter + "]";			
 			var queryLineTableId = queryLineGeneralId + ".table";
 			var queryLineTable = document.createElement('table');
 			queryLineTable.id = queryLineTableId;
-			document.getElementById(queryLineDivContainerId).appendChild(queryLineTable);
+			queryLineTable.className = "queryLineTable";
+			document.getElementById(queryLinesCellId).appendChild(queryLineTable);
+			
+			// Playing with styles ... best to use CSS.
+			// document.getElementById(queryLineTableId).style.border = "none";
+			// document.getElementById(queryLineTableId).style.border = "hidden";
+			// document.getElementById(queryLineTableId).style.borderColor = "white";
+			// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
 			
 			rowId = queryLineGeneralId + ".row";
 			var row = queryLineTable.insertRow(0);
