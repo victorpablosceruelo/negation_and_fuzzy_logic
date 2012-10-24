@@ -1,4 +1,4 @@
-:- module(restaurant_db,_,[rfuzzy, clpr]).
+:- module(restaurant_db,_,[rfuzzy, pkgs_output_debug, clpr]).
 % or clpq. We can use clpr or clpq.
 % debug with pkgs_output_debug, 
 
