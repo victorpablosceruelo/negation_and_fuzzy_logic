@@ -90,7 +90,7 @@
 	
 		<script type="text/javascript">
 			function unhideUpload() {
-				var html = "<INPUT TYPE=\'submit\' VALUE=\'Upload File\'>"
+				var html = "<INPUT TYPE=\'submit\' VALUE=\'Upload File\'>";
 				document.getElementById('uploadButton').innerHTML = html;	
 			}
 		</script>
