@@ -20,10 +20,9 @@
 		</table>
 		<br />		
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
-			<div id="simpleOrAdvancedQuery"></div>
+			<input type="hidden" name="queryLinesCounter" value="0"> 
 			<div id="queryLinesDiv"></div>
 	 		<br />
-	 		<div id="hiddenNumOfVariables"></div>
      		<INPUT type="submit" value="Execute Query">
 		</form>
 		<br /><br /><br /><br /><br />

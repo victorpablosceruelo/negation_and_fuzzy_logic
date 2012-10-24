@@ -13,7 +13,7 @@ public class QueryConversorClass {
 	int finalQueryVariablesCounter = 0;
 	int subQueryCounter = 0;
 	
-	public QueryConversorClass(int queryLinesCounter, int fuzzyVarsCounter) {
+	public QueryConversorClass(int queryLinesCounter) {
 		varsMapping = new CiaoPrologVarsMappingClass(fuzzyVarsCounter);
 		subqueries = new PLStructure [queryLinesCounter+1];
 		subQueryCounter = 0;

@@ -213,6 +213,7 @@
 			addChooseRule(rowId, queryLineGeneralId, startupType);
 			
 			queryLinesCounter++;
+			changeInFormTheQueryLinesCounter(queryLinesCounter);
 		}
 	}
 	
@@ -264,10 +265,18 @@
 		return false;
 	}
 	
+	function changeInFormTheQueryLinesCounter(newValue) {
+		var formCounter = document.getElementById('queryLinesCounter');
+		formCounter.value = newValue;
+	}
+	
+	
 	function startupChange(comboBox, queryLinesDivId, queryTypeDivId) {
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 		debug.info("comboBoxValue: " + comboBoxValue);
 		queryLinesCounter=0;
+		changeInFormTheQueryLinesCounter(queryLinesCounter);
+		
 		document.getElementById(queryLinesDivId).innerHTML="";
 		
 		var queryLinesTableId = "queryLines.table";

@@ -149,14 +149,9 @@ public class QueryServlet extends HttpServlet {
 	
 	private void build_and_execute_query(String fileOwner, String fileName, CiaoPrologConnectionClass connection, HttpServletRequest request) 
 			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
-		int queryLinesCounter = 0;
 		LOG.info("build_and_execute_query call.");
-		while (request.getParameter("fuzzyRule[" + queryLinesCounter + "]") != null) {
-			LOG.info("fuzzyRule[" + queryLinesCounter + "]:" + request.getParameter("fuzzyRule[" + queryLinesCounter + "]"));
-			queryLinesCounter++;
-		}
 		
-		String formParameters = " --- \n";
+		String formParameters = " --- Parameters Names and Values --- \n";
 	    Enumeration<String> paramNames = request.getParameterNames();
 	    while(paramNames.hasMoreElements()) {
 	    	String paramName = (String)paramNames.nextElement();
@@ -167,8 +162,8 @@ public class QueryServlet extends HttpServlet {
 	    }
 	    LOG.info(formParameters);
 	    
-	    int fuzzyVarsCounter = Integer.parseInt(request.getParameter("fuzzyVarsCounter"));
-	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter, fuzzyVarsCounter);
+	    int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
+	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter);
 	    
 	    int numOfArguments;
 	    String [][] arguments;
