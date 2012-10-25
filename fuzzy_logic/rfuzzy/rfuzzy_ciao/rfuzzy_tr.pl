@@ -110,6 +110,7 @@ save_predicates_definition_list([Pred_Name | Pred_List], Pred_Arity, Pred_Type, 
 save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew) :-
 	print_msg('debug', 'save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info)', (Pred_Name, Pred_Arity, Pred_Type, More_Info)),
 	check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Info),
+	print_msg('debug', 'check_save_predicate_definition_input', 'ok'),
 	(
 	    (	 
 		retract_fact(predicate_definition(Pred_Name, Pred_Arity, Old_Pred_Type, Old_More_Info)), !, % Retract last
@@ -126,7 +127,7 @@ save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew) :-
 	    )
 	), 
 	assertz_fact(predicate_definition(Pred_Name, Pred_Arity, New_Pred_Type, New_More_Info)),
-	print_msg('debug', 'saved', save_predicate_definition(Pred_Name, Pred_Arity, New_Pred_Type, New_More_Info)),
+	print_msg('debug', 'saved', save_predicate_definition(Pred_Name, Pred_Arity, New_Pred_Type, New_More_Info, IsNew)),
 	!.
 
 retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error) :-
@@ -155,6 +156,7 @@ retrieve_all_predicate_infos(Retrieved) :-
 % ------------------------------------------------------
 	
 check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Info) :-
+	print_msg('debug', 'check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Info)', (Pred_Name, Pred_Arity, Pred_Type, More_Info)),
 	( 
 	    (	nonvar(Pred_Name), !    )
 	;
@@ -197,6 +199,7 @@ check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Inf
 	),
 	(
 	    (
+		print_msg('debug', 'check_pred_type_aux(Pred_Arity, Pred_Type)', (Pred_Arity, Pred_Type)),
 		check_pred_type_aux(Pred_Arity, Pred_Type), !
 	    )
 	;
@@ -275,30 +278,31 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 	add_auxiliar_code(Fuzzy_Rules_2, Fuzzy_Rules_3).
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
+	activate_rfuzzy_debug,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition('rfuzzy_any_type', 1, _Pred_Type1, [], 'no'),
-	save_predicate_definition('rfuzzy_truth_value_type', 1, _Pred_Type2, [], 'no'),
-	save_predicate_definition('rfuzzy_credibility_value_type', 1, _Pred_Type3, [], 'no'),
-	save_predicate_definition('rfuzzy_predicate_type', 1, _Pred_Type4, [], 'no'),
-	save_predicate_definition('rfuzzy_number_type', 1, _Pred_Type5, [], 'no'),
-	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], 'no'),
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew)
+	save_predicate_definition('rfuzzy_any_type', 1, ['null'], [], _IsNew1),
+	save_predicate_definition('rfuzzy_truth_value_type', 1, ['null'], [], _IsNew2),
+	save_predicate_definition('rfuzzy_credibility_value_type', 1, ['null'], [], _IsNew3),
+	save_predicate_definition('rfuzzy_predicate_type', 1, ['null'], [], _IsNew4),
+	save_predicate_definition('rfuzzy_number_type', 1, ['null'], [], _IsNew5),
+	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], _IsNew6),
 
-	save_predicate_definition('rfuzzy_string_type', 1, _Pred_Type11, [], 'no'),
-	save_predicate_definition('rfuzzy_integer_type', 1, _Pred_Type12, [], 'no'),
-	save_predicate_definition('rfuzzy_float_type', 1, _Pred_Type13, [], 'no'),
-	save_predicate_definition('rfuzzy_enum_type', 1, _Pred_Type14, [], 'no'),
-	save_predicate_definition('rfuzzy_boolean_type', 1, _Pred_Type15, [], 'no'),
-	save_predicate_definition('rfuzzy_datetime_type', 1, _Pred_Type16, [], 'no'),
+	save_predicate_definition('rfuzzy_string_type', 1, ['null'], [], _IsNew11),
+	save_predicate_definition('rfuzzy_integer_type', 1, ['null'], [], _IsNew12),
+	save_predicate_definition('rfuzzy_float_type', 1, ['null'], [], _IsNew13),
+	save_predicate_definition('rfuzzy_enum_type', 1, ['null'], [], _IsNew14),
+	save_predicate_definition('rfuzzy_boolean_type', 1, ['null'], [], _IsNew15),
+	save_predicate_definition('rfuzzy_datetime_type', 1, ['null'], [], _IsNew16),
 
 	rfuzzy_defined_aggregators(Defined_Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
 	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, []),
 	
 	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
-	save_predicate_definition('rfuzzy_compute_defined_operators', 0, _Rfuzzy_Compute_Type, Compute_Defined_Operators, 'no'),
+	save_predicate_definition('rfuzzy_compute_defined_operators', 0, _Rfuzzy_Compute_Type, Compute_Defined_Operators, _IsNew7),
 
 	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
 	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
@@ -356,8 +360,8 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 	Translation = (Aggregator :- Code),
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, [], 'no'),
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew)
+	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, [], _IsNew),
 	!.
 
 % function definition.
@@ -380,8 +384,8 @@ translate((Head :# (Lower_Bound, List, Upper_Bound)), Cls) :-
 
 	Pred_Type = ['rfuzzy_number_type', 'rfuzzy_truth_value_type'],
 	Other_Info = [('lower_bound', Lower_Bound), ('upper_bound', Upper_Bound)],
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, Other_Info, 'no'), 
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
+	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, Other_Info, _IsNew), 
 	Cls = (Pred_Functor :- (Body, print_msg('debug', 'function_call', Pred_Functor))),
 	print_msg('debug', '(Head :# (Lower_Bound, List, Upper_Bound)) -> Cls', Cls).
 
@@ -613,8 +617,8 @@ translate(Other, Other) :-
 		Pred_Name \== 'fuzzify'
 	    )
 	),
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, [], 'no').
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
+	save_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, [], _IsNew).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -762,8 +766,8 @@ translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Pred_More
 	    )
 	;
 	    (   % Define it !!!
-		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, Pred_More_Info, 'no'),
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
+		save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, Pred_More_Info, _IsNew),
 		Cls = [Cl]
 	    )
 	), !.
@@ -779,18 +783,19 @@ translate_db_description([(Field_Name, Field_Type) | Description], Index, Max_In
 	New_Index is Index + 1,
 	translate_db_description(Description, New_Index, Max_Index, Types, DB_Fields).
 % translate_db_fields(DB_Fields, Index, Max_Index, DB_Pred_Name, Cls) 
-translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name, [Cl]) :- 
+translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name, Cls) :- 
 	print_msg('debug', 'translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name)', ([Pred_Name], Index, Index, DB_Pred_Name)),
 	nonvar(Index), !,
-	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cl).
-translate_db_fields([Pred_Name|DB_Fields], Index, Max_Index, DB_Pred_Name, [Cl | Cls]) :-
+	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cls).
+translate_db_fields([Pred_Name|DB_Fields], Index, Max_Index, DB_Pred_Name, Cls) :-
 	print_msg('debug', 'translate_db_fields([Pred_Name], Index, Max_Index, DB_Pred_Name)', ([Pred_Name], Index, Max_Index, DB_Pred_Name)),
 	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
 	New_Index is Index + 1,
-	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cl),
-	translate_db_fields(DB_Fields, New_Index, Max_Index, DB_Pred_Name, Cls).
+	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cls_1),
+	translate_db_fields(DB_Fields, New_Index, Max_Index, DB_Pred_Name, Cls_2),
+	append_local(Cls_1, Cls_2, Cls).
 
-translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position, Cl) :-
+translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position, [Cl | Cls]) :-
 	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)', (Pred_Name, Database_Pred_Name, Position)),
 	nonvar(Pred_Name), nonvar(Database_Pred_Name), nonvar(Position), 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error)
@@ -813,15 +818,15 @@ translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position, Cl) :-
 	Pred_Type = [Database_Pred_Name, Type],
 	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Pred_Type)', (Pred_Name, Pred_Type)),
 	(
-	    (	translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion), !    )
+	    (	translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, Cls), !    )
 	;
 	    (	print_msg('error', 'Error translating db definition for (Pred_Name, Pred_Type)', (Pred_Name, Pred_Type)), !, fail    )
 	),
 	
 	Cl = (Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Conversion)),
-	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Cl)', (Pred_Name, Cl)).
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Cl)', (Pred_Name, Cl, Cls)).
 
-translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, Cls) :-
 	
 		nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_truth_value_type'), !, 
 		Pred_Class = 'fuzzy_rule_db_value', Pred_Arity=1,
@@ -832,9 +837,9 @@ translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Fun
 		arg(1, Pred_Functor, Input),
 		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Truth_Value),
 		% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls)
-		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_Unused).
+		save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls).
 
-translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, []) :-
 		nonvar(Type), nonvar(Pred_Name), 
 		(Type = 'rfuzzy_string_type' ; Type = 'rfuzzy_integer_type' ; Type = 'rfuzzy_enum_type' ;
 		    Type = 'rfuzzy_boolean_type' ; Type = 'rfuzzy_datetime_type'), !, 
@@ -842,17 +847,17 @@ translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Fun
 		functor(Pred_Functor, Pred_Name, Pred_Arity),
 		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
 		Conversion = 'true',
-		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], 'no').
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], _IsNew).
 
-translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion) :-
+translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, []) :-
 		nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_float_type'), !, 
 		Pred_Arity = 2,
 		functor(Pred_Functor, Pred_Name, Pred_Arity),
 		arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value_Out),
 		functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Value_Out),
-		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], 'no').
+		% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
+		save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [(Type, Pred_Name, Pred_Arity)], _IsNew).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -882,8 +887,8 @@ save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Truth_Value_In, Truth_Valu
 		      ),
 
 	Pred_Type = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], 'no'), !,
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
+	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], _IsNew), !,
 
 	save_rfuzzy_quantifiers_list(More, Translations).
 
@@ -1307,14 +1312,6 @@ get_nth_element_from_list(Position, [_Head | Tail], Head) :-
 	Position > 1, !,
 	NewPosition is Position - 1,
 	get_nth_element_from_list(NewPosition, Tail, Head).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-boolean_or('true', _Any, 'true').
-boolean_or(_Any, 'true', 'true').
-boolean_or('no', 'no', 'no').
 
 % ------------------------------------------------------
 % ------------------------------------------------------

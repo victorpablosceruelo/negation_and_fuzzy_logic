@@ -6,7 +6,7 @@
 % :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
 
 % Activate/Deactivate debug.
-%:- activate_rfuzzy_debug.
+% :- activate_rfuzzy_debug.
 
 rfuzzy_define_database(restaurant/7, 
 	[(restaurant_id, rfuzzy_string_type), 
