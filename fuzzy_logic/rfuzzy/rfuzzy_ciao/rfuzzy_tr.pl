@@ -209,6 +209,7 @@ check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Inf
 	    )
 	), !.
 
+check_pred_type_aux(0, []) :- !.
 check_pred_type_aux(1, [_Pred_Type]) :- !.
 check_pred_type_aux(Pred_Arity, [_Pred_Type|More]) :-
 	New_Pred_Arity is Pred_Arity -1,
@@ -302,7 +303,7 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, []),
 	
 	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
-	save_predicate_definition('rfuzzy_compute_defined_operators', 0, _Rfuzzy_Compute_Type, Compute_Defined_Operators, _IsNew7),
+	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], Compute_Defined_Operators, _IsNew7),
 
 	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
 	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
