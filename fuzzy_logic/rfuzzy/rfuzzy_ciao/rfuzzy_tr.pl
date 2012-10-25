@@ -517,73 +517,89 @@ translate((rfuzzy_quantifier(Pred_Name/Pred_Arity, Var_In, Var_Out) :- Code), Tr
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)).
 
 % fuzzification:
-translate(rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Name), Cls):-
+translate(rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pred_Name), Cls):-
 	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'translate: rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Name)', rfuzzy_define_fuzzification(Pred_Name, Crisp_Pred_Name, Funct_Pred_Name)),
+	nonvar(Pred_Functor), nonvar(Crisp_Pred_Functor), nonvar(Funct_Pred_Name),
+	print_msg('debug', 'translate: rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pred_Name)', rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pred_Name)),
+	functor(Pred_Functor, Pred_Name, 1), 
+	arg(1, Pred_Functor, Pred_Type_11_Functor), nonvar(Pred_Type_11_Functor),
+	functor(Pred_Type_11_Functor, Pred_Type_11, 0), nonvar(Pred_Type_11),
+	functor(Crisp_Pred_Functor, Crisp_Pred_Name, 1), 
+	arg(1, Crisp_Pred_Functor, Pred_Type_21_Functor), nonvar(Pred_Type_21_Functor),
+	functor(Pred_Type_21_Functor, Pred_Type_21, 0), nonvar(Pred_Type_21),
+	Pred_Type_11 = Pred_Type_21,
+
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error) 
-	retrieve_predicate_info(Crisp_Pred_Name,  2, Pred_Type_1, _MI_1, 'true'),
-	retrieve_predicate_info(Funct_Pred_Name, 2, Pred_Type_2, _MI_2, 'true'),
+	retrieve_predicate_info(Crisp_Pred_Name,  2, Pred_Type_2, _MI_1, 'true'),
+	memberchk_local([Pred_Type_21, Pred_Type_22], Pred_Type_2),
+	retrieve_predicate_info(Funct_Pred_Name, 2, Pred_Type_3, _MI_2, 'true'),
+	memberchk_local([Pred_Type_31, Pred_Type_32], Pred_Type_3),
 	(
-	    (	var(Pred_Type_1), 
+	    (	var(Pred_Type_22), 
 		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Crisp_Pred_Name)), 
 		!, fail    )
 	;
-	    nonvar(Pred_Type_1)
+	    (   nonvar(Pred_Type_22), !   )
 	),
 	(
-	    (	var(Pred_Type_2), 
-		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Funct_Pred_Name)), 
-		!, fail    )
+	    (	(var(Pred_Type_31)   ;   var(Pred_Type_32)   ), 
+		 print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Funct_Pred_Name)), 
+		 !, fail    )
 	;	
-	    nonvar(Pred_Type_2)
+	    (    nonvar(Pred_Type_31),    nonvar(Pred_Type_32),   !    )
 	),
-
-	get_nth_element_from_list(1, Pred_Type_1, Type_1),
- 	get_nth_element_from_list(2, Pred_Type_1, Type_2_Pred_1),
- 	get_nth_element_from_list(1, Pred_Type_2, Type_2_Pred_2),
- 	get_nth_element_from_list(2, Pred_Type_2, Type_3),
 	(
-	    Type_2_Pred_1 = 'rfuzzy_integer_type'
+	    (   Pred_Type_22 = 'rfuzzy_integer_type', !   )
 	;
-	    Type_2_Pred_1 = 'rfuzzy_float_type'
+	    (   Pred_Type_22 = 'rfuzzy_float_type', !   )
 	;
 	    (
 		print_msg('error', 'Type of predicate is not suitable for fuzzification', Crisp_Pred_Name), 
+		print_msg('debug', 'Pred_Type_22', Pred_Type_22), 
 		!, fail    
 	    )
 	),
 	(
 	    (
-		Type_2_Pred_2 = 'rfuzzy_number_type',
-		Type_3 = 'rfuzzy_truth_value_type'
+		Pred_Type_31 = 'rfuzzy_number_type',
+		Pred_Type_32 = 'rfuzzy_truth_value_type',
+		!
 	    )
 	;
 	    (
 		print_msg('error', 'Type of predicate is not suitable for fuzzification', Funct_Pred_Name), 
+		print_msg('debug', Pred_Type_31, Pred_Type_32), 
 		!, fail    
 	    )
 	),
 
 	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 1,
+	print_msg('debug', 'rfuzzy_define_fuzzification :: (Pred_Class, Pred_Arity)', (Pred_Class, Pred_Arity)), 
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
 	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
-	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
+	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, New_Pred_Functor, Truth_Value),
 
 	% We need to do here as in other translations, so 
 	% it generates aux and main predicates for fuzzifications too.
-	functor(Crisp_Pred_Functor, Crisp_Pred_Name, 2),
-	functor(Funct_Pred_Functor, Funct_Pred_Name, 2),
+	functor(New_Crisp_Pred_Functor, Crisp_Pred_Name, 2),
+	functor(New_Funct_Pred_Functor, Funct_Pred_Name, 2),
+	retrieve_predicate_info(Pred_Type_11, Type_Check_Arity, _Type_Check_Type, _MI_3, 'true'),
+	functor(Type_Check_Functor, Pred_Type_11, Type_Check_Arity),
+	functor(Type_Check_Aux, '=', 2),
 
-	arg(1, Pred_Functor, Input),
-	arg(1, Crisp_Pred_Functor, Input),
-	arg(2, Crisp_Pred_Functor, Crisp_Value),
-	arg(1, Funct_Pred_Functor, Crisp_Value),
-	arg(2, Funct_Pred_Functor, Truth_Value),
+	print_msg('debug', 'rfuzzy_define_fuzzification :: linking', (New_Pred_Functor, New_Crisp_Pred_Functor, New_Funct_Pred_Functor)), 
+	arg(1, New_Pred_Functor, Input),
+	arg(1, New_Crisp_Pred_Functor, Input),
+	arg(2, New_Crisp_Pred_Functor, Crisp_Value),
+	arg(1, New_Funct_Pred_Functor, Crisp_Value),
+	arg(2, New_Funct_Pred_Functor, Truth_Value),
+	arg(1, Type_Check_Aux, Input),
+	arg(2, Type_Check_Aux, Type_Check_Functor),
 
-	Cl = (Pred_Functor :- (Crisp_Pred_Functor, Funct_Pred_Functor)),
+	Cl = (New_Pred_Functor :- (Type_Check_Functor, (Type_Check_Aux, (New_Crisp_Pred_Functor, New_Funct_Pred_Functor)))),
 
-	Pred_Type = [Type_1],
+	Pred_Type = [Pred_Type_11],
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_Aux),
 	Cls = [ Cl | Cls_Aux ], 
 	!.
