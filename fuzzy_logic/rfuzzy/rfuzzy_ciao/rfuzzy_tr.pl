@@ -121,7 +121,7 @@ save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew) :-
 	    )
 	;
 	    (
-		New_Pred_Type = Pred_Type,
+		New_Pred_Type = [Pred_Type],
 		New_More_Info = More_Info, 
 		IsNew = 'true'
 	    )
@@ -225,8 +225,11 @@ append_types(Pred_Name, Pred_Arity, Pred_Type_In, [Pred_Type|PTL_In], [Pred_Type
 	get_nth_element_from_list(Pred_Arity, Pred_Type_In, Last_Type),
 	get_nth_element_from_list(Pred_Arity, Pred_Type, Last_Type), !,
 	append_types(Pred_Name, Pred_Arity, Pred_Type_In, PTL_In, PTL_Out).
-append_types(Pred_Name, Pred_Arity, Pred_Type_In, [_Pred_Type|_PTL_In], _PTL_Out) :-
-	print_msg('error', 'You can not define different types for the same predicate. (Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type_In)), !, fail. 
+append_types(Pred_Name, Pred_Arity, Pred_Type_In, [Pred_Type|_PTL_In], _PTL_Out) :-
+	print_msg('error', 'You can not define different types for the same predicate. (Pred_Name, Pred_Arity)', (Pred_Name, Pred_Arity)), 
+	print_msg('error', 'Previous type', Pred_Type),
+ 	print_msg('error', 'New        type', Pred_Type_In),
+	!, fail. 
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -392,14 +395,7 @@ translate((Head :# (Lower_Bound, List, Upper_Bound)), Cls) :-
 
 % Predicate type(s) definition (Class = database).
 translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), Cls):- !,
-	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
-	print_msg('debug', 'rfuzzy_db_description(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
-	translate_db_description(Description, 1, Pred_Arity, Pred_Type, DB_Fields),
-	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, ['database'], Cls_1),
-	translate_db_fields(DB_Fields, 1, Pred_Arity, Pred_Name, Cls_2),
-	print_msg('debug', 'rfuzzy_db_description :: Cls_1', Cls_1),
-	print_msg('debug', 'rfuzzy_db_description :: Cls_2', Cls_2),
-	append_local(Cls_1, Cls_2, Cls).
+	translate_rfuzzy_define_database(Pred_Name, Pred_Arity, Description, Cls).
 
 % Predicate type(s) definition (Class \== database).
 translate(rfuzzy_type_for(Pseudo_Class, Pred_Name/Pred_Arity, Pred_Type), Cls):-
@@ -618,8 +614,20 @@ translate(Other, Other) :-
 		Pred_Name \== 'fuzzify'
 	    )
 	),
+	generate_fake_type(Pred_Arity, Pred_Type),
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, _IsNew)
-	save_predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, [], _IsNew).
+	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], _IsNew).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+generate_fake_type(0, []) :- !.
+generate_fake_type(1, [_Any]) :- !.
+generate_fake_type(N, [_Any|More]) :-
+	N > 1,
+	NewN is N - 1,
+	generate_fake_type(NewN, More).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -777,49 +785,38 @@ translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Pred_More
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% translate_db_description(Description, Index, Max_Index, Types, DB_Fields) 
-translate_db_description([(Field_Name, Field_Type)], Index, Index, [Field_Type], [Field_Name]) :- nonvar(Index), !.
-translate_db_description([(Field_Name, Field_Type) | Description], Index, Max_Index, [Field_Type|Types], [Field_Name|DB_Fields]) :-
-	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
-	New_Index is Index + 1,
-	translate_db_description(Description, New_Index, Max_Index, Types, DB_Fields).
-% translate_db_fields(DB_Fields, Index, Max_Index, DB_Pred_Name, Cls) 
-translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name, Cls) :- 
-	print_msg('debug', 'translate_db_fields([Pred_Name], Index, Index, DB_Pred_Name)', ([Pred_Name], Index, Index, DB_Pred_Name)),
-	nonvar(Index), !,
-	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cls).
-translate_db_fields([Pred_Name|DB_Fields], Index, Max_Index, DB_Pred_Name, Cls) :-
-	print_msg('debug', 'translate_db_fields([Pred_Name], Index, Max_Index, DB_Pred_Name)', ([Pred_Name], Index, Max_Index, DB_Pred_Name)),
-	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
-	New_Index is Index + 1,
-	translate_rfuzzy_db_value_for(Pred_Name, DB_Pred_Name, Index, Cls_1),
-	translate_db_fields(DB_Fields, New_Index, Max_Index, DB_Pred_Name, Cls_2),
+translate_rfuzzy_define_database(Pred_Name, Pred_Arity, Description, Cls) :-
+	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
+	print_msg('debug', 'rfuzzy_define_database(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
+	translate_db_description(Description, 1, Pred_Name, Pred_Arity, Pred_Type, DB_Fields, Cls_2),
+	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, ['database'], Cls_1),
+	print_msg('debug', 'rfuzzy_define_database :: Cls_1', Cls_1),
+	print_msg('debug', 'rfuzzy_define_database :: Cls_2', Cls_2),
 	append_local(Cls_1, Cls_2, Cls).
 
-translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position, [Cl | Cls]) :-
-	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position)', (Pred_Name, Database_Pred_Name, Position)),
-	nonvar(Pred_Name), nonvar(Database_Pred_Name), nonvar(Position), 
-	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error)
-	retrieve_predicate_info(Database_Pred_Name, Database_Pred_Arity, Database_Pred_Type, _List, 'true'), !,
-	print_msg('debug', 'translate_rfuzzy_db_value_for(Database_Pred_Arity, Database_Pred_Type)', (Database_Pred_Arity, Database_Pred_Type)),	
-	(
-	    (	nonvar(Database_Pred_Arity), nonvar(Database_Pred_Type), !     )
-	;
-	    (	print_msg('error', 'You must define the database type before. Database', Database_Pred_Name), !, fail     )
-	),
-	Position =< Database_Pred_Arity, 
-	get_nth_element_from_list(Position, Database_Pred_Type, Type),
-	print_msg('debug', 'translate_rfuzzy_db_value_for(Position, Type, Pred_Name)', (Position, Type, Pred_Name)),
+% translate_db_description(Description, Index, DB_Pred_Name, DB_Pred_Arity, Types, DB_Fields) 
+translate_db_description([(Field_Name, Field_Type)], Index, DB_Pred_Name, DB_Pred_Arity, [Field_Type], Cls) :- 
+	nonvar(Index), !,
+	translate_field_description(Field_Name, Field_Type, DB_Pred_Name, DB_Pred_Arity, Index, Cls).
+translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_Pred_Name, DB_Pred_Arity, [Field_Type|Types], Cls) :-
+	nonvar(Index), nonvar(Max_Index), Index < Max_Index, !,
+	translate_field_description(Field_Name, Field_Type, DB_Pred_Name, DB_Pred_Arity, Index, Cls_1),
+	New_Index is Index + 1,
+	translate_db_description(Description, New_Index, Max_Index, Types, DB_Fields, Cls_2),
+	append_local(Cls_1, Cls_2, Cls).
 
-	functor(DB_Pred_Functor, Database_Pred_Name, Database_Pred_Arity),
-	arg(Position, DB_Pred_Functor, Value),
+translate_field_description(Field_Name, Field_Type_2, DB_Pred_Name, DB_Pred_Arity, Index, [Cl | Cls]) :-
+	nonvar(Field_Name), nonvar(Field_Type_2), nonvar(DB_Pred_Name), nonvar(DB_Pred_Arity), nonvar(Index),
+
+	functor(DB_Pred_Functor, DB_Pred_Name, DB_Pred_Arity),
+	arg(Index, DB_Pred_Functor, Value),
 	functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
 	functor(Test, '\\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
 
-	Pred_Type = [Database_Pred_Name, Type],
-	print_msg('debug', 'translate_rfuzzy_db_value_for(Pred_Name, Pred_Type)', (Pred_Name, Pred_Type)),
+	Pred_Type = [Database_Pred_Name, Field_Type],
+	print_msg('debug', 'translate_rfuzzy_db_value_for(Field_Name, Pred_Type)', (Pred_Name, Pred_Type)),
 	(
-	    (	translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, Cls), !    )
+	    (	translate_rfuzzy_db_value_aux(Field_Type, Field_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, Cls), !    )
 	;
 	    (	print_msg('error', 'Error translating db definition for (Pred_Name, Pred_Type)', (Pred_Name, Pred_Type)), !, fail    )
 	),
@@ -829,7 +826,7 @@ translate_rfuzzy_db_value_for(Pred_Name, Database_Pred_Name, Position, [Cl | Cls
 
 translate_rfuzzy_db_value_aux(Type, Pred_Name, Pred_Type, Input, Value, Pred_Functor, Conversion, Cls) :-
 	
-		nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_truth_value_type'), !, 
+	nonvar(Type), nonvar(Pred_Name), (Type = 'rfuzzy_truth_value_type'), !, 
 		Pred_Class = 'fuzzy_rule_db_value', Pred_Arity=1,
 		% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 		translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
