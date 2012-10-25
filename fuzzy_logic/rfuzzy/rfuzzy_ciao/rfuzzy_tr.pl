@@ -30,14 +30,14 @@ translation_info('crisp_rule_type',      0, -1, "rfuzzy_crisp_rule_type_").
 translation_info('fuzzy_rule_type',     2, -1, "rfuzzy_fuzzy_rule_type_").
 
 % For fuzzy rules
-translation_info('fuzzy_rule_default_without_cond',   2, 0,        "rfuzzy_fuzzy_rule_default_without_cond_").
-translation_info('fuzzy_rule_default_with_cond',        2, 0.25,   "rfuzzy_fuzzy_rule_default_with_cond_"). 
-translation_info('fuzzy_rule_rule',                                2, 0.5,     "rfuzzy_fuzzy_rule_rule_").
-translation_info('fuzzy_rule_fuzzification',                  2, 0.75,   "rfuzzy_fuzzy_rule_fuzzification_").
-translation_info('fuzzy_rule_db_value',                       2, 0.9,     "rfuzzy_fuzzy_rule_db_value_").
-translation_info('fuzzy_rule_fact',                                2, 1,        "rfuzzy_fuzzy_rule_fact_").
-translation_info('fuzzy_rule_synonym',                        2, -1,       "rfuzzy_fuzzy_rule_sinonym_").
-translation_info('fuzzy_rule_antonym',                        2, -1,       "rfuzzy_fuzzy_rule_antonym_").
+translation_info('fuzzy_rule_default_without_cond',   2, 0,        "rfuzzy_aux_").
+translation_info('fuzzy_rule_default_with_cond',        2, 0.25,   "rfuzzy_aux_"). 
+translation_info('fuzzy_rule_rule',                                2, 0.5,     "rfuzzy_aux_").
+translation_info('fuzzy_rule_fuzzification',                  2, 0.75,   "rfuzzy_aux_").
+translation_info('fuzzy_rule_db_value',                       2, 0.9,     "rfuzzy_aux_").
+translation_info('fuzzy_rule_fact',                                2, 1,        "rfuzzy_aux_").
+translation_info('fuzzy_rule_synonym',                        2, -1,       "rfuzzy_aux_").
+translation_info('fuzzy_rule_antonym',                        2, -1,       "rfuzzy_aux_").
 %translation_info('non_rfuzzy_fuzzy_rule', 0, -1,         "non_rfuzzy_fuzzy_rule").
 
 % This produces unexpected results.
@@ -303,26 +303,40 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 
 % Unconditional default
-translate((rfuzzy_default_value_for(Pred_Name, Fixed_Truth_Value)), Cls) :- 
+translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value)), Cls) :- 
 	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Name, Truth_Value) ', (Pred_Name, Fixed_Truth_Value)),
 	!, % If patter matching, backtracking forbiden.
-	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), nonvar(Pred_Name), 
+	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), nonvar(Pred_Functor), 
+	functor(Pred_Functor, Pred_Arity, Pred_Name), Pred_Arity = 1,
+	arg(1, Pred_Functor, Type_1_Functor), nonvar(Type_1_Functor),
+	functor(Type_1_Functor, 0, Type_1_Name)
 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error),
-	retrieve_predicate_info(Pred_Name, Tmp_Pred_Arity, Pred_Type, _MI, _NHB, 'true'),
-	Pred_Arity is Tmp_Pred_Arity - 1,
+	retrieve_predicate_info(Type_1_Name, Type_1_Arity, _Type_1_Type, _MI, _NHB, 'true'),
 
 	Pred_Class = 'fuzzy_rule_default_without_cond',
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
 	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
-	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value),
+	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, New_Pred_Functor, Truth_Value),
 
-	generate_truth_value_equal_to_functor(Fixed_Truth_Value, Truth_Value, Truth_Value_Functor),
-	Cls = (Pred_Functor :- Truth_Value_Functor),
+	(
+	    translate_rfuzzy_default_value_condition(Condition, Condition_Aux)
+	;
+	    translate_rfuzzy_default_value_thershold(Thershold, Condition_Aux)
+	;
+	    Condition_Aux = 'true'
+	),
+
+	arg(1, New_Pred_Functor, Argument),
+	generate_check_types_subgoal(Type_1_Name, Type_1_Arity, Argument, Check_Types_SubGoal),
+	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal),
+	Cls_1 = [(Pred_Functor :- Check_Types_SubGoal, Assign_Truth_Value_SubGoal, Condition_Aux)],
 	print_msg('debug', 'translate :: Cls ', Cls),
+
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, 'no', _Cls_Unused),
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, 'no', Cls_2),
+	append(Cls_1, Cls_2, Cls)
 	!. % Backtracking forbidden.
 
 % Conditional default
