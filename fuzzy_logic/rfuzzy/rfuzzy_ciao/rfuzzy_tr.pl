@@ -54,40 +54,51 @@ save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Clas
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, 'fuzzy_rule', Real_Pred_Name, Real_Pred_Arity),
 
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew)
+	save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, Pred_Type, [Pred_Class], IsNew),
 
-
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)
-	save_predicate_definition(Real_Pred_Name, Real_Pred_Arity, _Not_Yet_Pred_Type, More_Info, 'true'),
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-save_predicates_definition_list([], _Pred_Arity, _Pred_Type, _More_Info, _Needs_Head_Building) :- !.
-save_predicates_definition_list([Pred_Name | Pred_List], Pred_Arity, Pred_Type, More_Info, Needs_Head_Building) :-
-	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building), !,
-	save_predicates_definition_list(Pred_List, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building).
-
-save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building) :-
-	print_msg('debug', 'save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)', (Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building)),
-	check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type),
 	(
-	    (	 
-		list(More_Info),
-		retract_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Old_More_Info, Old_Needs_Head_Building)), !, % Retract last
-		print_msg('debug', 'save_predicate_definition :: current', (Pred_Name, Pred_Arity, Pred_Type, Old_More_Info, Old_Needs_Head_Building)),
-		append_local(More_Info, Old_More_Info, New_More_Info),
-		boolean_or(Old_Needs_Head_Building, Needs_Head_Building, New_Needs_Head_Building)
+	    (
+		IsNew = 'true', !,
+		generate_main_functor(Pred_Name, Pred_Arity, Cls)
 	    )
 	;
 	    (
-		list(More_Info),
+		IsNew \== 'true', !,
+		Cls = []
+	    )
+	), !,
+	print_msg('debug', 'save_fuzzy_rule_predicate_definition(Cls)', Cls).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+save_predicates_definition_list([], _Pred_Arity, _Pred_Type, _More_Info) :- !.
+save_predicates_definition_list([Pred_Name | Pred_List], Pred_Arity, Pred_Type, More_Info) :-
+	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info), !,
+	save_predicates_definition_list(Pred_List, Pred_Arity, Pred_Type, More_Info).
+
+save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew) :-
+	print_msg('debug', 'save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info)', (Pred_Name, Pred_Arity, Pred_Type, More_Info)),
+	check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Info),
+	(
+	    (	 
+		retract_fact(predicate_definition(Pred_Name, Pred_Arity, Old_Pred_Type, Old_More_Info)), !, % Retract last
+		print_msg('debug', 'save_predicate_definition :: current', (Pred_Name, Pred_Arity, Old_Pred_Type, Old_More_Info)),
+		append_local(More_Info, Old_More_Info, New_More_Info),
+		append_types(Pred_Arity, Pred_Type, Old_Pred_Type, New_Pred_Type),
+		IsNew = 'false'
+	    )
+	;
+	    (
+		New_Pred_Type = Pred_Type,
 		New_More_Info = More_Info, 
-		New_Needs_Head_Building = Needs_Head_Building
+		IsNew = 'true'
 	    )
 	), 
-	assertz_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)),
-	print_msg('debug', 'saved', save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)),
+	assertz_fact(predicate_definition(Pred_Name, Pred_Arity, New_Pred_Type, New_More_Info)),
+	print_msg('debug', 'saved', save_predicate_definition(Pred_Name, Pred_Arity, New_Pred_Type, New_More_Info)),
 	!.
 
 retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Needs_Head_Building, Show_Error) :-
@@ -115,44 +126,70 @@ retrieve_all_predicate_infos(Retrieved) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 	
-check_save_predicate_definition_input(Pred_Name, Pred_Arity, _Pred_Type) :-
+check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type, More_Info) :-
 	( 
-	    (
-		var(Pred_Name), 
-		print_msg('error', 'save_predicate_definition: Pred_Name cannot be a variable. Value', Pred_Name)
-	    )
-	; 
-	    (
-		var(Pred_Arity),
-		print_msg('error', 'save_predicate_definition: Pred_Arity cannot be a variable. Value', Pred_Arity)
+	    (	nonvar(Pred_Name), !    )
+	;
+	    (	var(Pred_Name), 
+		print_msg('error', 'save_predicate_definition: Pred_Name cannot be a variable. Value', Pred_Name), !, fail
 	    )
 	),
-	!, fail.
-
-check_save_predicate_definition_input(Pred_Name, Pred_Arity, Pred_Type) :-
-	nonvar(Pred_Arity), nonvar(Pred_Name), number(Pred_Arity), 
+	( 
+	    (	nonvar(Pred_Arity), number(Pred_Arity), !	)
+	;
+	    (   nonvar(Pred_Arity),
+		print_msg('error', 'save_predicate_definition: Pred_Arity must be a number. Value', Pred_Arity), !, fail
+	    )
+	; 
+	    (	var(Pred_Arity), 
+		print_msg('error', 'save_predicate_definition: Pred_Arity cannot be a variable. Value', Pred_Arity), !, fail
+	    )
+	),
 	(
-	    (
-		var(Pred_Type), !
+	    (	nonvar(Pred_Type), list(Pred_Type), !    )
+	;
+	    (	nonvar(Pred_Type),
+		print_msg('error', 'save_predicate_definition: Pred_Type must be a list. Value', Pred_Type), !, fail
 	    )
 	;
+	    (	var(Pred_Type),
+		print_msg('error', 'save_predicate_definition: Pred_Type cannot be a variable. Value', Pred_Type), !, fail
+	    )
+	),
+	(
+	    (	nonvar(More_Info), list(More_Info), !    )
+	;
+	    (   nonvar(More_Info),
+		print_msg('error', 'save_predicate_definition: More_Info must be a list. Value', More_Info), !, fail
+	    )
+	;
+	    (	var(More_Info),
+		print_msg('error', 'save_predicate_definition: More_Info cannot be a variable. Value', More_Info), !, fail
+	    )
+	),
+	(
 	    (
-		nonvar(Pred_Type), 
 		check_pred_type_aux(Pred_Arity, Pred_Type), !
 	    )
 	;
 	    (
-		nonvar(Pred_Type),
 		print_msg('error', 'Types in type definition do not sum up the arity value. (Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)), 
 		!, fail
 	    )
-	).
+	), !.
 
 check_pred_type_aux(1, [_Pred_Type]) :- !.
 check_pred_type_aux(Pred_Arity, [_Pred_Type|More]) :-
 	New_Pred_Arity is Pred_Arity -1,
 	check_pred_type_aux(New_Pred_Arity, More).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 	
+append_types(Pred_Arity, Pred_Type, Old_Pred_Type, New_Pred_Type) :-
+
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
