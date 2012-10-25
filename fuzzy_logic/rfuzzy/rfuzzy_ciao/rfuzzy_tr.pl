@@ -323,15 +323,14 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 
 % Unconditional default
-translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value)), Cls) :- 
-	translate_rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, _No_Condition, _No_Thershold, Cls).
+translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value)), Cls) :- !,
+	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) ', (Pred_Functor, Fixed_Truth_Value)),
+	translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, _No_Condition_or_Thershold, Cls).
 
-% Conditional default
-translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) if Condition), Cls) :-
-	translate_rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, Condition, _No_Thershold, Cls).
-
-translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) if Thershold), Cls) :-
-	translate_rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, _No_Condition, Thershold, Cls).
+% Conditional default (for condition or thershold).
+translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) if Condition_or_Thershold), Cls) :- !,
+	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold) ', (Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold)),
+	translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold, Cls).
 
 % Fuzzy facts.
 translate((Head value Fixed_Truth_Value), (Pred_Functor :- Assign_Truth_Value_SubGoal)):-
@@ -649,23 +648,34 @@ generate_fake_type(N, [_Any|More]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, Condition, Thershold, Cls) :-
-	print_msg('debug', 'translate :: rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, Condition, Thershold) ', (Pred_Name, Truth_Value)),
+translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold, Cls) :-
+	print_msg('debug', 'rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold) ', (Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold)),
 	!, % If patter matching, backtracking forbiden.
-	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), nonvar(Pred_Functor), 
-	functor(Pred_Functor, Pred_Arity, Pred_Name), Pred_Arity = 1,
-	arg(1, Pred_Functor, Type_1_Functor), nonvar(Type_1_Functor),
-	functor(Type_1_Functor, 0, Type_1_Name),
+	(
+	    (	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), !   )
+	;
+	    (   print_msg('error', 'The truth value must be a number. Value', Fixed_Truth_Value), !, fail   )
+	),
+	(
+	    (
+		print_msg('debug', 'Predicate value', Pred_Functor),
+		nonvar(Pred_Functor), 
+		functor(Pred_Functor, Pred_Name, Pred_Arity), Pred_Arity = 1,
+		arg(1, Pred_Functor, Type_1_Functor), 
+		nonvar(Type_1_Functor),
+		functor(Type_1_Functor, Type_1_Name, 0), !
+	    )
+	;
+	    (   print_msg('error', 'The predicate has an incorrect format. Value', Pred_Functor), !, fail   )
+	),
 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error),
 	retrieve_predicate_info(Type_1_Name, Type_1_Arity, _Type_1_Type, _MI, 'true'),
 
 	(
-	    (	var(Condition), var(Thershold), Pred_Class = 'fuzzy_rule_default_without_cond'   )
+	    (	var(Condition_or_Thershold), Pred_Class = 'fuzzy_rule_default_without_cond'   )
 	;
-	    (	nonvar(Condition), var(Thershold), Pred_Class = 'fuzzy_rule_default_with_cond'   )
-	;
-	    (	var(Condition), nonvar(Thershold), Pred_Class = 'fuzzy_rule_default_with_cond'   )
+	    (	nonvar(Condition_or_Thershold), Pred_Class = 'fuzzy_rule_default_with_cond'   )
 	),
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
@@ -674,12 +684,11 @@ translate_rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, Condition, T
 	arg(1, New_Pred_Functor, Argument),
 
 	(
-	    translate_rfuzzy_default_value_condition(Condition, Type_1_Name, Argument, Condition_Aux)
-	;
-	    translate_rfuzzy_default_value_thershold(Thershold, Type_1_Name, Argument, Condition_Aux)
+	    translate_rfuzzy_default_value_aux(Condition_or_Thershold, Type_1_Name, Argument, Condition_Aux)
 	;
 	    Condition_Aux = 'true'
 	),
+	print_msg('debug', 'translate :: Condition_Aux', Condition_Aux),
 
 	generate_check_types_subgoal(Type_1_Name, Type_1_Arity, Argument, Check_Types_SubGoal),
 	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal),
@@ -696,28 +705,11 @@ translate_rfuzzy_default_value_aux(Pred_Functor, Fixed_Truth_Value, Condition, T
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_rfuzzy_default_value_condition(Condition, Type_1_Name, Argument, Condition_Aux) :-
-	nonvar(Condition),
-	print_msg('debug', 'Condition', Condition),
-
-	functor(Condition, Condition_Name, 1), 
-	arg(1, Condition, Type_1_Functor), 
-	functor(Type_1_Functor, Type_1_Name, 0),
-
-	Condition_Arity = 1,
-	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error),
-	retrieve_predicate_info(Condition_Name, Condition_Arity, Condition_Type, _MI, 'true'),
-	nonvar(Condition_Type), Condition_Type = [ Type_1_Name ],
-
-	functor(Condition_Aux, Condition_Name, Condition_Arity),
-	arg(1, Condition_Aux, Argument),
-	print_msg('debug', 'Condition_Aux', Condition_Aux).
-
-translate_rfuzzy_default_value_thershold(Thershold, Type_1_Name, Argument, Condition_Aux) :-
+translate_rfuzzy_default_value_aux(Thershold, Type_1_Name, Argument, Condition_Aux) :-
 	nonvar(Thershold), 
 	print_msg('debug', 'Thershold', Thershold),
 
-	Thershold = thershold(Pred2_Functor, Cond, Thershold_Truth_Value),
+	Thershold = thershold(Pred2_Functor, Cond, Thershold_Truth_Value), !,
 	functor(Pred2_Functor, Pred2_Name, Pred2_Arity), Pred2_Arity = 1,
 	arg(1, Pred2_Functor, Type_1_Functor), 
 	functor(Type_1_Functor, Type_1_Name, 0),
@@ -748,6 +740,23 @@ translate_rfuzzy_default_value_thershold(Thershold, Type_1_Name, Argument, Condi
 	    )
 	), 
 	Condition_Aux = (New_Pred2_Functor, Pred3_Functor),
+	print_msg('debug', 'Condition_Aux', Condition_Aux).
+
+translate_rfuzzy_default_value_aux(Condition, Type_1_Name, Argument, Condition_Aux) :-
+	nonvar(Condition),
+	print_msg('debug', 'Condition', Condition),
+
+	functor(Condition, Condition_Name, 1), 
+	arg(1, Condition, Type_1_Functor), 
+	functor(Type_1_Functor, Type_1_Name, 0),
+
+	Condition_Arity = 1,
+	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error),
+	retrieve_predicate_info(Condition_Name, Condition_Arity, Condition_Type, _MI, 'true'),
+	nonvar(Condition_Type), Condition_Type = [ Type_1_Name ],
+
+	functor(Condition_Aux, Condition_Name, Condition_Arity),
+	arg(1, Condition_Aux, Argument),
 	print_msg('debug', 'Condition_Aux', Condition_Aux).
 
 % ------------------------------------------------------
