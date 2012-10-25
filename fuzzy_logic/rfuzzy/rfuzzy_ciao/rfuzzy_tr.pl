@@ -89,13 +89,13 @@ fuzzy_rule_generate_main_functor(Pred_Name, Pred_Arity, Cls) :-
 	arg(Real_Pred_Arity, Real_Pred_Functor, Truth_Value),
 	arg(Aux_Pred_Arity, Aux_Pred_Functor, Truth_Value),
 	
-	Cls = (
-		  Real_Pred_Functor :- (
-					   print_msg('debug', 'Predicate called', Real_Pred_Functor),
-					   findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
-					   supreme(Results, Real_Pred_Functor)
-				       )
-	      ), !.
+	Cls = [(
+		   Real_Pred_Functor :- (
+					    print_msg('debug', 'Predicate called', Real_Pred_Functor),
+					    findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
+					    supreme(Results, Real_Pred_Functor)
+					)
+	       )], !.
 
 
 % ------------------------------------------------------
@@ -693,12 +693,13 @@ translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or
 	generate_check_types_subgoal(Type_1_Name, Type_1_Arity, Argument, Check_Types_SubGoal),
 	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal),
 	print_msg('debug', 'rfuzzy_default_value_for :: Assign_Truth_Value_SubGoal', Assign_Truth_Value_SubGoal),
-	Cls_1 = [(New_Pred_Functor :- Check_Types_SubGoal, Assign_Truth_Value_SubGoal, Condition_Aux)],
-	print_msg('debug', 'rfuzzy_default_value_for :: Cls ', Cls),
+	Cls_2 = [(New_Pred_Functor :- Check_Types_SubGoal, Assign_Truth_Value_SubGoal, Condition_Aux)],
+	print_msg('debug', 'rfuzzy_default_value_for :: Cls_2 ', Cls_2),
 
 	Pred_Type = [   Type_1_Name   ],
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_2),
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_1),
+	print_msg('debug', 'rfuzzy_default_value_for :: Cls_1 ', Cls_1),
 	append_local(Cls_1, Cls_2, Cls),
 	!. % Backtracking forbidden.
 
