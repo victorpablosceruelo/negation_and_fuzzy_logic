@@ -658,7 +658,7 @@ translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or
 	),
 	(
 	    (
-		print_msg('debug', 'Predicate value', Pred_Functor),
+		print_msg('debug', 'rfuzzy_default_value_for: Predicate value', Pred_Functor),
 		nonvar(Pred_Functor), 
 		functor(Pred_Functor, Pred_Name, Pred_Arity), Pred_Arity = 1,
 		arg(1, Pred_Functor, Type_1_Functor), 
@@ -688,12 +688,13 @@ translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or
 	;
 	    Condition_Aux = 'true'
 	),
-	print_msg('debug', 'translate :: Condition_Aux', Condition_Aux),
+	print_msg('debug', 'rfuzzy_default_value_for :: Condition_Aux', Condition_Aux),
 
 	generate_check_types_subgoal(Type_1_Name, Type_1_Arity, Argument, Check_Types_SubGoal),
 	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal),
-	Cls_1 = [(Pred_Functor :- Check_Types_SubGoal, Assign_Truth_Value_SubGoal, Condition_Aux)],
-	print_msg('debug', 'translate :: Cls ', Cls),
+	print_msg('debug', 'rfuzzy_default_value_for :: Assign_Truth_Value_SubGoal', Assign_Truth_Value_SubGoal),
+	Cls_1 = [(New_Pred_Functor :- Check_Types_SubGoal, Assign_Truth_Value_SubGoal, Condition_Aux)],
+	print_msg('debug', 'rfuzzy_default_value_for :: Cls ', Cls),
 
 	Pred_Type = [   Type_1_Name   ],
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls)
@@ -764,13 +765,15 @@ translate_rfuzzy_default_value_aux(Condition, Type_1_Name, Argument, Condition_A
 % ------------------------------------------------------
 
 generate_check_types_subgoal(Type_1_Name, Type_1_Arity, Argument, Check_Types_SubGoal) :-
+	print_msg('debug', 'generate_check_types_subgoal(Type_1_Name, Type_1_Arity, Argument)', (Type_1_Name, Type_1_Arity, Argument)),
 	functor(Type_1_Functor, Type_1_Name, Type_1_Arity),
 	Check_Types_SubGoal = (Type_1_Functor, (Argument = Type_1_Functor)).
 
 generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal) :-
+	print_msg('debug', 'generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value)', (Fixed_Truth_Value, Truth_Value)),
 	functor(Assign_Truth_Value_SubGoal, '.=.', 2),
-	arg(1, Truth_Value_Functor, Truth_Value),
-	arg(2, Truth_Value_Functor, Fixed_Truth_Value), !.
+	arg(1, Assign_Truth_Value_SubGoal, Truth_Value),
+	arg(2, Assign_Truth_Value_SubGoal, Fixed_Truth_Value), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
