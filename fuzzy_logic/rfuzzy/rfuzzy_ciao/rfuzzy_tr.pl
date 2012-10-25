@@ -432,42 +432,40 @@ translate((Head :~ Body), Translation):-
 	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
 	translate_rule(Head, 'prod', 1, Body, Translation).
 
-translate(rfuzzy_synonym(Pred2_Name, Pred_Name, Cred_Op, Cred), Cls):-
+translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
 	!,
-	print_msg('debug', 'translate(rfuzzy_synonym(Pred2_Name, Pred_Name, Cred_Op, Cred))) ', rfuzzy_synonym(Pred2_Name, Pred_Name, Cred_Op, Cred)),
-	nonvar(Pred2_Name), nonvar(Pred_Name), nonvar(Cred_Op), nonvar(Cred), number(Cred),
+	print_msg('debug', 'translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred))) ', rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred)),
+	nonvar(Pred2_Functor), nonvar(Pred_Functor), nonvar(Cred_Op), nonvar(Cred), number(Cred),
 	test_aggregator_is_defined(Cred_Op, 'true'),
+	functor(Pred2_Functor, Pred2_Name, 1), arg(1, Pred2_Functor, Type_Functor_1), nonvar(Type_Functor_1),
+	functor(Pred_Functor, Pred_Name, 1), arg(1, Pred_Functor, Type_Functor_2), nonvar(Type_Functor_2),
+	functor(Type_Functor_1, Type_Name, 0), functor(Type_Functor_2, Type_Name, 0), 
 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error),
 	retrieve_predicate_info(Pred2_Name, Pred2_Arity, Pred2_Type, _MI_2, 'true'),
 	( 
-	    (
-		nonvar(Pred2_Arity), nonvar(Pred2_Type), !
-	    )
+	    (	memberchk_local([Type_Name, _Unused_Type_Name], Pred2_Type), !    )
 	;
-	    (
-		print_msg('error', 'You must define the type for the predicate', Pred2_Name), !, fail
-	    )
+	    (	print_msg('error', 'The type is not correctly defined for the predicate', Pred2_Name), !, fail    )
 	),
 
 	Pred_Class = 'fuzzy_rule_synonym', Pred_Arity is Pred2_Arity - 1,
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity),
 	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
-	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, Pred_Functor, Truth_Value_Out),
+	predicate_to_functor(New_Pred_Name, New_Pred_Arity, Pred_Class, New_Pred_Functor, Truth_Value_Out),
+	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, New_Pred_Name, New_Pred_Arity).
+	translate_predicate(Pred2_Name, Pred_Arity, Pred_Class, New_Pred2_Name, New_Pred2_Arity),
+	% predicate_to_functor(Pred_Name, Pred_Arity, Pred_Class, Pred_Functor, Truth_Value).
+	predicate_to_functor(New_Pred2_Name, New_Pred2_Arity, Pred_Class, New_Pred2_Functor, Truth_Value_In),
 
+	copy_args(Pred2_Arity, New_Pred_Functor, New_Pred2_Functor),
 	functor(Credibility_Functor, Cred_Op, 3), 
 	Credibility_Functor=..[Cred_Op, Truth_Value_In, Cred, Truth_Value_Out],
 
-	add_preffix_to_name(Pred2_Name, "rfuzzy_aux_", Pred2_Name_Aux),
-	functor(Pred2_Functor_Aux, Pred2_Name_Aux, New_Pred_Arity),
-	copy_args(Pred2_Arity, Pred_Functor, Pred2_Functor_Aux),
-	arg(New_Pred_Arity, Pred2_Functor_Aux, Truth_Value_In),
-
-	Cl = (Pred_Functor :- Pred2_Functor_Aux, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
-	append_local(Pred_Type, ['rfuzzy_truth_value_type'], Pred2_Type),
+	Cl = (New_Pred_Functor :- New_Pred2_Functor, Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1)),
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls)
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Cls_Aux),
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [Type_Name], Pred_Class, Cls_Aux),
 	Cls = [ Cl | Cls_Aux ], 
 	!.
 
@@ -969,9 +967,10 @@ test_aggregator_is_defined(Pred_Name, Show_Error) :-
 	nonvar(Pred_Name),
 	Pred_Arity = 3,
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, More_Info, Show_Error),
-	retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, _MI, Show_Error),
-	nonvar(Pred_Type), 
-	Pred_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'].
+	retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, _MI, Show_Error), !,
+	nonvar(Pred_Type),
+	Expected_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
+	memberchk_local(Expected_Type, Pred_Type).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
