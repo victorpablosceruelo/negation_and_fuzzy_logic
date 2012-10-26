@@ -26,19 +26,19 @@ translation_info('quantifier',                1, -1, '').
 translation_info('crisp_rule',               0, -1, '').
 translation_info('fuzzy_rule',              1, -1, '').
 
-translation_info('crisp_rule_type',      0, -1, 'rfuzzy_crisp_rule_type_').
-translation_info('fuzzy_rule_type',     2, -1, 'rfuzzy_fuzzy_rule_type_').
+translation_info('crisp_rule_type',      0, -1, 'rfuzzy_crisp_rule_type').
+translation_info('fuzzy_rule_type',     2, -1, 'rfuzzy_fuzzy_rule_type').
 
 % For fuzzy rules
-translation_info('fuzzy_rule_default_without_cond',   2, 0,        'rfuzzy_aux_').
-translation_info('fuzzy_rule_default_with_cond',        2, 0.25,   'rfuzzy_aux_'). 
-translation_info('fuzzy_rule_rule',                                2, 0.5,     'rfuzzy_aux_').
-translation_info('fuzzy_rule_fuzzification',                  2, 0.75,   'rfuzzy_aux_').
-translation_info('fuzzy_rule_db_value',                       2, 0.9,     'rfuzzy_aux_').
-translation_info('fuzzy_rule_fact',                                2, 1,        'rfuzzy_aux_').
-translation_info('fuzzy_rule_synonym',                        2, -1,       'rfuzzy_aux_').
-translation_info('fuzzy_rule_antonym',                        2, -1,       'rfuzzy_aux_').
-translation_info('fuzzy_rule_aux',                                2, -1,       'rfuzzy_aux_').
+translation_info('fuzzy_rule_default_without_cond',   2, 0,        'rfuzzy_aux').
+translation_info('fuzzy_rule_default_with_cond',        2, 0.25,   'rfuzzy_aux'). 
+translation_info('fuzzy_rule_rule',                                2, 0.5,     'rfuzzy_aux').
+translation_info('fuzzy_rule_fuzzification',                  2, 0.75,   'rfuzzy_aux').
+translation_info('fuzzy_rule_db_value',                       2, 0.9,     'rfuzzy_aux').
+translation_info('fuzzy_rule_fact',                                2, 1,        'rfuzzy_aux').
+translation_info('fuzzy_rule_synonym',                        2, -1,       'rfuzzy_aux').
+translation_info('fuzzy_rule_antonym',                        2, -1,       'rfuzzy_aux').
+translation_info('fuzzy_rule_aux',                                2, -1,       'rfuzzy_aux').
 %translation_info('non_rfuzzy_fuzzy_rule', 0, -1,         'non_rfuzzy_fuzzy_rule').
 
 % This produces unexpected results.
@@ -1188,13 +1188,13 @@ build_auxiliary_clauses_aux([Selector | Selectors], Pred_Name, Pred_Arity, [Cl |
 	arg(Pred_Arity, Pred_Functor, Truth_Value),
 	arg(Aux_Pred_Arity, Aux_Pred_Functor, Truth_Value),
 	
-	Cl = [(
-		  Pred_Functor :- (
-				      print_msg('debug', 'Predicate called', Pred_Functor),
-				      findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
-				      supreme(Results, Pred_Functor)
-				  )
-	      )], !.
+	Cl = (
+		 Pred_Functor :- (
+				     print_msg('debug', 'Predicate called', Pred_Functor),
+				     findall(Aux_Pred_Functor, Aux_Pred_Functor, Results), 
+				     supreme(Results, Pred_Functor)
+				 )
+	     ), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1312,8 +1312,9 @@ code_for_defined_quantifiers(Code_In, Code_Out) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_rfuzzy_compute(In, [Code | In]) :-
-	Code = (rfuzzy_compute(Operator, Elt1, Elt2, Truth_Value) :- 
+code_for_rfuzzy_compute(In, [Code_1, Code_2 | In]) :-
+	Code_1 = (rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred) :- fail),
+	Code_2 = (rfuzzy_compute(Operator, Elt1, Elt2, Truth_Value) :- 
 	       findall(rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
 	       rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
 	       Computed_Similarities),

@@ -1,4 +1,4 @@
-:- module(database,_,[rfuzzy, clpr]).
+:- module(database,_,[rfuzzy, pkgs_output_debug, clpr]).
 % or clpq. We can use clpr or clpq.
 % debug with pkgs_output_debug, 
 
@@ -83,7 +83,7 @@ test3(A, B, C) :- C .=. A + B.
 % TYPE DECLARATION
 rfuzzy_define_database(house/7, 
 	[(code, rfuzzy_enum_type), 
-	  (type, rfuzzy_enum_type), 
+	  (house_type, rfuzzy_enum_type), 
 	   (size, rfuzzy_integer_type),
 	    (rooms_number, rfuzzy_integer_type), 
 	     (price, rfuzzy_integer_type), 
@@ -180,7 +180,11 @@ rfuzzy_default_value_for(q3(house),0.5).
 q3(house):~ my_prod((close_to_beach(house), very_far_from_center(house))).
 
 rfuzzy_type_for(is_apartment/1, [house]).
-is_apartment(House) :- house_type(House, House_Type), House_Type = 'apartment'.
+is_apartment(House) :- 
+	house(T1, T2, T3, T4, T5, T6, T7), 
+	House = house(T1, T2, T3, T4, T5, T6, T7), 
+	house_type(House, House_Type), 
+	House_Type = 'apartment'.
 rfuzzy_default_value_for(q4(house), 0) if is_apartment(house).
 
 rfuzzy_default_value_for(q5(house),0.5).
