@@ -11,7 +11,7 @@
 		return firstCharacter + lastCharacters; 
 	}
 	
-	function addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoIndex) {
+	function addRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoIndex, typeIndex) {
 		
 		foundPredInfo = programIntrospectionArray[foundPredInfoIndex];
 		debug.info("foundPredInfo: "+foundPredInfo);
@@ -19,7 +19,7 @@
 		debug.info("foundPredInfo.predArity: "+foundPredInfo.predArity);
 		debug.info("foundPredInfo.predType: "+foundPredInfo.predType);
 		debug.info("foundPredInfo.predOtherInfo: "+foundPredInfo.predOtherInfo);
-		var foundPredInfoLastType = foundPredInfo.predType[foundPredInfo.predType.length -1];
+		var foundPredInfoLastType = foundPredInfo.predType[typeIndex][foundPredInfo.predType[typeIndex].length -1];
 		debug.info("foundPredInfoLastType: "+foundPredInfoLastType);
 		
 		var index = 0;
@@ -57,7 +57,7 @@
 		cell.innerHTML = html;	
 		
 	}
-	function addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoIndex) {
+	function addRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoIndex, typeIndex) {
 		foundPredInfo = programIntrospectionArray[foundPredInfoIndex];
 		
 		var row = document.getElementById(rowId);
@@ -67,14 +67,18 @@
 		var rfuzzyComputeArgumentId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
 		debug.info("foundPredType: "+foundPredInfo.predType[foundPredInfo.predType.length-1]);
 		var html = "";
-		if (foundPredInfo.predType[foundPredInfo.predType.length-1] == 'rfuzzy_enum_type') {
+		var type = foundPredInfo.predType[typeIndex];
+		
+		if (type[type.length-1] == 'rfuzzy_enum_type') {
 			html += "<select name=\'" + rfuzzyComputeArgumentId + "\'>";;
 			html += "<option name=\'----\' value=\'----\'>----</option>";
 			var values = foundPredInfo.predOtherInfo;
 			var valuesLength = values.length;
-			for (var i=0; i<valuesLength; i++) {
+			i = 0;
+			while (i<valuesLength) {
 				html+= "<option name=\'" + values[i] + "\' value=\'" + values[i] + "\'>" +
 				values[i] + "</option>";
+				i++;
 			}
 			html += "</select>";
 		}
@@ -85,15 +89,19 @@
 	}
 
 	
-	function isQuantifierPredicate(programIntrospectionElement) {
-		
+	function isQuantifierPredicate(index) {
+		var result = false;
+		var i = 0;
+		var programIntrospectionElement = programIntrospectionArray[index];
 		if ((programIntrospectionElement.predArity == 2) &&
 			(programIntrospectionElement.predType != "-variable-")){
-			var types = programIntrospectionElement.predType;
-				return ((types[0] == "rfuzzy_predicate_type") &&
-						(types[1] == "rfuzzy_truth_value_type"));
+			while (i<programIntrospectionElement.predType.lenght && ! result) 
+				var types = programIntrospectionElement.predType[i];
+				result = result || ((types[0] == "rfuzzy_predicate_type") &&
+						  			(types[1] == "rfuzzy_truth_value_type"));
+				i++;
 		}
-		else return false;
+		return result;
 	}
 	
 	function addQuantifier(queryLineGeneralId, rowId, quantifierIndex) {
@@ -105,7 +113,7 @@
 		var html = "<select name=\'" + quantifierId + "\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		for (var i=0; i<programIntrospectionArray.length; i++){
-			if (isQuantifierPredicate(programIntrospectionArray[i])) {
+			if (isQuantifierPredicate(i)) {
 				if (((quantifierIndex == 0) && (programIntrospectionArray[i].predName == "fnot")) ||
 						((quantifierIndex == 1) && (programIntrospectionArray[i].predName != "fnot"))) {
 					html += "<option name=\'" + programIntrospectionArray[i].predName + 
@@ -152,10 +160,10 @@
 		}
 		
 		if (foundPredInfo != null) {
-			var i = 0;
+			var typeIndex = 0;
 			var predType = null;
-			while ((i < foundPredInfo.predType.length) && (predType == null)) {
-				if (foundPredInfo.predType[i][0] == startupType) predType = foundPredInfo.predType[i];
+			while ((typeIndex < foundPredInfo.predType.length) && (predType == null)) {
+				if (foundPredInfo.predType[typeIndex][0] == startupType) predType = foundPredInfo.predType[typeIndex];
 				else i++;
 			}
 			if (predType[predType.length -1] == 'rfuzzy_truth_value_type') {
@@ -163,8 +171,8 @@
 				addQuantifier(queryLineGeneralId, rowId, 0);
 			}
 			else {
-				addRfuzzyComputeOperator(queryLineGeneralId, rowId, index);
-				addRfuzzyComputeArgument(queryLineGeneralId, rowId, index);
+				addRfuzzyComputeOperator(queryLineGeneralId, rowId, index, typeIndex);
+				addRfuzzyComputeArgument(queryLineGeneralId, rowId, index, typeIndex);
 			}
 		}
 	}

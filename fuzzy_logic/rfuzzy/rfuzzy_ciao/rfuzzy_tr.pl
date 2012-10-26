@@ -1232,7 +1232,7 @@ generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Resul
 generate_introspection_predicate_real(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info_List, _NHB), Cl) :-
 	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Pred_Type), 
 	Pred_Arity = 2,
-	Pred_Type = [_Whatever, 'rfuzzy_enum_type'], 
+	memberchk_local([_Whatever, 'rfuzzy_enum_type'], Pred_Type),
 	More_Info_List = [('rfuzzy_enum_type', Pred_Name, Pred_Arity)], !,
 
 	functor(Pred_Functor, Pred_Name, Pred_Arity),
