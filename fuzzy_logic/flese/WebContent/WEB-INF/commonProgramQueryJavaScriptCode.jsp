@@ -120,7 +120,7 @@
 		cell.innerHTML = html;	
 	}
 	
-	function changeInChooseRule(comboBox, queryLineGeneralId, rowId) {
+	function changeInChooseRule(comboBox, queryLineGeneralId, rowId, startupType) {
 		// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 		debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
@@ -152,7 +152,13 @@
 		}
 		
 		if (foundPredInfo != null) {
-			if (foundPredInfo.predType[foundPredInfo.predType.length -1] == 'rfuzzy_truth_value_type') {
+			var i = 0;
+			var predType = null;
+			while ((i < foundPredInfo.predType.length) && (predType == null)) {
+				if (foundPredInfo.predType[i][0] == startupType) predType = foundPredInfo.predType[i];
+				else i++;
+			}
+			if (predType[predType.length -1] == 'rfuzzy_truth_value_type') {
 				addQuantifier(queryLineGeneralId, rowId, 1);
 				addQuantifier(queryLineGeneralId, rowId, 0);
 			}
@@ -163,8 +169,8 @@
 		}
 	}
 	
-	function startupTypeIsValid(startupType, predType) {
-		return (predType[0] == startupType);
+	function startupTypeIsValid(startupType, predType, predArity) {
+		return ((predType[0] == startupType) && (predArity == "2"));
 	}
 	
 	function addChooseRule(rowId, queryLineGeneralId, startupType) {
@@ -175,13 +181,18 @@
 		
 		var queryLineSelectPredicateId = queryLineGeneralId + ".selectPredicate";
 		var html = "<select name=\'"+queryLineSelectPredicateId+"\'"+
-					"onchange=\"changeInChooseRule(this, \'" + queryLineGeneralId + "\', \'"+rowId+"\');\">";
+					"onchange=\"changeInChooseRule(this, \'" + queryLineGeneralId + "\', \'"+rowId+ "\', \'"+startupType+"\');\">";
 		html += "<option name=\'----\' value=\'----\''>----</option>";
+		var addOption=false;
 		for (var i=0; i<programIntrospectionArray.length; i++){
-			if (startupTypeIsValid(startupType, programIntrospectionArray[i].predType)) {
+			addOption=false;
+			for (var j=0; j<programIntrospectionArray[i].predType.length; j++){
+				addOption = addOption || startupTypeIsValid(startupType, programIntrospectionArray[i].predType[j], programIntrospectionArray[i].predArity);
+			}
+			if (addOption) {
 				html += "<option name=\'" + programIntrospectionArray[i].predName + 
-							"\' value=\'" + programIntrospectionArray[i].predName + "\'>"+
-							programIntrospectionArray[i].predName + "</option>";
+						"\' value=\'" + programIntrospectionArray[i].predName + "\'>"+
+						programIntrospectionArray[i].predName + "</option>";
 			}
 		}
 		html += "</select>";

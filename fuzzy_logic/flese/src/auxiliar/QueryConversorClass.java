@@ -1,6 +1,7 @@
 package auxiliar;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -81,8 +82,19 @@ public class QueryConversorClass {
 		}
 	}
 	
-	private  getPredicateInfo (String predicateName) {
-		connection.getProgramIntrospectionIterator()
+	private AnswerTermInJava [] getPredicateInfo (String predicateName) {
+		Iterator<AnswerTermInJava []> iterator = connection.getProgramIntrospectionIterator();
+		AnswerTermInJava [] answer = null;
+		boolean found = false;
+		if ((predicateName != null) && (iterator != null)) {
+			while ((iterator.hasNext()) && (! found)) {
+				answer = iterator.next();
+				if (! predicateName.equals(answer[0].toString())) {
+					answer = null;
+				}
+			}
+		}
+		return answer;
 	}
 	
 	public void newSubquery() throws QueryConversorExceptionClass {

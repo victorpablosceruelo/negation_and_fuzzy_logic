@@ -111,8 +111,8 @@ public class AnswerTermInJava {
 	}
 	
 	public String toString () {
-		String retVal = " ";
-		if (singleAnswerTerm != null) retVal += singleAnswerTerm;
+		String retVal = "";
+		if ((singleAnswerTerm != null) && (! ",".equals(singleAnswerTerm))) retVal += singleAnswerTerm;
 		if (compositeAnswerTerm != null) {
 			retVal += "(";
 			for (int i=0; i<listLength; i++) {
@@ -121,7 +121,7 @@ public class AnswerTermInJava {
 			}
 			retVal += ")";
 		}
-		retVal += " ";
+		retVal += "";
 		return retVal;
 	}
 	
