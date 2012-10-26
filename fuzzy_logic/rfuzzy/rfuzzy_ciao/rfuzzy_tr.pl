@@ -256,7 +256,7 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 	add_auxiliar_code(Fuzzy_Rules_2, Fuzzy_Rules_3).
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
-	activate_rfuzzy_debug,
+	% activate_rfuzzy_debug,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
@@ -662,7 +662,7 @@ translate_rfuzzy_default_value_aux(Thershold, Type_1_Name, Argument, Condition_A
 	
 	Pred2_Class = 'fuzzy_rule', Pred2_Arity = 1,
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
-	translate_predicate(Pred2_Name, Pred2_Arity, Pred2_Class, Type_1_Name, New_Pred2_Name, New_Pred2_Arity, New_Pred2_Functor, Truth_Value_For_Thershold),
+	translate_predicate(Pred2_Name, Pred2_Arity, Pred2_Class, '', New_Pred2_Name, New_Pred2_Arity, New_Pred2_Functor, Truth_Value_For_Thershold),
 	arg(1, New_Pred2_Functor, Argument),
 
 	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, Show_Error)

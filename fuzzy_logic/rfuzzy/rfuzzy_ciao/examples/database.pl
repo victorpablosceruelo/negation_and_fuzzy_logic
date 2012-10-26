@@ -82,13 +82,13 @@ test3(A, B, C) :- C .=. A + B.
 
 % TYPE DECLARATION
 rfuzzy_define_database(house/7, 
-	[(house_code, rfuzzy_enum_type), 
-	  (house_type, rfuzzy_enum_type), 
-	   (house_size, rfuzzy_integer_type),
-	    (house_rooms_number, rfuzzy_integer_type), 
+	[(code, rfuzzy_enum_type), 
+	  (type, rfuzzy_enum_type), 
+	   (size, rfuzzy_integer_type),
+	    (rooms_number, rfuzzy_integer_type), 
 	     (price, rfuzzy_integer_type), 
-	      (house_distance_to_the_center, rfuzzy_integer_type), 
-	       (house_distance_to_the_beach, rfuzzy_integer_type)]).
+	      (distance_to_the_center, rfuzzy_integer_type), 
+	       (distance_to_the_beach, rfuzzy_integer_type)]).
 
 % DATABASE
 house(lfs2168,'apartment',114,5,630000,2,5700).
