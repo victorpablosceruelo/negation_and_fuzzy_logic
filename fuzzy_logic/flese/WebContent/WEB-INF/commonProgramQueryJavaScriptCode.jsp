@@ -92,13 +92,12 @@
 	function isQuantifierPredicate(index) {
 		var result = false;
 		var i = 0;
-		var programIntrospectionElement = programIntrospectionArray[index];
-		if ((programIntrospectionElement.predArity == 2) &&
-			(programIntrospectionElement.predType != "-variable-")){
-			while (i<programIntrospectionElement.predType.lenght && ! result) 
-				var types = programIntrospectionElement.predType[i];
-				result = result || ((types[0] == "rfuzzy_predicate_type") &&
-						  			(types[1] == "rfuzzy_truth_value_type"));
+		var predInfo = programIntrospectionArray[index];
+		
+		if ((predInfo.predArity == 2) && (predInfo.predType != "-variable-")){
+			while (i<predInfo.predType.lenght && ! result) 
+				result = result || ((predInfo.predType[i][0] == "rfuzzy_predicate_type") &&
+						  			(predInfo.predType[i][1] == "rfuzzy_truth_value_type"));
 				i++;
 		}
 		return result;
