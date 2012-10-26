@@ -14,7 +14,8 @@
 	supreme/2, reorder_by_truth_value/3, 
 	one_by_one_first_head/2, one_by_one_first_tail/2,
 	rfuzzy_process_attribute_dump/4,
-	append_local/3, memberchk_local/2, remove_list_dupplicates/3
+	append_local/3, memberchk_local/2, remove_list_dupplicates/3,
+	sets_union/3, lists_substraction/3
 		     ],[hiord]).
 
 :- use_module(library(write),[write/1]).
@@ -295,6 +296,28 @@ rfuzzy_compute_aux(_Operator, _Elt1, _Elt2, _Computed_Similarities, 0) :- !.
 
 % rfuzzy_defined_quantifiers([]).
 rfuzzy_defined_quantifiers([(very, 2, TV_In, TV_Out, (TV_Out .=. (TV_In * TV_In)))]).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+sets_union([], Set2, Set2) :- !.
+sets_union([Member1 | Set1], Set2, Set3) :-
+	memberchk_local(Member1, Set2), !,
+	sets_union(Set1, Set2, Set3).
+sets_union([Member1 | Set1], Set2, [Member1 | Set3]) :-
+	sets_union(Set1, Set2, Set3).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+lists_substraction([], _List_2, []) :- !.
+lists_substraction([Head | Tail ], List_2, Result_List) :-
+	memberchk_local(Head, List_2), !, 
+	lists_substraction(Tail, List_2, Result_List).
+lists_substraction([Head | Tail ], List_2, [Head | Result_List]) :-
+	lists_substraction(Tail, List_2, Result_List).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
