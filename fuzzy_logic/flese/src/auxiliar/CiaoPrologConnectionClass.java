@@ -16,8 +16,8 @@ public class CiaoPrologConnectionClass {
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
-	private ArrayList<AnswerTermInJava []> latestEvaluatedQueryAnswers = null;
-	private ArrayList<AnswerTermInJava []> programIntrospection = null;
+	private ArrayList<AnswerTermInJavaClass []> latestEvaluatedQueryAnswers = null;
+	private ArrayList<AnswerTermInJavaClass []> programIntrospection = null;
 	private String latestEvaluatedQueryProgramFileName = null;
 	private String latestEvaluatedQueryProgramFileOwner = null;
 	private String latestEvaluatedQueryProgramFileOwnerWithPath = null;
@@ -39,7 +39,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void programFileIntrospectionQuery(String fileOwner, String fileName) 
-			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
 		// Prepare the query structure.
@@ -58,10 +58,10 @@ public class CiaoPrologConnectionClass {
 		
 		if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
 		else {
-			Iterator<AnswerTermInJava []> test = getProgramIntrospectionIterator();
+			Iterator<AnswerTermInJavaClass []> test = getProgramIntrospectionIterator();
 			String testMsg = " - ProgramIntrospection - ";
 			while (test.hasNext()) {
-				AnswerTermInJava [] subTest = test.next();
+				AnswerTermInJavaClass [] subTest = test.next();
 				for (int i=0; i<subTest.length; i++) {
 					testMsg += "\n[" + i + "]: " + subTest[i].toString();
 				}
@@ -75,16 +75,16 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Iterator<AnswerTermInJava []> getProgramIntrospectionIterator() {
+	public Iterator<AnswerTermInJavaClass []> getProgramIntrospectionIterator() {
 		if (programIntrospection == null) return null;
 		else return programIntrospection.iterator();
 	}
-	public Iterator<AnswerTermInJava []> getLatestEvaluatedQueryAnswersIterator() {
+	public Iterator<AnswerTermInJavaClass []> getLatestEvaluatedQueryAnswersIterator() {
 		if (latestEvaluatedQueryAnswers == null) return null;
 		else return latestEvaluatedQueryAnswers.iterator();
 	}
-	public AnswerTermInJava [] getPredicateInfo (String predicateName) {
-		Iterator<AnswerTermInJava []> iterator = getProgramIntrospectionIterator();
+	public AnswerTermInJavaClass [] getPredicateInfo (String predicateName) {
+		Iterator<AnswerTermInJavaClass []> iterator = getProgramIntrospectionIterator();
 		if ((predicateName == null) || ("".equals(predicateName))) {
 			LOG.info("Predicate Name is not valid. predicateName: " + predicateName);
 		}
@@ -92,7 +92,7 @@ public class CiaoPrologConnectionClass {
 			LOG.error("Iterator of Program Introspection is NULL!! ");
 		}
 		
-		AnswerTermInJava [] answer = null;
+		AnswerTermInJavaClass [] answer = null;
 		if ((predicateName != null) && (iterator != null)) {
 			while ((iterator.hasNext()) && (answer == null)) {
 				answer = iterator.next();
@@ -108,7 +108,7 @@ public class CiaoPrologConnectionClass {
 		return latestEvaluatedQueryProgramFileOwner; }
 	public String getLatestEvaluatedQueryProgramFileOwnerWithPath () { 
 		return latestEvaluatedQueryProgramFileOwnerWithPath; }
-	public ArrayList<AnswerTermInJava []> getLatestEvaluatedQueryAnswers () { 
+	public ArrayList<AnswerTermInJavaClass []> getLatestEvaluatedQueryAnswers () { 
 		return latestEvaluatedQueryAnswers; } 
 	public String getLatestEvaluatedQuery() { 
 		return latestEvaluatedQuery; }
@@ -118,7 +118,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
-			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
 
 		// Connect to the Ciao Prolog Server.
 		String [] argv = new String[1];
@@ -147,9 +147,10 @@ public class CiaoPrologConnectionClass {
 	 * @exception PLException
 	 * @exception IOException
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
+	 * @throws AnswerTermInJavaClassException when the term cannot be converted.
 	 */
 	private void changeCiaoPrologWorkingFolder(String programFileOwner, PLConnection plConnection) 
-			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException {
+			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
 		// Log info
 		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + programFileOwner);
 		
@@ -173,7 +174,7 @@ public class CiaoPrologConnectionClass {
 				new PLTerm[]{variables[0], new PLAtom(programFileOwnerWithPath)}); 
 
 		performQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
-		Iterator<AnswerTermInJava []> queryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
+		Iterator<AnswerTermInJavaClass []> queryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
 
 		// Log results
 		while (queryAnswersIterator.hasNext()) {
@@ -186,15 +187,20 @@ public class CiaoPrologConnectionClass {
 	}
 	
 	private void performQueryAux(PLStructure query, String programFileName, PLVariable [] variables, long maxNumAnswers, long maxNumberOfTries, PLConnection plConnection) 
-			throws PLException, IOException {
+			throws PLException, IOException, AnswerTermInJavaClassException {
 		
 		// Initialize ...
 		latestEvaluatedQuery = null;
 		latestEvaluatedQueryProgramFileName = null;
-		latestEvaluatedQueryAnswers = new ArrayList<AnswerTermInJava []>();
+		latestEvaluatedQueryAnswers = new ArrayList<AnswerTermInJavaClass []>();
 		
 		if (query == null) throw new PLException("query is null.");
 		if (plConnection == null) throw new PLException("runQuery: plConnection is null.");
+		for (int i=0; i<variables.length; i++) {
+			if (variables[i] == null) {
+				throw new PLException("runQuery: variables["+i+"] is null.");
+			}
+		}
 		
 		PLGoal currentGoal = null;
 		long answersCounter = 0;
@@ -212,7 +218,7 @@ public class CiaoPrologConnectionClass {
 
 		LOG.info("performQueryAux: getting answers ...");
 		PLTerm prologQueryAnswer;
-		AnswerTermInJava [] answerTermInJava = null;
+		AnswerTermInJavaClass [] answerTermInJava = null;
 		long timesCounter;
 
 		do { // Get all the answers you can.
@@ -235,14 +241,25 @@ public class CiaoPrologConnectionClass {
 			if (prologQueryAnswer != null) {
 				preMsg += PLVariablesToString(variables);
 				preMsg += "\n   result: ";
-				answerTermInJava = new AnswerTermInJava [variables.length];
+				answerTermInJava = new AnswerTermInJavaClass [variables.length];
 				for (int i=0; i<variables.length; i++) {
-					answerTermInJava[i] = new AnswerTermInJava(variables[i], prologQueryAnswer);
-					preMsg += answerTermInJava[i].toString() + " ";
+					if (variables[i] != null) {
+						answerTermInJava[i] = new AnswerTermInJavaClass(variables[i], prologQueryAnswer);
+						preMsg += answerTermInJava[i].toString() + " ";
+					}
+					else {
+						answerTermInJava[i] = null;
+						preMsg += "null ";
+					}
 				}
 				preMsg += "\n   Creation MSGS: ";
 				for (int i=0; i<variables.length; i++) {
-					preMsg += answerTermInJava[i].getCreationMsgs(); 
+					if (answerTermInJava[i] != null) {
+						preMsg += answerTermInJava[i].getCreationMsgs();
+					}
+					else {
+						preMsg += " answerTermInJava["+i+"] is null ";
+					}
 				}
 				latestEvaluatedQueryAnswers.add(answerTermInJava);
 				LOG.info(preMsg);
@@ -273,8 +290,9 @@ public class CiaoPrologConnectionClass {
 
 	/**
 	 * Serves for testing the query system, but has no use at all. 
+	 * @throws AnswerTermInJavaClassException 
 	 */	
-	public void testingQuery (String owner, String programFile) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+	public void testingQuery (String owner, String programFile) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
 		LOG.info("testingQuery ...");
 		if ("restaurant.pl".equals(programFile)) {
 			PLVariable[] variables = new PLVariable[6];

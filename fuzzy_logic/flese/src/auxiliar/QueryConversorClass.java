@@ -49,7 +49,6 @@ public class QueryConversorClass {
 	
 	public QueryConversorClass(int queryLinesCounter, CiaoPrologConnectionClass connection) {
 		this.connection = connection;
-		subQueries = new ArrayList<SubQueryConversionClass>();
 	}
 	
 	public String subqueryRetrieveAndSaveSubpart(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
@@ -85,7 +84,8 @@ public class QueryConversorClass {
 		return msg;
 	}
 	
-	public void subqueryEndTestAndSave() throws QueryConversorExceptionClass {
+	public void subqueryEndTestAndSave() 
+			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		String msg = "";
 		msg += ("\n  fp: " + tmpQuantifier0 + "(" + tmpQuantifier1 + "(" + tmpPredicate + "))");
 		msg += ("\n  cp: " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue);
@@ -108,7 +108,7 @@ public class QueryConversorClass {
 			}
 			else {
 				subqueryFuzzyEndTestAndSave();
-			}	
+			}
 		}
 		else {
 			if ((tmpInitialPredicate != null) && (inputVariable == null)) {
@@ -125,14 +125,14 @@ public class QueryConversorClass {
 		
 	}
 	
-	private void subQueryInitialEndTestAndSave() throws QueryConversorExceptionClass {
+	private void subQueryInitialEndTestAndSave() throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		if (tmpInitialPredicate == null) {
 			throw new QueryConversorExceptionClass("No initial predicate for the query.");
 		}
 		if (inputVariable != null) {
 			throw new QueryConversorExceptionClass("You cannot configure twice the initial subquery.");
 		}
-		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpInitialPredicate);
+		AnswerTermInJavaClass [] PredInfo = connection.getPredicateInfo(tmpInitialPredicate);
 		if (PredInfo == null) throw new QueryConversorExceptionClass("No possible conversion for the initial predicate.");
 		if (PredInfo[1] == null) throw new QueryConversorExceptionClass("No defined arity for the initial predicate.");
 		if (PredInfo[1].toString() == null) throw new QueryConversorExceptionClass("No defined arity for the initial predicate.");
@@ -140,7 +140,7 @@ public class QueryConversorClass {
 		LOG.info("PredInfo[1].toString(): " + PredInfo[1].toString());
 		
 		// SubGoal1: call the typing predicate.
-		int PredArity = Integer.getInteger(PredInfo[1].toString());
+		int PredArity = Integer.parseInt(PredInfo[1].toString());
 		PLTerm [] plArgsSubGoal1 = new PLTerm [PredArity];
 		for (int i=0; i<PredArity; i++) {
 			plArgsSubGoal1[i] = new PLVariable();
@@ -159,13 +159,14 @@ public class QueryConversorClass {
 		initialSubQuery = new SubQueryConversionClass();
 		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
 		initialSubQuery.SubQuerySimpleInfoString = "";
-		AnswerTermInJava tmpQuery = new AnswerTermInJava(initialSubQuery.subQuery, null);
+		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(initialSubQuery.subQuery, null);
 		initialSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		initialSubQuery.resultVariable = inputVariable;
 	}
 	
-	private void subqueryRfuzzyComputeOperatorEndTestAndSave() throws QueryConversorExceptionClass {
-		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpPredicate);
+	private void subqueryRfuzzyComputeOperatorEndTestAndSave() 
+			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
+		AnswerTermInJavaClass [] PredInfo = connection.getPredicateInfo(tmpPredicate);
 		if (PredInfo[1].toString() == null) {
 			throw new QueryConversorExceptionClass("No defined arity for the predicate " + tmpPredicate);
 		}
@@ -186,15 +187,19 @@ public class QueryConversorClass {
 		SubQueryConversionClass subQuery = new SubQueryConversionClass();
 		subQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
 		subQuery.SubQuerySimpleInfoString = " " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue;
-		AnswerTermInJava tmpQuery = new AnswerTermInJava(subQuery.subQuery, null);
+		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(subQuery.subQuery, null);
 		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		subQuery.resultVariable = resultVar;
+		
+		// We only initialize the list if we really need it. 
+		if (subQueries == null) subQueries = new ArrayList<SubQueryConversionClass>();
 		subQueries.add(subQuery);
 		
 	}
 	
-	private void subqueryFuzzyEndTestAndSave() throws QueryConversorExceptionClass {
-		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpPredicate);
+	private void subqueryFuzzyEndTestAndSave() 
+			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
+		AnswerTermInJavaClass [] PredInfo = connection.getPredicateInfo(tmpPredicate);
 		if (PredInfo == null) 
 			throw new QueryConversorExceptionClass("Predicate is not in database. Predicate: " + tmpPredicate);
 		if (PredInfo[1].toString() == null) {
@@ -241,13 +246,17 @@ public class QueryConversorClass {
 		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += ")";
 		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += ")";
 		
-		AnswerTermInJava tmpQuery = new AnswerTermInJava(subQuery.subQuery, null);
+		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(subQuery.subQuery, null);
 		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		subQuery.resultVariable = tmpVar3;
+
+		// We only initialize the list if we really need it.
+		if (subQueries == null) subQueries = new ArrayList<SubQueryConversionClass>();
 		subQueries.add(subQuery);
 	}
 	
-	public PLStructure queryConvert () throws QueryConversorExceptionClass {
+	public PLStructure queryConvert () 
+			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		
 		if (initialSubQuery == null) {
 			throw new QueryConversorExceptionClass("No initial subQuery to convert.");
@@ -260,7 +269,7 @@ public class QueryConversorClass {
 		PLVariable currentVar = null;
 		PLVariable tmpVar = null;
 		PLStructure aggrSubQuery = null;
-		AnswerTermInJava tmpQuery = null;
+		AnswerTermInJavaClass tmpQuery = null;
 		
 		if (subQueries != null) {
 			Iterator<SubQueryConversionClass> subQueriesIterator = subQueries.iterator();
@@ -286,7 +295,7 @@ public class QueryConversorClass {
 
 					querySimpleInfoString += ", " + currentSubQuery.SubQuerySimpleInfoString;
 					queryComplexInfoString += ", " + currentSubQuery.SubQueryComplexInfoString;
-					tmpQuery = new AnswerTermInJava(currentSubQuery.subQuery, null);
+					tmpQuery = new AnswerTermInJavaClass(currentSubQuery.subQuery, null);
 					queryComplexInfoString += ", " +  tmpQuery.toString();
 
 
@@ -313,15 +322,37 @@ public class QueryConversorClass {
 		return finalQuery;
 	}
 	
+	public PLVariable [] getListOfVariables() {
+		PLVariable [] variables = null;
+		if (subQueries == null) {
+			variables = new PLVariable[1];
+			variables[0] = inputVariable;
+		}
+		else {
+			variables = new PLVariable[2];
+		    variables[0] = inputVariable;
+		    variables[1] = outputVariable;
+		}
+		return variables;
+	}
 	
-	public PLVariable getInputVariable() { return inputVariable; };
-	public String getInputVariableName() { return inputVariableName; };
-	public PLVariable getOutputVariable() { return outputVariable; };
-	public String getOutputVariableName() { return outputVariableName; };
-	
+	public String [] getListOfNamesForVariables() {
+		String [] variablesNames = null;
+		if (subQueries == null) {
+			variablesNames = new String[1];
+			variablesNames[0] = inputVariableName;
+		}
+		else {
+			variablesNames = new String[2];
+			variablesNames[0] = inputVariableName;
+			variablesNames[1] = outputVariableName;
+		}
+		return variablesNames;
+	}
+		
 	public String getQuerySimpleInfoString() {return querySimpleInfoString; };
 	public String getQueryComplexInfoString() { return queryComplexInfoString; };
-
+	
 }
 
 

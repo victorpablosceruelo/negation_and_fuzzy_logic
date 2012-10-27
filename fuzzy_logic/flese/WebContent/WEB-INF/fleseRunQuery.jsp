@@ -7,10 +7,10 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
-<%@page import="auxiliar.AnswerTermInJava"%>
+<%@page import="auxiliar.AnswerTermInJavaClass"%>
 
 <% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
-<%  Iterator<AnswerTermInJava []> answersIterator = connection.getLatestEvaluatedQueryAnswersIterator(); %>
+<%  Iterator<AnswerTermInJavaClass []> answersIterator = connection.getLatestEvaluatedQueryAnswersIterator(); %>
 
 <body>
     <div id="body">
@@ -27,19 +27,20 @@
 
 <%
 	if (answersIterator != null) {
-		%><table><%
-		AnswerTermInJava [] answer;
+		out.print("<table>");
+		AnswerTermInJavaClass [] answer;
 		while (answersIterator.hasNext()) {
-			%><tr><%
+			out.print("<tr>");
 			answer = answersIterator.next();
 			for (int i=0; i<answer.length; i++) {
-				%><td><%=answer[i] %></td><%
+				out.print("<td>" + answer[i].toJavaScript(true) + "</td>");
 			}
-			%></tr><%
+			out.print("</tr>");
 		}
-		%></table><%
+		out.print("</table>");
 	}
 %>
+
 	<br /><br /><br /><br />
 	</div>
 </body>

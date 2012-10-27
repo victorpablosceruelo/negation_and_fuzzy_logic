@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import CiaoJava.PLException;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
+import auxiliar.AnswerTermInJavaClassException;
 import auxiliar.CiaoPrologConnectionClass;
 import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.QueryConversorClass;
@@ -93,10 +94,11 @@ public class QueryServlet extends HttpServlet {
 	 * and shows the results in a web page.
 	 * Offers to the jsp all the collected information.
 	 * @throws QueryConversorExceptionClass 
+	 * @throws AnswerTermInJavaClassException 
 	 */
 	private void dbQueryAux(String fileOwner, String fileName, String operation, 
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		
 			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
@@ -127,7 +129,7 @@ public class QueryServlet extends HttpServlet {
 	}
 	
 	private void dbQueryAux_Introspection(String fileOwner, String fileName, CiaoPrologConnectionClass connection) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
 		
 		connection.programFileIntrospectionQuery(fileOwner, fileName);
 		/*
@@ -142,7 +144,7 @@ public class QueryServlet extends HttpServlet {
 	
 	
 	private void build_and_execute_query(String fileOwner, String fileName, CiaoPrologConnectionClass connection, HttpServletRequest request) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass {
+			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		LOG.info("build_and_execute_query call.");
 		
 		String formParameters = " --- Parameters Names and Values --- \n";
@@ -180,9 +182,9 @@ public class QueryServlet extends HttpServlet {
 	    
 	    conversor.subqueryEndTestAndSave();
 	    PLStructure query = conversor.queryConvert();
-	    PLVariable [] variables = new PLVariable[2];
-	    variables[1] = conversor.getInputVariable();
-	    variables[2] = conversor.getOutputVariable();
+	    PLVariable [] variables = conversor.getListOfVariables();
+	    String [] variablesNames = conversor.getListOfNamesForVariables();
+	    request.setAttribute("variablesNames", variablesNames);
 	    
 	    String querySimpleInfoString = conversor.getQuerySimpleInfoString();
 	    String queryComplexInfoString = conversor.getQueryComplexInfoString();

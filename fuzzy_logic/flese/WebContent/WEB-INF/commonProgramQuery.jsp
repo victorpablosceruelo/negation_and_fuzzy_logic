@@ -3,10 +3,14 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
-<%@page import="auxiliar.AnswerTermInJava"%>
+<%@page import="auxiliar.AnswerTermInJavaClass"%>
 
-<% CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection"); %>
-<% Iterator<AnswerTermInJava []> loadedProgramIntrospectionIterator = connection.getProgramIntrospectionIterator(); %>
+<%
+	CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
+%>
+<%
+	Iterator<AnswerTermInJavaClass []> loadedProgramIntrospectionIterator = connection.getProgramIntrospectionIterator();
+%>
 
 <script type="text/javascript">
 	function predInfo(predName, predArity, predType, predOtherInfo) {
@@ -17,10 +21,9 @@
 	}
 	
 	var programIntrospectionArray = new Array();
-	<%
-		int counter = 0;
+	<%int counter = 0;
 		if (loadedProgramIntrospectionIterator != null) {
-			AnswerTermInJava [] predInfo;
+			AnswerTermInJavaClass [] predInfo;
 			while (loadedProgramIntrospectionIterator.hasNext()) {
 				predInfo = loadedProgramIntrospectionIterator.next();
 				out.print("    programIntrospectionArray["+counter+"] = new predInfo(");
@@ -31,8 +34,7 @@
 				out.print(");\n");
 				counter++;
 			}
-		}
-	%>
+		}%>
 	debug.info("Added a total of <%=counter%> elements from program introspection.");
 	
 	var currentProgramFileName = "<%=connection.getLatestEvaluatedQueryProgramFileName() %>";
