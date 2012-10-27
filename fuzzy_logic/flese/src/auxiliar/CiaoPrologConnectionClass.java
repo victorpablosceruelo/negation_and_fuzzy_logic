@@ -85,6 +85,13 @@ public class CiaoPrologConnectionClass {
 	}
 	public AnswerTermInJava [] getPredicateInfo (String predicateName) {
 		Iterator<AnswerTermInJava []> iterator = getProgramIntrospectionIterator();
+		if ((predicateName == null) || ("".equals(predicateName))) {
+			LOG.info("Predicate Name is not valid. predicateName: " + predicateName);
+		}
+		if (iterator == null) {
+			LOG.error("Iterator of Program Introspection is NULL!! ");
+		}
+		
 		AnswerTermInJava [] answer = null;
 		boolean found = false;
 		if ((predicateName != null) && (iterator != null)) {

@@ -60,7 +60,7 @@ public class QueryConversorClass {
 		}
 		String retrieved = request.getParameter(paramName);
 		msg += "\n  retrieved for paramName " + paramName + " value " + retrieved;
-		if ((retrieved != null) && (retrieved != "----")){
+		if ((retrieved != null) && (! ("----".equals(retrieved))) && (! ("".equals(retrieved)))){
 			LOG.info("type: "+type+" for paramName: "+paramName+" -> "+retrieved + " ");
 			switch (type) {
 			case initialPredicate: tmpInitialPredicate = retrieved;
