@@ -90,6 +90,7 @@ public class QueryConversorClass {
 		msg += ("\n  fp: " + tmpQuantifier0 + "(" + tmpQuantifier1 + "(" + tmpPredicate + "))");
 		msg += ("\n  cp: " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue);
 		msg += ("\n  aggregator: " + tmpAggregator);
+		msg += ("\n  tmpInitialPredicate: " + tmpInitialPredicate);
 		LOG.info(msg);
 		if ((tmpQuantifier0 != null) || (tmpQuantifier1 != null) ||
 			(tmpPredicate != null) || 
@@ -132,10 +133,12 @@ public class QueryConversorClass {
 			throw new QueryConversorExceptionClass("You cannot configure twice the initial subquery.");
 		}
 		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpInitialPredicate);
-		if (PredInfo[1].toString() == null) {
-			throw new QueryConversorExceptionClass("No defined arity for the initial predicate.");
-		}
-
+		if (PredInfo == null) throw new QueryConversorExceptionClass("No possible conversion for the initial predicate.");
+		if (PredInfo[1] == null) throw new QueryConversorExceptionClass("No defined arity for the initial predicate.");
+		if (PredInfo[1].toString() == null) throw new QueryConversorExceptionClass("No defined arity for the initial predicate.");
+		
+		LOG.info("PredInfo[1].toString(): " + PredInfo[1].toString());
+		
 		// SubGoal1: call the typing predicate.
 		int PredArity = Integer.getInteger(PredInfo[1].toString());
 		PLTerm [] plArgsSubGoal1 = new PLTerm [PredArity];

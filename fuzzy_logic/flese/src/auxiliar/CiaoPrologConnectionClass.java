@@ -93,13 +93,10 @@ public class CiaoPrologConnectionClass {
 		}
 		
 		AnswerTermInJava [] answer = null;
-		boolean found = false;
 		if ((predicateName != null) && (iterator != null)) {
-			while ((iterator.hasNext()) && (! found)) {
+			while ((iterator.hasNext()) && (answer == null)) {
 				answer = iterator.next();
-				if (! predicateName.equals(answer[0].toString())) {
-					answer = null;
-				}
+				if (! predicateName.equals(answer[0].toString())) answer = null;
 			}
 		}
 		return answer;
