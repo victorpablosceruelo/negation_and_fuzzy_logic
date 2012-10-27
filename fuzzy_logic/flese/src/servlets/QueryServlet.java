@@ -167,7 +167,7 @@ public class QueryServlet extends HttpServlet {
 	    
 	    conversor.subqueryEndTestAndSave();
 	    msg += conversor.subqueryRetrieveAndSaveSubpart("startupType", request, QueryConversorClass.initialPredicate);
-	    msg += conversor.subqueryRetrieveAndSaveSubpart("selectAggregator", request, QueryConversorClass.aggregator);
+	    msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
 	    
 	    for (int i=0; i<queryLinesCounter; i++) {
 	    	conversor.subqueryEndTestAndSave();

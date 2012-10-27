@@ -291,6 +291,7 @@ public class QueryConversorClass {
 					tmpVar = new PLVariable();
 					aggrSubQuery = new PLStructure(tmpAggregator, new PLTerm[]{currentVar, currentSubQuery.resultVariable, tmpVar});
 					currentVar = tmpVar;
+					tmpVar = null;
 					finalQuery = new PLStructure(",", new PLTerm[]{finalQuery, aggrSubQuery});
 
 					querySimpleInfoString += ", " + currentSubQuery.SubQuerySimpleInfoString;
@@ -301,6 +302,10 @@ public class QueryConversorClass {
 
 				}
 			}
+			
+			// currentVar, after all subQueries, is our output variable !!!
+			outputVariable = currentVar;
+			
 			
 			if (tmpAggregator != null) {
 				querySimpleInfoString = tmpAggregator + "(" + querySimpleInfoString + ")";
