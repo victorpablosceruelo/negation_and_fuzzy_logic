@@ -31,15 +31,6 @@ import auxiliar.FoldersUtilsClassException;
 public class QueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(QueryServlet.class);
-	
-	// static private FoldersUtilsClass FoldersUtilsObject = null;
-	
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public QueryServlet() { 
-        super();
-    }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -83,8 +74,8 @@ public class QueryServlet extends HttpServlet {
 				try {
 					dbQueryAux(fileOwner, fileName, operation, session, request, response);
 				} catch (Exception e) {
+					LOG.info(e.getMessage());
 					e.printStackTrace();
-					ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
 					ServletsAuxMethodsClass.addMessageToTheUser(request, "Exception in dbQuery. Message: \n" + e.getMessage(), LOG);
 					ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);
 				}
@@ -167,23 +158,25 @@ public class QueryServlet extends HttpServlet {
 	    
 	    int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
 	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter +1, connection);
+	    String msg = "";
 	    
 	    // Parameters to be retrieved and saved:
 	    // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
 	    
 	    conversor.subqueryEndTestAndSave();
-	    conversor.subqueryRetrieveAndSaveSubpart("startupType", request, QueryConversorClass.initialPredicate);
-	    conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.aggregator);
-	    	    
+	    msg += conversor.subqueryRetrieveAndSaveSubpart("startupType", request, QueryConversorClass.initialPredicate);
+	    msg += conversor.subqueryRetrieveAndSaveSubpart("selectAggregator", request, QueryConversorClass.aggregator);
+	    
 	    for (int i=0; i<queryLinesCounter; i++) {
 	    	conversor.subqueryEndTestAndSave();
 	    
-	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.quantifier0);
-	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.quantifier1);
-	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.predicate);
-	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.rfuzzyComputeOperator);
-	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.rfuzzyComputeValue);
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_0", request, QueryConversorClass.quantifier0);
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_1", request, QueryConversorClass.quantifier1);
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectPredicate", request, QueryConversorClass.predicate);
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeOperator", request, QueryConversorClass.rfuzzyComputeOperator);
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeValue", request, QueryConversorClass.rfuzzyComputeValue);
 	    }
+	    LOG.info(msg);
 	    
 	    conversor.subqueryEndTestAndSave();
 	    PLStructure query = conversor.queryConvert();

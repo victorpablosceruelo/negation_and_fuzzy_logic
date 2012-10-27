@@ -52,12 +52,14 @@ public class QueryConversorClass {
 		subQueries = new ArrayList<SubQueryConversionClass>();
 	}
 	
-	public void subqueryRetrieveAndSaveSubpart(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
+	public String subqueryRetrieveAndSaveSubpart(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
 		boolean error=false;
+		String msg = ""; 
 		if ((paramName == null) || ("".equals(paramName))) {
 			throw new QueryConversorExceptionClass("paramName is null or empty string.");
 		}
 		String retrieved = request.getParameter(paramName);
+		msg += "\n  retrieved for paramName " + paramName + " value " + retrieved;
 		if ((retrieved != null) && (retrieved != "----")){
 			LOG.info("type: "+type+" for paramName: "+paramName+" -> "+retrieved + " ");
 			switch (type) {
@@ -80,12 +82,15 @@ public class QueryConversorClass {
 			}
 			if (error) throw new QueryConversorExceptionClass("Unknown type.");
 		}
+		return msg;
 	}
 	
 	public void subqueryEndTestAndSave() throws QueryConversorExceptionClass {
-		LOG.info(" " + tmpQuantifier0 + "(" + tmpQuantifier1 + "(" + tmpPredicate + "))");
-		LOG.info(" " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue);
-		LOG.info(" " + "aggregator: " + tmpAggregator);
+		String msg = "";
+		msg += ("\n  fp: " + tmpQuantifier0 + "(" + tmpQuantifier1 + "(" + tmpPredicate + "))");
+		msg += ("\n  cp: " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue);
+		msg += ("\n  aggregator: " + tmpAggregator);
+		LOG.info(msg);
 		if ((tmpQuantifier0 != null) || (tmpQuantifier1 != null) ||
 			(tmpPredicate != null) || 
 			(tmpRfuzzyComputeOperator != null) || (tmpRfuzzyComputeValue != null)) {
@@ -187,6 +192,8 @@ public class QueryConversorClass {
 	
 	private void subqueryFuzzyEndTestAndSave() throws QueryConversorExceptionClass {
 		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpPredicate);
+		if (PredInfo == null) 
+			throw new QueryConversorExceptionClass("Predicate is not in database. Predicate: " + tmpPredicate);
 		if (PredInfo[1].toString() == null) {
 			throw new QueryConversorExceptionClass("No defined arity for the predicate " + tmpPredicate);
 		}

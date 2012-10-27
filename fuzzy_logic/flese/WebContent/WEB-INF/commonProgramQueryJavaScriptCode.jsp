@@ -36,7 +36,9 @@
 		cell.id = queryLineGeneralId + ".rfuzzyComputeOperator";
 		
 		var rfuzzyComputeOperatorId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
-		html="<select name=\'" + rfuzzyComputeOperatorId + "\'>";
+		var html="<select name=\'";
+		html += rfuzzyComputeOperatorId;
+		html += "\'>";
 		html += "<option name=\'----\' value=\'----\'>----</option>";		
 		
 
@@ -64,7 +66,7 @@
 		var cell = row.insertCell(-1);
 		cell.id = queryLineGeneralId + ".rfuzzyComputeArgument";
 		
-		var rfuzzyComputeArgumentId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
+		var rfuzzyComputeArgumentId = queryLineGeneralId + ".selectRfuzzyComputeValue";
 		debug.info("foundPredType: "+foundPredInfo.predType[foundPredInfo.predType.length-1]);
 		var html = "";
 		var type = foundPredInfo.predType[typeIndex];
@@ -94,12 +96,18 @@
 		var i = 0;
 		var predInfo = programIntrospectionArray[index];
 		
-		if ((predInfo.predArity == 2) && (predInfo.predType != "-variable-")){
-			while (i<predInfo.predType.lenght && ! result) 
-				result = result || ((predInfo.predType[i][0] == "rfuzzy_predicate_type") &&
+		// debug.info("quantifier ?? predName: " + predInfo.predName);
+		if (predInfo.predArity == "2") {
+			while (i<predInfo.predType.length && ! result) {
+				// debug.info("quantifier ?? predType["+i+"]: " + predInfo.predType[i]);
+				result = result || ((predInfo.predType[i].length == 2) &&
+									(predInfo.predType[i][0] == "rfuzzy_predicate_type") &&
 						  			(predInfo.predType[i][1] == "rfuzzy_truth_value_type"));
 				i++;
+			}
 		}
+		
+		if (! result) debug.info("not a quantifier:" + predInfo.predName);
 		return result;
 	}
 	
@@ -130,23 +138,21 @@
 	function changeInChooseRule(comboBox, queryLineGeneralId, rowId, startupType) {
 		// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');
 		var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+		var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
+		var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
+		var comboBoxTitle = comboBox.options[comboBox.selectedIndex].title;
 		debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
+		debug.info("changeInChooseRule: comboBoxText: " + comboBoxText);
+		debug.info("changeInChooseRule: comboBoxName: " + comboBoxName);
+		debug.info("changeInChooseRule: comboBoxTitle: " + comboBoxTitle);
 		
-		var foundPredInfo = null;
-		var index = 0;
-		debug.info("changeInChooseRule: searching ... ");
-		while ((foundPredInfo == null) && (index < programIntrospectionArray.length)) {
-			debug.info("programIntrospectionArray["+index+"]: " + programIntrospectionArray[index].predName);
-			if (comboBoxValue == programIntrospectionArray[index].predName) {
-				foundPredInfo = programIntrospectionArray[index];
-				debug.info("changeInChooseRule: found");
-			}
-			else index++;
-		}
-		
+		var index = comboBoxTitle;
+		var foundPredInfo = programIntrospectionArray[index];
+		debug.info("programIntrospectionArray["+index+"]: " + programIntrospectionArray[index].predName);
+				
 		var row = document.getElementById(rowId);
 		var cell = null;
-		debug.info("row.cells.lenght = " + row.cells.length);
+		debug.info("row.cells.length = " + row.cells.length);
 		if ((row.cells.length != 1) && (row.cells.length != 'undefined')) {	
 			for (var i=(row.cells.length -1); i>=0; i--) {
 				cell = row.cells[i];
@@ -161,6 +167,7 @@
 		if (foundPredInfo != null) {
 			var typeIndex = 0;
 			var predType = null;
+			var i = 0;
 			while ((typeIndex < foundPredInfo.predType.length) && (predType == null)) {
 				if (foundPredInfo.predType[typeIndex][0] == startupType) predType = foundPredInfo.predType[typeIndex];
 				else i++;
@@ -197,8 +204,7 @@
 				addOption = addOption || startupTypeIsValid(startupType, programIntrospectionArray[i].predType[j], programIntrospectionArray[i].predArity);
 			}
 			if (addOption) {
-				html += "<option name=\'" + programIntrospectionArray[i].predName + 
-						"\' value=\'" + programIntrospectionArray[i].predName + "\'>"+
+				html += "<option title=\'" + i + "\' value=\'" + programIntrospectionArray[i].predName + "\'>"+
 						programIntrospectionArray[i].predName + "</option>";
 			}
 		}
@@ -242,15 +248,20 @@
 		if ((chooseAgregatorCell.innerHTML == null) || (chooseAgregatorCell.innerHTML == "")) {
 			debug.info("null nor empty chooseAgregatorCell.innerHTML");
 			var predInfo = null;
+			var isAggregator = false;
 			var html = "";
 			html += "Truth values combined by: <br />";
 			html += "<select name=\'"+queryLinesSelectAggregatorId+"\'>";
 			for (var i=0; i<programIntrospectionArray.length; i++){
 				predInfo = programIntrospectionArray[i];
-				if ((predInfo.predType.length == 3) &&
-					(predInfo.predType[0] == 'rfuzzy_truth_value_type') &&
-					(predInfo.predType[1] == 'rfuzzy_truth_value_type') &&
-					(predInfo.predType[2] == 'rfuzzy_truth_value_type')) {
+				isAggregator = false;
+				for (var j=0; j<predInfo.predType.length; j++) {
+					isAggregator = isAggregator || ((predInfo.predType[j].length == 3) &&
+							(predInfo.predType[j][0] == 'rfuzzy_truth_value_type') &&
+							(predInfo.predType[j][1] == 'rfuzzy_truth_value_type') &&
+							(predInfo.predType[j][2] == 'rfuzzy_truth_value_type'));
+				}
+				if  (isAggregator) {
 					html += "<option name=\'" + predInfo.predName + 
 							"\' value=\'" + predInfo.predName + "\'>"+predInfo.predName + "</option>";
 				}
