@@ -83,6 +83,20 @@ public class CiaoPrologConnectionClass {
 		if (latestEvaluatedQueryAnswers == null) return null;
 		else return latestEvaluatedQueryAnswers.iterator();
 	}
+	public AnswerTermInJava [] getPredicateInfo (String predicateName) {
+		Iterator<AnswerTermInJava []> iterator = getProgramIntrospectionIterator();
+		AnswerTermInJava [] answer = null;
+		boolean found = false;
+		if ((predicateName != null) && (iterator != null)) {
+			while ((iterator.hasNext()) && (! found)) {
+				answer = iterator.next();
+				if (! predicateName.equals(answer[0].toString())) {
+					answer = null;
+				}
+			}
+		}
+		return answer;
+	}
 	
 	public String getLatestEvaluatedQueryProgramFileName () { 
 		return latestEvaluatedQueryProgramFileName; }

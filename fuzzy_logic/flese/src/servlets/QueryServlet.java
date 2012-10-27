@@ -171,22 +171,30 @@ public class QueryServlet extends HttpServlet {
 	    // Parameters to be retrieved and saved:
 	    // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
 	    
-	    conversor.newSubquery();
-	    conversor.retrieveAndSave("startupType", request, QueryConversorClass.predicate);
-	    conversor.retrieveAndSave("", request, QueryConversorClass.aggregator);
+	    conversor.subqueryEndTestAndSave();
+	    conversor.subqueryRetrieveAndSaveSubpart("startupType", request, QueryConversorClass.initialPredicate);
+	    conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.aggregator);
 	    	    
 	    for (int i=0; i<queryLinesCounter; i++) {
-	    	conversor.newSubquery();
+	    	conversor.subqueryEndTestAndSave();
 	    
-	    	conversor.retrieveAndSave("", request, QueryConversorClass.quantifier0);
-	    	conversor.retrieveAndSave("", request, QueryConversorClass.quantifier1);
-	    	conversor.retrieveAndSave("", request, QueryConversorClass.predicate);
-	    	conversor.retrieveAndSave("", request, QueryConversorClass.rfuzzyComputeOperator);
-	    	conversor.retrieveAndSave("", request, QueryConversorClass.rfuzzyComputeValue);
+	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.quantifier0);
+	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.quantifier1);
+	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.predicate);
+	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.rfuzzyComputeOperator);
+	    	conversor.subqueryRetrieveAndSaveSubpart("", request, QueryConversorClass.rfuzzyComputeValue);
 	    }
 	    
-	    PLStructure query = conversor.getFinalQuery();
-	    PLVariable [] variables = conversor.getFinalQueryVariables();
+	    conversor.subqueryEndTestAndSave();
+	    PLStructure query = conversor.queryConvert();
+	    PLVariable [] variables = new PLVariable[2];
+	    variables[1] = conversor.getInputVariable();
+	    variables[2] = conversor.getOutputVariable();
+	    
+	    String querySimpleInfoString = conversor.getQuerySimpleInfoString();
+	    String queryComplexInfoString = conversor.getQueryComplexInfoString();
+	    request.setAttribute("querySimpleInfoString", querySimpleInfoString);
+	    request.setAttribute("queryComplexInfoString", queryComplexInfoString);
 
 	    connection.performQuery(query, fileOwner, fileName, variables);
 	    // performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)

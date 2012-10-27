@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import servlets.FilesMgmtServlet;
-
 import CiaoJava.PLAtom;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
@@ -22,13 +20,15 @@ public class QueryConversorClass {
     // Parameters to be retrieved, converted and saved:
     // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
 	
-	public static final int quantifier0 = 0;
-	public static final int quantifier1 = 1;
-	public static final int predicate = 2;
-	public static final int rfuzzyComputeOperator = 3;
-	public static final int rfuzzyComputeValue = 4;
-	public static final int aggregator = 5;
+	public static final int initialPredicate = 0;
+	public static final int quantifier0 = 1;
+	public static final int quantifier1 = 2;
+	public static final int predicate = 3;
+	public static final int rfuzzyComputeOperator = 4;
+	public static final int rfuzzyComputeValue = 5;
+	public static final int aggregator = 6;
 	
+	private String tmpInitialPredicate = null;
 	private String tmpQuantifier0 = null;
 	private String tmpQuantifier1 = null;
 	private String tmpPredicate = null;
@@ -36,25 +36,23 @@ public class QueryConversorClass {
 	private String tmpRfuzzyComputeValue = null;
 	private String tmpAggregator = null;
 
-	private CiaoPrologConnectionClass connection = null;
-	private ArrayList<CiaoPrologVarMappingClass> varsMappings = null; 
-	PLStructure [] subqueries = null;
-	PLVariable [] finalQueryVariables = null;
-	int finalQueryVariablesCounter = 0;
-	int subQueriesCounter = 0;
+	private CiaoPrologConnectionClass connection = null; 
+	private ArrayList<SubQueryConversionClass> subQueries = null;
+	private SubQueryConversionClass initialSubQuery = null;
+	private PLVariable inputVariable = null;
+	private String inputVariableName = null;
+	private PLVariable outputVariable = null;
+	private String outputVariableName = null;
+	
+	private String queryComplexInfoString = null;
+	private String querySimpleInfoString = null;
 	
 	public QueryConversorClass(int queryLinesCounter, CiaoPrologConnectionClass connection) {
-		varsMappings = new ArrayList<CiaoPrologVarMappingClass>();
 		this.connection = connection;
-		
-		subqueries = new PLStructure [queryLinesCounter+1];
-		subQueriesCounter = 0;
-		for (int i=0; i<=queryLinesCounter; i++) {
-			subqueries[i] = null; // Initialization.
-		}
+		subQueries = new ArrayList<SubQueryConversionClass>();
 	}
 	
-	public void retrieveAndSave(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
+	public void subqueryRetrieveAndSaveSubpart(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
 		boolean error=false;
 		if ((paramName == null) || ("".equals(paramName))) {
 			throw new QueryConversorExceptionClass("paramName is null or empty string.");
@@ -63,6 +61,8 @@ public class QueryConversorClass {
 		if ((retrieved != null) && (retrieved != "----")){
 			LOG.info("type: "+type+" for paramName: "+paramName+" -> "+retrieved + " ");
 			switch (type) {
+			case initialPredicate: tmpInitialPredicate = retrieved;
+				break;
 			case quantifier0: tmpQuantifier0 = retrieved;
 				break; 
 			case quantifier1: tmpQuantifier1 = retrieved;
@@ -82,22 +82,10 @@ public class QueryConversorClass {
 		}
 	}
 	
-	private AnswerTermInJava [] getPredicateInfo (String predicateName) {
-		Iterator<AnswerTermInJava []> iterator = connection.getProgramIntrospectionIterator();
-		AnswerTermInJava [] answer = null;
-		boolean found = false;
-		if ((predicateName != null) && (iterator != null)) {
-			while ((iterator.hasNext()) && (! found)) {
-				answer = iterator.next();
-				if (! predicateName.equals(answer[0].toString())) {
-					answer = null;
-				}
-			}
-		}
-		return answer;
-	}
-	
-	public void newSubquery() throws QueryConversorExceptionClass {
+	public void subqueryEndTestAndSave() throws QueryConversorExceptionClass {
+		LOG.info(" " + tmpQuantifier0 + "(" + tmpQuantifier1 + "(" + tmpPredicate + "))");
+		LOG.info(" " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue);
+		LOG.info(" " + "aggregator: " + tmpAggregator);
 		if ((tmpQuantifier0 != null) || (tmpQuantifier1 != null) ||
 			(tmpPredicate != null) || 
 			(tmpRfuzzyComputeOperator != null) || (tmpRfuzzyComputeValue != null)) {
@@ -109,8 +97,17 @@ public class QueryConversorClass {
 				throw new QueryConversorExceptionClass("Cannot build a so complex query.");
 			}
 			
-			
-			
+			if ((tmpRfuzzyComputeOperator != null) && (tmpRfuzzyComputeValue != null)) {
+				subqueryRfuzzyComputeOperatorEndTestAndSave();
+			}
+			else {
+				subqueryFuzzyEndTestAndSave();
+			}	
+		}
+		else {
+			if ((tmpInitialPredicate != null) && (inputVariable == null)) {
+				subQueryInitialEndTestAndSave();
+			}
 		}
 		
 		// Re-initialize the values for the next subQuery.
@@ -122,115 +119,199 @@ public class QueryConversorClass {
 		
 	}
 	
-	public void addSubQuery (String quantifier1, String quantifier2, String fuzzyPredicate, String [] [] arguments) 
-			throws QueryConversorExceptionClass {
+	private void subQueryInitialEndTestAndSave() throws QueryConversorExceptionClass {
+		if (tmpInitialPredicate == null) {
+			throw new QueryConversorExceptionClass("No initial predicate for the query.");
+		}
+		if (inputVariable != null) {
+			throw new QueryConversorExceptionClass("You cannot configure twice the initial subquery.");
+		}
+		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpInitialPredicate);
+		if (PredInfo[1].toString() == null) {
+			throw new QueryConversorExceptionClass("No defined arity for the initial predicate.");
+		}
+
+		// SubGoal1: call the typing predicate.
+		int PredArity = Integer.getInteger(PredInfo[1].toString());
+		PLTerm [] plArgsSubGoal1 = new PLTerm [PredArity];
+		for (int i=0; i<PredArity; i++) {
+			plArgsSubGoal1[i] = new PLVariable();
+		}
+		PLStructure subGoal1 = new PLStructure(tmpInitialPredicate, plArgsSubGoal1);
 		
-		if ((fuzzyPredicate == null) || ("".equals(fuzzyPredicate)) || ("none".equals(fuzzyPredicate))) {
-			// We understood the user has decided to not use this line.
-			return;
+		// SubGoal2: ensure the input variable always has values from the typing predicate.
+		inputVariable = new PLVariable();
+		inputVariableName =  tmpInitialPredicate;
+		PLTerm [] plArgsSubGoal2 = new PLTerm [2];
+		plArgsSubGoal2[0] = inputVariable;
+		plArgsSubGoal2[1] = subGoal1;
+		
+		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
+		
+		initialSubQuery = new SubQueryConversionClass();
+		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
+		initialSubQuery.SubQuerySimpleInfoString = "";
+		AnswerTermInJava tmpQuery = new AnswerTermInJava(initialSubQuery.subQuery, null);
+		initialSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
+		initialSubQuery.resultVariable = inputVariable;
+	}
+	
+	private void subqueryRfuzzyComputeOperatorEndTestAndSave() throws QueryConversorExceptionClass {
+		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpPredicate);
+		if (PredInfo[1].toString() == null) {
+			throw new QueryConversorExceptionClass("No defined arity for the predicate " + tmpPredicate);
 		}
 		else {
-			// First the variables.
-			PLTerm [] plArguments = new PLTerm [arguments.length];
-			for (int i=0; i<arguments.length; i++) {
-				if (arguments[i][0] == "constant") {
-					plArguments[i] = new PLAtom(arguments[i][1]);
+			int PredArity = Integer.getInteger(PredInfo[1].toString());
+			if (PredArity != 2) 
+				throw new QueryConversorExceptionClass("Arity of predicate is not 2. Predicate " + tmpPredicate);
+		}
+		
+		PLVariable tmpVar = new PLVariable();
+		PLVariable resultVar = new PLVariable();
+		
+		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{inputVariable, tmpVar});
+		PLAtom operator = new PLAtom(tmpRfuzzyComputeOperator);
+		PLAtom value = new PLAtom(tmpRfuzzyComputeValue);
+		PLStructure subGoal2 = new PLStructure("rfuzzy_compute", new PLTerm[]{operator, tmpVar, value, resultVar});
+		
+		SubQueryConversionClass subQuery = new SubQueryConversionClass();
+		subQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
+		subQuery.SubQuerySimpleInfoString = " " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue;
+		AnswerTermInJava tmpQuery = new AnswerTermInJava(subQuery.subQuery, null);
+		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
+		subQuery.resultVariable = resultVar;
+		subQueries.add(subQuery);
+		
+	}
+	
+	private void subqueryFuzzyEndTestAndSave() throws QueryConversorExceptionClass {
+		AnswerTermInJava [] PredInfo = connection.getPredicateInfo(tmpPredicate);
+		if (PredInfo[1].toString() == null) {
+			throw new QueryConversorExceptionClass("No defined arity for the predicate " + tmpPredicate);
+		}
+		else {
+			int PredArity = Integer.getInteger(PredInfo[1].toString());
+			if (PredArity != 2) 
+				throw new QueryConversorExceptionClass("Arity of predicate is not 2. Predicate " + tmpPredicate);
+		}
+		
+		PLVariable tmpVar1 = new PLVariable();
+		PLVariable tmpVar2 = null;
+		PLVariable tmpVar3 = null;
+		
+		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{inputVariable, tmpVar1});
+		PLStructure subGoal2 = null;
+		PLStructure subGoal3 = null;
+		
+		if (tmpQuantifier1 != null) {
+			tmpVar2 = new PLVariable();
+			subGoal2 = new PLStructure(tmpQuantifier1, new PLTerm[]{subGoal1, tmpVar2});
+		}
+		else {
+			subGoal2 = subGoal1;
+			tmpVar2 = tmpVar1;
+		}
+		
+		if (tmpQuantifier0 != null) {
+			tmpVar3 = new PLVariable();
+			subGoal3 = new PLStructure(tmpQuantifier0, new PLTerm[]{subGoal2, tmpVar3});
+		}
+		else {
+			subGoal3 = subGoal2;
+			tmpVar3 = tmpVar2;
+		}
+		
+		SubQueryConversionClass subQuery = new SubQueryConversionClass();
+		subQuery.subQuery = subGoal3;
+		subQuery.SubQuerySimpleInfoString = " ";
+		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += tmpQuantifier0 + "(";
+		if (tmpQuantifier1 != null) subQuery.SubQuerySimpleInfoString += tmpQuantifier1 + "(";
+		subQuery.SubQuerySimpleInfoString += tmpPredicate;
+		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += ")";
+		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += ")";
+		
+		AnswerTermInJava tmpQuery = new AnswerTermInJava(subQuery.subQuery, null);
+		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
+		subQuery.resultVariable = tmpVar3;
+		subQueries.add(subQuery);
+	}
+	
+	public PLStructure queryConvert () throws QueryConversorExceptionClass {
+		
+		if (initialSubQuery == null) {
+			throw new QueryConversorExceptionClass("No initial subQuery to convert.");
+		}
+		
+		querySimpleInfoString = "";
+		queryComplexInfoString = "";
+
+		PLStructure finalQuery = null;
+		PLVariable currentVar = null;
+		PLVariable tmpVar = null;
+		PLStructure aggrSubQuery = null;
+		AnswerTermInJava tmpQuery = null;
+		
+		if (subQueries != null) {
+			Iterator<SubQueryConversionClass> subQueriesIterator = subQueries.iterator();
+			while (subQueriesIterator.hasNext()) {
+				SubQueryConversionClass currentSubQuery = subQueriesIterator.next();
+
+				if (finalQuery == null) {
+					finalQuery = currentSubQuery.subQuery;
+					currentVar = currentSubQuery.resultVariable;
+					querySimpleInfoString += currentSubQuery.SubQuerySimpleInfoString;
+					queryComplexInfoString += currentSubQuery.SubQueryComplexInfoString;
 				}
 				else {
-					if (arguments[i][0] == "variable") {
-						plArguments[i] = varsMapping.returnMapping(arguments[i][1]);
+					if (tmpAggregator == null) {
+						throw new QueryConversorExceptionClass("No aggregator to combine the truth values.");
 					}
-					else {
-						throw new QueryConversorExceptionClass("Not a variable nor a constant.");
-					}
+					
+					finalQuery = new PLStructure(",", new PLTerm[]{finalQuery, currentSubQuery.subQuery});
+					tmpVar = new PLVariable();
+					aggrSubQuery = new PLStructure(tmpAggregator, new PLTerm[]{currentVar, currentSubQuery.resultVariable, tmpVar});
+					currentVar = tmpVar;
+					finalQuery = new PLStructure(",", new PLTerm[]{finalQuery, aggrSubQuery});
+
+					querySimpleInfoString += ", " + currentSubQuery.SubQuerySimpleInfoString;
+					queryComplexInfoString += ", " + currentSubQuery.SubQueryComplexInfoString;
+					tmpQuery = new AnswerTermInJava(currentSubQuery.subQuery, null);
+					queryComplexInfoString += ", " +  tmpQuery.toString();
+
 
 				}
 			}
-			// Now the main functor, the fuzzy predicate.
-			PLStructure mainGoal = new PLStructure(fuzzyPredicate, plArguments);
 			
-			// Now the second quantifier.
-			mainGoal = addQuantifierToSubQuery(quantifier2, "varQuantifier2", mainGoal);
-			
-			// Now the first quantifier.
-			mainGoal = addQuantifierToSubQuery(quantifier1, "varQuantifier1", mainGoal);
-
-			// Now we save it.
-			subqueries[subQueryCounter] = mainGoal;
-			subQueryCounter++;
+			if (tmpAggregator != null) {
+				querySimpleInfoString = tmpAggregator + "(" + querySimpleInfoString + ")";
+			}
 		}
-	}
-	
-	private PLStructure addQuantifierToSubQuery (String quantifier, String varName, PLStructure inputGoal) {
-		if ((quantifier != null) && (! "".equals(quantifier)) && (! "none".equals(quantifier))) {
-			varsMapping.markIndexedVariableAsTemporal();
-			PLTerm [] plArguments = new PLTerm [2];
-			plArguments[0] = inputGoal;
-			plArguments[1] = varsMapping.returnMapping(varName);
-			PLStructure goal = new PLStructure(quantifier, plArguments);
-			return goal;
-		}	
+		
+		if (finalQuery == null) {
+			finalQuery = initialSubQuery.subQuery;
+			querySimpleInfoString = initialSubQuery.SubQuerySimpleInfoString;
+			queryComplexInfoString = initialSubQuery.SubQueryComplexInfoString;
+		}
 		else {
-			return inputGoal;
-		}
-	}
-	
-	public PLStructure getFinalQuery () {
-		PLStructure accumulator = variablesConversionSubQuery();
-		
-		for (int i=(subQueryCounter -1); i >=0; i--) {
+			finalQuery = new PLStructure(",", new PLTerm[]{initialSubQuery.subQuery, finalQuery});
+			querySimpleInfoString = initialSubQuery.SubQuerySimpleInfoString + querySimpleInfoString;
+			queryComplexInfoString = initialSubQuery.SubQueryComplexInfoString + queryComplexInfoString;
 			
-			accumulator = getConjunctiveQuery(subqueries[i], accumulator);
 		}
 		
-		return accumulator;
+		return finalQuery;
 	}
 	
-	private PLStructure variablesConversionSubQuery () {
-		PLStructure subquery = null;
-		PLStructure accumulator = null;
-		
-		finalQueryVariables = new PLVariable[varsMapping.getRealSize()];
-		for (int i=0; i<varsMapping.getRealSize(); i++) finalQueryVariables[i] = null;
-		finalQueryVariablesCounter=0;
-		
-		for (int i=(varsMapping.getRealSize() -1); i>=0; i--) {
-			CiaoPrologVarMappingClass varMapping = varsMapping.getMappingWithIndex(i);
-			if (! varMapping.isTemporalVariable) {
-				PLTerm [] plArguments = new PLTerm [3];
-				plArguments[0] = varMapping.variable;
-				plArguments[1] = varMapping.condition;
-				plArguments[2] = varMapping.realVariable;
-				subquery = new PLStructure("rfuzzy_var_truth_value", plArguments);
-				
-				finalQueryVariables[finalQueryVariablesCounter] = varMapping.realVariable;
-				finalQueryVariablesCounter++;
-			}
-			accumulator = getConjunctiveQuery(subquery, accumulator);
-			subquery = null;
-		}
-		return accumulator;
-	}
 	
-	private PLStructure getConjunctiveQuery(PLStructure subQuery1, PLStructure subQuery2) {
-		if (subQuery1 == null) return subQuery2;
-		if (subQuery2 == null) return subQuery1;
-		
-		PLTerm [] plArguments = {subQuery1, subQuery2};
-		PLStructure result = new PLStructure(",", plArguments);
-		return result;
-	}
+	public PLVariable getInputVariable() { return inputVariable; };
+	public String getInputVariableName() { return inputVariableName; };
+	public PLVariable getOutputVariable() { return outputVariable; };
+	public String getOutputVariableName() { return outputVariableName; };
 	
-	public PLVariable [] getFinalQueryVariables () { 
-		PLVariable [] filteredFinalQueryVariables = new PLVariable [finalQueryVariablesCounter];
-		for (int i=0; i<finalQueryVariablesCounter; i++) {
-			if (finalQueryVariables[i] != null) {
-				filteredFinalQueryVariables[i] = finalQueryVariables[i];
-			}
-		}
-		return filteredFinalQueryVariables;
-	}
-	
+	public String getQuerySimpleInfoString() {return querySimpleInfoString; };
+	public String getQueryComplexInfoString() { return queryComplexInfoString; };
+
 }
 
 
