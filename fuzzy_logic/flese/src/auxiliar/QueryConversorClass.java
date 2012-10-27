@@ -171,7 +171,7 @@ public class QueryConversorClass {
 			throw new QueryConversorExceptionClass("No defined arity for the predicate " + tmpPredicate);
 		}
 		else {
-			int PredArity = Integer.getInteger(PredInfo[1].toString());
+			int PredArity = Integer.parseInt(PredInfo[1].toString());
 			if (PredArity != 2) 
 				throw new QueryConversorExceptionClass("Arity of predicate is not 2. Predicate " + tmpPredicate);
 		}
