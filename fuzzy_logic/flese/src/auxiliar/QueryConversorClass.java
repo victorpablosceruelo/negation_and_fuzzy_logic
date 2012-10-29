@@ -49,6 +49,7 @@ public class QueryConversorClass {
 	
 	public QueryConversorClass(int queryLinesCounter, CiaoPrologConnectionClass connection) {
 		this.connection = connection;
+		LOG.debug("\n -- Query Conversor Started -- \n");
 	}
 	
 	public String subqueryRetrieveAndSaveSubpart(String paramName, HttpServletRequest request, int type) throws QueryConversorExceptionClass {
@@ -60,7 +61,7 @@ public class QueryConversorClass {
 		String retrieved = request.getParameter(paramName);
 		msg += "\n  retrieved for paramName " + paramName + " value " + retrieved;
 		if ((retrieved != null) && (! ("----".equals(retrieved))) && (! ("".equals(retrieved)))){
-			LOG.info("type: "+type+" for paramName: "+paramName+" -> "+retrieved + " ");
+			// LOG.info("type: "+type+" for paramName: "+paramName+" -> "+retrieved + " ");
 			switch (type) {
 			case initialPredicate: tmpInitialPredicate = retrieved;
 				break;
@@ -173,10 +174,11 @@ public class QueryConversorClass {
 	}
 	
 	private void copyVariablesNamesToo(String firstVarName, AnswerTermInJavaClass predInfoMoreInfo) throws QueryConversorExceptionClass {
-		
 		if (predInfoMoreInfo == null) {
 			throw new QueryConversorExceptionClass("predInfoMoreInfo is null.");
 		}
+		LOG.info("copyVariablesNamesToo" + firstVarName + predInfoMoreInfo);
+		
 		int i = 0;
 		int j = 0;
 		boolean found = false;
@@ -383,6 +385,7 @@ public class QueryConversorClass {
 		// rfuzzy_var_truth_value(Var, Condition, Value)
 		finalQuery = fixVariables(finalQuery);
 		
+		LOG.debug("\n -- Query Conversor Returns a Query -- \n");
 		return finalQuery;
 	}
 	
@@ -398,44 +401,33 @@ public class QueryConversorClass {
 			finalQueryIn = new PLStructure(",", new PLTerm[]{finalQueryIn, conversion});
 			showVariables[i] = tmpVar;
 		}
+		if (outputVariable != null) {
+			tmpVar = new PLVariable();
+			auxVar = new PLVariable();
+			conversion = new PLStructure("rfuzzy_var_truth_value", new PLTerm[]{outputVariable, auxVar, tmpVar});
+			finalQueryIn = new PLStructure(",", new PLTerm[]{finalQueryIn, conversion});
+			outputVariable = tmpVar;
+		}
 		return finalQueryIn;
 	}
 	
 	
 	public PLVariable [] getListOfVariables() {
-		PLVariable [] variables = null;
-		int lengthShowVariables = 0;
-		if (showVariables != null) lengthShowVariables = showVariables.length;
-		if (subQueries == null) {
-			variables = new PLVariable[1 + lengthShowVariables];
-			variables[0] = inputVariable;
-			for (int i=0; i<lengthShowVariables; i++) variables[i+1] = showVariables[i];
-		}
-		else {
-			variables = new PLVariable[2 + lengthShowVariables];
-		    variables[0] = inputVariable;
-		    for (int i=0; i<lengthShowVariables; i++) variables[i+1] = showVariables[i];
-		    variables[lengthShowVariables + 1] = outputVariable;
-		}
-		return variables;
+		int length = showVariables.length;
+		if (outputVariable != null) length++;
+		PLVariable [] listOfVariables = new PLVariable[length];
+		for (int i=0; i<showVariables.length; i++) listOfVariables[i] = showVariables[i];
+		if (outputVariable != null) listOfVariables[length-1] = outputVariable;
+		return listOfVariables;
 	}
 	
 	public String [] getListOfNamesForVariables() {
-		String [] variablesNames = null;
-		int lengthShowVariablesNames = 0;
-		if (showVariablesNames != null) lengthShowVariablesNames = showVariablesNames.length;
-		if (subQueries == null) {
-			variablesNames = new String[1 + lengthShowVariablesNames];
-			variablesNames[0] = inputVariableName;
-			for (int i=0; i<lengthShowVariablesNames; i++) variablesNames[i+1] = showVariablesNames[i];
-		}
-		else {
-			variablesNames = new String[2 + lengthShowVariablesNames];
-			variablesNames[0] = inputVariableName;
-			for (int i=0; i<lengthShowVariablesNames; i++) variablesNames[i+1] = showVariablesNames[i];
-			variablesNames[lengthShowVariablesNames + 1] = outputVariableName;
-		}
-		return variablesNames;
+		int length = showVariablesNames.length;
+		if (outputVariable != null) length++;
+		String [] listOfNamesForVariables = new String[length];
+		for (int i=0; i<showVariablesNames.length; i++) listOfNamesForVariables[i] = showVariablesNames[i];
+		if (outputVariable != null) listOfNamesForVariables[length-1] = outputVariableName;
+		return listOfNamesForVariables;
 	}
 		
 	public String getQuerySimpleInfoString() {return querySimpleInfoString; };

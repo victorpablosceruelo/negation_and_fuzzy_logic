@@ -252,6 +252,7 @@ public class CiaoPrologConnectionClass {
 						preMsg += "null ";
 					}
 				}
+				/*
 				preMsg += "\n   Creation MSGS: ";
 				for (int i=0; i<variables.length; i++) {
 					if (answerTermInJava[i] != null) {
@@ -261,6 +262,7 @@ public class CiaoPrologConnectionClass {
 						preMsg += " answerTermInJava["+i+"] is null ";
 					}
 				}
+				*/
 				latestEvaluatedQueryAnswers.add(answerTermInJava);
 				LOG.info(preMsg);
 			}
