@@ -39,10 +39,8 @@ public class QueryConversorClass {
 	private CiaoPrologConnectionClass connection = null; 
 	private ArrayList<SubQueryConversionClass> subQueries = null;
 	private SubQueryConversionClass initialSubQuery = null;
-	private PLVariable inputVariable = null;
-	private String inputVariableName = null;
 	private PLVariable outputVariable = null;
-	private String outputVariableName = null;
+	private String outputVariableName = "Truth Value";
 	private PLVariable [] showVariables = null;
 	private String [] showVariablesNames = null;
 	
@@ -113,7 +111,7 @@ public class QueryConversorClass {
 			}
 		}
 		else {
-			if ((tmpInitialPredicate != null) && (inputVariable == null)) {
+			if ((tmpInitialPredicate != null) && (showVariables == null)) {
 				subQueryInitialEndTestAndSave();
 			}
 		}
@@ -131,7 +129,7 @@ public class QueryConversorClass {
 		if (tmpInitialPredicate == null) {
 			throw new QueryConversorExceptionClass("No initial predicate for the query.");
 		}
-		if (inputVariable != null) {
+		if (showVariables != null) {
 			throw new QueryConversorExceptionClass("You cannot configure twice the initial subquery.");
 		}
 		AnswerTermInJavaClass [] PredInfo = connection.getPredicateInfo(tmpInitialPredicate);
@@ -147,29 +145,34 @@ public class QueryConversorClass {
 		for (int i=0; i<PredArity; i++) {
 			plArgsSubGoal1[i] = new PLVariable();
 		}
-		showVariables = plArgsSubGoal1;
-		copyVariablesNamesToo(PredInfo[3]);
+
+		showVariables = new PLVariable[plArgsSubGoal1.length + 1];
+		showVariables[0] =  new PLVariable();
+		for (int i=0; i<plArgsSubGoal1.length; i++) {
+			showVariables[i+1] = plArgsSubGoal1[i];
+		}
+
+		copyVariablesNamesToo(tmpInitialPredicate, PredInfo[3]);
 
 		PLStructure subGoal1 = new PLStructure(tmpInitialPredicate, plArgsSubGoal1);
 		
 		// SubGoal2: ensure the input variable always has values from the typing predicate.
-		inputVariable = new PLVariable();
-		inputVariableName =  tmpInitialPredicate;
 		PLTerm [] plArgsSubGoal2 = new PLTerm [2];
-		plArgsSubGoal2[0] = inputVariable;
+		plArgsSubGoal2[0] = showVariables[0];
 		plArgsSubGoal2[1] = subGoal1;
 		
 		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
+		
 		
 		initialSubQuery = new SubQueryConversionClass();
 		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
 		initialSubQuery.SubQuerySimpleInfoString = "";
 		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(initialSubQuery.subQuery, null);
 		initialSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
-		initialSubQuery.resultVariable = inputVariable;
+		initialSubQuery.resultVariable = showVariables[0];
 	}
 	
-	private void copyVariablesNamesToo(AnswerTermInJavaClass predInfoMoreInfo) throws QueryConversorExceptionClass {
+	private void copyVariablesNamesToo(String firstVarName, AnswerTermInJavaClass predInfoMoreInfo) throws QueryConversorExceptionClass {
 		
 		if (predInfoMoreInfo == null) {
 			throw new QueryConversorExceptionClass("predInfoMoreInfo is null.");
@@ -179,6 +182,7 @@ public class QueryConversorClass {
 		boolean found = false;
 		AnswerTermInJavaClass aux1 = null;
 		AnswerTermInJavaClass aux2 = null;
+		int lengthShowVariablesNames = 1;
 		
 		if (predInfoMoreInfo.isList()) {
 			while (i < predInfoMoreInfo.length() && (! found)) {
@@ -187,18 +191,23 @@ public class QueryConversorClass {
 				if ((aux1 != null) && (aux1.isList()) && (aux1.length() > 1)) {
 					if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null) && 
 						("database".equals(aux1.atPosition(0).toString()))) {
+						LOG.info("Found database information: " + aux1.toString());
 						found = true;
 						aux2 = aux1.atPosition(1);
 
-						if (aux2.isList()) {
-							showVariablesNames = new String [aux2.length()];
-							for (j=0; j < aux2.length(); j++) {
-								showVariablesNames[j] = aux2.atPosition(j).toString();
-							}
-						}
+						if (aux2.isList()) lengthShowVariablesNames += aux2.length();
+						else LOG.info("Found database information ... not a database definition.");
 					}
 				}
 				if (! found) i++;
+			}
+		}
+		
+		showVariablesNames = new String [lengthShowVariablesNames];
+		showVariablesNames[0] = firstVarName;
+		for (j=1; j < lengthShowVariablesNames; j++) {
+			if ((aux2 != null) && (aux2.atPosition(j) != null)) {
+				showVariablesNames[j] = aux2.atPosition(j).toString();
 			}
 		}
 	}
@@ -218,7 +227,7 @@ public class QueryConversorClass {
 		PLTerm tmpVar = new PLVariable();
 		PLVariable resultVar = new PLVariable();
 
-		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{inputVariable, tmpVar});
+		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{showVariables[0], tmpVar});
 		
 		PLAtom operator = new PLAtom(tmpRfuzzyComputeOperator);
 		
@@ -262,7 +271,7 @@ public class QueryConversorClass {
 		PLVariable tmpVar2 = null;
 		PLVariable tmpVar3 = null;
 		
-		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{inputVariable, tmpVar1});
+		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{showVariables[0], tmpVar1});
 		PLStructure subGoal2 = null;
 		PLStructure subGoal3 = null;
 		
@@ -371,8 +380,27 @@ public class QueryConversorClass {
 			
 		}
 		
+		// rfuzzy_var_truth_value(Var, Condition, Value)
+		finalQuery = fixVariables(finalQuery);
+		
 		return finalQuery;
 	}
+	
+	private PLStructure fixVariables(PLStructure finalQueryIn) {
+		PLVariable tmpVar = null;
+		PLVariable auxVar = null;
+		PLStructure conversion = null;
+		for (int i=0; i<showVariables.length; i++) {
+			tmpVar = new PLVariable();
+			auxVar = new PLVariable();
+			// rfuzzy_var_truth_value(Var, Condition, Value)
+			conversion = new PLStructure("rfuzzy_var_truth_value", new PLTerm[]{showVariables[i], auxVar, tmpVar});
+			finalQueryIn = new PLStructure(",", new PLTerm[]{finalQueryIn, conversion});
+			showVariables[i] = tmpVar;
+		}
+		return finalQueryIn;
+	}
+	
 	
 	public PLVariable [] getListOfVariables() {
 		PLVariable [] variables = null;
