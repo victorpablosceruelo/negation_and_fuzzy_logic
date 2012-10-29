@@ -754,22 +754,22 @@ translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Pred_More
 translate_rfuzzy_define_database(Pred_Name, Pred_Arity, Description, Cls) :-
 	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
 	print_msg('debug', 'rfuzzy_define_database(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
-	translate_db_description(Description, 1, Pred_Name, Pred_Arity, Pred_Type, Cls_2),
-	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, ['database'], Cls_1),
+	translate_db_description(Description, 1, Pred_Name, Pred_Arity, Pred_Type, Cls_2, Fields_Names),
+	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, [('database', Fields_Names)], Cls_1),
 	print_msg('debug', 'rfuzzy_define_database :: Cls_1', Cls_1),
 	print_msg('debug', 'rfuzzy_define_database :: Cls_2', Cls_2),
 	append_local(Cls_1, Cls_2, Cls).
 
 % translate_db_description(Description, Index, DB_Pred_Name, DB_Pred_Arity, Types, DB_Fields) 
-translate_db_description([(Field_Name, Field_Type)], Index, DB_Pred_Name, DB_Pred_Arity, [Field_Type], Cls) :- 
+translate_db_description([(Field_Name, Field_Type)], Index, DB_Pred_Name, DB_Pred_Arity, [Field_Type], Cls, [Field_Name]) :- 
 	nonvar(Index), nonvar(DB_Pred_Arity), Index = DB_Pred_Arity, !,
 	translate_field_description(Field_Name, Field_Type, DB_Pred_Name, DB_Pred_Arity, Index, Cls).
 
-translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_Pred_Name, DB_Pred_Arity, [Field_Type|Types], Cls) :-
+translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_Pred_Name, DB_Pred_Arity, [Field_Type|Types], Cls, [Field_Name | Field_Names]) :-
 	nonvar(Index), nonvar(DB_Pred_Arity), Index < DB_Pred_Arity, !,
 	translate_field_description(Field_Name, Field_Type, DB_Pred_Name, DB_Pred_Arity, Index, Cls_1),
 	New_Index is Index + 1,
-	translate_db_description(Description, New_Index, DB_Pred_Name, DB_Pred_Arity, Types, Cls_2),
+	translate_db_description(Description, New_Index, DB_Pred_Name, DB_Pred_Arity, Types, Cls_2, Field_Names),
 	append_local(Cls_1, Cls_2, Cls).
 
 translate_field_description(Field_Name, Field_Type_2, DB_Pred_Name, DB_Pred_Arity, Index, Cls) :-

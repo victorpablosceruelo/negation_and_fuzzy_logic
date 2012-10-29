@@ -262,33 +262,71 @@ rfuzzy_process_attribute_dump(Dump, _Var, _Condition, _Value) :-
 % ------------------------------------------------------
 
 rfuzzy_compute_defined_operators([('=~=', 'rfuzzy_enum_type'), ('=', 'rfuzzy_any_type'), ('=/=', 'rfuzzy_any_type'), ('>', 'rfuzzy_number_type'), ('<', 'rfuzzy_number_type'), ('>=', 'rfuzzy_number_type'), ('=<', 'rfuzzy_number_type')]).
+rfuzzy_compute_aux(Operator, _Elt1, _Elt2, _Computed_Similarities, _Truth_Value) :-
+	var(Operator), !, fail.
 rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
 	Operator = '=', !,
 	(
-	    (
-		Elt1 .=. Elt2, !,
-		Truth_Value = 1
-	    )
+	    (	Elt1 .=. Elt2, !,	Truth_Value .=. 1    )
 	;
-	    (
-		Truth_Value = 0
-	    )
+	    (	Truth_Value .=. 0    )
 	).
 
 rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
 	Operator = '=/=', !,
 	(
+	    (	Elt1 .=. Elt2, !,	Truth_Value .=. 0    )
+	;
+	    (	Truth_Value .=. 1    )
+	).
+rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
+	Operator = '>', !,
+	(
+	    (	Elt1 .>. Elt2, !,	Truth_Value .=. 1    )
+	;
+	    (	Truth_Value .=. 0    )
+	).
+rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
+	Operator = '<', !,
+	(
+	    (	Elt1 .<. Elt2, !,	Truth_Value .=. 1    )
+	;
+	    (	Truth_Value .=. 0    )
+	).
+rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
+	Operator = '>=', !,
+	(
+	    (	Elt1 .>=. Elt2, !,	Truth_Value .=. 1    )
+	;
+	    (	Truth_Value .=. 0    )
+	).
+rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
+	Operator = '=<', !,
+	(
+	    (	Elt1 .=<. Elt2, !,	Truth_Value .=. 1    )
+	;
+	    (	Truth_Value .=. 0    )
+	).
+rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value) :-
+	Operator = '=~=', !,
+	Format = rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
+	(
 	    (
-		Elt1 .=. Elt2, !,
-		Truth_Value = 0
+		memberchk_local(Format, Computed_Similarities), !,
+		functor(Cred_Functor, Cred_Op, 3),
+		arg(1, Cred_Functor, TV), 
+		arg(2, Cred_Functor, Cred), 
+		arg(3, Cred_Functor, Truth_Value),
+		call(Cred_Functor)
 	    )
 	;
 	    (
-		Truth_Value = 1
+		Truth_Value .=. 0
 	    )
 	).
 
-rfuzzy_compute_aux(_Operator, _Elt1, _Elt2, _Computed_Similarities, 0) :- !.
+rfuzzy_compute_aux(Operator, _Elt1, _Elt2, _Computed_Similarities, 0) :- !,
+	print_msg('error', 'rfuzzy_compute_aux :: Unknown operator', Operator), !, fail.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
