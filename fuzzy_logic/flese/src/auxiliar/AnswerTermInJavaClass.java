@@ -11,7 +11,6 @@ import CiaoJava.PLVariable;
 
 public class AnswerTermInJavaClass {
 
-	private int listLength = 0;
 	private String singleAnswerTerm = null;
 	private AnswerTermInJavaClass[] compositeAnswerTerm = null;
 	
@@ -45,7 +44,7 @@ public class AnswerTermInJavaClass {
 		if (term.isList()) {
 			creationMsgs += "is a list. ";
 			PLList prologList = (PLList) term;
-			listLength = prologList.length();
+			int listLength = prologList.length();
 			if (listLength > 0) {
 				compositeAnswerTerm = new AnswerTermInJavaClass [listLength];
 				for (int i=0; i<listLength; i++) {
@@ -116,9 +115,9 @@ public class AnswerTermInJavaClass {
 		if ((singleAnswerTerm != null) && (! ",".equals(singleAnswerTerm))) retVal += singleAnswerTerm;
 		if (compositeAnswerTerm != null) {
 			retVal += "(";
-			for (int i=0; i<listLength; i++) {
+			for (int i=0; i<compositeAnswerTerm.length; i++) {
 				retVal += compositeAnswerTerm[i].toString();
-				if ((i+1) < listLength) retVal += ", ";
+				if ((i+1) < compositeAnswerTerm.length) retVal += ", ";
 			}
 			retVal += ")";
 		}

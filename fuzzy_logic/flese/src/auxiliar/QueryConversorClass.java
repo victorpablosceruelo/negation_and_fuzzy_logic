@@ -177,7 +177,8 @@ public class QueryConversorClass {
 		if (predInfoMoreInfo == null) {
 			throw new QueryConversorExceptionClass("predInfoMoreInfo is null.");
 		}
-		LOG.info("copyVariablesNamesToo" + firstVarName + predInfoMoreInfo);
+		LOG.info("copyVariablesNamesToo: firstVarName: " + firstVarName + " predInfoMoreInfo: "+ predInfoMoreInfo);
+		LOG.info("copyVariablesNamesToo: firstVarName: " + firstVarName + " predInfoMoreInfo: "+ predInfoMoreInfo.toString());
 		
 		int i = 0;
 		int j = 0;
@@ -191,6 +192,7 @@ public class QueryConversorClass {
 				aux1 =  predInfoMoreInfo.atPosition(i);
 				
 				if ((aux1 != null) && (aux1.isList()) && (aux1.length() > 1)) {
+					LOG.info("aux1 is a list and its length is over 1.");
 					if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null) && 
 						("database".equals(aux1.atPosition(0).toString()))) {
 						LOG.info("Found database information: " + aux1.toString());
@@ -201,9 +203,13 @@ public class QueryConversorClass {
 						else LOG.info("Found database information ... not a database definition.");
 					}
 				}
+				else {
+					LOG.info("ERROR: aux is NULL or aux1 is NOT a list or its length is NOT over 1.");
+				}
 				if (! found) i++;
 			}
 		}
+		else LOG.info("ERROR: predInfoMoreInfo is NOT a list.");
 		
 		showVariablesNames = new String [lengthShowVariablesNames];
 		showVariablesNames[0] = firstVarName;
