@@ -536,10 +536,10 @@ translate(rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pr
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [P1_Type_1_Name], Pred_Class, Selectors), 
 	!.
 
-translate((rfuzzy_similarity_between(Element1, Element2, Truth_Value)), Translation) :-
-	translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, 'prod', 1, Translation).
-translate((rfuzzy_similarity_between(Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
-	translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
+translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), Translation) :-
+	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1, Translation).
+translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
+	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
@@ -833,7 +833,7 @@ translate_field_description_aux([DB_Pred_Type, Type], Pred_Name, Input, Value, P
 % ------------------------------------------------------
 
 % translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
-translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
+translate_rfuzzy_similarity_between(_Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
 	Translation = rfuzzy_computed_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility).
 
 % ------------------------------------------------------
