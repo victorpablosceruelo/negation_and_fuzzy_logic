@@ -43,6 +43,8 @@ public class QueryConversorClass {
 	private String inputVariableName = null;
 	private PLVariable outputVariable = null;
 	private String outputVariableName = null;
+	private PLVariable [] showVariables = null;
+	private String [] showVariablesNames = null;
 	
 	private String queryComplexInfoString = null;
 	private String querySimpleInfoString = null;
@@ -141,10 +143,13 @@ public class QueryConversorClass {
 		
 		// SubGoal1: call the typing predicate.
 		int PredArity = Integer.parseInt(PredInfo[1].toString());
-		PLTerm [] plArgsSubGoal1 = new PLTerm [PredArity];
+		PLVariable [] plArgsSubGoal1 = new PLVariable [PredArity];
 		for (int i=0; i<PredArity; i++) {
 			plArgsSubGoal1[i] = new PLVariable();
 		}
+		showVariables = plArgsSubGoal1;
+		copyVariablesNamesToo(PredInfo[3]);
+
 		PLStructure subGoal1 = new PLStructure(tmpInitialPredicate, plArgsSubGoal1);
 		
 		// SubGoal2: ensure the input variable always has values from the typing predicate.
@@ -164,6 +169,40 @@ public class QueryConversorClass {
 		initialSubQuery.resultVariable = inputVariable;
 	}
 	
+	private void copyVariablesNamesToo(AnswerTermInJavaClass predInfoMoreInfo) throws QueryConversorExceptionClass {
+		
+		if (predInfoMoreInfo == null) {
+			throw new QueryConversorExceptionClass("predInfoMoreInfo is null.");
+		}
+		int i = 0;
+		int j = 0;
+		boolean found = false;
+		AnswerTermInJavaClass aux1 = null;
+		AnswerTermInJavaClass aux2 = null;
+		
+		if (predInfoMoreInfo.isList()) {
+			while (i < predInfoMoreInfo.length() && (! found)) {
+				aux1 =  predInfoMoreInfo.atPosition(i);
+				
+				if ((aux1 != null) && (aux1.isList()) && (aux1.length() > 1)) {
+					if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null) && 
+						("database".equals(aux1.atPosition(0).toString()))) {
+						found = true;
+						aux2 = aux1.atPosition(1);
+
+						if (aux2.isList()) {
+							showVariablesNames = new String [aux2.length()];
+							for (j=0; j < aux2.length(); j++) {
+								showVariablesNames[j] = aux2.atPosition(j).toString();
+							}
+						}
+					}
+				}
+				if (! found) i++;
+			}
+		}
+	}
+	
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave() 
 			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		AnswerTermInJavaClass [] PredInfo = connection.getPredicateInfo(tmpPredicate);
@@ -175,22 +214,30 @@ public class QueryConversorClass {
 			if (PredArity != 2) 
 				throw new QueryConversorExceptionClass("Arity of predicate is not 2. Predicate " + tmpPredicate);
 		}
-		
-		PLVariable tmpVar = new PLVariable();
+
+		PLTerm tmpVar = new PLVariable();
 		PLVariable resultVar = new PLVariable();
-		
+
 		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{inputVariable, tmpVar});
-		PLAtom operator = new PLAtom(tmpRfuzzyComputeOperator);
-		PLAtom value = new PLAtom(tmpRfuzzyComputeValue);
-		PLStructure subGoal2 = new PLStructure("rfuzzy_compute", new PLTerm[]{operator, tmpVar, value, resultVar});
 		
+		PLAtom operator = new PLAtom(tmpRfuzzyComputeOperator);
+		
+		PLTerm value = new PLAtom(tmpRfuzzyComputeValue);
+
+		if ("=~=".equals(tmpRfuzzyComputeOperator)) {
+			tmpVar = new PLStructure(tmpPredicate, new PLTerm[]{tmpVar});
+			value = new PLStructure(tmpPredicate, new PLTerm[]{value});
+		}
+		PLTerm database = new PLAtom(tmpInitialPredicate);
+		PLStructure subGoal2 = new PLStructure("rfuzzy_compute", new PLTerm[]{operator, database, tmpVar, value, resultVar});
+
 		SubQueryConversionClass subQuery = new SubQueryConversionClass();
 		subQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
 		subQuery.SubQuerySimpleInfoString = " " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue;
 		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(subQuery.subQuery, null);
 		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		subQuery.resultVariable = resultVar;
-		
+
 		// We only initialize the list if we really need it. 
 		if (subQueries == null) subQueries = new ArrayList<SubQueryConversionClass>();
 		subQueries.add(subQuery);
@@ -329,28 +376,36 @@ public class QueryConversorClass {
 	
 	public PLVariable [] getListOfVariables() {
 		PLVariable [] variables = null;
+		int lengthShowVariables = 0;
+		if (showVariables != null) lengthShowVariables = showVariables.length;
 		if (subQueries == null) {
-			variables = new PLVariable[1];
+			variables = new PLVariable[1 + lengthShowVariables];
 			variables[0] = inputVariable;
+			for (int i=0; i<lengthShowVariables; i++) variables[i+1] = showVariables[i];
 		}
 		else {
-			variables = new PLVariable[2];
+			variables = new PLVariable[2 + lengthShowVariables];
 		    variables[0] = inputVariable;
-		    variables[1] = outputVariable;
+		    for (int i=0; i<lengthShowVariables; i++) variables[i+1] = showVariables[i];
+		    variables[lengthShowVariables + 1] = outputVariable;
 		}
 		return variables;
 	}
 	
 	public String [] getListOfNamesForVariables() {
 		String [] variablesNames = null;
+		int lengthShowVariablesNames = 0;
+		if (showVariablesNames != null) lengthShowVariablesNames = showVariablesNames.length;
 		if (subQueries == null) {
-			variablesNames = new String[1];
+			variablesNames = new String[1 + lengthShowVariablesNames];
 			variablesNames[0] = inputVariableName;
+			for (int i=0; i<lengthShowVariablesNames; i++) variablesNames[i+1] = showVariablesNames[i];
 		}
 		else {
-			variablesNames = new String[2];
+			variablesNames = new String[2 + lengthShowVariablesNames];
 			variablesNames[0] = inputVariableName;
-			variablesNames[1] = outputVariableName;
+			for (int i=0; i<lengthShowVariablesNames; i++) variablesNames[i+1] = showVariablesNames[i];
+			variablesNames[lengthShowVariablesNames + 1] = outputVariableName;
 		}
 		return variablesNames;
 	}

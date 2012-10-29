@@ -332,7 +332,7 @@
 			valid = false;
 			if (programIntrospectionArray[i].predOtherInfo != '[]') {
 				for (var j=0; j<programIntrospectionArray[i].predOtherInfo.length; j++) {
-					if (programIntrospectionArray[i].predOtherInfo[j] == 'database') {
+					if (programIntrospectionArray[i].predOtherInfo[j][0] == 'database') {
 						valid = true;
 					}
 				}

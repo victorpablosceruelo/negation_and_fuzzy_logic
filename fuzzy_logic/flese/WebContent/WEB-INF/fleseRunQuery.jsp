@@ -28,6 +28,14 @@
 <%
 	if (answersIterator != null) {
 		out.print("<table>");
+		String [] variablesNames = (String []) request.getAttribute("variablesNames");
+		if (variablesNames != null) {
+			out.print("<tr>");
+			for (int i=0; i<variablesNames.length; i++) {
+				out.print("<th>" + variablesNames[i] + "</th>");
+			}
+			out.print("</tr>");
+		}
 		AnswerTermInJavaClass [] answer;
 		while (answersIterator.hasNext()) {
 			out.print("<tr>");
