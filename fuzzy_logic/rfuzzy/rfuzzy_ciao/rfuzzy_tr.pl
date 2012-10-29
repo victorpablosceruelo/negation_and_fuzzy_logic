@@ -1345,10 +1345,19 @@ generate_subcalls_for_rfuzzy_computed_similarity_between_aux([Element | More_Inf
 
 code_for_rfuzzy_compute_2(In, [Code | In]) :-
 	Code = (rfuzzy_compute(Operator, Database, Elt1, Elt2, Truth_Value) :- 
-	       findall(rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
-	       rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
-	       Computed_Similarities),
-		rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value)
+	       nonvar(Operator), nonvar(Database),
+	       (
+		   (   Operator = '=~=', !,
+		       findall(rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
+		       rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
+		       Computed_Similarities)
+		   )
+	       ;
+		   (   Operator \== '=~=', !,
+		       Computed_Similarities = []
+		   )
+	       ),
+	       rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value)
 	       ).
 
 % ------------------------------------------------------
