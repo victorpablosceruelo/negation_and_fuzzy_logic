@@ -109,10 +109,11 @@ retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, Show_Error) :-
 	    )
 	).
 
-retrieve_all_predicate_infos(Retrieved) :-
-	findall((predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors)),
-	(retract_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors))), Retrieved),
-	 !.
+retrieve_all_predicate_infos(Pred_Name, Pred_Arity, Retrieved) :-
+	findall((predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors)), 
+	predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors), Retrieved), !.
+%	(retract_fact(predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors))), Retrieved),
+%	 !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -249,7 +250,7 @@ print_list_info(Level, [Arg | Args]) :- !,
 % eat_3 uses info supplied by eat_1 and eat_2.	
 rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 	!,
-	retrieve_all_predicate_infos(All_Predicate_Infos),
+	retrieve_all_predicate_infos(_Any_Pred_Name, _Any_Pred_Arity, All_Predicate_Infos),
 	print_msg('debug', 'all_predicate_info', All_Predicate_Infos),
 	build_auxiliary_clauses(All_Predicate_Infos, Fuzzy_Rules_1),
 	generate_introspection_predicate(All_Predicate_Infos, Fuzzy_Rules_1, Fuzzy_Rules_2),
@@ -833,8 +834,19 @@ translate_field_description_aux([DB_Pred_Type, Type], Pred_Name, Input, Value, P
 % ------------------------------------------------------
 
 % translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
-translate_rfuzzy_similarity_between(_Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
-	Translation = rfuzzy_computed_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility).
+translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
+	nonvar(Database), nonvar(Element1), nonvar(Element2), nonvar(Truth_Value), nonvar(Credibility_Operator), nonvar(Credibility),
+	Real_Pred_Name = 'rfuzzy_computed_similarity_between',
+	add_preffix_to_name(Database, Real_Pred_Name, Pred_Name),
+	functor(Translation, Pred_Name, 5),
+	arg(1, Translation, Element1), 
+	arg(2, Translation, Element2), 
+	arg(3, Translation, Truth_Value), 
+	arg(4, Translation, Credibility_Operator), 
+	arg(5, Translation, Credibility),
+	
+	Real_Pred_Type = ['rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_truth_value_type', 'rfuzzy_predicate_type', 'rfuzzy_credibility_value_type'],
+	save_predicate_definition(Real_Pred_Name, 6, Real_Pred_Type, [(Database, Pred_Name, 5)], []).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1216,16 +1228,10 @@ get_nth_element_from_list(Position, [_Head | Tail], Head) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_introspection_predicate(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules) :-
-	retrieve_all_predicate_infos(Retrieved),
-	generate_introspection_predicate_aux(Fuzzy_Rules_To_Build, Fuzzy_Rules_Built, Fuzzy_Rules_Tmp),
-	generate_introspection_predicate_aux(Retrieved, Fuzzy_Rules_Tmp, Fuzzy_Rules).
-
-% generate_introspection_predicate_aux(Input_List, Accumulator_List, Result_List),
-generate_introspection_predicate_aux([], Accumulator_List, Accumulator_List) :- !.
-generate_introspection_predicate_aux([Input|Input_List], Accumulator_List, Result_List) :-
+generate_introspection_predicate([], List_In, List_In) :- !.
+generate_introspection_predicate([Input|Input_List], List_In, List_Out) :-
 	generate_introspection_predicate_real(Input, Output),
-	generate_introspection_predicate_aux(Input_List, [Output|Accumulator_List], Result_List).
+	generate_introspection_predicate(Input_List,  [Output | List_In], List_Out).
 
 % INFO: predicate_definition(Pred_Name, Pred_Arity, Pred_Type, New_More_Info, New_Needs_Head_Building)
 
@@ -1253,7 +1259,8 @@ add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 	code_for_getting_attribute_values(Fuzzy_Rules_Aux_1, Fuzzy_Rules_Aux_2), 
 	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Aux_3),
 	code_for_defined_quantifiers(Fuzzy_Rules_Aux_3, Fuzzy_Rules_Aux_4),
-	code_for_rfuzzy_compute(Fuzzy_Rules_Aux_4, Fuzzy_Rules_Out).
+	code_for_rfuzzy_compute_1(Fuzzy_Rules_Aux_4, Fuzzy_Rules_Aux_5),
+	code_for_rfuzzy_compute_2(Fuzzy_Rules_Aux_5, Fuzzy_Rules_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1312,11 +1319,34 @@ code_for_defined_quantifiers(Code_In, Code_Out) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_rfuzzy_compute(In, [Code_1, Code_2 | In]) :-
-	Code_1 = (rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred) :- fail),
-	Code_2 = (rfuzzy_compute(Operator, Elt1, Elt2, Truth_Value) :- 
-	       findall(rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
-	       rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
+code_for_rfuzzy_compute_1(In, Out) :-
+	Pred_Name = 'rfuzzy_computed_similarity_between',
+	retrieve_all_predicate_infos(Pred_Name, 6, All_Predicate_Infos),
+	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, Show_Error)
+	generate_subcalls_for_rfuzzy_computed_similarity_between(All_Predicate_Infos, In, Out),
+	!.
+
+generate_subcalls_for_rfuzzy_computed_similarity_between([], In, [Code | In]) :- !,
+	Code = (rfuzzy_computed_similarity_between(_Database, _Elt1, _Elt2, _TV, _Cred_Op, _Cred) :- fail).
+generate_subcalls_for_rfuzzy_computed_similarity_between([Element | List], In, Out) :- 
+	Element = (predicate_definition(Pred_Name, Pred_Arity, _Pred_Type, More_Info, _Selectors)), !,
+	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(More_Info, Pred_Name, Pred_Arity, In, Aux),
+	generate_subcalls_for_rfuzzy_computed_similarity_between(List, Aux, Out).
+
+generate_subcalls_for_rfuzzy_computed_similarity_between_aux([], _Pred_Name, _Pred_Arity, In, In) :- !.
+generate_subcalls_for_rfuzzy_computed_similarity_between_aux([Element | More_Infos], Pred_Name, Pred_Arity, In, Out) :-
+	Element = (Database, Aux_Pred_Name, Aux_Pred_Arity), !,
+	functor(Pred_Functor, Pred_Name, Pred_Arity),
+	Pred_Functor =..[Pred_Name, Database | Args],
+	functor(Aux_Pred_Functor, Aux_Pred_Name, Aux_Pred_Arity),
+	Aux_Pred_Functor =..[Aux_Pred_Name | Args],
+	Cl = (Pred_Functor :- Aux_Pred_Functor), !,
+	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(More_Infos, Pred_Name, Pred_Arity, [Cl | In], Out).
+
+code_for_rfuzzy_compute_2(In, [Code | In]) :-
+	Code = (rfuzzy_compute(Operator, Database, Elt1, Elt2, Truth_Value) :- 
+	       findall(rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
+	       rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
 	       Computed_Similarities),
 		rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value)
 	       ).
