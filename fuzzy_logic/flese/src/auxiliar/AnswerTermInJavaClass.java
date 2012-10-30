@@ -141,7 +141,7 @@ public class AnswerTermInJavaClass {
 			return compositeAnswerTerm.length;
 	}
 	public AnswerTermInJavaClass atPosition(int i) {
-		if (isList() && (i > 0) && (i < length())) {
+		if ((isList()) && (i >= 0) && (i < length())) {
 			return compositeAnswerTerm[i];
 		}
 		else return null;

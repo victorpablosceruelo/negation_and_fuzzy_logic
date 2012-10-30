@@ -27,7 +27,7 @@
 		</h3>
     	<jsp:include page="commonBodyProgramQuery.jsp" />
     	
-    	<h3>Query Results for the query &nbsp;&nbsp; <%=connection.getLatestEvaluatedQuery() %> </h3>
+    	<h3>Query Results for the query &nbsp;&nbsp; <%=(String) request.getAttribute("querySimpleInfoString") %></h3>
 		<br /><br /><br /><br /><br />
 
 <%
@@ -54,6 +54,25 @@
 	}
 %>
 
+	<br /><br /><br /><br />
+	<table>
+		<tr>
+			<th>Query Format</th>
+			<th>Query</th>
+		</tr>
+		<tr>
+			<td>Basic</td>
+			<td> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
+		</tr>
+		<tr>
+			<td>Complex</td>
+			<td><%=request.getAttribute("queryComplexInfoString") %></td>
+		</tr>
+		<tr>
+			<td>Prolog</td>
+			<td><%=connection.getLatestEvaluatedQuery() %> </td>
+		</tr>
+	</table>
 	<br /><br /><br /><br />
 	</div>
 </body>

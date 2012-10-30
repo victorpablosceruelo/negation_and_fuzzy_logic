@@ -191,6 +191,15 @@ public class QueryConversorClass {
 			while (i < predInfoMoreInfo.length() && (! found)) {
 				aux1 =  predInfoMoreInfo.atPosition(i);
 				
+				if (aux1 == null) LOG.info("ERROR: aux1 is NULL.");
+				else {
+					LOG.info("aux1: " + aux1.toString() + " isList: " + aux1.isList() + " length: " + aux1.length());
+					if (! aux1.isList()) LOG.info("ERROR: aux1 is NOT a list.");
+					else {
+						if (aux1.length() == 1) LOG.info("ERROR: aux1 length is NOT over 1.");
+					}
+				}
+
 				if ((aux1 != null) && (aux1.isList()) && (aux1.length() > 1)) {
 					LOG.info("aux1 is a list and its length is over 1.");
 					if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null) && 
@@ -203,9 +212,7 @@ public class QueryConversorClass {
 						else LOG.info("Found database information ... not a database definition.");
 					}
 				}
-				else {
-					LOG.info("ERROR: aux is NULL or aux1 is NOT a list or its length is NOT over 1.");
-				}
+
 				if (! found) i++;
 			}
 		}
@@ -213,9 +220,9 @@ public class QueryConversorClass {
 		
 		showVariablesNames = new String [lengthShowVariablesNames];
 		showVariablesNames[0] = firstVarName;
-		for (j=1; j < lengthShowVariablesNames; j++) {
+		for (j=0; j < lengthShowVariablesNames; j++) {
 			if ((aux2 != null) && (aux2.atPosition(j) != null)) {
-				showVariablesNames[j] = aux2.atPosition(j).toString();
+				showVariablesNames[j+1] = aux2.atPosition(j).toString();
 			}
 		}
 	}
