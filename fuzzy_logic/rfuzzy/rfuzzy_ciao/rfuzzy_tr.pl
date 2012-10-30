@@ -1348,16 +1348,19 @@ code_for_rfuzzy_compute_2(In, [Code | In]) :-
 	       nonvar(Operator), nonvar(Database),
 	       (
 		   (   Operator = '=~=', !,
-		       findall(rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
-		       rfuzzy_computed_similarity_between(Database, Elt1, Elt2, TV, Cred_Op, Cred),
-		       Computed_Similarities)
+		       print_msg('debug', 'rfuzzy_compute_aux :: operator is =~=', Operator),
+		       Template = rfuzzy_computed_similarity_between(Database, Elt1, Elt2, _TV, _Cred_Op, _Cred),
+		       findall(Template, Template, Computed_Similarities)
 		   )
 	       ;
 		   (   Operator \== '=~=', !,
+		       print_msg('debug', 'rfuzzy_compute_aux :: operator is NOT =~=', Operator),
 		       Computed_Similarities = []
 		   )
 	       ),
-	       rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value)
+	       print_msg('debug', 'rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities)', (Operator, Elt1, Elt2, Computed_Similarities)),
+	       rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value),
+	       print_msg('debug', 'rfuzzy_compute_aux :: Truth_Value', Truth_Value)
 	       ).
 
 % ------------------------------------------------------
