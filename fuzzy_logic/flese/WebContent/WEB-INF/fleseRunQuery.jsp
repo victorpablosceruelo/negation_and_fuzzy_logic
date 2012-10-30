@@ -58,53 +58,30 @@
     	<jsp:include page="commonBodyProgramQuery.jsp" />
     	
     	<h3>Query Results for the query &nbsp;&nbsp; <%=(String) request.getAttribute("querySimpleInfoString") %></h3>
-		<br /><br /><br /><br /><br />
+		<br /><br />
 
 		<div id="results"></div>
-<%
-	if (answersIterator != null) {
-		out.print("<table>");
-		String [] variablesNames = (String []) request.getAttribute("variablesNames");
-		if (variablesNames != null) {
-			out.print("<tr>");
-			for (int i=0; i<variablesNames.length; i++) {
-				out.print("<th>" + variablesNames[i] + "</th>");
-			}
-			out.print("</tr>");
-		}
-		AnswerTermInJavaClass [] answer;
-		while (answersIterator.hasNext()) {
-			out.print("<tr>");
-			answer = answersIterator.next();
-			for (int i=0; i<answer.length; i++) {
-				out.print("<td>" + answer[i].toJavaScript(true) + "</td>");
-			}
-			out.print("</tr>");
-		}
-		out.print("</table>");
-	}
-%>
 
-	<br /><br /><br /><br />
-	<table>
-		<tr>
-			<th>Query Format</th>
-			<th>Query</th>
-		</tr>
-		<tr>
-			<td>Basic</td>
-			<td> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
-		</tr>
-		<tr>
-			<td>Complex</td>
-			<td><%=request.getAttribute("queryComplexInfoString") %></td>
-		</tr>
-		<tr>
-			<td>Prolog</td>
-			<td><%=connection.getLatestEvaluatedQuery() %> </td>
-		</tr>
-	</table>
-	<br /><br /><br /><br />
+		<br /><br /><br />
+		<table>
+			<tr>
+				<th>Query Format</th>
+				<th>Query</th>
+			</tr>
+			<tr>
+				<td>Basic</td>
+				<td> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
+			</tr>
+			<tr>
+				<td>Complex</td>
+				<td><%=request.getAttribute("queryComplexInfoString") %></td>
+			</tr>
+			<tr>
+				<td>Prolog</td>
+				<td><%=connection.getLatestEvaluatedQuery() %> </td>
+			</tr>
+		</table>
+		<br /><br /><br /><br />
 	</div>
 	
 	<script type="text/javascript">
@@ -119,7 +96,7 @@
 		
 			for (var i=0; i<answers.length; i++) {
 				var row = table.insertRow(-1);
-				for (var j=0; j<answers[i].length; j++) {
+				for (var j=1; j<answers[i].length; j++) {
 					var cell = row.insertCell(-1);
 					cell.innerHTML = answers[i][j];
 				}
