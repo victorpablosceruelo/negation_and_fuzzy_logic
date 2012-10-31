@@ -5,12 +5,12 @@
 	String localUserName = (String) session.getAttribute("localUserName");
 %>
 
-	<table id="bodyHead">
-		<tr>
-			<td id="bodyHeadTitle">
+	<table id="bodyHead" class="bodyHead">
+		<tr class="bodyHead">
+			<td id="bodyHeadTitle" class="bodyHead">
 				<H1>FleSe : <u>Fle</u>xible <u>Se</u>arches in Databases</H1>
 			</td>
-			<td id="bodyHeadLogged">
+			<td id="bodyHeadLogged" class="bodyHead">
 				<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
 				logged as <%=localUserName %>
 				<br>
@@ -19,30 +19,31 @@
 				Not logged in
 				<% } %>
 			</td>
-			<td id="bodyHeadLogout">
+			<td id="bodyHeadLogout" class="bodyHead">
 				<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Signout</a>
 			</td>
 		</tr>
 	</table>
 
 
+
 <div class="bodyToUserMsgs">
 	<%
 		if (session != null) {
 			if (session.getAttribute("msgs") != null) {
-				%><h3>Messages to the user:</h3>
-					<ul>
+				%><h3 class="bodyToUserMsgs">Messages to the user:</h3>
+					<ul class="bodyToUserMsgs">
 				<%
 				String [] msgs = (String []) session.getAttribute("msgs");
 				for (int i=0; i<msgs.length; i++) {
-					%><li><%=msgs[i]%></li><%
+					%><li class="bodyToUserMsgs"><%=msgs[i]%></li><%
 				}
 				%></ul><%
 				session.removeAttribute("msgs");
 			}			
 		}
 		else {
-			%><h3> ERROR: Session is null.</h3><%
+			%><p class=class="bodyToUserMsgs"> ERROR: Session is null.</h3><%
 		}
 	%>
 </div>
