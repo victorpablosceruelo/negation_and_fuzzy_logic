@@ -19,7 +19,7 @@ html {
 }
 
 body {
-    background-color: #fff;
+    background-color: #EBE8D9;
     color: #000;
     margin: 0.5em;
     padding: 0.5em;
@@ -33,7 +33,6 @@ h1 {
     font-weight:600;
     margin: 0em;
     padding:0em;
-    /* border-top: 3px #f00 solid; */
     text-align:left;
 }
 
@@ -42,13 +41,8 @@ h2 {
     font-size: larger;
     font-weight:500;
     text-align:left;
-    /* border-bottom: 1px solid #fbb; */
-    width: 80%;
+    /* width: 80%; */
     margin-left: 0.2em;
-/*     background-color: #fff8ec; */
-/*     border: 1px solid #330000; */
-   /*  font-variant: small-caps; */
-    /*  border-top: 1px solid #f00; */
 }
 
 p {
@@ -62,25 +56,22 @@ p.up {
 
 /* Definicion de estilos de Links */
 a {
-    color:#09c;
+    color:#395BED;
     text-decoration:none;
 }
 
 a:link {
-    color:#FB6D1D;
+    color:#395BED;
 }
 
 a:visited {
-    color:#07a;
+    color:#395BED;
 }
 
 a:hover {
-    color: #0ba;
+    color:#395BED;
 }
 
-a:hover {
-    /*background-color:#0ba;*/
-}
 
 /* Clase que decora su elemento */
 .dec {
@@ -121,15 +112,29 @@ pre {
 }
 
 table {
-    border: 1px solid #999;
+    border:1px solid #000000;
+    /*border-collapse:collapse;*/
 }
 
-td {
-    border: 1px solid #999;
+.withoutBorder table, #withoutBorder table {
+    border:none;
+    border-style:hidden;
+    border-width:0px;
+    border-collapse:collapse;
 }
 
-tr {
-    border: 1px solid #999;
+th, td, tr {
+	border:none;
+	margin:1px;
+	padding:0.5em;
+	/* border-collapse:collapse; */
+	border-style:hidden;
+	/* border-color:transparent; */
+	border-width:0px;
+	/* color:white; */
+	align:center;
+	vertical-align:center;
+	text-align:center;
 }
 
 /* Members style. */
@@ -137,58 +142,8 @@ ul.members {
     list-style-type: none;
 }
 
-.members li {
-    background-color: #FFD;
-    border: 2px solid black;
-    margin: 5px;
-    padding: 1px;
-    margin-right: 20px;
-}
-
-.members li:hover {
-    background-color: #FFA;
-}
-
 ul.sqr { list-style: square; }
 .sqr li { margin-bottom:6px; }
-
-/* Barra de men� lateral ========================*/
-.sidebar {
-    /* should be aligned with logo */
-    /* padding-left: 7px;*/
-    border-top: 3px #f00 solid;
-    color: #FFFFFF;
-    background-color: #fff8dc;
-    height: 470px;
-}
-
-.sidebar a{
-/*  color: #FFFFFF;*/
-}
-
-.sidebar li:hover {
-    background-color: #fff;
-    /*  margin-top: 1px;*/
-    /*  margin-bottom: 1em;*/
-    border-bottom: 1px #fff solid;
-}
-
-.sidebar li:link{
-
-}
-
-.sidebar li {
-    height: 1.5em;
-    background-color: #fff8dc;
-    border-top: 1px #fff solid;
-    border-bottom: 1px #ffe4c4 solid;
-    text-align: left;
-    vertical-align: middle;
-    text-transform: uppercase;
-    font-family: Sans, "Trebuchet MS";
-    padding-left: 7px;
-    color: #f00;
-}
 
 /*-----------------------------------------------*/
 
@@ -236,7 +191,7 @@ div {
     height: 40px;
     border: #FB6D1D solid 1px;
     float: left;
-    }
+}
 #HeaderOut{
     position: relative;
     margin-top: 12px;
@@ -323,27 +278,6 @@ li.menuHeader {
   border: 3px #000 solid;
 }
 
-body#secMain         #Menu li#Main,
-body#secMembers      #Menu li#Members,
-body#secResearch     #Menu li#Research,
-body#secProjects     #Menu li#Projects,
-body#secPublications #Menu li#Publications,
-body#secResources    #Menu li#Resources,
-body#secSoftware     #Menu li#Software,
-body#secJobs         #Menu li#JobOpenings,
-body#secTeaching     #Menu li#Teaching,
-body#secLinks        #Menu li#Links,
-body#secConferences  #Menu li#Conferences     {
-                                          background-color: #0ba;
-                                          /*border-right: 8px #0ba solid;*/
-                                          }
-
-/*
-li#Menu {
-  display: inline;
-}
-*/
-
 .bold {
   font-weight: bold;
 }
@@ -406,32 +340,7 @@ h3 {
 
 }
 
-.queryLineTable table, 
-.queryLineTable th, 
-.queryLineTable td {
-	border:0em solid white;
-	margin:0em;
-	border-collapse:collapse;
-}
 
-.queryLineAggregatorTable table,
-.queryLineAggregatorTable tr,
-.queryLineAggregatorTable td {
-	border:none;
-	margin:none;
-	/* border-collapse:collapse; */
-	border-style:hidden;
-	/* border-color:transparent; */
-	border-width:0px;
-	/* color:white; */
-	align:center;
-	vertical-align:center;
-	text-align:center;
-}
-
-#bodyHead {
-	width:90%;
-}
 
 #bodyHeadTitle {
 	border:1px solid black;

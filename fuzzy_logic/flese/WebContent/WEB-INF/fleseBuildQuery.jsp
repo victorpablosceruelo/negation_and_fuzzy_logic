@@ -13,7 +13,7 @@
     	<jsp:include page="commonBodyProgramQuery.jsp" />
 
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
-			<table id="queryStartTable">
+			<table id="queryStartTable" class="withoutBorder">
 				<tr>
 					<td><h3>Your query: I'm looking for a </h3></td>
 					<td id="queryStart"></td>
