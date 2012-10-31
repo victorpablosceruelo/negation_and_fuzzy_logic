@@ -192,104 +192,6 @@ div {
     border: #FB6D1D solid 1px;
     float: left;
 }
-#HeaderOut{
-    position: relative;
-    margin-top: 12px;
-    float: right;
-    right: 5px;
-    bottom: 3px;
-}
-
-#Content {
-/*     position: absolute;  */
-    top: 50px;
-    margin-top: 10px;
-    margin-left: 130px;
-    width: 570px;
-    padding: 0px;
-}
-
-#Footer {
-          font-size: smaller;
-          width: 700px;
-          margin-top: 2em;
-          clear: both;
-}
-
-#Footer p {
-            text-align: right;
-            }
-
-#Footer img {
-            border: none;
-            }
-
-#LSide {
-/*     position: absolute;  */
-    float: left;
-    top: 50px;
-    margin-top: 10px;
-    width: 120px;
-}
-
-#RSide {
-  float: right;
-  margin-right: 1ex;
-  overflow: hidden;
-}
-
-#FileListing {
-               font-family: Courier, "Courier New", monospace;
-               font-size: 11pt;
-               background-color: #f3faf4;
-               margin-left: 2em;
-               margin-right: 2em;
-               margin-top: 2em;
-               padding: 10px;
-               border: 1px #d8d8d8 solid;
-               }
-
-#FileListing table {
-                     border: none;
-                    }
-#FileListing td {
-                  border: none;
-                  padding-left: 1em;
-                  }
-/**************************/
-span#Label {
-  font-size: smaller;
-}
-
-input#Words {
-  width: 10em;
-}
-
-ul#Menu {
-  list-style: none;
-  margin: 0;
-  /*display: inline-block;*/
-  vertical-align: middle;
-  padding-left: 1px;
-  padding-right: 1px;
-}
-
-li.menuHeader {
-  border: 3px #000 solid;
-}
-
-.bold {
-  font-weight: bold;
-}
-.small {
-  font-size: smaller;
-}
-
-.Talk {
-        border: 1px solid #cccccc;
-        padding-left: 1em;
-        padding-right: 1em;
-        }
 
 h3 {
      color: #000;
@@ -298,49 +200,10 @@ h3 {
      text-align: left;
  }
 
-.title {
-               border-bottom: 2px solid #ff0000;
-               font-size: 130%;
-               }
-.AuthorData {
-              margin-left: 2em;
-              border: 1px solid black;
-              padding: 1px;
-              height: 7em;
-/*               height: 80px;  */
-              }
-.AuthorImg {
-             float: left;
-            }
-.AuthorImg img {
-                 height: 7em;
-                 }
-.AuthorText {
-              margin-top: 15px;
-              margin-left: 78px;
-              }
 
-.speaker {
-                 position: static;
-                 padding: 0px;
-                 margin: 0px;
-                 border-bottom: 1px solid #cc1111;
-                 }
-
-.affiliation {
-                     padding: 0px;
-                     margin: 0px;
-                     }
-
-
-.test {
-    float: left;
-    margin-right: 6px;
-    margin-top: 16px;
-
+#bodyHead {
+	width:90%;
 }
-
-
 
 #bodyHeadTitle {
 	border:1px solid black;
@@ -374,13 +237,5 @@ h3 {
 	padding:0.2em;
 }
 
-/* Super obsolete code */
-/* h1 a, h1 a:link, h1 a:visited {  */
-/*     color: #000;  */
-/* } */
-
-/* h1 a:hover {  */
-/*     background-color: #000;  */
-/* } */
 
 
