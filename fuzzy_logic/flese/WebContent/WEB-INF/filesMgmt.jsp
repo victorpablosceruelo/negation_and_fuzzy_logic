@@ -72,8 +72,8 @@
 				cell1.className = 'programFilesTable';
 				cell1.innerHTML = "<a href='"+filesMgmtServlet+
 						"?op=view&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
-						"onmouseover='showInfoMessage(\""+msgsCellId+"\", \"view program file "+fileName+"\")' "+
-						"onmouseout='showInfoMessage(\""+msgsCellId+"\", \"&nbsp;\")'>"+fileName+"</a> ";
+						"title=\"view program file "+fileName+"\""+
+						">"+fileName+"</a> ";
 				
 				var cell2 = row.insertCell(1);
 				cell2.className = 'programFilesTable';
@@ -83,8 +83,7 @@
 				cell3.className = 'programFilesTable';
 				cell3.innerHTML = "<a href='"+filesMgmtServlet+
 						"?op=remove&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
-						"onmouseover='showInfoMessage(\""+msgsCellId+"\", \"remove program file "+fileName+"\")' "+
-						"onmouseout='showInfoMessage(\""+msgsCellId+"\", \"&nbsp;\")'"+
+						"title=\"remove program file "+fileName+"\""+
 						"onclick='return confirm(\"Are you sure you want to delete program file "+fileName+"?\")'>"+
 						"<img src=\"remove-file.gif\" alt=\"remove\" width=\"20\"></img></a> ";
 				
@@ -92,30 +91,9 @@
 				cell4.className = 'programFilesTable';
 				cell4.innerHTML = "<a href='"+queryServlet+
 						"&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
-						"title=\"query program file "+fileName+"\""+
-						"onmouseover='showInfoMessage(\""+msgsCellId+"\", \"query program file "+fileName+"\")' "+
-						"onmouseout='showInfoMessage(\""+msgsCellId+"\", \"&nbsp;\")'>Query</a> ";
+						"title=\"query program file "+fileName+"\">Query</a> ";
 			}
-			
-			function showInfoMessage(cellId,msg){
-				if ((cellId != null) && (msg != null)) {
-					var cell = document.getElementById(cellId);
-					if (cell != null) {
-						if (msg=="") msg = "&nbsp;";
-						cell.innerHTML = msg;
-					}
-					else {
-						debug.info("showInfoMessage: cell is null");
-						debug.info("showInfoMessage: cellId:"+cellId);
-						debug.info("showInfoMessage: msg: "+msg);
-					}
-				}
-				else {
-					debug.info("showInfoMessage: cellId is null or msg is null.");
-					debug.info("showInfoMessage: msg: "+msg);
-				}
-			}
-			
+						
 			function unhideUpload() {
 				var html = "<INPUT TYPE=\'submit\' VALUE=\'Upload File\'>";
 				document.getElementById('uploadButton').innerHTML = html;	
