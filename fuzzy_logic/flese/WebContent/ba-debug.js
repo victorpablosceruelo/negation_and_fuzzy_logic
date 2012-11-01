@@ -57,6 +57,8 @@
 // methods will not be passed through if the logging level is set to 0 via
 // <debug.setLevel>.
 
+
+
 window.debug = (function(){
   var window = this,
     

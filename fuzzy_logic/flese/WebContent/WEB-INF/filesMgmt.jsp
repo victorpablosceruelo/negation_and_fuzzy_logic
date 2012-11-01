@@ -9,7 +9,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <body>
-	<script type="text/javascript" src="floatingMsg.js"></script>
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
 	
@@ -113,6 +112,11 @@
 					debug.info("showInfoMessage: cellId is null or msg is null.");
 					debug.info("showInfoMessage: msg: "+msg);
 				}
+				
+				var help = [];
+				help[0] = "This is my first help tooltip.";
+				var hwnd = window.open(); //apply your window attrbutes
+				hwnd.document.write(help[index]);
 			}
 			
 			function unhideUpload() {
