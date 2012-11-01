@@ -1,6 +1,4 @@
-<jsp:include page="commonHead.jsp" />
-<!-- JavaScript Debugging Code and more -->
-<jsp:include page="commonJavaScriptCode.jsp" />
+<jsp:include page="commonHtmlHead.jsp" />
 
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
@@ -22,7 +20,7 @@
 	
 <body>
     <div id="body">
-    	<jsp:include page="commonBody.jsp" />
+    	<jsp:include page="commonBodyHead.jsp" />
 			
 		<h2>
 			To access to FleSe you need an account in a Social Authentication Provider.

@@ -1,6 +1,4 @@
-<jsp:include page="commonHead.jsp" />
-<!-- JavaScript Debugging Code and more -->
-<jsp:include page="commonJavaScriptCode.jsp" />
+<jsp:include page="commonHtmlHead.jsp" />
 
 <%@page import="servlets.*"%>
 <%@page import="java.util.ArrayList"%>
@@ -12,7 +10,7 @@
 
 <body>
     <div id="body">
-    	<jsp:include page="commonBody.jsp" />
+    	<jsp:include page="commonBodyHead.jsp" />
 	
 		<script type="text/javascript">
 			var filesMgmtServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";

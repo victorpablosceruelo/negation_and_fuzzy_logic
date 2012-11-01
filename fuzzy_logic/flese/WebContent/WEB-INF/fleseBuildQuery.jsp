@@ -1,13 +1,9 @@
-<jsp:include page="commonHead.jsp" />
-<!-- JavaScript Debugging Code and more -->
-<jsp:include page="commonJavaScriptCode.jsp" />
-
+<jsp:include page="commonHtmlHead.jsp" />
 <jsp:include page="commonProgramQuery.jsp" />
-<jsp:include page="commonProgramQueryJavaScriptCode.jsp" />
 
 <body>
     <div id="body">
-    	<jsp:include page="commonBody.jsp" />
+    	<jsp:include page="commonBodyHead.jsp" />
     	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
 		<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; Perform a query </h3>
     	<jsp:include page="commonBodyProgramQuery.jsp" />

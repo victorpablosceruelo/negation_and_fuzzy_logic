@@ -1,6 +1,4 @@
-<jsp:include page="WEB-INF/commonHead.jsp" />
-<!-- JavaScript Debugging Code and more -->
-<jsp:include page="WEB-INF/commonJavaScriptCode.jsp" />
+<jsp:include page="WEB-INF/commonHtmlHead.jsp" />
 
 <body>
 <H1>FleSe : <u>Fle</u>xible <u>Se</u>arches in Databases</H1>

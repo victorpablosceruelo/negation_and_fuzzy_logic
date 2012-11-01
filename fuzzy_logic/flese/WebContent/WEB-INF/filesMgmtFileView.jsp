@@ -1,6 +1,4 @@
-<jsp:include page="commonHead.jsp" />
-<!-- JavaScript Debugging Code and more -->
-<jsp:include page="commonJavaScriptCode.jsp" />
+<jsp:include page="commonHtmlHead.jsp" />
 
 <%@page import="java.util.*"%>
 <%@page import="java.io.*"%>
@@ -9,7 +7,7 @@
 
 <body>
     <div id="body">
-    	<jsp:include page="commonBody.jsp" />
+    	<jsp:include page="commonBodyHead.jsp" />
     	<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
     		View program file <%= (String) request.getAttribute("fileName") %> </h3>
 		<br />
