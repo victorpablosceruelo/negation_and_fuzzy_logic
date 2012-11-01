@@ -129,30 +129,6 @@ ul.sqr { list-style: square; }
 
 /*  L A Y O U T  */
 
-/* Contenedores */
-#Body {
-    position: absolute;
-    top: 0px;
-    background-color: #fff;
-    color: #000;
-    margin: 0px;
-    padding: 0%;
-}
-
-#Header {
-/*     position: absolute; */
-    top: 0px;
-    left: 0px;
-    font-size: 8pt;
-    background-color:#292929;
-    width: 700px;
-    /* should be aligned with items in sidebar */
-    margin:0px;
-    padding-top: 0px;
-    padding-left: 7px;
-    height: 50px;
-}
-
 div {
     margin:0px;
     padding: 0px;
