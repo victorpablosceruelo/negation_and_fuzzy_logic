@@ -11,8 +11,9 @@
     	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
     		View program file <%= (String) request.getAttribute("fileName") %> </h3>
 		<br />
-		<hr>
 		<br />
+		<table class="fileViewTable">
+			<tr><td>
 		<%
 			String filePath = (String) request.getAttribute("filePath");
 			if ((filePath != null) && ( ! ("".equals(filePath)))) {
@@ -25,8 +26,9 @@
 				reader.close();
 			}
 		%>
+			</td></tr>
+		</table>
 		<br />
-		<hr>
 		<br />
 		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
     		View program file <%= (String) request.getAttribute("fileName") %> </h3>

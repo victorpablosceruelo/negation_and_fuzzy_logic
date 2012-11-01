@@ -13,9 +13,10 @@ html {
                "Luxi Sans", "Tahoma",
                 sans, sans-serif;
   font-size: 10pt;
-  margin: 0;
+  margin: 1em;
   margin-bottom: 2em;
   padding: 0;
+  width:90%
 }
 
 body {
@@ -25,6 +26,12 @@ body {
     padding: 1em;
     width:100%;
     text-align:left;
+}
+
+hr {
+	margin: 1em;
+	padding: 0em;
+    width:100%;
 }
 
 /* Encabezamientos y p�rrafos */
@@ -151,13 +158,17 @@ div {
     float: left;
 }
 
-.bodyHead  {
+table.bodyHead, tr.bodyHead {
 	border:1px solid black;
 	text-align:center;
 	padding:0em;
+	width:100%;
 }
 
-td.bodyHead { padding:0.5em; }
+td.bodyHead { 
+	border:1px solid black;
+	padding:0.5em; 
+}
 
 #bodyHeadTitle {
 	width:60%;
@@ -182,8 +193,18 @@ li.bodyToUserMsgs {
 	color:red;
 }
 
-table.programFilesList {
-	border:2em;
+table.fileViewTable {
+	padding:1em;
+	width:100%;
+}
+
+table.programFilesTable, td.programFilesTable {
+	border:0.1em solid #000000;
+	border-color:black;
+	padding:0.4em;
+	margin:0.2em;
+	align:center;
+	text-align:center;
 }
 
 div#qTip {

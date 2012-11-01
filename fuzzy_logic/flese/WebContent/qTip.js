@@ -1,24 +1,25 @@
-/*!
- * JavaScript Floating Message
- */
-/*<script type="text/javascript">*/
 
-// qTip - CSS Tool Tips - by Craig Erskine
-// http://qrayg.com
-//
-// Multi-tag support by James Crooke
-// http://www.cj-design.com
-//
-// Inspired by code from Travis Beckham
-// http://www.squidfingers.com | http://www.podlob.com
-//
-// Copyright (c) 2006 Craig Erskine
-// Permission is granted to copy, distribute and/or modify this document
-// under the terms of the GNU Free Documentation License, Version 1.3
-// or any later version published by the Free Software Foundation;
-// with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-// A copy of the license is included in the section entitled "GNU
-// Free Documentation License".
+/*!
+ * More info at http://qrayg.com/learn/code/qtip/
+ * 
+ * JavaScript Floating Message
+ * qTip - CSS Tool Tips - by Craig Erskine
+ * http://qrayg.com
+ *
+ * Multi-tag support by James Crooke
+ * http://www.cj-design.com
+ *
+ * Inspired by code from Travis Beckham
+ * http://www.squidfingers.com | http://www.podlob.com
+ *
+ * Copyright (c) 2006 Craig Erskine
+ * Permission is granted to copy, distribute and/or modify this document
+ * under the terms of the GNU Free Documentation License, Version 1.3
+ * or any later version published by the Free Software Foundation;
+ * with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+ * A copy of the license is included in the section entitled "GNU
+ * Free Documentation License".
+ */
 
 var qTipTag = "a,label,input"; //Which tag do you want to qTip-ize? Keep it lowercase!//
 var qTipX = 0; //This is qTip's X offset//
@@ -107,4 +108,4 @@ window.onload = function () {
 	tooltip.init ();
 };
 
-/* </script> */
+/* ----------------------------------------------------------------------- */

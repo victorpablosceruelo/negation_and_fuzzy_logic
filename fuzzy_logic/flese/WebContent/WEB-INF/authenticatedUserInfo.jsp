@@ -15,7 +15,7 @@
     <div id="body">
      	<jsp:include page="commonBodyHead.jsp" />
     	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
-    	<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
+    	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
     	&gt; 
     	User Info </h3>
 

@@ -2,7 +2,7 @@
 
 <%@page import="servlets.*"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="java.util.Iterator"%>
+<%@page import="java.util.Iterator"%> 
 <%@page import="auxiliar.FoldersUtilsClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
@@ -45,10 +45,10 @@
 				debug.info("lineForProgramFile: fileName: " + fileName);
 				debug.info("lineForProgramFile: fileOwner: " + fileOwner);
 				var table = document.getElementById(tableId);
-				table.className = "programFilesList";
+				table.className = "programFilesTable";
 				var rowCount = table.rows.length;
 				var row = table.insertRow(rowCount);
-				row.className = "programFilesList";
+				row.className = "programFilesTable";
 
 				var cell1 = row.insertCell(0);
 				cell1.className = 'programFilesTable';
