@@ -53,16 +53,6 @@ function init_callback_firebuglite() {
   }
 }
 
-function showInfoMessage(divName,msg){
-	// document.getElementById(divName);
-	if (msg=="") msg = "&nbsp;";
-	document.getElementById(divName).innerHTML = msg;
-	//messageBox.style.top=obj.offsetTop;
-	//messageBox.style.left=obj.offsetLeft+obj.offsetWidth+5;
-	//contents.innerHTML=msg+"<p>"+obj.href;
-	//messageBox.style.display="block";
-}
-
 var clientSoftware = "";
 var clientSoftwareVersion = "";
 
