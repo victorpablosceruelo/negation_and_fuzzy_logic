@@ -207,6 +207,10 @@ table.programFilesTable, td.programFilesTable {
 	text-align:center;
 }
 
+td.programFileChosen {
+	padding:0.2em;
+}
+
 div#qTip {
  padding: 3px;
  border: 1px solid #666;

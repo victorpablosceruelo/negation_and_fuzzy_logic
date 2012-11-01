@@ -42,33 +42,41 @@ public class CiaoPrologConnectionClass {
 			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
-		// Prepare the query structure.
-		// rfuzzy_introspection(PClass, PName, PArity, PType).
-		PLVariable[] variables = new PLVariable[4];
-		variables[0] = new PLVariable(); // predicateType
-		variables[1] = new PLVariable(); // predicateName
-		variables[2] = new PLVariable(); // predicateArity
-		variables[3] = new PLVariable(); // predicateType
-		PLTerm[] args = {variables[0], variables[1], variables[2], variables[3]};
-		PLStructure query = new PLStructure("rfuzzy_introspection", args); 
-		
-		// Run the query and save the results in programIntrospection
-		performQuery(query, fileOwner, fileName, variables);
-		programIntrospection = latestEvaluatedQueryAnswers;
-		
-		if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
-		else {
-			Iterator<AnswerTermInJavaClass []> test = getProgramIntrospectionIterator();
-			String testMsg = " - ProgramIntrospection - ";
-			while (test.hasNext()) {
-				AnswerTermInJavaClass [] subTest = test.next();
-				for (int i=0; i<subTest.length; i++) {
-					testMsg += "\n[" + i + "]: " + subTest[i].toString();
-				}
-			}
-			LOG.info(testMsg + "\n");
+		if ((latestEvaluatedQueryProgramFileName != null) &&
+			(latestEvaluatedQueryProgramFileOwner != null) &&
+			(latestEvaluatedQueryProgramFileName.equals(fileName)) &&
+			(latestEvaluatedQueryProgramFileOwner.equals(fileOwner))) {
+			LOG.info("programFileIntrospectionQuery: using the last query results.");
 		}
-		LOG.info("programFileIntrospectionQuery: END");
+		else {
+			// Prepare the query structure.
+			// rfuzzy_introspection(PClass, PName, PArity, PType).
+			PLVariable[] variables = new PLVariable[4];
+			variables[0] = new PLVariable(); // predicateType
+			variables[1] = new PLVariable(); // predicateName
+			variables[2] = new PLVariable(); // predicateArity
+			variables[3] = new PLVariable(); // predicateType
+			PLTerm[] args = {variables[0], variables[1], variables[2], variables[3]};
+			PLStructure query = new PLStructure("rfuzzy_introspection", args); 
+
+			// Run the query and save the results in programIntrospection
+			performQuery(query, fileOwner, fileName, variables);
+			programIntrospection = latestEvaluatedQueryAnswers;
+
+			if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
+			else {
+				Iterator<AnswerTermInJavaClass []> test = getProgramIntrospectionIterator();
+				String testMsg = " - ProgramIntrospection - ";
+				while (test.hasNext()) {
+					AnswerTermInJavaClass [] subTest = test.next();
+					for (int i=0; i<subTest.length; i++) {
+						testMsg += "\n[" + i + "]: " + subTest[i].toString();
+					}
+				}
+				LOG.info(testMsg + "\n");
+			}
+			LOG.info("programFileIntrospectionQuery: END");
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////

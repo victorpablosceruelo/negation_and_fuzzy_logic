@@ -1,24 +1,26 @@
 
+<!-- beginning of commonBodyProgramQuery -->
 <br />
     	
 <table class="programFileChosen">
-	<thead>
-		<tr>
-			<th colspan="2">
+	<thead class="programFileChosen">
+		<tr class="programFileChosen">
+			<th colspan="2" class="programFileChosen">
 				Information about program file chosen 
 			</th>
 		</tr>
 	</thead>
 
 	<tr>
-		<td>Program file name</td>
-		<td id="currentProgramFileName"></td>
+		<td class="programFileChosen">Program file name</td>
+		<td class="programFileChosen" id="currentProgramFileName"></td>
 	</tr>
 	<tr>
-		<td>Owner</td>
-		<td id="currentProgramFileOwner"></td>
+		<td class="programFileChosen">Owner</td>
+		<td class="programFileChosen" id="currentProgramFileOwner"></td>
 	</tr>
 </table>
+
 <script type="text/javascript">
 	if (clientSoftware == "msie") {
 		document.getElementById("currentProgramFileName").innerText = currentProgramFileName;
@@ -32,7 +34,7 @@
 		document.getElementById("currentProgramFileName").innerHTML = currentProgramFileName;
 		document.getElementById("currentProgramFileOwner").innerHTML = currentProgramFileOwner;		
 	}
-		
-	
 </script>
 <br />
+
+<!-- end of commonBodyProgramQuery -->
