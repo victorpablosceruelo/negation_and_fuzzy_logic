@@ -12,6 +12,7 @@
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
 	
+		<script language="JavaScript" src="qTip.js" type="text/JavaScript"></script>
 		<script type="text/javascript">
 			var filesMgmtServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
 			var queryServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null)%>";
@@ -91,6 +92,7 @@
 				cell4.className = 'programFilesTable';
 				cell4.innerHTML = "<a href='"+queryServlet+
 						"&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
+						"title=\"query program file "+fileName+"\""+
 						"onmouseover='showInfoMessage(\""+msgsCellId+"\", \"query program file "+fileName+"\")' "+
 						"onmouseout='showInfoMessage(\""+msgsCellId+"\", \"&nbsp;\")'>Query</a> ";
 			}
@@ -112,11 +114,6 @@
 					debug.info("showInfoMessage: cellId is null or msg is null.");
 					debug.info("showInfoMessage: msg: "+msg);
 				}
-				
-				var help = [];
-				help[0] = "This is my first help tooltip.";
-				var hwnd = window.open(); //apply your window attrbutes
-				hwnd.document.write(help[index]);
 			}
 			
 			function unhideUpload() {
