@@ -5,7 +5,7 @@
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
     	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
-		<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; Perform a query </h3>
+		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; Perform a query </h3>
     	<jsp:include page="commonBodyProgramQuery.jsp" />
 
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">

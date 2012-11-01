@@ -6,6 +6,7 @@
 <title>FleSe: Flexible Searches in Databases</title>
 <link href="style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="ba-debug.js"></script>
+<script type="text/javascript" src="qTip.js"></script>
 </head>
 
 <!-- JavaScript Debugging Code and more -->

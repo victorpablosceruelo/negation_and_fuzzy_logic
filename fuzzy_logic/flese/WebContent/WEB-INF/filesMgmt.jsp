@@ -11,8 +11,6 @@
 <body>
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
-	
-		<script language="JavaScript" src="qTip.js" type="text/JavaScript"></script>
 		<script type="text/javascript">
 			var filesMgmtServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
 			var queryServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null)%>";

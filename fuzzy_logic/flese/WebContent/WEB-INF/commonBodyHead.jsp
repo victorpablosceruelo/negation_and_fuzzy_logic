@@ -14,13 +14,13 @@
 				<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
 				logged as <%=localUserName %>
 				<br>
-				<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletUserInfo, request, null) %>">user profile</a>
+				<a title="view user profile" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletUserInfo, request, null) %>">user profile</a>
 				<% } else { %>
 				Not logged in
 				<% } %>
 			</td>
 			<td id="bodyHeadLogout" class="bodyHead">
-				<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Signout</a>
+				<a title="Sign out" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Signout</a>
 			</td>
 		</tr>
 	</table>

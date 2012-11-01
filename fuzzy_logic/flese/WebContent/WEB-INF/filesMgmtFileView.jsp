@@ -8,7 +8,7 @@
 <body>
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
-    	<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
+    	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
     		View program file <%= (String) request.getAttribute("fileName") %> </h3>
 		<br />
 		<hr>
@@ -28,7 +28,7 @@
 		<br />
 		<hr>
 		<br />
-		<h3><a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
+		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
     		View program file <%= (String) request.getAttribute("fileName") %> </h3>
     	<br /><br />
 	</div>
