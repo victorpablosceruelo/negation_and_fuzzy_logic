@@ -59,22 +59,23 @@
 		<div id="results"></div>
 
 		<br /><br /><br />
-		<table>
-			<tr>
-				<th>Query Format</th>
-				<th>Query</th>
+		<h3>Debug information about the query run in the Prolog system</h3>
+		<table class='queryResults'>
+			<tr class='queryResults'>
+				<th class='queryResults'>Query Format</th>
+				<th class='queryResults'>Query</th>
 			</tr>
-			<tr>
-				<td>Basic</td>
-				<td> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
+			<tr class='queryResults'>
+				<td class='queryResults'>Basic</td>
+				<td class='queryResults'> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
 			</tr>
-			<tr>
-				<td>Complex</td>
-				<td><%=request.getAttribute("queryComplexInfoString") %></td>
+			<tr class='queryResults'>
+				<td class='queryResults'>Complex</td>
+				<td class='queryResults'><%=request.getAttribute("queryComplexInfoString") %></td>
 			</tr>
-			<tr>
-				<td>Prolog</td>
-				<td><%=connection.getLatestEvaluatedQuery() %> </td>
+			<tr class='queryResults'>
+				<td class='queryResults'>Prolog</td>
+				<td class='queryResults'><%=connection.getLatestEvaluatedQuery() %> </td>
 			</tr>
 		</table>
 		<br /><br /><br /><br />
@@ -88,13 +89,26 @@
 		else {
 			var table = document.createElement('table');
 			table.id = 'resultsTable';
+			table.className = 'queryResults';
 			div.appendChild(table);
 		
+			var row = null;
+			var cell = null;
 			for (var i=0; i<answers.length; i++) {
-				var row = table.insertRow(-1);
+				row = table.insertRow(-1);
+				row.className = 'queryResults';
 				for (var j=1; j<answers[i].length; j++) {
-					var cell = row.insertCell(-1);
-					cell.innerHTML = answers[i][j];
+					if (i==0) {
+						cell = document.createElement('th');
+						cell.className = 'queryResults';
+						cell.innerHTML = answers[i][j];
+						row.appendChild(cell);
+					}
+					else {
+						cell = row.insertCell(-1);
+						cell.className = 'queryResults';
+						cell.innerHTML = answers[i][j];
+					}
 				}
 			}
 		}

@@ -83,7 +83,6 @@
 		</script>
 
 	<h3>Choose an existing program file for querying, viewing or remove</h3>
-	<br />
 	<div id="programFilesTableWithInfo">&nbsp;</div>
 	<br />
 

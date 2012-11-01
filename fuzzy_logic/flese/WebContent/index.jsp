@@ -1,29 +1,65 @@
 <jsp:include page="WEB-INF/commonHtmlHead.jsp" />
 
 <body>
-<H1>FleSe : <u>Fle</u>xible <u>Se</u>arches in Databases</H1>
-
+<div class="indexPageTitle">
+	FleSe
+</div>
+<br /><br />
+<div class="indexPageTitleExplanation">
+	<span class="underline">Fle</span>xible 
+	<span class="underline">Se</span>arches in Databases
+</div>
+<br /><br />
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Go to the application</a>
+<div class='indexPageImportantLink'>
+<a class='indexPageImportantLink' href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Go to the application</a>
+</div>
 <br />
 <br />
-This application has been developed by
-<a href="http://babel.ls.fi.upm.es/~vpablos/">Victor Pablos Ceruelo</a>
+<div class='indexPageSubTitle'>What is FleSe</div>
+<div class='indexPageText'>
+Flese is a framework allowing the final user to perform fuzzy queries 
+(as "fast red car") in databases that might have no fuzzy information at all.
+</div>
+<br />
+<br />
+<div class='indexPageSubTitle'>FleSe in detail</div>
+<div class='indexPageText'>
+Flese is a framework composed by two sub-frameworks: 
+the engine that processes fuzzy queries and the web interface that presents results in a human-readable way. 
+<ul>
+	<li>
+		The engine is an improved version of the framework Rfuzzy presented in
+		<a href="http://www.sciencedirect.com/science/article/pii/S0020025510003610">&ldquo;RFuzzy: Syntax, semantics and implementation details of a simple and expressive fuzzy tool over Prolog&rdquo;</a>.
+		In this new framework we have included the management of quantifiers (even negation), similarity, overload of attribute's names and others.
+		Its main advantage over some other engines is that its syntax is trivial, it allows to reuse existing databases and Prolog code
+		and it has every facility we need to represent real-world applications. 
+		Rfuzzy is a package of the <a href="http://ciaohome.org/">Ciao Prolog</a> logic programming environment.
+	</li>
+</ul>
+<ul>
+	<li>
+		The web interface is a Java application that interprets the answers provided by the fuzzy framework.
+		It runs on a Tomcat server behind an Apache proxy. 
+	</li>
+</ul>
+</div>
+<br />
+<br />
+<div class='indexPageSubTitle'>Developers</div>
+<div class='indexPageText'>
+This application is being developed by
+<a href="http://babel.ls.fi.upm.es/~vpablos/">Ph.D. student Victor Pablos Ceruelo</a>
 under the supervision of 
-<a href="http://babel.ls.fi.upm.es/~susana/">Susana Muñoz Hernandez</a>
+<a href="http://babel.ls.fi.upm.es/~susana/">Dr. Susana Muñoz Hernandez</a>,
 as part of his research in the 
 <a href="http://babel.ls.fi.upm.es/">Babel Research Group</a>.
+</div>
 
 <br /><br />
-This aplication is divided in two: the web interface and the engine that processes
-fuzzy queries. The web interface is a Java application 
-running on a Tomcat server (behind an Apache proxy) and
-the engine is a <a href="http://ciaohome.org/">Ciao Prolog</a> server
-running fuzzy logic programs thanks to its packages system
-and the package Rfuzzy
-(see <a href="http://www.sciencedirect.com/science/article/pii/S0020025510003610">RFuzzy: Syntax, semantics and implementation details of a simple and expressive fuzzy tool over Prolog</a>).  
 
-<br /><br />
+<div class='indexPageSubTitle'>Support</div>
+<div class='indexPageText'>
 This work is partially supported by research projects 
 DESAFIOS10 (TIN2009-14599-C03-00) funded by Ministerio Ciencia e Innovación of Spain,
 PROMETIDOS (P2009/TIC-1465) funded by Comunidad Autónoma de Madrid,
@@ -35,6 +71,31 @@ funded by the Spanish Ministry of Science and Innovation.
 It is partially supported too by the Universidad Politécnica de Madrid entities 
 Departamento de Lenguajes y Sistemas Informáticos e Ingeniería de Software 
 and Facultad de Informática.
-
+</div>
+<br /><br /><br />
+<div class=indexPageImages>
+	<a href="http://babel.ls.fi.upm.es/">
+		<img height="150" src="logo-babel.jpg" alt="logo babel research group"></img>
+	</a>
+	<a href="http://upm.es/">
+		<img height="150" src="logo-upm.jpg" alt="logo Universidad Politécnica de Madrid"></img>
+	</a>
+	<a href="http://www.fi.upm.es/">
+		<img height="150" src="logo-fi.jpg" alt="logo Facultad de Informática"></img>
+	</a>
+	<a href="http://www.dlsiis.fi.upm.es/">
+		<img height="150" src="logo-lsiis.jpeg" alt="logo Departamento de Lenguajes y Sistemas Informáticos e Ingeniería del Software"></img>
+	</a>
+	<a href="http://www.micinn.es/">
+		<img height="150" src="logo-micinn.png" alt="logo Ministerio de Ciencia e Innovación"></img>
+	</a>
+	<a href="http://www.madrid.org/">
+		<img height="150" src="logo-cm.gif" alt="logo Comunidad de Madrid"></img>
+	</a>
+	<a href="http://mcyt.es/">
+		<img height="150" src="logo-mcyt.gif" alt="logo Ministerio de Ciencia y Tecnología"></img>
+	</a>
+	
+</div>
 </body>
 </html>

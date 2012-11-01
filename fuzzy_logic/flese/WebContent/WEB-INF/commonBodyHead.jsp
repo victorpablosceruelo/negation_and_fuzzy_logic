@@ -1,14 +1,20 @@
 
+<!-- beginning of commonBodyHead -->
+
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
 <%
-	String localUserName = (String) session.getAttribute("localUserName");
+	String localUserName = null;
+	if (session != null) {
+		localUserName = (String) session.getAttribute("localUserName");
+	}
 %>
 
 	<table id="bodyHead" class="bodyHead">
 		<tr class="bodyHead">
 			<td id="bodyHeadTitle" class="bodyHead">
-				<H1>FleSe : <u>Fle</u>xible <u>Se</u>arches in Databases</H1>
+				FleSe : <span class="underline">Fle</span>xible 
+				<span class="underline">Se</span>arches in Databases
 			</td>
 			<td id="bodyHeadLogged" class="bodyHead">
 				<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
@@ -43,8 +49,15 @@
 			}			
 		}
 		else {
-			%><p class=class="bodyToUserMsgs"> ERROR: Session is null.</h3><%
+			%>
+				<ul class="bodyToUserMsgs">
+					<li class="bodyToUserMsgs"> ERROR: Session is null.</li>
+				</ul>
+			<%
 		}
 	%>
 </div>
+
+<!-- end of commonBodyHead -->
+
 

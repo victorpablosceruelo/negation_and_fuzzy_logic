@@ -52,22 +52,10 @@ p {
     text-align: justify;
 }
 
-/* Definicion de estilos de Links */
-a {
+/* Links definition */
+a, a:link, a:visited, a:hover {
     color:#395BED;
     text-decoration:none;
-}
-
-a:link {
-    color:#395BED;
-}
-
-a:visited {
-    color:#395BED;
-}
-
-a:hover {
-    color:#395BED;
 }
 
 /* DESCRIPTION LISTS */
@@ -124,21 +112,41 @@ th.withoutBorder, td.withoutBorder, tr.withoutBorder {
 	text-align:center;
 }
 
-/* Members style. */
-ul.members {
-    list-style-type: none;
-}
-
-ul.sqr { list-style: square; }
-.sqr li { margin-bottom:6px; }
-
-/*-----------------------------------------------*/
-
-/*  L A Y O U T  */
-
 div {
     margin:0px;
     padding: 0px;
+}
+
+/*-----------------------------------------------*/
+
+.underline {
+	text-decoration:underline;
+}
+
+.indexPageTitle {
+	font-size:250%;
+	text-align:center;
+}
+.indexPageTitleExplanation {
+	font-size:200%;
+	text-align:center;
+}
+
+.indexPageImportantLink,
+a.indexPageImportantLink, a.indexPageImportantLink:link, 
+a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
+	color:red;
+	text-color:red;
+	font-size:125%;
+	text-align:center;
+}
+.indexPageSubTitle {
+	text-decoration:underline;
+	font-size:175%;
+	margin:0.5em;
+}
+.indexPageText {
+	font-size:125%;
 }
 
 #HeaderLogo {
@@ -173,10 +181,11 @@ td.bodyHead {
 #bodyHeadTitle {
 	width:60%;
 	padding:1em;
+	font-size:200%;
 }
 
-#bodyHeadLogged { width:30%; }
-#bodyHeadLogout { width:10%; }
+#bodyHeadLogged { width:30%; font-size:125%;}
+#bodyHeadLogout { width:10%; font-size:125%;}
 
 td.providersIcons  {
 	border:1em;
@@ -207,8 +216,20 @@ table.programFilesTable, td.programFilesTable {
 	text-align:center;
 }
 
-td.programFileChosen {
-	padding:0.2em;
+th.programFileChosen, td.programFileChosen {
+	padding:0.5em;
+}
+
+table.queryResults {
+	border:0.1em solid #000000;
+}
+tr.queryResults, th.queryResults, td.queryResults {
+	border:0.1em solid #000000;
+	border-color:black;
+	padding:0.6em;
+	margin:0.2em;
+	align:center;
+	text-align:center;
 }
 
 div#qTip {
