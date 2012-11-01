@@ -22,8 +22,10 @@
 				debug.info("lineForProgramFile: fileName: " + fileName);
 				debug.info("lineForProgramFile: fileOwner: " + fileOwner);
 				var table = document.getElementById(tableId);
+				table.className = "programFilesList";
 				var rowCount = table.rows.length;
 				var row = table.insertRow(rowCount);
+				row.className = "programFilesList";
 
 				var cell1 = row.insertCell(0);
 				cell1.innerHTML = "<a href='"+filesMgmtServlet+

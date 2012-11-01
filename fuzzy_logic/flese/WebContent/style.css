@@ -157,12 +157,14 @@ div {
     margin:0px;
     padding: 0px;
 }
+
 #HeaderLogo {
     position: relative;
     top: 16px;
     left: 5px;
     float: left;
 }
+
 .babelimg {
     position: relative;
     top: 5px;
@@ -204,5 +206,7 @@ li.bodyToUserMsgs {
 	color:red;
 }
 
-
+table.programFilesList {
+	border:2em;
+}
 
