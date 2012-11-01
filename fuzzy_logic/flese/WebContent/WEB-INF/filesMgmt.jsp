@@ -19,26 +19,10 @@
 			
 			function createProgramFilesWithMsgsTable (divId, programFilesTableId, msgsCellId) {
 				var div = document.getElementById(divId);
-				var programFilesWithMsgsTable = document.createElement('table');
-				programFilesWithMsgsTable.id = 'programFilesWithMsgsTable';
-				programFilesWithMsgsTable.className = 'programFilesWithMsgsTable';
-				div.appendChild(programFilesWithMsgsTable);
-				
-				var row0 = programFilesWithMsgsTable.insertRow(-1);
-				row0.className = 'programFilesWithMsgsTable';
-				var row0cell0 = row0.insertCell(-1);
-				row0cell0.className = 'programFilesWithMsgsTable';
-				row0cell0.id = msgsCellId;
-				row0cell0.innerHTML = "&nbsp;";
-				
-				var row1 = programFilesWithMsgsTable.insertRow(-1);
-				row1.className = 'programFilesWithMsgsTable';
-				var row1cell0 = row1.insertCell(-1);
-				row1cell0.className = 'programFilesWithMsgsTable';
 				var programFilesTable = document.createElement('table');
 				programFilesTable.id = programFilesTableId;
 				programFilesTable.className = 'programFilesTable';
-				row1cell0.appendChild(programFilesTable); 
+				div.appendChild(programFilesTable); 
 				
 				var programFilesTableHead = programFilesTable.insertRow(-1);
 				var programFilesTableHeadCell0 = document.createElement('th');
