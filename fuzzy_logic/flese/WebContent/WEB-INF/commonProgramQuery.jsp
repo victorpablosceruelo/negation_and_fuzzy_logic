@@ -345,7 +345,8 @@
 		
 		var html = "<a href=\"\" onClick='return addQueryLineAndAggregatorChoose"+
 					"(\""+queryLinesCellId+"\", \""+chooseAgregatorCell.id+"\", \""+comboBoxValue+"\");' >" +
-					"<img src=\"add.png\" width=\"20\" alt=\"Add more conditions to the query\" /></a>";
+					"<img src=\"images/add.png\" width=\"20\" alt=\"Add more conditions to the query\" "+
+						"title=\"Add more conditions to the query\" /></a>";
 		addMoreQueryLinesButtonCell.innerHTML = html;
 		return false;
 	}

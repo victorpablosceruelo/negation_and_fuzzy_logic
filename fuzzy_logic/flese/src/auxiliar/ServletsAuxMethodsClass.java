@@ -214,7 +214,7 @@ public class ServletsAuxMethodsClass {
 				break;
 		case SocialAuthUserInfoPage: retVal = "WEB-INF/authenticatedUserInfo.jsp";
 				break;
-		case SocialAuthCallBackServlet: retVal = "SocialAuthServlet?op=signed";
+		case SocialAuthCallBackServlet: retVal = "SocialAuthCallBackServlet";
 				break;
 		case FilesMgmtServlet: retVal = "FilesMgmtServlet";
 				break;
