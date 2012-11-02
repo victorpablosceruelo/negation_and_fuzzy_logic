@@ -9,7 +9,7 @@ public class AnswerTermInJavaClassException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(FoldersUtilsClassException .class);
+	final Log LOG = LogFactory.getLog(AnswerTermInJavaClassException .class);
 
 	public AnswerTermInJavaClassException(String msg) {
 		super(msg);

@@ -28,50 +28,15 @@ import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
 // import org.brickred.socialauth.util.SocialAuthUtil;
 
-import auxiliar.LocalUserNameFixesClass;
+import auxiliar.LocalUserNameClass;
 import auxiliar.ServletsAuxMethodsClass;
-
-
-
-/**
- * 
- * It redirects the browser to an appropriate URL which will be used for
- * authentication with the provider that has been set by clicking the icon. It
- * creates an instance of the requested provider from AuthProviderFactory and
- * calls the getLoginRedirectURL() method to find the URL which the user should
- * be redirect to.
- * 
- * @author tarunn@brickred.com
- * 
- */
-// public class SocialAuthenticationAction extends Action {
 
 @WebServlet("/SocialAuthServlet")
 public class SocialAuthServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(SocialAuthServlet.class);
 
-	/**
-	 * creates a instance of the requested provider from AuthProviderFactory and
-	 * calls the getLoginRedirectURL() method to find the URL which the user
-	 * should be redirect to.
-	 * 
-	 * @param mapping
-	 *            the action mapping
-	 * @param form
-	 *            the action form
-	 * @param request
-	 *            the http servlet request
-	 * @param response
-	 *            tc the http servlet response
-	 * @return ActionForward where the action should flow
-	 * @throws Exception
-	 *             if an error occurs
-	 */
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doGet invocation ---");
@@ -104,7 +69,7 @@ public class SocialAuthServlet extends HttpServlet {
 		
 		if ((request_op == null) || ("".equals(request_op))	) { 
 			LOG.info("ERROR: erroneous request_op (empty or null). ");
-			request_op = "signin";
+			request_op = "signout";
 		}
 		
 		if ("signout".equals(request_op)) 
@@ -115,14 +80,39 @@ public class SocialAuthServlet extends HttpServlet {
 			}
 		}
 	}
-		
+
+	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		// Ask for the previously created session.
+		HttpSession session = request.getSession(true);
+		Boolean retval = false;
+
+	    // Returns the host name of the server to which the request was sent.
+	    LOG.info("request.getServerName(): " + request.getServerName());
+	    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
+	    	if (session != null) {
+	    		retval = true; // Fake authentication !!!
+	    		session.setAttribute("testingMode", "true");
+	    		
+	    		LocalUserNameClass localUserName = new LocalUserNameClass(null);
+	    		// if (localUserName==null) throw new Exception("localUserName is null");
+	    		session.setAttribute("localUserName", localUserName.getLocalUserName());
+	    		
+	    		ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
+	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
+	    	}
+		}
+	    
+
+	    return retval;
+	}
+	
 	private void socialAuthenticationSignIn(HttpServletRequest request, HttpServletResponse response) 
 			throws Exception {
 		
 		LOG.info("socialAuthenticationSignIn method call. ");
 		
 		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
+		HttpSession session = request.getSession(true);
 		
 		if (session == null) throw new Exception("Session is null");
 
@@ -191,29 +181,6 @@ public class SocialAuthServlet extends HttpServlet {
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthSignInPage, request, response, LOG);
 	}
 	
-	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
-		Boolean retval = false;
-
-	    // Returns the host name of the server to which the request was sent.
-	    LOG.info("request.getServerName(): " + request.getServerName());
-	    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
-	    	if (session != null) {
-	    		retval = true; // Fake authentication !!!
-	    		session.setAttribute("authenticated", true);
-	    		
-				// Determine correct value for variable localUserName
-				String localUserName = LocalUserNameFixesClass.getLocalUserName(null);
-	    		session.setAttribute("localUserName", localUserName);
-	    		ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
-	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
-	    	}
-		}
-	    
-
-	    return retval;
-	}
 }
 
 

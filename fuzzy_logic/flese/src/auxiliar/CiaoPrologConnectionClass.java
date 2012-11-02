@@ -27,7 +27,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public CiaoPrologConnectionClass() throws PLException, IOException, FoldersUtilsClassException {
+	public CiaoPrologConnectionClass() throws Exception {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
 		if (FoldersUtilsObject == null) {
 			FoldersUtilsObject = new FoldersUtilsClass();
@@ -38,8 +38,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void programFileIntrospectionQuery(String fileOwner, String fileName) 
-			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
+	public void programFileIntrospectionQuery(String fileOwner, String fileName) throws Exception {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
 		if ((latestEvaluatedQueryProgramFileName != null) &&
@@ -126,7 +125,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
-			throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
+			throws Exception {
 
 		// Connect to the Ciao Prolog Server.
 		String [] argv = new String[1];
@@ -158,18 +157,18 @@ public class CiaoPrologConnectionClass {
 	 * @throws AnswerTermInJavaClassException when the term cannot be converted.
 	 */
 	private void changeCiaoPrologWorkingFolder(String programFileOwner, PLConnection plConnection) 
-			throws FoldersUtilsClassException, PLException, IOException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
+			throws Exception {
 		// Log info
 		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + programFileOwner);
 		
 		if ((programFileOwner == null) || ("".equals(programFileOwner))){
 			LOG.info("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
+			throw new Exception("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
 		}
 		
 		if ((! FoldersUtilsObject.folderExists(programFileOwner, true))) {
 			LOG.info("changeCiaoPrologWorkingFolder: programFileOwner is an invalid folder.");
-			throw new FoldersUtilsClassException("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
+			throw new Exception("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
 		}
 		
 		// Adequate the value of programFileOwner (it was relative until here).
@@ -302,7 +301,7 @@ public class CiaoPrologConnectionClass {
 	 * Serves for testing the query system, but has no use at all. 
 	 * @throws AnswerTermInJavaClassException 
 	 */	
-	public void testingQuery (String owner, String programFile) throws PLException, IOException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
+	public void testingQuery (String owner, String programFile) throws Exception {
 		LOG.info("testingQuery ...");
 		if ("restaurant.pl".equals(programFile)) {
 			PLVariable[] variables = new PLVariable[6];

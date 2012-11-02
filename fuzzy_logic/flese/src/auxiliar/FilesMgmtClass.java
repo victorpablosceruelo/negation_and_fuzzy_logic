@@ -30,7 +30,7 @@ public class FilesMgmtClass {
 	private int maxFileSize = 50000 * 1024;
 	private int maxMemSize = 50000 * 1024;
 
-	public FilesMgmtClass(ServletContext servletContext) throws FoldersUtilsClassException {
+	public FilesMgmtClass(ServletContext servletContext) throws Exception {
 		FoldersUtilsObject = new FoldersUtilsClass();
 		this.servletContext = servletContext;
 	}
@@ -105,7 +105,7 @@ public class FilesMgmtClass {
 	}	
 
 	public void downloadFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, FoldersUtilsClassException, LocalUserNameFixesClassException {
+			throws Exception {
 		LOG.info("--- downloadFile invocation ---");
 		
 		String fileName = request.getParameter("fileName");
@@ -169,7 +169,7 @@ public class FilesMgmtClass {
 	}
 	
 	public void viewFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response) 
-			throws FoldersUtilsClassException, LocalUserNameFixesClassException, ServletException, IOException {
+			throws Exception {
 		String fileName = request.getParameter("fileName");
 		String fileOwner = request.getParameter("fileOwner");
 

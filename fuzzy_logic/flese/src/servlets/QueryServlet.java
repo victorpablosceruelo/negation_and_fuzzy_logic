@@ -1,10 +1,8 @@
 package servlets;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,16 +12,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import CiaoJava.PLException;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import auxiliar.AnswerTermInJavaClassException;
 import auxiliar.CiaoPrologConnectionClass;
-import auxiliar.LocalUserNameFixesClassException;
 import auxiliar.QueryConversorClass;
 import auxiliar.QueryConversorExceptionClass;
 import auxiliar.ServletsAuxMethodsClass;
-import auxiliar.FoldersUtilsClassException;
 
 /**
  * Servlet implementation class DbQueryServlet
@@ -107,8 +102,7 @@ public class QueryServlet extends HttpServlet {
 	 * @throws AnswerTermInJavaClassException 
 	 */
 	private void dbQueryAux(String fileOwner, String fileName, String operation, 
-			HttpSession session, HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass, AnswerTermInJavaClassException {
+			HttpSession session, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
@@ -139,7 +133,7 @@ public class QueryServlet extends HttpServlet {
 	}
 	
 	private void dbQueryAux_Introspection(String fileOwner, String fileName, CiaoPrologConnectionClass connection) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, AnswerTermInJavaClassException {
+			throws Exception {
 		
 		connection.programFileIntrospectionQuery(fileOwner, fileName);
 		/*
@@ -154,7 +148,7 @@ public class QueryServlet extends HttpServlet {
 	
 	
 	private void build_and_execute_query(String fileOwner, String fileName, CiaoPrologConnectionClass connection, HttpServletRequest request) 
-			throws ServletException, IOException, PLException, FoldersUtilsClassException, LocalUserNameFixesClassException, QueryConversorExceptionClass, AnswerTermInJavaClassException {
+			throws Exception {
 		LOG.info("build_and_execute_query call.");
 		
 		String formParameters = " --- Parameters Names and Values --- \n";

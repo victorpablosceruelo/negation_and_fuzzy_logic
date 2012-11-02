@@ -5,12 +5,12 @@ public class FileInfoClass {
 	private String fileName = null;
 	private String fileOwner = null;
 	
-	public FileInfoClass(String fileName, String fileOwner) throws FoldersUtilsClassException {
+	public FileInfoClass(String fileName, String fileOwner) throws Exception {
 		if (fileName == null)  {
-			throw new FoldersUtilsClassException("FileInfoClass constructor: fileName can not be null.");
+			throw new Exception("FileInfoClass constructor: fileName can not be null.");
 		}
 		if (fileOwner == null) {
-			throw new FoldersUtilsClassException("FileInfoClass constructor: fileOwner can not be null.");
+			throw new Exception("FileInfoClass constructor: fileOwner can not be null.");
 		}
 		this.fileName = fileName;
 		this.fileOwner = fileOwner;

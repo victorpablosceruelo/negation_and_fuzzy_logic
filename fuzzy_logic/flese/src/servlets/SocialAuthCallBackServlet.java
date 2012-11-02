@@ -11,12 +11,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.AuthProvider;
+import org.brickred.socialauth.Profile;
 // import org.brickred.socialauth.Contact;
 // import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
+import auxiliar.LocalUserNameClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 
@@ -116,7 +118,21 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 
 		if (provider == null) throw new Exception("provider is null");
 		session.setAttribute("provider", provider);
-				
+		
+		// get profile
+		Profile profile = provider.getUserProfile();
+		if (profile == null) throw new Exception("profile is null");
+
+		// you can obtain profile information
+		// System.out.println(profile.getFirstName());
+
+		// OR also obtain list of contacts
+		// List<Contact> contactsList = provider.getContactList();
+		
+		LocalUserNameClass localUserName = new LocalUserNameClass(profile);
+		// if (localUserName==null) throw new Exception("localUserName is null");
+		session.setAttribute("localUserName", localUserName);
+		
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
 	}	

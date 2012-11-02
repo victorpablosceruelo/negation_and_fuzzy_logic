@@ -56,11 +56,7 @@ public class FilesMgmtServlet extends HttpServlet {
 			}
 			fileMgmtServlet(doMethod, request, response);
 		} catch (Exception e) {
-			LOG.error("Exception thrown: ");
-			LOG.error(e);
-			e.printStackTrace();
-			ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
 		}
 	}
 

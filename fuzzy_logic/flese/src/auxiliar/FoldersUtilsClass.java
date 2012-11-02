@@ -20,7 +20,7 @@ public class FoldersUtilsClass {
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
 	
-	public FoldersUtilsClass() throws FoldersUtilsClassException {
+	public FoldersUtilsClass() throws Exception {
 		
 		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
 			LOG.info("looking for a folder for uploading program files ... ");
@@ -32,7 +32,7 @@ public class FoldersUtilsClass {
 		}
 		
 		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
-			throw new FoldersUtilsClassException("configureProgramFilesPath: Cannot configure the path for the programs.");
+			throw new Exception("configureProgramFilesPath: Cannot configure the path for the programs.");
 		}
 		else {
 			LOG.info("choosen folder for uploads: " + programFilesPath);
@@ -56,7 +56,7 @@ public class FoldersUtilsClass {
 		}
 		
 		if ((plServerPath == null) || ("".equals(plServerPath))) {
-			throw new FoldersUtilsClassException("lookForPlServer: impossible to find plserver.");
+			throw new Exception("lookForPlServer: impossible to find plserver.");
 		}
 		else {
 			LOG.info("plServer path: " + plServerPath);
@@ -70,12 +70,11 @@ public class FoldersUtilsClass {
 	 * @param 	 createIfDoesNotExist If yes and the whole path does not exists the method creates it.
 	 * @return   the complete path where the owner can read/store his/her program files.
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
-	 * @exception FoldersUtilsClassException if the folder can not be created
+	 * @exception Exception if the folder can not be created
 	 */
-	public String getCompletePathOfOwner(String owner, Boolean createIfDoesNotExist) 
-			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
+	public String getCompletePathOfOwner(String owner, Boolean createIfDoesNotExist) throws Exception {
 
-		LocalUserNameFixesClass.checkValidLocalUserName(owner);
+		if (owner == null) throw new Exception("owner is null");
 		String userProgramFilesPath = programFilesPath + owner + "/";
 		testOrCreateProgramFilesPath(userProgramFilesPath, createIfDoesNotExist);
 		LOG.info("getCompletePathOfOwner: owner: "+owner+" userProgramFilesPath: "+userProgramFilesPath);
@@ -89,18 +88,17 @@ public class FoldersUtilsClass {
 	 * @param    fileName It is the name of the file for which we are computing the path.
 	 * @return   the complete path where the owner can read/store his/her files.
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
-	 * @exception FoldersUtilsClassException if the folder or the program file do not exist or are invalid.
+	 * @exception Exception if the folder or the program file do not exist or are invalid.
 	 */
-	public String getCompletePathOfProgramFile(String fileOwner, String fileName) 
-			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
+	public String getCompletePathOfProgramFile(String fileOwner, String fileName) throws Exception {
 
-		LocalUserNameFixesClass.checkValidLocalUserName(fileOwner);
+		if (fileOwner == null) throw new Exception("fileOwner is null");
 		String ownerPath = programFilesPath + fileOwner + "/";
 		testOrCreateProgramFilesPath(ownerPath, false);
 		String programFilePath = ownerPath + fileName;
 		File file = new File(programFilePath);
 		if ((! file.exists()) || (! file.isFile()) || (! file.canRead())) {
-			throw new FoldersUtilsClassException("getCompletePathOfProgramFile: file does not exist or is invalid.");
+			throw new Exception("getCompletePathOfProgramFile: file does not exist or is invalid.");
 		}
 		return programFilePath;
 	}
@@ -112,7 +110,7 @@ public class FoldersUtilsClass {
 	 *  
 	 * @return the path in which programs can be found and/or stored.
 	 */
-	public String getProgramFilesPath() throws FoldersUtilsClassException {
+	public String getProgramFilesPath() throws Exception {
 		return programFilesPath;
 	}
 
@@ -124,7 +122,7 @@ public class FoldersUtilsClass {
 	 * 
 	 * @param newProgramFilesPath is the new path to test.
 	 */
-	private void configureProgramFilesPathAux(String newProgramFilesPath) throws FoldersUtilsClassException {
+	private void configureProgramFilesPathAux(String newProgramFilesPath) throws Exception {
 		LOG.info("configureProgramFilesPathAux: testing: " + newProgramFilesPath);
 		
 		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
@@ -141,17 +139,17 @@ public class FoldersUtilsClass {
 	 * @param     newProgramFilesPath is the path we are checking.
 	 * @param 	  createIfDoesNotExist If yes and the whole path does not exists the method creates it.
 	 * @return    true if the folder was there or has been created. False otherwise. 
-	 * @exception FoldersUtilsClassException if the folder can not be created
+	 * @exception Exception if the folder can not be created
 	 */
 	public Boolean testOrCreateProgramFilesPath(String newProgramFilesPath, Boolean createIfDoesNotExist) 
-			throws FoldersUtilsClassException {
+			throws Exception {
 		
 		LOG.info("testOrCreateuserProgramFilesPath: newProgramFilesPath: " + newProgramFilesPath + " createIfDoesNotExist: " +
 				createIfDoesNotExist);
 		boolean retval = false;
 		
 		if ((newProgramFilesPath==null) || (newProgramFilesPath.equals(""))){
-			throw new FoldersUtilsClassException("testOrCreateuserProgramFilesPath: newProgramFilesPath cannot be null nor empty string.");
+			throw new Exception("testOrCreateuserProgramFilesPath: newProgramFilesPath cannot be null nor empty string.");
 		}
 		else {
 			
@@ -187,16 +185,15 @@ public class FoldersUtilsClass {
 	 * @param     fileOwner is the owner of the file to be removed, and its relative path.
 	 * @param     localUserName is the name of the user that requests its removal.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
-	 * @exception FoldersUtilsClassException if it cannot be removed.
+	 * @exception Exception if it cannot be removed.
 	 */
-	public void removeProgramFile(String fileName, String fileOwner, String localUserName) 
-			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
+	public void removeProgramFile(String fileName, String fileOwner, String localUserName) throws Exception {
 
 		LOG.info("programFileName: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName);
 		
-		if (fileName == null) { throw new FoldersUtilsClassException("fileName is null"); }
-		if (fileOwner == null) { throw new FoldersUtilsClassException("fileOwner is null"); }
-		if (localUserName == null) { throw new FoldersUtilsClassException("localUserName is null"); }
+		if (fileName == null) { throw new Exception("fileName is null"); }
+		if (fileOwner == null) { throw new Exception("fileOwner is null"); }
+		if (localUserName == null) { throw new Exception("localUserName is null"); }
 		
 		
 		Boolean retVal = false;
@@ -207,15 +204,15 @@ public class FoldersUtilsClass {
 			File file = new File(fileToRemove);
 			retVal = file.exists();
 			if (! retVal) {
-				throw new FoldersUtilsClassException("The program file" + fileToRemove + "does not exist.");
+				throw new Exception("The program file" + fileToRemove + "does not exist.");
 			}
 			retVal = file.delete();
 			if (! retVal) {
-				throw new FoldersUtilsClassException("The program file" + fileToRemove + "can not be removed.");
+				throw new Exception("The program file" + fileToRemove + "can not be removed.");
 			}
 		}
 		else {
-			throw new FoldersUtilsClassException("You do not own the program file.");
+			throw new Exception("You do not own the program file.");
 		}
 	}
 	
@@ -250,10 +247,9 @@ public class FoldersUtilsClass {
 	 * @param     localUserName is the name of the user that is logged in.
 	 * @return    the program files iterator, null if there are no program files to iterate.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
-	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
+	 * @exception Exception if there is some problem with a subfolder.
 	 */
-	private ArrayList<FileInfoClass> listProgramFiles(String localUserName) 
-			throws FoldersUtilsClassException, LocalUserNameFixesClassException {
+	private ArrayList<FileInfoClass> listProgramFiles(String localUserName) throws Exception {
 				
 		File dir = new File(programFilesPath);
 		ArrayList<FileInfoClass> currentList = new ArrayList<FileInfoClass>();
@@ -262,7 +258,7 @@ public class FoldersUtilsClass {
 		String[] subDirs;
 		
 		// We list first the localUserName program files.
-		LocalUserNameFixesClass.checkValidLocalUserName(localUserName);
+		LocalUserNameClass.checkValidLocalUserName(localUserName);
 		filter = (FilenameFilter) new OnlyLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
 
@@ -274,7 +270,7 @@ public class FoldersUtilsClass {
 		}
 
 		// We list in second (and last) place the other program files.
-		LocalUserNameFixesClass.checkValidLocalUserName(localUserName);
+		LocalUserNameClass.checkValidLocalUserName(localUserName);
 		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
 
@@ -294,14 +290,14 @@ public class FoldersUtilsClass {
 	 * @param     subDir is the full path of the subdirectory we are listing.
 	 * @return    the program files iterator, null if there are no program files to iterate.
 	 * @exception LocalUserNameFixesClassException if owner is empty or null.
-	 * @exception FoldersUtilsClassException if there is some problem with a subfolder.
+	 * @exception Exception if there is some problem with a subfolder.
 	 */
 	private ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) 
-			throws FoldersUtilsClassException {
+			throws Exception {
 
 		LOG.info("listProgramFilesInSubDir: subDir: " + subDir);
 		if ((subDir == null) || ("".equals(subDir))) {
-			throw new FoldersUtilsClassException("listProgramFilesInSubDir: subDir cannot be null nor empty string.");
+			throw new Exception("listProgramFilesInSubDir: subDir cannot be null nor empty string.");
 		}
 		String realPathSubDir = programFilesPath + subDir + "/";
 		File dir = new File(realPathSubDir);
@@ -325,12 +321,12 @@ public class FoldersUtilsClass {
 	 * Returns the value of the path of plserver
 	 * 
 	 * @return    the path of the executable file plServer.
-	 * @exception FoldersUtilsClassException if plServer is null.
+	 * @exception Exception if plServer is null.
 	 * 
 	 */
-	public String getPlServerPath() throws FoldersUtilsClassException {
+	public String getPlServerPath() throws Exception {
 		if (plServerPath == null) {
-			throw new FoldersUtilsClassException("getPlServerPath: plServerPath is null.");
+			throw new Exception("getPlServerPath: plServerPath is null.");
 		}
 		return plServerPath;
 	}
@@ -340,13 +336,13 @@ public class FoldersUtilsClass {
 	 * it looks for the plServer executable in the subpath given.
 	 * 
 	 * @param subPath is the new proposed subpath for the plServer.
-	 * @throws FoldersUtilsClassException when subPath is an empty string or null,
+	 * @throws Exception when subPath is an empty string or null,
 	 * 
 	 */
-	private void configurePlServerPathAdvanced(String subPath) throws FoldersUtilsClassException {
+	private void configurePlServerPathAdvanced(String subPath) throws Exception {
 		if (plServerPath == null) {
 			if ((subPath == null) || ("".equals(subPath))) {
-				throw new FoldersUtilsClassException("configurePlServerPathAdvanced: subPath is empty string or null.");
+				throw new Exception("configurePlServerPathAdvanced: subPath is empty string or null.");
 			}
 			File currentDir = new File(subPath);
 			if ((currentDir.exists()) || (currentDir.isDirectory()) || (currentDir.canRead()) || (currentDir.canExecute())) {
@@ -387,13 +383,13 @@ public class FoldersUtilsClass {
 	 * If it is a valid path, it just sets the attribute plServerPath.
 	 * 
 	 * @param untestedPathForPlServer is the new proposed path for the plServer.
-	 * @throws FoldersUtilsClassException when untestedPathForPlServer is empty string or null.
+	 * @throws Exception when untestedPathForPlServer is empty string or null.
 	 * 
 	 */
-	private void configurePlServerPathAux(String untestedPathForPlServer) throws FoldersUtilsClassException {
+	private void configurePlServerPathAux(String untestedPathForPlServer) throws Exception {
 		if (plServerPath == null) {
 			if ((untestedPathForPlServer == null) || ("".equals(untestedPathForPlServer))) {
-				throw new FoldersUtilsClassException("configurePlServerPathAux: untestedPathForPlServer is empty string or null.");
+				throw new Exception("configurePlServerPathAux: untestedPathForPlServer is empty string or null.");
 			}
 			File file = new File(untestedPathForPlServer);
 			if ((file.exists()) && (file.isFile()) && (file.canRead()) && (file.canExecute()) && (file.getName().equals("plserver"))) {
@@ -412,14 +408,14 @@ public class FoldersUtilsClass {
 	 * 
 	 * @param folderPath is the path of the folder.
 	 * @param relativePath if true then programFilesPath + relativePath will be used instead.
-	 * @throws FoldersUtilsClassException when folderPath is empty string or null.
+	 * @throws Exception when folderPath is empty string or null.
 	 * 
 	 */
-	public Boolean folderExists (String folderPath, Boolean relativePath) throws FoldersUtilsClassException {
+	public Boolean folderExists (String folderPath, Boolean relativePath) throws Exception {
 		
 		LOG.info("folderExists: folderPath: " + folderPath);
 		if ((folderPath == null) || ("".equals(folderPath))) {
-			throw new FoldersUtilsClassException("folderExists: folderPath is empty string or null.");
+			throw new Exception("folderExists: folderPath is empty string or null.");
 		}
 		if (relativePath) {
 			folderPath = programFilesPath + folderPath;
@@ -435,14 +431,14 @@ public class FoldersUtilsClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Boolean programFileExists(String fileOwner, String fileName, Boolean relativePath) throws FoldersUtilsClassException {
+	public Boolean programFileExists(String fileOwner, String fileName, Boolean relativePath) throws Exception {
 		
 		LOG.info("programFileExists: fileOwner: " + fileOwner + " fileName: " + fileName);
 		if ((fileOwner == null) || ("".equals(fileOwner))) {
-			throw new FoldersUtilsClassException("programFileExists: fileOwner is empty string or null.");
+			throw new Exception("programFileExists: fileOwner is empty string or null.");
 		}
 		if ((fileName == null) || ("".equals(fileName))) {
-			throw new FoldersUtilsClassException("programFileExists: fileName is empty string or null.");
+			throw new Exception("programFileExists: fileName is empty string or null.");
 		}
 		
 		String fullPath = null;
