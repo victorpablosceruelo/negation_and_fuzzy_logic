@@ -36,22 +36,32 @@ public class QueryServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doGet invocation ---");
-		dbQuery(request, response);
+		doGetAndDoPost(request, response);
 		LOG.info("--- doGet end ---");
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doPost invocation ---");
-		dbQuery(request, response);
+		doGetAndDoPost(request, response);
 		LOG.info("--- doPost end ---");
 	}
 	
-	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
+				dbQuery(request, response);
+			}
+		} catch (Exception e) {
+			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
+		}
+	}
+	
+	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		String fileName = null;

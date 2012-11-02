@@ -1,7 +1,6 @@
 
 package servlets;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +12,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.AuthProvider;
 // import org.brickred.socialauth.Contact;
-import org.brickred.socialauth.Profile;
+// import org.brickred.socialauth.Profile;
+import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
-import auxiliar.LocalUserNameFixesClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 
@@ -62,30 +61,23 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	 *             if an error occurs
 	 */
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doGet invocation ---");
 		doGetAndDoPost(request, response);
 		LOG.info("--- doGet end ---");
 	}
 	
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doPost invocation ---");
 		doGetAndDoPost(request, response);
 		LOG.info("--- doPost end ---");	
 	}
 	
-	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
+	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			socialAuthenticationAuthenticate(request, response);
 		} catch (Exception e) {
-			LOG.error("Exception thrown: ");
-			LOG.error(e);
-			e.printStackTrace();
-			ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
 		}
 	}
 	
@@ -95,63 +87,38 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		
 		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
-		Boolean error = false;
-		String msg = "";
+		HttpSession session = request.getSession(true);
 
-		if (session == null) {
-			error = true;
-			msg = "ERROR: session is null.";
-			LOG.info(msg);
+		if (session == null) throw new Exception("Session is null");
+
+		// get the social auth manager from session
+		SocialAuthManager manager = (SocialAuthManager)session.getAttribute("authManager");
+		if (manager == null) {
+			LOG.info("INFO: creating a new manager because it was null. ");
+			//Create an instance of SocialAuthConfgi object
+			SocialAuthConfig config = SocialAuthConfig.getDefault();
+			// config.setApplicationProperties()
+			//load configuration. By default load the configuration from oauth_consumer.properties. 
+			//You can also pass input stream, properties object or properties file name.
+			config.load();
+
+			//Create an instance of SocialAuthManager and set config
+			manager = new SocialAuthManager();
+			manager.setSocialAuthConfig(config);
+			session.setAttribute("manager", manager);
 		}
-		else {
-			// get the social auth manager from session
-			SocialAuthManager manager = (SocialAuthManager)session.getAttribute("authManager");
 
-			if (manager == null) {
-				error = true;
-				msg = "ERROR: manager is null.";
-				LOG.info(msg);
-			}
-			else {
-				// call connect method of manager which returns the provider object. 
-				// Pass request parameter map while calling connect method. 
-				AuthProvider provider = manager.connect(SocialAuthUtil.getRequestParametersMap(request));
-
-				if (provider == null) {
-					error = true;
-					msg = "ERROR: provider is null.";
-					LOG.info(msg);
-				}
-				else {
-					// get profile
-					Profile profile = provider.getUserProfile();
-
-					// you can obtain profile information
-					// System.out.println(profile.getFirstName());
-
-					// OR also obtain list of contacts
-					// List<Contact> contactsList = provider.getContactList();
-
-					session.setAttribute("authenticated", true);
-					session.setAttribute("profile", profile);
-					session.setAttribute("provider", provider);
-
-					// Determine correct value for variable localUserName
-					String localUserName = LocalUserNameFixesClass.getLocalUserName(profile);
-					session.setAttribute("localUserName", localUserName);
-				}
-			}
-		}
+		// if (manager == null) throw new Exception("manager is null");
 		
-		if (error) {
-			ServletsAuxMethodsClass.addMessageToTheUser(request, msg, LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
-		}
-		else {
-			ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
-		}
+		// call connect method of manager which returns the provider object. 
+		// Pass request parameter map while calling connect method. 
+		AuthProvider provider = manager.connect(SocialAuthUtil.getRequestParametersMap(request));
+
+		if (provider == null) throw new Exception("provider is null");
+		session.setAttribute("provider", provider);
+				
+		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
 	}	
 }
 

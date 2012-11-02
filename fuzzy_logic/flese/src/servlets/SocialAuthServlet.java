@@ -73,30 +73,23 @@ public class SocialAuthServlet extends HttpServlet {
 	 *             if an error occurs
 	 */
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doGet invocation ---");
 		doGetAndDoPost(request, response);
 		LOG.info("--- doGet end ---");
 	}
 	
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- doPost invocation ---");
 		doGetAndDoPost(request, response);
 		LOG.info("--- doPost end ---");	
 	}
 	
-	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, java.io.IOException {
+	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			socialAuthentication(request, response);
 		} catch (Exception e) {
-			LOG.error("Exception thrown: ");
-			LOG.error(e);
-			e.printStackTrace();
-			ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
 		}
 	}
 	
@@ -114,19 +107,12 @@ public class SocialAuthServlet extends HttpServlet {
 			request_op = "signin";
 		}
 		
-		if ("signout".equals(request_op)) socialAuthenticationSignOut(request, response);
-		if ("userInfo".equals(request_op)) socialAuthenticationUserInfo(request, response);
-
-		if ("signin".equals(request_op)) {
+		if ("signout".equals(request_op)) 
+			socialAuthenticationSignOut(request, response);
+		else {
 			if (! socialAuthenticationInTestingMode(request, response)) {
 				socialAuthenticationSignIn(request, response);
 			}
-		}
-
-		if ((! "signin".equals(request_op)) &&
-			(! "signout".equals(request_op)) && (! "userInfo".equals(request_op))) {
-			LOG.info("ERROR: erroneous request_op: " + request_op);
-			socialAuthenticationSignOut(request, response);
 		}
 	}
 		
@@ -137,82 +123,45 @@ public class SocialAuthServlet extends HttpServlet {
 		
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
-		Boolean error = false;
-		String msg = "";
-		String athenticationUrl = "";
-		SocialAuthManager manager = null;
 		
-		if (session == null) {
-			error = true;
-			msg = "Session is null";
-			LOG.info("ERROR: Session is null.");
+		if (session == null) throw new Exception("Session is null");
+
+		// Get the value of the parameter; the name is case-sensitive
+		String id = (String) request.getParameter("id");
+		if ((id == null) || ("".equals(id))) throw new Exception("id is null");
+
+		SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
+		if (manager == null) {
+			LOG.info("INFO: creating a new manager because it was null. ");
+			//Create an instance of SocialAuthConfgi object
+			SocialAuthConfig config = SocialAuthConfig.getDefault();
+			// config.setApplicationProperties()
+			//load configuration. By default load the configuration from oauth_consumer.properties. 
+			//You can also pass input stream, properties object or properties file name.
+			config.load();
+
+			//Create an instance of SocialAuthManager and set config
+			manager = new SocialAuthManager();
+			manager.setSocialAuthConfig(config);
 		}
-		else {
-			// Get the value of the parameter; the name is case-sensitive
-			String id = (String) request.getParameter("id");
-			// Only if parameter does not contain the id we try with the one saved in session.
-			if ((id == null) || ("".equals(id))) {
-				id = (String) session.getAttribute("id");
-			}
-				
-			if ((id == null) || ("".equals(id))) {
-				// (id == null) :: The request parameter was not present in the query string. 
-				// ("".equals(id)) The request parameter was present in the query string but has no value. 
-				error = true;
-				msg = "id is null or empty in request and in session.";
-				LOG.info("ERROR: erroneous id (empty or null) in request and in session. ");
-			}
-			
-			if (! error) {
-				 manager = (SocialAuthManager) session.getAttribute("authManager");
-				if (manager == null) {
-					LOG.info("INFO: creating a new manager because it was null. ");
-					//Create an instance of SocialAuthConfgi object
-					SocialAuthConfig config = SocialAuthConfig.getDefault();
-					// config.setApplicationProperties()
 
-					//load configuration. By default load the configuration from oauth_consumer.properties. 
-					//You can also pass input stream, properties object or properties file name.
-					config.load();
+		// URL of YOUR application which will be called after authentication
+		String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);
+		LOG.info("successUrl: " + successUrl);
 
-					//Create an instance of SocialAuthManager and set config
-					manager = new SocialAuthManager();
-					manager.setSocialAuthConfig(config);
-				}
-			}
+		// get Provider URL to which you should redirect for authentication.
+		// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
+		String athenticationUrl = manager.getAuthenticationUrl(id, successUrl);
 
-			if (! error) {
-				// URL of YOUR application which will be called after authentication
-				String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);
-				LOG.info("successUrl: " + successUrl);
+		// Store in session.
+		session.setAttribute("authManager", manager);
 
-				// get Provider URL to which you should redirect for authentication.
-				// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
-				athenticationUrl = manager.getAuthenticationUrl(id, successUrl);
-
-				// Store in session.
-				session.setAttribute("authManager", manager);
-				session.setAttribute("id", id);
-				session.setAttribute("authenticated", false);
-
-				if ((athenticationUrl == null) || ("".equals(athenticationUrl))) {
-					LOG.info("ERROR: newUrl is empty or null !!! ");
-					error = true;
-					msg = "ERROR: newUrl is empty or null !!! ";	
-				}
-			}
-		}
+		if (athenticationUrl == null) throw new Exception("athenticationUrl is null."); 
+		if ("".equals(athenticationUrl)) throw new Exception("athenticationUrl is empty string."); 
 		
-		if (error) {
-			ServletsAuxMethodsClass.addMessageToTheUser(request, msg, LOG);
-			// ServletsAuxMethodsClass.goToAuthenticationSignout(request, response, LOG);
-			socialAuthenticationSignOut(request, response);
-		}
-		else {
-			LOG.info("Redirecting to: " + athenticationUrl);
-			response.sendRedirect( athenticationUrl );
-			// response.encodeRedirectURL( athenticationUrl );
-		}
+		LOG.info("Redirecting to: " + athenticationUrl);
+		response.sendRedirect( athenticationUrl );
+		// response.encodeRedirectURL( athenticationUrl );
 	}
 	
 	private void socialAuthenticationSignOut(HttpServletRequest request, HttpServletResponse response) 
@@ -265,17 +214,6 @@ public class SocialAuthServlet extends HttpServlet {
 
 	    return retval;
 	}
-	
-	private void socialAuthenticationUserInfo(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
-		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthUserInfoPage, request, response, LOG);
-		}
-		else {
-			socialAuthenticationSignOut(request, response);
-		}
-	}
-	
 }
 
 

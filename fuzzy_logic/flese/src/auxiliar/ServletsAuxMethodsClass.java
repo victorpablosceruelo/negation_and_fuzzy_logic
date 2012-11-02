@@ -1,7 +1,6 @@
 package auxiliar;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
@@ -11,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
+import org.brickred.socialauth.AuthProvider;
 //import org.apache.commons.logging.LogFactory;
+import org.brickred.socialauth.SocialAuthManager;
 
 public class ServletsAuxMethodsClass {
 
@@ -26,34 +27,47 @@ public class ServletsAuxMethodsClass {
 	 * @param response is the HttpServletResponse
 	 * @param LOG is the servlet logging facility. Can be null (but it is not recommended).
 	 * @return true if it has been authenticated; false if not.
-	 * @throws IOException if forward_to launches it.
-	 * @throws ServletException if forward_to launches it.
+	 * @throws Exception 
 	 */
 	public static boolean clientSessionIsAuthenticated(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws IOException, ServletException {
-		if ((request != null) && (response != null)) {
-			HttpSession session = request.getSession(false);
+			throws Exception {
+		if (request == null) throw new Exception("request is null");
+		if (response == null) throw new Exception("response is null");
+		
+		HttpSession session = request.getSession(false);
+		if (session == null) throw new Exception("session is null");
 
-			if ((session == null) || (session.getAttribute("authenticated") == null) || 
-					(! (Boolean) session.getAttribute("authenticated"))) {
+		String testingMode = (String) session.getAttribute("testingMode");
+		if (testingMode == null) {
+			SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
+			if (manager == null) throw new Exception("manager is null");
 
-				if (LOG != null) LOG.info("no session. logout.");
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
-				return false;
-			}
-			else {
-				if (LOG != null) LOG.info("valid session. Session id: " + session.getId() + 
-						" Creation Time" + new Date(session.getCreationTime()) + 
-						" Time of Last Access" + new Date(session.getLastAccessedTime()));
-				return true;
-			}
+			AuthProvider provider = (AuthProvider) session.getAttribute("provider");
+			if (provider == null) throw new Exception("provider is null");
+		}		
+		return true;
+	}
+
+	/**
+	 * Executes de default actions when an exception is thrown.
+	 * @param e is the exception thrown.
+	 * @param request is the HttpServletRequest.
+	 * @param response is the HttpServletResponse.
+	 * @param LOG is the Log facility.
+	 */
+	static public void actionOnException(Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
+		LOG.error("Exception thrown: ");
+		LOG.error(e);
+		e.printStackTrace();
+		ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
+		try{
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
 		}
-		else {
-			LOG.error("request or response is null. ERROR");
-			return false;
+		catch (Exception e2) {
+			actionOnException(e, request, response, LOG);
 		}
 	}
-	
+
 	/**
 	 * Adds a msg to the request session attribute msgs.
 	 * 
@@ -306,5 +320,4 @@ public class ServletsAuxMethodsClass {
 		if (LOG != null) LOG.info("encodeRedirectURL: " + url);
 		response.encodeRedirectURL( url );
 	}
-	
 }
