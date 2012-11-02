@@ -31,45 +31,45 @@
 		<table class="providersIcons">
 			<tr class="providersIcons">
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=facebook">
-					<img src="facebook_icon.png" alt="Facebook" title="Facebook" border="0" width="50"></img>
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=facebook">
+					<img src="images/facebook_icon.png" alt="Facebook" title="Facebook" border="0" width="50"></img>
 					</a>
 				</td>
 				<td class="providersIcons">			
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=twitter">
-					<img src="twitter_icon.png" alt="Twitter" title="Twitter" border="0" width="50"></img></a> 
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=twitter">
+					<img src="images/twitter_icon.png" alt="Twitter" title="Twitter" border="0" width="50"></img></a> 
 				</td> 
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=google">
-					<img src="gmail_icon.png" alt="Gmail" title="Gmail" border="0" width="50"></img></a> 
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=google">
+					<img src="images/gmail_icon.png" alt="Gmail" title="Gmail" border="0" width="50"></img></a> 
 				</td>
 			</tr>
 			<tr class="providersIcons">
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=yahoo">
-					<img src="yahoomail_icon.png" alt="YahooMail" title="YahooMail" border="0" width="50"></img></a> 
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=yahoo">
+					<img src="images/yahoomail_icon.png" alt="YahooMail" title="YahooMail" border="0" width="50"></img></a> 
 				</td> 
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=hotmail">
-					<img src="hotmail_icon.jpeg" alt="HotMail" title="HotMail" border="0" width="50"></img></a> 
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=hotmail">
+					<img src="images/hotmail_icon.jpeg" alt="HotMail" title="HotMail" border="0" width="50"></img></a> 
 				</td> 
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=linkedin">
-					<img src="linkedin_icon.gif" alt="Linked In" title="Linked In" border="0" width="50"></img></a> 
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=linkedin">
+					<img src="images/linkedin_icon.gif" alt="Linked In" title="Linked In" border="0" width="50"></img></a> 
 				</td>
 			</tr>
 			<tr class="providersIcons">
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=foursquare">
-					<img src="foursquare_icon.jpeg" alt="FourSquare" title="FourSquare" border="0" width="50"></img></a> 
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=foursquare">
+					<img src="images/foursquare_icon.jpeg" alt="FourSquare" title="FourSquare" border="0" width="50"></img></a> 
 				</td>
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=myspace">
-					<img src="myspace_icon.jpeg" alt="MySpace" title="MySpace" border="0" width="50"></img></a>
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=myspace">
+					<img src="images/myspace_icon.jpeg" alt="MySpace" title="MySpace" border="0" width="50"></img></a>
 				</td> 
 				<td class="providersIcons">
-					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignin, request, null) %>&id=mendeley">
-					<img src="mendeley_icon.jpg" alt="Mendeley" title="Mendeley" border="0" width="50"></img>
+					<a href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignIn, request, null) %>&id=mendeley">
+					<img src="images/mendeley_icon.jpg" alt="Mendeley" title="Mendeley" border="0" width="50"></img>
 					</a> 
 				</td>
 			</tr>

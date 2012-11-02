@@ -67,7 +67,7 @@
 						"?op=remove&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"title=\"remove program file "+fileName+"\""+
 						"onclick='return confirm(\"Are you sure you want to delete program file "+fileName+"?\")'>"+
-						"<img src=\"remove-file.gif\" alt=\"remove\" width=\"20\"></img></a> ";
+						"<img src=\"images/remove-file.gif\" alt=\"remove\" width=\"20\"></img></a> ";
 				
 				var cell4 = row.insertCell(3);
 				cell4.className = 'programFilesTable';

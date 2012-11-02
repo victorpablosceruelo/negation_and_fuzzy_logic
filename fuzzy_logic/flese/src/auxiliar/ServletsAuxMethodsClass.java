@@ -38,7 +38,7 @@ public class ServletsAuxMethodsClass {
 					(! (Boolean) session.getAttribute("authenticated"))) {
 
 				if (LOG != null) LOG.info("no session. logout.");
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
 				return false;
 			}
 			else {
@@ -182,12 +182,12 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	public static final int errorPage = 0;
 	public static final int IndexPage = 1;
-	public static final int AuthenticationServletSignin = 2;
-	public static final int AuthenticationServletSignout = 3;
-	public static final int AuthenticationServletSigned = 4;
-	public static final int AuthenticationServletUserInfo = 5;
-	public static final int AuthenticationPage = 6;
-	public static final int AuthenticatedUserInfoPage = 7;
+	public static final int SocialAuthServletSignIn = 2;
+	public static final int SocialAuthServletSignOut = 3;
+	public static final int SocialAuthServletUserInfo = 4;
+	public static final int SocialAuthSignInPage = 5;
+	public static final int SocialAuthUserInfoPage = 6;
+	public static final int SocialAuthCallBackServlet = 7;
 	public static final int FilesMgmtServlet = 8;
 	public static final int FilesMgmtIndexPage = 9;
 	public static final int FilesMgmtFileViewPage = 10;
@@ -204,17 +204,17 @@ public class ServletsAuxMethodsClass {
 				break;
 		case IndexPage: retVal = "index.jsp";
 				break;
-		case AuthenticationServletSignin: retVal = "SocialAuthServlet?op=signin";
+		case SocialAuthServletSignIn: retVal = "SocialAuthServlet?op=signin";
 				break;
-		case AuthenticationServletSignout: retVal = "SocialAuthServlet?op=signout";
+		case SocialAuthServletSignOut: retVal = "SocialAuthServlet?op=signout";
 				break;
-		case AuthenticationServletSigned: retVal = "SocialAuthServlet?op=signed";
+		case SocialAuthServletUserInfo: retVal = "SocialAuthServlet?op=userInfo";
 				break;
-		case AuthenticationServletUserInfo: retVal = "SocialAuthServlet?op=userInfo";
+		case SocialAuthSignInPage: retVal = "WEB-INF/authentication.jsp";
 				break;
-		case AuthenticationPage: retVal = "WEB-INF/authentication.jsp";
+		case SocialAuthUserInfoPage: retVal = "WEB-INF/authenticatedUserInfo.jsp";
 				break;
-		case AuthenticatedUserInfoPage: retVal = "WEB-INF/authenticatedUserInfo.jsp";
+		case SocialAuthCallBackServlet: retVal = "SocialAuthServlet?op=signed";
 				break;
 		case FilesMgmtServlet: retVal = "FilesMgmtServlet";
 				break;

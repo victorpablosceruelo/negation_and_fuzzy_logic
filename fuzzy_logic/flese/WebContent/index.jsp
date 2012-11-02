@@ -12,7 +12,7 @@
 <br /><br />
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <div class='indexPageImportantLink'>
-<a class='indexPageImportantLink' href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.AuthenticationServletSignout, request, null) %>">Go to the application</a>
+<a class='indexPageImportantLink' href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, null) %>">Go to the application</a>
 </div>
 <br />
 <br />
@@ -75,25 +75,25 @@ and Facultad de Informática.
 <br /><br /><br />
 <div class=indexPageImages>
 	<a href="http://babel.ls.fi.upm.es/">
-		<img height="150" src="logo-babel.jpg" alt="logo babel research group"></img>
+		<img height="150" src="images/logo-babel.jpg" alt="logo babel research group"></img>
 	</a>
 	<a href="http://upm.es/">
-		<img height="150" src="logo-upm.jpg" alt="logo Universidad Politécnica de Madrid"></img>
+		<img height="150" src="images/logo-upm.jpg" alt="logo Universidad Politécnica de Madrid"></img>
 	</a>
 	<a href="http://www.fi.upm.es/">
-		<img height="150" src="logo-fi.jpg" alt="logo Facultad de Informática"></img>
+		<img height="150" src="images/logo-fi.jpg" alt="logo Facultad de Informática"></img>
 	</a>
 	<a href="http://www.dlsiis.fi.upm.es/">
-		<img height="150" src="logo-lsiis.jpeg" alt="logo Departamento de Lenguajes y Sistemas Informáticos e Ingeniería del Software"></img>
+		<img height="150" src="images/logo-lsiis.jpeg" alt="logo Departamento de Lenguajes y Sistemas Informáticos e Ingeniería del Software"></img>
 	</a>
 	<a href="http://www.micinn.es/">
-		<img height="150" src="logo-micinn.png" alt="logo Ministerio de Ciencia e Innovación"></img>
+		<img height="150" src="images/logo-micinn.png" alt="logo Ministerio de Ciencia e Innovación"></img>
 	</a>
 	<a href="http://www.madrid.org/">
-		<img height="150" src="logo-cm.gif" alt="logo Comunidad de Madrid"></img>
+		<img height="150" src="images/logo-cm.gif" alt="logo Comunidad de Madrid"></img>
 	</a>
 	<a href="http://mcyt.es/">
-		<img height="150" src="logo-mcyt.gif" alt="logo Ministerio de Ciencia y Tecnología"></img>
+		<img height="150" src="images/logo-mcyt.gif" alt="logo Ministerio de Ciencia y Tecnología"></img>
 	</a>
 	
 </div>

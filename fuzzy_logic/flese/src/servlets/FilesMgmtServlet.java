@@ -60,7 +60,7 @@ public class FilesMgmtServlet extends HttpServlet {
 			LOG.error(e);
 			e.printStackTrace();
 			ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.AuthenticationServletSignout, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
 		}
 	}
 
