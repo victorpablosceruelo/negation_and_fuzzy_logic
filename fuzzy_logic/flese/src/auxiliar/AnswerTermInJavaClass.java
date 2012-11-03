@@ -114,12 +114,14 @@ public class AnswerTermInJavaClass {
 		String retVal = "";
 		if ((singleAnswerTerm != null) && (! ",".equals(singleAnswerTerm))) retVal += singleAnswerTerm;
 		if (compositeAnswerTerm != null) {
-			retVal += "(";
+			if (singleAnswerTerm != null) retVal += "(";
+			else retVal += "[";
 			for (int i=0; i<compositeAnswerTerm.length; i++) {
 				retVal += compositeAnswerTerm[i].toString();
 				if ((i+1) < compositeAnswerTerm.length) retVal += ", ";
 			}
-			retVal += ")";
+			if (singleAnswerTerm != null) retVal += ")";
+			else retVal += "]";
 		}
 		retVal += "";
 		return retVal;
@@ -132,6 +134,11 @@ public class AnswerTermInJavaClass {
 		return creationMsgs;
 	}
 	
+	/**
+	 * Tests if the answerTerm is a list.
+	 * In this case the answerTerm has compositeAnswerTerm, but has not singleAnswerTerm.
+	 * @return = ((singleAnswerTerm == null) && (compositeAnswerTerm != null))
+	 */
 	public boolean isList() {
 		return ((singleAnswerTerm == null) && (compositeAnswerTerm != null));
 	}

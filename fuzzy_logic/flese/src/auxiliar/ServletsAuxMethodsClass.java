@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ServletsAuxMethodsClass {
 
+	final static Log LOG = LogFactory.getLog(QueryConversorClass.class);
 	private final static String appPath = "flese/";
 	private static String appUrl = null;
 	
@@ -60,8 +62,16 @@ public class ServletsAuxMethodsClass {
 			try{
 				ServletsAuxMethodsClass.forward_to(where, request, response, LOG);
 			}
+			catch (java.lang.IllegalStateException e1) {
+				LOG.error("-------------------------------------------------------------------");
+			}
 			catch (Exception e2) {
-				actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+				if (where != theSamePage) {
+					actionOnException(where, e, request, response, LOG);
+				}
+				else {
+					actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+				}
 			}
 		}
 		else {
@@ -157,7 +167,6 @@ public class ServletsAuxMethodsClass {
 	}
 	
 	private static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
-		String logMsg = "";
 		
 	    if ((appUrl == null) || ("".equals(appUrl))) { 
 		    String requestUrl = request.getRequestURL().toString();
@@ -185,6 +194,7 @@ public class ServletsAuxMethodsClass {
 	    	}
 	    	
 		    if (LOG != null) {
+		    	String logMsg = "";
 		    	if (requestUrl != null) logMsg += "\n getUrlFromRequest: requestUrl: " + requestUrl;
 		    	// if (queryString != null) logMsg += "\n getUrlFromRequest: queryString: " + queryString;
 	    		if (appUrl != null) logMsg += "\n getUrlFromRequest: appUrl: " + appUrl;
@@ -200,21 +210,22 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
-	public static final int errorPage = 0;
-	public static final int IndexPage = 1;
-	public static final int SocialAuthServletSignIn = 2;
-	public static final int SocialAuthServletSignOut = 3;
-	public static final int SocialAuthServletUserInfo = 4;
-	public static final int SocialAuthSignInPage = 5;
-	public static final int SocialAuthUserInfoPage = 6;
-	public static final int SocialAuthCallBackServlet = 7;
-	public static final int FilesMgmtServlet = 8;
-	public static final int FilesMgmtIndexPage = 9;
-	public static final int FilesMgmtFileViewPage = 10;
-	public static final int QueryServletBuildQuery = 11;
-	public static final int QueryServletRunQuery = 12;
-	public static final int BuildQueryPage = 13;
-	public static final int RunQueryPage = 15;
+	public static final int theSamePage = 1;
+	public static final int errorPage = 2;
+	public static final int IndexPage = 3;
+	public static final int SocialAuthServletSignIn = 4;
+	public static final int SocialAuthServletSignOut = 5;
+	public static final int SocialAuthServletUserInfo = 6;
+	public static final int SocialAuthSignInPage = 7;
+	public static final int SocialAuthUserInfoPage = 8;
+	public static final int SocialAuthCallBackServlet = 9;
+	public static final int FilesMgmtServlet = 10;
+	public static final int FilesMgmtIndexPage = 11;
+	public static final int FilesMgmtFileViewPage = 12;
+	public static final int QueryServletBuildQuery = 13;
+	public static final int QueryServletRunQuery = 14;
+	public static final int BuildQueryPage = 15;
+	public static final int RunQueryPage = 16;
 	
 	/**
 	 * Returns the app mapping for uriNickName.
@@ -225,6 +236,8 @@ public class ServletsAuxMethodsClass {
 	private static String appMappingForUriNickName(int uriNickName) throws Exception {
 		String retVal = null;
 		switch (uriNickName) {
+		case theSamePage: retVal = "";
+				break;
 		case errorPage: retVal = "error.jsp";
 				break;
 		case IndexPage: retVal = "index.jsp";
@@ -255,8 +268,13 @@ public class ServletsAuxMethodsClass {
 				break;
 		case RunQueryPage: retVal = "WEB-INF/fleseRunQuery.jsp";
 				break;
-		default: throw new Exception("Unknown UriNickName: " + uriNickName);
+		default: retVal = "";
+				break;
 		}
+		if (("".equals(retVal)) && (uriNickName != theSamePage)) {
+			throw new Exception("Unknown UriNickName: " + uriNickName);
+		}
+		LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);
 		return retVal;
 	}
 	
@@ -270,8 +288,10 @@ public class ServletsAuxMethodsClass {
 	 */
 	public static String getFullPathForUriNickName(int UriNickName, HttpServletRequest request, Log LOG) 
 			throws Exception {
-		String url = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-		url += appMappingForUriNickName(UriNickName);
+		String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
+		String nickNameUrl = ServletsAuxMethodsClass.appMappingForUriNickName(UriNickName);
+		String url = "";
+		if (! "".equals(nickNameUrl)) url = appUrl + nickNameUrl;
 		if (LOG != null) LOG.info("url: " + url);
 		return url;
 	}
@@ -328,7 +348,6 @@ public class ServletsAuxMethodsClass {
 	public static void redirect_to_with_session(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
-		
 		if (LOG != null) LOG.info("encodeRedirectURL: redirecting_to: " + url);
 		response.encodeRedirectURL( url );
 	}

@@ -92,8 +92,7 @@ public class QueryConversorClass {
 		return msg;
 	}
 	
-	public void subqueryEndTestAndSave() 
-			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
+	public void subqueryEndTestAndSave() throws Exception {
 		String msg = "";
 		msg += ("\n  fp: " + tmpQuantifier0 + "(" + tmpQuantifier1 + "(" + tmpPredicate + "))");
 		msg += ("\n  cp: " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue);
@@ -115,7 +114,13 @@ public class QueryConversorClass {
 				subqueryRfuzzyComputeOperatorEndTestAndSave();
 			}
 			else {
-				subqueryFuzzyEndTestAndSave();
+				AnswerTermInJavaClass [] predInfo = connection.getPredicateInfo(tmpInitialPredicate);
+				if (hasFuzzyPredicateType(predInfo[2])) {
+					subqueryFuzzyEndTestAndSave();
+				}
+				else {
+					throw new Exception("You need to fill all the fields for non-fuzzy queries.");
+				}
 			}
 		}
 		else {
@@ -131,6 +136,24 @@ public class QueryConversorClass {
 		tmpRfuzzyComputeOperator = null;
 		tmpRfuzzyComputeValue = null;
 		
+	}
+	
+	private boolean hasFuzzyPredicateType(AnswerTermInJavaClass predInfoType) {
+		boolean found = false;
+		if ((predInfoType != null) && (predInfoType.isList())) {
+			int predInfoTypeLength = predInfoType.length();
+			int predInfoTypeIndex = 0;
+			while ((predInfoTypeIndex < predInfoTypeLength) && (! found)) {
+				AnswerTermInJavaClass type = predInfoType.atPosition(predInfoTypeIndex);
+				if ((type != null) && (type.isList()) && (type.length() == 2)) {
+					if ("rfuzzy_integer_type".equals(type.atPosition(1).toString())) found=true;
+					if ("rfuzzy_float_type".equals(type.atPosition(1).toString())) found=true;
+					if ("rfuzzy_number_type".equals(type.atPosition(1).toString())) found=true;
+				}
+				if (! found) predInfoTypeIndex++;
+			}
+		}
+		return found;
 	}
 	
 	private void subQueryInitialEndTestAndSave() throws QueryConversorExceptionClass, AnswerTermInJavaClassException {

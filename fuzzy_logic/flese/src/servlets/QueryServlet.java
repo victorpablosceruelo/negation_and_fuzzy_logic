@@ -84,7 +84,11 @@ public class QueryServlet extends HttpServlet {
 				buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
 			}
 			if ("runQuery".equals(operation)) {
-				buildAndExecuteQueryGeneric(fileOwner, fileName, localUserName, connection, request);
+				try {
+					buildAndExecuteQueryGeneric(fileOwner, fileName, localUserName, connection, request);
+				} catch (Exception e) {
+					ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.BuildQueryPage, e, request, response, LOG);
+				}
 			}
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
