@@ -130,7 +130,7 @@ public class QueryServlet extends HttpServlet {
 	    LOG.info(formParameters);
 	    
 	    int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
-	    QueryConversorClass conversor = new QueryConversorClass(queryLinesCounter +1, connection);
+	    QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
 	    String msg = "";
 	    
 	    // Parameters to be retrieved and saved:

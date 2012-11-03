@@ -28,6 +28,7 @@ public class QueryConversorClass {
 	public static final int rfuzzyComputeValue = 5;
 	public static final int aggregator = 6;
 	
+	private String localUserName = null;
 	private String tmpInitialPredicate = null;
 	private String tmpQuantifier0 = null;
 	private String tmpQuantifier1 = null;
@@ -47,8 +48,14 @@ public class QueryConversorClass {
 	private String queryComplexInfoString = null;
 	private String querySimpleInfoString = null;
 	
-	public QueryConversorClass(int queryLinesCounter, CiaoPrologConnectionClass connection) {
+	public QueryConversorClass(CiaoPrologConnectionClass connection, String localUserName) 
+			throws Exception {
+		if (connection == null) throw new Exception("connection is null.");
+		if (localUserName == null) throw new Exception("localUserName is null.");
+		if ("".equals(localUserName)) throw new Exception("localUserName is empty string.");
+		
 		this.connection = connection;
+		this.localUserName = localUserName;
 		LOG.debug("\n -- Query Conversor Started -- \n");
 	}
 	
@@ -164,9 +171,11 @@ public class QueryConversorClass {
 		
 		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
 		
+		PLStructure subGoal3 = new PLStructure("assertLocalUserName", new PLTerm[]{new PLAtom(localUserName)});
 		
 		initialSubQuery = new SubQueryConversionClass();
 		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
+		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal3, initialSubQuery.subQuery});
 		initialSubQuery.SubQuerySimpleInfoString = "";
 		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(initialSubQuery.subQuery, null);
 		initialSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
@@ -257,7 +266,7 @@ public class QueryConversorClass {
 
 		SubQueryConversionClass subQuery = new SubQueryConversionClass();
 		subQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
-		subQuery.SubQuerySimpleInfoString = " " + tmpPredicate + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue;
+		subQuery.SubQuerySimpleInfoString = " " + tmpPredicate + "(" + tmpInitialPredicate + ")" + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue;
 		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(subQuery.subQuery, null);
 		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		subQuery.resultVariable = resultVar;
@@ -313,7 +322,8 @@ public class QueryConversorClass {
 		subQuery.SubQuerySimpleInfoString = " ";
 		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += tmpQuantifier0 + "(";
 		if (tmpQuantifier1 != null) subQuery.SubQuerySimpleInfoString += tmpQuantifier1 + "(";
-		subQuery.SubQuerySimpleInfoString += tmpPredicate;
+		subQuery.SubQuerySimpleInfoString += tmpPredicate + "(" + tmpInitialPredicate + ")";
+		
 		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += ")";
 		if (tmpQuantifier0 != null) subQuery.SubQuerySimpleInfoString += ")";
 		
