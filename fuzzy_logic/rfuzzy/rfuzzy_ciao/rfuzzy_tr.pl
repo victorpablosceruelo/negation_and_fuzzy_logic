@@ -297,6 +297,7 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+
 % Unconditional default
 translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value)), Cls) :- !,
 	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) ', (Pred_Functor, Fixed_Truth_Value)),
@@ -1260,7 +1261,16 @@ add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Aux_3),
 	code_for_defined_quantifiers(Fuzzy_Rules_Aux_3, Fuzzy_Rules_Aux_4),
 	code_for_rfuzzy_compute_1(Fuzzy_Rules_Aux_4, Fuzzy_Rules_Aux_5),
-	code_for_rfuzzy_compute_2(Fuzzy_Rules_Aux_5, Fuzzy_Rules_Out).
+	code_for_rfuzzy_compute_2(Fuzzy_Rules_Aux_5, Fuzzy_Rules_Aux_6),
+	code_for_assert_local_user_name(Fuzzy_Rules_Aux_6, Fuzzy_Rules_Out).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_assert_local_user_name(Code, [Cl_1, Cl_2 | Code]) :-
+	Cl_1 = (:- data localUserName/1),
+	Cl_2 = (assertLocalUserName(UserName) :- assertz_fact(localUserName(UserName))).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
