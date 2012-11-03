@@ -14,9 +14,10 @@ public class LocalUserNameClass {
 	 * 
 	 * @param     profile is the profile returned by Open Authentication.
 	 * @return    localUserName, an unique identifier for the logged in user.
+	 * @throws Exception 
 	 * 
 	 */
-	public LocalUserNameClass(Profile profile) {
+	public LocalUserNameClass(Profile profile) throws Exception {
 		if (profile != null) { 
 				ifNullThenSetUserNameFrom(profile.getEmail(), profile.getProviderId(), "email", "providerId"); 
 				ifNullThenSetUserNameFrom(profile.getDisplayName(), profile.getProviderId(), "displayName", "providerId");
@@ -38,9 +39,11 @@ public class LocalUserNameClass {
 	 * @param     localUserName is the name of the user.
 	 * @param     newLocalUserName is the new value proposed for localUserName.
 	 * @return    newLocalUserName if localUserName is null; localUserName otherwise
+	 * @throws Exception 
 	 * 
 	 */
-	private void ifNullThenSetUserNameFrom(String beforeAt, String afterAt, String msgForBeforeAt, String msgForAfterAt) {
+	private void ifNullThenSetUserNameFrom(String beforeAt, String afterAt, String msgForBeforeAt, String msgForAfterAt) 
+			throws Exception {
 		if (localUserName == null) {
 			if ((beforeAt != null) && (afterAt != null)){
 				if (beforeAt.contains(afterAt)) {
@@ -60,10 +63,11 @@ public class LocalUserNameClass {
 	 * 
 	 * @param     localUserName is the name of the user.
 	 * @return    the fixed localUserName.
+	 * @throws Exception 
 	 * @exception LocalUserNameFixesClassException if localUserName is empty, null or can not be fixed.
 	 * 
 	 */
-	private String fixLocalUserName(String newLocalUserName) {
+	private String fixLocalUserName(String newLocalUserName) throws Exception {
 		String msg = "fixLocalUserName: ";
 		if ((newLocalUserName != null) && (! "".equals(newLocalUserName))) {
 			msg += newLocalUserName + " -> ";
@@ -76,26 +80,8 @@ public class LocalUserNameClass {
 			LOG.info(msg);
 		}
 		if ("".equals(newLocalUserName)) newLocalUserName=null;
-		if (! checkValidLocalUserName(newLocalUserName)) newLocalUserName=null;
+		if (! ServletsAuxMethodsClass.checkUserNameIsValid(newLocalUserName)) newLocalUserName=null;
 		return newLocalUserName;
-	}
-	
-	/**
-	 * Checks if an username is valid.
-	 * 
-	 * @param     localUserName is the name of the user that we are checking.
-	 * @exception LocalUserNameFixesClassException if localUserName is empty, null or invalid.
-	 */
-	private boolean checkValidLocalUserName(String newLocalUserName) {
-		boolean retVal = true;
-		if ((newLocalUserName == null) || "".equals(newLocalUserName)) retVal = false;
-		else {
-			if (newLocalUserName.contains("\\s")) retVal = false;
-			if (newLocalUserName.contains("\\@")) retVal = false;
-			if (newLocalUserName.contains("\\.")) retVal = false;
-		}
-		
-		return retVal;
 	}
 }
 

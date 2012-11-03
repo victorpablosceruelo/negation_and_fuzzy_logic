@@ -81,7 +81,8 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 	}
 
-	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) 
+			throws Exception {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(true);
 		Boolean retval = false;

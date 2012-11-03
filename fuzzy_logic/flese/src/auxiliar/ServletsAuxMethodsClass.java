@@ -47,24 +47,60 @@ public class ServletsAuxMethodsClass {
 		}		
 		return true;
 	}
+	
+	/**
+	 * Checks if an username is valid.
+	 * 
+	 * @param     localUserName is the name of the user that we are checking.
+	 * @exception LocalUserNameFixesClassException if localUserName is empty, null or invalid.
+	 */
+	public static boolean checkUserNameIsValid(String userName) throws Exception {
+
+		if (userName == null) throw new Exception("userName is null"); 
+		if ("".equals(userName)) throw new Exception("userName is empty"); 
+		if (userName.contains("\\s")) throw new Exception("userName contains \\s");
+		if (userName.contains("\\@")) throw new Exception("userName contains \\@");
+		if (userName.contains("\\.")) throw new Exception("userName contains \\.");
+		
+		return true;
+	}
 
 	/**
 	 * Executes de default actions when an exception is thrown.
 	 * @param e is the exception thrown.
 	 * @param request is the HttpServletRequest.
 	 * @param response is the HttpServletResponse.
-	 * @param LOG is the Log facility.
+	 * @param LOG is the Log facility. Can be null.
 	 */
 	static public void actionOnException(Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
-		LOG.error("Exception thrown: ");
-		LOG.error(e);
-		e.printStackTrace();
-		ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
-		try{
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
+		if (e != null) {
+			if (LOG != null) {
+				LOG.error("Exception thrown: " + e);
+				LOG.error("Exception trace: ");
+			}
+			e.printStackTrace();
+			if (e.getMessage() != null) {
+				ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
+			}
+			else {
+				ServletsAuxMethodsClass.addMessageToTheUser(request, e.toString(), LOG);
+			}
 		}
-		catch (Exception e2) {
-			actionOnException(e, request, response, LOG);
+		else ServletsAuxMethodsClass.addMessageToTheUser(request, "Thrown exception is null.", LOG);
+		
+		if ((request != null) && (response != null)) {
+			try{
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
+			}
+			catch (Exception e2) {
+				actionOnException(e, request, response, LOG);
+			}
+		}
+		else {
+			if (LOG != null) {
+				if (request == null) LOG.error("HttpServletRequest request is null.");
+				if (response == null) LOG.error("HttpServletRequest response is null.");
+			}
 		}
 	}
 

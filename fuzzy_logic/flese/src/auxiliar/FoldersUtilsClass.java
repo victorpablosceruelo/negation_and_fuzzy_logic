@@ -66,18 +66,18 @@ public class FoldersUtilsClass {
 	/**
 	 * Obtains the complete path of the owner. 
 	 * 
-	 * @param    owner It is the user for which we compute the path.
+	 * @param    fileOwner It is the user for which we compute the path.
 	 * @param 	 createIfDoesNotExist If yes and the whole path does not exists the method creates it.
 	 * @return   the complete path where the owner can read/store his/her program files.
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
 	 * @exception Exception if the folder can not be created
 	 */
-	public String getCompletePathOfOwner(String owner, Boolean createIfDoesNotExist) throws Exception {
+	public String getCompletePathFromFileOwner(String fileOwner, Boolean createIfDoesNotExist) throws Exception {
 
-		if (owner == null) throw new Exception("owner is null");
-		String userProgramFilesPath = programFilesPath + owner + "/";
+		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
+		String userProgramFilesPath = programFilesPath + fileOwner + "/";
 		testOrCreateProgramFilesPath(userProgramFilesPath, createIfDoesNotExist);
-		LOG.info("getCompletePathOfOwner: owner: "+owner+" userProgramFilesPath: "+userProgramFilesPath);
+		LOG.info("getCompletePathOfOwner: owner: "+fileOwner+" userProgramFilesPath: "+userProgramFilesPath);
 		return userProgramFilesPath ;
 	}
 
@@ -92,7 +92,7 @@ public class FoldersUtilsClass {
 	 */
 	public String getCompletePathOfProgramFile(String fileOwner, String fileName) throws Exception {
 
-		if (fileOwner == null) throw new Exception("fileOwner is null");
+		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
 		String ownerPath = programFilesPath + fileOwner + "/";
 		testOrCreateProgramFilesPath(ownerPath, false);
 		String programFilePath = ownerPath + fileName;
@@ -192,13 +192,12 @@ public class FoldersUtilsClass {
 		LOG.info("programFileName: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName);
 		
 		if (fileName == null) { throw new Exception("fileName is null"); }
-		if (fileOwner == null) { throw new Exception("fileOwner is null"); }
-		if (localUserName == null) { throw new Exception("localUserName is null"); }
-		
+		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
+		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);		
 		
 		Boolean retVal = false;
 		if (fileOwner.equals(localUserName)) {
-			String ownerProgramFilesPath = getCompletePathOfOwner(fileOwner, false);
+			String ownerProgramFilesPath = getCompletePathFromFileOwner(fileOwner, false);
 			String fileToRemove=ownerProgramFilesPath+fileName;
 			
 			File file = new File(fileToRemove);
@@ -225,18 +224,13 @@ public class FoldersUtilsClass {
 	 * 
 	 * @param     localUserName is the name of the user that is logged in.
 	 * @return    the program files iterator, null if there are no program files to iterate.
+	 * @throws Exception 
 	 */
-	public Iterator<FileInfoClass> returnFilesIterator(String localUserName) {
+	public Iterator<FileInfoClass> returnFilesIterator(String localUserName) throws Exception {
 		Iterator<FileInfoClass> programFilesIterator = null;
-		try {
-			ArrayList<FileInfoClass> programFilesList = listProgramFiles(localUserName);
-			if (!programFilesList.isEmpty()) {
-				programFilesIterator = programFilesList.iterator(); 
-			}
-		} catch (Exception e) {
-			LOG.info("Exception: " + e);
-			e.printStackTrace();
-			programFilesIterator = null;
+		ArrayList<FileInfoClass> programFilesList = listProgramFiles(localUserName);
+		if ((programFilesList != null) && (! programFilesList.isEmpty())) {
+			programFilesIterator = programFilesList.iterator(); 
 		}
 		return programFilesIterator;
 	}
@@ -258,7 +252,7 @@ public class FoldersUtilsClass {
 		String[] subDirs;
 		
 		// We list first the localUserName program files.
-		LocalUserNameClass.checkValidLocalUserName(localUserName);
+		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);
 		filter = (FilenameFilter) new OnlyLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
 
@@ -270,7 +264,7 @@ public class FoldersUtilsClass {
 		}
 
 		// We list in second (and last) place the other program files.
-		LocalUserNameClass.checkValidLocalUserName(localUserName);
+		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);
 		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
 

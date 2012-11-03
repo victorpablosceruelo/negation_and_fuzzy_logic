@@ -63,7 +63,7 @@ public class FilesMgmtClass {
 
 			// Get the path where we are going to upload the file.
 			String localUserName = (String) session.getAttribute("localUserName");
-			String filesPath = FoldersUtilsObject.getCompletePathOfOwner(localUserName, true);
+			String filesPath = FoldersUtilsObject.getCompletePathFromFileOwner(localUserName, true);
 
 			// Parse the request to get file items.
 			List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
