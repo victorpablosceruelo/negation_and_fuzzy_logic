@@ -14,10 +14,9 @@ import org.apache.commons.logging.LogFactory;
 
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
-import auxiliar.AnswerTermInJavaClassException;
 import auxiliar.CiaoPrologConnectionClass;
+import auxiliar.LocalUserNameClass;
 import auxiliar.QueryConversorClass;
-import auxiliar.QueryConversorExceptionClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 /**
@@ -32,28 +31,24 @@ public class QueryServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- doGet invocation ---");
-		doGetAndDoPost(request, response);
-		LOG.info("--- doGet end ---");
+		doGetAndDoPost("doGet", request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- doPost invocation ---");
-		doGetAndDoPost(request, response);
-		LOG.info("--- doPost end ---");
+		doGetAndDoPost("doPost", request, response);
 	}
 	
-	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response) {
+	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("--- "+doAction+" invocation ---");
 		try {
-			if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
-				dbQuery(request, response);
-			}
+			dbQuery(request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
 		}
+		LOG.info("--- "+doAction+" end ---");
 	}
 	
 	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -63,62 +58,33 @@ public class QueryServlet extends HttpServlet {
 		String fileOwner = null;
 		String operation = null;
 		
-		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
-			LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-			fileName = request.getParameter("fileName");
-			fileOwner = request.getParameter("fileOwner");
-			operation = request.getParameter("op");
-			if ((fileName == null) || (fileOwner == null) || (operation == null) ||
-					((! "buildQuery".equals(operation)) && (! "runQuery".equals(operation)))) {
-				LOG.info("operation: "+operation+" fileName: "+fileName+" fileOwner: "+fileOwner);
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "Incorrect arguments for request.", LOG);
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);
-			}
-			else {
-				LOG.info("Choosen fileName, fileOwner and op are: " + fileName + " :: " + fileOwner + " :: " + operation + " ");
-
-				try {
-					dbQueryAux(fileOwner, fileName, operation, session, request, response);
-				} catch (Exception e) {
-					LOG.info(e.getMessage());
-					e.printStackTrace();
-					ServletsAuxMethodsClass.addMessageToTheUser(request, "Exception in dbQuery. Message: \n" + e.getMessage(), LOG);
-					ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);
-				}
-			}
-		}
-	}
-	
-	//String localUserName = (String) session.getAttribute("localUserName");
-	//connection.changeCiaoPrologWorkingFolder(localUserName);
-	
-	/**
-	 * Connects to prolog server plserver, 
-	 * changes the current folder to the one owned by the fileOwner of the fileName,
-	 * asks the fileName for the available predicates via introspection
-	 * and shows the results in a web page.
-	 * Offers to the jsp all the collected information.
-	 * @throws QueryConversorExceptionClass 
-	 * @throws AnswerTermInJavaClassException 
-	 */
-	private void dbQueryAux(String fileOwner, String fileName, String operation, 
-			HttpSession session, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 		
+		LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
+		fileName = request.getParameter("fileName");
+		fileOwner = request.getParameter("fileOwner");
+		operation = request.getParameter("op");
+		if ((fileName == null) || (fileOwner == null) || (operation == null) ||
+				((! "buildQuery".equals(operation)) && (! "runQuery".equals(operation)))) {
+			throw new Exception("Incorrect arguments for a QueryServlet request: operation: "+operation+" fileName: "+fileName+" fileOwner: "+fileOwner);
+		}
+		else {
+			LOG.info("Choosen fileName, fileOwner and op are: " + fileName + " :: " + fileOwner + " :: " + operation + " ");
 			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
 			boolean justUpdatedIntrospection = false;
 			
 			if (connection == null) {
 				connection = new CiaoPrologConnectionClass();
-				dbQueryAux_Introspection(fileOwner, fileName, connection);
+				buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
 				justUpdatedIntrospection = true;
 			}
 			
 			if (("buildQuery".equals(operation)) && (! justUpdatedIntrospection)) {
-				dbQueryAux_Introspection(fileOwner, fileName, connection);
+				buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
 			}
 			if ("runQuery".equals(operation)) {
-				build_and_execute_query(fileOwner, fileName, connection, request);
+				buildAndExecuteQueryGeneric(fileOwner, fileName, localUserName, connection, request);
 			}
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
@@ -130,9 +96,10 @@ public class QueryServlet extends HttpServlet {
 			if ("runQuery".equals(operation)) {
 				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryPage, request, response, LOG);
 			}
+		}
 	}
 	
-	private void dbQueryAux_Introspection(String fileOwner, String fileName, CiaoPrologConnectionClass connection) 
+	private void buildAndExecuteQueryIntrospection(String fileOwner, String fileName, CiaoPrologConnectionClass connection) 
 			throws Exception {
 		
 		connection.programFileIntrospectionQuery(fileOwner, fileName);
@@ -147,7 +114,7 @@ public class QueryServlet extends HttpServlet {
 	}
 	
 	
-	private void build_and_execute_query(String fileOwner, String fileName, CiaoPrologConnectionClass connection, HttpServletRequest request) 
+	private void buildAndExecuteQueryGeneric(String fileOwner, String fileName, LocalUserNameClass localUserName, CiaoPrologConnectionClass connection, HttpServletRequest request) 
 			throws Exception {
 		LOG.info("build_and_execute_query call.");
 		

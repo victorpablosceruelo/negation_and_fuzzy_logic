@@ -1,8 +1,14 @@
 package auxiliar;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.brickred.socialauth.AuthProvider;
 import org.brickred.socialauth.Profile;
+import org.brickred.socialauth.SocialAuthManager;
 
 public class LocalUserNameClass {
 
@@ -10,23 +16,51 @@ public class LocalUserNameClass {
 	private static String localUserName = null;
 	
 	/**
-	 * Gets from profile a valid localUserName to identify uniquely the user logged in.
+	 * Tests if the client session has been authenticated, which is why it needs request and response.
 	 * 
-	 * @param     profile is the profile returned by Open Authentication.
-	 * @return    localUserName, an unique identifier for the logged in user.
+	 * @param request is the HttpServletRequest
+	 * @param response is the HttpServletResponse
 	 * @throws Exception 
-	 * 
 	 */
-	public LocalUserNameClass(Profile profile) throws Exception {
-		if (profile != null) { 
+	public LocalUserNameClass(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		if (request == null) throw new Exception("request is null");
+		if (response == null) throw new Exception("response is null");
+		
+		HttpSession session = request.getSession(false);
+		if (session == null) throw new Exception("session is null");
+
+		String testingMode = (String) session.getAttribute("testingMode");
+		Profile profile = null;
+		if (testingMode == null) {
+			SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
+			if (manager == null) throw new Exception("manager is null");
+
+			AuthProvider provider = (AuthProvider) session.getAttribute("provider");
+			if (provider == null) throw new Exception("provider is null");
+			
+			// get profile
+			profile = provider.getUserProfile();
+			if (profile == null) throw new Exception("profile is null");
+			else {
 				ifNullThenSetUserNameFrom(profile.getEmail(), profile.getProviderId(), "email", "providerId"); 
 				ifNullThenSetUserNameFrom(profile.getDisplayName(), profile.getProviderId(), "displayName", "providerId");
 				ifNullThenSetUserNameFrom(profile.getFullName(), profile.getProviderId(), "fullName", "providerId");
 				ifNullThenSetUserNameFrom(profile.getFirstName(), profile.getProviderId(), "firstName", "providerId");
 				ifNullThenSetUserNameFrom(profile.getLastName(), profile.getProviderId(), "lastName", "providerId");
+			}
+			
+			// you can obtain profile information
+			// System.out.println(profile.getFirstName());
+			// OR also obtain list of contacts
+			// List<Contact> contactsList = provider.getContactList();
 		}
+		
 		ifNullThenSetUserNameFrom("Testing User", "wakamola.es", "testing", "testing");
 		LOG.info("localUserName: " + localUserName);
+		
+		if (request.getAttribute("localUserName") != null) request.removeAttribute("localUserName");
+		request.setAttribute("localUserName", localUserName);
 	}
 	
 	public String getLocalUserName() {
@@ -51,8 +85,8 @@ public class LocalUserNameClass {
 					LOG.info(msgForBeforeAt);
 				}
 				else {
-					localUserName = fixLocalUserName(beforeAt + afterAt);
-					LOG.info(msgForBeforeAt+ " + " + msgForAfterAt);
+					localUserName = fixLocalUserName(beforeAt + "_at_" + afterAt);
+					LOG.info(msgForBeforeAt+ "+ _at_ + "+ msgForAfterAt);
 				}
 			}
 		}

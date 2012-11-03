@@ -97,17 +97,7 @@
 	</div>
 	
 	<%
-		String localUserName = (String) session.getAttribute("localUserName");
-
-		FoldersUtilsClass workingFolder = new FoldersUtilsClass();
-		Iterator<FileInfoClass> filesIterator = null;
-		if (workingFolder != null) {
-			filesIterator = workingFolder.returnFilesIterator(localUserName);
-		}
-		/*
-		else {
-			out.print("<h4>Error in application: working folder should not be null</h4>");
-		}*/
+		Iterator<FileInfoClass> filesIterator = (Iterator<FileInfoClass>) request.getAttribute("filesIterator");
 		if (filesIterator != null) {
 			out.println("<script type=\"text/javascript\">\n");
 			out.println("createProgramFilesWithMsgsTable('programFilesTableWithInfo', 'programFilesTable', 'msgsCell');");

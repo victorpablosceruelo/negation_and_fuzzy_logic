@@ -7,8 +7,9 @@
 <%@page import="org.brickred.socialauth.AuthProvider"%>
 
 <%
-	Profile profile = (Profile) session.getAttribute("profile");
 	AuthProvider provider = (AuthProvider) session.getAttribute("provider");
+	Profile profile = null;
+	if (provider != null) profile = provider.getUserProfile();
 %>
 
 <body>

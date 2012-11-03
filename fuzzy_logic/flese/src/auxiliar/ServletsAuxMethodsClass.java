@@ -4,52 +4,19 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
-import org.brickred.socialauth.AuthProvider;
-//import org.apache.commons.logging.LogFactory;
-import org.brickred.socialauth.SocialAuthManager;
 
 public class ServletsAuxMethodsClass {
 
 	private final static String appPath = "flese/";
 	private static String appUrl = null;
-
-	/**
-	 * Tests if the client session has been authenticated.
-	 * If it has not been then redirects the user client to the logout servlet.
-	 * 
-	 * @param request is the HttpServletRequest
-	 * @param response is the HttpServletResponse
-	 * @param LOG is the servlet logging facility. Can be null (but it is not recommended).
-	 * @return true if it has been authenticated; false if not.
-	 * @throws Exception 
-	 */
-	public static boolean clientSessionIsAuthenticated(HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws Exception {
-		if (request == null) throw new Exception("request is null");
-		if (response == null) throw new Exception("response is null");
-		
-		HttpSession session = request.getSession(false);
-		if (session == null) throw new Exception("session is null");
-
-		String testingMode = (String) session.getAttribute("testingMode");
-		if (testingMode == null) {
-			SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
-			if (manager == null) throw new Exception("manager is null");
-
-			AuthProvider provider = (AuthProvider) session.getAttribute("provider");
-			if (provider == null) throw new Exception("provider is null");
-		}		
-		return true;
-	}
 	
 	/**
-	 * Checks if an username is valid.
+	 * Checks if an user name is valid.
 	 * 
 	 * @param     localUserName is the name of the user that we are checking.
 	 * @exception LocalUserNameFixesClassException if localUserName is empty, null or invalid.
@@ -67,12 +34,13 @@ public class ServletsAuxMethodsClass {
 
 	/**
 	 * Executes de default actions when an exception is thrown.
+	 * @param where is the where we are redirected whe an exception occurs.
 	 * @param e is the exception thrown.
 	 * @param request is the HttpServletRequest.
 	 * @param response is the HttpServletResponse.
 	 * @param LOG is the Log facility. Can be null.
 	 */
-	static public void actionOnException(Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
+	static public void actionOnException(int where, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
 		if (e != null) {
 			if (LOG != null) {
 				LOG.error("Exception thrown: " + e);
@@ -90,10 +58,10 @@ public class ServletsAuxMethodsClass {
 		
 		if ((request != null) && (response != null)) {
 			try{
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, response, LOG);
+				ServletsAuxMethodsClass.forward_to(where, request, response, LOG);
 			}
 			catch (Exception e2) {
-				actionOnException(e, request, response, LOG);
+				actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
 			}
 		}
 		else {
@@ -189,21 +157,15 @@ public class ServletsAuxMethodsClass {
 	}
 	
 	private static String getAppUrlFromRequest(HttpServletRequest request, Log LOG) {
-	    if (appUrl == null) {
+		String logMsg = "";
+		
+	    if ((appUrl == null) || ("".equals(appUrl))) { 
 		    String requestUrl = request.getRequestURL().toString();
-		    String queryString = request.getQueryString();   // d=789
-		    
-		    if (LOG != null) {
-		    	if (requestUrl != null) LOG.info("getUrlFromRequest: requestUrl: " + requestUrl);
-		    	if (queryString != null) LOG.info("getUrlFromRequest: queryString: " + queryString);
-		    }
-		    
+		    // String queryString = request.getQueryString();   // d=789
+		    		    
 	    	if (requestUrl != null) {
 	    		Integer index = requestUrl.lastIndexOf(appPath); // http:// ... /page
 	    		appUrl = requestUrl.substring(0, index + appPath.length());
-	    		if (appUrl != null) {
-	    			if (LOG != null) LOG.info("getUrlFromRequest: appUrl: " + appUrl);
-	    		}
 	    	}
 	    	
 	    	if ((request.getServerName() == null) || (! ("localhost".equals(request.getServerName())))) {
@@ -221,10 +183,18 @@ public class ServletsAuxMethodsClass {
 	    			appUrl = httpsPrefix + appUrl;
 	    		}
 	    	}
+	    	
+		    if (LOG != null) {
+		    	if (requestUrl != null) logMsg += "\n getUrlFromRequest: requestUrl: " + requestUrl;
+		    	// if (queryString != null) logMsg += "\n getUrlFromRequest: queryString: " + queryString;
+	    		if (appUrl != null) logMsg += "\n getUrlFromRequest: appUrl: " + appUrl;
+	    		LOG.info(logMsg);
+		    }
+
 	    }
 	    
-	    if (appUrl == null) return ""; // Better an empty stream than a null pointer !!!
-	    else return appUrl;
+	    if (appUrl == null) appUrl = ""; // Better an empty stream than a null pointer !!!
+	    return appUrl;
 	}
 	
 	// ----------------------------------------------------------------------------------------------
@@ -246,10 +216,15 @@ public class ServletsAuxMethodsClass {
 	public static final int BuildQueryPage = 13;
 	public static final int RunQueryPage = 15;
 	
-	
-	private static String appMappingForUriNickName(int UriNickName, Log LOG) {
+	/**
+	 * Returns the app mapping for uriNickName.
+	 * @param UriNickName is the uri Nick Name.
+	 * @return the app mapping nickname introduced.
+	 * @throws Exception when the nick name is unknown.
+	 */
+	private static String appMappingForUriNickName(int uriNickName) throws Exception {
 		String retVal = null;
-		switch (UriNickName) {
+		switch (uriNickName) {
 		case errorPage: retVal = "error.jsp";
 				break;
 		case IndexPage: retVal = "index.jsp";
@@ -258,11 +233,11 @@ public class ServletsAuxMethodsClass {
 				break;
 		case SocialAuthServletSignOut: retVal = "SocialAuthServlet?op=signout";
 				break;
-		case SocialAuthServletUserInfo: retVal = "SocialAuthServlet?op=userInfo";
+		case SocialAuthServletUserInfo: retVal = "SocialAuthUserInfoServlet";
 				break;
-		case SocialAuthSignInPage: retVal = "WEB-INF/authentication.jsp";
+		case SocialAuthSignInPage: retVal = "WEB-INF/SocialAuthSignInJspPage.jsp";
 				break;
-		case SocialAuthUserInfoPage: retVal = "WEB-INF/authenticatedUserInfo.jsp";
+		case SocialAuthUserInfoPage: retVal = "WEB-INF/SocialAuthUserInfoJspPage.jsp";
 				break;
 		case SocialAuthCallBackServlet: retVal = "SocialAuthCallBackServlet";
 				break;
@@ -280,10 +255,8 @@ public class ServletsAuxMethodsClass {
 				break;
 		case RunQueryPage: retVal = "WEB-INF/fleseRunQuery.jsp";
 				break;
-		default: retVal = "error.jsp";
-				break;
+		default: throw new Exception("Unknown UriNickName: " + uriNickName);
 		}
-		if (LOG != null) LOG.info("appURIsMappingFor " + UriNickName + " is " + retVal);
 		return retVal;
 	}
 	
@@ -293,10 +266,14 @@ public class ServletsAuxMethodsClass {
 	 * @param request is the HttpServletRequest
 	 * @param LOG is the Log facility (can be null).
 	 * @return the full url for the nickname introduced.
+	 * @throws Exception when the nick name is unknown.
 	 */
-	public static String getFullPathForUriNickName(int UriNickName, HttpServletRequest request, Log LOG) {
-		String appUrl = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
-		return appUrl + appMappingForUriNickName(UriNickName, LOG);
+	public static String getFullPathForUriNickName(int UriNickName, HttpServletRequest request, Log LOG) 
+			throws Exception {
+		String url = ServletsAuxMethodsClass.getAppUrlFromRequest(request, LOG);
+		url += appMappingForUriNickName(UriNickName);
+		if (LOG != null) LOG.info("url: " + url);
+		return url;
 	}
 	
 	// ----------------------------------------------------------------------------------------------
@@ -311,13 +288,12 @@ public class ServletsAuxMethodsClass {
 	 * @param request is the servlet request parameter.
 	 * @param response is the servlet response parameter.
 	 * @param LOG is the LOG object (can be null).
-	 * @throws ServletException if getRequestDispatcher launches it
-	 * @throws IOException if getRequestDispatcher launches it
+	 * @throws Exception when the nick name is unknown.
 	 */
 	public static void forward_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws ServletException, IOException {
-		String url = appMappingForUriNickName(where, LOG);
-		if (LOG != null) LOG.info("forward_to: " + url);
+			throws Exception {
+		String url = appMappingForUriNickName(where);
+		if (LOG != null) LOG.info("forwarding_to: " + url);
 		RequestDispatcher dispatcher = request.getRequestDispatcher(url);
 		dispatcher.forward(request, response);
 	}
@@ -330,12 +306,12 @@ public class ServletsAuxMethodsClass {
 	 * @param request is the servlet request parameter.
 	 * @param response is the servlet response parameter.
 	 * @param LOG is the LOG object (can be null).
-	 * @throws IOException if sendRedirect launches it.
+	 * @throws Exception when the nick name is unknown or the operation is not possible.
 	 */
 	public static void redirect_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws IOException {
+			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
-		if (LOG != null) LOG.info("redirect_to: " + url);
+		if (LOG != null) LOG.info("redirecting_to: " + url);
 		response.sendRedirect( url );
 	}
 	
@@ -347,13 +323,13 @@ public class ServletsAuxMethodsClass {
 	 * @param request is the servlet request parameter.
 	 * @param response is the servlet response parameter.
 	 * @param LOG is the LOG object (can be null).
-	 * @throws IOException if sendRedirectURL launches it.
+	 * @throws Exception when the nick name is unknown or the operation is not possible.
 	 */
 	public static void redirect_to_with_session(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
-			throws IOException {
+			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
 		
-		if (LOG != null) LOG.info("encodeRedirectURL: " + url);
+		if (LOG != null) LOG.info("encodeRedirectURL: redirecting_to: " + url);
 		response.encodeRedirectURL( url );
 	}
 }

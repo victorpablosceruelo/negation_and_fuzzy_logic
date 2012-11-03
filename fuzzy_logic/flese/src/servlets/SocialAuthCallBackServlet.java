@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.AuthProvider;
-import org.brickred.socialauth.Profile;
+// import org.brickred.socialauth.Profile;
 // import org.brickred.socialauth.Contact;
 // import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthConfig;
@@ -45,42 +45,22 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log LOG = LogFactory.getLog(SocialAuthCallBackServlet.class);
 
-	/**
-	 * creates a instance of the requested provider from AuthProviderFactory and
-	 * calls the getLoginRedirectURL() method to find the URL which the user
-	 * should be redirect to.
-	 * 
-	 * @param mapping
-	 *            the action mapping
-	 * @param form
-	 *            the action form
-	 * @param request
-	 *            the http servlet request
-	 * @param response
-	 *            tc the http servlet response
-	 * @return ActionForward where the action should flow
-	 * @throws Exception
-	 *             if an error occurs
-	 */
-
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- doGet invocation ---");
-		doGetAndDoPost(request, response);
-		LOG.info("--- doGet end ---");
+		doGetAndDoPost("doGet", request, response);
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- doPost invocation ---");
-		doGetAndDoPost(request, response);
-		LOG.info("--- doPost end ---");	
+		doGetAndDoPost("doPost", request, response);
 	}
 	
-	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response) {
+	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("--- "+doAction+" invocation ---");
 		try {
 			socialAuthenticationAuthenticate(request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
 		}
+		LOG.info("--- "+doAction+" end ---");
 	}
 	
 	private void socialAuthenticationAuthenticate(HttpServletRequest request, HttpServletResponse response)
@@ -119,19 +99,9 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		if (provider == null) throw new Exception("provider is null");
 		session.setAttribute("provider", provider);
 		
-		// get profile
-		Profile profile = provider.getUserProfile();
-		if (profile == null) throw new Exception("profile is null");
-
-		// you can obtain profile information
-		// System.out.println(profile.getFirstName());
-
-		// OR also obtain list of contacts
-		// List<Contact> contactsList = provider.getContactList();
 		
-		LocalUserNameClass localUserName = new LocalUserNameClass(profile);
-		// if (localUserName==null) throw new Exception("localUserName is null");
-		session.setAttribute("localUserName", localUserName);
+		@SuppressWarnings("unused")
+		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 		
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	

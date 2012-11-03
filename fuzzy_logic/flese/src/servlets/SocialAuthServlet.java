@@ -1,17 +1,6 @@
 
 package servlets;
 
-import java.io.IOException;
-// import java.util.List;
-//import java.io.PrintWriter;
-//import java.util.ArrayList;
-//import java.util.Enumeration;
-//import java.util.List;
-//import java.util.Map;
-//import java.io.InputStream;
-//import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 // import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
+// import org.brickred.socialauth.util.Base64.InputStream;
 // import org.brickred.socialauth.util.SocialAuthUtil;
 
 import auxiliar.LocalUserNameClass;
@@ -39,23 +29,21 @@ public class SocialAuthServlet extends HttpServlet {
 
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- doGet invocation ---");
-		doGetAndDoPost(request, response);
-		LOG.info("--- doGet end ---");
+		doGetAndDoPost("doGet", request, response);
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- doPost invocation ---");
-		doGetAndDoPost(request, response);
-		LOG.info("--- doPost end ---");	
+		doGetAndDoPost("doPost", request, response);
 	}
 	
-	private void doGetAndDoPost(HttpServletRequest request, HttpServletResponse response) {
+	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("--- "+doAction+" invocation ---");
 		try {
 			socialAuthentication(request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
 		}
+		LOG.info("--- "+doAction+" end ---");
 	}
 	
 	private void socialAuthentication(HttpServletRequest request, HttpServletResponse response)
@@ -94,7 +82,7 @@ public class SocialAuthServlet extends HttpServlet {
 	    		retval = true; // Fake authentication !!!
 	    		session.setAttribute("testingMode", "true");
 	    		
-	    		LocalUserNameClass localUserName = new LocalUserNameClass(null);
+	    		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 	    		// if (localUserName==null) throw new Exception("localUserName is null");
 	    		session.setAttribute("localUserName", localUserName.getLocalUserName());
 	    		
@@ -124,6 +112,7 @@ public class SocialAuthServlet extends HttpServlet {
 		SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
 		if (manager == null) {
 			LOG.info("INFO: creating a new manager because it was null. ");
+		
 			//Create an instance of SocialAuthConfgi object
 			SocialAuthConfig config = SocialAuthConfig.getDefault();
 			// config.setApplicationProperties()
@@ -138,7 +127,6 @@ public class SocialAuthServlet extends HttpServlet {
 
 		// URL of YOUR application which will be called after authentication
 		String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);
-		LOG.info("successUrl: " + successUrl);
 
 		// get Provider URL to which you should redirect for authentication.
 		// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
@@ -150,13 +138,12 @@ public class SocialAuthServlet extends HttpServlet {
 		if (athenticationUrl == null) throw new Exception("athenticationUrl is null."); 
 		if ("".equals(athenticationUrl)) throw new Exception("athenticationUrl is empty string."); 
 		
-		LOG.info("Redirecting to: " + athenticationUrl);
 		response.sendRedirect( athenticationUrl );
 		// response.encodeRedirectURL( athenticationUrl );
 	}
 	
 	private void socialAuthenticationSignOut(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+			throws Exception {
 		
 		LOG.info("socialAuthenticationSignOut method call. ");
 		

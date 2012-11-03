@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -14,7 +15,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
+import auxiliar.FileInfoClass;
 import auxiliar.FilesMgmtClass;
+import auxiliar.FoldersUtilsClass;
+import auxiliar.LocalUserNameClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 
@@ -25,16 +29,14 @@ import auxiliar.ServletsAuxMethodsClass;
 public class FilesMgmtServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(FilesMgmtServlet.class);
-	private static FilesMgmtClass fileMgmtAux = null;
+	private static FilesMgmtClass filesMgmtAux = null;
 	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
-		LOG.info("--- doGet invocation ---");
 		doGetAndDoPost("doGet", request, response);
-		LOG.info("--- doGet end ---");
 	}
 
 	/**
@@ -42,55 +44,71 @@ public class FilesMgmtServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
-		LOG.info("--- doPost invocation ---");
 		doGetAndDoPost("doPost", request, response);
-		LOG.info("--- doPost end ---");	
 	}
 	
-	private void doGetAndDoPost(String doMethod, HttpServletRequest request, HttpServletResponse response) 
+	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
+		LOG.info("--- "+doAction+" invocation ---");
 		try {
-			if (fileMgmtAux == null) {
+			if (filesMgmtAux == null) {
 				ServletContext servletContext = getServletConfig().getServletContext();
-				fileMgmtAux = new FilesMgmtClass(servletContext);
+				filesMgmtAux = new FilesMgmtClass(servletContext);
 			}
-			fileMgmtServlet(doMethod, request, response);
+			fileMgmtServlet(doAction, request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
 		}
+		LOG.info("--- "+doAction+" end ---");
 	}
 
-	private void fileMgmtServlet(String doMethod, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void fileMgmtServlet(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// Ask for the previously created session.
 		HttpSession session = request.getSession(false);
 		
-		if (ServletsAuxMethodsClass.clientSessionIsAuthenticated(request, response, LOG)) {
-			String request_op = request.getParameter("op");
-			LOG.info("op: " + request_op);
-			if (request_op != null) {
+		// Tests if we have logged in.
+		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+		
+		String request_op = request.getParameter("op");
+		LOG.info("op: " + request_op);
+		if (request_op != null) {
+			try {
 				if ("upload".equals(request_op)) {
-					fileMgmtAux.uploadFile(doMethod, session, request, response);
+					filesMgmtAux.uploadFile(doAction, session, request, response);
 				}
 				if ("download".equals(request_op)) {
-					fileMgmtAux.downloadFile(doMethod, session, request, response);
+					filesMgmtAux.downloadFile(doAction, session, request, response);
 				}
 				if ("remove".equals(request_op)) {
-					fileMgmtAux.removeFile(doMethod, session, request, response);
+					filesMgmtAux.removeFile(doAction, session, request, response);
 				}
 				if ("view".equals(request_op)) {
-					fileMgmtAux.viewFile(doMethod, session, request, response);
+					filesMgmtAux.viewFile(doAction, session, request, response);
 				}
-				
+
 				if ((! "upload".equals(request_op)) && (! ("download".equals(request_op))) &&
-					     (! ("remove".equals(request_op))) && (! ("view".equals(request_op)))) {
+						(! ("remove".equals(request_op))) && (! ("view".equals(request_op)))) {
 					LOG.info("Strange op in request. op: " + request_op);
 				}
-			}
-
-			if ((request_op == null) || ((! ("download".equals(request_op))) && (! ("view".equals(request_op))))) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, request, response, LOG);
+			} catch (Exception e) {
+				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
 			}
 		}
+
+		if ((request_op == null) || ((! ("download".equals(request_op))) && (! ("view".equals(request_op))))) {
+
+			// Prepare the information we present in the jsp page.
+			FoldersUtilsClass workingFolder = new FoldersUtilsClass();
+			Iterator<FileInfoClass> filesIterator = null;
+			if (workingFolder != null) {
+				filesIterator = workingFolder.returnFilesIterator(localUserName.getLocalUserName());
+			}
+			request.setAttribute("filesIterator", filesIterator);
+
+			// Forward to the jsp page.
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, request, response, LOG);
+		}
+
 	}
 }
 
