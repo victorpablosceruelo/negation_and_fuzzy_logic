@@ -41,6 +41,7 @@
 	}
 %>
 </script>
+<script type="text/javascript" src="tabber.js"></script>
 <body>
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
@@ -56,33 +57,37 @@
     	<h3>Query Results for the query &nbsp;&nbsp; <%=(String) request.getAttribute("querySimpleInfoString") %></h3>
 		<br /><br />
 
-		<div id="results"></div>
-
-		<br /><br /><br />
-		<h3>Debug information about the query run in the Prolog system</h3>
-		<table class='queryResults'>
-			<tr class='queryResults'>
-				<th class='queryResults'>Query Format</th>
-				<th class='queryResults'>Query</th>
-			</tr>
-			<tr class='queryResults'>
-				<td class='queryResults'>Basic</td>
-				<td class='queryResults'> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
-			</tr>
-			<tr class='queryResults'>
-				<td class='queryResults'>Complex</td>
-				<td class='queryResults'><%=request.getAttribute("queryComplexInfoString") %></td>
-			</tr>
-			<tr class='queryResults'>
-				<td class='queryResults'>Prolog</td>
-				<td class='queryResults'><%=connection.getLatestEvaluatedQuery() %> </td>
-			</tr>
-		</table>
+		<div class="tabber">
+			<div class="tabbertab">
+				<h3>All results</h3>
+				<div id="allResults"></div>
+			</div>
+			<div class="tabbertab">
+				<h3>Debug information about the query run in the Prolog system</h3>
+				<table class='queryResults'>
+					<tr class='queryResults'>
+						<th class='queryResults'>Query Format</th>
+						<th class='queryResults'>Query</th>
+					</tr>
+					<tr class='queryResults'>
+						<td class='queryResults'>Basic</td>
+						<td class='queryResults'> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
+					</tr>
+					<tr class='queryResults'>
+						<td class='queryResults'>Complex</td>
+						<td class='queryResults'><%=request.getAttribute("queryComplexInfoString") %></td>
+					</tr>
+					<tr class='queryResults'>
+						<td class='queryResults'>Prolog</td>
+						<td class='queryResults'><%=connection.getLatestEvaluatedQuery() %> </td>
+					</tr>
+				</table>
+			</div>
 		<br /><br /><br /><br />
 	</div>
 	
 	<script type="text/javascript">
-		var div = document.getElementById('results');
+		var div = document.getElementById('allResults');
 		if ((answers.length == 1) || (answers.length == 0)) {
 			div.innerHTML = "no answers";
 		}
