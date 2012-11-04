@@ -2,12 +2,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>FleSe: Flexible Searches in Databases</title>
-<link href="style.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="ba-debug.js"></script>
-<script type="text/javascript" src="qTip.js"></script>
-<script type="text/javascript" src="tabber.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>FleSe: Flexible Searches in Databases</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="ba-debug.js"></script>
+	<script type="text/javascript" src="qTip.js"></script>
+
+
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+	<script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+	<script>
+		$(function() {
+			$( "#tabs" ).tabs();
+		});
+	</script>
 </head>
 
 <!-- JavaScript Debugging Code and more -->

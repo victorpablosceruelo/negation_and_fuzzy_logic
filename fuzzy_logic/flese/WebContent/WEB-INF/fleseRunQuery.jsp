@@ -56,20 +56,34 @@
    	<h3>Query Results for the query &nbsp;&nbsp; <%=(String) request.getAttribute("querySimpleInfoString") %></h3>
 	<br /><br />
 
-	<div class="tabber">
-			<ul class="tabbernav">
-				<li class="active">
-					<a href="javascript:void(null)" onclick="">All results</a>
-				</li>
-				<li>
-					<a href="javascript:void(null)" onclick="">Debug information about the query run in the Prolog system</a>
-				</li>
-			</ul>
-			<div class="tabbertab">
-				<h3>All results</h3>
-				test
-			</div>
-			<div class="tabbertab">
+	<div id="tabs">
+		<ul>
+			<li><a href="#tabs-1">10 best results</a></li>
+			<li><a href="#tabs-2">Results over 70%</a></li>
+			<li><a href="#tabs-3">Results over 50%</a></li>
+			<li><a href="#tabs-4">Results over 0%</a></li>
+			<li><a href="#tabs-5">All results</a></li>
+			<li><a href="#tabs-6">Debug information</a></li>
+		</ul>
+		
+		<div id="tabs-1">
+			<div id="queryResultsBest10"></div>
+		</div>
+		<div id="tabs-2">
+			<div id="queryResultsOver70"></div>
+		</div>
+		<div id="tabs-3">
+			<div id="queryResultsOver50"></div>
+		</div>
+		<div id="tabs-4">
+			<div id="queryResultsOver0"></div>
+		</div>
+		<div id="tabs-5">
+			<div id="queryResultsAll"></div>
+		</div>
+		
+	
+    	<div id="tabs-6">
 				<h3>Debug information about the query run in the Prolog system</h3>
 				<table class='queryResults'>
 					<tr class='queryResults'>
@@ -89,23 +103,28 @@
 						<td class='queryResults'><%=connection.getLatestEvaluatedQuery() %> </td>
 					</tr>
 				</table>
-			</div>
 		</div>
+	</div>
 	<br /><br /><br /><br />
 	
-	<div id="allResults"></div>
 
 	
 	<script type="text/javascript">
-		var div = document.getElementById('allResults');
-		if ((answers.length == 1) || (answers.length == 0)) {
-			div.innerHTML = "no answers";
-		}
-		else {
+		function createTable(divId) {
+			var div = document.getElementById(divId);
 			var table = document.createElement('table');
-			table.id = 'resultsTable';
+			table.id = divId + 'Table';
 			table.className = 'queryResults';
 			div.appendChild(table);
+		}
+		if ((answers.length == 1) || (answers.length == 0)) {
+			document.getElementById('queryResultsBest10').innerHTML = "no answers";
+			document.getElementById('queryResultsOver70').innerHTML = "no answers";
+			document.getElementById('queryResultsOver50').innerHTML = "no answers";
+			document.getElementById('queryResultsOver0').innerHTML = "no answers";
+			document.getElementById('queryResultsAll').innerHTML = "no answers";
+		}
+		else {
 		
 			var row = null;
 			var cell = null;
