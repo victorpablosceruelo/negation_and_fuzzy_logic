@@ -110,6 +110,20 @@
 
 	
 	<script type="text/javascript">
+		// Sort the array of answers.
+		function arraySortFunction(elt1, elt2) {
+			// Info:
+		    // return -1: Sort "a" to be a lower index than "b"
+			// return 0: "a" and "b" should be considered equal, and no sorting performed.
+			// return +1: Sort "b" to be a lower index than "a".
+			if (elt1[elt1.length -1] == "Truth Value") return -1;
+			if (elt2[elt2.length -1] == "Truth Value") return +1;
+			if (elt1[elt1.length -1] >  elt2[elt2.length -1]) return -1;
+			if (elt1[elt1.length -1] == elt2[elt2.length -1]) return 0;
+			if (elt1[elt1.length -1] <  elt2[elt2.length -1]) return +1;
+		}
+		if (answers.length > 1) answers.sort(arraySortFunction);
+		
 		function createTable(divId) {
 			var div = document.getElementById(divId);
 			var table = document.createElement('table');
@@ -117,6 +131,36 @@
 			table.className = 'queryResults';
 			div.appendChild(table);
 		}
+		
+		function insertAnswerToTable(divId, index) {
+			var tableId = divId + 'Table';
+			var table = document.getElementById(tableId);
+			var row = table.insertRow(-1);
+			row.className = 'queryResults';
+			var cell = null;
+			var answer = answers[i];
+			for (var j=1; j<answer.length; j++) {
+				if (index==0) {
+					cell = document.createElement('th');
+					cell.className = 'queryResults';
+					cell.innerHTML = answer[j];
+					row.appendChild(cell);
+				}
+				else {
+					cell = row.insertCell(-1);
+					cell.className = 'queryResults';
+					cell.innerHTML = answer[j];
+				}
+			}
+		}
+		
+		function resultOver(value, index) {
+			var answer = answers[index];
+			var realValue = answer[answer.length -1];
+			if (realValue == "Truth Value") return true;
+			return (realValue > value)
+		}
+		
 		if ((answers.length == 1) || (answers.length == 0)) {
 			document.getElementById('queryResultsBest10').innerHTML = "no answers";
 			document.getElementById('queryResultsOver70').innerHTML = "no answers";
@@ -125,25 +169,18 @@
 			document.getElementById('queryResultsAll').innerHTML = "no answers";
 		}
 		else {
-		
-			var row = null;
-			var cell = null;
+			createTable('queryResultsBest10');
+			createTable('queryResultsOver70');
+			createTable('queryResultsOver50');
+			createTable('queryResultsOver0');
+			createTable('queryResultsAll');
+			
 			for (var i=0; i<answers.length; i++) {
-				row = table.insertRow(-1);
-				row.className = 'queryResults';
-				for (var j=1; j<answers[i].length; j++) {
-					if (i==0) {
-						cell = document.createElement('th');
-						cell.className = 'queryResults';
-						cell.innerHTML = answers[i][j];
-						row.appendChild(cell);
-					}
-					else {
-						cell = row.insertCell(-1);
-						cell.className = 'queryResults';
-						cell.innerHTML = answers[i][j];
-					}
-				}
+				if (i <= 11) insertAnswerToTable('queryResultsBest10', i);
+				if (resultOver(0.7, i)) insertAnswerToTable('queryResultsOver70', i);
+				if (resultOver(0.5, i)) insertAnswerToTable('queryResultsOver50', i);
+				if (resultOver(0, i)) insertAnswerToTable('queryResultsOver0', i);
+				insertAnswerToTable('queryResultsAll', i);
 			}
 		}
 	</script>

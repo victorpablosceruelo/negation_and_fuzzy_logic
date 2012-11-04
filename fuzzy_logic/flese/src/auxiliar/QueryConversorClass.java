@@ -417,7 +417,9 @@ public class QueryConversorClass {
 		}
 		
 		if (finalQuery == null) {
-			finalQuery = initialSubQuery.subQuery;
+			outputVariable = new PLVariable();
+			PLStructure hackTruthValueQuery = new PLStructure("=", new PLTerm[]{outputVariable, new PLAtom("1")});
+			finalQuery = new PLStructure(",", new PLTerm[]{initialSubQuery.subQuery, hackTruthValueQuery});
 			querySimpleInfoString = initialSubQuery.SubQuerySimpleInfoString;
 			queryComplexInfoString = initialSubQuery.SubQueryComplexInfoString;
 		}
