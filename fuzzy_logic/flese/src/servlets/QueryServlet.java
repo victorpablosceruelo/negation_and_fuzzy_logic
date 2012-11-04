@@ -1,6 +1,5 @@
 package servlets;
 
-import java.util.Date;
 import java.util.Enumeration;
 
 import javax.servlet.annotation.WebServlet;
@@ -43,33 +42,35 @@ public class QueryServlet extends HttpServlet {
 	
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- "+doAction+" invocation ---");
+		String operation = null;
 		try {
-			dbQuery(request, response);
+			operation = request.getParameter("op");
+			dbQuery(operation, request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+			if ((operation != null) && ("runQuery".equals(operation))) {
+				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.QueryServletBuildQuery, e, request, response, LOG);
+			}
+			else {
+				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+			}
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
 	
-	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
-		String fileName = null;
-		String fileOwner = null;
-		String operation = null;
+	private void dbQuery(String operation, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-		
-		LOG.info("valid session. Session id: " + session.getId() + " Creation Time" + new Date(session.getCreationTime()) + " Time of Last Access" + new Date(session.getLastAccessedTime()));
-		fileName = request.getParameter("fileName");
-		fileOwner = request.getParameter("fileOwner");
-		operation = request.getParameter("op");
+		String fileName = request.getParameter("fileName");
+		String fileOwner = request.getParameter("fileOwner");
+
 		if ((fileName == null) || (fileOwner == null) || (operation == null) ||
 				((! "buildQuery".equals(operation)) && (! "runQuery".equals(operation)))) {
 			throw new Exception("Incorrect arguments for a QueryServlet request: operation: "+operation+" fileName: "+fileName+" fileOwner: "+fileOwner);
 		}
 		else {
 			LOG.info("Choosen fileName, fileOwner and op are: " + fileName + " :: " + fileOwner + " :: " + operation + " ");
+			// Ask for the previously created session.
+			HttpSession session = request.getSession(false);
 			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
 			boolean justUpdatedIntrospection = false;
@@ -84,11 +85,7 @@ public class QueryServlet extends HttpServlet {
 				buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
 			}
 			if ("runQuery".equals(operation)) {
-				try {
-					buildAndExecuteQueryGeneric(fileOwner, fileName, localUserName, connection, request);
-				} catch (Exception e) {
-					ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.BuildQueryPage, e, request, response, LOG);
-				}
+				buildAndExecuteQueryGeneric(fileOwner, fileName, localUserName, connection, request);
 			}
 
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 

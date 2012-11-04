@@ -43,6 +43,10 @@ public class ServletsAuxMethodsClass {
 	 * @param LOG is the Log facility. Can be null.
 	 */
 	static public void actionOnException(int where, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
+		actionOnExceptionAux(where, e, request, response, LOG, false);
+	}
+	
+	static public void actionOnExceptionAux(int where, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG, boolean abort) {
 		if (e != null) {
 			if (LOG != null) {
 				LOG.error("Exception thrown: " + e);
@@ -56,7 +60,7 @@ public class ServletsAuxMethodsClass {
 				ServletsAuxMethodsClass.addMessageToTheUser(request, e.toString(), LOG);
 			}
 		}
-		else ServletsAuxMethodsClass.addMessageToTheUser(request, "Thrown exception is null.", LOG);
+		else ServletsAuxMethodsClass.addMessageToTheUser(request, "Internal problem: thrown exception is null.", LOG);
 		
 		if ((request != null) && (response != null)) {
 			try{
@@ -66,11 +70,13 @@ public class ServletsAuxMethodsClass {
 				LOG.error("-------------------------------------------------------------------");
 			}
 			catch (Exception e2) {
-				if (where != theSamePage) {
-					actionOnException(where, e, request, response, LOG);
-				}
-				else {
-					actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+				if (! abort) {
+					if (where != theSamePage) {
+						actionOnExceptionAux(where, e, request, response, LOG, true);
+					}
+					else {
+						actionOnExceptionAux(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG, true);
+					}
 				}
 			}
 		}
@@ -79,6 +85,7 @@ public class ServletsAuxMethodsClass {
 				if (request == null) LOG.error("HttpServletRequest request is null.");
 				if (response == null) LOG.error("HttpServletRequest response is null.");
 			}
+			// throw(e);
 		}
 	}
 
