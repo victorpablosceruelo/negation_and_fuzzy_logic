@@ -41,26 +41,33 @@
 	}
 %>
 </script>
-<script type="text/javascript" src="tabber.js"></script>
-<body>
-    <div id="body">
-    	<jsp:include page="commonBodyHead.jsp" />
-    	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
-		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
-			&gt; 
-			<a title="Back to perform a query to program <%=connection.getLatestEvaluatedQueryProgramFileName()%>" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null) %>&fileName=<%=connection.getLatestEvaluatedQueryProgramFileName()%>&fileOwner=<%=connection.getLatestEvaluatedQueryProgramFileOwner() %>">Query the database</a>
-			&gt;
-			Query results 
-		</h3>
-    	<jsp:include page="commonBodyProgramQuery.jsp" />
-    	
-    	<h3>Query Results for the query &nbsp;&nbsp; <%=(String) request.getAttribute("querySimpleInfoString") %></h3>
-		<br /><br />
 
-		<div class="tabber">
+<body class='body'>
+   	<jsp:include page="commonBodyHead.jsp" />
+   	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
+		&gt; 
+		<a title="Back to perform a query to program <%=connection.getLatestEvaluatedQueryProgramFileName()%>" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null) %>&fileName=<%=connection.getLatestEvaluatedQueryProgramFileName()%>&fileOwner=<%=connection.getLatestEvaluatedQueryProgramFileOwner() %>">Query the database</a>
+		&gt;
+		Query results 
+	</h3>
+   	<jsp:include page="commonBodyProgramQuery.jsp" />
+    	
+   	<h3>Query Results for the query &nbsp;&nbsp; <%=(String) request.getAttribute("querySimpleInfoString") %></h3>
+	<br /><br />
+
+	<div class="tabber">
+			<ul class="tabbernav">
+				<li class="active">
+					<a href="javascript:void(null)" onclick="">All results</a>
+				</li>
+				<li>
+					<a href="javascript:void(null)" onclick="">Debug information about the query run in the Prolog system</a>
+				</li>
+			</ul>
 			<div class="tabbertab">
 				<h3>All results</h3>
-				<div id="allResults"></div>
+				test
 			</div>
 			<div class="tabbertab">
 				<h3>Debug information about the query run in the Prolog system</h3>
@@ -83,8 +90,11 @@
 					</tr>
 				</table>
 			</div>
-		<br /><br /><br /><br />
-	</div>
+		</div>
+	<br /><br /><br /><br />
+	
+	<div id="allResults"></div>
+
 	
 	<script type="text/javascript">
 		var div = document.getElementById('allResults');

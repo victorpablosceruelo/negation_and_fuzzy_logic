@@ -7,6 +7,7 @@
 <link href="style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="ba-debug.js"></script>
 <script type="text/javascript" src="qTip.js"></script>
+<script type="text/javascript" src="tabber.js"></script>
 </head>
 
 <!-- JavaScript Debugging Code and more -->
