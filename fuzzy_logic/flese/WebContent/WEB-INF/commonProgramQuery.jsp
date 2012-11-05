@@ -297,12 +297,37 @@
 		}
 	}
 	
-	function addQueryLineAndAggregatorChoose(queryLinesCellId, chooseAgregatorCellId, comboBoxValue) {
+	function addQueryLineAndAggregatorChoose(queryLinesCellId, aggregatorTableId, comboBoxValue) {
 		addQueryLine(queryLinesCellId, comboBoxValue);
-		queryLinesSelectAggregatorId = "queryLines.selectAggregator";
-		var chooseAgregatorCell = document.getElementById(chooseAgregatorCellId);
-		if ((chooseAgregatorCell.innerHTML == null) || (chooseAgregatorCell.innerHTML == "")) {
-			debug.info("null nor empty chooseAgregatorCell.innerHTML");
+		
+		var aggregatorTable = document.getElementById(aggregatorTableId);
+		var rowsCount = aggregatorTable.getElementsByTagName('tr').length;
+		debug.info("aggregatorTable rowsCount: " + rowsCount);
+		if (rowsCount == 1) {
+			var row2 = aggregatorTable.insertRow(-1);
+			row2.className = "queryLineAggregatorTable";
+			var showOrHideChooseAggregatorCell = row2.insertCell(-1);
+			showOrHideChooseAggregatorCell.className = "queryLineAggregatorTable";
+			
+			var row3 = aggregatorTable.insertRow(-1);
+			row3.className = "queryLineAggregatorTable";
+			var chooseAgregatorCell = row3.insertCell(-1);
+			chooseAgregatorCell.className = "queryLineAggregatorTable";
+			chooseAgregatorCell.id = "queryLines.chooseAgregatorCell";
+		
+			var queryLinesSelectAggregatorShowOptionsId='queryLinesSelectAggregatorShowOptions';
+			var queryLinesSelectAggregatorHideOptionsId='queryLinesSelectAggregatorHideOptions';
+			showOrHideChooseAggregatorCell.innerHTML = ""+
+				"<a id='"+queryLinesSelectAggregatorShowOptionsId+"' href='' onclick='return hide1Show2(\""+
+						queryLinesSelectAggregatorShowOptionsId+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+chooseAgregatorCell.id+"\");'>"+
+						"show options</a>"+
+				"<a id='"+queryLinesSelectAggregatorHideOptionsId+"' href='' onclick='return hide2show1(\""+
+						chooseAgregatorCell.id+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+queryLinesSelectAggregatorShowOptionsId+"\");'>"+
+						"hide options</a>";
+			document.getElementById(queryLinesSelectAggregatorHideOptionsId).style.display='none';
+				
+			var queryLinesSelectAggregatorId = "queryLines.selectAggregator"; // used below.
+			chooseAgregatorCell.style.display='none';
 			var predInfo = null;
 			var isAggregator = false;
 			var html = "";
@@ -318,7 +343,9 @@
 							(predInfo.predType[j][2] == 'rfuzzy_truth_value_type'));
 				}
 				if  (isAggregator) {
-					html += "<option name=\'" + predInfo.predName + 
+					html += "<option ";
+					if (predInfo.predName == "min") html += "selected "
+					html += "name=\'" + predInfo.predName + 
 							"\' value=\'" + predInfo.predName + "\'>"+predInfo.predName + "</option>";
 				}
 			}
@@ -338,13 +365,10 @@
 		aggregatorCell.appendChild(aggregatorTable);
 		
 		var row1 = aggregatorTable.insertRow(-1);
-		var row2 = aggregatorTable.insertRow(-1);
 		var addMoreQueryLinesButtonCell = row1.insertCell(-1);
-		var chooseAgregatorCell = row2.insertCell(-1);
-		chooseAgregatorCell.id = "queryLines.chooseAgregatorCell";
 		
 		var html = "<a href=\"\" onClick='return addQueryLineAndAggregatorChoose"+
-					"(\""+queryLinesCellId+"\", \""+chooseAgregatorCell.id+"\", \""+comboBoxValue+"\");' >" +
+					"(\""+queryLinesCellId+"\", \""+aggregatorTable.id+"\", \""+comboBoxValue+"\");' >" +
 					"<img src=\"images/add.png\" width=\"20\" alt=\"Add more conditions to the query\" "+
 						"title=\"Add more conditions to the query\" /></a>";
 		addMoreQueryLinesButtonCell.innerHTML = html;
@@ -418,8 +442,31 @@
 		document.getElementById(queryStartId).innerHTML = html;
 	}
 	
+	function hide(toHideId) {
+		document.getElementById(toHideId).style.display='none';
+	}
+	
+	function show(toShowId) {
+		document.getElementById(toShowId).style.display='inline';
+	}
+	
+	function hide1Show2(toHideId, toShowId1, toShowId2) {
+		hide(toHideId);
+		show(toShowId1);
+		show(toShowId2);
+		return false;
+	}
+	
+	function hide2show1(toHideId1, toHideId2, toShowId) {
+		hide(toHideId1);
+		hide(toHideId2);
+		show(toShowId);
+		return false;		
+	}
+	
 	/* This function makes a soft test of the query. */
 	function testQueryValidity() {
+		
 		return true;
 	}
 	
