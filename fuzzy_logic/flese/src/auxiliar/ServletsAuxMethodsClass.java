@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,28 +96,25 @@ public class ServletsAuxMethodsClass {
 	 */
 	public static void addMessageToTheUser(HttpServletRequest request, String msg, Log LOG) {
 		if (request != null) {
-			HttpSession session = request.getSession(false);
-			if (session != null) {
-				String [] currentMsgs = (String []) session.getAttribute("msgs");
-				String [] newMsgs;
-				if (currentMsgs != null) {
-					newMsgs = new String[currentMsgs.length +1];
-					for (int i=0; i<currentMsgs.length; i++) {
-						newMsgs[i] = currentMsgs[i];
-					}
-					newMsgs[currentMsgs.length] = msg;
+			String [] currentMsgs = (String[]) request.getAttribute("msgs");
+			String [] newMsgs;
+			if (currentMsgs != null) {
+				newMsgs = new String[currentMsgs.length +1];
+				for (int i=0; i<currentMsgs.length; i++) {
+					newMsgs[i] = currentMsgs[i];
 				}
-				else {
-					newMsgs = new String[1];
-					newMsgs[0] = msg;
-				}
-				session.removeAttribute("msgs");
-				session.setAttribute("msgs", newMsgs);
-				if (LOG != null) LOG.error("Added to the msgs session attribute in the request the msg \'" + msg + "\'");
+				newMsgs[currentMsgs.length] = msg;
+				// Remove the old messages array.
+				request.removeAttribute("msgs");
 			}
 			else {
-				if (LOG != null) LOG.error("Session is null.");
+				newMsgs = new String[1];
+				newMsgs[0] = msg;
 			}
+			// Save the new messages array.
+			request.setAttribute("msgs", newMsgs);
+			// Log
+			if (LOG != null) LOG.info("Added to the msgs session attribute in the request the msg \'" + msg + "\'");
 		}
 		else {
 			if (LOG != null) LOG.error("request is null. ERROR");

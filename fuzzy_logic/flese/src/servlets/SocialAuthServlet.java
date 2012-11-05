@@ -1,6 +1,9 @@
 
 package servlets;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -55,54 +58,64 @@ public class SocialAuthServlet extends HttpServlet {
 		String request_op = request.getParameter("op");
 		if (! (request_op == null)) request.removeAttribute("op");
 		
-		if ((request_op == null) || ("".equals(request_op))	) { 
-			LOG.info("ERROR: erroneous request_op (empty or null). ");
+		if ((request_op == null) || ("".equals(request_op))	|| (! "signin".equals(request_op))) { 
+			LOG.info("ERROR: request_op has been changed to signout. ");
 			request_op = "signout";
 		}
 		
+		// Ask for an existing session.
+		HttpSession session = request.getSession(false);
+		
+		// If we are not using signout we cannot have a session.
+		if ((! "signout".equals(request_op)) && (session != null)) {
+			socialAuthenticationSignOut(request, response, session);
+			session = null;
+		}
+		
+		
 		if ("signout".equals(request_op)) 
-			socialAuthenticationSignOut(request, response);
+			socialAuthenticationSignOut(request, response, session);
 		else {
-			if (! socialAuthenticationInTestingMode(request, response)) {
-				socialAuthenticationSignIn(request, response);
+			// Ask for a new session.
+			session = request.getSession(true);
+			if (! socialAuthenticationInTestingMode(request, response, session)) {
+				socialAuthenticationSignIn(request, response, session);
 			}
+		}
+		
+		if ("signout".equals(request_op)) {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthSignInPage, request, response, LOG);
 		}
 	}
 
-	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response) 
+	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
 			throws Exception {
 		// Ask for the previously created session.
-		HttpSession session = request.getSession(true);
+		if (session == null) throw new Exception("session is null");
 		Boolean retval = false;
 
 	    // Returns the host name of the server to which the request was sent.
 	    LOG.info("request.getServerName(): " + request.getServerName());
 	    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
-	    	if (session != null) {
-	    		retval = true; // Fake authentication !!!
-	    		session.setAttribute("testingMode", "true");
-	    		
-	    		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-	    		// if (localUserName==null) throw new Exception("localUserName is null");
-	    		session.setAttribute("localUserName", localUserName.getLocalUserName());
-	    		
-	    		ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
-	    		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
-	    	}
-		}
-	    
+	    	
+	    	retval = true; // Fake authentication !!!
+	    	session.setAttribute("testingMode", "true");
+
+	    	LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+	    	// if (localUserName==null) throw new Exception("localUserName is null");
+	    	session.setAttribute("localUserName", localUserName.getLocalUserName());
+
+	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
+	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
+		} 
 
 	    return retval;
 	}
 	
-	private void socialAuthenticationSignIn(HttpServletRequest request, HttpServletResponse response) 
+	private void socialAuthenticationSignIn(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
 			throws Exception {
 		
-		LOG.info("socialAuthenticationSignIn method call. ");
-		
-		// Ask for the previously created session.
-		HttpSession session = request.getSession(true);
-		
+		LOG.info("socialAuthenticationSignIn method call. ");		
 		if (session == null) throw new Exception("Session is null");
 
 		// Get the value of the parameter; the name is case-sensitive
@@ -142,31 +155,30 @@ public class SocialAuthServlet extends HttpServlet {
 		// response.encodeRedirectURL( athenticationUrl );
 	}
 	
-	private void socialAuthenticationSignOut(HttpServletRequest request, HttpServletResponse response) 
+	private void socialAuthenticationSignOut(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
 			throws Exception {
 		
 		LOG.info("socialAuthenticationSignOut method call. ");
-		
-		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
-		String [] msgs;
 
 		if (session != null) {
-			String id = (String)session.getAttribute("id");
-			if (id != null) {
-				SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
-				if (manager != null) {
-					manager.disconnectProvider(id);
+			SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
+			if (manager != null) {
+				List <String> connectedProvidersIds = manager.getConnectedProvidersIds();
+				if (connectedProvidersIds != null) {
+					Iterator <String> connectedProvidersIdsIterator = connectedProvidersIds.iterator();
+					if (connectedProvidersIdsIterator != null) {
+						while(connectedProvidersIdsIterator.hasNext()) {
+							String id = connectedProvidersIdsIterator.next();
+							if (id != null) {
+								manager.disconnectProvider(id);
+							}
+						}
+					}
 				}
 			}
-
-			msgs = (String []) session.getAttribute("msgs");
+			// Invalidate the session.
 			session.invalidate();
-			session = request.getSession(true);
-			session.setAttribute("msgs", msgs);
 		}
-		
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthSignInPage, request, response, LOG);
 	}
 	
 }

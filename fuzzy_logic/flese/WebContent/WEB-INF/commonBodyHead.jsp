@@ -35,23 +35,23 @@
 
 <div class="bodyToUserMsgs">
 	<%
-		if (session != null) {
-			if (session.getAttribute("msgs") != null) {
+		if (request != null) {
+			if (request.getAttribute("msgs") != null) {
 				%><h3 class="bodyToUserMsgs">Messages to the user:</h3>
 					<ul class="bodyToUserMsgs">
 				<%
-				String [] msgs = (String []) session.getAttribute("msgs");
+				String [] msgs = (String []) request.getAttribute("msgs");
 				for (int i=0; i<msgs.length; i++) {
 					%><li class="bodyToUserMsgs"><%=msgs[i]%></li><%
 				}
 				%></ul><%
-				session.removeAttribute("msgs");
+				request.removeAttribute("msgs");
 			}			
 		}
 		else {
 			%>
 				<ul class="bodyToUserMsgs">
-					<li class="bodyToUserMsgs"> ERROR: Session is null.</li>
+					<li class="bodyToUserMsgs"> ERROR: request is null.</li>
 				</ul>
 			<%
 		}
