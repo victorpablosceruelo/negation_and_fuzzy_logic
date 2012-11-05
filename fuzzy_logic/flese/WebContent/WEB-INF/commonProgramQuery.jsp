@@ -312,19 +312,30 @@
 			
 			var row3 = aggregatorTable.insertRow(-1);
 			row3.className = "queryLineAggregatorTable";
-			var chooseAgregatorCell = row3.insertCell(-1);
+			var chooseAgregatorInfoCell = row3.insertCell(-1);
+			chooseAgregatorInfoCell.className = "queryLineAggregatorTable";
+			chooseAgregatorInfoCell.id = "queryLines.chooseAgregatorInfoCell";			
+			chooseAgregatorInfoCell.innerHTML = "The aggregator used to combine <br />the subqueries' truth values is:";
+			
+			var row4 = aggregatorTable.insertRow(-1);
+			row4.className = "queryLineAggregatorTable";
+			var chooseAgregatorCell = row4.insertCell(-1);
 			chooseAgregatorCell.className = "queryLineAggregatorTable";
 			chooseAgregatorCell.id = "queryLines.chooseAgregatorCell";
 		
 			var queryLinesSelectAggregatorShowOptionsId='queryLinesSelectAggregatorShowOptions';
 			var queryLinesSelectAggregatorHideOptionsId='queryLinesSelectAggregatorHideOptions';
 			showOrHideChooseAggregatorCell.innerHTML = ""+
-				"<a id='"+queryLinesSelectAggregatorShowOptionsId+"' href='' onclick='return hide1Show2(\""+
-						queryLinesSelectAggregatorShowOptionsId+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+chooseAgregatorCell.id+"\");'>"+
+				"<a id='"+queryLinesSelectAggregatorShowOptionsId+"' href='' onclick='return aggregatorDetailsShow(\""+
+						queryLinesSelectAggregatorShowOptionsId+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+
+						chooseAgregatorInfoCell.id+"\", \""+chooseAgregatorCell.id+"\");'>"+
 						"show options</a>"+
-				"<a id='"+queryLinesSelectAggregatorHideOptionsId+"' href='' onclick='return hide2show1(\""+
-						chooseAgregatorCell.id+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+queryLinesSelectAggregatorShowOptionsId+"\");'>"+
+				"<a id='"+queryLinesSelectAggregatorHideOptionsId+"' href='' onclick='return aggregatorDetailsHide(\""+
+						queryLinesSelectAggregatorShowOptionsId+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+
+						chooseAgregatorInfoCell.id+"\", \""+chooseAgregatorCell.id+"\");'>"+
 						"hide options</a>";
+						// alert(showOrHideChooseAggregatorCell.innerHTML);
+			document.getElementById(chooseAgregatorInfoCell.id).style.display='none';
 			document.getElementById(queryLinesSelectAggregatorHideOptionsId).style.display='none';
 				
 			var queryLinesSelectAggregatorId = "queryLines.selectAggregator"; // used below.
@@ -332,7 +343,6 @@
 			var predInfo = null;
 			var isAggregator = false;
 			var html = "";
-			html += "Truth values combined by: <br />";
 			html += "<select name=\'"+queryLinesSelectAggregatorId+"\'>";
 			for (var i=0; i<programIntrospectionArray.length; i++){
 				predInfo = programIntrospectionArray[i];
@@ -446,24 +456,31 @@
 	}
 	
 	function hide(toHideId) {
-		document.getElementById(toHideId).style.display='none';
+		document.getElementById(toHideId)
 	}
 	
-	function show(toShowId) {
-		document.getElementById(toShowId).style.display='inline';
-	}
 	
-	function hide1Show2(toHideId, toShowId1, toShowId2) {
-		hide(toHideId);
-		show(toShowId1);
-		show(toShowId2);
+	function aggregatorDetailsShow(toShowMsgId, toHideMsgId, chooseAgregatorInfoCellId, chooseAgregatorCellId) {
+		document.getElementById(toShowMsgId).style.display='none';
+		
+		document.getElementById(toHideMsgId).style.display='inline';
+		document.getElementById(toHideMsgId).className = "queryLineAggregatorTable";
+		
+		document.getElementById(chooseAgregatorInfoCellId).style.display='table-cell';
+		document.getElementById(chooseAgregatorInfoCellId).className = "queryLineAggregatorTable";
+		
+		document.getElementById(chooseAgregatorCellId).style.display='table-cell';
+		document.getElementById(chooseAgregatorCellId).className = "queryLineAggregatorTable";
 		return false;
 	}
 	
-	function hide2show1(toHideId1, toHideId2, toShowId) {
-		hide(toHideId1);
-		hide(toHideId2);
-		show(toShowId);
+	function aggregatorDetailsHide(toShowMsgId, toHideMsgId, chooseAgregatorInfoCellId, chooseAgregatorCellId) {
+		document.getElementById(toHideMsgId).style.display='none';
+		document.getElementById(chooseAgregatorInfoCellId).style.display='none';
+		document.getElementById(chooseAgregatorCellId).style.display='none';
+		
+		document.getElementById(toShowMsgId).style.display='inline';
+		document.getElementById(toShowMsgId).className = "queryLineAggregatorTable";
 		return false;		
 	}
 	
