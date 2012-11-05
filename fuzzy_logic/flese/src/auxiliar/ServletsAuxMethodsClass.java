@@ -1,6 +1,5 @@
 package auxiliar;
 
-import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
@@ -127,22 +126,29 @@ public class ServletsAuxMethodsClass {
 	}
 	
 
-	public static void logRequestParameters(HttpServletRequest request, Log LOG) throws IOException {
+	public static void logRequestParameters(HttpServletRequest request, Log LOG) {
 		// Get the values of all request parameters
 		Enumeration<String> parametersEnum = request.getParameterNames();
 		String parameterName;
+		String msg = "";
 
-		while (parametersEnum.hasMoreElements()) {
-			// Get the name of the request parameter
-			parameterName = (parametersEnum.nextElement()).toString();
-			LOG.info("Parameter name: " + parameterName);
-			
-			String[] values = request.getParameterValues(parameterName);
-			for (int i=0; i<values.length; i++) {
-				LOG.info("Parameter name and value: " + parameterName + "[" + i + "]: " + values[i]);
+		if (parametersEnum != null) {
+			while (parametersEnum.hasMoreElements()) {
+				// Get the name of the request parameter
+				parameterName = (parametersEnum.nextElement()).toString();
+				msg += "\n - Parameter name: " + parameterName;
+
+				String[] values = request.getParameterValues(parameterName);
+				if (values != null) {
+					for (int i=0; i<values.length; i++) {
+						msg += "\n   Parameter name and value: " + parameterName + "[" + i + "]: " + values[i];
+					}
+				}
+				else msg += "\n   Parameter values is null.";
 			}
+			LOG.info(msg + "\n - <END of parameters list>");
 		}
-		LOG.info("<end of attributes list>");
+		else LOG.info("parametersEnum is null.");
 	}
 	
 	public static String requestParametersToString (HttpServletRequest request, Log LOG) {

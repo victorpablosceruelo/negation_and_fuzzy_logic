@@ -118,9 +118,12 @@
 			// return +1: Sort "b" to be a lower index than "a".
 			if (elt1[elt1.length -1] == "Truth Value") return -1;
 			if (elt2[elt2.length -1] == "Truth Value") return +1;
-			if (elt1[elt1.length -1] >  elt2[elt2.length -1]) return -1;
-			if (elt1[elt1.length -1] == elt2[elt2.length -1]) return 0;
-			if (elt1[elt1.length -1] <  elt2[elt2.length -1]) return +1;
+			var elt1float = parseFloat(elt1[elt1.length -1]);
+			var elt2float = parseFloat(elt2[elt2.length -1]);
+			
+			if (elt1float >  elt2float) return -1;
+			if (elt1float == elt2float) return 0;
+			if (elt1float <  elt2float) return +1;
 		}
 		if (answers.length > 1) answers.sort(arraySortFunction);
 		
@@ -158,7 +161,7 @@
 			var answer = answers[index];
 			var realValue = answer[answer.length -1];
 			if (realValue == "Truth Value") return true;
-			return (realValue > value)
+			return (parseFloat(realValue) > value)
 		}
 		
 		if ((answers.length == 1) || (answers.length == 0)) {

@@ -58,6 +58,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		try {
 			socialAuthenticationAuthenticate(request, response);
 		} catch (Exception e) {
+			ServletsAuxMethodsClass.logRequestParameters(request, LOG);
 			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
