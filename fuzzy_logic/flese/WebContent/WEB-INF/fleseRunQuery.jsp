@@ -179,7 +179,7 @@
 			createTable('queryResultsAll');
 			
 			for (var i=0; i<answers.length; i++) {
-				if (i <= 11) insertAnswerToTable('queryResultsBest10', i);
+				if ((i <= 11) && (resultOver(0, i))) insertAnswerToTable('queryResultsBest10', i);
 				if (resultOver(0.7, i)) insertAnswerToTable('queryResultsOver70', i);
 				if (resultOver(0.5, i)) insertAnswerToTable('queryResultsOver50', i);
 				if (resultOver(0, i)) insertAnswerToTable('queryResultsOver0', i);

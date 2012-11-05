@@ -455,11 +455,6 @@
 		document.getElementById(queryStartId).innerHTML = html;
 	}
 	
-	function hide(toHideId) {
-		document.getElementById(toHideId)
-	}
-	
-	
 	function aggregatorDetailsShow(toShowMsgId, toHideMsgId, chooseAgregatorInfoCellId, chooseAgregatorCellId) {
 		document.getElementById(toShowMsgId).style.display='none';
 		
