@@ -114,7 +114,7 @@ public class QueryConversorClass {
 				subqueryRfuzzyComputeOperatorEndTestAndSave();
 			}
 			else {
-				AnswerTermInJavaClass [] predInfo = connection.getPredicateInfo(tmpInitialPredicate);
+				AnswerTermInJavaClass [] predInfo = connection.getPredicateInfo(tmpPredicate);
 				if (hasTruthValueTypeAsReturnType(predInfo[2])) {
 					subqueryFuzzyEndTestAndSave();
 				}
@@ -140,7 +140,10 @@ public class QueryConversorClass {
 	
 	private boolean hasTruthValueTypeAsReturnType(AnswerTermInJavaClass predInfoType) throws Exception {
 		boolean found = false;
+		String msg = "";
 		if (predInfoType == null) throw new Exception("predInfoType is null.");
+		msg += "tmpInitialPredicate: " + tmpInitialPredicate;
+		msg += "\n predInfoType: " + predInfoType.toString();
 		if (! predInfoType.isList()) throw new Exception("predInfoType is not a list.");
 		
 		int predInfoTypeLength = predInfoType.length();
@@ -148,17 +151,19 @@ public class QueryConversorClass {
 		while ((predInfoTypeIndex < predInfoTypeLength) && (! found)) {
 			AnswerTermInJavaClass type = predInfoType.atPosition(predInfoTypeIndex);
 			if (type == null) throw new Exception("predInfoType type is null.");
-			if (! type.isList()) throw new Exception("predInfoType type is not a list.");
-			if (! (type.length() == 2)) throw new Exception("predInfoType type length is not 2.");
-			
-			if ((type.atPosition(0) != null) && (type.atPosition(1) != null) &&
-				(tmpInitialPredicate.equals(type.atPosition(0).toString())) && 
-				("rfuzzy_truth_value_type".equals(type.atPosition(1).toString()))) found=true;
-			else LOG.info("NOT valid: \n" +
-					"tmpInitialPredicate: " + tmpInitialPredicate + 
-					"rfuzzy_truth_value_type: " + type.atPosition(1).toString());
+			LOG.info("type: " + type.toString());
+			if (! type.isList()) throw new Exception("predInfoType type is not a list. type: " + type.toString());
+			if ((type.length() == 2) && 
+					(type.atPosition(0) != null) && (type.atPosition(1) != null) &&
+					(tmpInitialPredicate.equals(type.atPosition(0).toString())) && 
+					("rfuzzy_truth_value_type".equals(type.atPosition(1).toString()))) {
+				found=true;
+				msg += "\n valid type: " + type.toString();
+			}
+			else msg += "\n NOT valid type: " + type.toString();
 			if (! found) predInfoTypeIndex++;
 		}
+		LOG.info(msg);
 		return found;
 	}
 	
