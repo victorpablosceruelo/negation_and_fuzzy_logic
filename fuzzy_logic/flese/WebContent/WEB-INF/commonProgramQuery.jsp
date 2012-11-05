@@ -481,7 +481,57 @@
 	
 	/* This function makes a soft test of the query. */
 	function testQueryValidity() {
+		var comboBox = document.getElementsByName("startupType");
+		var comboBoxValue = null;
 		
+		if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
+		if (comboBox != null) {
+			if (comboBox.selectedIndex != null) {
+				comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+				if ((comboBoxValue == null) || (comboBoxValue == '----')) {
+					alert("Please, say what you are looking for.");
+					return false; 
+				}
+				else debug.info("comboBoxValue: " + comboBoxValue);
+			}
+			else debug.info("comboBox.selectedIndex is null ");
+		}
+		else {
+			debug.info("comboBox is null.");
+			return false;
+		}
+		
+		// alert("Stop 2");
+		for (var i=0; i < queryLinesCounter; i++) {
+			// operator 
+			comboBox = document.getElementsByName("queryLine["+i+"].selectRfuzzyComputeOperator");
+			if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
+			if (comboBox != null) {
+				if (comboBox.selectedIndex != null) {
+					comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+					if (comboBoxValue == '----') {
+						alert("Please fill the operator in subquery number " + (i+1));
+						return false; 
+					}
+					else debug.info("comboBoxValue: " + comboBoxValue);
+				}
+				else debug.info("comboBox.selectedIndex is null ");
+			}
+			else debug.info("comboBox is null.");
+			
+			// value 
+			var value = document.getElementsByName("queryLine["+i+"].selectRfuzzyComputeValue");
+			if ((value != null) && (value.length == 1)) value = value[0];
+			if (value != null) {
+				if (value.value == '') {
+					alert("Please fill the value in subquery number " + (i+1));
+					return false; 
+				}
+				else debug.info("value: " + value);
+			}
+			else debug.info("value is null.");
+		}
+		// alert("Stop");
 		return true;
 	}
 	
