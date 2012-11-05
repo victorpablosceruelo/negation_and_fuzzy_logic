@@ -220,6 +220,11 @@ th.programFileChosen, td.programFileChosen {
 	padding:0.5em;
 }
 
+th.queryLineAggregatorTable, td.queryLineAggregatorTable {
+	align:center;
+	text-align:center;
+}
+
 table.queryResults {
 	border:0.1em solid #000000;
 }

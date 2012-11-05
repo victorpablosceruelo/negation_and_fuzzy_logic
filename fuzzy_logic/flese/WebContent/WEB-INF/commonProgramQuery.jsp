@@ -365,7 +365,9 @@
 		aggregatorCell.appendChild(aggregatorTable);
 		
 		var row1 = aggregatorTable.insertRow(-1);
+		row1.className = "queryLineAggregatorTable";
 		var addMoreQueryLinesButtonCell = row1.insertCell(-1);
+		addMoreQueryLinesButtonCell.className = "queryLineAggregatorTable";
 		
 		var html = "<a href=\"\" onClick='return addQueryLineAndAggregatorChoose"+
 					"(\""+queryLinesCellId+"\", \""+aggregatorTable.id+"\", \""+comboBoxValue+"\");' >" +
