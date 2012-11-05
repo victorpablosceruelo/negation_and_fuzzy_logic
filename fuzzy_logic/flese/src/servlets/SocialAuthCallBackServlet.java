@@ -55,10 +55,10 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- "+doAction+" invocation ---");
+		ServletsAuxMethodsClass.logRequestParameters(request, LOG);
 		try {
 			socialAuthenticationAuthenticate(request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.logRequestParameters(request, LOG);
 			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");

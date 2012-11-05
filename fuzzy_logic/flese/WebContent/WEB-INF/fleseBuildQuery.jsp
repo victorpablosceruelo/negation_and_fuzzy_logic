@@ -20,7 +20,7 @@
 			<input type="hidden" name="queryLinesCounter" value="0" id="queryLinesCounter"> 
 			<div id="queryLinesDiv"></div>
 	 		<br />
-     		<INPUT type="submit" value="Execute Query">
+     		<INPUT type="submit" value="Execute Query" onclick='return testQueryValidity()'>
 		</form>
 		<br /><br /><br /><br /><br />
 	</div>

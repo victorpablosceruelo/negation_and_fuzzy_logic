@@ -418,4 +418,9 @@
 		document.getElementById(queryStartId).innerHTML = html;
 	}
 	
+	/* This function makes a soft test of the query. */
+	function testQueryValidity() {
+		return true;
+	}
+	
 </script>

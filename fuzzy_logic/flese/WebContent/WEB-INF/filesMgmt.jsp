@@ -97,6 +97,7 @@
 	</div>
 	
 	<%
+		@SuppressWarnings("unchecked")
 		Iterator<FileInfoClass> filesIterator = (Iterator<FileInfoClass>) request.getAttribute("filesIterator");
 		if (filesIterator != null) {
 			out.println("<script type=\"text/javascript\">\n");
