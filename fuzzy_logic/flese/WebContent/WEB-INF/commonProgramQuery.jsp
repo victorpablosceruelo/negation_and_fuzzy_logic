@@ -222,19 +222,20 @@
 		
 		if (foundPredInfo != null) {
 			var typeIndex = 0;
-			var predType = null;
-			var i = 0;
-			while ((typeIndex < foundPredInfo.predType.length) && (predType == null)) {
-				if (foundPredInfo.predType[typeIndex][0] == startupType) predType = foundPredInfo.predType[typeIndex];
-				else i++;
+			while ((typeIndex < foundPredInfo.predType.length) && 
+					(foundPredInfo.predType[typeIndex][0] != startupType)) {
+				typeIndex++;
 			}
-			if (predType[predType.length -1] == 'rfuzzy_truth_value_type') {
-				addQuantifier(queryLineGeneralId, rowId, 1);
-				addQuantifier(queryLineGeneralId, rowId, 0);
-			}
-			else {
-				addRfuzzyComputeOperator(queryLineGeneralId, rowId, index, typeIndex);
-				addRfuzzyComputeArgument(queryLineGeneralId, rowId, index, typeIndex);
+			if ((typeIndex < foundPredInfo.predType.length) && 
+					(foundPredInfo.predType[typeIndex][0] == startupType)) {
+				if (foundPredInfo.predType[typeIndex][foundPredInfo.predType[typeIndex].length -1] == 'rfuzzy_truth_value_type') {
+					addQuantifier(queryLineGeneralId, rowId, 1);
+					addQuantifier(queryLineGeneralId, rowId, 0);
+				}
+				else {
+					addRfuzzyComputeOperator(queryLineGeneralId, rowId, index, typeIndex);
+					addRfuzzyComputeArgument(queryLineGeneralId, rowId, index, typeIndex);
+				}
 			}
 		}
 	}
