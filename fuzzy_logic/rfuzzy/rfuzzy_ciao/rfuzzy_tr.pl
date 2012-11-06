@@ -1354,17 +1354,18 @@ generate_subcalls_for_rfuzzy_computed_similarity_between_aux([Element | More_Inf
 	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(More_Infos, Pred_Name, Pred_Arity, [Cl | In], Out).
 
 code_for_rfuzzy_compute_2(In, [Code | In]) :-
-	Code = (rfuzzy_compute(Operator, Database, Elt1_In, Elt2, Truth_Value) :- 
+	Code = (rfuzzy_compute(Operator, Elt1_In, Elt2, Database, Truth_Value) :- 
 	       nonvar(Operator), nonvar(Database),
+	       functor(Elt1_In, Name, 1),
+	       functor(Aux_Elt1, Name, 2),
+	       arg(1, Elt1_In, Elt1_Arg1), 
+	       arg(1, Aux_Elt1, Elt1_Arg1),
+	       arg(2, Aux_Elt1, Elt1_Arg2),
+	       print_msg('debug', 'rfuzzy_compute_aux :: calling Aux_Elt1', Aux_Elt1),
+	       Aux_Elt1, 
 	       (
 		   (   Operator = '=~=', !,
 		       print_msg('debug', 'rfuzzy_compute_aux :: operator is =~=', Operator),
-		       functor(Elt1_In, Name, 1),
-		       functor(Aux_Elt1, Name, 2),
-		       arg(1, Elt1_In, Elt1_Arg1), 
-		       arg(1, Aux_Elt1, Elt1_Arg1),
-		       arg(2, Aux_Elt1, Elt1_Arg2),
-		       Aux_Elt1, 
 		       functor(Elt1, Name, 1),
 		       arg(1, Elt1, Elt1_Arg2),
 		       Template = rfuzzy_computed_similarity_between(Database, Elt1, Elt2, _TV, _Cred_Op, _Cred),
@@ -1373,7 +1374,7 @@ code_for_rfuzzy_compute_2(In, [Code | In]) :-
 	       ;
 		   (   Operator \== '=~=', !,
 		       print_msg('debug', 'rfuzzy_compute_aux :: operator is NOT =~=', Operator),
-		       Elt1 = Elt1_In,
+		       Elt1 = Elt1_Arg2,
 		       Computed_Similarities = []
 		   )
 	       ),

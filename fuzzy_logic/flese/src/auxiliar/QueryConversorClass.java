@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import CiaoJava.PLAtom;
+import CiaoJava.PLFloat;
+import CiaoJava.PLInteger;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
@@ -273,7 +275,7 @@ public class QueryConversorClass {
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave() 
 			throws QueryConversorExceptionClass, AnswerTermInJavaClassException {
 		AnswerTermInJavaClass [] PredInfo = connection.getPredicateInfo(tmpPredicate);
-		if (PredInfo[1].toString() == null) {
+		if ((PredInfo == null) || (PredInfo[1] == null) || (PredInfo[1].toString() == null)) {
 			throw new QueryConversorExceptionClass("No defined arity for the predicate " + tmpPredicate);
 		}
 		else {
@@ -282,24 +284,48 @@ public class QueryConversorClass {
 				throw new QueryConversorExceptionClass("Arity of predicate is not 2. Predicate " + tmpPredicate);
 		}
 
-		PLTerm tmpVar = new PLVariable();
+		PLTerm database = new PLAtom(tmpInitialPredicate);
 		PLVariable resultVar = new PLVariable();
-
-		PLStructure subGoal1 = new PLStructure(tmpPredicate, new PLTerm[]{showVariables[0], tmpVar});
-		
+		PLStructure origin = new PLStructure(tmpPredicate, new PLTerm[]{showVariables[0]});
 		PLAtom operator = new PLAtom(tmpRfuzzyComputeOperator);
+
+		boolean isInteger = true;
+		int valueInt = 0;
+		try {
+			valueInt = Integer.parseInt(tmpRfuzzyComputeValue);
+		}
+		catch (Exception e) {
+			isInteger = false;
+		}
 		
-		PLTerm value = new PLAtom(tmpRfuzzyComputeValue);
+		boolean isDouble = true;
+		double valueDouble = 0;
+		try {
+			valueDouble = Double.parseDouble(tmpRfuzzyComputeValue);
+		}
+		catch (Exception e) {
+			isDouble = false;
+		}
+
+		PLTerm value = null;
+		if ((! isInteger) && (! isDouble)) { 
+			value = new PLAtom(tmpRfuzzyComputeValue);
+		}
+		else {
+			if (isInteger) {
+				value = new PLInteger(valueInt);
+			}
+			else {
+				value = new PLFloat(valueDouble);
+			}
+		}
 
 		if ("=~=".equals(tmpRfuzzyComputeOperator)) {
-			tmpVar = new PLStructure(tmpPredicate, new PLTerm[]{tmpVar});
 			value = new PLStructure(tmpPredicate, new PLTerm[]{value});
 		}
-		PLTerm database = new PLAtom(tmpInitialPredicate);
-		PLStructure subGoal2 = new PLStructure("rfuzzy_compute", new PLTerm[]{operator, database, tmpVar, value, resultVar});
 
 		SubQueryConversionClass subQuery = new SubQueryConversionClass();
-		subQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
+		subQuery.subQuery = new PLStructure("rfuzzy_compute", new PLTerm[]{operator, origin, value, database, resultVar});
 		subQuery.SubQuerySimpleInfoString = " " + tmpPredicate + "(" + tmpInitialPredicate + ")" + " " + tmpRfuzzyComputeOperator + " " + tmpRfuzzyComputeValue;
 		AnswerTermInJavaClass tmpQuery = new AnswerTermInJavaClass(subQuery.subQuery, null);
 		subQuery.SubQueryComplexInfoString = tmpQuery.toString();
