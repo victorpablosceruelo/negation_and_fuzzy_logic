@@ -309,7 +309,7 @@ rfuzzy_compute_aux(Operator, Elt1, Elt2, _Computed_Similarities, Truth_Value) :-
 	).
 rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value) :-
 	Operator = '=~=', !,
-	Format = rfuzzy_computed_similarity_between(Elt1, Elt2, TV, Cred_Op, Cred),
+	Format = rfuzzy_computed_similarity_between(_Database, Elt1, Elt2, TV, Cred_Op, Cred),
 	(
 	    (
 		memberchk_local(Format, Computed_Similarities), !,
@@ -325,7 +325,8 @@ rfuzzy_compute_aux(Operator, Elt1, Elt2, Computed_Similarities, Truth_Value) :-
 	    )
 	).
 
-rfuzzy_compute_aux(Operator, _Elt1, _Elt2, _Computed_Similarities, 0) :- !,
+rfuzzy_compute_aux(Operator, _Elt1, _Elt2, _Computed_Similarities, Truth_Value) :- !,
+	Truth_Value .=. -1,
 	print_msg('error', 'rfuzzy_compute_aux :: Unknown operator', Operator), !, fail.
 
 % ------------------------------------------------------
