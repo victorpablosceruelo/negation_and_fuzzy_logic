@@ -11,6 +11,18 @@
 :- data aggregators/1.
 :- data sentences/2.
 :- data defined_quantifiers_code/1.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+clean_up_asserted_facts :-
+	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14, _15)), _Removed_1),
+	findall('done', retract_fact(aggregators(_21)), _Removed_2),
+	findall('done', retract_fact(sentences(_31, _32)), _Removed_3),
+	findall('done', retract_fact(defined_quantifiers_code(_41)), _Removed_4),
+	!.
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -20,7 +32,7 @@
 
 translation_info('aggregator',             0, -1, '').
 translation_info('defuzzification',       0, -1, '').
-translation_info('function',                  1, -1, '').
+%translation_info('function',                  1, -1, '').
 translation_info('quantifier',                1, -1, '').
 
 translation_info('crisp_rule',               0, -1, '').
@@ -254,7 +266,8 @@ rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
 	print_msg('debug', 'all_predicate_info', All_Predicate_Infos),
 	build_auxiliary_clauses(All_Predicate_Infos, Fuzzy_Rules_1),
 	generate_introspection_predicate(All_Predicate_Infos, Fuzzy_Rules_1, Fuzzy_Rules_2),
-	add_auxiliar_code(Fuzzy_Rules_2, Fuzzy_Rules_3).
+	add_auxiliar_code(Fuzzy_Rules_2, Fuzzy_Rules_3), 
+	clean_up_asserted_facts.
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
 	% activate_rfuzzy_debug,
@@ -341,29 +354,6 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew)
 	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, [], []),
 	!.
-
-% function definition.
-translate((Head :# (Lower_Bound, List, Upper_Bound)), Cls) :-
-	!, % If patter matching, backtracking forbiden.
-	nonvar(Head), nonvar(List),
-	% list(Lista),
-	print_msg('debug', '(Head :# (Lower_Bound, List, Upper_Bound)) ', (Head :# (Lower_Bound, List, Upper_Bound))),
-
-	functor(Head, Pred_Name, 0),
-	Pred_Arity = 1,
-	Pred_Class = 'function',
-	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
-	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, '', New_Pred_Name, New_Pred_Arity, Pred_Functor, Truth_Value),
-
-	arg(1, Pred_Functor, X),
-	build_straight_lines(X, Truth_Value, Lower_Bound, List, Upper_Bound, Body),
-
-	Pred_Type = ['rfuzzy_number_type', 'rfuzzy_truth_value_type'],
-	Other_Info = [('lower_bound', Lower_Bound), ('upper_bound', Upper_Bound)],
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors)
-	save_predicate_definition(New_Pred_Name, New_Pred_Arity, Pred_Type, Other_Info, []), 
-	Cls = (Pred_Functor :- (Body, print_msg('debug', 'function_call', Pred_Functor))),
-	print_msg('debug', '(Head :# (Lower_Bound, List, Upper_Bound)) -> Cls', Cls).
 
 % Predicate type(s) definition (Class = database).
 translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), Cls):- !,
@@ -458,85 +448,12 @@ translate((rfuzzy_quantifier(Pred_Name/Pred_Arity, Var_In, Var_Out) :- Code), Tr
 	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)).
 
 % fuzzification:
-translate(rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pred_Name), Cls):-
-	!, % If patter matching, backtracking forbiden.
-	nonvar(Pred_Functor), nonvar(Crisp_Pred_Functor), nonvar(Funct_Pred_Name),
-	print_msg('debug', 'translate: rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pred_Name)', rfuzzy_define_fuzzification(Pred_Functor, Crisp_Pred_Functor, Funct_Pred_Name)),
-	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, P1_Type_1_Name, P1_Type_1_Arity),
-	extract_from_pred_functor_name_and_pred_type_1(Crisp_Pred_Functor, Crisp_Pred_Name, P2_Type_1_Name, P2_Type_1_Arity),
-	P1_Type_1_Name = P2_Type_1_Name,
-	P1_Type_1_Arity = P2_Type_1_Arity,
+translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName) :- function(Function_List)), Cls):-
+	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls).
 
-	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, Show_Error) 
-	retrieve_predicate_info(Crisp_Pred_Name,  2, P2_Type, 'true'),
-	memberchk_local([P2_Type_1_Name, P2_Type_2_Name], P2_Type),
-	retrieve_predicate_info(Funct_Pred_Name, 2, P3_Type, 'true'),
-	memberchk_local([P3_Type_1_Name, P3_Type_2_Name], P3_Type),
-	(
-	    (	var(P2_Type_2_Name), 
-		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Crisp_Pred_Name)), 
-		!, fail    )
-	;
-	    (   nonvar(P2_Type_2_Name), !   )
-	),
-	(
-	    (	(var(P3_Type_1_Name)   ;   var(P3_Type_2_Name)   ), 
-		 print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Funct_Pred_Name)), 
-		 !, fail    )
-	;	
-	    (    nonvar(P3_Type_1_Name),    nonvar(P3_Type_2_Name),   !    )
-	),
-	(
-	    (   P2_Type_2_Name = 'rfuzzy_integer_type', !   )
-	;
-	    (   P2_Type_2_Name = 'rfuzzy_float_type', !   )
-	;
-	    (
-		print_msg('error', 'Type of predicate is not suitable for fuzzification', Crisp_Pred_Name), 
-		print_msg('debug', 'P2_Type_2_Name', P2_Type_2_Name), 
-		!, fail    
-	    )
-	),
-	(
-	    (
-		P3_Type_1_Name = 'rfuzzy_number_type',
-		P3_Type_2_Name = 'rfuzzy_truth_value_type',
-		!
-	    )
-	;
-	    (
-		print_msg('error', 'Type of predicate is not suitable for fuzzification', Funct_Pred_Name), 
-		print_msg('debug', P3_Type_1_Name, P3_Type_2_Name), 
-		!, fail    
-	    )
-	),
+translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor) :- function(Function_List)), Cls):-
+	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, _UserName, Function_List, Cls).
 
-	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 1,
-	print_msg('debug', 'rfuzzy_define_fuzzification :: (Pred_Class, Pred_Arity)', (Pred_Class, Pred_Arity)), 
-	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
-	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, P1_Type_1_Name, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, Truth_Value),
-
-	% We need to do here as in other translations, so 
-	% it generates aux and main predicates for fuzzifications too.
-	functor(New_Crisp_Pred_Functor, Crisp_Pred_Name, 2),
-	functor(New_Funct_Pred_Functor, Funct_Pred_Name, 2),
-	functor(Type_Check_Functor, P1_Type_1_Name, P1_Type_1_Arity),
-	functor(Type_Check_Aux, '=', 2),
-
-	print_msg('debug', 'rfuzzy_define_fuzzification :: linking', (New_Pred_Functor, New_Crisp_Pred_Functor, New_Funct_Pred_Functor)), 
-	arg(1, New_Pred_Functor, Input),
-	arg(1, New_Crisp_Pred_Functor, Input),
-	arg(2, New_Crisp_Pred_Functor, Crisp_Value),
-	arg(1, New_Funct_Pred_Functor, Crisp_Value),
-	arg(2, New_Funct_Pred_Functor, Truth_Value),
-	arg(1, Type_Check_Aux, Input),
-	arg(2, Type_Check_Aux, Type_Check_Functor),
-
-	Cls = [(New_Pred_Functor :- (Type_Check_Functor, (Type_Check_Aux, (New_Crisp_Pred_Functor, New_Funct_Pred_Functor))))],
-
-	Selectors = [(New_Pred_Name, New_Pred_Arity)],
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [P1_Type_1_Name], Pred_Class, Selectors), 
-	!.
 
 translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), Translation) :-
 	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1, Translation).
@@ -738,7 +655,7 @@ translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Pred_More
 	    (   % it has been defined before.
 		retrieve_predicate_info(Real_Pred_Name, Real_Pred_Arity, Retrieved_Pred_Type, 'no'), 
 		nonvar(Retrieved_Pred_Type), !,
-		Retrieved_Pred_Type = Pred_Type,
+		memberchk_local(Pred_Type, Retrieved_Pred_Type),
 		Cls = []
 	    )
 	;
@@ -754,9 +671,11 @@ translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, Pred_More
 % ------------------------------------------------------
 
 translate_rfuzzy_define_database(Pred_Name, Pred_Arity, Description, Cls) :-
-	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
 	print_msg('debug', 'rfuzzy_define_database(Pred_Name/Pred_Arity, Description)', (Pred_Name/Pred_Arity, Description)),
+	nonvar(Pred_Name), nonvar(Pred_Arity), nonvar(Description),
+	print_msg('debug', 'rfuzzy_define_database :: translate_db_description(Description)', (Description)),
 	translate_db_description(Description, 1, Pred_Name, Pred_Arity, Pred_Type, Cls_2, Fields_Names),
+	print_msg('debug', 'rfuzzy_define_database :: translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
 	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, [('database', Fields_Names)], Cls_1),
 	print_msg('debug', 'rfuzzy_define_database :: Cls_1', Cls_1),
 	print_msg('debug', 'rfuzzy_define_database :: Cls_2', Cls_2),
@@ -1032,68 +951,117 @@ fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 	functor(Type, 'rfuzzy_enum_type', 1),
 	arg(1, Type, Pred_Name).
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_straight_lines(X, V, Lower_Bound, [(X1,V1) | List], Upper_Bound, Cls) :-
+translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls) :-
+	!, % If patter matching, backtracking forbiden.
+	nonvar(Pred_Functor), nonvar(Crisp_Pred_Functor), nonvar(Function_List),
+	print_msg('debug', 'translate: rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName)', (Pred_Functor, Crisp_Pred_Functor, UserName)),
+	print_msg('debug', 'translate: rfuzzy_fuzzification(Function_List)', Function_List),
+	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, P1_Type_1_Name, P1_Type_1_Arity),
+	extract_from_pred_functor_name_and_pred_type_1(Crisp_Pred_Functor, Crisp_Pred_Name, P2_Type_1_Name, P2_Type_1_Arity),
+	P1_Type_1_Name = P2_Type_1_Name,
+	P1_Type_1_Arity = P2_Type_1_Arity,
+
+	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, Show_Error) 
+	retrieve_predicate_info(Crisp_Pred_Name,  2, P2_Type, 'true'),
+	memberchk_local([P2_Type_1_Name, P2_Type_2_Name], P2_Type),
+	(
+	    (	var(P2_Type_2_Name), 
+		print_msg('error', 'Types for predicates used in fuzzification must be defined before', (Crisp_Pred_Name)), 
+		!, fail    )
+	;
+	    (   nonvar(P2_Type_2_Name), !   )
+	),
+	(
+	    (   P2_Type_2_Name = 'rfuzzy_integer_type', !   )
+	;
+	    (   P2_Type_2_Name = 'rfuzzy_float_type', !   )
+	;
+	    (
+		print_msg('error', 'Type of predicate is not suitable for fuzzification', Crisp_Pred_Name), 
+		print_msg('debug', 'P2_Type_2_Name', P2_Type_2_Name), 
+		!, fail    
+	    )
+	),
+
+	Pred_Class = 'fuzzy_rule_fuzzification', Pred_Arity = 1,
+	print_msg('debug', 'rfuzzy_define_fuzzification :: (Pred_Class, Pred_Arity)', (Pred_Class, Pred_Arity)), 
+	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
+	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, P1_Type_1_Name, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, Truth_Value),
+
+	% We need to do here as in other translations, so 
+	% it generates aux and main predicates for fuzzifications too.
+	functor(New_Crisp_Pred_Functor, Crisp_Pred_Name, 2),
+	functor(Type_Check_Functor, P1_Type_1_Name, P1_Type_1_Arity),
+	functor(Type_Check_Aux, '=', 2),
+	functor(Obtain_UserName, 'localUserName', 1),
+	functor(UserName_Check, '=', 2),
+
+	print_msg('debug', 'rfuzzy_define_fuzzification :: linking', (New_Pred_Functor, New_Crisp_Pred_Functor)), 
+	arg(1, New_Pred_Functor, Input),
+	arg(1, Type_Check_Aux, Input),
+	arg(2, Type_Check_Aux, Type_Check_Functor),
+	arg(1, New_Crisp_Pred_Functor, Input),
+	arg(2, New_Crisp_Pred_Functor, Crisp_Value),
+	arg(1, Obtain_UserName, Input_UserName),
+	arg(1, UserName_Check, Input_UserName), 
+	arg(2, UserName_Check, UserName),
+
+	build_straight_lines(Crisp_Value, Truth_Value, Function_List, List_Body),
+	More_Cl1 = (Obtain_UserName, (UserName_Check, (New_Crisp_Pred_Functor, List_Body))),
+	Cl1 = (New_Pred_Functor :- (Type_Check_Functor, (Type_Check_Aux, More_Cl1))),
+	Cls = [Cl1],
+
+	Selectors = [(New_Pred_Name, New_Pred_Arity)],
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [P1_Type_1_Name], Pred_Class, Selectors), 
+	!.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+
+build_straight_lines(X, V, List, Cls) :-
 	(
 	    (
-		nonvar(Lower_Bound), nonvar(X1),
-		Lower_Bound = X1, !,
-		build_straight_lines_aux(X, V, [(X1,V1) | List], Upper_Bound, Cls)
+		nonvar(List), list(List),
+		build_straight_lines_aux(X, V, List, Cls), !
 	    )
 	;
 	    (
-		print_msg('error', 'function: Lower_Bound =/= first element in list.', (Lower_Bound, X1)), !, fail
+		print_msg('error', 'function definition contains errors. Please fix them', function(List)), !, fail
 	    )
 	), !.
 
-build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)], Upper_Bound, (Point1 ; Line ; Point2)) :- !,
+build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)], (Point1 ; Line ; Point2)) :- !,
 	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)], (Point1, Line, Point2)))),
 	build_point(X, V, X1, V1, Point1),
 	build_line(X, V, X1, V1, X2, V2, Line),
-	build_point(X, V, X2, V2, Point2), !,
-	(
-	    (
-		nonvar(Upper_Bound), nonvar(X2),
-		Upper_Bound = X2, !
-	    )
-	;
-	    (
-		print_msg('error', 'function: Lower_Bound =/= last element in list.', (Upper_Bound, X2)), !, fail
-	    )
-	), !.
+	build_point(X, V, X2, V2, Point2), !.
 
-build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)|List], Upper_Bound, (Point ; Line ; More)) :-
+build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)|List], (Point ; Line ; More)) :- !,
 	print_msg('debug', 'build_straight_lines', (build_straight_lines(X, V, [(X1,V1),(X2,V2)|List], (Point, Line, More)))),
 	build_point(X, V, X1, V1, Point),
 	build_line(X, V, X1, V1, X2, V2, Line),
-	build_straight_lines_aux(X, V, [(X2,V2)|List], Upper_Bound, More).
+	build_straight_lines_aux(X, V, [(X2,V2)|List], More).
 
 build_point(X, V, X1, V1, (X .=. X1, V .=. V1)) :-
 	print_msg('debug', 'build_point', build_point(X, V, X, V, (H :- (H :- X1 .=. X, V1 .=. V)))),
-	nonvar(X1), nonvar(V1).
+	nonvar(X1), nonvar(V1), !.
 
 build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)) :-
 	print_msg('debug', 'build_line', (build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)))),
 
 	nonvar(X1), nonvar(X2), nonvar(V1), nonvar(V2), 
 	number(X1), number(X2), number(V1), number(V2),
-	X1 < X2, 
+	%	X1 .<. X2, 
 
 	!, % Backtracking is not allowed here.
-	evaluate_V(X, V, X1, V1, X2, V2, Calculate_V).
-
-evaluate_V(_X, V, _X1, Vf, _X2, Vf, (V .=. Vf)) :- !.
-
-evaluate_V(X, V, X1, V1, X2, V2, (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X1))) :-
-	X2 - X1 > 0,
-	V1 \= V2.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
+	Calculate_V = (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X1)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
