@@ -320,9 +320,11 @@ public class QueryConversorClass {
 			}
 		}
 
+		/* 
 		if ("=~=".equals(tmpRfuzzyComputeOperator)) {
 			value = new PLStructure(tmpPredicate, new PLTerm[]{value});
 		}
+		*/
 
 		SubQueryConversionClass subQuery = new SubQueryConversionClass();
 		subQuery.subQuery = new PLStructure("rfuzzy_compute", new PLTerm[]{operator, origin, value, database, resultVar});
