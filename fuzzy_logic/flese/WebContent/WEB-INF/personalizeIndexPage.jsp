@@ -12,27 +12,35 @@
 	if ((filePath != null) && ( ! ("".equals(filePath)))) {
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
 		String line;
+		String whiteSpaces        = "[\\s]*";
 		String anythingPattern    = "[\\s\\S]*";
-		String termNamePattern    = "[0-9a-zA-Z\\s_-]+";
-		String predicatePattern   = termNamePattern + "(\\(){1}"+termNamePattern+"(\\)){1}";
-		String prologIfPattern    = "[\\s]*(:-){1}[\\s]*";
-		String listElementPattern = "\\([\\d]+,[\\s]*[\\d]+\\)";
-		String functionPattern    = "(function\\(){1}\\[(["+listElementPattern+"]+)?\\]\\)[\\s]*\\."+anythingPattern;
-		String detectionPattern   = "^(rfuzzy_fuzzification\\(){1}("+predicatePattern+"){1}?(,){1}("+predicatePattern+"){1}?(\\)){1}"+
-									prologIfPattern+"("+functionPattern+")?"+anythingPattern+"$";
+		String termNamePattern    = "[0-9a-zA-Z_-]+";
+		String predicatePattern   = whiteSpaces + termNamePattern + "[\\(]{1}" + whiteSpaces + 
+									termNamePattern + whiteSpaces + "[\\)]{1}" + whiteSpaces;
+		String prologIfPattern    = whiteSpaces + "[:]{1}[-]{1}" + whiteSpaces;
+		String floatPattern       = whiteSpaces + "[\\d]+(\\.[\\d]+)?" + whiteSpaces;
+		String listElementPattern = whiteSpaces + "\\("+floatPattern+"[,]{1}"+floatPattern+"\\)"+
+									whiteSpaces + "[,]*" + whiteSpaces;
+		String functionPattern    = "function\\(\\[" + "("+listElementPattern+")+" + "\\]\\)"; 
+		String detectionPattern   = "^rfuzzy_fuzzification\\(("+predicatePattern+"){1}[,]{1}("+predicatePattern+"){1}[\\)]{1}"+
+									prologIfPattern + functionPattern + whiteSpaces + "(\\.){1}" + anythingPattern + "$";
 		
 		int i=0;
 		while ((line = reader.readLine()) != null) {
 			if (line.matches(detectionPattern)) {
 				String predNameDefined = line.replaceAll(detectionPattern, "$1");
 				String predNameNecessary = line.replaceAll(detectionPattern, "$2");
-				String predNameFunction = line.replaceAll(detectionPattern, "$3");
+				String predNameFunction1 = line.replaceAll(detectionPattern, "$3");
+				String predNameFunction2 = line.replaceAll(detectionPattern, "$4");
 				
-				out.println("personalizePredInfo["+i+"]= new Array('" + predNameDefined + "', '" + predNameNecessary + "', '" + predNameFunction + 
-						"', '" + line + "'); \n");
+				out.println("personalizePredInfo["+i+"]= new Array('" + predNameDefined + "', '" + predNameNecessary + "', '" + predNameFunction1 + 
+						"', '" + predNameFunction2 + "', '" + line + "'); \n");
 				// out.println(line);
 				// out.print("<br />\n");
 				i++;
+			}
+			else {
+				out.println("// " + line + "\n");
 			}
 		}
 		reader.close();
