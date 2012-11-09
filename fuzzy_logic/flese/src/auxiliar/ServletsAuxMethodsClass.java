@@ -299,7 +299,7 @@ public class ServletsAuxMethodsClass {
 		if (("".equals(retVal)) && (uriNickName != theSamePage)) {
 			throw new Exception("Unknown UriNickName: " + uriNickName);
 		}
-		LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);
+		// LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);
 		return retVal;
 	}
 	

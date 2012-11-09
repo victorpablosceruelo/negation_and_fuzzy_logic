@@ -19,9 +19,13 @@
 			if ((filePath != null) && ( ! ("".equals(filePath)))) {
 				BufferedReader reader = new BufferedReader(new FileReader(filePath));
 				String line;
+				String predPatt = "[0-9a-zA-Z \\_\\-]+[\\([0-9a-zA-Z \\_\\-]+)\\)]*";
+				String regexPattern = "rfuzzy_fuzzification\\("+predPatt+"[,]{1}"+predPatt+"\\)[ ]*[:\\-]{1}[\\s\\S]*";
 				while ((line = reader.readLine()) != null) {
-       				out.println(line);
-       				out.print("<br />\n");
+					if (line.matches(regexPattern)) {
+       					out.println(line);
+       					out.print("<br />\n");
+					}
 				}
 				reader.close();
 			}
