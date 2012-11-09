@@ -5,6 +5,10 @@
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
+<script type="text/javascript">
+	var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
+</script>
+
 <body>
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
@@ -21,8 +25,11 @@
 				String line;
 				String predPatt = "[0-9a-zA-Z \\_\\-]+[\\([0-9a-zA-Z \\_\\-]+)\\)]*";
 				String regexPattern = "rfuzzy_fuzzification\\("+predPatt+"[,]{1}"+predPatt+"\\)[ ]*[:\\-]{1}[\\s\\S]*";
+				String predNamePattern = "rfuzzy_fuzzification\\(("+predPatt+")?[,]{1}"+predPatt+"\\)[ ]*[:\\-]{1}[\\s\\S]*";
 				while ((line = reader.readLine()) != null) {
 					if (line.matches(regexPattern)) {
+						String predName = line.replaceAll(predNamePattern, "$1");
+						out.println(predName + "<br />");
        					out.println(line);
        					out.print("<br />\n");
 					}

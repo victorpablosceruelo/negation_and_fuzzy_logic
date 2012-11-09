@@ -244,7 +244,8 @@ public class ServletsAuxMethodsClass {
 	public static final int RunQueryPage = 16;
 	public static final int PersonalizeServlet = 17;
 	public static final int PersonalizeIndexPage = 18;
-	public static final int PersonalizeEditPage = 19;
+	public static final int PersonalizeServletEditAction = 19;
+	public static final int PersonalizeEditPage = 20;
 	
 	/**
 	 * Returns the app mapping for uriNickName.
@@ -288,6 +289,8 @@ public class ServletsAuxMethodsClass {
 		case RunQueryPage: retVal = "WEB-INF/fleseRunQuery.jsp";
 				break;
 		case PersonalizeServlet: retVal = "PersonalizeServlet";
+				break;
+		case PersonalizeServletEditAction: retVal = "PersonalizeServlet?op=edit";
 				break;
 		case PersonalizeIndexPage: retVal = "WEB-INF/personalizeIndexPage.jsp";
 				break;
