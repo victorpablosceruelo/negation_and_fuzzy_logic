@@ -14,6 +14,7 @@
 		<script type="text/javascript">
 			var filesMgmtServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null)%>";
 			var queryServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.QueryServletBuildQuery, request, null)%>";
+			var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServlet, request, null)%>";
 			
 			function createProgramFilesWithMsgsTable (divId, programFilesTableId, msgsCellId) {
 				var div = document.getElementById(divId);
@@ -39,6 +40,10 @@
 				programFilesTableHeadCell3.innerHTML = "&nbsp;";
 				programFilesTableHeadCell3.className = 'programFilesTable';
 				programFilesTableHead.appendChild(programFilesTableHeadCell3);
+				var programFilesTableHeadCell4 = document.createElement('th');
+				programFilesTableHeadCell4.innerHTML = "&nbsp;";
+				programFilesTableHeadCell4.className = 'programFilesTable';
+				programFilesTableHead.appendChild(programFilesTableHeadCell4);
 			}
 			
 			function lineForProgramFile(tableId, msgsCellId, fileName, fileOwner) {
@@ -74,6 +79,12 @@
 				cell4.innerHTML = "<a href='"+queryServlet+
 						"&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"title=\"query program file "+fileName+"\">Query</a> ";
+						
+				var cell5 = row.insertCell(4);
+				cell5.className = 'programFilesTable';
+				cell5.innerHTML = "<a href='"+personalizeServlet+
+						"?fileName="+fileName+"&fileOwner="+fileOwner+"' "+
+						"title=\"Personalize program file "+fileName+"\">Personalize</a> ";
 			}
 						
 			function unhideUpload() {
