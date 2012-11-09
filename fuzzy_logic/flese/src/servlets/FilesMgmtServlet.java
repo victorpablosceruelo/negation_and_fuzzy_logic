@@ -9,7 +9,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,9 +62,6 @@ public class FilesMgmtServlet extends HttpServlet {
 	}
 
 	private void fileMgmtServlet(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// Ask for the previously created session.
-		HttpSession session = request.getSession(false);
-		
 		// Tests if we have logged in.
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 		
@@ -74,16 +70,16 @@ public class FilesMgmtServlet extends HttpServlet {
 		if (request_op != null) {
 			try {
 				if ("upload".equals(request_op)) {
-					filesMgmtAux.uploadFile(doAction, session, request, response);
+					filesMgmtAux.uploadFile(doAction, localUserName, request, response);
 				}
 				if ("download".equals(request_op)) {
-					filesMgmtAux.downloadFile(doAction, session, request, response);
+					filesMgmtAux.downloadFile(doAction, localUserName, request, response);
 				}
 				if ("remove".equals(request_op)) {
-					filesMgmtAux.removeFile(doAction, session, request, response);
+					filesMgmtAux.removeFile(doAction, localUserName, request, response);
 				}
 				if ("view".equals(request_op)) {
-					filesMgmtAux.viewFile(doAction, session, request, response);
+					filesMgmtAux.viewFile(doAction, localUserName, request, response);
 				}
 
 				if ((! "upload".equals(request_op)) && (! ("download".equals(request_op))) &&

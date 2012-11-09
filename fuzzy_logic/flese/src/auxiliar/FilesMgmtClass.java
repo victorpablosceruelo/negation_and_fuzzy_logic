@@ -5,7 +5,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import java.io.*;
 import java.util.*;
@@ -35,81 +34,86 @@ public class FilesMgmtClass {
 		this.servletContext = servletContext;
 	}
 	
-	public void uploadFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response)
+	public void uploadFile(String doMethod, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		LOG.info("--- uploadFile invocation ---");
 		if ((doMethod == null) || ("doGet".equals(doMethod))) {
 			throw new ServletException("GET method used with " + getClass( ).getName( )+": POST method required.");	
 		}
+		if (localUserName == null) throw new Exception("localUserName is null.");
 			
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if( !isMultipart ){
 			ServletsAuxMethodsClass.addMessageToTheUser(request, "ERROR. No file uploaded.", LOG);
+			throw new Exception("the content of the request is not multipart.");
 		}
-		else {
 
-			DiskFileItemFactory factory = new DiskFileItemFactory();
-			// maximum size that will be stored in memory
-			factory.setSizeThreshold(maxMemSize);
-			// Location to save data that is larger than maxMemSize.
-			factory.setRepository(new File("/tmp/uploads"));
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		// maximum size that will be stored in memory
+		factory.setSizeThreshold(maxMemSize);
+		// Location to save data that is larger than maxMemSize.
+		factory.setRepository(new File("/tmp/uploads"));
 
-			// Create a new file upload handler
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			// maximum file size to be uploaded.
-			upload.setSizeMax( maxFileSize );
+		// Create a new file upload handler
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		// maximum file size to be uploaded.
+		upload.setSizeMax( maxFileSize );
 
 
-			// Get the path where we are going to upload the file.
-			String localUserName = (String) session.getAttribute("localUserName");
-			String filesPath = FoldersUtilsObject.getCompletePathFromFileOwner(localUserName, true);
+		// Get the path where we are going to upload the file.
+		String filesPath = FoldersUtilsObject.getCompletePathFromFileOwner(localUserName.getLocalUserName(), true);
 
-			// Parse the request to get file items.
-			List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
+		// Parse the request to get file items.
+		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
 
-			// Process the uploaded file items
-			Iterator<FileItem> i = fileItems.iterator();
+		// Process the uploaded file items
+		Iterator<FileItem> i = fileItems.iterator();
 
-			while ( i.hasNext () ) 
+		while ( i.hasNext () ) 
+		{
+			FileItem fileItem = (FileItem)i.next();
+			if ( !fileItem.isFormField () )	
 			{
-				FileItem fileItem = (FileItem)i.next();
-				if ( !fileItem.isFormField () )	
-				{
-					// Get the uploaded file parameters
-					//	            String fieldName = fi.getFieldName();
-					String fileName = fileItem.getName();
-					if ((fileName == null) || ("".equals(fileName)) || (! fileName.endsWith(".pl"))) {
-						ServletsAuxMethodsClass.addMessageToTheUser(request, "Please choose a correct program file. Allowed file extension is \'.pl\'", LOG);
-					}
-					else {
-						String fileNameReal = ""; 
-						//	            String contentType = fi.getContentType();
-						//	            boolean isInMemory = fi.isInMemory();
-						//	            long sizeInBytes = fi.getSize();
-						// Write the file
-						if( fileName.lastIndexOf("\\") >= 0 ){
-							fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
-
-						}else{
-							fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
-						}
-						File file = new File( fileNameReal ) ;
-						fileItem.write( file );
-						ServletsAuxMethodsClass.addMessageToTheUser(request, "Uploaded Filename: " + fileName + " to " + fileNameReal, LOG);
-					}
+				// Get the uploaded file parameters
+				//	            String fieldName = fi.getFieldName();
+				String fileName = fileItem.getName();
+				if (fileName == null) {
+					throw new Exception("fileName to upload is null.");
 				}
-			}
+				if  ("".equals(fileName)) {
+					throw new Exception("fileName to upload is empty string.");
+				}
+				if (! fileName.endsWith(".pl")) {
+					throw new Exception("fileName to upload must have the extension '.pl'.");
+				}
+				//	ServletsAuxMethodsClass.addMessageToTheUser(request, "Please choose a correct program file. Allowed file extension is \'.pl\'", LOG);
 
+				String fileNameReal = ""; 
+				//	            String contentType = fi.getContentType();
+				//	            boolean isInMemory = fi.isInMemory();
+				//	            long sizeInBytes = fi.getSize();
+				// Write the file
+				if( fileName.lastIndexOf("\\") >= 0 ){
+					fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
+				}
+				else{
+					fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
+				}
+				File file = new File( fileNameReal ) ;
+				fileItem.write( file );
+				ServletsAuxMethodsClass.addMessageToTheUser(request, "Uploaded Filename: " + fileName + " to " + fileNameReal, LOG);
+			}
 		}
 	}	
 
-	public void downloadFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response)
+	public void downloadFile(String doMethod, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		LOG.info("--- downloadFile invocation ---");
-		
+		if (localUserName == null) throw new Exception("localUserName is null.");
 		String fileName = request.getParameter("fileName");
+		if (fileName == null) throw new Exception("fileName is null.");
 		String fileOwner = request.getParameter("fileOwner");
+		if (fileOwner == null) throw new Exception("fileOwner is null.");
 
 		String FileNameWithPath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		// request.getParameter("filename");
@@ -144,44 +148,31 @@ public class FilesMgmtClass {
 		op.close();
 	}
 
-	public void removeFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
-		LOG.info("--- removeFile invocation ---");
-
+	public void removeFile(String doMethod, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
+			throws Exception {
+		if (localUserName == null) throw new Exception("localUserName is null.");
 		String fileName = request.getParameter("fileName");
+		if (fileName == null) throw new Exception("fileName is null.");
 		String fileOwner = (String) request.getParameter("fileOwner");
-		String localUserName = (String) session.getAttribute("localUserName");
+		if (fileOwner == null) throw new Exception("fileOwner is null.");
 		
-		if ((fileName != null) && (fileOwner != null) && (localUserName != null)) {
+		FoldersUtilsObject.removeProgramFile(fileName, fileOwner, localUserName.getLocalUserName());
+		ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" has been removed. ", LOG);
 		
-			try {
-				FoldersUtilsObject.removeProgramFile(fileName, fileOwner, localUserName);
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" has been removed. ", LOG);
-			} catch (Exception e) {
-				LOG.info("Exception: " + e +": " + e.getMessage());
-				e.printStackTrace();
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" could not be removed. ", LOG);
-			}
-		}
-		else {
-			ServletsAuxMethodsClass.addMessageToTheUser(request, "Sorry. Unknown request. Program file name: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName, LOG);
-		}
 	}
 	
-	public void viewFile(String doMethod, HttpSession session, HttpServletRequest request, HttpServletResponse response) 
+	public void viewFile(String doMethod, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
 			throws Exception {
+		if (localUserName == null) throw new Exception("localUserName is null.");
 		String fileName = request.getParameter("fileName");
+		if (fileName == null) throw new Exception("fileName is null.");
 		String fileOwner = request.getParameter("fileOwner");
+		if (fileOwner == null) throw new Exception("fileOwner is null.");
 
-		if ((fileName != null) && (fileOwner != null)) {
-			String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
-			request.setAttribute("fileName", fileName);
-			request.setAttribute("filePath", filePath);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, request, response, LOG);
-		}
-		else {
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, request, response, LOG);
-		}
+		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		request.setAttribute("fileName", fileName);
+		request.setAttribute("filePath", filePath);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, request, response, LOG);
 	}
 }
 

@@ -152,8 +152,23 @@
 				else {
 					cell = row.insertCell(-1);
 					cell.className = 'queryResults';
-					cell.innerHTML = answer[j];
+					if (j+1 < answer.length) {
+						cell.innerHTML = answer[j];
+					}
+					else {
+						cell.innerHTML = truncate_truth_value(answer[j]);
+					}
 				}
+			}
+		}
+		
+		function truncate_truth_value (truth_value) {
+			var newValue = parseFloat(truth_value);
+			if ((newValue != null) && (newValue != NaN)) {
+				return newValue.toFixed(2);
+			} 
+			else {
+				return truth_value;
 			}
 		}
 		
@@ -179,7 +194,7 @@
 			createTable('queryResultsAll');
 			
 			for (var i=0; i<answers.length; i++) {
-				if ((i <= 11) && (resultOver(0, i))) insertAnswerToTable('queryResultsBest10', i);
+				if ((i <= 10) && (resultOver(0, i))) insertAnswerToTable('queryResultsBest10', i);
 				if (resultOver(0.7, i)) insertAnswerToTable('queryResultsOver70', i);
 				if (resultOver(0.5, i)) insertAnswerToTable('queryResultsOver50', i);
 				if (resultOver(0, i)) insertAnswerToTable('queryResultsOver0', i);
