@@ -5,13 +5,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>FleSe: Flexible Searches in Databases</title>
 	<link href="style.css" rel="stylesheet" type="text/css" />
-	<script type="text/javascript" src="ba-debug.js"></script>
-	<script type="text/javascript" src="qTip.js"></script>
+	<script type="text/javascript" src="js/ba-debug.js"></script>
+	<script type="text/javascript" src="js/qTip.js"></script>
 
 
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
-	<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
-	<script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="js/jquery-ui.css" />
+	<script src="js/jquery-1.8.2.js"></script>
+	<script src="js/jquery-ui.js"></script>
 	<script>
 		$(function() {
 			$( "#tabs" ).tabs();
