@@ -5,7 +5,6 @@
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
-<script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/jquery.jqplot.min.js"></script>
 <link rel="stylesheet" type="text/css" href="js/jquery.jqplot.css" />
 <script type="text/javascript" src="js/jqplot.canvasTextRenderer.min.js"></script>
