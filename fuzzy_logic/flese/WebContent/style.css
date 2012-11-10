@@ -241,6 +241,18 @@ tr.queryResults, th.queryResults, td.queryResults {
 	text-align:center;
 }
 
+table.personalizationTable {
+	border:0.1em solid #000000;
+}
+tr.personalizationTable, th.personalizationTable, td.personalizationTable {
+	border:0.1em solid #000000;
+	border-color:black;
+	padding:0.6em;
+	margin:0.2em;
+	align:center;
+	text-align:center;
+}
+
 div#qTip {
  padding: 3px;
  border: 1px solid #666;
