@@ -243,6 +243,7 @@ tr.queryResults, th.queryResults, td.queryResults {
 
 table.personalizationTable {
 	border:0.1em solid #000000;
+	width:100%;
 }
 tr.personalizationTable, th.personalizationTable, td.personalizationTable {
 	border:0.1em solid #000000;
@@ -251,6 +252,16 @@ tr.personalizationTable, th.personalizationTable, td.personalizationTable {
 	margin:0.2em;
 	align:center;
 	text-align:center;
+}
+
+td.personalizationGraphicsInTable, th.personalizationGraphicsInTable {
+	border:0.1em solid #000000;
+	border-color:black;
+	padding:0.6em;
+	margin:0.2em;
+	align:center;
+	text-align:center;
+	width:60%;
 }
 
 div#qTip {
