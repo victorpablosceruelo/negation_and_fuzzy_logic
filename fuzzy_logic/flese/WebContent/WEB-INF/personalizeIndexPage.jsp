@@ -4,6 +4,7 @@
 <%@page import="java.io.*"%>
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
+<%@page import="auxiliar.FunctionsClass"%>
 
 <script type="text/javascript" src="js/jquery.jqplot.min.js"></script>
 <link rel="stylesheet" type="text/css" href="js/jquery.jqplot.css" />
@@ -12,7 +13,10 @@
 
 <script type="text/javascript">
 	function drawChart(i) {
-		$.jqplot('chartDiv_' + i,  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]);
+		var myFunction = personalizePredInfo[i][3];
+		
+		// $.jqplot('chartDiv_' + i,  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]);
+		$.jqplot('chartDiv_' + i,  [myFunction]);
 	}
 </script>
 
@@ -22,43 +26,17 @@
 	String filePath = (String) request.getAttribute("filePath");
 	if ((filePath != null) && ( ! ("".equals(filePath)))) {
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		String line;
-		String whiteSpaces        = "[\\s]*";
-		String anythingPattern    = "[\\s\\S]*";
-		String termNamePattern    = "[0-9a-zA-Z_-]+";
-		String predicatePattern   = whiteSpaces + termNamePattern + "[\\(]{1}" + whiteSpaces + 
-									termNamePattern + whiteSpaces + "[\\)]{1}" + whiteSpaces;
-		String prologIfPattern    = whiteSpaces + "[:]{1}[-]{1}" + whiteSpaces;
-		String floatPattern       = whiteSpaces + "[\\d]+(\\.[\\d]+)?" + whiteSpaces;
-		String listElementPattern = whiteSpaces + "[\\(]{1}"+floatPattern+"[,]{1}"+floatPattern+"[\\)]{1}"+
-									whiteSpaces + "[,]?" + whiteSpaces;
-		String functionPattern    = "(function\\(\\[){1}" + "["+listElementPattern+"]{2,}" + "(\\]\\)){1}"; 
-		String detectionPattern   = "^(rfuzzy_fuzzification\\(){1}("+predicatePattern+"){1}[,]{1}("+predicatePattern+"){1}[\\)]{1}"+
-									prologIfPattern + "(" + functionPattern + "){1}" + whiteSpaces + 
-									"(\\.){1}" + anythingPattern + "$";
 		
+		String line;
 		int i=0;
 		while ((line = reader.readLine()) != null) {
 			out.println("// " + line + "\n");
-			if (line.matches(detectionPattern)) {
-				String lineStart             = line.replaceAll(detectionPattern, "$1");
-				String predNameDefined       = line.replaceAll(detectionPattern, "$2");
-				String predNameNecessary     = line.replaceAll(detectionPattern, "$3");
-				String predNameFunction      = line.replaceAll(detectionPattern, "$4");
-				String predNameFunctionStart = line.replaceAll(detectionPattern, "$5");
-				String predNameFunctionEnd   = line.replaceAll(detectionPattern, "$6");
-				String lineEnd               = line.replaceAll(detectionPattern, "$7");
-				out.println("// lineStart: "             + lineStart + "\n");
-				out.println("// predNameDefined: "       + predNameDefined + "\n");
-				out.println("// predNameNecessary: "     + predNameNecessary + "\n");
-				out.println("// predNameFunction: "      + predNameFunction + "\n");
-				out.println("// predNameFunctionStart: " + predNameFunctionStart + "\n");
-				out.println("// predNameFunctionEnd: "   + predNameFunctionEnd + "\n");
-				out.println("// lineEnd: "               + lineEnd + "\n");
-				
+			if (line.startsWith("rfuzzy_fuzzification")) {
+				FunctionsClass function = new FunctionsClass(line); 
+				out.println("// line: "             + line + "\n");
 				out.println("personalizePredInfo["+i+"]= new Array('" + 
-							predNameDefined + "', '" + predNameNecessary + "', '" + predNameFunction + "', '" + 
-							line + "'); \n");
+							function.getPredDefined() + "', '" + function.getPredNecessary() + "', '" + function.getPredOwner() + "', " + 
+							function.getFunctionInJavaScript() + "); \n");
 				// out.println(line);
 				// out.print("<br />\n");
 				i++;
