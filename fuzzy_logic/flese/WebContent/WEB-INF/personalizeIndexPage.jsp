@@ -83,17 +83,22 @@
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
     	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
-    		View program file <%= (String) request.getAttribute("fileName") %> </h3>
+    		Personalize program file <%= (String) request.getAttribute("fileName") %> </h3>
 		<br />
 		<br />
 		<div id="personalizationTableDiv"></div><table id="resultsTable" class="personalizationTable"></table>
 		<br />
 		<br />
 		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
-    		View program file <%= (String) request.getAttribute("fileName") %> </h3>
+    		Personalize program file <%= (String) request.getAttribute("fileName") %> </h3>
     	<br /><br />
 	</div>
 	<script type="text/javascript">
+	
+		var personalizeServletEditAction = "<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null) %>";
+		var fileName = "<%= (String) request.getAttribute("fileName") %>";
+		var fileOwner = "<%= (String) request.getAttribute("fileOwner") %>";
+		
 		if (personalizePredInfo.length > 0) {
 			var divContainer = document.getElementById("personalizationTableDiv");
 			var table = document.createElement('table');
@@ -125,7 +130,7 @@
 
 					cell = row.insertCell(-1);
 					cell.className = "personalizationTable";
-					cell.innerHTML=personalizePredInfo[i][0];
+					cell.innerHTML="<a title='Personalize fuzzification "+personalizePredInfo[i][0]+"' href='" + personalizeServletEditAction + "&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+personalizePredInfo[i][0]+"'>"+personalizePredInfo[i][0]+"</a>";
 
 					cell = row.insertCell(-1);
 					cell.className = "personalizationTable";

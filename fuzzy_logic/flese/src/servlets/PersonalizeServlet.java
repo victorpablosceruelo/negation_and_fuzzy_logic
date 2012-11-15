@@ -88,6 +88,7 @@ public class PersonalizeServlet extends HttpServlet {
 		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
 		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		request.setAttribute("fileName", fileName);
+		request.setAttribute("fileOwner", fileOwner);
 		request.setAttribute("filePath", filePath);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeIndexPage, request, response, LOG);
 	}
