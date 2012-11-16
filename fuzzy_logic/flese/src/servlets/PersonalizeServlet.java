@@ -82,20 +82,36 @@ public class PersonalizeServlet extends HttpServlet {
 		if (localUserName == null) throw new Exception("localUserName is null.");
 		String fileName = request.getParameter("fileName");
 		if (fileName == null) throw new Exception("fileName is null.");
+		request.setAttribute("fileName", fileName);
 		String fileOwner = request.getParameter("fileOwner");
 		if (fileOwner == null) throw new Exception("fileOwner is null.");
+		request.setAttribute("fileOwner", fileOwner);
 
 		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
 		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
-		request.setAttribute("fileName", fileName);
-		request.setAttribute("fileOwner", fileOwner);
 		request.setAttribute("filePath", filePath);
+		
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeIndexPage, request, response, LOG);
 	}
 	
 	private void edit(String doAction, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
 			throws Exception {
 
+		if (localUserName == null) throw new Exception("localUserName is null.");
+		String fileName = request.getParameter("fileName");
+		if (fileName == null) throw new Exception("fileName is null.");
+		request.setAttribute("fileName", fileName);
+		String fileOwner = request.getParameter("fileOwner");
+		if (fileOwner == null) throw new Exception("fileOwner is null.");
+		request.setAttribute("fileOwner", fileOwner);
+		String fuzzification = request.getParameter("fuzzification");
+		if (fuzzification == null) throw new Exception("fuzzification is null.");
+		request.setAttribute("fuzzification", fuzzification);
+		
+		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
+		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		request.setAttribute("filePath", filePath);
+		
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeEditPage, request, response, LOG);
 	}

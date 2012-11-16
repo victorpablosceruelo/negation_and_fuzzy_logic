@@ -62,7 +62,7 @@
 		while ((line = reader.readLine()) != null) {
 			out.println("// " + line + "\n");
 			if (line.startsWith("rfuzzy_fuzzification")) {
-				FunctionsClass function = new FunctionsClass(line); 
+				FunctionsClass function = new FunctionsClass(line);
 				out.println("// line: "             + line + "\n");
 				out.println("personalizePredInfo["+i+"]= new Array('" + 
 							function.getPredDefined() + "', '" + function.getPredNecessary() + "', '" + function.getPredOwner() + "', " + 
@@ -83,14 +83,16 @@
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
     	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
-    		Personalize program file <%= (String) request.getAttribute("fileName") %> </h3>
+    		Personalize program file <%= (String) request.getAttribute("fileName") %> 
+    	</h3>
 		<br />
 		<br />
 		<div id="personalizationTableDiv"></div><table id="resultsTable" class="personalizationTable"></table>
 		<br />
 		<br />
-		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
-    		Personalize program file <%= (String) request.getAttribute("fileName") %> </h3>
+    	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
+    		Personalize program file <%= (String) request.getAttribute("fileName") %> 
+    	</h3>
     	<br /><br />
 	</div>
 	<script type="text/javascript">
@@ -126,7 +128,7 @@
 			for (var i=0; i<personalizePredInfo.length; i++) {
 				row = table.insertRow(-1);
 				row.className = "personalizationTable";
-				if (personalizePredInfo[i].length >= 3){
+				if ((personalizePredInfo[i].length >= 4) && ((personalizePredInfo[i][2] == ''))){
 
 					cell = row.insertCell(-1);
 					cell.className = "personalizationTable";
