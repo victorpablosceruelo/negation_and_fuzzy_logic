@@ -15,11 +15,12 @@
 <script type="text/javascript" src="js/jqplot.dateAxisRenderer.min.js"></script>
 
 <script type="text/javascript">
-	function drawChart(i) {
-		var myFunction = personalizePredInfo[i][3];
+	var functionValues = new Array();
+	
+	function drawChart(identifier) {
 		
-		// $.jqplot('chartDiv_' + i,  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]);
-		$.jqplot('chartDiv_' + i,  [myFunction], {
+		/* $.jqplot('chartDiv_' + i,  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]); */
+		$.jqplot(identifier,  functionValues, {
 		      // Give the plot a title.
 		      // title: '',
 		      // An axes object holds options for all axes.
@@ -90,7 +91,7 @@
 </script>
 
 <body>
-    <div id="body">
+    <div id="bodyContainer">
     	<jsp:include page="commonBodyHead.jsp" />
     	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt;
     		<a title="Back to personalize program file <%= (String) request.getAttribute("fileName") %>" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServlet, request, null) %>?fileName=<%= (String) request.getAttribute("fileName") %>&fileOwner=<%= (String) request.getAttribute("fileOwner") %>">Personalize program file <%= (String) request.getAttribute("fileName") %></a> &gt; 
@@ -140,6 +141,72 @@
     	<br /><br />
 	</div>
 	<script type="text/javascript">
+
+		var myPersonalizedFunction = new Array();
+		
+		function createPersonalizationTable() {
+			var divContainer = document.getElementById("myPersonalizationTableDiv");
+			divContainer.innerHTML = ""; // clean up !!!
+			
+			var table = document.createElement('table');
+			table.id = "myPersonalizationTable";
+			table.className = "personalizationTable";
+			divContainer.appendChild(table);
+
+			var row = table.insertRow(-1);
+			row.className = "personalizationTable";
+			var cell = row.insertCell(-1);
+			// cell.className = "personalizationTable";
+			// cell.innerHTML=personalizePredInfo[i][2];
+			cell.className = "personalizationGraphicsInTable";
+			
+			var chartDiv = document.createElement('div');
+			chartDiv.id = 'chartDiv_' + i;
+			cell.appendChild(chartDiv);
+			// cell.innerHTML=personalizePredInfo[i][2];
+
+			drawChart(i);
+		}
+		function updateFunctionTable() {
+			
+		}
+		
+		function updateFunctionGraphic() {
+			
+		}
+		
+		function copyFunctionValues(index) {
+			newFunctionValues = personalizePredInfo[index][3];
+			for (var i=0; i<newFunctionValues.length; i++) {
+				myPersonalizedFunction[i] = new Array();
+				for (var j=0; j<newFunctionValues[i].length; j++) {
+					if (j>1) {
+						alert("Function is not well defined. Extra information will be discarded.")
+					}
+					else {
+						myPersonalizedFunction[i][j] = newFunctionValues[i][j];
+					}
+				}
+			}
+			updateFunctionTable();
+			updateFunctionGraphic();
+		}
+		
+		function copyFunction(index) {
+			var functionOwner = personalizePredInfo[index][2];
+			var confirmationText="";
+			if (functionOwner == '') {
+				confirmationText = "predefined function";
+			}
+			else {
+				confirmationText = "function defined by " + functionOwner;
+			}
+			if (confirm("Do you want to take the " + confirmationText + " as your personalized function for the fuzzification " + personalizePredInfo[index][0])) {
+				copyFunctionValues(index);
+			}
+			return false;
+		}
+	
 	
 		var personalizeServletEditAction = "<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null) %>";
 		var fileName = "<%= (String) request.getAttribute("fileName") %>";
@@ -183,14 +250,17 @@
 						cell.className = "personalizationTable";
 						cell.innerHTML="<a title='take this function as my function' href='' onclick='return copyFunction("+i+")'><img src='images/copy.png'></img></a>";
 
+						functionValues[0] = personalizePredInfo[i][3];
+						
 						cell = row.insertCell(-1);
 						cell.className = "personalizationGraphicsInTable";
+						cell.id = "functionGraphic_" + i;
 						chartDiv = document.createElement('div');
 						chartDiv.id = 'chartDiv_' + i;
-						cell.appendChild(chartDiv);
+						// cell.appendChild(chartDiv);
 						// cell.innerHTML=personalizePredInfo[i][2];
 
-						drawChart(i);
+						drawChart(cell.id);
 						
 						document.getElementById("dependsOn").innerHTML = personalizePredInfo[i][1];
 					}
@@ -202,26 +272,7 @@
 		}
 		
 		if (myPersonalization != null) {
-			var divContainer = document.getElementById("myPersonalizationTableDiv");
-			divContainer.innerHTML = ""; // clean up !!!
-			var table = document.createElement('table');
-			table.id = "myPersonalizationTable";
-			table.className = "personalizationTable";
-			divContainer.appendChild(table);
-
-			var row = table.insertRow(-1);
-			row.className = "personalizationTable";
-			var cell = row.insertCell(-1);
-			// cell.className = "personalizationTable";
-			// cell.innerHTML=personalizePredInfo[i][2];
-			cell.className = "personalizationGraphicsInTable";
-			var chartDiv = document.createElement('div');
-			chartDiv.id = 'chartDiv_' + i;
-			cell.appendChild(chartDiv);
-			// cell.innerHTML=personalizePredInfo[i][2];
-
-			drawChart(i);
-
+			copyFunctionValues(myPersonalization);
 		}
 		
 	</script>
