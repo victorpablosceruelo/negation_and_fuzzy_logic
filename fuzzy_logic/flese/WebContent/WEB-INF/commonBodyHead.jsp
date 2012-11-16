@@ -10,26 +10,24 @@
 	}
 %>
 
-	<table id="bodyHead" class="bodyHead">
-		<tr class="bodyHead">
-			<td id="bodyHeadTitle" class="bodyHead">
+	<div id="bodyHeadContainer" class="bodyHead">
+		<div id="bodyHeadTitle" class="bodyHead">
 				FleSe : <span class="underline">Fle</span>xible 
 				<span class="underline">Se</span>arches in Databases
-			</td>
-			<td id="bodyHeadLogged" class="bodyHead">
-				<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
-				logged as <%=localUserName %>
-				<br>
-				<a title="view user profile" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletUserInfo, request, null) %>">user profile</a>
-				<% } else { %>
-				Not logged in
-				<% } %>
-			</td>
-			<td id="bodyHeadLogout" class="bodyHead">
-				<a title="Sign out" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, null) %>">Signout</a>
-			</td>
-		</tr>
-	</table>
+		</div>
+		<div id="bodyHeadLogged" class="bodyHead">
+			<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
+			logged as <%=localUserName %>
+			<br>
+			<a title="view user profile" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletUserInfo, request, null) %>">user profile</a>
+			<% } else { %>
+			Not logged in
+			<% } %>
+		</div>
+		<div id="bodyHeadLogout" class="bodyHead">
+			<a title="Sign out" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, null) %>">Signout</a>
+		</div>
+	</div>
 
 
 

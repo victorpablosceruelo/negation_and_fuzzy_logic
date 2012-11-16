@@ -170,26 +170,26 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
     float: left;
 }
 
-table.bodyHead, tr.bodyHead {
+.bodyHead  {
 	border:1px solid black;
 	text-align:center;
-	padding:0em;
+	margin:0;
+	padding:0;
 	width:100%;
-}
-
-td.bodyHead { 
-	border:1px solid black;
-	padding:0.5em; 
+	display:table;
 }
 
 #bodyHeadTitle {
 	width:60%;
+	height:1.5em;
 	padding:1em;
 	font-size:200%;
+	display:table-cell;
+	margin:0;
 }
 
-#bodyHeadLogged { width:30%; font-size:125%;}
-#bodyHeadLogout { width:10%; font-size:125%;}
+#bodyHeadLogged { width:30%; font-size:125%; display:table-cell;}
+#bodyHeadLogout { width:10%; font-size:125%; display:table-cell;}
 
 td.providersIcons  {
 	border:1em;

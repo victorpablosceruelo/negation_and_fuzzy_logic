@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Borders</title>
+<style>
+.outer {
+    position:relative;
+    float: left;
+    border: 1px solid blue
+}
+.inner {
+    border: 1px solid green
+}
+.tl, .tm, .tr, .ml, .mr, .bl, .bm, .br {
+    border: 1px solid red;
+    margin: 0;
+    padding: 0;
+}
+.tm, .bm, .tl, .tr, .bl, .br {
+    height: 16px
+}
+.tl, .tr, .bl, .br {
+    width: 16px
+}
+.tm, .bm {
+    height: 16px;
+    margin: 0 0px
+}
+.tm {
+    background-repeat:repeat-x;
+    margin: 0 16px
+}
+.bm {
+    background-repeat:repeat-x;
+    margin: 0 16px
+}
+.tl {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.tr {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.bl {
+    position: absolute;
+    left: 0;
+}
+.br {
+    position: absolute;
+    right: 0;
+}
+.ml {
+    padding-left: 16px;
+    background-repeat:repeat-y
+}
+.mr {
+    padding-right: 16px;
+    background-repeat:repeat-y;
+    background-position: 100% 0
+}
+</style>
+</head>
+<body>
+<div class="outer">
+    <div class="tm">
+        <div class="tl">1</div>
+        <div class="tr">2</div>
+        3
+    </div>
+    <div class="ml">
+        <div class="mr">
+            <div class="inner">
+                <h2>Lorem</h2>
+                <p>Ipsum dolor</p>
+            </div>
+        </div>
+    </div>
+    <div class="bm" >
+        <div class="bl"></div>
+        <div class="br"></div>
+    </div>
+</div>
+</body>
+</html>
