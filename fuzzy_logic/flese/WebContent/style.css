@@ -191,6 +191,22 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 #bodyHeadLogged { width:30%; font-size:125%; display:table-cell;}
 #bodyHeadLogout { width:10%; font-size:125%; display:table-cell;}
 
+.tableWithBorderWidth50 {display:table; border:0.2em solid black; width:50%; text-align:center;}
+.tableHeadWithBorderWidth50 {display:table-caption; border:0.1em solid black; width:50%;}
+.tableHeadWithBorderWidth100 {display:table-caption; border:0.1em solid black; width:100%;}
+.tableRowWithBorderWidth100 {display:table-row; border:0.1em solid grey; width:100%;}
+.tableCellWithBorderWidth50 {display:table-cell; border:0.1em solid grey; width:50%; text-align:left; padding:0.1em;}
+.tableCellWithBorderWidth100 {display:table-cell; border:0.1em solid grey; width:100%; text-align:left; padding:0.1em;}
+
+.tableHeadWithOutBorderWidth100 {display:table-caption; border:none; width:100%; font-size:125%; margin:0.2em;}
+
+.personalizationTable {display:table; border:0.2em solid black; width:100%; text-align:center;}
+.personalizationTableRow {display:table-row; border:0.1em solid grey; width:100%;}
+.personalizationTableCell1 {display:table-cell; border:0.1em solid grey; width:25%; text-align:left; padding:0.1em;}
+.personalizationTableCell2 {display:table-cell; border:0.1em solid grey; width:5%; text-align:left; padding:0.1em;}
+.personalizationTableCell3 {display:table-cell; border:0.1em solid grey; width:70%; height:20em; text-align:left; padding:0.1em;}
+
+
 td.providersIcons  {
 	border:1em;
 	padding:1em;
