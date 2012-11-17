@@ -53,28 +53,10 @@
 <script type="text/javascript">
 	personalizePredInfo = new Array();
 	<%
-	String filePath = (String) request.getAttribute("filePath");
-	if ((filePath != null) && ( ! ("".equals(filePath)))) {
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+		String filePath = (String) request.getAttribute("filePath");
+		FunctionsClass functions = new FunctionsClass(filePath);
 		
-		String line;
-		int i=0;
-		while ((line = reader.readLine()) != null) {
-			out.println("// " + line + "\n");
-			if (line.startsWith("rfuzzy_fuzzification")) {
-				FunctionsClass function = new FunctionsClass(line);
-				out.println("// line: "             + line + "\n");
-				out.println("personalizePredInfo["+i+"]= new Array('" + 
-							function.getPredDefined() + "', '" + function.getPredNecessary() + "', '" + function.getPredOwner() + "', " + 
-							function.getFunctionInJavaScript() + "); \n");
-				// out.println(line);
-				// out.print("<br />\n");
-				i++;
-			}
-		}
-		reader.close();
-	}
-%>
+	%>
 
 	var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
 </script>

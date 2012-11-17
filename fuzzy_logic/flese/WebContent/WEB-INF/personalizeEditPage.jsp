@@ -4,7 +4,7 @@
 <%@page import="java.io.*"%>
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<%@page import="auxiliar.FunctionsClass"%>
+<%@page import="auxiliar.FunctionClass"%>
 
 <script type="text/javascript" src="js/highcharts.js" ></script>
 
@@ -45,8 +45,7 @@
 
 <script type="text/javascript">
 	personalizePredInfo = new Array();
-	<%
-	String filePath = (String) request.getAttribute("filePath");
+	<%String filePath = (String) request.getAttribute("filePath");
 	String fuzzification = (String) request.getAttribute("fuzzification");
 	
 	if ((filePath != null) && ( ! ("".equals(filePath))) && 
@@ -60,7 +59,7 @@
 		while ((line = reader.readLine()) != null) {
 			out.println("// " + line + "\n");
 			if (line.startsWith("rfuzzy_fuzzification")) {
-				FunctionsClass function = new FunctionsClass(line); 
+				FunctionClass function = new FunctionClass(line); 
 				if (fuzzification.equals(function.getPredDefined())) {
 					out.println("// line: "             + line + "\n");
 					out.println("personalizePredInfo["+i+"]= new Array('" + 
@@ -76,8 +75,7 @@
 			}
 		}
 		reader.close();
-	}
-%>
+	}%>
 
 	var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
 </script>
