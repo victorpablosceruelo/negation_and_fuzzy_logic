@@ -4,81 +4,8 @@
 <%@page import="java.io.*"%>
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<%@page import="auxiliar.FunctionClass"%>
 
-<script type="text/javascript" src="js/highcharts.js" ></script>
-
-<script type="text/javascript">
-	var functionValues = new Array();
-	var charts = new Array(); // globally available
-	
-	function drawChart(identifier, index) {
-		
-		$(document).ready(function() {
-		      charts[i] = new Highcharts.Chart({
-		         chart: {
-		            renderTo: identifier,
-		            type: 'bar'
-		         },
-		         title: {
-		            text: 'Fruit Consumption'
-		         },
-		         xAxis: {
-		            categories: ['Apples', 'Bananas', 'Oranges']
-		         },
-		         yAxis: {
-		            title: {
-		               text: 'Fruit eaten'
-		            }
-		         },
-		         series: [{
-		            name: 'Jane',
-		            data: [1, 0, 4]
-		         }, {
-		            name: 'John',
-		            data: [5, 7, 3]
-		         }]
-		      });
-		   });
-	}
-</script>
-
-<script type="text/javascript">
-	personalizePredInfo = new Array();
-	<%String filePath = (String) request.getAttribute("filePath");
-	String fuzzification = (String) request.getAttribute("fuzzification");
-	
-	if ((filePath != null) && ( ! ("".equals(filePath))) && 
-			(fuzzification != null) && ( ! ("".equals(fuzzification)))) {
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		
-		out.println("// fuzzification: " + fuzzification + "\n");
-		
-		String line;
-		int i=0;
-		while ((line = reader.readLine()) != null) {
-			out.println("// " + line + "\n");
-			if (line.startsWith("rfuzzy_fuzzification")) {
-				FunctionClass function = new FunctionClass(line); 
-				if (fuzzification.equals(function.getPredDefined())) {
-					out.println("// line: "             + line + "\n");
-					out.println("personalizePredInfo["+i+"]= new Array('" + 
-								function.getPredDefined() + "', '" + function.getPredNecessary() + "', '" + function.getPredOwner() + "', " + 
-								function.getFunctionInJavaScript() + "); \n");
-					// out.println(line);
-					// out.print("<br />\n");
-					i++;
-				}
-				else {
-					out.println("// function.getPredDefined(): " + function.getPredDefined() + "\n");
-				}
-			}
-		}
-		reader.close();
-	}%>
-
-	var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
-</script>
+<jsp:include page="commonPersonalization.jsp" />
 
 <body>
     <div id="bodyContainer">

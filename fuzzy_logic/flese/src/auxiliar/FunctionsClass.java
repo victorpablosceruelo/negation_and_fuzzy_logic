@@ -8,7 +8,7 @@ public class FunctionsClass {
 	
 	private ArrayList <ArrayList <FunctionClass>> functionsOrdered = null;
 	private Iterator <Iterator <FunctionClass>> functionsOrderedIterator = null;
-	private String [][] functionsOrderedInJavaScript = null;
+	private String [] functionsOrderedInJavaScript = null;
 
 	public FunctionsClass (String filePath) throws Exception {
 		
@@ -68,35 +68,50 @@ public class FunctionsClass {
 			while (i<functionsOrdered.size()) {
 				current = functionsOrdered.get(i).iterator();
 				tmp.add(current);
+				i++;
 			}
 			functionsOrderedIterator = tmp.iterator();
 		}
 		return functionsOrderedIterator;
-		// out.println("// line: "             + line + "\n");
-		// out.println("personalizePredInfo["+i+"]= new Array('" + 
-		//		function.getPredDefined() + "', '" + function.getPredNecessary() + "', '" + function.getPredOwner() + "', " + 
-		//		function.getFunctionInJavaScript() + "); \n");
-		// out.println(line);
-		// out.print("<br />\n");
-
 	}
 	
-	public String [] getResultInJavaScript() {
-		ArrayList <String> result = new ArrayList <String>();
+	public String [] getResultInJavaScript() throws Exception {
 		String tmp = null;
 		FunctionClass function = null;
+		ArrayList<FunctionClass> current = null;
 		
 		if (functionsOrderedInJavaScript == null) {
-			Iterator <Iterator <FunctionClass>> iterator = getResult();
-			while (iterator.hasNext()) {
-				Iterator <FunctionClass> current = iterator.next();
-				while (current.hasNext()) {
-					function = current.next();
-					result.add(e)
+			functionsOrderedInJavaScript = new String[functionsOrdered.size()];
+			int i = 0;
+			while (i<functionsOrdered.size()) {
+				current = functionsOrdered.get(i);
+				int j = 0;
+				while (j<current.size()) {
+					function = current.get(j);
+					
+					if (j==0) {
+						tmp = "new Array('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
+						tmp += "new Array(";
+					}
+					else tmp += ", ";
+					
+					tmp += "new Array('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
+					j++;
 				}
+				tmp += "))"; // End the javascript arrays.
+				functionsOrderedInJavaScript[i] = tmp;
+				i++;
 			}
 		}
+		
 		return functionsOrderedInJavaScript;
 	}
+	
+	// out.println("// line: "             + line + "\n");
+	// out.println("personalizePredInfo["+i+"]= new Array('" + 
+	//		function.getPredDefined() + "', '" + function.getPredNecessary() + "', '" + function.getPredOwner() + "', " + 
+	//		function.getFunctionInJavaScript() + "); \n");
+	// out.println(line);
+	// out.print("<br />\n");
 	
 }
