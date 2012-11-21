@@ -31,51 +31,32 @@
 		
 		if (personalizePredInfo.length > 0) {
 			var divContainer = document.getElementById("personalizationTableDiv");
-			var table = document.createElement('div');
-			table.id = "personalizationTable";
-			table.className = "personalizationTable";
-			divContainer.appendChild(table);
-		
-			var row = document.createElement('div');
-			row.className = "personalizationTable";
-			table.appendChild(row);
-			
+			var table = null;
+			var row = null;
 			var cell = null;
-			cell = document.createElement('div');
-			cell.className = "personalizationTable";
-			cell.innerHTML = "Fuzzification";
-			row.appendChild(cell);
-			
-			cell = document.createElement('div');
-			cell.className = "personalizationTable";
-			cell.innerHTML = "depends on the values of";
-			row.appendChild(cell);
-			
-			cell = document.createElement('div');
-			cell.className = "personalizationGraphicsInTable";
-			cell.innerHTML = "applying function";
-			row.appendChild(cell);
 			
 			for (var i=0; i<personalizePredInfo.length; i++) {				
 				if (personalizePredInfo[i].length >= 3){
 
+					table = document.createElement('div');
+					table.id = "personalizationTable";
+					table.className = "personalizationTable";
+					divContainer.appendChild(table);
+					
+					cell = document.createElement('div');
+					cell.className = "personalizationTableCaption";
+					cell.innerHTML="Graphical representation of the fuzzification " + 
+									"<a title='Personalize fuzzification "+personalizePredInfo[i][0]+"' href='" + personalizeServletEditAction + "&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+personalizePredInfo[i][0]+"'>"+personalizePredInfo[i][0]+"</a>."+
+									" The input values fuzzified are obtained using the getter " + personalizePredInfo[i][1];
+					table.appendChild(cell);
+
 					// row.
 					row = document.createElement('div');
-					row.className = "personalizationTable";
+					row.className = "personalizationTableRow";
 					table.appendChild(row);
-
+					
 					cell = document.createElement('div');
-					cell.className = "personalizationTable";
-					cell.innerHTML="<a title='Personalize fuzzification "+personalizePredInfo[i][0]+"' href='" + personalizeServletEditAction + "&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+personalizePredInfo[i][0]+"'>"+personalizePredInfo[i][0]+"</a>";
-					row.appendChild(cell);
-
-					cell = document.createElement('div');
-					cell.className = "personalizationTable";
-					cell.innerHTML=personalizePredInfo[i][1];
-					row.appendChild(cell);
-
-					cell = document.createElement('div');
-					cell.className = "personalizationGraphicsInTable";
+					cell.className = "personalizationTableCellForGraphic";
 					cell.id = 'chartDiv_' + i;
 					row.appendChild(cell);
 					

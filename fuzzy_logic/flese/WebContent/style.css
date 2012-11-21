@@ -206,6 +206,11 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .personalizationTableCell2 {display:table-cell; border:0.1em solid grey; width:5%; text-align:left; padding:0.1em;}
 .personalizationTableCell3 {display:table-cell; border:0.1em solid grey; width:70%; height:20em; text-align:left; padding:0.1em;}
 
+.personalizationTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; }
+.personalizationTableCaption{display:table-caption; border:none; width:90%; padding:0.2em; font-size:125%; }
+.personalizationTableCell {display:table-cell; border:0.1em solid #000000; width:20%; text-align:center; align:center; }
+.personalizationTableCellForGraphic {display:table-cell; border:0.1em solid #000000; width:60%; }
+
 
 td.providersIcons  {
 	border:1em;
@@ -255,29 +260,6 @@ tr.queryResults, th.queryResults, td.queryResults {
 	margin:0.2em;
 	align:center;
 	text-align:center;
-}
-
-table.personalizationTable {
-	border:0.1em solid #000000;
-	width:100%;
-}
-tr.personalizationTable, th.personalizationTable, td.personalizationTable {
-	border:0.1em solid #000000;
-	border-color:black;
-	padding:0.6em;
-	margin:0.2em;
-	align:center;
-	text-align:center;
-}
-
-td.personalizationGraphicsInTable, th.personalizationGraphicsInTable {
-	border:0.1em solid #000000;
-	border-color:black;
-	padding:0.6em;
-	margin:0.2em;
-	align:center;
-	text-align:center;
-	width:60%;
 }
 
 div#qTip {

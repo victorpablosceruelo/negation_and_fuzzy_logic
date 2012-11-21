@@ -10,7 +10,7 @@ public class FunctionsClass {
 	private Iterator <Iterator <FunctionClass>> functionsOrderedIterator = null;
 	private String [] functionsOrderedInJavaScript = null;
 
-	public FunctionsClass (String filePath) throws Exception {
+	public FunctionsClass (String filePath, String fuzzification) throws Exception {
 		
 		functionsOrdered = null;
 		functionsOrderedIterator = null;
@@ -24,7 +24,7 @@ public class FunctionsClass {
 			while ((line = reader.readLine()) != null) {
 				// out.println("// " + line + "\n");
 				if (line.startsWith("rfuzzy_fuzzification")) {
-					FunctionClass function = new FunctionClass(line);
+					FunctionClass function = new FunctionClass(line, fuzzification);
 					addInItsList(function);
 				}
 			}

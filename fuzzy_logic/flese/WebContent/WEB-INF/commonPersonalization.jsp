@@ -19,8 +19,10 @@
 	<%
 		String filePath = (String) request.getAttribute("filePath");
 		String fuzzification = (String) request.getAttribute("fuzzification");
+		if (filePath != null) request.removeAttribute("filePath");
+		if (fuzzification != null) request.removeAttribute("fuzzification");
 		
-		FunctionsClass functions = new FunctionsClass(filePath);
+		FunctionsClass functions = new FunctionsClass(filePath, fuzzification);
 		String [] functionsInJS = functions.getResultInJavaScript();
 		for (int i=0; i<functionsInJS.length; i++) {
 			out.println("personalizePredInfo["+i+"]= " + functionsInJS[i] + ";");
@@ -44,6 +46,11 @@
 				series[i] = new Object();
 				series[i].name = personalizePredInfo[index][2][i][0];
 				series[i].data = personalizePredInfo[index][2][i][1];
+				
+				// Fix the series name if empty
+				if (series[i].name == '') {
+					series[i].name = "default definition"
+				}
 			}
 		}
 		
@@ -51,18 +58,29 @@
 		      charts[i] = new Highcharts.Chart({
 		         chart: {
 		            renderTo: identifier,
-		            type: 'bar'
+		            type: 'line',
+					style: {
+						margin: '0 auto'
+					}
 		         },
 		         title: {
 		            text: personalizePredInfo[index][0]
 		         },
 		         xAxis: {
+					title: {
+						text: 'value of ' + personalizePredInfo[index][1]
+					},
+					min: 0
+
 		            // categories: ['Apples', 'Bananas', 'Oranges']
 		         },
 		         yAxis: {
-		            /* title: {
-		               text: 'Fruit eaten'
-		            } */
+					title: {
+						text: 'Truth value'
+					},
+					min: 0,
+					max: 1
+		         	// categories: [0, 0.25, 0.5, 0.75, 1]
 		         },
 		         series: series
 		         		/*	[{
