@@ -24,8 +24,11 @@ public class FunctionsClass {
 			while ((line = reader.readLine()) != null) {
 				// out.println("// " + line + "\n");
 				if (line.startsWith("rfuzzy_fuzzification")) {
-					FunctionClass function = new FunctionClass(line, fuzzification);
-					addInItsList(function);
+					FunctionClass function = new FunctionClass(line);
+					if ((fuzzification == null) || 
+						((fuzzification != null) && (function.getPredDefined().equals(fuzzification)))) {
+						addInItsList(function);
+					}
 				}
 			}
 			reader.close();

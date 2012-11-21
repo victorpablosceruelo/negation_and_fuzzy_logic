@@ -29,11 +29,11 @@
 			</div>
 			<div class="tableRowWithBorderWidth100">
 				<div class="tableCellWithBorderWidth50">Fuzzification</div>
-				<div class="tableCellWithBorderWidth50"><%= (String) request.getAttribute("fuzzification") %></div>
+				<div class="tableCellWithBorderWidth50" id="predDefined"></div>
 			</div>
 			<div class="tableRowWithBorderWidth100">
 				<div class="tableCellWithBorderWidth50">Depends on the values of</div>
-				<div class="tableCellWithBorderWidth50" id="dependsOn"></div>
+				<div class="tableCellWithBorderWidth50" id="predNecessary"></div>
 			</div>			
 		</div>
     	
@@ -132,68 +132,46 @@
 			table.id = "personalizationTable";
 			table.className = "personalizationTable";
 			divContainer.appendChild(table);
-		
+
+			/*
 			var row = document.createElement('div');
 			row.className = "personalizationTableRow";
 			table.appendChild(row);
 			
 			var cell = null;
 			cell = document.createElement('div');
-			cell.className = "personalizationTableCell1";
-			cell.innerHTML = "Owner";
-			row.appendChild(cell);
-			
-			cell = document.createElement('div');
-			cell.className = "personalizationTableCell2";
-			cell.innerHTML = "";
-			row.appendChild(cell);
-			
-			cell = document.createElement('div');
 			cell.className = "personalizationTableCell3";
 			cell.innerHTML = "function applied";
 			row.appendChild(cell);
-			
-			var chartDiv = null;
+			*/
+
 			for (var i=0; i<personalizePredInfo.length; i++) {
 				row = document.createElement('div');
 				row.className = "personalizationTableRow";
 				table.appendChild(row);
 				
 				if (personalizePredInfo[i].length >= 3) {
-					if (personalizePredInfo[i][2] != fileOwner) {
-						cell = document.createElement('div');
-						cell.className = "personalizationTableCell1";
-						cell.innerHTML=personalizePredInfo[i][2];
-						row.appendChild(cell);
-
-						cell = document.createElement('div');
-						cell.className = "personalizationTableCell2";
-						cell.innerHTML="<a title='take this function as my function' href='' onclick='return copyFunction("+i+")'><img src='images/copy.png'></img></a>";
-						row.appendChild(cell);
-
-						functionValues[0] = personalizePredInfo[i][3];
-						
-						cell = document.createElement('div');
-						cell.className = "personalizationTableCell3";
-						cell.id = "functionGraphic_" + i;
-						row.appendChild(cell);
-						// cell.innerHTML=personalizePredInfo[i][2];
-
-						drawChart(cell.id, i);
-						
-						document.getElementById("dependsOn").innerHTML = personalizePredInfo[i][1];
+					for (var j=0; j<personalizePredInfo[i][2].length; j++) {
+						if (personalizePredInfo[i][j][0] == fileOwner) {
+							myPersonalization = j;
+						}
 					}
-					else {
-						myPersonalization = i;
-					}
+					
+					cell = document.createElement('div');
+					cell.className = "personalizationTableCell3";
+					cell.id = "functionGraphic_" + i;
+					row.appendChild(cell);
+					// cell.innerHTML=personalizePredInfo[i][2];
+					drawChart(cell.id, i);
+						
+					document.getElementById("predDefined").innerHTML = personalizePredInfo[i][0];
+					document.getElementById("predNecessary").innerHTML = personalizePredInfo[i][1];
+						
 				}
 			}
 		}
 		
-		if (myPersonalization != null) {
-			copyFunctionValues(myPersonalization);
-		}
-		
+		// "<a title='take this function as my function' href='' onclick='return copyFunction("+i+")'><img src='images/copy.png'></img></a>";
 	</script>
 </body>
 </html>

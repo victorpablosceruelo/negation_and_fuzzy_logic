@@ -19,7 +19,7 @@ public class FunctionClass {
 	private static String fuzzificationInitialSubstring = "rfuzzy_fuzzification(";
 	private static String functionInitialSubstring = "function([";
 	
-	public FunctionClass (String line, String fuzzification) throws Exception {
+	public FunctionClass (String line) throws Exception {
 		
 		if (line == null) throw new Exception("line is null");
 		if ("".equals(line)) throw new Exception("line is empty string");
