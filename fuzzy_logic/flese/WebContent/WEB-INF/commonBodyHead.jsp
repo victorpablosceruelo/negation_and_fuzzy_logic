@@ -10,28 +10,30 @@
 	}
 %>
 
-	<div id="bodyHeadContainer" class="bodyHead">
-		<div id="bodyHeadTitle" class="bodyHead">
-				FleSe : <span class="underline">Fle</span>xible 
-				<span class="underline">Se</span>arches in Databases
+<header>
+	<div id="bodyHeadTable" class="bodyHeadTable">
+		<div id="bodyHeadTitle" class="bodyHeadTable">
+			FleSe : <span class="underline">Fle</span>xible 
+			<span class="underline">Se</span>arches in Databases
 		</div>
-		<div id="bodyHeadLogged" class="bodyHead">
+		<div id="bodyHeadLogged" class="bodyHeadTable">
 			<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
-			logged as <%=localUserName %>
+			logged as 
+			<br>
+			<%=localUserName %>
 			<br>
 			<a title="view user profile" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletUserInfo, request, null) %>">user profile</a>
 			<% } else { %>
 			Not logged in
 			<% } %>
 		</div>
-		<div id="bodyHeadLogout" class="bodyHead">
+		<div id="bodyHeadLogout" class="bodyHeadTable">
 			<a title="Sign out" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, null) %>">Signout</a>
 		</div>
 	</div>
+</header>
 
-
-
-<div class="bodyToUserMsgs">
+<section class="bodyToUserMsgs">
 	<%
 		if (request != null) {
 			if (request.getAttribute("msgs") != null) {
@@ -54,7 +56,7 @@
 			<%
 		}
 	%>
-</div>
+</section>
 
 <!-- end of commonBodyHead -->
 

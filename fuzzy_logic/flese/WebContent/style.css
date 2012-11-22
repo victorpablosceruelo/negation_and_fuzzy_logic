@@ -170,9 +170,10 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
     float: left;
 }
 
-.bodyHead  {
+.bodyHeadTable  {
 	border:1px solid black;
 	text-align:center;
+	vertical-align:middle;
 	margin:0;
 	padding:0;
 	width:100%;
@@ -188,8 +189,8 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 	margin:0;
 }
 
-#bodyHeadLogged { width:30%; font-size:125%; display:table-cell;}
-#bodyHeadLogout { width:10%; font-size:125%; display:table-cell;}
+#bodyHeadLogged { width:30%; font-size:125%; padding:0.5em; display:table-cell;}
+#bodyHeadLogout { width:10%; font-size:125%; padding:0.5em; display:table-cell;}
 
 .tableWithBorderWidth50 {display:table; border:0.2em solid black; width:50%; text-align:center;}
 .tableHeadWithBorderWidth50 {display:table-caption; border:0.1em solid black; width:50%;}
@@ -211,6 +212,7 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .personalizationTableCell {display:table-cell; border:0.1em solid #000000; width:20%; text-align:center; align:center; }
 .personalizationTableCellForGraphic {display:table-cell; border:0.1em solid #000000; width:60%; }
 
+.personalizationBarsTitle{display:block; font-size:150%; text-align:center; }
 
 td.providersIcons  {
 	border:1em;
@@ -275,3 +277,9 @@ div#qTip {
  position: absolute;
  z-index: 1000;
 }
+
+.rotate {
+	rotation-point:50% 50%;
+	rotation:180deg;
+}
+
