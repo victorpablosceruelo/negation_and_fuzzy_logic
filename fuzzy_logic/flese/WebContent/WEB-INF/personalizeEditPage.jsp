@@ -78,6 +78,13 @@
 			}
 			else value = 0;
 			document.getElementById("personalizationBarValue["+kIndex+"]").innerHTML=value;
+			
+			// Update the values in the function.
+			var i = myPersonalizationIndexI;
+			var j = myPersonalizationIndexJ;			
+			personalizePredInfo[i][2][j][1][kIndex][1] = barObject.value;
+			
+			updateFunctionGraphic(i);
 		}
 		
 		function updateFunctionBars() {
