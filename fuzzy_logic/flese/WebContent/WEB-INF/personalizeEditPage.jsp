@@ -42,8 +42,19 @@
 		<div id="personalizationTableDiv"></div>
 		<br />
 		<br />
-		My personalized fuzzification
-		<div id="myPersonalizationTableDiv">You have not defined your personalization for this fuzzification yet.</div>
+		Your personalized fuzzification
+		<div id="myPersonalizationTableDiv">
+			You have not defined your personalization for this fuzzification yet. <br>
+			Create my personalization
+			<input type="range"  min="0" max="1" step="0.01" onchange="showValue(this.value)"/>
+			<span id="range">0</span>
+			<script type="text/javascript">
+function showValue(newValue)
+{
+	document.getElementById("range").innerHTML=newValue;
+}
+</script>
+		</div>
 		<br />
 		<br />		
     	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt;
@@ -168,6 +179,10 @@
 					document.getElementById("predNecessary").innerHTML = personalizePredInfo[i][1];
 						
 				}
+			}
+			
+			if (myPersonalization != null) {
+				
 			}
 		}
 		
