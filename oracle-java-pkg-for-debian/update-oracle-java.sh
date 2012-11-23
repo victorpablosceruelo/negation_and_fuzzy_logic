@@ -19,39 +19,66 @@ if [ ! -f ${1} ]; then
 	exit 0
 fi
 
-TMP_FILENAME="`basename ${1} .tar.gz`"
-TMP_FILENAME=`echo "${TMP_FILENAME}"|sed 's/\.tar\.gz$//'`
+FILENAME_AUX="`basename ${1} .tar.gz`"
+FILENAME_AUX=`echo "${FILENAME_AUX}"|sed 's/\.tar\.gz$//'`
 
-FILENAME="${TMP_FILENAME}.tar.gz"
-DIRNAME="${1}"
+FILENAME="${FILENAME_AUX}.tar.gz"
 JAVA_INSTALLATION_DIR="/opt"
-JAVA_LINK="java_jre_oracle"
+JAVA_LINK_1="java_jre_oracle"
+JAVA_LINK_2="java_oracle"
 
 sudo mkdir -p ${JAVA_INSTALLATION_DIR}
-sudo cp ${1} ${JAVA_INSTALLATION_DIR}
 
-if [ ! -f ${JAVA_INSTALLATION_DIR}/${FILENAME} ]; then
-	echo "ERROR: Filename does not exist: ${JAVA_INSTALLATION_DIR}/${FILENAME}"
-	exit 0
-fi
 if [ ! -d ${JAVA_INSTALLATION_DIR} ]; then
 	echo "ERROR: destiny folder does not exist. "
 	exit 0
 fi
 
 pushd ${JAVA_INSTALLATION_DIR}
+echo "Removing ${FILENAME_AUX} ... "
+sudo rm -fR ${FILENAME_AUX}
+sudo mkdir -p ${FILENAME_AUX}
+popd
 
-sudo rm -fR ${TMP_FILENAME}
+sudo cp -vi ${1} ${JAVA_INSTALLATION_DIR}/${FILENAME_AUX} 
+pushd ${JAVA_INSTALLATION_DIR}
+pushd ${FILENAME_AUX}
+
 sudo touch .oracle-java-update.txt
 sudo chmod 777 .oracle-java-update.txt
 sudo tar zxvf ${FILENAME} >> .oracle-java-update.txt
 sudo chmod 444 .oracle-java-update.txt
-sudo rm -fv ${JAVA_LINK}
-sudo ln -s ${DIRNAME} ${JAVA_LINK}
+sudo rm -fv ${FILENAME}
 
+for file in * ; do
+	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "." ] && [ ! "$file" == ".." ] && [ ! "$file" == "*" ]; then
+		DIRNAME="$file"
+	fi
+done
 popd
 
-sudo /usr/share/oracle-java-pkg-for-debian/oracle-java-nondebian-installation.sh ${JAVA_INSTALLATION_DIR}/${JAVA_LINK} 
+if [ -z "${DIRNAME}" ] || [ "${DIRNAME}" == "" ]; then
+	echo "ERROR: DIRNAME is not set. "
+	exit 0
+fi
+
+if [ ! -z "${FILENAME_AUX}" ] && [ ! -z "${DIRNAME}" ] && [ ! "${FILENAME_AUX}" == "" ] && [ ! "${DIRNAME}" == "" ] && [ ! "${FILENAME_AUX}" == "*" ] && [ ! "${DIRNAME}" == "*" ]; then
+	echo "Removing old version in ${DIRNAME}"
+	sudo rm -fR ${DIRNAME} 
+	echo "Moving new version to ${DIRNAME} "
+	sudo mv -v ${FILENAME_AUX}/${DIRNAME} .
+fi
+
+sudo rm -fv ${JAVA_LINK_1} ${JAVA_LINK_2}
+echo "Building new links for ${JAVA_LINK_1} and ${JAVA_LINK_2} ... "
+sudo ln -vs ${DIRNAME} ${JAVA_LINK_1}
+sudo ln -vs ${DIRNAME} ${JAVA_LINK_2}
+
+popd 
+
+echo "Updating alternatives ... "
+sudo /usr/share/oracle-java-pkg-for-debian/oracle-java-nondebian-installation.sh ${JAVA_INSTALLATION_DIR}/${JAVA_LINK_2} 
+echo "END."
 
 #EOF
 
