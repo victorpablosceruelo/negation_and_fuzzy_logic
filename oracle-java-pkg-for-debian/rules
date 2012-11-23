@@ -21,20 +21,22 @@ export SHELL=/bin/sh
 # export DH_OPTIONS=
 
 PKG_FINAL_PATH=$(CURDIR)/debian/tmp/
-PKG_FINAL_SUBPATH=/usr/share/CiaoDE
+PKG_FINAL_SUBPATH=/usr/share/oracle-java-pkg-for-debian
+PKG_FINAL_LINKS=/usr/bin
 
 clean:
 	@echo "Makefile :: clean (it does nothing)"
 build:
 	@echo "Makefile :: build (it does nothing)"
 
-build-and-install: fixes
+build-and-install: 
 	@echo "Makefile :: build and install"
 	dh_testdir
 	dh_testroot
 	dh_installdirs
 
-	cp 
+	cp debian/* $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
+	ln -s $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)/update-oracle-java.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_LINKS)
 
 	@echo " "
 	dh_install --list-missing
