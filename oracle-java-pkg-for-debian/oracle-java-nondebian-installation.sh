@@ -8,7 +8,10 @@ if [ -z "$1" ] || [ "$1" == "" ]; then
 fi
 
 if [ ! -d "$1" ]; then
-	echo "ERROR: folder does not exist. "
+	if [ ! -f "$1" ]; then
+		echo "WARNING: folder does not exist. "
+		exit 0
+	fi
 fi
 
 RealPath="${1}"
