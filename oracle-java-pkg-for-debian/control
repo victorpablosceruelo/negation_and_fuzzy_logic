@@ -11,5 +11,6 @@ Architecture: i386 amd64 powerpc
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: bash
 Replaces: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk
+Conflicts: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk
 Provides: java6-runtime, java7-runtime, java6-sdk, java7-jdk, java6-runtime, java7-runtime, java6-runtime-headless, java7-runtime-headless
 Description: Scripts to download and install java sdk from oracle. It avoids the installation of old java6 and openjre or openjdk.
