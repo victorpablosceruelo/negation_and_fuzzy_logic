@@ -7,7 +7,7 @@ Section: devel
 
 Package: oracle-java-pkg-for-debian
 Section: devel
-Architecture: i386 amd64 powerpc
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: bash
 Replaces: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk

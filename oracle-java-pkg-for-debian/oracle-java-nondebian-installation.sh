@@ -14,6 +14,12 @@ if [ ! -d "$1" ]; then
 	fi
 fi
 
+# Remove old plugins definitely.
+echo "Removing old plugins to avoid conflicts ... "
+rm -fv /usr/lib/iceweasel/plugins/libjavaplugin.so
+rm -fv /usr/lib/iceweasel/plugins/libnpjp2.so
+
+
 RealPath="${1}"
 FakePath="/usr/lib/java_installation"
 Priority="100"
@@ -170,7 +176,15 @@ update-alternatives --auto xulrunner-1.9-javaplugin.so
 update-alternatives --install /usr/lib/xulrunner/plugins/libjavaplugin.so xulrunner-javaplugin.so ${FakePath}/jre/lib/${ARCH_FOLDER}/libnpjp2.so ${Priority}
 update-alternatives --auto xulrunner-javaplugin.so
 
+update-alternatives --install /usr/lib/iceweasel/plugins/libjavaplugin.so libjavaplugin.so ${FakePath}/jre/lib/amd64/libnpjp2.so ${Priority}
+update-alternatives --auto libjavaplugin.so
 
+update-alternatives --install /usr/lib/iceweasel/plugins/libnpjp2.so libnpjp2.so ${FakePath}/jre/lib/amd64/libnpjp2.so ${Priority}
+update-alternatives --auto libnpjp2.so
+
+# From Sara's computer (i386).
+update-alternatives --install /usr/lib/jvm/java-6-sun/bin/jvisualvm jvisualvm ${FakePath}/bin/jvisualvm ${Priority}
+update-alternatives --auto jvisualvm
 
 #EOF
 
