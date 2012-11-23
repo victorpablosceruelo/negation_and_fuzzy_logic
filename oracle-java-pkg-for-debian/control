@@ -12,5 +12,5 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: bash
 Replaces: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk
 Conflicts: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk
-Provides: java6-runtime, java7-runtime, java6-sdk, java7-jdk, java6-runtime, java7-runtime, java6-runtime-headless, java7-runtime-headless, default-jre, default-jdk
+Provides: java1-runtime, java2-runtime, java3-runtime, java4-runtime, java5-runtime, java6-runtime, java7-runtime, java1-runtime-headless, java2-runtime-headless, java3-runtime-headless, java4-runtime-headless, java5-runtime-headless, java6-runtime-headless, java7-runtime-headless, java1-sdk, java2-sdk, java3-sdk, java4-sdk, java5-sdk, java6-sdk, java7-jdk, default-jre, default-jre-headless, default-jdk, default-jdk-headless, sun-java6-jre
 Description: Scripts to download and install java sdk from oracle. It avoids the installation of old java6 and openjre or openjdk.
