@@ -1,11 +1,11 @@
-Source: java-oracle
+Source: oracle-java-pkg-for-debian
 Priority: optional
 Maintainer: Victor Pablos Ceruelo <vpablos@babel.ls.fi.upm.es>
 Build-Depends: bash, bash-static, tar, bzip2, wget
 Standards-Version: 3.7.2
 Section: devel
 
-Package: java-oracle
+Package: oracle-java-pkg-for-debian
 Section: devel
 Architecture: i386 amd64 powerpc
 Depends: ${shlibs:Depends}, ${misc:Depends}
