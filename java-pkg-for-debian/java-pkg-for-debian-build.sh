@@ -7,41 +7,29 @@ echo "running $0 $* ... "
 if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ] || [ -z "$4" ] || [ "$4" == "" ]; then
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
-	echo "usage: $0 DEST_FOLDER VERSION SVN_REVISION_CIAO SVN_REVISION_DEBIAN_CIAO_REPOS "
-	echo "example: $0 ~/tmp 1.13 11293 "
-	echo "example: $0 ~/tmp 1.14.2 13646 382"
-	echo "example: $0 ~/tmp 1.15.0 14440 latest"
-	echo "example: $0 ~/tmp 1.15.0 14854 826"
-	echo "example: $0 ~/tmp 1.15.0 14944 922"
-	echo "example: $0 ~/tmp 1.15.0 14990 969"
-	echo "example: $0 ~/tmp 1.15.0 14992 969"
+	echo "usage: $0 ORIG_FOLDER DEST_FOLDER  "
+	echo "example: $0 . ~/tmp "
 	echo " "
 	exit 0
 else
-	DEST_FOLDER="$1"
-	VERSION="$2"
-	SVN_REVISION_CIAO="$3"
-	SVN_REVISION_DEBIAN_CIAO_REPOS="$4"
+	ORIG_FOLDER="$1"
+	DEST_FOLDER="$2"
 fi;
 
 DATE=`date +%Y%m%d`
-PKG_VERSION=${VERSION}+r${SVN_REVISION_CIAO}
-FOLDER_NAME=ciao-prolog-${PKG_VERSION}
-FILE_NAME=ciao-prolog_${PKG_VERSION}
+PKG_VERSION="1"
+FOLDER_NAME="oracle-java-pkg-for-debian"
+FILE_NAME=oracle-java-pkg-for-debian_${PKG_VERSION}
 BUILD_TGZ=${FILE_NAME}.orig.tar.gz
 BUILD_DSC=${FILE_NAME}.dsc
 BUILD_DIFF=${FILE_NAME}.diff
 BUILD_DIFF_GZ=${FILE_NAME}.diff.gz
 SCRIPT_DIR=`dirname $0`
 
-# Checkout the correct revisions.
-${SCRIPT_DIR}/ciao-prolog-svn-co.sh ${DEST_FOLDER} ${VERSION} ${SVN_REVISION_CIAO} ${SVN_REVISION_DEBIAN_CIAO_REPOS}
-
-# Apply patches.
-${SCRIPT_DIR}/ciao-prolog-apply-patches.sh ${DEST_FOLDER}/${FOLDER_NAME} do_not_apply
-
-# FIXES.
-# ${SCRIPT_DIR}/ciao-prolog-fixes.sh
+mkdir -p ${DEST_FOLDER}
+mkdir -p ${DEST_FOLDER}/${FOLDER_NAME}
+mkdir -p ${DEST_FOLDER}/${FOLDER_NAME}/debian
+cp ${ORIG_FOLDER}/* ${DEST_FOLDER}/${FOLDER_NAME}/debian
 
 # Ensure we work locally.
 pushd ${DEST_FOLDER}
