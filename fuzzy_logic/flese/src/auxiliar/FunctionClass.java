@@ -127,7 +127,8 @@ public class FunctionClass {
 	}
 	
 	public String getPredOwner() {
-		return predOwner;
+		if ((predOwner != null) && ("".equals(predOwner))) return "default definition";
+		else return predOwner;
 	}
 
 	public String getFunctionInJavaScript() throws Exception {

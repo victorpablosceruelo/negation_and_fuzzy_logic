@@ -14,8 +14,19 @@
 	 */
 
 	// Script: Personalize.js
+	
+	function fuzzificationDef(predDefined, predNecessary, functionsArray) {
+		this.predDefined = predDefined;
+		this.predNecessary = predNecessary;
+		this.functionsArray = functionsArray;
+	}
+	
+	function fuzzificationFunctionDef(name, data) {
+		this.name = name; // this is the function owner.
+		this.data = data; // this are the functions points (an array).
+	}
 
-	personalizePredInfo = new Array();
+	fuzzificationDefs = new Array();
 	<%
 		String filePath = (String) request.getAttribute("filePath");
 		String fuzzification = (String) request.getAttribute("fuzzification");
@@ -25,73 +36,58 @@
 		FunctionsClass functions = new FunctionsClass(filePath, fuzzification);
 		String [] functionsInJS = functions.getResultInJavaScript();
 		for (int i=0; i<functionsInJS.length; i++) {
-			out.println("personalizePredInfo["+i+"]= " + functionsInJS[i] + ";");
+			out.println("fuzzificationDefs["+i+"]= " + functionsInJS[i] + ";");
 		}
 		
 	%>
 
 	var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
 
-
-	var functionValues = new Array();
 	var charts = new Array(); // globally available
-	
-	
-	
+		
 	function drawChart(identifier, index) {
-		var series = new Array();
 		
-		if ((personalizePredInfo[index] != null) && (personalizePredInfo[index][2] != null)) {
-			for (var i=0; i<personalizePredInfo[index][2].length; i++) {
-				series[i] = new Object();
-				series[i].name = personalizePredInfo[index][2][i][0];
-				series[i].data = personalizePredInfo[index][2][i][1];
-				
-				// Fix the series name if empty
-				if (series[i].name == '') {
-					series[i].name = "default definition"
-				}
-			}
-		}
-		
-		$(document).ready(function() {
-		      charts[i] = new Highcharts.Chart({
-		         chart: {
-		            renderTo: identifier,
-		            type: 'line',
-					style: {
-						margin: '0 auto'
-					}
-		         },
-		         title: {
-		            text: personalizePredInfo[index][0]
-		         },
-		         xAxis: {
-					title: {
-						text: 'value of ' + personalizePredInfo[index][1]
-					},
-					min: 0
+		if ((fuzzificationDefs[index] != null) && (fuzzificationDefs[index].functionsArray != null)) {
+	
+			$(document).ready(function() {
+			      charts[i] = new Highcharts.Chart({
+			         chart: {
+		    	        renderTo: identifier,
+		        	    type: 'line',
+						style: {
+							margin: '0 auto'
+						}
+			         },
+			         title: {
+		    	        text: fuzzificationDefs[index].predDefined
+		        	 },
+			         xAxis: {
+						title: {
+							text: 'value of ' + fuzzificationDefs[index].predNecessary
+						},
+						min: 0
 
-		            // categories: ['Apples', 'Bananas', 'Oranges']
-		         },
-		         yAxis: {
-					title: {
-						text: 'Truth value'
-					},
-					min: 0,
-					max: 1
-		         	// categories: [0, 0.25, 0.5, 0.75, 1]
-		         },
-		         series: series
-		         		/*	[{
-		            name: 'Jane',
-		            data: [1, 0, 4]
-		         }, {
-		            name: 'John',
-		            data: [5, 7, 3]
-		         }] */
-		      });
-		   });
+			            // categories: ['Apples', 'Bananas', 'Oranges']
+			         },
+			         yAxis: {
+						title: {
+							text: 'Truth value'
+						},
+						min: 0,
+						max: 1
+			         	// categories: [0, 0.25, 0.5, 0.75, 1]
+		    	     },
+		        	 series: fuzzificationDefs[index].functionsArray
+			         		/*	[{
+			            name: 'Jane',
+			            data: [1, 0, 4]
+		    	     }, {
+		        	    name: 'John',
+		            	data: [5, 7, 3]
+			         }] */
+			      });
+			   });
+		}
 	}
 
 	/*

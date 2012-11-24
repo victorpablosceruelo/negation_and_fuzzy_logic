@@ -93,12 +93,12 @@ public class FunctionsClass {
 					function = current.get(j);
 					
 					if (j==0) {
-						tmp = "new Array('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
+						tmp = "new fuzzificationDef('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
 						tmp += "new Array(";
 					}
 					else tmp += ", ";
 					
-					tmp += "new Array('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
+					tmp += "new fuzzificationFunctionDef('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
 					j++;
 				}
 				tmp += "))"; // End the javascript arrays.

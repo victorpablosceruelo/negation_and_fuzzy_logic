@@ -15,7 +15,7 @@
     	</h3>
 		<br />
 		<br />
-		<div id="personalizationTableDiv"></div><table id="resultsTable" class="personalizationTable"></table>
+		<div id="fuzzificationDefsTableDiv"></div><table id="resultsTable" class="fuzzificationDefsTable"></table>
 		<br />
 		<br />
     	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
@@ -29,38 +29,38 @@
 		var fileName = "<%= (String) request.getAttribute("fileName") %>";
 		var fileOwner = "<%= (String) request.getAttribute("fileOwner") %>";
 		
-		if (personalizePredInfo.length > 0) {
-			var divContainer = document.getElementById("personalizationTableDiv");
+		if (fuzzificationDefs.length > 0) {
+			var divContainer = document.getElementById("fuzzificationDefsTableDiv");
 			var table = null;
 			var row = null;
 			var cell = null;
 			
-			for (var i=0; i<personalizePredInfo.length; i++) {				
-				if (personalizePredInfo[i].length >= 3){
+			for (var i=0; i<fuzzificationDefs.length; i++) {				
+				if (fuzzificationDefs[i] != null){
 
 					table = document.createElement('div');
-					table.id = "personalizationTable";
-					table.className = "personalizationTable";
+					table.id = "fuzzificationDefsTable";
+					table.className = "fuzzificationDefsTable";
 					divContainer.appendChild(table);
 					
 					cell = document.createElement('div');
-					cell.className = "personalizationTableCaption";
+					cell.className = "fuzzificationDefsTableCaption";
 					cell.innerHTML="Graphical representation of the fuzzification " + 
-									"<a title='Personalize fuzzification "+personalizePredInfo[i][0]+"' href='" + personalizeServletEditAction + "&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+personalizePredInfo[i][0]+"'>"+personalizePredInfo[i][0]+"</a>."+
-									" The input values fuzzified are obtained using the getter " + personalizePredInfo[i][1];
+									"<a title='Personalize fuzzification "+fuzzificationDefs[i].predDefined+"' href='" + personalizeServletEditAction + "&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+fuzzificationDefs[i].predDefined+"'>"+fuzzificationDefs[i].predDefined+"</a>."+
+									" The input values fuzzified are obtained using the getter " + fuzzificationDefs[i].predNecessary;
 					table.appendChild(cell);
 
 					// row.
 					row = document.createElement('div');
-					row.className = "personalizationTableRow";
+					row.className = "fuzzificationDefsTableRow";
 					table.appendChild(row);
 					
 					cell = document.createElement('div');
-					cell.className = "personalizationTableCellForGraphic";
+					cell.className = "fuzzificationDefsTableCellForGraphic";
 					cell.id = 'chartDiv_' + i;
 					row.appendChild(cell);
 					
-					// cell.innerHTML=personalizePredInfo[i][2];
+					// cell.innerHTML=fuzzificationDefs[i][2];
 
 					drawChart(cell.id, i);
 				}
