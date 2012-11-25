@@ -42,7 +42,7 @@
 		<div id="personalizationTableDiv"></div>
 		<br />
 		<br />
-		<form name="saveFuzzification" method="post" action="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null) %>">
+		<form name="saveFuzzification" method="post" action="null">
 			<div class="personalizationBarsTitle">Your personalized fuzzification</div>
 			<br />
 			<div id="myPersonalizationBarsDiv">
@@ -186,6 +186,12 @@
 					}
 				}
 			}
+			
+			// Set the form action.
+			var form = document.getElementById("saveFuzzification");
+			var saveAction = personalizeServletSaveAction + "&fileName=" + fileName + "&fileOwner=" + fileOwner + "&fuzzification=" + fuzzification;
+			form.action = saveAction;
+			form.setAttribute('action', saveAction);
 		}
 			
 		if (fuzzificationDefs.length > 0) {

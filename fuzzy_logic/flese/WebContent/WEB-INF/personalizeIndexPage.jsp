@@ -24,11 +24,7 @@
     	<br /><br />
 	</div>
 	<script type="text/javascript">
-	
-		var personalizeServletEditAction = "<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null) %>";
-		var fileName = "<%= (String) request.getAttribute("fileName") %>";
-		var fileOwner = "<%= (String) request.getAttribute("fileOwner") %>";
-		
+			
 		if (fuzzificationDefs.length > 0) {
 			var divContainer = document.getElementById("fuzzificationDefsTableDiv");
 			var table = null;

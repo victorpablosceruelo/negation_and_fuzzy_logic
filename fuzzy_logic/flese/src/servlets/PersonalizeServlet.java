@@ -68,7 +68,7 @@ public class PersonalizeServlet extends HttpServlet {
 					throw new Exception("Unknown operation.");
 				}
 			} catch (Exception e) {
-				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.PersonalizeServlet, e, request, response, LOG);
+				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
 			}
 		}
 
@@ -101,9 +101,11 @@ public class PersonalizeServlet extends HttpServlet {
 		String fileName = request.getParameter("fileName");
 		if (fileName == null) throw new Exception("fileName is null.");
 		request.setAttribute("fileName", fileName);
+		
 		String fileOwner = request.getParameter("fileOwner");
 		if (fileOwner == null) throw new Exception("fileOwner is null.");
 		request.setAttribute("fileOwner", fileOwner);
+		
 		String fuzzification = request.getParameter("fuzzification");
 		if (fuzzification == null) throw new Exception("fuzzification is null.");
 		request.setAttribute("fuzzification", fuzzification);

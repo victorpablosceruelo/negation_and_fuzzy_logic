@@ -33,6 +33,7 @@
 		if (filePath != null) request.removeAttribute("filePath");
 		if (fuzzification != null) request.removeAttribute("fuzzification");
 		
+		
 		FunctionsClass functions = new FunctionsClass(filePath, fuzzification);
 		String [] functionsInJS = functions.getResultInJavaScript();
 		for (int i=0; i<functionsInJS.length; i++) {
@@ -40,9 +41,15 @@
 		}
 		
 	%>
+	
+	var fileName = "<%= (String) request.getAttribute("fileName") %>";
+	var fileOwner = "<%= (String) request.getAttribute("fileOwner") %>";
+	var fuzzification = "<%= fuzzification %>";
 
-	var personalizeServlet="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
+	var personalizeServletEditAction="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletEditAction, request, null)%>";
+	var personalizeServletSaveAction = "<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.PersonalizeServletSaveAction, request, null) %>";
 
+	
 	var charts = new Array(); // globally available
 		
 	function drawChart(identifier, index) {

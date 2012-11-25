@@ -246,6 +246,7 @@ public class ServletsAuxMethodsClass {
 	public static final int PersonalizeIndexPage = 18;
 	public static final int PersonalizeServletEditAction = 19;
 	public static final int PersonalizeEditPage = 20;
+	public static final int PersonalizeServletSaveAction = 21;
 	
 	/**
 	 * Returns the app mapping for uriNickName.
@@ -291,6 +292,8 @@ public class ServletsAuxMethodsClass {
 		case PersonalizeServlet: retVal = "PersonalizeServlet";
 				break;
 		case PersonalizeServletEditAction: retVal = "PersonalizeServlet?op=edit";
+				break;
+		case PersonalizeServletSaveAction: retVal = "PersonalizeServlet?op=save";
 				break;
 		case PersonalizeIndexPage: retVal = "WEB-INF/personalizeIndexPage.jsp";
 				break;
