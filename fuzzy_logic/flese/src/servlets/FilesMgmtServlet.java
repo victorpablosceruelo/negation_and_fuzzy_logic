@@ -56,7 +56,7 @@ public class FilesMgmtServlet extends HttpServlet {
 			}
 			fileMgmtServlet(doAction, request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
@@ -87,7 +87,7 @@ public class FilesMgmtServlet extends HttpServlet {
 					LOG.info("Strange op in request. op: " + request_op);
 				}
 			} catch (Exception e) {
-				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, "", e, request, response, LOG);
 			}
 		}
 
@@ -102,7 +102,7 @@ public class FilesMgmtServlet extends HttpServlet {
 			request.setAttribute("filesIterator", filesIterator);
 
 			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, "", request, response, LOG);
 		}
 
 	}

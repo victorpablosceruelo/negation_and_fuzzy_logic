@@ -35,9 +35,9 @@ public class SocialAuthUserInfoServlet extends HttpServlet {
 		try {
 			@SuppressWarnings("unused")
 			LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthUserInfoPage, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthUserInfoPage, "", request, response, LOG);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}	

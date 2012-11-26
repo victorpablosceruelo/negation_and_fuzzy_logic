@@ -59,7 +59,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		try {
 			socialAuthenticationAuthenticate(request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
@@ -105,7 +105,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 		
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the fuzzy search application !!", LOG);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, "", request, response, LOG);	
 	}	
 }
 

@@ -42,7 +42,7 @@
 		<div id="personalizationTableDiv"></div>
 		<br />
 		<br />
-		<form name="saveFuzzification" method="post" action="null">
+		<form name="saveFuzzification" id="saveFuzzification" method="post" action="null">
 			<div class="personalizationBarsTitle">Your personalized fuzzification</div>
 			<br />
 			<div id="myPersonalizationBarsDiv">

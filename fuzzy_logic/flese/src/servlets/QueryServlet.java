@@ -42,61 +42,56 @@ public class QueryServlet extends HttpServlet {
 	
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- "+doAction+" invocation ---");
-		String operation = null;
 		try {
-			operation = request.getParameter("op");
-			dbQuery(operation, request, response);
+			dbQuery(request, response);
 		} catch (Exception e) {
-			if ((operation != null) && ("runQuery".equals(operation))) {
-				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.QueryServletBuildQuery, e, request, response, LOG);
-			}
-			else {
-				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
-			}
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
 	
-	private void dbQuery(String operation, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void dbQuery(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-		String fileName = request.getParameter("fileName");
-		String fileOwner = request.getParameter("fileOwner");
+		String request_op = request.getParameter("op");
+		if (request_op == null) throw new Exception("op is null.");
 
-		if ((fileName == null) || (fileOwner == null) || (operation == null) ||
-				((! "buildQuery".equals(operation)) && (! "runQuery".equals(operation)))) {
-			throw new Exception("Incorrect arguments for a QueryServlet request: operation: "+operation+" fileName: "+fileName+" fileOwner: "+fileOwner);
+		String fileName = request.getParameter("fileName");
+		if (fileName == null) throw new Exception("fileName is null.");
+		
+		String fileOwner = request.getParameter("fileOwner");
+		if (fileOwner == null) throw new Exception("fileOwner is null.");
+
+		// Ask for the previously created session.
+		HttpSession session = request.getSession(false);
+		// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
+		CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
+		
+		if (connection == null) {
+			connection = new CiaoPrologConnectionClass();
 		}
-		else {
-			LOG.info("Choosen fileName, fileOwner and op are: " + fileName + " :: " + fileOwner + " :: " + operation + " ");
-			// Ask for the previously created session.
-			HttpSession session = request.getSession(false);
-			// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
-			CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
-			boolean justUpdatedIntrospection = false;
-			
-			if (connection == null) {
-				connection = new CiaoPrologConnectionClass();
-				buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
-				justUpdatedIntrospection = true;
-			}
-			
-			if (("buildQuery".equals(operation)) && (! justUpdatedIntrospection)) {
-				buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
-			}
-			if ("runQuery".equals(operation)) {
+		
+		// If the program contains errors this will thrown an exception in the highest level.
+		buildAndExecuteQueryIntrospection(fileOwner, fileName, connection);
+		
+		try {
+			LOG.info("Choosen fileName, fileOwner and op are: " + fileName + " :: " + fileOwner + " :: " + request_op + " ");
+			if ("runQuery".equals(request_op)) {
 				buildAndExecuteQueryGeneric(fileOwner, fileName, localUserName, connection, request);
 			}
-
+			
 			// ArrayList<CiaoPrologProgramElementInfoClass> programInfo = 
 			session.setAttribute("connection", connection);
 
-			if ("buildQuery".equals(operation)) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.BuildQueryPage, request, response, LOG);
+			if ("buildQuery".equals(request_op)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.BuildQueryPage, "", request, response, LOG);
 			}
-			if ("runQuery".equals(operation)) {
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryPage, request, response, LOG);
+			if ("runQuery".equals(request_op)) {
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryPage, "", request, response, LOG);
 			}
+		} catch (Exception e) {
+			String additionalInfo="?op="+request_op+"&fileName="+fileName+"&fileOwner="+fileOwner;
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.QueryServletBuildQuery, additionalInfo, e, request, response, LOG);
 		}
 	}
 	

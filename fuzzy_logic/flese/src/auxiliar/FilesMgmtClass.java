@@ -172,7 +172,7 @@ public class FilesMgmtClass {
 		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		request.setAttribute("fileName", fileName);
 		request.setAttribute("filePath", filePath);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, "", request, response, LOG);
 	}
 }
 

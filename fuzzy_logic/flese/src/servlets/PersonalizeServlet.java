@@ -43,7 +43,7 @@ public class PersonalizeServlet extends HttpServlet {
 		try {
 			personalizeServlet(doAction, request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
@@ -52,73 +52,64 @@ public class PersonalizeServlet extends HttpServlet {
 			throws Exception {
 		// Tests if we have logged in.
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+		// if (localUserName == null) throw new Exception("localUserName is null.");
 		
 		String request_op = request.getParameter("op");
-		LOG.info("op: " + request_op);
-		if (request_op != null) {
+		if (request_op == null) throw new Exception("op is null.");		
+
+		String fileName = request.getParameter("fileName");
+		if (fileName == null) throw new Exception("fileName is null.");
+		request.setAttribute("fileName", fileName);
+
+		String fileOwner = request.getParameter("fileOwner");
+		if (fileOwner == null) throw new Exception("fileOwner is null.");
+		request.setAttribute("fileOwner", fileOwner);
+
+		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
+		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		request.setAttribute("filePath", filePath);
+			
+		if (("edit".equals(request_op)) || ("save".equals(request_op))) {
+			// In case the edit method fails.
 			try {
-				if ("edit".equals(request_op)) {
-					edit(doAction, localUserName, request, response);
-				}
-				if ("save".equals(request_op)) {
-					save(doAction, localUserName, request, response);
-				}
+				String fuzzification = request.getParameter("fuzzification");
+				if (fuzzification == null) throw new Exception("fuzzification is null.");
+				request.setAttribute("fuzzification", fuzzification);
 
-				if ((! "edit".equals(request_op)) && (! ("save".equals(request_op)))) {
-					throw new Exception("Unknown operation.");
+				if ("save".equals(doAction)) {
+					// In case the save method fails
+					try {
+						save(doAction, localUserName, request, response);
+
+						// Forward to the jsp page.
+						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeEditPage, "", request, response, LOG);
+
+					} catch (Exception e) {
+						// Forward to the jsp page.
+						String additionalInfo="?op=edit&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+fuzzification;
+						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeServlet, additionalInfo, request, response, LOG);
+						// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+					}
 				}
-			} catch (Exception e) {
-				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
 			}
+			catch (Exception e) {
+				// Forward to the jsp page.
+				String additionalInfo="?op=none&fileName="+fileName+"&fileOwner="+fileOwner;
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeServlet, additionalInfo, request, response, LOG);
+				// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+			}
+			
 		}
-
-		if ((request_op == null) || (! ("edit".equals(request_op)))) {
-			list_functions_to_edit(doAction, localUserName, request, response);
+		else {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeIndexPage, "", request, response, LOG);
 		}
+		
 	}
 
-	private void list_functions_to_edit(String doAction, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
-			throws Exception {
-		if (localUserName == null) throw new Exception("localUserName is null.");
-		String fileName = request.getParameter("fileName");
-		if (fileName == null) throw new Exception("fileName is null.");
-		request.setAttribute("fileName", fileName);
-		String fileOwner = request.getParameter("fileOwner");
-		if (fileOwner == null) throw new Exception("fileOwner is null.");
-		request.setAttribute("fileOwner", fileOwner);
+		
+	private void save(String doAction, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
-		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
-		request.setAttribute("filePath", filePath);
-		
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeIndexPage, request, response, LOG);
-	}
-	
-	private void edit(String doAction, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
-			throws Exception {
 
-		if (localUserName == null) throw new Exception("localUserName is null.");
-		String fileName = request.getParameter("fileName");
-		if (fileName == null) throw new Exception("fileName is null.");
-		request.setAttribute("fileName", fileName);
 		
-		String fileOwner = request.getParameter("fileOwner");
-		if (fileOwner == null) throw new Exception("fileOwner is null.");
-		request.setAttribute("fileOwner", fileOwner);
-		
-		String fuzzification = request.getParameter("fuzzification");
-		if (fuzzification == null) throw new Exception("fuzzification is null.");
-		request.setAttribute("fuzzification", fuzzification);
-		
-		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
-		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
-		request.setAttribute("filePath", filePath);
-		
-		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeEditPage, request, response, LOG);
-	}
-	
-	private void save(String doAction, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) {
-
 	}
 }

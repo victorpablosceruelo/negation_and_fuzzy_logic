@@ -33,18 +33,44 @@ public class ServletsAuxMethodsClass {
 	}
 
 	/**
-	 * Executes de default actions when an exception is thrown.
+	 * Executes default actions when an exception is thrown.
 	 * @param where is the where we are redirected whe an exception occurs.
+	 * @param addToUri is the string added to the where, for adding additional parameters to the request.
 	 * @param e is the exception thrown.
 	 * @param request is the HttpServletRequest.
 	 * @param response is the HttpServletResponse.
 	 * @param LOG is the Log facility. Can be null.
 	 */
-	static public void actionOnException(int where, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
-		actionOnExceptionAux(where, e, request, response, LOG, false);
+	static public void actionOnException(int where, String addToUri, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) {
+		try {
+			actionOnExceptionAux(where, addToUri, e, request, response, LOG);
+		}
+		catch (java.lang.IllegalStateException e1) {
+			LOG.error("-------------------------------------------------------------------");
+			LOG.error("Exception thrown inside actionOnException: " + e);
+			e.printStackTrace();
+			LOG.error("-------------------------------------------------------------------");
+		}
+		catch (Exception e2) {
+			LOG.error("-------------------------------------------------------------------");
+			LOG.error("Exception thrown inside actionOnException: " + e);
+			e.printStackTrace();
+			LOG.error("-------------------------------------------------------------------");
+			
+			try {
+				actionOnExceptionAux(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
+			}
+			catch (Exception e3) {
+				LOG.error("-------------------------------------------------------------------");
+				LOG.error("Exception thrown inside actionOnException: " + e);
+				e.printStackTrace();
+				LOG.error("-------------------------------------------------------------------");
+			}
+		}
 	}
 	
-	static public void actionOnExceptionAux(int where, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG, boolean abort) {
+	static private void actionOnExceptionAux(int where, String addToUri, Exception e, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+			throws Exception {
 		if (e != null) {
 			if (LOG != null) {
 				LOG.error("Exception thrown: " + e);
@@ -60,31 +86,9 @@ public class ServletsAuxMethodsClass {
 		}
 		else ServletsAuxMethodsClass.addMessageToTheUser(request, "Internal problem: thrown exception is null.", LOG);
 		
-		if ((request != null) && (response != null)) {
-			try{
-				ServletsAuxMethodsClass.forward_to(where, request, response, LOG);
-			}
-			catch (java.lang.IllegalStateException e1) {
-				LOG.error("-------------------------------------------------------------------");
-			}
-			catch (Exception e2) {
-				if (! abort) {
-					if (where != theSamePage) {
-						actionOnExceptionAux(where, e, request, response, LOG, true);
-					}
-					else {
-						actionOnExceptionAux(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG, true);
-					}
-				}
-			}
-		}
-		else {
-			if (LOG != null) {
-				if (request == null) LOG.error("HttpServletRequest request is null.");
-				if (response == null) LOG.error("HttpServletRequest response is null.");
-			}
-			// throw(e);
-		}
+		if (request == null) throw new Exception("request is null.");
+		if (response == null) throw new Exception("response is null.");
+		ServletsAuxMethodsClass.forward_to(where, addToUri, request, response, LOG);
 	}
 
 	/**
@@ -336,12 +340,13 @@ public class ServletsAuxMethodsClass {
 	 * It keeps the current context so you can share the same session.
 	 * 
 	 * @param where is the new page to which we are going.
+	 * @param addToUri is the string added to the where, for adding additional parameters to the request.
 	 * @param request is the servlet request parameter.
 	 * @param response is the servlet response parameter.
 	 * @param LOG is the LOG object (can be null).
 	 * @throws Exception when the nick name is unknown.
 	 */
-	public static void forward_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void forward_to(int where, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = appMappingForUriNickName(where);
 		if (LOG != null) LOG.info("forwarding_to: " + url);
@@ -354,12 +359,13 @@ public class ServletsAuxMethodsClass {
 	 * It generates a different context so you can not share the same session.
 	 * 
 	 * @param where is the new page to which we are going.
+	 * @param addToUri is the string added to the where, for adding additional parameters to the request.
 	 * @param request is the servlet request parameter.
 	 * @param response is the servlet response parameter.
 	 * @param LOG is the LOG object (can be null).
 	 * @throws Exception when the nick name is unknown or the operation is not possible.
 	 */
-	public static void redirect_to(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void redirect_to(int where, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
 		if (LOG != null) LOG.info("redirecting_to: " + url);
@@ -371,12 +377,13 @@ public class ServletsAuxMethodsClass {
 	 * It keeps the context by using encodeRedirectURL so you can not share the same session.
 	 * 
 	 * @param where is the new page to which we are going.
+	 * @param addToUri is the string added to the where, for adding additional parameters to the request.
 	 * @param request is the servlet request parameter.
 	 * @param response is the servlet response parameter.
 	 * @param LOG is the LOG object (can be null).
 	 * @throws Exception when the nick name is unknown or the operation is not possible.
 	 */
-	public static void redirect_to_with_session(int where, HttpServletRequest request, HttpServletResponse response, Log LOG) 
+	public static void redirect_to_with_session(int where, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
 		if (LOG != null) LOG.info("encodeRedirectURL: redirecting_to: " + url);

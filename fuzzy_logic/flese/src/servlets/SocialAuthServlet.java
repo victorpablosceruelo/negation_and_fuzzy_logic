@@ -44,7 +44,7 @@ public class SocialAuthServlet extends HttpServlet {
 		try {
 			socialAuthentication(request, response);
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
@@ -84,7 +84,7 @@ public class SocialAuthServlet extends HttpServlet {
 		}
 		
 		if ("signout".equals(request_op)) {
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthSignInPage, request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthSignInPage, "", request, response, LOG);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class SocialAuthServlet extends HttpServlet {
 	    	session.setAttribute("localUserName", localUserName.getLocalUserName());
 
 	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
-	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, request, response, LOG);	
+	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, "", request, response, LOG);	
 		} 
 
 	    return retval;

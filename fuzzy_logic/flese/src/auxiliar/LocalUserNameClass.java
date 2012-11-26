@@ -20,7 +20,7 @@ public class LocalUserNameClass {
 	 * 
 	 * @param request is the HttpServletRequest
 	 * @param response is the HttpServletResponse
-	 * @throws Exception 
+	 * @throws Exception if request is null, response is null, session is null or localUserName can not be set.
 	 */
 	public LocalUserNameClass(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -55,8 +55,10 @@ public class LocalUserNameClass {
 			// OR also obtain list of contacts
 			// List<Contact> contactsList = provider.getContactList();
 		}
-		
-		ifNullThenSetUserNameFrom("Testing User", "wakamola.es", "testing", "testing");
+		else {
+			ifNullThenSetUserNameFrom("Testing User", "wakamola.es", "testing", "testing");
+		}
+		if (localUserName == null) throw new Exception("localUserName is null");
 		LOG.info("localUserName: " + localUserName);
 		
 		if (request.getAttribute("localUserName") != null) request.removeAttribute("localUserName");
