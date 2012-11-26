@@ -39,18 +39,19 @@
     	
 		<br />
 		<br />
-		<div id="personalizationTableDiv"></div>
+		<div id="fuzzificationTableDiv"></div>
 		<br />
 		<br />
 		<form name="saveFuzzification" id="saveFuzzification" method="post" action="null">
-			<div class="personalizationBarsTitle">Your personalized fuzzification</div>
+			<div class="fuzzificationBarsTitle">Your personalized fuzzification</div>
 			<br />
-			<div id="myPersonalizationBarsDiv">
+			<div id="fuzzificationBarsDiv">
 				You have not defined your personalization for this fuzzification yet. <br>
 				Choose one between the existing personalizations or the default function in the selecion box below as the starting point. 
-				<div id="myPersonalizationStartingPoint"></div>
+				<div id="fuzzificationBarsStartingPoint"></div>
 			</div>
-			<div id="myPersonalizationSaveButtonDiv">
+			<br />
+			<div id="fuzzificationBarsSaveButtonDiv">
 			</div>
 		</form>
 		<br />
@@ -90,7 +91,7 @@
 				valueToShow = 0;
 			}
 			
-			document.getElementById("personalizationBarValue["+kIndex+"]").innerHTML=valueToShow;
+			document.getElementById("fuzzificationBarValue["+kIndex+"]").innerHTML=valueToShow;
 			
 			// Update the values in the function.
 			var i = myFuzzificationDefIndexI;
@@ -105,8 +106,11 @@
 			var i = myFuzzificationDefIndexI;
 			var j = myFuzzificationDefIndexJ;
 			
-			var divContainer = document.getElementById("myPersonalizationBarsDiv");
-			divContainer.innerHTML = ""; // clean up !!!
+			var divContainer = document.createElement('div');
+			divContainer.className = "fuzzificationBarsTable";
+			
+			document.getElementById("fuzzificationBarsDiv").innerHTML = ""; // clean up !!!
+			document.getElementById("fuzzificationBarsDiv").appendChild(divContainer);
 			
 			/* 
 				var form = document.createElement("form");
@@ -116,22 +120,51 @@
 			*/
 			
 			var html = null;
+			var divRow = null;
 			var divChild = null;
+
+			divRow = document.createElement('div');
+			divRow.className = "fuzzificationBarsTableRow";
+			divContainer.appendChild(divRow);
+			
+			divChild = document.createElement('div');
+			divChild.className = "fuzzificationBarsTableCell";
+			divChild.innerHTML = "When " + fuzzificationDefs[i].predNecessary + " takes the value ";
+			// + fuzzificationDefs[i].functionsArray[j].data[k][0];
+			divRow.appendChild(divChild);
+			
+			divChild = document.createElement('div');
+			divChild.className = "fuzzificationBarsTableCell";
+			divChild.innerHTML = "I consider that " + fuzzificationDefs[i].predDefined + " is satisfied in the degree "; 
+			divRow.appendChild(divChild);
+			
 			for (var k=0; k<fuzzificationDefs[i].functionsArray[j].data.length; k++) {
+				divRow = document.createElement('div');
+				divRow.className = "fuzzificationBarsTableRow";
+				divContainer.appendChild(divRow);
+				
 				divChild = document.createElement('div');
-				divChild.className = "personalizationBar";
-				html = "<input type='range'  min='0' max='1' step='0.01'"+
-					" name='"+"personalizationBar["+k+"]'" + 
-					" value='"+fuzzificationDefs[i].functionsArray[j].data[k][1]+
-					"' onchange='barValueChanged(this, "+k+", "+fuzzificationDefs[i].functionsArray[j].data[k][0]+")'/>" +
-					"<span id='personalizationBarValue["+k+"]'>"+fuzzificationDefs[i].functionsArray[j].data[k][1]+"</span>";
+				divChild.className = "fuzzificationBarsTableCell";
+				html = ""; // Reinitialize.
+				html += fuzzificationDefs[i].functionsArray[j].data[k][0];
+				html += "<input type='hidden' name='fuzzificationBars["+k+"].fpx' value='"+fuzzificationDefs[i].functionsArray[j].data[k][0]+"'/>";
+				divChild.innerHTML = html;
+				divRow.appendChild(divChild);
+
+				divChild = document.createElement('div');
+				divChild.className = "fuzzificationBarsTableCell";
+				html = ""; // Reinitialize.
+				html += "<input type='range'  name='fuzzificationBars["+k+"].fpy'" + 
+						" min='0' max='1' step='0.01' value='"+fuzzificationDefs[i].functionsArray[j].data[k][1]+
+						"' onchange='barValueChanged(this, "+k+", "+fuzzificationDefs[i].functionsArray[j].data[k][0]+")'/>";
+				html += "<span id='fuzzificationBarValue["+k+"]'>"+fuzzificationDefs[i].functionsArray[j].data[k][1]+"</span>";
 				divChild.innerHTML = html; 
-				divContainer.appendChild(divChild);
+				divRow.appendChild(divChild);
 				// alert("appended: " + html);
 			}
 			
-			divChild = document.getElementById('myPersonalizationSaveButtonDiv');
-			divChild.innerHTML = "<input type='submit' name='save'>";
+			divChild = document.getElementById('fuzzificationBarsSaveButtonDiv');
+			divChild.innerHTML = "<input type='submit' name='save' value='Save changes'>";
 			divContainer.appendChild(divChild);
 		}
 		
@@ -195,10 +228,10 @@
 		}
 			
 		if (fuzzificationDefs.length > 0) {
-			var divContainer = document.getElementById("personalizationTableDiv");
+			var divContainer = document.getElementById("fuzzificationTableDiv");
 			var table = document.createElement('div');
-			table.id = "personalizationTable";
-			table.className = "personalizationTable";
+			table.id = "fuzzificationTable";
+			table.className = "fuzzificationTable";
 			divContainer.appendChild(table);
 
 			/*
@@ -215,7 +248,7 @@
 
 			for (var i=0; i<fuzzificationDefs.length; i++) {
 				row = document.createElement('div');
-				row.className = "personalizationTableRow";
+				row.className = "fuzzificationTableRow";
 				table.appendChild(row);
 				
 				if (fuzzificationDefs[i] != null) {
@@ -227,7 +260,7 @@
 					}
 					
 					cell = document.createElement('div');
-					cell.className = "personalizationTableCell3";
+					cell.className = "fuzzificationTableCell3";
 					cell.id = "functionGraphic_" + i;
 					row.appendChild(cell);
 					// cell.innerHTML=personalizePredInfo[i][2];
@@ -240,8 +273,8 @@
 			}
 			
 			if ((myFuzzificationDefIndexI == null) || (myFuzzificationDefIndexJ == null)) {
-				var selectStartingPoingDiv = document.getElementById("myPersonalizationStartingPoint");
-				var html = "<select name=\'" + "myPersonalizationStartingPointSelect" + "\'" + 
+				var selectStartingPoingDiv = document.getElementById("fuzzificationBarsStartingPoint");
+				var html = "<select name=\'fuzzificationBarsStartingPointSelect" + "\'" + 
 							"onchange=\"chosenStartingPoint(this);\">";
 				html += "<option name=\'----\' value=\'----\'>----</option>";
 				var optionName = null;

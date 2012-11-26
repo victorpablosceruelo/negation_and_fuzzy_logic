@@ -83,7 +83,7 @@
 				var cell5 = row.insertCell(4);
 				cell5.className = 'programFilesTable';
 				cell5.innerHTML = "<a href='"+personalizeServlet+
-						"?fileName="+fileName+"&fileOwner="+fileOwner+"' "+
+						"?op=none&fileName="+fileName+"&fileOwner="+fileOwner+"' "+
 						"title=\"Personalize program file "+fileName+"\">Personalize</a> ";
 			}
 						

@@ -76,14 +76,10 @@ public class PersonalizeServlet extends HttpServlet {
 				if (fuzzification == null) throw new Exception("fuzzification is null.");
 				request.setAttribute("fuzzification", fuzzification);
 
-				if ("save".equals(doAction)) {
+				if ("save".equals(request_op)) {
 					// In case the save method fails
 					try {
-						save(doAction, localUserName, request, response);
-
-						// Forward to the jsp page.
-						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeEditPage, "", request, response, LOG);
-
+						save(localUserName, fileName, fileOwner, filePath, fuzzification, request, response);
 					} catch (Exception e) {
 						// Forward to the jsp page.
 						String additionalInfo="?op=edit&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+fuzzification;
@@ -91,6 +87,10 @@ public class PersonalizeServlet extends HttpServlet {
 						// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
 					}
 				}
+
+				// Forward to the jsp page.
+				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeEditPage, "", request, response, LOG);
+
 			}
 			catch (Exception e) {
 				// Forward to the jsp page.
@@ -107,9 +107,32 @@ public class PersonalizeServlet extends HttpServlet {
 	}
 
 		
-	private void save(String doAction, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-
+	private void save(LocalUserNameClass localUserName, String fileName, String fileOwner, String filePath, String fuzzification, 
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		int counter=0;
+		String [] [] params = null;
+		String paramsDebug = "";
+		
+		while ( (request.getParameter("fuzzificationBars["+counter+"].fpx") != null) && 
+				(request.getParameter("fuzzificationBars["+counter+"].fpy") != null)) {
+			counter++;
+		}
+		
+		if (counter>0) { 
+			params = new String[counter][2];
+			for (int i=0; i<counter; i++) {
+				params[i][0] = request.getParameter("fuzzificationBars["+i+"].fpx");
+				params[i][1] = request.getParameter("fuzzificationBars["+i+"].fpy");
+				paramsDebug += "\n" + params[i][0] + " -> " + params[i][1] + " ";
+			}
+		}
+		
+		LOG.info(paramsDebug);
 		
 	}
 }
+
+
+
+/* EOF */

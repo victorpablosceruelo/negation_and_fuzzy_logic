@@ -201,18 +201,21 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 
 .tableHeadWithOutBorderWidth100 {display:table-caption; border:none; width:100%; font-size:125%; margin:0.2em;}
 
-.fuzzificationDefsTable {display:table; border:0.2em solid black; width:100%; text-align:center;}
+.fuzzificationDefsTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
+.fuzzificationDefsTableCaption{display:table-caption; border:none; width:90%; padding:0.2em; font-size:125%; }
 .fuzzificationDefsTableRow {display:table-row; border:0.1em solid grey; width:100%;}
+.fuzzificationDefsTableCell {display:table-cell; border:0.1em solid #000000; width:20%; text-align:center; align:center; }
 .fuzzificationDefsTableCell1 {display:table-cell; border:0.1em solid grey; width:25%; text-align:left; padding:0.1em;}
 .fuzzificationDefsTableCell2 {display:table-cell; border:0.1em solid grey; width:5%; text-align:left; padding:0.1em;}
 .fuzzificationDefsTableCell3 {display:table-cell; border:0.1em solid grey; width:70%; height:20em; text-align:left; padding:0.1em;}
-
-.fuzzificationDefsTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; }
-.fuzzificationDefsTableCaption{display:table-caption; border:none; width:90%; padding:0.2em; font-size:125%; }
-.fuzzificationDefsTableCell {display:table-cell; border:0.1em solid #000000; width:20%; text-align:center; align:center; }
 .fuzzificationDefsTableCellForGraphic {display:table-cell; border:0.1em solid #000000; width:60%; }
 
+.fuzzificationBarsTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
+.fuzzificationBarsTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.fuzzificationBarsTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+
 .fuzzificationFunctionPointBarTitle{display:block; font-size:150%; text-align:center; }
+
 
 td.providersIcons  {
 	border:1em;
