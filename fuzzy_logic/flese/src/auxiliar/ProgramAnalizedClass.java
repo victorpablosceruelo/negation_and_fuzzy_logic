@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ProgramAnalizedClass {
+	final Log LOG = LogFactory.getLog(ProgramAnalizedClass.class);
 	
 	private String filePath = null;
 	private ArrayList <ProgramLineClass> programLines = null;
@@ -30,46 +34,48 @@ public class ProgramAnalizedClass {
 			
 			String line;
 			ProgramLineClass programLine = null;
-			int index = 0;
 			
 			while ((line = reader.readLine()) != null) {
-				programLine = new ProgramLineClass(index, line);
+				programLine = new ProgramLineClass(line);
 				programLines.add(programLine);
 				
-				if ((fuzzification == null) || 
-					((fuzzification != null) && (programLine.getFunctionAnalized().getPredDefined().equals(fuzzification)))) {
-					addToFunctionsOrderedList(programLine.getFunctionAnalized());
+				if (programLine.getFunctionAnalized() != null) {
+					addToFunctionsOrderedList(programLine.getFunctionAnalized(), fuzzification);
 				}
 			}
 			reader.close();
 		}
 	}
 	
-	private void addToFunctionsOrderedList (FunctionAnalizedClass function) throws Exception {
+	private void addToFunctionsOrderedList (FunctionAnalizedClass function, String fuzzification) throws Exception {
 		
 		if (function == null) throw new Exception("function cannot be null.");
-		
-		int i=0;
-		boolean placed = false;
-		ArrayList <FunctionAnalizedClass> current = null;
-		
-		while ((i<programFunctionsOrdered.size()) && (! placed)) {
-			current = programFunctionsOrdered.get(i);
-			if ((current != null) && (current.size() > 0)) {
-				if (current.get(0).getPredDefined().equals(function.getPredDefined())) {
-					current.add(function);
-					placed = true;
+
+		if ((fuzzification == null) || 
+				((fuzzification != null) && (function.getPredDefined().equals(fuzzification)))) {
+
+			int i=0;
+			boolean placed = false;
+			ArrayList <FunctionAnalizedClass> current = null;
+
+			while ((i<programFunctionsOrdered.size()) && (! placed)) {
+				current = programFunctionsOrdered.get(i);
+				if ((current != null) && (current.size() > 0)) {
+					if (current.get(0).getPredDefined().equals(function.getPredDefined())) {
+						current.add(function);
+						placed = true;
+					}
 				}
+				i++;
 			}
-			i++;
+			if (! placed) {
+				current = new ArrayList <FunctionAnalizedClass>();
+				current.add(function);
+				programFunctionsOrdered.add(current);
+				placed = true;
+			}
+			// if (placed) programFunctionsOrderedIterator = null; // Reject last saved result.
 		}
-		if (! placed) {
-			current = new ArrayList <FunctionAnalizedClass>();
-			current.add(function);
-			programFunctionsOrdered.add(current);
-			placed = true;
-		}
-		// if (placed) programFunctionsOrderedIterator = null; // Reject last saved result.
 	}
 	
 	
@@ -160,14 +166,31 @@ public class ProgramAnalizedClass {
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		
-		for (int index=0; index<programLines.size(); index++) {
-			programLine = programLines.get(index);
+		for (int i=0; i<programLines.size(); i++) {
+			programLine = programLines.get(i);
 			
-			if ((programLine.getFunctionAnalized() != null) && 
-				(programLine.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
-				String newLine = buildFuzzificationLine(fuzzification, localUserName, )
-				bw.write(newLine);
-				previouslyWritten = true;
+			if (! copiedBackFuzzifications) {
+				if ((programLine.getFunctionAnalized() != null) && 
+						(programLine.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
+					foundFuzzifications = true;
+					if (! programLine.getFunctionAnalized().getPredOwner().equals(localUserName)) {
+						programLinesAffected.add(programLine);
+					}
+				}
+				else {
+					if (foundFuzzifications) {
+						copiedBackFuzzifications = true;
+						
+						String predNecessary = null;
+						for (int j=0; j<programLinesAffected.size(); j++) {
+							predNecessary = programLinesAffected.get(j).getFunctionAnalized().getPredNecessary();
+							bw.write(programLinesAffected.get(j).getLine());
+						}
+						String newLine = buildFuzzificationLine(fuzzification, predNecessary, localUserName, params);
+						LOG.info("Adding to the program the generated line: \n " + newLine);
+						bw.write(newLine);
+					}
+				}
 			}
 			
 			bw.write(programLine.getLine());
@@ -176,7 +199,20 @@ public class ProgramAnalizedClass {
 		bw.close();
 	}
 	
-	
+	private String buildFuzzificationLine(String fuzzification, String predNecessary, LocalUserNameClass localUserName, String [] [] params) {
+		// example: 
+		// rfuzzy_fuzzification(traditional(restaurant), years_since_opening(restaurant), bartolo) :- function([ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
+
+		String result = "([ ";
+		for (int i=0; i<params.length; i++) {
+			result += "(" + params[i][0] + ", " + params[i][1] + ")";
+			if (i+1 < params.length) result += ", ";
+		}
+		result += " ]).";
+		result = "rfuzzy_fuzzification(" + fuzzification + ", " + predNecessary + ", " + localUserName.getLocalUserName() + ") :- function" + result;
+		
+		return "result";
+	}
 }
 
 

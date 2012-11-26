@@ -349,6 +349,7 @@ public class ServletsAuxMethodsClass {
 	public static void forward_to(int where, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = appMappingForUriNickName(where);
+		if (addToUri != null) url += addToUri;
 		if (LOG != null) LOG.info("forwarding_to: " + url);
 		RequestDispatcher dispatcher = request.getRequestDispatcher(url);
 		dispatcher.forward(request, response);
@@ -368,6 +369,7 @@ public class ServletsAuxMethodsClass {
 	public static void redirect_to(int where, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
+		if (addToUri != null) url += addToUri;
 		if (LOG != null) LOG.info("redirecting_to: " + url);
 		response.sendRedirect( url );
 	}
@@ -386,6 +388,7 @@ public class ServletsAuxMethodsClass {
 	public static void redirect_to_with_session(int where, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG) 
 			throws Exception {
 		String url = getFullPathForUriNickName(where, request, LOG);
+		if (addToUri != null) url += addToUri;
 		if (LOG != null) LOG.info("encodeRedirectURL: redirecting_to: " + url);
 		response.encodeRedirectURL( url );
 	}
