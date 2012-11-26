@@ -112,7 +112,7 @@ public class PersonalizeServlet extends HttpServlet {
 		
 		int counter=0;
 		String [] [] params = null;
-		String paramsDebug = "";
+		String paramsDebug = "Function definition to save: ";
 		
 		while ( (request.getParameter("fuzzificationBars["+counter+"].fpx") != null) && 
 				(request.getParameter("fuzzificationBars["+counter+"].fpy") != null)) {
@@ -130,6 +130,10 @@ public class PersonalizeServlet extends HttpServlet {
 		
 		LOG.info(paramsDebug);
 		
+		int j = 0;
+		while (true) {
+			j++;
+		}
 	}
 }
 

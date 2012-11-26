@@ -42,7 +42,7 @@
 		<div id="fuzzificationTableDiv"></div>
 		<br />
 		<br />
-		<form name="saveFuzzification" id="saveFuzzification" method="post" action="null">
+		<form name="saveFuzzification" id="saveFuzzification" method="post" action="null" accept-charset="utf-8">
 			<div class="fuzzificationBarsTitle">Your personalized fuzzification</div>
 			<br />
 			<div id="fuzzificationBarsDiv">
