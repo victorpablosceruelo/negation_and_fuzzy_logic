@@ -6,9 +6,9 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class FunctionClass {
+public class FunctionAnalizedClass {
 	
-	final Log LOG = LogFactory.getLog(FunctionClass.class);
+	final Log LOG = LogFactory.getLog(FunctionAnalizedClass.class);
 	
 	private String predDefined = null;
 	private String predNecessary = null;
@@ -19,7 +19,7 @@ public class FunctionClass {
 	private static String fuzzificationInitialSubstring = "rfuzzy_fuzzification(";
 	private static String functionInitialSubstring = "function([";
 	
-	public FunctionClass (String line) throws Exception {
+	public FunctionAnalizedClass (String line) throws Exception {
 		
 		if (line == null) throw new Exception("line is null");
 		if ("".equals(line)) throw new Exception("line is empty string");

@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.FoldersUtilsClass;
 import auxiliar.LocalUserNameClass;
+import auxiliar.ProgramAnalizedClass;
 import auxiliar.ServletsAuxMethodsClass;
 
 /**
@@ -130,10 +131,15 @@ public class PersonalizeServlet extends HttpServlet {
 		
 		LOG.info(paramsDebug);
 		
+		ProgramAnalizedClass programAnalized = new ProgramAnalizedClass(filePath, null);
+		programAnalized.updateProgramFile(fuzzification, localUserName, params);
+		
+		/* This is just to test if the send button produces errors.
 		int j = 0;
 		while (true) {
 			j++;
 		}
+		*/
 	}
 }
 

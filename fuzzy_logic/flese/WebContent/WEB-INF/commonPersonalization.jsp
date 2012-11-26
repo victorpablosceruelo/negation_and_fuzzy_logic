@@ -1,6 +1,6 @@
 
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<%@page import="auxiliar.FunctionsClass"%>
+<%@page import="auxiliar.ProgramAnalizedClass"%>
 
 <script type="text/javascript" src="js/highcharts.js" ></script>
 
@@ -27,20 +27,17 @@
 	}
 
 	fuzzificationDefs = new Array();
-	<%
-		String filePath = (String) request.getAttribute("filePath");
+	<%String filePath = (String) request.getAttribute("filePath");
 		String fuzzification = (String) request.getAttribute("fuzzification");
 		if (filePath != null) request.removeAttribute("filePath");
 		if (fuzzification != null) request.removeAttribute("fuzzification");
 		
 		
-		FunctionsClass functions = new FunctionsClass(filePath, fuzzification);
+		ProgramAnalizedClass functions = new ProgramAnalizedClass(filePath, fuzzification);
 		String [] functionsInJS = functions.getResultInJavaScript();
 		for (int i=0; i<functionsInJS.length; i++) {
 			out.println("fuzzificationDefs["+i+"]= " + functionsInJS[i] + ";");
-		}
-		
-	%>
+		}%>
 	
 	var fileName = "<%= (String) request.getAttribute("fileName") %>";
 	var fileOwner = "<%= (String) request.getAttribute("fileOwner") %>";
