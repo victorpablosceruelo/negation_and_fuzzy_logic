@@ -7,10 +7,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.CiaoPrologConnectionClass;
 import auxiliar.FoldersUtilsClass;
 import auxiliar.LocalUserNameClass;
 import auxiliar.ProgramAnalizedClass;
@@ -79,6 +81,17 @@ public class PersonalizeServlet extends HttpServlet {
 				request.setAttribute("fuzzification", fuzzification);
 
 				if ("save".equals(request_op)) {
+					// At this point we must clear the CiaoPrologConnection queries cache,
+					// so we do not get the saved results instead of the ones that we should get.
+					
+					// Ask for the previously created session.
+					HttpSession session = request.getSession(false);
+					CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
+					if (connection != null) {
+						connection.clearCacheInCiaoPrologConnectionClass();
+					}
+					
+					// Now save the program with the modifications done.
 					save(localUserName, fileName, fileOwner, filePath, fuzzification, request, response);
 				}
 

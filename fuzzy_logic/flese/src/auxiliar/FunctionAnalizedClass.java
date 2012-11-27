@@ -127,7 +127,7 @@ public class FunctionAnalizedClass {
 	}
 	
 	public String getPredOwner() {
-		if ((predOwner != null) && ("".equals(predOwner))) return "default definition";
+		if ((predOwner == null) || (predOwner != null) && ("".equals(predOwner))) return "default definition";
 		else return predOwner;
 	}
 

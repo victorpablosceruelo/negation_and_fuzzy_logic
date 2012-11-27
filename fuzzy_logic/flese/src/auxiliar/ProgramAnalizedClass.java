@@ -181,7 +181,8 @@ public class ProgramAnalizedClass {
 				if ((programLine.getFunctionAnalized() != null) && 
 						(programLine.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
 					foundFuzzifications = true;
-					if (! programLine.getFunctionAnalized().getPredOwner().equals(localUserName)) {
+					if ((programLine.getFunctionAnalized().getPredOwner().equals("default definition")) || 
+						((! programLine.getFunctionAnalized().getPredOwner().equals(localUserName.getLocalUserName())))) {
 						programLinesAffected.add(programLine);
 					}
 				}
@@ -209,7 +210,9 @@ public class ProgramAnalizedClass {
 		
 		bw.close();
 		
-		// Clear queries cache.
+		// At this point we must clear the CiaoPrologConnection queries cache, but introducing the parameter session
+		// or the parameter CiaoPrologConnectionClass complicates this innecessarily. We must do it in the servlet
+		// that calls us.
 	}
 	
 	private String buildFuzzificationLine(String fuzzification, String predNecessary, LocalUserNameClass localUserName, String [] [] params) {
