@@ -174,25 +174,20 @@
 			drawChart(divId, i);
 		}
 		
-		function copyFunctionValues(i, j) {
-			var newIndex = fuzzificationDefs[i].functionsArray.length;
-			fuzzificationDefs[i].functionsArray[newIndex] = new fuzzificationFunctionDef(localUserName, new Array());
+		function updateBars() {
+			if ((myFuzzificationDefIndexI != null) && (myFuzzificationDefIndexJ != null)) {
+				updateFunctionBars();
+				updateFunctionGraphic(myFuzzificationDefIndexI);
 			
-			for (var k=0; k<fuzzificationDefs[i].functionsArray[j].data.length; k++) {
-				
-				//debug.info(personalizePredInfo[i][2][j][1][k] + " " + personalizePredInfo[i][2][j][1][k].length);
-				//debug.info(personalizePredInfo[i][2][j][1][k][0] + " " + personalizePredInfo[i][2][j][1][k][1]);
-				
-				fuzzificationDefs[i].functionsArray[newIndex].data[k] = new Array();
-				fuzzificationDefs[i].functionsArray[newIndex].data[k][0] = fuzzificationDefs[i].functionsArray[j].data[k][0];
-				fuzzificationDefs[i].functionsArray[newIndex].data[k][1] = fuzzificationDefs[i].functionsArray[j].data[k][1];
+				// Set the form action.
+				var form = document.getElementById("saveFuzzification");
+				var saveAction = personalizeServletSaveAction + "&fileName=" + fileName + "&fileOwner=" + fileOwner + "&fuzzification=" + fuzzification;
+				form.action = saveAction;
+				form.setAttribute('action', saveAction);
 			}
-
-			myFuzzificationDefIndexI = i;
-			myFuzzificationDefIndexJ = newIndex;
-
-			updateFunctionBars();
-			updateFunctionGraphic(myFuzzificationDefIndexI);
+			else {
+				alert("Erroneous values for the indexes myFuzzificationDefIndexI: " + myFuzzificationDefIndexI + " and/or myFuzzificationDefIndexJ: " + myFuzzificationDefIndexJ)
+			}
 		}
 		
 		function copyFunction(i, j) {
@@ -202,29 +197,43 @@
 			}
 			if (confirm("Do you want to take the " + confirmationText + " as your personalized function for the fuzzification " + 
 					fuzzificationDefs[i].predDefined)) {
-				copyFunctionValues(i, j);
+				
+				var newIndex = fuzzificationDefs[i].functionsArray.length;
+				fuzzificationDefs[i].functionsArray[newIndex] = new fuzzificationFunctionDef(localUserName, new Array());
+				
+				for (var k=0; k<fuzzificationDefs[i].functionsArray[j].data.length; k++) {
+					
+					//debug.info(personalizePredInfo[i][2][j][1][k] + " " + personalizePredInfo[i][2][j][1][k].length);
+					//debug.info(personalizePredInfo[i][2][j][1][k][0] + " " + personalizePredInfo[i][2][j][1][k][1]);
+					
+					fuzzificationDefs[i].functionsArray[newIndex].data[k] = new Array();
+					fuzzificationDefs[i].functionsArray[newIndex].data[k][0] = fuzzificationDefs[i].functionsArray[j].data[k][0];
+					fuzzificationDefs[i].functionsArray[newIndex].data[k][1] = fuzzificationDefs[i].functionsArray[j].data[k][1];
+				}
+
+				myFuzzificationDefIndexI = i;
+				myFuzzificationDefIndexJ = newIndex;
 			}
-			return false;
 		}
 	
 		function chosenStartingPoint (comboBox) {
 			var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 			// alert(comboBoxValue);
+			var original_i = null;
+			var original_j = null;
 			for (var i=0; i<fuzzificationDefs.length; i++){
 				if (fuzzificationDefs[i] != null) {
 					for (var j=0; j<fuzzificationDefs[i].functionsArray.length; j++) {
 						if (fuzzificationDefs[i].functionsArray[j].name == comboBoxValue) {
-							copyFunction(i, j);
+							original_i = i;
+							original_j = j;
 						}
 					}
 				}
 			}
 			
-			// Set the form action.
-			var form = document.getElementById("saveFuzzification");
-			var saveAction = personalizeServletSaveAction + "&fileName=" + fileName + "&fileOwner=" + fileOwner + "&fuzzification=" + fuzzification;
-			form.action = saveAction;
-			form.setAttribute('action', saveAction);
+			copyFunction(original_i, original_j);
+			updateBars();
 		}
 			
 		if (fuzzificationDefs.length > 0) {
@@ -253,9 +262,9 @@
 				
 				if (fuzzificationDefs[i] != null) {
 					for (var j=0; j<fuzzificationDefs[i].functionsArray.length; j++) {
-						if (fuzzificationDefs[i].functionsArray[j].name == fileOwner) {
-							myPersonalizationIndexI = i;
-							myPersonalizationIndexJ = j;
+						if (fuzzificationDefs[i].functionsArray[j].name == localUserName) {
+							myFuzzificationDefIndexI = i;
+							myFuzzificationDefIndexJ = j;
 						}
 					}
 					
@@ -290,7 +299,7 @@
 				selectStartingPoingDiv.innerHTML = html;
 			}
 			else {
-				
+				updateBars();
 			}
 		}
 		
