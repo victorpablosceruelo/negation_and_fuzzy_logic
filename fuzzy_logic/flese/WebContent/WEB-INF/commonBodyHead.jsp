@@ -5,8 +5,8 @@
 
 <%
 	String localUserName = null;
-	if (session != null) {
-		localUserName = (String) session.getAttribute("localUserName");
+	if (request != null) {
+		localUserName = (String) request.getAttribute("localUserName");
 	}
 %>
 
