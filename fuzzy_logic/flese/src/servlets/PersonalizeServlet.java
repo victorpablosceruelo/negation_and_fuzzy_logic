@@ -71,22 +71,15 @@ public class PersonalizeServlet extends HttpServlet {
 		request.setAttribute("filePath", filePath);
 			
 		if (("edit".equals(request_op)) || ("save".equals(request_op))) {
+			String fuzzification = null;
 			// In case the edit method fails.
 			try {
-				String fuzzification = request.getParameter("fuzzification");
+				fuzzification = request.getParameter("fuzzification");
 				if (fuzzification == null) throw new Exception("fuzzification is null.");
 				request.setAttribute("fuzzification", fuzzification);
 
 				if ("save".equals(request_op)) {
-					// In case the save method fails
-					try {
-						save(localUserName, fileName, fileOwner, filePath, fuzzification, request, response);
-					} catch (Exception e) {
-						// Forward to the jsp page.
-						String additionalInfo="?op=edit&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+fuzzification;
-						ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeServlet, additionalInfo, request, response, LOG);
-						// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
-					}
+					save(localUserName, fileName, fileOwner, filePath, fuzzification, request, response);
 				}
 
 				// Forward to the jsp page.
@@ -94,10 +87,19 @@ public class PersonalizeServlet extends HttpServlet {
 
 			}
 			catch (Exception e) {
-				// Forward to the jsp page.
-				String additionalInfo="?op=none&fileName="+fileName+"&fileOwner="+fileOwner;
-				ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.PersonalizeServlet, additionalInfo, request, response, LOG);
-				// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+				// Distinguish if the exception was generated in edit or in save. 
+				if ("save".equals(request_op)) {
+					// Forward to the jsp page.
+					String additionalInfo="?op=edit&fileName="+fileName+"&fileOwner="+fileOwner+"&fuzzification="+fuzzification;
+					ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.PersonalizeServlet, additionalInfo, e, request, response, LOG);
+					// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);					
+				}
+				else {
+					// Forward to the jsp page.
+					String additionalInfo="?op=none&fileName="+fileName+"&fileOwner="+fileOwner;
+					ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.PersonalizeServlet, additionalInfo, e, request, response, LOG);
+					// ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, e, request, response, LOG);
+				}
 			}
 			
 		}

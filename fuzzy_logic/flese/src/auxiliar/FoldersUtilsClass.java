@@ -34,9 +34,7 @@ public class FoldersUtilsClass {
 		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
 			throw new Exception("configureProgramFilesPath: Cannot configure the path for the programs.");
 		}
-		else {
-			LOG.info("choosen folder for uploads: " + programFilesPath);
-		}
+
 		
 		if ((plServerPath == null) || ("".equals(plServerPath))) {
 			LOG.info("looking for the path of plserver ... ");
@@ -58,9 +56,8 @@ public class FoldersUtilsClass {
 		if ((plServerPath == null) || ("".equals(plServerPath))) {
 			throw new Exception("lookForPlServer: impossible to find plserver.");
 		}
-		else {
-			LOG.info("plServer path: " + plServerPath);
-		}
+
+		LOG.info("uploads' folder: " + programFilesPath + " plServer path: " + plServerPath);
 	}
 	
 	/**

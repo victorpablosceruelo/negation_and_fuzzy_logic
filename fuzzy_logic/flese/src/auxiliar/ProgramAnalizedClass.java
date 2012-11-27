@@ -21,6 +21,8 @@ public class ProgramAnalizedClass {
 
 	public ProgramAnalizedClass (String filePath, String fuzzification) throws Exception {
 		
+		LOG.info("filePath: " + filePath + " fuzzification: " + fuzzification);
+		
 		this.filePath = filePath;
 		programFunctionsOrdered = null;
 		programFunctionsOrderedIterator = null;
@@ -135,13 +137,16 @@ public class ProgramAnalizedClass {
 
 	
 	public void updateProgramFile(String fuzzification, LocalUserNameClass localUserName, String [] [] params) throws IOException {
+		
+		LOG.info("saving fuzzification: " + fuzzification + " for username: " + localUserName.getLocalUserName() + "\n\n");
+		
 		ProgramLineClass programLine = null;
 		
 		File file = new File(filePath);
 		if (file.exists()) {
 			String filePathAux = filePath;
 			
-			DateFormat dateFormat = new SimpleDateFormat("backup_yyyyMMdd_HHmmss");
+			DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
 			Date date = new Date();
 			// System.out.println(dateFormat.format(date));
 			
@@ -149,14 +154,16 @@ public class ProgramAnalizedClass {
 			if (filePathAux.endsWith(".pl"))  filePathAux = filePathAux.substring(0, filePathAux.length() - ".pl".length());
 			
 			// Add the new suffix.
-			filePathAux = filePathAux + dateFormat.format(date);
+			filePathAux = filePathAux + "_backup_" + dateFormat.format(date);
 			
 			// Rename the original file.
+			LOG.info("renaming " + filePath + " into " + filePathAux);
 			File fileAux = new File(filePathAux);
 			file.renameTo(fileAux);
 		}
 		
 		// Create a new file.
+		LOG.info("creating the file " + filePath);
 		file.createNewFile();
 
 		ArrayList <ProgramLineClass> programLinesAffected = new ArrayList <ProgramLineClass>();
@@ -168,6 +175,7 @@ public class ProgramAnalizedClass {
 		
 		for (int i=0; i<programLines.size(); i++) {
 			programLine = programLines.get(i);
+			LOG.info("analizing the program line: " + programLine.getLine());
 			
 			if (! copiedBackFuzzifications) {
 				if ((programLine.getFunctionAnalized() != null) && 
@@ -184,19 +192,24 @@ public class ProgramAnalizedClass {
 						String predNecessary = null;
 						for (int j=0; j<programLinesAffected.size(); j++) {
 							predNecessary = programLinesAffected.get(j).getFunctionAnalized().getPredNecessary();
-							bw.write(programLinesAffected.get(j).getLine());
+							bw.write(programLinesAffected.get(j).getLine() + "\n");
 						}
+						
 						String newLine = buildFuzzificationLine(fuzzification, predNecessary, localUserName, params);
-						LOG.info("Adding to the program the generated line: \n " + newLine);
-						bw.write(newLine);
+						LOG.info("\n\nAdding to the program the generated line: \n " + newLine + "\n\n");
+						bw.write(newLine + "\n");
 					}
 				}
 			}
 			
-			bw.write(programLine.getLine());
+			if ((! foundFuzzifications) || (foundFuzzifications && copiedBackFuzzifications)) {
+				bw.write(programLine.getLine() + "\n");
+			}
 		}
 		
 		bw.close();
+		
+		// Clear queries cache.
 	}
 	
 	private String buildFuzzificationLine(String fuzzification, String predNecessary, LocalUserNameClass localUserName, String [] [] params) {
@@ -211,7 +224,7 @@ public class ProgramAnalizedClass {
 		result += " ]).";
 		result = "rfuzzy_fuzzification(" + fuzzification + ", " + predNecessary + ", " + localUserName.getLocalUserName() + ") :- function" + result;
 		
-		return "result";
+		return result;
 	}
 }
 
