@@ -13,7 +13,7 @@ import org.brickred.socialauth.SocialAuthManager;
 public class LocalUserNameClass {
 
 	private static final Log LOG = LogFactory.getLog(LocalUserNameClass.class);
-	private static String localUserName = null;
+	private String localUserName = null;
 	
 	/**
 	 * Tests if the client session has been authenticated, which is why it needs request and response.
