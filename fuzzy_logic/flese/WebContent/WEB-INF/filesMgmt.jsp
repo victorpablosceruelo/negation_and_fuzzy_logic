@@ -3,7 +3,7 @@
 <%@page import="servlets.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Iterator"%> 
-<%@page import="auxiliar.FoldersUtilsClass"%>
+<%@page import="auxiliar.FilesMgmtClass"%>
 <%@page import="auxiliar.FileInfoClass"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>

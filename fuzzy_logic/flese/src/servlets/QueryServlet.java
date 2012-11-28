@@ -2,6 +2,7 @@ package servlets;
 
 import java.util.Enumeration;
 
+import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,8 @@ public class QueryServlet extends HttpServlet {
 		CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
 		
 		if (connection == null) {
-			connection = new CiaoPrologConnectionClass();
+			ServletContext servletContext = getServletConfig().getServletContext();
+			connection = new CiaoPrologConnectionClass(servletContext);
 		}
 		
 		// If the program contains errors this will thrown an exception in the highest level.

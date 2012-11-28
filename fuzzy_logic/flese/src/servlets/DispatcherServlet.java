@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.FileInfoClass;
 import auxiliar.FilesMgmtClass;
-import auxiliar.FoldersUtilsClass;
+import auxiliar.FilesMgmtClass;
 import auxiliar.LocalUserNameClass;
 import auxiliar.ServletsAuxMethodsClass;
 
@@ -90,6 +90,11 @@ public class DispatcherServlet extends HttpServlet {
 	private void dispatchQuery(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session, LocalUserNameClass localUserName) 
 			throws Exception {
 		
+		if (filesMgmtAux == null) {
+			ServletContext servletContext = getServletConfig().getServletContext();
+			filesMgmtAux = new FilesMgmtClass(servletContext);
+		}
+
 		String request_op = request.getParameter("op");
 		if (request_op == null) request_op = "default";
 
@@ -97,72 +102,30 @@ public class DispatcherServlet extends HttpServlet {
 		
 		switch (op) {
 		case UPLOAD_FILE:
-			
+			filesMgmtAux.uploadFile(doAction, localUserName, request, response);
 			break;
 		case DOWNLOAD_FILE:
+			filesMgmtAux.downloadFile(doAction, localUserName, request, response);
 			break;
 		case REMOVE_FILE:
+			filesMgmtAux.removeFile(doAction, localUserName, request, response);
 			break;
 		case VIEW_FILE:
+			filesMgmtAux.viewFile(doAction, localUserName, request, response);
 			break;
 		case EMPTY_REQUEST:
 		case BUILD_QUERY:
 		default:
+			Iterator<FileInfoClass> filesIterator = filesMgmtAux.returnFilesIterator(localUserName.getLocalUserName());
+			request.setAttribute("filesIterator", filesIterator);
 			// Forward to the jsp page.
 			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, "", request, response, LOG);
 			break;
 		}
-		if (filesMgmtAux == null) {
-			ServletContext servletContext = getServletConfig().getServletContext();
-			filesMgmtAux = new FilesMgmtClass(servletContext);
-		}
-		fileMgmtServlet(doAction, request, response);
-	}
-	
-	private void fileMgmtServlet(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session, LocalUserNameClass localUserName, String request_op) throws Exception {
-		
-		String request_op = request.getParameter("op");
-		LOG.info("op: " + request_op);
-		if (request_op != null) {
-			try {
-				
-					filesMgmtAux.uploadFile(doAction, localUserName, request, response);
-				}
-				
-					filesMgmtAux.downloadFile(doAction, localUserName, request, response);
-				}
-				
-					filesMgmtAux.removeFile(doAction, localUserName, request, response);
-				}
-				
-					filesMgmtAux.viewFile(doAction, localUserName, request, response);
-				}
-
-				if ((! "upload".equals(request_op)) && (! ("download".equals(request_op))) &&
-						(! ("remove".equals(request_op))) && (! ("view".equals(request_op)))) {
-					LOG.info("Strange op in request. op: " + request_op);
-				}
-			} catch (Exception e) {
-				ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.FilesMgmtServlet, "", e, request, response, LOG);
-			}
-		}
-
-		if ((request_op == null) || ((! ("download".equals(request_op))) && (! ("view".equals(request_op))))) {
-
-			// Prepare the information we present in the jsp page.
-			FoldersUtilsClass workingFolder = new FoldersUtilsClass();
-			Iterator<FileInfoClass> filesIterator = null;
-			if (workingFolder != null) {
-				filesIterator = workingFolder.returnFilesIterator(localUserName.getLocalUserName());
-			}
-			request.setAttribute("filesIterator", filesIterator);
-
-			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, "", request, response, LOG);
-		}
-
 	}
 }
+	
+
 
 
 

@@ -2,6 +2,7 @@ package servlets;
 
 import java.io.IOException;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,7 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import auxiliar.CiaoPrologConnectionClass;
-import auxiliar.FoldersUtilsClass;
+import auxiliar.FilesMgmtClass;
 import auxiliar.LocalUserNameClass;
 import auxiliar.ProgramAnalizedClass;
 import auxiliar.ServletsAuxMethodsClass;
@@ -68,7 +69,8 @@ public class PersonalizeServlet extends HttpServlet {
 		if (fileOwner == null) throw new Exception("fileOwner is null.");
 		request.setAttribute("fileOwner", fileOwner);
 
-		FoldersUtilsClass FoldersUtilsObject = new FoldersUtilsClass();
+		ServletContext servletContext = getServletConfig().getServletContext();
+		FilesMgmtClass FoldersUtilsObject = new FilesMgmtClass(servletContext);
 		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		request.setAttribute("filePath", filePath);
 			

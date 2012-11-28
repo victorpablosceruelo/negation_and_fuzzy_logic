@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -12,7 +14,7 @@ import CiaoJava.*;
 public class CiaoPrologConnectionClass {
 
 	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
-	static private FoldersUtilsClass FoldersUtilsObject = null;
+	static private FilesMgmtClass FoldersUtilsObject = null;
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
@@ -27,10 +29,10 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public CiaoPrologConnectionClass() throws Exception {
+	public CiaoPrologConnectionClass(ServletContext servletContext) throws Exception {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
 		if (FoldersUtilsObject == null) {
-			FoldersUtilsObject = new FoldersUtilsClass();
+			FoldersUtilsObject = new FilesMgmtClass(servletContext);
 		}
 	}
 	

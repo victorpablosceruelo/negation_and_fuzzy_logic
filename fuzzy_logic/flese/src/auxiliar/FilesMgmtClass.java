@@ -25,10 +25,10 @@ import org.apache.commons.logging.LogFactory;
 // import servlets.UploadFileServlet;
 //import org.apache.commons.io.filefilter.WildcardFileFilter;
 
-public class FoldersUtilsClass {
+public class FilesMgmtClass {
 
 	// private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(FoldersUtilsClass.class);
+	private static final Log LOG = LogFactory.getLog(FilesMgmtClass.class);
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
 	
@@ -37,7 +37,7 @@ public class FoldersUtilsClass {
 	private int maxFileSize = 50000 * 1024;
 	private int maxMemSize = 50000 * 1024;
 	
-	public FoldersUtilsClass(ServletContext servletContext) throws Exception {
+	public FilesMgmtClass(ServletContext servletContext) throws Exception {
 		
 		this.servletContext = servletContext;
 		
