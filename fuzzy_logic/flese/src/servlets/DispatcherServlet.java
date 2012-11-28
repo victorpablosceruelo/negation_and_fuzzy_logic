@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,20 +51,48 @@ public class DispatcherServlet extends HttpServlet {
 			throws ServletException, IOException {
 		LOG.info("--- "+doAction+" invocation ---");
 		try {
-			if (filesMgmtAux == null) {
-				ServletContext servletContext = getServletConfig().getServletContext();
-				filesMgmtAux = new FilesMgmtClass(servletContext);
-			}
-			fileMgmtServlet(doAction, request, response);
+			// Ask for an existing session.
+			HttpSession session = request.getSession(false);
+			if (session == null) throw new Exception("Session is null");
+
+			// Tests if we have logged in.
+			LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+
+			// Dispatch the query.
+			dispatchQuery(doAction, request, response, session, localUserName);
+
 		} catch (Exception e) {
 			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
 
+	private static final int EMPTY_REQUEST = 0;
+	
+	private int dispatcherConversion(String request_op) {
+		if ("".equals(request_op)) return EMPTY_REQUEST;
+		
+		return EMPTY_REQUEST;
+	}
+	
+	private void dispatchQuery(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session, LocalUserNameClass localUserName) 
+			throws Exception {
+		
+		String request_op = request.getParameter("op");
+		if ((request_op == null) || ("".equals(request_op))) {
+			request_op = "default";
+		}
+
+		int op = dispatcherConversion(request_op);
+		
+		if (filesMgmtAux == null) {
+			ServletContext servletContext = getServletConfig().getServletContext();
+			filesMgmtAux = new FilesMgmtClass(servletContext);
+		}
+		fileMgmtServlet(doAction, request, response);
+	}
+	
 	private void fileMgmtServlet(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// Tests if we have logged in.
-		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 		
 		String request_op = request.getParameter("op");
 		LOG.info("op: " + request_op);
