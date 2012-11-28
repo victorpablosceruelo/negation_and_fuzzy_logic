@@ -25,9 +25,9 @@ import auxiliar.ServletsAuxMethodsClass;
  * Servlet implementation class SearchServlet
  */
 @WebServlet("/FilesMgmtServlet")
-public class FilesMgmtServlet extends HttpServlet {
+public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	final Log LOG = LogFactory.getLog(FilesMgmtServlet.class);
+	final Log LOG = LogFactory.getLog(DispatcherServlet.class);
 	private static FilesMgmtClass filesMgmtAux = null;
 	
 	/**
