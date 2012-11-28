@@ -49,6 +49,8 @@ public class DispatcherServlet extends HttpServlet {
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
 		LOG.info("--- "+doAction+" invocation ---");
+		ServletsAuxMethodsClass.logRequestParameters(request, LOG);
+		
 		try {
 			// Ask for an existing session.
 			HttpSession session = request.getSession(false);

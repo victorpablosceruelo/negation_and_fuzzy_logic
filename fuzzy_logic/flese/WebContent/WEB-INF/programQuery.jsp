@@ -1,12 +1,30 @@
 <jsp:include page="commonHtmlHead.jsp" />
+<%@page import="java.util.Iterator"%>
+<%@page import="auxiliar.FileInfoClass"%>
+
+<%
+	@SuppressWarnings("unchecked")
+	Iterator<FileInfoClass> filesIterator = (Iterator<FileInfoClass>) request.getAttribute("filesIterator"); 
+%>
 
 <body>
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
 		<section id="selectDatabase" class="selectDatabase">
 			Select a program file to perform your query: 
-			<select name="selectedDatabase">
+			<select name="selectedDatabase" onchange='selectedProgramDatabaseChanged(this)' >
 				<option id="----" value="----">----</option>
+				<%
+					while (filesIterator.hasNext()) {
+						FileInfoClass current = filesIterator.next();
+				%>
+				<option id="<%=current.getFileName() + "-owned-by-" + current.getFileOwner()%>"
+						value="<%=current.getFileName() + "-owned-by-" + current.getFileOwner()%>">
+						<%=current.getFileName() + " ( owned by " + current.getFileOwner() + " ) "%>
+				</option>
+				<%
+					}
+				%>
 			</select>
 		</section>
 		

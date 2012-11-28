@@ -59,7 +59,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- "+doAction+" invocation ---");
-		ServletsAuxMethodsClass.logRequestParameters(request, LOG);
+		//	ServletsAuxMethodsClass.logRequestParameters(request, LOG);
 		HttpSession session = null;
 		
 		try {
