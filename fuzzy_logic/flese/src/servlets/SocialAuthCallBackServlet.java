@@ -112,7 +112,8 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 
 		// get the social auth manager from session
 		SocialAuthManager manager = (SocialAuthManager)session.getAttribute("authManager");
-		if (manager == null) {
+		if (manager == null) throw new Exception("manager is null");
+		{
 			LOG.info("INFO: creating a new manager because it was null. ");
 			//Create an instance of SocialAuthConfgi object
 			SocialAuthConfig config = SocialAuthConfig.getDefault();
