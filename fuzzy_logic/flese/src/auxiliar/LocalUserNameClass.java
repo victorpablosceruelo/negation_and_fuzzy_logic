@@ -33,8 +33,8 @@ public class LocalUserNameClass {
 		String testingMode = (String) session.getAttribute("testingMode");
 		Profile profile = null;
 		if (testingMode == null) {
-			SocialAuthManager manager = (SocialAuthManager) session.getAttribute("authManager");
-			if (manager == null) throw new Exception("manager is null");
+			SocialAuthManager authManager = (SocialAuthManager) session.getAttribute("authManager");
+			if (authManager == null) throw new Exception("authManager is null");
 
 			AuthProvider provider = (AuthProvider) session.getAttribute("provider");
 			if (provider == null) throw new Exception("provider is null");

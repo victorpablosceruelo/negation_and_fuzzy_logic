@@ -267,9 +267,9 @@ public class ServletsAuxMethodsClass {
 				break;
 		case IndexPage: retVal = "index.jsp";
 				break;
-		case SocialAuthServletSignIn: retVal = "SocialAuthServlet?op=signin";
+		case SocialAuthServletSignIn: retVal = "SocialAuthCallBackServlet?op=signin";
 				break;
-		case SocialAuthServletSignOut: retVal = "SocialAuthServlet?op=signout";
+		case SocialAuthServletSignOut: retVal = "SocialAuthCallBackServlet?op=signout";
 				break;
 		case SocialAuthServletUserInfo: retVal = "SocialAuthUserInfoServlet";
 				break;
