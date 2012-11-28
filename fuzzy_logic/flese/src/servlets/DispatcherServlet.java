@@ -68,10 +68,22 @@ public class DispatcherServlet extends HttpServlet {
 	}
 
 	private static final int EMPTY_REQUEST = 0;
+	private static final int BUILD_QUERY = 1;
+	private static final int UPLOAD_FILE = 2;
+	private static final int DOWNLOAD_FILE = 3;
+	private static final int REMOVE_FILE = 4;
+	private static final int VIEW_FILE = 5;
 	
-	private int dispatcherConversion(String request_op) {
-		if ("".equals(request_op)) return EMPTY_REQUEST;
+	
+	private int dispatcherConversion(String request_op) throws Exception {
+		if (request_op == null) throw new Exception("request_op is null");
 		
+		if ("".equals(request_op)) return EMPTY_REQUEST;
+		if ("buildQuery".equals(request_op)) return BUILD_QUERY;
+		if ("uploadFile".equals(request_op)) return UPLOAD_FILE;
+		if ("downloadFile".equals(request_op)) return DOWNLOAD_FILE;
+		if ("removeFile".equals(request_op)) return REMOVE_FILE;
+		if ("viewFile".equals(request_op)) return VIEW_FILE;
 		return EMPTY_REQUEST;
 	}
 	
@@ -79,12 +91,27 @@ public class DispatcherServlet extends HttpServlet {
 			throws Exception {
 		
 		String request_op = request.getParameter("op");
-		if ((request_op == null) || ("".equals(request_op))) {
-			request_op = "default";
-		}
+		if (request_op == null) request_op = "default";
 
 		int op = dispatcherConversion(request_op);
 		
+		switch (op) {
+		case UPLOAD_FILE:
+			
+			break;
+		case DOWNLOAD_FILE:
+			break;
+		case REMOVE_FILE:
+			break;
+		case VIEW_FILE:
+			break;
+		case EMPTY_REQUEST:
+		case BUILD_QUERY:
+		default:
+			// Forward to the jsp page.
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, "", request, response, LOG);
+			break;
+		}
 		if (filesMgmtAux == null) {
 			ServletContext servletContext = getServletConfig().getServletContext();
 			filesMgmtAux = new FilesMgmtClass(servletContext);
@@ -92,22 +119,22 @@ public class DispatcherServlet extends HttpServlet {
 		fileMgmtServlet(doAction, request, response);
 	}
 	
-	private void fileMgmtServlet(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void fileMgmtServlet(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session, LocalUserNameClass localUserName, String request_op) throws Exception {
 		
 		String request_op = request.getParameter("op");
 		LOG.info("op: " + request_op);
 		if (request_op != null) {
 			try {
-				if ("upload".equals(request_op)) {
+				
 					filesMgmtAux.uploadFile(doAction, localUserName, request, response);
 				}
-				if ("download".equals(request_op)) {
+				
 					filesMgmtAux.downloadFile(doAction, localUserName, request, response);
 				}
-				if ("remove".equals(request_op)) {
+				
 					filesMgmtAux.removeFile(doAction, localUserName, request, response);
 				}
-				if ("view".equals(request_op)) {
+				
 					filesMgmtAux.viewFile(doAction, localUserName, request, response);
 				}
 
