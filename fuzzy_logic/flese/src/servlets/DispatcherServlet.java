@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.FileInfoClass;
 import auxiliar.FilesMgmtClass;
-import auxiliar.FilesMgmtClass;
 import auxiliar.LocalUserNameClass;
 import auxiliar.ServletsAuxMethodsClass;
 
@@ -25,7 +24,7 @@ import auxiliar.ServletsAuxMethodsClass;
 /**
  * Servlet implementation class SearchServlet
  */
-@WebServlet("/FilesMgmtServlet")
+@WebServlet("/DispatcherServlet")
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(DispatcherServlet.class);
@@ -119,7 +118,7 @@ public class DispatcherServlet extends HttpServlet {
 			Iterator<FileInfoClass> filesIterator = filesMgmtAux.returnFilesIterator(localUserName.getLocalUserName());
 			request.setAttribute("filesIterator", filesIterator);
 			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtIndexPage, "", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryPage, "", request, response, LOG);
 			break;
 		}
 	}

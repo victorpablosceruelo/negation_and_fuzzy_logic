@@ -123,7 +123,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 				
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the FleSe application !!", LOG);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, "", request, response, LOG);	
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryAction, "", request, response, LOG);	
 	}
 	
 	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
@@ -144,7 +144,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	    	LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 
 	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
-	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtServlet, "", request, response, LOG);	
+	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryAction, "", request, response, LOG);	
 		} 
 
 	    return retval;

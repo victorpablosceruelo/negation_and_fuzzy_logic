@@ -251,6 +251,8 @@ public class ServletsAuxMethodsClass {
 	public static final int PersonalizeServletEditAction = 19;
 	public static final int PersonalizeEditPage = 20;
 	public static final int PersonalizeServletSaveAction = 21;
+	public static final int ProgramQueryAction = 22;
+	public static final int ProgramQueryPage = 23;
 	
 	/**
 	 * Returns the app mapping for uriNickName.
@@ -302,6 +304,10 @@ public class ServletsAuxMethodsClass {
 		case PersonalizeIndexPage: retVal = "WEB-INF/personalizeIndexPage.jsp";
 				break;
 		case PersonalizeEditPage: retVal = "WEB-INF/personalizeEditPage.jsp";
+				break;
+		case ProgramQueryAction: retVal = "DispatcherServlet";
+				break;				
+		case ProgramQueryPage: retVal = "WEB-INF/programQuery.jsp";
 				break;
 		default: retVal = "";
 				break;
