@@ -7,15 +7,21 @@ function loadingImageHtml() {
 	return "<img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
 }
 
+function fileInfo(fileName, fileOwner) {
+	this.fileName = fileName;
+	this.fileOwner = fileOwner;
+}
+
 function insertProgramFileSelection(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
 	parentDiv.innerHTML = loadingImageHtml();
 	
-	$.getScript(urlMappingFor('FilesListRequest'), 
-			insertProgramFileSelectionAux(parentDivId));
+	$.getScript(urlMappingFor('FilesListRequest'), insertProgramFileSelectionAux(parentDivId));
 }
 
 function insertProgramFileSelectionAux(parentDivId) {
+	var parentDiv = document.getElementById(parentDivId);
+	parentDiv.innerHTML = "";
 	
 }
 
