@@ -30,9 +30,11 @@ public class LocalUserNameClass {
 		HttpSession session = request.getSession(false);
 		if (session == null) throw new Exception("session is null");
 
-		String testingMode = (String) session.getAttribute("testingMode");
-		Profile profile = null;
-		if (testingMode == null) {
+		String isInTestingMode = (String) session.getAttribute("testingMode");
+		if ((isInTestingMode != null) && ("true".equals(isInTestingMode))) {
+			ifNullThenSetUserNameFrom("Testing User", "localhost.localnet", "testing", "testing");
+		}
+		else {
 			SocialAuthManager authManager = (SocialAuthManager) session.getAttribute("authManager");
 			if (authManager == null) throw new Exception("authManager is null");
 
@@ -40,7 +42,7 @@ public class LocalUserNameClass {
 			if (provider == null) throw new Exception("provider is null");
 			
 			// get profile
-			profile = provider.getUserProfile();
+			Profile profile = provider.getUserProfile();
 			if (profile == null) throw new Exception("profile is null");
 			else {
 				ifNullThenSetUserNameFrom(profile.getEmail(), profile.getProviderId(), "email", "providerId"); 
@@ -55,9 +57,7 @@ public class LocalUserNameClass {
 			// OR also obtain list of contacts
 			// List<Contact> contactsList = provider.getContactList();
 		}
-		else {
-			ifNullThenSetUserNameFrom("Testing User", "wakamola.es", "testing", "testing");
-		}
+
 		if (localUserName == null) throw new Exception("localUserName is null");
 		LOG.info("localUserName: " + localUserName);
 		
