@@ -114,7 +114,7 @@
 
 <script type="text/javascript">
 	setupBodyHeadLoggedDiv();
-	setupHref ('signOut', urlMappingFor('SocialAuthServletSignOut'));
+	setupHref ('signOut', urlMappingFor('SignOutRequest'));
 	setupHref ('userOptions', urlMappingFor('SocialAuthServletUserInfo'));
 	showMsgsToTheUser();
 </script>

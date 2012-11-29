@@ -100,7 +100,7 @@ public class DispatchersClass {
 		Iterator<FileInfoClass> filesIterator = filesMgmt.returnFilesIterator(localUserName.getLocalUserName());
 		request.setAttribute("filesIterator", filesIterator);
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryPage, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SignedInAnswer, "", request, response, LOG);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -322,7 +322,7 @@ public class DispatchersClass {
 		String filePath = filesMgmt.getCompletePathOfProgramFile(fileOwner, fileName);
 		request.setAttribute("fileName", fileName);
 		request.setAttribute("filePath", filePath);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesMgmtFileViewPage, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileViewAnswer, "", request, response, LOG);
 	}
 	
 

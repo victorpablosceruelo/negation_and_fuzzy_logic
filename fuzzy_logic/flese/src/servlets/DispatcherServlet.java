@@ -52,7 +52,7 @@ public class DispatcherServlet extends HttpServlet {
 			dispatchQuery(doAction, request, response);
 
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SignOutRequest, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}

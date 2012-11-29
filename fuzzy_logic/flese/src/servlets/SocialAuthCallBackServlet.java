@@ -69,7 +69,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 			socialAuthentication(request, response, session);
 		} catch (Exception e) {
 			// socialAuthenticationSignOut(request, response, session);
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SignOutRequest, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}
@@ -130,7 +130,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 				
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the FleSe application !!", LOG);
-		ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.SocialAuthServletSignIn, "&id=" + id, request, response, LOG);
+		ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.SignInRequest, "&id=" + id, request, response, LOG);
 	}
 	
 	private void socialAuthenticationSignInOrContinue(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
@@ -155,11 +155,11 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		}
 		
 		if (userIsAuthenticated) {
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryAction, "", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SignedInAnswer, "", request, response, LOG);
 		}
 		else {
 			// URL of YOUR application which will be called after authentication
-			String nextURL = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);;
+			String nextURL = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthenticationCallBackRequest, request, LOG);;
 			
 		    // Returns the host name of the server to which the request was sent.
 		    
@@ -231,7 +231,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 			session.invalidate();
 		}
 		
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SocialAuthSignInPage, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SignedOutAnswer, "", request, response, LOG);
 	}
 	
 }

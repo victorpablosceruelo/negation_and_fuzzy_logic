@@ -58,7 +58,7 @@ public class ServletsAuxMethodsClass {
 			LOG.error("-------------------------------------------------------------------");
 			
 			try {
-				actionOnExceptionAux(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
+				actionOnExceptionAux(ServletsAuxMethodsClass.SignOutRequest, "", e, request, response, LOG);
 			}
 			catch (Exception e3) {
 				LOG.error("-------------------------------------------------------------------");
@@ -233,26 +233,35 @@ public class ServletsAuxMethodsClass {
 	public static final int theSamePage = 1;
 	public static final int errorPage = 2;
 	public static final int IndexPage = 3;
-	public static final int SocialAuthServletSignIn = 4;
-	public static final int SocialAuthServletSignOut = 5;
-	public static final int SocialAuthServletUserInfo = 6;
-	public static final int SocialAuthSignInPage = 7;
-	public static final int SocialAuthUserInfoPage = 8;
-	public static final int SocialAuthCallBackServlet = 9;
-	public static final int FilesMgmtServlet = 10;
-	public static final int FilesMgmtIndexPage = 11;
-	public static final int FilesMgmtFileViewPage = 12;
-	public static final int QueryServletBuildQuery = 13;
-	public static final int QueryServletRunQuery = 14;
-	public static final int BuildQueryPage = 15;
-	public static final int RunQueryPage = 16;
-	public static final int PersonalizeServlet = 17;
-	public static final int PersonalizeIndexPage = 18;
-	public static final int PersonalizeServletEditAction = 19;
-	public static final int PersonalizeEditPage = 20;
-	public static final int PersonalizeServletSaveAction = 21;
-	public static final int ProgramQueryAction = 22;
-	public static final int ProgramQueryPage = 23;
+	
+	public static final int SocialAuthenticationCallBackRequest = 4;
+	public static final int SignInRequest = 5;
+	public static final int SignOutRequest = 6;
+	public static final int SignedInAnswer = 7;
+	public static final int SignedOutAnswer = 8;
+	public static final int UserOptionsRequest = 9;
+	public static final int UserOptionsAnswer = 10;
+	
+	public static final int FilesListRequest = 11;
+	public static final int FilesListAnswer = 12;
+	public static final int FileUploadRequest = 13;
+	public static final int FileUploadAnswer = 14;
+	public static final int FileViewRequest = 15;
+	public static final int FileViewAnswer = 16;
+	public static final int FileDownloadRequest = 17;
+	public static final int FileDownloadAnswer = 18;
+	public static final int FileRemoveRequest = 19;
+	public static final int FileRemoveAnswer = 20;
+	
+	public static final int ProgramFileIntrospectionRequest = 21;
+	public static final int ProgramFileIntrospectionAnswer = 22;
+	public static final int RunQueryRequest = 23;
+	public static final int RunQueryAnswer = 24;
+
+	public static final int ListProgramFuzzificationsRequest = 25;
+	public static final int ListProgramFuzzificationsAnswer = 26;	
+	public static final int SaveProgramFuzzificationRequest  = 27;
+	public static final int SaveProgramFuzzificationAnswer  = 28;
 	
 	public static String [] [] urlsMappings() {
 		String [][] urlsMappings = new String[24][2];
@@ -261,27 +270,35 @@ public class ServletsAuxMethodsClass {
 		urlsMappings[theSamePage] = new String[]{"theSamePage", ""};
 		urlsMappings[errorPage] = new String[]{"errorPage", "error.jsp"};
 		urlsMappings[IndexPage] = new String[]{"IndexPage", "index.jsp"};
-		urlsMappings[SocialAuthServletSignIn] = new String[]{"SocialAuthServletSignIn", "SocialAuthCallBackServlet?op=signin"};
-		urlsMappings[SocialAuthServletSignOut] = new String[]{"SocialAuthServletSignOut", "SocialAuthCallBackServlet?op=signout"};
-		urlsMappings[SocialAuthServletUserInfo] = new String[]{"SocialAuthServletUserInfo", "SocialAuthUserInfoServlet"};
-		urlsMappings[SocialAuthSignInPage] = new String[]{"SocialAuthSignInPage", "WEB-INF/SocialAuthSignInJspPage.jsp"};
-		urlsMappings[SocialAuthUserInfoPage] = new String[]{"SocialAuthUserInfoPage", "WEB-INF/SocialAuthUserInfoJspPage.jsp"};
-		urlsMappings[SocialAuthCallBackServlet] = new String[]{"SocialAuthCallBackServlet", "SocialAuthCallBackServlet"};
-		urlsMappings[FilesMgmtServlet] = new String[]{"FilesMgmtServlet", "FilesMgmtServlet"};
-		urlsMappings[FilesMgmtIndexPage] = new String[]{"FilesMgmtIndexPage", "WEB-INF/filesMgmt.jsp"};
-		urlsMappings[FilesMgmtFileViewPage] = new String[]{"FilesMgmtFileViewPage", "WEB-INF/filesMgmtFileView.jsp"};
-		urlsMappings[QueryServletBuildQuery] = new String[]{"QueryServletBuildQuery", "QueryServlet?op=buildQuery"};
-		urlsMappings[QueryServletRunQuery] = new String[]{"QueryServletRunQuery", "QueryServlet?op=runQuery"};
-		urlsMappings[BuildQueryPage] = new String[]{"BuildQueryPage", "WEB-INF/fleseBuildQuery.jsp"};
-		urlsMappings[RunQueryPage] = new String[]{"RunQueryPage", "WEB-INF/fleseRunQuery.jsp"};
-		urlsMappings[PersonalizeServlet] = new String[]{"PersonalizeServlet", "PersonalizeServlet"};
-		urlsMappings[PersonalizeServletEditAction] = new String[]{"PersonalizeServletEditAction", "PersonalizeServlet?op=edit"};
-		urlsMappings[PersonalizeServletSaveAction] = new String[]{"PersonalizeServletSaveAction", "PersonalizeServlet?op=save"};
-		urlsMappings[PersonalizeIndexPage] = new String[]{"PersonalizeIndexPage", "WEB-INF/personalizeIndexPage.jsp"};
-		urlsMappings[PersonalizeEditPage] = new String[]{"PersonalizeEditPage", "WEB-INF/personalizeEditPage.jsp"};
-		urlsMappings[ProgramQueryAction] = new String[]{"ProgramQueryAction", "DispatcherServlet"};
-		urlsMappings[ProgramQueryPage] = new String[]{"theSamePage", "WEB-INF/programQuery.jsp"};
 		
+		urlsMappings[SocialAuthenticationCallBackRequest] = new String[]{"SocialAuthenticationCallBackRequest", "SocialAuthCallBackServlet"};
+		urlsMappings[SignInRequest] = new String[]{"SignInRequest", "SocialAuthCallBackServlet?op=signin"};
+		urlsMappings[SignOutRequest] = new String[]{"SignOutRequest", "SocialAuthCallBackServlet?op=signout"};
+		urlsMappings[SignedInAnswer] = new String[]{"SignedInAnswer", "WEB-INF/signedIn.jsp"};
+		urlsMappings[SignedOutAnswer] = new String[]{"SignedOutAnswer", "WEB-INF/signedOut.jsp"};
+		urlsMappings[UserOptionsRequest] = new String[]{"UserOptionsRequest", "DispatcherServlet?op=userInfo"};
+		urlsMappings[UserOptionsAnswer] = new String[]{"UserOptionsAnswer", "WEB-INF/userOptions.jsp"};
+		
+		urlsMappings[FilesListRequest] = new String[]{"FilesListRequest", "DispatcherServlet?op=filesList"};
+		urlsMappings[FilesListAnswer] = new String[]{"FilesListAnswer", "WEB-INF/filesList.jsp"};
+		urlsMappings[FileUploadRequest] = new String[]{"FileUploadRequest", "DispatcherServlet?op=fileUpload"};
+		urlsMappings[FileUploadAnswer] = new String[]{"FileUploadAnswer", "WEB-INF/fileUpload.jsp"};
+		urlsMappings[FileViewRequest] = new String[]{"FileViewRequest", "DispatcherServlet?op=fileView"};
+		urlsMappings[FileViewAnswer] = new String[]{"FileViewAnswer", "WEB-INF/fileView.jsp"};
+		urlsMappings[FileDownloadRequest] = new String[]{"FileDownloadRequest", "DispatcherServlet?op=fileDownload"};
+		urlsMappings[FileDownloadAnswer] = new String[]{"FileDownloadAnswer", "WEB-INF/fileDownload.jsp"};
+		urlsMappings[FileRemoveRequest] = new String[]{"FileRemoveRequest", "DispatcherServlet?op=fileRemove"};
+		urlsMappings[FileRemoveAnswer] = new String[]{"FileRemoveAnswer", "WEB-INF/fileRemove.jsp"};
+		
+		urlsMappings[ProgramFileIntrospectionRequest] = new String[]{"ProgramFileIntrospectionRequest", "DispatcherServlet?op=programFileIntrospection"};
+		urlsMappings[ProgramFileIntrospectionAnswer] = new String[]{"ProgramFileIntrospectionAnswer", "WEB-INF/programFileIntrospection.jsp"};
+		urlsMappings[RunQueryRequest] = new String[]{"RunQueryRequest", "DispatcherServlet?op=runQuery"};
+		urlsMappings[RunQueryAnswer] = new String[]{"RunQueryAnswer", "WEB-INF/runQuery.jsp"};
+		
+		urlsMappings[ListProgramFuzzificationsRequest] = new String[]{"ListProgramFuzzificationsRequest", "DispatcherServlet?op=listProgramFuzzifications"};
+		urlsMappings[ListProgramFuzzificationsAnswer] = new String[]{"ListProgramFuzzificationsAnswer", "WEB-INF/runQuery.jsp"};
+		urlsMappings[SaveProgramFuzzificationRequest] = new String[]{"SaveProgramFuzzificationRequest", "DispatcherServlet?op=saveProgramFuzzification"};
+		urlsMappings[SaveProgramFuzzificationAnswer] = new String[]{"SaveProgramFuzzificationAnswer", "WEB-INF/runQuery.jsp"};
 		
 		return urlsMappings;
 	}
