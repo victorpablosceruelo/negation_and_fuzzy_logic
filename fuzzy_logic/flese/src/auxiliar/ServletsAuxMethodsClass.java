@@ -264,7 +264,7 @@ public class ServletsAuxMethodsClass {
 	public static final int SaveProgramFuzzificationAnswer  = 28;
 	
 	public static String [] [] urlsMappings() {
-		String [][] urlsMappings = new String[24][2];
+		String [][] urlsMappings = new String[29][2];
 		
 		urlsMappings[0] = new String[]{null, null};
 		urlsMappings[theSamePage] = new String[]{"theSamePage", ""};
