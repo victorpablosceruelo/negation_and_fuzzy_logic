@@ -23,6 +23,30 @@ function insertProgramFileSelectionAux(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
 	parentDiv.innerHTML = "";
 	
+	var selectDatabaseDiv = document.createElement('div');
+	parentDiv.appendChild(selectDatabaseDiv);
+	
+	if ((filesList == null) || (filesList.length == 0)) {
+		selectDatabaseDiv.innerHTML = "No databases. Please upload one via your user options.";
+	}
+	else {
+		var html = "";
+		html += "<select name='selectedDatabase' onchange='selectedProgramDatabaseChanged(this, "+parentDivId+")' >";
+		html += "<option id='----' value='----'>----</option>";
+		for (var i=0; i<filesList.length; i++) {
+			html += "<option id=" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner +
+					"value=" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + ">" + 
+					filesList[i].fileName + " ( owned by " + filesList[i].fileOwner + " ) " +
+					"</option>";
+		}
+		html += "</select>";
+		selectDatabaseDiv.innerHTML = html;
+	}
+		
+		
+		
+	
+	
 }
 
 function selectedProgramDatabaseChanged(comboBox, selectQueryDivId) {

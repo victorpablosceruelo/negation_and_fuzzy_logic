@@ -9,7 +9,7 @@
 	Iterator<FileInfoClass> filesListIterator = (Iterator<FileInfoClass>) request.getAttribute("filesListIterator");
 	if (filesListIterator != null) {
 		// out.println("<script type=\"text/javascript\">\n");
-		out.println("filesList = new Array ();");
+		out.println("filesList = new Array();");
 		int i=0;
 		while (filesListIterator.hasNext()) {
 			FileInfoClass fileInfo = filesListIterator.next();
@@ -20,4 +20,5 @@
 	}
 %>
 
+for (var i=0; i<filesList.length; i++) debug.info("filesList["+i+"]=("+filesList[i].fileName+", "+filesList[i].fileOwner+")");
 debug.info('Loaded contents of filesList.jsp.');

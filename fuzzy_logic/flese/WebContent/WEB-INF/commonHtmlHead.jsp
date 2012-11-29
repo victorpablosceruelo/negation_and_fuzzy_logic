@@ -18,6 +18,11 @@
 	
 	<script type="text/javascript" src="js/clientSoftware.js"></script>
 	<script type="text/javascript" src="js/tabsSelection.js"></script>
+	<script type="text/javascript">
+		// Initialize the variables that are shared between JS libraries 
+		// and the html body, to avoid warnings.
+		var filesList = null;
+	</script>
 	<script type="text/javascript" src="js/auxiliarJS.js"></script>
 </head>
 <!-- end of commonHtmlHead -->
