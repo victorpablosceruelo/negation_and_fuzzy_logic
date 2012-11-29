@@ -86,11 +86,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 			}
 
 			if ("signin".equals(request_op)) { 
-				// Ask for a new session.
-				session = request.getSession(true);
-				if (! socialAuthenticationInTestingMode(request, response, session)) {
-					socialAuthenticationSignIn(request, response, session);
-				}
+				socialAuthenticationSignInOrContinue(request, response, session);
 			}
 		}
 		else {
@@ -104,6 +100,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		if (session == null) throw new Exception("Session is null");
 
+		String id="none";
 		String isInTestingMode = (String) session.getAttribute("testingMode");
 		if ((isInTestingMode != null) && ("true".equals(isInTestingMode))) {
 	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "INFO: Social Authentication in Testing mode.", LOG);
@@ -118,6 +115,10 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 			// Pass request parameter map while calling connect method. 
 			AuthProvider provider = authManager.connect(SocialAuthUtil.getRequestParametersMap(request));
 			if (provider == null) throw new Exception("provider is null");
+			
+			// Retrieve the provider id to rebuild the initial query.
+			// NO: authManager.getCurrentAuthProvider().getProviderId();
+			id = provider.getProviderId();
 
 			// Save new computed results in session.
 			session.setAttribute("authManager", authManager);
@@ -129,31 +130,10 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 				
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the FleSe application !!", LOG);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryAction, "", request, response, LOG);	
+		ServletsAuxMethodsClass.redirect_to(ServletsAuxMethodsClass.SocialAuthServletSignIn, "&id=" + id, request, response, LOG);
 	}
 	
-	private Boolean socialAuthenticationInTestingMode(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
-			throws Exception {
-		
-		LOG.info("socialAuthenticationInTestingMode method call. ");
-		if (session == null) throw new Exception("session is null");
-		Boolean retval = false;
-
-	    // Returns the host name of the server to which the request was sent.
-	    LOG.info("request.getServerName(): " + request.getServerName());
-	    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
-	    	
-	    	retval = true; // Fake authentication !!!
-	    	session.setAttribute("testingMode", "true");
-	    	
-	    	String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);
-	    	response.sendRedirect( successUrl );
-		} 
-
-	    return retval;
-	}
-	
-	private void socialAuthenticationSignIn(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
+	private void socialAuthenticationSignInOrContinue(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
 			throws Exception {
 		
 		LOG.info("socialAuthenticationSignIn method call. ");
@@ -163,41 +143,67 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		String id = (String) request.getParameter("id");
 		if ((id == null) || ("".equals(id))) throw new Exception("id is null");
 
-		SocialAuthManager authManager = (SocialAuthManager) session.getAttribute("authManager");
-		if (authManager != null) {
-			session.removeAttribute("authManager");
+		// Test if we have signed in before and the session contains the info.
+		boolean userIsAuthenticated = false;
+		try {
+			@SuppressWarnings("unused")
+			LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+			userIsAuthenticated = true;
+		}
+		catch (Exception e) {
+			userIsAuthenticated = false;
+		}
+		
+		if (userIsAuthenticated) {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryAction, "", request, response, LOG);
 		}
 		else {
-			LOG.info("INFO: creating a new auth manager because it was null. ");
-		
-			//Create an instance of SocialAuthConfgi object
-			SocialAuthConfig config = SocialAuthConfig.getDefault();
-			// config.setApplicationProperties()
-			//load configuration. By default load the configuration from oauth_consumer.properties. 
-			//You can also pass input stream, properties object or properties file name.
-			config.load();
+			// URL of YOUR application which will be called after authentication
+			String nextURL = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);;
+			
+		    // Returns the host name of the server to which the request was sent.
+		    
+		    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
+		    	LOG.info("request.getServerName(): " + request.getServerName());
+		    	session.setAttribute("testingMode", "true");
+			} 
+		    else {
+				SocialAuthManager authManager = (SocialAuthManager) session.getAttribute("authManager");
+				if (authManager != null) {
+					session.removeAttribute("authManager");
+				}
+				else {
+					LOG.info("INFO: creating a new auth manager because it was null. ");
 
-			//Create an instance of SocialAuthManager and set config
-			authManager = new SocialAuthManager();
-			authManager.setSocialAuthConfig(config);
+					//Create an instance of SocialAuthConfgi object
+					SocialAuthConfig config = SocialAuthConfig.getDefault();
+					// config.setApplicationProperties()
+					//load configuration. By default load the configuration from oauth_consumer.properties. 
+					//You can also pass input stream, properties object or properties file name.
+					config.load();
+
+					//Create an instance of SocialAuthManager and set config
+					authManager = new SocialAuthManager();
+					authManager.setSocialAuthConfig(config);
+				}
+
+				// get Provider URL to which you should redirect for authentication.
+				// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
+				authManager.setPermission(id, Permission.AUTHENTICATE_ONLY);
+				nextURL = authManager.getAuthenticationUrl(id, nextURL);
+
+				// Store in session.
+				session.setAttribute("authManager", authManager);
+
+			}
+		    
+			if (nextURL == null) throw new Exception("nextURL is null."); 
+			if ("".equals(nextURL)) throw new Exception("nextURL is empty string."); 
+
+	    	response.sendRedirect( nextURL );
+			// response.encodeRedirectURL( athenticationUrl );
+
 		}
-
-		// URL of YOUR application which will be called after authentication
-		String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);
-
-		// get Provider URL to which you should redirect for authentication.
-		// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
-		authManager.setPermission(id, Permission.AUTHENTICATE_ONLY);
-		String athenticationUrl = authManager.getAuthenticationUrl(id, successUrl);
-
-		// Store in session.
-		session.setAttribute("authManager", authManager);
-
-		if (athenticationUrl == null) throw new Exception("athenticationUrl is null."); 
-		if ("".equals(athenticationUrl)) throw new Exception("athenticationUrl is empty string."); 
-		
-		response.sendRedirect( athenticationUrl );
-		// response.encodeRedirectURL( athenticationUrl );
 	}
 	
 	private void socialAuthenticationSignOut(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
