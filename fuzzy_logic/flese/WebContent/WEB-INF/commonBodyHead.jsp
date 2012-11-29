@@ -8,7 +8,53 @@
 	if (request != null) {
 		localUserName = (String) request.getAttribute("localUserName");
 	}
+	if (localUserName != null) {
 %>
+	<script type="text/javascript">
+		var localUserName = "<%=localUserName %>";
+	</script>
+<%
+	} else {
+%>
+	<script type="text/javascript">
+		var localUserName = null;
+	</script>
+<%		
+	}
+%>
+
+<script type="text/javascript">
+	function urlMapping(nickName, url) {
+		this.nickName = nickName;
+		this.url = url;
+	}
+	var urlsMappings = new Array();
+<%
+	String [][] urlsMappings = ServletsAuxMethodsClass.urlsMappings();
+	for (int i=0; i<urlsMappings.length; i++) {
+%>
+	urlsMappings[<%=i%>] = new urlMapping("<%=urlsMappings[i][0]%>", "<%=urlsMappings[i][1]%>");
+<%
+	}
+%>
+	function urlMappingFor (nickName) {
+		var found = false;
+		var i = 0;
+		while ((! found) && (i < urlsMappings.length)) {
+			if (urlsMappings[i].nickName == nickName) {
+				found = true;
+				return urlsMappings[i].url;
+			}
+			else i++
+		}
+		return null;
+	}
+	function setupHref (aId, href) {
+		var aLink = document.getElementById(aId);
+		if (aLink != null) aLink.href = href;
+	}
+</script>
+
 
 <header>
 	<div id="bodyHeadTable" class="bodyHeadTable">
@@ -16,22 +62,23 @@
 			FleSe : <span class="underline">Fle</span>xible 
 			<span class="underline">Se</span>arches in Databases
 		</div>
-		<div id="bodyHeadLogged" class="bodyHeadTable">
-			<% if ((localUserName != null) && (! "".equals(localUserName))) { %>
-			logged as 
-			<br>
-			<%=localUserName %>
-			<br>
-			<a title="view user profile" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletUserInfo, request, null) %>">user profile</a>
-			<% } else { %>
-			Not logged in
-			<% } %>
-		</div>
-		<div id="bodyHeadLogout" class="bodyHeadTable">
-			<a title="Sign out" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthServletSignOut, request, null) %>">Signout</a>
-		</div>
+		<div id="bodyHeadLogged" class="bodyHeadTable"></div>
+		<div id="bodyHeadLogout" class="bodyHeadTable"><a id="signOut" title="Sign out" href="">Signout</a></div>
 	</div>
 </header>
+
+<script type="text/javascript">
+	var bodyHeadLoggedDiv = document.getElementById("bodyHeadLogged");
+	if (localUserName == null) {
+		bodyHeadLoggedDiv.innerHTML = "Not logged in";
+	}
+	else {
+		bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + "<a id='userOptions' title='user options' href=''>user options</a>";
+	}
+	
+	setupHref ('signOut', urlMappingFor('SocialAuthServletSignOut'));
+	setupHref ('userOptions', urlMappingFor('SocialAuthServletUserInfo'));
+</script>
 
 <section class="bodyToUserMsgs">
 	<%

@@ -254,6 +254,38 @@ public class ServletsAuxMethodsClass {
 	public static final int ProgramQueryAction = 22;
 	public static final int ProgramQueryPage = 23;
 	
+	public static String [] [] urlsMappings() {
+		String [][] urlsMappings = new String[24][2];
+		
+		urlsMappings[0] = new String[]{null, null};
+		urlsMappings[theSamePage] = new String[]{"theSamePage", ""};
+		urlsMappings[errorPage] = new String[]{"errorPage", "error.jsp"};
+		urlsMappings[IndexPage] = new String[]{"IndexPage", "index.jsp"};
+		urlsMappings[SocialAuthServletSignIn] = new String[]{"SocialAuthServletSignIn", "SocialAuthCallBackServlet?op=signin"};
+		urlsMappings[SocialAuthServletSignOut] = new String[]{"SocialAuthServletSignOut", "SocialAuthCallBackServlet?op=signout"};
+		urlsMappings[SocialAuthServletUserInfo] = new String[]{"SocialAuthServletUserInfo", "SocialAuthUserInfoServlet"};
+		urlsMappings[SocialAuthSignInPage] = new String[]{"SocialAuthSignInPage", "WEB-INF/SocialAuthSignInJspPage.jsp"};
+		urlsMappings[SocialAuthUserInfoPage] = new String[]{"SocialAuthUserInfoPage", "WEB-INF/SocialAuthUserInfoJspPage.jsp"};
+		urlsMappings[SocialAuthCallBackServlet] = new String[]{"SocialAuthCallBackServlet", "SocialAuthCallBackServlet"};
+		urlsMappings[FilesMgmtServlet] = new String[]{"FilesMgmtServlet", "FilesMgmtServlet"};
+		urlsMappings[FilesMgmtIndexPage] = new String[]{"FilesMgmtIndexPage", "WEB-INF/filesMgmt.jsp"};
+		urlsMappings[FilesMgmtFileViewPage] = new String[]{"FilesMgmtFileViewPage", "WEB-INF/filesMgmtFileView.jsp"};
+		urlsMappings[QueryServletBuildQuery] = new String[]{"QueryServletBuildQuery", "QueryServlet?op=buildQuery"};
+		urlsMappings[QueryServletRunQuery] = new String[]{"QueryServletRunQuery", "QueryServlet?op=runQuery"};
+		urlsMappings[BuildQueryPage] = new String[]{"BuildQueryPage", "WEB-INF/fleseBuildQuery.jsp"};
+		urlsMappings[RunQueryPage] = new String[]{"RunQueryPage", "WEB-INF/fleseRunQuery.jsp"};
+		urlsMappings[PersonalizeServlet] = new String[]{"PersonalizeServlet", "PersonalizeServlet"};
+		urlsMappings[PersonalizeServletEditAction] = new String[]{"PersonalizeServletEditAction", "PersonalizeServlet?op=edit"};
+		urlsMappings[PersonalizeServletSaveAction] = new String[]{"PersonalizeServletSaveAction", "PersonalizeServlet?op=save"};
+		urlsMappings[PersonalizeIndexPage] = new String[]{"PersonalizeIndexPage", "WEB-INF/personalizeIndexPage.jsp"};
+		urlsMappings[PersonalizeEditPage] = new String[]{"PersonalizeEditPage", "WEB-INF/personalizeEditPage.jsp"};
+		urlsMappings[ProgramQueryAction] = new String[]{"ProgramQueryAction", "DispatcherServlet"};
+		urlsMappings[ProgramQueryPage] = new String[]{"theSamePage", "WEB-INF/programQuery.jsp"};
+		
+		
+		return urlsMappings;
+	}
+	
 	/**
 	 * Returns the app mapping for uriNickName.
 	 * @param UriNickName is the uri Nick Name.
@@ -261,62 +293,17 @@ public class ServletsAuxMethodsClass {
 	 * @throws Exception when the nick name is unknown.
 	 */
 	private static String appMappingForUriNickName(int uriNickName) throws Exception {
-		String retVal = null;
-		switch (uriNickName) {
-		case theSamePage: retVal = "";
-				break;
-		case errorPage: retVal = "error.jsp";
-				break;
-		case IndexPage: retVal = "index.jsp";
-				break;
-		case SocialAuthServletSignIn: retVal = "SocialAuthCallBackServlet?op=signin";
-				break;
-		case SocialAuthServletSignOut: retVal = "SocialAuthCallBackServlet?op=signout";
-				break;
-		case SocialAuthServletUserInfo: retVal = "SocialAuthUserInfoServlet";
-				break;
-		case SocialAuthSignInPage: retVal = "WEB-INF/SocialAuthSignInJspPage.jsp";
-				break;
-		case SocialAuthUserInfoPage: retVal = "WEB-INF/SocialAuthUserInfoJspPage.jsp";
-				break;
-		case SocialAuthCallBackServlet: retVal = "SocialAuthCallBackServlet";
-				break;
-		case FilesMgmtServlet: retVal = "FilesMgmtServlet";
-				break;
-		case FilesMgmtIndexPage: retVal = "WEB-INF/filesMgmt.jsp";
-				break;
-		case FilesMgmtFileViewPage: retVal = "WEB-INF/filesMgmtFileView.jsp";
-				break;
-		case QueryServletBuildQuery: retVal = "QueryServlet?op=buildQuery";
-				break;
-		case QueryServletRunQuery: retVal = "QueryServlet?op=runQuery";
-				break;
-		case BuildQueryPage: retVal = "WEB-INF/fleseBuildQuery.jsp";
-				break;
-		case RunQueryPage: retVal = "WEB-INF/fleseRunQuery.jsp";
-				break;
-		case PersonalizeServlet: retVal = "PersonalizeServlet";
-				break;
-		case PersonalizeServletEditAction: retVal = "PersonalizeServlet?op=edit";
-				break;
-		case PersonalizeServletSaveAction: retVal = "PersonalizeServlet?op=save";
-				break;
-		case PersonalizeIndexPage: retVal = "WEB-INF/personalizeIndexPage.jsp";
-				break;
-		case PersonalizeEditPage: retVal = "WEB-INF/personalizeEditPage.jsp";
-				break;
-		case ProgramQueryAction: retVal = "DispatcherServlet";
-				break;				
-		case ProgramQueryPage: retVal = "WEB-INF/programQuery.jsp";
-				break;
-		default: retVal = "";
-				break;
-		}
-		if (("".equals(retVal)) && (uriNickName != theSamePage)) {
+
+		String [] [] urlsMappings = urlsMappings();
+
+		if ((uriNickName > urlsMappings.length) || 
+			(urlsMappings[uriNickName][0] == null) ||
+			(urlsMappings[uriNickName][1] == null) ||
+			(("".equals(urlsMappings[uriNickName][1])) && (uriNickName != theSamePage))) {
 			throw new Exception("Unknown UriNickName: " + uriNickName);
 		}
 		// LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);
-		return retVal;
+		return urlsMappings[uriNickName][1];
 	}
 	
 	/**
