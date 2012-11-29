@@ -58,19 +58,22 @@ public class DispatcherServlet extends HttpServlet {
 	}
 
 	private static final int EMPTY_REQUEST = 0;
-	private static final int BUILD_QUERY = 1;
-	private static final int UPLOAD_FILE = 2;
-	private static final int DOWNLOAD_FILE = 3;
-	private static final int REMOVE_FILE = 4;
-	private static final int VIEW_FILE = 5;
-	private static final int DB_INTROSPECTION_QUERY = 6;
-	private static final int DB_GENERIC_QUERY = 7;
+	
+	private static final int FILES_LIST = 1;
+	private static final int BUILD_QUERY = 2;
+	private static final int UPLOAD_FILE = 3;
+	private static final int DOWNLOAD_FILE = 4;
+	private static final int REMOVE_FILE = 5;
+	private static final int VIEW_FILE = 6;
+	private static final int DB_INTROSPECTION_QUERY = 7;
+	private static final int DB_GENERIC_QUERY = 8;
 	
 	
 	private int dispatcherConversion(String request_op) throws Exception {
 		if (request_op == null) throw new Exception("request_op is null");
 		
 		if ("".equals(request_op)) return EMPTY_REQUEST;
+		if ("filesList".equals(request_op)) return FILES_LIST;
 		if ("buildQuery".equals(request_op)) return BUILD_QUERY;
 		if ("uploadFile".equals(request_op)) return UPLOAD_FILE;
 		if ("downloadFile".equals(request_op)) return DOWNLOAD_FILE;
@@ -100,6 +103,8 @@ public class DispatcherServlet extends HttpServlet {
 		int op = dispatcherConversion(request_op);
 		
 		switch (op) {
+		case FILES_LIST: dispatcherObject.filesList();
+			break;
 		case UPLOAD_FILE: dispatcherObject.uploadFile();
 			break;
 		case DOWNLOAD_FILE: dispatcherObject.downloadFile();

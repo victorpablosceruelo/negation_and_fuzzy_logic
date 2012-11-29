@@ -107,6 +107,24 @@
 		</FORM>
 	</div>
 	
+			<section id="selectDatabase" class="selectDatabase">
+			Select a program file to perform your query: 
+			<select name="selectedDatabase" onchange='selectedProgramDatabaseChanged(this, "selectQuery")' >
+				<option id="----" value="----">----</option>
+				<%
+					while (filesIterator.hasNext()) {
+						FileInfoClass current = filesIterator.next();
+				%>
+				<option id="<%=current.getFileName() + "-owned-by-" + current.getFileOwner()%>"
+						value="<%=current.getFileName() + "-owned-by-" + current.getFileOwner()%>">
+						<%=current.getFileName() + " ( owned by " + current.getFileOwner() + " ) "%>
+				</option>
+				<%
+					}
+				%>
+			</select>
+	
+	
 	<%
 		@SuppressWarnings("unchecked")
 		Iterator<FileInfoClass> filesIterator = (Iterator<FileInfoClass>) request.getAttribute("filesIterator");

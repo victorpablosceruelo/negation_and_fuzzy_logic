@@ -97,10 +97,15 @@ public class DispatchersClass {
 	 * @throws Exception
 	 */
 	public void emptyRequest() throws Exception {
-		Iterator<FileInfoClass> filesIterator = filesMgmt.returnFilesIterator(localUserName.getLocalUserName());
-		request.setAttribute("filesIterator", filesIterator);
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SignedInAnswer, "", request, response, LOG);
+	}
+	
+	public void filesList() throws Exception {
+		Iterator<FileInfoClass> filesListIterator = filesMgmt.returnFilesIterator(localUserName.getLocalUserName());
+		request.setAttribute("filesListIterator", filesListIterator);
+		// Forward to the jsp page.
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesListAnswer, "", request, response, LOG);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////

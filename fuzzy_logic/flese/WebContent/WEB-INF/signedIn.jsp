@@ -8,25 +8,12 @@
 %>
 
 <body>
-    <div id="body">
-    	<jsp:include page="commonBodyHead.jsp" />
-		<section id="selectDatabase" class="selectDatabase">
-			Select a program file to perform your query: 
-			<select name="selectedDatabase" onchange='selectedProgramDatabaseChanged(this, "selectQuery")' >
-				<option id="----" value="----">----</option>
-				<%
-					while (filesIterator.hasNext()) {
-						FileInfoClass current = filesIterator.next();
-				%>
-				<option id="<%=current.getFileName() + "-owned-by-" + current.getFileOwner()%>"
-						value="<%=current.getFileName() + "-owned-by-" + current.getFileOwner()%>">
-						<%=current.getFileName() + " ( owned by " + current.getFileOwner() + " ) "%>
-				</option>
-				<%
-					}
-				%>
-			</select>
-		</section>
+   	<jsp:include page="commonBodyHead.jsp" />
+
+	<section id="mainSection" class="">
+	</section>
+	
+
 		<section id="selectQuery" class="selectQuery">
 		</section>
 		<section id="showResults" class="showResults">
@@ -46,11 +33,13 @@
      		<INPUT type="submit" value="Execute Query" onclick='return testQueryValidity();'>
 		</form>
 		<br /><br /><br /><br /><br />
-	</div>
 
 	<script type="text/javascript">
+		insertProgramFileSelection('mainSection');
+		
 		//fillQueryStartupValues("queryStart");
 		//changeFormAction("submitQuery", "QueryServlet?op=runQuery&fileName="+currentProgramFileName+"&fileOwner="+currentProgramFileOwner);
+		
 	</script>
 </body>
 </html>

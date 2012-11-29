@@ -18,6 +18,6 @@
 	
 	<script type="text/javascript" src="js/clientSoftware.js"></script>
 	<script type="text/javascript" src="js/tabsSelection.js"></script>
-	<script type="text/javascript" src="js/programQuery.js"></script>
+	<script type="text/javascript" src="js/auxiliarJS.js"></script>
 </head>
 <!-- end of commonHtmlHead -->

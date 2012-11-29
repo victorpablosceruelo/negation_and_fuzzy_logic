@@ -107,10 +107,10 @@
 		<div id="bodyHeadLogout" class="bodyHeadTable"><a id="signOut" title="Sign out" href="">Signout</a></div>
 	</div>
 </header>
-
+<br />
 <section class="bodyToUserMsgs">
 </section>
-
+<br />
 
 <script type="text/javascript">
 	setupBodyHeadLoggedDiv();

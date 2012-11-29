@@ -3,10 +3,26 @@
  * Author: Victor Pablos Ceruelo
  */
 
+function loadingImageHtml() {
+	return "<img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
+}
+
+function insertProgramFileSelection(parentDivId) {
+	var parentDiv = document.getElementById(parentDivId);
+	parentDiv.innerHTML = loadingImageHtml();
+	
+	$.getScript(urlMappingFor('FilesListRequest'), 
+			insertProgramFileSelectionAux(parentDivId));
+}
+
+function insertProgramFileSelectionAux(parentDivId) {
+	
+}
+
 function selectedProgramDatabaseChanged(comboBox, selectQueryDivId) {
 	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
-	selectQueryDiv.innerHTML = "<img src=\"images/loading.gif\" width=\"20\" alt=\"loading\" title=\"loading\" />";
+	selectQueryDiv.innerHTML = loadingImageHtml();
 	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 	var fileName = null;
