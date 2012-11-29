@@ -9,11 +9,11 @@
 	Iterator<FileInfoClass> filesListIterator = (Iterator<FileInfoClass>) request.getAttribute("filesListIterator");
 	if (filesListIterator != null) {
 		// out.println("<script type=\"text/javascript\">\n");
-		out.println("filesList = new Array();");
+		out.println("cleanUpFilesList();");
 		int i=0;
 		while (filesListIterator.hasNext()) {
 			FileInfoClass fileInfo = filesListIterator.next();
-			out.println("filesList["+i+"] = new fileInfo('" + fileInfo.getFileName() + "', '" + fileInfo.getFileOwner() + "');");
+			out.println("addToFilesList("+ i +", '" + fileInfo.getFileName() + "', '" + fileInfo.getFileOwner() + "');");
 			i++;
 		}
 		// out.println("</script>");
