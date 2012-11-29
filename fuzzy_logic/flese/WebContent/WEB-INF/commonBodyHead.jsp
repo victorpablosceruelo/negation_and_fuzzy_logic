@@ -2,27 +2,6 @@
 <!-- beginning of commonBodyHead -->
 
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-
-<%
-	String localUserName = null;
-	if (request != null) {
-		localUserName = (String) request.getAttribute("localUserName");
-	}
-	if (localUserName != null) {
-%>
-	<script type="text/javascript">
-		var localUserName = "<%=localUserName %>";
-	</script>
-<%
-	} else {
-%>
-	<script type="text/javascript">
-		var localUserName = null;
-	</script>
-<%		
-	}
-%>
-
 <script type="text/javascript">
 	function urlMapping(nickName, url) {
 		this.nickName = nickName;
@@ -32,9 +11,7 @@
 <%
 	String [][] urlsMappings = ServletsAuxMethodsClass.urlsMappings();
 	for (int i=0; i<urlsMappings.length; i++) {
-%>
-	urlsMappings[<%=i%>] = new urlMapping("<%=urlsMappings[i][0]%>", "<%=urlsMappings[i][1]%>");
-<%
+		out.write("    urlsMappings["+i+"] = new urlMapping('" + urlsMappings[i][0] + "', '" + urlsMappings[i][1] + "');\n");
 	}
 %>
 	function urlMappingFor (nickName) {
@@ -49,11 +26,75 @@
 		}
 		return null;
 	}
+	
 	function setupHref (aId, href) {
 		var aLink = document.getElementById(aId);
 		if (aLink != null) aLink.href = href;
 	}
+
+<%
+	String localUserName = null;
+	if (request != null) {
+		localUserName = (String) request.getAttribute("localUserName");
+	}
+	if (localUserName != null) {
+		out.write("    var localUserName = '" + localUserName + "';\n");
+	} 
+	else {
+		out.write("    var localUserName = null;\n");
+	}
+%>
+	function setupBodyHeadLoggedDiv() {
+		var bodyHeadLoggedDiv = document.getElementById("bodyHeadLogged");
+		if (localUserName == null) {
+			bodyHeadLoggedDiv.innerHTML = "Not logged in";
+		}
+		else {
+			bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + "<a id='userOptions' title='user options' href=''>user options</a>";
+		}
+	}
+	
+	var msgsToTheUser = new Array();
+	
+	function addMsgToTheUser (msg) {
+		msgsToTheUser[msgsToTheUser.length] = msg;
+	}
+	
+	function showMsgsToTheUser () {
+		var bodyToUserMsgsDiv = document.getElementById("bodyToUserMsgs");
+		var html = "";
+		if (msgsToTheUser.length != 0) {
+			html += "<h3 class='bodyToUserMsgs'>Messages to the user:</h3>";
+			html += "<ul class='bodyToUserMsgs'>";
+			for (var i=0; i<msgsToTheUser.length; i++) {
+				html += "<li class='bodyToUserMsgs'>";
+				html += msgsToTheUser[i];
+				html += "</li>";
+			}
+			html += "</ul>";
+		}
+		if (bodyToUserMsgsDiv != null) {
+			bodyToUserMsgsDiv.innerHTML = html;
+		}
+	}
+	
+<%
+	if (request != null) {
+		if (request.getAttribute("msgs") != null) {
+			String [] msgs = (String []) request.getAttribute("msgs");
+			for (int i=0; i<msgs.length; i++) {
+				out.write("    addMsgToTheUser('"+msgs[i]+"');");
+			}
+			request.removeAttribute("msgs");
+		}			
+	}
+	else {
+		out.write("    addMsgToTheUser('ERROR: request is null.');");
+	}
+%>
+	
 </script>
+
 
 
 <header>
@@ -67,43 +108,16 @@
 	</div>
 </header>
 
+<section class="bodyToUserMsgs">
+</section>
+
+
 <script type="text/javascript">
-	var bodyHeadLoggedDiv = document.getElementById("bodyHeadLogged");
-	if (localUserName == null) {
-		bodyHeadLoggedDiv.innerHTML = "Not logged in";
-	}
-	else {
-		bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + "<a id='userOptions' title='user options' href=''>user options</a>";
-	}
-	
+	setupBodyHeadLoggedDiv();
 	setupHref ('signOut', urlMappingFor('SocialAuthServletSignOut'));
 	setupHref ('userOptions', urlMappingFor('SocialAuthServletUserInfo'));
+	showMsgsToTheUser();
 </script>
-
-<section class="bodyToUserMsgs">
-	<%
-		if (request != null) {
-			if (request.getAttribute("msgs") != null) {
-				%><h3 class="bodyToUserMsgs">Messages to the user:</h3>
-					<ul class="bodyToUserMsgs">
-				<%
-				String [] msgs = (String []) request.getAttribute("msgs");
-				for (int i=0; i<msgs.length; i++) {
-					%><li class="bodyToUserMsgs"><%=msgs[i]%></li><%
-				}
-				%></ul><%
-				request.removeAttribute("msgs");
-			}			
-		}
-		else {
-			%>
-				<ul class="bodyToUserMsgs">
-					<li class="bodyToUserMsgs"> ERROR: request is null.</li>
-				</ul>
-			<%
-		}
-	%>
-</section>
 
 <!-- end of commonBodyHead -->
 
