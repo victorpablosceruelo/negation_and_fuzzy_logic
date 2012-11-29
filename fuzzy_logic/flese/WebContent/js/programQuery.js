@@ -3,7 +3,10 @@
  * Author: Victor Pablos Ceruelo
  */
 
-function selectedProgramDatabaseChanged(comboBox) {
+function selectedProgramDatabaseChanged(comboBox, selectQueryDivId) {
+	
+	var selectQueryDiv = document.getElementById(selectQueryDivId);
+	selectQueryDiv.innerHTML = "<img src=\"images/loading.gif\" width=\"20\" alt=\"loading\" title=\"loading\" />";
 	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 	var fileName = null;

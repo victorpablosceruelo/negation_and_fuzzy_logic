@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -29,10 +27,10 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public CiaoPrologConnectionClass(ServletContext servletContext) throws Exception {
+	public CiaoPrologConnectionClass() throws Exception {
 		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
 		if (FoldersUtilsObject == null) {
-			FoldersUtilsObject = new FilesMgmtClass(servletContext);
+			FoldersUtilsObject = new FilesMgmtClass();
 		}
 	}
 	

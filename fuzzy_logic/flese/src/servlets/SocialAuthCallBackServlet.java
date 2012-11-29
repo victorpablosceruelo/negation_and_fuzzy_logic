@@ -104,20 +104,26 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		if (session == null) throw new Exception("Session is null");
 
-		// get the social auth manager from session
-		SocialAuthManager authManager = (SocialAuthManager)session.getAttribute("authManager");
-		if (authManager == null) throw new Exception("authManager is null");
-		session.removeAttribute("authManager");
+		String isInTestingMode = (String) session.getAttribute("testingMode");
+		if ((isInTestingMode != null) && ("true".equals(isInTestingMode))) {
+	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "INFO: Social Authentication in Testing mode.", LOG);
+		}
+		else {
+			// get the social auth manager from session
+			SocialAuthManager authManager = (SocialAuthManager)session.getAttribute("authManager");
+			if (authManager == null) throw new Exception("authManager is null");
+			session.removeAttribute("authManager");
+
+			// call connect method of manager which returns the provider object. 
+			// Pass request parameter map while calling connect method. 
+			AuthProvider provider = authManager.connect(SocialAuthUtil.getRequestParametersMap(request));
+			if (provider == null) throw new Exception("provider is null");
+
+			// Save new computed results in session.
+			session.setAttribute("authManager", authManager);
+			session.setAttribute("provider", provider);
+		}
 		
-		// call connect method of manager which returns the provider object. 
-		// Pass request parameter map while calling connect method. 
-		AuthProvider provider = authManager.connect(SocialAuthUtil.getRequestParametersMap(request));
-		if (provider == null) throw new Exception("provider is null");
-
-		// Save new computed results in session.
-		session.setAttribute("authManager", authManager);
-		session.setAttribute("provider", provider);
-
 		// Test if we have an username or not.
 		@SuppressWarnings("unused")
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
@@ -139,12 +145,9 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	    	
 	    	retval = true; // Fake authentication !!!
 	    	session.setAttribute("testingMode", "true");
-
-	    	@SuppressWarnings("unused")
-	    	LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-
-	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "Social Authentication in Testing mode.", LOG);
-	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryAction, "", request, response, LOG);	
+	    	
+	    	String successUrl = ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SocialAuthCallBackServlet, request, LOG);
+	    	response.sendRedirect( successUrl );
 		} 
 
 	    return retval;

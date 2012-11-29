@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -15,8 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-import auxiliar.FileInfoClass;
-import auxiliar.FilesMgmtClass;
+import auxiliar.DispatchersClass;
 import auxiliar.LocalUserNameClass;
 import auxiliar.ServletsAuxMethodsClass;
 
@@ -28,7 +26,6 @@ import auxiliar.ServletsAuxMethodsClass;
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(DispatcherServlet.class);
-	private static FilesMgmtClass filesMgmtAux = null;
 	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -49,18 +46,10 @@ public class DispatcherServlet extends HttpServlet {
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
 		LOG.info("--- "+doAction+" invocation ---");
-		ServletsAuxMethodsClass.logRequestParameters(request, LOG);
 		
 		try {
-			// Ask for an existing session.
-			HttpSession session = request.getSession(false);
-			if (session == null) throw new Exception("Session is null");
-
-			// Tests if we have logged in.
-			LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-
 			// Dispatch the query.
-			dispatchQuery(doAction, request, response, session, localUserName);
+			dispatchQuery(doAction, request, response);
 
 		} catch (Exception e) {
 			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SocialAuthServletSignOut, "", e, request, response, LOG);
@@ -74,6 +63,8 @@ public class DispatcherServlet extends HttpServlet {
 	private static final int DOWNLOAD_FILE = 3;
 	private static final int REMOVE_FILE = 4;
 	private static final int VIEW_FILE = 5;
+	private static final int DB_INTROSPECTION_QUERY = 6;
+	private static final int DB_GENERIC_QUERY = 7;
 	
 	
 	private int dispatcherConversion(String request_op) throws Exception {
@@ -85,16 +76,23 @@ public class DispatcherServlet extends HttpServlet {
 		if ("downloadFile".equals(request_op)) return DOWNLOAD_FILE;
 		if ("removeFile".equals(request_op)) return REMOVE_FILE;
 		if ("viewFile".equals(request_op)) return VIEW_FILE;
+		if ("dbIntrospectionQuery".equals(request_op)) return DB_INTROSPECTION_QUERY;
+		if ("dbGenericQuery".equals(request_op)) return DB_GENERIC_QUERY;
 		return EMPTY_REQUEST;
 	}
 	
-	private void dispatchQuery(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session, LocalUserNameClass localUserName) 
-			throws Exception {
+	private void dispatchQuery(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		if (filesMgmtAux == null) {
-			ServletContext servletContext = getServletConfig().getServletContext();
-			filesMgmtAux = new FilesMgmtClass(servletContext);
-		}
+		// Ask for an existing session.
+		HttpSession session = request.getSession(false);
+		if (session == null) throw new Exception("Session is null");
+
+		// Tests if we have logged in.
+		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+
+		// Needed to work.
+		ServletContext servletContext = getServletConfig().getServletContext();
+		DispatchersClass dispatcherObject = new DispatchersClass(servletContext, doAction, localUserName, request, response);
 
 		String request_op = request.getParameter("op");
 		if (request_op == null) request_op = "default";
@@ -102,25 +100,21 @@ public class DispatcherServlet extends HttpServlet {
 		int op = dispatcherConversion(request_op);
 		
 		switch (op) {
-		case UPLOAD_FILE:
-			filesMgmtAux.uploadFile(doAction, localUserName, request, response);
+		case UPLOAD_FILE: dispatcherObject.uploadFile();
 			break;
-		case DOWNLOAD_FILE:
-			filesMgmtAux.downloadFile(doAction, localUserName, request, response);
+		case DOWNLOAD_FILE: dispatcherObject.downloadFile();
 			break;
-		case REMOVE_FILE:
-			filesMgmtAux.removeFile(doAction, localUserName, request, response);
+		case REMOVE_FILE: dispatcherObject.removeFile();
 			break;
-		case VIEW_FILE:
-			filesMgmtAux.viewFile(doAction, localUserName, request, response);
+		case VIEW_FILE: dispatcherObject.viewFile();
 			break;
+		case DB_INTROSPECTION_QUERY: dispatcherObject.dbIntrospectionQuery();
+			break;
+		case DB_GENERIC_QUERY: dispatcherObject.dbGenericQuery();
+			break;		
 		case EMPTY_REQUEST:
 		case BUILD_QUERY:
-		default:
-			Iterator<FileInfoClass> filesIterator = filesMgmtAux.returnFilesIterator(localUserName.getLocalUserName());
-			request.setAttribute("filesIterator", filesIterator);
-			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramQueryPage, "", request, response, LOG);
+		default: dispatcherObject.emptyRequest();
 			break;
 		}
 	}

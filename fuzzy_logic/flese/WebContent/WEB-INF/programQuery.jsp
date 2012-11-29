@@ -12,7 +12,7 @@
     	<jsp:include page="commonBodyHead.jsp" />
 		<section id="selectDatabase" class="selectDatabase">
 			Select a program file to perform your query: 
-			<select name="selectedDatabase" onchange='selectedProgramDatabaseChanged(this)' >
+			<select name="selectedDatabase" onchange='selectedProgramDatabaseChanged(this, "selectQuery")' >
 				<option id="----" value="----">----</option>
 				<%
 					while (filesIterator.hasNext()) {
@@ -27,7 +27,10 @@
 				%>
 			</select>
 		</section>
-		
+		<section id="selectQuery" class="selectQuery">
+		</section>
+		<section id="showResults" class="showResults">
+		</section>
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
 			<table id="queryStartTable" class="withoutBorder">
 				<tr>
