@@ -84,8 +84,8 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 			fileName = comboBoxValue.substring(0, i);
 			fileOwner = comboBoxValue.substring(i+separation.length);
 		}
-	
-		$.getScript("DispatcherServlet?op=databaseIntrospection&fileName="+fileName+"&fileOwner="+fileOwner, 
+		
+		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
 				function(data, textStatus, jqxhr) {
 		   			console.log(data); //data returned
 		   			console.log(textStatus); //success

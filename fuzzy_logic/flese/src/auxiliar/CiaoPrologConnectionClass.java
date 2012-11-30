@@ -55,6 +55,11 @@ public class CiaoPrologConnectionClass {
 	public void programFileIntrospectionQuery(String fileOwner, String fileName) throws Exception {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
+		if (fileOwner == null) throw new Exception("fileOwner cannot null.");
+		if (fileName == null) throw new Exception("fileName cannot null.");
+		if ("".equals(fileOwner)) throw new Exception("fileOwner cannot be empty string.");
+		if ("".equals(fileName)) throw new Exception("fileName cannot be empty string.");
+		
 		if ((latestEvaluatedQueryProgramFileName != null) &&
 			(latestEvaluatedQueryProgramFileOwner != null) &&
 			(latestEvaluatedQueryProgramFileName.equals(fileName)) &&
@@ -141,6 +146,11 @@ public class CiaoPrologConnectionClass {
 	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
 			throws Exception {
 
+		if (fileOwner == null) throw new Exception("fileOwner cannot null.");
+		if (fileName == null) throw new Exception("fileName cannot null.");
+		if ("".equals(fileOwner)) throw new Exception("fileOwner cannot be empty string.");
+		if ("".equals(fileName)) throw new Exception("fileName cannot be empty string.");
+		
 		// Connect to the Ciao Prolog Server.
 		String [] argv = new String[1];
 		argv[0] = FoldersUtilsObject.getPlServerPath();
@@ -181,8 +191,8 @@ public class CiaoPrologConnectionClass {
 		}
 		
 		if ((! FoldersUtilsObject.folderExists(programFileOwner, true))) {
-			LOG.info("changeCiaoPrologWorkingFolder: programFileOwner is an invalid folder.");
-			throw new Exception("changeCiaoPrologWorkingFolder: newWorkingFolder is an invalid folder.");
+			// LOG.info("folder does not exist. folder: " + programFileOwner);
+			throw new Exception("folder does not exist. folder: " + programFileOwner);
 		}
 		
 		// Adequate the value of programFileOwner (it was relative until here).
