@@ -111,7 +111,7 @@
 			<span class="underline">Se</span>arches in Databases
 		</div>
 		<div id="bodyHeadLogged" class="bodyHeadTable"></div>
-		<div id="bodyHeadLogout" class="bodyHeadTable"><a id="signOut" title="Sign out" href="">Signout</a></div>
+		<div id="bodyHeadLogout" class="bodyHeadTable"><a id="signOut" title="Sign out" href="">Sign out</a></div>
 	</div>
 </header>
 <br />

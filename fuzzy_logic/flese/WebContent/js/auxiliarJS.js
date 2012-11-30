@@ -30,10 +30,12 @@ function insertProgramFileSelection(parentDivId) {
 		else {
 			var html = "";
 			html += "<select name='selectedDatabase' onchange='selectedProgramDatabaseChanged(this, \""+parentDivId+"\")' >";
-			html += "<option id='----' value='----'>----</option>";
+			html += "<option id='----' name='----' title='----' value='----'>----</option>";
 			for (var i=0; i<filesList.length; i++) {
-				html += "<option id=" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner +
-						"value=" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + ">" + 
+				html += "<option id='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
+						"name='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
+						"title='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
+						"value='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "'>" + 
 						filesList[i].fileName + " ( owned by " + filesList[i].fileOwner + " ) " +
 						"</option>";
 			}
@@ -72,7 +74,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 	alert("comboBoxValue: " + comboBoxValue);
-	if (comboBoxValue == "----") {
+	if ((comboBoxValue == null) || (comboBoxValue == "") || (comboBoxValue == "----")) {
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
