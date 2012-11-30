@@ -71,6 +71,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	selectQueryDiv.innerHTML = loadingImageHtml();
 	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+	alert("comboBoxValue: " + comboBoxValue);
 	if (comboBoxValue == "----") {
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
@@ -83,6 +84,10 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		if (i != -1) {
 			fileName = comboBoxValue.substring(0, i);
 			fileOwner = comboBoxValue.substring(i+separation.length);
+		}
+		else {
+			fileName = '';
+			fileOwner = '';
 		}
 		
 		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 

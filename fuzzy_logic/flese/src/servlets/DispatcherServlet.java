@@ -52,7 +52,7 @@ public class DispatcherServlet extends HttpServlet {
 			dispatchQuery(doAction, request, response);
 
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SignOutRequest, "", e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.ExceptionAjaxPage, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
 	}	
@@ -62,7 +62,7 @@ public class DispatcherServlet extends HttpServlet {
 		// Ask for an existing session.
 		HttpSession session = request.getSession(false);
 		if (session == null) {
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.NullSessionPage, "", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.NullSessionAjaxPage, "", request, response, LOG);
 		}
 		else {
 			dispatchQueryWithSession(doAction, request, response, session);

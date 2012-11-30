@@ -77,6 +77,12 @@
 		if (bodyToUserMsgsDiv != null) {
 			bodyToUserMsgsDiv.innerHTML = html;
 		}
+		else {
+			alert("bodyToUserMsgsDiv is null. Msgs will be shown in this way.")
+			for (var i=0; i<msgsToTheUser.length; i++) {
+				alert(msgsToTheUser[i]);
+			}
+		}
 	}
 	
 <%
@@ -109,7 +115,7 @@
 	</div>
 </header>
 <br />
-<section class="bodyToUserMsgs">
+<section id="bodyToUserMsgs" class="bodyToUserMsgs">
 </section>
 <br />
 

@@ -231,9 +231,9 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	public static final int TheSamePage = 0;
-	public static final int ErrorPage = 1;
-	public static final int IndexPage = 2;
-	public static final int NullSessionPage = 3;
+	public static final int IndexPage = 1;
+	public static final int ExceptionAjaxPage = 2;
+	public static final int NullSessionAjaxPage = 3;
 	
 	public static final int SocialAuthenticationCallBackRequest = 4;
 	public static final int SignInRequest = 5;
@@ -268,9 +268,9 @@ public class ServletsAuxMethodsClass {
 		UrlMappingClass [] urlsMappings = new UrlMappingClass[29];
 		
 		urlsMappings[TheSamePage] = new UrlMappingClass(TheSamePage, "theSamePage", "", "");
-		urlsMappings[ErrorPage] = new UrlMappingClass(ErrorPage, "errorPage", "", "error.jsp");
 		urlsMappings[IndexPage] = new UrlMappingClass(IndexPage, "IndexPage", "", "index.jsp");
-		urlsMappings[NullSessionPage] = new UrlMappingClass(NullSessionPage, "NullSessionPage", "", "nullSession.jsp");
+		urlsMappings[ExceptionAjaxPage] = new UrlMappingClass(ExceptionAjaxPage, "ExceptionAjaxPage", "", "WEB-INF/exceptionAjaxPage.jsp");
+		urlsMappings[NullSessionAjaxPage] = new UrlMappingClass(NullSessionAjaxPage, "NullSessionAjaxPage", "", "WEB-INF/nullSessionAjaxPage.jsp");
 		
 		urlsMappings[SocialAuthenticationCallBackRequest] = new UrlMappingClass(SocialAuthenticationCallBackRequest, "SocialAuthenticationCallBackRequest", "", "SocialAuthCallBackServlet");
 		urlsMappings[SignInRequest] = new UrlMappingClass(SignInRequest, "SignInRequest", "signin", "SocialAuthCallBackServlet");

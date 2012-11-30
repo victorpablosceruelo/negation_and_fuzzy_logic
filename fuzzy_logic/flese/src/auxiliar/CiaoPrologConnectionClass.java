@@ -55,8 +55,8 @@ public class CiaoPrologConnectionClass {
 	public void programFileIntrospectionQuery(String fileOwner, String fileName) throws Exception {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
-		if (fileOwner == null) throw new Exception("fileOwner cannot null.");
-		if (fileName == null) throw new Exception("fileName cannot null.");
+		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
+		if (fileName == null) throw new Exception("fileName cannot be null.");
 		if ("".equals(fileOwner)) throw new Exception("fileOwner cannot be empty string.");
 		if ("".equals(fileName)) throw new Exception("fileName cannot be empty string.");
 		
@@ -146,8 +146,8 @@ public class CiaoPrologConnectionClass {
 	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
 			throws Exception {
 
-		if (fileOwner == null) throw new Exception("fileOwner cannot null.");
-		if (fileName == null) throw new Exception("fileName cannot null.");
+		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
+		if (fileName == null) throw new Exception("fileName cannot be null.");
 		if ("".equals(fileOwner)) throw new Exception("fileOwner cannot be empty string.");
 		if ("".equals(fileName)) throw new Exception("fileName cannot be empty string.");
 		
