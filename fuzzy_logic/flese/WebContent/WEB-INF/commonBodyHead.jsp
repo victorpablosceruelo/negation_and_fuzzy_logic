@@ -2,6 +2,7 @@
 <!-- beginning of commonBodyHead -->
 
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
+<%@page import="auxiliar.UrlMappingClass"%>
 <script type="text/javascript">
 	function urlMapping(nickName, url) {
 		this.nickName = nickName;
@@ -9,9 +10,9 @@
 	}
 	var urlsMappings = new Array();
 <%
-	String [][] urlsMappings = ServletsAuxMethodsClass.urlsMappings();
+	UrlMappingClass[] urlsMappings = ServletsAuxMethodsClass.urlsMappings();
 	for (int i=0; i<urlsMappings.length; i++) {
-		out.write("    urlsMappings["+i+"] = new urlMapping('" + urlsMappings[i][0] + "', '" + urlsMappings[i][1] + "');\n");
+		out.write("    urlsMappings["+i+"] = new urlMapping('" + urlsMappings[i].getKeyString() + "', '" + urlsMappings[i].getUrl() + "');\n");
 	}
 %>
 	function urlMappingFor (nickName) {

@@ -230,9 +230,10 @@ public class ServletsAuxMethodsClass {
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------------------------
-	public static final int theSamePage = 1;
-	public static final int errorPage = 2;
-	public static final int IndexPage = 3;
+	public static final int TheSamePage = 0;
+	public static final int ErrorPage = 1;
+	public static final int IndexPage = 2;
+	public static final int NullSessionPage = 3;
 	
 	public static final int SocialAuthenticationCallBackRequest = 4;
 	public static final int SignInRequest = 5;
@@ -263,42 +264,42 @@ public class ServletsAuxMethodsClass {
 	public static final int SaveProgramFuzzificationRequest  = 27;
 	public static final int SaveProgramFuzzificationAnswer  = 28;
 	
-	public static String [] [] urlsMappings() {
-		String [][] urlsMappings = new String[29][2];
+	public static UrlMappingClass [] urlsMappings() throws Exception {
+		UrlMappingClass [] urlsMappings = new UrlMappingClass[29];
 		
-		urlsMappings[0] = new String[]{null, null};
-		urlsMappings[theSamePage] = new String[]{"theSamePage", ""};
-		urlsMappings[errorPage] = new String[]{"errorPage", "error.jsp"};
-		urlsMappings[IndexPage] = new String[]{"IndexPage", "index.jsp"};
+		urlsMappings[TheSamePage] = new UrlMappingClass(TheSamePage, "theSamePage", "", "");
+		urlsMappings[ErrorPage] = new UrlMappingClass(ErrorPage, "errorPage", "", "error.jsp");
+		urlsMappings[IndexPage] = new UrlMappingClass(IndexPage, "IndexPage", "", "index.jsp");
+		urlsMappings[NullSessionPage] = new UrlMappingClass(NullSessionPage, "NullSessionPage", "", "nullSession.jsp");
 		
-		urlsMappings[SocialAuthenticationCallBackRequest] = new String[]{"SocialAuthenticationCallBackRequest", "SocialAuthCallBackServlet"};
-		urlsMappings[SignInRequest] = new String[]{"SignInRequest", "SocialAuthCallBackServlet?op=signin"};
-		urlsMappings[SignOutRequest] = new String[]{"SignOutRequest", "SocialAuthCallBackServlet?op=signout"};
-		urlsMappings[SignedInAnswer] = new String[]{"SignedInAnswer", "WEB-INF/signedIn.jsp"};
-		urlsMappings[SignedOutAnswer] = new String[]{"SignedOutAnswer", "WEB-INF/signedOut.jsp"};
-		urlsMappings[UserOptionsRequest] = new String[]{"UserOptionsRequest", "DispatcherServlet?op=userInfo"};
-		urlsMappings[UserOptionsAnswer] = new String[]{"UserOptionsAnswer", "WEB-INF/userOptions.jsp"};
+		urlsMappings[SocialAuthenticationCallBackRequest] = new UrlMappingClass(SocialAuthenticationCallBackRequest, "SocialAuthenticationCallBackRequest", "", "SocialAuthCallBackServlet");
+		urlsMappings[SignInRequest] = new UrlMappingClass(SignInRequest, "SignInRequest", "signin", "SocialAuthCallBackServlet");
+		urlsMappings[SignOutRequest] = new UrlMappingClass(SignOutRequest, "SignOutRequest", "signout", "SocialAuthCallBackServlet");
+		urlsMappings[SignedInAnswer] = new UrlMappingClass(SignedInAnswer, "SignedInAnswer", "", "WEB-INF/signedIn.jsp");
+		urlsMappings[SignedOutAnswer] = new UrlMappingClass(SignedOutAnswer, "SignedOutAnswer", "", "WEB-INF/signedOut.jsp");
+		urlsMappings[UserOptionsRequest] = new UrlMappingClass(UserOptionsRequest, "UserOptionsRequest", "userInfo", "DispatcherServlet");
+		urlsMappings[UserOptionsAnswer] = new UrlMappingClass(UserOptionsAnswer, "UserOptionsAnswer", "", "WEB-INF/userOptions.jsp");
 		
-		urlsMappings[FilesListRequest] = new String[]{"FilesListRequest", "DispatcherServlet?op=filesList"};
-		urlsMappings[FilesListAnswer] = new String[]{"FilesListAnswer", "WEB-INF/filesList.jsp"};
-		urlsMappings[FileUploadRequest] = new String[]{"FileUploadRequest", "DispatcherServlet?op=fileUpload"};
-		urlsMappings[FileUploadAnswer] = new String[]{"FileUploadAnswer", "WEB-INF/fileUpload.jsp"};
-		urlsMappings[FileViewRequest] = new String[]{"FileViewRequest", "DispatcherServlet?op=fileView"};
-		urlsMappings[FileViewAnswer] = new String[]{"FileViewAnswer", "WEB-INF/fileView.jsp"};
-		urlsMappings[FileDownloadRequest] = new String[]{"FileDownloadRequest", "DispatcherServlet?op=fileDownload"};
-		urlsMappings[FileDownloadAnswer] = new String[]{"FileDownloadAnswer", "WEB-INF/fileDownload.jsp"};
-		urlsMappings[FileRemoveRequest] = new String[]{"FileRemoveRequest", "DispatcherServlet?op=fileRemove"};
-		urlsMappings[FileRemoveAnswer] = new String[]{"FileRemoveAnswer", "WEB-INF/fileRemove.jsp"};
+		urlsMappings[FilesListRequest] = new UrlMappingClass(FilesListRequest, "FilesListRequest", "filesList", "DispatcherServlet");
+		urlsMappings[FilesListAnswer] = new UrlMappingClass(FilesListAnswer, "FilesListAnswer", "", "WEB-INF/filesList.jsp");
+		urlsMappings[FileUploadRequest] = new UrlMappingClass(FileUploadRequest, "FileUploadRequest", "fileUpload", "DispatcherServlet");
+		urlsMappings[FileUploadAnswer] = new UrlMappingClass(FileUploadAnswer, "FileUploadAnswer", "", "WEB-INF/fileUpload.jsp");
+		urlsMappings[FileViewRequest] = new UrlMappingClass(FileViewRequest, "FileViewRequest", "fileView", "DispatcherServlet");
+		urlsMappings[FileViewAnswer] = new UrlMappingClass(FileViewAnswer, "FileViewAnswer", "", "WEB-INF/fileView.jsp");
+		urlsMappings[FileDownloadRequest] = new UrlMappingClass(FileDownloadRequest, "FileDownloadRequest", "fileDownload", "DispatcherServlet");
+		urlsMappings[FileDownloadAnswer] = new UrlMappingClass(FileDownloadAnswer, "FileDownloadAnswer", "", "WEB-INF/fileDownload.jsp");
+		urlsMappings[FileRemoveRequest] = new UrlMappingClass(FileRemoveRequest, "FileRemoveRequest", "fileRemove", "DispatcherServlet");
+		urlsMappings[FileRemoveAnswer] = new UrlMappingClass(FileRemoveAnswer, "FileRemoveAnswer", "", "WEB-INF/fileRemove.jsp");
 		
-		urlsMappings[ProgramFileIntrospectionRequest] = new String[]{"ProgramFileIntrospectionRequest", "DispatcherServlet?op=programFileIntrospection"};
-		urlsMappings[ProgramFileIntrospectionAnswer] = new String[]{"ProgramFileIntrospectionAnswer", "WEB-INF/programFileIntrospection.jsp"};
-		urlsMappings[RunQueryRequest] = new String[]{"RunQueryRequest", "DispatcherServlet?op=runQuery"};
-		urlsMappings[RunQueryAnswer] = new String[]{"RunQueryAnswer", "WEB-INF/runQuery.jsp"};
+		urlsMappings[ProgramFileIntrospectionRequest] = new UrlMappingClass(ProgramFileIntrospectionRequest, "ProgramFileIntrospectionRequest", "programFileIntrospection", "DispatcherServlet");
+		urlsMappings[ProgramFileIntrospectionAnswer] = new UrlMappingClass(ProgramFileIntrospectionAnswer, "ProgramFileIntrospectionAnswer", "", "WEB-INF/programFileIntrospection.jsp");
+		urlsMappings[RunQueryRequest] = new UrlMappingClass(RunQueryRequest, "RunQueryRequest", "runQuery", "DispatcherServlet");
+		urlsMappings[RunQueryAnswer] = new UrlMappingClass(RunQueryAnswer, "RunQueryAnswer", "", "WEB-INF/runQuery.jsp");
 		
-		urlsMappings[ListProgramFuzzificationsRequest] = new String[]{"ListProgramFuzzificationsRequest", "DispatcherServlet?op=listProgramFuzzifications"};
-		urlsMappings[ListProgramFuzzificationsAnswer] = new String[]{"ListProgramFuzzificationsAnswer", "WEB-INF/runQuery.jsp"};
-		urlsMappings[SaveProgramFuzzificationRequest] = new String[]{"SaveProgramFuzzificationRequest", "DispatcherServlet?op=saveProgramFuzzification"};
-		urlsMappings[SaveProgramFuzzificationAnswer] = new String[]{"SaveProgramFuzzificationAnswer", "WEB-INF/runQuery.jsp"};
+		urlsMappings[ListProgramFuzzificationsRequest] = new UrlMappingClass(ListProgramFuzzificationsRequest, "ListProgramFuzzificationsRequest", "listProgramFuzzifications", "DispatcherServlet");
+		urlsMappings[ListProgramFuzzificationsAnswer] = new UrlMappingClass(ListProgramFuzzificationsAnswer, "ListProgramFuzzificationsAnswer", "", "WEB-INF/runQuery.jsp");
+		urlsMappings[SaveProgramFuzzificationRequest] = new UrlMappingClass(SaveProgramFuzzificationRequest, "SaveProgramFuzzificationRequest", "saveProgramFuzzification", "DispatcherServlet");
+		urlsMappings[SaveProgramFuzzificationAnswer] = new UrlMappingClass(SaveProgramFuzzificationAnswer, "SaveProgramFuzzificationAnswer", "", "WEB-INF/runQuery.jsp");
 		
 		return urlsMappings;
 	}
@@ -311,16 +312,32 @@ public class ServletsAuxMethodsClass {
 	 */
 	private static String appMappingForUriNickName(int uriNickName) throws Exception {
 
-		String [] [] urlsMappings = urlsMappings();
+		UrlMappingClass [] urlsMappings = urlsMappings();
 
 		if ((uriNickName > urlsMappings.length) || 
-			(urlsMappings[uriNickName][0] == null) ||
-			(urlsMappings[uriNickName][1] == null) ||
-			(("".equals(urlsMappings[uriNickName][1])) && (uriNickName != theSamePage))) {
+			(urlsMappings[uriNickName] == null) ||
+			(urlsMappings[uriNickName].getKeyString() == null) ||
+			(urlsMappings[uriNickName].getUrl() == null) ||
+			(("".equals(urlsMappings[uriNickName].getUrl())) && (uriNickName != TheSamePage))) {
 			throw new Exception("Unknown UriNickName: " + uriNickName);
 		}
 		// LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);
-		return urlsMappings[uriNickName][1];
+		return urlsMappings[uriNickName].getUrl();
+	}
+	
+	public static int uriNickNameForOpValue (String opValue) throws Exception {
+		
+		if (opValue == null) throw new Exception("opValue cannot be null."); 
+		
+		UrlMappingClass [] urlsMappings = urlsMappings();
+		boolean found = false;
+		int i = 0;
+		while ((! found) && (i < urlsMappings.length)) {
+			if (urlsMappings[i].getOpValue().equals(opValue)) found = true;
+			else i++;
+		}
+		if (! found) throw new Exception("opValue is not recognized."); 
+		return i;
 	}
 	
 	/**

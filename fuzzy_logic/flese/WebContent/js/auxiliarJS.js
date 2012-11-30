@@ -18,8 +18,6 @@ function insertProgramFileSelection(parentDivId) {
 	
 	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
-		debug.info(parentDivId);
-		// var parentDiv2 = document.getElementById(parentDivId);
 		parentDiv.innerHTML = "";
 		
 		var selectDatabaseDiv = document.createElement('div');
@@ -31,7 +29,7 @@ function insertProgramFileSelection(parentDivId) {
 		}
 		else {
 			var html = "";
-			html += "<select name='selectedDatabase' onchange='selectedProgramDatabaseChanged(this, "+parentDivId+")' >";
+			html += "<select name='selectedDatabase' onchange='selectedProgramDatabaseChanged(this, \""+parentDivId+"\")' >";
 			html += "<option id='----' value='----'>----</option>";
 			for (var i=0; i<filesList.length; i++) {
 				html += "<option id=" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner +
@@ -60,9 +58,8 @@ function insertProgramFileSelectionAux(parentDivId) {
 }
 
 function selectedProgramDatabaseChanged(comboBox, parentDivId) {
-	debug.info("parentDivId: " + parentDivId);
+	// debug.info("parentDivId: " + parentDivId);
 	var parentDiv = document.getElementById(parentDivId);
-	parentDiv.innerHTML = loadingImageHtml();
 	
 	var selectQueryDiv = document.getElementById('selectQueryDiv');
 	if (selectQueryDiv == null) {
@@ -96,6 +93,5 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		   			console.log('Load was performed.');
 				});
 	}
-	alert("sent a request to the dispatcher");
 	
 }

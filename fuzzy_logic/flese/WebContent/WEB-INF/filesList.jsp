@@ -20,5 +20,6 @@
 	}
 %>
 
-for (var i=0; i<filesList.length; i++) debug.info("filesList["+i+"]=("+filesList[i].fileName+", "+filesList[i].fileOwner+")");
-debug.info('Loaded contents of filesList.jsp.');
+<% // for (var i=0; i<filesList.length; i++) debug.info("filesList["+i+"]=("+filesList[i].fileName+", "+filesList[i].fileOwner+")");
+// debug.info('Loaded contents of filesList.jsp.');
+%>

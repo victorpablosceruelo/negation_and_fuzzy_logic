@@ -117,7 +117,7 @@ public class DispatchersClass {
 	 * so the results can be obtained in any jsp page.
 	 * @throws Exception
 	 */
-	public void dbIntrospectionQuery() throws Exception {
+	public void dbIntrospectionQuery(boolean doForward) throws Exception {
 		
 		testAndInitialize_fileName_and_fileOwner();
 		connection.programFileIntrospectionQuery(fileOwner, fileName);
@@ -134,6 +134,9 @@ public class DispatchersClass {
 		session.removeAttribute("connection"); 
 		session.setAttribute("connection", connection);
 
+		if (doForward) {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramFileIntrospectionAnswer, "", request, response, LOG);
+		}
 	}
 	
 	/**
@@ -144,7 +147,7 @@ public class DispatchersClass {
 	public void dbGenericQuery() throws Exception {
 		
 		testAndInitialize_fileName_and_fileOwner();
-		dbIntrospectionQuery();
+		dbIntrospectionQuery(false);
 		
 		String formParameters = " --- Parameters Names and Values --- \n";
 	    Enumeration<String> paramNames = request.getParameterNames();

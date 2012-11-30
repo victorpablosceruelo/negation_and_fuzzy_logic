@@ -55,41 +55,24 @@ public class DispatcherServlet extends HttpServlet {
 			ServletsAuxMethodsClass.actionOnException(ServletsAuxMethodsClass.SignOutRequest, "", e, request, response, LOG);
 		}
 		LOG.info("--- "+doAction+" end ---");
-	}
-
-	private static final int EMPTY_REQUEST = 0;
-	
-	private static final int FILES_LIST = 1;
-	private static final int BUILD_QUERY = 2;
-	private static final int UPLOAD_FILE = 3;
-	private static final int DOWNLOAD_FILE = 4;
-	private static final int REMOVE_FILE = 5;
-	private static final int VIEW_FILE = 6;
-	private static final int DB_INTROSPECTION_QUERY = 7;
-	private static final int DB_GENERIC_QUERY = 8;
-	
-	
-	private int dispatcherConversion(String request_op) throws Exception {
-		if (request_op == null) throw new Exception("request_op is null");
-		
-		if ("".equals(request_op)) return EMPTY_REQUEST;
-		if ("filesList".equals(request_op)) return FILES_LIST;
-		if ("buildQuery".equals(request_op)) return BUILD_QUERY;
-		if ("uploadFile".equals(request_op)) return UPLOAD_FILE;
-		if ("downloadFile".equals(request_op)) return DOWNLOAD_FILE;
-		if ("removeFile".equals(request_op)) return REMOVE_FILE;
-		if ("viewFile".equals(request_op)) return VIEW_FILE;
-		if ("dbIntrospectionQuery".equals(request_op)) return DB_INTROSPECTION_QUERY;
-		if ("dbGenericQuery".equals(request_op)) return DB_GENERIC_QUERY;
-		return EMPTY_REQUEST;
-	}
+	}	
 	
 	private void dispatchQuery(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+
 		// Ask for an existing session.
 		HttpSession session = request.getSession(false);
-		if (session == null) throw new Exception("Session is null");
+		if (session == null) {
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.NullSessionPage, "", request, response, LOG);
+		}
+		else {
+			dispatchQueryWithSession(doAction, request, response, session);
+		}
 
+	}
+	private void dispatchQueryWithSession(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+		
+		if (session == null) throw new Exception("Session is null");
+			
 		// Tests if we have logged in.
 		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
 
@@ -100,25 +83,24 @@ public class DispatcherServlet extends HttpServlet {
 		String request_op = request.getParameter("op");
 		if (request_op == null) request_op = "default";
 
-		int op = dispatcherConversion(request_op);
+		int op = ServletsAuxMethodsClass.uriNickNameForOpValue(request_op);
 		
 		switch (op) {
-		case FILES_LIST: dispatcherObject.filesList();
+		case ServletsAuxMethodsClass.FilesListRequest: dispatcherObject.filesList();
 			break;
-		case UPLOAD_FILE: dispatcherObject.uploadFile();
+		case ServletsAuxMethodsClass.FileUploadRequest: dispatcherObject.uploadFile();
 			break;
-		case DOWNLOAD_FILE: dispatcherObject.downloadFile();
+		case ServletsAuxMethodsClass.FileDownloadRequest: dispatcherObject.downloadFile();
 			break;
-		case REMOVE_FILE: dispatcherObject.removeFile();
+		case ServletsAuxMethodsClass.FileRemoveRequest: dispatcherObject.removeFile();
 			break;
-		case VIEW_FILE: dispatcherObject.viewFile();
+		case ServletsAuxMethodsClass.FileViewRequest: dispatcherObject.viewFile();
 			break;
-		case DB_INTROSPECTION_QUERY: dispatcherObject.dbIntrospectionQuery();
+		case ServletsAuxMethodsClass.ProgramFileIntrospectionRequest: dispatcherObject.dbIntrospectionQuery(true);
 			break;
-		case DB_GENERIC_QUERY: dispatcherObject.dbGenericQuery();
+		case ServletsAuxMethodsClass.RunQueryRequest: dispatcherObject.dbGenericQuery();
 			break;		
-		case EMPTY_REQUEST:
-		case BUILD_QUERY:
+		case ServletsAuxMethodsClass.TheSamePage:
 		default: dispatcherObject.emptyRequest();
 			break;
 		}
