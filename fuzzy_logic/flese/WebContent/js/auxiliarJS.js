@@ -4,7 +4,7 @@
  */
 
 function loadingImageHtml() {
-	return "<img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
+	return "<br /><img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
 }
 
 function fileInfo(fileName, fileOwner) {
@@ -67,13 +67,13 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	if (selectQueryDiv == null) {
 		selectQueryDiv = document.createElement('div');
 		selectQueryDiv.id = 'selectQueryDiv';
-		parentDiv.appendChild(selectDatabaseDiv);
+		parentDiv.appendChild(selectQueryDiv);
 	}
 
 	selectQueryDiv.innerHTML = loadingImageHtml();
 	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	alert("comboBoxValue: " + comboBoxValue);
+	// alert("comboBoxValue: " + comboBoxValue);
 	if ((comboBoxValue == null) || (comboBoxValue == "") || (comboBoxValue == "----")) {
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
