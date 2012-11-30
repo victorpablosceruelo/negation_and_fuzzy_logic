@@ -333,7 +333,70 @@ public class DispatchersClass {
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileViewAnswer, "", request, response, LOG);
 	}
 	
+	public void listProgramFuzzifications () throws Exception {
+		
+		testAndInitialize_fileName_and_fileOwner();
+		
+		FilesMgmtClass FoldersUtilsObject = new FilesMgmtClass();
+		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		request.setAttribute("filePath", filePath);
+		
+		String fuzzification = request.getParameter("fuzzification");
+		if (fuzzification == null) throw new Exception("fuzzification is null.");
+		request.setAttribute("fuzzification", fuzzification);
+		
+		// Forward to the jsp page.
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ListProgramFuzzificationsAnswer, "", request, response, LOG);
 
+	}
+	public void saveProgramFuzzification () throws Exception {
+		
+		testAndInitialize_fileName_and_fileOwner();
+		
+		FilesMgmtClass FoldersUtilsObject = new FilesMgmtClass();
+		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		request.setAttribute("filePath", filePath);
+		
+		String fuzzification = request.getParameter("fuzzification");
+		if (fuzzification == null) throw new Exception("fuzzification is null.");
+		request.setAttribute("fuzzification", fuzzification);
+		
+		int counter=0;
+		String [] [] params = null;
+		String paramsDebug = "Function definition to save: ";
+		
+		while ( (request.getParameter("fuzzificationBars["+counter+"].fpx") != null) && 
+				(request.getParameter("fuzzificationBars["+counter+"].fpy") != null)) {
+			counter++;
+		}
+		
+		if (counter>0) { 
+			params = new String[counter][2];
+			for (int i=0; i<counter; i++) {
+				params[i][0] = request.getParameter("fuzzificationBars["+i+"].fpx");
+				params[i][1] = request.getParameter("fuzzificationBars["+i+"].fpy");
+				paramsDebug += "\n" + params[i][0] + " -> " + params[i][1] + " ";
+			}
+		}
+		
+		LOG.info(paramsDebug);
+		
+		ProgramAnalizedClass programAnalized = new ProgramAnalizedClass(filePath, null);
+		programAnalized.updateProgramFile(fuzzification, localUserName, params);
+		
+		connection.clearCacheInCiaoPrologConnectionClass();
+		
+		/* This is just to test if the send button produces errors.
+		int j = 0;
+		while (true) {
+			j++;
+		}
+		*/
+		
+		// Forward to the jsp page.
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SaveProgramFuzzificationAnswer, "", request, response, LOG);
+
+	}
 	
 }
 

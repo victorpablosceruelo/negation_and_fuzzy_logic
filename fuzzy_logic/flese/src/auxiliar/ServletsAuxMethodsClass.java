@@ -336,7 +336,7 @@ public class ServletsAuxMethodsClass {
 			if (urlsMappings[i].getOpValue().equals(opValue)) found = true;
 			else i++;
 		}
-		if (! found) throw new Exception("opValue is not recognized."); 
+		if (! found) throw new Exception("opValue is not recognized. opValue: " + opValue); 
 		return i;
 	}
 	

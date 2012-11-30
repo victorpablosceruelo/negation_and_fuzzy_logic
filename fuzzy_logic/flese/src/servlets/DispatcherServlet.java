@@ -86,6 +86,15 @@ public class DispatcherServlet extends HttpServlet {
 		int op = ServletsAuxMethodsClass.uriNickNameForOpValue(request_op);
 		
 		switch (op) {
+		case ServletsAuxMethodsClass.UserOptionsRequest :
+			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.UserOptionsAnswer, "", request, response, LOG);
+			break;
+		case ServletsAuxMethodsClass.ListProgramFuzzificationsRequest:
+			dispatcherObject.listProgramFuzzifications();
+			break;
+		case ServletsAuxMethodsClass.SaveProgramFuzzificationRequest:
+			dispatcherObject.saveProgramFuzzification();
+			break;
 		case ServletsAuxMethodsClass.FilesListRequest: dispatcherObject.filesList();
 			break;
 		case ServletsAuxMethodsClass.FileUploadRequest: dispatcherObject.uploadFile();
@@ -99,7 +108,7 @@ public class DispatcherServlet extends HttpServlet {
 		case ServletsAuxMethodsClass.ProgramFileIntrospectionRequest: dispatcherObject.dbIntrospectionQuery(true);
 			break;
 		case ServletsAuxMethodsClass.RunQueryRequest: dispatcherObject.dbGenericQuery();
-			break;		
+			break;
 		case ServletsAuxMethodsClass.TheSamePage:
 		default: dispatcherObject.emptyRequest();
 			break;
