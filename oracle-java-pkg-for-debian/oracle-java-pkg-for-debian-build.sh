@@ -17,7 +17,7 @@ else
 fi;
 
 DATE=`date +%Y%m%d`
-PKG_VERSION="1.0.2"
+PKG_VERSION="1.0.3"
 FOLDER_NAME="oracle-java-pkg-for-debian-${PKG_VERSION}"
 FILE_NAME=oracle-java-pkg-for-debian_${PKG_VERSION}
 BUILD_TGZ=${FILE_NAME}.orig.tar.gz
