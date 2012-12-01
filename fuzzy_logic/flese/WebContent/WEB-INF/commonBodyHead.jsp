@@ -32,6 +32,11 @@
 		var aLink = document.getElementById(aId);
 		if (aLink != null) aLink.href = href;
 	}
+	
+	function setupOnClick (aId, action) {
+		var aLink = document.getElementById(aId);
+		if (aLink != null) aLink.onclick = action;		
+	}
 
 <%
 	String localUserName = null;
@@ -51,7 +56,8 @@
 			bodyHeadLoggedDiv.innerHTML = "Not logged in";
 		}
 		else {
-			bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + "<a id='userOptions' title='user options' href=''>user options</a>";
+			bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + 
+			"<a id='userOptions' title='user options' href='' onclick='return false'>user options</a>";
 		}
 	}
 	
@@ -123,6 +129,7 @@
 	setupBodyHeadLoggedDiv();
 	setupHref ('signOut', urlMappingFor('SignOutRequest'));
 	setupHref ('userOptions', urlMappingFor('SocialAuthServletUserInfo'));
+	setupOnClick ('userOptions', 'return false;');
 	showMsgsToTheUser();
 </script>
 
