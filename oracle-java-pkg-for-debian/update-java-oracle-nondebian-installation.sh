@@ -77,7 +77,7 @@ sudo ln -vs ${DIRNAME} ${JAVA_LINK_2}
 popd 
 
 echo "Updating alternatives ... "
-sudo /usr/share/oracle-java-pkg-for-debian/oracle-java-nondebian-installation.sh ${JAVA_INSTALLATION_DIR}/${JAVA_LINK_2} 
+sudo /usr/share/oracle-java-pkg-for-debian/update-java-oracle-nondebian-installation-aux.sh ${JAVA_INSTALLATION_DIR}/${JAVA_LINK_2} 
 echo "END."
 
 #EOF

@@ -27,7 +27,6 @@ PKG_NAME=oracle-java-pkg-for-debian
 PKG_FAKE_PATH=$(CURDIR)/debian/tmp
 PKG_FINAL_PATH=$(CURDIR)/debian/$(PKG_NAME)
 PKG_FINAL_SUBPATH=/usr/share/oracle-java-pkg-for-debian
-PKG_FINAL_LINKS=/usr/bin
 
 clean:
 	@echo "Makefile :: clean (it does nothing)"
@@ -43,14 +42,10 @@ build-and-install:
 	# Fake installation.
 	mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
 	cp debian/*.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
-	mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_LINKS)
-	ln -s $(PKG_FINAL_SUBPATH)/update-oracle-java.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_LINKS)
 
 	# Real installation.
 	mkdir -p $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
 	cp debian/*.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
-	mkdir -p $(PKG_FINAL_PATH)/$(PKG_FINAL_LINKS)
-	ln -s $(PKG_FINAL_SUBPATH)/update-oracle-java.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_LINKS)
 
 	# See what it is really doing ... (debug)
 	find / | grep -iv 'proc' | grep -i 'oracle-java'
