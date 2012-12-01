@@ -1,10 +1,12 @@
 #! /bin/bash
 
-if [ -z "$1" ] || [ "$1" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
 	echo " "
-	echo "usage: $0 oracle-java-jdk.tar.gz "
-	echo "example: $0 jdk-7u9-linux-x64"
-	echo "you need super-user rights to run this script."
+	echo "This script installs java-oracle in your system from a tar.gz file you must download from oracle web page."
+	echo "Note: we install to  "
+	echo " "
+	echo "usage: sudo $0 oracle-java-jdk.tar.gz destiny_folder"
+	echo "example: sudo $0 jdk-7u9-linux-x64 /opt/oracle-java"
 	echo " "
 	echo "you can download oracle java from: "
 	echo " http://www.oracle.com/technetwork/java/javase/downloads/ "
@@ -19,15 +21,11 @@ if [ ! -f ${1} ]; then
 	exit 0
 fi
 
-FILENAME_AUX="`basename ${1} .tar.gz`"
-FILENAME_AUX=`echo "${FILENAME_AUX}"|sed 's/\.tar\.gz$//'`
+JAVA_INSTALLATION_DIR="${2}"
+SUBDIR_NAME="`basename ${1} .tar.gz | sed 's/\.tar\.gz$//'`"
+FILENAME="${SUBDIR_NAME}.tar.gz"
 
-FILENAME="${FILENAME_AUX}.tar.gz"
-JAVA_INSTALLATION_DIR="/opt"
-JAVA_LINK_1="java_jre_oracle"
-JAVA_LINK_2="java_oracle"
-
-sudo mkdir -p ${JAVA_INSTALLATION_DIR}
+mkdir -p ${JAVA_INSTALLATION_DIR}
 
 if [ ! -d ${JAVA_INSTALLATION_DIR} ]; then
 	echo "ERROR: destiny folder does not exist. "
@@ -35,49 +33,63 @@ if [ ! -d ${JAVA_INSTALLATION_DIR} ]; then
 fi
 
 pushd ${JAVA_INSTALLATION_DIR}
-echo "Removing ${FILENAME_AUX} ... "
-sudo rm -fR ${FILENAME_AUX}
-sudo mkdir -p ${FILENAME_AUX}
+echo "Removing subdirectory ${SUBDIR_NAME} in ${JAVA_INSTALLATION_DIR} "
+rm -fvR ${SUBDIR_NAME}
+mkdir -pv ${SUBDIR_NAME}
 popd
 
-sudo cp -vi ${1} ${JAVA_INSTALLATION_DIR}/${FILENAME_AUX} 
+echo "Copying file ${1} to ${JAVA_INSTALLATION_DIR}/${SUBDIR_NAME} "
+cp -vi ${1} ${JAVA_INSTALLATION_DIR}/${SUBDIR_NAME} 
 pushd ${JAVA_INSTALLATION_DIR}
-pushd ${FILENAME_AUX}
+pushd ${SUBDIR_NAME}
 
-sudo touch .oracle-java-update.txt
-sudo chmod 777 .oracle-java-update.txt
-sudo tar zxvf ${FILENAME} >> .oracle-java-update.txt
-sudo chmod 444 .oracle-java-update.txt
-sudo rm -fv ${FILENAME}
+echo "Uncompressing file ${FILENAME} to ${JAVA_INSTALLATION_DIR}/${SUBDIR_NAME} "
+rm -fv .java-oracle-update-log.txt
+touch .java-oracle-update-log.txt
+chmod 777 .java-oracle-update.txt
+tar zxvf ${FILENAME} >> .java-oracle-update.txt
+chmod 444 .java-oracle-update.txt
 
+echo "Removing file ${FILENAME}"
+rm -fv ${FILENAME}
+
+echo -p "Setting the subfolder name to use ... "
 for file in * ; do
 	if [ ! -z $file ] && [ ! "$file" == "" ] && [ ! "$file" == "." ] && [ ! "$file" == ".." ] && [ ! "$file" == "*" ]; then
 		DIRNAME="$file"
 	fi
 done
 popd
+echo "$DIRNAME"
 
 if [ -z "${DIRNAME}" ] || [ "${DIRNAME}" == "" ]; then
 	echo "ERROR: DIRNAME is not set. "
 	exit 0
 fi
 
-if [ ! -z "${FILENAME_AUX}" ] && [ ! -z "${DIRNAME}" ] && [ ! "${FILENAME_AUX}" == "" ] && [ ! "${DIRNAME}" == "" ] && [ ! "${FILENAME_AUX}" == "*" ] && [ ! "${DIRNAME}" == "*" ]; then
-	echo "Removing old version in ${DIRNAME}"
-	sudo rm -fR ${DIRNAME} 
-	echo "Moving new version to ${DIRNAME} "
-	sudo mv -v ${FILENAME_AUX}/${DIRNAME} .
+echo -p "Testing that everything is as expected ... "
+if [ -z "${SUBDIR_NAME}" ] || [ "${SUBDIR_NAME}" == "" ] || [ "${SUBDIR_NAME}" == "*" ]; then
+    echo "The variable SUBDIR_NAME contains an invalid value. SUBDIR_NAME: ${SUBDIR_NAME}"
+    exit 0
+fi
+if [ -z "${DIRNAME}" ] || [ "${DIRNAME}" == "" ] || [ ! "${DIRNAME}" == "*" ]; then
+    echo "The variable DIRNAME contains an invalid value. DIRNAME: ${DIRNAME}"
+    exit 0
+fi
+if [ "${DIRNAME}" == "${SUBDIR_NAME}" ]; then
+    echo "The variables DIRNAME and SUBDIR_NAME contain the same value. DIRNAME: ${DIRNAME}"
+    exit 0
 fi
 
-sudo rm -fv ${JAVA_LINK_1} ${JAVA_LINK_2}
-echo "Building new links for ${JAVA_LINK_1} and ${JAVA_LINK_2} ... "
-sudo ln -vs ${DIRNAME} ${JAVA_LINK_1}
-sudo ln -vs ${DIRNAME} ${JAVA_LINK_2}
+echo "Removing old version in ${DIRNAME}"
+rm -fRv ${DIRNAME} 
+echo "Moving new version to ${DIRNAME} "
+mv -v ${SUBDIR_NAME}/${DIRNAME} .
 
 popd 
 
 echo "Updating alternatives ... "
-sudo /usr/share/oracle-java-pkg-for-debian/update-java-oracle-nondebian-installation-aux.sh ${JAVA_INSTALLATION_DIR}/${JAVA_LINK_2} 
+/usr/share/oracle-java-pkg-for-debian/update-java-oracle-nondebian-installation-aux.sh ${JAVA_INSTALLATION_DIR} ${DIRNAME}
 echo "END."
 
 #EOF

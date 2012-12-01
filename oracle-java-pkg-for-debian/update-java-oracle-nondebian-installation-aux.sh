@@ -1,29 +1,39 @@
 #! /bin/bash
 
-if [ -z "$1" ] || [ "$1" == "" ]; then
-	echo "usage: $0 java-installation-path "
-	echo "example: $0 /opt/java_jre_oracle "
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
+	echo "usage: $0 java-installation-path java-installation-subpath"
+	echo "example: $0 /opt/oracle-java oracle-java-subfolder "
 	echo "you need super-user rights to run this script."
 	exit 0
 fi
 
-if [ ! -d "$1" ]; then
-	if [ ! -f "$1" ]; then
-		echo "WARNING: folder does not exist. "
-		exit 0
-	fi
+if [ ! -d "${1}" ]; then
+    echo "ERROR: folder ${1} does not exist. "
+    exit 0
 fi
 
-# Remove old plugins definitely.
-echo "Removing old plugins to avoid conflicts ... "
-rm -fv /usr/lib/iceweasel/plugins/libjavaplugin.so
-rm -fv /usr/lib/iceweasel/plugins/libnpjp2.so
+if [ ! -d "${1}/${2}" ]; then
+    echo "ERROR: folder ${2} does not exist. "
+    exit 0
+fi
 
+# Old way:
+# Remove old plugins definitely.
+# echo "Removing old plugins to avoid conflicts ... "
+# rm -vi /usr/lib/iceweasel/plugins/libjavaplugin.so
+# rm -vi /usr/lib/iceweasel/plugins/libnpjp2.so
+
+JAVA_LINK_1="java_jre"
+JAVA_LINK_2="java_jdk"
+
+
+rm -fv ${JAVA_LINK_1} ${JAVA_LINK_2}
+echo "Building new links for ${JAVA_LINK_1} and ${JAVA_LINK_2} ... "
+ln -vs ${DIRNAME} ${JAVA_LINK_1}
+ln -vs ${DIRNAME} ${JAVA_LINK_2}
 
 RealPath="${1}"
 FakePath="/usr/lib/java_installation"
-Priority="100"
-CMD="update-alternatives"
 
 if [ "`uname -m`" == "x86_64" ]; then 
     ARCH_FOLDER="amd64"
@@ -34,8 +44,32 @@ fi
 # Syntax:
 # update-alternatives --install link name path priority [--slave link name path]...
 
-update-alternatives --install ${FakePath} java_installation ${RealPath}/ ${Priority}
-update-alternatives --auto java_installation
+REMOVE="update-alternatives --remove-all"
+INSTALL="update-alternatives --install"
+UPDATE="update-alternatives --auto"
+Priority="100"
+
+# $0 -> function name
+# $1 -> link
+# $2 -> name
+# $3 -> path
+function real_install () {
+
+    echo "real_install ${1} ${2} ${3} "
+    
+    ${REMOVE} ${2}
+    ${INSTALL} ${1} ${2} ${3} ${Priority}
+    ${UPDATE} ${2}
+
+    echo " "
+}
+
+# In previous versions we used /usr/lib/java_installation
+# We prefer not using it anymore and keeping everything in /opt folder.
+
+
+real_install ${FakePath} java_installation ${RealPath}/ ${Priority}
+${UPDATE}  java_installation
 update-alternatives --install /usr/bin/appletviewer appletviewer ${FakePath}/bin/appletviewer ${Priority} --slave /usr/share/man/man1/appletviewer.1 appletviewer.1 ${FakePath}/man/ja_JP.UTF-8/man1/appletviewer.1
 update-alternatives --auto appletviewer
 update-alternatives --install /usr/bin/apt apt ${FakePath}/bin/apt ${Priority} --slave /usr/lib/jvm/java-6-sun/man/man1/apt.1 apt.1 ${FakePath}/man/man1/apt.1
