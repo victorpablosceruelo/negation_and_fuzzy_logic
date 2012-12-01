@@ -27,15 +27,23 @@ fi
 
 INSTALLATION_PATH="${1}/${2}"
 JAVA_INSTALLATION="${1}/java_installation"
+JAVA_LINKS_FOLDER="${1}/java_links_folder"
 JAVA_JDK_PATH="${1}/java_jdk"
 JAVA_JRE_PATH="${1}/java_jre"
 
+mkdir -p ${JAVA_LINKS_FOLDER}
+if [ ! -d ${JAVA_LINKS_FOLDER} ]; then
+    echo "Cannot create links folder ${JAVA_LINKS_FOLDER}"
+    echo "Maybe you do not have write permissions ? "
+    exit 0
+fi
+
+# Fixes a bug when machine architecture is amd64
 if [ "`uname -m`" == "x86_64" ]; then 
     ARCH_FOLDER="amd64"
 else
     ARCH_FOLDER="i386"
 fi
-
 
 # $0 -> function name
 # $1 -> link
@@ -51,7 +59,11 @@ function real_install () {
 	NEW_7="${JAVA_JDK_PATH}/${7}"
     fi
     
-    real_install_aux ${1} ${2} ${NEW_3} ${4} ${5} ${6} ${NEW_7}
+    if [ -z "${4}" ] || [ "${4}" == "" ]; then 
+	real_install_aux ${1} ${2} ${NEW_3}
+    else
+	real_install_aux ${1} ${2} ${NEW_3} ${4} ${5} ${6} ${NEW_7}
+    fi;
 }
 
 function real_install_aux () {
@@ -62,7 +74,11 @@ function real_install_aux () {
     # update-alternatives --install link name path priority [--slave link name path]...
 
     update-alternatives --remove-all ${2}
-    update-alternatives --install ${1} ${2} ${3} ${Priority} ${4} ${5} ${6} ${7}
+    if [ -z "${4}" ] || [ "${4}" == "" ]; then 
+	update-alternatives --install ${1} ${2} ${3} ${Priority} 
+    else
+	update-alternatives --install ${1} ${2} ${3} ${Priority} ${4} ${5} ${6} ${7}
+    fi
     update-alternatives --auto ${2}
 
     echo " "
@@ -71,10 +87,17 @@ function real_install_aux () {
 # In previous versions we used /usr/lib/java_installation
 # We prefer not using it anymore and keeping everything in /opt folder.
 
-
+real_install_aux /usr/lib/jvm/java-6-sun java-6-sun-fake ${JAVA_LINKS_FOLDER}
+real_install_aux /usr/lib/jvm/java-7-sun java-7-sun-fake ${JAVA_LINKS_FOLDER}
 real_install_aux ${JAVA_INSTALLATION} java_installation ${INSTALLATION_PATH} 
 real_install_aux ${JAVA_JDK_PATH} java_jdk ${INSTALLATION_PATH} 
 real_install_aux ${JAVA_JRE_PATH} java_jre ${INSTALLATION_PATH} 
+
+# Needed fake subfolders.
+mkdir -p ${JAVA_LINKS_FOLDER}/man/man1
+mkdir -p ${JAVA_LINKS_FOLDER}/bin
+mkdir -p ${JAVA_LINKS_FOLDER}/lib
+mkdir -p ${JAVA_LINKS_FOLDER}/plugins
 
 real_install /usr/bin/appletviewer appletviewer bin/appletviewer  --slave /usr/share/man/man1/appletviewer.1 appletviewer.1 man/ja_JP.UTF-8/man1/appletviewer.1
 
@@ -213,7 +236,7 @@ real_install /usr/bin/xjc xjc bin/xjc  --slave /usr/share/man/man1/xjc.1 xjc.1 m
 
 real_install /usr/lib/xulrunner-addons/plugins/libjavaplugin.so xulrunner-1.9-javaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 real_install /usr/lib/xulrunner/plugins/libjavaplugin.so xulrunner-javaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
-real_install /usr/lib/iceweasel/plugins/libjavaplugin.so libjavaplugin.so jre/lib/amd64/libnpjp2.so 
+real_install /usr/lib/jvm/java-6-sun/plugins/libjavaplugin.so libjavaplugin.so jre/lib/amd64/libnpjp2.so 
 
 real_install /usr/lib/iceweasel/plugins/libnpjp2.so libnpjp2.so jre/lib/amd64/libnpjp2.so 
 
