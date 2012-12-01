@@ -13,9 +13,8 @@
 	<section id="mainSection" class="">
 	</section>
 	
+<!--  The following sections should not be here. TBR -->
 
-		<section id="selectQuery" class="selectQuery">
-		</section>
 		<section id="showResults" class="showResults">
 		</section>
 		<form id="submitQuery" action="" method="POST" accept-charset="utf-8">
