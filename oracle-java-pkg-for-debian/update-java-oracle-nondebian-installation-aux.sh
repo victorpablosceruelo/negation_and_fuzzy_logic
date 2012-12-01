@@ -129,6 +129,8 @@ real_install /usr/bin/jdb jdb bin/jdb  --slave /usr/share/man/man1/jdb.1 jdb.1 m
 
 real_install /usr/bin/jexec jexec lib/jexec 
 #  --slave /usr/share/binfmts/jar jexec-binfmt 
+
+# Not found. Which one is the updated version? Is it necessary?
 # real_install jexec-binfmt -> /usr/lib/jvm/java-6-sun/jre/lib/jar.binfmt
 
 real_install /usr/bin/jhat jhat bin/jhat  --slave /usr/share/man/man1/jhat.1 jhat.1 man/man1/jhat.1
