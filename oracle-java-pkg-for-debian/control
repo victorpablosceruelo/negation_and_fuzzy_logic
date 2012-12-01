@@ -29,5 +29,7 @@ Description: This package does not contain the sun-java-jdk nor the java-jdk fro
  some scripts that automatize the installation of the java sdk 
  (that you must download from oracle, because you have to accept the copyright). 
  .
+ The scripts are installed in /usr/share/oracle-java-pkg-for-debian/ 
+ .
  Enjoy !!
  .
