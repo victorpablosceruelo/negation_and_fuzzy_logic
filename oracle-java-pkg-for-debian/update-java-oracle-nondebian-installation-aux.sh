@@ -27,26 +27,8 @@ fi
 
 INSTALLATION_PATH="${1}/${2}"
 JAVA_INSTALLATION="${1}/java_installation"
-JAVA_LINKS_FOLDER="${1}/java_links_folder"
 JAVA_JDK_PATH="${1}/java_jdk"
 JAVA_JRE_PATH="${1}/java_jre"
-
-# Removing folder in which we just have old links.
-if [ -d ${JAVA_LINKS_FOLDER} ]; then
-    rm -fR ${JAVA_LINKS_FOLDER}
-fi
-if [ -d ${JAVA_LINKS_FOLDER} ]; then
-    echo "Cannot remove links folder ${JAVA_LINKS_FOLDER}"
-    echo "Maybe you do not have write permissions ? "
-    exit 0
-fi
-
-mkdir -p ${JAVA_LINKS_FOLDER}
-if [ ! -d ${JAVA_LINKS_FOLDER} ]; then
-    echo "Cannot create links folder ${JAVA_LINKS_FOLDER}"
-    echo "Maybe you do not have write permissions ? "
-    exit 0
-fi
 
 # Fixes a bug when machine architecture is amd64
 if [ "`uname -m`" == "x86_64" ]; then 
@@ -120,17 +102,11 @@ function real_install_aux () {
 # In previous versions we used /usr/lib/java_installation
 # We prefer not using it anymore and keeping everything in /opt folder.
 
-real_install_aux /usr/lib/jvm/java-6-sun java-6-sun-fake ${JAVA_LINKS_FOLDER}
-real_install_aux /usr/lib/jvm/java-7-sun java-7-sun-fake ${JAVA_LINKS_FOLDER}
+real_install_aux /usr/lib/jvm/java-6-sun java-6-sun-fake ${JAVA_INSTALLATION}
+real_install_aux /usr/lib/jvm/java-7-sun java-7-sun-fake ${JAVA_INSTALLATION}
 real_install_aux ${JAVA_INSTALLATION} java_installation ${INSTALLATION_PATH} 
 real_install_aux ${JAVA_JDK_PATH} java_jdk ${INSTALLATION_PATH} 
 real_install_aux ${JAVA_JRE_PATH} java_jre ${INSTALLATION_PATH} 
-
-# Needed fake subfolders.
-# mkdir -p ${JAVA_LINKS_FOLDER}/man/man1
-# mkdir -p ${JAVA_LINKS_FOLDER}/bin
-# mkdir -p ${JAVA_LINKS_FOLDER}/lib
-# mkdir -p ${JAVA_LINKS_FOLDER}/plugins
 
 real_install /usr/bin/appletviewer appletviewer bin/appletviewer  --slave /usr/share/man/man1/appletviewer.1 appletviewer.1 man/ja_JP.UTF-8/man1/appletviewer.1
 
