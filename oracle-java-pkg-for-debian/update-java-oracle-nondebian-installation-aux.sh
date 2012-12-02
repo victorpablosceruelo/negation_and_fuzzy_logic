@@ -76,10 +76,8 @@ function real_install () {
     fi;
 }
 
-function real_install_aux () {
-    Priority="100"    
-    echo "real_install ${1} ${2} ${3} ${Priority} ${4} ${5} ${6} ${7}"
-
+function filename_folder_test_or_create () {
+# ${1} is the filename
     LINK_FILENAME="`basename ${1} `"
     LINK_FOLDER_FILENAME="`dirname ${1} `"
 
@@ -88,7 +86,7 @@ function real_install_aux () {
 	    echo " "
 	    echo "An error will show up if we try to generate a link in a folder which does not exist. "
 	    echo " "
-	    read -p 'Create the folder ${LINK_FOLDER_FILENAME} ?? y/n ' -e answer
+	    read -p "Create the folder ${LINK_FOLDER_FILENAME} ?? y/n " -e answer
 	    if [ ! -z "$answer" ] && [ "$answer" == "y" ]; then 
 		mkdir -p ${LINK_FOLDER_FILENAME}
 	    else
@@ -96,14 +94,22 @@ function real_install_aux () {
 	    fi
 	fi
     fi
+}
+
+function real_install_aux () {
+    Priority="100"    
+    echo "real_install ${1} ${2} ${3} ${Priority} ${4} ${5} ${6} ${7}"
 
     # Syntax:
     # update-alternatives --install link name path priority [--slave link name path]...
 
     update-alternatives --remove-all ${2}
     if [ -z "${4}" ] || [ "${4}" == "" ]; then 
+	filename_folder_test_or_create ${1}
 	update-alternatives --install ${1} ${2} ${3} ${Priority} 
     else
+	filename_folder_test_or_create ${1}
+	filename_folder_test_or_create ${5}
 	update-alternatives --install ${1} ${2} ${3} ${Priority} ${4} ${5} ${6} ${7}
     fi
     update-alternatives --auto ${2}
