@@ -134,7 +134,7 @@ real_install_aux ${JAVA_JRE_PATH} java_jre ${INSTALLATION_PATH}
 
 real_install /usr/bin/appletviewer appletviewer bin/appletviewer  --slave /usr/share/man/man1/appletviewer.1 appletviewer.1 man/ja_JP.UTF-8/man1/appletviewer.1
 
-real_install /usr/bin/apt apt bin/apt  --slave /usr/lib/jvm/java-6-sun/man/man1/apt.1 apt.1 man/man1/apt.1
+real_install /usr/bin/apt apt bin/apt  --slave /usr/share/man/man1/apt.1 apt.1 man/man1/apt.1
 
 real_install /usr/bin/ControlPanel ControlPanel bin/ControlPanel 
 
@@ -269,12 +269,12 @@ real_install /usr/bin/xjc xjc bin/xjc  --slave /usr/share/man/man1/xjc.1 xjc.1 m
 
 real_install /usr/lib/xulrunner-addons/plugins/libjavaplugin.so xulrunner-1.9-javaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 real_install /usr/lib/xulrunner/plugins/libjavaplugin.so xulrunner-javaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
-real_install /usr/lib/jvm/java-6-sun/plugins/libjavaplugin.so libjavaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
+real_install /usr/lib/jvm/libjavaplugin.so libjavaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 
 real_install /usr/lib/iceweasel/plugins/libnpjp2.so libnpjp2.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 
 # This one is only needed in some i386 machines (at least strange).
-real_install /usr/lib/jvm/java-6-sun/bin/jvisualvm jvisualvm bin/jvisualvm 
+real_install /usr/bin/jvisualvm jvisualvm bin/jvisualvm 
 update-alternatives --auto jvisualvm
 
 #EOF
