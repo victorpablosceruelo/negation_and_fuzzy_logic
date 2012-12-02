@@ -27,8 +27,6 @@ fi
 
 INSTALLATION_PATH="${1}/${2}"
 JAVA_INSTALLATION="${1}/java_installation"
-JAVA_JDK_PATH="${1}/java_jdk"
-JAVA_JRE_PATH="${1}/java_jre"
 
 # Fixes a bug when machine architecture is amd64
 if [ "`uname -m`" == "x86_64" ]; then 
@@ -44,11 +42,11 @@ fi
 function real_install () {
 
     if [ ! -z "${3}" ] && [ ! "" == "${3}" ]; then 
-	NEW_3="${JAVA_JDK_PATH}/${3}"
+	NEW_3="${JAVA_INSTALLATION}/${3}"
     fi
 
     if [ ! -z "${7}" ] && [ ! "" == "${7}" ]; then 
-	NEW_7="${JAVA_JDK_PATH}/${7}"
+	NEW_7="${JAVA_INSTALLATION}/${7}"
     fi
     
     if [ -z "${4}" ] || [ "${4}" == "" ]; then 
@@ -102,11 +100,11 @@ function real_install_aux () {
 # In previous versions we used /usr/lib/java_installation
 # We prefer not using it anymore and keeping everything in /opt folder.
 
+real_install_aux ${JAVA_INSTALLATION} java_installation ${INSTALLATION_PATH} 
 real_install_aux /usr/lib/jvm/java-6-sun java-6-sun-fake ${JAVA_INSTALLATION}
 real_install_aux /usr/lib/jvm/java-7-sun java-7-sun-fake ${JAVA_INSTALLATION}
-real_install_aux ${JAVA_INSTALLATION} java_installation ${INSTALLATION_PATH} 
-real_install_aux ${JAVA_JDK_PATH} java_jdk ${INSTALLATION_PATH} 
-real_install_aux ${JAVA_JRE_PATH} java_jre ${INSTALLATION_PATH} 
+real_install_aux /usr/lib/jvm/java_jdk java_jdk ${INSTALLATION_PATH} 
+real_install_aux /usr/lib/jvm/java_jre java_jre ${INSTALLATION_PATH}/jre
 
 real_install /usr/bin/appletviewer appletviewer bin/appletviewer  --slave /usr/share/man/man1/appletviewer.1 appletviewer.1 man/ja_JP.UTF-8/man1/appletviewer.1
 
@@ -253,5 +251,12 @@ real_install /usr/lib/iceweasel/plugins/libnpjp2.so libnpjp2.so jre/lib/${ARCH_F
 real_install /usr/bin/jvisualvm jvisualvm bin/jvisualvm 
 update-alternatives --auto jvisualvm
 
+echo " "
+echo "Please, remember to add to /etc/rc.local (or any other script loaded at boot time) the following lines: "
+echo " "
+echo "# From http://ubuntuforums.org/showthread.php?t=1375273"
+echo "export JAVA_HOME=/usr/lib/jvm/java_jdk "
+echo "export CLASSPATH=/usr/share/java/:/usr/lib/java:/usr/lib/jvm/java_jre/lib/:/usr/lib/jvm/java_jdk/lib/"
+echo " "
 #EOF
 
