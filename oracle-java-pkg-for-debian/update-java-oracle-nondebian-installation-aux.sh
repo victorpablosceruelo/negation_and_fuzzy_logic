@@ -70,6 +70,24 @@ function real_install_aux () {
     Priority="100"    
     echo "real_install ${1} ${2} ${3} ${Priority} ${4} ${5} ${6} ${7}"
 
+    LINK_FILENAME="`basename ${1} `"
+    LINK_FOLDER_FILENAME="`dirname ${1} `"
+
+    if [ ! -f ${1} ]; then
+	if [ ! -d ${LINK_FOLDER_FILENAME} ]; then
+	    echo " "
+	    echo "An error will show up if we try to generate a link in a folder which does not exist. "
+	    echo "Since this is a system folder we ask you to create the folder, but the decision is up to you."
+	    echo " "
+	    read -p 'Create the folder ${LINK_FOLDER_FILENAME} ?? y/n ' -e answer
+	    if [ ! -z $answer ] && [ "$answer" == "y" ]; then 
+		mkdir -p ${LINK_FOLDER_FILENAME}
+	    else
+		echo "Not creating the folder. An error will show up."
+	    fi
+	fi
+    fi
+
     # Syntax:
     # update-alternatives --install link name path priority [--slave link name path]...
 
@@ -236,11 +254,11 @@ real_install /usr/bin/xjc xjc bin/xjc  --slave /usr/share/man/man1/xjc.1 xjc.1 m
 
 real_install /usr/lib/xulrunner-addons/plugins/libjavaplugin.so xulrunner-1.9-javaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 real_install /usr/lib/xulrunner/plugins/libjavaplugin.so xulrunner-javaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
-real_install /usr/lib/jvm/java-6-sun/plugins/libjavaplugin.so libjavaplugin.so jre/lib/amd64/libnpjp2.so 
+real_install /usr/lib/jvm/java-6-sun/plugins/libjavaplugin.so libjavaplugin.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 
-real_install /usr/lib/iceweasel/plugins/libnpjp2.so libnpjp2.so jre/lib/amd64/libnpjp2.so 
+real_install /usr/lib/iceweasel/plugins/libnpjp2.so libnpjp2.so jre/lib/${ARCH_FOLDER}/libnpjp2.so 
 
-# From Sara's computer (i386).
+# This one is only needed in some i386 machines (at least strange).
 real_install /usr/lib/jvm/java-6-sun/bin/jvisualvm jvisualvm bin/jvisualvm 
 update-alternatives --auto jvisualvm
 
