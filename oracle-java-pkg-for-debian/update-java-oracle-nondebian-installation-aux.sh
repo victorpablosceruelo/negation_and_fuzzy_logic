@@ -31,6 +31,16 @@ JAVA_LINKS_FOLDER="${1}/java_links_folder"
 JAVA_JDK_PATH="${1}/java_jdk"
 JAVA_JRE_PATH="${1}/java_jre"
 
+# Removing folder in which we just have old links.
+if [ -d ${JAVA_LINKS_FOLDER} ]; then
+    rm -fR ${JAVA_LINKS_FOLDER}
+fi
+if [ -d ${JAVA_LINKS_FOLDER} ]; then
+    echo "Cannot remove links folder ${JAVA_LINKS_FOLDER}"
+    echo "Maybe you do not have write permissions ? "
+    exit 0
+fi
+
 mkdir -p ${JAVA_LINKS_FOLDER}
 if [ ! -d ${JAVA_LINKS_FOLDER} ]; then
     echo "Cannot create links folder ${JAVA_LINKS_FOLDER}"
@@ -77,10 +87,9 @@ function real_install_aux () {
 	if [ ! -d ${LINK_FOLDER_FILENAME} ]; then
 	    echo " "
 	    echo "An error will show up if we try to generate a link in a folder which does not exist. "
-	    echo "Since this is a system folder we ask you to create the folder, but the decision is up to you."
 	    echo " "
 	    read -p 'Create the folder ${LINK_FOLDER_FILENAME} ?? y/n ' -e answer
-	    if [ ! -z $answer ] && [ "$answer" == "y" ]; then 
+	    if [ ! -z "$answer" ] && [ "$answer" == "y" ]; then 
 		mkdir -p ${LINK_FOLDER_FILENAME}
 	    else
 		echo "Not creating the folder. An error will show up."
@@ -112,10 +121,10 @@ real_install_aux ${JAVA_JDK_PATH} java_jdk ${INSTALLATION_PATH}
 real_install_aux ${JAVA_JRE_PATH} java_jre ${INSTALLATION_PATH} 
 
 # Needed fake subfolders.
-mkdir -p ${JAVA_LINKS_FOLDER}/man/man1
-mkdir -p ${JAVA_LINKS_FOLDER}/bin
-mkdir -p ${JAVA_LINKS_FOLDER}/lib
-mkdir -p ${JAVA_LINKS_FOLDER}/plugins
+# mkdir -p ${JAVA_LINKS_FOLDER}/man/man1
+# mkdir -p ${JAVA_LINKS_FOLDER}/bin
+# mkdir -p ${JAVA_LINKS_FOLDER}/lib
+# mkdir -p ${JAVA_LINKS_FOLDER}/plugins
 
 real_install /usr/bin/appletviewer appletviewer bin/appletviewer  --slave /usr/share/man/man1/appletviewer.1 appletviewer.1 man/ja_JP.UTF-8/man1/appletviewer.1
 
