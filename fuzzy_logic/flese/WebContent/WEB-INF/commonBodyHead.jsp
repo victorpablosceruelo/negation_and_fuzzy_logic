@@ -32,15 +32,6 @@
 		var aLink = document.getElementById(aId);
 		if (aLink != null) aLink.href = href;
 	}
-	
-	function setupUserOptionsLink (aId) {
-		var aLink = document.getElementById(aId);
-		if (aLink != null) {
-			aLink.onclick = function() { insertUserOptions('mainSection'); };
-			aLink.href = "alcahueta";
-		}
-		
-	}
 
 <%
 	String localUserName = null;
