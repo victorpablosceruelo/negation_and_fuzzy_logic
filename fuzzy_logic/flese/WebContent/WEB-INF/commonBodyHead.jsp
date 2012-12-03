@@ -52,7 +52,7 @@
 		}
 		else {
 			bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + 
-			"<a id='userOptions' title='user options' href='' onclick='return insertUserOptions(\'"+mainSectionDivId+"\');'>user options</a>";
+			"<a id='userOptions' title='user options' href='' onclick='return insertUserOptions(\""+mainSectionDivId+"\");'>user options</a>";
 		}
 	}
 	
