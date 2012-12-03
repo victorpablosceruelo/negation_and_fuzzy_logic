@@ -33,9 +33,13 @@
 		if (aLink != null) aLink.href = href;
 	}
 	
-	function setupOnClick (aId, action) {
+	function setupUserOptionsLink (aId) {
 		var aLink = document.getElementById(aId);
-		if (aLink != null) aLink.onclick = action;		
+		if (aLink != null) {
+			aLink.onclick = function() { insertUserOptions('mainSection'); };
+			aLink.href = "alcahueta";
+		}
+		
 	}
 
 <%
@@ -50,14 +54,14 @@
 		out.write("    var localUserName = null;\n");
 	}
 %>
-	function setupBodyHeadLoggedDiv() {
+	function setupBodyHeadLoggedDiv(mainSectionDivId) {
 		var bodyHeadLoggedDiv = document.getElementById("bodyHeadLogged");
 		if (localUserName == null) {
 			bodyHeadLoggedDiv.innerHTML = "Not logged in";
 		}
 		else {
 			bodyHeadLoggedDiv.innerHTML = "logged as <br /> " + localUserName + " <br> " + 
-			"<a id='userOptions' title='user options' href='' onclick='return false'>user options</a>";
+			"<a id='userOptions' title='user options' href='' onclick='return insertUserOptions(\'"+mainSectionDivId+"\');'>user options</a>";
 		}
 	}
 	
@@ -126,10 +130,8 @@
 <br />
 
 <script type="text/javascript">
-	setupBodyHeadLoggedDiv();
+	setupBodyHeadLoggedDiv('mainSection');
 	setupHref ('signOut', urlMappingFor('SignOutRequest'));
-	setupHref ('userOptions', urlMappingFor('SocialAuthServletUserInfo'));
-	setupOnClick ('userOptions', 'return false;');
 	showMsgsToTheUser();
 </script>
 

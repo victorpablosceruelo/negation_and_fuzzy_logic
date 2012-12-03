@@ -102,3 +102,9 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	}
 	
 }
+
+
+function insertUserOptions(parentDivId) {
+	alert("executed insertUserOptions");
+	return false;
+}
