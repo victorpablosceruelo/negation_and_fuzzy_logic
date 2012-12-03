@@ -3,9 +3,17 @@
  * Author: Victor Pablos Ceruelo
  */
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 function loadingImageHtml() {
 	return "<br /><img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
 }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
 
 function fileInfo(fileName, fileOwner) {
 	this.fileName = fileName;
@@ -56,9 +64,6 @@ function addToFilesList(index, fileName, fileOwner) {
 	filesList[index] = new fileInfo(fileName, fileOwner);
 }
 
-function insertProgramFileSelectionAux(parentDivId) {	
-}
-
 function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	// debug.info("parentDivId: " + parentDivId);
 	var parentDiv = document.getElementById(parentDivId);
@@ -103,8 +108,77 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	
 }
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+userInformation = null;
+
+function userInformationClass(fieldName, fieldValue) {
+	this.fieldName = fieldName;
+	this.fieldValue = fieldValue;
+}
+
+function cleanUpUserInformation () {
+	userInformation = null;
+	userInformation = new Array ();
+}
+
+function addToUserInformation(index, fieldName, fieldValue) {
+	userInformation[index] = new userInformationClass(fieldName, fieldValue);
+}
 
 function insertUserOptions(parentDivId) {
-	alert("executed insertUserOptions");
+	var parentDiv = document.getElementById(parentDivId);
+	
+	parentDiv.innerHTML = loadingImageHtml();
+	
+	$.getScript(urlMappingFor('UserOptionsRequest'), 
+			function(data, textStatus, jqxhr) {
+	   			parentDiv.innerHTML = "";
+	   			
+	   			var userInformationDiv = document.createElement('div');
+	   			userInformationDiv.id = "userInformationDiv";
+	   			userInformationDiv.className = "userInformationTable";
+	   			parentDiv.appendChild(userInformationDiv);
+	   			
+	   			var row = null;
+	   			var cell = null;
+	   			
+	   			row = document.createElement('div');
+	   			row.className = "userInformationTableRow";
+	   			userInformationDiv.appendChild(row);
+	   			
+	   			cell = document.createElement('div');
+	   			cell.className = "userInformationTableCell";
+	   			cell.innerHTML = "Field Name";
+	   			row.appendChild(cell);
+
+	   			cell = document.createElement('div');
+	   			cell.className = "userInformationTableCell";
+	   			cell.innerHTML = "Value";
+	   			row.appendChild(cell);
+
+	   			for (var i=0; i<userInformation.length; i++) {
+		   			row = document.createElement('div');
+		   			row.className = "userInformationTableRow";
+		   			userInformationDiv.appendChild(row);
+		   			
+		   			cell = document.createElement('div');
+		   			cell.className = "userInformationTableCell";
+		   			cell.innerHTML = userInformation[i].fieldName;
+		   			row.appendChild(cell);
+
+		   			cell = document.createElement('div');
+		   			cell.className = "userInformationTableCell";
+		   			cell.innerHTML = userInformation[i].fieldValue;;
+		   			row.appendChild(cell);
+	   			}
+	   			
+	   			
+			});
+	
+	
+	
 	return false;
 }

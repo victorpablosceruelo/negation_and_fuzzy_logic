@@ -1,5 +1,3 @@
-<jsp:include page="commonHtmlHead.jsp" />
-
 <%@page import="java.util.List"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="org.brickred.socialauth.Profile"%>
@@ -10,83 +8,52 @@
 	AuthProvider provider = (AuthProvider) session.getAttribute("provider");
 	Profile profile = null;
 	if (provider != null) profile = provider.getUserProfile();
-%>
 
-<body>
-    <div id="body">
-     	<jsp:include page="commonBodyHead.jsp" />
-    	<%@page import="auxiliar.ServletsAuxMethodsClass"%>
-    	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> 
-    	&gt; 
-    	User Info </h3>
+	out.println("cleanUpUserInformation();");
+	if (profile == null) {
+		out.println("addToUserInformation(0, 'DisplayName', '"+ session.getAttribute("localUserName") + "');");
+	} else {
+		out.println("addToUserInformation(0, 'DisplayName', '" + profile.getDisplayName() + "');");
+		out.println("addToUserInformation(1, 'Email', '" + profile.getEmail() + "');");
+		out.println("addToUserInformation(2, 'FirstName', '" + profile.getFirstName() + "');");
+		out.println("addToUserInformation(3, 'LastName', '" + profile.getLastName() + "');");
+		out.println("addToUserInformation(4, 'FullName', '" + profile.getFullName() + "');");
+		out.println("addToUserInformation(5, 'Language', '" + profile.getLanguage() + "');");
+		out.println("addToUserInformation(6, 'Country', '" + profile.getCountry() + "');");
+		out.println("addToUserInformation(7, 'Location', '" + profile.getLocation() + "');");
+		out.println("addToUserInformation(8, 'Gender', '" + profile.getGender() + "');");
+		out.println("addToUserInformation(9, 'ProfileImageUrl', '" + profile.getProfileImageURL() + "');");
+		out.println("addToUserInformation(10, 'ProviderId', '" + profile.getProviderId() + "');");
+		out.println("addToUserInformation(11, 'ValidatedId', '" + profile.getValidatedId() + "');");
+		out.println("addToUserInformation(12, 'Date Of BirthDay', '" + profile.getDob() + "');");
+	}
 
-		<h3>User information</h3>
-		<table>
-			<thead>
-				<tr>
-					<th>Field</th>
-					<th>Value</th>
-				</tr>
-			</thead>
-			<%
-				if (profile == null) {
-					out.print("<tr><td>"+"DisplayName"+"</td><td>"+session.getAttribute("localUserName")+"</td></tr>");
-				}
-				else {
-					out.print("<tr><td>"+"Country"+"</td><td>"+profile.getCountry()+"</td></tr>");
-					out.print("<tr><td>"+"DisplayName"+"</td><td>"+profile.getDisplayName()+"</td></tr>");
-					out.print("<tr><td>"+"Email"+"</td><td>"+profile.getEmail()+"</td></tr>");
-					out.print("<tr><td>"+"FirstName"+"</td><td>"+profile.getFirstName()+"</td></tr>");
-					out.print("<tr><td>"+"FullName"+"</td><td>"+profile.getFullName()+"</td></tr>");
-					out.print("<tr><td>"+"Gender"+"</td><td>"+profile.getGender()+"</td></tr>");
-					out.print("<tr><td>"+"Language"+"</td><td>"+profile.getLanguage()+"</td></tr>");
-					out.print("<tr><td>"+"LastName"+"</td><td>"+profile.getLastName()+"</td></tr>");
-					out.print("<tr><td>"+"Location"+"</td><td>"+profile.getLocation()+"</td></tr>");
-					out.print("<tr><td>"+"ProfileImageUrl"+"</td><td>"+profile.getProfileImageURL()+"</td></tr>");
-					out.print("<tr><td>"+"ProviderId"+"</td><td>"+profile.getProviderId()+"</td></tr>");
-					out.print("<tr><td>"+"ValidatedId"+"</td><td>"+profile.getValidatedId()+"</td></tr>");
-					out.print("<tr><td>"+"Date Of BirthDay"+"</td><td>"+profile.getDob()+"</td></tr>");
-				}
-			%>
-		</table>
-		
-		<%
-		
-		if (provider != null) {
-			List<Contact> contactsList = provider.getContactList();
-			if (contactsList != null) {
-				Iterator<Contact> contactsIterator = contactsList.iterator();
-				if (contactsIterator != null) {
-		%>
-					<h3>User contacts information</h3>
-							<table>
-							<thead>
-								<tr>
-									<th>Display Name</th>
-									<th>Field</th>
-									<th>Value</th>
-								</tr>
-							</thead>
-		<%			
-					while (contactsIterator.hasNext()) {
-						Contact contact = contactsIterator.next();
-						out.print("<tr><td rowspan=7>"+contact.getDisplayName()+"</td>");
-						out.print("<td>"+"Email"+"</td><td>"+contact.getEmail()+"</td></tr>");
-						out.print("<tr><td>"+"EmailHash"+"</td><td>"+contact.getEmailHash()+"</td></tr>");
-						out.print("<tr><td>"+"FirstName"+"</td><td>"+contact.getFirstName()+"</td></tr>");
-						out.print("<tr><td>"+"Id"+"</td><td>"+contact.getId()+"</td></tr>");
-						out.print("<tr><td>"+"LastName"+"</td><td>"+contact.getLastName()+"</td></tr>");
-						out.print("<tr><td>"+"ProfileUrl"+"</td><td>"+contact.getProfileUrl()+"</td></tr>");
-						out.print("<tr><td>"+"OtherEmails"+"</td><td>"+contact.getOtherEmails()+"</td></tr>");
-					}
-		%>
-							</table>
-		<%
+	/*
+	if (provider != null) {
+		List<Contact> contactsList = provider.getContactList();
+		if (contactsList != null) {
+			Iterator<Contact> contactsIterator = contactsList
+					.iterator();
+			if (contactsIterator != null) {
+				while (contactsIterator.hasNext()) {
+					Contact contact = contactsIterator.next();
+					out.println("<tr><td rowspan=7>" + contact.getDisplayName() + "</td>");
+					out.println("<td>" + "Email" + "</td><td>" + contact.getEmail() + "</td></tr>");
+					out.println("<tr><td>" + "EmailHash" + "</td><td>"
+							+ contact.getEmailHash() + "</td></tr>");
+					out.println("<tr><td>" + "FirstName" + "</td><td>"
+							+ contact.getFirstName() + "</td></tr>");
+					out.println("<tr><td>" + "Id" + "</td><td>"
+							+ contact.getId() + "</td></tr>");
+					out.println("<tr><td>" + "LastName" + "</td><td>"
+							+ contact.getLastName() + "</td></tr>");
+					out.println("<tr><td>" + "ProfileUrl" + "</td><td>"
+							+ contact.getProfileUrl() + "</td></tr>");
+					out.println("<tr><td>" + "OtherEmails" + "</td><td>"
+							+ contact.getOtherEmails() + "</td></tr>");
 				}
 			}
 		}
-		
-		%>
-	</div>
-</body>
-</html>
+	}
+	*/
+%>
