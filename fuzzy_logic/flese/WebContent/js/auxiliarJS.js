@@ -178,6 +178,63 @@ function insertUserOptions(parentDivId) {
 	   			
 			});
 	
+	$.getScript(urlMappingFor('FilesListRequest'), 
+			function(data, textStatus, jqxhr) {
+	   			parentDiv.innerHTML = "";
+	   			
+	   			var userInformationDiv = document.createElement('div');
+	   			userInformationDiv.id = "filesListDiv";
+	   			userInformationDiv.className = "filesListTable";
+	   			parentDiv.appendChild(userInformationDiv);
+	   			
+	   			var row = null;
+	   			var cell = null;
+	   			
+	   			if ((filesList != null) && (filesList.length > 0)) {
+	   				
+	   				row = document.createElement('div');
+	   				row.className = "filesListTableRow";
+	   				userInformationDiv.appendChild(row);
+	   			
+	   				cell = document.createElement('div');
+	   				cell.className = "filesListTableCell";
+	   				cell.innerHTML = "Program File Name";
+	   				row.appendChild(cell);
+
+	   				cell = document.createElement('div');
+	   				cell.className = "filesListTableCell";
+	   				cell.innerHTML = "";
+	   				row.appendChild(cell);
+
+	   				cell = document.createElement('div');
+	   				cell.className = "filesListTableCell";
+	   				cell.innerHTML = "Personalizations";
+	   				row.appendChild(cell);
+	   			
+	   				for (var i=0; i<filesList.length; i++) {
+	   					
+		   				row = document.createElement('div');
+		   				row.className = "filesListTableRow";
+		   				userInformationDiv.appendChild(row);
+		   			
+		   				cell = document.createElement('div');
+		   				cell.className = "filesListTableCell";
+		   				cell.innerHTML = "<a href='' title='view program file " + filesList.fileName + "' onclick=''>" + filesList.fileName + "</a>";
+		   				row.appendChild(cell);
+
+		   				cell = document.createElement('div');
+		   				cell.className = "filesListTableCell";
+		   				cell.innerHTML = "";
+		   				row.appendChild(cell);
+
+		   				cell = document.createElement('div');
+		   				cell.className = "filesListTableCell";
+		   				cell.innerHTML = "Personalizations";
+		   				row.appendChild(cell);
+	   					
+	   				}
+	   			}
+			});
 	
 	
 	return false;

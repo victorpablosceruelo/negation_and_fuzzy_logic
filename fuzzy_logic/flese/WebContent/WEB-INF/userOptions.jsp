@@ -11,7 +11,7 @@
 
 	out.println("cleanUpUserInformation();");
 	if (profile == null) {
-		out.println("addToUserInformation(0, 'DisplayName', '"+ session.getAttribute("localUserName") + "');");
+		out.println("addToUserInformation(0, 'DisplayName', '"+ request.getAttribute("localUserName") + "');");
 	} else {
 		out.println("addToUserInformation(0, 'DisplayName', '" + profile.getDisplayName() + "');");
 		out.println("addToUserInformation(1, 'Email', '" + profile.getEmail() + "');");
