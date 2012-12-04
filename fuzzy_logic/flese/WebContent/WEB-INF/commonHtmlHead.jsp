@@ -12,7 +12,7 @@
 	
 	<script type="text/javascript" src="js/ba-debug.js"></script>
 	<script type="text/javascript" src="js/ba-debug-init.js"></script>
-	<script type="text/javascript" src="js/qTip.js"></script>
+	<script type="text/javascript" src="js/jquery.qtip-1.0.0-rc3.min.js"></script>
 	<script type="text/javascript" src="js/jquery-1.8.2.js"></script>
 	<script type="text/javascript" src="js/jquery-ui.js"></script>
 	

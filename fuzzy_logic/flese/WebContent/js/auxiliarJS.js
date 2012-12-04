@@ -180,7 +180,6 @@ function insertUserOptions(parentDivId) {
 	
 	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
-	   			parentDiv.innerHTML = "";
 	   			
 	   			var userInformationDiv = document.createElement('div');
 	   			userInformationDiv.id = "filesListDiv";
@@ -219,7 +218,9 @@ function insertUserOptions(parentDivId) {
 		   			
 		   				cell = document.createElement('div');
 		   				cell.className = "filesListTableCell";
-		   				cell.innerHTML = "<a href='' title='view program file " + filesList.fileName + "' onclick=''>" + filesList.fileName + "</a>";
+		   				cell.innerHTML = "<a href='#' title='view program file " + filesList.fileName + "' "+
+		   								 "onclick='fileContentsPopUp('"+filesList.fileName+"')'>" + 
+		   								 filesList.fileName + "</a>";
 		   				row.appendChild(cell);
 
 		   				cell = document.createElement('div');
@@ -233,9 +234,63 @@ function insertUserOptions(parentDivId) {
 		   				row.appendChild(cell);
 	   					
 	   				}
+	   				
+	   				useRelAttributeToCreatePopUps();
 	   			}
 			});
 	
 	
 	return false;
 }
+
+function useRelAttributeToCreatePopUps() {
+	   // Use the each() method to gain access to each elements attributes
+	   $('a[rel]').each(function()
+	   {
+	      $(this).qtip(
+	      {
+	         content: {
+	            // Set the text to an image HTML string with the correct src URL to the loading image you want to use
+	            text: '<img class="throbber" src="/projects/qtip/images/throbber.gif" alt="Loading..." />',
+	            url: $(this).attr('rel'), // Use the rel attribute of each element for the url to load
+	            title: {
+	               text: 'Wikipedia - ' + $(this).text(), // Give the tooltip a title using each elements text
+	               button: 'Close' // Show a close link in the title
+	            }
+	         },
+	         position: {
+	            corner: {
+	               target: 'bottomMiddle', // Position the tooltip above the link
+	               tooltip: 'topMiddle'
+	            },
+	            adjust: {
+	               screen: true // Keep the tooltip on-screen at all times
+	            }
+	         },
+	         show: { 
+	            when: 'click', 
+	            solo: true // Only show one tooltip at a time
+	         },
+	         hide: 'unfocus',
+	         style: {
+	            tip: true, // Apply a speech bubble tip to the tooltip at the designated tooltip corner
+	            border: {
+	               width: 0,
+	               radius: 4
+	            },
+	            name: 'light', // Use the default light style
+	            width: 570 // Set the tooltip width
+	         }
+	      });
+	   });
+}
+
+
+function fileContentsPopUp(fileName) {
+	
+	return false;
+}
+
+
+
+
