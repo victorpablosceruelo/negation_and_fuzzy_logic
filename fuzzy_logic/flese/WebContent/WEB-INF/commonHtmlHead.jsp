@@ -12,9 +12,9 @@
 	
 	<script type="text/javascript" src="js/ba-debug.js"></script>
 	<script type="text/javascript" src="js/ba-debug-init.js"></script>
-	<script type="text/javascript" src="js/jquery.qtip-1.0.0-rc3.js"></script>
 	<script type="text/javascript" src="js/jquery-1.8.2.js"></script>
 	<script type="text/javascript" src="js/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/jquery.qtip-1.0.0-rc3.js"></script>
 	
 	<script type="text/javascript" src="js/clientSoftware.js"></script>
 	<script type="text/javascript" src="js/tabsSelection.js"></script>

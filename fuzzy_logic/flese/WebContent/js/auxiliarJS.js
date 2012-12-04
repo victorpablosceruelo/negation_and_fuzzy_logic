@@ -219,7 +219,8 @@ function insertUserOptions(parentDivId) {
 		   				cell = document.createElement('div');
 		   				cell.className = "filesListTableCell";
 		   				cell.innerHTML = "<a href='#' title='view program file " + filesList.fileName + "' "+
-		   								 "rel='" + urlMappingFor('FileViewRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "'>" + 
+		   								 "rel='" + urlMappingFor('FileViewRequest') + 
+		   								 "&fileName="+filesList.fileName+"&fileOwner="+filesList.fileOwner + "'>" + 
 		   								 filesList.fileName + "</a>";
 		   				row.appendChild(cell);
 
