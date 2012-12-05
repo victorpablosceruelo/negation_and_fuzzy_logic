@@ -7,17 +7,17 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>FleSe: Flexible Searches in Databases</title>
 	
-	<link href="style.css" rel="stylesheet" type="text/css" />
-	<link rel="stylesheet" href="js/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="js_and_css/style.css" />
+	<link rel="stylesheet" type="text/css" href="js_and_css/jquery-ui.css" />
 	
-	<script type="text/javascript" src="js/ba-debug.js"></script>
-	<script type="text/javascript" src="js/ba-debug-init.js"></script>
-	<script type="text/javascript" src="js/jquery-1.8.2.js"></script>
-	<script type="text/javascript" src="js/jquery-ui.js"></script>
-	<script type="text/javascript" src="js/jquery.qtip-1.0.0-rc3.js"></script>
+	<script type="text/javascript" src="js_and_css/ba-debug.js"></script>
+	<script type="text/javascript" src="js_and_css/ba-debug-init.js"></script>
+	<script type="text/javascript" src="js_and_css/jquery-1.8.2.js"></script>
+	<script type="text/javascript" src="js_and_css/jquery-ui.js"></script>
+	<script type="text/javascript" src="js_and_css/jquery.qtip-1.0.0-rc3.js"></script>
 	
-	<script type="text/javascript" src="js/clientSoftware.js"></script>
-	<script type="text/javascript" src="js/tabsSelection.js"></script>
-	<script type="text/javascript" src="js/auxiliarJS.js"></script>
+	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
+	<script type="text/javascript" src="js_and_css/tabsSelection.js"></script>
+	<script type="text/javascript" src="js_and_css/auxiliarJS.js"></script>
 </head>
 <!-- end of commonHtmlHead -->
