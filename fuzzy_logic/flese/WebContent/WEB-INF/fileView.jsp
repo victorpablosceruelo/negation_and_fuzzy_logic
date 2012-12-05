@@ -1,5 +1,3 @@
-<jsp:include page="commonHtmlHead.jsp" />
-
 <%@page import="java.util.*"%>
 <%@page import="java.io.*"%>
 <%@page import="java.io.InputStreamReader"%>
@@ -7,13 +5,10 @@
 
 <body>
     <div id="body">
-    	<jsp:include page="commonBodyHead.jsp" />
-    	<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
-    		View program file <%= (String) request.getAttribute("fileName") %> </h3>
 		<br />
-		<br />
-		<table class="fileViewTable">
-			<tr><td>
+		<div class="fileViewTable">
+			<div class="fileViewTableRow">
+				<div class="fileViewTableCell">
 		<%
 			String filePath = (String) request.getAttribute("filePath");
 			if ((filePath != null) && ( ! ("".equals(filePath)))) {
@@ -21,18 +16,20 @@
 				String line;
 				while ((line = reader.readLine()) != null) {
        				out.println(line);
-       				out.print("<br />\n");
+       				out.println("<br />");
 				}
 				reader.close();
 			}
+			else {
+				out.println("Internal error.");
+			}
+				
 		%>
-			</td></tr>
-		</table>
+				</div>
+			</div>
+		</div>
 		<br />
 		<br />
-		<h3><a title="Back to the program files menu" href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.FilesMgmtServlet, request, null) %>">Program Files Menu</a> &gt; 
-    		View program file <%= (String) request.getAttribute("fileName") %> </h3>
-    	<br /><br />
 	</div>
 </body>
 </html>

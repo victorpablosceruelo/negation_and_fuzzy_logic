@@ -257,14 +257,21 @@ function useRelAttributeToCreatePopUps() {
 	      {
 	         content: {
 	            // Set the text to an image HTML string with the correct src URL to the loading image you want to use
-	            text: '<img class="throbber" src="/projects/qtip/images/throbber.gif" alt="Loading..." />',
+	            text: loadingImageHtml(),
+	            // '<img class="throbber" src="/projects/qtip/images/throbber.gif" alt="Loading..." />',
 	            url: $(this).attr('rel'), // Use the rel attribute of each element for the url to load
 	            title: {
-	               text: 'Wikipedia - ' + $(this).text(), // Give the tooltip a title using each elements text
+	               text: 'Showing contents of program file ' + $(this).text(), // Give the tooltip a title using each elements text
 	               button: 'Close' // Show a close link in the title
 	            }
 	         },
 	         position: {
+	             corner: {
+	                target: 'topRight',
+	                tooltip: 'bottomLeft'
+	             }
+	         },
+/*	         position: {
 	            corner: {
 	               target: 'bottomMiddle', // Position the tooltip above the link
 	               tooltip: 'topMiddle'
@@ -272,7 +279,7 @@ function useRelAttributeToCreatePopUps() {
 	            adjust: {
 	               screen: true // Keep the tooltip on-screen at all times
 	            }
-	         },
+	         }, */
 	         show: { 
 	            when: 'click', 
 	            solo: true // Only show one tooltip at a time
@@ -285,7 +292,8 @@ function useRelAttributeToCreatePopUps() {
 	               radius: 4
 	            },
 	            name: 'light', // Use the default light style
-	            width: 570 // Set the tooltip width
+	            // width: 570 // Set the tooltip width
+	            width: '50%' // Set the tooltip width
 	         }
 	      });
 	   });
