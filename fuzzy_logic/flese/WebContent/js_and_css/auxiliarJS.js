@@ -176,6 +176,7 @@ function insertUserOptions(parentDivId) {
 	   			}
 	   			
 	   			insertFilesList(parentDivId);
+	   			insertFileUploadFacility(parentDivId);
 			});
 	
 	return false;
@@ -201,57 +202,71 @@ function insertFilesList (parentDivId) {
 	   			var row = null;
 	   			var cell = null;
 	   			
+	   			var showHead = true;
 	   			if ((filesList != null) && (filesList.length > 0)) {
-	   				
-	   				row = document.createElement('div');
-	   				row.className = "filesListTableRow";
-	   				filesListDiv.appendChild(row);
-	   			
-	   				cell = document.createElement('div');
-	   				cell.className = "filesListTableCell";
-	   				cell.innerHTML = "Program File Name";
-	   				row.appendChild(cell);
-
-	   				cell = document.createElement('div');
-	   				cell.className = "filesListTableCell";
-	   				cell.innerHTML = "";
-	   				row.appendChild(cell);
-
-	   				cell = document.createElement('div');
-	   				cell.className = "filesListTableCell";
-	   				cell.innerHTML = "Personalizations";
-	   				row.appendChild(cell);
-	   			
 	   				for (var i=0; i<filesList.length; i++) {
-	   					
-		   				row = document.createElement('div');
-		   				row.className = "filesListTableRow";
-		   				filesListDiv.appendChild(row);
+	   					if (filesList[i].fileOwner == localUserName) {
+	   						if (showHead) {
+	   							insertFilesListHead(filesListDiv.id);
+	   							showHead = false;
+	   						}
+	   						
+	   						row = document.createElement('div');
+	   						row.className = "filesListTableRow";
+	   						filesListDiv.appendChild(row);
 		   			
-		   				cell = document.createElement('div');
-		   				cell.className = "filesListTableCell";
-		   				cell.innerHTML = "<a href='#' title='view program file " + filesList[i].fileName + "' "+
-		   								 "onclick='fileViewAction(" + i + ", " + fileViewContents.id + ");' >" + 
-		   								 filesList[i].fileName + "</a>";
-		   				row.appendChild(cell);
+	   						cell = document.createElement('div');
+	   						cell.className = "filesListTableCell";
+	   						cell.innerHTML = "<a href='#' title='view program file " + filesList[i].fileName + "' "+
+		   								 	 "onclick='fileViewAction(" + i + ", " + fileViewContents.id + ");' >" + 
+		   								 	 filesList[i].fileName + "</a>";
+	   						row.appendChild(cell);
 
-		   				cell = document.createElement('div');
-		   				cell.className = "filesListTableCell";
-		   				cell.innerHTML = "<a href='#' title='remove program file " + filesList[i].fileName + "' "+
-		   								 "onclick='removeFileAction(" + i + ", " + parentDivId + ");' >" + 
-		   								 "<img src='images/remove-file.gif'>" + "</a>";
-		   				row.appendChild(cell);
+	   						cell = document.createElement('div');
+	   						cell.className = "filesListTableCell";
+	   						cell.innerHTML = "<a href='#' title='remove program file " + filesList[i].fileName + "' "+
+	   										 "onclick='removeFileAction(" + i + ", \"" + parentDivId + "\");' >" + 
+	   										 "<img src='images/remove-file.gif' width='20em'>" + "</a>";
+	   						row.appendChild(cell);
 
-		   				cell = document.createElement('div');
-		   				cell.className = "filesListTableCell";
-		   				cell.innerHTML = "Personalizations";
-		   				row.appendChild(cell);
-	   					
+	   						cell = document.createElement('div');
+	   						cell.className = "filesListTableCell";
+		   					cell.innerHTML = "Personalizations";
+		   					row.appendChild(cell);
+	   					}
 	   				}
+	   			}
+	   			
+	   			if (showHead) {
+	   				filesListDiv.innerHTML = "You do not owe any program file. Upload one by using the facility below.";
 	   			}
 			});
 }
 
+function insertFilesListHead(filesListDivId) {
+	var filesListDiv = document.getElementById(filesListDivId);
+	var row = null;
+	var cell = null;
+	
+	row = document.createElement('div');
+	row.className = "filesListTableRow";
+	filesListDiv.appendChild(row);
+		
+	cell = document.createElement('div');
+	cell.className = "filesListTableCell";
+	cell.innerHTML = "Program File Name";
+	row.appendChild(cell);
+
+	cell = document.createElement('div');
+	cell.className = "filesListTableCell";
+	cell.innerHTML = "";
+	row.appendChild(cell);
+
+	cell = document.createElement('div');
+	cell.className = "filesListTableCell";
+	cell.innerHTML = "Personalizations";
+	row.appendChild(cell);
+}
 
 function fileViewAction(index, fileViewContentsDivId) {
 	var fileViewContents = document.getElementById(fileViewContentsDivId);
@@ -275,10 +290,53 @@ function removeFileAction (index, parentDivId) {
 				fileViewContents.innerHTML = data;
 				
 				// Reload the screen.
+				// alert("parentDivId: " + parentDivId);
 				insertUserOptions(parentDivId);
 			});
 }
 
+function insertFileUploadFacility(parentDivId) {
+	var parentDiv = document.getElementById(parentDivId);
+	
+	parentDiv.innerHTML = "<FORM ID='uploadForm' ENCTYPE='multipart/form-data' method='POST' action='" + urlMappingFor('FileUploadRequest') + "'>" +
+						  "<INPUT TYPE='file' NAME='programFileToUpload' size='50' onchange='autoSendForm(\"uploadForm\");'>" +
+						  "<DIV id='uploadButton'> </DIV> " +
+						  "</FORM>";
+	
+    <div class="progress">
+    <div class="bar"></div >
+    <div class="percent">0%</div >
+</div>
+
+<div id="status"></div>
+	
+	var bar = $('.bar');
+	var percent = $('.percent');
+	var status = $('#status');
+	   
+	$('form').ajaxForm({
+	    beforeSend: function() {
+	        status.empty();
+	        var percentVal = '0%';
+	        bar.width(percentVal);
+	        percent.html(percentVal);
+	    },
+	    uploadProgress: function(event, position, total, percentComplete) {
+	        var percentVal = percentComplete + '%';
+	        bar.width(percentVal);
+	        percent.html(percentVal);
+	    },
+		complete: function(xhr) {
+			status.html(xhr.responseText);
+		}
+	}); 
+	
+}
+
+function autoSendForm(formId) {
+	var form = document.getElementById(formId);
+	form.submit();
+}
 
 
 
