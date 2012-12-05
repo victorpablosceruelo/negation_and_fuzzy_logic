@@ -216,6 +216,15 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 
 .fuzzificationFunctionPointBarTitle{display:block; font-size:150%; text-align:center; }
 
+.filesListTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
+.filesListTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.filesListTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+
+.userInformationTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
+.userInformationTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.userInformationTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+
+
 
 td.providersIcons  {
 	border:1em;

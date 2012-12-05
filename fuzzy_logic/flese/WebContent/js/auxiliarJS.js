@@ -175,17 +175,24 @@ function insertUserOptions(parentDivId) {
 		   			row.appendChild(cell);
 	   			}
 	   			
-	   			
+	   			insertFilesList(parentDivId);
 			});
 	
+	return false;
+}
+
+function insertFilesList (parentDivId) {
+	
+	var parentDiv = document.getElementById(parentDivId);
+	var filesListDiv = document.createElement('div');
+	filesListDiv.id = "filesListDiv";
+	parentDiv.appendChild(filesListDiv);
+	filesListDiv.innerHTML = loadingImageHtml();
+		
 	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
-	   			
-	   			var userInformationDiv = document.createElement('div');
-	   			userInformationDiv.id = "filesListDiv";
-	   			userInformationDiv.className = "filesListTable";
-	   			parentDiv.appendChild(userInformationDiv);
-	   			
+				filesListDiv.innerHTML = "";
+	   			filesListDiv.className = "filesListTable"; 			
 	   			var row = null;
 	   			var cell = null;
 	   			
@@ -193,7 +200,7 @@ function insertUserOptions(parentDivId) {
 	   				
 	   				row = document.createElement('div');
 	   				row.className = "filesListTableRow";
-	   				userInformationDiv.appendChild(row);
+	   				filesListDiv.appendChild(row);
 	   			
 	   				cell = document.createElement('div');
 	   				cell.className = "filesListTableCell";
@@ -214,14 +221,14 @@ function insertUserOptions(parentDivId) {
 	   					
 		   				row = document.createElement('div');
 		   				row.className = "filesListTableRow";
-		   				userInformationDiv.appendChild(row);
+		   				filesListDiv.appendChild(row);
 		   			
 		   				cell = document.createElement('div');
 		   				cell.className = "filesListTableCell";
-		   				cell.innerHTML = "<a href='#' title='view program file " + filesList.fileName + "' "+
+		   				cell.innerHTML = "<a href='#' title='view program file " + filesList[i].fileName + "' "+
 		   								 "rel='" + urlMappingFor('FileViewRequest') + 
-		   								 "&fileName="+filesList.fileName+"&fileOwner="+filesList.fileOwner + "'>" + 
-		   								 filesList.fileName + "</a>";
+		   								 "&fileName="+filesList[i].fileName+"&fileOwner="+filesList[i].fileOwner + "'>" + 
+		   								 filesList[i].fileName + "</a>";
 		   				row.appendChild(cell);
 
 		   				cell = document.createElement('div');
@@ -239,10 +246,8 @@ function insertUserOptions(parentDivId) {
 	   				useRelAttributeToCreatePopUps();
 	   			}
 			});
-	
-	
-	return false;
 }
+
 
 function useRelAttributeToCreatePopUps() {
 	   // Use the each() method to gain access to each elements attributes
