@@ -251,16 +251,16 @@ function insertFilesList (parentDivId) {
 
 function useRelAttributeToCreatePopUps() {
 	// Use the each() method to gain access to each elements attributes
-	   $('a[rel="modal"]:first').qtip(
-			   {
+	   $('a[rel]').each(function() {
+		   
+		   $(this).qtip({
 			      content: {
 			         title: {
-			            text: 'Modal qTip',
+			            text: 'Showing contents of program file ' + $(this).text(),
 			            button: 'Close'
 			         },
-			         text: 'Heres an example of a rather bizarre use for qTip... a tooltip as a <b>modal dialog</b>! <br /><br />' +
-			               'Much like the <a href="http://onehackoranother.com/projects/jquery/boxy/">Boxy</a> plugin, ' +
-			               'but if you\'re already using tooltips on your page... <i>why not utilise qTip<i> as a modal dailog instead?'
+			         text: loadingImageHtml(),
+			         url: $(this).attr('rel'),
 			      },
 			      position: {
 			         target: $(document.body), // Position it via the document body...
@@ -272,8 +272,8 @@ function useRelAttributeToCreatePopUps() {
 			      },
 			      hide: false,
 			      style: {
-			         width: { max: 350 },
-			         padding: '14px',
+			         width: { max: '50em', min: '50em' },
+			         //padding: '2em',
 			         border: {
 			            width: 9,
 			            radius: 9,
@@ -294,8 +294,8 @@ function useRelAttributeToCreatePopUps() {
 			         }
 			      }
 			   });
-	   
-	   }
+	});
+}
 
 
 function fileContentsPopUp(fileName) {
