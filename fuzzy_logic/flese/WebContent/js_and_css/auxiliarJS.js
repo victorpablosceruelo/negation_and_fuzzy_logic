@@ -188,6 +188,11 @@ function insertFilesList (parentDivId) {
 	filesListDiv.id = "filesListDiv";
 	parentDiv.appendChild(filesListDiv);
 	filesListDiv.innerHTML = loadingImageHtml();
+	
+	var fileViewContents = document.createElement('div');
+	fileViewContents.id = "fileViewContents";
+	parentDiv.appendChild(fileViewContents);
+	fileViewContents.innerHTML = "";
 		
 	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
@@ -226,8 +231,7 @@ function insertFilesList (parentDivId) {
 		   				cell = document.createElement('div');
 		   				cell.className = "filesListTableCell";
 		   				cell.innerHTML = "<a href='#' title='view program file " + filesList[i].fileName + "' "+
-		   								 "rel='" + urlMappingFor('FileViewRequest') + 
-		   								 "&fileName="+filesList[i].fileName+"&fileOwner="+filesList[i].fileOwner + "'>" + 
+		   								 "onclick='fileViewAction(" + i + ", " + fileViewContents.id + ");' >" + 
 		   								 filesList[i].fileName + "</a>";
 		   				row.appendChild(cell);
 
@@ -242,66 +246,34 @@ function insertFilesList (parentDivId) {
 		   				row.appendChild(cell);
 	   					
 	   				}
-	   				
-	   				useRelAttributeToCreatePopUps();
 	   			}
 			});
 }
 
 
-function useRelAttributeToCreatePopUps() {
-	// Use the each() method to gain access to each elements attributes
-	   $('a[rel]').each(function() {
-		   
-		   $(this).qtip({
-			      content: {
-			         title: {
-			            text: 'Showing contents of program file ' + $(this).text(),
-			            button: 'Close'
-			         },
-			         text: loadingImageHtml(),
-			         url: $(this).attr('rel'),
-			      },
-			      position: {
-			         target: $(document.body), // Position it via the document body...
-			         corner: 'center' // ...at the center of the viewport
-			      },
-			      show: {
-			         when: 'click', // Show it on click
-			         solo: true // And hide all other tooltips
-			      },
-			      hide: false,
-			      style: {
-			         width: { max: '50em', min: '50em' },
-			         //padding: '2em',
-			         border: {
-			            width: 9,
-			            radius: 9,
-			            color: '#666666'
-			         },
-			         name: 'light'
-			      },
-			      api: {
-			         beforeShow: function()
-			         {
-			            // Fade in the modal "blanket" using the defined show speed
-			            $('#qtip-blanket').fadeIn(this.options.show.effect.length);
-			         },
-			         beforeHide: function()
-			         {
-			            // Fade out the modal "blanket" using the defined hide speed
-			            $('#qtip-blanket').fadeOut(this.options.hide.effect.length);
-			         }
-			      }
-			   });
-	});
-}
-
-
-function fileContentsPopUp(fileName) {
+function fileViewAction(index, fileViewContentsDivId) {
+	var fileViewContents = document.getElementById(fileViewContentsDivId);
+	
+	$.get(urlMappingFor('FileViewRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+			function(data, textStatus, jqxhr) {
+				fileViewContents.innerHTML = data;
+				
+			    $(function() {
+			        $( "#" + fileViewContentsDivId ).dialog();
+			    });
+			});
+	
 	
 	return false;
 }
+
+
+
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
 
 
 

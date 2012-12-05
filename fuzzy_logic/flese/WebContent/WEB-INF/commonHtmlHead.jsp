@@ -14,7 +14,6 @@
 	<script type="text/javascript" src="js_and_css/ba-debug-init.js"></script>
 	<script type="text/javascript" src="js_and_css/jquery-1.8.2.js"></script>
 	<script type="text/javascript" src="js_and_css/jquery-ui.js"></script>
-	<script type="text/javascript" src="js_and_css/jquery.qtip-1.0.0-rc3.js"></script>
 	
 	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
 	<script type="text/javascript" src="js_and_css/tabsSelection.js"></script>
