@@ -1,0 +1,6 @@
+[submodule "fuzzy_logic/flese-utils/jquery.git"]
+	path = fuzzy_logic/flese-utils/jquery.git
+	url = git://github.com/jquery/jquery.git
+[submodule "fuzzy_logic/flese-utils/qTip2.git"]
+	path = fuzzy_logic/flese-utils/qTip2.git
+	url = https://github.com/Craga89/qTip2.git
