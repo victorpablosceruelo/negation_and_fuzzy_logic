@@ -237,7 +237,9 @@ function insertFilesList (parentDivId) {
 
 		   				cell = document.createElement('div');
 		   				cell.className = "filesListTableCell";
-		   				cell.innerHTML = "";
+		   				cell.innerHTML = "<a href='#' title='remove program file " + filesList[i].fileName + "' "+
+		   								 "onclick='removeFileAction(" + i + ", " + parentDivId + ");' >" + 
+		   								 "<img src='images/remove-file.gif'>" + "</a>";
 		   				row.appendChild(cell);
 
 		   				cell = document.createElement('div');
@@ -265,6 +267,16 @@ function fileViewAction(index, fileViewContentsDivId) {
 	
 	
 	return false;
+}
+
+function removeFileAction (index, parentDivId) {
+	$.get(urlMappingFor('FileRemoveRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+			function(data, textStatus, jqxhr) {
+				fileViewContents.innerHTML = data;
+				
+				// Reload the screen.
+				insertUserOptions(parentDivId);
+			});
 }
 
 
