@@ -295,17 +295,59 @@ function removeFileAction (index, parentDivId) {
 			});
 }
 
+function getIframeWindow(iframe_object) {
+	  var doc = null;
+
+	  if (iframe_object.contentWindow) return iframe_object.contentWindow;
+	  if (iframe_object.window) return iframe_object.window;
+
+	  if ((doc == null) && iframe_object.contentDocument) doc = iframe_object.contentDocument;
+	  if ((doc == null) && iframe_object.document) doc = iframe_object.document;
+
+	  if ((doc != null) && doc.defaultView) return doc.defaultView;
+	  if ((doc != null) && doc.parentWindow) return doc.parentWindow;
+
+	  return null;
+	}
+
+function notNullNorundefined(value) {
+	return ((value != null) && (value != undefined));
+}
+
 function insertFileUploadFacility(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
+	var uploadFormTargetiFrameId = "uploadFormTargetiFrame";
 	
 	parentDiv.innerHTML = "<div class='uploadProgress'>" + 
-						  "<FORM ID='uploadForm' ENCTYPE='multipart/form-data' method='POST' action='" + urlMappingFor('FileUploadRequest') + "'>" +
+						  "<FORM ID='uploadForm' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
+						  "target='" + uploadFormTargetiFrameId+ "' " +
+						  "action='" + urlMappingFor('FileUploadRequest') + "' onsubmit='uploadSubmitAction();'>" +
 						  "<INPUT TYPE='file' NAME='programFileToUpload' size='50' onchange='autoSendForm(\"uploadForm\");'>" +
 						  "<DIV id='uploadButton'> </DIV> " +
 						  "</FORM>" +
-						  "<div id='uploadBar'></div ><div id='uploadPercent'>0%</div ></div><div id='uploadStatus'></div>" + 
-						  "<iframe name='submit-iframe' style='display: none;'></iframe>";
+						  "<div id='uploadBar' style='display:none;'></div >" + 
+						  "<div id='uploadPercent'>0%</div ><div id='uploadStatus'></div></div>" +
+						  "<iframe id='"+uploadFormTargetiFrameId+"' name='"+uploadFormTargetiFrameId+"' "+
+						  "src='#' style='display:none;'></iframe>";
     	
+	$('#' + uploadFormTargetiFrameId).load(function() {
+		// document.getElementById('#' + submitiFrameId);
+		var responseText = null;
+		var iFrameWindow = getIframeWindow(this);
+		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
+			responseText = iFrameWindow.document.body.innerHTML;
+			// Do something with response text.
+			if (notNullNorundefined(responseText)) {
+				iFrameWindow.document.body.innerHTML="";
+			}
+			// Clear the content of the iframe.
+			// this.contentDocument.location.href = '/images/loading.gif';
+			alert("responseText: " + responseText);
+		}
+		  
+	});
+	
+	/*
 	var uploadBar = $('#uploadBar');
 	var uploadPercent = $('#uploadPercent');
 	var uploadStatus = $('#uploadStatus');
@@ -327,7 +369,7 @@ function insertFileUploadFacility(parentDivId) {
 			uploadStatus.html(xhr.responseText);
 		}
 	});
-	
+	*/
 /*    var options = { 
             target:        '#uploadStatus',   // target element(s) to be updated with server response 
             // beforeSubmit:  showRequest,  // pre-submit callback 
@@ -361,6 +403,13 @@ function insertFileUploadFacility(parentDivId) {
 function autoSendForm(formId) {
 	var form = document.getElementById(formId);
 	form.submit();
+}
+
+function uploadSubmitAction () {
+	alert("Upload Submit Action started ...");
+	document.getElementById('uploadBar').style.visibility = 'visible';
+	document.getElementById('uploadBar').innerHTML = loadingImageHtml();
+	return true;
 }
 
 
