@@ -8,12 +8,12 @@
 	<title>FleSe: Flexible Searches in Databases</title>
 	
 	<link rel="stylesheet" type="text/css" href="js_and_css/style.css" />
-	<link rel="stylesheet" type="text/css" href="js_and_css/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="js_and_css/jquery-ui-1.9.2.custom.css" />
 	
 	<script type="text/javascript" src="js_and_css/ba-debug.js"></script>
 	<script type="text/javascript" src="js_and_css/ba-debug-init.js"></script>
 	<script type="text/javascript" src="js_and_css/jquery-1.8.2.js"></script>
-	<script type="text/javascript" src="js_and_css/jquery-ui.js"></script>
+	<script type="text/javascript" src="js_and_css/jquery-ui-1.9.2.custom.js"></script>
 	
 	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
 	<script type="text/javascript" src="js_and_css/tabsSelection.js"></script>
