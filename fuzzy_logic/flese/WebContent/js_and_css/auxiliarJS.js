@@ -298,36 +298,31 @@ function removeFileAction (index, parentDivId) {
 function insertFileUploadFacility(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
 	
-	parentDiv.innerHTML = "<FORM ID='uploadForm' ENCTYPE='multipart/form-data' method='POST' action='" + urlMappingFor('FileUploadRequest') + "'>" +
+	parentDiv.innerHTML = "<div class='uploadProgress'>" + 
+						  "<FORM ID='uploadForm' ENCTYPE='multipart/form-data' method='POST' action='" + urlMappingFor('FileUploadRequest') + "'>" +
 						  "<INPUT TYPE='file' NAME='programFileToUpload' size='50' onchange='autoSendForm(\"uploadForm\");'>" +
 						  "<DIV id='uploadButton'> </DIV> " +
-						  "</FORM>";
-	
-    <div class="progress">
-    <div class="bar"></div >
-    <div class="percent">0%</div >
-</div>
-
-<div id="status"></div>
-	
-	var bar = $('.bar');
-	var percent = $('.percent');
-	var status = $('#status');
+						  "</FORM>" +
+						  "<div id='uploadBar'></div ><div id='uploadPercent'>0%</div ></div><div id='uploadStatus'></div>";
+    	
+	var uploadBar = $('#uploadBar');
+	var uploadPercent = $('#uploadPercent');
+	var uploadStatus = $('#uploadStatus');
 	   
-	$('form').ajaxForm({
+	$('uploadForm').ajaxForm({
 	    beforeSend: function() {
-	        status.empty();
+	    	uploadStatus.empty();
 	        var percentVal = '0%';
-	        bar.width(percentVal);
-	        percent.html(percentVal);
+	        uploadBar.width(percentVal);
+	        uploadPercent.html(percentVal);
 	    },
 	    uploadProgress: function(event, position, total, percentComplete) {
 	        var percentVal = percentComplete + '%';
-	        bar.width(percentVal);
-	        percent.html(percentVal);
+	        uploadBar.width(percentVal);
+	        uploadPercent.html(percentVal);
 	    },
 		complete: function(xhr) {
-			status.html(xhr.responseText);
+			uploadStatus.html(xhr.responseText);
 		}
 	}); 
 	
