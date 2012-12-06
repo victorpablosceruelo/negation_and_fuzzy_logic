@@ -316,50 +316,54 @@ function notNullNorundefined(value) {
 
 function insertFileUploadFacility(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
+	
+	parentDiv.innerHTML = "";
+	var fileUploadDiv = document.createElement('div');
+	fileUploadDiv.id = "fileUploadDiv";
+	parentDiv.appendChild(fileUploadDiv);
+	
+	var uploadFormId = "uploadForm";
+	var uploadStatusDivId = "uploadStatus";
 	var uploadFormTargetiFrameId = "uploadFormTargetiFrame";
 	
-	parentDiv.innerHTML = "<div class='uploadProgress'>" + 
-						  "<FORM ID='uploadForm' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
-						  "target='" + uploadFormTargetiFrameId+ "' " +
-						  "action='" + urlMappingFor('FileUploadRequest') + "' onsubmit='uploadSubmitAction();'>" +
-						  "<INPUT TYPE='file' NAME='programFileToUpload' size='50' onchange='autoSendForm(\"uploadForm\");'>" +
-						  "<DIV id='uploadButton'> </DIV> " +
-						  "</FORM>" +
-						  "<div id='uploadBar' style='display:none;'></div >" + 
-						  "<div id='uploadPercent'>0%</div ><div id='uploadStatus'></div></div>" +
-						  "<iframe id='"+uploadFormTargetiFrameId+"' name='"+uploadFormTargetiFrameId+"' "+
-						  "src='#' style='display:none;'></iframe>";
+	fileUploadDiv.innerHTML = "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
+							  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
+							  		"<INPUT TYPE='file' NAME='programFileToUpload' size='50' "+
+							  		"onchange='uploadActionOnChange(\""+uploadFormId+"\", \""+uploadStatusDivId+"\");'>" +
+							  "</FORM>" +
+							  "<div id='"+uploadStatusDivId+"'></div>" +
+							  "<iframe id='"+uploadFormTargetiFrameId+"' name='"+uploadFormTargetiFrameId+"' "+
+							  "src='#' style='display:none;'></iframe>";
     	
 	$('#' + uploadFormTargetiFrameId).load(function() {
 		// document.getElementById('#' + submitiFrameId);
-		var responseText = null;
+		var responseHtmlText = null;
 		var iFrameWindow = getIframeWindow(this);
 		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
-			responseText = iFrameWindow.document.body.innerHTML;
+			responseHtmlText = iFrameWindow.document.body.innerHTML;
 			// Do something with response text.
-			if (notNullNorundefined(responseText)) {
+			if (notNullNorundefined(responseHtmlText)) {
 				iFrameWindow.document.body.innerHTML="";
 			}
 			// Clear the content of the iframe.
 			// this.contentDocument.location.href = '/images/loading.gif';
-			alert("responseText: " + responseText);
+			alert("responseText: " + responseHtmlText);
+			document.getElementById(uploadStatusDivId).style.visibility = 'visible';
+			document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
+
 		}
 		  
 	});	
 }
 
-function autoSendForm(formId) {
+function uploadActionOnChange(formId, uploadStatusDivId) {
+	alert("Upload Submit Action started ...");
+	document.getElementById(uploadStatusDivId).style.visibility = 'visible';
+	document.getElementById(uploadStatusDivId).innerHTML = loadingImageHtml();
+
 	var form = document.getElementById(formId);
 	form.submit();
 }
-
-function uploadSubmitAction () {
-	alert("Upload Submit Action started ...");
-	document.getElementById('uploadBar').style.visibility = 'visible';
-	document.getElementById('uploadBar').innerHTML = loadingImageHtml();
-	return true;
-}
-
 
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
