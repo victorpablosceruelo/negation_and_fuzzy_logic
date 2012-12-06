@@ -103,8 +103,36 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		   			console.log(textStatus); //success
 		   			console.log(jqxhr.status); //200
 		   			console.log('Load was performed.');
+		   			insertQuerySelection(parentDivId, selectQueryDiv.id, fileName, fileOwner);
 				});
 	}
+	
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner) {
+	var selectQueryDiv = document.getElementById(selectQueryDivId);
+	selectQueryDiv.innerHTML = "";
+	
+	var html = "";
+	html += "<form id='queryForm' action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' " +
+			"method='POST' accept-charset='utf-8'>";
+	html += "     <div id='queryStartContainer' class='queryStartContainer'>";
+	html += "          <div id='queryStartInfo'> ";
+	html += "               <h3>Your query: I'm looking for a </h3> ";
+	html += "          </div>";
+	html += "          <div id='queryStart'></div>";
+	html += "     </div>";
+    html += "     <input type='hidden' name='queryLinesCounter' value='0' id='queryLinesCounter'>";
+    html += "     <div id='queryLinesDiv'></div>";
+	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity();'>";
+	html += "</form>";
+
+	selectQueryDiv.innerHTML = html;
+	fillQueryStartupValues("queryStart");
 	
 }
 
@@ -398,7 +426,10 @@ function uploadActionOnChange(formId, uploadStatusDivId) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
+// EOF
 
-
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
 
 

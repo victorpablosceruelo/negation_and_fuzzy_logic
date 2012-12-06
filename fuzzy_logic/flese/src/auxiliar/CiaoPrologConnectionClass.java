@@ -101,11 +101,42 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Iterator<AnswerTermInJavaClass []> getProgramIntrospectionIterator() {
+	public String[] getProgramIntrospectionInJS () {
+		if (programIntrospection==null) return null;
+		Iterator <AnswerTermInJavaClass[]> programIntrospectionIterator = getProgramIntrospectionIterator();
+		if (programIntrospectionIterator == null) return null;
+		
+		String[] result = new String [programIntrospection.size() + 1];
+		
+		result[0] = "cleanUpProgramIntrospection();";
+		
+		int counter=1;
+		String tmp=null;
+		AnswerTermInJavaClass [] predInfo;
+		while (programIntrospectionIterator.hasNext()) {
+			predInfo = programIntrospectionIterator.next();
+			tmp = "";
+			tmp += "addToProgramIntrospection("+counter+", new predInfo(";
+			for (int i=0; i<predInfo.length; i++) {
+				tmp += predInfo[i].toJavaScript(true);
+				if (i+1 < predInfo.length) tmp += ",";
+			}
+			tmp += ");";
+			result[counter] = tmp;
+			counter ++;
+		}
+		return result;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private Iterator<AnswerTermInJavaClass []> getProgramIntrospectionIterator() {
 		if (programIntrospection == null) return null;
 		else return programIntrospection.iterator();
 	}
-	public Iterator<AnswerTermInJavaClass []> getLatestEvaluatedQueryAnswersIterator() {
+	private Iterator<AnswerTermInJavaClass []> getLatestEvaluatedQueryAnswersIterator() {
 		if (latestEvaluatedQueryAnswers == null) return null;
 		else return latestEvaluatedQueryAnswers.iterator();
 	}
