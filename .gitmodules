@@ -4,3 +4,6 @@
 [submodule "fuzzy_logic/flese-utils/qTip2.git"]
 	path = fuzzy_logic/flese-utils/qTip2.git
 	url = https://github.com/Craga89/qTip2.git
+[submodule "fuzzy_logic/flese-utils/form.git"]
+	path = fuzzy_logic/flese-utils/form.git
+	url = https://github.com/malsup/form.git
