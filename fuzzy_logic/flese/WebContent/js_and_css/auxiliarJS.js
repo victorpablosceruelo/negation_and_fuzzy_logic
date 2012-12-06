@@ -64,6 +64,21 @@ function addToFilesList(index, fileName, fileOwner) {
 	filesList[index] = new fileInfo(fileName, fileOwner);
 }
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+var programIntrospection = new Array();
+
+function cleanUpProgramIntrospection() {
+	programIntrospection = null;
+	programIntrospection = new Array();
+}
+
+function addToProgramIntrospection(index, predInfo) {
+	programIntrospection[index] = predInfo;
+}
+
 function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	// debug.info("parentDivId: " + parentDivId);
 	var parentDiv = document.getElementById(parentDivId);
@@ -99,6 +114,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		
 		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
 				function(data, textStatus, jqxhr) {
+					debug.info("ProgramFileIntrospectionRequest done ... ");
 		   			alert("ProgramFileIntrospectionRequest done ... ");
 		   			insertQuerySelection(parentDivId, selectQueryDiv.id, fileName, fileOwner);
 				});
