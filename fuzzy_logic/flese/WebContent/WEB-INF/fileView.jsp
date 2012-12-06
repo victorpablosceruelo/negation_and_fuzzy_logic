@@ -21,7 +21,7 @@
 				reader.close();
 			}
 			else {
-				out.println("Internal error.");
+				out.println("You are not allowed to see the contents of the file " + request.getAttribute("fileName"));
 			}
 				
 		%>

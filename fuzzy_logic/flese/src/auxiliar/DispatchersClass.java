@@ -101,13 +101,6 @@ public class DispatchersClass {
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SignedInAnswer, "", request, response, LOG);
 	}
 	
-	public void filesList() throws Exception {
-		Iterator<FileInfoClass> filesListIterator = filesMgmt.returnFilesIterator(localUserName.getLocalUserName());
-		request.setAttribute("filesListIterator", filesListIterator);
-		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesListAnswer, "", request, response, LOG);
-	}
-	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,6 +197,13 @@ public class DispatchersClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public void filesList() throws Exception {
+		Iterator<FileInfoClass> filesListIterator = filesMgmt.returnFilesIterator(localUserName.getLocalUserName());
+		request.setAttribute("filesListIterator", filesListIterator);
+		// Forward to the jsp page.
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesListAnswer, "", request, response, LOG);
+	}
 	
 	public void uploadFile() throws Exception {
 		LOG.info("--- uploadFile invocation ---");
@@ -327,11 +327,19 @@ public class DispatchersClass {
 		
 		testAndInitialize_fileName_and_fileOwner();
 
-		String filePath = filesMgmt.getCompletePathOfProgramFile(fileOwner, fileName);
+		String filePath = null;
+		if (localUserName.getLocalUserName().equals(fileOwner)) {
+			filePath = filesMgmt.getCompletePathOfProgramFile(fileOwner, fileName);
+		}
 		request.setAttribute("fileName", fileName);
+		request.setAttribute("fileOwner", fileOwner);
 		request.setAttribute("filePath", filePath);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileViewAnswer, "", request, response, LOG);
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public void listProgramFuzzifications () throws Exception {
 		
