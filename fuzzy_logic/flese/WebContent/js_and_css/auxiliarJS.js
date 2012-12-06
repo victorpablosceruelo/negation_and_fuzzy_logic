@@ -99,10 +99,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		
 		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
 				function(data, textStatus, jqxhr) {
-		   			console.log(data); //data returned
-		   			console.log(textStatus); //success
-		   			console.log(jqxhr.status); //200
-		   			console.log('Load was performed.');
+		   			alert("ProgramFileIntrospectionRequest done ... ");
 		   			insertQuerySelection(parentDivId, selectQueryDiv.id, fileName, fileOwner);
 				});
 	}
@@ -114,6 +111,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner) {
+	alert("Running insertQuerySelection ... ");
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	selectQueryDiv.innerHTML = "";
 	
