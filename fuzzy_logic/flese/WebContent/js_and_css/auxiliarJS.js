@@ -137,10 +137,14 @@ function insertUserOptions(parentDivId) {
 			function(data, textStatus, jqxhr) {
 	   			parentDiv.innerHTML = "";
 	   			
-	   			var userInformationDiv = document.createElement('div');
-	   			userInformationDiv.id = "userInformationDiv";
-	   			userInformationDiv.className = "userInformationTable";
-	   			parentDiv.appendChild(userInformationDiv);
+	   			var userInformationDiv = document.getElementById("userInformationDiv");
+	   			if (userInformationDiv == null) {
+	   				userInformationDiv = document.createElement('div');
+	   				userInformationDiv.id = "userInformationDiv";
+	   				userInformationDiv.className = "userInformationTable";
+	   				parentDiv.appendChild(userInformationDiv);
+	   			}
+	   			userInformationDiv.innerHTML = "";
 	   			
 	   			var row = null;
 	   			var cell = null;
@@ -185,9 +189,12 @@ function insertUserOptions(parentDivId) {
 function insertFilesList (parentDivId) {
 	
 	var parentDiv = document.getElementById(parentDivId);
-	var filesListDiv = document.createElement('div');
-	filesListDiv.id = "filesListDiv";
-	parentDiv.appendChild(filesListDiv);
+	var filesListDiv = document.getElementById('filesListDiv'); 
+	if (filesListDiv == null) {
+		filesListDiv = document.createElement('div');
+		filesListDiv.id = "filesListDiv";
+		parentDiv.appendChild(filesListDiv);
+	}
 	filesListDiv.innerHTML = loadingImageHtml();
 	
 	var fileViewContents = document.createElement('div');
@@ -316,17 +323,19 @@ function notNullNorundefined(value) {
 
 function insertFileUploadFacility(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
-	
-	parentDiv.innerHTML = "";
-	var fileUploadDiv = document.createElement('div');
-	fileUploadDiv.id = "fileUploadDiv";
-	parentDiv.appendChild(fileUploadDiv);
+	var fileUploadDiv = document.getElementById("fileUploadDiv");
+	if (fileUploadDiv == null) {
+		fileUploadDiv = document.createElement('div');
+		fileUploadDiv.id = "fileUploadDiv";
+		parentDiv.appendChild(fileUploadDiv);
+	}
 	
 	var uploadFormId = "uploadForm";
 	var uploadStatusDivId = "uploadStatus";
 	var uploadFormTargetiFrameId = "uploadFormTargetiFrame";
 	
-	fileUploadDiv.innerHTML = "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
+	fileUploadDiv.innerHTML = "Upload Program files <br />" + 
+							  "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
 							  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
 							  		"<INPUT TYPE='file' NAME='programFileToUpload' size='50' "+
 							  		"onchange='uploadActionOnChange(\""+uploadFormId+"\", \""+uploadStatusDivId+"\");'>" +
@@ -351,6 +360,8 @@ function insertFileUploadFacility(parentDivId) {
 			document.getElementById(uploadStatusDivId).style.visibility = 'visible';
 			document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
 
+			// Update the files list.
+			insertFilesList (parentDivId);
 		}
 		  
 	});	
