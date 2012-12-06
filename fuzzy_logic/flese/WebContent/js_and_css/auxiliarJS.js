@@ -197,10 +197,13 @@ function insertFilesList (parentDivId) {
 	}
 	filesListDiv.innerHTML = loadingImageHtml();
 	
-	var fileViewContents = document.createElement('div');
-	fileViewContents.id = "fileViewContents";
-	parentDiv.appendChild(fileViewContents);
-	fileViewContents.innerHTML = "";
+	var fileViewContentsDiv = document.getElementById("fileViewContentsDiv");
+	if (fileViewContentsDiv == null) {
+		fileViewContentsDiv = document.createElement('div');
+		fileViewContentsDiv.id = "fileViewContentsDiv";	 
+		parentDiv.appendChild(fileViewContentsDiv);
+	}
+	fileViewContentsDiv.innerHTML = "";
 		
 	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
@@ -225,7 +228,7 @@ function insertFilesList (parentDivId) {
 	   						cell = document.createElement('div');
 	   						cell.className = "filesListTableCell";
 	   						cell.innerHTML = "<a href='#' title='view program file " + filesList[i].fileName + "' "+
-		   								 	 "onclick='fileViewAction(" + i + ", " + fileViewContents.id + ");' >" + 
+		   								 	 "onclick='fileViewAction(" + i + ", \"" + fileViewContentsDiv.id + "\");' >" + 
 		   								 	 filesList[i].fileName + "</a>";
 	   						row.appendChild(cell);
 
@@ -276,18 +279,32 @@ function insertFilesListHead(filesListDivId) {
 }
 
 function fileViewAction(index, fileViewContentsDivId) {
-	var fileViewContents = document.getElementById(fileViewContentsDivId);
+	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
+	var fileViewContentsDiv = document.getElementById(fileViewContentsDivId);
 	
 	$.get(urlMappingFor('FileViewRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
 			function(data, textStatus, jqxhr) {
-				fileViewContents.innerHTML = data;
+				fileViewContentsDiv.innerHTML = data;
 				
 			    $(function() {
-			        $( "#" + fileViewContentsDivId ).dialog();
+			    	$(fileViewContentsDiv).dialog({
+		                // add a close listener to prevent adding multiple divs to the document
+		                close: function(event, ui) {
+		                    // remove div with all data and events
+		                    // dialog.remove();
+		                    fileViewContentsDiv.innerHTML = "";
+		                },
+		                modal: true,
+		                resizable: true, 
+		                height: "auto", // 800,
+		                width: "auto", // 800,
+		                title: 'Contents of program file ' + filesList[index].fileName
+		            });
+			        // $( "#" + fileViewContentsDivId ).dialog();
 			    });
 			});
 	
-	
+	//prevent the browser to follow the link
 	return false;
 }
 
