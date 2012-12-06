@@ -347,7 +347,7 @@ function insertFileUploadFacility(parentDivId) {
 			}
 			// Clear the content of the iframe.
 			// this.contentDocument.location.href = '/images/loading.gif';
-			alert("responseText: " + responseHtmlText);
+			// alert("responseText: " + responseHtmlText);
 			document.getElementById(uploadStatusDivId).style.visibility = 'visible';
 			document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
 
@@ -357,7 +357,7 @@ function insertFileUploadFacility(parentDivId) {
 }
 
 function uploadActionOnChange(formId, uploadStatusDivId) {
-	alert("Upload Submit Action started ...");
+	// alert("Upload Submit Action started ...");
 	document.getElementById(uploadStatusDivId).style.visibility = 'visible';
 	document.getElementById(uploadStatusDivId).innerHTML = loadingImageHtml();
 

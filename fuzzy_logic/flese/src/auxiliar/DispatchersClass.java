@@ -206,17 +206,26 @@ public class DispatchersClass {
 	}
 	
 	public void uploadFile() throws Exception {
+		String msg = "Program File has been uploaded.";
+		try {
+			uploadFileAux();
+		} catch (Exception e) {
+			msg = "Error: " + e.getMessage();
+		}
+		request.setAttribute("uploadResult", msg);
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileUploadAnswer, "", request, response, LOG);
+	}
+	
+	public void uploadFileAux() throws Exception {
 		LOG.info("--- uploadFile invocation ---");
 		if ((doMethod == null) || ("doGet".equals(doMethod))) {
-			throw new ServletException("GET method used with " + getClass( ).getName( )+": POST method required.");	
+			throw new ServletException("Uploads are only allowed using http post method.");	
 		}
-		if (localUserName == null) throw new Exception("localUserName is null.");
 			
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if( !isMultipart ){
-			ServletsAuxMethodsClass.addMessageToTheUser(request, "ERROR. No file uploaded.", LOG);
-			throw new Exception("the content of the request is not multipart.");
+			throw new Exception("We cannot upload because the content of the request is not multipart.");
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -249,13 +258,13 @@ public class DispatchersClass {
 				//	            String fieldName = fi.getFieldName();
 				String fileName = fileItem.getName();
 				if (fileName == null) {
-					throw new Exception("fileName to upload is null.");
+					throw new Exception("The name of the program file to upload is null.");
 				}
 				if  ("".equals(fileName)) {
-					throw new Exception("fileName to upload is empty string.");
+					throw new Exception("The name of the program file to upload is an empty string.");
 				}
 				if (! fileName.endsWith(".pl")) {
-					throw new Exception("fileName to upload must have the extension '.pl'.");
+					throw new Exception("The name of the program file to upload must have the extension '.pl'.");
 				}
 				//	ServletsAuxMethodsClass.addMessageToTheUser(request, "Please choose a correct program file. Allowed file extension is \'.pl\'", LOG);
 
@@ -272,7 +281,6 @@ public class DispatchersClass {
 				}
 				File file = new File( fileNameReal ) ;
 				fileItem.write( file );
-				ServletsAuxMethodsClass.addMessageToTheUser(request, "Uploaded Filename: " + fileName + " to " + fileNameReal, LOG);
 			}
 		}
 	}	
