@@ -305,7 +305,7 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 	
 	var queryLineSelectPredicateId = queryLineId + ".selectPredicate";
 	var html = "<select name=\'"+queryLineSelectPredicateId+"\'"+
-				"onchange=\"changeInChooseRule(this, \'" + queryLineId + "\', \'"+rowId+ "\', \'"+startupType+"\');\">";
+				"onchange=\"selectPredicateChanged(this, \'" + queryLineId + "\', \'"+rowId+ "\', \'"+startupType+"\', \'" + queryLinesTableId + "');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
 	var addOption=false;
 	for (var i=0; i<programIntrospection.length; i++){
@@ -322,6 +322,110 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 	html += "</select>";
 	
 	cell.innerHTML = html;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function selectPredicateChanged(comboBox, queryLineId, rowId, startupType, queryLinesTableId) {
+	// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');
+	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
+	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
+	var comboBoxTitle = comboBox.options[comboBox.selectedIndex].title;
+	debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
+	debug.info("changeInChooseRule: comboBoxText: " + comboBoxText);
+	debug.info("changeInChooseRule: comboBoxName: " + comboBoxName);
+	debug.info("changeInChooseRule: comboBoxTitle: " + comboBoxTitle);
+	
+	var index = comboBoxTitle;
+	
+	var row = document.getElementById(rowId);
+	var rowCells = row.childNodes;
+	
+	if ((rowCells != null) && (rowCells.length != 'undefined')) {	
+		for (var i=(rowCells.length -1); i >= 0 ; i--) {
+			if ((rowCells[i] != null) && (rowCells[i] != undefined) && (rowCells[i].id != (queryLineId + ".predicate"))) {
+				rowCells.removeChild(rowCells[i]);
+			}
+		}
+	}
+	
+	var foundPredInfo = programIntrospection[index];
+	debug.info("programIntrospection["+index+"]: " + programIntrospection[index].predName);
+
+	if (foundPredInfo != null) {
+		var typeIndex = 0;
+		while ((typeIndex < foundPredInfo.predType.length) && 
+				(foundPredInfo.predType[typeIndex][0] != startupType)) {
+			typeIndex++;
+		}
+		if ((typeIndex < foundPredInfo.predType.length) && 
+				(foundPredInfo.predType[typeIndex][0] == startupType)) {
+			if (foundPredInfo.predType[typeIndex][foundPredInfo.predType[typeIndex].length -1] == 'rfuzzy_truth_value_type') {
+				insertChooseQuantifier(queryLineId, rowId, 1, queryLinesTableId);
+				insertChooseQuantifier(queryLineId, rowId, 0, queryLinesTableId);
+			}
+			else {
+				addRfuzzyComputeOperator(queryLineId, rowId, index, typeIndex);
+				addRfuzzyComputeArgument(queryLineId, rowId, index, typeIndex);
+			}
+		}
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function insertChooseQuantifier(queryLineId, rowId, quantifierIndex, queryLinesTableId) {
+	var row = document.getElementById(rowId);
+	var firstCell = row.firstChild;
+	
+	var cell = document.createElement('div');
+	cell.id = queryLineId + ".quantifier_" + quantifierIndex;
+	cell.className = queryLinesTableId + "Cell";
+	row.insertBefore(cell, firstCell);
+	
+	var quantifierId = queryLineId + ".selectQuantifier_" + quantifierIndex;
+
+	var html = "<select name=\'" + quantifierId + "\'>";
+	html += "<option name=\'----\' value=\'----\'>----</option>";
+	for (var i=0; i<programIntrospection.length; i++){
+		if (isQuantifierPredicate(i)) {
+			if (((quantifierIndex == 0) && (programIntrospection[i].predName == "fnot")) ||
+					((quantifierIndex == 1) && (programIntrospection[i].predName != "fnot"))) {
+				html += "<option name=\'" + programIntrospection[i].predName + 
+							"\' value=\'" + programIntrospection[i].predName + "\'>";
+				if (programIntrospection[i].predName == "fnot") html += "not";
+				else html += programIntrospection[i].predName;
+				html += "</option>";
+			}
+		}
+	}
+	html += "</select>";
+	cell.innerHTML = html;	
+}
+
+function isQuantifierPredicate(index) {
+	var result = false;
+	var i = 0;
+	var predInfo = programIntrospection[index];
+	
+	// debug.info("quantifier ?? predName: " + predInfo.predName);
+	if (predInfo.predArity == "2") {
+		while (i<predInfo.predType.length && ! result) {
+			// debug.info("quantifier ?? predType["+i+"]: " + predInfo.predType[i]);
+			result = result || ((predInfo.predType[i].length == 2) &&
+								(predInfo.predType[i][0] == "rfuzzy_predicate_type") &&
+					  			(predInfo.predType[i][1] == "rfuzzy_truth_value_type"));
+			i++;
+		}
+	}
+	
+	if (! result) debug.info("not a quantifier:" + predInfo.predName);
+	return result;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
