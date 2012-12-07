@@ -140,24 +140,26 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	selectQueryDiv.innerHTML = "";
 	
 	var chooseQueryStartTypeDivId = "chooseQueryStartTypeDiv";
-	var queryLinesDivId = "queryLinesDiv";
+	var queryLinesContainerDivId = "queryLinesContainerDiv";
 	var queryLinesCounterFieldId = "queryLinesCounter";
 	var html = "";
 	html += "<form id='queryForm' action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' " +
 			"method='POST' accept-charset='utf-8'>";
-	html += "     <div id='queryStartContainer' class='queryStartContainer'>";
-	html += "          <div id='queryStartInfo'> ";
-	html += "               <h3>Your query: I'm looking for a </h3> ";
+	html += "     <div id='queryStartContainer' class='queryStartTable'>";
+	html += "          <div class='queryStartRow'>";
+	html += "               <div class='queryStartCell'> ";
+	html += "                    <h3>Your query: I'm looking for a </h3> ";
+	html += "               </div>";
+	html += "               <div class='queryStartCell' id='"+ chooseQueryStartTypeDivId +"'></div>";
 	html += "          </div>";
-	html += "          <div id='"+ chooseQueryStartTypeDivId +"'></div>";
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
-    html += "     <div id='"+ queryLinesDivId +"'></div>";
+    html += "     <div id='"+ queryLinesContainerDivId +"' class='queryLinesContainerTable'></div>";
 	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity();'>";
 	html += "</form>";
 
 	selectQueryDiv.innerHTML = html;
-	insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesDivId, queryLinesCounterFieldId);
+	insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesContainerDivId, queryLinesCounterFieldId);
 	
 }
 
@@ -165,7 +167,7 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesDivId, queryLinesCounterFieldId) {
+function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesContainerDivId, queryLinesCounterFieldId) {
 	var validTypesArray = new Array();
 	var valid = false;
 	for (var i=0; i<programIntrospection.length; i++) {
@@ -191,7 +193,7 @@ function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesDivId
 		}
 	}
 	
-	var html = "<select name=\'startupType' onchange=\"queryStartupTypeChanged(this, \'"+queryLinesDivId+"\', \'"+queryLinesCounterFieldId+"\');\">";
+	var html = "<select name=\'startupType' onchange=\"queryStartupTypeChanged(this, \'"+queryLinesContainerDivId+"\', \'"+queryLinesCounterFieldId+"\');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
 	for (var i=0; i<validTypesArray.length; i++) {
 		html += "<option name=\'"+validTypesArray[i]+"\' value=\'"+validTypesArray[i]+"\''>"+validTypesArray[i]+"</option>";
@@ -204,29 +206,81 @@ function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesDivId
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function queryStartupTypeChanged(comboBox, queryLinesDivId, queryLinesCounterFieldId) {
+function queryStartupTypeChanged(comboBox, queryLinesContainerDivId, queryLinesCounterFieldId) {
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	debug.info("comboBoxValue: " + comboBoxValue);
-	queryLinesCounter=0;
-	changeInFormTheQueryLinesCounter(queryLinesCounter);
+	debug.info("queryStartupTypeChanged: to " + comboBoxValue);
 	
-	document.getElementById(queryLinesDivId).innerHTML="";
+	resetQueryLinesCounterField(queryLinesCounterFieldId);
+	var queryLinesContainerDiv = document.getElementById(queryLinesContainerDivId); 
+	queryLinesDiv.innerHTML="";
 	
-	var queryLinesTableId = "queryLines.table";
-	var queryLinesTable = document.createElement('table');
-	queryLinesTable.id = queryLinesTableId;
-	document.getElementById(queryLinesDivId).appendChild(queryLinesTable);
+	var row = null;
+	var cell = null;
+	var cellContents = null;
+	var queryLinesTableId = "queryLinesTable";
+	var queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 	
-	row = queryLinesTable.insertRow(0);
-	row.id = "queryLines.row";
-	var cell1 = row.insertCell(-1);
-	cell1.id = "queryLines.cell1";
-	var cell2 = row.insertCell(-1);
-	cell2.id = "queryLines.cell2";
+	row = document.createElement('div');
+	row.className = "queryLinesContainerTableRow";
+	queryLinesContainerDiv.appendChild(row);
 	
-	addQueryLine(cell1.id, comboBoxValue);
-	addMoreQueryLines(cell1.id, cell2.id, comboBoxValue);
+	cell = document.createElement('div');
+	cell.className = "queryLinesContainerTableCell";
+	row.appendChild(cell);
+	
+	cellContents = document.createElement('div');
+	cell.className = queryLinesTableId;
+	cell.id = queryLinesTableId;
+	cell.appendChild(cellContents);
+	
+	cell = document.createElement('div');
+	cell.className = "queryLinesContainerTableCell";
+	row.appendChild(cell);
+	
+	cellContents = document.createElement('div');
+	cell.className = queryLinesAggregatorTableId;
+	cell.id = queryLinesAggregatorTableId;
+	cell.appendChild(cellContents);
+	
+	insertQueryLine(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
+	// insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
 }
+
+function resetQueryLinesCounterField(queryLinesCounterFieldId) {
+	document.getElementById(queryLinesCounterFieldId).value = 0;
+}
+
+function incrementQueryLinesCounterField(queryLinesCounterFieldId) {
+	document.getElementById(queryLinesCounterFieldId).value ++;
+	return document.getElementById(queryLinesCounterFieldId).value;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue) {
+
+	var queryLinesAggregatorTable = document.getElementById(queryLinesAggregatorTableId);
+	var row = null;
+	var cell = null;
+	
+	row = document.createElement('div');
+	row.className = queryLinesAggregatorTableId + "Row";
+	queryLinesAggregatorTable.appendChild(row);
+	
+	cell = document.createElement('div');
+	cell.className = queryLinesAggregatorTableId + "Cell";
+	row.appendChild(cell);
+	
+	cell.innerHTML= "<a href=\"\" onClick='return addQueryLineAndAggregatorChoose"+
+					"(\""+queryLinesTableId+"\", \""+queryLinesAggregatorTableId+"\", \""+comboBoxValue+"\");' >" +
+					"<img src=\"images/add.png\" width=\"20\" alt=\"Add more conditions to the query\" "+
+					"title=\"Add more conditions to the query\" /></a>";
+	
+	return false;
+}
+
 
 
 /* ---------------------------------------------------------------------------------------------------------------- */
