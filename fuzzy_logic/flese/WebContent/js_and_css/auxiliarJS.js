@@ -347,7 +347,7 @@ function selectPredicateChanged(comboBox, queryLineId, rowId, startupType, query
 	if ((rowCells != null) && (rowCells.length != 'undefined')) {	
 		for (var i=(rowCells.length -1); i >= 0 ; i--) {
 			if ((rowCells[i] != null) && (rowCells[i] != undefined) && (rowCells[i].id != (queryLineId + ".predicate"))) {
-				rowCells.removeChild(rowCells[i]);
+				row.removeChild(rowCells[i]);
 			}
 		}
 	}
@@ -368,8 +368,8 @@ function selectPredicateChanged(comboBox, queryLineId, rowId, startupType, query
 				insertChooseQuantifier(queryLineId, rowId, 0, queryLinesTableId);
 			}
 			else {
-				addRfuzzyComputeOperator(queryLineId, rowId, index, typeIndex);
-				addRfuzzyComputeArgument(queryLineId, rowId, index, typeIndex);
+				insertRfuzzyComputeOperator(queryLineId, rowId, index, typeIndex, queryLinesTableId);
+				insertRfuzzyComputeArgument(queryLineId, rowId, index, typeIndex, queryLinesTableId);
 			}
 		}
 	}
@@ -424,7 +424,7 @@ function isQuantifierPredicate(index) {
 		}
 	}
 	
-	if (! result) debug.info("not a quantifier:" + predInfo.predName);
+	// if (! result) debug.info("not a quantifier:" + predInfo.predName);
 	return result;
 }
 
@@ -454,7 +454,97 @@ function insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, c
 	return false;
 }
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
 
+function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoIndex, typeIndex, queryLinesTableId) {
+	foundPredInfo = programIntrospection[foundPredInfoIndex];
+	
+	var row = document.getElementById(rowId);
+	var cell = document.createElement('div');
+	cell.id = queryLineGeneralId + ".rfuzzyComputeArgument";
+	cell.className = queryLinesTableId + "Cell";
+	row.appendChild(cell);
+	
+	var rfuzzyComputeArgumentId = queryLineGeneralId + ".selectRfuzzyComputeValue";
+	debug.info("foundPredType: "+foundPredInfo.predType[foundPredInfo.predType.length-1]);
+	var html = "";
+	var type = foundPredInfo.predType[typeIndex];
+	
+	if (type[type.length-1] == 'rfuzzy_enum_type') {
+		html += "<select name=\'" + rfuzzyComputeArgumentId + "\'>";;
+		html += "<option name=\'----\' value=\'----\'>----</option>";
+		var values = foundPredInfo.predOtherInfo;
+		var valuesLength = values.length;
+		i = 0;
+		while (i<valuesLength) {
+			html+= "<option name=\'" + values[i] + "\' value=\'" + values[i] + "\'>" +
+			values[i] + "</option>";
+			i++;
+		}
+		html += "</select>";
+	}
+	else {
+		html += "<input type='text' value='' name='"+rfuzzyComputeArgumentId+"'/>";
+	}
+	cell.innerHTML = html;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoIndex, typeIndex, queryLinesTableId) {
+	
+	foundPredInfo = programIntrospection[foundPredInfoIndex];
+	debug.info("foundPredInfo: "+foundPredInfo);
+	debug.info("foundPredInfo.predName: "+foundPredInfo.predName);
+	debug.info("foundPredInfo.predArity: "+foundPredInfo.predArity);
+	debug.info("foundPredInfo.predType: "+foundPredInfo.predType);
+	debug.info("foundPredInfo.predOtherInfo: "+foundPredInfo.predOtherInfo);
+	var foundPredInfoLastType = foundPredInfo.predType[typeIndex][foundPredInfo.predType[typeIndex].length -1];
+	debug.info("foundPredInfoLastType: "+foundPredInfoLastType);
+	
+	var index = 0;
+	var operatorsPredInfo = null;
+	while (index<programIntrospection.length && operatorsPredInfo == null){
+		if (programIntrospection[index].predName == 'rfuzzy_compute_defined_operators') {
+			operatorsPredInfo = programIntrospection[index];
+		}
+		else index++;
+	}
+	
+	var row = document.getElementById(rowId);
+	var cell = document.createElement('div');
+	cell.id = queryLineGeneralId + ".rfuzzyComputeOperator";
+	cell.className = queryLinesTableId + "Cell";
+	row.appendChild(cell);
+	
+	var rfuzzyComputeOperatorId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
+	var html="<select name=\'";
+	html += rfuzzyComputeOperatorId;
+	html += "\'>";
+	html += "<option name=\'----\' value=\'----\'>----</option>";		
+	
+
+	var operators = operatorsPredInfo.predOtherInfo;
+	for (var i=0; i<operators.length; i++) {
+		
+		debug.info("operatorType: "+operators[i][1]);
+		var case1 = ((foundPredInfoLastType == 'rfuzzy_enum_type') && 
+				((operators[i][1] == 'rfuzzy_enum_type') || (operators[i][1] == 'rfuzzy_any_type')));
+		var case2 = ((foundPredInfoLastType != 'rfuzzy_enum_type') &&
+				(operators[i][1] != 'rfuzzy_enum_type'));
+		if (case1 || case2) {
+			html+= "<option name=\'" + operators[i][0] + "\' value=\'" + operators[i][0] + "\'>" +
+					operators[i][0] + "</option>";
+		}
+	}
+	html += "</select>";
+	cell.innerHTML = html;	
+	
+}
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
