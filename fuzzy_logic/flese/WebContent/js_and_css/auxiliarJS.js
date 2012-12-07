@@ -139,27 +139,27 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	selectQueryDiv.innerHTML = "";
 	
-	var chooseQueryStartTypeDivId = "chooseQueryStartTypeDiv";
-	var queryLinesContainerDivId = "queryLinesContainerDiv";
+	var chooseQueryStartTypeContainerId = "chooseQueryStartTypeDiv";
+	var queryLinesContainerId = "queryLinesContainer";
 	var queryLinesCounterFieldId = "queryLinesCounter";
 	var html = "";
 	html += "<form id='queryForm' action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' " +
 			"method='POST' accept-charset='utf-8'>";
-	html += "     <div id='queryStartContainer' class='queryStartTable'>";
-	html += "          <div class='queryStartRow'>";
-	html += "               <div class='queryStartCell'> ";
+	html += "     <div id='queryStartContainer' class='queryStartContainerTable'>";
+	html += "          <div class='queryStartContainerTableRow'>";
+	html += "               <div class='queryStartContainerTableCell'> ";
 	html += "                    <h3>Your query: I'm looking for a </h3> ";
 	html += "               </div>";
-	html += "               <div class='queryStartCell' id='"+ chooseQueryStartTypeDivId +"'></div>";
+	html += "               <div class='queryStartContainerTableCell' id='"+ chooseQueryStartTypeContainerId +"'></div>";
 	html += "          </div>";
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
-    html += "     <div id='"+ queryLinesContainerDivId +"' class='queryLinesContainerTable'></div>";
+    html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
 	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity();'>";
 	html += "</form>";
 
 	selectQueryDiv.innerHTML = html;
-	insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesContainerDivId, queryLinesCounterFieldId);
+	insertChooseQueryStartupType(chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
 	
 }
 
@@ -167,7 +167,7 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesContainerDivId, queryLinesCounterFieldId) {
+function insertChooseQueryStartupType(chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId) {
 	var validTypesArray = new Array();
 	var valid = false;
 	for (var i=0; i<programIntrospection.length; i++) {
@@ -193,25 +193,26 @@ function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesConta
 		}
 	}
 	
-	var html = "<select name=\'selectQueryStartupType' onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerDivId+"\', \'"+queryLinesCounterFieldId+"\');\">";
+	var html = "<select name=\'selectQueryStartupType' onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerId+
+				"\', \'"+queryLinesCounterFieldId+"\');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
 	for (var i=0; i<validTypesArray.length; i++) {
 		html += "<option name=\'"+validTypesArray[i]+"\' value=\'"+validTypesArray[i]+"\''>"+validTypesArray[i]+"</option>";
 	}
 	html += "</select>";
-	document.getElementById(chooseQueryStartTypeDivId).innerHTML = html;
+	document.getElementById(chooseQueryStartTypeContainerId).innerHTML = html;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectQueryStartupTypeChanged(comboBox, queryLinesContainerDivId, queryLinesCounterFieldId) {
+function selectQueryStartupTypeChanged(comboBox, queryLinesContainerId, queryLinesCounterFieldId) {
 	var startupType = comboBox.options[comboBox.selectedIndex].value;
 	debug.info("startupType changed to " + startupType);
 	
 	resetQueryLinesCounterField(queryLinesCounterFieldId);
-	var queryLinesContainerDiv = document.getElementById(queryLinesContainerDivId); 
+	var queryLinesContainerDiv = document.getElementById(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
 	var row = null;
@@ -221,25 +222,25 @@ function selectQueryStartupTypeChanged(comboBox, queryLinesContainerDivId, query
 	var queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 	
 	row = document.createElement('div');
-	row.className = "queryLinesContainerTableRow";
+	row.className = queryLinesContainerId + "TableRow";
 	queryLinesContainerDiv.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "queryLinesContainerTableCell";
+	cell.className = queryLinesContainerId + "TableCell";
 	row.appendChild(cell);
 	
 	cellContents = document.createElement('div');
-	cell.className = queryLinesTableId;
-	cell.id = queryLinesTableId;
+	cellContents.className = queryLinesTableId;
+	cellContents.id = queryLinesTableId;
 	cell.appendChild(cellContents);
 	
 	cell = document.createElement('div');
-	cell.className = "queryLinesContainerTableCell";
+	cell.className = queryLinesContainerId + "TableCell";
 	row.appendChild(cell);
 	
 	cellContents = document.createElement('div');
-	cell.className = queryLinesAggregatorTableId;
-	cell.id = queryLinesAggregatorTableId;
+	cellContents.className = queryLinesAggregatorTableId;
+	cellContents.id = queryLinesAggregatorTableId;
 	cell.appendChild(cellContents);
 	
 	insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
