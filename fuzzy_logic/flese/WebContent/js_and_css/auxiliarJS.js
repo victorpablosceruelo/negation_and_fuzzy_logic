@@ -193,7 +193,7 @@ function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesConta
 		}
 	}
 	
-	var html = "<select name=\'startupType' onchange=\"queryStartupTypeChanged(this, \'"+queryLinesContainerDivId+"\', \'"+queryLinesCounterFieldId+"\');\">";
+	var html = "<select name=\'selectQueryStartupType' onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerDivId+"\', \'"+queryLinesCounterFieldId+"\');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
 	for (var i=0; i<validTypesArray.length; i++) {
 		html += "<option name=\'"+validTypesArray[i]+"\' value=\'"+validTypesArray[i]+"\''>"+validTypesArray[i]+"</option>";
@@ -206,13 +206,13 @@ function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesConta
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function queryStartupTypeChanged(comboBox, queryLinesContainerDivId, queryLinesCounterFieldId) {
-	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	debug.info("queryStartupTypeChanged: to " + comboBoxValue);
+function selectQueryStartupTypeChanged(comboBox, queryLinesContainerDivId, queryLinesCounterFieldId) {
+	var startupType = comboBox.options[comboBox.selectedIndex].value;
+	debug.info("startupType changed to " + startupType);
 	
 	resetQueryLinesCounterField(queryLinesCounterFieldId);
 	var queryLinesContainerDiv = document.getElementById(queryLinesContainerDivId); 
-	queryLinesDiv.innerHTML="";
+	queryLinesContainerDiv.innerHTML="";
 	
 	var row = null;
 	var cell = null;
@@ -242,7 +242,7 @@ function queryStartupTypeChanged(comboBox, queryLinesContainerDivId, queryLinesC
 	cell.id = queryLinesAggregatorTableId;
 	cell.appendChild(cellContents);
 	
-	insertQueryLine(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
+	insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
 	// insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
 }
 
@@ -252,7 +252,75 @@ function resetQueryLinesCounterField(queryLinesCounterFieldId) {
 
 function incrementQueryLinesCounterField(queryLinesCounterFieldId) {
 	document.getElementById(queryLinesCounterFieldId).value ++;
+	return getQueryLinesCounterField(queryLinesCounterFieldId);
+}
+
+function getQueryLinesCounterField(queryLinesCounterFieldId) {
 	return document.getElementById(queryLinesCounterFieldId).value;
+}
+
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+var queryLinesCounterLimit = 100;
+function insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType) {
+	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
+	if (queryLinesCounter == queryLinesCounterLimit) {
+		alert("You cannot add more subqueries. Maximum number of allowed subqueries is: " + queryLinesCounterLimit);
+	} else {
+		var queryLineId = "queryLine[" + queryLinesCounter + "]";			
+
+		var row = document.createElement('div');
+		row.className = queryLinesTableId + "Row";
+		row.id = queryLineId + ".row";
+		document.getElementById(queryLinesTableId).appendChild(row);
+		
+		// Playing with styles ... best to use CSS.
+		// document.getElementById(queryLineTableId).style.border = "none";
+		// document.getElementById(queryLineTableId).style.border = "hidden";
+		// document.getElementById(queryLineTableId).style.borderColor = "white";
+		// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
+							
+		insertChooseRule(row.id, queryLineId, queryLinesTableId, startupType);
+		
+		queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
+		insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, startupType);
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
+	
+	var row = document.getElementById(rowId);
+	var cell = document.createElement('div');
+	cell.id = queryLineId + ".predicate";
+	cell.className = queryLinesTableId + "Cell";
+	row.appendChild(cell);
+	
+	var queryLineSelectPredicateId = queryLineId + ".selectPredicate";
+	var html = "<select name=\'"+queryLineSelectPredicateId+"\'"+
+				"onchange=\"changeInChooseRule(this, \'" + queryLineId + "\', \'"+rowId+ "\', \'"+startupType+"\');\">";
+	html += "<option name=\'----\' value=\'----\''>----</option>";
+	var addOption=false;
+	for (var i=0; i<programIntrospection.length; i++){
+		addOption=false;
+		for (var j=0; j<programIntrospection[i].predType.length; j++){
+			addOption = addOption || 
+				((startupType == programIntrospection[i].predType[j][0]) && (programIntrospection[i].predArity == "2"));
+		}
+		if (addOption) {
+			html += "<option title=\'" + i + "\' value=\'" + programIntrospection[i].predName + "\'>"+
+					programIntrospection[i].predName + "</option>";
+		}
+	}
+	html += "</select>";
+	
+	cell.innerHTML = html;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
