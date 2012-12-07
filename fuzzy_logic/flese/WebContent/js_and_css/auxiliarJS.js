@@ -265,7 +265,9 @@ function getQueryLinesCounterField(queryLinesCounterFieldId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+// Constant 
 var queryLinesCounterLimit = 100;
+
 function insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType) {
 	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
 	if (queryLinesCounter == queryLinesCounterLimit) {
@@ -287,8 +289,11 @@ function insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLines
 		insertChooseRule(row.id, queryLineId, queryLinesTableId, startupType);
 		
 		queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
-		insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, startupType);
+		insertAggregatorTable(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
 	}
+	
+	// Do not allow navigator to call url.
+	return false;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -432,26 +437,134 @@ function isQuantifierPredicate(index) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue) {
+// insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
+function insertAggregatorTable(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType) {
 
-	var queryLinesAggregatorTable = document.getElementById(queryLinesAggregatorTableId);
 	var row = null;
 	var cell = null;
+	var queryLinesAggregatorTable = document.getElementById(queryLinesAggregatorTableId);
 	
-	row = document.createElement('div');
-	row.className = queryLinesAggregatorTableId + "Row";
-	queryLinesAggregatorTable.appendChild(row);
+	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
+	// debug.info("queryLinesCounter: " + queryLinesCounter);
 	
-	cell = document.createElement('div');
-	cell.className = queryLinesAggregatorTableId + "Cell";
-	row.appendChild(cell);
+	if (queryLinesCounter == 1) {
+		// debug.info("queryLinesCounter: 1 == " + queryLinesCounter);
+		row = document.createElement('div');
+		row.className = queryLinesAggregatorTableId + "Row";
+		queryLinesAggregatorTable.appendChild(row);
 	
-	cell.innerHTML= "<a href=\"\" onClick='return addQueryLineAndAggregatorChoose"+
-					"(\""+queryLinesTableId+"\", \""+queryLinesAggregatorTableId+"\", \""+comboBoxValue+"\");' >" +
-					"<img src=\"images/add.png\" width=\"20\" alt=\"Add more conditions to the query\" "+
-					"title=\"Add more conditions to the query\" /></a>";
+		cell = document.createElement('div');
+		cell.className = queryLinesAggregatorTableId + "Cell";
+		row.appendChild(cell);
 	
+		cell.innerHTML= "<a href=\"#\" onClick='return insertQueryLine"+
+						"(\""+queryLinesCounterFieldId+"\", \""+queryLinesTableId+
+						"\", \""+queryLinesAggregatorTableId+"\", \""+startupType+"\");' >" +
+						"<img src=\"images/add.png\" width=\"20\" alt=\"Add more conditions to the query\" "+
+						"title=\"Add more conditions to the query\" /></a>";
+	}
+	
+	if (queryLinesCounter == 2) {
+		// debug.info("queryLinesCounter: 2 == " + queryLinesCounter);
+		row = document.createElement('div');
+		row.className = queryLinesAggregatorTableId + "Row";
+		queryLinesAggregatorTable.appendChild(row);
+
+		var queryLinesSelectAggregatorShowOptionsId='queryLinesSelectAggregatorShowOptions';
+		var queryLinesSelectAggregatorHideOptionsId='queryLinesSelectAggregatorHideOptions';
+		var chooseAgregatorInfoCellId='queryLines.chooseAgregatorInfoCell';
+		var chooseAgregatorCellId = 'queryLines.chooseAgregatorCell';
+
+		cell = document.createElement('div');
+		cell.className = queryLinesAggregatorTableId + "Cell";
+		cell.innerHTML = ""+
+		"<a id='"+queryLinesSelectAggregatorShowOptionsId+"' href='' onclick='return aggregatorDetailsShow(\""+
+				queryLinesSelectAggregatorShowOptionsId+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+
+				chooseAgregatorInfoCellId+"\", \""+chooseAgregatorCellId+"\");'>"+
+				"show options</a>"+
+		"<a id='"+queryLinesSelectAggregatorHideOptionsId+"' href='' onclick='return aggregatorDetailsHide(\""+
+				queryLinesSelectAggregatorShowOptionsId+"\", \""+queryLinesSelectAggregatorHideOptionsId+"\", \""+
+				chooseAgregatorInfoCellId+"\", \""+chooseAgregatorCellId+"\");'>"+
+				"hide options</a>";
+		row.appendChild(cell);
+		document.getElementById(queryLinesSelectAggregatorHideOptionsId).style.display='none';
+			
+		row = document.createElement('div');
+		row.className = queryLinesAggregatorTableId + "Row";
+		queryLinesAggregatorTable.appendChild(row);
+			
+		cell = document.createElement('div');
+		cell.className = queryLinesAggregatorTableId + "Cell";
+		cell.id = chooseAgregatorInfoCellId;			
+		cell.innerHTML = "The aggregator used to combine <br />the subqueries' truth values is:";
+		cell.style.display='none';
+		row.appendChild(cell);
+			
+		row = document.createElement('div');
+		row.className = queryLinesAggregatorTableId + "Row";
+		queryLinesAggregatorTable.appendChild(row);
+
+		cell = document.createElement('div');
+		cell.className = queryLinesAggregatorTableId + "Cell";
+		cell.id = chooseAgregatorCellId;
+		cell.style.display='none';
+				
+		var queryLinesSelectAggregatorId = "queryLines.selectAggregator"; // used below.
+		var predInfo = null;
+		var isAggregator = false;
+		var html = "";
+		html += "<select name=\'"+queryLinesSelectAggregatorId+"\'>";
+		for (var i=0; i<programIntrospection.length; i++){
+			predInfo = programIntrospection[i];
+			isAggregator = false;
+			for (var j=0; j<predInfo.predType.length; j++) {
+				isAggregator = isAggregator || ((predInfo.predType[j].length == 3) &&
+						(predInfo.predType[j][0] == 'rfuzzy_truth_value_type') &&
+						(predInfo.predType[j][1] == 'rfuzzy_truth_value_type') &&
+						(predInfo.predType[j][2] == 'rfuzzy_truth_value_type'));
+			}
+			if  (isAggregator) {
+				html += "<option ";
+				if (predInfo.predName == "min") html += "selected ";
+				html += "name=\'" + predInfo.predName + 
+						"\' value=\'" + predInfo.predName + "\'>"+predInfo.predName + "</option>";
+			}
+		}
+		html += "</select>";
+		cell.innerHTML = html;
+		row.appendChild(cell);
+	}
+	
+	// alert("stop");
 	return false;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function aggregatorDetailsShow(toShowMsgId, toHideMsgId, chooseAgregatorInfoCellId, chooseAgregatorCellId) {
+	document.getElementById(toShowMsgId).style.display='none';
+	
+	document.getElementById(toHideMsgId).style.display='inline';
+	document.getElementById(toHideMsgId).className = "queryLineAggregatorTable";
+	
+	document.getElementById(chooseAgregatorInfoCellId).style.display='table-cell';
+	document.getElementById(chooseAgregatorInfoCellId).className = "queryLineAggregatorTable";
+	
+	document.getElementById(chooseAgregatorCellId).style.display='table-cell';
+	document.getElementById(chooseAgregatorCellId).className = "queryLineAggregatorTable";
+	return false;
+}
+
+function aggregatorDetailsHide(toShowMsgId, toHideMsgId, chooseAgregatorInfoCellId, chooseAgregatorCellId) {
+	document.getElementById(toHideMsgId).style.display='none';
+	document.getElementById(chooseAgregatorInfoCellId).style.display='none';
+	document.getElementById(chooseAgregatorCellId).style.display='none';
+	
+	document.getElementById(toShowMsgId).style.display='inline';
+	document.getElementById(toShowMsgId).className = "queryLineAggregatorTable";
+	return false;		
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
