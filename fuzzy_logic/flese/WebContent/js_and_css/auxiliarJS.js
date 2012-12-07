@@ -155,7 +155,7 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity();'>";
+	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity(\""+queryLinesCounterFieldId+"\");'>";
 	html += "</form>";
 
 	selectQueryDiv.innerHTML = html;
@@ -193,7 +193,8 @@ function insertChooseQueryStartupType(chooseQueryStartTypeContainerId, queryLine
 		}
 	}
 	
-	var html = "<select name=\'selectQueryStartupType' onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerId+
+	var html = "<select id=\'selectQueryStartupType' name=\'selectQueryStartupType' "+
+				"onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerId+
 				"\', \'"+queryLinesCounterFieldId+"\');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
 	for (var i=0; i<validTypesArray.length; i++) {
@@ -215,36 +216,41 @@ function selectQueryStartupTypeChanged(comboBox, queryLinesContainerId, queryLin
 	var queryLinesContainerDiv = document.getElementById(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
-	var row = null;
-	var cell = null;
-	var cellContents = null;
-	var queryLinesTableId = "queryLinesTable";
-	var queryLinesAggregatorTableId = "queryLinesAggregatorTable";
+	if (startupType == "----") {
+		queryLinesContainerDiv.innerHTML="You cannot be looking for that.";
+	}
+	else {
+		var row = null;
+		var cell = null;
+		var cellContents = null;
+		var queryLinesTableId = "queryLinesTable";
+		var queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 	
-	row = document.createElement('div');
-	row.className = queryLinesContainerId + "TableRow";
-	queryLinesContainerDiv.appendChild(row);
+		row = document.createElement('div');
+		row.className = queryLinesContainerId + "TableRow";
+		queryLinesContainerDiv.appendChild(row);
 	
-	cell = document.createElement('div');
-	cell.className = queryLinesContainerId + "TableCell";
-	row.appendChild(cell);
+		cell = document.createElement('div');
+		cell.className = queryLinesContainerId + "TableCell";
+		row.appendChild(cell);
 	
-	cellContents = document.createElement('div');
-	cellContents.className = queryLinesTableId;
-	cellContents.id = queryLinesTableId;
-	cell.appendChild(cellContents);
+		cellContents = document.createElement('div');
+		cellContents.className = queryLinesTableId;
+		cellContents.id = queryLinesTableId;
+		cell.appendChild(cellContents);
 	
-	cell = document.createElement('div');
-	cell.className = queryLinesContainerId + "TableCell";
-	row.appendChild(cell);
+		cell = document.createElement('div');
+		cell.className = queryLinesContainerId + "TableCell";
+		row.appendChild(cell);
 	
-	cellContents = document.createElement('div');
-	cellContents.className = queryLinesAggregatorTableId;
-	cellContents.id = queryLinesAggregatorTableId;
-	cell.appendChild(cellContents);
+		cellContents = document.createElement('div');
+		cellContents.className = queryLinesAggregatorTableId;
+		cellContents.id = queryLinesAggregatorTableId;
+		cell.appendChild(cellContents);
 	
-	insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
-	// insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
+		insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
+		// insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
+	}
 }
 
 function resetQueryLinesCounterField(queryLinesCounterFieldId) {
@@ -657,6 +663,73 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	html += "</select>";
 	cell.innerHTML = html;	
 	
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+/* This function makes a soft test of the query. */
+function testQueryValidity(queryLinesCounterFieldId) {
+	var comboBox = document.getElementById("selectQueryStartupType");
+	var comboBoxValue = null;
+	
+	if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
+	if (comboBox != null) {
+		if (comboBox.selectedIndex != null) {
+			comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+			if ((comboBoxValue == null) || (comboBoxValue == '----')) {
+				alert("Please, say what you are looking for.");
+				return false; 
+			}
+			else {
+				debug.info("comboBoxValue: " + comboBoxValue);
+			}
+		}
+		else {
+			debug.info("comboBox.selectedIndex is null ");
+			return false;
+		}
+	}
+	else {
+		debug.info("comboBox is null.");
+		return false;
+	}
+	
+	// alert("Stop 2");
+	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
+	for (var i=0; i < queryLinesCounter; i++) {
+		// operator 
+		comboBox = document.getElementsByName("queryLine["+i+"].selectRfuzzyComputeOperator");
+		if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
+		if (comboBox != null) {
+			if (comboBox.selectedIndex != null) {
+				comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+				if (comboBoxValue == '----') {
+					alert("Please fill the operator in subquery number " + (i+1));
+					return false; 
+				}
+				else debug.info("comboBoxValue: " + comboBoxValue);
+			}
+			else debug.info("comboBox.selectedIndex is null ");
+		}
+		else debug.info("comboBox is null.");
+		
+		// value 
+		var value = document.getElementsByName("queryLine["+i+"].selectRfuzzyComputeValue");
+		if ((value != null) && (value.length == 1)) value = value[0];
+		if (value != null) {
+			if (value.value == '') {
+				alert("Please fill the value in subquery number " + (i+1));
+				return false; 
+			}
+			else debug.info("value: " + value);
+		}
+		else debug.info("value is null.");
+	}
+	
+	alert("Stop");
+	return true;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
