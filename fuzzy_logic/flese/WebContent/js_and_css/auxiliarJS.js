@@ -122,8 +122,8 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		
 		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
 				function(data, textStatus, jqxhr) {
-					debug.info("ProgramFileIntrospectionRequest done ... ");
-		   			alert("ProgramFileIntrospectionRequest done ... ");
+					// debug.info("ProgramFileIntrospectionRequest done ... ");
+		   			// alert("ProgramFileIntrospectionRequest done ... ");
 		   			insertQuerySelection(parentDivId, selectQueryDiv.id, fileName, fileOwner);
 				});
 	}
@@ -135,10 +135,13 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner) {
-	alert("Running insertQuerySelection ... ");
+	// alert("Running insertQuerySelection ... ");
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	selectQueryDiv.innerHTML = "";
 	
+	var chooseQueryStartTypeDivId = "chooseQueryStartTypeDiv";
+	var queryLinesDivId = "queryLinesDiv";
+	var queryLinesCounterFieldId = "queryLinesCounter";
 	var html = "";
 	html += "<form id='queryForm' action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' " +
 			"method='POST' accept-charset='utf-8'>";
@@ -146,17 +149,89 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	html += "          <div id='queryStartInfo'> ";
 	html += "               <h3>Your query: I'm looking for a </h3> ";
 	html += "          </div>";
-	html += "          <div id='queryStart'></div>";
+	html += "          <div id='"+ chooseQueryStartTypeDivId +"'></div>";
 	html += "     </div>";
-    html += "     <input type='hidden' name='queryLinesCounter' value='0' id='queryLinesCounter'>";
-    html += "     <div id='queryLinesDiv'></div>";
+    html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
+    html += "     <div id='"+ queryLinesDivId +"'></div>";
 	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity();'>";
 	html += "</form>";
 
 	selectQueryDiv.innerHTML = html;
-	fillQueryStartupValues("queryStart");
+	insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesDivId, queryLinesCounterFieldId);
 	
 }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function insertChooseQueryStartupType(chooseQueryStartTypeDivId, queryLinesDivId, queryLinesCounterFieldId) {
+	var validTypesArray = new Array();
+	var valid = false;
+	for (var i=0; i<programIntrospection.length; i++) {
+		valid = false;
+		if (programIntrospection[i].predOtherInfo != '[]') {
+			for (var j=0; j<programIntrospection[i].predOtherInfo.length; j++) {
+				if (programIntrospection[i].predOtherInfo[j][0] == 'database') {
+					valid = true;
+				}
+			}
+		}
+		
+		if (valid) {
+			var k=0;
+			var found=false;
+			while ((k < validTypesArray.length) && (! found)) {
+				if (validTypesArray[k] == programIntrospection[i].predName)	found = true;
+				else k++;
+			}
+			if (! found) {
+				validTypesArray[validTypesArray.length] = programIntrospection[i].predName;
+			}
+		}
+	}
+	
+	var html = "<select name=\'startupType' onchange=\"queryStartupTypeChanged(this, \'"+queryLinesDivId+"\', \'"+queryLinesCounterFieldId+"\');\">";
+	html += "<option name=\'----\' value=\'----\''>----</option>";
+	for (var i=0; i<validTypesArray.length; i++) {
+		html += "<option name=\'"+validTypesArray[i]+"\' value=\'"+validTypesArray[i]+"\''>"+validTypesArray[i]+"</option>";
+	}
+	html += "</select>";
+	document.getElementById(chooseQueryStartTypeDivId).innerHTML = html;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function queryStartupTypeChanged(comboBox, queryLinesDivId, queryLinesCounterFieldId) {
+	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+	debug.info("comboBoxValue: " + comboBoxValue);
+	queryLinesCounter=0;
+	changeInFormTheQueryLinesCounter(queryLinesCounter);
+	
+	document.getElementById(queryLinesDivId).innerHTML="";
+	
+	var queryLinesTableId = "queryLines.table";
+	var queryLinesTable = document.createElement('table');
+	queryLinesTable.id = queryLinesTableId;
+	document.getElementById(queryLinesDivId).appendChild(queryLinesTable);
+	
+	row = queryLinesTable.insertRow(0);
+	row.id = "queryLines.row";
+	var cell1 = row.insertCell(-1);
+	cell1.id = "queryLines.cell1";
+	var cell2 = row.insertCell(-1);
+	cell2.id = "queryLines.cell2";
+	
+	addQueryLine(cell1.id, comboBoxValue);
+	addMoreQueryLines(cell1.id, cell2.id, comboBoxValue);
+}
+
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */

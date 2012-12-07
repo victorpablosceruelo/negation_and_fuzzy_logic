@@ -106,11 +106,9 @@ public class CiaoPrologConnectionClass {
 		Iterator <AnswerTermInJavaClass[]> programIntrospectionIterator = getProgramIntrospectionIterator();
 		if (programIntrospectionIterator == null) return null;
 		
-		String[] result = new String [programIntrospection.size() + 1];
+		String[] result = new String [programIntrospection.size()];
 		
-		result[0] = "cleanUpProgramIntrospection();";
-		
-		int counter=1;
+		int counter=0;
 		String tmp=null;
 		AnswerTermInJavaClass [] predInfo;
 		while (programIntrospectionIterator.hasNext()) {

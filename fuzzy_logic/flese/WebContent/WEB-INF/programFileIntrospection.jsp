@@ -9,6 +9,7 @@
 <%
 	// @SuppressWarnings("unchecked")
 	CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
+	out.println("cleanUpProgramIntrospection();");
 	if (connection != null) {
 		String [] jsLines = connection.getProgramIntrospectionInJS();
 		if (jsLines != null) {
