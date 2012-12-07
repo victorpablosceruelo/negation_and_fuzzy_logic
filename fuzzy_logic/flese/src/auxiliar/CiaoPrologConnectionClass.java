@@ -121,7 +121,7 @@ public class CiaoPrologConnectionClass {
 				tmp += predInfo[i].toJavaScript(true);
 				if (i+1 < predInfo.length) tmp += ",";
 			}
-			tmp += ");";
+			tmp += "));";
 			result[counter] = tmp;
 			counter ++;
 		}

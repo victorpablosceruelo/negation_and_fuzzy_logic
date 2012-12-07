@@ -79,6 +79,14 @@ function addToProgramIntrospection(index, predInfo) {
 	programIntrospection[index] = predInfo;
 }
 
+function predInfo(predName, predArity, predType, predOtherInfo) {
+	this.predName = predName;
+	this.predArity = predArity;
+	this.predType = predType;
+	this.predOtherInfo = predOtherInfo;
+}
+
+
 function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	// debug.info("parentDivId: " + parentDivId);
 	var parentDiv = document.getElementById(parentDivId);
@@ -353,11 +361,9 @@ function fileViewAction(index, fileViewContentsDivId) {
 function removeFileAction (index, parentDivId) {
 	$.get(urlMappingFor('FileRemoveRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
 			function(data, textStatus, jqxhr) {
-				fileViewContents.innerHTML = data;
-				
 				// Reload the screen.
 				// alert("parentDivId: " + parentDivId);
-				insertUserOptions(parentDivId);
+				insertFilesList(parentDivId);
 			});
 }
 
