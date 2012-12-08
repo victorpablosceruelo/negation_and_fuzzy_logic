@@ -1122,8 +1122,10 @@ function arraySortFunction(elt1, elt2) {
 }
 
 function truncate_truth_value (truth_value) {
+	if (truth_value == "Truth Value") return truth_value;
+	
 	var newValue = parseFloat(truth_value);
-	if ((newValue != null) && (newValue != NaN)) {
+	if ((newValue != null) && (newValue != undefined) && (newValue != NaN) && (newValue != "Truth Value")) {
 		return newValue.toFixed(2);
 	} 
 	else {
