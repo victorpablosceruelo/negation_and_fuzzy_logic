@@ -16,7 +16,6 @@
 	<script type="text/javascript" src="js_and_css/jquery-ui-1.9.2.custom.js"></script>
 	
 	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
-	<script type="text/javascript" src="js_and_css/tabsSelection.js"></script>
 	<script type="text/javascript" src="js_and_css/auxiliarJS.js"></script>
 </head>
 <!-- end of commonHtmlHead -->

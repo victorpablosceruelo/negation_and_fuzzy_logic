@@ -1277,6 +1277,9 @@ function showQueryAnswers(runQueryDivId) {
 				}
 			}
 		}
+		
+		// Enable tabs
+		$( "#tabs" ).tabs();
 	}
 }
 
