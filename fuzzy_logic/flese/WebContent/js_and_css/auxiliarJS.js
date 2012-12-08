@@ -183,13 +183,13 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 			responseHtmlText = iFrameWindow.document.body.innerHTML;
 			// Do something with response text.
 			if (notNullNorundefined(responseHtmlText)) {
-				// iFrameWindow.document.body.innerHTML="";
+				iFrameWindow.document.body.innerHTML="";
 			}
 			// Clear the content of the iframe.
 			// this.contentDocument.location.href = '/images/loading.gif';
 			// alert("responseText: " + responseHtmlText);
 			// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
-			// document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
+			document.getElementById(runQueryDivId).innerHTML = responseHtmlText;
 
 			// Update the files list.
 			// insertFilesList (parentDivId);
@@ -774,28 +774,21 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 		else debug.info("value is null.");
 	}
 	
-	alert("Stop");
-	runQuery(parentDivId, runQueryDivId, runQueryTargetiFrameId);
-	
-	// Do not allow the navigator to follow the link !!!
-	return false;
-}
-
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-
-/* Use ajax to send the query. */
-function runQuery(parentDivId, runQueryDivId, runQueryTargetiFrameId) {
-	
 	var runQueryDiv = document.getElementById(runQueryDivId);
 	runQueryDiv.innerHTML = loadingImageHtml();
 	runQueryDiv.style.display='block'; 
-	// runQueryDiv.style.display='inline'; 
+	// runQueryDiv.style.display='inline';
 	
-	alert("runQuery function ended !!!");
-	return false;
+	alert("Stop");
+	
+	// Tell the navigator to follow the link !!!
+	return true;
 }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 
 
 /* ---------------------------------------------------------------------------------------------------------------- */
