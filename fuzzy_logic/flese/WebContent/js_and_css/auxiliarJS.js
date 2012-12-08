@@ -779,7 +779,8 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	runQueryDiv.style.display='block'; 
 	// runQueryDiv.style.display='inline';
 	
-	alert("Stop");
+	// Used to debug
+	//alert("Stop");
 	
 	// Tell the navigator to follow the link !!!
 	return true;

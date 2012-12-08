@@ -162,7 +162,7 @@ public class DispatchersClass {
 	    // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
 	    
 	    conversor.subqueryEndTestAndSave();
-	    msg += conversor.subqueryRetrieveAndSaveSubpart("startupType", request, QueryConversorClass.initialPredicate);
+	    msg += conversor.subqueryRetrieveAndSaveSubpart("selectQueryStartupType", request, QueryConversorClass.initialPredicate);
 	    msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
 	    
 	    for (int i=0; i<queryLinesCounter; i++) {

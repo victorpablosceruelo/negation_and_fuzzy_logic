@@ -1,8 +1,10 @@
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
 
-// This file contains only JavaScript, and you should not see this.
+
 
 <% 
+	// Debug msg...
+	out.println("alert('The iframe runs JS !!!');");
 	CiaoPrologConnectionClass connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
 	out.println("cleanUpQueryAnswers();");
 	if (connection != null) {
