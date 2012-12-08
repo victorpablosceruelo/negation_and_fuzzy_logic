@@ -1139,13 +1139,104 @@ function resultOver(value, index) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+var infosForQueryAnswers = null;
+
+function infoForQueryAnswers (tableName, queryAnswerIndex) {
+	this.tableName = tableName;
+	this.queryAnswersIndexes = new Array();
+	if ((queryAnswerIndex != null) && (queryAnswerIndex != undefined)) {
+		this.queryAnswersIndexes[0] = queryAnswerIndex;
+	}
+}
+
+function insertInfoForQueryAnswers (tableName, queryAnswerIndex) {
+	if (infosForQueryAnswers == null) {
+		infosForQueryAnswers = new Array();
+	}
+	
+	var i = 0;
+	var found = false;
+	while ((i < infosForQueryAnswers.length) && (! found)) {
+		found = (tableName == infosForQueryAnswers[i].tableName);
+		if (!found) i++;
+	}
+	
+	if (! found) {
+		infosForQueryAnswers[infosForQueryAnswers.length] = new infoForQueryAnswers(tableName, queryAnswerIndex);
+	}
+	else {
+		infosForQueryAnswers[i].queryAnswersIndexes[infosForQueryAnswers[i].queryAnswersIndexes.length] = queryAnswerIndex;
+	}
+}
+
+
+var queryAnswersOver70 = null;
+var queryAnswersOver50 = null;
+var queryAnswersOver0 = null;
+
 function showQueryAnswers(runQueryDivId) {
 	
 	// Initialize.
+	infosForQueryAnswers = null;
 	
-	
-	if (answers.length > 1) answers.sort(arraySortFunction);
+	if (queryAnswers.length > 1) queryAnswers.sort(arraySortFunction);
 
+	var best10answersName = "The 10 answers that best satisfy the query";
+	var answersOver70Name = "The query is very satisfied";
+	var answersOver50Name = "The query is fairly satisfied";
+	var answersOver0Name  = "The query is satisfied";
+	var allAnswers        = "All answers";
+	
+	// Initialize to keep the final order.
+	insertInfoForQueryAnswers(best10answersName, null);
+	insertInfoForQueryAnswers(answersOver70Name, null);
+	insertInfoForQueryAnswers(answersOver50Name, null);
+	insertInfoForQueryAnswers(answersOver0Name, null);
+	insertInfoForQueryAnswers(allAnswers, null);
+	
+	if (queryAnswers.length > 0) {
+		for (var i=0; i<queryAnswers.length; i++) {
+			if ((i <= 10) && (resultOver(0, i))) insertInfoForQueryAnswers(best10answersName, i);
+			if (resultOver(0.7, i)) insertInfoForQueryAnswers(answersOver70Name, i);
+			if (resultOver(0.5, i)) insertInfoForQueryAnswers(answersOver50Name, i);
+			if (resultOver(0, i)) insertInfoForQueryAnswers(answersOver0Name, i);
+			if (resultOver(0, i)) insertInfoForQueryAnswers(allAnswers, i);
+		}
+	}
+	
+	// Create the real tables (if necessary) and put inside the results.
+	var noAnswers = true;
+	for (var i=0; i<infosForQueryAnswers.length; i++) {
+		if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
+			noAnswers = false;
+		}
+	}
+	
+	var runQueryDiv = document.getElementById(runQueryDivId);
+	runQueryDiv.innerHTML = "";
+	
+	if (noAnswers) {
+		runQueryDiv.innerHTML = "The query has no answers. Maybe the database is empty? ";
+	}
+	else {
+		var tabsDiv = document.createElement('div');
+		tabsDiv.id = "tabs";
+		runQueryDiv.appendChild(tabsDiv);
+		var tabsDivList = document.createElement('ul');
+		tabsDiv.appendChild(tabsDivList);
+		
+		var html = "";
+		var j = 1;
+		for (var i=0; i<infosForQueryAnswers.length; i++) {
+			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
+				html += "<li><a href='#tabs-"+j+"'>"+infosForQueryAnswers[i].tableName+"</a></li>";
+			}
+		}
+		tabsDivList.innerHTML = html;
+		
+		
+	}
+	
 	if ((answers.length == 1) || (answers.length == 0)) {
 		document.getElementById('queryAnswersBest10').innerHTML = "no answers";
 		document.getElementById('queryAnswersOver70').innerHTML = "no answers";
