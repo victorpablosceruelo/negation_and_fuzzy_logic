@@ -139,9 +139,11 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	selectQueryDiv.innerHTML = "";
 	
+	var chooseQueryStartTypeId = "selectQueryStartupType";
 	var chooseQueryStartTypeContainerId = "chooseQueryStartTypeDiv";
 	var queryLinesContainerId = "queryLinesContainer";
 	var queryLinesCounterFieldId = "queryLinesCounter";
+	
 	var html = "";
 	html += "<form id='queryForm' action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' " +
 			"method='POST' accept-charset='utf-8'>";
@@ -155,11 +157,12 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-	html += "     <INPUT type='submit' value='Execute Query' onclick='return testQueryValidity(\""+queryLinesCounterFieldId+"\");'>";
+	html += "     <INPUT type='submit' value='Execute Query' ";
+	html += "            onclick='return runQueryAfterSoftTests(\"" + chooseQueryStartTypeId + "\", \""+queryLinesCounterFieldId+"\");'>";
 	html += "</form>";
 
 	selectQueryDiv.innerHTML = html;
-	insertChooseQueryStartupType(chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
+	insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
 	
 }
 
@@ -167,7 +170,7 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function insertChooseQueryStartupType(chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId) {
+function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId) {
 	var validTypesArray = new Array();
 	var valid = false;
 	for (var i=0; i<programIntrospection.length; i++) {
@@ -193,7 +196,7 @@ function insertChooseQueryStartupType(chooseQueryStartTypeContainerId, queryLine
 		}
 	}
 	
-	var html = "<select id=\'selectQueryStartupType' name=\'selectQueryStartupType' "+
+	var html = "<select id='"+chooseQueryStartTypeId+"' name='"+chooseQueryStartTypeId+"' "+
 				"onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerId+
 				"\', \'"+queryLinesCounterFieldId+"\');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
@@ -669,21 +672,21 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-/* This function makes a soft test of the query. */
-function testQueryValidity(queryLinesCounterFieldId) {
-	var comboBox = document.getElementById("selectQueryStartupType");
+/* This function makes a soft test of the query. The one in charge of running the query is below. */
+function runQueryAfterSoftTests(chooseQueryStartTypeId, queryLinesCounterFieldId) {
+	var comboBox = document.getElementById(chooseQueryStartTypeId);
 	var comboBoxValue = null;
 	
 	if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
 	if (comboBox != null) {
 		if (comboBox.selectedIndex != null) {
 			comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-			if ((comboBoxValue == null) || (comboBoxValue == '----')) {
-				alert("Please, say what you are looking for.");
-				return false; 
+			if ((comboBoxValue != null) && (comboBoxValue != '----')) {
+				debug.info("comboBoxValue: " + comboBoxValue);
 			}
 			else {
-				debug.info("comboBoxValue: " + comboBoxValue);
+				alert("Please, say what you are looking for.");
+				return false; 				
 			}
 		}
 		else {
