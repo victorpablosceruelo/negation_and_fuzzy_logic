@@ -1129,8 +1129,8 @@ function truncate_truth_value (truth_value) {
 }
 
 function resultOver(value, index) {
-	var answer = answers[index];
-	var realValue = answer[answer.length -1];
+	var realValue = queryAnswers[index][queryAnswers[index].length -1];
+	if ((realValue == null) || (realValue == undefined)) return false;
 	if (realValue == "Truth Value") return true;
 	return (parseFloat(realValue) > value);
 }
@@ -1230,6 +1230,8 @@ function showQueryAnswers(runQueryDivId) {
 		var j = null;
 		var tabDiv = null;
 		var tabContentDiv = null;
+		var row = null;
+		var cell = null;
 		
 		html = "";
 		j = 1;
@@ -1247,6 +1249,7 @@ function showQueryAnswers(runQueryDivId) {
 			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
 				tabDiv = document.createElement('div');
 				tabDiv.id = "tabs-" + j;
+				j++;
 				tabsDiv.appendChild(tabDiv);
 				
 				tabContentDiv = document.createElement('div');
@@ -1255,103 +1258,27 @@ function showQueryAnswers(runQueryDivId) {
 				
 				// Now insert each answer in a row, inside the table
 				for (var k=0; k<infosForQueryAnswers[i].queryAnswersIndexes.length; k++) {
+					row = document.createElement('div');
+					row.className = "queryAnswersTableRow";
+					tabContentDiv.appendChild(row);
 					
+					var answer = queryAnswers[infosForQueryAnswers[i].queryAnswersIndexes[k]];
+					for (var l=1; l<answer.length; l++) {
+						cell = document.createElement('div');
+						cell.className = "queryAnswersTableCell";
+						row.appendChild(cell);
+						if (l+1 < answer.length) {
+							cell.innerHTML = answer[k];
+						}
+						else {
+							cell.innerHTML = truncate_truth_value(answer[k]);
+						}
+					}
 				}
 			}
 		}
 	}
 }
-
-function createTable(divId) {
-	var div = document.getElementById(divId);
-	var table = document.createElement('table');
-	table.id = divId + 'Table';
-	table.className = 'queryAnswers';
-	div.appendChild(table);
-}
-
-function insertAnswerToTable(divId, index) {
-	var tableId = divId + 'Table';
-	var table = document.getElementById(tableId);
-	var row = table.insertRow(-1);
-	row.className = 'queryAnswers';
-	var cell = null;
-	var answer = answers[i];
-	for (var j=1; j<answer.length; j++) {
-		if (index==0) {
-			cell = document.createElement('th');
-			cell.className = 'queryAnswers';
-			cell.innerHTML = answer[j];
-			row.appendChild(cell);
-		}
-		else {
-			cell = row.insertCell(-1);
-			cell.className = 'queryAnswers';
-			if (j+1 < answer.length) {
-				cell.innerHTML = answer[j];
-			}
-			else {
-				cell.innerHTML = truncate_truth_value(answer[j]);
-			}
-		}
-	}
-}
-
-/*
-
-	<div id="tabs">
-		<ul>
-			<li><a href="#tabs-1">10 best results</a></li>
-			<li><a href="#tabs-2">Results over 70%</a></li>
-			<li><a href="#tabs-3">Results over 50%</a></li>
-			<li><a href="#tabs-4">Results over 0%</a></li>
-			<li><a href="#tabs-5">All results</a></li>
-			<li><a href="#tabs-6">Debug information</a></li>
-		</ul>
-		
-		<div id="tabs-1">
-			<div id="queryAnswersBest10"></div>
-		</div>
-		<div id="tabs-2">
-			<div id="queryAnswersOver70"></div>
-		</div>
-		<div id="tabs-3">
-			<div id="queryAnswersOver50"></div>
-		</div>
-		<div id="tabs-4">
-			<div id="queryAnswersOver0"></div>
-		</div>
-		<div id="tabs-5">
-			<div id="queryAnswersAll"></div>
-		</div>
-		
-	
-    	<div id="tabs-6">
-				<h3>Debug information about the query run in the Prolog system</h3>
-				<table class='queryAnswers'>
-					<tr class='queryAnswers'>
-						<th class='queryAnswers'>Query Format</th>
-						<th class='queryAnswers'>Query</th>
-					</tr>
-					<tr class='queryAnswers'>
-						<td class='queryAnswers'>Basic</td>
-						<td class='queryAnswers'> <%=(String) request.getAttribute("querySimpleInfoString") %> </td>
-					</tr>
-					<tr class='queryAnswers'>
-						<td class='queryAnswers'>Complex</td>
-						<td class='queryAnswers'><%=request.getAttribute("queryComplexInfoString") %></td>
-					</tr>
-					<tr class='queryAnswers'>
-						<td class='queryAnswers'>Prolog</td>
-						<td class='queryAnswers'><%=connection.getLatestEvaluatedQuery() %> </td>
-					</tr>
-				</table>
-		</div>
-	</div>
-	<br /><br /><br /><br />
-	
-*/
-
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
