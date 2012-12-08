@@ -143,10 +143,12 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	var chooseQueryStartTypeContainerId = "chooseQueryStartTypeDiv";
 	var queryLinesContainerId = "queryLinesContainer";
 	var queryLinesCounterFieldId = "queryLinesCounter";
+	var runQueryTargetiFrameId = "runQueryTargetiFrame";
 	
 	var html = "";
-	html += "<form id='queryForm' action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' " +
-			"method='POST' accept-charset='utf-8'>";
+	html += "<form id='queryForm' method='POST' accept-charset='utf-8' ";
+	html += "      action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
+	html += "      target='" + runQueryTargetiFrameId+ "'>";
 	html += "     <div id='queryStartContainer' class='queryStartContainerTable'>";
 	html += "          <div class='queryStartContainerTableRow'>";
 	html += "               <div class='queryStartContainerTableCell'> ";
@@ -157,13 +159,21 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-	html += "     <INPUT type='submit' value='Execute Query' ";
-	html += "            onclick='return runQueryAfterSoftTests(\"" + chooseQueryStartTypeId + "\", \""+queryLinesCounterFieldId+"\");'>";
+	html += "     <INPUT type='submit' value='Execute Query' onclick='return runQueryAfterSoftTests(\"" + parentDivId + 
+					"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + "\", \"" + queryLinesCounterFieldId+"\");'>";
 	html += "</form>";
 
 	selectQueryDiv.innerHTML = html;
 	insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
 	
+	/*
+	"Upload Program files <br />" + 
+	  "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
+	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
+	  		"<INPUT TYPE='file' NAME='programFileToUpload' size='50' "+
+	  		"onchange='uploadActionOnChange(\""+uploadFormId+"\", \""+uploadStatusDivId+"\");'>" +
+	  "</FORM>" +
+	*/
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -673,7 +683,7 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
-function runQueryAfterSoftTests(chooseQueryStartTypeId, queryLinesCounterFieldId) {
+function runQueryAfterSoftTests(parentDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId) {
 	var comboBox = document.getElementById(chooseQueryStartTypeId);
 	var comboBoxValue = null;
 	
@@ -732,8 +742,58 @@ function runQueryAfterSoftTests(chooseQueryStartTypeId, queryLinesCounterFieldId
 	}
 	
 	alert("Stop");
-	return true;
+	runQuery(parentDivId, runQueryTargetiFrameId);
+	
+	// Do not allow the navigator to follow the link !!!
+	return false;
 }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+/* Use ajax to send the query. */
+function runQuery(parentDivId, runQueryTargetiFrameId) {
+	alert("runQuery function !!!");
+	
+	var parentDiv = document.getElementById(parentDivId);
+	var runQueryDiv = document.getElementById('runQueryDiv');
+	if (runQueryDiv == null) {
+		runQueryDiv = document.createElement('div');
+		runQueryDiv.id = 'runQueryDiv';
+		parentDiv.appendChild(runQueryDiv);
+	}
+	
+	// runQueryDiv.innerHTML = loadingImageHtml();
+	runQueryDiv.innerHTML = "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' "+
+							  "src='#' style='display:none;'>" + loadingImageHtml() + "</iframe>";
+    	
+	$('#' + runQueryTargetiFrameId).load(function() {
+		// document.getElementById('#' + submitiFrameId);
+		var responseHtmlText = null;
+		var iFrameWindow = getIframeWindow(this);
+		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
+			responseHtmlText = iFrameWindow.document.body.innerHTML;
+			// Do something with response text.
+			if (notNullNorundefined(responseHtmlText)) {
+				// iFrameWindow.document.body.innerHTML="";
+			}
+			// Clear the content of the iframe.
+			// this.contentDocument.location.href = '/images/loading.gif';
+			// alert("responseText: " + responseHtmlText);
+			// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
+			// document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
+
+			// Update the files list.
+			// insertFilesList (parentDivId);
+		}
+		  
+	});	
+	
+	alert("runQuery function ended !!!");
+	return false;
+}
+
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
