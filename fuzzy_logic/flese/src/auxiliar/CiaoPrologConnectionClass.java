@@ -148,7 +148,7 @@ public class CiaoPrologConnectionClass {
 				result[answersCounter] += "'" + variablesNames[i] + "'";
 				if ((i+1) < variablesNames.length) result[answersCounter] += ", ";
 			}
-			result[answersCounter] += "); ";
+			result[answersCounter] += ")); ";
 		}
 		
 		answersCounter++;
@@ -160,7 +160,7 @@ public class CiaoPrologConnectionClass {
 				result[answersCounter] += answer[i].toJavaScript(true);
 				if ((i+1) < answer.length) result[answersCounter] += ", ";
 			}
-			result[answersCounter] += "); ";
+			result[answersCounter] += ")); ";
 			answersCounter++;
 		}
 		return result;

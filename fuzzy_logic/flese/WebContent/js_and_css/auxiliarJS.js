@@ -193,6 +193,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 
 			// Update the files list.
 			// insertFilesList (parentDivId);
+			eval(responseHtmlText);
 		}
 		  
 	});
