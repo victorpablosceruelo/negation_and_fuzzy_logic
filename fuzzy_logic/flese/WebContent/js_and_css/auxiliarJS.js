@@ -1225,38 +1225,39 @@ function showQueryAnswers(runQueryDivId) {
 		var tabsDivList = document.createElement('ul');
 		tabsDiv.appendChild(tabsDivList);
 		
-		var html = "";
-		var j = 1;
-		for (var i=0; i<infosForQueryAnswers.length; i++) {
+		var html = null;
+		var i = null;
+		var j = null;
+		var tabDiv = null;
+		var tabContentDiv = null;
+		
+		html = "";
+		j = 1;
+		for (i=0; i<infosForQueryAnswers.length; i++) {
 			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
 				html += "<li><a href='#tabs-"+j+"'>"+infosForQueryAnswers[i].tableName+"</a></li>";
+				j++;
 			}
 		}
 		tabsDivList.innerHTML = html;
 		
-		
-	}
-	
-	if ((answers.length == 1) || (answers.length == 0)) {
-		document.getElementById('queryAnswersBest10').innerHTML = "no answers";
-		document.getElementById('queryAnswersOver70').innerHTML = "no answers";
-		document.getElementById('queryAnswersOver50').innerHTML = "no answers";
-		document.getElementById('queryAnswersOver0').innerHTML = "no answers";
-		document.getElementById('queryAnswersAll').innerHTML = "no answers";
-	}
-	else {
-		createTable('queryAnswersBest10');
-		createTable('queryAnswersOver70');
-		createTable('queryAnswersOver50');
-		createTable('queryAnswersOver0');
-		createTable('queryAnswersAll');
-	
-		for (var i=0; i<answers.length; i++) {
-			if ((i <= 10) && (resultOver(0, i))) insertAnswerToTable('queryAnswersBest10', i);
-			if (resultOver(0.7, i)) insertAnswerToTable('queryAnswersOver70', i);
-			if (resultOver(0.5, i)) insertAnswerToTable('queryAnswersOver50', i);
-			if (resultOver(0, i)) insertAnswerToTable('queryAnswersOver0', i);
-			insertAnswerToTable('queryAnswersAll', i);
+		html = "";
+		j = 1;
+		for (i=0; i<infosForQueryAnswers.length; i++) {
+			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
+				tabDiv = document.createElement('div');
+				tabDiv.id = "tabs-" + j;
+				tabsDiv.appendChild(tabDiv);
+				
+				tabContentDiv = document.createElement('div');
+				tabContentDiv.className = "queryAnswersTable";
+				tabDiv.appendChild(tabContentDiv);
+				
+				// Now insert each answer in a row, inside the table
+				for (var k=0; k<infosForQueryAnswers[i].queryAnswersIndexes.length; k++) {
+					
+				}
+			}
 		}
 	}
 }
