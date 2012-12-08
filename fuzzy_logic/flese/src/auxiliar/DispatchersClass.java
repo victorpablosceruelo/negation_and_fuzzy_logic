@@ -180,14 +180,10 @@ public class DispatchersClass {
 	    PLStructure query = conversor.queryConvert();
 	    PLVariable [] variables = conversor.getListOfVariables();
 	    String [] variablesNames = conversor.getListOfNamesForVariables();
-	    request.setAttribute("variablesNames", variablesNames);
-	    
 	    String querySimpleInfoString = conversor.getQuerySimpleInfoString();
 	    String queryComplexInfoString = conversor.getQueryComplexInfoString();
-	    request.setAttribute("querySimpleInfoString", querySimpleInfoString);
-	    request.setAttribute("queryComplexInfoString", queryComplexInfoString);
 
-	    connection.performQuery(query, fileOwner, fileName, variables);
+	    connection.performQuery(query, fileOwner, fileName, variables, variablesNames, querySimpleInfoString, queryComplexInfoString);
 	    // performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)
 		
 		// Update the connection object in the session.

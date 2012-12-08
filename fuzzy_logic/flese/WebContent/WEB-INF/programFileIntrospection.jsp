@@ -1,8 +1,4 @@
-<%@page import="java.util.Iterator"%> 
-<%@page import="auxiliar.FilesMgmtClass"%>
-<%@page import="auxiliar.FileInfoClass"%>
 <%@page import="auxiliar.CiaoPrologConnectionClass"%>
-<%@page import="auxiliar.AnswerTermInJavaClass"%>
 
 // This file contains only JavaScript, and you should not see this.
 

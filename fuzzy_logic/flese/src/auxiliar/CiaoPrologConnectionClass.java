@@ -23,6 +23,10 @@ public class CiaoPrologConnectionClass {
 	private String latestEvaluatedQueryProgramFileOwnerWithPath = null;
 	private String latestEvaluatedQuery = null;
 	
+	private String [] variablesNames = null;
+	private String querySimpleInfoString = null;
+	private String queryComplexInfoString = null;
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +82,7 @@ public class CiaoPrologConnectionClass {
 			PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 
 			// Run the query and save the results in programIntrospection
-			performQuery(query, fileOwner, fileName, variables);
+			performQuery(query, fileOwner, fileName, variables, null, null, null);
 			programIntrospection = latestEvaluatedQueryAnswers;
 
 			if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
@@ -130,6 +134,43 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public String[] getQueryAnswersInJS () {
+		if (latestEvaluatedQueryAnswers==null) return null;
+		Iterator <AnswerTermInJavaClass[]> latestEvaluatedQueryAnswersIterator = getLatestEvaluatedQueryAnswersIterator();
+		if (latestEvaluatedQueryAnswersIterator == null) return null;
+		
+		String[] result = new String [latestEvaluatedQueryAnswers.size() + 1];
+		int answersCounter = 0;
+		
+		if (variablesNames != null) {
+			result[answersCounter] = "addToProgramQueryAnsers("+answersCounter+", new Array(";
+			for (int i=0; i<variablesNames.length; i++) {
+				result[answersCounter] += "'" + variablesNames[i] + "'";
+				if ((i+1) < variablesNames.length) result[answersCounter] += ", ";
+			}
+			result[answersCounter] += "); ";
+		}
+		
+		answersCounter++;
+		AnswerTermInJavaClass [] answer;
+		while (latestEvaluatedQueryAnswersIterator.hasNext()) {
+			answer = latestEvaluatedQueryAnswersIterator.next();
+			result[answersCounter] = "addToProgramQueryAnsers("+answersCounter+", new Array(";
+			for (int i=0; i<answer.length; i++) {
+				result[answersCounter] += answer[i].toJavaScript(true);
+				if ((i+1) < answer.length) result[answersCounter] += ", ";
+			}
+			result[answersCounter] += "); ";
+			answersCounter++;
+		}
+		return result;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
 	private Iterator<AnswerTermInJavaClass []> getProgramIntrospectionIterator() {
 		if (programIntrospection == null) return null;
 		else return programIntrospection.iterator();
@@ -168,17 +209,29 @@ public class CiaoPrologConnectionClass {
 	public String getLatestEvaluatedQuery() { 
 		return latestEvaluatedQuery; }
 	
+	public String getQuerySimpleInfoString () { 
+		return querySimpleInfoString;
+	}
+	public String getQueryComplexInfoString () {
+		return queryComplexInfoString;
+	}
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables) 
+	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables, 
+			String [] variablesNames, String querySimpleInfoString, String queryComplexInfoString) 
 			throws Exception {
 
 		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
 		if (fileName == null) throw new Exception("fileName cannot be null.");
 		if ("".equals(fileOwner)) throw new Exception("fileOwner cannot be empty string.");
 		if ("".equals(fileName)) throw new Exception("fileName cannot be empty string.");
+		
+		this.variablesNames = variablesNames;
+		this.querySimpleInfoString = querySimpleInfoString;
+		this.queryComplexInfoString = queryComplexInfoString;
 		
 		// Connect to the Ciao Prolog Server.
 		String [] argv = new String[1];
@@ -384,7 +437,7 @@ public class CiaoPrologConnectionClass {
 			PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
 			PLStructure query = new PLStructure(",", args_conjunction);
 
-			performQuery(query, owner, programFile, variables);
+			performQuery(query, owner, programFile, variables, null, null, null);
 			LOG.info("testingQuery ... num of answers: " + latestEvaluatedQueryAnswers.size());
 		}
 	}
