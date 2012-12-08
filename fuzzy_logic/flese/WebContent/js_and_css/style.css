@@ -246,6 +246,9 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .queryAnswersTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 .queryAnswersTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 
+.debugTable{display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
+.debugTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.debugTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 
 
 td.providersIcons  {

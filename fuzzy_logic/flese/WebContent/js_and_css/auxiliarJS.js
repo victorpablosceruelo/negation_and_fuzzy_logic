@@ -169,7 +169,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
 	html += "     <INPUT type='submit' value='Execute Query' onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
 					"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + "\", \"" + queryLinesCounterFieldId+"\");'>";
-	html += "</form>";
+	html += "</form><br />";
 	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' src='#' style='display:none;'> </iframe>";
     	
 	selectQueryDiv.innerHTML = html;
@@ -199,6 +199,9 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 			
 			// Show the answers retrieved to the user.
 			showQueryAnswers(runQueryDivId);
+			
+			// Debug information
+			// debugQueryAnswers(parentDivId);
 		}
 		  
 	});
@@ -1268,10 +1271,10 @@ function showQueryAnswers(runQueryDivId) {
 						cell.className = "queryAnswersTableCell";
 						row.appendChild(cell);
 						if (l+1 < answer.length) {
-							cell.innerHTML = answer[k];
+							cell.innerHTML = answer[l];
 						}
 						else {
-							cell.innerHTML = truncate_truth_value(answer[k]);
+							cell.innerHTML = truncate_truth_value(answer[l]);
 						}
 					}
 				}
@@ -1280,6 +1283,33 @@ function showQueryAnswers(runQueryDivId) {
 		
 		// Enable tabs
 		$( "#tabs" ).tabs();
+	}
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function debugQueryAnswers(parentDivId) {
+	var parentDiv = document.getElementById(parentDivId);
+	var debugDiv = document.createElement('div');
+	debugDiv.className = "debugTable";
+	parentDiv.appendChild(debugDiv);
+	var rowDiv = null;
+	var cellDiv = null;
+	
+	for (var i=0; i<queryAnswers.length; i++) {
+		rowDiv = document.createElement('div');
+		rowDiv.className = "debugTableRow";
+		debugDiv.appendChild(rowDiv);
+		
+		for (var j=0; j < queryAnswers[i].length; j++) {
+			cellDiv = document.createElement('div');
+			cellDiv.className = "debugTableCell";
+			rowDiv.appendChild(cellDiv);
+			
+			cellDiv.innerHTML = queryAnswers[i][j];
+		}
 	}
 }
 
