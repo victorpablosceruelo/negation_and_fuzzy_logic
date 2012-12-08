@@ -100,6 +100,14 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 
 	selectQueryDiv.innerHTML = loadingImageHtml();
 	
+	runQueryDivId = 'runQueryDiv';
+	var runQueryDiv = document.getElementById(runQueryDivId);
+	if (runQueryDiv == null) {
+		runQueryDiv = document.createElement('div');
+		runQueryDiv.id = runQueryDivId;
+		parentDiv.appendChild(runQueryDiv);
+	}
+	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 	// alert("comboBoxValue: " + comboBoxValue);
 	if ((comboBoxValue == null) || (comboBoxValue == "") || (comboBoxValue == "----")) {
@@ -124,7 +132,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 				function(data, textStatus, jqxhr) {
 					// debug.info("ProgramFileIntrospectionRequest done ... ");
 		   			// alert("ProgramFileIntrospectionRequest done ... ");
-		   			insertQuerySelection(parentDivId, selectQueryDiv.id, fileName, fileOwner);
+		   			insertQuerySelection(parentDivId, runQueryDivId, selectQueryDiv.id, fileName, fileOwner);
 				});
 	}
 	
@@ -134,7 +142,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner) {
+function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, fileName, fileOwner) {
 	// alert("Running insertQuerySelection ... ");
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	selectQueryDiv.innerHTML = "";
@@ -159,11 +167,36 @@ function insertQuerySelection(parentDivId, selectQueryDivId, fileName, fileOwner
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-	html += "     <INPUT type='submit' value='Execute Query' onclick='return runQueryAfterSoftTests(\"" + parentDivId + 
+	html += "     <INPUT type='submit' value='Execute Query' onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
 					"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + "\", \"" + queryLinesCounterFieldId+"\");'>";
 	html += "</form>";
-
+	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' src='#' style='display:none;'> </iframe>";
+    	
 	selectQueryDiv.innerHTML = html;
+	
+	// Callback run after runQueryTargetiFrame is loaded.
+	$('#' + runQueryTargetiFrameId).load(function() {
+		// document.getElementById('#' + submitiFrameId);
+		var responseHtmlText = null;
+		var iFrameWindow = getIframeWindow(this);
+		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
+			responseHtmlText = iFrameWindow.document.body.innerHTML;
+			// Do something with response text.
+			if (notNullNorundefined(responseHtmlText)) {
+				// iFrameWindow.document.body.innerHTML="";
+			}
+			// Clear the content of the iframe.
+			// this.contentDocument.location.href = '/images/loading.gif';
+			// alert("responseText: " + responseHtmlText);
+			// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
+			// document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
+
+			// Update the files list.
+			// insertFilesList (parentDivId);
+		}
+		  
+	});
+	
 	insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
 	
 	/*
@@ -683,7 +716,7 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
-function runQueryAfterSoftTests(parentDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId) {
+function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId) {
 	var comboBox = document.getElementById(chooseQueryStartTypeId);
 	var comboBoxValue = null;
 	
@@ -742,7 +775,7 @@ function runQueryAfterSoftTests(parentDivId, runQueryTargetiFrameId, chooseQuery
 	}
 	
 	alert("Stop");
-	runQuery(parentDivId, runQueryTargetiFrameId);
+	runQuery(parentDivId, runQueryDivId, runQueryTargetiFrameId);
 	
 	// Do not allow the navigator to follow the link !!!
 	return false;
@@ -753,42 +786,12 @@ function runQueryAfterSoftTests(parentDivId, runQueryTargetiFrameId, chooseQuery
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /* Use ajax to send the query. */
-function runQuery(parentDivId, runQueryTargetiFrameId) {
-	alert("runQuery function !!!");
+function runQuery(parentDivId, runQueryDivId, runQueryTargetiFrameId) {
 	
-	var parentDiv = document.getElementById(parentDivId);
-	var runQueryDiv = document.getElementById('runQueryDiv');
-	if (runQueryDiv == null) {
-		runQueryDiv = document.createElement('div');
-		runQueryDiv.id = 'runQueryDiv';
-		parentDiv.appendChild(runQueryDiv);
-	}
-	
-	// runQueryDiv.innerHTML = loadingImageHtml();
-	runQueryDiv.innerHTML = "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' "+
-							  "src='#' style='display:none;'>" + loadingImageHtml() + "</iframe>";
-    	
-	$('#' + runQueryTargetiFrameId).load(function() {
-		// document.getElementById('#' + submitiFrameId);
-		var responseHtmlText = null;
-		var iFrameWindow = getIframeWindow(this);
-		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
-			responseHtmlText = iFrameWindow.document.body.innerHTML;
-			// Do something with response text.
-			if (notNullNorundefined(responseHtmlText)) {
-				// iFrameWindow.document.body.innerHTML="";
-			}
-			// Clear the content of the iframe.
-			// this.contentDocument.location.href = '/images/loading.gif';
-			// alert("responseText: " + responseHtmlText);
-			// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
-			// document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
-
-			// Update the files list.
-			// insertFilesList (parentDivId);
-		}
-		  
-	});	
+	var runQueryDiv = document.getElementById(runQueryDivId);
+	runQueryDiv.innerHTML = loadingImageHtml();
+	runQueryDiv.style.display='block'; 
+	// runQueryDiv.style.display='inline'; 
 	
 	alert("runQuery function ended !!!");
 	return false;
