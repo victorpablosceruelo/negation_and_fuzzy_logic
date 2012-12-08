@@ -105,9 +105,9 @@ public class DispatcherServlet extends HttpServlet {
 			break;
 		case ServletsAuxMethodsClass.FileViewRequest: dispatcherObject.viewFile();
 			break;
-		case ServletsAuxMethodsClass.ProgramFileIntrospectionRequest: dispatcherObject.dbIntrospectionQuery(true);
+		case ServletsAuxMethodsClass.ProgramFileIntrospectionRequest: dispatcherObject.runProgramIntrospectionQuery(true);
 			break;
-		case ServletsAuxMethodsClass.RunQueryRequest: dispatcherObject.dbGenericQuery();
+		case ServletsAuxMethodsClass.RunQueryRequest: dispatcherObject.runProgramQuery();
 			break;
 		case ServletsAuxMethodsClass.TheSamePage:
 		default: dispatcherObject.emptyRequest();

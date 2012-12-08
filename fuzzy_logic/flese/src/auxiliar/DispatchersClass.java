@@ -110,7 +110,7 @@ public class DispatchersClass {
 	 * so the results can be obtained in any jsp page.
 	 * @throws Exception
 	 */
-	public void dbIntrospectionQuery(boolean doForward) throws Exception {
+	public void runProgramIntrospectionQuery(boolean doForward) throws Exception {
 		
 		testAndInitialize_fileName_and_fileOwner();
 		connection.programFileIntrospectionQuery(fileOwner, fileName);
@@ -128,6 +128,7 @@ public class DispatchersClass {
 		session.setAttribute("connection", connection);
 
 		if (doForward) {
+			// Forward to the jsp page.
 			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramFileIntrospectionAnswer, "", request, response, LOG);
 		}
 	}
@@ -137,10 +138,10 @@ public class DispatchersClass {
 	 * so the results can be obtained in any jsp page.
 	 * @throws Exception
 	 */
-	public void dbGenericQuery() throws Exception {
+	public void runProgramQuery() throws Exception {
 		
 		testAndInitialize_fileName_and_fileOwner();
-		dbIntrospectionQuery(false);
+		runProgramIntrospectionQuery(false);
 		
 		String formParameters = " --- Parameters Names and Values --- \n";
 	    Enumeration<String> paramNames = request.getParameterNames();
@@ -192,6 +193,9 @@ public class DispatchersClass {
 		// Update the connection object in the session.
 		session.removeAttribute("connection"); 
 		session.setAttribute("connection", connection);
+		
+		// Forward to the jsp page.
+		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryAnswer, "", request, response, LOG);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
