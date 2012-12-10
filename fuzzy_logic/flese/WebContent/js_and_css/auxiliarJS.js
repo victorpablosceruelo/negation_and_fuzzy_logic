@@ -1354,31 +1354,40 @@ function debugQueryAnswers(parentDivId) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizeProgramFile(chooseQueryStartTypeId) {
+function personalizeProgramFile(chooseProgramFileId) {
 	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
-	var fileViewContentsDiv = document.getElementById(fileViewContentsDivId);
+	var comboBox = document.getElementById(chooseProgramFileId);
+	var selectedProgramDatabase = getProgramDatabaseComboBoxValue(comboBox);
 	
-	$.get(urlMappingFor('FileViewRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+	if (selectedProgramDatabase == null) {
+		alert("Please choose a valid database to continue.");
+	}
+	else {
+		var personalizationDiv = document.createElement('div');
+		
+		$.get(urlMappingFor('ListProgramFuzzificationsRequest') + 
+				"&fileName="+selectedProgramDatabase.fileName+"&fileOwner="+selectedProgramDatabase.fileOwner, 
 			function(data, textStatus, jqxhr) {
-				fileViewContentsDiv.innerHTML = data;
+				personalizationDiv.innerHTML = data;
 				
 			    $(function() {
-			    	$(fileViewContentsDiv).dialog({
+			    	$(personalizationDiv).dialog({
 		                // add a close listener to prevent adding multiple divs to the document
 		                close: function(event, ui) {
 		                    // remove div with all data and events
 		                    // dialog.remove();
-		                    fileViewContentsDiv.innerHTML = "";
+		                	personalizationDiv.innerHTML = "";
 		                },
 		                modal: true,
 		                resizable: true, 
 		                height: "auto", // 800,
 		                width: "auto", // 800,
-		                title: 'Contents of program file ' + filesList[index].fileName
+		                title: 'Personalizing program file ' + selectedProgramDatabase.fileName + " owned by " + selectedProgramDatabase.fileOwner
 		            });
 			        // $( "#" + fileViewContentsDivId ).dialog();
 			    });
 			});
+	}
 	
 	//prevent the browser to follow the link
 	return false;

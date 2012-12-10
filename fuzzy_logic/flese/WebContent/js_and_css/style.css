@@ -224,11 +224,14 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .userInformationTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 .userInformationTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 
+.selectDatabaseTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
+.selectDatabaseTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.selectDatabaseTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+
 
 .queryStartContainerTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
 .queryStartContainerTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 .queryStartContainerTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
-
 
 .queryLinesContainerTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
 .queryLinesContainerTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
