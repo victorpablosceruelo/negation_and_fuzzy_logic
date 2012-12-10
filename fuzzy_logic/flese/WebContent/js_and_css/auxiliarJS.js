@@ -1373,15 +1373,19 @@ function ownerPersonalization (predOwner, functionPoints) {
 	this.functionPoints = functionPoints;
 }
 
+function fuzzificationFunction(predDefined, predNecessary, ownersPersonalizations) {
+	this.predDefined = predDefined;
+	this.predNecessary = predNecessary;
+	this.ownersPersonalizations = ownersPersonalizations;
+}
+
 function cleanUpFuzzificationFunctionsDefinitions () {
 	fuzzificationsFunctions = null;
 	fuzzificationsFunctions = new Array();
 }
 
 function addFuzzificationFunctionDefinition (predDefined, predNecessary, ownersPersonalizations) {
-	this.predDefined = predDefined;
-	this.predNecessary = predNecessary;
-	this.ownersPersonalizations = ownersPersonalizations;
+	fuzzificationsFunctions[fuzzificationsFunctions.length] = new fuzzificationFunction(predDefined, predNecessary, ownersPersonalizations);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
