@@ -1366,6 +1366,28 @@ function debugQueryAnswers(parentDivId) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
+var fuzzificationsFunctions = null;
+
+function ownerPersonalization (predOwner, functionPoints) {
+	this.predOwner = predOwner;
+	this.functionPoints = functionPoints;
+}
+
+function cleanUpFuzzificationFunctionsDefinitions () {
+	fuzzificationsFunctions = null;
+	fuzzificationsFunctions = new Array();
+}
+
+function addFuzzificationFunctionDefinition (predDefined, predNecessary, ownersPersonalizations) {
+	this.predDefined = predDefined;
+	this.predNecessary = predNecessary;
+	this.ownersPersonalizations = ownersPersonalizations;
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
 function personalizeProgramFile(chooseProgramFileId, mode) {
 	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
 	var comboBox = document.getElementById(chooseProgramFileId);
@@ -1401,14 +1423,46 @@ function personalizeProgramFile(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showBasicPersonalizeProgramFileDialog(fileName, fileOwner) {
-	var basicpersonalizationDiv = document.createElement('div');
+function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
+	var personalizationDiv = document.createElement('div');
+	
+	var personalizationDivSubTable = document.createElement('div');
+	personalizationDivSubTable.className = "personalizationDivSubTable";
+	personalizationDiv.appendChild(personalizationDivSubTable);
+	
+	var row = document.createElement('div');
+	row.className = "personalizationDivSubTableRow";
+	personalizationDivSubTable.appendChild(row);
+	
+	var cell = document.createElement('div');
+	cell.className = "personalizationDivSubTableCell";
+	personalizationDivSubTable.appendChild(cell);
+	
+	var PersonalizationFunctionUnderModificationDivId = "PersonalizationDivCell";
 	
 	// Fill in the div.
-	var 
+	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
 	var html = "";
+	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
+			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId+"\");'>";
+	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
-	personalizationDiv.innerHTML = "alcahueta !!!";
+	for (var i=0; i < fuzzificationsFunctions.length; i++) {
+		html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
+				"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
+				fuzzificationsFunctions[i].predDefined + "</option>";
+	}
+	html += "</select>";
+	cell.innerHTML = html;
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivSubTableRow";
+	personalizationDivSubTable.appendChild(row);
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubTableCell";
+	personalizationDivSubTable.appendChild(cell);
+	cell.innerHTML = "Select the fuzzification you want to personalize.";
 	
 	// Show the div.
     $(function() {
@@ -1433,24 +1487,9 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-var fuzzificationsFunctions = null;
-
-function ownerPersonalization (predOwner, functionPoints) {
-	this.predOwner = predOwner;
-	this.functionPoints = functionPoints;
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId) {
+	alert("Not implemented");
 }
-
-function cleanUpFuzzificationFunctionsDefinitions () {
-	fuzzificationsFunctions = null;
-	fuzzificationsFunctions = new Array();
-}
-
-function addFuzzificationFunctionDefinition (predDefined, predNecessary, ownersPersonalizations) {
-	this.predDefined = predDefined;
-	this.predNecessary = predNecessary;
-	this.ownersPersonalizations = ownersPersonalizations;
-}
-
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
