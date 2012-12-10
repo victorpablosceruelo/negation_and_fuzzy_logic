@@ -68,13 +68,13 @@ function insertProgramFileSelection(parentDivId) {
 			html += "</select>";
 			cell.innerHTML = html;
 			
-			cell = document.createElement('div');
-			cell.className = "selectDatabaseTableCell";
-			cell.id = "personalizationButtonContainer";
-			row.appendChild(cell);
+			//cell = document.createElement('div');
+			//cell.className = "selectDatabaseTableCell";
+			//cell.id = "personalizationButtonContainer";
+			//row.appendChild(cell);
 			
-			cell.innerHTML = "<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(\"" +
-							 chooseProgramFileId + "\");'>";
+			//cell.innerHTML = "<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(\"" +
+			//				 chooseProgramFileId + "\");'>";
 		}
 	});
 }
@@ -202,8 +202,20 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-	html += "     <INPUT type='submit' value='Search' onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
-					"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + "\", \"" + queryLinesCounterFieldId+"\");'>";
+    html += "     <div class='searchOrPersonalizeTable'>";
+    html += "          <div class='searchOrPersonalizeTableRow'>";
+    html += "               <div class='searchOrPersonalizeTableCell'>";
+	html += "                    <INPUT type='submit' value='Search' "+
+									"onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
+									"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + 
+									"\", \"" + queryLinesCounterFieldId+"\");'>";
+	html += "               </div>";
+	html += "               <div class='searchOrPersonalizeTableCell'>";
+	html += "                    <INPUT type='submit' value='Personalize Program File' " +
+									"onclick='return personalizeProgramFile(\"" + fileName + "\", \"" + fileOwner + "\");'>";
+	html += "               </div>";
+	html += "          </div>";
+	html += "     </div>";
 	html += "</form><br />";
 	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' src='#' style='display:none;'> </iframe>";
     	
@@ -1363,17 +1375,23 @@ function personalizeProgramFile(chooseProgramFileId) {
 		alert("Please choose a valid database to continue.");
 	}
 	else {
-		$.get(urlMappingFor('ListProgramFuzzificationsRequest') + 
-				"&fileName="+selectedProgramDatabase.fileName+"&fileOwner="+selectedProgramDatabase.fileOwner, 
-			function(data, textStatus, jqxhr) {
-				// Evaluate the JS code returned by the server.
-				eval(data);
-				
-				// Show the personalization dialog to the user.
-				showPersonalizeProgramFileDialog(selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
-
-			});
+		personalizeProgramFile(selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
 	}
+	
+	//prevent the browser to follow the link
+	return false;
+}
+
+function personalizeProgramFile(fileName, fileOwner) {
+	$.get(urlMappingFor('ListProgramFuzzificationsRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
+		function(data, textStatus, jqxhr) {
+			// Evaluate the JS code returned by the server.
+			eval(data);
+			
+			// Show the personalization dialog to the user.
+			showPersonalizeProgramFileDialog(fileName, fileOwner);
+
+		});
 	
 	//prevent the browser to follow the link
 	return false;
