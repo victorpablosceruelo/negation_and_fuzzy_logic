@@ -74,7 +74,7 @@ function insertProgramFileSelection(parentDivId) {
 			//row.appendChild(cell);
 			
 			//cell.innerHTML = "<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(\"" +
-			//				 chooseProgramFileId + "\");'>";
+			//				 chooseProgramFileId + "\", \"basic\");'>";
 		}
 	});
 }
@@ -212,7 +212,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "               </div>";
 	html += "               <div class='searchOrPersonalizeTableCell'>";
 	html += "                    <INPUT type='submit' value='Personalize Program File' " +
-									"onclick='return personalizeProgramFile(\"" + fileName + "\", \"" + fileOwner + "\");'>";
+									"onclick='return personalizeProgramFile(\"" + fileName + "\", \"" + fileOwner + "\", \"basic\");'>";
 	html += "               </div>";
 	html += "          </div>";
 	html += "     </div>";
@@ -1366,7 +1366,7 @@ function debugQueryAnswers(parentDivId) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizeProgramFile(chooseProgramFileId) {
+function personalizeProgramFile(chooseProgramFileId, mode) {
 	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
 	var comboBox = document.getElementById(chooseProgramFileId);
 	var selectedProgramDatabase = getProgramDatabaseComboBoxValue(comboBox);
@@ -1375,22 +1375,22 @@ function personalizeProgramFile(chooseProgramFileId) {
 		alert("Please choose a valid database to continue.");
 	}
 	else {
-		personalizeProgramFile(selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
+		personalizeProgramFile(selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner, mode);
 	}
 	
 	//prevent the browser to follow the link
 	return false;
 }
 
-function personalizeProgramFile(fileName, fileOwner) {
+function personalizeProgramFile(fileName, fileOwner, mode) {
 	$.get(urlMappingFor('ListProgramFuzzificationsRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
 		function(data, textStatus, jqxhr) {
 			// Evaluate the JS code returned by the server.
 			eval(data);
-			
-			// Show the personalization dialog to the user.
-			showPersonalizeProgramFileDialog(fileName, fileOwner);
 
+			// Show the personalization dialog to the user.
+			showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode);
+			
 		});
 	
 	//prevent the browser to follow the link
@@ -1401,10 +1401,13 @@ function personalizeProgramFile(fileName, fileOwner) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showPersonalizeProgramFileDialog(fileName, fileOwner) {
-	var personalizationDiv = document.createElement('div');
+function showBasicPersonalizeProgramFileDialog(fileName, fileOwner) {
+	var basicpersonalizationDiv = document.createElement('div');
 	
 	// Fill in the div.
+	var 
+	var html = "";
+	
 	personalizationDiv.innerHTML = "alcahueta !!!";
 	
 	// Show the div.
