@@ -82,9 +82,11 @@ public class DispatchersClass {
 	private void testAndInitialize_fileName_and_fileOwner() throws Exception {
 		fileName = request.getParameter("fileName");
 		if (fileName == null) throw new Exception("fileName is null.");
+		request.setAttribute("fileName", fileName);
 		
 		fileOwner = request.getParameter("fileOwner");
 		if (fileOwner == null) throw new Exception("fileOwner is null.");
+		request.setAttribute("fileOwner", fileOwner);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,8 +341,6 @@ public class DispatchersClass {
 		if (localUserName.getLocalUserName().equals(fileOwner)) {
 			filePath = filesMgmt.getCompletePathOfProgramFile(fileOwner, fileName);
 		}
-		request.setAttribute("fileName", fileName);
-		request.setAttribute("fileOwner", fileOwner);
 		request.setAttribute("filePath", filePath);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileViewAnswer, "", request, response, LOG);
 	}
@@ -357,14 +357,10 @@ public class DispatchersClass {
 		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		request.setAttribute("filePath", filePath);
 		
-		String fuzzification = request.getParameter("fuzzification");
-		if (fuzzification == null) throw new Exception("fuzzification is null.");
-		request.setAttribute("fuzzification", fuzzification);
-		
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ListProgramFuzzificationsAnswer, "", request, response, LOG);
-
 	}
+	
 	public void saveProgramFuzzification () throws Exception {
 		
 		testAndInitialize_fileName_and_fileOwner();
@@ -397,7 +393,7 @@ public class DispatchersClass {
 		
 		LOG.info(paramsDebug);
 		
-		ProgramAnalizedClass programAnalized = new ProgramAnalizedClass(filePath, null);
+		ProgramAnalizedClass programAnalized = new ProgramAnalizedClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
 		programAnalized.updateProgramFile(fuzzification, localUserName, params);
 		
 		connection.clearCacheInCiaoPrologConnectionClass();

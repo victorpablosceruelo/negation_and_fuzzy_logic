@@ -1363,35 +1363,73 @@ function personalizeProgramFile(chooseProgramFileId) {
 		alert("Please choose a valid database to continue.");
 	}
 	else {
-		var personalizationDiv = document.createElement('div');
-		
 		$.get(urlMappingFor('ListProgramFuzzificationsRequest') + 
 				"&fileName="+selectedProgramDatabase.fileName+"&fileOwner="+selectedProgramDatabase.fileOwner, 
 			function(data, textStatus, jqxhr) {
-				personalizationDiv.innerHTML = data;
+				// Evaluate the JS code returned by the server.
+				eval(data);
 				
-			    $(function() {
-			    	$(personalizationDiv).dialog({
-		                // add a close listener to prevent adding multiple divs to the document
-		                close: function(event, ui) {
-		                    // remove div with all data and events
-		                    // dialog.remove();
-		                	personalizationDiv.innerHTML = "";
-		                },
-		                modal: true,
-		                resizable: true, 
-		                height: "auto", // 800,
-		                width: "auto", // 800,
-		                title: 'Personalizing program file ' + selectedProgramDatabase.fileName + " owned by " + selectedProgramDatabase.fileOwner
-		            });
-			        // $( "#" + fileViewContentsDivId ).dialog();
-			    });
+				// Show the personalization dialog to the user.
+				showPersonalizeProgramFileDialog(selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
+
 			});
 	}
 	
 	//prevent the browser to follow the link
 	return false;
 }
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function showPersonalizeProgramFileDialog(fileName, fileOwner) {
+	var personalizationDiv = document.createElement('div');
+	
+	// Fill in the div.
+	personalizationDiv.innerHTML = "alcahueta !!!";
+	
+	// Show the div.
+    $(function() {
+    	$(personalizationDiv).dialog({
+            // add a close listener to prevent adding multiple divs to the document
+            close: function(event, ui) {
+                // remove div with all data and events
+                // dialog.remove();
+            	personalizationDiv.innerHTML = "";
+            },
+            modal: true,
+            resizable: true, 
+            height: "auto", // 800,
+            width: "auto", // 800,
+            title: 'Personalizing program file ' + fileName + " owned by " + fileOwner
+        });
+        // $( "#" + fileViewContentsDivId ).dialog();
+    });
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+var fuzzificationsFunctions = null;
+
+function ownerPersonalization (predOwner, functionPoints) {
+	this.predOwner = predOwner;
+	this.functionPoints = functionPoints;
+}
+
+function cleanUpFuzzificationFunctionsDefinitions () {
+	fuzzificationsFunctions = null;
+	fuzzificationsFunctions = new Array();
+}
+
+function addFuzzificationFunctionDefinition (predDefined, predNecessary, ownersPersonalizations) {
+	this.predDefined = predDefined;
+	this.predNecessary = predNecessary;
+	this.ownersPersonalizations = ownersPersonalizations;
+}
+
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/

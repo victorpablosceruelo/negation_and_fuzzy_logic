@@ -13,15 +13,35 @@ import org.apache.commons.logging.LogFactory;
 public class ProgramAnalizedClass {
 	final Log LOG = LogFactory.getLog(ProgramAnalizedClass.class);
 	
+	final private static String DEFAULT_DEFINITION = "default definition";
+	
 	private String filePath = null;
 	private ArrayList <ProgramLineClass> programLines = null;
 	private ArrayList <ArrayList <FunctionAnalizedClass>> programFunctionsOrdered = null;
 	private Iterator <Iterator <FunctionAnalizedClass>> programFunctionsOrderedIterator = null;
 	private String [] programFunctionsOrderedInJavaScript = null;
 
-	public ProgramAnalizedClass (String filePath, String fuzzification) throws Exception {
+	/**
+	 * Analizes the program file pointed by filePath.
+	 * @param localUserName
+	 * @param fileName
+	 * @param fileOwner
+	 * @param filePath
+	 * @throws Exception when any of the previous is null or empty string.
+	 */
+	public ProgramAnalizedClass (String localUserName, String fileName, String fileOwner, String filePath) throws Exception {
 		
-		LOG.info("filePath: " + filePath + " fuzzification: " + fuzzification);
+		if (localUserName == null) throw new Exception("localUserName cannot be null.");
+		if (fileName == null) throw new Exception("fileName cannot be null.");
+		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
+		if (filePath == null) throw new Exception("filePath cannot be null.");
+		
+		if ("".equals(localUserName)) throw new Exception("localUserName cannot be an empty string.");
+		if ("".equals(fileName)) throw new Exception("fileName cannot be an empty string.");
+		if ("".equals(fileOwner)) throw new Exception("fileOwner cannot be an empty string.");
+		if ("".equals(filePath)) throw new Exception("filePath cannot be an empty string.");
+		
+		LOG.info("localUserName: " + localUserName + " fileName: " + fileName + " fileOwner: " + fileOwner + " filePath: " + filePath);
 		
 		this.filePath = filePath;
 		programFunctionsOrdered = null;
@@ -42,42 +62,43 @@ public class ProgramAnalizedClass {
 				programLines.add(programLine);
 				
 				if (programLine.getFunctionAnalized() != null) {
-					addToFunctionsOrderedList(programLine.getFunctionAnalized(), fuzzification);
+					if ((localUserName.equals(fileOwner)) ||
+						((programLine.getFunctionAnalized().getPredOwner() != null) && 
+						 ((programLine.getFunctionAnalized().getPredOwner().equals(fileOwner)) ||
+						  (programLine.getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION))))) {
+						addToFunctionsOrderedList(programLine.getFunctionAnalized());
+					}
 				}
 			}
 			reader.close();
 		}
 	}
 	
-	private void addToFunctionsOrderedList (FunctionAnalizedClass function, String fuzzification) throws Exception {
+	private void addToFunctionsOrderedList (FunctionAnalizedClass function) throws Exception {
 		
 		if (function == null) throw new Exception("function cannot be null.");
 
-		if ((fuzzification == null) || 
-				((fuzzification != null) && (function.getPredDefined().equals(fuzzification)))) {
+		int i=0;
+		boolean placed = false;
+		ArrayList <FunctionAnalizedClass> current = null;
 
-			int i=0;
-			boolean placed = false;
-			ArrayList <FunctionAnalizedClass> current = null;
-
-			while ((i<programFunctionsOrdered.size()) && (! placed)) {
-				current = programFunctionsOrdered.get(i);
-				if ((current != null) && (current.size() > 0)) {
-					if (current.get(0).getPredDefined().equals(function.getPredDefined())) {
-						current.add(function);
-						placed = true;
-					}
+		while ((i<programFunctionsOrdered.size()) && (! placed)) {
+			current = programFunctionsOrdered.get(i);
+			if ((current != null) && (current.size() > 0)) {
+				if (current.get(0).getPredDefined().equals(function.getPredDefined())) {
+					current.add(function);
+					placed = true;
 				}
-				i++;
 			}
-			if (! placed) {
-				current = new ArrayList <FunctionAnalizedClass>();
-				current.add(function);
-				programFunctionsOrdered.add(current);
-				placed = true;
-			}
-			// if (placed) programFunctionsOrderedIterator = null; // Reject last saved result.
+			i++;
 		}
+		if (! placed) {
+			current = new ArrayList <FunctionAnalizedClass>();
+			current.add(function);
+			programFunctionsOrdered.add(current);
+			placed = true;
+		}
+		// if (placed) programFunctionsOrderedIterator = null; // Reject last saved result.
 	}
 	
 	
@@ -96,7 +117,7 @@ public class ProgramAnalizedClass {
 		return programFunctionsOrderedIterator;
 	}
 	
-	public String [] getResultInJavaScript() throws Exception {
+	public String [] getProgramFuzzificationsInJS() throws Exception {
 		String tmp = null;
 		FunctionAnalizedClass function = null;
 		ArrayList<FunctionAnalizedClass> current = null;
@@ -111,12 +132,12 @@ public class ProgramAnalizedClass {
 					function = current.get(j);
 					
 					if (j==0) {
-						tmp = "new fuzzificationDef('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
+						tmp = "addFuzzificationFunctionDefinition('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
 						tmp += "new Array(";
 					}
 					else tmp += ", ";
 					
-					tmp += "new fuzzificationFunctionDef('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
+					tmp += "new ownerPersonalization('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
 					j++;
 				}
 				tmp += "))"; // End the javascript arrays.
@@ -181,7 +202,7 @@ public class ProgramAnalizedClass {
 				if ((programLine.getFunctionAnalized() != null) && 
 						(programLine.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
 					foundFuzzifications = true;
-					if ((programLine.getFunctionAnalized().getPredOwner().equals("default definition")) || 
+					if ((programLine.getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) || 
 						((! programLine.getFunctionAnalized().getPredOwner().equals(localUserName.getLocalUserName())))) {
 						programLinesAffected.add(programLine);
 					}

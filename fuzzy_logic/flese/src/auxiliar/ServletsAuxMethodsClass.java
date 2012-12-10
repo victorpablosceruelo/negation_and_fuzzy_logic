@@ -297,9 +297,9 @@ public class ServletsAuxMethodsClass {
 		urlsMappings[RunQueryAnswer] = new UrlMappingClass(RunQueryAnswer, "RunQueryAnswer", "", "WEB-INF/runQuery.jsp");
 		
 		urlsMappings[ListProgramFuzzificationsRequest] = new UrlMappingClass(ListProgramFuzzificationsRequest, "ListProgramFuzzificationsRequest", "listProgramFuzzifications", "DispatcherServlet");
-		urlsMappings[ListProgramFuzzificationsAnswer] = new UrlMappingClass(ListProgramFuzzificationsAnswer, "ListProgramFuzzificationsAnswer", "", "WEB-INF/runQuery.jsp");
+		urlsMappings[ListProgramFuzzificationsAnswer] = new UrlMappingClass(ListProgramFuzzificationsAnswer, "ListProgramFuzzificationsAnswer", "", "WEB-INF/listFuzzifications.jsp");
 		urlsMappings[SaveProgramFuzzificationRequest] = new UrlMappingClass(SaveProgramFuzzificationRequest, "SaveProgramFuzzificationRequest", "saveProgramFuzzification", "DispatcherServlet");
-		urlsMappings[SaveProgramFuzzificationAnswer] = new UrlMappingClass(SaveProgramFuzzificationAnswer, "SaveProgramFuzzificationAnswer", "", "WEB-INF/runQuery.jsp");
+		urlsMappings[SaveProgramFuzzificationAnswer] = new UrlMappingClass(SaveProgramFuzzificationAnswer, "SaveProgramFuzzificationAnswer", "", "WEB-INF/saveFuzzification.jsp");
 		
 		return urlsMappings;
 	}
