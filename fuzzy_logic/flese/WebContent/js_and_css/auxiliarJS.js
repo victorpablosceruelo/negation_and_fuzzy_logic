@@ -28,16 +28,34 @@ function insertProgramFileSelection(parentDivId) {
 			function(data, textStatus, jqxhr) {
 		parentDiv.innerHTML = "";
 		
-		var selectDatabaseDiv = document.createElement('div');
-		selectDatabaseDiv.id = "selectDatabaseDiv";
-		parentDiv.appendChild(selectDatabaseDiv);
+
+		var selectDatabaseContainer = document.createElement('div');
+		selectDatabaseContainer.id = "selectDatabaseContainerDiv";
+		selectDatabaseContainer.className = "selectDatabaseTable";
+		parentDiv.appendChild(selectDatabaseContainer);
+		
+		var row = document.createElement('div');
+		row.className = "selectDatabaseTableRow";
+		selectDatabaseContainer.appendChild(row);
+		
+		var cell = null;
 		
 		if ((filesList == null) || (filesList.length == 0)) {
-			selectDatabaseDiv.innerHTML = "No databases. Please upload one via your user options.";
+			cell = document.createElement('div');
+			cell.className = "selectDatabaseTableCell";
+			cell.innerHTML = "No databases. Please upload one via your user options.";
+			row.appendChild(cell);
 		}
 		else {
+			cell = document.createElement('div');
+			cell.className = "selectDatabaseTableCell";
+			cell.id = "selectDatabaseDiv";
+			row.appendChild(cell);
+
+			var chooseProgramFileId = "selectProgramFile";
 			var html = "";
-			html += "<select name='selectedDatabase' onchange='selectedProgramDatabaseChanged(this, \""+parentDivId+"\")' >";
+			html += "<select name='"+chooseProgramFileId+"' id='"+chooseProgramFileId+"' ";
+			html += "onchange='selectedProgramDatabaseChanged(this, \""+parentDivId+"\")' >";
 			html += "<option id='----' name='----' title='----' value='----'>----</option>";
 			for (var i=0; i<filesList.length; i++) {
 				html += "<option id='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
@@ -48,7 +66,15 @@ function insertProgramFileSelection(parentDivId) {
 						"</option>";
 			}
 			html += "</select>";
-			selectDatabaseDiv.innerHTML = html;
+			cell.innerHTML = html;
+			
+			cell = document.createElement('div');
+			cell.className = "selectDatabaseTableCell";
+			cell.id = "personalizationButtonContainer";
+			row.appendChild(cell);
+			
+			cell.innerHTML = "<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(\"" +
+							 chooseProgramFileId + "\");'>";
 		}
 	});
 }
@@ -86,6 +112,28 @@ function predInfo(predName, predArity, predType, predOtherInfo) {
 	this.predOtherInfo = predOtherInfo;
 }
 
+function selectedProgramDatabaseInfo(fileName, fileOwner) {
+	this.fileName = fileName;
+	this.fileOwner = fileOwner;
+}
+
+function getProgramDatabaseComboBoxValue(comboBox) {
+	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+	var selectedProgramDatabase = null;
+	
+	// alert("comboBoxValue: " + comboBoxValue);
+	if ((comboBoxValue != null) && (comboBoxValue != "") && (comboBoxValue != "----")) {
+		var separation = "-owned-by-";
+	
+		i = comboBoxValue.indexOf(separation);
+		if (i != -1) {
+			selectedProgramDatabase = new selectedProgramDatabaseInfo('', '');
+			selectedProgramDatabase.fileName = comboBoxValue.substring(0, i);
+			selectedProgramDatabase.fileOwner = comboBoxValue.substring(i+separation.length);
+		}
+	}
+	return selectedProgramDatabase;
+}
 
 function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 	// debug.info("parentDivId: " + parentDivId);
@@ -108,31 +156,18 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		parentDiv.appendChild(runQueryDiv);
 	}
 	
-	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	// alert("comboBoxValue: " + comboBoxValue);
-	if ((comboBoxValue == null) || (comboBoxValue == "") || (comboBoxValue == "----")) {
+	var selectedProgramDatabase = getProgramDatabaseComboBoxValue(comboBox);
+	
+	if (selectedProgramDatabase == null) {
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
-		var fileName = null;
-		var fileOwner = null;
-		var separation = "-owned-by-";
-	
-		i = comboBoxValue.indexOf(separation);
-		if (i != -1) {
-			fileName = comboBoxValue.substring(0, i);
-			fileOwner = comboBoxValue.substring(i+separation.length);
-		}
-		else {
-			fileName = '';
-			fileOwner = '';
-		}
-		
-		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
+		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + 
+				"&fileName="+selectedProgramDatabase.fileName+"&fileOwner="+selectedProgramDatabase.fileOwner, 
 				function(data, textStatus, jqxhr) {
 					// debug.info("ProgramFileIntrospectionRequest done ... ");
 		   			// alert("ProgramFileIntrospectionRequest done ... ");
-		   			insertQuerySelection(parentDivId, runQueryDivId, selectQueryDiv.id, fileName, fileOwner);
+		   			insertQuerySelection(parentDivId, runQueryDivId, selectQueryDiv.id, selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
 				});
 	}
 	
@@ -167,7 +202,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
     html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-	html += "     <INPUT type='submit' value='Execute Query' onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
+	html += "     <INPUT type='submit' value='Search' onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
 					"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + "\", \"" + queryLinesCounterFieldId+"\");'>";
 	html += "</form><br />";
 	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' src='#' style='display:none;'> </iframe>";
@@ -1313,6 +1348,40 @@ function debugQueryAnswers(parentDivId) {
 			cellDiv.innerHTML = queryAnswers[i][j];
 		}
 	}
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function personalizeProgramFile(chooseQueryStartTypeId) {
+	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
+	var fileViewContentsDiv = document.getElementById(fileViewContentsDivId);
+	
+	$.get(urlMappingFor('FileViewRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+			function(data, textStatus, jqxhr) {
+				fileViewContentsDiv.innerHTML = data;
+				
+			    $(function() {
+			    	$(fileViewContentsDiv).dialog({
+		                // add a close listener to prevent adding multiple divs to the document
+		                close: function(event, ui) {
+		                    // remove div with all data and events
+		                    // dialog.remove();
+		                    fileViewContentsDiv.innerHTML = "";
+		                },
+		                modal: true,
+		                resizable: true, 
+		                height: "auto", // 800,
+		                width: "auto", // 800,
+		                title: 'Contents of program file ' + filesList[index].fileName
+		            });
+			        // $( "#" + fileViewContentsDivId ).dialog();
+			    });
+			});
+	
+	//prevent the browser to follow the link
+	return false;
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
