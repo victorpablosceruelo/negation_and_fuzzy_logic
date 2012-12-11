@@ -1499,9 +1499,22 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationDiv = document.createElement('div');
 	
+	/*
+	 * "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
+	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
+	 */
+	var formTargetiFrameId = "personalizeMyFuzzification";
+	var form = document.createElement('form');
+	form.target = formTargetiFrameId;
+	form.action = urlMappingFor('SaveProgramFuzzificationRequest');
+	form.method = 'post';
+	// form.accept-charset = 'UTF-8';
+	personalizationDiv.appendChild(form);
+	alert("form.action: " + form.action);
+	
 	var personalizationDivSubTable = document.createElement('div');
 	personalizationDivSubTable.className = "personalizationDivSubTable";
-	personalizationDiv.appendChild(personalizationDivSubTable);
+	form.appendChild(personalizationDivSubTable);
 	
 	var row = null;
 	var cell = null;
@@ -1540,7 +1553,7 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
 	var html = "";
 	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
-			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId+"\");'>";
+			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId+"\", \"" +formTargetiFrameId+"\");'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
 	for (var i=0; i < fuzzificationsFunctions.length; i++) {
@@ -1584,7 +1597,7 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId) {
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId) {
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 /*	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
 	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
@@ -1603,14 +1616,14 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 		else i++;
 	}
 	
-	showPersonalizationForm(i, PersonalizationFunctionUnderModificationDivId);
+	showPersonalizationForm(i, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showPersonalizationForm(index, PersonalizationFunctionUnderModificationDivId) {
+function showPersonalizationForm(index, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId) {
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
 	
@@ -1716,6 +1729,51 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 		cell.innerHTML = fpd;		
 	}
 	
+	// Table for the button in charge of saving the changes.
+	table = document.createElement('div');
+	table.className = "personalizationDivSaveButtonTable";
+	PersonalizationFunctionUnderModificationDiv.appendChild(table);
+
+	row = document.createElement('div');
+	row.className = "personalizationDivSaveButtonTableRow";
+	table.appendChild(row);
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSaveButtonTableCell";
+	row.appendChild(cell);
+	cell.innerHTML = "<INPUT type='submit' value='Save modifications' >";
+
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSaveButtonTableCell";
+	cell.id = "saveMyFuzzificationStatus";
+	row.appendChild(cell);
+	cell.innerHTML = "";
+
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSaveButtonTableCell";
+	row.appendChild(cell);
+	cell.innerHTML = "<iframe id='"+formTargetiFrameId+"' name='"+formTargetiFrameId+"' height='20' style='display:none;'> </iframe>";
+	
+	
+	$('#' + formTargetiFrameId).load(function() {
+		// document.getElementById('#' + submitiFrameId);
+		var responseHtmlText = null;
+		var iFrameWindow = getIframeWindow(this);
+		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
+			responseHtmlText = iFrameWindow.document.body.innerHTML;
+			// Do something with response text.
+			if (notNullNorundefined(responseHtmlText)) {
+				iFrameWindow.document.body.innerHTML="";
+			}
+			// Clear the content of the iframe.
+			// this.contentDocument.location.href = '/images/loading.gif';
+			// alert("responseText: " + responseHtmlText);
+			// document.getElementById().style.visibility = 'visible';
+			document.getElementById("saveMyFuzzificationStatus").innerHTML = responseHtmlText;
+		}
+		  
+	});
+		
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

@@ -81,8 +81,7 @@ public class DispatcherServlet extends HttpServlet {
 		DispatchersClass dispatcherObject = new DispatchersClass(servletContext, doAction, localUserName, request, response);
 
 		String request_op = request.getParameter("op");
-		if (request_op == null) request_op = "default";
-
+		// if ((request_op == null) || ("".equals(request_op))) request_op = "default";
 		int op = ServletsAuxMethodsClass.uriNickNameForOpValue(request_op);
 		
 		switch (op) {

@@ -23,8 +23,9 @@
 				found = true;
 				return urlsMappings[i].url;
 			}
-			else i++
+			else i++;
 		}
+		alert("Error in urlMappingFor. Not recognized nickName: " + nickName);
 		return null;
 	}
 	

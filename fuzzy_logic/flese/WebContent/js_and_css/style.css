@@ -261,6 +261,10 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .personalizationDivSubSubTableCellType2 {display:table-cell; border:0.05em solid #000000; width:45%; text-align:center; padding:0.1em;}
 .personalizationDivSubSubTableCellType3 {display:table-cell; border:0.05em solid #000000; width:10%; text-align:center; padding:0.1em;}
 
+.personalizationDivSaveButtonTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
+.personalizationDivSaveButtonTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.personalizationDivSaveButtonTableCell {display:table-cell; border:none; width:30%; text-align:center; padding:0.1em;}
+
 .queryStartContainerTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
 .queryStartContainerTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
 .queryStartContainerTableCell1 {display:table-cell; border:none; width:20%; text-align:left; padding:0.1em;}

@@ -325,18 +325,19 @@ public class ServletsAuxMethodsClass {
 		return urlsMappings[uriNickName].getUrl();
 	}
 	
-	public static int uriNickNameForOpValue (String opValue) throws Exception {
+	public static int uriNickNameForOpValue (String op) throws Exception {
 		
-		if (opValue == null) throw new Exception("opValue cannot be null."); 
+		if (op == null) throw new Exception("op value cannot be null.");
+		if ("".equals(op)) throw new Exception("op value cannot be empty string.");
 		
 		UrlMappingClass [] urlsMappings = urlsMappings();
 		boolean found = false;
 		int i = 0;
 		while ((! found) && (i < urlsMappings.length)) {
-			if (urlsMappings[i].getOpValue().equals(opValue)) found = true;
+			if (urlsMappings[i].getOpValue().equals(op)) found = true;
 			else i++;
 		}
-		if (! found) throw new Exception("opValue is not recognized. opValue: " + opValue); 
+		if (! found) throw new Exception("op value is not recognized. opValue: " + op); 
 		return i;
 	}
 	
