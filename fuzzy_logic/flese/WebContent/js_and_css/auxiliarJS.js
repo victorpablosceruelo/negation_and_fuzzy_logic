@@ -1463,7 +1463,7 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	personalizationDivSubTable.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubTableCell";
+	cell.className = "personalizationDivSubTableCellType1";
 	row.appendChild(cell);
 	
 	subTable = document.createElement('div');
@@ -1475,12 +1475,12 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	subTable.appendChild(subRow);
 	
 	subCell = document.createElement('div');
-	subCell.className = "personalizationDivSubTableCell";	
+	subCell.className = "personalizationDivSubTableCellType2";	
 	subCell.innerHTML = "I want to personalize how it is determined that a ";
 	subRow.appendChild(subCell);
 	
 	subCell = document.createElement('div');
-	subCell.className = "personalizationDivSubTableCell";
+	subCell.className = "personalizationDivSubTableCellType2";
 	subCell.innerHTML = "Test";
 	subRow.appendChild(subCell);
 	
@@ -1507,6 +1507,7 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSubTableCell";
+	cell.id = PersonalizationFunctionUnderModificationDivId;
 	personalizationDivSubTable.appendChild(cell);
 	cell.innerHTML = "Select the fuzzification you want to personalize.";
 	
@@ -1534,7 +1535,39 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
 function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId) {
-	alert("Not implemented");
+	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+/*	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
+	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
+	var comboBoxTitle = comboBox.options[comboBox.selectedIndex].title;
+	debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
+	debug.info("changeInChooseRule: comboBoxText: " + comboBoxText);
+	debug.info("changeInChooseRule: comboBoxName: " + comboBoxName);
+	debug.info("changeInChooseRule: comboBoxTitle: " + comboBoxTitle);
+*/
+	var found = false;
+	var i = 0;
+	while ((i<fuzzificationsFunctions.length) && (! found)) {
+		if (comboBoxValue == fuzzificationsFunctions[i].predDefined) {
+			found = true;
+		}
+		else i++;
+	}
+	
+	showPersonalizationForm(i, PersonalizationFunctionUnderModificationDivId);
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function showPersonalizationForm(i, PersonalizationFunctionUnderModificationDivId) {
+	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
+	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
+	
+	var table = document.createElement('div');
+	table.className = "personalizationDivSubTableRow";
+	PersonalizationFunctionUnderModificationDiv.appendChild(table);
+	
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
