@@ -1213,22 +1213,6 @@ function transformTextLabel(textLabelIn) {
 		textLabelIn = textLabel;
 	}
 	textLabel = textLabelIn;
-	
-	if ((textLabel != null) && (textLabel != undefined) && 
-		(textLabel.length != null) && (textLabel.length != undefined) && (textLabel.length > 0)) {
-		debug.info("textLabel: " + textLabel);
-		for (var i=0; i<textLabel.length; i++) {
-			// debug.info("-" + textLabel[i] + "-");
-			if ((textLabel[i] == "_") || (textLabel[i] == "-")) {
-				debug.info("changed !! ");
-				textLabel[i] = " ";
-			}
-		}
-		debug.info("textLabel: " + textLabel);
-		textLabel.replace(/_/gi, " ");
-		textLabel.replace(/-/gi, " ");
-		debug.info("textLabel: " + textLabel);
-	}
 	return textLabel;
 }
 
