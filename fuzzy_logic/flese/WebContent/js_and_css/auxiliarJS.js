@@ -215,6 +215,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 									"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + 
 									"\", \"" + queryLinesCounterFieldId+"\");'>";
 	html += "               </div>";
+	html += "               <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;</div>";
 	html += "               <div class='searchOrPersonalizeTableCell'>";
 	html += "                    <INPUT type='submit' value='Personalize Program File' " +
 									"onclick='return personalizeProgramFile(\"" + fileName + "\", \"" + fileOwner + "\", \"basic\");'>";
