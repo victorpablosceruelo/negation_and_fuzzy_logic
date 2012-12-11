@@ -22,11 +22,11 @@
     <div id="body">
     	<jsp:include page="commonBodyHead.jsp" />
 			
-		<h2>
+		<h3>
 			To access to FleSe you need an account in a Social Authentication Provider.
 			<br />
 			Please choose one of the following or provide an OpenId url.
-		</h2 >
+		</h3>
 
 		<table class="providersIcons">
 			<tr class="providersIcons">
@@ -81,7 +81,7 @@
 		</table>
 			
 		<br />
-		<h2>or enter OpenID url: </h2>	
+		<h3>or enter OpenID url: </h3>	
 		<form action="SocialAuthServlet" onsubmit="return validate(this);">
 			<input type="text" value="" name="id" /> 
 			<input type="submit" value="Submit" />

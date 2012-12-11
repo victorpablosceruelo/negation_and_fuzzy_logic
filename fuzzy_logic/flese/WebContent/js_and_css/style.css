@@ -12,7 +12,7 @@ html {
                "Lucida Grande", "Lucida Sans",
                "Luxi Sans", "Tahoma",
                 sans, sans-serif;
-  font-size: 10pt;
+  font-size: 14pt;
   margin: 1em;
   margin-bottom: 2em;
   padding: 0;
@@ -48,7 +48,7 @@ h3 {
 }
 
 p {
-	font-size:100%;
+	font-size:125%;
     text-align: justify;
 }
 
@@ -56,6 +56,16 @@ p {
 a, a:link, a:visited, a:hover {
     color:#395BED;
     text-decoration:none;
+}
+
+/* select */
+select {
+	font-size: 125%;
+}
+
+/* input */
+input {
+	font-size: 125%;
 }
 
 /* DESCRIPTION LISTS */
@@ -224,9 +234,10 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .userInformationTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 .userInformationTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
 
-.selectDatabaseTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
-.selectDatabaseTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
-.selectDatabaseTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.selectDatabaseTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
+.selectDatabaseTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.selectDatabaseTableCell1 {display:table-cell; border:none; width:25%; text-align:left; }
+.selectDatabaseTableCell2 {display:table-cell; border:none; width:75%; text-align:left; }
 
 .searchOrPersonalizeTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
 .searchOrPersonalizeTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
@@ -237,21 +248,23 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .personalizationDivSubTableCellType1 {display:table-cell; border:none; width:100%; text-align:left; padding:0.1em;}
 .personalizationDivSubTableCellType2 {display:table-cell; border:none; width:50%; text-align:left; padding:0.1em;}
 
-.queryStartContainerTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
-.queryStartContainerTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
-.queryStartContainerTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.queryStartContainerTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
+.queryStartContainerTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.queryStartContainerTableCell1 {display:table-cell; border:none; width:20%; text-align:left; padding:0.1em;}
+.queryStartContainerTableCell2 {display:table-cell; border:none; width:80%; text-align:left; padding:0.1em;}
 
-.queryLinesContainerTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
-.queryLinesContainerTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
-.queryLinesContainerTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.queryLinesContainerTable {display:table; border:none; width:100%; margin:1em; text-align:center;}
+.queryLinesContainerTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.queryLinesContainerTableCell {display:table-cell; border:none; text-align:left; padding:0.1em;}
+/* width:70%; */ 
 
-.queryLinesTable {display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
-.queryLinesTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
-.queryLinesTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.queryLinesTable {display:table; border:none; width:100%; margin:1em; text-align:center;}
+.queryLinesTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.queryLinesTableCell {display:table-cell; border:none; width:100%; text-align:left; padding:0.1em;}
 
-.queryLinesAggregatorTable{display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
-.queryLinesAggregatorTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
-.queryLinesAggregatorTableCell {display:table-cell; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}
+.queryLinesAggregatorTable{display:table; border:none; width:100%; margin:1em; text-align:center;}
+.queryLinesAggregatorTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.queryLinesAggregatorTableCell {display:table-cell; border:none; width:100%; text-align:center; padding:0.1em;}
 
 .queryAnswersTable{display:table; border:0.1em solid #000000; width:90%; margin:1em; text-align:center;}
 .queryAnswersTableRow {display:table-row; border:0.1em solid grey; width:70%; text-align:left; padding:0.1em;}

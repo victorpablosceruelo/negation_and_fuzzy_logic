@@ -48,7 +48,12 @@ function insertProgramFileSelection(parentDivId) {
 		}
 		else {
 			cell = document.createElement('div');
-			cell.className = "selectDatabaseTableCell";
+			cell.className = "selectDatabaseTableCell1";
+			cell.innerHTML="Please, choose a database to load: ";
+			row.appendChild(cell);
+			
+			cell = document.createElement('div');
+			cell.className = "selectDatabaseTableCell2";
 			cell.id = "selectDatabaseDiv";
 			row.appendChild(cell);
 
@@ -168,7 +173,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 				function(data, textStatus, jqxhr) {
 					// debug.info("ProgramFileIntrospectionRequest done ... ");
 		   			// alert("ProgramFileIntrospectionRequest done ... ");
-					alert("data: " + data);
+					// alert("data: " + data);
 		   			insertQuerySelection(parentDivId, runQueryDivId, selectQueryDiv.id, selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
 				});
 	}
@@ -196,10 +201,8 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "      target='" + runQueryTargetiFrameId+ "'>";
 	html += "     <div id='queryStartContainer' class='queryStartContainerTable'>";
 	html += "          <div class='queryStartContainerTableRow'>";
-	html += "               <div class='queryStartContainerTableCell'> ";
-	html += "                    <h3>Your query: I'm looking for a </h3> ";
-	html += "               </div>";
-	html += "               <div class='queryStartContainerTableCell' id='"+ chooseQueryStartTypeContainerId +"'></div>";
+	html += "               <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>";
+	html += "               <div class='queryStartContainerTableCell2' id='"+ chooseQueryStartTypeContainerId +"'></div>";
 	html += "          </div>";
 	html += "     </div>";
     html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
@@ -223,6 +226,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	// This does not work on google chrome: src='#' 
     	
 	selectQueryDiv.innerHTML = html;
+	document.getElementById(queryLinesContainerId).style.display='none';
 	
 	// Callback run after runQueryTargetiFrame is loaded.
 	$('#' + runQueryTargetiFrameId).load(function() {
@@ -241,17 +245,16 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 			// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
 			document.getElementById(runQueryDivId).innerHTML = responseHtmlText;
 
-			// Update the files list.
-			// insertFilesList (parentDivId);
+			if (responseHtmlText != "") {
+				// Evaluate the JS code returned by the server.
+				eval(responseHtmlText);
 			
-			// Evaluate the JS code returned by the server.
-			eval(responseHtmlText);
+				// Show the answers retrieved to the user.
+				showQueryAnswers(runQueryDivId);
 			
-			// Show the answers retrieved to the user.
-			showQueryAnswers(runQueryDivId);
-			
-			// Debug information
-			// debugQueryAnswers(parentDivId);
+				// Debug information
+				// debugQueryAnswers(parentDivId);
+			}
 		}
 		  
 	});
@@ -323,8 +326,11 @@ function selectQueryStartupTypeChanged(comboBox, queryLinesContainerId, queryLin
 	
 	if (startupType == "----") {
 		queryLinesContainerDiv.innerHTML="You cannot be looking for that.";
+		queryLinesContainerDiv.style.display='none';
 	}
 	else {
+		queryLinesContainerDiv.style.display='block';
+		
 		var row = null;
 		var cell = null;
 		var cellContents = null;
@@ -1235,7 +1241,7 @@ function showQueryAnswers(runQueryDivId) {
 	// Initialize.
 	infosForQueryAnswers = null;
 	
-	if (queryAnswers.length > 1) queryAnswers.sort(arraySortFunction);
+	if ((queryAnswers != null) && (queryAnswers.length > 1)) queryAnswers.sort(arraySortFunction);
 
 	var best10answersName = "The 10 answers that best satisfy the query";
 	var answersOver70Name = "The query is very satisfied";
@@ -1250,7 +1256,7 @@ function showQueryAnswers(runQueryDivId) {
 	insertInfoForQueryAnswers(answersOver0Name, null);
 	insertInfoForQueryAnswers(allAnswers, null);
 	
-	if (queryAnswers.length > 0) {
+	if ((queryAnswers != null) && (queryAnswers.length > 0)) {
 		for (var i=0; i<queryAnswers.length; i++) {
 			if ((i <= 10) && (resultOver(0, i))) insertInfoForQueryAnswers(best10answersName, i);
 			if (resultOver(0.7, i)) insertInfoForQueryAnswers(answersOver70Name, i);
