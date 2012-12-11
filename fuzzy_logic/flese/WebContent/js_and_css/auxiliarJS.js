@@ -1248,11 +1248,11 @@ function showQueryAnswers(runQueryDivId) {
 	
 	if ((queryAnswers != null) && (queryAnswers.length > 1)) queryAnswers.sort(arraySortFunction);
 
-	var best10answersName = "The 10 answers that best satisfy the query";
-	var answersOver70Name = "The query is very satisfied";
-	var answersOver50Name = "The query is fairly satisfied";
-	var answersOver0Name  = "The query is satisfied";
-	var allAnswers        = "All answers";
+	var best10answersName = "10 best results";
+	var answersOver70Name = "Results over 70%";
+	var answersOver50Name = "Results over 50%";
+	var answersOver0Name  = "Results over 0%";
+	var allAnswers        = "All results";
 	
 	// Initialize to keep the final order.
 	insertInfoForQueryAnswers(best10answersName, null);
