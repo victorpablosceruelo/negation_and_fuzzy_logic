@@ -1469,7 +1469,7 @@ function personalizeProgramFile(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function fuzzificationFunctionNameInColloquial(currentName) {
+function fuzzificationFunctionNameInColloquial(currentName, grade) {
 	var result = null;
 	if ((currentName != null) && (currentName != "") && (currentName != "----")) {
 	
@@ -1477,7 +1477,16 @@ function fuzzificationFunctionNameInColloquial(currentName) {
 		var j = currentName.indexOf(")");
 		
 		if ((i != -1) && (j != -1)){
-			result = currentName.substring(i+"(".length, j) + " is " + currentName.substring(0, i);
+			result = "";
+			if ((grade == 'all') || (grade == 'subject')) {
+				result += currentName.substring(i+"(".length, j);
+			}
+			if (grade == 'all') {
+				result += " is ";
+			}
+			if ((grade == 'all') || (grade == 'adjective')) {
+				result += currentName.substring(0, i);
+			}
 		}
 	}
 	return result;
@@ -1523,7 +1532,6 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	
 	subCell = document.createElement('div');
 	subCell.className = "personalizationDivSubTableCellType2";
-	subCell.innerHTML = "Test";
 	subRow.appendChild(subCell);
 	
 	var PersonalizationFunctionUnderModificationDivId = "PersonalizationDivCell";
@@ -1538,7 +1546,7 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	for (var i=0; i < fuzzificationsFunctions.length; i++) {
 		html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
 				"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
-				fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined) + "</option>";
+				fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') + "</option>";
 	}
 	html += "</select>";
 	subCell.innerHTML = html;
@@ -1548,9 +1556,9 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	personalizationDivSubTable.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubTableCell";
+	cell.className = "personalizationDivSubTableCellType1";
 	cell.id = PersonalizationFunctionUnderModificationDivId;
-	personalizationDivSubTable.appendChild(cell);
+	row.appendChild(cell);
 	cell.innerHTML = "Select the fuzzification you want to personalize.";
 	
 	// Show the div.
@@ -1602,13 +1610,134 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showPersonalizationForm(i, PersonalizationFunctionUnderModificationDivId) {
+function showPersonalizationForm(index, PersonalizationFunctionUnderModificationDivId) {
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
 	
 	var table = document.createElement('div');
-	table.className = "personalizationDivSubTableRow";
+	table.className = "personalizationDivSubSubTable";
 	PersonalizationFunctionUnderModificationDiv.appendChild(table);
+	
+	var row = null;
+	var cell = null;
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivSubSubTableRow";
+	table.appendChild(row);
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubSubTableCellType1";
+	row.appendChild(cell);
+	cell.innerHTML = "A " + 
+						fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'subject') +
+						" whose value for " + 
+						fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predNecessary, 'adjective') + 
+						" is ";
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubSubTableCellType2";
+	row.appendChild(cell);
+	cell.innerHTML = "is " + fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'adjective') +
+						" with a degree of ";
+
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubSubTableCellType3";
+	row.appendChild(cell);
+	cell.innerHTML = "Current Value";
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubSubTableCellType3";
+	row.appendChild(cell);
+	cell.innerHTML = "Default Value";
+	
+	var i = null;
+	var j = null;
+	var indexOfDefault = null;
+	var indexOfMine = null;
+	
+	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations.length; i++) {
+		if (fuzzificationsFunctions[index].ownersPersonalizations[i].predOwner == localUserName) {
+			indexOfMine = i;
+		}
+		if (fuzzificationsFunctions[index].ownersPersonalizations[i].predOwner == 'default definition') {
+			indexOfDefault = i;
+		}
+	}
+	
+	var fpx = null;
+	var fpy = null;
+	var fpd = null;
+	var found = false;
+	
+	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints.length; i++) {
+		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints[i][0];
+		fpd = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints[i][1];
+		
+		found = false;
+		if (indexOfMine != null) {
+			j = 0;
+			while ((j<fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].functionPoints.length) && (! found)) {
+				if (fpx == fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].functionPoints[j][0]) {
+					found = true;
+					fpy = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].functionPoints[j][1];
+				}
+				else j++;
+			}
+		}
+		
+		// Assign default value if personalized one is not found.
+		if ((! found) || (fpy == null) || (fpy == undefined)) fpy = fpd;
+		
+		// Now it is time to build the table with the data.
+		row = document.createElement('div');
+		row.className = "personalizationDivSubSubTableRow";
+		table.appendChild(row);
+		
+		cell = document.createElement('div');
+		cell.className = "personalizationDivSubSubTableCellType1";
+		row.appendChild(cell);
+		cell.innerHTML = fpx;
+		
+		cell = document.createElement('div');
+		cell.className = "personalizationDivSubSubTableCellType2";
+		row.appendChild(cell);
+		cell.innerHTML = "<input type='hidden' name='fuzzificationBars["+i+"].fpx' value='"+fpx+"'/>" +
+						 "<input type='range'  name='fuzzificationBars["+i+"].fpy' min='0' max='1' step='0.01' "+
+						 "value='"+fpy+"' width='150px' onchange='barValueChanged(this, "+i+")'/>";
+
+		cell = document.createElement('div');
+		cell.className = "personalizationDivSubSubTableCellType3";
+		row.appendChild(cell);
+		cell.innerHTML = "<span id='fuzzificationBarValue["+i+"]'>"+fpy+"</span>";
+		
+		cell = document.createElement('div');
+		cell.className = "personalizationDivSubSubTableCellType3";
+		row.appendChild(cell);
+		cell.innerHTML = fpd;		
+	}
+	
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function barValueChanged(barObject, i) {
+	var div = document.getElementById("fuzzificationBarValue["+i+"]");
+	
+	var valueOriginal=barObject.value;
+	var valueFloat = parseFloat(valueOriginal);
+	var valueToShow = 0;
+	
+	if ((valueFloat != null) && (valueFloat != NaN)) {
+		valueToShow = valueFloat.toFixed(2);
+	}
+	else {
+		valueFloat = 0;
+		valueToShow = 0;
+	}
+	
+	div.innerHTML = valueToShow;
 	
 }
 
