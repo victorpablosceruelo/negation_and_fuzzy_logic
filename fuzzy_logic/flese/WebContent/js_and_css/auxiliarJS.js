@@ -1201,14 +1201,14 @@ function resultOver(value, index) {
 function transformTextLabel(textLabelIn) {
 	var textLabel = null;
 	
-	debug.info("textLabel: " + textLabelIn);
+	// debug.info("textLabel: " + textLabelIn);
 	var i = textLabelIn.indexOf("_");
 	while (i != -1) {
 		textLabel = ""; //Initialize
 		textLabel += textLabelIn.substring(0, i);
 		textLabel += " ";
 		textLabel += textLabelIn.substring(i+1, textLabelIn.length);
-		debug.info(textLabel);
+		// debug.info(textLabel);
 		i = textLabel.indexOf("_");
 		textLabelIn = textLabel;
 	}
