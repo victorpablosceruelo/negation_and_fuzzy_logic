@@ -1199,8 +1199,21 @@ function resultOver(value, index) {
 }
 
 function transformTextLabel(textLabelIn) {
-	var textLabel = textLabelIn;
-	debug.info("textLabel: " + textLabel);
+	var textLabel = null;
+	
+	debug.info("textLabel: " + textLabelIn);
+	var i = textLabelIn.indexOf("_");
+	while (i != -1) {
+		textLabel = ""; //Initialize
+		textLabel += textLabelIn.substring(0, i);
+		textLabel += " ";
+		textLabel += textLabelIn.substring(i+1, textLabelIn.length);
+		debug.info(textLabel);
+		i = textLabel.indexOf("_");
+		textLabelIn = textLabel;
+	}
+	textLabel = textLabelIn;
+	
 	if ((textLabel != null) && (textLabel != undefined) && 
 		(textLabel.length != null) && (textLabel.length != undefined) && (textLabel.length > 0)) {
 		debug.info("textLabel: " + textLabel);
