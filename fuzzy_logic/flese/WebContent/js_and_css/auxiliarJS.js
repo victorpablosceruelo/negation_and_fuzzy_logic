@@ -1219,15 +1219,19 @@ function insertInfoForQueryAnswers (tableName, queryAnswerIndex) {
 	var i = 0;
 	var found = false;
 	while ((i < infosForQueryAnswers.length) && (! found)) {
-		found = (tableName == infosForQueryAnswers[i].tableName);
-		if (!found) i++;
+		if (tableName == infosForQueryAnswers[i].tableName) {
+			found = true;
+		}
+		else i++;
 	}
 	
 	if (! found) {
 		infosForQueryAnswers[infosForQueryAnswers.length] = new infoForQueryAnswers(tableName, queryAnswerIndex);
 	}
 	else {
-		infosForQueryAnswers[i].queryAnswersIndexes[infosForQueryAnswers[i].queryAnswersIndexes.length] = queryAnswerIndex;
+		if ((queryAnswerIndex != null) && (queryAnswerIndex != undefined)) {
+			infosForQueryAnswers[i].queryAnswersIndexes[infosForQueryAnswers[i].queryAnswersIndexes.length] = queryAnswerIndex;
+		}
 	}
 }
 
@@ -1269,7 +1273,8 @@ function showQueryAnswers(runQueryDivId) {
 	// Create the real tables (if necessary) and put inside the results.
 	var noAnswers = true;
 	for (var i=0; i<infosForQueryAnswers.length; i++) {
-		if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
+		// The first answer is information about the database fields.
+		if (infosForQueryAnswers[i].queryAnswersIndexes.length > 1) {
 			noAnswers = false;
 		}
 	}
@@ -1290,6 +1295,7 @@ function showQueryAnswers(runQueryDivId) {
 		var html = null;
 		var i = null;
 		var j = null;
+		var k = null;
 		var tabDiv = null;
 		var tabContentDiv = null;
 		var row = null;
@@ -1298,7 +1304,8 @@ function showQueryAnswers(runQueryDivId) {
 		html = "";
 		j = 1;
 		for (i=0; i<infosForQueryAnswers.length; i++) {
-			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
+			// The first answer is information about the database fields.
+			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 1) {
 				html += "<li><a href='#tabs-"+j+"'>"+infosForQueryAnswers[i].tableName+"</a></li>";
 				j++;
 			}
@@ -1308,7 +1315,8 @@ function showQueryAnswers(runQueryDivId) {
 		html = "";
 		j = 1;
 		for (i=0; i<infosForQueryAnswers.length; i++) {
-			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 0) {
+			// The first answer is information about the database fields.
+			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 1) {
 				tabDiv = document.createElement('div');
 				tabDiv.id = "tabs-" + j;
 				j++;
@@ -1319,7 +1327,7 @@ function showQueryAnswers(runQueryDivId) {
 				tabDiv.appendChild(tabContentDiv);
 				
 				// Now insert each answer in a row, inside the table
-				for (var k=0; k<infosForQueryAnswers[i].queryAnswersIndexes.length; k++) {
+				for (k=0; k<infosForQueryAnswers[i].queryAnswersIndexes.length; k++) {
 					row = document.createElement('div');
 					row.className = "queryAnswersTableRow";
 					tabContentDiv.appendChild(row);

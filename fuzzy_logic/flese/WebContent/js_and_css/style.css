@@ -260,7 +260,8 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 
 .queryLinesTable {display:table; border:none; width:100%; margin:1em; text-align:center;}
 .queryLinesTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
-.queryLinesTableCell {display:table-cell; border:none; width:100%; text-align:left; padding:0.1em;}
+.queryLinesTableCell {display:table-cell; border:none; text-align:left; white-space: nowrap; padding:0.1em;}
+/* width:100%; */
 
 .queryLinesAggregatorTable{display:table; border:none; width:100%; margin:1em; text-align:center;}
 .queryLinesAggregatorTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
