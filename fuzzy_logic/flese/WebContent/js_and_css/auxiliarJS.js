@@ -1512,6 +1512,20 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	personalizationDiv.appendChild(form);
 	alert("form.action: " + form.action);
 	
+	var hiddenField = null; 
+	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "fileName";
+	hiddenField.value = fileName;
+	form.appendChild(hiddenField);
+	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "fileOwner";
+	hiddenField.value = fileOwner;
+	form.appendChild(hiddenField);
+	
 	var personalizationDivSubTable = document.createElement('div');
 	personalizationDivSubTable.className = "personalizationDivSubTable";
 	form.appendChild(personalizationDivSubTable);
@@ -1626,6 +1640,14 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 function showPersonalizationForm(index, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId) {
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
+	
+	var hiddenField = null; 
+	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "fuzzification";
+	hiddenField.value = fuzzificationsFunctions[index].predDefined;
+	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
 	
 	var table = document.createElement('div');
 	table.className = "personalizationDivSubSubTable";
