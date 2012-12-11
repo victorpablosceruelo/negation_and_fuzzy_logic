@@ -155,6 +155,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		runQueryDiv.id = runQueryDivId;
 		parentDiv.appendChild(runQueryDiv);
 	}
+	runQueryDiv.innerHTML = "";
 	
 	var selectedProgramDatabase = getProgramDatabaseComboBoxValue(comboBox);
 	
@@ -167,6 +168,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 				function(data, textStatus, jqxhr) {
 					// debug.info("ProgramFileIntrospectionRequest done ... ");
 		   			// alert("ProgramFileIntrospectionRequest done ... ");
+					alert("data: " + data);
 		   			insertQuerySelection(parentDivId, runQueryDivId, selectQueryDiv.id, selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
 				});
 	}
@@ -217,7 +219,8 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "          </div>";
 	html += "     </div>";
 	html += "</form><br />";
-	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' src='#' style='display:none;'> </iframe>";
+	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' style='display:none;'> </iframe>";
+	// This does not work on google chrome: src='#' 
     	
 	selectQueryDiv.innerHTML = html;
 	
@@ -1095,7 +1098,8 @@ function insertFileUploadFacility(parentDivId) {
 							  "</FORM>" +
 							  "<div id='"+uploadStatusDivId+"'></div>" +
 							  "<iframe id='"+uploadFormTargetiFrameId+"' name='"+uploadFormTargetiFrameId+"' "+
-							  "src='#' style='display:none;'></iframe>";
+							  "style='display:none;'></iframe>";
+	// This does not work on google chrome: "src='#' " 
     	
 	$('#' + uploadFormTargetiFrameId).load(function() {
 		// document.getElementById('#' + submitiFrameId);
