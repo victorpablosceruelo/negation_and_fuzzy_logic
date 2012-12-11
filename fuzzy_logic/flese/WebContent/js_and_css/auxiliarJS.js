@@ -1427,6 +1427,24 @@ function personalizeProgramFile(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
+function fuzzificationFunctionNameInColloquial(currentName) {
+	var result = null;
+	if ((currentName != null) && (currentName != "") && (currentName != "----")) {
+	
+		var i = currentName.indexOf("(");
+		var j = currentName.indexOf(")");
+		
+		if ((i != -1) && (j != -1)){
+			result = currentName.substring(i+"(".length, j) + " is " + currentName.substring(0, i);
+		}
+	}
+	return result;
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
 function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationDiv = document.createElement('div');
 	
@@ -1434,13 +1452,37 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	personalizationDivSubTable.className = "personalizationDivSubTable";
 	personalizationDiv.appendChild(personalizationDivSubTable);
 	
-	var row = document.createElement('div');
+	var row = null;
+	var cell = null;
+	var subTable = null;
+	var subRow = null;
+	var subCell = null;
+	
+	row = document.createElement('div');
 	row.className = "personalizationDivSubTableRow";
 	personalizationDivSubTable.appendChild(row);
 	
-	var cell = document.createElement('div');
+	cell = document.createElement('div');
 	cell.className = "personalizationDivSubTableCell";
-	personalizationDivSubTable.appendChild(cell);
+	row.appendChild(cell);
+	
+	subTable = document.createElement('div');
+	subTable.className = "personalizationDivSubTable";
+	cell.appendChild(subTable);
+	
+	subRow = document.createElement('div');
+	subRow.className = "personalizationDivSubTableRow";
+	subTable.appendChild(subRow);
+	
+	subCell = document.createElement('div');
+	subCell.className = "personalizationDivSubTableCell";	
+	subCell.innerHTML = "I want to personalize how it is determined that a ";
+	subRow.appendChild(subCell);
+	
+	subCell = document.createElement('div');
+	subCell.className = "personalizationDivSubTableCell";
+	subCell.innerHTML = "Test";
+	subRow.appendChild(subCell);
 	
 	var PersonalizationFunctionUnderModificationDivId = "PersonalizationDivCell";
 	
@@ -1454,10 +1496,10 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	for (var i=0; i < fuzzificationsFunctions.length; i++) {
 		html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
 				"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
-				fuzzificationsFunctions[i].predDefined + "</option>";
+				fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined) + "</option>";
 	}
 	html += "</select>";
-	cell.innerHTML = html;
+	subCell.innerHTML = html;
 	
 	row = document.createElement('div');
 	row.className = "personalizationDivSubTableRow";
