@@ -1198,6 +1198,27 @@ function resultOver(value, index) {
 	return (parseFloat(realValue) > value);
 }
 
+function transformTextLabel(textLabelIn) {
+	var textLabel = textLabelIn;
+	debug.info("textLabel: " + textLabel);
+	if ((textLabel != null) && (textLabel != undefined) && 
+		(textLabel.length != null) && (textLabel.length != undefined) && (textLabel.length > 0)) {
+		debug.info("textLabel: " + textLabel);
+		for (var i=0; i<textLabel.length; i++) {
+			// debug.info("-" + textLabel[i] + "-");
+			if ((textLabel[i] == "_") || (textLabel[i] == "-")) {
+				debug.info("changed !! ");
+				textLabel[i] = " ";
+			}
+		}
+		debug.info("textLabel: " + textLabel);
+		textLabel.replace(/_/gi, " ");
+		textLabel.replace(/-/gi, " ");
+		debug.info("textLabel: " + textLabel);
+	}
+	return textLabel;
+}
+
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -1339,7 +1360,12 @@ function showQueryAnswers(runQueryDivId) {
 						cell.className = "queryAnswersTableCell";
 						row.appendChild(cell);
 						if (l+1 < answer.length) {
-							cell.innerHTML = answer[l];
+							if (k==0) {
+								cell.innerHTML = transformTextLabel(answer[l]);
+							}
+							else {
+								cell.innerHTML = answer[l];
+							}
 						}
 						else {
 							cell.innerHTML = truncate_truth_value(answer[l]);
