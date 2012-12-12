@@ -1418,8 +1418,8 @@ function debugQueryAnswers(parentDivId) {
 var fuzzificationsFunctions = null;
 
 function ownerPersonalization (predOwner, functionPoints) {
-	this.predOwner = predOwner;
-	this.functionPoints = functionPoints;
+	this.name = predOwner;
+	this.data = functionPoints;
 }
 
 function fuzzificationFunction(predDefined, predNecessary, ownersPersonalizations) {
@@ -1789,10 +1789,10 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 	var indexOfMine = null;
 	
 	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations.length; i++) {
-		if (fuzzificationsFunctions[index].ownersPersonalizations[i].predOwner == localUserName) {
+		if (fuzzificationsFunctions[index].ownersPersonalizations[i].name == localUserName) {
 			indexOfMine = i;
 		}
-		if (fuzzificationsFunctions[index].ownersPersonalizations[i].predOwner == 'default definition') {
+		if (fuzzificationsFunctions[index].ownersPersonalizations[i].name == 'default definition') {
 			indexOfDefault = i;
 		}
 	}
@@ -1802,17 +1802,17 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 	var fpd = null;
 	var found = false;
 	
-	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints.length; i++) {
-		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints[i][0];
-		fpd = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints[i][1];
+	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data.length; i++) {
+		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][0];
+		fpd = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][1];
 		
 		found = false;
 		if (indexOfMine != null) {
 			j = 0;
-			while ((j<fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].functionPoints.length) && (! found)) {
-				if (fpx == fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].functionPoints[j][0]) {
+			while ((j<fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data.length) && (! found)) {
+				if (fpx == fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[j][0]) {
 					found = true;
-					fpy = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].functionPoints[j][1];
+					fpy = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[j][1];
 				}
 				else j++;
 			}
@@ -2014,7 +2014,7 @@ function barValueChanged(barObject, i, indexOfDefault, index, fuzzificationGraph
 	div.innerHTML = valueToShow;
 	
 	// Modify the stored value 
-	fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints[i][1] = valueFloat;
+	fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][1] = valueFloat;
 
 	// Display in the graphic the result.
 	insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
