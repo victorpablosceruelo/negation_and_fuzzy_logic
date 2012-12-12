@@ -250,20 +250,25 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .searchOrPersonalizeTableRow {display:table-row; border:none; text-align:left; padding:0.1em;}
 .searchOrPersonalizeTableCell {display:table-cell; border:none; text-align:center; white-space: nowrap; padding:0.1em;}
 
-.personalizationDivSubTable {display:table; border:none; width:100%; margin:1em; text-align:center;}
-.personalizationDivSubTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
-.personalizationDivSubTableCellType1 {display:table-cell; border:none; width:100%; text-align:center; padding:0.1em;}
-.personalizationDivSubTableCellType2 {display:table-cell; border:none; width:50%; text-align:left; padding:0.1em;}
+.personalizationDivMainTable {display:table; border:none; width:100%; margin:1em; text-align:center;}
+.personalizationDivMainTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.personalizationDivMainTableCell {display:table-cell; border:none; width:100%; text-align:center; padding:0.1em;}
 
-.personalizationDivSubSubTable {display:table; border:0.05em solid #000000; width:90%; margin:1em; text-align:center;}
-.personalizationDivSubSubTableRow {display:table-row; border:0.05em solid #000000; width:100%; text-align:left; padding:0.1em;}
-.personalizationDivSubSubTableCellType1 {display:table-cell; border:0.05em solid #000000; width:35%; text-align:center; padding:0.1em;}
-.personalizationDivSubSubTableCellType2 {display:table-cell; border:0.05em solid #000000; width:45%; text-align:center; padding:0.1em;}
-.personalizationDivSubSubTableCellType3 {display:table-cell; border:0.05em solid #000000; width:10%; text-align:center; padding:0.1em;}
+.personalizationDivSelectFuzzificationTable {display:table; border:none; margin:1em; text-align:center;}
+.personalizationDivSelectFuzzificationTableRow {display:table-row; border:none; text-align:left; padding:0.1em;}
+.personalizationDivSelectFuzzificationTableCell {display:table-cell; border:none; text-align:center; padding:0.1em;}
 
-.personalizationDivSaveButtonTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
-.personalizationDivSaveButtonTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
-.personalizationDivSaveButtonTableCell {display:table-cell; border:none; width:30%; text-align:center; padding:0.1em;}
+.personalizationDivFuzzificationFunctionTable {display:table; border:0.05em solid #000000; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionTableRow {display:table-row; border:0.05em solid #000000; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionTableCell {display:table-cell; border:0.05em solid #000000; text-align:center; margin:0em; padding:0em; }
+
+.personalizationDivFuzzificationFunctionValuesTable {display:table; border:0.05em solid #000000; margin:1em; text-align:center;}
+.personalizationDivFuzzificationFunctionValuesTableRow {display:table-row; border:0.05em solid #000000; text-align:left; padding:0.1em;}
+.personalizationDivFuzzificationFunctionValuesTableCell {display:table-cell; border:0.05em solid #000000; text-align:center; padding:0.3em;}
+
+.personalizationDivSaveButtonTable {display:table; border:none; text-align:center; margin:1em; padding:0em; }
+.personalizationDivSaveButtonTableRow {display:table-row; border:none; text-align:center; margin:0em; padding:0em; }
+.personalizationDivSaveButtonTableCell {display:table-cell; border:none; text-align:center; margin:0em; padding:0em; }
 
 .queryStartContainerTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
 .queryStartContainerTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}

@@ -1461,15 +1461,12 @@ function personalizeProgramFile(fileName, fileOwner, mode) {
 			// Evaluate the JS code returned by the server.
 			eval(data);
 
-			if (mode == 'basic') {
+			if ((mode == 'basic') || (mode == 'advanced')) {
 				// Show the personalization dialog to the user.
-				showBasicPersonalizeProgramFileDialog(fileName, fileOwner);
+				showPersonalizeProgramFileDialog(fileName, fileOwner, mode);
 			}
-			if (mode == 'advanced') {
-				showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner);
-			}
-			if ((mode != 'basic') && (mode != 'advanced')) {
-				alert("mode is not basic nor advanced. Internal error.");
+			else {
+				alert("mode selected is not basic nor advanced. Internal error.");
 			}
 			
 		});
@@ -1509,7 +1506,7 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
+function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationDiv = document.createElement('div');
 	
 	/*
@@ -1539,9 +1536,9 @@ function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
 	hiddenField.value = fileOwner;
 	form.appendChild(hiddenField);
 	
-	var personalizationDivSubTable = document.createElement('div');
-	personalizationDivSubTable.className = "personalizationDivSubTable";
-	form.appendChild(personalizationDivSubTable);
+	var personalizationDivMainTable = document.createElement('div');
+	personalizationDivMainTable.className = "personalizationDivMainTable";
+	form.appendChild(personalizationDivMainTable);
 	
 	var row = null;
 	var cell = null;
@@ -1550,28 +1547,28 @@ function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
 	var subCell = null;
 	
 	row = document.createElement('div');
-	row.className = "personalizationDivSubTableRow";
-	personalizationDivSubTable.appendChild(row);
+	row.className = "personalizationDivMainTableRow";
+	personalizationDivMainTable.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubTableCellType1";
+	cell.className = "personalizationDivMainTableCell";
 	row.appendChild(cell);
 	
 	subTable = document.createElement('div');
-	subTable.className = "personalizationDivSubTable";
+	subTable.className = "personalizationDivSelectFuzzificationTable";
 	cell.appendChild(subTable);
 	
 	subRow = document.createElement('div');
-	subRow.className = "personalizationDivSubTableRow";
+	subRow.className = "personalizationDivSelectFuzzificationTableRow";
 	subTable.appendChild(subRow);
 	
 	subCell = document.createElement('div');
-	subCell.className = "personalizationDivSubTableCellType2";	
-	subCell.innerHTML = "I want to personalize how it is determined that a ";
+	subCell.className = "personalizationDivSelectFuzzificationTableCell";	
+	subCell.innerHTML = "I want to personalize how it is determined that a &nbsp;";
 	subRow.appendChild(subCell);
 	
 	subCell = document.createElement('div');
-	subCell.className = "personalizationDivSubTableCellType2";
+	subCell.className = "personalizationDivSelectFuzzificationTableCell";
 	subRow.appendChild(subCell);
 	
 	var PersonalizationFunctionUnderModificationDivId = "PersonalizationDivCell";
@@ -1580,7 +1577,8 @@ function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
 	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
 	var html = "";
 	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
-			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId+"\", \"" +formTargetiFrameId+"\");'>";
+			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId + "\", \"" +
+			formTargetiFrameId + "\", \"" + mode + "\");'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
 	for (var i=0; i < fuzzificationsFunctions.length; i++) {
@@ -1592,11 +1590,11 @@ function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
 	subCell.innerHTML = html;
 	
 	row = document.createElement('div');
-	row.className = "personalizationDivSubTableRow";
-	personalizationDivSubTable.appendChild(row);
+	row.className = "personalizationDivMainTableRow";
+	personalizationDivMainTable.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubTableCellType1";
+	cell.className = "personalizationDivMainTableCell";
 	cell.id = PersonalizationFunctionUnderModificationDivId;
 	row.appendChild(cell);
 	cell.innerHTML = "Select the fuzzification you want to personalize.";
@@ -1624,122 +1622,7 @@ function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showBasicPersonalizeProgramFileDialog(fileName, fileOwner) {
-	var personalizationDiv = document.createElement('div');
-	
-	/*
-	 * "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
-	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
-	 */
-	var formTargetiFrameId = "personalizeMyFuzzification";
-	var form = document.createElement('form');
-	form.target = formTargetiFrameId;
-	form.action = urlMappingFor('SaveProgramFuzzificationRequest');
-	form.method = 'post';
-	// form.accept-charset = 'UTF-8';
-	personalizationDiv.appendChild(form);
-	// alert("form.action: " + form.action);
-	
-	var hiddenField = null; 
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "fileName";
-	hiddenField.value = fileName;
-	form.appendChild(hiddenField);
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "fileOwner";
-	hiddenField.value = fileOwner;
-	form.appendChild(hiddenField);
-	
-	var personalizationDivSubTable = document.createElement('div');
-	personalizationDivSubTable.className = "personalizationDivSubTable";
-	form.appendChild(personalizationDivSubTable);
-	
-	var row = null;
-	var cell = null;
-	var subTable = null;
-	var subRow = null;
-	var subCell = null;
-	
-	row = document.createElement('div');
-	row.className = "personalizationDivSubTableRow";
-	personalizationDivSubTable.appendChild(row);
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivSubTableCellType1";
-	row.appendChild(cell);
-	
-	subTable = document.createElement('div');
-	subTable.className = "personalizationDivSubTable";
-	cell.appendChild(subTable);
-	
-	subRow = document.createElement('div');
-	subRow.className = "personalizationDivSubTableRow";
-	subTable.appendChild(subRow);
-	
-	subCell = document.createElement('div');
-	subCell.className = "personalizationDivSubTableCellType2";	
-	subCell.innerHTML = "I want to personalize how it is determined that a ";
-	subRow.appendChild(subCell);
-	
-	subCell = document.createElement('div');
-	subCell.className = "personalizationDivSubTableCellType2";
-	subRow.appendChild(subCell);
-	
-	var PersonalizationFunctionUnderModificationDivId = "PersonalizationDivCell";
-	
-	// Fill in the div.
-	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
-	var html = "";
-	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
-			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId+"\", \"" +formTargetiFrameId+"\");'>";
-	html += "<option name=\'----\' value=\'----\'>----</option>";
-	
-	for (var i=0; i < fuzzificationsFunctions.length; i++) {
-		html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
-				"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
-				fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') + "</option>";
-	}
-	html += "</select>";
-	subCell.innerHTML = html;
-	
-	row = document.createElement('div');
-	row.className = "personalizationDivSubTableRow";
-	personalizationDivSubTable.appendChild(row);
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivSubTableCellType1";
-	cell.id = PersonalizationFunctionUnderModificationDivId;
-	row.appendChild(cell);
-	cell.innerHTML = "Select the fuzzification you want to personalize.";
-	
-	// Show the div.
-    $(function() {
-    	$(personalizationDiv).dialog({
-            // add a close listener to prevent adding multiple divs to the document
-            close: function(event, ui) {
-                // remove div with all data and events
-                // dialog.remove();
-            	personalizationDiv.innerHTML = "";
-            },
-            modal: true,
-            resizable: true, 
-            height: "auto", // 800,
-            width: "auto", // 800,
-            title: 'Personalizing program file ' + fileName + " owned by " + fileOwner
-        });
-        // $( "#" + fileViewContentsDivId ).dialog();
-    });
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
-function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId) {
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode) {
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 /*	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
 	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
@@ -1758,14 +1641,19 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 		else i++;
 	}
 	
-	showPersonalizationForm(i, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId);
+	if (found) {
+		showPersonalizationFunctionValues(i, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode);
+	}
+	else {
+		alert("Fuzzification function was not found. Reload the page (press F5) after closing this message.");
+	}
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showPersonalizationForm(index, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId) {
+function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode) {
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
 	
@@ -1777,19 +1665,46 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 	hiddenField.value = fuzzificationsFunctions[index].predDefined;
 	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
 	
-	var table = document.createElement('div');
-	table.className = "personalizationDivSubSubTable";
-	PersonalizationFunctionUnderModificationDiv.appendChild(table);
-	
+	var table = null;
 	var row = null;
 	var cell = null;
+	var fuzzificationGraphicTableCell = null;
+	var fuzzificationValuesTableCell = null;
+	
+	// Table that contains everything about the fuzzification function.
+	table = document.createElement('div');
+	table.className = "personalizationDivFuzzificationFunctionTable";
+	PersonalizationFunctionUnderModificationDiv.appendChild(table);	
 	
 	row = document.createElement('div');
-	row.className = "personalizationDivSubSubTableRow";
+	row.className = "personalizationDivFuzzificationFunctionTableRow";
+	table.appendChild(row);	
+	
+	fuzzificationGraphicTableCell = document.createElement('div');
+	fuzzificationGraphicTableCell.className = "personalizationDivFuzzificationFunctionTableCell";
+	fuzzificationGraphicTableCell.innerHTML = "";
+	row.appendChild(fuzzificationGraphicTableCell);
+	
+	fuzzificationValuesTableCell = document.createElement('div');
+	fuzzificationValuesTableCell.className = "personalizationDivFuzzificationFunctionTableCell";
+	fuzzificationValuesTableCell.innerHTML = "";
+	row.appendChild(fuzzificationValuesTableCell);
+	
+	// Graphical representation of the fuzzification function.
+
+	
+	// Fuzzification function values view and modification.
+	// We present them inside a table.
+	table = document.createElement('div');
+	table.className = "personalizationDivFuzzificationFunctionValuesTable";
+	fuzzificationValuesTableCell.appendChild(table);	
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivFuzzificationFunctionValuesTableRow";
 	table.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubSubTableCellType1";
+	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 	row.appendChild(cell);
 	cell.innerHTML = "A " + 
 						fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'subject') +
@@ -1798,18 +1713,18 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 						" is ";
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubSubTableCellType2";
+	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 	row.appendChild(cell);
 	cell.innerHTML = "is " + fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'adjective') +
 						" with a degree of ";
 
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubSubTableCellType3";
+	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 	row.appendChild(cell);
 	cell.innerHTML = "Current Value";
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSubSubTableCellType3";
+	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 	row.appendChild(cell);
 	cell.innerHTML = "Default Value";
 	
@@ -1853,28 +1768,28 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 		
 		// Now it is time to build the table with the data.
 		row = document.createElement('div');
-		row.className = "personalizationDivSubSubTableRow";
+		row.className = "personalizationDivFuzzificationFunctionValuesTableRow";
 		table.appendChild(row);
 		
 		cell = document.createElement('div');
-		cell.className = "personalizationDivSubSubTableCellType1";
+		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 		row.appendChild(cell);
 		cell.innerHTML = fpx;
 		
 		cell = document.createElement('div');
-		cell.className = "personalizationDivSubSubTableCellType2";
+		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 		row.appendChild(cell);
 		cell.innerHTML = "<input type='hidden' name='fuzzificationBars["+i+"].fpx' value='"+fpx+"'/>" +
 						 "<input type='range'  name='fuzzificationBars["+i+"].fpy' min='0' max='1' step='0.01' "+
 						 "value='"+fpy+"' width='150px' onchange='barValueChanged(this, "+i+")'/>";
 
 		cell = document.createElement('div');
-		cell.className = "personalizationDivSubSubTableCellType3";
+		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 		row.appendChild(cell);
 		cell.innerHTML = "<span id='fuzzificationBarValue["+i+"]'>"+fpy+"</span>";
 		
 		cell = document.createElement('div');
-		cell.className = "personalizationDivSubSubTableCellType3";
+		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 		row.appendChild(cell);
 		cell.innerHTML = fpd;		
 	}
@@ -1882,7 +1797,7 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 	// Table for the button in charge of saving the changes.
 	table = document.createElement('div');
 	table.className = "personalizationDivSaveButtonTable";
-	PersonalizationFunctionUnderModificationDiv.appendChild(table);
+	fuzzificationValuesTableCell.appendChild(table);
 
 	row = document.createElement('div');
 	row.className = "personalizationDivSaveButtonTableRow";
