@@ -1804,7 +1804,7 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 			indexOfDefault = i;
 		}
 	}
-	if (mode == 'basic') indexOfMine = indexOfDefault;
+	if (mode == 'advanced') indexOfMine = indexOfDefault;
 	
 	var fpx = null;
 	var fpy = null;
