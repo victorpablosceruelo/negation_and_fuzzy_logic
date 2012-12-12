@@ -300,7 +300,7 @@ function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTy
 				else k++;
 			}
 			if (! found) {
-				validTypesArray[validTypesArray.length] = programIntrospection[i].predName;
+				validTypesArray[validTypesArray.length] = prologNameInColloquialLanguage(programIntrospection[i].predName);
 			}
 		}
 	}
@@ -442,7 +442,7 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 		}
 		if (addOption) {
 			html += "<option title=\'" + i + "\' value=\'" + programIntrospection[i].predName + "\'>"+
-					programIntrospection[i].predName + "</option>";
+					prologNameInColloquialLanguage(programIntrospection[i].predName) + "</option>";
 		}
 	}
 	html += "</select>";
@@ -525,7 +525,7 @@ function insertChooseQuantifier(queryLineId, rowId, quantifierIndex, queryLinesT
 				html += "<option name=\'" + programIntrospection[i].predName + 
 							"\' value=\'" + programIntrospection[i].predName + "\'>";
 				if (programIntrospection[i].predName == "fnot") html += "not";
-				else html += programIntrospection[i].predName;
+				else html += prologNameInColloquialLanguage(programIntrospection[i].predName);
 				html += "</option>";
 			}
 		}
@@ -648,7 +648,9 @@ function insertAggregatorTable(queryLinesCounterFieldId, queryLinesTableId, quer
 				html += "<option ";
 				if (predInfo.predName == "min") html += "selected ";
 				html += "name=\'" + predInfo.predName + 
-						"\' value=\'" + predInfo.predName + "\'>"+predInfo.predName + "</option>";
+						"\' value=\'" + predInfo.predName + "\'>"+
+						prologNameInColloquialLanguage(predInfo.predName) + 
+						"</option>";
 			}
 		}
 		html += "</select>";
@@ -714,7 +716,7 @@ function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoInd
 		i = 0;
 		while (i<valuesLength) {
 			html+= "<option name=\'" + values[i] + "\' value=\'" + values[i] + "\'>" +
-			values[i] + "</option>";
+					prologNameInColloquialLanguage(values[i]) + "</option>";
 			i++;
 		}
 		html += "</select>";
@@ -1203,7 +1205,7 @@ function resultOver(value, index) {
 	return (parseFloat(realValue) > value);
 }
 
-function transformTextLabel(textLabelIn) {
+function prologNameInColloquialLanguage(textLabelIn) {
 	var textLabel = null;
 	
 	// debug.info("textLabel: " + textLabelIn);
@@ -1362,12 +1364,12 @@ function showQueryAnswers(runQueryDivId) {
 						cell.className = "queryAnswersTableCell";
 						row.appendChild(cell);
 						if (l+1 < answer.length) {
-							if (k==0) {
-								cell.innerHTML = transformTextLabel(answer[l]);
-							}
-							else {
-								cell.innerHTML = answer[l];
-							}
+//							if (k==0) {
+								cell.innerHTML = prologNameInColloquialLanguage(answer[l]);
+//							}
+//							else {
+//								cell.innerHTML = answer[l];
+//							}
 						}
 						else {
 							cell.innerHTML = truncate_truth_value(answer[l]);
@@ -1499,7 +1501,7 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 			}
 		}
 	}
-	return result;
+	return prologNameInColloquialLanguage(result);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
@@ -1668,8 +1670,8 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	var table = null;
 	var row = null;
 	var cell = null;
-	var fuzzificationGraphicTableCell = null;
-	var fuzzificationValuesTableCell = null;
+	var fuzzificationGraphicDivId = "fuzzificationGraphicDiv";
+	var fuzzificationValuesAndButtonDivId = "fuzzificationValuesAndButtonDiv";
 	
 	// Table that contains everything about the fuzzification function.
 	table = document.createElement('div');
@@ -1680,24 +1682,67 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	row.className = "personalizationDivFuzzificationFunctionTableRow";
 	table.appendChild(row);	
 	
-	fuzzificationGraphicTableCell = document.createElement('div');
-	fuzzificationGraphicTableCell.className = "personalizationDivFuzzificationFunctionTableCell";
-	fuzzificationGraphicTableCell.innerHTML = "";
-	row.appendChild(fuzzificationGraphicTableCell);
+	if (mode == 'advanced') {
+		// Cell that contains the graphic representation of the fuzzification function.
+		cell = document.createElement('div');
+		cell.id = fuzzificationGraphicDivId;
+		cell.className = "personalizationDivFuzzificationFunctionTableCell";
+		cell.innerHTML = "";
+		row.appendChild(cell);
+		
+		insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
+	}
 	
-	fuzzificationValuesTableCell = document.createElement('div');
-	fuzzificationValuesTableCell.className = "personalizationDivFuzzificationFunctionTableCell";
-	fuzzificationValuesTableCell.innerHTML = "";
-	row.appendChild(fuzzificationValuesTableCell);
+	// Cell that contains the numerical representation of the function, the save
+	// button and some others.
+	cell = document.createElement('div');
+	cell.id = fuzzificationValuesAndButtonDivId;
+	cell.className = "personalizationDivFuzzificationFunctionTableCell";
+	cell.innerHTML = "";
+	row.appendChild(cell);
 	
-	// Graphical representation of the fuzzification function.
+	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId);
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId){
+	
+	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
+	var table = null;
+	var row = null;
+	var cell = null;
+	var saveButtonCell = null;
+	var fuzzificationValuesCell = null;
+	
+	table = document.createElement('div');
+	table.className = "personalizationDivFuzzificationFunctionWithButtonTable";
+	container.appendChild(table);
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivFuzzificationFunctionWithButtonTableRow";
+	table.appendChild(row);
+	
+	fuzzificationValuesCell = document.createElement('div');
+	fuzzificationValuesCell.className = "personalizationDivFuzzificationFunctionWithButtonTableCell";
+	row.appendChild(fuzzificationValuesCell);
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivFuzzificationFunctionWithButtonTableRow";
+	table.appendChild(row);
+	
+	saveButtonCell = document.createElement('div');
+	saveButtonCell.className = "personalizationDivFuzzificationFunctionWithButtonTableCell";
+	row.appendChild(saveButtonCell);
 
 	
 	// Fuzzification function values view and modification.
 	// We present them inside a table.
 	table = document.createElement('div');
 	table.className = "personalizationDivFuzzificationFunctionValuesTable";
-	fuzzificationValuesTableCell.appendChild(table);	
+	fuzzificationValuesCell.appendChild(table);	
 	
 	row = document.createElement('div');
 	row.className = "personalizationDivFuzzificationFunctionValuesTableRow";
@@ -1796,27 +1841,27 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	
 	// Table for the button in charge of saving the changes.
 	table = document.createElement('div');
-	table.className = "personalizationDivSaveButtonTable";
-	fuzzificationValuesTableCell.appendChild(table);
+	table.className = "personalizationDivSaveButtonAndMsgTable";
+	saveButtonCell.appendChild(table);
 
 	row = document.createElement('div');
-	row.className = "personalizationDivSaveButtonTableRow";
+	row.className = "personalizationDivSaveButtonAndMsgTableRow";
 	table.appendChild(row);
 	
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonTableCell";
+	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
 	row.appendChild(cell);
 	cell.innerHTML = "<INPUT type='submit' value='Save modifications' onclick='showSavingFuzzificationMsg(\"saveMyFuzzificationStatus\")'>";
 
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonTableCell";
+	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
 	cell.id = "saveMyFuzzificationStatus";
 	row.appendChild(cell);
 	cell.innerHTML = "";
 
 	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonTableCell";
-	row.appendChild(cell);
+	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
+	container.appendChild(cell);
 	cell.innerHTML = "<iframe id='"+formTargetiFrameId+"' name='"+formTargetiFrameId+"' height='20' style='display:none;'> </iframe>";
 	
 	
@@ -1839,6 +1884,14 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 		  
 	});
 		
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId) {
+	alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

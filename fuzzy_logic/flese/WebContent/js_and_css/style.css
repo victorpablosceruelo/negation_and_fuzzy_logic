@@ -258,17 +258,21 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .personalizationDivSelectFuzzificationTableRow {display:table-row; border:none; text-align:left; padding:0.1em;}
 .personalizationDivSelectFuzzificationTableCell {display:table-cell; border:none; text-align:center; padding:0.1em;}
 
-.personalizationDivFuzzificationFunctionTable {display:table; border:0.05em solid #000000; text-align:center; margin:0em; padding:0em; }
-.personalizationDivFuzzificationFunctionTableRow {display:table-row; border:0.05em solid #000000; text-align:center; margin:0em; padding:0em; }
-.personalizationDivFuzzificationFunctionTableCell {display:table-cell; border:0.05em solid #000000; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionWithButtonTable {display:table; border:none; text-align:center; align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionWithButtonTableRow {display:table-row; border:none; text-align:center; align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionWithButtonTableCell {display:table-cell; border:none; text-align:center; align:center; margin:0em; padding:0em; }
+
+.personalizationDivFuzzificationFunctionTable {display:table; border:none; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionTableRow {display:table-row; border:none; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionTableCell {display:table-cell; border:none; text-align:center; margin:0em; padding:0em; }
 
 .personalizationDivFuzzificationFunctionValuesTable {display:table; border:0.05em solid #000000; margin:1em; text-align:center;}
 .personalizationDivFuzzificationFunctionValuesTableRow {display:table-row; border:0.05em solid #000000; text-align:left; padding:0.1em;}
 .personalizationDivFuzzificationFunctionValuesTableCell {display:table-cell; border:0.05em solid #000000; text-align:center; padding:0.3em;}
 
-.personalizationDivSaveButtonTable {display:table; border:none; text-align:center; margin:1em; padding:0em; }
-.personalizationDivSaveButtonTableRow {display:table-row; border:none; text-align:center; margin:0em; padding:0em; }
-.personalizationDivSaveButtonTableCell {display:table-cell; border:none; text-align:center; margin:0em; padding:0em; }
+.personalizationDivSaveButtonAndMsgTable {display:table; border:none; text-align:center; margin:1em; padding:0em; }
+.personalizationDivSaveButtonAndMsgTableRow {display:table-row; border:none; text-align:center; margin:0em; padding:0em; }
+.personalizationDivSaveButtonAndMsgTableCell {display:table-cell; border:none; text-align:center; margin:0em; padding:0em; }
 
 .queryStartContainerTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
 .queryStartContainerTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
