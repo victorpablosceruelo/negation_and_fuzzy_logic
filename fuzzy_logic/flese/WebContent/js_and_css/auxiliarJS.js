@@ -992,7 +992,9 @@ function insertFilesList (parentDivId) {
 
 	   						cell = document.createElement('div');
 	   						cell.className = "filesListTableCell";
-		   					cell.innerHTML = "Personalizations";
+		   					cell.innerHTML = "<a href='#' title='personalize program file " + filesList[i].fileName + "' "+
+								 			 "onclick='personalizeProgramFileAction(" + i + ", \"" + parentDivId + "\");' >" + 
+								 			 "<img src='images/edit.png' width='20em'>" + "</a>";
 		   					row.appendChild(cell);
 	   					}
 	   				}
@@ -1025,7 +1027,7 @@ function insertFilesListHead(filesListDivId) {
 
 	cell = document.createElement('div');
 	cell.className = "filesListTableCell";
-	cell.innerHTML = "Personalizations";
+	cell.innerHTML = "";
 	row.appendChild(cell);
 }
 
