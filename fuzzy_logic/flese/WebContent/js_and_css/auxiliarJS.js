@@ -1711,14 +1711,14 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	cell.innerHTML = "";
 	row.appendChild(cell);
 	
-	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId);
+	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId){
+function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId){
 	
 	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
 	var table = null;
@@ -1836,7 +1836,8 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 		row.appendChild(cell);
 		cell.innerHTML = "<input type='hidden' name='fuzzificationBars["+i+"].fpx' value='"+fpx+"'/>" +
 						 "<input type='range'  name='fuzzificationBars["+i+"].fpy' min='0' max='1' step='0.01' "+
-						 "value='"+fpy+"' width='150px' onchange='barValueChanged(this, "+i+")'/>";
+						 "value='"+fpy+"' width='150px' "+
+						 "onchange='barValueChanged(this, "+i+", "+indexOfDefault+", "+index+", \""+fuzzificationGraphicDivId+"\")'/>";
 
 		cell = document.createElement('div');
 		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
@@ -1903,20 +1904,21 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId) {
 	
 	var div = document.getElementById(fuzzificationGraphicDivId);
-	div.innerHTML = ""; // Re-initialize
+	if ((div != null) && (div != undefined)) {
+		div.innerHTML = ""; // Re-initialize
 	
-	var container = document.createElement('div');
-	container.id = fuzzificationGraphicDivId + "Container";
-	container.style.width= "50em"; 
-	container.style.height= "15em";
-	container.style.margin= "2em";
-	container.style['text-align'] = "center";
-	container.style['align'] = "center";
-	div.appendChild(container);
+		var container = document.createElement('div');
+		container.id = fuzzificationGraphicDivId + "Container";
+		container.style.width= "50em"; 
+		container.style.height= "15em";
+		container.style.margin= "2em";
+		container.style['text-align'] = "center";
+		container.style['align'] = "center";
+		div.appendChild(container);
 	
-	// alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
-	drawChart(container.id, index);
-	
+		// alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
+		drawChart(container.id, index);
+	}
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
@@ -1993,7 +1995,7 @@ function showSavingFuzzificationMsg(saveMyFuzzificationStatusDivId) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function barValueChanged(barObject, i) {
+function barValueChanged(barObject, i, indexOfDefault, index, fuzzificationGraphicDivId) {
 	var div = document.getElementById("fuzzificationBarValue["+i+"]");
 	
 	var valueOriginal=barObject.value;
@@ -2008,8 +2010,14 @@ function barValueChanged(barObject, i) {
 		valueToShow = 0;
 	}
 	
+	// Show the value in the div.
 	div.innerHTML = valueToShow;
 	
+	// Modify the stored value 
+	fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].functionPoints[i][1] = valueFloat;
+
+	// Display in the graphic the result.
+	insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
