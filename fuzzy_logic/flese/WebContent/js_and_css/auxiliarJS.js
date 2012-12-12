@@ -1677,38 +1677,48 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	table = document.createElement('div');
 	table.className = "personalizationDivFuzzificationFunctionTable";
 	PersonalizationFunctionUnderModificationDiv.appendChild(table);	
-	
+
+	/* They cannnot share the same row ... :-(
 	row = document.createElement('div');
 	row.className = "personalizationDivFuzzificationFunctionTableRow";
-	table.appendChild(row);	
+	table.appendChild(row);
+	*/	
 	
 	if (mode == 'advanced') {
+		row = document.createElement('div');
+		row.className = "personalizationDivFuzzificationFunctionTableRow";
+		table.appendChild(row);
+		
 		// Cell that contains the graphic representation of the fuzzification function.
 		cell = document.createElement('div');
 		cell.id = fuzzificationGraphicDivId;
-		cell.className = "personalizationDivFuzzificationFunctionTableCell";
+		cell.className = "personalizationDivFuzzificationFunctionTableCell1";
 		cell.innerHTML = "";
 		row.appendChild(cell);
 		
 		insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
 	}
 	
+	row = document.createElement('div');
+	row.className = "personalizationDivFuzzificationFunctionTableRow";
+	table.appendChild(row);
+	
 	// Cell that contains the numerical representation of the function, the save
 	// button and some others.
 	cell = document.createElement('div');
 	cell.id = fuzzificationValuesAndButtonDivId;
-	cell.className = "personalizationDivFuzzificationFunctionTableCell";
+	cell.className = "personalizationDivFuzzificationFunctionTableCell2";
 	cell.innerHTML = "";
 	row.appendChild(cell);
 	
-	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId);
+	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId){
+function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId){
 	
 	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
 	var table = null;
@@ -1891,7 +1901,83 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
 function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId) {
-	alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
+	
+	var div = document.getElementById(fuzzificationGraphicDivId);
+	div.innerHTML = ""; // Re-initialize
+	
+	var container = document.createElement('div');
+	container.id = fuzzificationGraphicDivId + "Container";
+	container.style.width= "50em"; 
+	container.style.height= "15em";
+	container.style.margin= "2em";
+	container.style['text-align'] = "center";
+	container.style['align'] = "center";
+	div.appendChild(container);
+	
+	// alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
+	drawChart(container.id, index);
+	
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+// var charts = new Array(); // globally available
+var chart = null;
+
+function drawChart(identifier, index) {
+	
+	if ((fuzzificationsFunctions[index] != null) && 
+		(fuzzificationsFunctions[index].ownersPersonalizations != null)) {
+
+		$(document).ready(function() {
+			  // charts[i] = 
+		      chart = new Highcharts.Chart({
+		         chart: {
+	    	        renderTo: identifier,
+	        	    type: 'line' //,
+/*					style: { margin: '0 auto' }
+*/
+		         },
+		         title: {
+	    	        text: fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'all')
+	        	 },
+		         xAxis: {
+					title: {
+						text: fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predNecessary, 'adjective') + 
+								" of a " + fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predNecessary, 'subject')
+					},
+					min: 0
+
+		            // categories: ['Apples', 'Bananas', 'Oranges']
+		         },
+		         yAxis: {
+					title: {
+						text: 'Truth value'
+					},
+					min: 0,
+					max: 1
+		         	// categories: [0, 0.25, 0.5, 0.75, 1]
+	    	     },
+/*	    	     navigator: {
+	    	    	 height: 30,
+	    	    	 width: 40
+	    	     },
+	    	     center: [60, 45],
+	    	     size: 50,
+*/
+	        	 series: fuzzificationsFunctions[index].ownersPersonalizations
+		         		/*	[{
+		            name: 'Jane',
+		            data: [1, 0, 4]
+	    	     }, {
+	        	    name: 'John',
+	            	data: [5, 7, 3]
+		         }] */
+		      });
+		   });
+	}
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

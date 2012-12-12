@@ -264,7 +264,8 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 
 .personalizationDivFuzzificationFunctionTable {display:table; border:none; text-align:center; margin:0em; padding:0em; }
 .personalizationDivFuzzificationFunctionTableRow {display:table-row; border:none; text-align:center; margin:0em; padding:0em; }
-.personalizationDivFuzzificationFunctionTableCell {display:table-cell; border:none; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionTableCell1 {display:table-cell; border:none; width:30%; text-align:center; margin:0em; padding:0em; }
+.personalizationDivFuzzificationFunctionTableCell2 {display:table-cell; border:none; text-align:center; margin:0em; padding:0em; }
 
 .personalizationDivFuzzificationFunctionValuesTable {display:table; border:0.05em solid #000000; margin:1em; text-align:center;}
 .personalizationDivFuzzificationFunctionValuesTableRow {display:table-row; border:0.05em solid #000000; text-align:left; padding:0.1em;}
