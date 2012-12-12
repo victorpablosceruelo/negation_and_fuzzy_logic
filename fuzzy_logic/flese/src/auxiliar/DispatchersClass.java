@@ -371,7 +371,10 @@ public class DispatchersClass {
 		
 		String fuzzification = request.getParameter("fuzzification");
 		if (fuzzification == null) throw new Exception("fuzzification is null.");
-		request.setAttribute("fuzzification", fuzzification);
+		// request.setAttribute("fuzzification", fuzzification);
+		
+		String fuzzificationOwner = request.getParameter("fuzzificationOwner");
+		
 		
 		int counter=0;
 		String [] [] params = null;
@@ -394,7 +397,7 @@ public class DispatchersClass {
 		LOG.info(paramsDebug);
 		
 		ProgramAnalizedClass programAnalized = new ProgramAnalizedClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
-		programAnalized.updateProgramFile(fuzzification, localUserName, params);
+		programAnalized.updateProgramFile(fuzzification, fuzzificationOwner, params);
 		
 		connection.clearCacheInCiaoPrologConnectionClass();
 		

@@ -7,8 +7,11 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function loadingImageHtml() {
-	return "<br /><img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
+function loadingImageHtml(withNewLine) {
+	var result = "<img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
+	
+	if (withNewLine) return "<br />" + result;
+	else return result;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -22,7 +25,7 @@ function fileInfo(fileName, fileOwner) {
 
 function insertProgramFileSelection(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
-	parentDiv.innerHTML = loadingImageHtml();
+	parentDiv.innerHTML = loadingImageHtml(true);
 	
 	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
@@ -151,7 +154,7 @@ function selectedProgramDatabaseChanged(comboBox, parentDivId) {
 		parentDiv.appendChild(selectQueryDiv);
 	}
 
-	selectQueryDiv.innerHTML = loadingImageHtml();
+	selectQueryDiv.innerHTML = loadingImageHtml(true);
 	
 	runQueryDivId = 'runQueryDiv';
 	var runQueryDiv = document.getElementById(runQueryDivId);
@@ -841,7 +844,7 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	}
 	
 	var runQueryDiv = document.getElementById(runQueryDivId);
-	runQueryDiv.innerHTML = loadingImageHtml();
+	runQueryDiv.innerHTML = loadingImageHtml(true);
 	runQueryDiv.style.display='block'; 
 	// runQueryDiv.style.display='inline';
 	
@@ -879,7 +882,7 @@ function addToUserInformation(index, fieldName, fieldValue) {
 function insertUserOptions(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
 	
-	parentDiv.innerHTML = loadingImageHtml();
+	parentDiv.innerHTML = loadingImageHtml(true);
 	
 	$.getScript(urlMappingFor('UserOptionsRequest'), 
 			function(data, textStatus, jqxhr) {
@@ -943,7 +946,7 @@ function insertFilesList (parentDivId) {
 		filesListDiv.id = "filesListDiv";
 		parentDiv.appendChild(filesListDiv);
 	}
-	filesListDiv.innerHTML = loadingImageHtml();
+	filesListDiv.innerHTML = loadingImageHtml(true);
 	
 	var fileViewContentsDiv = document.getElementById("fileViewContentsDiv");
 	if (fileViewContentsDiv == null) {
@@ -1134,7 +1137,7 @@ function insertFileUploadFacility(parentDivId) {
 function uploadActionOnChange(formId, uploadStatusDivId) {
 	// alert("Upload Submit Action started ...");
 	document.getElementById(uploadStatusDivId).style.visibility = 'visible';
-	document.getElementById(uploadStatusDivId).innerHTML = loadingImageHtml();
+	document.getElementById(uploadStatusDivId).innerHTML = loadingImageHtml(true);
 
 	var form = document.getElementById(formId);
 	form.submit();
@@ -1510,7 +1513,7 @@ function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	form.method = 'post';
 	// form.accept-charset = 'UTF-8';
 	personalizationDiv.appendChild(form);
-	alert("form.action: " + form.action);
+	// alert("form.action: " + form.action);
 	
 	var hiddenField = null; 
 	
@@ -1763,7 +1766,7 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSaveButtonTableCell";
 	row.appendChild(cell);
-	cell.innerHTML = "<INPUT type='submit' value='Save modifications' >";
+	cell.innerHTML = "<INPUT type='submit' value='Save modifications' onclick='showSavingFuzzificationMsg(\"saveMyFuzzificationStatus\")'>";
 
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSaveButtonTableCell";
@@ -1797,6 +1800,15 @@ function showPersonalizationForm(index, PersonalizationFunctionUnderModification
 	});
 		
 }
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function showSavingFuzzificationMsg(saveMyFuzzificationStatusDivId) {
+	document.getElementById(saveMyFuzzificationStatusDivId).innerHTML = loadingImageHtml(false);
+}
+
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/

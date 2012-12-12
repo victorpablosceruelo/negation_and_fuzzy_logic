@@ -1,5 +1,8 @@
 package auxiliar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
@@ -125,6 +128,12 @@ public class ServletsAuxMethodsClass {
 		}
 	}
 	
+	public static String getCurrentDate () {
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+		Date date = new Date();
+		// System.out.println(dateFormat.format(date));
+		return (dateFormat.format(date));
+	}
 
 	public static void logRequestParameters(HttpServletRequest request, Log LOG) {
 		if ((request != null) && (LOG != null)) {
