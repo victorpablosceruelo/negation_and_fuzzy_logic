@@ -1538,6 +1538,13 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	hiddenField.value = fileOwner;
 	form.appendChild(hiddenField);
 	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "fuzzificationOwner";
+	if (mode == 'basic') hiddenField.value = localUserName;
+	else hiddenField.value = 'default definition';
+	form.appendChild(hiddenField);
+	
 	var personalizationDivMainTable = document.createElement('div');
 	personalizationDivMainTable.className = "personalizationDivMainTable";
 	form.appendChild(personalizationDivMainTable);
@@ -1711,14 +1718,14 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	cell.innerHTML = "";
 	row.appendChild(cell);
 	
-	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId);
+	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId, mode);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId){
+function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId, mode){
 	
 	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
 	var table = null;
@@ -1781,7 +1788,8 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 	cell = document.createElement('div');
 	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
 	row.appendChild(cell);
-	cell.innerHTML = "Default Value";
+	if (mode == 'basic') cell.innerHTML = "Default Value";
+	else cell.innerHTML = "Old Value";
 	
 	var i = null;
 	var j = null;
@@ -1796,6 +1804,7 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 			indexOfDefault = i;
 		}
 	}
+	if (mode == 'basic') indexOfMine = indexOfDefault;
 	
 	var fpx = null;
 	var fpy = null;
