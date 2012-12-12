@@ -993,7 +993,7 @@ function insertFilesList (parentDivId) {
 	   						cell = document.createElement('div');
 	   						cell.className = "filesListTableCell";
 		   					cell.innerHTML = "<a href='#' title='personalize program file " + filesList[i].fileName + "' "+
-								 			 "onclick='personalizeProgramFileAction(" + i + ", \"" + parentDivId + "\");' >" + 
+								 			 "onclick='return personalizeProgramFile(\"" + filesList[i].fileName + "\", \"" + filesList[i].fileOwner + "\", \"advanced\");'>" + 
 								 			 "<img src='images/edit.png' width='20em'>" + "</a>";
 		   					row.appendChild(cell);
 	   					}
@@ -1461,8 +1461,16 @@ function personalizeProgramFile(fileName, fileOwner, mode) {
 			// Evaluate the JS code returned by the server.
 			eval(data);
 
-			// Show the personalization dialog to the user.
-			showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode);
+			if (mode == 'basic') {
+				// Show the personalization dialog to the user.
+				showBasicPersonalizeProgramFileDialog(fileName, fileOwner);
+			}
+			if (mode == 'advanced') {
+				showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner);
+			}
+			if ((mode != 'basic') && (mode != 'advanced')) {
+				alert("mode is not basic nor advanced. Internal error.");
+			}
 			
 		});
 	
@@ -1501,7 +1509,122 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showBasicPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
+function showAdvancedPersonalizeProgramFileDialog(fileName, fileOwner) {
+	var personalizationDiv = document.createElement('div');
+	
+	/*
+	 * "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
+	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
+	 */
+	var formTargetiFrameId = "personalizeMyFuzzification";
+	var form = document.createElement('form');
+	form.target = formTargetiFrameId;
+	form.action = urlMappingFor('SaveProgramFuzzificationRequest');
+	form.method = 'post';
+	// form.accept-charset = 'UTF-8';
+	personalizationDiv.appendChild(form);
+	// alert("form.action: " + form.action);
+	
+	var hiddenField = null; 
+	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "fileName";
+	hiddenField.value = fileName;
+	form.appendChild(hiddenField);
+	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "fileOwner";
+	hiddenField.value = fileOwner;
+	form.appendChild(hiddenField);
+	
+	var personalizationDivSubTable = document.createElement('div');
+	personalizationDivSubTable.className = "personalizationDivSubTable";
+	form.appendChild(personalizationDivSubTable);
+	
+	var row = null;
+	var cell = null;
+	var subTable = null;
+	var subRow = null;
+	var subCell = null;
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivSubTableRow";
+	personalizationDivSubTable.appendChild(row);
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubTableCellType1";
+	row.appendChild(cell);
+	
+	subTable = document.createElement('div');
+	subTable.className = "personalizationDivSubTable";
+	cell.appendChild(subTable);
+	
+	subRow = document.createElement('div');
+	subRow.className = "personalizationDivSubTableRow";
+	subTable.appendChild(subRow);
+	
+	subCell = document.createElement('div');
+	subCell.className = "personalizationDivSubTableCellType2";	
+	subCell.innerHTML = "I want to personalize how it is determined that a ";
+	subRow.appendChild(subCell);
+	
+	subCell = document.createElement('div');
+	subCell.className = "personalizationDivSubTableCellType2";
+	subRow.appendChild(subCell);
+	
+	var PersonalizationFunctionUnderModificationDivId = "PersonalizationDivCell";
+	
+	// Fill in the div.
+	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
+	var html = "";
+	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
+			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId+"\", \"" +formTargetiFrameId+"\");'>";
+	html += "<option name=\'----\' value=\'----\'>----</option>";
+	
+	for (var i=0; i < fuzzificationsFunctions.length; i++) {
+		html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
+				"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
+				fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') + "</option>";
+	}
+	html += "</select>";
+	subCell.innerHTML = html;
+	
+	row = document.createElement('div');
+	row.className = "personalizationDivSubTableRow";
+	personalizationDivSubTable.appendChild(row);
+	
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSubTableCellType1";
+	cell.id = PersonalizationFunctionUnderModificationDivId;
+	row.appendChild(cell);
+	cell.innerHTML = "Select the fuzzification you want to personalize.";
+	
+	// Show the div.
+    $(function() {
+    	$(personalizationDiv).dialog({
+            // add a close listener to prevent adding multiple divs to the document
+            close: function(event, ui) {
+                // remove div with all data and events
+                // dialog.remove();
+            	personalizationDiv.innerHTML = "";
+            },
+            modal: true,
+            resizable: true, 
+            height: "auto", // 800,
+            width: "auto", // 800,
+            title: 'Personalizing program file ' + fileName + " owned by " + fileOwner
+        });
+        // $( "#" + fileViewContentsDivId ).dialog();
+    });
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function showBasicPersonalizeProgramFileDialog(fileName, fileOwner) {
 	var personalizationDiv = document.createElement('div');
 	
 	/*
