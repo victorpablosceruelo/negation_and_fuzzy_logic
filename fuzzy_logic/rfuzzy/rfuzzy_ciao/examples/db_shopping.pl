@@ -22,11 +22,11 @@ car('Fiat Cinquecento', 'Fiat Auto Poland', 'City Car', 1991, 1998, 3230, 1490, 
 car('VW Caddy', 'Volkswagen Commercial Vehicles', 'Work Van', 1980, null, 1794, 4405, 1833, 80, 110, 45000).
 car('Alfa Romeo GT', 'Alfa Romeo', 'Sport Car', 2003, 2010, 4489, 1763, 1362, 237, 130, 30000).
 car('Aston Martin Bulldog', 'Aston Martin', 'Sport Car', 1980, null, 4376, 1698, 1100, 522, 191, 150000).
-car('Ford Fiesta', 'Ford Motor Company', 'City Car', 1976, null, 3924, 1685, 1468, 73, 185, 12000).
+car('Ford Fiesta', 'Ford Motor Company', 'City Car', 1976, null, 3924, 1685, 1468, 73, 114, 12000).
 %  vw_phaeton.
 % ferrari
 
-rfuzzy_fuzzification(expensive(car), price_in_euros(car)) :- function([ (0, 0), (10000, 0.5), (30000, 1) ]).
+rfuzzy_fuzzification(expensive(car), price_in_euros(car)) :- function([ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
 % Future syntax
 % expensive(car) :~ function(price_in_euros(car), [(0, 0), (10000, 0.5), (30000, 1)]).
 
