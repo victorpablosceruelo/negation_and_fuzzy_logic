@@ -1,44 +1,33 @@
-:- module(cars, _, [rfuzzy, clpr]).
+:- module(db_shopping, _, [rfuzzy, clpr]).
+% Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
+% Running time debug can be activated removing the comment marker % at the beginning of the following line.
+% :- activate_rfuzzy_debug.
+
+% TYPE DECLARATION
+rfuzzy_define_database(car/11, 
+	[(id, rfuzzy_enum_type), 
+	  (manufacturer, rfuzzy_enum_type),
+	   (class,  rfuzzy_enum_type),
+	    (year_of_production_start, rfuzzy_integer_type),
+	     (year_of_production_end, rfuzzy_integer_type), 
+	      (length, rfuzzy_integer_type),
+	       (width, rfuzzy_integer_type),
+		(height, rfuzzy_integer_type),
+		 (horsepower_in_kw, rfuzzy_integer_type),
+		  (max_speed_in_mph, rfuzzy_integer_type),
+		   (price_in_euros, rfuzzy_integer_type)]).
 
 % We define the individuals belonging to th set car.
-car(fiat_cinquecento).
-car(vw_caddy).
-car(alfa_romeo_gt).
-car(aston_martin_bulldog).
-car(ford_fiesta).
+car('Fiat Cinquecento', 'Fiat Auto Poland', 'City Car', 1991, 1998, 3230, 1490, 1435, 31, 93, null).
+car('VW Caddy', 'Volkswagen Commercial Vehicles', 'Work Van', 1980, null, 1794, 4405, 1833, 80, 110, 45000).
+car('Alfa Romeo GT', 'Alfa Romeo', 'Sport Car', 2003, 2010, 4489, 1763, 1362, 237, 130, 30000).
+car('Aston Martin Bulldog', 'Aston Martin', 'Sport Car', 1980, null, 4376, 1698, 1100, 522, 191, 150000).
+car('Ford Fiesta', 'Ford Motor Company', 'City Car', 1976, null, 3924, 1685, 1468, 73, 185, 12000).
+%  vw_phaeton.
+% ferrari
 
-% expensive_car type definition
-rfuzzy_type_for(expensive_car/1, [car/1]).
-% expensive car default value when car belong to the expensive_
-rfuzzy_default_value_for(expensive_car/1, 0.9) if expensive_type/1.
-rfuzzy_default_value_for(expensive_car/1, 0.5).
+rfuzzy_fuzzification(expensive(car), price_in_euros(car)) :- function([ (0, 0), (10000, 0.5), (30000, 1) ]).
+% Future syntax
+% expensive(car) :~ function(price_in_euros(car), [(0, 0), (10000, 0.5), (30000, 1)]).
 
-expensive_type(X) :-
-	X = alfa_romeo;
-	X = aston_martin;
-	X = vw_phaeton.
-
-expensive_car(ferrari) value 1.0.
-
-rfuzzy_type_for(better_car/2, [car/1, car/1]).
-rfuzzy_default_value_for(better_car/2, 0.5).
-
-rfuzzy_type_for(expensive_manpower/1, [car/1]).
-rfuzzy_default_value_for(expensive_manpower/1, 0.9) if expensive_type/1.
-rfuzzy_default_value_for(expensive_manpower/1, 0.5).
-
-rfuzzy_type_for(expensive_parts/1, [car/1]).
-rfuzzy_default_value_for(expensive_parts/1, 0.9) if expensive_type/1.
-rfuzzy_default_value_for(expensive_parts/1, 0.5).
-
-rfuzzy_type_for(garage_taxes/1,  [car/1]).
-rfuzzy_default_value_for(garage_taxes/1, 0.1).
-garage_taxes(Car) :~ prod((expensive_car(Car), expensive_parts(Car), expensive_manpower(Car))).
-garage_taxes(ferrari) value 0.9 .
-
-% rfuzzy_default_value_for(car_life_is_10_years/1, 1).
-car_life_is_10_years :# ([(0,0.2),(24000,0.5),(30000,0.7),(50000,0.9),(60000,1)]).
-% First variable is price ...
-
-
-garage_taxes_aux(Car) :- 0.=<.V2, garage_taxes(Car, V2).
+rfuzzy_fuzzification(fast(car), max_speed_in_mph(car)) :- function([ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
