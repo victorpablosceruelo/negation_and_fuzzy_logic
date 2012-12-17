@@ -1,13 +1,9 @@
 :- module(database,_,[rfuzzy, pkgs_output_debug, clpr]).
-% or clpq. We can use clpr or clpq.
-% debug with pkgs_output_debug, 
-
-% Define the file where we want debug msgs.
-% :- define_pkgs_output_debug_file('~/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/debug_restaurant.pl').
-
-% Activate/Deactivate debug.
+% Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
+% Running time debug can be activated removing the comment marker % at the beginning of the following line.
 % :- activate_rfuzzy_debug.
 
+% Define the restaurants database format.
 rfuzzy_define_database(restaurant/7, 
 	[(restaurant_id, rfuzzy_string_type), 
 	  (restaurant_type, rfuzzy_enum_type), 
