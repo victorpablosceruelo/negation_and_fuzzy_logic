@@ -51,14 +51,14 @@ rfuzzy_fuzzification(cheap(restaurant), price_average(restaurant)) :- function([
 rfuzzy_synonym(cheap(restaurant), unexpensive(restaurant), prod, 1).
 rfuzzy_antonym(cheap(restaurant), expensive(restaurant), prod, 1).
 
-rfuzzy_quantifier(my_very/2, TV_In, TV_Out) :-
+rfuzzy_quantifier(special_very/2, TV_In, TV_Out) :-
  	Thershold .=. 0.7,
 	Min_In .=. TV_In - Thershold, 
 	min(0, Min_In, Dividend), 
 	TV_Out .=. ((Dividend)/(0 - Thershold)).
 
 rfuzzy_default_value_for(tempting_restaurant(restaurant), 0.1).
-tempting_restaurant(restaurant) cred (min, 0.7) :~ min((near_the_city_center(restaurant), fnot(my_very(expensive(restaurant))), very(traditional(restaurant)))).
+tempting_restaurant(restaurant) cred (min, 0.7) :~ min((near_the_city_center(restaurant), fnot(special_very(expensive(restaurant))), very(traditional(restaurant)))).
 tempting_restaurant(restaurant) cred (min, 0.5) :~ near_the_city_center(restaurant).
 
 % More tests (maybe not needed in this DB).
@@ -122,38 +122,31 @@ greater(X,Y):- X.>.Y.
 rfuzzy_quantifier(a_little/2, TV_In, TV_Out) :-
 	TV_Out .=. TV_In / TV_In.
 
-% QUALIFIED FUZZY FUNCTIONS
-a_little_big(house):~ a_little(big(house)).
-
 % Our main aggregator
-rfuzzy_aggregator(my_prod/3, TV_In_1, TV_In_2, TV_Out) :-
+rfuzzy_aggregator(special_prod/3, TV_In_1, TV_In_2, TV_Out) :-
 	TV_Out .=. TV_In_1 * TV_In_2.
-test_my_prod(M) :- X .=. 0.7, Y .=. 0.5, my_prod(X, Y, M).
-
 
 % Rules
-rfuzzy_default_value_for(q1(house),0.5).
-q1(house):~ my_prod((cheap(house), close_to_center(house))).
+rfuzzy_default_value_for(cheap_and_close_to_the_center(house),0.5).
+cheap_and_close_to_the_center(house):~ special_prod((cheap(house), close_to_center(house))).
 
-rfuzzy_default_value_for(q2(house),0.5).
-q2(house):~ my_prod((cheap(house), a_little_big(house), close_to_beach(house))).
+rfuzzy_default_value_for(not_very_expensive(house),0.5).
+not_very_expensive(house):~ fnot(very(expensive(house))).
 
-rfuzzy_default_value_for(q3(house),0.5).
-q3(house):~ my_prod((close_to_beach(house), very(far_from_center(house)))).
+rfuzzy_default_value_for(big_and_very_close_to_the_beach(house),0.5).
+big_and_very_close_to_the_beach(house):~ special_prod((big(house), very(close_to_beach(house)))).% missing crisp and not* parts 
 
-rfuzzy_type_for(is_apartment/1, [house]).
-is_apartment(House) :- 
-	house(T1, T2, T3, T4, T5, T6, T7), 
-	House = house(T1, T2, T3, T4, T5, T6, T7), 
-	house_type(House, House_Type), 
-	House_Type = 'apartment'.
-rfuzzy_default_value_for(q4(house), 0) if is_apartment(house).
+rfuzzy_default_value_for(very_cheap_house(house),0.5).
+very_cheap_house(house):~ prod((very(cheap(house)))). % 2 missing crisp parts
 
-rfuzzy_default_value_for(q5(house),0.5).
-q5(house):~ my_prod((expensive(house), big(house), very(close_to_beach(house)))).% missing crisp and not* parts 
+rfuzzy_default_value_for(close_to_the_center_and_the_beach(house),0.5).
+close_to_the_center_and_the_beach(house):~ prod((close_to_center(house), close_to_beach(house))). % 2 missing crisp parts
 
-rfuzzy_default_value_for(q6(house),0.5).
-q6(house):~ my_prod((very(cheap(house)))). % 2 missing crisp parts
-
-rfuzzy_default_value_for(q7(house),0.5).
-q7(house):~ my_prod((close_to_center(house), close_to_beach(house))). % 2 missing crisp parts
+% This will be changed in a future version of rfuzzy.
+%rfuzzy_type_for(is_apartment/1, [house]).
+%is_apartment(House) :- 
+%	house(T1, T2, T3, T4, T5, T6, T7), 
+%	House = house(T1, T2, T3, T4, T5, T6, T7), 
+%	house_type(House, House_Type), 
+%	House_Type = 'apartment'.
+%rfuzzy_default_value_for(q4(house), 0) if is_apartment(house).
