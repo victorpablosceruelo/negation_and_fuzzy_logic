@@ -310,6 +310,77 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+% General syntax: 
+% Pred_Functor :~ Pred_Body if Pred_Condition with_credibility (Op, Cred) only_for_user UserName
+translate(Pred_Functor :~ Pred_Body), Cls) :- !,
+	removeUserName(Pred_Body, UserName, Pred_Body_2),
+	removeCredibility(Pred_Body_2, Cred_Op, Cred_Value, Pred_Body_3),
+	translate_aux(Pred_Functor, Pred_Body_3, UserName, Cred_Op, Cred_Value, Cls).
+
+% Although aggregators are just crisp predicates of arity 3, 
+% we use the following to ensure programmers do not use as aggregators
+% fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
+translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
+	!, % If patter matching, backtracking forbiden.
+	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
+
+	functor(Aggregator, Aggregator_Name, Aggregator_Arity),
+	arg(1, Aggregator, TV_In_1),
+	arg(2, Aggregator, TV_In_2),
+	arg(3, Aggregator, TV_Out),
+	Translation = (Aggregator :- Code),
+
+	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew)
+	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, [], []),
+	!.
+
+translate((rfuzzy_quantifier(Pred_Name/Pred_Arity, Var_In, Var_Out) :- Code), Translation) :- !,
+	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)),
+	save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Var_In, Var_Out, Code)], Translation),
+	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)).
+
+% Predicate type(s) definition (Class = database).
+translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), Cls):- !,
+	translate_rfuzzy_define_database(Pred_Name, Pred_Arity, Description, Cls).
+
+% Predicate type(s) definition (Class \== database).
+translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Pred_Type), Cls):-
+	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', 'translate_rfuzzy_type_for(Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
+	nonvar(Pred_Name), nonvar(Pred_Arity), number(Pred_Arity), nonvar(Pred_Type), 
+	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, [], Cls),
+	print_msg('debug', 'translate_rfuzzy_type_for(Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
+	print_msg('debug', 'translate_rfuzzy_type_for(Cls)', Cls).
+
+% crisp predicates (non-facts) and crisp facts.
+translate(Other, Other) :-
+	print_msg('debug', 'Non-Rfuzzy predicate', Other),
+	nonvar(Other), 
+	(
+	    (
+		functor(Other, ':-', 2), !,
+		arg(1, Other, Arg_1), 
+		nonvar(Arg_1), 
+		functor(Arg_1, Pred_Name, Pred_Arity)
+	    )
+	;
+	    (
+		functor(Other, Pred_Name, Pred_Arity), 
+		Pred_Name \== ':-',
+		Pred_Name \== ':~',
+		Pred_Name \== ':#',
+		Pred_Name \== 'value',
+		Pred_Name \== 'fuzzify'
+	    )
+	),
+	generate_fake_type(Pred_Arity, Pred_Type),
+	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors)
+	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], []).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 
 % Unconditional default
 translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value)), Cls) :- !,
@@ -337,36 +408,6 @@ translate((Head value Fixed_Truth_Value), (Pred_Functor :- Assign_Truth_Value_Su
 	print_msg('debug', 'fact conversion :: OUT ', (Pred_Functor :- Assign_Truth_Value_SubGoal)),
 	!. % Backtracking forbidden.
 
-% Although aggregators are just crisp predicates of arity 3, 
-% we use the following to ensure programmers do not use as aggregators
-% fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
-translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
-	!, % If patter matching, backtracking forbiden.
-	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
-
-	functor(Aggregator, Aggregator_Name, Aggregator_Arity),
-	arg(1, Aggregator, TV_In_1),
-	arg(2, Aggregator, TV_In_2),
-	arg(3, Aggregator, TV_Out),
-	Translation = (Aggregator :- Code),
-
-	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, IsNew)
-	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, [], []),
-	!.
-
-% Predicate type(s) definition (Class = database).
-translate(rfuzzy_define_database(Pred_Name/Pred_Arity, Description), Cls):- !,
-	translate_rfuzzy_define_database(Pred_Name, Pred_Arity, Description, Cls).
-
-% Predicate type(s) definition (Class \== database).
-translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Pred_Type), Cls):-
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'translate_rfuzzy_type_for(Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
-	nonvar(Pred_Name), nonvar(Pred_Arity), number(Pred_Arity), nonvar(Pred_Type), 
-	translate_rfuzzy_type_for_crisp_rule(Pred_Name, Pred_Arity, Pred_Type, [], Cls),
-	print_msg('debug', 'translate_rfuzzy_type_for(Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
-	print_msg('debug', 'translate_rfuzzy_type_for(Cls)', Cls).
 
 % rules with credibility:
 translate(((Head cred (Cred_Op, Cred)) :~ Body), Translation):-
@@ -442,11 +483,6 @@ translate(rfuzzy_antonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [Type_1_Name], Pred_Class, Selectors),
 	!.
 
-translate((rfuzzy_quantifier(Pred_Name/Pred_Arity, Var_In, Var_Out) :- Code), Translation) :- !,
-	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)),
-	save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Var_In, Var_Out, Code)], Translation),
-	print_msg('debug', 'translate: rfuzzy_quantifier(Pred_Name/Pred_Arity)', rfuzzy_quantifier(Pred_Name/Pred_Arity)).
-
 % fuzzification:
 translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName) :- function(Function_List)), Cls):-
 	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls).
@@ -459,31 +495,6 @@ translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value))
 	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1, Translation).
 translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
 	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
-
-% crisp predicates (non-facts) and crisp facts.
-translate(Other, Other) :-
-	print_msg('debug', 'Non-Rfuzzy predicate', Other),
-	nonvar(Other), 
-	(
-	    (
-		functor(Other, ':-', 2), !,
-		arg(1, Other, Arg_1), 
-		nonvar(Arg_1), 
-		functor(Arg_1, Pred_Name, Pred_Arity)
-	    )
-	;
-	    (
-		functor(Other, Pred_Name, Pred_Arity), 
-		Pred_Name \== ':-',
-		Pred_Name \== ':~',
-		Pred_Name \== ':#',
-		Pred_Name \== 'value',
-		Pred_Name \== 'fuzzify'
-	    )
-	),
-	generate_fake_type(Pred_Arity, Pred_Type),
-	% save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, More_Info, Selectors)
-	save_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, [], []).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
