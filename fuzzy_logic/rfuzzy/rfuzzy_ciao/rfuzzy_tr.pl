@@ -311,15 +311,17 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 
 % rfuzzy_pred_info(Pred_Info, Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName)
-rfuzzy_pred_info(pred_info(Pred_Functor, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName), 
-	Pred_Functor, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName) :- !.
+rfuzzy_pred_info(pred_info(Pred_Functor, Type_1_Name, Type_1_Arity, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName), 
+	Pred_Functor, Type_1_Name, Type_1_Arity, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName) :- !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
 removePredFunctor(Pred_Functor, Pred_Info) :-
-	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, Type_1_Name, Type_1_Arity),
+
+	rfuzzy_pred_info(Pred_Info, Pred_Functor, Pred_Name, Type_1_Name, Type_1_Arity, _Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 removeUserName(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
@@ -333,36 +335,36 @@ removeUserName(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
 	;
 	    true
 	), !,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, UserName),
 	!.
 
 removeUserName(Pred_Body_In, Pred_Body_In, Pred_Info) :-
 	UserName = null,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, _Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, UserName),
 	!.
 
 removeCredibility(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
 	Pred_Body_In = (Pred_Body_Out with_credibility (Cred_Op, Cred_Value)), !,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _IfCondition, Cred_Op, Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, _Pred_Body, _IfCondition, Cred_Op, Cred_Value, _UserName),
 	!.
 
 removeCredibility(Pred_Body_In, Pred_Body_In, Pred_Info) :-
 	Cred_Op = 'prod', Cred_Value = 1,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _IfCondition, Cred_Op, Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, _Pred_Body, _IfCondition, Cred_Op, Cred_Value, _UserName),
 	!.
 
 removeCondition(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
 	Pred_Body_In = (Pred_Body_Out if IfCondition), !,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 removeCondition(Pred_Body_In, Pred_Body_In, Pred_Info) :-
 	IfCondition = 'true',
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 removePredBody(Pred_Body, Pred_Info) :-
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, _Type_1_Name, _Type_1_Arity, Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 % ------------------------------------------------------
@@ -498,12 +500,16 @@ translate_fuzzy(Pred_Info, Cls) :-
 	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, Type_1_Name, _Type_1_Arity),
 	Pred_Arity = 1,
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
-	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Type_1_Name, _New_Pred_Name, _New_Pred_Arity, Pred_Functor, Truth_Value),
+	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Type_1_Name, New_Pred_Name, New_Pred_Arity, Pred_Functor, Truth_Value),
 	generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, Truth_Value, SubCl_Credibility),
 	generate_ifcondition_subCl(IfCondition, SubCl_IfCondition),
 	generate_username_subCl(UserName, SubCl_UserName),
 	Cls = [(Pred_Functor :- Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName)],
-	print_msg('debug', 'translate_fuzzy', Cls).
+	print_msg('debug', 'translate_fuzzy', Cls),
+
+	Selectors = [(New_Pred_Name, New_Pred_Arity)],
+	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [Type_1_Name], Pred_Class, Selectors),
+	print_msg('debug', 'translate_fuzzy ', ' ').
 
 
 translate_rfuzzy_fact(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
@@ -512,8 +518,8 @@ translate_rfuzzy_fact(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
 	!. % Backtracking forbidden.
 
 
-
-translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
+translate_rfuzzy_synonym(Pred_Info, Defined_Pred, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
+% translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
 	!,
 	print_msg('debug', 'translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred))) ', rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred)),
 	nonvar(Pred2_Functor), nonvar(Pred_Functor), nonvar(Cred_Op), nonvar(Cred), number(Cred),
@@ -896,57 +902,14 @@ save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Truth_Value_In, Truth_Valu
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-
-	translate_rfuzzy_rule(Pred_Info, Rule_Op, Rule_Body, Cl_Body, Cl_Body_TV),
-% rules with credibility:
-translate(((Head cred (Cred_Op, Cred)) :~ Body), Translation):-
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', '(Head cred (Cred_Op, Cred)) :~ Body)', ((Head cred (Cred_Op, Cred))  :~ Body)),
-	translate_rule(Head, Cred_Op, Cred, Body, Translation).
-
-% rules without credibility:
-translate((Head :~ Body), Translation):-
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
-	translate_rule(Head, 'prod', 1, Body, Translation).
-
-
-translate_rule(Head, Cred_Op, Cred, Body, Cls) :-
-	print_msg('debug', 'translate_rule(Head, Cred_Op, Cred, Body) ', (translate_rule(Head, Cred_Op, Cred, Body))),
-	nonvar(Head), nonvar(Cred_Op), nonvar(Body), number(Cred),
-
-	extract_from_pred_functor_name_and_pred_type_1(Head, Pred_Name, Type_1_Name, _Type_1_Arity),
-
-	Pred_Class = 'fuzzy_rule_rule', Pred_Arity = 1,
-	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
-	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Type_1_Name, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, Truth_Value),
-
-	% Translate all predicates in the body.
-	extract_aggregator(Body, TV_Aggregator, Tmp_Body),
-
-	translate_rule_body(Tmp_Body, TV_Aggregator, Type_1_Name, Truth_Value, Fuzzy_Body), 
-	print_msg('debug', 'translate_rule_body :: Fuzzy_Body', Fuzzy_Body),
-	Cls = (New_Pred_Functor :- Fuzzy_Body),
-
-	Selectors = [(New_Pred_Name, New_Pred_Arity)],
-	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [Type_1_Name], Pred_Class, Selectors),
-	print_msg('debug', 'translate_rule(Cls) ', (translate_rule(Cls))).
+translate_rfuzzy_rule(Pred_Info, Rule_Op, Rule_Body, Cl_Body, Cl_Body_TV),
+%	Pred_Class = 'fuzzy_rule_rule', Pred_Arity = 1,
+	test_aggregator_is_defined(Rule_Op, 'yes'),
+	translate_rule_body(Tmp_Body, Rule_Op, Type_1_Name, Cl_Body_TV, Cl_Body).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
-
-extract_aggregator(Body, Aggregator_Op, Tmp_Body) :-
-	print_msg('debug', 'extract_aggregator(Body)', extract_aggregator(Body)),
-	extract_aggregator_aux(Body, Aggregator_Op, Tmp_Body),
-	print_msg('debug', 'extract_aggregator(Body, Aggregator_Op, Tmp_Body)', extract_aggregator(Body, Aggregator_Op, Tmp_Body)).
-	
-extract_aggregator_aux(Body, Aggregator_Op_Name, Tmp_Body) :-
-	nonvar(Body),
-	functor(Body, Aggregator_Op_Name, 1),
-	test_aggregator_is_defined(Aggregator_Op_Name, 'no'),
-	arg(1, Body, Tmp_Body), !.
-extract_aggregator_aux(Body, 'null', Body) :- !.
 
 test_aggregator_is_defined(Pred_Name, Show_Error) :-
 	nonvar(Pred_Name),
