@@ -480,6 +480,14 @@ translate_fuzzy(Pred_Info, Cls) :-
 	    )
 	;
 	    (
+		Pred_Body_Name = 'function', Pred_Body_Arity = 2,
+		arg(1, Pred_Body, Defined_Pred),
+		arg(1, Pred_Body, Function_Body),
+		translate_rfuzzy_fuzzification(Pred_Info, Defined_Pred, Function_Body, Cl_Body, Cl_Body_TV),
+		Pred_Class = 'fuzzy_rule_fact'
+	    )
+	;
+	    (
 		Pred_Body_Name = 'synonym_of', Pred_Body_Arity = 2,
 		arg(1, Pred_Body, Defined_Pred),
 		arg(1, Pred_Body, Fixed_Truth_Value),
@@ -517,28 +525,23 @@ translate_rfuzzy_fact(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
 	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Cl_Body_TV, Cl_Body),
 	!. % Backtracking forbidden.
 
-
 translate_rfuzzy_synonym(Pred_Info, Defined_Pred, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Name, Type_1_Name, Type_1_Arity, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
 % translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
 	!,
-	print_msg('debug', 'translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred))) ', rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred)),
-	nonvar(Pred2_Functor), nonvar(Pred_Functor), nonvar(Cred_Op), nonvar(Cred), number(Cred),
-	test_aggregator_is_defined(Cred_Op, 'true'),
-	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, Type_1_Name, Type_1_Arity),
-	extract_from_pred_functor_name_and_pred_type_1(Pred2_Functor, Pred2_Name, Type_1_Name, Type_1_Arity),
-
-	% retrieve_predicate_info(Pred_Name, Pred_Arity, Pred_Type, Show_Error),
-	retrieve_predicate_info(Pred2_Name, Pred2_Arity, Pred2_Type, 'true'),
+	print_msg('debug', 'translate_rfuzzy_synonym(Pred_Info, Defined_Pred, Fixed_Truth_Value))) ', (Pred_Info, Defined_Pred, Fixed_Truth_Value)),
+	nonvar(Defined_Pred), 
+	extract_from_pred_functor_name_and_pred_type_1(Defined_Pred, Defined_Pred_Name, Type_1_Name, Type_1_Arity),
+	retrieve_predicate_info(Defined_Pred_Name, Defined_Pred_Arity, Defined_Pred_Type, 'true'),
 	( 
-	    (	memberchk_local([Type_1_Name, _Unused_Type_Name], Pred2_Type), !    )
+	    (	memberchk_local([Type_1_Name, _Unused_Type_Name], Defined_Pred_Type), !    )
 	;
-	    (	print_msg('error', 'The type is not correctly defined for the predicate', Pred2_Name), !, fail    )
+	    (	print_msg('error', 'The type is not correctly defined for the predicate', Defined_Pred_Name), !, fail    )
 	),
 
-	Pred_Class = 'fuzzy_rule_synonym', Pred_Arity is Pred2_Arity - 1,
+	Pred_Class = 'fuzzy_rule_synonym', Arity_Aux is Defined_Pred_Arity - 1,
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
-	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Type_1_Name, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, Truth_Value_Out),
-	translate_predicate(Pred2_Name, Pred_Arity, Pred_Class, Type_1_Name, _New_Pred2_Name, _New_Pred2_Arity, New_Pred2_Functor, Truth_Value_In),
+	translate_predicate(Defined_Pred_Name, Arity_Aux, Pred_Class, Type_1_Name, _New_PN, _New_PA, New_Defined_Pred_Functor, Truth_Value_In),
 
 	copy_args(Pred2_Arity, New_Pred_Functor, New_Pred2_Functor),
 	functor(Credibility_Functor, Cred_Op, 3), 
@@ -580,15 +583,6 @@ translate(rfuzzy_antonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
 	% save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, Pred_Type, Pred_Class, Selectors)
 	save_fuzzy_rule_predicate_definition(Pred_Name, Pred_Arity, [Type_1_Name], Pred_Class, Selectors),
 	!.
-
-% fuzzification:
-translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName) :- function(Function_List)), Cls):-
-	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls).
-
-translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor) :- function(Function_List)), Cls):-
-	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, _UserName, Function_List, Cls).
-
-
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1033,6 +1027,15 @@ fix_functor_type_aux_extract_Pred_Name(Type, Pred_Name) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+
+% fuzzification:
+%translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName) :- function(Function_List)), Cls):-
+%	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls).
+
+%translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor) :- function(Function_List)), Cls):-
+%	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, _UserName, Function_List, Cls).
+
+% translate_rfuzzy_fuzzification(Pred_Info, Defined_Pred, Function_Body, Cl_Body, Cl_Body_TV),
 translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls) :-
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Pred_Functor), nonvar(Crisp_Pred_Functor), nonvar(Function_List),
