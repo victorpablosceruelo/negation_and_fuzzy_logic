@@ -310,12 +310,74 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+% rfuzzy_pred_info(Pred_Info, Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName)
+rfuzzy_pred_info(pred_info(Pred_Functor, Pred_Body, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName), 
+	Pred_Functor, Pred_Body, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName) :- !.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 % General syntax: 
 % Pred_Functor :~ Pred_Body if Pred_Condition with_credibility (Op, Cred) only_for_user UserName
-translate(Pred_Functor :~ Pred_Body), Cls) :- !,
-	removeUserName(Pred_Body, UserName, Pred_Body_2),
-	removeCredibility(Pred_Body_2, Cred_Op, Cred_Value, Pred_Body_3),
-	translate_aux(Pred_Functor, Pred_Body_3, UserName, Cred_Op, Cred_Value, Cls).
+translate((Pred_Functor :~ Pred_Body), Cls) :- !,
+	removePredFunctor(Pred_Functor, Pred_Info),
+	removeUserName(Pred_Body, Pred_Body_2, Pred_Info),
+	removeCredibility(Pred_Body_2, Pred_Body_3, Pred_Info),
+	removeIfCondition(Pred_Body_3, Pred_Body_4, Pred_Info),
+	removePredBody(Pred_Body_4, Pred_Info),
+	translate_aux(Pred_Info, Cls).
+
+removePredFunctor(Pred_Functor, Pred_Info) :-
+	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	!.
+
+removeUserName(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
+	Pred_Body_In = (Pred_Body_Out only_for_user UserName), 
+	nonvar(UserName), 
+	(
+	    (
+		UserName = 'null',
+		print_msg('warning', 'invalid UserName for rule.', 'Taken default instead.')
+	    )
+	;
+	    true
+	), !,
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, UserName),
+	!.
+
+removeUserName(Pred_Body_In, Pred_Body_In, Pred_Info) :-
+	UserName = null,
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, UserName),
+	!.
+
+removeCredibility(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
+	Pred_Body_In = (Pred_Body_Out with_credibility (Cred_Op, Cred_Value)), !,
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, Cred_Op, Cred_Value, _UserName),
+	!.
+
+removeCredibility(Pred_Body_In, Pred_Body_In, Pred_Info) :-
+	Cred_Op = 'prod', Cred_Value = 1,
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, Cred_Op, Cred_Value, _UserName),
+	!.
+
+removeCondition(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
+	Pred_Body_In = (Pred_Body_Out if IfCondition), !,
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	!.
+
+removeCondition(Pred_Body_In, Pred_Body_In, Pred_Info) :-
+	IfCondition = 'true',
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	!.
+
+removePredBody(Pred_Body, Pred_Info) :-
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	!.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 
 % Although aggregators are just crisp predicates of arity 3, 
 % we use the following to ensure programmers do not use as aggregators
@@ -353,6 +415,12 @@ translate(rfuzzy_type_for(Pred_Name/Pred_Arity, Pred_Type), Cls):-
 	print_msg('debug', 'translate_rfuzzy_type_for(Pred_Name, Pred_Arity, Pred_Type)', (Pred_Name, Pred_Arity, Pred_Type)),
 	print_msg('debug', 'translate_rfuzzy_type_for(Cls)', Cls).
 
+% Similarity between elements.
+translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), Translation) :-
+	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1, Translation).
+translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
+	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
+
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
 	print_msg('debug', 'Non-Rfuzzy predicate', Other),
@@ -382,23 +450,30 @@ translate(Other, Other) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% Unconditional default
-translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value)), Cls) :- !,
-	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) ', (Pred_Functor, Fixed_Truth_Value)),
-	translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, _No_Condition_or_Thershold, Cls).
+translate_aux(Pred_Info, Cls) :-
+	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	nonvar(Pred_Body),
+	functor(Pred_Body, Pred_Name, Pred_Arity), 
+	(
+	    (
+		Pred_Name = 'defaults_to', Pred_Arity = 1,
+		arg(1, Pred_Body, Fixed_Truth_Value),
+		translate_rfuzzy_default_value_for(Pred_Info, Fixed_Truth_Value, Cl_Head, Cl_Body)
+	    )
+	
+translate_aux(Pred_Functor, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName, Cls) :-
+	nonvar(Pred_Body),
+	functor(Pred_Body, 'value', 1),
+	arg(1, Pred_Body, Fixed_Truth_Value),
+	translate_rfuzzy_fact(Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName, Cls).
 
-% Conditional default (for condition or thershold).
-translate((rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value) if Condition_or_Thershold), Cls) :- !,
-	print_msg('debug', 'translate :: rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold) ', (Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold)),
-	translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold, Cls).
-
-% Fuzzy facts.
-translate((Head value Fixed_Truth_Value), (Pred_Functor :- Assign_Truth_Value_SubGoal)):-
+translate_rfuzzy_fact(Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName, Cls) :-
+% translate((Head value Fixed_Truth_Value), (Pred_Functor :- Assign_Truth_Value_SubGoal)):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'fact conversion :: IN ',(Head value Fixed_Truth_Value)),
-	nonvar(Head), nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value),
+	nonvar(Pred_Functor), nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value),
 
-	extract_from_pred_functor_name_and_pred_type_1(Head, Pred_Name, Type_1_Name, _Type_1_Arity),
+	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, Type_1_Name, _Type_1_Arity),
 	Pred_Arity = 1,
 	Pred_Class = 'fuzzy_rule_fact',
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
@@ -491,10 +566,6 @@ translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor) :- function(Fu
 	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, _UserName, Function_List, Cls).
 
 
-translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), Translation) :-
-	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1, Translation).
-translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
-	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

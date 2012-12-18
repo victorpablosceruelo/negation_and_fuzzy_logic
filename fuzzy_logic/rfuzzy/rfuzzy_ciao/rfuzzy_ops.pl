@@ -3,8 +3,10 @@
 :- op(1200,xfx,':~').    % Fuzzy Rule
 % :- op(1200,xf,':~').     % Fuzzy Fact
 
-:- op(1200,xfx,'value').   % Rfuzzy Fact
+:- op(1175,xfx,'value').   % Rfuzzy Fact
 :- op(1175,xfx,'cred').    % Credibility value Rfuzzy.
+:- op(1175,xfx,'only_for_user').    % 
+:- op(1175,xfx,'with_credibility').    % 
 
 %:- new_declaration(prop/1).
 %:- op(1150,fx,(prop)).
