@@ -311,25 +311,15 @@ rfuzzy_trans_sent_aux(Sentence, Translation) :-
 % ------------------------------------------------------
 
 % rfuzzy_pred_info(Pred_Info, Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName)
-rfuzzy_pred_info(pred_info(Pred_Functor, Pred_Body, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName), 
-	Pred_Functor, Pred_Body, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName) :- !.
+rfuzzy_pred_info(pred_info(Pred_Functor, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName), 
+	Pred_Functor, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName) :- !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
-
-% General syntax: 
-% Pred_Functor :~ Pred_Body if Pred_Condition with_credibility (Op, Cred) only_for_user UserName
-translate((Pred_Functor :~ Pred_Body), Cls) :- !,
-	removePredFunctor(Pred_Functor, Pred_Info),
-	removeUserName(Pred_Body, Pred_Body_2, Pred_Info),
-	removeCredibility(Pred_Body_2, Pred_Body_3, Pred_Info),
-	removeIfCondition(Pred_Body_3, Pred_Body_4, Pred_Info),
-	removePredBody(Pred_Body_4, Pred_Info),
-	translate_aux(Pred_Info, Cls).
 
 removePredFunctor(Pred_Functor, Pred_Info) :-
-	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 removeUserName(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
@@ -348,36 +338,46 @@ removeUserName(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
 
 removeUserName(Pred_Body_In, Pred_Body_In, Pred_Info) :-
 	UserName = null,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, UserName),
 	!.
 
 removeCredibility(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
 	Pred_Body_In = (Pred_Body_Out with_credibility (Cred_Op, Cred_Value)), !,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, Cred_Op, Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _IfCondition, Cred_Op, Cred_Value, _UserName),
 	!.
 
 removeCredibility(Pred_Body_In, Pred_Body_In, Pred_Info) :-
 	Cred_Op = 'prod', Cred_Value = 1,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, Cred_Op, Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _IfCondition, Cred_Op, Cred_Value, _UserName),
 	!.
 
 removeCondition(Pred_Body_In, Pred_Body_Out, Pred_Info) :-
 	Pred_Body_In = (Pred_Body_Out if IfCondition), !,
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 removeCondition(Pred_Body_In, Pred_Body_In, Pred_Info) :-
 	IfCondition = 'true',
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, _Fixed_Truth_Value, IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, _Pred_Body, IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 removePredBody(Pred_Body, Pred_Info) :-
-	rfuzzy_pred_info(Pred_Info, _Pred_Functor, Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+	rfuzzy_pred_info(Pred_Info, _Pred_Functor, Pred_Body, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
 	!.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
+
+% General syntax: 
+% Pred_Functor :~ Pred_Body if Pred_Condition with_credibility (Op, Cred) only_for_user UserName
+translate((Pred_Functor :~ Pred_Body), Cls) :- !,
+	removePredFunctor(Pred_Functor, Pred_Info),
+	removeUserName(Pred_Body, Pred_Body_2, Pred_Info),
+	removeCredibility(Pred_Body_2, Pred_Body_3, Pred_Info),
+	removeIfCondition(Pred_Body_3, Pred_Body_4, Pred_Info),
+	removePredBody(Pred_Body_4, Pred_Info),
+	translate_fuzzy(Pred_Info, Cls).
 
 % Although aggregators are just crisp predicates of arity 3, 
 % we use the following to ensure programmers do not use as aggregators
@@ -450,51 +450,68 @@ translate(Other, Other) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_aux(Pred_Info, Cls) :-
-	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, _Fixed_Truth_Value, _IfCondition, _Cred_Op, _Cred_Value, _UserName),
+translate_fuzzy(Pred_Info, Cls) :-
+	rfuzzy_pred_info(Pred_Info, Pred_Functor, _Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName),
 	nonvar(Pred_Body),
-	functor(Pred_Body, Pred_Name, Pred_Arity), 
+	functor(Pred_Body, Pred_Body_Name, Pred_Body_Arity), 
 	(
 	    (
-		Pred_Name = 'defaults_to', Pred_Arity = 1,
+		Pred_Body_Name = 'defaults_to', Pred_Body_Arity = 1,
 		arg(1, Pred_Body, Fixed_Truth_Value),
-		translate_rfuzzy_default_value_for(Pred_Info, Fixed_Truth_Value, Cl_Head, Cl_Body)
+		translate_rfuzzy_default_value_for(Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV),
+		Pred_Class = 'fuzzy_rule_fact'
 	    )
-	
-translate_aux(Pred_Functor, Pred_Body, IfCondition, Cred_Op, Cred_Value, UserName, Cls) :-
-	nonvar(Pred_Body),
-	functor(Pred_Body, 'value', 1),
-	arg(1, Pred_Body, Fixed_Truth_Value),
-	translate_rfuzzy_fact(Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName, Cls).
+	;
+	    (
+		Pred_Body_Name = 'value', Pred_Body_Arity = 1,
+		arg(1, Pred_Body, Fixed_Truth_Value),
+		translate_rfuzzy_fact(Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV),
+		Pred_Class = 'fuzzy_rule_fact'
+	    )
+	;
+	    (
+		Pred_Body_Name = 'rule', Pred_Body_Arity = 2,
+		arg(1, Pred_Body, Rule_Op),
+		arg(1, Pred_Body, Rule_Body),
+		translate_rfuzzy_rule(Pred_Info, Rule_Op, Rule_Body, Cl_Body, Cl_Body_TV),
+		Pred_Class = 'fuzzy_rule_fact'
+	    )
+	;
+	    (
+		Pred_Body_Name = 'synonym_of', Pred_Body_Arity = 2,
+		arg(1, Pred_Body, Defined_Pred),
+		arg(1, Pred_Body, Fixed_Truth_Value),
+		translate_rfuzzy_synonym(Pred_Info, Defined_Pred, Fixed_Truth_Value, Cl_Body, Cl_Body_TV),
+		Pred_Class = 'fuzzy_rule_fact'
+	    )
+	;
+	    (
+		Pred_Body_Name = 'antonym_of', Pred_Body_Arity = 2,
+		arg(1, Pred_Body, Defined_Pred),
+		arg(1, Pred_Body, Fixed_Truth_Value),
+		translate_rfuzzy_antonym(Pred_Info, Defined_Pred, Fixed_Truth_Value, Cl_Body, Cl_Body_TV),
+		Pred_Class = 'fuzzy_rule_fact'
+	    )
+	), !,
 
-translate_rfuzzy_fact(Pred_Functor, Fixed_Truth_Value, IfCondition, Cred_Op, Cred_Value, UserName, Cls) :-
-% translate((Head value Fixed_Truth_Value), (Pred_Functor :- Assign_Truth_Value_SubGoal)):-
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', 'fact conversion :: IN ',(Head value Fixed_Truth_Value)),
-	nonvar(Pred_Functor), nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value),
-
+	print_msg('debug', 'translate_fuzzy ::  (Cl_Body, Cl_Body_TV)', (Cl_Body, Cl_Body_TV)),
 	extract_from_pred_functor_name_and_pred_type_1(Pred_Functor, Pred_Name, Type_1_Name, _Type_1_Arity),
 	Pred_Arity = 1,
-	Pred_Class = 'fuzzy_rule_fact',
 	% translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Pred_Type, New_Pred_Name, New_Pred_Arity, New_Pred_Functor, TV)
 	translate_predicate(Pred_Name, Pred_Arity, Pred_Class, Type_1_Name, _New_Pred_Name, _New_Pred_Arity, Pred_Functor, Truth_Value),
+	generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, Truth_Value, SubCl_Credibility),
+	generate_ifcondition_subCl(IfCondition, SubCl_IfCondition),
+	generate_username_subCl(UserName, SubCl_UserName),
+	Cls = [(Pred_Functor :- Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName)],
+	print_msg('debug', 'translate_fuzzy', Cls).
 
-	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal),
-	print_msg('debug', 'fact conversion :: OUT ', (Pred_Functor :- Assign_Truth_Value_SubGoal)),
+
+translate_rfuzzy_fact(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
+	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value),
+	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Cl_Body_TV, Cl_Body),
 	!. % Backtracking forbidden.
 
 
-% rules with credibility:
-translate(((Head cred (Cred_Op, Cred)) :~ Body), Translation):-
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', '(Head cred (Cred_Op, Cred)) :~ Body)', ((Head cred (Cred_Op, Cred))  :~ Body)),
-	translate_rule(Head, Cred_Op, Cred, Body, Translation).
-
-% rules without credibility:
-translate((Head :~ Body), Translation):-
-	!, % If patter matching, backtracking forbiden.
-	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
-	translate_rule(Head, 'prod', 1, Body, Translation).
 
 translate(rfuzzy_synonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
 	!,
@@ -878,6 +895,21 @@ save_rfuzzy_quantifiers_list([(Pred_Name, Pred_Arity, Truth_Value_In, Truth_Valu
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
+
+
+	translate_rfuzzy_rule(Pred_Info, Rule_Op, Rule_Body, Cl_Body, Cl_Body_TV),
+% rules with credibility:
+translate(((Head cred (Cred_Op, Cred)) :~ Body), Translation):-
+	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', '(Head cred (Cred_Op, Cred)) :~ Body)', ((Head cred (Cred_Op, Cred))  :~ Body)),
+	translate_rule(Head, Cred_Op, Cred, Body, Translation).
+
+% rules without credibility:
+translate((Head :~ Body), Translation):-
+	!, % If patter matching, backtracking forbiden.
+	print_msg('debug', '(Head :~ Body)', (Head  :~ Body)),
+	translate_rule(Head, 'prod', 1, Body, Translation).
+
 
 translate_rule(Head, Cred_Op, Cred, Body, Cls) :-
 	print_msg('debug', 'translate_rule(Head, Cred_Op, Cred, Body) ', (translate_rule(Head, Cred_Op, Cred, Body))),
