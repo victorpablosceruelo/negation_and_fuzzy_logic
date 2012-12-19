@@ -547,35 +547,35 @@ translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Bod
 	Cl_Body = (Defined_NP_F, (Defined_NP_Arg_TV .>=. 0, Defined_NP_Arg_TV .=<. 1), Compute_TV),
 	!.
 
-translate(rfuzzy_antonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred), Cls):-
-	!,
-	print_msg('debug', 'translate(rfuzzy_antonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred)) ', rfuzzy_antonym(Pred2_Functor, Pred_Functor, Cred_Op, Cred)),
-	nonvar(Pred_Functor), nonvar(Pred2_Functor), nonvar(Cred_Op), nonvar(Cred), number(Cred),
-	test_aggregator_is_defined(Cred_Op, 'true'),
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred_Functor, P_N, Type_1_Name, Type_1_Arity),
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred2_Functor, Pred2_Name, Type_1_Name, Type_1_Arity),
+translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
+	rfuzzy_pred_info(Pred_Info,	_P_F, _P_N, _P_A, P_TN, P_TA, _P_B, NP_F, _NP_N, _NP_A, _If_Cond, _Cred_Op, _Cred_Value, _UN),
 
-	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
-	retrieve_predicate_info(Pred2_Name, Pred2_Arity, Pred2_Type, 'true'),
+	nonvar(Defined_Pred), 
+	extract_from_PF_values_PN_PA_PTN_PTA(Defined_Pred, Defined_P_N, Defined_P_A, P_TN, P_TA),
+	retrieve_predicate_info(Defined_P_N, Defined_P_A, Defined_P_T, 'true'),
 	( 
-	    (	memberchk_local([Type_1_Name, _Unused_Type_Name], Pred2_Type), !    )
+	    (	memberchk_local([P_TN, _Unused_Type_Name], Defined_P_T), !    )
 	;
-	    (	print_msg('error', 'The type is not correctly defined for the predicate', Pred2_Name), !, fail    )
+	    (	print_msg('error', 'The type is not correctly defined for the predicate', Defined_P_N), !, fail    )
 	),
 
-	Pred_Class = 'fuzzy_rule_antonym', P_A is Pred2_Arity - 1,
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, Pred_Class, Type_1_Name, New_P_N, New_P_A, New_Pred_Functor, Truth_Value_Out),
-	translate_predicate(Pred2_Name, P_A, Pred_Class, Type_1_Name, _New_Pred2_Name, _New_Pred2_Arity, New_Pred2_Functor, Truth_Value_In),
+	% Prepare the predicate head
+	get_auxiliar_suffix(Suffix),
+	add_preffix_to_name(Defined_P_N, Suffix, Defined_NP_N), % Change name
+	Defined_NP_A = 3,
+	functor(Defined_NP_F, Defined_NP_N, Defined_NP_A),
+	arg(1, Defined_NP_F, Defined_NP_Arg_Input),
+	arg(2, Defined_NP_F, Defined_NP_Arg_Prio),
+	arg(3, Defined_NP_F, Defined_NP_Arg_TV),
 
-	copy_args(Pred2_Arity, New_Pred_Functor, New_Pred2_Functor),
-	functor(Credibility_Functor, Cred_Op, 3), 
-	Credibility_Functor=..[Cred_Op, Truth_Value_Aux, Cred, Truth_Value_Out],
-
-	Cls = [(New_Pred_Functor :- New_Pred2_Functor, (Truth_Value_Aux .=. 1 - Truth_Value_In), Credibility_Functor, (Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1))],
-	MI_2 = [(New_P_N, New_P_A)],
-	% save_fuzzy_rule_predicate_definition(P_N, P_A, P_T, Pred_Class, MI_2)
-	save_fuzzy_rule_predicate_definition(P_N, P_A, [Type_1_Name], Pred_Class, MI_2),
+	arg(1, NP_F, Defined_NP_Arg_Input),
+	Cl_Body_Prio = Defined_NP_Arg_Prio,
+	functor(Compute_TV, TV_Op, 3),
+	arg(1, Compute_TV, Defined_NP_Arg_TV_Aux),
+	arg(2, Compute_TV, TV_Val), 
+	arg(3, Compute_TV, Cl_Body_TV),
+	Antonym = (Defined_NP_Arg_TV_Aux .=. 1 - Defined_NP_Arg_TV),
+	Cl_Body = (Defined_NP_F, (Defined_NP_Arg_TV .>=. 0, Defined_NP_Arg_TV .=<. 1), Antonym, Compute_TV),
 	!.
 
 % ------------------------------------------------------
