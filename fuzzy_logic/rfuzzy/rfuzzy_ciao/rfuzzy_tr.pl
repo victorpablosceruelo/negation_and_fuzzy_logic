@@ -663,6 +663,20 @@ translate_rfuzzy_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Bod
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+% translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold, Cls) :-
+translate_rfuzzy_default_value_for(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
+	(
+	    (	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), !   )
+	;
+	    (   print_msg('error', 'The truth value must be a number. Value', Fixed_Truth_Value), !, fail   )
+	),
+	Cl_Body = (Cl_Body_TV .=. Fixed_Truth_Value),
+	!. % Backtracking forbidden.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 generate_fake_type(0, []) :- !.
 generate_fake_type(1, [_Any]) :- !.
 generate_fake_type(N, [_Any|More]) :-
@@ -698,100 +712,6 @@ extract_from_PF_values_PN_PA_PTN_PTA(P_F, P_N, P_A, PT_N, PT_A) :-
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(PT_N, PT_A, _PT_Type, 'true'),
 	print_msg('debug', 'extract_from_PF_values_PN_PA_PTN_PTA(P_N, PT_N, PT_A)', (P_N, PT_N, PT_A)), !.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold, Cls) :-
-	print_msg('debug', 'rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold) ', (Pred_Functor, Fixed_Truth_Value, Condition_or_Thershold)),
-	!, % If patter matching, backtracking forbiden.
-	(
-	    (	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value), !   )
-	;
-	    (   print_msg('error', 'The truth value must be a number. Value', Fixed_Truth_Value), !, fail   )
-	),
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred_Functor, P_N, _P_A, P_TN, Type_1_Arity),
-
-	(
-	    (	var(Condition_or_Thershold), Pred_Class = 'fuzzy_rule_default_without_cond'   )
-	;
-	    (	nonvar(Condition_or_Thershold), Pred_Class = 'fuzzy_rule_default_with_cond'   )
-	),
-	P_A = 1,
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, Pred_Class, P_TN, New_P_N, New_P_A, New_Pred_Functor, Truth_Value),
-	arg(1, New_Pred_Functor, Argument),
-
-	(
-	    translate_rfuzzy_default_value_aux(Condition_or_Thershold, P_TN, Argument, Condition_Aux)
-	;
-	    Condition_Aux = 'true'
-	),
-	print_msg('debug', 'rfuzzy_default_value_for :: Condition_Aux', Condition_Aux),
-
-	generate_check_types_subgoal(P_TN, Type_1_Arity, Argument, Check_Types_SubGoal),
-	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal),
-	print_msg('debug', 'rfuzzy_default_value_for :: Assign_Truth_Value_SubGoal', Assign_Truth_Value_SubGoal),
-	Cls = [(New_Pred_Functor :- Check_Types_SubGoal, Assign_Truth_Value_SubGoal, Condition_Aux)],
-	print_msg('debug', 'rfuzzy_default_value_for :: Cls', Cls),
-
-	P_T = [   P_TN   ],
-	MI_2 = [(New_P_N, New_P_A)],
-	% save_fuzzy_rule_predicate_definition(P_N, P_A, P_T, Pred_Class, MI_2)
-	save_fuzzy_rule_predicate_definition(P_N, P_A, P_T, Pred_Class, MI_2),
-	!. % Backtracking forbidden.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-translate_rfuzzy_default_value_aux(Thershold, P_TN, Argument, Condition_Aux) :-
-	nonvar(Thershold), 
-	print_msg('debug', 'Thershold', Thershold),
-
-	Thershold = thershold(Pred2_Functor, Cond, Thershold_Truth_Value), !,
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred2_Functor, Pred2_Name, _Pred2_Arity, P_TN, _Type_1_Arity),
-	
-	Pred2_Class = 'fuzzy_rule', Pred2_Arity = 1,
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(Pred2_Name, Pred2_Arity, Pred2_Class, '', New_Pred2_Name, New_Pred2_Arity, New_Pred2_Functor, Truth_Value_For_Thershold),
-	arg(1, New_Pred2_Functor, Argument),
-
-	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error)
-	retrieve_predicate_info(New_Pred2_Name, New_Pred2_Arity, New_Pred2_Type, 'true'), 
-	New_Pred2_Type = [ P_TN, 'rfuzzy_truth_value_type' ],
-
-	print_msg('debug', 'translate', 'condition (over | under)'),
-	(
-	    (
-		Cond = 'over',
-		functor(Pred3_Functor, '.>.', 2),
-		Pred3_Functor=..['.>.', Truth_Value_For_Thershold, Thershold_Truth_Value]
-	    )
-	;
-	    (
-		Cond = 'under',
-		functor(Pred3_Functor, '.<.', 2),
-		Pred3_Functor=..['.<.', Truth_Value_For_Thershold, Thershold_Truth_Value]
-	    )
-	), 
-	Condition_Aux = (New_Pred2_Functor, Pred3_Functor),
-	print_msg('debug', 'Condition_Aux', Condition_Aux).
-
-translate_rfuzzy_default_value_aux(Condition_Functor, P_TN, Argument, Condition_Aux) :-
-	nonvar(Condition_Functor),
-	print_msg('debug', 'Condition', Condition_Functor),
-	extract_from_PF_values_PN_PA_PTN_PTA(Condition_Functor, Condition_Name, Condition_Arity, P_TN, _Type_1_Arity),
-
-	Condition_Arity = 1,
-	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
-	retrieve_predicate_info(Condition_Name, Condition_Arity, Condition_Type, 'true'),
-	nonvar(Condition_Type), Condition_Type = [ P_TN ],
-
-	functor(Condition_Aux, Condition_Name, Condition_Arity),
-	arg(1, Condition_Aux, Argument),
-	print_msg('debug', 'Condition_Aux', Condition_Aux).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
