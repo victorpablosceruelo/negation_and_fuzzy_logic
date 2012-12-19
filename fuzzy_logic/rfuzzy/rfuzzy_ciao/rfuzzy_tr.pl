@@ -60,6 +60,12 @@ translation_info('fuzzy_rule_aux',                                2, -1,       '
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+get_auxiliar_suffix('rfuzzy_aux').
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 save_predicates_definition_list([], _P_A, _P_T, _MI_1) :- !.
 save_predicates_definition_list([P_N | Pred_List], P_A, P_T, MI_1) :-
 	save_predicate_definition(P_N, P_A, P_T, MI_1, []), !,
@@ -548,7 +554,7 @@ translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Bod
 	Cl_Body = (Defined_NP_F, (Defined_NP_Arg_TV .>=. 0, Defined_NP_Arg_TV .=<. 1), Compute_TV),
 	!.
 
-translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
+translate_rfuzzy_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
 	rfuzzy_pred_info(Pred_Info,	_P_F, _P_N, _P_A, P_TN, P_TA, _P_B, NP_F, _NP_N, _NP_A, _If_Cond, _Cred_Op, _Cred_Value, _UN),
 
 	nonvar(Defined_Pred), 
@@ -631,7 +637,7 @@ translate_rfuzzy_default_value_for(Pred_Functor, Fixed_Truth_Value, Condition_or
 	;
 	    (   print_msg('error', 'The truth value must be a number. Value', Fixed_Truth_Value), !, fail   )
 	),
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred_Functor, P_N, P_TN, Type_1_Arity),
+	extract_from_PF_values_PN_PA_PTN_PTA(Pred_Functor, P_N, _P_A, P_TN, Type_1_Arity),
 
 	(
 	    (	var(Condition_or_Thershold), Pred_Class = 'fuzzy_rule_default_without_cond'   )
@@ -671,7 +677,7 @@ translate_rfuzzy_default_value_aux(Thershold, P_TN, Argument, Condition_Aux) :-
 	print_msg('debug', 'Thershold', Thershold),
 
 	Thershold = thershold(Pred2_Functor, Cond, Thershold_Truth_Value), !,
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred2_Functor, Pred2_Name, P_TN, _Type_1_Arity),
+	extract_from_PF_values_PN_PA_PTN_PTA(Pred2_Functor, Pred2_Name, _Pred2_Arity, P_TN, _Type_1_Arity),
 	
 	Pred2_Class = 'fuzzy_rule', Pred2_Arity = 1,
 	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
@@ -702,7 +708,7 @@ translate_rfuzzy_default_value_aux(Thershold, P_TN, Argument, Condition_Aux) :-
 translate_rfuzzy_default_value_aux(Condition_Functor, P_TN, Argument, Condition_Aux) :-
 	nonvar(Condition_Functor),
 	print_msg('debug', 'Condition', Condition_Functor),
-	extract_from_PF_values_PN_PA_PTN_PTA(Condition_Functor, Condition_Name, P_TN, _Type_1_Arity),
+	extract_from_PF_values_PN_PA_PTN_PTA(Condition_Functor, Condition_Name, Condition_Arity, P_TN, _Type_1_Arity),
 
 	Condition_Arity = 1,
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
@@ -949,7 +955,7 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, P_TN, Truth_Value, Translatio
 % Normal.
 translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, P_TN, Truth_Value, Translation) :-
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
-	extract_from_PF_values_PN_PA_PTN_PTA(Body_F, P_N, P_TN, _Type_1_Arity),
+	extract_from_PF_values_PN_PA_PTN_PTA(Body_F, P_N, _P_A, P_TN, _Type_1_Arity),
 
 	Pred_Class = 'fuzzy_rule', P_A = 1,
 	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
@@ -1022,14 +1028,16 @@ fix_functor_type_aux_extract_P_N(Type, P_N) :-
 %translate((rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor) :- function(Function_List)), Cls):-
 %	translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, _UserName, Function_List, Cls).
 
+translate_rfuzzy_fuzzification(Pred_Info, Defined_Pred, Function_Body, Cl_Body, Cl_Body_TV),
+
 % translate_rfuzzy_fuzzification(Pred_Info, Defined_Pred, Function_Body, Cl_Body, Cl_Body_TV),
 translate_rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName, Function_List, Cls) :-
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Pred_Functor), nonvar(Crisp_Pred_Functor), nonvar(Function_List),
 	print_msg('debug', 'translate: rfuzzy_fuzzification(Pred_Functor, Crisp_Pred_Functor, UserName)', (Pred_Functor, Crisp_Pred_Functor, UserName)),
 	print_msg('debug', 'translate: rfuzzy_fuzzification(Function_List)', Function_List),
-	extract_from_PF_values_PN_PA_PTN_PTA(Pred_Functor, P_N, P1_P_TN, P1_Type_1_Arity),
-	extract_from_PF_values_PN_PA_PTN_PTA(Crisp_Pred_Functor, Crisp_P_N, P2_P_TN, P2_Type_1_Arity),
+	extract_from_PF_values_PN_PA_PTN_PTA(Pred_Functor, P_N, P_A, P1_P_TN, P1_Type_1_Arity),
+	extract_from_PF_values_PN_PA_PTN_PTA(Crisp_Pred_Functor, Crisp_P_N, Crisp_P_A, P2_P_TN, P2_Type_1_Arity),
 	P1_P_TN = P2_P_TN,
 	P1_Type_1_Arity = P2_Type_1_Arity,
 
