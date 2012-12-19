@@ -375,12 +375,18 @@ rfuzzy_defined_quantifiers([(very, 2, TV_In, TV_Out, (TV_Out .=. (TV_In * TV_In)
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-sets_union([], Set2, Set2) :- !.
-sets_union([Member1 | Set1], Set2, Set3) :-
+sets_union(Set1, Set2, Result_Set) :-
+	list(Set1), list(Set2), list(Result_Set),
+	sets_union_aux(Set1, Set2, Result_Set).
+sets_union(Set1, Set2, Result_Set) :-
+	print_msg('error', 'sets_union :: not a list error', (Set1, Set2, Result_Set)), !, fail.
+
+sets_union_aux([], Set2, Set2) :- !.
+sets_union_aux([Member1 | Set1], Set2, Set3) :-
 	memberchk_local(Member1, Set2), !,
-	sets_union(Set1, Set2, Set3).
-sets_union([Member1 | Set1], Set2, [Member1 | Set3]) :-
-	sets_union(Set1, Set2, Set3).
+	sets_union_aux(Set1, Set2, Set3).
+sets_union_aux([Member1 | Set1], Set2, [Member1 | Set3]) :-
+	sets_union_aux(Set1, Set2, Set3).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
