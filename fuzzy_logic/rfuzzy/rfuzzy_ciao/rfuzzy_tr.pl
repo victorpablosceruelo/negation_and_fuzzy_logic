@@ -442,7 +442,7 @@ translate(Other, Other) :-
 
 translate_fuzzy(Pred_Info, Cls) :-
 	% Info previously retrieved or to be filled in.
-	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, P_A, P_TN, _P_TA, P_B, _NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
+	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, P_A, P_TN, P_TA, P_B, _NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
 
 	% Prepare the predicate head
 	get_auxiliar_suffix(Suffix),
@@ -507,17 +507,91 @@ translate_fuzzy(Pred_Info, Cls) :-
 	), !,
 
 	print_msg('debug', 'translate_fuzzy ::  (Cl_Body, Cl_Body_TV)', (Cl_Body, Cl_Body_TV)),
-	generate_type_test_subCl(NP_Arg_Input, P_TN, SubCl_TypeTest),
+	generate_type_test_subCl(NP_Arg_Input, P_TN, P_TA, SubCl_TypeTest),
 	generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, NP_Arg_TV, SubCl_Credibility),
-	generate_ifcondition_subCl(If_Cond, SubCl_IfCondition),
+	generate_ifcondition_subCl(If_Cond, P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition),
 	generate_username_subCl(UN, SubCl_UserName),
-	generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, SubCl_Prio),
+	generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, If_Cond, SubCl_Prio),
 	Cls = [(NP_F :- SubCl_TypeTest, Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio)],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
 	save_predicate_definition(P_N, P_A, [(P_TN, 'rfuzzy_truth_value_type')], [], [(NP_N, NP_A)]),
 	print_msg('debug', 'translate_fuzzy ', ' ').
 
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+generate_type_test_subCl(NP_Arg_Input, P_TN, P_TA, SubCl_TypeTest) :-
+	functor(Type_F, P_TN, P_TA),
+	SubCl_TypeTest = ((Type_F = NP_Arg_Input), Type_F).
+
+generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, NP_Arg_TV, SubCl_Credibility) :-
+	(   % Trivial cases (optimizations).
+	    (   Cred_Op = 'prod', Cred_Value = 1   )
+	;
+	    (   Cred_Op = 'min', Cred_Value = 1   )
+	), !, 
+	NP_Arg_TV = Cl_Body_TV, 
+	SubCl_Credibility = true.
+
+generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, NP_Arg_TV, SubCl_Credibility) :-
+	functor(Cred_F, Cred_Op, 3), 
+	arg(1, Cred_F, Cred_Value),
+	arg(2, Cred_F, Cl_Body_TV),
+	arg(3, Cred_F, NP_Arg_TV),
+	SubCl_Credibility = (Cred_F, NP_Arg_TV .>=. 0, NP_Arg_TV .=<. 1).
+
+generate_ifcondition_subCl(If_Cond, _P_TN, _P_TA, _NP_Arg_Input, _SubCl_IfCondition) :-
+	var(If_Cond), 
+	print_msg('debug', 'The if condition cannot be a variable', If_Cond).
+
+generate_ifcondition_subCl('true', _P_TN, _P_TA, _NP_Arg_Input, 'true') :- !. % No condition.
+	
+generate_ifcondition_subCl((If_Cond_1, If_Cond_2), P_TN, P_TA, NP_Arg_Input, (SubCl_IfCondition_1, SubCl_IfCondition_2)) :-
+	!,
+	generate_ifcondition_subCl(If_Cond_1, P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition_1),
+	generate_ifcondition_subCl(If_Cond_2, P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition_2).
+
+generate_ifcondition_subCl((Functor equals Value), P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition) :-
+	extract_from_PF_values_PN_PA_PTN_PTA(Functor, FP_N, _FP_A, P_TN, P_TA),
+	functor(Get_Value, FP_N, 2),
+	arg(1, Get_Value, NP_Arg_Input),
+	arg(2, Get_Value, Obtained_Value),
+	SubCl_IfCondition = (Get_Value, (Obtained_Value .=. Value)).
+
+generate_ifcondition_subCl((Functor is_over Value), P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition) :-
+	extract_from_PF_values_PN_PA_PTN_PTA(Functor, FP_N, _FP_A, P_TN, P_TA),	
+	functor(Get_Value, FP_N, 2),
+	arg(1, Get_Value, NP_Arg_Input),
+	arg(2, Get_Value, Obtained_Value),
+	SubCl_IfCondition = (Get_Value, (Obtained_Value .>. Value)).
+
+generate_ifcondition_subCl((Functor is_under Value), P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition) :-
+	extract_from_PF_values_PN_PA_PTN_PTA(Functor, FP_N, _FP_A, P_TN, P_TA),	
+	functor(Get_Value, FP_N, 2),
+	arg(1, Get_Value, NP_Arg_Input),
+	arg(2, Get_Value, Obtained_Value),
+	SubCl_IfCondition = (Get_Value, (Obtained_Value .<. Value)).
+
+	
+generate_username_subCl(UN, SubCl_UserName) :-
+	functor(Obtain_UserName, 'localUserName', 1),
+	arg(1, Obtain_UserName, Obtined_UserName),
+	SubCl_UserName = (Obtain_UserName, (Obtined_UserName = UN)).
+
+generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, 'true', SubCl_Prio) :- !,
+	SubCl_Prio = (NP_Arg_Prio = Cl_Body_Prio), !.
+
+generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, _If_Cond, SubCl_Prio) :- !,
+	SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.1), !.
+ 
+	
+
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 
 translate_rfuzzy_fact(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
 	nonvar(Fixed_Truth_Value), number(Fixed_Truth_Value),
