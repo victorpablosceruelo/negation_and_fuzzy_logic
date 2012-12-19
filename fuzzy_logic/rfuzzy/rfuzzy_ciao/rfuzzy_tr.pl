@@ -732,31 +732,24 @@ generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, Pred_MI_1, Cls) :-
-	nonvar(P_N), nonvar(P_A), nonvar(P_T),
+translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, P_MI_1, [Cl]) :-
+	nonvar(P_N), nonvar(P_A), number(P_A), nonvar(P_T),
 	print_msg('debug', 'rfuzzy_type_for :: (P_N, P_A, P_T)', (P_N, P_A, P_T)),
 	
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, 'crisp_rule_type', '', _New_P_N, New_P_A, Pred_Functor, _Truth_Value),
+	test_type_definition(P_A, 1, P_T),
+	functor(P_F, P_N, P_A),
+	Cl = (P_F :- fail), % This is just to invite prolog to complaint if any rule has same name but different arity.
 
-	fix_functor_type(Pred_Functor, New_P_A, 1, P_T, Body),
-	Cl = (Pred_Functor :- Body),
-
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, 'crisp_rule', '', Real_P_N, Real_P_A, _RPF, _RTV),
-	
-	(   % Generate cls only if necessary.
-	    (   % it has been defined before.
-		retrieve_predicate_info(Real_P_N, Real_P_A, Retrieved_P_T, 'no'), 
+	(   
+	    (   % it has been defined before and our definition is included.
+		retrieve_predicate_info(P_N, P_A, Retrieved_P_T, 'no'), 
 		nonvar(Retrieved_P_T), !,
-		memberchk_local(P_T, Retrieved_P_T),
-		Cls = []
+		memberchk_local(P_T, Retrieved_P_T)
 	    )
 	;
-	    (   % Define it !!!
-		% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-		save_predicate_definition(Real_P_N, Real_P_A, P_T, Pred_MI_1, []),
-		Cls = [Cl]
+	    (   % Define it or redefine it (Include the new type definition)
+		% save_predicate_definition(P_N, P_A, P_T, P_MI_1, P_MI_2)
+		save_predicate_definition(P_N, P_A, P_T, P_MI_1, [])
 	    )
 	), !.
 
@@ -971,44 +964,33 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _P_TN, _Truth_Value, _Result)
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-fix_functor_type(Functor, Arity, Actual, [Type], Type_F) :-
-	print_msg('debug', 'fix_functor_type(Functor, Arity, Actual, Type)', (Functor, Arity, Actual, [Type]) ),
-	Actual = Arity, !, % Security conditions.
-	fix_functor_type_aux(Functor, Actual, Type, Type_F),
+test_type_definition(P_A, Actual, [Type]) :-
+	print_msg('debug', 'test_type_definition(Functor, P_A, Actual, Type)', (P_A, Actual, [Type]) ),
+	Actual = P_A, !, % Security conditions.
+	test_type_definition_aux(Type),
 	!. % Backtracking not allowed.
 
-fix_functor_type(Functor, Arity, Actual, [Type | More], (Type_F, More_F)) :-
-	print_msg('debug', 'fix_functor_type(Functor, Arity, Actual, Type)', (Functor, Arity, Actual, [Type|More]) ),
-	Actual < Arity, !,  % Security conditions.
-	fix_functor_type_aux(Functor, Actual, Type, Type_F),
+test_type_definition(P_A, Actual, [Type | More]) :-
+	print_msg('debug', 'test_type_definition(P_A, Actual, Type)', (P_A, Actual, [Type|More]) ),
+	Actual < P_A, !,  % Security conditions.
+	test_type_definition_aux(Type),
 	NewActual is Actual + 1, % Next values.
 	!,
-	fix_functor_type(Functor, Arity, NewActual, More, More_F),
+	test_type_definition(P_A, NewActual, More),
 	!. % Backtracking not allowed here.
 
-fix_functor_type(Functor, Arity, Actual, Types, _Type_F) :-
-	print_msg('error', 'fix_functor_type(Functor, Arity, Actual, Types)', fix_functor_type(Functor, Arity, Actual, Types)),
+test_type_definition(_P_A, _Actual, Types) :-
+	print_msg('error', 'test_type_definition :: Types', Types),
 	!, fail.
 
-fix_functor_type_aux(Functor, Actual, Type, (Type_F)) :-
-	print_msg('debug', 'fix_functor_type_aux(Functor, Actual, Type)', fix_functor_type_aux(Functor, Actual, Type)),
-	fix_functor_type_aux_extract_P_N(Type, P_N),
+test_type_definition_aux(Type) :-
+	print_msg('debug', 'test_type_definition_aux :: Type', Type),
+	test_type_definition_aux_extract_P_N(Type, P_N),
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
-	retrieve_predicate_info(P_N, P_A, _P_T, 'true'),
-	functor(Type_F, P_N, P_A), % Build functor.
-	arg(1, Type_F, X), % Arguments of functor.
-	arg(Actual, Functor, X), % Unify with Argument of functor.
+	retrieve_predicate_info(P_N, _P_A, _P_T, 'true'),
 	!.
-fix_functor_type_aux(_Functor, _Actual, Type, (_Type_F)) :-
+test_type_definition_aux(Type) :-
 	print_msg('error', 'Not an adequate type name', Type), !, fail.
-
-fix_functor_type_aux_extract_P_N(Type, P_N) :-
-	functor(Type, _Name, 0),
-	P_N = Type.
-
-fix_functor_type_aux_extract_P_N(Type, P_N) :-
-	functor(Type, 'rfuzzy_enum_type', 1),
-	arg(1, Type, P_N).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
