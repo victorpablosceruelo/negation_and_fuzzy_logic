@@ -791,28 +791,26 @@ translate_field_description(Field_Name, Field_Type_2, DB_P_N, DB_P_A, Index, Cls
 
 	P_T = [DB_P_N, Field_Type_2],
 	print_msg('debug', 'translate_field_description_for(Field_Name, P_T)', (P_N, P_T)),
-	(
-	    (	translate_field_description_aux(P_T, Field_Name, Input, Value, Pred_Functor, Conversion), !    )
+	(   % DBF_F is DataBase Field Functor.
+	    (	translate_field_description_aux(P_T, Field_Name, Input, Value, DBF_F, Conversion), !    )
 	;
 	    (	print_msg('error', 'Error translating db definition for (P_N, P_T)', (P_N, P_T)), !, fail    )
 	),
 	
-	Cls = [(Pred_Functor :- (((Mapping, DB_Pred_Functor), Test), Conversion))],
+	Cls = [(DBF_F :- (((Mapping, DBF_F), Test), Conversion))],
 	print_msg('debug', 'translate_field_description_for(P_N, Cls)', (P_N, Cls)).
 
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, Pred_Functor, Conversion) :-
+translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
 	
 	Type = 'rfuzzy_truth_value_type', !, 
-	Pred_Class = 'fuzzy_rule_db_value', P_A=1,
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, Pred_Class, DB_P_T, New_P_N, New_P_A, Pred_Functor, Truth_Value),
-	arg(1, Pred_Functor, Input),
+	functor(DBF_F, P_N, 2),
+	arg(1, DBF_F, Input),
+	arg(2, DBF_F, Truth_Value),
 	functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Truth_Value),
-	MI_2 = [(New_P_N, New_P_A)],
-	% save_fuzzy_rule_predicate_definition(P_N, P_A, P_T, Pred_Class, MI_2)
-	save_fuzzy_rule_predicate_definition(P_N, P_A, [DB_P_T, Type], Pred_Class, MI_2).
+	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], [], []).
 
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, Pred_Functor, Conversion) :-
+translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
 	(
 	    Type = 'rfuzzy_string_type' ; 
 	    Type = 'rfuzzy_integer_type' ; 
@@ -820,21 +818,23 @@ translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, Pred_Functor,
 	    Type = 'rfuzzy_boolean_type' ; 
 	    Type = 'rfuzzy_datetime_type'
 	), !, 
-	P_A = 2,
-	functor(Pred_Functor, P_N, P_A),
-	arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value),
+	functor(DBF_F, P_N, 2),
+	arg(1, DBF_F, Input), 
+	arg(2, DBF_F, Value),
 	Conversion = 'true',
 	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, P_A, [DB_P_T, Type], [(Type, P_N, P_A)], []).
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], [], []).
 
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, Pred_Functor, Conversion) :-
+translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
 	Type = 'rfuzzy_float_type', !, 
-	P_A = 2,
-	functor(Pred_Functor, P_N, P_A),
-	arg(1, Pred_Functor, Input), arg(2, Pred_Functor, Value_Out),
-	functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Value_Out),
+	functor(DBF_F, P_N, 2),
+	arg(1, DBF_F, Input), 
+	arg(2, DBF_F, Value_Out),
+	functor(Conversion, '.=.', 2), 
+	arg(1, Conversion, Value), 
+	arg(2, Conversion, Value_Out),
 	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, P_A, [DB_P_T, Type], [(Type, P_N, P_A)], []).
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], [], []).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
