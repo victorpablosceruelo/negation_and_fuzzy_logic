@@ -52,9 +52,9 @@ save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2) :-
 	    )
 	;
 	    (
-		New_P_T = P_T,
-		New_MI_1 = MI_1, 
-		New_MI_2 = MI_2
+		New_P_T = [P_T],
+		New_MI_1 = [MI_1], 
+		New_MI_2 = [MI_2]
 	    )
 	), 
 	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_MI_1, New_MI_2)),
