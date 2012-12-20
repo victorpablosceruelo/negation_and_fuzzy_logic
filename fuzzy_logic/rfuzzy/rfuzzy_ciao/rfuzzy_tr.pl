@@ -1150,22 +1150,6 @@ build_auxiliary_clauses_aux([Selector | MI_2], P_N, P_A, [Cl | Cls]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-get_nth_element_from_list(Position, [Head], Head) :-
-	nonvar(Position), 
-	Position = 1, !.
-get_nth_element_from_list(Position, [Head | _Tail], Head) :-
-	nonvar(Position), 
-	Position = 1, !.
-get_nth_element_from_list(Position, [_Head | Tail], Head) :-
-	nonvar(Position), 
-	Position > 1, !,
-	NewPosition is Position - 1,
-	get_nth_element_from_list(NewPosition, Tail, Head).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 generate_introspection_predicate([], List_In, List_In) :- !.
 generate_introspection_predicate([Input|Input_List], List_In, List_Out) :-
 	generate_introspection_predicate_real(Input, Output),
