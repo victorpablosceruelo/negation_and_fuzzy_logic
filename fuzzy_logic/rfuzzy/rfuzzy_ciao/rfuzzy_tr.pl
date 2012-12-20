@@ -46,9 +46,9 @@ save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2) :-
 	    (	 
 		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_MI_1, Old_MI_2)), !, % Retract last
 		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_MI_1, Old_MI_2)),
-		sets_union(P_T, Old_P_T, New_P_T),
-		sets_union(MI_1, Old_MI_1, New_MI_1),
-		sets_union(MI_2, Old_MI_2, New_MI_2)
+		sets_union([P_T], Old_P_T, New_P_T),
+		sets_union([MI_1], Old_MI_1, New_MI_1),
+		sets_union([MI_2], Old_MI_2, New_MI_2)
 	    )
 	;
 	    (
@@ -121,10 +121,13 @@ check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
 	    )
 	), !.
 
+check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
+	print_msg('debug', (P_N, P_A, P_T, MI_1, MI_2), (P_N, P_A, P_T, MI_1, MI_2)), !, fail.
+
 check_save_predicate_definition_input_aux(Variable, Error_Msg) :-
 	(
-	    (	var(P_T),
-		print_msg('error', Error_Msg, P_T), !, fail
+	    (	var(Variable),
+		print_msg('error', Error_Msg, Variable), !, fail
 	    )
 	;
 	    (	nonvar(Variable), list(Variable), 
@@ -141,7 +144,7 @@ check_save_predicate_definition_input_aux(Variable, Error_Msg) :-
 	    )
 	;
 	    (	nonvar(Variable),
-		print_msg('error', Error_Msg, P_T), !, fail
+		print_msg('error', Error_Msg, Variable), !, fail
 	    )
 	), !.
 
