@@ -130,18 +130,7 @@ check_save_predicate_definition_input_aux(Variable, Error_Msg) :-
 		print_msg('error', Error_Msg, Variable), !, fail
 	    )
 	;
-	    (	nonvar(Variable), list(Variable), 
-		(
-		    (
-			empty_list(Variable)
-		    )
-		;
-		    (
-			list_head(Variable, Head),
-			list(Head)
-		    )
-		)
-	    )
+	    (	nonvar(Variable), list(Variable)   )
 	;
 	    (	nonvar(Variable),
 		print_msg('error', Error_Msg, Variable), !, fail
