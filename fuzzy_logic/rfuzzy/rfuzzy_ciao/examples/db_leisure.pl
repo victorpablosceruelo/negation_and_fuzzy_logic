@@ -38,7 +38,7 @@ rfuzzy_default_value_for(near_the_city_center(restaurant), 0).
 rfuzzy_fuzzification(near_the_city_center(restaurant), distance_to_the_city_center(restaurant)) :- function([ (0, 1), (100, 1), (1000, 0.1) ]).
 
 rfuzzy_fuzzification(traditional(restaurant), years_since_opening(restaurant)) :- function([ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
-rfuzzy_fuzzification(traditional(restaurant), years_since_opening(restaurant), bartolo) :- function([ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
+traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]) only_for_user bartolo.
 
 rfuzzy_type_for(is_zalacain/1, [restaurant]).
 is_zalacain(Restaurant) :- restaurant_id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.

@@ -107,50 +107,46 @@ check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
 		print_msg('error', 'save_predicate_definition: P_A cannot be a variable. Value', P_A), !, fail
 	    )
 	),
+	check_save_predicate_definition_input_aux(MI_1, 'Not a valid value for MI_1. Value'), 
+	check_save_predicate_definition_input_aux(MI_2, 'Not a valid value for MI_2. Value'), 
+	check_save_predicate_definition_input_aux(P_T, 'Not a valid value for P_T. Value'), 
+
 	(
-	    (	nonvar(P_T), list(P_T), !    )
-	;
-	    (	nonvar(P_T),
-		print_msg('error', 'save_predicate_definition: P_T must be a list. Value', P_T), !, fail
-	    )
-	;
-	    (	var(P_T),
-		print_msg('error', 'save_predicate_definition: P_T cannot be a variable. Value', P_T), !, fail
-	    )
-	),
-	(
-	    (	nonvar(MI_1), list(MI_1), !    )
-	;
-	    (   nonvar(MI_1),
-		print_msg('error', 'save_predicate_definition: MI_1 must be a list. Value', MI_1), !, fail
-	    )
-	;
-	    (	var(MI_1),
-		print_msg('error', 'save_predicate_definition: MI_1 cannot be a variable. Value', MI_1), !, fail
-	    )
-	),
-	(
-	    (	nonvar(MI_2), list(MI_2), !    )
-	;
-	    (   nonvar(MI_2),
-		print_msg('error', 'save_predicate_definition: MI_2 must be a list. Value', MI_2), !, fail
-	    )
-	;
-	    (	var(MI_2),
-		print_msg('error', 'save_predicate_definition: MI_2 cannot be a variable. Value', MI_2), !, fail
-	    )
-	),
-	(
-	    (
-		print_msg('debug', 'check_pred_type_aux(P_A, P_T)', (P_A, P_T)),
-		check_pred_type_aux(P_A, P_T), !
-	    )
+	    print_msg('debug', 'check_pred_type_aux(P_A, P_T)', (P_A, P_T)),
+	    check_pred_type_aux(P_A, P_T), !
 	;
 	    (
 		print_msg('error', 'Types in type definition do not sum up the arity value. (P_N, P_A, P_T)', (P_N, P_A, P_T)), 
 		!, fail
 	    )
 	), !.
+
+check_save_predicate_definition_input_aux(Variable, Error_Msg) :-
+	(
+	    (	var(P_T),
+		print_msg('error', Error_Msg, P_T), !, fail
+	    )
+	;
+	    (	nonvar(Variable), list(Variable), 
+		(
+		    (
+			empty_list(Variable)
+		    )
+		;
+		    (
+			list_head(Variable, Head),
+			list(Head)
+		    )
+		)
+	    )
+	;
+	    (	nonvar(Variable),
+		print_msg('error', Error_Msg, P_T), !, fail
+	    )
+	), !.
+
+empty_list([]).
+list_head([Head|_List], Head).
 
 check_pred_type_aux(0, []) :- !.
 check_pred_type_aux(1, [_P_T]) :- !.
@@ -473,7 +469,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 	    )
 	), !,
 
-	print_msg('debug', 'translate_fuzzy ::  (Cl_Body, Cl_Body_TV)', (Cl_Body, Cl_Body_TV)),
+	print_msg('debug', 'translate_fuzzy ::  (Cl_Body, Cl_Body_TV, Cl_Body_Prio)', (Cl_Body, Cl_Body_TV, Cl_Body_Prio)),
 	generate_type_test_subCl(NP_Arg_Input, P_TN, P_TA, SubCl_TypeTest),
 	generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, NP_Arg_TV, SubCl_Credibility),
 	generate_ifcondition_subCl(If_Cond, P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition),
@@ -995,7 +991,9 @@ translate_rfuzzy_fuzzification(Pred_Info, NP_Arg_Input, Defined_Pred_F, Function
 	arg(1, NDP_F, NP_Arg_Input),
 	arg(2, NDP_F, Crisp_Value),
 
+	print_msg('debug', 'build_straight_lines(Crisp_Value, Cl_Body_TV, Function_Body)', (Crisp_Value, Cl_Body_TV, Function_Body)), 
 	build_straight_lines(Crisp_Value, Cl_Body_TV, Function_Body, List_Body),
+	print_msg('debug', 'build_straight_lines(List_Body)', (List_Body)), 
 	Cl_Body = (NDP_F, List_Body),
 	!.
 
