@@ -476,7 +476,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 		arg(1, P_B, Rule_Op),
 		arg(2, P_B, Rule_Body),
 		test_aggregator_is_defined(Rule_Op, 'yes'),
-		translate_rfuzzy_rule_body(Rule_Body, Rule_Op, P_TN, Cl_Body_TV, Cl_Body),
+		translate_rfuzzy_rule_body(Rule_Body, Rule_Op, NP_Arg_Input, P_TN, Cl_Body_TV, Cl_Body),
 		Cl_Body_Prio = 0.4
 	    )	
 	;
@@ -899,65 +899,68 @@ test_aggregator_is_defined(P_N, Show_Error) :-
 % ------------------------------------------------------
 
 % Security issues
-translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _P_TN, _Truth_Value, _FB) :- 
+translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _NP_Arg_Input, _P_TN, _Truth_Value, _FB) :- 
 	var(Body_F), 
 	print_msg('error', 'Rule body cannot be a variable. Body', Body_F),
 	!, fail. % If this is a variable the tranlate rules loop forever !!!
 
 % Conjunction.
-translate_rfuzzy_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, P_TN, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,
+translate_rfuzzy_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, (FB_1, FB_2, Aggr_F)) :- !,
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, TV_Aggregator, Truth_Value) - conjunction',((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, Truth_Value)),
 	nonvar(TV_Aggregator),
 	\+ ( TV_Aggregator = 'none' ),
-	translate_rfuzzy_rule_body(Tmp_Body_1, TV_Aggregator, P_TN, TV_1, FB_1),
-	translate_rfuzzy_rule_body(Tmp_Body_2, TV_Aggregator, P_TN, TV_2, FB_2),
+	translate_rfuzzy_rule_body(Tmp_Body_1, TV_Aggregator, NP_Arg_Input, P_TN, TV_1, FB_1),
+	translate_rfuzzy_rule_body(Tmp_Body_2, TV_Aggregator, NP_Arg_Input, P_TN, TV_2, FB_2),
 	functor(Aggr_F, TV_Aggregator, 3),
 	arg(1, Aggr_F, TV_1), 
 	arg(2, Aggr_F, TV_2), 
 	arg(3, Aggr_F, Truth_Value), !.
 
-% Quantifier.
-translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, P_TN, Truth_Value, Translation) :-
+% Rule Body Conjunct with Quantifier.
+translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, Translation) :-
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - with quantifier',(Body_F, Truth_Value)),
 	nonvar(Body_F),
-	functor(Body_F, P_N, 1),
-
-	P_A = 1, Pred_Class = 'quantifier',
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, Pred_Class, '', New_P_N, New_P_A, Pred_Functor, Truth_Value),
+	functor(Body_F, QP_N, QP_Arity),
+	QP_Arity = 1, % If not then it is not a quantifier.
+	arg(1, Body_F, SubBody),
+	functor(SubBody, _BodyP_N, BodyP_Arity),
+	BodyP_Arity > 0, % If not then it is not a quantifier.
+	!,
 
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error) 
-	retrieve_predicate_info(New_P_N, New_P_A, P_T, 'true'), 
-	Valid_P_T = ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'],
-	nonvar(P_T), memberchk_local(Valid_P_T, P_T),
-
-	arg(1, Body_F, SubBody),
+	retrieve_predicate_info(QP_N, 2, QP_T, 'true'), 
+	nonvar(QP_T), 
+	memberchk_local(['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], QP_T),
+	!,
+	
 	print_msg('debug', 'translate_rfuzzy_rule_body(SubBody)',(SubBody)),
-	translate_rfuzzy_rule_body(SubBody, 'none', P_TN, _SubCall_Truth_Value, SubCall),
+	translate_rfuzzy_rule_body(SubBody, 'none', NP_Arg_Input, P_TN, _SubCall_Truth_Value, SubCall),
 	print_msg('debug', 'translate_rfuzzy_rule_body(SubBody, SubCall)',(SubBody, SubCall)),
-	arg(1, Pred_Functor, SubCall),
-	Translation = (Pred_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
+
+	functor(QP_F, QP_N, 2),
+	arg(1, QP_F, SubCall),
+	arg(2, QP_F, Truth_Value),
+	Translation = (QP_F, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
 	print_msg('debug', 'translate_rfuzzy_rule_body(Translation) - with quantifier',(Translation)).
 
-% Normal.
-translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, P_TN, Truth_Value, Translation) :-
+% Rule Body Conjunct without Quantifier.
+translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, Translation) :-
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
-	extract_from_PF_values_PN_PA_PTN_PTA(Body_F, P_N, _P_A, P_TN, _Type_1_Arity),
-
-	Pred_Class = 'fuzzy_rule', P_A = 1,
-	% translate_predicate(P_N, P_A, Pred_Class, P_T, New_P_N, New_P_A, New_Pred_Functor, TV)
-	translate_predicate(P_N, P_A, Pred_Class, '', New_P_N, New_P_A, Pred_Functor, Truth_Value),
+	extract_from_PF_values_PN_PA_PTN_PTA(Body_F, P_N, _Fake_P_A, P_TN, _Type_1_Arity),
 
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error) 
-	retrieve_predicate_info(New_P_N, New_P_A, P_T, 'true'), 
-	nonvar(P_T), Valid_P_T = [P_TN, 'rfuzzy_truth_value_type'],
-	memberchk_local(Valid_P_T, P_T),
+	retrieve_predicate_info(P_N, P_A, P_T, 'true'), 
+	nonvar(P_T), 
+	memberchk_local([P_TN, 'rfuzzy_truth_value_type'], P_T),
 
-	Translation = (Pred_Functor, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
+	functor(P_F, P_N, P_A),
+	arg(1, P_F, NP_Arg_Input),
+	arg(2, P_F, Truth_Value),
+	Translation = (P_F, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Translation)',(Body_F, Translation)),
 	print_msg_nl('debug').
 
-translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _P_TN, _Truth_Value, _Result) :-
+translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _NP_Arg_Input, _P_TN, _Truth_Value, _Result) :-
 	print_msg('error', 'translating the rule subbody',(Body_F)), !, fail.
 
 % ------------------------------------------------------
@@ -985,7 +988,7 @@ test_type_definition(_P_A, _Actual, Types) :-
 
 test_type_definition_aux(Type) :-
 	print_msg('debug', 'test_type_definition_aux :: Type', Type),
-	test_type_definition_aux_extract_P_N(Type, P_N),
+	functor(Type, P_N, _Fake_P_A),
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(P_N, _P_A, _P_T, 'true'),
 	!.
