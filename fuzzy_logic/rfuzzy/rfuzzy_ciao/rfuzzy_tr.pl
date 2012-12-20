@@ -717,11 +717,6 @@ extract_from_PF_values_PN_PA_PTN_PTA(P_F, P_N, P_A, PT_N, PT_A) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_check_types_subgoal(P_TN, Type_1_Arity, Argument, Check_Types_SubGoal) :-
-	print_msg('debug', 'generate_check_types_subgoal(P_TN, Type_1_Arity, Argument)', (P_TN, Type_1_Arity, Argument)),
-	functor(Type_1_Functor, P_TN, Type_1_Arity),
-	Check_Types_SubGoal = (Type_1_Functor, (Argument = Type_1_Functor)).
-
 generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth_Value_SubGoal) :-
 	print_msg('debug', 'generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value)', (Fixed_Truth_Value, Truth_Value)),
 	functor(Assign_Truth_Value_SubGoal, '.=.', 2),
