@@ -137,9 +137,6 @@ check_save_predicate_definition_input_aux(Variable, Error_Msg) :-
 	    )
 	), !.
 
-empty_list([]).
-list_head([Head|_List], Head).
-
 check_pred_type_aux(0, []) :- !.
 check_pred_type_aux(1, [_P_T]) :- !.
 check_pred_type_aux(P_A, [_P_T|More]) :-
