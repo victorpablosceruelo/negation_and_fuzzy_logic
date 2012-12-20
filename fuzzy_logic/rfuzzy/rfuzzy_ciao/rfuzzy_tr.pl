@@ -394,7 +394,7 @@ translate(Other, Other) :-
 
 translate_fuzzy(Pred_Info, Cls) :-
 	% Info previously retrieved or to be filled in.
-	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, P_A, P_TN, P_TA, P_B, _NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
+	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, _P_A, P_TN, P_TA, P_B, _NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
 
 	% Prepare the predicate head
 	get_auxiliar_suffix(Suffix),
@@ -467,7 +467,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 	Cls = [(NP_F :- SubCl_TypeTest, Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio)],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
-	save_predicate_definition(P_N, P_A, [(P_TN, 'rfuzzy_truth_value_type')], [], [(NP_N, NP_A)]),
+	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], [], [(NP_N, NP_A)]),
 	print_msg('debug', 'translate_fuzzy ', ' ').
 
 % ------------------------------------------------------
@@ -637,7 +637,7 @@ generate_fake_type(N, [_Any|More]) :-
 	generate_fake_type(NewN, More).
 
 extract_from_PF_values_PN_PA_PTN_PTA(P_F, P_N, P_A, PT_N, PT_A) :-
-	print_msg('debug', 'extract_from_PF_values_PN_PA_PTN_PTA(P_F)', (P_F)),
+	print_msg('debug', 'extract_from_PF_values_PN_PA_PTN_PTA:: (P_F)', (P_F)),
 	(
 	    (	nonvar(P_F), !    )
 	;

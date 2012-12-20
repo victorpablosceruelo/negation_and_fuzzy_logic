@@ -34,19 +34,19 @@ rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(tapas), 0.6)
 rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(spanish), 0.6) cred (prod, 0.8).
 rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(italian), 0.6) cred (prod, 0.8).
 
-rfuzzy_default_value_for(near_the_city_center(restaurant), 0).
-rfuzzy_fuzzification(near_the_city_center(restaurant), distance_to_the_city_center(restaurant)) :- function([ (0, 1), (100, 1), (1000, 0.1) ]).
+near_the_city_center(restaurant) :~ defaults_to(0).
+near_the_city_center(restaurant):~ function(distance_to_the_city_center(restaurant), [ (0, 1), (100, 1), (1000, 0.1) ]).
 
-rfuzzy_fuzzification(traditional(restaurant), years_since_opening(restaurant)) :- function([ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
+traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
 traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]) only_for_user bartolo.
 
 rfuzzy_type_for(is_zalacain/1, [restaurant]).
 is_zalacain(Restaurant) :- restaurant_id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.
 
-rfuzzy_default_value_for(cheap(restaurant), 0.5).
-rfuzzy_default_value_for(cheap(restaurant), 0.2) if thershold(near_the_city_center(restaurant), over, 0.7).
-rfuzzy_default_value_for(cheap(restaurant), 0.1) if is_zalacain(restaurant).
-rfuzzy_fuzzification(cheap(restaurant), price_average(restaurant)) :- function([ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ]).
+cheap(restaurant) :~ defaults_to(0.5).
+cheap(restaurant) :~ defaults_to(0.2) if (near_the_city_center(restaurant) is_over 0.7).
+cheap(restaurant) :~ defaults_to(0.1) if (restaurant_id(restaurant) equals zalacain).
+cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ]).
 
 rfuzzy_synonym(cheap(restaurant), unexpensive(restaurant), prod, 1).
 rfuzzy_antonym(cheap(restaurant), expensive(restaurant), prod, 1).
@@ -57,9 +57,9 @@ rfuzzy_quantifier(special_very/2, TV_In, TV_Out) :-
 	min(0, Min_In, Dividend), 
 	TV_Out .=. ((Dividend)/(0 - Thershold)).
 
-rfuzzy_default_value_for(tempting_restaurant(restaurant), 0.1).
-tempting_restaurant(restaurant) cred (min, 0.7) :~ min((near_the_city_center(restaurant), fnot(special_very(expensive(restaurant))), very(traditional(restaurant)))).
-tempting_restaurant(restaurant) cred (min, 0.5) :~ near_the_city_center(restaurant).
+tempting_restaurant(restaurant) :~ defaults_to( 0.1).
+tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(special_very(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
+tempting_restaurant(restaurant) :~ near_the_city_center(restaurant) with_cred (min, 0.5) .
 
 % More tests (maybe not needed in this DB).
 not_very_expensive(restaurant) :~ fnot(very(expensive(restaurant))).
