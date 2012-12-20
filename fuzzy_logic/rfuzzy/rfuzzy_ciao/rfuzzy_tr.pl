@@ -723,9 +723,9 @@ translate_rfuzzy_define_database(P_N, P_A, Description, Cls) :-
 	print_msg('debug', 'rfuzzy_define_database(P_N/P_A, Description)', (P_N/P_A, Description)),
 	nonvar(P_N), nonvar(P_A), nonvar(Description),
 	print_msg('debug', 'rfuzzy_define_database :: translate_db_description(Description)', (Description)),
-	translate_db_description(Description, 1, P_N, P_A, P_T, Cls_2, Fields_Names),
+	translate_db_description(Description, 1, P_N, P_A, P_T, Cls_1, Fields_Names),
 	print_msg('debug', 'rfuzzy_define_database :: translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T)', (P_N, P_A, P_T)),
-	translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, [('database', Fields_Names)], Cls_1),
+	translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, [('database', Fields_Names)], Cls_2),
 	print_msg('debug', 'rfuzzy_define_database :: Cls_1', Cls_1),
 	print_msg('debug', 'rfuzzy_define_database :: Cls_2', Cls_2),
 	append_local(Cls_1, Cls_2, Cls).
