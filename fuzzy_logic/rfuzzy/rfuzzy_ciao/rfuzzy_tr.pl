@@ -394,7 +394,7 @@ translate(Other, Other) :-
 
 translate_fuzzy(Pred_Info, Cls) :-
 	% Info previously retrieved or to be filled in.
-	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, _P_A, P_TN, P_TA, P_B, _NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
+	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, _P_A, P_TN, P_TA, P_B, NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
 
 	% Prepare the predicate head
 	get_auxiliar_suffix(Suffix),
@@ -445,7 +445,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 		arg(2, P_B, TV_Op),
 		test_aggregator_is_defined(TV_Op, 'true'),
 		arg(3, P_B, TV_Val),
-		translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio)
+		translate_rfuzzy_rule_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio)
 	    )
 	;
 	    (
@@ -454,7 +454,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 		arg(2, P_B, TV_Op),
 		test_aggregator_is_defined(TV_Op, 'true'),
 		arg(3, P_B, TV_Val),
-		translate_rfuzzy_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio)
+		translate_rfuzzy_rule_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio)
 	    )
 	), !,
 
@@ -550,12 +550,12 @@ translate_rfuzzy_fact(_Pred_Info, Fixed_Truth_Value, Cl_Body, Cl_Body_TV) :-
 	generate_assign_truth_value_subgoal(Fixed_Truth_Value, Cl_Body_TV, Cl_Body),
 	!. % Backtracking forbidden.
 
-translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
+translate_rfuzzy_rule_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
 	rfuzzy_pred_info(Pred_Info,	_P_F, _P_N, _P_A, P_TN, P_TA, _P_B, NP_F, _NP_N, _NP_A, _If_Cond, _Cred_Op, _Cred_Value, _UN),
 
 	nonvar(Defined_Pred), 
-	extract_from_PF_values_PN_PA_PTN_PTA(Defined_Pred, Defined_P_N, Defined_P_A, P_TN, P_TA),
-	retrieve_predicate_info(Defined_P_N, Defined_P_A, Defined_P_T, 'true'),
+	extract_from_PF_values_PN_PA_PTN_PTA(Defined_Pred, Defined_P_N, _Fake_P_A, P_TN, P_TA),
+	retrieve_predicate_info(Defined_P_N, 2, Defined_P_T, 'true'),
 	( 
 	    (	memberchk_local([P_TN, _Unused_Type_Name], Defined_P_T), !    )
 	;
@@ -570,22 +570,25 @@ translate_rfuzzy_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Bod
 	arg(1, Defined_NP_F, Defined_NP_Arg_Input),
 	arg(2, Defined_NP_F, Defined_NP_Arg_Prio),
 	arg(3, Defined_NP_F, Defined_NP_Arg_TV),
+	print_msg('debug', 'translate_rfuzzy_rule_synonym :: created defined functor Defined_NP_F', Defined_NP_F),
 
 	arg(1, NP_F, Defined_NP_Arg_Input),
 	Cl_Body_Prio = Defined_NP_Arg_Prio,
 	functor(Compute_TV, TV_Op, 3),
+	print_msg('debug', 'translate_rfuzzy_rule_synonym :: created compute TV functor Compute_TV', Compute_TV),
 	arg(1, Compute_TV, Defined_NP_Arg_TV),
 	arg(2, Compute_TV, TV_Val), 
 	arg(3, Compute_TV, Cl_Body_TV),
 	Cl_Body = (Defined_NP_F, (Defined_NP_Arg_TV .>=. 0, Defined_NP_Arg_TV .=<. 1), Compute_TV),
+	print_msg('debug', 'translate_rfuzzy_rule_synonym :: Cl_Body', Cl_Body),
 	!.
 
-translate_rfuzzy_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
+translate_rfuzzy_rule_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio) :-
 	rfuzzy_pred_info(Pred_Info,	_P_F, _P_N, _P_A, P_TN, P_TA, _P_B, NP_F, _NP_N, _NP_A, _If_Cond, _Cred_Op, _Cred_Value, _UN),
 
 	nonvar(Defined_Pred), 
-	extract_from_PF_values_PN_PA_PTN_PTA(Defined_Pred, Defined_P_N, Defined_P_A, P_TN, P_TA),
-	retrieve_predicate_info(Defined_P_N, Defined_P_A, Defined_P_T, 'true'),
+	extract_from_PF_values_PN_PA_PTN_PTA(Defined_Pred, Defined_P_N, _Fake_P_A, P_TN, P_TA),
+	retrieve_predicate_info(Defined_P_N, 2, Defined_P_T, 'true'),
 	( 
 	    (	memberchk_local([P_TN, _Unused_Type_Name], Defined_P_T), !    )
 	;
@@ -600,15 +603,18 @@ translate_rfuzzy_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Bod
 	arg(1, Defined_NP_F, Defined_NP_Arg_Input),
 	arg(2, Defined_NP_F, Defined_NP_Arg_Prio),
 	arg(3, Defined_NP_F, Defined_NP_Arg_TV),
+	print_msg('debug', 'translate_rfuzzy_rule_antonym :: created defined functor Defined_NP_F', Defined_NP_F),
 
 	arg(1, NP_F, Defined_NP_Arg_Input),
 	Cl_Body_Prio = Defined_NP_Arg_Prio,
 	functor(Compute_TV, TV_Op, 3),
+	print_msg('debug', 'translate_rfuzzy_rule_antonym :: created compute TV functor Compute_TV', Compute_TV),
 	arg(1, Compute_TV, Defined_NP_Arg_TV_Aux),
 	arg(2, Compute_TV, TV_Val), 
 	arg(3, Compute_TV, Cl_Body_TV),
 	Antonym = (Defined_NP_Arg_TV_Aux .=. 1 - Defined_NP_Arg_TV),
 	Cl_Body = (Defined_NP_F, (Defined_NP_Arg_TV .>=. 0, Defined_NP_Arg_TV .=<. 1), Antonym, Compute_TV),
+	print_msg('debug', 'translate_rfuzzy_rule_antonym :: Cl_Body', Cl_Body),
 	!.
 
 % ------------------------------------------------------
@@ -663,7 +669,7 @@ extract_from_PF_values_PN_PA_PTN_PTA(P_F, P_N, P_A, PT_N, PT_A) :-
 	),
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(PT_N, PT_A, _PT_Type, 'true'),
-	print_msg('debug', 'extract_from_PF_values_PN_PA_PTN_PTA(P_N, PT_N, PT_A)', (P_N, PT_N, PT_A)), !.
+	print_msg('debug', 'extract_from_PF_values_PN_PA_PTN_PTA(P_F, P_N, P_A, PT_N, PT_A)', (P_F, P_N, P_A, PT_N, PT_A)), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------

@@ -48,8 +48,8 @@ cheap(restaurant) :~ defaults_to(0.2) if (near_the_city_center(restaurant) is_ov
 cheap(restaurant) :~ defaults_to(0.1) if (restaurant_id(restaurant) equals zalacain).
 cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ]).
 
-rfuzzy_synonym(cheap(restaurant), unexpensive(restaurant), prod, 1).
-rfuzzy_antonym(cheap(restaurant), expensive(restaurant), prod, 1).
+unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
+expensive(restaurant) :~ antonym_of(cheap(restaurant), prod, 1).
 
 rfuzzy_quantifier(special_very/2, TV_In, TV_Out) :-
  	Thershold .=. 0.7,
