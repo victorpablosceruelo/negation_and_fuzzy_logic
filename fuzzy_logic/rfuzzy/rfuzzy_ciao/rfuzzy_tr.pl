@@ -46,20 +46,40 @@ save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2) :-
 	    (	 
 		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_MI_1, Old_MI_2)), !, % Retract last
 		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_MI_1, Old_MI_2)),
-		sets_union([P_T], Old_P_T, New_P_T),
-		sets_union([MI_1], Old_MI_1, New_MI_1),
-		sets_union([MI_2], Old_MI_2, New_MI_2)
+		sets_union_if_non_empty(P_T, Old_P_T, New_P_T),
+		sets_union_if_non_empty(MI_1, Old_MI_1, New_MI_1),
+		sets_union_if_non_empty(MI_2, Old_MI_2, New_MI_2)
 	    )
 	;
 	    (
-		New_P_T = [P_T],
-		New_MI_1 = [MI_1], 
-		New_MI_2 = [MI_2]
+		sets_union_if_non_empty(P_T, [], New_P_T),
+		sets_union_if_non_empty(MI_1, [], New_MI_1),
+		sets_union_if_non_empty(MI_2, [], New_MI_2)
 	    )
 	), 
 	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_MI_1, New_MI_2)),
 	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_MI_1, New_MI_2)),
 	!.
+
+% sets_union_if_non_empty(New_SubSet, Set, New_Set).
+sets_union_if_non_empty(New_SubSet, Set, _New_Set) :- 
+	(
+	    (
+		var(New_SubSet),
+		print_msg('error', 'sets_union_if_non_empty', 'New_SubSet cannot be a variable')
+	    )
+	;
+	    (
+		var(Set),
+		print_msg('error', 'sets_union_if_non_empty', 'Set cannot be a variable')
+	    )
+	),
+	!, fail.
+
+sets_union_if_non_empty([], Set, Set) :- !.
+sets_union_if_non_empty(New_SubSet, [], [New_SubSet]) :- !.
+sets_union_if_non_empty(New_SubSet, Set, New_Set) :- 
+	sets_union([New_SubSet], Set, New_Set), !.
 
 retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	print_msg('debug', 'retrieve_predicate_info(P_N, P_A, P_T, Show_Error)', retrieve_predicate_info(P_N, P_A, P_T, Show_Error)),
