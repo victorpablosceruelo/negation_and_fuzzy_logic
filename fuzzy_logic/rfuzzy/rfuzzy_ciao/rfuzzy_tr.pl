@@ -97,7 +97,7 @@ retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
 	findall((predicate_definition(P_N, P_A, P_T, MI)), 
 	predicate_definition(P_N, P_A, P_T, MI), Retrieved), !.
-%	(retract_fact(predicate_definition(P_N, P_A, P_T, MI_1, MI_2))), Retrieved),
+%	(retract_fact(predicate_definition(P_N, P_A, P_T, MI))), Retrieved),
 %	 !.
 
 % ------------------------------------------------------
@@ -346,7 +346,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 	Translation = (Aggregator :- Code),
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, IsNew)
+	% save_predicate_definition(P_N, P_A, P_T, MI)
 	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, []),
 	!.
 
@@ -849,7 +849,7 @@ save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) 
 		      ),
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
+	% save_predicate_definition(P_N, P_A, P_T, MI)
 	save_predicate_definition(P_N, P_A, P_T, []), !,
 
 	save_rfuzzy_quantifiers_list(More, Translations).
@@ -1091,8 +1091,8 @@ build_auxiliary_clauses([], [end_of_file]) :- !.
 build_auxiliary_clauses([Predicate_Def|Predicate_Defs], Cls) :-
 	print_msg_nl('debug'),
 	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
-	Predicate_Def = predicate_definition(P_N, P_A, _P_T, _MI_1, MI_2),
-	build_auxiliary_clauses_aux(MI_2, P_N, P_A, Cls_1), !,
+	Predicate_Def = predicate_definition(P_N, P_A, _P_T, MI),
+	build_auxiliary_clauses_aux(MI, P_N, P_A, Cls_1), !,
 	print_msg('debug', 'build_auxiliary_clauses OUT (Cls_1)', Cls_1),
 	build_auxiliary_clauses(Predicate_Defs, Cls_2),
 	append_local(Cls_1, Cls_2, Cls).
@@ -1102,8 +1102,8 @@ build_auxiliary_clauses([Predicate_Def|Predicate_Defs], Cls) :-
 % ------------------------------------------------------
 
 build_auxiliary_clauses_aux([], _P_N, _P_A, []) :- !.
-build_auxiliary_clauses_aux([Selector | MI_2], P_N, P_A, [Cl | Cls]) :-
-	build_auxiliary_clauses_aux(MI_2, P_N, P_A, Cls),
+build_auxiliary_clauses_aux([Selector | MI], P_N, P_A, [Cl | Cls]) :-
+	build_auxiliary_clauses_aux(MI, P_N, P_A, Cls),
 
 	Selector = (Aux_P_N, Aux_P_A),
 	functor(Pred_Functor, P_N, P_A),
@@ -1133,11 +1133,11 @@ generate_introspection_predicate([Input|Input_List], List_In, List_Out) :-
 
 % INFO: predicate_definition(P_N, P_A, P_T, New_MI_1, New_Needs_Head_Building)
 
-generate_introspection_predicate_real(predicate_definition(P_N, P_A, P_T, MI_1_List, _NHB), Cl) :-
+generate_introspection_predicate_real(predicate_definition(P_N, P_A, P_T, MI_List, _NHB), Cl) :-
 	nonvar(P_N), nonvar(P_A), nonvar(P_T), 
 	P_A = 2,
 	memberchk_local([_Whatever, 'rfuzzy_enum_type'], P_T),
-	MI_1_List = [('rfuzzy_enum_type', P_N, P_A)], !,
+	MI_List = [('rfuzzy_enum_type', P_N, P_A)], !,
 
 	functor(Pred_Functor, P_N, P_A),
 	arg(2, Pred_Functor, Enum_Value),
@@ -1236,8 +1236,8 @@ code_for_rfuzzy_compute_1(In, Out) :-
 generate_subcalls_for_rfuzzy_computed_similarity_between([], In, [Code | In]) :- !,
 	Code = (rfuzzy_computed_similarity_between(_Database, _Elt1, _Elt2, _TV, _Cred_Op, _Cred) :- fail).
 generate_subcalls_for_rfuzzy_computed_similarity_between([Element | List], In, Out) :- 
-	Element = (predicate_definition(P_N, P_A, _P_T, MI_1, _MI_2)), !,
-	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(MI_1, P_N, P_A, In, Aux),
+	Element = (predicate_definition(P_N, P_A, _P_T, MI)), !,
+	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(MI, P_N, P_A, In, Aux),
 	generate_subcalls_for_rfuzzy_computed_similarity_between(List, Aux, Out).
 
 generate_subcalls_for_rfuzzy_computed_similarity_between_aux([], _P_N, _P_A, In, In) :- !.
