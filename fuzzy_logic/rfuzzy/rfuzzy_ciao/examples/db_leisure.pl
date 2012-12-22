@@ -59,10 +59,10 @@ rfuzzy_quantifier(special_very/2, TV_In, TV_Out) :-
 
 tempting_restaurant(restaurant) :~ defaults_to( 0.1).
 tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(special_very(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
-tempting_restaurant(restaurant) :~ near_the_city_center(restaurant) with_cred (min, 0.5) .
+tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_credibility (min, 0.5) .
 
 % More tests (maybe not needed in this DB).
-not_very_expensive(restaurant) :~ fnot(very(expensive(restaurant))).
+not_very_expensive(restaurant) :~ rule(fnot(very(expensive(restaurant)))).
 
 rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
 	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).

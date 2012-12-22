@@ -432,6 +432,16 @@ translate_fuzzy(Pred_Info, Cls) :-
 		Cl_Body_Prio = 0.4
 	    )	
 	;
+	    (   % Fuzzy Rule (without truth values aggregator) 
+		P_B_Name = 'rule', P_B_Arity = 1,
+		Rule_Op = 'prod',
+		arg(1, P_B, Rule_Body),
+		test_aggregator_is_defined(Rule_Op, 'yes'),
+		translate_rfuzzy_rule_body(Rule_Body, Rule_Op, NP_Arg_Input, P_TN, Cl_Body_TV, Cl_Body),
+		Cl_Body_Prio = 0.4
+	    )	
+	;
+
 	    (   % Fuzzy Default
 		P_B_Name = 'defaults_to', P_B_Arity = 1,
 		arg(1, P_B, Fixed_Truth_Value),
