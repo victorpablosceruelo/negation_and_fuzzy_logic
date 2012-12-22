@@ -196,13 +196,12 @@ print_list_info(Level, [Arg | Args]) :- !,
 % We need to evaluate the whole program at the same time.
 % Note that eat_2 uses info supplied by eat_1 and 
 % eat_3 uses info supplied by eat_1 and eat_2.	
-rfuzzy_trans_sent_aux(end_of_file, Fuzzy_Rules_3):-
+rfuzzy_trans_sent_aux(end_of_file, Code_Before_EOF_with_EOF):-
 	!,
 	retrieve_all_predicate_infos(_Any_P_N, _Any_P_A, All_Predicate_Infos),
 	print_msg('debug', 'all_predicate_info', All_Predicate_Infos),
-	build_auxiliary_clauses(All_Predicate_Infos, Fuzzy_Rules_1),
-	generate_introspection_predicate(All_Predicate_Infos, Fuzzy_Rules_1, Fuzzy_Rules_2),
-	add_auxiliar_code(Fuzzy_Rules_2, Fuzzy_Rules_3), 
+	generate_code_from_saved_info(All_Predicate_Infos, Generated_Code),
+	add_auxiliar_code(Generated_Code, Code_Before_EOF_with_EOF), 
 	clean_up_asserted_facts.
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
@@ -1087,25 +1086,32 @@ add_preffix_to_name(Input, Preffix, Output) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_auxiliary_clauses([], [end_of_file]) :- !.
-build_auxiliary_clauses([Predicate_Def|Predicate_Defs], Cls) :-
-	print_msg_nl('debug'),
-	print_msg('debug', 'build_auxiliary_clauses IN (Predicate_Def)', (Predicate_Def)),
-	Predicate_Def = predicate_definition(P_N, P_A, _P_T, MI),
-	build_auxiliary_clauses_aux(MI, P_N, P_A, Cls_1), !,
-	print_msg('debug', 'build_auxiliary_clauses OUT (Cls_1)', Cls_1),
-	build_auxiliary_clauses(Predicate_Defs, Cls_2),
-	append_local(Cls_1, Cls_2, Cls).
+generate_code_from_saved_info([], [end_of_file]) :- !.
+generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :-
+	Predicate_Def = predicate_definition(P_N, P_A, P_T, MI), !,
+	generate_code_main(P_N, P_A, P_T, MI, Generated_Code_1),
+	generate_code_from_saved_info(Predicate_Defs, Generated_Code_2),
+	append_local(Generated_Code_1, Generated_Code_2, Generated_Code).
 
+generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :- !,
+	print_msg('error', 'generate_code_from_saved_info :: cannot parse', Predicate_Def),
+	generate_code_from_saved_info(Predicate_Defs, Generated_Code).
+
+generate_code_main(P_N, P_A, P_T, MI, Generated_Code) :-
+	build_auxiliary_clause(MI, P_N, P_A, [], Cls_1), 
+	build_similarity_clause(MI, P_N, P_A, Cls_1, Cls_2),
+	build_introspection_clause(P_N, P_A, P_T, MI, Cls_2, Generated_Code).
+ 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_auxiliary_clauses_aux([], _P_N, _P_A, []) :- !.
-build_auxiliary_clauses_aux([Selector | MI], P_N, P_A, [Cl | Cls]) :-
-	build_auxiliary_clauses_aux(MI, P_N, P_A, Cls),
-
-	Selector = (Aux_P_N, Aux_P_A),
+build_auxiliary_clause([], _P_N, _P_A, Cls_In, Cls_In) :- !.
+build_auxiliary_clause([(Selector, _Details) | MI], P_N, P_A, Cls_In, Cls_Out) :-
+	nonvar(Selector), Selector \== 'fuzzy_rule', 
+	build_auxiliary_clause(MI, P_N, P_A, Cls_In, Cls_Out).
+build_auxiliary_clause([('fuzzy_rule', Details) | _MI], P_N, P_A, Cls_In, [Cl | Cls_In]) :-
+	Details = (Aux_P_N, Aux_P_A),
 	functor(Pred_Functor, P_N, P_A),
 	functor(Aux_Pred_Functor, Aux_P_N, Aux_P_A),
 	Tmp_P_A is P_A - 1,
@@ -1126,18 +1132,11 @@ build_auxiliary_clauses_aux([Selector | MI], P_N, P_A, [Cl | Cls]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_introspection_predicate([], List_In, List_In) :- !.
-generate_introspection_predicate([Input|Input_List], List_In, List_Out) :-
-	generate_introspection_predicate_real(Input, Output),
-	generate_introspection_predicate(Input_List,  [Output | List_In], List_Out).
-
-% INFO: predicate_definition(P_N, P_A, P_T, New_MI_1, New_Needs_Head_Building)
-
-generate_introspection_predicate_real(predicate_definition(P_N, P_A, P_T, MI_List, _NHB), Cl) :-
+build_introspection_clause(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
 	nonvar(P_N), nonvar(P_A), nonvar(P_T), 
 	P_A = 2,
 	memberchk_local([_Whatever, 'rfuzzy_enum_type'], P_T),
-	MI_List = [('rfuzzy_enum_type', P_N, P_A)], !,
+	MI = [('rfuzzy_enum_type', P_N, P_A)], !,
 
 	functor(Pred_Functor, P_N, P_A),
 	arg(2, Pred_Functor, Enum_Value),
@@ -1145,8 +1144,8 @@ generate_introspection_predicate_real(predicate_definition(P_N, P_A, P_T, MI_Lis
 	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
 	Cl = (rfuzzy_introspection(P_N, P_A, P_T, New_Enum_Values_List) :- Generator).
 
-generate_introspection_predicate_real(predicate_definition(P_N, P_A, P_T, Pred_MI_1_List, _NHB), Cl) :-
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, Pred_MI_1_List)).
+build_introspection_clause(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, MI)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
