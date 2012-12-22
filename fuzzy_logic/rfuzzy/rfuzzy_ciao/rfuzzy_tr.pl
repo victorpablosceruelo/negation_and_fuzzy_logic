@@ -7,7 +7,7 @@
 :- include(library('rfuzzy/rfuzzy_ops')).
 
 % Important info to be saved.
-:- data predicate_definition/5.
+:- data predicate_definition/4.
 :- data aggregators/1.
 :- data sentences/2.
 :- data defined_quantifiers_code/1.
@@ -17,7 +17,7 @@
 % ------------------------------------------------------
 
 clean_up_asserted_facts :-
-	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14, _15)), _Removed_1),
+	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14)), _Removed_1),
 	findall('done', retract_fact(aggregators(_21)), _Removed_2),
 	findall('done', retract_fact(sentences(_31, _32)), _Removed_3),
 	findall('done', retract_fact(defined_quantifiers_code(_41)), _Removed_4),
@@ -33,39 +33,37 @@ get_auxiliar_suffix('rfuzzy_aux').
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_predicates_definition_list([], _P_A, _P_T, _MI_1) :- !.
-save_predicates_definition_list([P_N | Pred_List], P_A, P_T, MI_1) :-
-	save_predicate_definition(P_N, P_A, P_T, MI_1, []), !,
-	save_predicates_definition_list(Pred_List, P_A, P_T, MI_1).
+save_predicates_definition_list([], _P_A, _P_T, _MI) :- !.
+save_predicates_definition_list([P_N | Pred_List], P_A, P_T, MI) :-
+	save_predicate_definition(P_N, P_A, P_T, MI), !,
+	save_predicates_definition_list(Pred_List, P_A, P_T, MI).
 
-save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2) :-
-	print_msg('debug', 'save_predicate_definition(P_N, P_A, P_T, MI_1)', (P_N, P_A, P_T, MI_1)),
-	check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2),
+save_predicate_definition(P_N, P_A, P_T, MI) :-
+	print_msg('debug', 'save_predicate_definition(P_N, P_A, P_T, MI)', (P_N, P_A, P_T, MI)),
+	check_save_predicate_definition_input(P_N, P_A, P_T),
 	print_msg('debug', 'check_save_predicate_definition_input', 'ok'),
 	(
 	    (	 
-		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_MI_1, Old_MI_2)), !, % Retract last
-		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_MI_1, Old_MI_2)),
-		sets_union_if_non_empty(P_T, Old_P_T, New_P_T),
-		sets_union_if_non_empty(MI_1, Old_MI_1, New_MI_1),
-		sets_union_if_non_empty(MI_2, Old_MI_2, New_MI_2)
+		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_MI)), !, % Retract last
+		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_MI)),
+		add_element_to_set_if_any(P_T, Old_P_T, New_P_T),
+		add_element_to_set_if_any(MI, Old_MI, New_MI)
 	    )
 	;
 	    (
-		sets_union_if_non_empty(P_T, [], New_P_T),
-		sets_union_if_non_empty(MI_1, [], New_MI_1),
-		sets_union_if_non_empty(MI_2, [], New_MI_2)
+		add_element_to_set_if_any(P_T, [], New_P_T),
+		add_element_to_set_if_any(MI, [], New_MI)
 	    )
 	), 
-	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_MI_1, New_MI_2)),
-	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_MI_1, New_MI_2)),
+	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_MI)),
+	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_MI)),
 	!.
 
 % sets_union_if_non_empty(New_SubSet, Set, New_Set).
-sets_union_if_non_empty(New_SubSet, Set, _New_Set) :- 
+add_element_to_set_if_any(Element, Set, _New_Set) :- 
 	(
 	    (
-		var(New_SubSet),
+		var(Element),
 		print_msg('error', 'sets_union_if_non_empty', 'New_SubSet cannot be a variable')
 	    )
 	;
@@ -76,16 +74,15 @@ sets_union_if_non_empty(New_SubSet, Set, _New_Set) :-
 	),
 	!, fail.
 
-sets_union_if_non_empty([], Set, Set) :- !.
-sets_union_if_non_empty(New_SubSet, [], [New_SubSet]) :- !.
-sets_union_if_non_empty(New_SubSet, Set, New_Set) :- 
-	sets_union([New_SubSet], Set, New_Set), !.
+add_element_to_set_if_any([], Set, Set) :- !.
+add_element_to_set_if_any(Element, Set, New_Set) :- 
+	sets_union([Element], Set, New_Set), !.
 
 retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	print_msg('debug', 'retrieve_predicate_info(P_N, P_A, P_T, Show_Error)', retrieve_predicate_info(P_N, P_A, P_T, Show_Error)),
 	(
-	    (   predicate_definition(P_N, P_A, P_T, MI_1, MI_2), !,
-		print_msg('debug', 'retrieved', retrieve_predicate_info(P_N, P_A, P_T, MI_1, MI_2))   
+	    (   predicate_definition(P_N, P_A, P_T, MI), !,
+		print_msg('debug', 'retrieved', retrieve_predicate_info(P_N, P_A, P_T, MI))   
 	    )
 	;
 	    (   Show_Error = 'no', !, 
@@ -98,8 +95,8 @@ retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	).
 
 retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
-	findall((predicate_definition(P_N, P_A, P_T, MI_1, MI_2)), 
-	predicate_definition(P_N, P_A, P_T, MI_1, MI_2), Retrieved), !.
+	findall((predicate_definition(P_N, P_A, P_T, MI)), 
+	predicate_definition(P_N, P_A, P_T, MI), Retrieved), !.
 %	(retract_fact(predicate_definition(P_N, P_A, P_T, MI_1, MI_2))), Retrieved),
 %	 !.
 
@@ -107,8 +104,8 @@ retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 	
-check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
-	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T, MI_1)', (P_N, P_A, P_T, MI_1)),
+check_save_predicate_definition_input(P_N, P_A, P_T) :-
+	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T)', (P_N, P_A, P_T)),
 	( 
 	    (	nonvar(P_N), !    )
 	;
@@ -127,10 +124,17 @@ check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
 		print_msg('error', 'save_predicate_definition: P_A cannot be a variable. Value', P_A), !, fail
 	    )
 	),
-	check_save_predicate_definition_input_aux(MI_1, 'Not a valid value for MI_1. Value'), 
-	check_save_predicate_definition_input_aux(MI_2, 'Not a valid value for MI_2. Value'), 
-	check_save_predicate_definition_input_aux(P_T, 'Not a valid value for P_T. Value'), 
-
+	(
+	    (	var(P_T),
+		print_msg('error', 'save_predicate_definition: P_T cannot be a variable. Value', P_T), !, fail
+	    )
+	;
+	    (	nonvar(P_T), list(P_T), !   )
+	;
+	    (	nonvar(P_T),
+		print_msg('error', 'save_predicate_definition: P_T must be a list. Value', P_T), !, fail
+	    )
+	), 
 	(
 	    print_msg('debug', 'check_pred_type_aux(P_A, P_T)', (P_A, P_T)),
 	    check_pred_type_aux(P_A, P_T), !
@@ -141,21 +145,8 @@ check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
 	    )
 	), !.
 
-check_save_predicate_definition_input(P_N, P_A, P_T, MI_1, MI_2) :-
-	print_msg('debug', (P_N, P_A, P_T, MI_1, MI_2), (P_N, P_A, P_T, MI_1, MI_2)), !, fail.
-
-check_save_predicate_definition_input_aux(Variable, Error_Msg) :-
-	(
-	    (	var(Variable),
-		print_msg('error', Error_Msg, Variable), !, fail
-	    )
-	;
-	    (	nonvar(Variable), list(Variable)   )
-	;
-	    (	nonvar(Variable),
-		print_msg('error', Error_Msg, Variable), !, fail
-	    )
-	), !.
+check_save_predicate_definition_input(P_N, P_A, P_T) :-
+	print_msg('debug', 'check_save_predicate_definition_input :: (P_N, P_A, P_T)', (P_N, P_A, P_T)), !, fail.
 
 check_pred_type_aux(0, []) :- !.
 check_pred_type_aux(1, [_P_T]) :- !.
@@ -219,27 +210,27 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, IsNew)
-	save_predicate_definition('rfuzzy_any_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_truth_value_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_credibility_value_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_predicate_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_number_type', 1, ['null'], [], []),
-	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], [], []),
+	% save_predicate_definition(P_N, P_A, P_T, MI)
+	save_predicate_definition('rfuzzy_any_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_truth_value_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_credibility_value_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_predicate_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_number_type', 1, ['null'], []),
+	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], []),
 
-	save_predicate_definition('rfuzzy_string_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_integer_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_float_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_enum_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_boolean_type', 1, ['null'], [], []),
-	save_predicate_definition('rfuzzy_datetime_type', 1, ['null'], [], []),
+	save_predicate_definition('rfuzzy_string_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_integer_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_float_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_enum_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_boolean_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_datetime_type', 1, ['null'], []),
 
 	rfuzzy_defined_aggregators(Defined_Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
 	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, []),
 	
 	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
-	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], Compute_Defined_Operators, []),
+	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], Compute_Defined_Operators),
 
 	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
 	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
@@ -356,7 +347,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
 	% save_predicate_definition(P_N, P_A, P_T, MI_1, IsNew)
-	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, [], []),
+	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, []),
 	!.
 
 translate((rfuzzy_quantifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
@@ -405,8 +396,8 @@ translate(Other, Other) :-
 	    )
 	),
 	generate_fake_type(P_A, P_T),
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, P_A, P_T, [], []).
+	% save_predicate_definition(P_N, P_A, P_T, MI)
+	save_predicate_definition(P_N, P_A, P_T, []).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -497,7 +488,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 	Cls = [(NP_F :- SubCl_TypeTest, Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio)],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
-	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], [], [(NP_N, NP_A)]),
+	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], ('fuzzy_rule', (NP_N, NP_A))),
 	print_msg('debug', 'translate_fuzzy ', ' ').
 
 % ------------------------------------------------------
@@ -715,7 +706,7 @@ generate_assign_truth_value_subgoal(Fixed_Truth_Value, Truth_Value, Assign_Truth
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, P_MI_1, [Cl]) :-
+translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, P_MI, [Cl]) :-
 	nonvar(P_N), nonvar(P_A), number(P_A), nonvar(P_T),
 	print_msg('debug', 'rfuzzy_type_for :: (P_N, P_A, P_T)', (P_N, P_A, P_T)),
 	
@@ -731,8 +722,8 @@ translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, P_MI_1, [Cl]) :-
 	    )
 	;
 	    (   % Define it or redefine it (Include the new type definition)
-		% save_predicate_definition(P_N, P_A, P_T, P_MI_1, P_MI_2)
-		save_predicate_definition(P_N, P_A, P_T, P_MI_1, [])
+		% save_predicate_definition(P_N, P_A, P_T, P_MI)
+		save_predicate_definition(P_N, P_A, P_T, P_MI)
 	    )
 	), !.
 
@@ -790,8 +781,8 @@ translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conver
 	arg(1, DBF_F, Input),
 	arg(2, DBF_F, Truth_Value),
 	functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Truth_Value),
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], [], []).
+	% save_predicate_definition(P_N, P_A, P_T, MI)
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
 
 translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
 	(
@@ -805,8 +796,8 @@ translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conver
 	arg(1, DBF_F, Input), 
 	arg(2, DBF_F, Value),
 	Conversion = 'true',
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], [], []).
+	% save_predicate_definition(P_N, P_A, P_T, MI)
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
 
 translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
 	Type = 'rfuzzy_float_type', !, 
@@ -816,14 +807,14 @@ translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conver
 	functor(Conversion, '.=.', 2), 
 	arg(1, Conversion, Value), 
 	arg(2, Conversion, Value_Out),
-	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], [], []).
+	% save_predicate_definition(P_N, P_A, P_T, MI)
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
+% translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, []).
 translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
 	nonvar(Database), nonvar(Element1), nonvar(Element2), nonvar(Truth_Value), nonvar(Credibility_Operator), nonvar(Credibility),
 	Real_P_N = 'rfuzzy_computed_similarity_between',
@@ -836,7 +827,7 @@ translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, C
 	arg(5, Translation, Credibility),
 	
 	Real_P_T = ['rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_truth_value_type', 'rfuzzy_predicate_type', 'rfuzzy_credibility_value_type'],
-	save_predicate_definition(Real_P_N, 6, Real_P_T, [(Database, P_N, 5)], []).
+	save_predicate_definition(Real_P_N, 6, Real_P_T, ('rfuzzy_similarity_clause', Translation)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -859,7 +850,7 @@ save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) 
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
 	% save_predicate_definition(P_N, P_A, P_T, MI_1, MI_2)
-	save_predicate_definition(P_N, P_A, P_T, [], []), !,
+	save_predicate_definition(P_N, P_A, P_T, []), !,
 
 	save_rfuzzy_quantifiers_list(More, Translations).
 
