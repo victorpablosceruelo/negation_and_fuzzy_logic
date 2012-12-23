@@ -755,7 +755,8 @@ save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(Field_Type, 1, _P_T, Show_Error), !,
 
-	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], ('db_field', (Field_Name, Field_Type, DB_P_N, DB_P_A, Index))).
+	MI = ('rfuzzy_db_field', (Field_Name, Field_Type, DB_P_N, DB_P_A, Index)),
+	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], MI).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1034,21 +1035,20 @@ add_preffix_to_name(Input, Preffix, Output) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_code_from_saved_info([], [end_of_file]) :- !.
-generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :-
+generate_code_from_saved_info([], [], [end_of_file]) :- !.
+generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_Out, Cls_2_Out) :-
 	Predicate_Def = predicate_definition(P_N, P_A, P_T, MI), !,
-	generate_code_main(P_N, P_A, P_T, MI, Generated_Code_1),
-	generate_code_from_saved_info(Predicate_Defs, Generated_Code_2),
+	generate_code_main(P_N, P_A, P_T, MI, Cls_1_Aux, Cls_2_Aux),
+	generate_code_from_saved_info(Predicate_Defs, Cls_1_In, Cls_2_2),
 	append_local(Generated_Code_1, Generated_Code_2, Generated_Code).
 
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :- !,
 	print_msg('error', 'generate_code_from_saved_info :: cannot parse', Predicate_Def),
 	generate_code_from_saved_info(Predicate_Defs, Generated_Code).
 
-generate_code_main(P_N, P_A, P_T, MI_In, Generated_Code) :-
-	generate_code_from_MIs(MI, P_N, P_A, P_T, [], [], Cls, PI_Body_List),
-	generate_enum_type_values_extractor(P_N, P_A, P_T, [], [], Cls),
-	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls, Generated_Code).
+generate_code_main(P_N, P_A, P_T, MI_In, Cls_1, Cls_2) :-
+	generate_code_from_MIs(MI, P_N, P_A, P_T, [], [], Cls_1, PI_Body_List),
+	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_2).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1097,9 +1097,9 @@ generate_code_from_MIs([(Selector, Details) | MI], P_N, P_A, P_T, History_In, Cl
 	    )
 	;
 	    (
-		Selector = 'rfuzzy_compute_enum_type_values', !,
-		History_Out = History_In,
-		PI_Body_List_Out = [ Details | PI_Body_List_In ]
+		Selector = 'rfuzzy_db_field', !,
+		build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, Cls_Aux, PI_Body_List_In, PI_Body_List_Out)
+		History_Out = History_In
 	    )
 	;
 	    (
@@ -1134,7 +1134,7 @@ build_similarity_clause(_P_N, _P_A, _P_T, Details, Cls_In, [Details | Cls_In]) :
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-
+build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, Cls_Aux, PI_Body_List_In, PI_Body_List_Out) :-
 	print_msg('debug', 'translate_field_description_for(Field_Type_2, DB_P_N, DB_P_A, Index)', (Field_Type_2, DB_P_N, DB_P_A, Index)),
 
 	functor(DB_Pred_Functor, DB_P_N, DB_P_A),
