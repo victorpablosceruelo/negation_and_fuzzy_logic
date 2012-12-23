@@ -734,26 +734,22 @@ translate_rfuzzy_define_database(P_N, P_A, Description, Cls) :-
 	print_msg('debug', 'rfuzzy_define_database(P_N/P_A, Description)', (P_N/P_A, Description)),
 	nonvar(P_N), nonvar(P_A), nonvar(Description),
 	print_msg('debug', 'rfuzzy_define_database :: translate_db_description(Description)', (Description)),
-	translate_db_description(Description, 1, P_N, P_A, P_T, Cls_1, Fields_Names),
+	translate_db_description(Description, 1, P_N, P_A, P_T, Fields_Names),
 	print_msg('debug', 'rfuzzy_define_database :: translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T)', (P_N, P_A, P_T)),
-	translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, [('database', Fields_Names)], Cls_2),
-	print_msg('debug', 'rfuzzy_define_database :: Cls_1', Cls_1),
-	print_msg('debug', 'rfuzzy_define_database :: Cls_2', Cls_2),
-	append_local(Cls_1, Cls_2, Cls).
+	translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, [('database', Fields_Names)], Cls).
 
 % translate_db_description(Description, Index, DB_P_N, DB_P_A, Types, DB_Fields) 
-translate_db_description([(Field_Name, Field_Type)], Index, DB_P_N, DB_P_A, [Field_Type], Cls, [Field_Name]) :- 
+translate_db_description([(Field_Name, Field_Type)], Index, DB_P_N, DB_P_A, [Field_Type], [Field_Name]) :- 
 	nonvar(Index), nonvar(DB_P_A), Index = DB_P_A, !,
-	translate_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index, Cls).
+	save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index).
 
 translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_P_N, DB_P_A, [Field_Type|Types], Cls, [Field_Name | Field_Names]) :-
 	nonvar(Index), nonvar(DB_P_A), Index < DB_P_A, !,
-	translate_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index, Cls_1),
+	save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index),
 	New_Index is Index + 1,
-	translate_db_description(Description, New_Index, DB_P_N, DB_P_A, Types, Cls_2, Field_Names),
-	append_local(Cls_1, Cls_2, Cls).
+	translate_db_description(Description, New_Index, DB_P_N, DB_P_A, Types, Field_Names).
 
-translate_field_description(Field_Name, Field_Type_2, DB_P_N, DB_P_A, Index, Cls) :-
+save_field_description(Field_Name, Field_Type_2, DB_P_N, DB_P_A, Index) :-
 	nonvar(Field_Name), nonvar(Field_Type_2), nonvar(DB_P_N), nonvar(DB_P_A), nonvar(Index),
 	print_msg('debug', 'translate_field_description_for(Field_Type_2, DB_P_N, DB_P_A, Index)', (Field_Type_2, DB_P_N, DB_P_A, Index)),
 
@@ -787,7 +783,7 @@ translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conver
 	(
 	    Type = 'rfuzzy_string_type' ; 
 	    Type = 'rfuzzy_integer_type' ; 
-	    Type = 'rfuzzy_enum_type' ;
+%	    Type = 'rfuzzy_enum_type' ;
 	    Type = 'rfuzzy_boolean_type' ; 
 	    Type = 'rfuzzy_datetime_type'
 	), !, 
@@ -797,6 +793,35 @@ translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conver
 	Conversion = 'true',
 	% save_predicate_definition(P_N, P_A, P_T, MI)
 	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
+
+translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
+	Type = 'rfuzzy_enum_type' 
+	functor(DBF_F, P_N, 2),
+	arg(1, DBF_F, Input), 
+	arg(2, DBF_F, Value),
+	Conversion = 'true',
+
+	Generator = (DB_P_T, )
+	MI = ('rfuzzy_compute_enum_type_values', Generator),
+	% save_predicate_definition(P_N, P_A, P_T, MI)
+	save_predicate_definition(P_N, 2, [DB_P_T, Type], MI).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+generate_enum_type_values_extractor(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
+	nonvar(P_N), nonvar(P_A), nonvar(P_T), 
+	P_A = 2,
+	memberchk_local([_Whatever, 'rfuzzy_enum_type'], P_T),
+	MI = [('rfuzzy_enum_type', P_N, P_A)], !,
+
+	functor(Pred_Functor, P_N, P_A),
+	arg(2, Pred_Functor, Enum_Value),
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
 
 translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
 	Type = 'rfuzzy_float_type', !, 
@@ -1181,19 +1206,6 @@ build_fuzzy_rule_main_clause(P_N, P_A, _P_T, Details, Cls_In, [Cl | Cls_In]) :-
 	     ), !.
 
 build_similarity_clause(_P_N, _P_A, _P_T, Details, Cls_In, [Details | Cls_In]) :- !.
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-generate_enum_type_values_extractor(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
-	nonvar(P_N), nonvar(P_A), nonvar(P_T), 
-	P_A = 2,
-	memberchk_local([_Whatever, 'rfuzzy_enum_type'], P_T),
-	MI = [('rfuzzy_enum_type', P_N, P_A)], !,
-
-	functor(Pred_Functor, P_N, P_A),
-	arg(2, Pred_Functor, Enum_Value),
 
 % ------------------------------------------------------
 % ------------------------------------------------------
