@@ -1098,19 +1098,51 @@ generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :-
 	generate_code_from_saved_info(Predicate_Defs, Generated_Code).
 
 generate_code_main(P_N, P_A, P_T, MI, Generated_Code) :-
-	build_auxiliary_clause(MI, P_N, P_A, [], Cls_1), 
-	build_similarity_clause(MI, P_N, P_A, Cls_1, Cls_2),
-	build_introspection_clause(P_N, P_A, P_T, MI, Cls_2, Generated_Code).
+	generate_code_from_MIs(MI, P_N, P_A, P_T, [], [], Cls),
+	generate_enum_type_values_extractor(P_N, P_A, P_T, [], [], Cls),
+	build_introspection_clause(P_N, P_A, P_T, MI, Cls, Generated_Code).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+build_introspection_clause(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, MI)).
  
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_auxiliary_clause([], _P_N, _P_A, Cls_In, Cls_In) :- !.
-build_auxiliary_clause([(Selector, _Details) | MI], P_N, P_A, Cls_In, Cls_Out) :-
-	nonvar(Selector), Selector \== 'fuzzy_rule', 
-	build_auxiliary_clause(MI, P_N, P_A, Cls_In, Cls_Out).
-build_auxiliary_clause([('fuzzy_rule', Details) | _MI], P_N, P_A, Cls_In, [Cl | Cls_In]) :-
+generate_code_from_MIs([], _P_N, _P_A, _P_T, _History, Cls_In, Cls_In) :- !.
+generate_code_from_MIs([(Selector, Details) | MI], P_N, P_A, P_T, History_In, Cls_In, Cls_Out) :-
+	nonvar(Selector), 
+	(
+	    (
+		Selector = 'fuzzy_rule', !,
+		(
+		    memberchk_local(Selector, History_In), !,
+		    Cls_Aux = Cls_In,
+		    History_Out = History_In
+		;
+		    build_fuzzy_rule_main_clause(P_N, P_A, P_T, Details, Cls_In, Cls_Aux),
+		    History_Out = [ Selector | History_In ]
+		)
+	    )
+	;
+	    (
+		Selector = 'rfuzzy_similarity_clause',
+		build_similarity_clause(P_N, P_A, P_T, Details, Cls_In, Cls_Aux),
+		History_Out = History_In
+	    )
+	;
+	    (
+		Cls_Aux = Cls_In,
+		History_Out = History_In
+	    )
+	),
+	generate_code_from_MIs(MI, P_N, P_A, P_T, History_Out, Cls_Aux, Cls_Out).
+
+build_fuzzy_rule_main_clause(P_N, P_A, _P_T, Details, Cls_In, [Cl | Cls_In]) :-
 	Details = (Aux_P_N, Aux_P_A),
 	functor(Pred_Functor, P_N, P_A),
 	functor(Aux_Pred_Functor, Aux_P_N, Aux_P_A),
@@ -1128,11 +1160,13 @@ build_auxiliary_clause([('fuzzy_rule', Details) | _MI], P_N, P_A, Cls_In, [Cl | 
 				 )
 	     ), !.
 
+build_similarity_clause(_P_N, _P_A, _P_T, Details, Cls_In, [Details | Cls_In]) :- !.
+
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_introspection_clause(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
+generate_enum_type_values_extractor(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
 	nonvar(P_N), nonvar(P_A), nonvar(P_T), 
 	P_A = 2,
 	memberchk_local([_Whatever, 'rfuzzy_enum_type'], P_T),
@@ -1142,10 +1176,7 @@ build_introspection_clause(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
 	arg(2, Pred_Functor, Enum_Value),
 	Generator= (findall(Enum_Value, Pred_Functor, Enum_Values_List), 
 	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, New_Enum_Values_List) :- Generator).
-
-build_introspection_clause(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, MI)).
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, [('rfuzzy_enum_type_values', New_Enum_Values_List)]) :- Generator).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
