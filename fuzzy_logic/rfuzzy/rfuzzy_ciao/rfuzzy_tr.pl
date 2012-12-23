@@ -749,8 +749,15 @@ translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_P_N
 	New_Index is Index + 1,
 	translate_db_description(Description, New_Index, DB_P_N, DB_P_A, Types, Field_Names).
 
-save_field_description(Field_Name, Field_Type_2, DB_P_N, DB_P_A, Index) :-
+save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
 	nonvar(Field_Name), nonvar(Field_Type_2), nonvar(DB_P_N), nonvar(DB_P_A), nonvar(Index),
+
+	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
+	retrieve_predicate_info(Field_Type, 1, _P_T, Show_Error), !,
+
+	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], ('db_field', (Field_Name, Field_Type, DB_P_N, DB_P_A, Index))).
+
+
 	print_msg('debug', 'translate_field_description_for(Field_Type_2, DB_P_N, DB_P_A, Index)', (Field_Type_2, DB_P_N, DB_P_A, Index)),
 
 	functor(DB_Pred_Functor, DB_P_N, DB_P_A),
