@@ -1,7 +1,7 @@
 :- module(db_leisure,_,[rfuzzy, pkgs_output_debug, clpr]).
 % Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
 % Running time debug can be activated removing the comment marker % at the beginning of the following line.
-:- activate_rfuzzy_debug.
+% :- activate_rfuzzy_debug.
 
 % Define the restaurants database format.
 rfuzzy_define_database(restaurant/7, 
@@ -90,8 +90,8 @@ film('Il buono, il brutto, il cattivo', 1967, 141, adventure, italian, 'Sergio L
 film('Finding Nemo', 2003, 112, comedy, english, 'Andrew Stanton and Lee Unkrich', 'Disney - PIXAR').
 
 
-rfuzzy_fuzzification(modern(film), release_year(film)) :- function([ (1970, 0), (2000, 1), (2010, 1)]).
-rfuzzy_fuzzification(long_duration(film), duration_in_minutes(film)) :- function([ (120, 0), (180, 1), (600, 1)]) .
+modern(film) :~ function(release_year(film), [ (1970, 0), (2000, 1), (2010, 1)]).
+long_duration(film) :~ function(duration_in_minutes(film), [ (120, 0), (180, 1), (600, 1)]) .
 
 % similarity over genres
 % rfuzzy_similarity_between(film, genre(drama), genre(drama), 1).
