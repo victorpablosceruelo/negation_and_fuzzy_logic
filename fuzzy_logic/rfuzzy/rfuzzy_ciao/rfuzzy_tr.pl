@@ -744,17 +744,17 @@ translate_db_description([(Field_Name, Field_Type)], Index, DB_P_N, DB_P_A, [Fie
 	nonvar(Index), nonvar(DB_P_A), Index = DB_P_A, !,
 	save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index).
 
-translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_P_N, DB_P_A, [Field_Type|Types], Cls, [Field_Name | Field_Names]) :-
+translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_P_N, DB_P_A, [Field_Type|Types], [Field_Name | Field_Names]) :-
 	nonvar(Index), nonvar(DB_P_A), Index < DB_P_A, !,
 	save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index),
 	New_Index is Index + 1,
 	translate_db_description(Description, New_Index, DB_P_N, DB_P_A, Types, Field_Names).
 
 save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
-	nonvar(Field_Name), nonvar(Field_Type_2), nonvar(DB_P_N), nonvar(DB_P_A), nonvar(Index),
+	nonvar(Field_Name), nonvar(Field_Type), nonvar(DB_P_N), nonvar(DB_P_A), nonvar(Index),
 
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
-	retrieve_predicate_info(Field_Type, 1, _P_T, Show_Error), !,
+	retrieve_predicate_info(Field_Type, 1, _P_T, 'true'), !,
 
 	MI = ('rfuzzy_db_field', (Field_Name, Field_Type, DB_P_N, DB_P_A, Index)),
 	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], MI).
@@ -1042,11 +1042,11 @@ generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Ou
 	generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_Aux, Cls_1_Out, Cls_2_Aux, Cls_2_Out).
 
-generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :- !,
+generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :- !,
 	print_msg('error', 'generate_code_from_saved_info :: cannot parse', Predicate_Def),
-	generate_code_from_saved_info(Predicate_Defs, Generated_Code).
+	generate_code_from_saved_info(Predicate_Defs, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out).
 
-generate_code_main(P_N, P_A, P_T, MI_In, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
+generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
 	generate_code_from_MIs(MI, P_N, P_A, P_T, [], Cls_1_In, Cls_1_Out, PI_Body_List),
 	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_2_In, Cls_2_Out).
 
@@ -1057,15 +1057,15 @@ generate_code_main(P_N, P_A, P_T, MI_In, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Ou
 build_introspection_clause(P_N, P_A, P_T, MI, [], Cls_In, [Cl | Cls_In]) :- !,
 	Cl = (rfuzzy_introspection(P_N, P_A, P_T, MI)).
 build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_In, [Cl | Cls_In]) :-
-	list_to_disjunction(PI_Body_List, PI_Body, Type),
+	list_to_disjunction(PI_Body_List, PI_Body, Type_Var, Enum_Value_Var),
 
-	Generator = (findall((Type, Enum_Value), PI_Body, Enum_Values_List), 
+	Generator = (findall((Type_Var, Enum_Value_Var), PI_Body, Enum_Values_List), 
 	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, [('rfuzzy_enum_type_values', New_Enum_Values_List)]) :- Generator).
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, [('rfuzzy_enum_type_values', New_Enum_Values_List) | MI]) :- Generator).
 	
-list_to_disjunction([], 'false', _Type) :- !.
-list_to_disjunction([(Type, Body) | PI_Body_List], (Body ; PI_Body), Type) :-
-	list_to_disjunction(PI_Body_List, PI_Body, Type), !.
+list_to_disjunction([], 'false', _Type_Var, _Enum_Value_Var) :- !.
+list_to_disjunction([(Type_Var, Enum_Value_Var, Body) | PI_Body_List], (Body ; PI_Body), Type_Var, Enum_Value_Var) :-
+	list_to_disjunction(PI_Body_List, PI_Body, Type_Var, Enum_Value_Var), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1098,7 +1098,7 @@ generate_code_from_MIs([(Selector, Details) | MI], P_N, P_A, P_T, History_In, Cl
 	;
 	    (
 		Selector = 'rfuzzy_db_field', !,
-		build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, Cls_Aux, PI_Body_List_In, PI_Body_List_Out)
+		build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, Cls_Aux, PI_Body_List_In, PI_Body_List_Out),
 		History_Out = History_In
 	    )
 	;
@@ -1134,74 +1134,58 @@ build_similarity_clause(_P_N, _P_A, _P_T, Details, Cls_In, [Details | Cls_In]) :
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, Cls_Aux, PI_Body_List_In, PI_Body_List_Out) :-
-	print_msg('debug', 'translate_field_description_for(Field_Type_2, DB_P_N, DB_P_A, Index)', (Field_Type_2, DB_P_N, DB_P_A, Index)),
-
-	functor(DB_Pred_Functor, DB_P_N, DB_P_A),
-	arg(Index, DB_Pred_Functor, Value),
-	functor(Mapping, '=', 2), arg(1, Mapping, Input), arg(2, Mapping, DB_Pred_Functor),
-	functor(Test, '\\==', 2), arg(1, Test, Value), arg(2, Test, 'null'),
-
-	P_T = [DB_P_N, Field_Type_2],
-	print_msg('debug', 'translate_field_description_for(Field_Name, P_T)', (P_N, P_T)),
-	(   % DBF_F is DataBase Field Functor.
-	    (	translate_field_description_aux(P_T, Field_Name, Input, Value, DBF_F, Conversion), !    )
-	;
-	    (	print_msg('error', 'Error translating db definition for (P_N, P_T)', (P_N, P_T)), !, fail    )
-	),
-	
-	Cls = [(DBF_F :- (((Mapping, DBF_F), Test), Conversion))],
-	print_msg('debug', 'translate_field_description_for(P_N, Cls)', (P_N, Cls)).
-
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
-	
-	Type = 'rfuzzy_truth_value_type', !, 
-	functor(DBF_F, P_N, 2),
-	arg(1, DBF_F, Input),
-	arg(2, DBF_F, Truth_Value),
-	functor(Conversion, '.=.', 2), arg(1, Conversion, Value), arg(2, Conversion, Truth_Value),
-	% save_predicate_definition(P_N, P_A, P_T, MI)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
-
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
-	(
-	    Type = 'rfuzzy_string_type' ; 
-	    Type = 'rfuzzy_integer_type' ; 
-%	    Type = 'rfuzzy_enum_type' ;
-	    Type = 'rfuzzy_boolean_type' ; 
-	    Type = 'rfuzzy_datetime_type'
-	), !, 
-	functor(DBF_F, P_N, 2),
-	arg(1, DBF_F, Input), 
-	arg(2, DBF_F, Value),
-	Conversion = 'true',
-	% save_predicate_definition(P_N, P_A, P_T, MI)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
-
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
-	Type = 'rfuzzy_enum_type' 
-	functor(DBF_F, P_N, 2),
-	arg(1, DBF_F, Input), 
-	arg(2, DBF_F, Value),
-	Conversion = 'true',
-
-	Generator = (DB_P_T, )
-	MI = ('rfuzzy_compute_enum_type_values', Generator),
-	% save_predicate_definition(P_N, P_A, P_T, MI)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], MI).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
-generate_enum_type_values_extractor(P_N, P_A, P_T, MI, Cls_In, [Cl | Cls_In]) :-
-	nonvar(P_N), nonvar(P_A), nonvar(P_T), 
+build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, [Cl | Cls_In], PI_Body_List_In, PI_Body_List_Out) :-
+	print_msg('debug', 'build_db_field_cls_and_retrievers :: (P_N, P_A, P_T, Details)', (P_N, P_A, P_T, Details)),
 	P_A = 2,
-	memberchk_local([_Whatever, 'rfuzzy_enum_type'], P_T),
-	MI = [('rfuzzy_enum_type', P_N, P_A)], !,
+	Details = (Field_Name, Field_Type, DB_P_N, DB_P_A, Index),
+	P_N = Field_Name,
 
-	functor(Pred_Functor, P_N, P_A),
-	arg(2, Pred_Functor, Enum_Value),
+	functor(Field_Functor, P_N, P_A),
+	arg(1, Field_Functor, Input_Value),
+	arg(1, Field_Functor, Output_Value),
+
+	functor(DB_P_F, DB_P_N, DB_P_A),
+	arg(Index, DB_P_F, DB_Value),
+
+	Mapping = (Input_Value = DB_P_F),
+	Test_Valid_Value = (DB_Value \== 'null'),
+	generate_db_value_conversor(Field_Type, DB_Value, Output_Value, Conversion),
+	Cl = (Field_Functor :- (((Mapping, DB_P_F), Test_Valid_Value), Conversion)),
+
+	generate_pl_body_when_enum_type(Field_Type, DB_P_N, DB_P_A, P_N, PI_Body_List_In, PI_Body_List_Out),
+	print_msg('debug', 'translate_field_description_for(P_N, Cls)', (P_N, Cl)).
+
+generate_db_value_conversor(Field_Type, DB_Value, Output_Value, Conversion) :-
+	Field_Type = 'rfuzzy_truth_value_type', !, 
+	Conversion = (Output_Value .=. DB_Value).
+
+generate_db_value_conversor(Field_Type, DB_Value, Output_Value, Conversion) :-
+	(
+	    Field_Type = 'rfuzzy_string_type' ; 
+	    Field_Type = 'rfuzzy_integer_type' ; 
+	    Field_Type = 'rfuzzy_enum_type' ;
+	    Field_Type = 'rfuzzy_boolean_type' ; 
+	    Field_Type = 'rfuzzy_datetime_type' % Not sure this is the right conversion ...
+	), !, 
+	Conversion = (Output_Value = DB_Value).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+generate_pl_body_when_enum_type(Field_Type, _DB_P_N, _DB_P_A, _P_N, PI_Body_List_In, PI_Body_List_In) :-
+	nonvar(Field_Type), Field_Type \== 'rfuzzy_enum_type', !.
+generate_pl_body_when_enum_type(Field_Type, DB_P_N, DB_P_A, P_N, PI_Body_List_In, [Pl_Body | PI_Body_List_In]) :-
+	nonvar(Field_Type), Field_Type = 'rfuzzy_enum_type', !,
+	Pl_Body = (Type_Var, Enum_Value_Var, Body),
+
+	functor(DB_P_F, DB_P_N, DB_P_A),
+	Mapping = (Input_Value = DB_P_F),
+	functor(P_F, P_N, 2), 
+	arg(1, P_F, Input_Value),
+	arg(2, P_F, Enum_Value_Var),
+
+	Body = (((Mapping, DB_P_F), P_F), (Type_Var = DB_P_N)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
