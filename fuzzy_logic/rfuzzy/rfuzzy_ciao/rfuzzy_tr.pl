@@ -202,6 +202,7 @@ rfuzzy_trans_sent_aux(end_of_file, Code_Before_EOF_with_EOF):-
 	print_msg('debug', 'all_predicate_info', All_Predicate_Infos),
 	generate_code_from_saved_info(All_Predicate_Infos, [], Cls_1, [end_of_file], Cls_2),
 	append_local(Cls_1, Cls_2, Generated_Code),
+	print_msg('debug', 'Generated_Code', Generated_Code),
 	add_auxiliar_code(Generated_Code, Code_Before_EOF_with_EOF), 
 	clean_up_asserted_facts.
 
@@ -230,7 +231,7 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, []),
 	
 	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
-	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], Compute_Defined_Operators),
+	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], ('defined_operators', Compute_Defined_Operators)),
 
 	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
 	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
@@ -369,10 +370,10 @@ translate(rfuzzy_type_for(P_N/P_A, P_T), Cls):-
 	print_msg('debug', 'translate_rfuzzy_type_for(Cls)', Cls).
 
 % Similarity between elements.
-translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), Translation) :-
-	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1, Translation).
-translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), Translation) :-
-	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation).
+translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), []) :-
+	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1).
+translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), []) :-
+	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility).
 
 % crisp predicates (non-facts) and crisp facts.
 translate(Other, Other) :-
@@ -737,7 +738,7 @@ translate_rfuzzy_define_database(P_N, P_A, Description, Cls) :-
 	print_msg('debug', 'rfuzzy_define_database :: translate_db_description(Description)', (Description)),
 	translate_db_description(Description, 1, P_N, P_A, P_T, Fields_Names),
 	print_msg('debug', 'rfuzzy_define_database :: translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T)', (P_N, P_A, P_T)),
-	translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, [('database', Fields_Names)], Cls).
+	translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, ('database', Fields_Names), Cls).
 
 % translate_db_description(Description, Index, DB_P_N, DB_P_A, Types, DB_Fields) 
 translate_db_description([(Field_Name, Field_Type)], Index, DB_P_N, DB_P_A, [Field_Type], [Field_Name]) :- 
@@ -764,16 +765,18 @@ save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
 % ------------------------------------------------------
 
 % translate_rfuzzy_similarity_between(Element1, Element2, Truth_Value, Credibility_Operator, Credibility, []).
-translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility, Translation) :-
+translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility) :-
 	nonvar(Database), nonvar(Element1), nonvar(Element2), nonvar(Truth_Value), nonvar(Credibility_Operator), nonvar(Credibility),
 	Real_P_N = 'rfuzzy_computed_similarity_between',
-	add_preffix_to_name(Database, Real_P_N, P_N),
-	functor(Translation, P_N, 5),
-	arg(1, Translation, Element1), 
-	arg(2, Translation, Element2), 
-	arg(3, Translation, Truth_Value), 
-	arg(4, Translation, Credibility_Operator), 
-	arg(5, Translation, Credibility),
+	% add_preffix_to_name(Database, Real_P_N, P_N),
+	% functor(Translation, P_N, 5),
+	functor(Translation, Real_P_N, 6),
+	arg(1, Translation, Database), 
+	arg(2, Translation, Element1), 
+	arg(3, Translation, Element2), 
+	arg(4, Translation, Truth_Value), 
+	arg(5, Translation, Credibility_Operator), 
+	arg(6, Translation, Credibility),
 	
 	Real_P_T = ['rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_truth_value_type', 'rfuzzy_predicate_type', 'rfuzzy_credibility_value_type'],
 	save_predicate_definition(Real_P_N, 6, Real_P_T, ('rfuzzy_similarity_clause', Translation)).
@@ -1036,10 +1039,15 @@ add_preffix_to_name(Input, Preffix, Output) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_code_from_saved_info([], Cls_1_In, Cls_1_In, Cls_2_In, Cls_2_In) :- !.
+generate_code_from_saved_info([], Cls_1_In, Cls_1_In, Cls_2_In, Cls_2_In) :- !,
+	print_msg('debug', 'generate_code_from_saved_info', 'END').
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
+	print_msg('debug', 'generate_code_from_saved_info :: Predicate_Def', Predicate_Def),
 	Predicate_Def = predicate_definition(P_N, P_A, P_T, MI), !,
+	print_msg('debug', 'generate_code_from_saved_info :: MI', MI),
 	generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
+%	print_msg('debug', 'generate_code_from_saved_info :: Cls_1_Aux', Cls_1_Aux),
+%	print_msg('debug', 'generate_code_from_saved_info :: Cls_2_Aux', Cls_2_Aux),
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_Aux, Cls_1_Out, Cls_2_Aux, Cls_2_Out).
 
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :- !,
@@ -1047,7 +1055,10 @@ generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Ou
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out).
 
 generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
+	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, MI)', (P_N, P_A, P_T, MI)),
 	generate_code_from_MIs(MI, P_N, P_A, P_T, [], Cls_1_In, Cls_1_Out, PI_Body_List),
+	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, MI)', (P_N, P_A, P_T, MI)),
+	print_msg('debug', 'generate_code_main :: PI_Body_List', PI_Body_List),
 	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_2_In, Cls_2_Out).
 
 % ------------------------------------------------------
@@ -1073,6 +1084,7 @@ list_to_disjunction([(Type_Var, Enum_Value_Var, Body) | PI_Body_List], (Body ; P
 
 generate_code_from_MIs([], _P_N, _P_A, _P_T, _History, Cls_In, Cls_In, []) :- !.
 generate_code_from_MIs([(Selector, Details) | MI], P_N, P_A, P_T, History_In, Cls_In, Cls_Out, PI_Body_List_Out) :-
+	print_msg('debug', 'generate_code_from_MIs :: (Selector, Details)', (Selector, Details)),
 	nonvar(Selector), 
 	(
 	    (
@@ -1191,14 +1203,19 @@ generate_pl_body_when_enum_type(Field_Type, DB_P_N, DB_P_A, P_N, PI_Body_List_In
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
-	code_for_quantifier_fnot(Fuzzy_Rules_In, Fuzzy_Rules_Aux_1), 
-	code_for_getting_attribute_values(Fuzzy_Rules_Aux_1, Fuzzy_Rules_Aux_2), 
-	code_for_predefined_types(Fuzzy_Rules_Aux_2, Fuzzy_Rules_Aux_3),
-	code_for_defined_quantifiers(Fuzzy_Rules_Aux_3, Fuzzy_Rules_Aux_4),
-	code_for_rfuzzy_compute_1(Fuzzy_Rules_Aux_4, Fuzzy_Rules_Aux_5),
-	code_for_rfuzzy_compute_2(Fuzzy_Rules_Aux_5, Fuzzy_Rules_Aux_6),
-	code_for_assert_local_user_name(Fuzzy_Rules_Aux_6, Fuzzy_Rules_Out).
+add_auxiliar_code(Cls_In, Cls_Out) :-
+	print_msg('debug', 'add_auxiliar_code :: Cls_In', Cls_In),
+	code_for_quantifier_fnot(Cls_In, Cls_Aux_1), 
+	code_for_getting_attribute_values(Cls_Aux_1, Cls_Aux_2), 
+	code_for_predefined_types(Cls_Aux_2, Cls_Aux_3),
+	code_for_defined_quantifiers(Cls_Aux_3, Cls_Aux_4),
+	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_4', Cls_Aux_4),
+	code_for_rfuzzy_compute_1(Cls_Aux_4, Cls_Aux_5),
+	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_5', Cls_Aux_5),
+	code_for_rfuzzy_compute_2(Cls_Aux_5, Cls_Aux_6),
+	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_6', Cls_Aux_6),
+	code_for_assert_local_user_name(Cls_Aux_6, Cls_Out),
+	print_msg('debug', 'add_auxiliar_code :: Cls_Out', Cls_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -1265,30 +1282,24 @@ code_for_defined_quantifiers(Code_In, Code_Out) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_rfuzzy_compute_1(In, Out) :-
+code_for_rfuzzy_compute_1(Cls_In, Cls_Out) :-
 	P_N = 'rfuzzy_computed_similarity_between',
 	retrieve_all_predicate_infos(P_N, 6, All_Predicate_Infos),
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error)
-	generate_subcalls_for_rfuzzy_computed_similarity_between(All_Predicate_Infos, In, Out),
+	code_for_rfuzzy_compute_1_aux_1(All_Predicate_Infos, Cls_In, Cls_Out),
 	!.
 
-generate_subcalls_for_rfuzzy_computed_similarity_between([], In, [Code | In]) :- !,
+code_for_rfuzzy_compute_1_aux_1([], Cls_In, [Code | Cls_In]) :- !,
 	Code = (rfuzzy_computed_similarity_between(_Database, _Elt1, _Elt2, _TV, _Cred_Op, _Cred) :- fail).
-generate_subcalls_for_rfuzzy_computed_similarity_between([Element | List], In, Out) :- 
-	Element = (predicate_definition(P_N, P_A, _P_T, MI)), !,
-	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(MI, P_N, P_A, In, Aux),
-	generate_subcalls_for_rfuzzy_computed_similarity_between(List, Aux, Out).
+code_for_rfuzzy_compute_1_aux_1([Element | List], Cls_In, Cls_Out) :- 
+	Element = (predicate_definition(_P_N, _P_A, _P_T, MI)), !,
+	code_for_rfuzzy_compute_1_aux_2(MI, Cls_In, Cls_Aux),
+	code_for_rfuzzy_compute_1_aux_1(List, Cls_Aux, Cls_Out).
 
-generate_subcalls_for_rfuzzy_computed_similarity_between_aux([], _P_N, _P_A, In, In) :- !.
-generate_subcalls_for_rfuzzy_computed_similarity_between_aux([Element | MI_1s], P_N, P_A, In, Out) :-
-	Element = (Database, Aux_P_N, Aux_P_A), !,
-	functor(Pred_Functor, P_N, P_A),
-	Pred_Functor =..[P_N, Database | Args],
-	functor(Aux_Pred_Functor, Aux_P_N, Aux_P_A),
-	Aux_Pred_Functor =..[Aux_P_N | Args],
-	Cl = (Pred_Functor :- Aux_Pred_Functor), !,
-	generate_subcalls_for_rfuzzy_computed_similarity_between_aux(MI_1s, P_N, P_A, [Cl | In], Out).
-
+code_for_rfuzzy_compute_1_aux_2([], Cls_In, Cls_In) :- !.
+code_for_rfuzzy_compute_1_aux_2([('rfuzzy_similarity_clause', Translation) | MI], Cls_In, Cls_Out) :- !,
+	code_for_rfuzzy_compute_1_aux_2(MI, [Translation | Cls_In], Cls_Out).
+	
 code_for_rfuzzy_compute_2(In, [Code | In]) :-
 	Code = (rfuzzy_compute(Operator, Elt1_In, Elt2_In, Database, Truth_Value) :- 
 	       nonvar(Operator), nonvar(Database),
