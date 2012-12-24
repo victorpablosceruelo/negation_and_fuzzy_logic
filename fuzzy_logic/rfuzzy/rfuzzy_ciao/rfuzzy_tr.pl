@@ -1191,21 +1191,6 @@ generate_pl_body_when_enum_type(Field_Type, DB_P_N, DB_P_A, P_N, PI_Body_List_In
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-translate_field_description_aux([DB_P_T, Type], P_N, Input, Value, DBF_F, Conversion) :-
-	Type = 'rfuzzy_float_type', !, 
-	functor(DBF_F, P_N, 2),
-	arg(1, DBF_F, Input), 
-	arg(2, DBF_F, Value_Out),
-	functor(Conversion, '.=.', 2), 
-	arg(1, Conversion, Value), 
-	arg(2, Conversion, Value_Out),
-	% save_predicate_definition(P_N, P_A, P_T, MI)
-	save_predicate_definition(P_N, 2, [DB_P_T, Type], []).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 add_auxiliar_code(Fuzzy_Rules_In, Fuzzy_Rules_Out) :-
 	code_for_quantifier_fnot(Fuzzy_Rules_In, Fuzzy_Rules_Aux_1), 
 	code_for_getting_attribute_values(Fuzzy_Rules_Aux_1, Fuzzy_Rules_Aux_2), 
