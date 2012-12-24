@@ -1210,9 +1210,9 @@ add_auxiliar_code(Cls_In, Cls_Out) :-
 	code_for_predefined_types(Cls_Aux_2, Cls_Aux_3),
 	code_for_defined_quantifiers(Cls_Aux_3, Cls_Aux_4),
 	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_4', Cls_Aux_4),
-	code_for_rfuzzy_compute_1(Cls_Aux_4, Cls_Aux_5),
-	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_5', Cls_Aux_5),
-	code_for_rfuzzy_compute_2(Cls_Aux_5, Cls_Aux_6),
+%	code_for_rfuzzy_compute_1(Cls_Aux_4, Cls_Aux_5),
+%	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_5', Cls_Aux_5),
+	code_for_rfuzzy_compute_2(Cls_Aux_4, Cls_Aux_6),
 	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_6', Cls_Aux_6),
 	code_for_assert_local_user_name(Cls_Aux_6, Cls_Out),
 	print_msg('debug', 'add_auxiliar_code :: Cls_Out', Cls_Out).
@@ -1282,24 +1282,6 @@ code_for_defined_quantifiers(Code_In, Code_Out) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_rfuzzy_compute_1(Cls_In, Cls_Out) :-
-	P_N = 'rfuzzy_computed_similarity_between',
-	retrieve_all_predicate_infos(P_N, 6, All_Predicate_Infos),
-	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error)
-	code_for_rfuzzy_compute_1_aux_1(All_Predicate_Infos, Cls_In, Cls_Out),
-	!.
-
-code_for_rfuzzy_compute_1_aux_1([], Cls_In, [Code | Cls_In]) :- !,
-	Code = (rfuzzy_computed_similarity_between(_Database, _Elt1, _Elt2, _TV, _Cred_Op, _Cred) :- fail).
-code_for_rfuzzy_compute_1_aux_1([Element | List], Cls_In, Cls_Out) :- 
-	Element = (predicate_definition(_P_N, _P_A, _P_T, MI)), !,
-	code_for_rfuzzy_compute_1_aux_2(MI, Cls_In, Cls_Aux),
-	code_for_rfuzzy_compute_1_aux_1(List, Cls_Aux, Cls_Out).
-
-code_for_rfuzzy_compute_1_aux_2([], Cls_In, Cls_In) :- !.
-code_for_rfuzzy_compute_1_aux_2([('rfuzzy_similarity_clause', Translation) | MI], Cls_In, Cls_Out) :- !,
-	code_for_rfuzzy_compute_1_aux_2(MI, [Translation | Cls_In], Cls_Out).
-	
 code_for_rfuzzy_compute_2(In, [Code | In]) :-
 	Code = (rfuzzy_compute(Operator, Elt1_In, Elt2_In, Database, Truth_Value) :- 
 	       nonvar(Operator), nonvar(Database),
