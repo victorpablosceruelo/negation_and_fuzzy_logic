@@ -200,7 +200,8 @@ rfuzzy_trans_sent_aux(end_of_file, Code_Before_EOF_with_EOF):-
 	!,
 	retrieve_all_predicate_infos(_Any_P_N, _Any_P_A, All_Predicate_Infos),
 	print_msg('debug', 'all_predicate_info', All_Predicate_Infos),
-	generate_code_from_saved_info(All_Predicate_Infos, Generated_Code),
+	generate_code_from_saved_info(All_Predicate_Infos, [], Cls_1, [end_of_file], Cls_2),
+	append_local(Cls_1, Cls_2, Generated_Code),
 	add_auxiliar_code(Generated_Code, Code_Before_EOF_with_EOF), 
 	clean_up_asserted_facts.
 
@@ -1035,20 +1036,19 @@ add_preffix_to_name(Input, Preffix, Output) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_code_from_saved_info([], [], [end_of_file]) :- !.
-generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_Out, Cls_2_Out) :-
+generate_code_from_saved_info([], Cls_1_In, Cls_1_In, Cls_2_In, Cls_2_In) :- !.
+generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
 	Predicate_Def = predicate_definition(P_N, P_A, P_T, MI), !,
-	generate_code_main(P_N, P_A, P_T, MI, Cls_1_Aux, Cls_2_Aux),
-	generate_code_from_saved_info(Predicate_Defs, Cls_1_In, Cls_2_2),
-	append_local(Generated_Code_1, Generated_Code_2, Generated_Code).
+	generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
+	generate_code_from_saved_info(Predicate_Defs, Cls_1_Aux, Cls_1_Out, Cls_2_Aux, Cls_2_Out).
 
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Generated_Code) :- !,
 	print_msg('error', 'generate_code_from_saved_info :: cannot parse', Predicate_Def),
 	generate_code_from_saved_info(Predicate_Defs, Generated_Code).
 
-generate_code_main(P_N, P_A, P_T, MI_In, Cls_1, Cls_2) :-
-	generate_code_from_MIs(MI, P_N, P_A, P_T, [], [], Cls_1, PI_Body_List),
-	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_2).
+generate_code_main(P_N, P_A, P_T, MI_In, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
+	generate_code_from_MIs(MI, P_N, P_A, P_T, [], Cls_1_In, Cls_1_Out, PI_Body_List),
+	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_2_In, Cls_2_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
