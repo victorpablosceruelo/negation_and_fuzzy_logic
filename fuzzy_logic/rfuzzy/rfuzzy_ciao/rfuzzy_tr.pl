@@ -1154,7 +1154,7 @@ build_db_field_cls_and_retrievers(P_N, P_A, P_T, Details, Cls_In, [Cl | Cls_In],
 
 	functor(Field_Functor, P_N, P_A),
 	arg(1, Field_Functor, Input_Value),
-	arg(1, Field_Functor, Output_Value),
+	arg(2, Field_Functor, Output_Value),
 
 	functor(DB_P_F, DB_P_N, DB_P_A),
 	arg(Index, DB_P_F, DB_Value),
