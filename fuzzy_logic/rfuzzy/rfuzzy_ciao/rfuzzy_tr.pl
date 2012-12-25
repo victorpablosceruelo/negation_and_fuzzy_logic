@@ -33,30 +33,30 @@ get_auxiliar_suffix('rfuzzy_aux').
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_predicates_definition_list([], _P_A, _P_T, _MI) :- !.
-save_predicates_definition_list([P_N | Pred_List], P_A, P_T, MI) :-
-	save_predicate_definition(P_N, P_A, P_T, MI), !,
-	save_predicates_definition_list(Pred_List, P_A, P_T, MI).
+save_predicates_definition_list([], _P_A, _P_T, _P_MI) :- !.
+save_predicates_definition_list([P_N | Pred_List], P_A, P_T, P_MI) :-
+	save_predicate_definition(P_N, P_A, P_T, P_MI), !,
+	save_predicates_definition_list(Pred_List, P_A, P_T, P_MI).
 
-save_predicate_definition(P_N, P_A, P_T, MI) :-
-	print_msg('debug', 'save_predicate_definition(P_N, P_A, P_T, MI)', (P_N, P_A, P_T, MI)),
-	check_save_predicate_definition_input(P_N, P_A, P_T),
+save_predicate_definition(P_N, P_A, P_T, P_MI) :-
+	print_msg('debug', 'save_predicate_definition(P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)),
+	check_save_predicate_definition_input(P_N, P_A, P_T, P_MI),
 	print_msg('debug', 'check_save_predicate_definition_input', 'ok'),
 	(
 	    (	 
-		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_MI)), !, % Retract last
-		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_MI)),
+		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_P_MI)), !, % Retract last
+		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_P_MI)),
 		add_element_to_set_if_any(P_T, Old_P_T, New_P_T),
-		add_element_to_set_if_any(MI, Old_MI, New_MI)
+		add_element_to_set_if_any(P_MI, Old_P_MI, New_P_MI)
 	    )
 	;
 	    (
 		add_element_to_set_if_any(P_T, [], New_P_T),
-		add_element_to_set_if_any(MI, [], New_MI)
+		add_element_to_set_if_any(P_MI, [], New_P_MI)
 	    )
 	), 
-	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_MI)),
-	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_MI)),
+	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_P_MI)),
+	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_P_MI)),
 	!.
 
 % sets_union_if_non_empty(New_SubSet, Set, New_Set).
@@ -81,8 +81,8 @@ add_element_to_set_if_any(Element, Set, New_Set) :-
 retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	print_msg('debug', 'retrieve_predicate_info(P_N, P_A, P_T, Show_Error)', retrieve_predicate_info(P_N, P_A, P_T, Show_Error)),
 	(
-	    (   predicate_definition(P_N, P_A, P_T, MI), !,
-		print_msg('debug', 'retrieved', retrieve_predicate_info(P_N, P_A, P_T, MI))   
+	    (   predicate_definition(P_N, P_A, P_T, P_MI), !,
+		print_msg('debug', 'retrieved', retrieve_predicate_info(P_N, P_A, P_T, P_MI))   
 	    )
 	;
 	    (   Show_Error = 'no', !, 
@@ -95,16 +95,16 @@ retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	).
 
 retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
-	findall((predicate_definition(P_N, P_A, P_T, MI)), 
-	predicate_definition(P_N, P_A, P_T, MI), Retrieved), !.
-%	(retract_fact(predicate_definition(P_N, P_A, P_T, MI))), Retrieved),
+	findall((predicate_definition(P_N, P_A, P_T, P_MI)), 
+	predicate_definition(P_N, P_A, P_T, P_MI), Retrieved), !.
+%	(retract_fact(predicate_definition(P_N, P_A, P_T, P_MI))), Retrieved),
 %	 !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 	
-check_save_predicate_definition_input(P_N, P_A, P_T) :-
+check_save_predicate_definition_input(P_N, P_A, P_T, P_MI) :-
 	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T)', (P_N, P_A, P_T)),
 	( 
 	    (	nonvar(P_N), !    )
@@ -143,10 +143,25 @@ check_save_predicate_definition_input(P_N, P_A, P_T) :-
 		print_msg('error', 'Types in type definition do not sum up the arity value. (P_N, P_A, P_T)', (P_N, P_A, P_T)), 
 		!, fail
 	    )
-	), !.
+	), 
+	(
+	    (
+		nonvar(P_MI), P_MI = []
+	    )
+	;
+	    (
+		nonvar(P_MI), P_MI = (Selector, Options), nonvar(Selector), list(Options)
+	    )
+	;
+	    (
+		print_msg('error', 'Predicate More Information is not a tuple of an element and a list. (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)), 
+		!, fail
+	    )
+	),
+	!.
 
-check_save_predicate_definition_input(P_N, P_A, P_T) :-
-	print_msg('debug', 'check_save_predicate_definition_input :: (P_N, P_A, P_T)', (P_N, P_A, P_T)), !, fail.
+check_save_predicate_definition_input(P_N, P_A, P_T, P_MI) :-
+	print_msg('debug', 'check_save_predicate_definition_input :: (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)), !, fail.
 
 check_pred_type_aux(0, []) :- !.
 check_pred_type_aux(1, [_P_T]) :- !.
@@ -211,7 +226,7 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
-	% save_predicate_definition(P_N, P_A, P_T, MI)
+	% save_predicate_definition(P_N, P_A, P_T, P_MI)
 	save_predicate_definition('rfuzzy_any_type', 1, ['null'], []),
 	save_predicate_definition('rfuzzy_truth_value_type', 1, ['null'], []),
 	save_predicate_definition('rfuzzy_credibility_value_type', 1, ['null'], []),
@@ -347,7 +362,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 	Translation = (Aggregator :- Code),
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	% save_predicate_definition(P_N, P_A, P_T, MI)
+	% save_predicate_definition(P_N, P_A, P_T, P_MI)
 	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, []),
 	!.
 
@@ -397,7 +412,7 @@ translate(Other, Other) :-
 	    )
 	),
 	generate_fake_type(P_A, P_T),
-	% save_predicate_definition(P_N, P_A, P_T, MI)
+	% save_predicate_definition(P_N, P_A, P_T, P_MI)
 	save_predicate_definition(P_N, P_A, P_T, []).
 
 % ------------------------------------------------------
@@ -489,7 +504,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 	Cls = [(NP_F :- SubCl_TypeTest, Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio)],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
-	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], ('fuzzy_rule', (NP_N, NP_A))),
+	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], ('fuzzy_rule', [(NP_N, NP_A)])),
 	print_msg('debug', 'translate_fuzzy ', ' ').
 
 % ------------------------------------------------------
@@ -757,8 +772,8 @@ save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(Field_Type, 1, _P_T, 'true'), !,
 
-	MI = ('rfuzzy_db_field', (Field_Name, Field_Type, DB_P_N, DB_P_A, Index)),
-	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], MI).
+	P_MI = ('rfuzzy_db_field', [(Field_Name, Field_Type, DB_P_N, DB_P_A, Index)]),
+	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], P_MI).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -779,7 +794,7 @@ translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, C
 	arg(6, Translation, Credibility),
 	
 	Real_P_T = ['rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_truth_value_type', 'rfuzzy_predicate_type', 'rfuzzy_credibility_value_type'],
-	save_predicate_definition(Real_P_N, 6, Real_P_T, ('rfuzzy_similarity_clause', Translation)).
+	save_predicate_definition(Real_P_N, 6, Real_P_T, ('rfuzzy_similarity_clause', [Translation])).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -801,7 +816,7 @@ save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) 
 		      ),
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
-	% save_predicate_definition(P_N, P_A, P_T, MI)
+	% save_predicate_definition(P_N, P_A, P_T, P_MI)
 	save_predicate_definition(P_N, P_A, P_T, []), !,
 
 	save_rfuzzy_quantifiers_list(More, Translations).
@@ -1043,9 +1058,9 @@ generate_code_from_saved_info([], Cls_1_In, Cls_1_In, Cls_2_In, Cls_2_In) :- !,
 	print_msg('debug', 'generate_code_from_saved_info', 'END').
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
 	print_msg('debug', 'generate_code_from_saved_info :: Predicate_Def', Predicate_Def),
-	Predicate_Def = predicate_definition(P_N, P_A, P_T, MI), !,
-	print_msg('debug', 'generate_code_from_saved_info :: MI', MI),
-	generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
+	Predicate_Def = predicate_definition(P_N, P_A, P_T, P_MI), !,
+	print_msg('debug', 'generate_code_from_saved_info :: P_MI', P_MI),
+	generate_code_main(P_N, P_A, P_T, P_MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
 %	print_msg('debug', 'generate_code_from_saved_info :: Cls_1_Aux', Cls_1_Aux),
 %	print_msg('debug', 'generate_code_from_saved_info :: Cls_2_Aux', Cls_2_Aux),
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_Aux, Cls_1_Out, Cls_2_Aux, Cls_2_Out).
@@ -1054,25 +1069,25 @@ generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Ou
 	print_msg('error', 'generate_code_from_saved_info :: cannot parse', Predicate_Def),
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out).
 
-generate_code_main(P_N, P_A, P_T, MI, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
-	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, MI)', (P_N, P_A, P_T, MI)),
-	generate_code_from_MIs(MI, P_N, P_A, P_T, [], Cls_1_In, Cls_1_Out, PI_Body_List),
-	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, MI)', (P_N, P_A, P_T, MI)),
+generate_code_main(P_N, P_A, P_T, P_MI, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
+	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)),
+	generate_code_from_P_MIs(P_MI, P_N, P_A, P_T, [], Cls_1_In, Cls_1_Out, PI_Body_List),
+	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)),
 	print_msg('debug', 'generate_code_main :: PI_Body_List', PI_Body_List),
-	build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_2_In, Cls_2_Out).
+	build_introspection_clause(P_N, P_A, P_T, P_MI, PI_Body_List, Cls_2_In, Cls_2_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_introspection_clause(P_N, P_A, P_T, MI, [], Cls_In, [Cl | Cls_In]) :- !,
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, MI)).
-build_introspection_clause(P_N, P_A, P_T, MI, PI_Body_List, Cls_In, [Cl | Cls_In]) :-
+build_introspection_clause(P_N, P_A, P_T, P_MI, [], Cls_In, [Cl | Cls_In]) :- !,
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, P_MI)).
+build_introspection_clause(P_N, P_A, P_T, P_MI, PI_Body_List, Cls_In, [Cl | Cls_In]) :-
 	list_to_disjunction(PI_Body_List, PI_Body, Type_Var, Enum_Value_Var),
 
 	Generator = (findall((Type_Var, Enum_Value_Var), PI_Body, Enum_Values_List), 
 	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, [('rfuzzy_enum_type_values', New_Enum_Values_List) | MI]) :- Generator).
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, [('rfuzzy_enum_type_values', New_Enum_Values_List) | P_MI]) :- Generator).
 	
 list_to_disjunction([], 'false', _Type_Var, _Enum_Value_Var) :- !.
 list_to_disjunction([(Type_Var, Enum_Value_Var, Body) | PI_Body_List], (Body ; PI_Body), Type_Var, Enum_Value_Var) :-
@@ -1082,9 +1097,16 @@ list_to_disjunction([(Type_Var, Enum_Value_Var, Body) | PI_Body_List], (Body ; P
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-generate_code_from_MIs([], _P_N, _P_A, _P_T, _History, Cls_In, Cls_In, []) :- !.
-generate_code_from_MIs([(Selector, Details) | MI], P_N, P_A, P_T, History_In, Cls_In, Cls_Out, PI_Body_List_Out) :-
-	print_msg('debug', 'generate_code_from_MIs :: (Selector, Details)', (Selector, Details)),
+list_head([Head | _List], Head).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+generate_code_from_P_MIs([], _P_N, _P_A, _P_T, _History, Cls_In, Cls_In, []) :- !.
+generate_code_from_P_MIs([(Selector, Details_List) | P_MI], P_N, P_A, P_T, History_In, Cls_In, Cls_Out, PI_Body_List_Out) :-
+	print_msg('debug', 'generate_code_from_P_MIs :: (Selector, Details_List)', (Selector, Details_List)),
+	list_head(Details_List, Details),
 	nonvar(Selector), 
 	(
 	    (
@@ -1120,7 +1142,7 @@ generate_code_from_MIs([(Selector, Details) | MI], P_N, P_A, P_T, History_In, Cl
 		PI_Body_List_Out = PI_Body_List_In
 	    )
 	),
-	generate_code_from_MIs(MI, P_N, P_A, P_T, History_Out, Cls_Aux, Cls_Out, PI_Body_List_In).
+	generate_code_from_P_MIs(P_MI, P_N, P_A, P_T, History_Out, Cls_Aux, Cls_Out, PI_Body_List_In).
 
 build_fuzzy_rule_main_clause(P_N, P_A, _P_T, Details, Cls_In, [Cl | Cls_In]) :-
 	Details = (Aux_P_N, Aux_P_A),
@@ -1222,12 +1244,13 @@ add_auxiliar_code(Cls_In, Cls_Out) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_testing_program_introspection(Cls_In, [Cl_1, Cl_2, Cl_3 | Cls_In]) :-
-	Cl_1 = (test_program_introspection :- findall(PMI, rfuzzy_introspection(_PN, _PA, _PT, PMI), L), test_program_introspection_aux_1(L)),
+code_for_testing_program_introspection(Cls_In, [Cl_1, Cl_2, Cl_3, Cl_4, Cl_5, Cl_6 | Cls_In]) :-
+	Cl_1 = (test_program_introspection :- findall(rfuzzy_introspection(PN, PA, PT, P_MI), rfuzzy_introspection(PN, PA, PT, P_MI), L), test_program_introspection_aux_1(L)),
 	Cl_2 = (test_program_introspection_aux_1([])), 
-	Cl_3 = (test_program_introspection_aux_1([H|T]) :- , list(PMI), pmi_has_correct_format(PMI)),
-	Cl_2 = (pmi_has_correct_format([])),
-	Cl_3 = (pmi_has_correct_format([(Selector, Info) | PMI]) :- print_msg('debug', '(Selector, Info)', (Selector, Info)), pmi_has_correct_format(PMI)).
+	Cl_3 = (test_program_introspection_aux_1([H|T]) :- test_program_introspection_aux_2(H), test_program_introspection_aux_1(T)),
+	Cl_4 = (test_program_introspection_aux_2(rfuzzy_introspection(_PN, _PA, _PT, P_MI)) :- test_program_introspection_aux_3(P_MI)),
+	Cl_5 = (test_program_introspection_aux_3([])),
+	Cl_6 = (test_program_introspection_aux_3([(Selector, Info) | P_MI]) :- list(Info), print_msg('debug', '(Selector, Info)', (Selector, Info)), test_program_introspection_aux_3(P_MI)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
