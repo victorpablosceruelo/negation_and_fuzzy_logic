@@ -1213,9 +1213,21 @@ add_auxiliar_code(Cls_In, Cls_Out) :-
 %	code_for_rfuzzy_compute_1(Cls_Aux_4, Cls_Aux_5),
 %	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_5', Cls_Aux_5),
 	code_for_rfuzzy_compute_2(Cls_Aux_4, Cls_Aux_6),
-	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_6', Cls_Aux_6),
-	code_for_assert_local_user_name(Cls_Aux_6, Cls_Out),
+	code_for_assert_local_user_name(Cls_Aux_6, Cls_Aux_7),
+%	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_7', Cls_Aux_7),
+	code_for_testing_program_introspection(Cls_Aux_7, Cls_Out),
 	print_msg('debug', 'add_auxiliar_code :: Cls_Out', Cls_Out).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+code_for_testing_program_introspection(Cls_In, [Cl_1, Cl_2, Cl_3 | Cls_In]) :-
+	Cl_1 = (test_program_introspection :- findall(PMI, rfuzzy_introspection(_PN, _PA, _PT, PMI), L), test_program_introspection_aux_1(L)),
+	Cl_2 = (test_program_introspection_aux_1([])), 
+	Cl_3 = (test_program_introspection_aux_1([H|T]) :- , list(PMI), pmi_has_correct_format(PMI)),
+	Cl_2 = (pmi_has_correct_format([])),
+	Cl_3 = (pmi_has_correct_format([(Selector, Info) | PMI]) :- print_msg('debug', '(Selector, Info)', (Selector, Info)), pmi_has_correct_format(PMI)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
