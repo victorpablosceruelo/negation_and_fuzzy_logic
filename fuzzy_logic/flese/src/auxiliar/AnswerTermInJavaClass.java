@@ -160,7 +160,10 @@ public class AnswerTermInJavaClass {
 		
 		if (singleAnswerTerm == null) return null;
 		if (compositeAnswerTerm == null) {
-			retVal += "\'" + singleAnswerTerm + "\'";
+			if (singleAnswerTerm.equals("[]")) {
+				retVal += "new Array()";
+			}
+			else retVal += "\'" + singleAnswerTerm + "\'";
 		}
 		else {
 			if (singleAnswerTerm.equals(".")) {
