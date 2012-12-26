@@ -710,7 +710,7 @@ function aggregatorDetailsHide(toShowMsgId, toHideMsgId, chooseAgregatorInfoCell
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoIndex, typeIndex, queryLinesTableId) {
-	foundPredInfo = programIntrospection[foundPredInfoIndex];
+	var foundPredInfo = programIntrospection[foundPredInfoIndex];
 	
 	var row = document.getElementById(rowId);
 	var cell = document.createElement('div');
@@ -726,13 +726,27 @@ function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoInd
 	if (type[type.length-1] == 'rfuzzy_enum_type') {
 		html += "<select name=\'" + rfuzzyComputeArgumentId + "\'>";;
 		html += "<option name=\'----\' value=\'----\'>----</option>";
-		var values = foundPredInfo.predMoreInfo;
-		var valuesLength = values.length;
-		i = 0;
-		while (i<valuesLength) {
-			html+= "<option name=\'" + values[i] + "\' value=\'" + values[i] + "\'>" +
-					prologNameInColloquialLanguage(values[i]) + "</option>";
-			i++;
+		
+		var valuesIndex = 0;
+		var found = false;
+		while ((valuesIndex<foundPredInfo.predMoreInfo.length) && (! found)) {
+			if (foundPredInfo.predMoreInfo[valuesIndex].key == "rfuzzy_enum_type_values") {
+				if (foundPredInfo.predMoreInfo[valuesIndex].value[0][0] == type[0]) {
+					found = true;
+				}
+				else debug.info(type[0] + " =/= " + foundPredInfo.predMoreInfo[valuesIndex].value[0][0]);
+			}
+			if (! found) valuesIndex++;
+		}
+		if (found) {
+			var values = foundPredInfo.predMoreInfo[valuesIndex].value;
+			var valuesLength = values.length;
+			i = 0;
+			while (i<valuesLength) {
+				html+= "<option name=\'" + values[i][1] + "\' value=\'" + values[i][1] + "\'>" +
+						prologNameInColloquialLanguage(values[i][1]) + "</option>";
+				i++;
+			}
 		}
 		html += "</select>";
 	}
@@ -757,13 +771,15 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	var foundPredInfoLastType = foundPredInfo.predType[typeIndex][foundPredInfo.predType[typeIndex].length -1];
 	debug.info("foundPredInfoLastType: "+foundPredInfoLastType);
 	
-	var index = 0;
-	var operatorsPredInfo = null;
-	while (index<programIntrospection.length && operatorsPredInfo == null){
-		if (programIntrospection[index].predName == 'rfuzzy_compute_defined_operators') {
-			operatorsPredInfo = programIntrospection[index];
-		}
-		else index++;
+	var operatorsPredInfoIndex = 0;
+	var found = false;
+	while (operatorsPredInfoIndex<programIntrospection.length && ! found){
+		if (programIntrospection[operatorsPredInfoIndex].predName == 'rfuzzy_compute_defined_operators') found = true;
+		else operatorsPredInfoIndex++;
+	}
+	if (! found) {
+		alert("ERROR 1: Could not find defined operators information.");
+		return;
 	}
 	
 	var row = document.getElementById(rowId);
@@ -779,11 +795,17 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	html += "<option name=\'----\' value=\'----\'>----</option>";		
 	
 	var moreInfoIndex = 0;
-	while (moreInfoIndex < operatorsPredInfo.predMoreInfo.length) {
-		debug.info("->"+operatorsPredInfo.predMoreInfo[moreInfoIndex]);
-		moreInfoIndex++;
+	found = false;
+	while (moreInfoIndex < programIntrospection[operatorsPredInfoIndex].predMoreInfo.length && ! found) {
+		if (programIntrospection[operatorsPredInfoIndex].predMoreInfo[moreInfoIndex].key = "defined_operators") found = true;
+		else moreInfoIndex++;
 	}
-	var operators = operatorsPredInfo.predMoreInfo;
+	if (! found) {
+		alert("ERROR 2: Could not find defined operators information.");
+		return;
+	}
+	
+	var operators = programIntrospection[operatorsPredInfoIndex].predMoreInfo[moreInfoIndex].value;
 	for (var i=0; i<operators.length; i++) {
 		
 		debug.info("operatorType: "+operators[i][1]);
@@ -1224,8 +1246,21 @@ function resultOver(value, index) {
 	return (parseFloat(realValue) > value);
 }
 
+function isString(o) {
+    return typeof o == "string" || (typeof o == "object" && o.constructor === String);
+}
+
 function prologNameInColloquialLanguage(textLabelIn) {
 	var textLabel = null;
+	
+	if ((textLabelIn == null) || (textLabelIn == undefined)) {
+		alert("prologNameInColloquialLanguage: null or undefined input.");
+		return null;
+	}
+	if (! isString(textLabelIn)) {
+		alert("prologNameInColloquialLanguage: input is not a string.");
+		return null;		
+	}
 	
 	// debug.info("textLabel: " + textLabelIn);
 	var i = textLabelIn.indexOf("_");
