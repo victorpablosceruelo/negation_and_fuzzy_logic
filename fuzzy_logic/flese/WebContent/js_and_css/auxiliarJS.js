@@ -117,7 +117,11 @@ function predInfo(predName, predArity, predType, predMoreInfo) {
 	this.predName = predName;
 	this.predArity = predArity;
 	this.predType = predType;
-	this.predMoreInfo = predMoreInfo;
+	this.predMoreInfo = new Array();
+	for (var i=0; i<predMoreInfo.length; i++) {
+		debug.info(predMoreInfo[i]);
+	}
+	
 }
 
 function selectedProgramDatabaseInfo(fileName, fileOwner) {
@@ -284,11 +288,9 @@ function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTy
 	var valid = false;
 	for (var i=0; i<programIntrospection.length; i++) {
 		valid = false;
-		if (programIntrospection[i].predMoreInfo != '[]') {
-			for (var j=0; j<programIntrospection[i].predMoreInfo.length; j++) {
-				if (programIntrospection[i].predMoreInfo[j][0] == 'database') {
-					valid = true;
-				}
+		for (var j=0; j<programIntrospection[i].predMoreInfo.length; j++) {
+			if (programIntrospection[i].predMoreInfo[j][0] == 'database') {
+				valid = true;
 			}
 		}
 		

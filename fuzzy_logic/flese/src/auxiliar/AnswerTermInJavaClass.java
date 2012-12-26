@@ -114,7 +114,7 @@ public class AnswerTermInJavaClass {
 		if (singleAnswerTerm == null) return null; 
 		if ((! ",".equals(singleAnswerTerm)) && (! ".".equals(singleAnswerTerm))) retVal += singleAnswerTerm;
 		if (compositeAnswerTerm != null) {
-			if (singleAnswerTerm.equals(".")) retVal += "[";
+			if ((singleAnswerTerm.equals(".")) || (singleAnswerTerm.equals(","))) retVal += "[";
 			else retVal += "(";
 
 			for (int i=0; i<compositeAnswerTerm.length; i++) {
@@ -122,7 +122,7 @@ public class AnswerTermInJavaClass {
 				if ((i+1) < compositeAnswerTerm.length) retVal += ", ";
 			}
 
-			if (singleAnswerTerm.equals(".")) retVal += "]";
+			if ((singleAnswerTerm.equals(".")) || (singleAnswerTerm.equals(","))) retVal += "]";
 			else retVal += ")"; 
 		}
 		retVal += "";
