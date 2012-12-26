@@ -113,11 +113,11 @@ function addToProgramIntrospection(index, predInfo) {
 	programIntrospection[index] = predInfo;
 }
 
-function predInfo(predName, predArity, predType, predOtherInfo) {
+function predInfo(predName, predArity, predType, predMoreInfo) {
 	this.predName = predName;
 	this.predArity = predArity;
 	this.predType = predType;
-	this.predOtherInfo = predOtherInfo;
+	this.predMoreInfo = predMoreInfo;
 }
 
 function selectedProgramDatabaseInfo(fileName, fileOwner) {
@@ -284,9 +284,9 @@ function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTy
 	var valid = false;
 	for (var i=0; i<programIntrospection.length; i++) {
 		valid = false;
-		if (programIntrospection[i].predOtherInfo != '[]') {
-			for (var j=0; j<programIntrospection[i].predOtherInfo.length; j++) {
-				if (programIntrospection[i].predOtherInfo[j][0] == 'database') {
+		if (programIntrospection[i].predMoreInfo != '[]') {
+			for (var j=0; j<programIntrospection[i].predMoreInfo.length; j++) {
+				if (programIntrospection[i].predMoreInfo[j][0] == 'database') {
 					valid = true;
 				}
 			}
@@ -714,7 +714,7 @@ function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoInd
 	if (type[type.length-1] == 'rfuzzy_enum_type') {
 		html += "<select name=\'" + rfuzzyComputeArgumentId + "\'>";;
 		html += "<option name=\'----\' value=\'----\'>----</option>";
-		var values = foundPredInfo.predOtherInfo;
+		var values = foundPredInfo.predMoreInfo;
 		var valuesLength = values.length;
 		i = 0;
 		while (i<valuesLength) {
@@ -741,7 +741,7 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	debug.info("foundPredInfo.predName: "+foundPredInfo.predName);
 	debug.info("foundPredInfo.predArity: "+foundPredInfo.predArity);
 	debug.info("foundPredInfo.predType: "+foundPredInfo.predType);
-	debug.info("foundPredInfo.predOtherInfo: "+foundPredInfo.predOtherInfo);
+	debug.info("foundPredInfo.predMoreInfo: "+foundPredInfo.predMoreInfo);
 	var foundPredInfoLastType = foundPredInfo.predType[typeIndex][foundPredInfo.predType[typeIndex].length -1];
 	debug.info("foundPredInfoLastType: "+foundPredInfoLastType);
 	
@@ -767,11 +767,11 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	html += "<option name=\'----\' value=\'----\'>----</option>";		
 	
 	var moreInfoIndex = 0;
-	while (moreInfoIndex < operatorsPredInfo.predOtherInfo.length) {
-		debug.info("->"+operatorsPredInfo.predOtherInfo[moreInfoIndex]);
+	while (moreInfoIndex < operatorsPredInfo.predMoreInfo.length) {
+		debug.info("->"+operatorsPredInfo.predMoreInfo[moreInfoIndex]);
 		moreInfoIndex++;
 	}
-	var operators = operatorsPredInfo.predOtherInfo;
+	var operators = operatorsPredInfo.predMoreInfo;
 	for (var i=0; i<operators.length; i++) {
 		
 		debug.info("operatorType: "+operators[i][1]);
