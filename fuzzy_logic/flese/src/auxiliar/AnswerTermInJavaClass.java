@@ -11,7 +11,7 @@ import CiaoJava.PLVariable;
 
 public class AnswerTermInJavaClass {
 
-	private String singleAnswerTerm = null;
+	private String singleAnswerTerm = null; // It can be . (list) or , (structure). 
 	private AnswerTermInJavaClass[] compositeAnswerTerm = null;
 	
 	private PLTerm prologQueryAnswer = null;
@@ -43,6 +43,7 @@ public class AnswerTermInJavaClass {
 		// For lists.
 		if (term.isList()) {
 			creationMsgs += "is a list. ";
+			singleAnswerTerm = ".";
 			PLList prologList = (PLList) term;
 			int listLength = prologList.length();
 			if (listLength > 0) {
@@ -81,9 +82,7 @@ public class AnswerTermInJavaClass {
 			creationMsgs += " is an structure. ";
 			PLStructure prologStructure = (PLStructure) term;
 			String functor = prologStructure.getFunctor();
-			if (! (",".equals(functor))) {
-				singleAnswerTerm = functor;
-			}
+			singleAnswerTerm = functor; // It will be , when no explicit functor.
 			
 			int listLength = prologStructure.getArity();
 			if (listLength > 0) {
@@ -112,16 +111,19 @@ public class AnswerTermInJavaClass {
 	
 	public String toString () {
 		String retVal = "";
-		if ((singleAnswerTerm != null) && (! ",".equals(singleAnswerTerm))) retVal += singleAnswerTerm;
+		if (singleAnswerTerm == null) return null; 
+		if ((! ",".equals(singleAnswerTerm)) && (! ".".equals(singleAnswerTerm))) retVal += singleAnswerTerm;
 		if (compositeAnswerTerm != null) {
-			if (singleAnswerTerm != null) retVal += "(";
-			else retVal += "[";
+			if (singleAnswerTerm.equals(".")) retVal += "[";
+			else retVal += "(";
+
 			for (int i=0; i<compositeAnswerTerm.length; i++) {
 				retVal += compositeAnswerTerm[i].toString();
 				if ((i+1) < compositeAnswerTerm.length) retVal += ", ";
 			}
-			if (singleAnswerTerm != null) retVal += ")";
-			else retVal += "]";
+
+			if (singleAnswerTerm.equals(".")) retVal += "]";
+			else retVal += ")"; 
 		}
 		retVal += "";
 		return retVal;
@@ -153,34 +155,25 @@ public class AnswerTermInJavaClass {
 		}
 		else return null;
 	}
-	public String toJavaScript(boolean withCommasAround) {
+	public String toJavaScript() {
 		String retVal="";
-		boolean subTermWithCommasAround = false;
-		if ((compositeAnswerTerm == null) && (singleAnswerTerm == null)) { 
-			withCommasAround=false;
-			retVal="null";
-		}
 		
-		// An atom or a structure.
-		if (singleAnswerTerm != null) {
-			if (withCommasAround) retVal += "\'";
-			retVal += singleAnswerTerm;
+		if (singleAnswerTerm == null) return null;
+		if (compositeAnswerTerm == null) {
+			retVal += "\'" + singleAnswerTerm + "\'";
 		}
-		// A list or a structure.
-		if (compositeAnswerTerm != null) {
-			if (singleAnswerTerm == null) {
+		else {
+			if (singleAnswerTerm.equals(".")) {
 				retVal+="new Array("; // A list
-				subTermWithCommasAround = true;
 			}
 			else retVal+="("; // A structure
 			
 			for (int i=0; i<compositeAnswerTerm.length; i++) {
-				retVal+=compositeAnswerTerm[i].toJavaScript(subTermWithCommasAround);
+				retVal+=compositeAnswerTerm[i].toJavaScript();
 				if (i+1 < compositeAnswerTerm.length) retVal+=",";
 			}
 			retVal += ")";
 		}
-		if ((singleAnswerTerm != null) && (withCommasAround)) retVal += "\'";
 		return retVal;
 	}
 }

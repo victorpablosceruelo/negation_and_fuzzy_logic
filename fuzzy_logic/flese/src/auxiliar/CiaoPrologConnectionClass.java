@@ -120,7 +120,7 @@ public class CiaoPrologConnectionClass {
 			tmp = "";
 			tmp += "addToProgramIntrospection("+counter+", new predInfo(";
 			for (int i=0; i<predInfo.length; i++) {
-				tmp += predInfo[i].toJavaScript(true);
+				tmp += predInfo[i].toJavaScript();
 				if (i+1 < predInfo.length) tmp += ",";
 			}
 			tmp += "));";
@@ -157,7 +157,7 @@ public class CiaoPrologConnectionClass {
 			answer = latestEvaluatedQueryAnswersIterator.next();
 			result[answersCounter] = "addToProgramQueryAnsers("+answersCounter+", new Array(";
 			for (int i=0; i<answer.length; i++) {
-				result[answersCounter] += answer[i].toJavaScript(true);
+				result[answersCounter] += answer[i].toJavaScript();
 				if ((i+1) < answer.length) result[answersCounter] += ", ";
 			}
 			result[answersCounter] += ")); ";

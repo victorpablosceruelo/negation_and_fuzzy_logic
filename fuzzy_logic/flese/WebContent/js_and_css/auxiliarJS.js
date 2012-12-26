@@ -767,7 +767,7 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	html += "<option name=\'----\' value=\'----\'>----</option>";		
 	
 	var moreInfoIndex = 0;
-	while (moreInfoIndex < operatorsPredInfo.predOtherInfo.length != null) {
+	while (moreInfoIndex < operatorsPredInfo.predOtherInfo.length) {
 		debug.info("->"+operatorsPredInfo.predOtherInfo[moreInfoIndex]);
 		moreInfoIndex++;
 	}
