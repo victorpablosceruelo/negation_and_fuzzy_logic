@@ -444,6 +444,9 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 			html += "<option title=\'" + i + "\' value=\'" + programIntrospection[i].predName + "\'>"+
 					prologNameInColloquialLanguage(programIntrospection[i].predName) + "</option>";
 		}
+		else {
+			debug.info("invalid: " + programIntrospection[i].predName + "/" + programIntrospection[i].predArity);
+		}
 	}
 	html += "</select>";
 	
@@ -763,7 +766,11 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	html += "\'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";		
 	
-
+	var moreInfoIndex = 0;
+	while (moreInfoIndex < operatorsPredInfo.predOtherInfo.length != null) {
+		debug.info("->"+operatorsPredInfo.predOtherInfo[moreInfoIndex]);
+		moreInfoIndex++;
+	}
 	var operators = operatorsPredInfo.predOtherInfo;
 	for (var i=0; i<operators.length; i++) {
 		
