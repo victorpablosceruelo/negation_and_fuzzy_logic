@@ -113,13 +113,23 @@ function addToProgramIntrospection(index, predInfo) {
 	programIntrospection[index] = predInfo;
 }
 
+function predMoreInfoClass(key, value) {
+	this.key = key;
+	this.value = value;
+}
+
 function predInfo(predName, predArity, predType, predMoreInfo) {
 	this.predName = predName;
 	this.predArity = predArity;
 	this.predType = predType;
 	this.predMoreInfo = new Array();
 	for (var i=0; i<predMoreInfo.length; i++) {
-		debug.info(predMoreInfo[i]);
+		if (predMoreInfo[i].length >= 2) {
+			this.predMoreInfo[i] = new predMoreInfoClass(predMoreInfo[i][0], predMoreInfo[i][1]);
+			for (var j=2; j<predMoreInfo[i].length; j++) {
+				alert("predMoreInfo["+i+"][" +j +"]: " + predMoreInfo[i][j]);
+			}
+		}
 	}
 	
 }
@@ -289,7 +299,7 @@ function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTy
 	for (var i=0; i<programIntrospection.length; i++) {
 		valid = false;
 		for (var j=0; j<programIntrospection[i].predMoreInfo.length; j++) {
-			if (programIntrospection[i].predMoreInfo[j][0] == 'database') {
+			if (programIntrospection[i].predMoreInfo[j].key == 'database') {
 				valid = true;
 			}
 		}

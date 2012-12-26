@@ -166,7 +166,7 @@ public class AnswerTermInJavaClass {
 			else retVal += "\'" + singleAnswerTerm + "\'";
 		}
 		else {
-			if (singleAnswerTerm.equals(".")) {
+			if ((singleAnswerTerm.equals(".")) || (singleAnswerTerm.equals(","))) {
 				retVal+="new Array("; // A list
 			}
 			else retVal+="("; // A structure
