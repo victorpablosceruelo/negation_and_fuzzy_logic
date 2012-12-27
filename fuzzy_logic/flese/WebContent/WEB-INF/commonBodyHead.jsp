@@ -4,6 +4,16 @@
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <%@page import="auxiliar.UrlMappingClass"%>
 <script type="text/javascript">
+
+	function isString(o) {
+		var result = false;
+		if ((o != null) && (o != undefined)) {
+			result = (typeof o == "string") || (o instanceof String) || (typeof o == "object" && o.constructor === String);
+		}
+		// alert("isString returns " + result);
+		return result;
+	}
+	
 	function urlMapping(nickName, url) {
 		this.nickName = nickName;
 		this.url = url;
@@ -16,14 +26,22 @@
 	}
 %>
 	function urlMappingFor (nickName) {
+		// alert("urlMappingFor");
 		var found = false;
 		var i = 0;
-		while ((! found) && (i < urlsMappings.length)) {
-			if (urlsMappings[i].nickName == nickName) {
-				found = true;
-				return urlsMappings[i].url;
+		if (isString(nickName)) {
+			if ((urlsMappings != null) && (urlsMappings.length != null) && (urlsMappings.length != undefined)) {
+				while ((! found) && (i < urlsMappings.length)) {
+					if (urlsMappings[i].nickName == nickName) {
+						found = true;
+						return urlsMappings[i].url;
+					}
+					else i++;
+				}
 			}
-			else i++;
+			else {
+				alert("Error in urlMappingFor. urlsMappings is not correctly defined.");
+			}
 		}
 		alert("Error in urlMappingFor. Not recognized nickName: " + nickName);
 		return null;

@@ -213,9 +213,10 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	var runQueryTargetiFrameId = "runQueryTargetiFrame";
 	
 	var html = "";
-	html += "<form id='queryForm' method='POST' accept-charset='utf-8' ";
-	html += "      action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
-	html += "      target='" + runQueryTargetiFrameId+ "'>";
+	html += "<form id='queryForm' action='' method='POST' accept-charset='utf-8'> ";
+	// 
+	// html += "      action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
+	// html += "      target='" + runQueryTargetiFrameId+ "'>";
 	html += "     <div id='queryStartContainer' class='queryStartContainerTable'>";
 	html += "          <div class='queryStartContainerTableRow'>";
 	html += "               <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>";
@@ -230,7 +231,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "                    <INPUT type='submit' value='Search' "+
 									"onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
 									"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + 
-									"\", \"" + queryLinesCounterFieldId+"\");'>";
+									"\", \"" + queryLinesCounterFieldId+"\", \""+fileName+"\", \""+fileOwner+"\");' >";
 	html += "               </div>";
 	html += "               <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;</div>";
 	html += "               <div class='searchOrPersonalizeTableCell'>";
@@ -827,65 +828,128 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-/* This function makes a soft test of the query. The one in charge of running the query is below. */
-function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId) {
-	var comboBox = document.getElementById(chooseQueryStartTypeId);
+function comboBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
+	alert("comboBoxCheckValue(" + fieldName + ", " + errorText + ", " + choosingIsMandatory + ")");
+	if (! isString(fieldName)) return null;
+	
+	var comboBox = document.getElementById(fieldName);
 	var comboBoxValue = null;
 	
-	if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
-	if (comboBox != null) {
+	// alert("step 1 comboBoxCheckValue " + fieldName);
+	if (comboBox == null) {
+		debug.info("comboBox (step 1) is null ("+fieldName+")");
+		return null;
+	}
+	if ((comboBox.length != null) && (comboBox.length != undefined) && (comboBox.length >= 1)) 
+		comboBox = comboBox[0]; // Sometimes it is an array.
+	
+	// alert("step 2 comboBoxCheckValue " + fieldName);
+	if (comboBox == null) {
+		debug.info("comboBox (step 2) is null ("+fieldName+")");
+		return null;
+	}
+	else {
 		if (comboBox.selectedIndex != null) {
 			comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-			if ((comboBoxValue != null) && (comboBoxValue != '----')) {
-				debug.info("comboBoxValue: " + comboBoxValue);
+			if (comboBoxValue != null) {
+				if (comboBoxValue != '----') {
+					debug.info("comboBoxValue ("+fieldName+"): " + comboBoxValue);
+					return "&" + fieldName + "=" + comboBoxValue;
+				}
+				else {
+					if (choosingIsMandatory) {
+						debug.info("choosingIsMandatory ("+fieldName+"): " + choosingIsMandatory);
+						alert(errorText);
+						return null;
+					}
+				}
 			}
 			else {
-				alert("Please, say what you are looking for.");
-				return false; 				
+				debug.info("null comboBoxValue in comboBox "+fieldName);
+				return null; 				
 			}
 		}
 		else {
-			debug.info("comboBox.selectedIndex is null ");
-			return false;
+			/// Siempre se mete por aqui !!!!!
+			debug.info("null selectedIndex in comboBox "+fieldName);
+			return null;
 		}
 	}
+}
+
+function comboBoxOrTextBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
+	// document.getElementsByName(fieldName);
+	var textField = document.getElementById(fieldName);
+	if (textField == null) {
+		debug.info("textField (step 1) is null ("+fieldName+")");
+		return null;
+	}
+	 
+	if (textField.length >= 1) textField = textField[0];
+	if (textField == null) {
+		debug.info("textField (step 1) is null ("+fieldName+")");
+		return null;
+	}
 	else {
-		debug.info("comboBox is null.");
+		if ((textField.value == null) || (textField.value == undefined)) {
+			debug.info("textField.value ("+fieldName+"): " + textField.value);
+			return comboBoxCheckValue(fieldName, errorText, choosingIsMandatory);
+		}
+		else {
+			if (textField.value == '') {
+				debug.info("textField.value ("+fieldName+"): empty string");
+				alert(errorText);
+				return null;
+			}
+			else {
+				debug.info("textField.value ("+fieldName+"): " + textField.value);
+				return "&" + fieldName + "=" + textField.value;
+			}
+		}
+	}	
+}
+
+/* This function makes a soft test of the query. The one in charge of running the query is below. */
+function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId, fileName, fileOwner) {
+	debug.info("runQueryAfterSoftTests");
+	
+	var action = urlMappingFor('RunQueryRequest');
+	if (isString(action) && isString(fileName) && isString(fileOwner)) {
+		action += "&fileName=" + fileName + "&fileOwner="+fileOwner;
+	}
+	else alert("ERROR: form action, fileName or fileOwner are not a string.");
+	var actionTmp = null;
+	actionTmp = comboBoxCheckValue(chooseQueryStartTypeId, "Please, say what you are looking for.", true);
+	if (actionTmp != null) action += actionTmp; 
+	else {
+		alert("actionTmp is null.");
 		return false;
 	}
+	alert("step 2");
 	
 	// alert("Stop 2");
 	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
 	for (var i=0; i < queryLinesCounter; i++) {
 		// operator 
-		comboBox = document.getElementsByName("queryLine["+i+"].selectRfuzzyComputeOperator");
-		if ((comboBox != null) && (comboBox.length == 1)) comboBox = comboBox[0];
-		if (comboBox != null) {
-			if (comboBox.selectedIndex != null) {
-				comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-				if (comboBoxValue == '----') {
-					alert("Please fill the operator in subquery number " + (i+1));
-					return false; 
-				}
-				else debug.info("comboBoxValue: " + comboBoxValue);
-			}
-			else debug.info("comboBox.selectedIndex is null ");
+		actionTmp = comboBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeOperator", "Please fill the operator in subquery number " + (i+1), true);
+		if (actionTmp != null) action += actionTmp;
+		else {
+			alert("actionTmp is null.");
+			return false;
 		}
-		else debug.info("comboBox is null.");
+		alert("step 3 - " + i);
 		
 		// value 
-		var value = document.getElementsByName("queryLine["+i+"].selectRfuzzyComputeValue");
-		if ((value != null) && (value.length == 1)) value = value[0];
-		if (value != null) {
-			if (value.value == '') {
-				alert("Please fill the value in subquery number " + (i+1));
-				return false; 
-			}
-			else debug.info("value: " + value);
+		actionTmp = comboBoxOrTextBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeValue", "Please fill the value in subquery number " + (i+1), true);
+		if (actionTmp != null) action += actionTmp;
+		else {
+			alert("actionTmp is null.");
+			return false;
 		}
-		else debug.info("value is null.");
+		alert("step 4 - " + i);
 	}
 	
+	alert("step 5");
 	var runQueryDiv = document.getElementById(runQueryDivId);
 	runQueryDiv.innerHTML = loadingImageHtml(true);
 	runQueryDiv.style.display='block'; 
@@ -894,8 +958,9 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	// Used to debug
 	//alert("Stop");
 	
-	// Tell the navigator to follow the link !!!
-	return true;
+	// Tell the navigator not to follow the link !!!
+	alert("step 6");
+	return false;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -1244,10 +1309,6 @@ function resultOver(value, index) {
 	if ((realValue == null) || (realValue == undefined)) return false;
 	if (realValue == "Truth Value") return true;
 	return (parseFloat(realValue) > value);
-}
-
-function isString(o) {
-    return typeof o == "string" || (typeof o == "object" && o.constructor === String);
 }
 
 function prologNameInColloquialLanguage(textLabelIn) {
