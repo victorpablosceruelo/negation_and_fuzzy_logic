@@ -246,7 +246,8 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
     	
 	selectQueryDiv.innerHTML = html;
 	document.getElementById(queryLinesContainerId).style.display='none';
-	
+
+	/*
 	// Callback run after runQueryTargetiFrame is loaded.
 	$('#' + runQueryTargetiFrameId).load(function() {
 		// document.getElementById('#' + submitiFrameId);
@@ -277,6 +278,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 		}
 		  
 	});
+	*/
 	
 	insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
 	
@@ -931,8 +933,10 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	if (chooseQueryStartType != null) {
 		action += "&selectQueryStartupType=" + chooseQueryStartType; 
 	
-		alert("step 1");
-	
+		actionTmp = comboBoxOrTextBoxCheckValue("queryLinesCounter", null);
+		if (actionTmp != null) action += "&queryLinesCounter=" +actionTmp;
+		else error = true;		
+		
 		var actionTmp = null;
 		var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
 		for (var i=0; i < queryLinesCounter; i++) {
@@ -945,13 +949,11 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 				actionTmp = comboBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeOperator", "Please fill the operator in subquery number " + (i+1));
 				if (actionTmp != null) action += "&queryLine["+i+"].selectRfuzzyComputeOperator=" + actionTmp;
 				else error = true;
-				alert("step 3 - " + i);
 		
 				// value 
 				actionTmp = comboBoxOrTextBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeValue", "Please fill the value in subquery number " + (i+1));
 				if (actionTmp != null) action += "&queryLine["+i+"].selectRfuzzyComputeValue=" +actionTmp;
 				else error = true;
-				alert("step 4 - " + i);
 			}
 			// quantifier 0
 			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectQuantifier_0", null);
@@ -963,19 +965,22 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 		}
 	}
 	
-	alert("step 5");
 	var runQueryDiv = document.getElementById(runQueryDivId);
-	runQueryDiv.innerHTML = loadingImageHtml(true);
-	runQueryDiv.style.display='block'; 
-	// runQueryDiv.style.display='inline';
 	
-	// Used to debug
-	// alert("Stop");
-	
-	if (! error) {
+	if (error) {
+		runQueryDiv.innerHTML = "Your query contains errors. Please, fix them and press the search button again.";
+	}
+	else {
+		runQueryDiv.innerHTML = loadingImageHtml(true);
+		runQueryDiv.style.display='block'; 
+		// runQueryDiv.style.display='inline';
+		
 		sendSearchQuery(action, runQueryDivId);
 	}
 	
+	// Used to debug
+	// alert("Stop");
+
 	// Tell the navigator not to follow the link !!!
 	return false;
 }
@@ -1016,6 +1021,17 @@ function needsComputeFields(actionTmp, chooseQueryStartType) {
 	
 function sendSearchQuery(action, runQueryDivId) {
 	alert("Sending search query.");
+	
+	$.getScript(action, 
+			function(data, textStatus, jqxhr) {
+				// debug.info("ProgramFileIntrospectionRequest done ... ");
+	   			// alert("ProgramFileIntrospectionRequest done ... ");
+				// alert("data: " + data);
+		
+				// Show the answers retrieved to the user.
+				showQueryAnswers(runQueryDivId);
+			});
+
 }
 	
 /* ---------------------------------------------------------------------------------------------------------------- */
