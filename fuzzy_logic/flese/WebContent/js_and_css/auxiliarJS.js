@@ -752,7 +752,7 @@ function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoInd
 		html += "</select>";
 	}
 	else {
-		html += "<input type='text' value='' name='"+rfuzzyComputeArgumentId+"'/>";
+		html += "<input type='text' value='' name='"+rfuzzyComputeArgumentId+"' id='"+rfuzzyComputeArgumentId+"' />";
 	}
 	cell.innerHTML = html;
 }
@@ -835,15 +835,7 @@ function comboBoxCheckValue(fieldName, errorText) {
 	
 	// alert("step 1 comboBoxCheckValue " + fieldName);
 	if (comboBox == null) {
-		debug.info("comboBox (step 1) is null ("+fieldName+")");
-		return null;
-	}
-	//if ((comboBox.length != null) && (comboBox.length != undefined) && (comboBox.length >= 1)) 
-	//	comboBox = comboBox[0]; // Sometimes it is an array.
-	
-	// alert("step 2 comboBoxCheckValue " + fieldName);
-	if (comboBox == null) {
-		debug.info("comboBox (step 2) is null ("+fieldName+")");
+		debug.info("null comboBox "+fieldName);
 		return null;
 	}
 	else {
@@ -883,29 +875,35 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 	// document.getElementsByName(fieldName);
 	var textField = document.getElementById(fieldName);
 	if (textField == null) {
-		debug.info("textField (step 1) is null ("+fieldName+")");
-		return null;
-	}
-	 
-	if (textField.length >= 1) textField = textField[0];
-	if (textField == null) {
-		debug.info("textField (step 1) is null ("+fieldName+")");
+		debug.info("null textField "+fieldName);
 		return null;
 	}
 	else {
-		if ((textField.value == null) || (textField.value == undefined)) {
-			debug.info("textField.value ("+fieldName+"): " + textField.value);
+		if (textField.value == null) {
+			debug.info("null value in textField "+fieldName);
 			return comboBoxCheckValue(fieldName, errorText);
 		}
-		else {
+		if (textField.value == undefined) {
+			debug.info("undefined value in textField "+fieldName);
+			if (errorText != null) alert(errorText);
+			return null;
+		}
+		
+		if ((textField.value != null) && (textField.value != undefined)) {
 			if (textField.value == '') {
 				debug.info("textField.value ("+fieldName+"): empty string");
 				alert(errorText);
 				return null;
 			}
 			else {
-				debug.info("textField.value ("+fieldName+"): " + textField.value);
-				return "&" + fieldName + "=" + textField.value;
+				if ((errorText != null) && (textField.value == '----')) {
+					alert(errorText);
+					return null;
+				}
+				else {
+					debug.info("textField.value ("+fieldName+"): " + textField.value);
+					return textField.value;
+				}
 			}
 		}
 	}	
@@ -951,7 +949,7 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 		
 				// value 
 				actionTmp = comboBoxOrTextBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeValue", "Please fill the value in subquery number " + (i+1));
-				if (actionTmp != null) action += actionTmp;
+				if (actionTmp != null) action += "&queryLine["+i+"].selectRfuzzyComputeValue=" +actionTmp;
 				else error = true;
 				alert("step 4 - " + i);
 			}
@@ -972,7 +970,7 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	// runQueryDiv.style.display='inline';
 	
 	// Used to debug
-	alert("Stop");
+	// alert("Stop");
 	
 	if (! error) {
 		sendSearchQuery(action, runQueryDivId);
