@@ -443,7 +443,7 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 	row.appendChild(cell);
 	
 	var queryLineSelectPredicateId = queryLineId + ".selectPredicate";
-	var html = "<select name=\'"+queryLineSelectPredicateId+"\'"+
+	var html = "<select name=\'"+queryLineSelectPredicateId+"\' id=\'"+queryLineSelectPredicateId+"\' "+
 				"onchange=\"selectPredicateChanged(this, \'" + queryLineId + "\', \'"+rowId+ "\', \'"+startupType+"\', \'" + queryLinesTableId + "');\">";
 	html += "<option name=\'----\' value=\'----\''>----</option>";
 	var addOption=false;
@@ -457,9 +457,9 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 			html += "<option title=\'" + i + "\' value=\'" + programIntrospection[i].predName + "\'>"+
 					prologNameInColloquialLanguage(programIntrospection[i].predName) + "</option>";
 		}
-		else {
-			debug.info("invalid: " + programIntrospection[i].predName + "/" + programIntrospection[i].predArity);
-		}
+//		else {
+//			debug.info("invalid: " + programIntrospection[i].predName + "/" + programIntrospection[i].predArity);
+//		}
 	}
 	html += "</select>";
 	
@@ -725,7 +725,7 @@ function insertRfuzzyComputeArgument(queryLineGeneralId, rowId, foundPredInfoInd
 	var type = foundPredInfo.predType[typeIndex];
 	
 	if (type[type.length-1] == 'rfuzzy_enum_type') {
-		html += "<select name=\'" + rfuzzyComputeArgumentId + "\'>";;
+		html += "<select name=\'" + rfuzzyComputeArgumentId + "\' id=\'" + rfuzzyComputeArgumentId + "\' >";;
 		html += "<option name=\'----\' value=\'----\'>----</option>";
 		
 		var valuesIndex = 0;
@@ -790,9 +790,7 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 	row.appendChild(cell);
 	
 	var rfuzzyComputeOperatorId = queryLineGeneralId + ".selectRfuzzyComputeOperator";
-	var html="<select name=\'";
-	html += rfuzzyComputeOperatorId;
-	html += "\'>";
+	var html="<select name=\'" + rfuzzyComputeOperatorId + "\' id=\'" + rfuzzyComputeOperatorId + "\'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";		
 	
 	var moreInfoIndex = 0;
@@ -828,8 +826,8 @@ function insertRfuzzyComputeOperator(queryLineGeneralId, rowId, foundPredInfoInd
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function comboBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
-	alert("comboBoxCheckValue(" + fieldName + ", " + errorText + ", " + choosingIsMandatory + ")");
+function comboBoxCheckValue(fieldName, errorText) {
+	// alert("comboBoxCheckValue(" + fieldName + ", " + errorText + ")");
 	if (! isString(fieldName)) return null;
 	
 	var comboBox = document.getElementById(fieldName);
@@ -854,14 +852,14 @@ function comboBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
 			if (comboBoxValue != null) {
 				if (comboBoxValue != '----') {
 					debug.info("comboBoxValue ("+fieldName+"): " + comboBoxValue);
-					return "&" + fieldName + "=" + comboBoxValue;
+					return comboBoxValue;
 				}
 				else {
-					if (choosingIsMandatory) {
-						debug.info("choosingIsMandatory ("+fieldName+"): " + choosingIsMandatory);
+					if (errorText != null) {
+						debug.info("choosingIsMandatory in comboBox "+fieldName);
 						alert(errorText);
-						return null;
 					}
+					return null;
 				}
 			}
 			else {
@@ -877,7 +875,11 @@ function comboBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
 	}
 }
 
-function comboBoxOrTextBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 	// document.getElementsByName(fieldName);
 	var textField = document.getElementById(fieldName);
 	if (textField == null) {
@@ -893,7 +895,7 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText, choosingIsMandatory) 
 	else {
 		if ((textField.value == null) || (textField.value == undefined)) {
 			debug.info("textField.value ("+fieldName+"): " + textField.value);
-			return comboBoxCheckValue(fieldName, errorText, choosingIsMandatory);
+			return comboBoxCheckValue(fieldName, errorText);
 		}
 		else {
 			if (textField.value == '') {
@@ -909,44 +911,58 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText, choosingIsMandatory) 
 	}	
 }
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
 function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId, fileName, fileOwner) {
 	debug.info("runQueryAfterSoftTests");
 	
+	var error = false;
 	var action = urlMappingFor('RunQueryRequest');
 	if (isString(action) && isString(fileName) && isString(fileOwner)) {
 		action += "&fileName=" + fileName + "&fileOwner="+fileOwner;
 	}
-	else alert("ERROR: form action, fileName or fileOwner are not a string.");
-	var actionTmp = null;
-	actionTmp = comboBoxCheckValue(chooseQueryStartTypeId, "Please, say what you are looking for.", true);
-	if (actionTmp != null) action += actionTmp; 
 	else {
-		alert("actionTmp is null.");
-		return false;
+		error = true;
+		alert("ERROR: form action, fileName or fileOwner are not a string.");
 	}
-	alert("step 2");
 	
-	// alert("Stop 2");
-	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
-	for (var i=0; i < queryLinesCounter; i++) {
-		// operator 
-		actionTmp = comboBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeOperator", "Please fill the operator in subquery number " + (i+1), true);
-		if (actionTmp != null) action += actionTmp;
-		else {
-			alert("actionTmp is null.");
-			return false;
-		}
-		alert("step 3 - " + i);
+	var chooseQueryStartType = comboBoxCheckValue(chooseQueryStartTypeId, "Please, say what you are looking for.");
+	if (chooseQueryStartType != null) {
+		action += "&selectQueryStartupType=" + chooseQueryStartType; 
+	
+		alert("step 1");
+	
+		var actionTmp = null;
+		var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
+		for (var i=0; i < queryLinesCounter; i++) {
+			// predicate
+			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectPredicate", null);
+			if (actionTmp != null) action += "&queryLine["+i+"].selectPredicate=" + actionTmp;
+			
+			if (needsComputeFields(actionTmp, chooseQueryStartType)) {
+				// operator 
+				actionTmp = comboBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeOperator", "Please fill the operator in subquery number " + (i+1));
+				if (actionTmp != null) action += "&queryLine["+i+"].selectRfuzzyComputeOperator=" + actionTmp;
+				else error = true;
+				alert("step 3 - " + i);
 		
-		// value 
-		actionTmp = comboBoxOrTextBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeValue", "Please fill the value in subquery number " + (i+1), true);
-		if (actionTmp != null) action += actionTmp;
-		else {
-			alert("actionTmp is null.");
-			return false;
+				// value 
+				actionTmp = comboBoxOrTextBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeValue", "Please fill the value in subquery number " + (i+1));
+				if (actionTmp != null) action += actionTmp;
+				else error = true;
+				alert("step 4 - " + i);
+			}
+			// quantifier 0
+			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectQuantifier_0", null);
+			if (actionTmp != null) action += "&queryLine["+i+"].selectQuantifier_0=" + actionTmp;
+
+			// quantifier 1
+			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectQuantifier_1", null);
+			if (actionTmp != null) action += "&queryLine["+i+"].selectQuantifier_1=" + actionTmp;
 		}
-		alert("step 4 - " + i);
 	}
 	
 	alert("step 5");
@@ -956,13 +972,54 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	// runQueryDiv.style.display='inline';
 	
 	// Used to debug
-	//alert("Stop");
+	alert("Stop");
+	
+	if (! error) {
+		sendSearchQuery(action, runQueryDivId);
+	}
 	
 	// Tell the navigator not to follow the link !!!
-	alert("step 6");
 	return false;
 }
 
+function needsComputeFields(actionTmp, chooseQueryStartType) {
+	var i = 0;
+	var found = false;
+	while (i<programIntrospection.length && ! found){
+		if (programIntrospection[i].predName == actionTmp) found = true;
+		else i++;
+	}
+	if (! found) {
+		debug.info("Predicate " + actionTmp + "could not be found.");
+		return false;
+	}
+	else {
+		var j = 0;
+		found = false;
+		while (j<programIntrospection[i].predType.length && ! found) {
+			if (programIntrospection[i].predType[j][0] == chooseQueryStartType) found = true;
+			else j++;
+		}
+		if (! found) {
+			alert("Predicate " + actionTmp + "does not work for type " + chooseQueryStartType);
+			return false;
+		}
+		else {
+			if (programIntrospection[i].predType[j][programIntrospection[i].predType[j].length -1] != 'rfuzzy_truth_value_type') {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+	
+function sendSearchQuery(action, runQueryDivId) {
+	alert("Sending search query.");
+}
+	
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
