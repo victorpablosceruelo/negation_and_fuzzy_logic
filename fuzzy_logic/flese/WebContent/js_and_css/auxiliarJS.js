@@ -840,8 +840,8 @@ function comboBoxCheckValue(fieldName, errorText, choosingIsMandatory) {
 		debug.info("comboBox (step 1) is null ("+fieldName+")");
 		return null;
 	}
-	if ((comboBox.length != null) && (comboBox.length != undefined) && (comboBox.length >= 1)) 
-		comboBox = comboBox[0]; // Sometimes it is an array.
+	//if ((comboBox.length != null) && (comboBox.length != undefined) && (comboBox.length >= 1)) 
+	//	comboBox = comboBox[0]; // Sometimes it is an array.
 	
 	// alert("step 2 comboBoxCheckValue " + fieldName);
 	if (comboBox == null) {
