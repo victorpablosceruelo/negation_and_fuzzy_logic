@@ -140,7 +140,8 @@ public class CiaoPrologConnectionClass {
 
 	public String[] getQueryAnswersInJS () {
 		if (latestEvaluatedQueryAnswers==null) return null;
-		Iterator <AnswerTermInJavaClass[]> latestEvaluatedQueryAnswersIterator = getLatestEvaluatedQueryAnswersIterator();
+		Iterator <AnswerTermInJavaClass[]> latestEvaluatedQueryAnswersIterator = null;
+		if (latestEvaluatedQueryAnswers != null) latestEvaluatedQueryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
 		if (latestEvaluatedQueryAnswersIterator == null) return null;
 		
 		String[] result = new String [latestEvaluatedQueryAnswers.size() + 1];
@@ -174,10 +175,6 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Iterator<AnswerTermInJavaClass []> getLatestEvaluatedQueryAnswersIterator() {
-		if (latestEvaluatedQueryAnswers == null) return null;
-		else return latestEvaluatedQueryAnswers.iterator();
-	}
 	public AnswerTermInJavaClass [] getPredicateInfo (String predicateName) {
 		Iterator<AnswerTermInJavaClass []> iterator = null;
 		if (programIntrospection != null) iterator = programIntrospection.iterator();
