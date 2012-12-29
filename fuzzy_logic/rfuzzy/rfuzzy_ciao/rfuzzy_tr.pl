@@ -420,6 +420,7 @@ translate(Other, Other) :-
 % ------------------------------------------------------
 
 translate_fuzzy(Pred_Info, Cls) :-
+	print_msg('debug', 'translate_fuzzy ::  (Pred_Info)', (Pred_Info)),
 	% Info previously retrieved or to be filled in.
 	rfuzzy_pred_info(Pred_Info,	_P_F, P_N, _P_A, P_TN, P_TA, P_B, NP_F, NP_N, NP_A, If_Cond, Cred_Op, Cred_Value, UN),
 
@@ -563,8 +564,11 @@ generate_ifcondition_subCl((Functor is_under Value), P_TN, P_TA, NP_Arg_Input, S
 	arg(2, Get_Value, Obtained_Value),
 	SubCl_IfCondition = (Get_Value, (Obtained_Value .<. Value)).
 
-	
+% generate_username_subCl(UN, SubCl_UserName)
+generate_username_subCl(UN, 'true') :-
+	nonvar(UN), UN = 'null', !.
 generate_username_subCl(UN, SubCl_UserName) :-
+	nonvar(UN), UN \== 'null', !, 
 	functor(Obtain_UserName, 'localUserName', 1),
 	arg(1, Obtain_UserName, Obtined_UserName),
 	SubCl_UserName = (Obtain_UserName, (Obtined_UserName = UN)).
