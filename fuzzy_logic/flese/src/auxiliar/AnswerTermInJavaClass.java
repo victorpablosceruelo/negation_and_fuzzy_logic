@@ -138,19 +138,31 @@ public class AnswerTermInJavaClass {
 	
 	/**
 	 * Tests if the answerTerm is a list.
-	 * In this case the answerTerm has compositeAnswerTerm, but has not singleAnswerTerm.
+	 * This happens only if (1) the functor is '.' and has arguments or if (2) the functor is '[]' and has no arguments.
 	 * @return = ((singleAnswerTerm == null) && (compositeAnswerTerm != null))
 	 */
 	public boolean isList() {
-		return ((singleAnswerTerm == null) && (compositeAnswerTerm != null));
+		return (((singleAnswerTerm != null) && (compositeAnswerTerm != null) && (".".equals(singleAnswerTerm))) ||
+				((singleAnswerTerm != null) && (compositeAnswerTerm == null) && ("[]".equals(singleAnswerTerm))));
 	}
+	
+	/**
+	 * Tests if the answerTerm is a structure.
+	 * This happens only if the functor is ',' and has arguments.
+	 * @return = ((singleAnswerTerm == null) && (compositeAnswerTerm != null))
+	 */
+	public boolean isArray() {
+		return ((singleAnswerTerm != null) && (compositeAnswerTerm != null) && (",".equals(singleAnswerTerm)));
+	}
+	
+	
 	public int length() {
-		if (! isList()) return 0;
+		if ((! isList()) && (! isArray())) return 0;
 		else
 			return compositeAnswerTerm.length;
 	}
 	public AnswerTermInJavaClass atPosition(int i) {
-		if ((isList()) && (i >= 0) && (i < length())) {
+		if (((isList()) || (isArray())) && (i >= 0) && (i < length())) {
 			return compositeAnswerTerm[i];
 		}
 		else return null;

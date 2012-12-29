@@ -223,14 +223,13 @@ public class QueryConversorClass {
 			throw new QueryConversorExceptionClass("predInfoMoreInfo is null.");
 		}
 		LOG.info("copyVariablesNamesToo: firstVarName: " + firstVarName + " predInfoMoreInfo: "+ predInfoMoreInfo);
-		LOG.info("copyVariablesNamesToo: firstVarName: " + firstVarName + " predInfoMoreInfo: "+ predInfoMoreInfo.toString());
+		// latestEvaluatedQueryAnswersIteratorLOG.info("copyVariablesNamesToo: firstVarName: " + firstVarName + " predInfoMoreInfo: "+ predInfoMoreInfo.toString());
 		
 		int i = 0;
 		int j = 0;
 		boolean found = false;
 		AnswerTermInJavaClass aux1 = null;
 		AnswerTermInJavaClass aux2 = null;
-		int lengthShowVariablesNames = 1;
 		
 		if (predInfoMoreInfo.isList()) {
 			while (i < predInfoMoreInfo.length() && (! found)) {
@@ -238,24 +237,16 @@ public class QueryConversorClass {
 				
 				if (aux1 == null) LOG.info("ERROR: aux1 is NULL.");
 				else {
-					LOG.info("aux1: " + aux1.toString() + " isList: " + aux1.isList() + " length: " + aux1.length());
-					if (! aux1.isList()) LOG.info("ERROR: aux1 is NOT a list.");
-					else {
-						if (aux1.length() == 1) LOG.info("ERROR: aux1 length is NOT over 1.");
+					if (aux1.isArray()) {
+						if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null) && 
+								("database".equals(aux1.atPosition(0).toString()))) {
+							LOG.info("Found database information: " + aux1.toString());
+							found = true;
+							aux2 = aux1.atPosition(1);
+						}
+						else LOG.info("ERROR: not valid value for aux1.atPosition(0)");
 					}
-				}
-
-				if ((aux1 != null) && (aux1.isList()) && (aux1.length() > 1)) {
-					LOG.info("aux1 is a list and its length is over 1.");
-					if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null) && 
-						("database".equals(aux1.atPosition(0).toString()))) {
-						LOG.info("Found database information: " + aux1.toString());
-						found = true;
-						aux2 = aux1.atPosition(1);
-
-						if (aux2.isList()) lengthShowVariablesNames += aux2.length();
-						else LOG.info("Found database information ... not a database definition.");
-					}
+					else LOG.info("ERROR: aux1 is NOT an array.");
 				}
 
 				if (! found) i++;
@@ -263,13 +254,20 @@ public class QueryConversorClass {
 		}
 		else LOG.info("ERROR: predInfoMoreInfo is NOT a list.");
 		
-		showVariablesNames = new String [lengthShowVariablesNames];
-		showVariablesNames[0] = firstVarName;
-		for (j=0; j < lengthShowVariablesNames; j++) {
-			if ((aux2 != null) && (aux2.atPosition(j) != null)) {
-				showVariablesNames[j+1] = aux2.atPosition(j).toString();
+		showVariablesNames = null;
+		if (aux2 != null) {
+			if (aux2.isList()) {
+				showVariablesNames = new String [aux2.length() +1];
+				showVariablesNames[0] = firstVarName;
+				for (j=0; j <= aux2.length(); j++) {
+					if ((aux2 != null) && (aux2.atPosition(j) != null)) {
+						showVariablesNames[j+1] = aux2.atPosition(j).toString();
+					}
+				}
 			}
+			else LOG.info("ERROR: aux2 is not a list. aux2: " + aux2.toString());
 		}
+		else LOG.info("ERROR: aux2 is null.");
 	}
 	
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave() 
@@ -509,6 +507,7 @@ public class QueryConversorClass {
 	}
 	
 	public String [] getListOfNamesForVariables() {
+		if (showVariablesNames == null) return null;
 		int length = showVariablesNames.length;
 		if (outputVariable != null) length++;
 		String [] listOfNamesForVariables = new String[length];

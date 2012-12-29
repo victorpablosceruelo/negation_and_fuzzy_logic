@@ -1376,6 +1376,7 @@ function truncate_truth_value (truth_value) {
 }
 
 function resultOver(value, index) {
+	if ((queryAnswers[index] == null) || (queryAnswers[index] == undefined)) return false;
 	var realValue = queryAnswers[index][queryAnswers[index].length -1];
 	if ((realValue == null) || (realValue == undefined)) return false;
 	if (realValue == "Truth Value") return true;
