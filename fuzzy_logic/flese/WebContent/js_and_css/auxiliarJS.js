@@ -1020,7 +1020,7 @@ function needsComputeFields(actionTmp, chooseQueryStartType) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 	
 function sendSearchQuery(action, runQueryDivId) {
-	alert("Sending search query.");
+	// alert("Sending search query.");
 	
 	$.getScript(action, 
 			function(data, textStatus, jqxhr) {
