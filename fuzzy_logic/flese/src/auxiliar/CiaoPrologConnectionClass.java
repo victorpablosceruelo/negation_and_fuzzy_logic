@@ -85,6 +85,7 @@ public class CiaoPrologConnectionClass {
 			performQuery(query, fileOwner, fileName, variables, null, null, null);
 			programIntrospection = latestEvaluatedQueryAnswers;
 
+			/*
 			if (programIntrospection == null) LOG.info("ERROR: queryAnswers is null.");
 			else {
 				Iterator<AnswerTermInJavaClass []> test = getProgramIntrospectionIterator();
@@ -97,6 +98,7 @@ public class CiaoPrologConnectionClass {
 				}
 				LOG.info(testMsg + "\n");
 			}
+			*/
 			LOG.info("programFileIntrospectionQuery: END");
 		}
 	}
@@ -107,7 +109,9 @@ public class CiaoPrologConnectionClass {
 
 	public String[] getProgramIntrospectionInJS () {
 		if (programIntrospection==null) return null;
-		Iterator <AnswerTermInJavaClass[]> programIntrospectionIterator = getProgramIntrospectionIterator();
+		Iterator <AnswerTermInJavaClass[]> programIntrospectionIterator = null;
+		if (programIntrospection != null) programIntrospectionIterator = programIntrospection.iterator();
+
 		if (programIntrospectionIterator == null) return null;
 		
 		String[] result = new String [programIntrospection.size()];
@@ -170,17 +174,14 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
-	private Iterator<AnswerTermInJavaClass []> getProgramIntrospectionIterator() {
-		if (programIntrospection == null) return null;
-		else return programIntrospection.iterator();
-	}
 	private Iterator<AnswerTermInJavaClass []> getLatestEvaluatedQueryAnswersIterator() {
 		if (latestEvaluatedQueryAnswers == null) return null;
 		else return latestEvaluatedQueryAnswers.iterator();
 	}
 	public AnswerTermInJavaClass [] getPredicateInfo (String predicateName) {
-		Iterator<AnswerTermInJavaClass []> iterator = getProgramIntrospectionIterator();
+		Iterator<AnswerTermInJavaClass []> iterator = null;
+		if (programIntrospection != null) iterator = programIntrospection.iterator();
+		
 		if ((predicateName == null) || ("".equals(predicateName))) {
 			LOG.info("Predicate Name is not valid. predicateName: " + predicateName);
 		}
@@ -287,12 +288,8 @@ public class CiaoPrologConnectionClass {
 				new PLTerm[]{variables[0], new PLAtom(programFileOwnerWithPath)}); 
 
 		performQueryAux(query, null, variables, maximumLong, maximumLong, plConnection);
-		Iterator<AnswerTermInJavaClass []> queryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
+		LOG.info("changeCiaoPrologWorkingFolder: amount of answers: " + latestEvaluatedQueryAnswers.size());
 
-		// Log results
-		while (queryAnswersIterator.hasNext()) {
-			LOG.info("changeCiaoPrologWorkingFolder: " + queryAnswersIterator.next().toString());
-		}
 		latestEvaluatedQueryProgramFileOwnerWithPath = programFileOwnerWithPath;
 		latestEvaluatedQueryProgramFileOwner = programFileOwner;
 		LOG.info("changeCiaoPrologWorkingFolder: changed working folder to " + latestEvaluatedQueryProgramFileOwner + " at " + latestEvaluatedQueryProgramFileOwnerWithPath);
