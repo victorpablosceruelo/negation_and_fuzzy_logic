@@ -16,7 +16,7 @@ public class ProgramAnalysisClass {
 	private String fileName = null; 
 	private String fileOwner = null;
 	private String filePath = null;
-	private ArrayList <ProgramPartAnalysisClass> programLines = null;
+	private ArrayList <ProgramPartAnalysisClass> programParts = null;
 	private ArrayList <ArrayList <FunctionAnalizedClass>> programFunctionsOrdered = null;
 	private Iterator <Iterator <FunctionAnalizedClass>> programFunctionsOrderedIterator = null;
 	private String [] programFunctionsOrderedInJavaScript = null;
@@ -49,7 +49,7 @@ public class ProgramAnalysisClass {
 		
 		LOG.info("localUserName: " + localUserName + " fileName: " + this.fileName + " fileOwner: " + this.fileOwner + " filePath: " + this.filePath);
 		
-		programLines = new ArrayList <ProgramPartAnalysisClass>();
+		programParts = new ArrayList <ProgramPartAnalysisClass>();
 		programFunctionsOrdered = new ArrayList <ArrayList <FunctionAnalizedClass>>();
 		programFunctionsOrderedIterator = null;
 		programFunctionsOrderedInJavaScript = null;
@@ -59,18 +59,21 @@ public class ProgramAnalysisClass {
 			BufferedReader reader = new BufferedReader(new FileReader(filePath));
 			
 			String line;
-			ProgramPartAnalysisClass programLine = null;
+			ProgramPartAnalysisClass programPart = null;
+			boolean continues = false;
 			
 			while ((line = reader.readLine()) != null) {
-				programLine = new ProgramPartAnalysisClass(line);
-				programLines.add(programLine);
+				if (! continues) programPart = new ProgramPartAnalysisClass();
 				
-				if (programLine.getFunctionAnalized() != null) {
+				programPart.parse(line);
+				programParts.add(programPart);
+				
+				if (programPart.getFunctionAnalized() != null) {
 					if ((localUserName.equals(fileOwner)) ||
-						((programLine.getFunctionAnalized().getPredOwner() != null) && 
-						 ((programLine.getFunctionAnalized().getPredOwner().equals(localUserName)) ||
-						  (programLine.getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION))))) {
-						addToFunctionsOrderedList(programLine.getFunctionAnalized());
+						((programPart.getFunctionAnalized().getPredOwner() != null) && 
+						 ((programPart.getFunctionAnalized().getPredOwner().equals(localUserName)) ||
+						  (programPart.getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION))))) {
+						addToFunctionsOrderedList(programPart.getFunctionAnalized());
 					}
 				}
 			}
@@ -167,7 +170,7 @@ public class ProgramAnalysisClass {
 			fuzzificationOwner = localUserName;
 		}
 		
-		ProgramPartAnalysisClass programLine = null;
+		ProgramPartAnalysisClass programPart = null;
 		
 		File file = new File(filePath);
 		if (file.exists()) {
@@ -189,7 +192,7 @@ public class ProgramAnalysisClass {
 		LOG.info("creating the file " + filePath);
 		file.createNewFile();
 
-		ArrayList <ProgramPartAnalysisClass> programLinesAffected = new ArrayList <ProgramPartAnalysisClass>();
+		ArrayList <ProgramPartAnalysisClass> programPartsAffected = new ArrayList <ProgramPartAnalysisClass>();
 		boolean foundFuzzifications = false;
 		boolean copiedBackFuzzifications = false;
 		
@@ -200,15 +203,15 @@ public class ProgramAnalysisClass {
 		String predNecessary = null;
 		boolean found = false;
 		
-		for (int i=0; i<programLines.size(); i++) {
-			programLine = programLines.get(i);
-			// LOG.info("analizing the program line: " + programLine.getLine());
+		for (int i=0; i<programParts.size(); i++) {
+			programPart = programParts.get(i);
+			// LOG.info("analizing the program line: " + programPart.getLine());
 			
 			if (! copiedBackFuzzifications) {
-				if ((programLine.getFunctionAnalized() != null) && 
-						(programLine.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
+				if ((programPart.getFunctionAnalized() != null) && 
+						(programPart.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
 					foundFuzzifications = true;
-					programLinesAffected.add(programLine);
+					programPartsAffected.add(programPart);
 				}
 				else {
 					if (foundFuzzifications) {
@@ -216,26 +219,26 @@ public class ProgramAnalysisClass {
 
 						// First the default definition.
 						found = false;
-						while ((j < programLinesAffected.size()) && (! found)) {
-							if (programLinesAffected.get(j).getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) found = true;
+						while ((j < programPartsAffected.size()) && (! found)) {
+							if (programPartsAffected.get(j).getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) found = true;
 							else j++;
 						}
 						// Initialize predNecessary value.
-						predNecessary = programLinesAffected.get(j).getFunctionAnalized().getPredNecessary();
+						predNecessary = programPartsAffected.get(j).getFunctionAnalized().getPredNecessary();
 						
 						if (fuzzificationOwner.equals(DEFAULT_DEFINITION)) {	
 							bw.write(buildFuzzificationLine(fuzzification, predNecessary, fuzzificationOwner, params));
 						}
 						else {
-							bw.write(programLinesAffected.get(j).getLine() + "\n");
+							bw.write(programPartsAffected.get(j).getLine() + "\n");
 						}
 						
 						// Now the other ones except the one we are playing with.
 						j=0;
-						while (j < programLinesAffected.size()) {
-							if ((! programLinesAffected.get(j).getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) &&
-								(! programLinesAffected.get(j).getFunctionAnalized().getPredOwner().equals(fuzzificationOwner))) {
-								bw.write(programLinesAffected.get(j).getLine() + "\n");
+						while (j < programPartsAffected.size()) {
+							if ((! programPartsAffected.get(j).getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) &&
+								(! programPartsAffected.get(j).getFunctionAnalized().getPredOwner().equals(fuzzificationOwner))) {
+								bw.write(programPartsAffected.get(j).getLine() + "\n");
 							}
 							j++;
 						}
@@ -249,7 +252,7 @@ public class ProgramAnalysisClass {
 			}
 			
 			if ((! foundFuzzifications) || (foundFuzzifications && copiedBackFuzzifications)) {
-				bw.write(programLine.getLine() + "\n");
+				bw.write(programPart.getLine() + "\n");
 			}
 		}
 		
