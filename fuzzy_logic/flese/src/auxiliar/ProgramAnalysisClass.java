@@ -7,8 +7,8 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ProgramAnalizedClass {
-	final Log LOG = LogFactory.getLog(ProgramAnalizedClass.class);
+public class ProgramAnalysisClass {
+	final Log LOG = LogFactory.getLog(ProgramAnalysisClass.class);
 	
 	final private static String DEFAULT_DEFINITION = "default definition";
 	
@@ -16,7 +16,7 @@ public class ProgramAnalizedClass {
 	private String fileName = null; 
 	private String fileOwner = null;
 	private String filePath = null;
-	private ArrayList <ProgramLineClass> programLines = null;
+	private ArrayList <ProgramPartAnalysisClass> programLines = null;
 	private ArrayList <ArrayList <FunctionAnalizedClass>> programFunctionsOrdered = null;
 	private Iterator <Iterator <FunctionAnalizedClass>> programFunctionsOrderedIterator = null;
 	private String [] programFunctionsOrderedInJavaScript = null;
@@ -30,7 +30,7 @@ public class ProgramAnalizedClass {
 	 * @param filePath
 	 * @throws Exception when any of the previous is null or empty string.
 	 */
-	public ProgramAnalizedClass (String localUserName, String fileName, String fileOwner, String filePath) throws Exception {
+	public ProgramAnalysisClass (String localUserName, String fileName, String fileOwner, String filePath) throws Exception {
 		
 		if (localUserName == null) throw new Exception("localUserName cannot be null.");
 		if (fileName == null) throw new Exception("fileName cannot be null.");
@@ -49,7 +49,7 @@ public class ProgramAnalizedClass {
 		
 		LOG.info("localUserName: " + localUserName + " fileName: " + this.fileName + " fileOwner: " + this.fileOwner + " filePath: " + this.filePath);
 		
-		programLines = new ArrayList <ProgramLineClass>();
+		programLines = new ArrayList <ProgramPartAnalysisClass>();
 		programFunctionsOrdered = new ArrayList <ArrayList <FunctionAnalizedClass>>();
 		programFunctionsOrderedIterator = null;
 		programFunctionsOrderedInJavaScript = null;
@@ -59,10 +59,10 @@ public class ProgramAnalizedClass {
 			BufferedReader reader = new BufferedReader(new FileReader(filePath));
 			
 			String line;
-			ProgramLineClass programLine = null;
+			ProgramPartAnalysisClass programLine = null;
 			
 			while ((line = reader.readLine()) != null) {
-				programLine = new ProgramLineClass(line);
+				programLine = new ProgramPartAnalysisClass(line);
 				programLines.add(programLine);
 				
 				if (programLine.getFunctionAnalized() != null) {
@@ -167,7 +167,7 @@ public class ProgramAnalizedClass {
 			fuzzificationOwner = localUserName;
 		}
 		
-		ProgramLineClass programLine = null;
+		ProgramPartAnalysisClass programLine = null;
 		
 		File file = new File(filePath);
 		if (file.exists()) {
@@ -189,7 +189,7 @@ public class ProgramAnalizedClass {
 		LOG.info("creating the file " + filePath);
 		file.createNewFile();
 
-		ArrayList <ProgramLineClass> programLinesAffected = new ArrayList <ProgramLineClass>();
+		ArrayList <ProgramPartAnalysisClass> programLinesAffected = new ArrayList <ProgramPartAnalysisClass>();
 		boolean foundFuzzifications = false;
 		boolean copiedBackFuzzifications = false;
 		

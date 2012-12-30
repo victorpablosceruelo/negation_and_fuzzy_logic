@@ -401,7 +401,7 @@ public class DispatchersClass {
 		
 		LOG.info(paramsDebug);
 		
-		ProgramAnalizedClass programAnalized = new ProgramAnalizedClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
+		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
 		programAnalized.updateProgramFile(fuzzification, fuzzificationOwner, params);
 		
 		connection.clearCacheInCiaoPrologConnectionClass();
