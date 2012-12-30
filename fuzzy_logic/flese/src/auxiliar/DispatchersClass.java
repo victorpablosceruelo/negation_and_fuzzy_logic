@@ -156,44 +156,49 @@ public class DispatchersClass {
 	    }
 	    LOG.info(formParameters);
 	    
-	    int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
-	    QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
-	    String msg = "";
-	    
-	    // Parameters to be retrieved and saved:
-	    // quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
-	    
-	    conversor.subqueryEndTestAndSave();
-	    msg += conversor.subqueryRetrieveAndSaveSubpart("selectQueryStartupType", request, QueryConversorClass.initialPredicate);
-	    msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
-	    
-	    for (int i=0; i<queryLinesCounter; i++) {
-	    	conversor.subqueryEndTestAndSave();
-	    
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_0", request, QueryConversorClass.quantifier0);
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_1", request, QueryConversorClass.quantifier1);
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectPredicate", request, QueryConversorClass.predicate);
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeOperator", request, QueryConversorClass.rfuzzyComputeOperator);
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeValue", request, QueryConversorClass.rfuzzyComputeValue);
+	    if (request.getParameter("queryLinesCounter") == null) {
+	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ExceptionAjaxPage, "", request, response, LOG);
 	    }
-	    LOG.info(msg);
-	    
-	    conversor.subqueryEndTestAndSave();
-	    PLStructure query = conversor.queryConvert();
-	    PLVariable [] variables = conversor.getListOfVariables();
-	    String [] variablesNames = conversor.getListOfNamesForVariables();
-	    String querySimpleInfoString = conversor.getQuerySimpleInfoString();
-	    String queryComplexInfoString = conversor.getQueryComplexInfoString();
+	    else {
+	    	int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
+	    	QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
+	    	String msg = "";
 
-	    connection.performQuery(query, fileOwner, fileName, variables, variablesNames, querySimpleInfoString, queryComplexInfoString);
-	    // performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)
-		
-		// Update the connection object in the session.
-		session.removeAttribute("connection"); 
-		session.setAttribute("connection", connection);
-		
-		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryAnswer, "", request, response, LOG);
+	    	// Parameters to be retrieved and saved:
+	    	// quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
+
+	    	conversor.subqueryEndTestAndSave();
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("selectQueryStartupType", request, QueryConversorClass.initialPredicate);
+	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
+
+	    	for (int i=0; i<queryLinesCounter; i++) {
+	    		conversor.subqueryEndTestAndSave();
+
+	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_0", request, QueryConversorClass.quantifier0);
+	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_1", request, QueryConversorClass.quantifier1);
+	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectPredicate", request, QueryConversorClass.predicate);
+	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeOperator", request, QueryConversorClass.rfuzzyComputeOperator);
+	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeValue", request, QueryConversorClass.rfuzzyComputeValue);
+	    	}
+	    	LOG.info(msg);
+
+	    	conversor.subqueryEndTestAndSave();
+	    	PLStructure query = conversor.queryConvert();
+	    	PLVariable [] variables = conversor.getListOfVariables();
+	    	String [] variablesNames = conversor.getListOfNamesForVariables();
+	    	String querySimpleInfoString = conversor.getQuerySimpleInfoString();
+	    	String queryComplexInfoString = conversor.getQueryComplexInfoString();
+
+	    	connection.performQuery(query, fileOwner, fileName, variables, variablesNames, querySimpleInfoString, queryComplexInfoString);
+	    	// performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)
+
+	    	// Update the connection object in the session.
+	    	session.removeAttribute("connection"); 
+	    	session.setAttribute("connection", connection);
+
+	    	// Forward to the jsp page.
+	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryAnswer, "", request, response, LOG);
+	    }
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////

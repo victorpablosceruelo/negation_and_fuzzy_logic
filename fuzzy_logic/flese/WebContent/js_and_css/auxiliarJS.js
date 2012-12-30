@@ -393,7 +393,13 @@ function incrementQueryLinesCounterField(queryLinesCounterFieldId) {
 }
 
 function getQueryLinesCounterField(queryLinesCounterFieldId) {
-	return document.getElementById(queryLinesCounterFieldId).value;
+	if ((document.getElementById(queryLinesCounterFieldId) != null) &&
+		(document.getElementById(queryLinesCounterFieldId) != undefined) &&
+		(document.getElementById(queryLinesCounterFieldId).value != null) &&
+		(document.getElementById(queryLinesCounterFieldId).value != undefined)) {
+		return document.getElementById(queryLinesCounterFieldId).value;
+	}
+	else return 0;
 }
 
 
@@ -930,7 +936,10 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 	}
 	
 	var chooseQueryStartType = comboBoxCheckValue(chooseQueryStartTypeId, "Please, say what you are looking for.");
-	if (chooseQueryStartType != null) {
+	if (chooseQueryStartType == null) {
+		error = true;
+	}
+	else {
 		action += "&selectQueryStartupType=" + chooseQueryStartType; 
 	
 		actionTmp = comboBoxOrTextBoxCheckValue("queryLinesCounter", null);
@@ -965,7 +974,17 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 		}
 	}
 	
+	if (!isString(runQueryDivId)) {
+		debug.info("ERROR: runQueryDivId is not a string.");
+		alert("ERROR: runQueryDivId is not a string.");
+		return false;
+	}
 	var runQueryDiv = document.getElementById(runQueryDivId);
+	if ((runQueryDiv == null) || (runQueryDiv == undefined)) {
+		debug.info("ERROR: runQueryDiv is null or undefined.");
+		alert("ERROR: runQueryDiv is null or undefined.");
+		return false;		
+	}
 	
 	if (error) {
 		runQueryDiv.innerHTML = "Your query contains errors. Please, fix them and press the search button again.";
@@ -1445,6 +1464,19 @@ var queryAnswersOver0 = null;
 
 function showQueryAnswers(runQueryDivId) {
 	
+	if (! isString(runQueryDivId)) {
+		debug.info("ERROR: runQueryDivId is not a string.");
+		alert("ERROR: runQueryDivId is not a string.");
+		return;
+	}
+	var runQueryDiv = document.getElementById(runQueryDivId);
+	if ((runQueryDiv == null) || (runQueryDiv == undefined)) {
+		debug.info("ERROR: runQueryDiv is null or undefined.");
+		alert("ERROR: runQueryDiv is null or undefined.");
+		return;
+	}
+	runQueryDiv.innerHTML = "";
+	
 	// Initialize.
 	infosForQueryAnswers = null;
 	
@@ -1481,9 +1513,6 @@ function showQueryAnswers(runQueryDivId) {
 			noAnswers = false;
 		}
 	}
-	
-	var runQueryDiv = document.getElementById(runQueryDivId);
-	runQueryDiv.innerHTML = "";
 	
 	if (noAnswers) {
 		runQueryDiv.innerHTML = "The query has no answers. Maybe the database is empty? ";
