@@ -975,7 +975,16 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrame
 		runQueryDiv.style.display='block'; 
 		// runQueryDiv.style.display='inline';
 		
-		sendSearchQuery(action, runQueryDivId);
+		// alert("Sending search query.");
+		$.getScript(action, 
+				function(data, textStatus, jqxhr) {
+					// debug.info("ProgramFileIntrospectionRequest done ... ");
+		   			// alert("ProgramFileIntrospectionRequest done ... ");
+					// alert("data: " + data);
+			
+					// Show the answers retrieved to the user.
+					showQueryAnswers(runQueryDivId);
+				});
 	}
 	
 	// Used to debug
@@ -1015,25 +1024,6 @@ function needsComputeFields(actionTmp, chooseQueryStartType) {
 	}
 	return false;
 }
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-	
-function sendSearchQuery(action, runQueryDivId) {
-	// alert("Sending search query.");
-	
-	$.getScript(action, 
-			function(data, textStatus, jqxhr) {
-				// debug.info("ProgramFileIntrospectionRequest done ... ");
-	   			// alert("ProgramFileIntrospectionRequest done ... ");
-				// alert("data: " + data);
-		
-				// Show the answers retrieved to the user.
-				showQueryAnswers(runQueryDivId);
-			});
-
-}
-	
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
