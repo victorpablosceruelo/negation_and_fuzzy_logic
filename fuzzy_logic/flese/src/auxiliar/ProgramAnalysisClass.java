@@ -17,8 +17,8 @@ public class ProgramAnalysisClass {
 	private String fileOwner = null;
 	private String filePath = null;
 	private ArrayList <ProgramPartAnalysisClass> programParts = null;
-	private ArrayList <ArrayList <FunctionAnalizedClass>> programFunctionsOrdered = null;
-	private Iterator <Iterator <FunctionAnalizedClass>> programFunctionsOrderedIterator = null;
+	private ArrayList <ArrayList <ProgramPartLineClass>> programFunctionsOrdered = null;
+	private Iterator <Iterator <ProgramPartLineClass>> programFunctionsOrderedIterator = null;
 	private String [] programFunctionsOrderedInJavaScript = null;
 	
 
@@ -50,7 +50,7 @@ public class ProgramAnalysisClass {
 		LOG.info("localUserName: " + localUserName + " fileName: " + this.fileName + " fileOwner: " + this.fileOwner + " filePath: " + this.filePath);
 		
 		programParts = new ArrayList <ProgramPartAnalysisClass>();
-		programFunctionsOrdered = new ArrayList <ArrayList <FunctionAnalizedClass>>();
+		programFunctionsOrdered = new ArrayList <ArrayList <ProgramPartLineClass>>();
 		programFunctionsOrderedIterator = null;
 		programFunctionsOrderedInJavaScript = null;
 		
@@ -63,31 +63,26 @@ public class ProgramAnalysisClass {
 			boolean continues = false;
 			
 			while ((line = reader.readLine()) != null) {
-				if (! continues) programPart = new ProgramPartAnalysisClass();
-				
-				programPart.parse(line);
-				programParts.add(programPart);
-				
-				if (programPart.getFunctionAnalized() != null) {
-					if ((localUserName.equals(fileOwner)) ||
-						((programPart.getFunctionAnalized().getPredOwner() != null) && 
-						 ((programPart.getFunctionAnalized().getPredOwner().equals(localUserName)) ||
-						  (programPart.getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION))))) {
-						addToFunctionsOrderedList(programPart.getFunctionAnalized());
+				while (line != null) {
+					if (! continues) {
+						programPart = new ProgramPartAnalysisClass();
 					}
+					line = programPart.parse(line);
 				}
+				continues = programPart.partIsIncomplete();
+				if (! continues) programParts.add(programPart);
 			}
 			reader.close();
 		}
 	}
 	
-	private void addToFunctionsOrderedList (FunctionAnalizedClass function) throws Exception {
+	private void addToFunctionsOrderedList (ProgramPartLineClass function) throws Exception {
 		
 		if (function == null) throw new Exception("function cannot be null.");
 
 		int i=0;
 		boolean placed = false;
-		ArrayList <FunctionAnalizedClass> current = null;
+		ArrayList <ProgramPartLineClass> current = null;
 
 		while ((i<programFunctionsOrdered.size()) && (! placed)) {
 			current = programFunctionsOrdered.get(i);
@@ -100,7 +95,7 @@ public class ProgramAnalysisClass {
 			i++;
 		}
 		if (! placed) {
-			current = new ArrayList <FunctionAnalizedClass>();
+			current = new ArrayList <ProgramPartLineClass>();
 			current.add(function);
 			programFunctionsOrdered.add(current);
 			placed = true;
@@ -112,8 +107,8 @@ public class ProgramAnalysisClass {
 		
 		if (programFunctionsOrderedIterator == null) {
 			programFunctionsOrderedInJavaScript = null;
-			ArrayList <Iterator <FunctionAnalizedClass>> tmp = new ArrayList <Iterator <FunctionAnalizedClass>>();
-			Iterator <FunctionAnalizedClass> current = null;
+			ArrayList <Iterator <ProgramPartLineClass>> tmp = new ArrayList <Iterator <ProgramPartLineClass>>();
+			Iterator <ProgramPartLineClass> current = null;
 			int i = 0;
 			while (i<programFunctionsOrdered.size()) {
 				current = programFunctionsOrdered.get(i).iterator();
@@ -124,8 +119,8 @@ public class ProgramAnalysisClass {
 		}
 		
 		String tmp = null;
-		FunctionAnalizedClass function = null;
-		ArrayList<FunctionAnalizedClass> current = null;
+		ProgramPartLineClass function = null;
+		ArrayList<ProgramPartLineClass> current = null;
 		
 		if (programFunctionsOrderedInJavaScript == null) {
 			programFunctionsOrderedInJavaScript = new String[programFunctionsOrdered.size()];

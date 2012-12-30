@@ -6,10 +6,13 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class FunctionAnalizedClass {
+public class ProgramPartLineClass {
 	
-	final Log LOG = LogFactory.getLog(FunctionAnalizedClass.class);
+	final Log LOG = LogFactory.getLog(ProgramPartLineClass.class);
 	
+
+	
+	private String programLine = null;
 	private String predDefined = null;
 	private String predNecessary = null;
 	private String predOwner = "";
@@ -19,9 +22,9 @@ public class FunctionAnalizedClass {
 	private static String fuzzificationInitialSubstring = "rfuzzy_fuzzification(";
 	private static String functionInitialSubstring = "function([";
 	
-	public FunctionAnalizedClass (String line) throws Exception {
+	public ProgramPartLineClass (String line) throws Exception {
+		if (programLine == null) throw new Exception("line is null");
 		
-		if (line == null) throw new Exception("line is null");
 		if ("".equals(line)) throw new Exception("line is empty string");
 		if (! line.startsWith(fuzzificationInitialSubstring)) 
 			throw new Exception("line is not a fuzzification definition. line: " +line);
