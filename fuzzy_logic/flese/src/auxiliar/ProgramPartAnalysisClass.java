@@ -43,7 +43,7 @@ public class ProgramPartAnalysisClass {
 	}
 	
 	public String parse(String programLine) throws Exception {
-		
+		LOG.info("programLine: " + programLine);
 		if (programLine == null) throw new Exception("program line is null");
 		String programSubPartLine = null;
 
@@ -60,7 +60,8 @@ public class ProgramPartAnalysisClass {
 		if (index > -1) {
 			// It contains at least 1 clause.
 			programSubPartLine = programLine.substring(0, index);
-			programLine = programLine.substring(index);
+			if (programLine.length() > (index +1)) programLine = programLine.substring(index +1);
+			else programLine = "";
 			partIsIncomplete = false;
 		}
 		else {
@@ -76,15 +77,15 @@ public class ProgramPartAnalysisClass {
 		if (! partIsIncomplete) {	
 			index = programSubPartJoinedLine.indexOf(":-");
 			if (index > -1) {
-				head = removeSpacesBeforeAndAfter(programLine.substring(0, index));
-				body = removeSpacesBeforeAndAfter(programLine.substring(0, index));
+				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
+				body = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
 				programSubPartJoinedLine = "";
 			}
 
 			index = programSubPartJoinedLine.indexOf(":~");
 			if (index > -1) {
-				head = removeSpacesBeforeAndAfter(programLine.substring(0, index));
-				fuzzyBody = removeSpacesBeforeAndAfter(programLine.substring(0, index));
+				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
+				fuzzyBody = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
 
 				parseHead();
 				parseFuzzyBody();
@@ -94,10 +95,12 @@ public class ProgramPartAnalysisClass {
 			if (! ("".equals(programSubPartJoinedLine))) {
 				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine);
 			}
-
-			programLine = removeSpacesBeforeAndAfter(programLine);
-			if ("".equals(programLine)) programLine = null;
 		}
+		
+		// Avoid problems when the line is formed by just white spaces.
+		programLine = removeSpacesBeforeAndAfter(programLine);
+		if ("".equals(programLine)) programLine = null;
+		
 		return programLine;
 	}
 	

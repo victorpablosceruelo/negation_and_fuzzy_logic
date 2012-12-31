@@ -72,6 +72,7 @@ public class ProgramAnalysisClass {
 	
 	public String [] getProgramFuzzificationsInJS() throws Exception {
 		
+		LOG.info("getProgramFuzzificationsInJS");
 		if (programParts == null) throw new Exception("programParts is null.");
 		
 		// Use the information cached.
