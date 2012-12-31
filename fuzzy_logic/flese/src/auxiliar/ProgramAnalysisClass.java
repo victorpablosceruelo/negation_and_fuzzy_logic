@@ -198,9 +198,11 @@ public class ProgramAnalysisClass {
 		String predNecessary = null;
 		boolean found = false;
 		
+		programParts.
+		
 		for (int i=0; i<programParts.size(); i++) {
 			programPart = programParts.get(i);
-			// LOG.info("analizing the program line: " + programPart.getLine());
+			// LOG.info("analyzing the program line: " + programPart.getLine());
 			
 			if (! copiedBackFuzzifications) {
 				if ((programPart.getFunctionAnalized() != null) && 
