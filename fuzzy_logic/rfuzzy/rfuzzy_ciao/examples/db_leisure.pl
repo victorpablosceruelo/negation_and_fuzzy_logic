@@ -45,7 +45,7 @@ is_zalacain(Restaurant) :- id(Restaurant, Restaurant_Id), Restaurant_Id = zalaca
 
 cheap(restaurant) :~ defaults_to(0.5).
 cheap(restaurant) :~ defaults_to(0.2) if (near_the_city_center(restaurant) is_over 0.7).
-cheap(restaurant) :~ defaults_to(0.1) if (id(restaurant) equals zalacain).
+cheap(restaurant) :~ value(0.1) if (id(restaurant) equals zalacain).
 cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ]).
 
 unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
