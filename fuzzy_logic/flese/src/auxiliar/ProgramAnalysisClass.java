@@ -205,8 +205,7 @@ public class ProgramAnalysisClass {
 			// LOG.info("analyzing the program line: " + programPart.getLine());
 			
 			if (! copiedBackFuzzifications) {
-				if ((programPart.getFunctionAnalized() != null) && 
-						(programPart.getFunctionAnalized().getPredDefined().equals(fuzzification))) {
+				if ((programPart.isFunction()) && (programPart.getPredDefined().equals(fuzzification))) {
 					foundFuzzifications = true;
 					programPartsAffected.add(programPart);
 				}
@@ -217,11 +216,11 @@ public class ProgramAnalysisClass {
 						// First the default definition.
 						found = false;
 						while ((j < programPartsAffected.size()) && (! found)) {
-							if (programPartsAffected.get(j).getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) found = true;
+							if (programPartsAffected.get(j).getPredOwner().equals(DEFAULT_DEFINITION)) found = true;
 							else j++;
 						}
 						// Initialize predNecessary value.
-						predNecessary = programPartsAffected.get(j).getFunctionAnalized().getPredNecessary();
+						predNecessary = programPartsAffected.get(j).getPredNecessary();
 						
 						if (fuzzificationOwner.equals(DEFAULT_DEFINITION)) {	
 							bw.write(buildFuzzificationLine(fuzzification, predNecessary, fuzzificationOwner, params));
@@ -259,36 +258,7 @@ public class ProgramAnalysisClass {
 		// or the parameter CiaoPrologConnectionClass complicates this innecessarily. We must do it in the servlet
 		// that calls us.
 	}
-	
-	private String buildFuzzificationLine(String fuzzification, String predNecessary, String fuzzificationOwner, String [] [] params) throws Exception {
-		// example: 
-		// rfuzzy_fuzzification(traditional(restaurant), years_since_opening(restaurant), bartolo) :- function([ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
 
-		if (fuzzification == null) throw new Exception ("fuzzification cannot be null.");
-		if (predNecessary == null) throw new Exception ("predNecessary cannot be null.");
-		if (fuzzificationOwner == null) throw new Exception ("fuzzificationOwner cannot be null.");
-		if (params == null) throw new Exception ("params cannot be null.");
-		
-		if ("".equals(fuzzification)) throw new Exception ("fuzzification cannot be empty string.");
-		if ("".equals(predNecessary)) throw new Exception ("predNecessary cannot be empty string.");
-		if ("".equals(fuzzificationOwner)) throw new Exception ("fuzzificationOwner cannot be empty string.");
-		
-		
-		String fuzzificationFunction = "function([ ";
-		for (int i=0; i<params.length; i++) {
-			fuzzificationFunction += "(" + params[i][0] + ", " + params[i][1] + ")";
-			if (i+1 < params.length) fuzzificationFunction += ", ";
-		}
-		fuzzificationFunction += " ]).";
-		
-		String fuzzificationHead = "rfuzzy_fuzzification(" + fuzzification + ", " + predNecessary;
-		if (! fuzzificationOwner.equals(DEFAULT_DEFINITION)) fuzzificationHead += ", " + fuzzificationOwner;
-		fuzzificationHead += ")"; 
-		
-		String result = fuzzificationHead + " :- " + fuzzificationFunction + " \n";
-		LOG.info("Line generated: \n " + result);
-		return result;
-	}
 }
 
 /*
