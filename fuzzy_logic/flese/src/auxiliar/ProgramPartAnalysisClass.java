@@ -57,6 +57,12 @@ public class ProgramPartAnalysisClass {
 		
 		// If the line contains more than 1 clause, split it.
 		index = programLine.indexOf(".");
+		if (index +1 != programLine.length()) {
+			while (! testIfDotDenotesClauseEnd(index, programLine)) {
+				index = programLine.indexOf(".", index);
+			}
+		}
+
 		if (index > -1) {
 			// It contains at least 1 clause.
 			programSubPartLine = programLine.substring(0, index);
@@ -102,6 +108,46 @@ public class ProgramPartAnalysisClass {
 		if ("".equals(programLine)) programLine = null;
 		
 		return programLine;
+	}
+	
+	private boolean testIfDotDenotesClauseEnd(int index, String programLine) throws Exception {
+		if (programLine.charAt(index) != '.') throw new Exception("Character at index is not a dot.");
+		
+		int subStringBegins = index -1;
+		while ( (subStringBegins >= 0) && 
+				(! isDelimiter(programLine.charAt(subStringBegins)))) {
+			subStringBegins--;
+		}
+		
+		int subStringEnds = index +1;
+		while ( (subStringEnds < programLine.length()) && 
+				(! isDelimiter(programLine.charAt(subStringEnds)))) {
+			subStringEnds++;
+		}
+		
+		String subString = programLine.substring(subStringBegins, subStringEnds);
+		if (subString.length() < 3) return true;
+		else {
+			try {
+				Float number = Float.parseFloat(subString);
+				LOG.info("It is not a dot because it is a number. Number: " + number);
+				return false;
+			} catch (Exception e) {
+				return true;
+			}
+		}
+		
+	}
+	
+	private boolean isDelimiter(char character) {
+		if (character == ' ') return true;
+		if (character == ',') return true;
+		if (character == '.') return true;
+		if (character == ')') return true;
+		if (character == '(') return true;
+		if (character == ']') return true;
+		if (character == '[') return true;
+		return false;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
