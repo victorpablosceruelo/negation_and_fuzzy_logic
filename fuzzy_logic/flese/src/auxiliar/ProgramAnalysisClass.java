@@ -150,19 +150,19 @@ public class ProgramAnalysisClass {
 	}
 
 	
-	public void updateProgramFile(String fuzzification, String fuzzificationOwner, String [] [] params) throws Exception {
+	public void updateProgramFile(String predDefined, String predNecessary, String predOwner, String [] [] params) throws Exception {
 		
-		LOG.info("saving fuzzification: " + fuzzification + " personalized for username: " + fuzzificationOwner + " by username: " + localUserName + "\n\n");
+		LOG.info("saving fuzzification: " + predDefined + " depending on " + predNecessary + " personalized for username: " + predOwner + " by username: " + localUserName + "\n\n");
 		
 		// Security issues.
-		if (fuzzificationOwner == null) fuzzificationOwner = localUserName;
-		if (fuzzificationOwner == null) throw new Exception ("fuzzificationOwner cannot be null.");
-		if ("".equals(fuzzificationOwner)) throw new Exception ("fuzzificationOwner cannot be empty string.");
+		if (predOwner == null) predOwner = localUserName;
+		if (predOwner == null) throw new Exception ("fuzzificationOwner cannot be null.");
+		if ("".equals(predOwner)) throw new Exception ("fuzzificationOwner cannot be empty string.");
 
 		// If I'm not the owner I can change only my fuzzification.
 		// If I'm the owner I can change mine and the default one, but no other one.
-		if ((! localUserName.equals(fileOwner)) || (! fuzzificationOwner.equals(DEFAULT_DEFINITION))) {
-			fuzzificationOwner = localUserName;
+		if ((! localUserName.equals(fileOwner)) || (! predOwner.equals(DEFAULT_DEFINITION))) {
+			predOwner = localUserName;
 		}
 		
 		ProgramPartAnalysisClass programPart = null;
@@ -194,18 +194,16 @@ public class ProgramAnalysisClass {
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		
-		int j=0;
-		String predNecessary = null;
-		boolean found = false;
-		
-		programParts.
+		int j=0, k=0;
+		boolean updated = false;
+		String [] lines = null;
 		
 		for (int i=0; i<programParts.size(); i++) {
 			programPart = programParts.get(i);
 			// LOG.info("analyzing the program line: " + programPart.getLine());
 			
 			if (! copiedBackFuzzifications) {
-				if ((programPart.isFunction()) && (programPart.getPredDefined().equals(fuzzification))) {
+				if ((programPart.isFunction()) && (programPart.getPredDefined().equals(predDefined)) && (programPart.getPredNecessary().equals(predNecessary))) {
 					foundFuzzifications = true;
 					programPartsAffected.add(programPart);
 				}
@@ -213,42 +211,40 @@ public class ProgramAnalysisClass {
 					if (foundFuzzifications) {
 						copiedBackFuzzifications = true;
 
-						// First the default definition.
-						found = false;
-						while ((j < programPartsAffected.size()) && (! found)) {
-							if (programPartsAffected.get(j).getPredOwner().equals(DEFAULT_DEFINITION)) found = true;
-							else j++;
-						}
-						// Initialize predNecessary value.
-						predNecessary = programPartsAffected.get(j).getPredNecessary();
-						
-						if (fuzzificationOwner.equals(DEFAULT_DEFINITION)) {	
-							bw.write(buildFuzzificationLine(fuzzification, predNecessary, fuzzificationOwner, params));
-						}
-						else {
-							bw.write(programPartsAffected.get(j).getLine() + "\n");
-						}
-						
-						// Now the other ones except the one we are playing with.
-						j=0;
-						while (j < programPartsAffected.size()) {
-							if ((! programPartsAffected.get(j).getFunctionAnalized().getPredOwner().equals(DEFAULT_DEFINITION)) &&
-								(! programPartsAffected.get(j).getFunctionAnalized().getPredOwner().equals(fuzzificationOwner))) {
-								bw.write(programPartsAffected.get(j).getLine() + "\n");
+						updated = false;
+						for (j=0; j < programPartsAffected.size(); j++) {
+							if (programPartsAffected.get(j).getPredOwner().equals(predOwner)) {
+								programPartsAffected.get(j).updateFunction(params);
+								updated = true;
 							}
-							j++;
+
+							lines = programPartsAffected.get(j).getLines();
+							for (k = 0; k< lines.length; k++) {
+								bw.write(lines[k] + "\n");
+							}
 						}
-						
-						// Now the one we are playing with, if it is not the default one.
-						if (! fuzzificationOwner.equals(DEFAULT_DEFINITION)) {
-							bw.write(buildFuzzificationLine(fuzzification, predNecessary, fuzzificationOwner, params));
+
+						if (! updated) {
+							ProgramPartAnalysisClass newProgramPart = new ProgramPartAnalysisClass();
+							newProgramPart.setPredDefined(predDefined);
+							newProgramPart.setPredNecessary(predNecessary);
+							newProgramPart.setPredOwner(predOwner);
+							newProgramPart.updateFunction(params);
+							
+							lines = programPartsAffected.get(j).getLines();
+							for (k = 0; k< lines.length; k++) {
+								bw.write(lines[k] + "\n");
+							}
 						}						
 					}
 				}
 			}
 			
 			if ((! foundFuzzifications) || (foundFuzzifications && copiedBackFuzzifications)) {
-				bw.write(programPart.getLine() + "\n");
+				lines = programPart.getLines();
+				for (k = 0; k< lines.length; k++) {
+					bw.write(lines[k] + "\n");
+				}
 			}
 		}
 		

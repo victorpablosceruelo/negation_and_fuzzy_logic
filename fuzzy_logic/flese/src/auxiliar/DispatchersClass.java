@@ -374,11 +374,13 @@ public class DispatchersClass {
 		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
 		request.setAttribute("filePath", filePath);
 		
-		String fuzzification = request.getParameter("fuzzification");
-		if (fuzzification == null) throw new Exception("fuzzification is null.");
-		// request.setAttribute("fuzzification", fuzzification);
+		String predDefined = request.getParameter("predDefined");
+		if (predDefined == null) throw new Exception("predDefined is null.");
 		
-		String fuzzificationOwner = request.getParameter("fuzzificationOwner");
+		String predNecessary = request.getParameter("predNecessary");
+		if (predNecessary == null) throw new Exception("predNecessary is null.");
+		
+		String predOwner = request.getParameter("predOwner");
 		
 		
 		int counter=0;
@@ -402,7 +404,7 @@ public class DispatchersClass {
 		LOG.info(paramsDebug);
 		
 		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
-		programAnalized.updateProgramFile(fuzzification, fuzzificationOwner, params);
+		programAnalized.updateProgramFile(predDefined, predNecessary, predOwner, params);
 		
 		connection.clearCacheInCiaoPrologConnectionClass();
 		
