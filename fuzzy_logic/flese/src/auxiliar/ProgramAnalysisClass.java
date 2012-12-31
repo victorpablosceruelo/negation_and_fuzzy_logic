@@ -10,15 +10,11 @@ import org.apache.commons.logging.LogFactory;
 public class ProgramAnalysisClass {
 	final Log LOG = LogFactory.getLog(ProgramAnalysisClass.class);
 	
-	final private static String DEFAULT_DEFINITION = "default definition";
-	
 	private String localUserName = null;
 	private String fileName = null; 
 	private String fileOwner = null;
 	private String filePath = null;
 	private ArrayList <ProgramPartAnalysisClass> programParts = null;
-	private ArrayList <ArrayList <ProgramPartLineClass>> programFunctionsOrdered = null;
-	private Iterator <Iterator <ProgramPartLineClass>> programFunctionsOrderedIterator = null;
 	private String [] programFunctionsOrderedInJavaScript = null;
 	
 
@@ -50,8 +46,6 @@ public class ProgramAnalysisClass {
 		LOG.info("localUserName: " + localUserName + " fileName: " + this.fileName + " fileOwner: " + this.fileOwner + " filePath: " + this.filePath);
 		
 		programParts = new ArrayList <ProgramPartAnalysisClass>();
-		programFunctionsOrdered = new ArrayList <ArrayList <ProgramPartLineClass>>();
-		programFunctionsOrderedIterator = null;
 		programFunctionsOrderedInJavaScript = null;
 		
 		
@@ -76,60 +70,74 @@ public class ProgramAnalysisClass {
 		}
 	}
 	
-	private void addToFunctionsOrderedList (ProgramPartLineClass function) throws Exception {
-		
-		if (function == null) throw new Exception("function cannot be null.");
-
-		int i=0;
-		boolean placed = false;
-		ArrayList <ProgramPartLineClass> current = null;
-
-		while ((i<programFunctionsOrdered.size()) && (! placed)) {
-			current = programFunctionsOrdered.get(i);
-			if ((current != null) && (current.size() > 0)) {
-				if (current.get(0).getPredDefined().equals(function.getPredDefined())) {
-					current.add(function);
-					placed = true;
-				}
-			}
-			i++;
-		}
-		if (! placed) {
-			current = new ArrayList <ProgramPartLineClass>();
-			current.add(function);
-			programFunctionsOrdered.add(current);
-			placed = true;
-		}
-		// if (placed) programFunctionsOrderedIterator = null; // Reject last saved result.
-	}
-	
 	public String [] getProgramFuzzificationsInJS() throws Exception {
 		
-		if (programFunctionsOrderedIterator == null) {
-			programFunctionsOrderedInJavaScript = null;
-			ArrayList <Iterator <ProgramPartLineClass>> tmp = new ArrayList <Iterator <ProgramPartLineClass>>();
-			Iterator <ProgramPartLineClass> current = null;
-			int i = 0;
-			while (i<programFunctionsOrdered.size()) {
-				current = programFunctionsOrdered.get(i).iterator();
-				tmp.add(current);
-				i++;
-			}
-			programFunctionsOrderedIterator = tmp.iterator();
+		if (programParts == null) throw new Exception("programParts is null.");
+		
+		// Use the information cached.
+		if (programFunctionsOrderedInJavaScript != null) {
+			return programFunctionsOrderedInJavaScript;
 		}
 		
+		ArrayList <ArrayList <ProgramPartAnalysisClass>> programFunctionsOrdered = new ArrayList <ArrayList <ProgramPartAnalysisClass>>();
+		ProgramPartAnalysisClass programPart = null;
+		int i=0, j=0;
+		
+		for (i=0; i<programParts.size(); i++) {
+			programPart = programParts.get(i);
+			if (	(localUserName.equals(fileOwner)) || 
+					(programPart.getPredOwner().equals(localUserName)) || 
+					(programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))   ) {
+				
+				boolean placed = false;
+				ArrayList <ProgramPartAnalysisClass> current = null;
+				j=0;
+				
+				while ((j<programFunctionsOrdered.size()) && (! placed)) {
+					current = programFunctionsOrdered.get(i);
+					if ((current != null) && (current.size() > 0)) {
+						if (	(current.get(0).getPredDefined().equals(programPart.getPredDefined())) &&
+								(current.get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
+							current.add(programPart);
+							placed = true;
+						}
+					}
+					j++;
+				}
+				if (! placed) {
+					current = new ArrayList <ProgramPartAnalysisClass>();
+					current.add(programPart);
+					programFunctionsOrdered.add(current);
+					placed = true;
+				}
+				
+				
+			}
+		}
+		
+
+		
+		ArrayList <Iterator <ProgramPartAnalysisClass>> tmpArrayList = new ArrayList <Iterator <ProgramPartAnalysisClass>>();
+		Iterator <ProgramPartAnalysisClass> current = null;
+		i = 0;
+		while (i<programFunctionsOrdered.size()) {
+			current = programFunctionsOrdered.get(i).iterator();
+			tmpArrayList.add(current);
+			i++;
+		}
+		// Iterator <Iterator <ProgramPartAnalysisClass>> programFunctionsOrderedIterator = tmpArrayList.iterator();
+	
+		
 		String tmp = null;
-		ProgramPartLineClass function = null;
-		ArrayList<ProgramPartLineClass> current = null;
+		ProgramPartAnalysisClass function = null;
 		
 		if (programFunctionsOrderedInJavaScript == null) {
 			programFunctionsOrderedInJavaScript = new String[programFunctionsOrdered.size()];
-			int i = 0;
+			i = 0;
 			while (i<programFunctionsOrdered.size()) {
-				current = programFunctionsOrdered.get(i);
-				int j = 0;
-				while (j<current.size()) {
-					function = current.get(j);
+				j = 0;
+				while (j<programFunctionsOrdered.get(i).size()) {
+					function = programFunctionsOrdered.get(i).get(j);
 					
 					if (j==0) {
 						tmp = "addFuzzificationFunctionDefinition('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
@@ -161,7 +169,7 @@ public class ProgramAnalysisClass {
 
 		// If I'm not the owner I can change only my fuzzification.
 		// If I'm the owner I can change mine and the default one, but no other one.
-		if ((! localUserName.equals(fileOwner)) || (! predOwner.equals(DEFAULT_DEFINITION))) {
+		if ((! localUserName.equals(fileOwner)) || (! predOwner.equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
 			predOwner = localUserName;
 		}
 		
@@ -250,6 +258,7 @@ public class ProgramAnalysisClass {
 		
 		bw.close();
 		
+		programFunctionsOrderedInJavaScript = null;
 		// At this point we must clear the CiaoPrologConnection queries cache, but introducing the parameter session
 		// or the parameter CiaoPrologConnectionClass complicates this innecessarily. We must do it in the servlet
 		// that calls us.

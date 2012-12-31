@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ProgramPartAnalysisClass {
 	final Log LOG = LogFactory.getLog(ProgramPartAnalysisClass.class);
+	public final static String DEFAULT_DEFINITION = "default definition";
 	
 	private ArrayList <String> programSubPartLines = null;
 	private ArrayList <String> programSubPartComments = null;
@@ -351,13 +352,13 @@ public class ProgramPartAnalysisClass {
 	}
 	
 	public void setPredOwner(String predOwner) {
-		if ((predOwner != null) && (! "default definition".equals(predOwner)) && (! "".equals(predOwner))) {
+		if ((predOwner != null) && (! DEFAULT_DEFINITION.equals(predOwner)) && (! "".equals(predOwner))) {
 			only_for_user = predOwner;
 		}
 	}
 	
 	public String getPredOwner() {
-		if ((only_for_user == null) || (only_for_user != null) && ("".equals(only_for_user))) return "default definition";
+		if ((only_for_user == null) || (only_for_user != null) && ("".equals(only_for_user))) return DEFAULT_DEFINITION;
 		else return only_for_user;
 	}
 
