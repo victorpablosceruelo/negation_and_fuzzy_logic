@@ -1796,10 +1796,12 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 			formTargetiFrameId + "\", \"" + mode + "\");'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
-	for (var i=0; i < fuzzificationsFunctions.length; i++) {
-		html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
-				"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
-				fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') + "</option>";
+	if (fuzzificationsFunctions != null) {
+		for (var i=0; i < fuzzificationsFunctions.length; i++) {
+			html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
+					"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
+					fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') + "</option>";
+		}
 	}
 	html += "</select>";
 	subCell.innerHTML = html;
