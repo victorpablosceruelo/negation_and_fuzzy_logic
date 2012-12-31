@@ -58,8 +58,8 @@ public class ProgramPartAnalysisClass {
 		// If the line contains more than 1 clause, split it.
 		index = programLine.indexOf(".");
 		if (index +1 != programLine.length()) {
-			while (! testIfDotDenotesClauseEnd(index, programLine)) {
-				index = programLine.indexOf(".", index);
+			while ((index > 0) && (! dotDenotesClauseEnd(index, programLine))) {
+				index = programLine.indexOf(".", index +1);
 			}
 		}
 
@@ -110,8 +110,10 @@ public class ProgramPartAnalysisClass {
 		return programLine;
 	}
 	
-	private boolean testIfDotDenotesClauseEnd(int index, String programLine) throws Exception {
-		if (programLine.charAt(index) != '.') throw new Exception("Character at index is not a dot.");
+	private boolean dotDenotesClauseEnd(int index, String programLine) throws Exception {
+		if (index < 0) throw new Exception("Index out of range. index: " + index + " programLine: " + programLine);
+		if (! (index < programLine.length())) throw new Exception("Index out of range. index: " + index + " programLine: " + programLine);
+		if (programLine.charAt(index) != '.') throw new Exception("Character at index is not a dot. index: " + index + " programLine: " + programLine);
 		
 		int subStringBegins = index -1;
 		while ( (subStringBegins >= 0) && 
