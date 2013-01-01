@@ -31,7 +31,7 @@ public class ProgramPartAnalysisClass {
 	
 	private static final String whiteSpacesPattern = "[\\s]*";
 	// private static final String anythingPattern    = "[\\s\\S]*";
-	private static final String termNamePattern    = "[0-9a-zA-Z_-]+";
+	private static final String termNamePattern    = "([0-9a-zA-Z_-]+){1}";
 	private static final String predicatePattern   = whiteSpacesPattern + termNamePattern + "[\\(]{1}" + whiteSpacesPattern + 
 													termNamePattern + whiteSpacesPattern + "[\\)]{1}" + whiteSpacesPattern;
 
@@ -123,12 +123,14 @@ public class ProgramPartAnalysisClass {
 				(! isDelimiter(programLine.charAt(subStringBegins)))) {
 			subStringBegins--;
 		}
+		if (subStringBegins <= 0) subStringBegins = 0;
 		
 		int subStringEnds = index +1;
 		while ( (subStringEnds < programLine.length()) && 
 				(! isDelimiter(programLine.charAt(subStringEnds)))) {
 			subStringEnds++;
 		}
+		if (subStringEnds >= programLine.length()) subStringEnds = programLine.length();
 		
 		String subString = programLine.substring(subStringBegins, subStringEnds);
 		if (subString.length() < 3) return true;

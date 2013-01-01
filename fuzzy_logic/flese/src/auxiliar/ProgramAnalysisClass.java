@@ -91,22 +91,20 @@ public class ProgramAnalysisClass {
 					(programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))   ) {
 				
 				boolean placed = false;
-				ArrayList <ProgramPartAnalysisClass> current = null;
-				j=0;
-				
+
+				j=0;				
 				while ((j<programFunctionsOrdered.size()) && (! placed)) {
-					current = programFunctionsOrdered.get(i);
-					if ((current != null) && (current.size() > 0)) {
-						if (	(current.get(0).getPredDefined().equals(programPart.getPredDefined())) &&
-								(current.get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
-							current.add(programPart);
+					if ((programFunctionsOrdered.get(j) != null) && (programFunctionsOrdered.get(j).size() > 0)) {
+						if (	(programFunctionsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined())) &&
+								(programFunctionsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
+							programFunctionsOrdered.get(j).add(programPart);
 							placed = true;
 						}
 					}
 					j++;
 				}
 				if (! placed) {
-					current = new ArrayList <ProgramPartAnalysisClass>();
+					ArrayList <ProgramPartAnalysisClass> current = new ArrayList <ProgramPartAnalysisClass>();
 					current.add(programPart);
 					programFunctionsOrdered.add(current);
 					placed = true;
