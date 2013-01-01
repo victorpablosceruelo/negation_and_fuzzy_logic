@@ -322,11 +322,15 @@ public class ProgramPartAnalysisClass {
 				if (indexEnd > -1) {
 
 					pointsPairString = functionPointsString.substring(0, indexEnd);
+					if ((indexEnd +1) > functionPointsString.length()) {
+						functionPointsString = functionPointsString.substring(indexEnd +1);
+					}
+					else functionPointsString = "";
 					indexStart = pointsPairString.indexOf("(");
 					if (indexStart > -1) {
 						indexMiddle = pointsPairString.indexOf(",");
 						if (indexMiddle > -1) {
-							String pointX = pointsPairString.substring(0, indexMiddle);
+							String pointX = pointsPairString.substring(indexStart +1, indexMiddle);
 							String pointY = pointsPairString.substring(indexMiddle +1);
 							
 							if (functionPoints == null) {
