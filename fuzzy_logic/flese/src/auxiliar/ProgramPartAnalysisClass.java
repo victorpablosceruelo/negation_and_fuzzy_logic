@@ -326,6 +326,8 @@ public class ProgramPartAnalysisClass {
 						functionPointsString = functionPointsString.substring(indexEnd +1);
 					}
 					else functionPointsString = "";
+					LOG.info("pointsPairString: " + pointsPairString);
+					
 					indexStart = pointsPairString.indexOf("(");
 					if (indexStart > -1) {
 						indexMiddle = pointsPairString.indexOf(",");
@@ -350,9 +352,8 @@ public class ProgramPartAnalysisClass {
 					}
 				}
 				else {
-					// No end in the points sequence.
+					// Finished reading the points sequence.
 					morePoints = false;
-					error = true;
 				}
 			}
 		}
@@ -368,7 +369,7 @@ public class ProgramPartAnalysisClass {
 			while (moreBody) {
 				indexStart = 0;
 				indexEnd = arguments.indexOf(")");
-				if (indexEnd > -1) {
+				if (indexEnd > 0) { // If it is zero we have finished !!!.
 					ruleBody += arguments.substring(0, indexEnd);
 					indexStart = (arguments.substring(0, indexEnd -1)).indexOf("(");
 					if (indexStart == -1) {
@@ -376,7 +377,12 @@ public class ProgramPartAnalysisClass {
 					}
 					arguments = arguments.substring(indexEnd +1);
 				}
-				else moreBody = false;
+				else {
+					moreBody = false;
+					if (indexEnd == 0) {
+						arguments = arguments.substring(indexEnd +1);
+					}
+				}
 			}
 		}
 
