@@ -67,6 +67,10 @@ public class ProgramAnalysisClass {
 			}
 			reader.close();
 		}
+		
+		String msg = "----------------------------------------------------------------------";
+		LOG.info("\n" + msg + "\n" + msg + "\n" + msg + "\n");
+		
 	}
 	
 	public String [] getProgramFuzzificationsInJS() throws Exception {
@@ -110,6 +114,15 @@ public class ProgramAnalysisClass {
 						placed = true;
 					}
 				}
+			}
+			else {
+				LOG.info("Not a function. programPart.getHead(): " + programPart.getHead());
+				String [] lines = programPart.getLines();
+				String line = "";
+				for (int k = 0; k< lines.length; k++) {
+					line += lines[k] + "\n";
+				}
+				LOG.info(line);
 			}
 		}	
 		

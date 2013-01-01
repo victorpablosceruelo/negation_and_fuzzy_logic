@@ -51,7 +51,7 @@ public class ProgramPartAnalysisClass {
 		int index = programLine.indexOf("%");
 		if (index > -1) {
 			programSubPartComments.add(programLine.substring(index));
-			programLine = programLine.substring(0, index);
+			programLine = removeSpacesBeforeAndAfter(programLine.substring(0, index));
 		}
 		else programSubPartComments.add(null);
 		
@@ -77,13 +77,15 @@ public class ProgramPartAnalysisClass {
 			partIsIncomplete = true;
 		}
 		
-		LOG.info("partIsIncomplete: " + partIsIncomplete + " programSubPartLine: " + programSubPartLine + " programLine: " + programLine);
-		
 		programSubPartLines.add(programSubPartLine);
 		programSubPartJoinedLine += programSubPartLine;
 		
 		head = null;
 		if (! partIsIncomplete) {	
+			String msg = "partIsIncomplete: " + partIsIncomplete + "\n";
+			msg += "programSubPartLine: " + programSubPartLine + "\n";
+			msg += "programLine: " + programLine;
+			
 			index = programSubPartJoinedLine.indexOf(":-");
 			if (index > -1) {
 				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
@@ -104,6 +106,11 @@ public class ProgramPartAnalysisClass {
 			if ((head != null) && (! ("".equals(programSubPartJoinedLine)))) {
 				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine);
 			}
+			
+			msg += "head: " + head + "\n";
+			msg += "body: " + body + "\n";
+			msg += "fuzzyBody: " + fuzzyBody + "\n";
+			LOG.info(msg);
 		}
 		
 		// Avoid problems when the line is formed by just white spaces.
@@ -425,6 +432,10 @@ public class ProgramPartAnalysisClass {
 		else return only_for_user;
 	}
 
+	public String getHead() {
+		return head;
+	}
+	
 	public String getBody() {
 		return body;
 	}
