@@ -2,7 +2,6 @@ package auxiliar;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -86,71 +85,57 @@ public class ProgramAnalysisClass {
 		
 		for (i=0; i<programParts.size(); i++) {
 			programPart = programParts.get(i);
-			if (	(localUserName.equals(fileOwner)) || 
-					(programPart.getPredOwner().equals(localUserName)) || 
-					(programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))   ) {
-				
-				boolean placed = false;
+			if (programPart.isFunction()) {
+				if (	(localUserName.equals(fileOwner)) || 
+						(programPart.getPredOwner().equals(localUserName)) || 
+						(programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))   ) {
 
-				j=0;				
-				while ((j<programFunctionsOrdered.size()) && (! placed)) {
-					if ((programFunctionsOrdered.get(j) != null) && (programFunctionsOrdered.get(j).size() > 0)) {
-						if (	(programFunctionsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined())) &&
-								(programFunctionsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
-							programFunctionsOrdered.get(j).add(programPart);
-							placed = true;
+					boolean placed = false;
+
+					j=0;				
+					while ((j<programFunctionsOrdered.size()) && (! placed)) {
+						if ((programFunctionsOrdered.get(j) != null) && (programFunctionsOrdered.get(j).size() > 0)) {
+							if (	(programFunctionsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined())) &&
+									(programFunctionsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
+								programFunctionsOrdered.get(j).add(programPart);
+								placed = true;
+							}
 						}
+						j++;
 					}
-					j++;
+					if (! placed) {
+						ArrayList <ProgramPartAnalysisClass> current = new ArrayList <ProgramPartAnalysisClass>();
+						current.add(programPart);
+						programFunctionsOrdered.add(current);
+						placed = true;
+					}
 				}
-				if (! placed) {
-					ArrayList <ProgramPartAnalysisClass> current = new ArrayList <ProgramPartAnalysisClass>();
-					current.add(programPart);
-					programFunctionsOrdered.add(current);
-					placed = true;
-				}
-				
-				
 			}
-		}
-		
-
-		
-		ArrayList <Iterator <ProgramPartAnalysisClass>> tmpArrayList = new ArrayList <Iterator <ProgramPartAnalysisClass>>();
-		Iterator <ProgramPartAnalysisClass> current = null;
-		i = 0;
-		while (i<programFunctionsOrdered.size()) {
-			current = programFunctionsOrdered.get(i).iterator();
-			tmpArrayList.add(current);
-			i++;
-		}
-		// Iterator <Iterator <ProgramPartAnalysisClass>> programFunctionsOrderedIterator = tmpArrayList.iterator();
-	
+		}	
 		
 		String tmp = null;
 		ProgramPartAnalysisClass function = null;
-		
-		if (programFunctionsOrderedInJavaScript == null) {
-			programFunctionsOrderedInJavaScript = new String[programFunctionsOrdered.size()];
-			i = 0;
-			while (i<programFunctionsOrdered.size()) {
-				j = 0;
-				while (j<programFunctionsOrdered.get(i).size()) {
-					function = programFunctionsOrdered.get(i).get(j);
-					
-					if (j==0) {
-						tmp = "addFuzzificationFunctionDefinition('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
-						tmp += "new Array(";
-					}
-					else tmp += ", ";
-					
-					tmp += "new ownerPersonalization('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
-					j++;
+		programFunctionsOrderedInJavaScript = new String[programFunctionsOrdered.size()];
+		i = 0;
+		LOG.info("programFunctionsOrdered.size(): " + programFunctionsOrdered.size());
+		while (i<programFunctionsOrdered.size()) {
+			j = 0;
+			LOG.info("programFunctionsOrdered.get(i).size(): " + programFunctionsOrdered.get(i).size());
+			while (j<programFunctionsOrdered.get(i).size()) {
+				function = programFunctionsOrdered.get(i).get(j);
+
+				if (j==0) {
+					tmp = "addFuzzificationFunctionDefinition('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
+					tmp += "new Array(";
 				}
-				tmp += "))"; // End the javascript arrays.
-				programFunctionsOrderedInJavaScript[i] = tmp;
-				i++;
+				else tmp += ", ";
+
+				tmp += "new ownerPersonalization('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
+				j++;
 			}
+			tmp += "))"; // End the javascript arrays.
+			programFunctionsOrderedInJavaScript[i] = tmp;
+			i++;
 		}
 		
 		return programFunctionsOrderedInJavaScript;

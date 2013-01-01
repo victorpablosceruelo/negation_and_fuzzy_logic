@@ -164,7 +164,7 @@ public class ProgramPartAnalysisClass {
 	private String removeSpacesBeforeAndAfter(String input) {
 		input = removeSpacesBefore(input);
 		input = removeSpacesAfter(input);
-		LOG.info("input: " + input);
+		// LOG.info("input: " + input);
 		return input;
 	}
 	
