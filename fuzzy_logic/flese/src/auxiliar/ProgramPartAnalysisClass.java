@@ -72,14 +72,17 @@ public class ProgramPartAnalysisClass {
 		}
 		else {
 			// It does not contain a clause.
-			programSubPartLine = programLine.substring(0);
+			programSubPartLine = programLine;
 			programLine = "";
 			partIsIncomplete = true;
 		}
 		
+		LOG.info("partIsIncomplete: " + partIsIncomplete + " programSubPartLine: " + programSubPartLine + " programLine: " + programLine);
+		
 		programSubPartLines.add(programSubPartLine);
 		programSubPartJoinedLine += programSubPartLine;
 		
+		head = null;
 		if (! partIsIncomplete) {	
 			index = programSubPartJoinedLine.indexOf(":-");
 			if (index > -1) {
@@ -98,7 +101,7 @@ public class ProgramPartAnalysisClass {
 				programSubPartJoinedLine = "";
 			}
 
-			if (! ("".equals(programSubPartJoinedLine))) {
+			if ((head != null) && (! ("".equals(programSubPartJoinedLine)))) {
 				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine);
 			}
 		}
@@ -159,6 +162,7 @@ public class ProgramPartAnalysisClass {
 	private String removeSpacesBeforeAndAfter(String input) {
 		input = removeSpacesBefore(input);
 		input = removeSpacesAfter(input);
+		LOG.info("input: " + input);
 		return input;
 	}
 	
@@ -167,14 +171,16 @@ public class ProgramPartAnalysisClass {
 		while ((! "".equals(input)) && (input.charAt(0) == ' ')) {
 			input = input.substring(1);
 		}
+		// LOG.info("input: " + input);
 		return input;
 	}
 	
 	private String removeSpacesAfter(String input) {
 		if (input == null) return input;
 		while ((! "".equals(input)) && (input.charAt(input.length() -1) == ' ')) {
-			input = input.substring(input.length() -1);
+			input = input.substring(0, input.length() -1);
 		}
+		// LOG.info("input: " + input);
 		return input;
 	}	
 	
@@ -214,6 +220,7 @@ public class ProgramPartAnalysisClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private void parseHead() throws Exception {
+		LOG.info("parseHead. head: " + head);
 		if (head == null) throw new Exception("head is null.");
 		
 		if (! head.matches(predicatePattern)) {
@@ -221,10 +228,11 @@ public class ProgramPartAnalysisClass {
 			predDefined = null;
 			predNecessary = null;
 		}
-
-		predDefined       = head.replaceAll(predicatePattern, "$1");
-		predNecessary     = head.replaceAll(predicatePattern, "$2");
-		// String predOthers = head.replaceAll(predicatePattern, "$3");
+		else {
+			predDefined       = head.replaceAll(predicatePattern, "$1");
+			predNecessary     = head.replaceAll(predicatePattern, "$2");
+			// 	String predOthers = head.replaceAll(predicatePattern, "$3");
+		}
 
 	}
 
@@ -233,6 +241,7 @@ public class ProgramPartAnalysisClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private void parseFuzzyBody() throws Exception {
+		LOG.info("parseFuzzyBody. fuzzyBody: " + fuzzyBody);
 		if (fuzzyBody == null) throw new Exception("fuzzy body is null.");
 		
 		fuzzyBody = removeSpacesBeforeAndAfter(fuzzyBody);
@@ -357,6 +366,7 @@ public class ProgramPartAnalysisClass {
 	}
 	
 	private String saveExtraOption(String extraOption, String arguments) {
+		LOG.info("extraOption: " + extraOption + " arguments: " + arguments);
 		if ("if".equals(extraOption)) if_condition = "";
 		if ("with_credibility".equals(extraOption)) with_credibility = "";
 		if ("only_for_user".equals(extraOption)) only_for_user = "";
