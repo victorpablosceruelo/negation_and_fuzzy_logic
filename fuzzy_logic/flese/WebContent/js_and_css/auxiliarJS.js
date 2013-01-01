@@ -1816,23 +1816,28 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	row.appendChild(cell);
 	cell.innerHTML = "Select the fuzzification you want to personalize.";
 	
-	// Show the div.
-    $(function() {
-    	$(personalizationDiv).dialog({
-            // add a close listener to prevent adding multiple divs to the document
-            close: function(event, ui) {
-                // remove div with all data and events
-                // dialog.remove();
-            	personalizationDiv.innerHTML = "";
-            },
-            modal: true,
-            resizable: true, 
-            height: "auto", // 800,
-            width: "auto", // 800,
-            title: 'Personalizing program file ' + fileName + " owned by " + fileOwner
-        });
-        // $( "#" + fileViewContentsDivId ).dialog();
-    });
+	if (fuzzificationsFunctions == null) {
+		alert("Program has nothing to personalize.");
+	}
+	else {
+		// Show the div.
+    	$(function() {
+    		$(personalizationDiv).dialog({
+    			// add a close listener to prevent adding multiple divs to the document
+    			close: function(event, ui) {
+    				// remove div with all data and events
+    				// dialog.remove();
+    				personalizationDiv.innerHTML = "";
+    			},
+    			modal: true,
+    			resizable: true, 
+    			height: "auto", // 800,
+    			width: "auto", // 800,
+    			title: 'Personalizing program file ' + fileName + " owned by " + fileOwner
+    		});
+    		// $( "#" + fileViewContentsDivId ).dialog();
+    	});
+	}
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
