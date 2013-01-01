@@ -5,7 +5,7 @@ public class FunctionPoint {
 	private String coordinate_1 = null;
 	private String coordinate_2 = null;
 	
-	public static String floatPattern = "([\\d]+(\\.[\\d]+)?){1}";
+	public static String floatPattern = "[\\s]*([\\d]+(\\.[\\d]+)?){1}[\\s]*";
 	
 	public FunctionPoint(String coordinate_1, String coordinate_2) throws Exception {
 		if (! coordinate_1.matches(floatPattern))
@@ -13,8 +13,8 @@ public class FunctionPoint {
 		if (! coordinate_2.matches(floatPattern))
 			throw new Exception("coordinate_2 is not a valid number. coordinate_2: " + coordinate_2);
 		
-		this.coordinate_1 = coordinate_1;
-		this.coordinate_2 = coordinate_2;
+		this.coordinate_1 = coordinate_1.replaceAll(floatPattern, "$1");
+		this.coordinate_2 = coordinate_2.replaceAll(floatPattern, "$1");
 	}
 	
 	public String toString () {

@@ -13,17 +13,17 @@ public class ProgramPartAnalysisClass {
 	private ArrayList <String> programSubPartLines = null;
 	private ArrayList <String> programSubPartComments = null;
 	
-	private String programSubPartJoinedLine = null;
+	private String programSubPartLineAcc = null;
 	private String head = null;
 	private String predDefined = null;
 	private String predNecessary = null;
 	private String body = null;
 	private String fuzzyBody = null;
-	private int value = -1;
+	private float value = -1;
 	private ArrayList <FunctionPoint> functionPoints = null;
 	private String ruleBody = null;
 	private String ruleAggregator = null;
-	private int defaults_to = -1;
+	private float defaults_to = -1;
 	private String if_condition = null;
 	private String with_credibility = null;
 	private String only_for_user = null;
@@ -37,74 +37,85 @@ public class ProgramPartAnalysisClass {
 
 	
 	ProgramPartAnalysisClass() {
-		this.programSubPartJoinedLine = "";
+		this.programSubPartLineAcc = "";
 		this.programSubPartLines = new ArrayList <String>();
 		this.programSubPartComments = new ArrayList <String>();
 	}
 	
-	public String parse(String programLine) throws Exception {
-		LOG.info("programLine: " + programLine);
-		if (programLine == null) throw new Exception("program line is null");
+	public String parse(String programLineIn) throws Exception {
+		LOG.info("programLineIn: " + programLineIn);
+		if (programLineIn == null) throw new Exception("program line is null");
 		String programSubPartLine = null;
 
 		// If there is a comment, save it.
-		int index = programLine.indexOf("%");
+		int index = programLineIn.indexOf("%");
 		if (index > -1) {
-			programSubPartComments.add(programLine.substring(index));
-			programLine = removeSpacesBeforeAndAfter(programLine.substring(0, index));
+			programSubPartComments.add(programLineIn.substring(index));
+			programLineIn = removeSpacesBeforeAndAfter(programLineIn.substring(0, index));
 		}
 		else programSubPartComments.add(null);
 		
 		// If the line contains more than 1 clause, split it.
-		index = programLine.indexOf(".");
-		if (index +1 != programLine.length()) {
-			while ((index > 0) && (! dotDenotesClauseEnd(index, programLine))) {
-				index = programLine.indexOf(".", index +1);
+		index = programLineIn.indexOf(".");
+		if (index +1 != programLineIn.length()) {
+			while ((index > 0) && (! dotDenotesClauseEnd(index, programLineIn))) {
+				index = programLineIn.indexOf(".", index +1);
 			}
 		}
 
-		if (index > -1) {
+		if (index > -1) { // We have 1 end of clause delimiter.
 			// It contains at least 1 clause.
-			programSubPartLine = programLine.substring(0, index);
-			if (programLine.length() > (index +1)) programLine = programLine.substring(index +1);
-			else programLine = "";
+			programSubPartLine = programLineIn.substring(0, index);
+			if ((index +1) < programLineIn.length()) programLineIn = programLineIn.substring(index +1);
+			else programLineIn = "";
 			partIsIncomplete = false;
 		}
 		else {
-			// It does not contain a clause.
-			programSubPartLine = programLine;
-			programLine = "";
-			partIsIncomplete = true;
+			if ("".equals(programSubPartLineAcc)) { // It is the beggining of a line.
+				if ("".equals(programLineIn)) { // The line contains only a comment.
+					partIsIncomplete = false;
+				}
+				else { // The line contains something but it is incomplete.
+					partIsIncomplete = true;
+				}
+			}
+			else { // We are inside a splitted subPart.
+				partIsIncomplete = true;
+				
+			}
+			// The subpart line is the full line (without comment).
+			programSubPartLine = programLineIn;
+			programLineIn = "";
 		}
 		
 		programSubPartLines.add(programSubPartLine);
-		programSubPartJoinedLine += programSubPartLine;
+		programSubPartLineAcc += programSubPartLine;
 		
 		head = null;
 		if (! partIsIncomplete) {	
 			String msg = "partIsIncomplete: " + partIsIncomplete + "\n";
 			msg += "programSubPartLine: " + programSubPartLine + "\n";
-			msg += "programLine: " + programLine;
+			msg += "programLineIn: " + programLineIn;
 			
-			index = programSubPartJoinedLine.indexOf(":-");
+			index = programSubPartLineAcc.indexOf(":-");
 			if (index > -1) {
-				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
-				body = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
-				programSubPartJoinedLine = "";
+				head = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(0, index));
+				body = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(index +2));
+				programSubPartLineAcc = "";
 			}
 
-			index = programSubPartJoinedLine.indexOf(":~");
+			index = programSubPartLineAcc.indexOf(":~");
 			if (index > -1) {
-				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
-				fuzzyBody = removeSpacesBeforeAndAfter(programSubPartJoinedLine.substring(0, index));
+				head = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(0, index));
+				fuzzyBody = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(index +2));
 
 				parseHead();
 				parseFuzzyBody();
-				programSubPartJoinedLine = "";
+				programSubPartLineAcc = "";
 			}
 
-			if ((head != null) && (! ("".equals(programSubPartJoinedLine)))) {
-				head = removeSpacesBeforeAndAfter(programSubPartJoinedLine);
+			if ((head != null) && (! ("".equals(programSubPartLineAcc)))) {
+				head = removeSpacesBeforeAndAfter(programSubPartLineAcc);
 			}
 			
 			msg += "head: " + head + "\n";
@@ -114,32 +125,32 @@ public class ProgramPartAnalysisClass {
 		}
 		
 		// Avoid problems when the line is formed by just white spaces.
-		programLine = removeSpacesBeforeAndAfter(programLine);
-		if ("".equals(programLine)) programLine = null;
+		programLineIn = removeSpacesBeforeAndAfter(programLineIn);
+		if ("".equals(programLineIn)) programLineIn = null;
 		
-		return programLine;
+		return programLineIn;
 	}
 	
-	private boolean dotDenotesClauseEnd(int index, String programLine) throws Exception {
-		if (index < 0) throw new Exception("Index out of range. index: " + index + " programLine: " + programLine);
-		if (! (index < programLine.length())) throw new Exception("Index out of range. index: " + index + " programLine: " + programLine);
-		if (programLine.charAt(index) != '.') throw new Exception("Character at index is not a dot. index: " + index + " programLine: " + programLine);
+	private boolean dotDenotesClauseEnd(int index, String programLineIn) throws Exception {
+		if (index < 0) throw new Exception("Index out of range. index: " + index + " programLineIn: " + programLineIn);
+		if (! (index < programLineIn.length())) throw new Exception("Index out of range. index: " + index + " programLineIn: " + programLineIn);
+		if (programLineIn.charAt(index) != '.') throw new Exception("Character at index is not a dot. index: " + index + " programLineIn: " + programLineIn);
 		
 		int subStringBegins = index -1;
 		while ( (subStringBegins >= 0) && 
-				(! isDelimiter(programLine.charAt(subStringBegins)))) {
+				(! isDelimiter(programLineIn.charAt(subStringBegins)))) {
 			subStringBegins--;
 		}
 		if (subStringBegins <= 0) subStringBegins = 0;
 		
 		int subStringEnds = index +1;
-		while ( (subStringEnds < programLine.length()) && 
-				(! isDelimiter(programLine.charAt(subStringEnds)))) {
+		while ( (subStringEnds < programLineIn.length()) && 
+				(! isDelimiter(programLineIn.charAt(subStringEnds)))) {
 			subStringEnds++;
 		}
-		if (subStringEnds >= programLine.length()) subStringEnds = programLine.length();
+		if (subStringEnds >= programLineIn.length()) subStringEnds = programLineIn.length();
 		
-		String subString = programLine.substring(subStringBegins, subStringEnds);
+		String subString = programLineIn.substring(subStringBegins, subStringEnds);
 		if (subString.length() < 3) return true;
 		else {
 			try {
@@ -262,8 +273,10 @@ public class ProgramPartAnalysisClass {
 		
 		if (indexStart == -1) throw new Exception("fuzzy body contains no functionality.");
 		
-		String functionality = removeSpacesBeforeAndAfter(fuzzyBody.substring(0, indexStart -1));
+		String functionality = removeSpacesBeforeAndAfter(fuzzyBody.substring(0, indexStart));
 		String arguments = removeSpacesBeforeAndAfter(fuzzyBody.substring(indexStart +1)); 
+		
+		LOG.info("\n" + "functionality: " + functionality + "\n" + "arguments: " + arguments);
 		
 		// For values.
 		if ("value".equals(functionality)) {
@@ -281,18 +294,40 @@ public class ProgramPartAnalysisClass {
 		
 		// For functions.
 		if ("function".equals(functionality)) {
+			indexMiddle = arguments.indexOf(",");
+			if (indexMiddle > 1) {
+				predNecessary = arguments.substring(0, indexMiddle);
+			}
+			
+			indexStart = arguments.indexOf("[");
+			indexEnd = arguments.indexOf("]");
+			
+			String functionPointsString = "";
+			if ((indexStart > -1) && (indexEnd > -1) && (indexStart +1 < arguments.length())) {
+				functionPointsString = arguments.substring(indexStart +1, indexEnd);
+			}
+			arguments = arguments.substring(indexEnd +1);
+			
+			indexEnd = arguments.indexOf(")");
+			if ((indexEnd > -1) && (indexEnd +1 < arguments.length())) 
+				arguments.substring(indexEnd +1);
+			else arguments = "";
+			
+			LOG.info("\n" + "functionPointsString: " + functionPointsString + "\n" + "arguments: " + arguments);
 			boolean morePoints = true;
+			String pointsPairString = "";
 			while (morePoints) {
 				indexStart = 0;
-				indexEnd = arguments.indexOf(")");
-				if (indexEnd != -1) {
+				indexEnd = functionPointsString.indexOf(")");
+				if (indexEnd > -1) {
 
-					indexStart = (arguments.substring(0, indexEnd -1)).indexOf("(");
+					pointsPairString = functionPointsString.substring(0, indexEnd);
+					indexStart = pointsPairString.indexOf("(");
 					if (indexStart > -1) {
-						indexMiddle = (arguments.substring(0, indexEnd -1)).indexOf(",", indexStart);
+						indexMiddle = pointsPairString.indexOf(",");
 						if (indexMiddle > -1) {
-							String pointX = arguments.substring(indexStart +1, indexMiddle -1);
-							String pointY = arguments.substring(indexMiddle +1, indexEnd -1);
+							String pointX = pointsPairString.substring(0, indexMiddle);
+							String pointY = pointsPairString.substring(indexMiddle +1);
 							
 							if (functionPoints == null) {
 								functionPoints = new ArrayList<FunctionPoint>();
@@ -309,8 +344,6 @@ public class ProgramPartAnalysisClass {
 						// Reached the end in the points sequence.
 						morePoints = false;
 					}
-					// Remove the part that has been processed.
-					arguments = arguments.substring(indexEnd +1);
 				}
 				else {
 					// No end in the points sequence.
@@ -331,16 +364,13 @@ public class ProgramPartAnalysisClass {
 			while (moreBody) {
 				indexStart = 0;
 				indexEnd = arguments.indexOf(")");
-				if (indexEnd != -1) {
+				if (indexEnd > -1) {
+					ruleBody += arguments.substring(0, indexEnd);
 					indexStart = (arguments.substring(0, indexEnd -1)).indexOf("(");
-					if (indexStart != -1) {
-						ruleBody += arguments.substring(indexStart, indexEnd);
-						arguments = arguments.substring(indexEnd +1);
-					}
-					else {
+					if (indexStart == -1) {
 						moreBody = false;
-						arguments = arguments.substring(indexEnd +1);
 					}
+					arguments = arguments.substring(indexEnd +1);
 				}
 				else moreBody = false;
 			}
@@ -349,8 +379,14 @@ public class ProgramPartAnalysisClass {
 		// For defaults.
 		if ("defaults_to".equals(functionality)) {
 			indexEnd = arguments.indexOf(")");
-			if (indexEnd > -1) {				
-				defaults_to = Integer.parseInt(arguments.substring(0, indexEnd -1));
+			if (indexEnd > -1) {
+				String defaults_to_str = arguments.substring(0, indexEnd);
+				try {
+					defaults_to = Float.parseFloat(defaults_to_str);
+				}
+				catch (Exception e) {
+					defaults_to = -1;
+				}
 				arguments = arguments.substring(indexEnd +1);
 			}
 		}
@@ -440,7 +476,7 @@ public class ProgramPartAnalysisClass {
 		return body;
 	}
 	
-	public int getValue() {
+	public float getValue() {
 		return value;
 	}
 	
@@ -452,7 +488,7 @@ public class ProgramPartAnalysisClass {
 		return ruleAggregator;
 	}
 
-	public int getDefaultsTo() {
+	public float getDefaultsTo() {
 		return defaults_to;
 	}
 	
