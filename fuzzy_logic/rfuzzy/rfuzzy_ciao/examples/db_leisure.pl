@@ -71,6 +71,8 @@ rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
 test1(A, B) :- A .=. B.
 test2(A, B) :- A .>. B.
 test3(A, B, C) :- C .=. A + B.
+test4(A, B) :- A .>=. B.
+test5(A, B) :- A .=<. B.
 
 % Define the films database format.
 rfuzzy_define_database(film/7, 
