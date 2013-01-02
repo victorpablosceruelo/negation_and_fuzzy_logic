@@ -73,6 +73,7 @@ test2(A, B) :- A .>. B.
 test3(A, B, C) :- C .=. A + B.
 test4(A, B) :- A .>=. B.
 test5(A, B) :- A .=<. B.
+test6(A, B) :- A .<>. B.
 
 % Define the films database format.
 rfuzzy_define_database(film/7, 
