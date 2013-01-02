@@ -93,35 +93,7 @@ public class ProgramPartAnalysisClass {
 		
 		head = null;
 		if (! partIsIncomplete) {	
-			String msg = "partIsIncomplete: " + partIsIncomplete + "\n";
-			msg += "programSubPartLine: " + programSubPartLine + "\n";
-			msg += "programLineIn: " + programLineIn;
-			
-			index = programSubPartLineAcc.indexOf(":-");
-			if (index > -1) {
-				head = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(0, index));
-				body = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(index +2));
-				programSubPartLineAcc = "";
-			}
-
-			index = programSubPartLineAcc.indexOf(":~");
-			if (index > -1) {
-				head = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(0, index));
-				fuzzyBody = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(index +2));
-
-				parseHead();
-				parseFuzzyBody();
-				programSubPartLineAcc = "";
-			}
-
-			if ((head != null) && (! ("".equals(programSubPartLineAcc)))) {
-				head = removeSpacesBeforeAndAfter(programSubPartLineAcc);
-			}
-			
-			msg += "head: " + head + "\n";
-			msg += "body: " + body + "\n";
-			msg += "fuzzyBody: " + fuzzyBody + "\n";
-			LOG.info(msg);
+			parseProgramSubPartLineAcc(programSubPartLineAcc);
 		}
 		
 		// Avoid problems when the line is formed by just white spaces.
@@ -129,6 +101,38 @@ public class ProgramPartAnalysisClass {
 		if ("".equals(programLineIn)) programLineIn = null;
 		
 		return programLineIn;
+	}
+	
+	private void parseProgramSubPartLineAcc(String programSubPartLineAcc) throws Exception {
+		int index;
+		
+		String msg = "programSubPartLineAcc: " + programSubPartLineAcc + " \n";
+		
+		index = programSubPartLineAcc.indexOf(":-");
+		if (index > -1) {
+			head = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(0, index));
+			body = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(index +2));
+			programSubPartLineAcc = "";
+		}
+
+		index = programSubPartLineAcc.indexOf(":~");
+		if (index > -1) {
+			head = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(0, index));
+			fuzzyBody = removeSpacesBeforeAndAfter(programSubPartLineAcc.substring(index +2));
+
+			parseHead();
+			parseFuzzyBody();
+			programSubPartLineAcc = "";
+		}
+
+		if ((head == null) && (! ("".equals(programSubPartLineAcc)))) {
+			head = removeSpacesBeforeAndAfter(programSubPartLineAcc);
+		}
+		
+		msg += " head: " + head;
+		msg += " body: " + body;
+		msg += " fuzzyBody: " + fuzzyBody + "\n";
+		LOG.info(msg);
 	}
 	
 	private boolean dotDenotesClauseEnd(int index, String programLineIn) throws Exception {
@@ -152,18 +156,28 @@ public class ProgramPartAnalysisClass {
 		if (subStringEnds >= programLineIn.length()) subStringEnds = programLineIn.length();
 		
 		String subString = programLineIn.substring(subStringBegins, subStringEnds);
-		LOG.info("subString: " + subString);
-		if (subString.length() < 3) return true;
+		Float number = -1.0f;
+		boolean result = false;
+		
+		// LOG.info("subString: " + subString);
+		if (subString.length() < 3) result = true;
 		else {
-			try {
-				Float number = Float.parseFloat(subString);
-				LOG.info("It is not a dot because it is a number. Number: " + number);
-				return false;
-			} catch (Exception e) {
-				return true;
+			if ((subString.contains(".=.")) || (subString.contains(".<>.")) || (subString.contains(".>.")) || (subString.contains(".<.")) || 
+				(subString.contains(".>=.")) || (subString.contains(".=<."))) {
+				result = false;
+			}
+			else {
+				try {
+					number = Float.parseFloat(subString);
+					result = false;
+				} catch (Exception e) {
+					number = -1.0f;
+					result = true;
+				}
 			}
 		}
-		
+		LOG.info("It is "+result+" that dot denotes clause end. Number: " + number);
+		return result;
 	}
 	
 	private boolean isDelimiter(char character) {
@@ -339,21 +353,14 @@ public class ProgramPartAnalysisClass {
 			arguments = parsed[0];
 		}
 
-		// Now we go for the condition, the credibility and the username filters.
-		// Pred_Functor :~ P_B if Pred_Condition with_credibility (Op, Cred) only_for_user UserName
-		String extraOption = null;
+		arguments = removeSpacesBeforeAndAfter(arguments);
+		LOG.info("arguments: " + arguments);
 		
-		
-		indexStart = arguments.indexOf("(");
-		while (indexStart > -1) {
-			
-			extraOption = removeSpacesBeforeAndAfter(arguments.substring(0, indexStart -1));
-			arguments = arguments.substring(indexStart +1);			
-			arguments = saveExtraOption(extraOption, arguments);
-
-			// Go for the next filter.
-			indexStart = arguments.indexOf("(");
+		while ((arguments != null) && (arguments.length() > 0)) {			
+			arguments = saveExtraOption(arguments);
+			arguments = removeSpacesBeforeAndAfter(arguments);
 		}
+		LOG.info("arguments: " + arguments);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +368,7 @@ public class ProgramPartAnalysisClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void parseFunctionPoints(String input) throws Exception {
-		LOG.info("input: " + input);
+		// LOG.info("input: " + input);
 		
 		boolean morePoints = true;
 		int indexStart, indexMiddle, indexEnd;
@@ -376,7 +383,7 @@ public class ProgramPartAnalysisClass {
 					input = input.substring(indexEnd +1);
 				}
 				else input = "";
-				LOG.info("pointsPairString: " + pointsPairString);
+				// LOG.info("pointsPairString: " + pointsPairString);
 				
 				indexStart = pointsPairString.indexOf("(");
 				if (indexStart > -1) {
@@ -391,7 +398,7 @@ public class ProgramPartAnalysisClass {
 							functionPoints = new ArrayList<FunctionPoint>();
 						}
 						FunctionPoint functionPoint = new FunctionPoint(pointX, pointY);
-						LOG.info("functionPoint " + functionPoint.toString());
+						// LOG.info("functionPoint " + functionPoint.toString());
 						functionPoints.add(functionPoint);
 					}
 					else throw new Exception("no comma between point coordinates.");
@@ -404,6 +411,15 @@ public class ProgramPartAnalysisClass {
 			}
 		}
 		
+		// LOG result.
+		String msg = "";
+		if (functionPoints != null) {
+			for (int i=0; i<functionPoints.size(); i++) {
+				msg += functionPoints.get(i).toString() + " ";
+			}
+		}
+		LOG.info(msg);
+		
 		if (! "".equals(removeSpacesBeforeAndAfter(input))) {
 			throw new Exception("Not parsed text: " + input);
 		}
@@ -413,19 +429,48 @@ public class ProgramPartAnalysisClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private String saveExtraOption(String extraOption, String arguments) throws Exception {
-		LOG.info("extraOption: " + extraOption + " arguments: " + arguments);
-		if ("if".equals(extraOption)) if_condition = "";
-		if ("with_credibility".equals(extraOption)) with_credibility = "";
-		if ("only_for_user".equals(extraOption)) only_for_user = "";
+	private String saveExtraOption(String argumentsIn) throws Exception {
+		if (argumentsIn == null) return argumentsIn;
 		
-		String [] parsed = parseUntilExtraPar(arguments, '(');
+		LOG.info("arguments: " + argumentsIn);
 		
-		if ("if".equals(extraOption)) if_condition = parsed[1];
-		if ("with_credibility".equals(extraOption)) with_credibility = parsed[1];
-		if ("only_for_user".equals(extraOption)) only_for_user = parsed[1];
+		final String if_marker = "if";
+		final String with_credibility_marker = "with_credibility";
+		final String only_for_user_marker = "only_for_user";
+		String argumentsOut = null;
+		
+		if (argumentsIn.startsWith(if_marker)) {
+			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(if_marker.length()));
+			if (argumentsOut.indexOf("(") == 0) argumentsOut = argumentsOut.substring(1);
+			String [] parsed = parseUntilExtraPar(argumentsOut, '(');
+			if_condition = parsed[1];
+			LOG.info("if_condition: " + if_condition);
+			argumentsOut = parsed[0];
+		}
+		if (argumentsIn.startsWith(with_credibility_marker)) { 
+			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(with_credibility_marker.length()));
+			if (argumentsOut.indexOf("(") == 0) argumentsOut = argumentsOut.substring(1);
+			String [] parsed = parseUntilExtraPar(argumentsOut, '(');
+			with_credibility = parsed[1];
+			LOG.info("with_credibility: " + with_credibility);
+			argumentsOut = parsed[0];
+		}
+		if (argumentsIn.startsWith(only_for_user_marker)) {
+			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(only_for_user_marker.length()));
+			for (int i=0; i<argumentsOut.length(); i++) {
+				if (isDelimiter(argumentsOut.charAt(i))) {
+					throw new Exception("Not a valid user name: " + argumentsOut);
+				}
+			}
+			only_for_user = argumentsOut;
+			LOG.info("only_for_user: " + only_for_user);
+			argumentsOut = "";
+		}
 
-		return parsed[0];
+		if ((! "".equals(argumentsOut)) && (argumentsIn.equals(argumentsOut))) {
+			throw new Exception("argumentsIn.equals(argumentsOut)");
+		}
+		return argumentsOut;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////

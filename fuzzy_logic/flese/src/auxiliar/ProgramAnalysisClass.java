@@ -115,7 +115,7 @@ public class ProgramAnalysisClass {
 					}
 				}
 			}
-			else {
+/*			else {
 				LOG.info("Not a function. programPart.getHead(): " + programPart.getHead());
 				String [] lines = programPart.getLines();
 				String line = "";
@@ -124,6 +124,7 @@ public class ProgramAnalysisClass {
 				}
 				LOG.info(line);
 			}
+*/
 		}	
 		
 		String tmp = null;
