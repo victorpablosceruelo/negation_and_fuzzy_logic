@@ -1707,7 +1707,9 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 			}
 		}
 	}
-	return prologNameInColloquialLanguage(result);
+	
+	if ((result == null) && (currentName != null)) return currentName;
+	else return prologNameInColloquialLanguage(result);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

@@ -142,6 +142,7 @@ public class ProgramPartAnalysisClass {
 			subStringBegins--;
 		}
 		if (subStringBegins <= 0) subStringBegins = 0;
+		if (isDelimiter(programLineIn.charAt(subStringBegins))) subStringBegins ++;
 		
 		int subStringEnds = index +1;
 		while ( (subStringEnds < programLineIn.length()) && 
@@ -151,6 +152,7 @@ public class ProgramPartAnalysisClass {
 		if (subStringEnds >= programLineIn.length()) subStringEnds = programLineIn.length();
 		
 		String subString = programLineIn.substring(subStringBegins, subStringEnds);
+		LOG.info("subString: " + subString);
 		if (subString.length() < 3) return true;
 		else {
 			try {
@@ -249,9 +251,7 @@ public class ProgramPartAnalysisClass {
 			predNecessary = null;
 		}
 		else {
-			predDefined       = head.replaceAll(predicatePattern, "$1");
-			predNecessary     = head.replaceAll(predicatePattern, "$2");
-			// 	String predOthers = head.replaceAll(predicatePattern, "$3");
+			predDefined       = head.replaceAll(predicatePattern, "$1") + "(" + head.replaceAll(predicatePattern, "$2") + ")";
 		}
 
 	}
@@ -267,138 +267,76 @@ public class ProgramPartAnalysisClass {
 		fuzzyBody = removeSpacesBeforeAndAfter(fuzzyBody);
 		
 		int indexStart = fuzzyBody.indexOf("(");
-		int indexMiddle = -1; 
-		int indexEnd = -1;
-		boolean error = false;
 		
 		if (indexStart == -1) throw new Exception("fuzzy body contains no functionality.");
 		
 		String functionality = removeSpacesBeforeAndAfter(fuzzyBody.substring(0, indexStart));
-		String arguments = removeSpacesBeforeAndAfter(fuzzyBody.substring(indexStart +1)); 
+		String arguments = removeSpacesBeforeAndAfter(fuzzyBody.substring(indexStart +1));
+		String [] parsed = null;
 		
 		LOG.info("\n" + "functionality: " + functionality + "\n" + "arguments: " + arguments);
 		
 		// For values.
 		if ("value".equals(functionality)) {
-			indexEnd = arguments.indexOf(")");
-			if (indexEnd > -1) {
-				try {
-					value = Integer.parseInt(arguments.substring(0, indexEnd -1));
-				}
-				catch (Exception e) {
-					error = true;
-				}
-				arguments = arguments.substring(indexEnd +1);
+			parsed = parseUntilExtraPar(arguments, '(');
+			try {
+				value = Float.parseFloat(parsed[1]);
 			}
+			catch (Exception e) {
+				throw new Exception("Erroneous number for value. line: " + arguments);
+			}
+			arguments = parsed[0];
 		}
 		
 		// For functions.
 		if ("function".equals(functionality)) {
-			indexMiddle = arguments.indexOf(",");
-			if (indexMiddle > 1) {
-				predNecessary = arguments.substring(0, indexMiddle);
-			}
+			parsed = parseUntilExtraPar(arguments, '(');
+			arguments = parsed[0];
 			
-			indexStart = arguments.indexOf("[");
-			indexEnd = arguments.indexOf("]");
-			
-			String functionPointsString = "";
-			if ((indexStart > -1) && (indexEnd > -1) && (indexStart +1 < arguments.length())) {
-				functionPointsString = arguments.substring(indexStart +1, indexEnd);
-			}
-			arguments = arguments.substring(indexEnd +1);
-			
-			indexEnd = arguments.indexOf(")");
-			if ((indexEnd > -1) && (indexEnd +1 < arguments.length())) 
-				arguments.substring(indexEnd +1);
-			else arguments = "";
-			
-			LOG.info("\n" + "functionPointsString: " + functionPointsString + "\n" + "arguments: " + arguments);
-			boolean morePoints = true;
-			String pointsPairString = "";
-			while (morePoints) {
-				indexStart = 0;
-				indexEnd = functionPointsString.indexOf(")");
-				if (indexEnd > -1) {
+			parsed = parseUntilComma(parsed[1]);			
+			predNecessary = parsed[1];
 
-					pointsPairString = functionPointsString.substring(0, indexEnd);
-					if ((indexEnd +1) > functionPointsString.length()) {
-						functionPointsString = functionPointsString.substring(indexEnd +1);
-					}
-					else functionPointsString = "";
-					LOG.info("pointsPairString: " + pointsPairString);
-					
-					indexStart = pointsPairString.indexOf("(");
-					if (indexStart > -1) {
-						indexMiddle = pointsPairString.indexOf(",");
-						if (indexMiddle > -1) {
-							String pointX = pointsPairString.substring(indexStart +1, indexMiddle);
-							String pointY = pointsPairString.substring(indexMiddle +1);
-							
-							if (functionPoints == null) {
-								functionPoints = new ArrayList<FunctionPoint>();
-							}
-							functionPoints.add(new FunctionPoint(pointX, pointY));
-						}
-						else {
-							// The format of a point is not correct. Omit it.
-							morePoints = true;
-							error = true;
-						}
-					}
-					else {
-						// Reached the end in the points sequence.
-						morePoints = false;
-					}
-				}
-				else {
-					// Finished reading the points sequence.
-					morePoints = false;
-				}
+			String functionPointsString = removeSpacesBeforeAndAfter(parsed[0]);
+			if (functionPointsString.indexOf("[") != 0) {
+				throw new Exception("Erroneous format for function points. Not starting with [.");
 			}
+			functionPointsString = functionPointsString.substring(1);
+			parsed = parseUntilExtraPar(functionPointsString, '[');
+			
+			if (! "".equals(removeSpacesBeforeAndAfter(parsed[0]))) {
+				throw new Exception("Erroneous format for function points. Not ending with ].");
+			}
+			parseFunctionPoints(parsed[1]);
+
 		}
 
 		// For rules.
 		if ("rule".equals(functionality)) {
-			ruleBody = "";
-			indexEnd = arguments.indexOf(",");
-			ruleAggregator = arguments.substring(0, indexEnd);
-			arguments = arguments.substring(indexEnd+1);
+			parsed = parseUntilExtraPar(arguments, '(');
+			arguments = parsed[0];
+			ruleAggregator = null;
+			ruleBody = parsed[1];
 			
-			boolean moreBody = true;
-			while (moreBody) {
-				indexStart = 0;
-				indexEnd = arguments.indexOf(")");
-				if (indexEnd > 0) { // If it is zero we have finished !!!.
-					ruleBody += arguments.substring(0, indexEnd);
-					indexStart = (arguments.substring(0, indexEnd -1)).indexOf("(");
-					if (indexStart == -1) {
-						moreBody = false;
-					}
-					arguments = arguments.substring(indexEnd +1);
-				}
-				else {
-					moreBody = false;
-					if (indexEnd == 0) {
-						arguments = arguments.substring(indexEnd +1);
-					}
-				}
+			try {
+				parsed = parseUntilComma(parsed[1]);		
+				ruleAggregator = parsed[1];
+				ruleBody = parsed[0];
+			}
+			catch (Exception e) {
+				LOG.info("ruleBody has no aggregator. ruleBody: " + ruleBody);
 			}
 		}
 
 		// For defaults.
 		if ("defaults_to".equals(functionality)) {
-			indexEnd = arguments.indexOf(")");
-			if (indexEnd > -1) {
-				String defaults_to_str = arguments.substring(0, indexEnd);
-				try {
-					defaults_to = Float.parseFloat(defaults_to_str);
-				}
-				catch (Exception e) {
-					defaults_to = -1;
-				}
-				arguments = arguments.substring(indexEnd +1);
+			parsed = parseUntilExtraPar(arguments, '(');
+			try {
+				defaults_to = Float.parseFloat(parsed[1]);
 			}
+			catch (Exception e) {
+				throw new Exception("Erroneous number for defaults_to. line: " + arguments);
+			}
+			arguments = parsed[0];
 		}
 
 		// Now we go for the condition, the credibility and the username filters.
@@ -416,35 +354,155 @@ public class ProgramPartAnalysisClass {
 			// Go for the next filter.
 			indexStart = arguments.indexOf("(");
 		}
-		
-		if (error) throw new Exception("Error reading file.");
 	}
 	
-	private String saveExtraOption(String extraOption, String arguments) {
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void parseFunctionPoints(String input) throws Exception {
+		LOG.info("input: " + input);
+		
+		boolean morePoints = true;
+		int indexStart, indexMiddle, indexEnd;
+		String pointsPairString = "";
+		
+		while (morePoints) {
+			indexEnd = input.indexOf(")");
+			if (indexEnd > -1) {
+
+				pointsPairString = input.substring(0, indexEnd);
+				if ((indexEnd +1) < input.length()) {
+					input = input.substring(indexEnd +1);
+				}
+				else input = "";
+				LOG.info("pointsPairString: " + pointsPairString);
+				
+				indexStart = pointsPairString.indexOf("(");
+				if (indexStart > -1) {
+					pointsPairString = pointsPairString.substring(indexStart +1);
+					
+					indexMiddle = pointsPairString.indexOf(",");
+					if (indexMiddle > -1) {
+						String pointX = pointsPairString.substring(0, indexMiddle);
+						String pointY = pointsPairString.substring(indexMiddle +1);
+						
+						if (functionPoints == null) {
+							functionPoints = new ArrayList<FunctionPoint>();
+						}
+						FunctionPoint functionPoint = new FunctionPoint(pointX, pointY);
+						LOG.info("functionPoint " + functionPoint.toString());
+						functionPoints.add(functionPoint);
+					}
+					else throw new Exception("no comma between point coordinates.");
+				}
+				else throw new Exception("no parenthesis starting point coordinates.");
+			}
+			else {
+				// Finished reading the points sequence.
+				morePoints = false;
+			}
+		}
+		
+		if (! "".equals(removeSpacesBeforeAndAfter(input))) {
+			throw new Exception("Not parsed text: " + input);
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private String saveExtraOption(String extraOption, String arguments) throws Exception {
 		LOG.info("extraOption: " + extraOption + " arguments: " + arguments);
 		if ("if".equals(extraOption)) if_condition = "";
 		if ("with_credibility".equals(extraOption)) with_credibility = "";
 		if ("only_for_user".equals(extraOption)) only_for_user = "";
 		
-		boolean optionRead = false;
-		int indexMiddle = 0, indexEnd = 0;
+		String [] parsed = parseUntilExtraPar(arguments, '(');
 		
-		while (! optionRead) {
-			indexEnd = arguments.indexOf(")");
-			if (indexEnd > -1) {
-				indexMiddle = (arguments.substring(0, indexEnd)).indexOf("(");
-				if (indexMiddle > -1) {
-					if ("if".equals(extraOption)) if_condition += arguments.substring(indexMiddle, indexEnd);
-					if ("with_credibility".equals(extraOption)) with_credibility += arguments.substring(indexMiddle, indexEnd);
-					if ("only_for_user".equals(extraOption)) only_for_user += arguments.substring(indexMiddle, indexEnd);
+		if ("if".equals(extraOption)) if_condition = parsed[1];
+		if ("with_credibility".equals(extraOption)) with_credibility = parsed[1];
+		if ("only_for_user".equals(extraOption)) only_for_user = parsed[1];
+
+		return parsed[0];
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private String[] parseUntilExtraPar(String input, char kind) throws Exception {
+		if (input == null) throw new Exception("input is null.");
+		// if (input == null) return new String [] {input, input};
+		
+		if ((kind != '[') && (kind != '(')) throw new Exception("kind is not valid. kind: " + kind);
+		
+		int index = 0;
+		int openPars1 = 0;
+		int openPars2 = 0;
+		char current;
+		
+		if (kind == '(') openPars1 ++;
+		if (kind == '[') openPars2 ++;
+		
+		while ((index < input.length()) && ((openPars1 > 0) || (openPars2 > 0))) {
+			current = input.charAt(index);
+			if (current == ')') openPars1 --;
+			if (current == '(') openPars1 ++;
+			if (current == ']') openPars2 --;
+			if (current == '[') openPars2 ++;
+			if ((openPars1 > 0) || (openPars2 > 0)) index ++;
+		}
+		
+		if (index >= input.length()) {
+			throw new Exception("input has mismatched paranthesis. input: " + input);
+		}
+		else {
+			if ((openPars1 < 0) || (openPars2 < 0)) {
+				throw new Exception("input has mismatched paranthesis. input: " + input);
+			}
+			else {
+				if (index == 0) {
+					throw new Exception("input has nothing before parenthesis. input: " + input);
 				}
 				else {
-					optionRead = true;
+					String inputParsed = input.substring(0, index);
+
+					if (index +1 < input.length()) {
+						input = input.substring(index +1);
+					}
+					else {
+						input = "";
+					}
+					return new String [] {input, inputParsed};
 				}
 			}
-			else return "";
 		}
-		return arguments.substring(indexEnd +1);
+	}
+	
+	private String [] parseUntilComma(String input) throws Exception {
+		if (input == null) throw new Exception("input is null.");
+		
+		int index = input.indexOf(",");
+		if (index < 0) {
+			throw new Exception("input has not a comma. input: " + input);
+		}
+		else {
+			if (index == 0) {
+				throw new Exception("input has no string before comma. input: " + input);
+			}
+			else {
+				String inputParsed = input.substring(0, index);
+				if (index +1 < input.length()) {
+					input = input.substring(index +1);
+				}
+				else {
+					input = "";
+				}
+				return new String [] {input, inputParsed};
+			}
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
