@@ -299,18 +299,22 @@ public class CiaoPrologConnectionClass {
 		}
 		currentGoal.query();
 
-		LOG.info("performQueryAux: getting answers ...");
+		LOG.info("performQueryAux: getting answers ... ");
 		PLTerm prologQueryAnswer;
 		AnswerTermInJavaClass [] answerTermInJava = null;
 		long timesCounter;
 
+		String msgsAccumulator = "";
 		do { // Get all the answers you can.
 			prologQueryAnswer = null;
 			answerTermInJava = null;
 			timesCounter = 0;
 			// Save the current answer.
 			answersCounter ++;
-			LOG.info("performQueryAux: getting answer number: "  + answersCounter);
+			msgsAccumulator += "getting answer number: "  + answersCounter + "\n";
+			// LOG.info(msgsAccumulator);
+			// msgsAccumulator = "";
+					
 			do { // Get the current answer.
 				prologQueryAnswer = currentGoal.nextSolution();
 				timesCounter++;
@@ -320,21 +324,24 @@ public class CiaoPrologConnectionClass {
 				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + maxNumberOfTries);
 			}
 
-			String preMsg = "\n goal: " + currentGoal.toString();
+			msgsAccumulator += "goal: " + currentGoal.toString() + "\n";
 			if (prologQueryAnswer != null) {
-				preMsg += PLVariablesToString(variables);
-				preMsg += "\n   result: ";
 				answerTermInJava = new AnswerTermInJavaClass [variables.length];
 				for (int i=0; i<variables.length; i++) {
+					if (i != 0) msgsAccumulator += "\t";
+					msgsAccumulator += " var["+i+"]: ";
+					
 					if (variables[i] != null) {
+						msgsAccumulator += (variables[i].toString() + " bind: " + variables[i].getBinding());
 						answerTermInJava[i] = new AnswerTermInJavaClass(variables[i], prologQueryAnswer);
-						preMsg += answerTermInJava[i].toString() + " ";
+						msgsAccumulator += " -> " + answerTermInJava[i].toString() + " ";
 					}
 					else {
 						answerTermInJava[i] = null;
-						preMsg += "null ";
+						msgsAccumulator += "null -> null ";
 					}
 				}
+				msgsAccumulator += "\n";
 				/*
 				preMsg += "\n   Creation MSGS: ";
 				for (int i=0; i<variables.length; i++) {
@@ -347,15 +354,17 @@ public class CiaoPrologConnectionClass {
 				}
 				*/
 				latestEvaluatedQueryAnswers.add(answerTermInJava);
-				LOG.info(preMsg);
+				// LOG.info(msgsAccumulator);
 			}
 			else {
-				LOG.info("performQueryAux: answer obtained: null ");
+				// LOG.info("performQueryAux: answer obtained: null ");
+				msgsAccumulator += "answer obtained: null \n";
 			}
 
 		} while ((prologQueryAnswer != null) && (answersCounter < maxNumAnswers));
 
-		LOG.info("performQueryAux: terminating goal execution ...");
+		LOG.info(msgsAccumulator);
+		// LOG.info("performQueryAux: terminating goal execution ...");
 		if (currentGoal != null) {
 			try {
 				currentGoal.terminate();
@@ -366,7 +375,7 @@ public class CiaoPrologConnectionClass {
 			answersCounter=-1; // Notify that there is no currentGoal.
 		}
 		
-		LOG.info("performQueryAux: end.");
+		// LOG.info("performQueryAux: end.");
 	}
 		
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,22 +425,5 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 
-	 * Logs the information in the variables.
-	 * 
-	 * @param variables is an array of PL variables to be logged. 
-	 */
-	private String PLVariablesToString(PLVariable [] variables) {
-		String msg = "";
-		for(int i=0; i<variables.length; i++) {
-			msg += ("\n   var["+i+"]: ");
-			if (variables[i] != null) {
-				msg += (variables[i].toString() + " bind: " + variables[i].getBinding());
-			}
-			else {
-				msg += "null ";
-			}
-		}
-		return msg;
-	}
+
 }
