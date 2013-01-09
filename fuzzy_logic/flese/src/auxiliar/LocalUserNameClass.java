@@ -84,11 +84,11 @@ public class LocalUserNameClass {
 			if ((beforeAt != null) && (afterAt != null)){
 				if (beforeAt.contains(afterAt)) {
 					localUserName = fixLocalUserName(beforeAt);
-					LOG.info(msgForBeforeAt);
+					// LOG.info(msgForBeforeAt);
 				}
 				else {
 					localUserName = fixLocalUserName(beforeAt + "_at_" + afterAt);
-					LOG.info(msgForBeforeAt+ "+ _at_ + "+ msgForAfterAt);
+					// LOG.info(msgForBeforeAt+ "+ _at_ + "+ msgForAfterAt);
 				}
 			}
 		}
@@ -104,16 +104,16 @@ public class LocalUserNameClass {
 	 * 
 	 */
 	private String fixLocalUserName(String newLocalUserName) throws Exception {
-		String msg = "fixLocalUserName: ";
+		// String msg = "fixLocalUserName: ";
 		if ((newLocalUserName != null) && (! "".equals(newLocalUserName))) {
-			msg += newLocalUserName + " -> ";
+			// msg += newLocalUserName + " -> ";
 			newLocalUserName = newLocalUserName.replaceAll("\\s", "_");
-			msg += newLocalUserName + " -> ";
+			// msg += newLocalUserName + " -> ";
 			newLocalUserName = newLocalUserName.replaceAll("\\@", "_at_");
-			msg += newLocalUserName + " -> ";
+			// msg += newLocalUserName + " -> ";
 			newLocalUserName = newLocalUserName.replaceAll("\\.", "_");
-			msg += newLocalUserName + " ";
-			LOG.info(msg);
+			// msg += newLocalUserName + " ";
+			// LOG.info(msg);
 		}
 		if ("".equals(newLocalUserName)) newLocalUserName=null;
 		if (! ServletsAuxMethodsClass.checkUserNameIsValid(newLocalUserName)) newLocalUserName=null;
