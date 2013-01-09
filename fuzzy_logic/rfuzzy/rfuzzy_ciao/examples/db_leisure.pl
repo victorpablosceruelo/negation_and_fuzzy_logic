@@ -81,8 +81,8 @@ rfuzzy_define_database(film/7,
 	  (release_year, rfuzzy_integer_type), 
 	   (duration_in_minutes, rfuzzy_integer_type),
 	    (genre, rfuzzy_enum_type), 
-	     (original_language, rfuzzy_integer_type), 
-	      (directed_by, rfuzzy_integer_type), 
+	     (original_language, rfuzzy_enum_type), 
+	      (directed_by, rfuzzy_enum_type), 
 	       (distributed_by, rfuzzy_enum_type)]).
 
 film('The Godfather', 1972, 207, drama, english, 'Francis Ford Coppola', 'Paramount Pictures').
