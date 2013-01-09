@@ -23,8 +23,6 @@ public class CiaoPrologConnectionClass {
 	private String latestEvaluatedQuery = null;
 	
 	private String [] variablesNames = null;
-	private String querySimpleInfoString = null;
-	private String queryComplexInfoString = null;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +42,7 @@ public class CiaoPrologConnectionClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void programFileIntrospectionQuery(String fileOwner, String fileName) throws Exception {
+	public void programFileIntrospectionQuery(String plServerPath, String programFilesPath, String fileOwner, String fileName) throws Exception {
 		LOG.info("programFileIntrospectionQuery: fileOwner: "+fileOwner+" fileName: "+fileName);
 		
 		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
@@ -70,7 +68,7 @@ public class CiaoPrologConnectionClass {
 			PLStructure query = new PLStructure("rfuzzy_introspection", args); 
 
 			// Run the query and save the results in programIntrospection
-			performQuery(query, fileOwner, fileName, variables, null, null, null);
+			performQuery(plServerPath, query, programFilesPath, fileOwner, fileName, variables, null);
 			programIntrospection = latestEvaluatedQueryAnswers;
 
 			/*
@@ -195,19 +193,13 @@ public class CiaoPrologConnectionClass {
 	public String getLatestEvaluatedQuery() { 
 		return latestEvaluatedQuery; }
 	
-	public String getQuerySimpleInfoString () { 
-		return querySimpleInfoString;
-	}
-	public String getQueryComplexInfoString () {
-		return queryComplexInfoString;
-	}
-	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public void performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables, 
-			String [] variablesNames, String querySimpleInfoString, String queryComplexInfoString) 
+	public void performQuery(String plServerPath, PLStructure query, 
+			String programFilesPath, String fileOwner, String fileName, 
+			PLVariable [] variables, String [] variablesNames) 
 			throws Exception {
 
 		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
@@ -216,17 +208,15 @@ public class CiaoPrologConnectionClass {
 		if ("".equals(fileName)) throw new Exception("fileName cannot be empty string.");
 		
 		this.variablesNames = variablesNames;
-		this.querySimpleInfoString = querySimpleInfoString;
-		this.queryComplexInfoString = queryComplexInfoString;
 		
 		// Connect to the Ciao Prolog Server.
 		String [] argv = new String[1];
-		argv[0] = FoldersUtilsObject.getPlServerPath();
+		argv[0] = plServerPath;
 		PLConnection plConnection = new PLConnection(argv);
 		LOG.info("performQuery: Connected to Ciao Prolog server (plServer). ");
 
 		// Change working folder and run the query.
-		changeCiaoPrologWorkingFolder(fileOwner, plConnection);
+		changeCiaoPrologWorkingFolder(fileOwner, programFilesPath, plConnection);
 		performQueryAux(query, fileName, variables, maximumLong, maximumLong, plConnection);
 		
 		if (plConnection != null) {
@@ -257,22 +247,12 @@ public class CiaoPrologConnectionClass {
 			throw new Exception("programFileOwner is null or empty.");
 		}
 		
-		if ((! FilesMgmtClass.folderExists(programFileOwner, true))) {
-			// LOG.info("folder does not exist. folder: " + programFileOwner);
-			throw new Exception("folder does not exist. folder: " + programFileOwner);
-		}
-		
 		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
 			throw new Exception("programFilesPath is null or empty.");
 		}
-		
-		if ((! FoldersUtilsObject.folderExists(programFilesPath, true))) {
-			// LOG.info("folder does not exist. folder: " + programFileOwner);
-			throw new Exception("folder does not exist. folder: " + programFileOwner);
-		}
-		
+				
 		// Adequate the value of programFileOwner (it was relative until here).
-		String programFileOwnerWithPath = FoldersUtilsObject.getProgramFilesPath() + programFileOwner;
+		String programFileOwnerWithPath = FilesMgmtClass.getFullPath(programFilesPath, programFileOwner, null, false);
 		
 		// Change working folder.
 		PLVariable [] variables = new PLVariable[1];
@@ -397,7 +377,7 @@ public class CiaoPrologConnectionClass {
 	 * Serves for testing the query system, but has no use at all. 
 	 * @throws AnswerTermInJavaClassException 
 	 */	
-	public void testingQuery (String owner, String programFile) throws Exception {
+	public void testingQuery (String plServerPath, String programFilesPath, String owner, String programFile) throws Exception {
 		LOG.info("testingQuery ...");
 		if ("restaurant.pl".equals(programFile)) {
 			PLVariable[] variables = new PLVariable[6];
@@ -427,7 +407,7 @@ public class CiaoPrologConnectionClass {
 			PLTerm[] args_conjunction = {query_not_very_expensive, query_dump_constraints};
 			PLStructure query = new PLStructure(",", args_conjunction);
 
-			performQuery(query, owner, programFile, variables, null, null, null);
+			performQuery(plServerPath, query, programFilesPath, owner, programFile, variables, null);
 			LOG.info("testingQuery ... num of answers: " + latestEvaluatedQueryAnswers.size());
 		}
 	}

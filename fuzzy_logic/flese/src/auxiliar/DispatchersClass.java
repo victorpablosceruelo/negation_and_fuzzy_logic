@@ -76,9 +76,13 @@ public class DispatchersClass {
 				"/tmp/java-apps/fuzzy-search/"
 		};
 		
-		programFilesPath = FilesMgmtClass.returnProgramFilesValidPath(programFilesValidPaths);
+		if (programFilesPath == null) {
+			programFilesPath = FilesMgmtClass.returnProgramFilesValidPath(programFilesValidPaths, LOG);
+			LOG.info("programFilesPath: " + programFilesPath);
+		}
 		
-		String [] plServerValidPaths = {	
+		
+		String [] plServerValidSubPaths = {	
 				"/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
 				"/usr/share/CiaoDE/ciao/library/javall/plserver",
 				"/usr/lib/ciao",
@@ -89,7 +93,10 @@ public class DispatchersClass {
 				"/"
 		};
 		
-		plServerPath = FilesMgmtClass.returnPlServerValidPath(plServerValidPaths);
+		if (plServerPath == null) {
+			plServerPath = FilesMgmtClass.returnPlServerValidPath(plServerValidSubPaths, LOG);
+			LOG.info("plServerPath: " + plServerPath);
+		}
 		
 		// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 		connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
@@ -136,7 +143,7 @@ public class DispatchersClass {
 	public void runProgramIntrospectionQuery(boolean doForward) throws Exception {
 		
 		testAndInitialize_fileName_and_fileOwner();
-		connection.programFileIntrospectionQuery(fileOwner, fileName);
+		connection.programFileIntrospectionQuery(plServerPath, programFilesPath, fileOwner, fileName);
 		/*
 		LOG.info("------");
 		LOG.info("------");
@@ -207,10 +214,8 @@ public class DispatchersClass {
 	    	PLStructure query = conversor.queryConvert();
 	    	PLVariable [] variables = conversor.getListOfVariables();
 	    	String [] variablesNames = conversor.getListOfNamesForVariables();
-	    	String querySimpleInfoString = conversor.getQuerySimpleInfoString();
-	    	String queryComplexInfoString = conversor.getQueryComplexInfoString();
 
-	    	connection.performQuery(query, fileOwner, fileName, variables, variablesNames, querySimpleInfoString, queryComplexInfoString);
+	    	connection.performQuery(plServerPath, query, programFilesPath, fileOwner, fileName, variables, variablesNames);
 	    	// performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)
 
 	    	// Update the connection object in the session.
@@ -227,7 +232,7 @@ public class DispatchersClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public void filesList() throws Exception {
-		Iterator<FileInfoClass> filesListIterator = filesMgmt.returnFilesIterator(localUserName.getLocalUserName());
+		Iterator<FileInfoClass> filesListIterator = FilesMgmtClass.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(), LOG);
 		request.setAttribute("filesListIterator", filesListIterator);
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesListAnswer, "", request, response, LOG);
@@ -269,7 +274,7 @@ public class DispatchersClass {
 
 
 		// Get the path where we are going to upload the file.
-		String filesPath = filesMgmt.getCompletePathFromFileOwner(localUserName.getLocalUserName(), true);
+		String filesPath = FilesMgmtClass.getFullPath(programFilesPath, localUserName.getLocalUserName(), null, true);
 
 		// Parse the request to get file items.
 		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
@@ -317,7 +322,7 @@ public class DispatchersClass {
 		
 		testAndInitialize_fileName_and_fileOwner();
 
-		String FileNameWithPath = filesMgmt.getCompletePathOfProgramFile(fileOwner, fileName);
+		String FileNameWithPath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		// request.getParameter("filename");
 		String browser_filename = fileName;
 
@@ -354,7 +359,7 @@ public class DispatchersClass {
 		
 		testAndInitialize_fileName_and_fileOwner();
 		
-		filesMgmt.removeProgramFile(fileName, fileOwner, localUserName.getLocalUserName());
+		FilesMgmtClass.removeProgramFile(programFilesPath, fileOwner, fileName, localUserName.getLocalUserName());
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" has been removed. ", LOG);
 		
 	}
@@ -365,7 +370,7 @@ public class DispatchersClass {
 
 		String filePath = null;
 		if (localUserName.getLocalUserName().equals(fileOwner)) {
-			filePath = filesMgmt.getCompletePathOfProgramFile(fileOwner, fileName);
+			filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		}
 		request.setAttribute("filePath", filePath);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileViewAnswer, "", request, response, LOG);
@@ -379,8 +384,7 @@ public class DispatchersClass {
 		
 		testAndInitialize_fileName_and_fileOwner();
 		
-		FilesMgmtClass FoldersUtilsObject = new FilesMgmtClass();
-		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		String filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		request.setAttribute("filePath", filePath);
 		
 		// Forward to the jsp page.
@@ -391,8 +395,7 @@ public class DispatchersClass {
 		
 		testAndInitialize_fileName_and_fileOwner();
 		
-		FilesMgmtClass FoldersUtilsObject = new FilesMgmtClass();
-		String filePath = FoldersUtilsObject.getCompletePathOfProgramFile(fileOwner, fileName);
+		String filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		request.setAttribute("filePath", filePath);
 		
 		String predDefined = request.getParameter("predDefined");

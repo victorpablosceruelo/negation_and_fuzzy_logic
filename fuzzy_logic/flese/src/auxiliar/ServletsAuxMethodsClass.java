@@ -31,6 +31,7 @@ public class ServletsAuxMethodsClass {
 		if (userName.contains("\\s")) throw new Exception("userName contains \\s");
 		if (userName.contains("\\@")) throw new Exception("userName contains \\@");
 		if (userName.contains("\\.")) throw new Exception("userName contains \\.");
+		if (userName.contains("/")) throw new Exception("userName contains /.");
 		
 		return true;
 	}
