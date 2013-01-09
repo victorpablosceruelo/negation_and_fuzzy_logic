@@ -1310,6 +1310,7 @@ function insertFileUploadFacility(parentDivId) {
 			// Do something with response text.
 			if (notNullNorundefined(responseHtmlText)) {
 				iFrameWindow.document.body.innerHTML="";
+				debug.info(responseHtmlText);
 			}
 			// Clear the content of the iframe.
 			// this.contentDocument.location.href = '/images/loading.gif';

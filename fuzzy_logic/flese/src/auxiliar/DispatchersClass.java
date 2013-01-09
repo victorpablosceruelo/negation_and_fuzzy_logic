@@ -245,12 +245,13 @@ public class DispatchersClass {
 		} catch (Exception e) {
 			msg = "Error: " + e.getMessage();
 		}
+		LOG.info(msg);
 		request.setAttribute("uploadResult", msg);
 		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileUploadAnswer, "", request, response, LOG);
 	}
 	
 	public void uploadFileAux() throws Exception {
-		LOG.info("--- uploadFile invocation ---");
+		LOG.info("--- uploadFileAux invocation ---");
 		if ((doMethod == null) || ("doGet".equals(doMethod))) {
 			throw new ServletException("Uploads are only allowed using http post method.");	
 		}
@@ -276,16 +277,24 @@ public class DispatchersClass {
 
 		// Get the path where we are going to upload the file.
 		String filesPath = FilesMgmtClass.getFullPath(programFilesPath, localUserName.getLocalUserName(), null, true);
+		if ((filesPath == null) || ("".equals(filesPath))){
+			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
+		}
+		else {
+			if (! (filesPath.endsWith("/"))) filesPath += "/";
+		}
 
 		// Parse the request to get file items.
 		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
 
 		// Process the uploaded file items
-		Iterator<FileItem> i = fileItems.iterator();
+		// Iterator<FileItem> i = fileItems.iterator();
 
-		while ( i.hasNext () ) 
+		//while ( i.hasNext () )
+		for (int i=0; i<fileItems.size(); i++)
 		{
-			FileItem fileItem = (FileItem)i.next();
+			// FileItem fileItem = (FileItem)i.next();
+			FileItem fileItem = fileItems.get(i);
 			if ( !fileItem.isFormField () )	
 			{
 				// Get the uploaded file parameters
@@ -302,18 +311,19 @@ public class DispatchersClass {
 				}
 				//	ServletsAuxMethodsClass.addMessageToTheUser(request, "Please choose a correct program file. Allowed file extension is \'.pl\'", LOG);
 
-				String fileNameReal = ""; 
+				// String fileNameReal = ""; 
 				//	            String contentType = fi.getContentType();
 				//	            boolean isInMemory = fi.isInMemory();
 				//	            long sizeInBytes = fi.getSize();
 				// Write the file
 				if( fileName.lastIndexOf("\\") >= 0 ){
-					fileNameReal = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
+					fileName = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
 				}
-				else{
-					fileNameReal = filesPath + fileName.substring(fileName.lastIndexOf("\\")+1);
-				}
-				File file = new File( fileNameReal ) ;
+				else fileName = filesPath + fileName;
+				
+
+				LOG.info("realFileName: " + fileName);
+				File file = new File( fileName ) ;
 				fileItem.write( file );
 			}
 		}
