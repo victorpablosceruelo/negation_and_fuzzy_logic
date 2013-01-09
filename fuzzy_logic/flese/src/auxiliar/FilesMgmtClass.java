@@ -6,53 +6,9 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+
 public class FilesMgmtClass {
-
-	private static String programFilesPath = null;
-	private static String plServerPath = null;
-	private String msgs = null;
-	
-	public FilesMgmtClass() throws Exception {
-		msgs = "";
-		
-		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
-			msgs += "looking for a folder for uploading program files ... ";
-			// Configure the programFilesPath: Try the different options one by one.
-			configureProgramFilesPathAux("/home/java-apps/fuzzy-search/");
-			configureProgramFilesPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
-			// configureProgramFilesPathAux(servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"));
-			configureProgramFilesPathAux("/tmp/java-apps/fuzzy-search/");
-		}
-		
-		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
-			throw new Exception("configureProgramFilesPath: Cannot configure the path for the programs.");
-		}
-
-		
-		if ((plServerPath == null) || ("".equals(plServerPath))) {
-			msgs += "looking for the path of plserver ... ";
-			// Configure plServer path
-			// configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
-			// configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
-			// configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
-			configurePlServerPathAux("/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
-			configurePlServerPathAux("/usr/share/CiaoDE/ciao/library/javall/plserver");
-
-			// ToDo: Convendria un mecanismo algo más avanzado ... :-(
-			configurePlServerPathAdvanced("/usr/lib/ciao");
-			configurePlServerPathAdvanced("/usr/share/CiaoDE");
-			configurePlServerPathAdvanced("/usr");
-			configurePlServerPathAdvanced("/opt");
-			configurePlServerPathAdvanced("/home");
-			configurePlServerPathAdvanced("/");
-		}
-		
-		if ((plServerPath == null) || ("".equals(plServerPath))) {
-			throw new Exception("lookForPlServer: impossible to find plserver.");
-		}
-
-		msgs += "uploads' folder: " + programFilesPath + " plServer path: " + plServerPath;
-	}
 	
 	/**
 	 * Obtains the complete path of the owner. 
@@ -68,7 +24,6 @@ public class FilesMgmtClass {
 		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
 		String userProgramFilesPath = programFilesPath + fileOwner + "/";
 		testOrCreateProgramFilesPath(userProgramFilesPath, createIfDoesNotExist);
-		msgs += "getCompletePathOfOwner: owner: "+fileOwner+" userProgramFilesPath: "+userProgramFilesPath;
 		return userProgramFilesPath ;
 	}
 
@@ -94,17 +49,6 @@ public class FilesMgmtClass {
 		return programFilePath;
 	}
 
-	
-	/**
-	 * Obtains the complete path of the folder in which programs can be found
-	 * and/or stored.
-	 *  
-	 * @return the path in which programs can be found and/or stored.
-	 */
-	public String getProgramFilesPath() throws Exception {
-		return programFilesPath;
-	}
-
 	/**
 	 * If the programFilesPath attribute is null or an empty string 
 	 * checks if the path proposed in newProgramFilesPath
@@ -113,14 +57,26 @@ public class FilesMgmtClass {
 	 * 
 	 * @param newProgramFilesPath is the new path to test.
 	 */
-	private void configureProgramFilesPathAux(String newProgramFilesPath) throws Exception {
-		msgs += "configureProgramFilesPathAux: testing: " + newProgramFilesPath;
-		
-		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
-			if (testOrCreateProgramFilesPath(newProgramFilesPath, true)) {
-				programFilesPath = newProgramFilesPath;
+	static public String returnProgramFilesValidPath(String [] programFilesValidPaths) throws Exception {
+		String programFilesValidPath = null;
+		int index = 0;
+				
+		while (((programFilesValidPath == null) || ("".equals(programFilesValidPath))) && 
+				(index < programFilesValidPaths.length)) {
+			programFilesValidPath = programFilesValidPaths[index];
+			try {
+				if (! testOrCreateProgramFilesPath(programFilesValidPath, true)) {
+					programFilesValidPath = null;
+				}
+			}
+			catch (Exception e) {
+				programFilesValidPath = null;
 			}
 		}
+		
+		if ((programFilesValidPath == null) || ("".equals(programFilesValidPath))) 
+			throw new Exception("programFilesValidPath cannot be null.");
+		return programFilesValidPath;
 	}
 	
 	/**
@@ -132,7 +88,7 @@ public class FilesMgmtClass {
 	 * @return    true if the folder was there or has been created. False otherwise. 
 	 * @exception Exception if the folder can not be created
 	 */
-	public Boolean testOrCreateProgramFilesPath(String newProgramFilesPath, Boolean createIfDoesNotExist) 
+	public static Boolean testOrCreateProgramFilesPath(String newProgramFilesPath, Boolean createIfDoesNotExist) 
 			throws Exception {
 		
 		msgs += "testOrCreateuserProgramFilesPath: newProgramFilesPath: " + newProgramFilesPath + " createIfDoesNotExist: " +
@@ -302,65 +258,62 @@ public class FilesMgmtClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/**
-	 * Returns the value of the path of plserver
+	 * Looks which one of the proposed subPaths for the plServer is the correct one.
 	 * 
-	 * @return    the path of the executable file plServer.
-	 * @exception Exception if plServer is null.
+	 * @param plServerValidSubPaths are the new proposed subpaths for the plServer.
+	 * @throws Exception when none is valid.
 	 * 
 	 */
-	public String getPlServerPath() throws Exception {
+	public String returnPlServerValidPath(String [] plServerValidSubPaths, Log LOG) throws Exception {
+		String plServerPath = null;
+		String plServerSubPath = null;
+		int index = 0;
+		
+		while (((plServerPath == null) || ("".equals(plServerPath))) &&
+				(index < plServerValidSubPaths.length)) {
+			plServerSubPath = plServerValidSubPaths[index];
+
+			plServerPath = lookForFileInSubDir("plserver", plServerSubPath, LOG);
+		}
+		
 		if (plServerPath == null) {
-			throw new Exception("getPlServerPath: plServerPath is null.");
+			throw new Exception("plServerPath is null.");
 		}
 		return plServerPath;
 	}
 	
-	/**
-	 * If the path of the plServer is not configured yet, 
-	 * it looks for the plServer executable in the subpath given.
-	 * 
-	 * @param subPath is the new proposed subpath for the plServer.
-	 * @throws Exception when subPath is an empty string or null,
-	 * 
-	 */
-	private void configurePlServerPathAdvanced(String subPath) throws Exception {
-		if (plServerPath == null) {
-			if ((subPath == null) || ("".equals(subPath))) {
-				throw new Exception("configurePlServerPathAdvanced: subPath is empty string or null.");
-			}
-			File currentDir = new File(subPath);
-			if ((currentDir.exists()) || (currentDir.isDirectory()) || (currentDir.canRead()) || (currentDir.canExecute())) {
-				File[] subFiles = currentDir.listFiles();
-				File file = null;
-				int counter;
-
-				if (subFiles != null) {
-					// Test first the files.
-					counter = 0;
-					while ((plServerPath == null) && (counter<subFiles.length)) {
-						file = subFiles[counter];
-						if (file.isFile()) {
-							if ("plserver".equals(file.getName())) {
-								configurePlServerPathAux(file.getAbsolutePath());
-							}
-						}
-						counter++;
+	private String lookForFileInSubDir(String fileName, String subPath, Log LOG) {
+		String result = null;
+		
+		if (subPath != null) {
+			File file_1 = new File(subPath);
+			
+			if ((file_1.exists()) && (file_1.canRead()) || (file_1.canExecute())) {
+				if (file_1.isFile()) {
+					if (fileName.equals(file_1.getName())) {
+						result = subPath;
 					}
-
-					// And at last the directories.
-					counter = 0;
-					while ((plServerPath == null) && (counter<subFiles.length)) {
-						file = subFiles[counter];
-						if ((file.exists()) && (file.isDirectory()) && (file.canRead()) && (file.canExecute())) {
-							configurePlServerPathAdvanced(file.getAbsolutePath());
+				}
+				else {
+					if (file_1.isDirectory()) {
+						File[] subFiles = file_1.listFiles();
+						int index = 0;
+						while ((result == null) && (index < subFiles.length)) {
+							result = lookForFileInSubDir(fileName, subFiles[index].getAbsolutePath(), LOG);
 						}
-						counter++;
+					}
+					else {
+						LOG.info("Impossible to process path (not a file nor a directory): " + subPath);
 					}
 				}
 			}
+			else {
+				LOG.info("Impossible to process path (not exists, not readable or not executable): " + subPath);
+			}
 		}
+		return result;
 	}
 	
 	/**

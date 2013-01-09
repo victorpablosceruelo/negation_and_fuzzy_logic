@@ -30,6 +30,9 @@ public class DispatchersClass {
 	private int maxFileSize = 50000 * 1024;
 	private int maxMemSize = 50000 * 1024;
 	
+	private static String programFilesPath = null;
+	private static String plServerPath = null;
+	
 	private ServletContext servletContext = null;
 	private String doMethod = null;
 	private HttpServletRequest request = null;
@@ -38,7 +41,6 @@ public class DispatchersClass {
 	private LocalUserNameClass localUserName = null;
 	private String fileName = null;
 	private String fileOwner = null;
-	private FilesMgmtClass filesMgmt = null;
 	private CiaoPrologConnectionClass connection = null;
 	
 	public DispatchersClass(ServletContext servletContext, String doMethod, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
@@ -67,8 +69,27 @@ public class DispatchersClass {
 		this.localUserName = localUserName;
 		if (localUserName == null) throw new Exception("localUserName is null.");
 		
-		// The files management class object.
-		filesMgmt = new FilesMgmtClass();
+		String [] programFilesValidPaths = {	
+				"/home/java-apps/fuzzy-search/", 
+				System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/",
+				// servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"),
+				"/tmp/java-apps/fuzzy-search/"
+		};
+		
+		programFilesPath = FilesMgmtClass.returnProgramFilesValidPath(programFilesValidPaths);
+		
+		String [] plServerValidPaths = {	
+				"/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
+				"/usr/share/CiaoDE/ciao/library/javall/plserver",
+				"/usr/lib/ciao",
+				"/usr/share/CiaoDE",
+				"/usr", 
+				"/opt", 
+				"/home", 
+				"/"
+		};
+		
+		plServerPath = FilesMgmtClass.returnPlServerValidPath(plServerValidPaths);
 		
 		// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
 		connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
