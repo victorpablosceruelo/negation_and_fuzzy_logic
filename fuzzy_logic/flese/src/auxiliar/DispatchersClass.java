@@ -55,7 +55,7 @@ public class DispatchersClass {
 		if (request == null) throw new Exception("request is null.");
 		
 		// Debugging information.
-		ServletsAuxMethodsClass.logRequestParameters(request, LOG);
+		LOG.info(ServletsAuxMethodsClass.requestParametersToString(request));
 		
 		this.response = response;
 		if (response == null) throw new Exception("response is null.");

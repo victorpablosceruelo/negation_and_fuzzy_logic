@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ServletsAuxMethodsClass {
 
-	final static Log LOG = LogFactory.getLog(QueryConversorClass.class);
+	final static Log LOG = LogFactory.getLog(ServletsAuxMethodsClass.class);
 	private final static String appPath = "flese/";
 	private static String appUrl = null;
 	
@@ -134,37 +134,39 @@ public class ServletsAuxMethodsClass {
 		// System.out.println(dateFormat.format(date));
 		return (dateFormat.format(date));
 	}
-
-	public static void logRequestParameters(HttpServletRequest request, Log LOG) {
+	
+	public static String requestParametersToString(HttpServletRequest request) {
+		
+		String result = "\n ";
+		
 		if ((request != null) && (LOG != null)) {
 			// Get the values of all request parameters
 			Enumeration<String> parametersEnum = request.getParameterNames();
 			String parameterName;
-			String msg = "";
-			LOG.info("---------------------------------------------------------------------------------------------");
 
 			if (parametersEnum != null) {
 				while (parametersEnum.hasMoreElements()) {
 					// Get the name of the request parameter
 					parameterName = (parametersEnum.nextElement()).toString();
-					msg += "\n - Parameter name: " + parameterName;
+					result += "\n - Values for parameter: " + parameterName + " :: ";
 
 					String[] values = request.getParameterValues(parameterName);
 					if (values != null) {
 						for (int i=0; i<values.length; i++) {
-							msg += "\n   Parameter name and value: " + parameterName + "[" + i + "]: " + values[i];
+							result += "[" + i + "]: " + values[i];
 						}
 					}
-					else msg += "\n   Parameter values is null.";
+					else result += "values list is null.";
 				}
-				LOG.info(msg + "\n - <END of parameters list>");
+				result += "\n - <END>";
 			}
-			else LOG.info("parametersEnum is null.");
-			LOG.info("---------------------------------------------------------------------------------------------");
+			else result += "\n - parametersEnum is null.";
 		}
 		else {
-			if (LOG != null) LOG.info("request is null.");
+			result += "\n - request is null.";
 		}
+		result += "\n";
+		return result;
 	}
 	
 	public static String requestParametersToString (HttpServletRequest request, Log LOG) {
