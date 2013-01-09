@@ -160,16 +160,18 @@ public class FilesMgmtClass {
 		}
 				
 		if ((fullPath != null) && (fileName != null) && (! "".equals(fileName))) {
-			fullPath += fileName;
+			if (fullPath.endsWith("/")) fullPath += fileName;
+			else fullPath += "/" + fileName;
+				
 			File file = new File(fullPath);
 			if (! file.exists()) {
-				throw new Exception("file does not exist.");
+				throw new Exception("file does not exist. file: " + fullPath);
 			}
 			if (! file.isFile()) {
-				throw new Exception("file is not a file.");
+				throw new Exception("file is not a file. file: " + fullPath);
 			}
 			if (! file.canRead()) {
-				throw new Exception("file is not readable.");
+				throw new Exception("file is not readable. file: " + fullPath);
 			}
 		}
 		return fullPath;
