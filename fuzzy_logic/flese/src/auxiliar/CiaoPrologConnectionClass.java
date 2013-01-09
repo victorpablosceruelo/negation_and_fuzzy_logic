@@ -12,7 +12,6 @@ import CiaoJava.*;
 public class CiaoPrologConnectionClass {
 
 	final static private Log LOG = LogFactory.getLog(CiaoPrologConnectionClass.class);
-	static private FilesMgmtClass FoldersUtilsObject = null;
 	final static private long maximumLong = 9223372036854775807L;
 	
 	// This one can not be shared between different processes.
@@ -26,17 +25,6 @@ public class CiaoPrologConnectionClass {
 	private String [] variablesNames = null;
 	private String querySimpleInfoString = null;
 	private String queryComplexInfoString = null;
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public CiaoPrologConnectionClass() throws Exception {
-		LOG.info("CiaoPrologConnectionClass: Connecting to Ciao Prolog server (plServer) ...");
-		if (FoldersUtilsObject == null) {
-			FoldersUtilsObject = new FilesMgmtClass();
-		}
-	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,17 +248,25 @@ public class CiaoPrologConnectionClass {
 	 * @exception LocalUserNameFixesClassException if the owner string is empty or null
 	 * @throws AnswerTermInJavaClassException when the term cannot be converted.
 	 */
-	private void changeCiaoPrologWorkingFolder(String programFileOwner, PLConnection plConnection) 
+	private void changeCiaoPrologWorkingFolder(String programFileOwner, String programFilesPath, PLConnection plConnection) 
 			throws Exception {
 		// Log info
 		LOG.info("changeCiaoPrologWorkingFolder: folder selected: " + programFileOwner);
 		
-		if ((programFileOwner == null) || ("".equals(programFileOwner))){
-			LOG.info("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
-			throw new Exception("changeCiaoPrologWorkingFolder: programFileOwner is null or empty.");
+		if ((programFileOwner == null) || ("".equals(programFileOwner))) {
+			throw new Exception("programFileOwner is null or empty.");
 		}
 		
-		if ((! FoldersUtilsObject.folderExists(programFileOwner, true))) {
+		if ((! FilesMgmtClass.folderExists(programFileOwner, true))) {
+			// LOG.info("folder does not exist. folder: " + programFileOwner);
+			throw new Exception("folder does not exist. folder: " + programFileOwner);
+		}
+		
+		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
+			throw new Exception("programFilesPath is null or empty.");
+		}
+		
+		if ((! FoldersUtilsObject.folderExists(programFilesPath, true))) {
 			// LOG.info("folder does not exist. folder: " + programFileOwner);
 			throw new Exception("folder does not exist. folder: " + programFileOwner);
 		}

@@ -6,20 +6,17 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class FilesMgmtClass {
 
-	// private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(FilesMgmtClass.class);
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
+	private String msgs = null;
 	
 	public FilesMgmtClass() throws Exception {
+		msgs = "";
 		
 		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
-			LOG.info("looking for a folder for uploading program files ... ");
+			msgs += "looking for a folder for uploading program files ... ";
 			// Configure the programFilesPath: Try the different options one by one.
 			configureProgramFilesPathAux("/home/java-apps/fuzzy-search/");
 			configureProgramFilesPathAux(System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/"); 
@@ -33,12 +30,13 @@ public class FilesMgmtClass {
 
 		
 		if ((plServerPath == null) || ("".equals(plServerPath))) {
-			LOG.info("looking for the path of plserver ... ");
+			msgs += "looking for the path of plserver ... ";
 			// Configure plServer path
 			// configurePlServerPathAux("/usr/lib/ciao/ciao-1.15/library/javall/plserver");
 			// configurePlServerPathAux("/home/vpablos/secured/CiaoDE_trunk/ciao/library/javall/plserver");
 			// configurePlServerPathAux("/home/vpablos/tmp/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
 			configurePlServerPathAux("/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver");
+			configurePlServerPathAux("/usr/share/CiaoDE/ciao/library/javall/plserver");
 
 			// ToDo: Convendria un mecanismo algo más avanzado ... :-(
 			configurePlServerPathAdvanced("/usr/lib/ciao");
@@ -53,7 +51,7 @@ public class FilesMgmtClass {
 			throw new Exception("lookForPlServer: impossible to find plserver.");
 		}
 
-		LOG.info("uploads' folder: " + programFilesPath + " plServer path: " + plServerPath);
+		msgs += "uploads' folder: " + programFilesPath + " plServer path: " + plServerPath;
 	}
 	
 	/**
@@ -70,7 +68,7 @@ public class FilesMgmtClass {
 		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
 		String userProgramFilesPath = programFilesPath + fileOwner + "/";
 		testOrCreateProgramFilesPath(userProgramFilesPath, createIfDoesNotExist);
-		LOG.info("getCompletePathOfOwner: owner: "+fileOwner+" userProgramFilesPath: "+userProgramFilesPath);
+		msgs += "getCompletePathOfOwner: owner: "+fileOwner+" userProgramFilesPath: "+userProgramFilesPath;
 		return userProgramFilesPath ;
 	}
 
@@ -116,7 +114,7 @@ public class FilesMgmtClass {
 	 * @param newProgramFilesPath is the new path to test.
 	 */
 	private void configureProgramFilesPathAux(String newProgramFilesPath) throws Exception {
-		LOG.info("configureProgramFilesPathAux: testing: " + newProgramFilesPath);
+		msgs += "configureProgramFilesPathAux: testing: " + newProgramFilesPath;
 		
 		if ((programFilesPath == null) || (programFilesPath.equals(""))) {
 			if (testOrCreateProgramFilesPath(newProgramFilesPath, true)) {
@@ -137,8 +135,8 @@ public class FilesMgmtClass {
 	public Boolean testOrCreateProgramFilesPath(String newProgramFilesPath, Boolean createIfDoesNotExist) 
 			throws Exception {
 		
-		LOG.info("testOrCreateuserProgramFilesPath: newProgramFilesPath: " + newProgramFilesPath + " createIfDoesNotExist: " +
-				createIfDoesNotExist);
+		msgs += "testOrCreateuserProgramFilesPath: newProgramFilesPath: " + newProgramFilesPath + " createIfDoesNotExist: " +
+				createIfDoesNotExist;
 		boolean retval = false;
 		
 		if ((newProgramFilesPath==null) || (newProgramFilesPath.equals(""))){
@@ -158,8 +156,9 @@ public class FilesMgmtClass {
 						retval = dir.mkdirs();
 					} 
 					catch (Exception ex) {
-						LOG.info("configureProgramFilesPathAux: not valid: " + newProgramFilesPath);
-						LOG.info("Exception: " + ex);
+						msgs += "configureProgramFilesPathAux: not valid: " + newProgramFilesPath;
+						if ((ex != null) && (ex.getMessage() != null)) 
+							msgs += "Exception: " + ex.getMessage();
 					}
 				}
 			}
@@ -182,7 +181,7 @@ public class FilesMgmtClass {
 	 */
 	public void removeProgramFile(String fileName, String fileOwner, String localUserName) throws Exception {
 
-		LOG.info("programFileName: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName);
+		msgs += "programFileName: "+fileName+" owner: "+fileOwner+" localUserName: "+localUserName;
 		
 		if (fileName == null) { throw new Exception("fileName is null"); }
 		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
@@ -282,7 +281,7 @@ public class FilesMgmtClass {
 	private ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) 
 			throws Exception {
 
-		LOG.info("listProgramFilesInSubDir: subDir: " + subDir);
+		msgs += "listProgramFilesInSubDir: subDir: " + subDir;
 		if ((subDir == null) || ("".equals(subDir))) {
 			throw new Exception("listProgramFilesInSubDir: subDir cannot be null nor empty string.");
 		}
@@ -398,9 +397,9 @@ public class FilesMgmtClass {
 	 * @throws Exception when folderPath is empty string or null.
 	 * 
 	 */
-	public Boolean folderExists (String folderPath, Boolean relativePath) throws Exception {
+	public static Boolean folderExists (String folderPath, Boolean relativePath) throws Exception {
 		
-		LOG.info("folderExists: folderPath: " + folderPath);
+		msgs += "folderExists: folderPath: " + folderPath;
 		if ((folderPath == null) || ("".equals(folderPath))) {
 			throw new Exception("folderExists: folderPath is empty string or null.");
 		}
@@ -409,8 +408,8 @@ public class FilesMgmtClass {
 		}
 		File dir = new File(folderPath);
 		Boolean retVal = ((dir.exists()) && (dir.isDirectory()) && (dir.canRead()) && (dir.canExecute()));
-		LOG.info("dir.exists(): " + dir.exists() + " dir.isDirectory(): " + dir.isDirectory());
-		LOG.info("dir.canRead(): " + dir.canRead() + " dir.canExecute(): " + dir.canExecute());
+		msgs += "dir.exists(): " + dir.exists() + " dir.isDirectory(): " + dir.isDirectory();
+		msgs += "dir.canRead(): " + dir.canRead() + " dir.canExecute(): " + dir.canExecute();
 		return retVal;
 	}
 	
@@ -420,7 +419,7 @@ public class FilesMgmtClass {
 
 	public Boolean programFileExists(String fileOwner, String fileName, Boolean relativePath) throws Exception {
 		
-		LOG.info("programFileExists: fileOwner: " + fileOwner + " fileName: " + fileName);
+		msgs += "programFileExists: fileOwner: " + fileOwner + " fileName: " + fileName;
 		if ((fileOwner == null) || ("".equals(fileOwner))) {
 			throw new Exception("programFileExists: fileOwner is empty string or null.");
 		}
@@ -434,8 +433,8 @@ public class FilesMgmtClass {
 		}
 		File file = new File(fullPath);
 		Boolean retVal = ((file.exists()) && (file.isFile()) && (file.canRead()));
-		LOG.info("file.exists(): " + file.exists() + " file.isFile(): " + file.isFile());
-		LOG.info("file.canRead(): " + file.canRead());
+		msgs += "file.exists(): " + file.exists() + " file.isFile(): " + file.isFile();
+		msgs += "file.canRead(): " + file.canRead();
 		return retVal;
 	}
 
@@ -443,4 +442,10 @@ public class FilesMgmtClass {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public String getMsgs () {
+		String retValue = msgs;
+		msgs = ""; // Re-initialize
+		return retValue;
+	}
+	
 }
