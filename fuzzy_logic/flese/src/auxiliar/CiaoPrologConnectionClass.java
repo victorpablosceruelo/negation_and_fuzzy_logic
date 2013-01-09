@@ -328,20 +328,20 @@ public class CiaoPrologConnectionClass {
 			if (prologQueryAnswer != null) {
 				answerTermInJava = new AnswerTermInJavaClass [variables.length];
 				for (int i=0; i<variables.length; i++) {
-					if (i != 0) msgsAccumulator += "\t";
-					msgsAccumulator += " var["+i+"]: ";
+					// if (i != 0) msgsAccumulator += "\t";
+					msgsAccumulator += "      var["+i+"]: ";
 					
 					if (variables[i] != null) {
 						msgsAccumulator += (variables[i].toString() + " bind: " + variables[i].getBinding());
 						answerTermInJava[i] = new AnswerTermInJavaClass(variables[i], prologQueryAnswer);
-						msgsAccumulator += " -> " + answerTermInJava[i].toString() + " ";
+						msgsAccumulator += " -> " + answerTermInJava[i].toString() + " \n";
 					}
 					else {
 						answerTermInJava[i] = null;
-						msgsAccumulator += "null -> null ";
+						msgsAccumulator += "null -> null \n";
 					}
 				}
-				msgsAccumulator += "\n";
+				// msgsAccumulator += "\n";
 				/*
 				preMsg += "\n   Creation MSGS: ";
 				for (int i=0; i<variables.length; i++) {
