@@ -1724,6 +1724,9 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	 * "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
 	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
 	 */
+	
+	// USAR UN IFRAME ES MATAR CHINCHES A CAÑONAZOS !!!
+	
 	var formTargetiFrameId = "personalizeMyFuzzification";
 	var form = document.createElement('form');
 	form.target = formTargetiFrameId;
@@ -1886,9 +1889,16 @@ function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderMo
 	
 	hiddenField = document.createElement('input');
 	hiddenField.type = "hidden";
-	hiddenField.name = "fuzzification";
+	hiddenField.name = "predDefined";
 	hiddenField.value = fuzzificationsFunctions[index].predDefined;
 	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
+	
+	hiddenField = document.createElement('input');
+	hiddenField.type = "hidden";
+	hiddenField.name = "predNecessary";
+	hiddenField.value = fuzzificationsFunctions[index].predNecessary;
+	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
+		
 	
 	var table = null;
 	var row = null;
