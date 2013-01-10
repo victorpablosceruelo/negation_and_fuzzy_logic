@@ -1761,8 +1761,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
 	var html = "";
 	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
-			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId + "\", \"" +
-			formTargetiFrameId + "\", \"" + mode + "\");'>";
+			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId + "\", \"" + mode + "\");'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
 	if (fuzzificationsFunctions != null) {
@@ -1788,7 +1787,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	cell.innerHTML = "Select the fuzzification you want to personalize.";
 	
 	if (fuzzificationsFunctions == null) {
-		alert("Program has nothing to personalize.");
+		alert("The program has nothing to personalize.");
 	}
 	else {
 		// Show the div.
@@ -1815,7 +1814,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode) {
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, mode) {
 	
 	if ((comboBox == null) || (comboBox == undefined)) {
 		alert("comboBox is invalid in personalizationFunctionChanged.");
