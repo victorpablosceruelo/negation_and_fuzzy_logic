@@ -1870,14 +1870,14 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	cell.innerHTML = "";
 	row.appendChild(cell);
 	
-	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId, mode);
+	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, formTargetiFrameId, fuzzificationGraphicDivId, mode){
+function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode){
 	
 	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
 	var table = null;
@@ -1957,6 +1957,13 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 		}
 	}
 	if (mode == 'advanced') indexOfMine = indexOfDefault;
+	else {
+		if (indexOfMine == null) {
+			indexOfMine = fuzzificationsFunctions[index].ownersPersonalizations.length;
+			fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine] =
+				new ownerPersonalization(localUserName, fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data);
+		}
+	}
 	
 	var fpx = null;
 	var fpy = null;
@@ -1966,6 +1973,7 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data.length; i++) {
 		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][0];
 		fpd = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][1];
+		fpy = null;
 		
 		found = false;
 		if (indexOfMine != null) {
@@ -1998,7 +2006,7 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 		cell.innerHTML = "<input type='hidden' name='fuzzificationBars["+i+"].fpx' value='"+fpx+"'/>" +
 						 "<input type='range'  name='fuzzificationBars["+i+"].fpy' min='0' max='1' step='0.01' "+
 						 "value='"+fpy+"' width='150px' "+
-						 "onchange='barValueChanged(this, "+i+", "+indexOfDefault+", "+index+", \""+fuzzificationGraphicDivId+"\")'/>";
+						 "onchange='barValueChanged(this, "+i+", "+indexOfMine+", "+index+", \""+fuzzificationGraphicDivId+"\")'/>";
 
 		cell = document.createElement('div');
 		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
@@ -2023,39 +2031,26 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
 	row.appendChild(cell);
-	cell.innerHTML = "<INPUT type='submit' value='Save modifications' onclick='showSavingFuzzificationMsg(\"saveMyFuzzificationStatus\")'>";
+	cell.innerHTML = 	"<INPUT type='submit' value='Save modifications' "+
+						"onclick='saveFuzzificationPersonalizations(\"saveFuzzificationPersonalizations\", "+ index + ", "+ indexOfMine + ")'>";
 
+	cell = document.createElement('div');
+	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
+	row.appendChild(cell);
+	cell.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;";
+	
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
 	cell.id = "saveMyFuzzificationStatus";
 	row.appendChild(cell);
 	cell.innerHTML = "";
 
+	/*
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
 	container.appendChild(cell);
-	cell.innerHTML = "<iframe id='"+formTargetiFrameId+"' name='"+formTargetiFrameId+"' height='20' style='display:none;'> </iframe>";
-	
-	
-	$('#' + formTargetiFrameId).load(function() {
-		// document.getElementById('#' + submitiFrameId);
-		var responseHtmlText = null;
-		var iFrameWindow = getIframeWindow(this);
-		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
-			responseHtmlText = iFrameWindow.document.body.innerHTML;
-			// Do something with response text.
-			if (notNullNorundefined(responseHtmlText)) {
-				iFrameWindow.document.body.innerHTML="";
-			}
-			// Clear the content of the iframe.
-			// this.contentDocument.location.href = '/images/loading.gif';
-			// alert("responseText: " + responseHtmlText);
-			// document.getElementById().style.visibility = 'visible';
-			document.getElementById("saveMyFuzzificationStatus").innerHTML = responseHtmlText;
-		}
-		  
-	});
-		
+	cell.innerHTML = "";
+	*/	
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
@@ -2147,8 +2142,11 @@ function drawChart(identifier, index) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showSavingFuzzificationMsg(saveMyFuzzificationStatusDivId) {
+function saveFuzzificationPersonalizations(saveMyFuzzificationStatusDivId, index, indexOfMine) {
 	document.getElementById(saveMyFuzzificationStatusDivId).innerHTML = loadingImageHtml(false);
+	
+	// Aqui generamos la query, la ejecutamos y mostramos el resultado.
+	
 }
 
 
@@ -2156,14 +2154,25 @@ function showSavingFuzzificationMsg(saveMyFuzzificationStatusDivId) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function barValueChanged(barObject, i, indexOfDefault, index, fuzzificationGraphicDivId) {
-	var div = document.getElementById("fuzzificationBarValue["+i+"]");
+function barValueChanged(barObject, i, indexOfMine, index, fuzzificationGraphicDivId) {
+	
+	if ((barObject == null) || (barObject == undefined)) {
+		debug.info("barObject is null or undefined in barValueChanged.");
+		return;
+	}
 	
 	var valueOriginal=barObject.value;
+	if  ((valueOriginal == null) || (valueOriginal == undefined) || (isNaN(valueOriginal))) {
+		alert("Erroneous value. I'll reset to 0.");
+		barObject.value = 0;
+		valueOriginal = 0;
+		return;
+	}
+	
 	var valueFloat = parseFloat(valueOriginal);
 	var valueToShow = 0;
 	
-	if ((valueFloat != null) && (valueFloat != NaN)) {
+	if ((valueFloat != null) && (valueFloat != undefined) && (! isNaN(valueFloat))) {
 		valueToShow = valueFloat.toFixed(2);
 	}
 	else {
@@ -2172,10 +2181,11 @@ function barValueChanged(barObject, i, indexOfDefault, index, fuzzificationGraph
 	}
 	
 	// Show the value in the div.
+	var div = document.getElementById("fuzzificationBarValue["+i+"]");
 	div.innerHTML = valueToShow;
 	
 	// Modify the stored value 
-	fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][1] = valueFloat;
+	fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][1] = valueFloat;
 
 	// Display in the graphic the result.
 	insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
