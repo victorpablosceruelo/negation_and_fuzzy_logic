@@ -1720,48 +1720,9 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationDiv = document.createElement('div');
 	
-	/*
-	 * "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
-	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
-	 */
-	
-	// USAR UN IFRAME ES MATAR CHINCHES A CAÑONAZOS !!!
-	
-	var formTargetiFrameId = "personalizeMyFuzzification";
-	var form = document.createElement('form');
-	form.target = formTargetiFrameId;
-	form.action = urlMappingFor('SaveProgramFuzzificationRequest');
-	form.method = 'post';
-	// form.accept-charset = 'UTF-8';
-	personalizationDiv.appendChild(form);
-	// alert("form.action: " + form.action);
-	
-	/*
-	var hiddenField = null; 
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "fileName";
-	hiddenField.value = fileName;
-	form.appendChild(hiddenField);
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "fileOwner";
-	hiddenField.value = fileOwner;
-	form.appendChild(hiddenField);
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "predOwner";
-	if (mode == 'basic') hiddenField.value = localUserName;
-	else hiddenField.value = 'default definition';
-	form.appendChild(hiddenField);
-	*/
-	
 	var personalizationDivMainTable = document.createElement('div');
 	personalizationDivMainTable.className = "personalizationDivMainTable";
-	form.appendChild(personalizationDivMainTable);
+	personalizationDiv.appendChild(personalizationDivMainTable);
 	
 	var row = null;
 	var cell = null;
