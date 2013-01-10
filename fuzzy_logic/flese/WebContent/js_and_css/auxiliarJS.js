@@ -1822,14 +1822,6 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	}
 	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-/*	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
-	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
-	var comboBoxTitle = comboBox.options[comboBox.selectedIndex].title;
-	debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
-	debug.info("changeInChooseRule: comboBoxText: " + comboBoxText);
-	debug.info("changeInChooseRule: comboBoxName: " + comboBoxName);
-	debug.info("changeInChooseRule: comboBoxTitle: " + comboBoxTitle);
-*/
 	if (	(comboBoxValue == null) || (comboBoxValue == undefined) || (isNaN(comboBoxValue)) || 
 			(comboBoxValue < 0) || (comboBoxValue >= fuzzificationsFunctions.length)) {
 		alert("comboBoxValue is invalid in personalizationFunctionChanged.");
@@ -1839,22 +1831,6 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	var index = comboBoxValue;
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
-
-	/*
-	var hiddenField = null; 
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "predDefined";
-	hiddenField.value = fuzzificationsFunctions[index].predDefined;
-	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
-	
-	hiddenField = document.createElement('input');
-	hiddenField.type = "hidden";
-	hiddenField.name = "predNecessary";
-	hiddenField.value = fuzzificationsFunctions[index].predNecessary;
-	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
-	*/
 	
 	var table = null;
 	var row = null;
@@ -1865,13 +1841,7 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	// Table that contains everything about the fuzzification function.
 	table = document.createElement('div');
 	table.className = "personalizationDivFuzzificationFunctionTable";
-	PersonalizationFunctionUnderModificationDiv.appendChild(table);	
-
-	/* They cannnot share the same row ... :-(
-	row = document.createElement('div');
-	row.className = "personalizationDivFuzzificationFunctionTableRow";
-	table.appendChild(row);
-	*/	
+	PersonalizationFunctionUnderModificationDiv.appendChild(table);		
 	
 	if (mode == 'advanced') {
 		row = document.createElement('div');
