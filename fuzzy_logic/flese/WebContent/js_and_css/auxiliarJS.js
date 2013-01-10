@@ -1736,6 +1736,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	personalizationDiv.appendChild(form);
 	// alert("form.action: " + form.action);
 	
+	/*
 	var hiddenField = null; 
 	
 	hiddenField = document.createElement('input');
@@ -1756,6 +1757,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	if (mode == 'basic') hiddenField.value = localUserName;
 	else hiddenField.value = 'default definition';
 	form.appendChild(hiddenField);
+	*/
 	
 	var personalizationDivMainTable = document.createElement('div');
 	personalizationDivMainTable.className = "personalizationDivMainTable";
@@ -1877,7 +1879,8 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	var index = comboBoxValue;
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
-	
+
+	/*
 	var hiddenField = null; 
 	
 	hiddenField = document.createElement('input');
@@ -1891,7 +1894,7 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	hiddenField.name = "predNecessary";
 	hiddenField.value = fuzzificationsFunctions[index].predNecessary;
 	PersonalizationFunctionUnderModificationDiv.appendChild(hiddenField);
-		
+	*/
 	
 	var table = null;
 	var row = null;
