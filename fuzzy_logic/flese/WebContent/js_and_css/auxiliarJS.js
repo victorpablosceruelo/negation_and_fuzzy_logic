@@ -1752,7 +1752,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	
 	hiddenField = document.createElement('input');
 	hiddenField.type = "hidden";
-	hiddenField.name = "fuzzificationOwner";
+	hiddenField.name = "predOwner";
 	if (mode == 'basic') hiddenField.value = localUserName;
 	else hiddenField.value = 'default definition';
 	form.appendChild(hiddenField);
@@ -1804,9 +1804,11 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	
 	if (fuzzificationsFunctions != null) {
 		for (var i=0; i < fuzzificationsFunctions.length; i++) {
-			html+= "<option name=\'" + fuzzificationsFunctions[i].predDefined + "\' "+
-					"value=\'" + fuzzificationsFunctions[i].predDefined + "\'>" +
-					fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') + "</option>";
+			html+= "<option name=\'" + i + "\' value=\'" + i + "\'>" +
+					fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predDefined, 'all') +
+					" from the value it has for " + 
+					fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[i].predNecessary, 'adjective') + 
+					"</option>";
 		}
 	}
 	html += "</select>";
@@ -1851,6 +1853,12 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
 function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode) {
+	
+	if ((comboBox == null) || (comboBox == undefined)) {
+		alert("comboBox is invalid in personalizationFunctionChanged.");
+		return;
+	}
+	
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 /*	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
 	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
@@ -1860,28 +1868,13 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	debug.info("changeInChooseRule: comboBoxName: " + comboBoxName);
 	debug.info("changeInChooseRule: comboBoxTitle: " + comboBoxTitle);
 */
-	var found = false;
-	var i = 0;
-	while ((i<fuzzificationsFunctions.length) && (! found)) {
-		if (comboBoxValue == fuzzificationsFunctions[i].predDefined) {
-			found = true;
-		}
-		else i++;
+	if (	(comboBoxValue == null) || (comboBoxValue == undefined) || (isNaN(comboBoxValue)) || 
+			(comboBoxValue < 0) || (comboBoxValue >= fuzzificationsFunctions.length)) {
+		alert("comboBoxValue is invalid in personalizationFunctionChanged.");
+		return;
 	}
 	
-	if (found) {
-		showPersonalizationFunctionValues(i, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode);
-	}
-	else {
-		alert("Fuzzification function was not found. Reload the page (press F5) after closing this message.");
-	}
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
-function showPersonalizationFunctionValues(index, PersonalizationFunctionUnderModificationDivId, formTargetiFrameId, mode) {
+	var index = comboBoxValue;
 	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
 	
