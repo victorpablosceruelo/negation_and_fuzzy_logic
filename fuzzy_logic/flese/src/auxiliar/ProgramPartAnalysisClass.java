@@ -176,7 +176,7 @@ public class ProgramPartAnalysisClass {
 				}
 			}
 		}
-		LOG.info("It is "+result+" that dot denotes clause end. Number: " + number);
+		LOG.info("It is "+result+" that dot denotes clause end. SubString: " + subString + " Number: " + number);
 		return result;
 	}
 	
@@ -243,11 +243,13 @@ public class ProgramPartAnalysisClass {
 		String [] lines = new String[programSubPartLines.size()];
 		for (int i=0; i<programSubPartLines.size(); i++) {
 			lines[i] = "";
-			if ((programSubPartLines.get(i) != null) &&  (! "".equals(programSubPartLines.get(i))))
-					lines[i] += programSubPartLines.get(i);
+			if ((programSubPartLines.get(i) != null) &&  (! "".equals(programSubPartLines.get(i)))) {
+				lines[i] += programSubPartLines.get(i);
+				if (i + 1 >= programSubPartLines.size()) lines[i] += ".";
+			}
 			if ((programSubPartComments.get(i) != null) &&  (! "".equals(programSubPartComments.get(i)))) {
-					if ("".equals(lines[i])) lines[i] += programSubPartComments.get(i);
-					else lines[i] += " " + programSubPartComments.get(i);
+				if ("".equals(lines[i])) lines[i] += programSubPartComments.get(i);
+				else lines[i] += " " + programSubPartComments.get(i);
 			}
 		}
 		return lines;
