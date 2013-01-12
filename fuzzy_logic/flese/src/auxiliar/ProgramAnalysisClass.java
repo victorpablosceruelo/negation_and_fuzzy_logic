@@ -42,7 +42,8 @@ public class ProgramAnalysisClass {
 		this.fileOwner = fileOwner;
 		this.filePath = filePath;
 		
-		LOG.info("localUserName: " + localUserName + " fileName: " + this.fileName + " fileOwner: " + this.fileOwner + " filePath: " + this.filePath);
+		LOG.info("\n localUserName: " + localUserName + "\n fileName: " + this.fileName + 
+				 "\n fileOwner: " + this.fileOwner + "\n filePath: " + this.filePath);
 		
 		programParts = new ArrayList <ProgramPartAnalysisClass>();
 		programFunctionsOrderedInJavaScript = null;
