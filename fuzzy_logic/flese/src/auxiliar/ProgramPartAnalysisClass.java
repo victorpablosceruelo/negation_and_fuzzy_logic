@@ -150,7 +150,7 @@ public class ProgramPartAnalysisClass {
 		
 		int subStringEnds = index +1;
 		while ( (subStringEnds < programLineIn.length()) && 
-				(! isDelimiter(programLineIn.charAt(subStringEnds)))) {
+				(! isDelimiter(programLineIn.charAt(subStringEnds)))) { // Problem is here !!!
 			subStringEnds++;
 		}
 		if (subStringEnds >= programLineIn.length()) subStringEnds = programLineIn.length();
