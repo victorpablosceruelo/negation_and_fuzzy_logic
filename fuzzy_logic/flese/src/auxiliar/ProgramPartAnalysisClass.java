@@ -140,6 +140,11 @@ public class ProgramPartAnalysisClass {
 		if (! (index < programLineIn.length())) throw new Exception("Index out of range. index: " + index + " programLineIn: " + programLineIn);
 		if (programLineIn.charAt(index) != '.') throw new Exception("Character at index is not a dot. index: " + index + " programLineIn: " + programLineIn);
 		
+		return ((! dotIsDecimalMarker(index, programLineIn)) &&
+				(! dotIsPartOfClpqrOperator(index, programLineIn)));
+	}
+	
+	private boolean dotIsDecimalMarker(int index, String programLineIn) {
 		int subStringBegins = index -1;
 		while ( (subStringBegins >= 0) && 
 				(! isDelimiter(programLineIn.charAt(subStringBegins)))) {
@@ -160,23 +165,38 @@ public class ProgramPartAnalysisClass {
 		boolean result = false;
 		
 		// LOG.info("subString: " + subString);
-		if (subString.length() < 3) result = true;
+		if (subString.length() < 3) result = false;
 		else {
-			if ((subString.contains(".=.")) || (subString.contains(".<>.")) || (subString.contains(".>.")) || (subString.contains(".<.")) || 
-				(subString.contains(".>=.")) || (subString.contains(".=<."))) {
+			try {
+				number = Float.parseFloat(subString);
+				result = true;
+				
+			} catch (Exception e) {
+				number = -1.0f;
 				result = false;
 			}
-			else {
-				try {
-					number = Float.parseFloat(subString);
-					result = false;
-				} catch (Exception e) {
-					number = -1.0f;
-					result = true;
-				}
-			}
 		}
-		LOG.info("It is "+result+" that dot denotes clause end. SubString: " + subString + " Number: " + number);
+		LOG.info("It is "+result+" that dot is decimal marker. SubString: " + subString + " Number: " + number);
+		return result;
+	}
+	
+	private boolean dotIsPartOfClpqrOperator(int index, String programLineIn) {
+
+		String before = null;
+		if (index+1 < programLineIn.length()) 
+			before = programLineIn.substring(0, index +1);
+		else
+			before = programLineIn;
+		String after = programLineIn.substring(index);
+		
+		boolean result = (	(before.endsWith(".=.")) || (before.endsWith(".<>.")) || 
+							(before.endsWith(".>.")) || (before.endsWith(".<.")) || 
+							(before.endsWith(".>=.")) || (before.endsWith(".=<.")) ||
+							(after.startsWith(".=.")) || (after.startsWith(".<>.")) || 
+							(after.startsWith(".>.")) || (after.startsWith(".<.")) || 
+							(after.startsWith(".>=.")) || (after.startsWith(".=<.")));
+		
+		LOG.info("It is "+result+" that dot is part of CLPQ/R operator. SubString: " + programLineIn);
 		return result;
 	}
 	
