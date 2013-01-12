@@ -1762,7 +1762,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var html = "";
 	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
 			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId + "\", \"" + 
-														mode + "\", \"" + fileName + "\", \"" + fileOwner + ");'>";
+														mode + "\", \"" + fileName + "\", \"" + fileOwner + "\");'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
 	if (fuzzificationsFunctions != null) {

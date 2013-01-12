@@ -244,7 +244,7 @@ public class ProgramAnalysisClass {
 							newProgramPart.setPredOwner(predOwner);
 							newProgramPart.updateFunction(params);
 							
-							lines = programPartsAffected.get(j).getLines();
+							lines = newProgramPart.getLines();
 							for (k = 0; k< lines.length; k++) {
 								bw.write(lines[k] + "\n");
 							}

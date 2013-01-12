@@ -242,7 +242,13 @@ public class ProgramPartAnalysisClass {
 	public String [] getLines () {
 		String [] lines = new String[programSubPartLines.size()];
 		for (int i=0; i<programSubPartLines.size(); i++) {
-			lines[i] = programSubPartLines.get(i) + " " + programSubPartComments.get(i);
+			lines[i] = "";
+			if ((programSubPartLines.get(i) != null) &&  (! "".equals(programSubPartLines.get(i))))
+					lines[i] += programSubPartLines.get(i);
+			if ((programSubPartComments.get(i) != null) &&  (! "".equals(programSubPartComments.get(i)))) {
+					if ("".equals(lines[i])) lines[i] += programSubPartComments.get(i);
+					else lines[i] += " " + programSubPartComments.get(i);
+			}
 		}
 		return lines;
 	}
