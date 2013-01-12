@@ -160,14 +160,20 @@ public class ProgramAnalysisClass {
 		
 		LOG.info("saving fuzzification: " + predDefined + " depending on " + predNecessary + " personalized for username: " + predOwner + " by username: " + localUserName + "\n\n");
 		
-		// Security issues.
-		if (predOwner == null) predOwner = localUserName;
-		if (predOwner == null) throw new Exception ("fuzzificationOwner cannot be null.");
-		if ("".equals(predOwner)) throw new Exception ("fuzzificationOwner cannot be empty string.");
+		// Security issues (null pointers).
+		if (predDefined == null) throw new Exception ("predDefined cannot be null.");
+		if (predNecessary == null) throw new Exception ("predNecessary cannot be null.");
+		if (predOwner == null) throw new Exception ("predOwner cannot be null.");
+		
+		// Security issues ("" strings).
+		if ("".equals(predDefined)) throw new Exception ("predDefined cannot be empty string.");
+		if ("".equals(predNecessary)) throw new Exception ("predNecessary cannot be empty string.");
+		if ("".equals(predOwner)) throw new Exception ("predOwner cannot be empty string.");
 
 		// If I'm not the owner I can change only my fuzzification.
 		// If I'm the owner I can change mine and the default one, but no other one.
-		if ((! localUserName.equals(fileOwner)) || (! predOwner.equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
+		if (	(! localUserName.equals(fileOwner)) || 
+				(! predOwner.equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
 			predOwner = localUserName;
 		}
 		

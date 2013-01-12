@@ -416,22 +416,22 @@ public class DispatchersClass {
 		if (predNecessary == null) throw new Exception("predNecessary is null.");
 		
 		String predOwner = request.getParameter("predOwner");
-		
+		if (predOwner == null) throw new Exception("predOwner is null.");
 		
 		int counter=0;
 		String [] [] params = null;
 		String paramsDebug = "Function definition to save: ";
 		
-		while ( (request.getParameter("fuzzificationBars["+counter+"].fpx") != null) && 
-				(request.getParameter("fuzzificationBars["+counter+"].fpy") != null)) {
+		while ( (request.getParameter("fpx["+counter+"]") != null) && 
+				(request.getParameter("fpy["+counter+"]") != null)) {
 			counter++;
 		}
 		
 		if (counter>0) { 
 			params = new String[counter][2];
 			for (int i=0; i<counter; i++) {
-				params[i][0] = request.getParameter("fuzzificationBars["+i+"].fpx");
-				params[i][1] = request.getParameter("fuzzificationBars["+i+"].fpy");
+				params[i][0] = request.getParameter("fpx["+i+"]");
+				params[i][1] = request.getParameter("fpy["+i+"]");
 				paramsDebug += "\n" + params[i][0] + " -> " + params[i][1] + " ";
 			}
 		}
