@@ -1761,7 +1761,8 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 	var personalizationSelectComboBoxId = "personalizationSelectComboBox";
 	var html = "";
 	html += "<select name='" + personalizationSelectComboBoxId + "' id='"+personalizationSelectComboBoxId+"' " +
-			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId + "\", \"" + mode + "\");'>";
+			"onchange='personalizationFunctionChanged(this, \""+PersonalizationFunctionUnderModificationDivId + "\", \"" + 
+														mode + "\", \"" + fileName + "\", \"" + fileOwner + ");'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	
 	if (fuzzificationsFunctions != null) {
@@ -1814,7 +1815,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, mode) {
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, mode, fileName, fileOwner) {
 	
 	if ((comboBox == null) || (comboBox == undefined)) {
 		alert("comboBox is invalid in personalizationFunctionChanged.");
@@ -1870,14 +1871,14 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 	cell.innerHTML = "";
 	row.appendChild(cell);
 	
-	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode);
+	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode, fileName, fileOwner);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode){
+function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode, fileName, fileOwner){
 	
 	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
 	var table = null;
@@ -2032,7 +2033,8 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
 	row.appendChild(cell);
 	cell.innerHTML = 	"<INPUT type='submit' value='Save modifications' "+
-						"onclick='saveFuzzificationPersonalizations(\"saveMyFuzzificationStatus\", \""+ mode + "\", "+ index + ", "+ indexOfMine + ")'>";
+						"onclick='saveFuzzificationPersonalizations(\"saveMyFuzzificationStatus\", \""+ 
+						mode + "\", \"" + fileName + "\", \"" + fileOwner + "\", " + index + ", "+ indexOfMine + ")'>";
 
 	cell = document.createElement('div');
 	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
@@ -2142,14 +2144,13 @@ function drawChart(identifier, index) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function saveFuzzificationPersonalizations(saveMyFuzzificationStatusDivId, mode, index, indexOfMine) {
+function saveFuzzificationPersonalizations(saveMyFuzzificationStatusDivId, mode, fileName, fileOwner, index, indexOfMine) {
 	document.getElementById(saveMyFuzzificationStatusDivId).innerHTML = loadingImageHtml(false);
 	
 	// Aqui generamos la query, la ejecutamos y mostramos el resultado.
 	var query = urlMappingFor('SaveProgramFuzzificationRequest');
-	query += "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner;
+	query += "&fileName=" + fileName + "&fileOwner="+ fileOwner + "&predOwner=";
 	
-	query += "&predOwner=";
 	if (mode == 'basic') query += localUserName;
 	else query += "default definition";
 	
