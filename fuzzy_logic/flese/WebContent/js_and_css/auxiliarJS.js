@@ -1957,14 +1957,26 @@ function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndBut
 			indexOfDefault = i;
 		}
 	}
+	//debug.info("indexOfMine: " + indexOfMine);
+	//debug.info("indexOfDefault: " + indexOfDefault);
+	//debug.info("mode: " + mode);
+	
 	if (mode == 'advanced') indexOfMine = indexOfDefault;
 	else {
 		if (indexOfMine == null) {
 			indexOfMine = fuzzificationsFunctions[index].ownersPersonalizations.length;
 			fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine] =
-				new ownerPersonalization(localUserName, fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data);
+				new ownerPersonalization(localUserName, new Array());
+			for (i=0; i < fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data.length; i++) {
+				fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i] = new Array();
+				for (j=0; j < fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i].length; j++) {
+					fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][j] = 
+						fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][j];
+				}
+			}
 		}
 	}
+	//debug.info("indexOfMine (fixed): " + indexOfMine);
 	
 	var fpx = null;
 	var fpy = null;
