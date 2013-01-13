@@ -692,10 +692,12 @@ public class ProgramPartAnalysisClass {
 		
 		for (int i=0; i<params.length; i++) {
 			functionPoints.add(new FunctionPoint(params[i][0], params[i][1]));
-			line += "(" + params[i][0] + ", " + params[i][1] + ")";
-			if (i+1 < params.length) line += ", ";
+			line += " (" + params[i][0] + ", " + params[i][1] + ")";
+			if (i+1 < params.length) line += ",";
 		}
 		line += " ])";
+		if ((only_for_user != null) && (! DEFAULT_DEFINITION.equals(only_for_user))) 
+			line += " only_for_user " + only_for_user;
 		programSubPartLines.add(line);
 		
 		programSubPartComments = new ArrayList <String>();
