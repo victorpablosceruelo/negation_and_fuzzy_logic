@@ -818,7 +818,7 @@ save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) 
 		      Fuzzy_Predicate_Functor_In,
 		      Code,
 		      Truth_Value_Out .>=. 0, 
-		      Truth_Value_Out .<=. 1, 
+		      Truth_Value_Out .=<. 1
 		      ),
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
