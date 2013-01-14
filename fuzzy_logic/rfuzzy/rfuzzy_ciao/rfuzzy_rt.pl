@@ -375,6 +375,21 @@ rfuzzy_defined_quantifiers([(very, 2, TV_In, TV_Out, (TV_Out .=. (TV_In * TV_In)
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+% This could be useful if we could execute the subbody of quantifiers as if they were
+% clauses' bodies, but they are not. If we have a composed subbody there is no simple 
+% way to detect if we are running a condition or another subbody. We cannot accept that.
+%
+%clpqr_op('.=.', [A, B]) :- A .=. B.
+%clpqr_op('.>=.', [A, B]) :- A .>=. B.
+%clpqr_op('.=<.', [A, B]) :- A .<=. B.
+%clpqr_op('.>.', [A, B]) :- A .>. B.
+%clpqr_op('.<.', [A, B]) :- A .<. B.
+%clpqr_op('.<>.', [A, B]) :- A .<>. B.
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
 sets_union(Set1, Set2, Result_Set) :-
 	list(Set1), list(Set2), list(Result_Set),
 	sets_union_aux(Set1, Set2, Result_Set).

@@ -816,7 +816,9 @@ save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) 
 		      functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
 		      arg(FP_Arity, Fuzzy_Predicate_Functor_In, Truth_Value_In),
 		      Fuzzy_Predicate_Functor_In,
-		      Code
+		      Code,
+		      Truth_Value_Out .>=. 0, 
+		      Truth_Value_Out .<=. 1, 
 		      ),
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
@@ -885,7 +887,7 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Val
 	functor(QP_F, QP_N, 2),
 	arg(1, QP_F, SubCall),
 	arg(2, QP_F, Truth_Value),
-	Translation = (QP_F, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
+	Translation = QP_F, % Note this can be a sub-body: it must be a functor, but not a conjunction of them.
 	print_msg('debug', 'translate_rfuzzy_rule_body(Translation) - with quantifier',(Translation)).
 
 % Rule Body Conjunct without Quantifier.
@@ -901,7 +903,7 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Val
 	functor(P_F, P_N, P_A),
 	arg(1, P_F, NP_Arg_Input),
 	arg(2, P_F, Truth_Value),
-	Translation = (P_F, (Truth_Value .>=. 0, Truth_Value .=<. 1)),
+	Translation = P_F, % Note this can be a sub-body: it must be a functor, but not a conjunction of them.
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Translation)',(Body_F, Translation)),
 	print_msg_nl('debug').
 
