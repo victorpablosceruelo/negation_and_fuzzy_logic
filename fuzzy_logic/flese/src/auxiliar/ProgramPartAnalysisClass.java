@@ -697,7 +697,7 @@ public class ProgramPartAnalysisClass {
 		}
 		line += " ])";
 		if ((only_for_user != null) && (! DEFAULT_DEFINITION.equals(only_for_user))) 
-			line += " only_for_user " + only_for_user;
+			line += " only_for_user '" + only_for_user + "'";
 		programSubPartLines.add(line);
 		
 		programSubPartComments = new ArrayList <String>();

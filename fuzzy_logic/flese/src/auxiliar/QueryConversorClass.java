@@ -207,7 +207,7 @@ public class QueryConversorClass {
 		
 		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
 		
-		PLStructure subGoal3 = new PLStructure("assertLocalUserName", new PLTerm[]{new PLAtom(localUserName)});
+		PLStructure subGoal3 = new PLStructure("assertLocalUserName", new PLTerm[]{new PLAtom("'" + localUserName + "'")});
 		
 		initialSubQuery = new SubQueryConversionClass();
 		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[]{subGoal1, subGoal2});
