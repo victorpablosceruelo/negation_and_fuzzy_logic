@@ -210,7 +210,6 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	var chooseQueryStartTypeContainerId = "chooseQueryStartTypeDiv";
 	var queryLinesContainerId = "queryLinesContainer";
 	var queryLinesCounterFieldId = "queryLinesCounter";
-	var runQueryTargetiFrameId = "runQueryTargetiFrame";
 	
 	var html = "";
 	html += "<form id='queryForm' action='' method='POST' accept-charset='utf-8'> ";
@@ -230,7 +229,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
     html += "               <div class='searchOrPersonalizeTableCell'>";
 	html += "                    <INPUT type='submit' value='Search' "+
 									"onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
-									"\", \"" + runQueryTargetiFrameId + "\", \"" + chooseQueryStartTypeId + 
+									"\", \"" + chooseQueryStartTypeId + 
 									"\", \"" + queryLinesCounterFieldId+"\", \""+fileName+"\", \""+fileOwner+"\");' >";
 	html += "               </div>";
 	html += "               <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;</div>";
@@ -241,55 +240,12 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "          </div>";
 	html += "     </div>";
 	html += "</form><br />";
-	html += "<iframe id='"+runQueryTargetiFrameId+"' name='"+runQueryTargetiFrameId+"' style='display:none;'> </iframe>";
-	// This does not work on google chrome: src='#' 
     	
 	selectQueryDiv.innerHTML = html;
 	document.getElementById(queryLinesContainerId).style.display='none';
-
-	/*
-	// Callback run after runQueryTargetiFrame is loaded.
-	$('#' + runQueryTargetiFrameId).load(function() {
-		// document.getElementById('#' + submitiFrameId);
-		var responseHtmlText = null;
-		var iFrameWindow = getIframeWindow(this);
-		if ((notNullNorundefined(iFrameWindow)) && (notNullNorundefined(iFrameWindow.document)) && (notNullNorundefined(iFrameWindow.document.body))) {
-			responseHtmlText = iFrameWindow.document.body.innerHTML;
-			// Do something with response text.
-			if (notNullNorundefined(responseHtmlText)) {
-				iFrameWindow.document.body.innerHTML="";
-			}
-			// Clear the content of the iframe.
-			// this.contentDocument.location.href = '/images/loading.gif';
-			// alert("responseText: " + responseHtmlText);
-			// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
-			document.getElementById(runQueryDivId).innerHTML = responseHtmlText;
-
-			if (responseHtmlText != "") {
-				// Evaluate the JS code returned by the server.
-				eval(responseHtmlText);
-			
-				// Show the answers retrieved to the user.
-				showQueryAnswers(runQueryDivId);
-			
-				// Debug information
-				// debugQueryAnswers(parentDivId);
-			}
-		}
-		  
-	});
-	*/
 	
 	insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
 	
-	/*
-	"Upload Program files <br />" + 
-	  "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
-	  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
-	  		"<INPUT TYPE='file' NAME='programFileToUpload' size='50' "+
-	  		"onchange='uploadActionOnChange(\""+uploadFormId+"\", \""+uploadStatusDivId+"\");'>" +
-	  "</FORM>" +
-	*/
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -922,7 +878,7 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
-function runQueryAfterSoftTests(parentDivId, runQueryDivId, runQueryTargetiFrameId, chooseQueryStartTypeId, queryLinesCounterFieldId, fileName, fileOwner) {
+function runQueryAfterSoftTests(parentDivId, runQueryDivId, chooseQueryStartTypeId, queryLinesCounterFieldId, fileName, fileOwner) {
 	debug.info("runQueryAfterSoftTests");
 	
 	var error = false;
