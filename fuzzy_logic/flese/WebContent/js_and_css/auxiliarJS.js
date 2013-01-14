@@ -212,7 +212,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	var queryLinesCounterFieldId = "queryLinesCounter";
 	
 	var html = "";
-	html += "<form id='queryForm' action='' method='POST' accept-charset='utf-8'> ";
+	// html += "<form id='queryForm' action='' method='POST' accept-charset='utf-8'> ";
 	// 
 	// html += "      action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
 	// html += "      target='" + runQueryTargetiFrameId+ "'>";
@@ -239,7 +239,7 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	html += "               </div>";
 	html += "          </div>";
 	html += "     </div>";
-	html += "</form><br />";
+	// html += "</form><br />";
     	
 	selectQueryDiv.innerHTML = html;
 	document.getElementById(queryLinesContainerId).style.display='none';
