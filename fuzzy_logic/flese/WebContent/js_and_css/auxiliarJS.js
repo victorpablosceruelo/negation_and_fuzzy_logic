@@ -490,13 +490,13 @@ function insertChooseQuantifier(queryLineId, rowId, quantifierIndex, queryLinesT
 	var firstCell = row.firstChild;
 	
 	var cell = document.createElement('div');
-	cell.id = queryLineId + ".quantifier_" + quantifierIndex;
+	cell.id = queryLineId + ".divForQuantifier_" + quantifierIndex;
 	cell.className = queryLinesTableId + "Cell";
 	row.insertBefore(cell, firstCell);
 	
 	var quantifierId = queryLineId + ".selectQuantifier_" + quantifierIndex;
 
-	var html = "<select name=\'" + quantifierId + "\'>";
+	var html = "<select id=\'" + quantifierId + "\' name=\'" + quantifierId + "\'>";
 	html += "<option name=\'----\' value=\'----\'>----</option>";
 	for (var i=0; i<programIntrospection.length; i++){
 		if (isQuantifierPredicate(i)) {
