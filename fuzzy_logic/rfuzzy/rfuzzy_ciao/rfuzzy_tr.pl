@@ -501,7 +501,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 	generate_credibility_subCl(Cred_Op, Cred_Value, Cl_Body_TV, NP_Arg_TV, SubCl_Credibility),
 	generate_ifcondition_subCl(If_Cond, P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition),
 	generate_username_subCl(UN, SubCl_UserName),
-	generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, If_Cond, SubCl_Prio),
+	generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, SubCl_IfCondition, SubCl_UserName, SubCl_Prio),
 	Cls = [(NP_F :- SubCl_TypeTest, Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio)],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
@@ -573,14 +573,33 @@ generate_username_subCl(UN, SubCl_UserName) :-
 	arg(1, Obtain_UserName, Obtined_UserName),
 	SubCl_UserName = (Obtain_UserName, (Obtined_UserName = UN)).
 
-generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, 'true', SubCl_Prio) :- !,
-	SubCl_Prio = (NP_Arg_Prio = Cl_Body_Prio), !.
-
-generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, _If_Cond, SubCl_Prio) :- !,
-	SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.1), !.
- 
-	
-
+generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, SubCl_IfCondition, SubCl_UserName, SubCl_Prio) :- 
+	nonvar(SubCl_IfCondition), nonvar(SubCl_UserName), !,
+	(
+	    (
+		SubCl_IfCondition = 'true', 
+		SubCl_UserName = 'true',
+		SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.15)
+	    )
+	;
+	    (
+		SubCl_IfCondition = 'true', 
+		SubCl_UserName \== 'true',
+		SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.1)		
+	    )
+	;
+	    (
+		SubCl_IfCondition \== 'true', 
+		SubCl_UserName = 'true',
+		SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.05)		
+	    )
+	;
+	    (
+		SubCl_IfCondition \== 'true', 
+		SubCl_UserName \== 'true',
+		SubCl_Prio = (NP_Arg_Prio = Cl_Body_Prio)		
+	    )
+	), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
