@@ -112,8 +112,21 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 			session.removeAttribute("authManager");
 
 			// call connect method of manager which returns the provider object. 
-			// Pass request parameter map while calling connect method. 
-			AuthProvider provider = authManager.connect(SocialAuthUtil.getRequestParametersMap(request));
+			// Pass request parameter map while calling connect method.
+			AuthProvider provider = null;
+			try {
+				provider = authManager.connect(SocialAuthUtil.getRequestParametersMap(request));
+			}
+			catch (Exception e) {
+				LOG.info("Error connecting social authentication provider.");
+				LOG.info(e);
+				if (e != null) {
+					LOG.info(e.getMessage());
+					LOG.info(e.toString());
+				}
+				provider = null;
+				throw new Exception("Impossible to connect with service provider.");
+			}
 			if (provider == null) throw new Exception("provider is null");
 			
 			// Retrieve the provider id to rebuild the initial query.
