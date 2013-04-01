@@ -59,6 +59,9 @@ if [ -d .svn ]; then
 else
 	svn co $REPOS_1 . $REVISION
 fi
+echo -n "Revision: "
+svn info -R | grep "Revision\: " | sort -k2nr | head -n1 | awk -F"Revision: " '{print $2}'
+
 popd
 echo " "
 
@@ -80,6 +83,9 @@ if [ -d .svn ]; then
 else
 	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
 fi
+echo -n "Revision: "
+svn info -R | grep "Revision\: " | sort -k2nr | head -n1 | awk -F"Revision: " '{print $2}'
+
 popd
 echo " "
 popd
