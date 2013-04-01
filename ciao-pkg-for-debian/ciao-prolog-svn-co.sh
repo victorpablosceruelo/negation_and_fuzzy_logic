@@ -44,15 +44,20 @@ pushd ${DEST_FOLDER}
 mkdir -p $FOLDER_NAME
 pushd $FOLDER_NAME
 
+if [ "$REVISION" != "latest" ]; then
+    REVISION="--revision $REVISION"
+else
+    REVISION=""
+fi
+
 # Update and export the Ciao's repository
 echo " "
+echo "updating/checking out CIAO from $REPOS_1 ($REVISION)"
 if [ -d .svn ]; then
-	echo "updating CIAO to revision $REVISION from $REPOS_1"
 	svn revert -R .
-	svn update --revision $REVISION
+	svn update $REVISION
 else
-	echo "checking out CIAO to revision $REVISION from $REPOS_1"
-	svn co $REPOS_1 . --revision $REVISION
+	svn co $REPOS_1 . $REVISION
 fi
 popd
 echo " "
@@ -61,25 +66,19 @@ echo " "
 mkdir -p $FOLDER_NAME/debian
 pushd $FOLDER_NAME/debian
 
-echo " "
-if [ -d .svn ]; then
-    if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
-	echo "updating debian subfolder to last revision from $REPOS_2"
-	svn revert -R .
-	svn update
-    else
-	echo "updating debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
-	svn revert -R .
-	svn update --revision $DEBIAN_REPOS_REVISION
-    fi
+if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
+    DEBIAN_REPOS_REVISION="--revision $DEBIAN_REPOS_REVISION"
 else
-    if [ "$DEBIAN_REPOS_REVISION" == "latest" ]; then
-	echo "checking out debian subfolder to last revision from $REPOS_2"
-	svn co $REPOS_2 . 
-    else
-	echo "checking out debian subfolder to revision $DEBIAN_REPOS_REVISION from $REPOS_2"
+    DEBIAN_REPOS_REVISION=""
+fi
+
+echo " "
+echo "updating debian subfolder from $REPOS_2 ($DEBIAN_REPOS_REVISION)"
+if [ -d .svn ]; then
+	svn revert -R .
+	svn update  $DEBIAN_REPOS_REVISION
+else
 	svn co $REPOS_2 . --revision $DEBIAN_REPOS_REVISION
-    fi
 fi
 popd
 echo " "
