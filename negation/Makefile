@@ -1,17 +1,18 @@
 all:
-	@echo "Only implemented make restart, make clean, make cleandist, make cleanall and make mrproper."
+	@echo "Only implemented make clean, make cleandist, make cleanall and make mrproper."
 clean:
-	rm -fv *_shfr_co.pl *_co.pl *_shfr_co* *.itf *.pl~ *.po *.ast *.P~ *.xwam 
-cleandist: clean
-	rm -fv debug_file_*.pl debug_pkg_*.pl intneg_debugging *_intneg.P .\#* \#*
-cleanall:
-	cd intneg; make cleandist
-	cd examples; make cleandist
-kill:
-	killall ciaoengine; killall xsb; killall swipl;
-mrproper: 
-	make -i kill
-	make -i cleandist
+	rm -fv *_shfr_co.pl *_co.pl *_shfr_co* *.itf *.pl~ *.po *.ast *.P~ *.xwam 1>&2
+	rm -fv debug_file_*.pl debug_pkg_*.pl intneg_debugging *_intneg.P .\#* \#* 1>&2
+	echo " " 1>&2
 
-restart: kill mrproper
+cleanall:
+	cd examples; make -i -s clean
+
+kill:
+	killall ciaoengine; killall ciaoengine.LINUXi86_64; killall xsb; killall swipl;
+	echo " " 1>&2
+
+mrproper: 
+	make -i -s kill
+	make -i -s cleanall
 
