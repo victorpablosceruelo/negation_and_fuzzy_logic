@@ -1,12 +1,18 @@
 
-:- module(cneg_rt, [cneg_rt/6, cneg_rt_test/5], [assertions]).
+:- module(cneg_rt, [cneg_rt/6], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
 :- comment(summary, "This module implements negation predicates for runtime evaluation.").
 
+:- use_module(library(aggregates),[setof/3]).
 :- use_module(library('cneg/cneg_aux'), _).
-:- use_module(library('cneg/cneg_diseq'), [prepare_attributes_for_printing/2, cneg_diseq_echo/5]).
+:- use_module(library('cneg/cneg_diseq'), 
+	[
+	    get_disequalities_from_constraints_and_remove_them/2,
+	    prepare_attributes_for_printing/2, 
+	    cneg_diseq_echo/5
+	]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.
@@ -63,7 +69,7 @@ cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 %	call_to_all_negated_subfrontiers(Result_List, Level, Trace_2, CN_Call).
 
 	    !, % Backtracking forbidden.
-	    call_to_conjunction_list(Result, Depth_Level, NewTrace, CN_Call).
+	    call_to_conjunction_list(Result_List, Depth_Level, NewTrace, CN_Call).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,19 +87,9 @@ negate_frontier(Frontier, GoalVars, Proposal, Negated_Frontier) :-
 
 negate_each_subfrontier([], _GoalVars, _Proposal, []) :- !.
 negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, [Result_Frontier | Result_More_Frontiers]) :-
-%	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
-	(
-	    (
-		Proposal = 'cneg_rt_New',
-		negate_subfrontier_new(Frontier, GoalVars, Proposal, Result_Frontier)
-	    )
-	;
-	    (
-		Proposal = 'cneg_rt_Chan',
-		negate_subfrontier_chan(Frontier, GoalVars, Proposal, Result_Frontier)
-	    )
-	),
-%	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
+	negate_subfrontier_chan(Frontier, GoalVars, Proposal, Result_Frontier),
+	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
 %	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
@@ -109,42 +105,6 @@ negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, Result_
 %combine_negated_frontiers(true, Result_More_Subfr, Result_More_Subfr) :- !.
 %combine_negated_frontiers(Result_Subfr, true, Result_Subfr) :- !.
 %combine_negated_frontiers(Result_Subfr, Result_More_Subfr, (Result_Subfr, Result_More_Subfr)) :- !.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cneg_rt_hybrid(UQV, GoalVars, Goal, _Proposal, [Answer]) :- 
-	% varsbag(Body, UQV, [], GoalVars),
-	cneg_tr_hybrid_negate_literal(Goal, GoalVars, 'true', Neg_Goal),
-	cneg_rt_test(UQV, GoalVars, true, Neg_Goal, Answer).
-
-cneg_rt_test(UQV, GoalVars, Body_First_Unification, Body, Result) :-
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: GoalVars', GoalVars),
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: UQV', UQV),
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: Body_First_Unification', Body_First_Unification),
-	echo_msg(1, '', 'cneg_hybrid', 'test_if_cneg_rt_needed :: Body', Body), 
-	    
-	varsbag(GoalVars, [], [], Real_GoalVars),
-	varsbag(Body_First_Unification, [], Real_GoalVars, Non_Problematic_Vars),
-	varsbag(Body, Non_Problematic_Vars, [], Problematic_Vars),
-	!, % No backtracking allowed.
-	(
-	    (   % If no problematic vars, use an static approach (intneg).
-		Problematic_Vars == [],
-		UQV == [],
-		Result = Body % Just run the body.
-	    )
-	;
-	    (   % If problematic vars, use a dynamic approach (chan, stuckey, new).
-		(
-		    Problematic_Vars \== []
-		;
-		    UQV \== []
-		),
-		Result = cneg_rt(UQV, GoalVars, Body, 'cneg_rt_New') % Just run the body.
-	    )
-	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -900,7 +860,8 @@ compute_goal_frontier(Goal, _Proposal, [F_Out]) :-
 compute_goal_frontier(Goal, Proposal, Frontier) :- 
 	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal, _Unused_Negation_Proposal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, GoalVars, SubGoal)', (Proposal, UQV, GoalVars, SubGoal)),
-	cneg_rt_dynamic(UQV, GoalVars, SubGoal, Proposal, Conj_List_Result), !,
+%     cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
+	cneg_rt(UQV, GoalVars, SubGoal, Proposal, 0, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, 'cneg_rt_gv', List_Of_Conjs_Frontier), !,
