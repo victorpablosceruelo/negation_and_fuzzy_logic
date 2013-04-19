@@ -3,6 +3,7 @@
  	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
+	    get_disequalities_from_constraints_and_remove_them/2, 
 	    get_diseq_constraints_in_term_variables/2,
 	    remove_diseq_constraints_in_term_variables/1,
  	    prepare_attributes_for_printing/2,
@@ -843,7 +844,7 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 %	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: (GoalVars, EQV_Aux, UQV_Tmp)', (GoalVars, EQV_Tmp, UQV_Tmp)),
 
 	varsbag_union(GoalVars, EQV_Tmp, EQV_Aux),
-	varsbag(UQV_Tmp, EQV_Aux, [], UQV_Aux),
+	varsbag(UQV_Tmp, EQV_Aux, [], UQV_Aux), % A var marked existential becomes existential.
 
 	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
 	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
@@ -856,13 +857,11 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_diseq_constraints_in_term_variables(Term, Disequalities).
-remove_diseq_constraints_in_term_variables(Term).
-
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
-get_disequalities_from_constraints_and_remove_them(Vars, Disequalities) :-
+get_disequalities_from_constraints_and_remove_them(Anything, Disequalities) :-
 	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
 
+	varsbag(Anything, [], [], Vars),
 	get_disequalities_from_constraints_and_remove_them_aux(Vars, [], [], Disequalities), !,
 	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Disequalities', Disequalities),
 	!.

@@ -1,4 +1,4 @@
-:- module(ex_diseqs,_,[.(cneg)]).
+:- module(ex_diseqs,_,[cneg]).
 % :- module(ex_diseqs,_,[.(cneg), .(debugger_pkg)]).
 
 cneg_ignores_preds([tests/0, logo/1, tests_fail/2, tests_succeed/2]).
