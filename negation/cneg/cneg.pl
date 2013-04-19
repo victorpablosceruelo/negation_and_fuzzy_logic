@@ -15,9 +15,9 @@
 % To be able to call Pred from cneg
 
 % Needed to be able to compile the modules.
-:- use_module(cneg_aux).
+:- use_module(library('cneg/cneg_aux')).
 % , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, echo_msg/3]). 
-:- use_module(cneg_diseq, 
+:- use_module(library('cneg/cneg_diseq'), 
 	[
 	    equality/3, disequality/3, 
 	    diseq_geuqv/5, eq_geuqv/5,
@@ -25,13 +25,13 @@
 	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5
 	]).
-:- use_module(cneg_tr).
-:- use_module(cneg_rt, [cneg_rt/6]).
+:- use_module(library('cneg/cneg_tr')).
+:- use_module(library('cneg/cneg_rt'), [cneg_rt/6]).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.
 %:- reexport(cneg_aux, [varsbag/4, varsbag_union/3]).    
-:- reexport(cneg_diseq, 
+:- reexport(library('cneg/cneg_diseq'), 
 	[
 	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
@@ -39,7 +39,7 @@
 	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5
 	]).
-:- reexport(cneg_rt, [cneg_rt/6]).
+:- reexport(library('cneg/cneg_rt'), [cneg_rt/6]).
 %:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
@@ -94,7 +94,7 @@ call_to_predicate(Predicate) :- call(Predicate).
 % This includes all the all the transformations needed by each one of the proposals included,
 % i.e. Chan's proposal, Barbuti's proposal, the New proposal and the hybrid proposal.
 %:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
-:- load_compilation_module(.('cneg_tr')).
+:- load_compilation_module(library('cneg/cneg_tr')).
 
 % trans_sent/3 makes the transformation.
 :- add_sentence_trans(trans_sent/3, 740). % TODO: Right priority?

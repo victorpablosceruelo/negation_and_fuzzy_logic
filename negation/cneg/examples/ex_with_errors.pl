@@ -1,4 +1,4 @@
-:- module(ex_with_errors,_,[.(cneg)]).
+:- module(ex_with_errors,_,[cneg]).
 % :- module(ex_with_errors,_,[.(cneg), .(debugger_pkg)]).
 
 cneg_ignores_preds([tests/0, test_chan/0, test_stuckey/0, echo/1, echo_error/0]).
