@@ -9,7 +9,7 @@
 
 :- use_module(library(engine(data_facts)),[retract_fact/1]).
 :- use_module(library(aggregates),[findall/3]).
-:- use_module(library('cneg/cneg_aux'), _).
+:- use_module(library('cneg/cneg_aux')).
 %:- use_module(library(terms), _).
 
 :- comment(title, "Contructive Negation Transformation").

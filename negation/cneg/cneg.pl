@@ -17,16 +17,16 @@
 % Needed to be able to compile the modules.
 :- use_module(library('cneg/cneg_aux')).
 % , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, echo_msg/3]). 
-:- use_module(library('cneg/cneg_diseq'), 
-	[
-	    equality/3, disequality/3, 
-	    diseq_geuqv/5, eq_geuqv/5,
-	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
-	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/5
-	]).
+:- use_module(library('cneg/cneg_diseq')).
+%	[
+%	    equality/3, disequality/3, 
+%	    diseq_geuqv/5, eq_geuqv/5,
+%	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
+%	    prepare_attributes_for_printing/2,
+%	    cneg_diseq_echo/5
+%	]).
 :- use_module(library('cneg/cneg_tr')).
-:- use_module(library('cneg/cneg_rt'), [cneg_rt/6]).
+:- use_module(library('cneg/cneg_rt')).
 %:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % Re-export predicates to use them in console.

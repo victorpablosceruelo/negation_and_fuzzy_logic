@@ -6,13 +6,10 @@
 :- comment(summary, "This module implements negation predicates for runtime evaluation.").
 
 :- use_module(library(aggregates),[setof/3]).
-:- use_module(library('cneg/cneg_aux'), _).
-:- use_module(library('cneg/cneg_diseq'), 
-	[
-	    get_disequalities_from_constraints_and_remove_them/2,
-	    prepare_attributes_for_printing/2, 
-	    cneg_diseq_echo/5
-	]).
+:- use_module(library('cneg/cneg_aux')).
+% :- reexport(library('cneg/cneg_aux')).
+:- use_module(library('cneg/cneg_diseq')).
+% :- reexport(cneg_diseq).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/6.

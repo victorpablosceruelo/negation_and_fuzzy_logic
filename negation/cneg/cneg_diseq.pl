@@ -11,7 +11,7 @@
 	], 
 	[assertions]).
 
-:- use_module(cneg_aux,_).
+:- use_module(library('cneg/cneg_aux')).
 :- use_package(attr).
 :- use_package(dcg).
 %:- use_module(engine(attributes)).
