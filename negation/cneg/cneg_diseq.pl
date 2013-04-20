@@ -4,8 +4,6 @@
 	    diseq_geuqv/5, eq_geuqv/5,
 	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    get_disequalities_from_constraints_and_remove_them/2, 
-	    get_diseq_constraints_in_term_variables/2,
-	    remove_diseq_constraints_in_term_variables/1,
  	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5
 	], 
