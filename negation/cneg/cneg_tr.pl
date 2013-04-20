@@ -70,9 +70,10 @@ save_sent_info(Clause) :-
 	Name==':-', !,
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
-	unifications_in_head_to_equality(Head, New_Head, Equality),
+	unifications_in_head_to_equality(Head, New_Head, New_Head_Arity, Equality),
 	split_goal_with_disjunctions_into_goals((Equality, Body), 'cneg_tr', Bodies),
-	store_head_and_bodies_info(New_Head, Head, Bodies).
+	split_bodies_into_E_IE_NIE(Bodies, Split_Bodies),
+	store_head_and_bodies_info(New_Head, New_Head_Arity, Head, Split_Bodies).
 
 save_sent_info(Head) :-
 	functor_local(Head, Name, Arity, _Arguments),
@@ -81,8 +82,9 @@ save_sent_info(Head) :-
 	; 
 	    Arity\==2
 	), !,
-	unifications_in_head_to_equality(Head, New_Head, Equality),
-	store_head_and_bodies_info(New_Head, Head, [Equality]).
+	unifications_in_head_to_equality(Head, New_Head, New_Head_Arity, Equality),
+	split_bodies_into_E_IE_NIE([Equality], Split_Bodies),
+	store_head_and_bodies_info(New_Head, New_Head_Arity, Head, Split_Bodies).
 
 unifications_in_head_to_equality(Head, New_Head, Equality) :-
 	% Take the unifications in the head and move them to the body.
