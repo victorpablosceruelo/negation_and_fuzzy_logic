@@ -22,6 +22,9 @@
 % dynamic predicate(s) 
 :- data cneg_tr_pred_head_and_body/1.
 :- data cneg_tr_pred_info/1.
+:- multifile file_debug_is_activated/1.
+
+file_debug_is_activated(true). % Change to disable debugging.
 
 name_for_assert_cneg_tr_pred_head_and_body('cneg_tr_pred_head_and_body').
 name_for_assert_cneg_tr_pred_info('cneg_tr_pred_info').
@@ -200,7 +203,7 @@ get_list_of_preds_to_ignore([(_Head, _Body, Test, _Counter) | _List_Of_H_and_B],
 %	echo_msg(2, '', 'cneg_tr', 'get_list_of_preds_to_ignore :: Test', Test),  
 	functor(Test, 'cneg_ignores_preds', 1), !,
 	arg(1, Test, List_Tmp),
-	List = ['cneg_ignores_preds'/1 | List_Tmp ].
+	List = ['cneg_ignores_preds'/1 | [ 'file_debug_is_activated'/1 | List_Tmp ]].
 %	List = ['cneg_ignores_preds'/1 | [ 'cneg_choosen_negation'/1 | List_Tmp ]].
 get_list_of_preds_to_ignore([(_Head, _Body, _Test, _Counter) | List_Of_H_and_B], List) :-
 	get_list_of_preds_to_ignore(List_Of_H_and_B, List).

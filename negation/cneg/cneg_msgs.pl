@@ -17,6 +17,7 @@
 % To access pre-frontiers from anywhere.
 %:- multifile cneg_pre_frontier/6.
 %:- multifile call_to/3.
+:- multifile file_debug_is_activated/1.
 
 :- comment(title, "Auxiliary predicates for printing msgs.").
 
@@ -37,18 +38,27 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Comment out the following sentences to disable all debugging.
-%echo_msg_aux(2, _File_Name, _Msg) :- !. % No debugging at all.
-	
 echo_msg_aux(0, _File_Name, _Msg) :- !.
 echo_msg_aux(1, File_Name, Msg) :-
 	echo_msg_aux(2, File_Name, Msg),
 	write(Msg).
 echo_msg_aux(2, File_Name, Msg) :-
+	file_debug_is_activated(true),
 	get_stream_to_file(File_Name, Stream_1),
 	write(Stream_1, Msg),
 	get_stream_to_file('with_all_debug_msgs', Stream_2),
 	write(Stream_2, Msg).
+echo_msg_aux(2, _File_Name, _Msg) :-
+	(
+	    (
+		file_debug_is_activated(Var),
+		Var \== true
+	    )
+	;
+	    (
+		\+ file_debug_is_activated(_Var)
+	    )
+	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
