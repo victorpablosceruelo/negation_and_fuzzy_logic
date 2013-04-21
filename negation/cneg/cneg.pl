@@ -58,21 +58,11 @@ cneg(UQV, Predicate) :-
 	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg(UQV, Predicate))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 
-	(
-	    (   cneg_choosen_negation(Negation_Mechanism), !   )
-	;
-	    (   
-		echo_msg(1, 'nl', 'cneg_rt', '', ''),
-		echo_msg(1, '', 'cneg_rt', 'You can choose the negation mechanism by defining the predicate', 'cneg_choosen_negation/1'),
-		echo_msg(1, '', 'cneg_rt', 'We will assume this time', 'cneg_choosen_negation(cneg_rt_Chan)'),
-		echo_msg(1, 'nl', 'cneg_rt', '', ''),
-		Negation_Mechanism = 'cneg_rt_Chan', !
-	    )
-	),
 	varsbag_clean_up(UQV, Real_UQV), % UQV is a list of variables. Remove anything else.
 	varsbag(Predicate, Real_UQV, [], GoalVars), % Compute goalvars. It is used by some methods.
 	generate_empty_trace(Trace), % This is for debugging and a future tabling mechanism.
-	cneg_rt(UQV, GoalVars, Predicate, Negation_Mechanism, 0, Trace). % 0 is the depth level.
+
+	cneg_rt(UQV, GoalVars, Predicate, 0, Trace). % 0 is the depth level.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
