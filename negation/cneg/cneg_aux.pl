@@ -25,7 +25,8 @@
 	    replace_in_term_var_by_value/4,
 	    replace_in_terms_list_var_by_value/4,
 	    retrieve_element_from_list/2,
-	    split_goal_with_disjunctions_into_goals/3
+	    split_goal_with_disjunctions_into_goals/3,
+	    goals_join_by_conjunction/3
 	],
 	[assertions]).
 
@@ -660,4 +661,11 @@ combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% goals_join_by_conjunction(Goal_1, Goal_2, Result) :-
+goals_join_by_conjunction('true', 'true', 'true') :- !.
+goals_join_by_conjunction('true', Goal_2, Goal_2) :- !.
+goals_join_by_conjunction(Goal_1, 'true', Goal_1) :- !.
+goals_join_by_conjunction(Goal_1, Goal_2, (Goal_1, Goal_2)) :- !.
+
 
