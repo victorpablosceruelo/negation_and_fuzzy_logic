@@ -633,8 +633,8 @@ compute_frontier(UQV_In, GoalVars_In, Goal, Frontier) :-
 
 compute_frontier_aux([], _UQV, _GoalVars, Frontier_Out, Frontier_Out) :- !.
 compute_frontier_aux([Goal | More_Goals], UQV, GoalVars, Frontier_In, Frontier_Out) :-
-	compute_goal_frontier(Goal, Goal_Frontier), !,
-	adequate_frontier(Goal_Frontier, UQV, GoalVars, [], Frontier_Tmp), !,
+	compute_goal_pre_frontier(Goal, Goal_Frontier), !,
+	pre_frontier_to_frontier(Goal_Frontier, UQV, GoalVars, [], Frontier_Tmp), !,
 	append(Frontier_In, Frontier_Tmp, Frontier_Aux), !,
 	compute_frontier_aux(More_Goals, UQV, GoalVars, Frontier_Aux, Frontier_Out).
 
@@ -643,36 +643,36 @@ compute_frontier_aux([Goal | More_Goals], UQV, GoalVars, Frontier_In, Frontier_O
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-adequate_frontier(Goal_Frontier, UQV, GoalVars, Frontier_In, Frontier_Out) :-
-	echo_msg(2, 'list', 'cneg_rt', 'adequate_frontier :: Frontier_In', Frontier_In),
-	adequate_frontier_aux(Goal_Frontier, UQV, GoalVars, Frontier_In, Frontier_Out), !,
-	echo_msg(2, 'list', 'cneg_rt', 'adequate_frontier :: Frontier_Out', Frontier_Out).
+pre_frontier_to_frontier(Goal_Frontier, UQV, GoalVars, Frontier_In, Frontier_Out) :-
+	echo_msg(2, 'list', 'cneg_rt', 'pre_frontier_to_frontier :: Frontier_In', Frontier_In),
+	pre_frontier_to_frontier_aux(Goal_Frontier, UQV, GoalVars, Frontier_In, Frontier_Out), !,
+	echo_msg(2, 'list', 'cneg_rt', 'pre_frontier_to_frontier :: Frontier_Out', Frontier_Out).
 
-adequate_frontier(Goal_Frontier, UQV, GoalVars, Frontier_In, _Frontier_Out) :-
+pre_frontier_to_frontier(Goal_Frontier, UQV, GoalVars, Frontier_In, _Frontier_Out) :-
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(1, '', 'cneg_rt', 'ERROR: pre_frontier_to_frontier :: (UQV, GoalVars)', (UQV, GoalVars)),
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, 'list', 'cneg_rt', 'ERROR: adequate_frontier :: Goal_Frontier', Goal_Frontier),
+	echo_msg(1, 'list', 'cneg_rt', 'ERROR: pre_frontier_to_frontier :: Goal_Frontier', Goal_Frontier),
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, 'list', 'cneg_rt', 'ERROR: adequate_frontier :: Frontier_In', Frontier_In),
+	echo_msg(1, 'list', 'cneg_rt', 'ERROR: pre_frontier_to_frontier :: Frontier_In', Frontier_In),
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
 	!, fail.
 
-adequate_frontier_aux([], _UQV, _GoalVars, Frontier_N_Out, Frontier_N_Out) :- !.
-adequate_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], UQV, GoalVars, Frontier_N_In, Frontier_N_Out) :-
-	convert_frontier_prenode_to_nodes(G_F_Pre_Node, UQV, GoalVars, [], Frontier_Nodes), !,
-	echo_msg(2, '', 'cneg_rt', 'adequate_frontier_aux :: Frontier_Nodes', Frontier_Nodes),
+pre_frontier_to_frontier_aux([], _UQV, _GoalVars, Frontier_N_Out, Frontier_N_Out) :- !.
+pre_frontier_to_frontier_aux([G_F_Pre_Node | G_F_Pre_Nodes], UQV, GoalVars, Frontier_N_In, Frontier_N_Out) :-
+	pre_frontier_node_to_frontier_node(G_F_Pre_Node, UQV, GoalVars, [], Frontier_Nodes), !,
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_to_frontier_aux :: Frontier_Nodes', Frontier_Nodes),
 	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Aux), !,
-	adequate_frontier_aux(G_F_Pre_Nodes, UQV, GoalVars, Frontier_N_Aux, Frontier_N_Out).
+	pre_frontier_to_frontier_aux(G_F_Pre_Nodes, UQV, GoalVars, Frontier_N_Aux, Frontier_N_Out).
 
-convert_frontier_prenode_to_nodes(G_F_Pre_Node, UQV, GoalVars, Frontier_N_In, Frontier_N_Out) :-
-	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: G_F_Pre_Node', G_F_Pre_Node),
+pre_frontier_node_to_frontier_node(G_F_Pre_Node, UQV, GoalVars, Frontier_N_In, Frontier_N_Out) :-
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: G_F_Pre_Node', G_F_Pre_Node),
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
 	split_body_between_E_IE_and_NIE(Body, [], E_IE_Body, [], NIE_Body),
-	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: Body', Body),
-	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: E_IE_Body', E_IE_Body),
-	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: NIE_Body', NIE_Body),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Body', Body),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: E_IE_Body', E_IE_Body),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: NIE_Body', NIE_Body),
 
 	% Link the query and the pre-node (only goalvars, not uqv).
 	copy_term((Real_Goal, UQV, GoalVars), (Real_Goal_Copy, _UQV_Copy, GoalVars_Copy)),
@@ -683,7 +683,7 @@ convert_frontier_prenode_to_nodes(G_F_Pre_Node, UQV, GoalVars, Frontier_N_In, Fr
 	% Proposal == 'cneg_rt_Chan',
 	varsbag((Head, Body), GoalVars, [], Pre_Node_UQV), % Identify UQV in Pre_Node
 	eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, Pre_Node_UQV, GoalVars, Frontier_Nodes),
-	echo_msg(2, '', 'cneg_rt', 'convert_frontier_prenode_to_nodes :: Frontier_Nodes', Frontier_Nodes),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Frontier_Nodes', Frontier_Nodes),
 	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Out). % Is order really relevant ???
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -799,51 +799,51 @@ split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_In, NIE_Body_In, [
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Just to debug.
-%compute_goal_frontier(Goal, _Proposal, _Frontier) :-
+%compute_goal_pre_frontier(Goal, _Proposal, _Frontier) :-
 %	echo_msg(2, '', 'cneg_rt', '--------------------------------------------------------------------------------------------------------------', ' '),
-%	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: (Goal)', (Goal)),	
+%	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: (Goal)', (Goal)),	
 %	fail. % Just debug and use backtracking to continue.
 
 % First remove $ and qualification from the goal's name.
-compute_goal_frontier(Goal, Frontier) :-
+compute_goal_pre_frontier(Goal, Frontier) :-
 	goal_clean_up(Goal, Tmp_Goal), !,
-	compute_goal_frontier(Tmp_Goal, Frontier).
+	compute_goal_pre_frontier(Tmp_Goal, Frontier).
 
 % Manage true and fail ...
-compute_goal_frontier('true', [F_Out]) :- !,
+compute_goal_pre_frontier('true', [F_Out]) :- !,
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(F_Out, 'true', 'true', 'true', 'true').
-compute_goal_frontier('fail', [F_Out]) :- !,
+compute_goal_pre_frontier('fail', [F_Out]) :- !,
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(F_Out, 'fail', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
 % The frontiers need to evaluated one at a time. 
-compute_goal_frontier(Goal, _Frontier_Out):- 
+compute_goal_pre_frontier(Goal, _Frontier_Out):- 
 	goal_is_disjunction(Goal, _G1, _G2), !,
 	echo_msg(1, '', 'cneg_rt', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
 	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, % Backtracking is forbidden.
 	fail.
 
 % Now go for the conjunctions.
-compute_goal_frontier(Goal, Frontier):- 
+compute_goal_pre_frontier(Goal, Frontier):- 
 	goal_is_conjunction(Goal, G1, G2), !,
-	compute_goal_frontier(G1, Frontier_G1),
-	compute_goal_frontier(G2, Frontier_G2),
+	compute_goal_pre_frontier(G1, Frontier_G1),
+	compute_goal_pre_frontier(G2, Frontier_G2),
 	!,
 	combine_frontiers_from_conjunction(Frontier_G1, Frontier_G2, Frontier),
 	!.
 
 % Now go for the functors for equality and disequality.
 % None of them is managed yet, so just bypass them.
-compute_goal_frontier(Goal, [F_Out]) :- 
+compute_goal_pre_frontier(Goal, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal),
 	!.
 
-compute_goal_frontier(Goal, [F_Out]) :- 
+compute_goal_pre_frontier(Goal, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
@@ -851,16 +851,16 @@ compute_goal_frontier(Goal, [F_Out]) :-
 	!.
 
 % Double negation is not managed yet. Bypass it.
-%compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
-compute_goal_frontier(Goal, Frontier) :- 
+%compute_goal_pre_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
+compute_goal_pre_frontier(Goal, Frontier) :- 
 	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal), !,
-	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (UQV, GoalVars, SubGoal)', (UQV, GoalVars, SubGoal)),
+	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: double negation for (UQV, GoalVars, SubGoal)', (UQV, GoalVars, SubGoal)),
 %     cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 	cneg_rt(UQV, GoalVars, SubGoal, 0, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
-	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
 	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, List_Of_Conjs_Frontier), !,
-	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
 	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'double neg :: Frontier', Frontier),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
@@ -868,19 +868,19 @@ compute_goal_frontier(Goal, Frontier) :-
 	!.
 
 % Now go for other functors stored in our database.
-compute_goal_frontier(Goal, Frontier_Out) :-
+compute_goal_pre_frontier(Goal, Frontier_Out) :-
 	goal_is_not_conj_disj_eq_diseq_dneg(Goal),
-	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: Goal', Goal),
+	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: Goal', Goal),
 	look_for_the_relevant_clauses(Goal, Frontier_Tmp_1),
 %	echo_msg(0, '', 'cneg_rt', 'compute_neg_frontier :: format', '(Head, Body, FrontierTest)'),
 %	echo_msg(2, 'list', 'cneg_rt', 'Frontier_Tmp_1', Frontier_Tmp_1),
 	simplify_frontier(Frontier_Tmp_1, Goal, [], Frontier_Out),
-	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_frontier :: Frontier_Out', Frontier_Out), 
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: Frontier_Out', Frontier_Out), 
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	!. % Backtracking is forbidden.
 
 % And at last report an error if it was impossible to found a valid entry.
-compute_goal_frontier(Goal, []) :-
+compute_goal_pre_frontier(Goal, []) :-
 	echo_msg(1, '', 'cneg_rt', 'ERROR: Not found frontier for Goal', Goal), 
 	echo_msg(1, 'nl', 'cneg_rt', '', ''), !. % Backtracking is forbidden.
 
