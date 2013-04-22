@@ -669,7 +669,6 @@ pre_frontier_node_to_frontier_node(G_F_Pre_Node, UQV, GoalVars, Frontier_N_In, F
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: G_F_Pre_Node', G_F_Pre_Node),
 %	subfrontier_contents(Frontier, Goal, Head, Body, FrontierTest).
 	subfrontier_contents(G_F_Pre_Node, Real_Goal, Head, Body, _F_Test),
-	split_body_between_E_IE_and_NIE(Body, [], E_IE_Body, [], NIE_Body),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Body', Body),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: E_IE_Body', E_IE_Body),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: NIE_Body', NIE_Body),
@@ -781,22 +780,6 @@ get_equalities_list_from_lists([Elto_1 | List_1], [Elto_2 | List_2], List_In, Li
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
-
-split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_Out, NIE_Body_In, NIE_Body_Out) :-
-	goal_is_conjunction(Body, Body_1, Body_2),
-	% The order is reversed to keep the order of the literals.
-	split_body_between_E_IE_and_NIE(Body_2, E_IE_Body_In, E_IE_Body_Aux, NIE_Body_In, NIE_Body_Aux),
-	split_body_between_E_IE_and_NIE(Body_1, E_IE_Body_Aux, E_IE_Body_Out, NIE_Body_Aux, NIE_Body_Out).
-
-split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-
-	goal_is_equality(Body, _Arg1, _Arg2, _GV, _EQV, _UQV), !.
-split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, [Body | E_IE_Body_In], NIE_Body_In, NIE_Body_In) :-
-	goal_is_disequality(Body, _Arg1, _Arg2, _GV, _EQV, _UQV), !.
-split_body_between_E_IE_and_NIE(Body, E_IE_Body_In, E_IE_Body_In, NIE_Body_In, [Body | NIE_Body_In]) :- !.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Just to debug.
 %compute_goal_pre_frontier(Goal, _Proposal, _Frontier) :-
