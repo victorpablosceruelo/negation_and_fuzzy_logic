@@ -682,7 +682,7 @@ pre_frontier_node_to_frontier_node(G_F_Pre_Node, UQV, GoalVars, Frontier_N_In, F
 
 	% Proposal == 'cneg_rt_Chan',
 	varsbag((Head, Body), GoalVars, [], Pre_Node_UQV), % Identify UQV in Pre_Node
-	eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, Pre_Node_UQV, GoalVars, Frontier_Nodes),
+	pre_frontier_node_to_frontier_node_aux(E_IE_Body, NIE_Body, Pre_Node_UQV, GoalVars, Frontier_Nodes),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Frontier_Nodes', Frontier_Nodes),
 	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Out). % Is order really relevant ???
 
@@ -690,42 +690,42 @@ pre_frontier_node_to_frontier_node(G_F_Pre_Node, UQV, GoalVars, Frontier_N_In, F
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-eval_frontier_prenode_to_get_nodes([], [], _UQV, _GoalVars, []) :- !.
-eval_frontier_prenode_to_get_nodes([], NIE_Body, _UQV, _GoalVars, Frontier_Nodes) :- !,
+pre_frontier_node_to_frontier_node_aux([], [], _UQV, _GoalVars, []) :- !.
+pre_frontier_node_to_frontier_node_aux([], NIE_Body, _UQV, _GoalVars, Frontier_Nodes) :- !,
 	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
-eval_frontier_prenode_to_get_nodes(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_Nodes) :-
+pre_frontier_node_to_frontier_node_aux(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_Nodes) :-
 	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Conj_E_IE_Body', Conj_E_IE_Body),
-	eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: Conj_E_IE_Body', Conj_E_IE_Body),
+	pre_frontier_node_to_frontier_node_aux_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers),
 	
 	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, UQV, GoalVars, [], Frontier_Nodes), !,
-	echo_msg(2, 'list', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: Frontier_Nodes', Frontier_Nodes).
+	echo_msg(2, 'list', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: Frontier_Nodes', Frontier_Nodes).
 
 %:- push_prolog_flag(unused_pred_warnings, no).
-%:- meta_predicate eval_frontier_prenode_to_get_nodes_aux(?, ?, ?, goal, ?).
-eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
+%:- meta_predicate pre_frontier_node_to_frontier_node_aux_aux(?, ?, ?, goal, ?).
+pre_frontier_node_to_frontier_node_aux_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
 	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
 	cneg_diseq_echo(2, 'list', 'cneg_rt', 'setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
 	!.
 
-eval_frontier_prenode_to_get_nodes_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, _Pre_Node_Answers) :-
+pre_frontier_node_to_frontier_node_aux_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, _Pre_Node_Answers) :-
 	call(Conj_E_IE_Body), !, % If this succeeds there is an error.
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, '', 'cneg_rt', 'ERROR in eval_frontier_prenode_to_get_nodes_aux', 'setof/3 has failed'),
+	echo_msg(1, '', 'cneg_rt', 'ERROR in pre_frontier_node_to_frontier_node_aux_aux', 'setof/3 has failed'),
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers)'),
-	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: UQV', UQV),
-	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: GoalVars', GoalVars),
-	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: NIE_Body', NIE_Body),
-	echo_msg(1, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
+	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers)'),
+	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: UQV', UQV),
+	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: GoalVars', GoalVars),
+	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: NIE_Body', NIE_Body),
+	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
  	echo_msg(1, 'nl', 'cneg_rt', '', ''),
 	!, fail.
 
-eval_frontier_prenode_to_get_nodes_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE_Body, []) :-
-	echo_msg(2, '', 'cneg_rt', 'eval_frontier_prenode_to_get_nodes :: not satisfiable :: Conj_E_IE_Body', Conj_E_IE_Body), !.
+pre_frontier_node_to_frontier_node_aux_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE_Body, []) :-
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: not satisfiable :: Conj_E_IE_Body', Conj_E_IE_Body), !.
 %:- pop_prolog_flag(unused_pred_warnings).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
