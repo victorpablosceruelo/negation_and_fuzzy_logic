@@ -1,5 +1,5 @@
 
-:- module(cneg_rt, [cneg_rt/6], [assertions]).
+:- module(cneg_rt, [cneg_rt/5], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
@@ -73,25 +73,25 @@ cneg_rt(UQV, GoalVars, Goal, Depth_Level, Trace) :-
 % negate_frontier_list(Frontier, GoalVars, Proposal, Result_List),
 % returns in Result_List a list with the negation of each subfrontier in Frontier.
 
-negate_frontier([], _GoalVars, _Proposal, [true]) :- !. % Optimization.
-negate_frontier(Frontier, GoalVars, Proposal, Negated_Frontier) :- 
+negate_frontier([], _GoalVars, [true]) :- !. % Optimization.
+negate_frontier(Frontier, GoalVars, Negated_Frontier) :- 
 	Frontier \== [], !,
-	negate_each_subfrontier(Frontier, GoalVars, Proposal, Negated_Frontier),
+	negate_each_subfrontier(Frontier, GoalVars, Negated_Frontier),
 	!.
 
-negate_each_subfrontier([], _GoalVars, _Proposal, []) :- !.
-negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, [Result_Frontier | Result_More_Frontiers]) :-
+negate_each_subfrontier([], _GoalVars, []) :- !.
+negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, [Result_Frontier | Result_More_Frontiers]) :-
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
-	negate_subfrontier_chan(Frontier, GoalVars, Proposal, Result_Frontier),
+	negate_subfrontier(Frontier, GoalVars, Result_Frontier),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
+	negate_each_subfrontier(More_Frontiers, GoalVars, Result_More_Frontiers).
 %	combine_negated_frontiers(Result_Frontier, Result_More_Frontiers, Result), 
 %	!. % Reduce the stack's memory by forbidding backtracking.
 
-negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Proposal, Result_More_Frontiers) :-
+negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Result_More_Frontiers) :-
 	echo_msg(1, '', 'cneg_rt', 'negate_each_subfrontier :: ERROR negating Frontier. Frontier', Frontier), !,
-	negate_each_subfrontier(More_Frontiers, GoalVars, Proposal, Result_More_Frontiers).
+	negate_each_subfrontier(More_Frontiers, GoalVars, Result_More_Frontiers).
 
 % combine_negated_subfrontiers(Result_Subfr, Result_More_Subfr, Result_Tmp),
 %combine_negated_frontiers(fail, _Result_More_Subfr, fail) :- !.
@@ -214,9 +214,9 @@ local_call_to_aux(Predicate, Level_In, Trace) :-
 
 local_call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
-	goal_is_cneg_rt(Predicate, UQV, GoalVars, Goal, Proposal),
+	goal_is_cneg_rt(Predicate, UQV, GoalVars, Goal),
 	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate),
-	cneg_rt(UQV, GoalVars, Goal, Proposal, Level, Trace),
+	cneg_rt(UQV, GoalVars, Goal, Level, Trace),
 	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: SUCCEED Predicate call. Predicate', Predicate).
 
 local_call_to_aux(Predicate, Level_In, Trace) :-
@@ -245,8 +245,8 @@ local_call_to_aux(Predicate, Level_In, Trace) :-
 % negate_subfrontier(SubFrontier, GoalVars, Proposal, Result_Frontier)
 % returns in Result_Frontier the negation of the subfrontier in SubFrontier
 
-% negate_subfrontier_chan(SubFrontier_In, GoalVars_In, Proposal, (Result)) :-
-negate_subfrontier_chan(SubFrontier_In, GoalVars_In, 'cneg_rt_Chan', (Result)) :-
+% negate_subfrontier(SubFrontier_In, GoalVars_In, Proposal, (Result)) :-
+negate_subfrontier(SubFrontier_In, GoalVars_In, (Result)) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
 	split_subfrontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
@@ -610,7 +610,8 @@ negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Structures to manage all the info about the subfrontier in an easy way.
-subfrontier_contents(subfrontier(Goal, Head, Body, FrontierTest), Goal, Head, Body, FrontierTest).
+subfrontier_contents(subfrontier(Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
+	Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 subfrontier_E_IE_NIE_contents(subfrontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
 subfrontier_E_IE_NIE_ie_contents(subfrontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp), E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
 
@@ -620,34 +621,34 @@ subfrontier_E_IE_NIE_ie_contents(subfrontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Frontier)
-compute_frontier(UQV_In, GoalVars_In, Goal, Proposal, Frontier) :-
+compute_frontier(UQV_In, GoalVars_In, Goal, Frontier) :-
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
 	varsbag_clean_up(UQV_In, UQV), % Clean up non-vars in UQV (subterms are not in UQV).
-	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (UQV, GoalVars, Goal, Proposal)', (UQV, GoalVars, Goal, Proposal)),
-	split_goal_with_disjunctions_into_goals(Goal, Proposal, Goals),
+	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (UQV, GoalVars, Goal)', (UQV, GoalVars, Goal)),
+	split_goal_with_disjunctions_into_goals(Goal, Goals),
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
-	compute_frontier_aux(Goals, UQV, GoalVars, Proposal, [], Frontier),
+	compute_frontier_aux(Goals, UQV, GoalVars, [], Frontier),
 	!.
 
-compute_frontier_aux([], _UQV, _GoalVars, _Proposal, Frontier_Out, Frontier_Out) :- !.
-compute_frontier_aux([Goal | More_Goals], UQV, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
-	compute_goal_frontier(Goal, Proposal, Goal_Frontier), !,
-	adequate_frontier(Goal_Frontier, UQV, GoalVars, Proposal, [], Frontier_Tmp), !,
+compute_frontier_aux([], _UQV, _GoalVars, Frontier_Out, Frontier_Out) :- !.
+compute_frontier_aux([Goal | More_Goals], UQV, GoalVars, Frontier_In, Frontier_Out) :-
+	compute_goal_frontier(Goal, Goal_Frontier), !,
+	adequate_frontier(Goal_Frontier, UQV, GoalVars, [], Frontier_Tmp), !,
 	append(Frontier_In, Frontier_Tmp, Frontier_Aux), !,
-	compute_frontier_aux(More_Goals, UQV, GoalVars, Proposal, Frontier_Aux, Frontier_Out).
+	compute_frontier_aux(More_Goals, UQV, GoalVars, Frontier_Aux, Frontier_Out).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-adequate_frontier(Goal_Frontier, UQV, GoalVars, Proposal, Frontier_In, Frontier_Out) :-
+adequate_frontier(Goal_Frontier, UQV, GoalVars, Frontier_In, Frontier_Out) :-
 	echo_msg(2, 'list', 'cneg_rt', 'adequate_frontier :: Frontier_In', Frontier_In),
-	adequate_frontier_aux(Goal_Frontier, UQV, GoalVars, Proposal, Frontier_In, Frontier_Out), !,
+	adequate_frontier_aux(Goal_Frontier, UQV, GoalVars, Frontier_In, Frontier_Out), !,
 	echo_msg(2, 'list', 'cneg_rt', 'adequate_frontier :: Frontier_Out', Frontier_Out).
 
-adequate_frontier(Goal_Frontier, UQV, GoalVars, _Proposal, Frontier_In, _Frontier_Out) :-
+adequate_frontier(Goal_Frontier, UQV, GoalVars, Frontier_In, _Frontier_Out) :-
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
 	echo_msg(1, '', 'cneg_rt', 'ERROR: adequate_frontier :: (UQV, GoalVars)', (UQV, GoalVars)),
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
@@ -852,7 +853,7 @@ compute_goal_frontier(Goal, _Proposal, [F_Out]) :-
 % Double negation is not managed yet. Bypass it.
 %compute_goal_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_frontier(Goal, Proposal, Frontier) :- 
-	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal, _Unused_Negation_Proposal), !,
+	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_frontier :: dn :: double negation for (Proposal, UQV, GoalVars, SubGoal)', (Proposal, UQV, GoalVars, SubGoal)),
 %     cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
 	cneg_rt(UQV, GoalVars, SubGoal, Proposal, 0, Conj_List_Result), !,
@@ -910,13 +911,14 @@ build_a_frontier_from_each_result(Real_Goal, [Result | Results], [Frontier | Fro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 look_for_the_relevant_clauses(Goal, Frontier) :-
-	functor(Goal, Name, Arity),  % Security
-	Name \== ',', Name \== ';',    % Issues
+	functor(Goal, Head_Name, Head_Arity),  % Security
+	Head_Name \== ',', Head_Name \== ';',    % Issues
 	!, % Backtracking forbiden.
-	cneg_pre_frontier(Name, Arity, _SourceFileName, _Head_Aux, _Body_Aux, _FrontierTest_Aux), 
+	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName_, _Clean_Head_, _E_, _IE_, _NIE_, _Head_, _Body_),
 %	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
-	setof(subfrontier(_Real_Goal, Head, Body, FrontierTest), 
-	cneg_pre_frontier(Name, Arity, _SourceFileName, Head, Body, FrontierTest), Frontier).
+	setof(subfrontier(_Real_Goal, Clean_Head, E, IE, NIE, Head, Body), 
+	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
+	Frontier).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
