@@ -25,7 +25,7 @@
 	    replace_in_term_var_by_value/4,
 	    replace_in_terms_list_var_by_value/4,
 	    retrieve_element_from_list/2,
-	    split_goal_with_disjunctions_into_goals/3,
+	    split_goal_with_disjunctions_into_goals/2,
 	    goals_join_by_conjunction/3
 	],
 	[assertions]).
@@ -615,22 +615,22 @@ term_to_meta(X, '$:'(X)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %split_goal_with_disjunctions_into_goals(Body, Bodies)
-split_goal_with_disjunctions_into_goals(Body, Negation_Predicate, Bodies) :- 
+split_goal_with_disjunctions_into_goals(Body, Bodies) :- 
 	echo_msg(0, '', 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goal ', Body), 
-	split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies),
+	split_goal_with_disjunctions_into_goals_aux(Body, Bodies),
 	echo_msg(0, '', 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goals ', Bodies), 
 	!.
 
-split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :- 
+split_goal_with_disjunctions_into_goals_aux(Body, Bodies) :- 
 	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
-	split_goal_with_disjunctions_into_goals_aux(Body_Conj_1, Negation_Predicate, Bodies_Conj_1),
-	split_goal_with_disjunctions_into_goals_aux(Body_Conj_2, Negation_Predicate, Bodies_Conj_2),
+	split_goal_with_disjunctions_into_goals_aux(Body_Conj_1, Bodies_Conj_1),
+	split_goal_with_disjunctions_into_goals_aux(Body_Conj_2, Bodies_Conj_2),
 	combine_sub_bodies_by_conjunction(Bodies_Conj_1, Bodies_Conj_2, Bodies).
 
-split_goal_with_disjunctions_into_goals_aux(Body, Negation_Predicate, Bodies) :- 
+split_goal_with_disjunctions_into_goals_aux(Body, Bodies) :- 
 	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
-	split_goal_with_disjunctions_into_goals_aux(Body_Disj_1, Negation_Predicate, Body_Result_1),
-	split_goal_with_disjunctions_into_goals_aux(Body_Disj_2, Negation_Predicate, Body_Result_2),
+	split_goal_with_disjunctions_into_goals_aux(Body_Disj_1, Body_Result_1),
+	split_goal_with_disjunctions_into_goals_aux(Body_Disj_2, Body_Result_2),
 	append(Body_Result_1, Body_Result_2, Bodies).
 
 split_goal_with_disjunctions_into_goals_aux(Body, [Body]) :- % Goal is something else.
