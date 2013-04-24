@@ -923,13 +923,11 @@ eq_geuqv_adv(T1, T2, GoalVars, EQV_In, UQV_In) :-
 	(
 	    ( 
 		cneg_diseq_eq(T1, T2, UQV),
-		Result = 'true',
 		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
 		echo_msg(2, 'nl', 'cneg_diseq', '', '')
 	    )
 	;
 	    (
-		Result = 'fail',
 		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
 		echo_msg(2, '', 'cneg_diseq', 'continues', '...'),
 		diseq_geuqv(T1, T2, GoalVars, UQV, 'compute') 
