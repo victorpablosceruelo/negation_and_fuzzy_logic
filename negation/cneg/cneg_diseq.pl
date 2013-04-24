@@ -399,7 +399,7 @@ retrieve_affected_disequalities([Var|Vars], Visited_Vars, Diseq_Acc_In, Diseq_Ac
 	remove_attribute_local(Var), 
 
 	cneg_aux:varsbag(Disequalities, [Var|Visited_Vars], Vars, New_Vars),
-	accumulate_disequations(Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
+	append(Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
         retrieve_affected_disequalities(New_Vars, [Var|Visited_Vars], Diseq_Acc_Aux, Diseq_Acc_Out).
 
 retrieve_affected_disequalities([Var|Vars_In], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out) :- 
