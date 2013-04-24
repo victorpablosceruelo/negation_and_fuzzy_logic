@@ -399,7 +399,7 @@ retrieve_affected_disequalities([Var|Vars], Visited_Vars, Diseq_Acc_In, Diseq_Ac
 	remove_attribute_local(Var), 
 
 	cneg_aux:varsbag(Disequalities, [Var|Visited_Vars], Vars, New_Vars),
-	append(Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
+	cneg_aux:append(Disequalities, Diseq_Acc_In, Diseq_Acc_Aux),
         retrieve_affected_disequalities(New_Vars, [Var|Visited_Vars], Diseq_Acc_Aux, Diseq_Acc_Out).
 
 retrieve_affected_disequalities([Var|Vars_In], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out) :- 
@@ -536,7 +536,7 @@ constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Ou
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % For the case we do not have a disequality to simplify.
-% The answer is obviously empty, but we might fail because of Can_Fail = fail.
+% It is obvious that we must fail.
 diseqs_to_constraints([], [], _EQV) :- 
 	!, 
 	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: Diseqs = [] ---- FAIL ', ''),
@@ -876,7 +876,7 @@ get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Di
 	get_attribute_local(Var, Attribute), !,
 	remove_attribute_local(Var),
 	varsbag(Attribute, [Var | Visited], [], More_Vars),
-	append(More_Vars, Vars, New_Vars),
+	cneg_aux:append(More_Vars, Vars, New_Vars),
 	attribute_contents(Attribute, _Target, Disequalities),
 	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Aux),
 	get_disequalities_from_constraints_and_remove_them_aux(New_Vars, [Var | Visited], Diseqs_Aux, Diseqs_Out).
