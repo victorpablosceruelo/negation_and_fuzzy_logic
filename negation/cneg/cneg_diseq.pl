@@ -368,29 +368,29 @@ get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
 test_and_update_vars_attributes(New_Diseqs) :-
-%	echo_msg(1, '', 'cneg_diseq', 'test_and_update_vars_attributes :: New_Diseqs', New_Diseqs),  
+	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: New_Diseqs', New_Diseqs),  
 
-	cneg_aux:varsbag(New_Diseqs, [], [], New_Diseq_Vars), !,
-	retrieve_affected_disequalities(New_Diseq_Vars, [], [], Old_Diseqs), !,
-%	echo_msg(1, '', 'cneg_diseq', 'test_and_update_vars_attributes :: Old_Diseqs', Old_Diseqs),
+	cneg_aux:varsbag(New_Diseqs, [], [], New_Diseqs_Vars), !,
+	retrieve_affected_disequalities(New_Diseqs_Vars, [], [], Old_Diseqs), !,
+	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: Old_Diseqs', Old_Diseqs),
 
 	% Get which variables are EQV so we distinguish them from UQV.
-	get_and_remove_eqv_and_uqv_from_diseqs(New_Diseqs, [], EQV_Tmp, [], UQV_Tmp, New_Diseqs_Aux),
-	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, EQV_Tmp, All_EQV_Aux, UQV_Tmp, All_UQV, Old_Diseqs_Aux),
-	varsbag(All_EQV_Aux, All_UQV, [], All_EQV), % The sets must be exclusive.
-%	echo_msg(1, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
+	get_and_remove_eqv_and_uqv_from_diseqs(New_Diseqs, [], ND_EQV, [], ND_UQV, New_Diseqs_Aux),
+	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, [], OD_EQV, [], OD_UQV, Old_Diseqs_Aux),
+	
+	test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV), % The sets must be exclusive.
+	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
 
 	% At first we check that the new disequalities can be added to the old ones.
-	simplify_disequations(New_Diseqs_Aux, [], Simplified_Diseqs_1, All_EQV),
-	% At last we check that the old disequalities are still valid.
-	simplify_disequations(Old_Diseqs_Aux, [], Simplified_Diseqs_2, All_EQV),
-
-	% Now we aggregate all of them.
-	accumulate_disequations(Simplified_Diseqs_1, Simplified_Diseqs_2, Simplified_Diseqs),
+	diseqs_to_constraints(New_Diseqs_Aux, Old_Diseqs_Aux, [], Simplified_Diseqs, All_EQV),
 
 %	echo_msg(1, '', 'cneg_diseq', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
 	restore_attributes(Simplified_Diseqs, All_EQV, All_UQV).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
 retrieve_affected_disequalities([], _Visited_Vars, Diseq_Acc_Out, Diseq_Acc_Out) :- !. % Loop over vars list.
 retrieve_affected_disequalities([Var|Vars], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out):- 
 	var(Var), % It cannot be other things ...
@@ -405,6 +405,39 @@ retrieve_affected_disequalities([Var|Vars], Visited_Vars, Diseq_Acc_In, Diseq_Ac
 retrieve_affected_disequalities([Var|Vars_In], Visited_Vars, Diseq_Acc_In, Diseq_Acc_Out) :- 
         retrieve_affected_disequalities(Vars_In, [Var|Visited_Vars], Diseq_Acc_In, Diseq_Acc_Out).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The sets must be exclusive.
+test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV) :-
+	(
+	    (varsbag_intersection(ND_EQV, ND_UQV, []), !)
+	;
+	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (ND_EQV, ND_UQV)', (ND_EQV, ND_UQV))
+	),
+	(
+	    (varsbag_intersection(OD_EQV, OD_UQV, []), !)
+	;
+	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (OD_EQV, OD_UQV)', (OD_EQV, OD_UQV))
+	),
+	(
+	    (varsbag_intersection(OD_EQV, ND_UQV, []), !)
+	;
+	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (OD_EQV, ND_UQV)', (OD_EQV, ND_UQV))
+	),
+	(
+	    (varsbag_intersection(ND_EQV, OD_UQV, []), !)
+	;
+	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (ND_EQV, OD_UQV)', (ND_EQV, OD_UQV))
+	),
+	varsbag_union(ND_EQV, OD_EQV, All_EQV),
+	varsbag_union(ND_UQV, OD_UQV, All_UQV),
+	(
+	    (varsbag_intersection(All_EQV, All_UQV, []), !)
+	;
+	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (All_EQV, All_UQV)', (All_EQV, All_UQV))
+	), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -462,33 +495,36 @@ restore_attributes_var(Var, Diseqs) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-accumulate_disequations(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
+% diseqs_to_constraints(New_Diseqs, Old_Diseqs, Simplified_Diseqs_In, Simplified_Diseqs_Out, All_EQV),
+diseqs_to_constraints([], [], Simplified_Diseqs, Simplified_Diseqs, _All_EQV) :- !.
+diseqs_to_constraints([], [Diseq|Diseqs_List], Diseq_Acc_In, Diseq_Acc_Out, All_EQV) :- !,
+	diseqs_to_constraints([Diseq|Diseqs_List], [], Diseq_Acc_In, Diseq_Acc_Out, All_EQV).
+diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Diseq_Acc_In, Diseq_Acc_Out, All_EQV) :- !,
+	simplify_disequation([Diseq], Simplified_Diseq, All_EQV),
+	diseqs_append(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
+	diseqs_to_constraints(Diseqs_List, Old_Diseqs, Diseq_Acc_Aux, Diseq_Acc_Out, All_EQV).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+diseqs_append(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
 	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_In', Diseqs_In),
 	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
-	accumulate_disequations_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
+	diseqs_append_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
 	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
 
-accumulate_disequations_aux([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
-accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+diseqs_append_aux([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
+diseqs_append_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 	cneg_aux:memberchk(Diseq, Diseq_Acc_In), !, % It is there.
-	accumulate_disequations_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-accumulate_disequations_aux([(T1, T2) | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+	diseqs_append_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
+diseqs_append_aux([(T1, T2) | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
 %	attribute_disequality_contents(Diseq, T1, T2, EQV, UQV),
 %	attribute_disequality_contents(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
 	cneg_aux:memberchk((T2, T1), Diseq_Acc_In), !, % It is there.
-	accumulate_disequations_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-accumulate_disequations_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
-	accumulate_disequations_aux(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
-
-% Note that each disequality analized gets a clean status on its Result variable.
-% This is because all of them need to be satisfied, we should not override the status of
-% a previous disequality with the status of the current one.
-simplify_disequations([], Diseq_Acc_In, Diseq_Acc_In, _EQV) :- !.
-
-simplify_disequations([Diseq|Diseq_List], Diseq_Acc_In, Diseq_Acc_Out, EQV) :- !,
-	simplify_disequation([Diseq], Simplified_Diseq, EQV),
-	accumulate_disequations(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	simplify_disequations(Diseq_List, Diseq_Acc_Aux, Diseq_Acc_Out, EQV).
+	diseqs_append_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
+diseqs_append_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+	diseqs_append_aux(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
