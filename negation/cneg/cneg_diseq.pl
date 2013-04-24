@@ -495,14 +495,19 @@ restore_attributes_var(Var, Diseqs) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set_of_diseqs_to_constraints(New_Diseqs, Old_Diseqs, Simplified_Diseqs_In, Simplified_Diseqs_Out, All_EQV),
-set_of_diseqs_to_constraints([], [], Simplified_Diseqs, Simplified_Diseqs, _All_EQV) :- !.
-set_of_diseqs_to_constraints([], [Diseq|Diseqs_List], Diseq_Acc_In, Diseq_Acc_Out, All_EQV) :- !,
-	set_of_diseqs_to_constraints([Diseq|Diseqs_List], [], Diseq_Acc_In, Diseq_Acc_Out, All_EQV).
-set_of_diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Diseq_Acc_In, Diseq_Acc_Out, All_EQV) :- !,
-	diseqs_to_constraints([Diseq], Simplified_Diseq, All_EQV),
-	constraints_sets_append(Simplified_Diseq, Diseq_Acc_In, Diseq_Acc_Aux),
-	set_of_diseqs_to_constraints(Diseqs_List, Old_Diseqs, Diseq_Acc_Aux, Diseq_Acc_Out, All_EQV).
+% set_of_diseqs_to_constraints(New_Diseqs, Old_Diseqs, Constraints_In, Constraints_Out, All_EQV),
+set_of_diseqs_to_constraints([], [], Constraints, Constraints, _All_EQV) :- !.
+set_of_diseqs_to_constraints([], [Diseq|Diseqs_List], Constraints_In, Constraints_Out, All_EQV) :- !,
+	set_of_diseqs_to_constraints([Diseq|Diseqs_List], [], Constraints_In, Constraints_Out, All_EQV).
+set_of_diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Constraints_In, Constraints_Out, All_EQV) :- !,
+	echo_msg(0, '', 'cneg_diseq', '', ''),
+	echo_msg(0, '', 'cneg_diseq', 'diseqs_to_constraints :: (Diseqs, ---, EQV)', ([Diseq], '---', All_EQV)),
+	diseqs_to_constraints([Diseq], Constraints, All_EQV),
+	echo_msg(0, '', 'cneg_diseq', 'diseqs_to_constraints :: Constraints', Constraints),
+	echo_msg(0, '', 'cneg_diseq', '', ''),
+
+	constraints_sets_append(Constraints, Constraints_In, Constraints_Aux),
+	set_of_diseqs_to_constraints(Diseqs_List, Old_Diseqs, Constraints_Aux, Constraints_Out, All_EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -514,73 +519,65 @@ constraints_sets_append(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
 	constraints_sets_append_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
 	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
 
-constraints_sets_append_aux([], Diseq_Acc_Out, Diseq_Acc_Out) :- !.
-constraints_sets_append_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
-	cneg_aux:memberchk(Diseq, Diseq_Acc_In), !, % It is there.
-	constraints_sets_append_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-constraints_sets_append_aux([(T1, T2) | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
+constraints_sets_append_aux([], Constraints_Out, Constraints_Out) :- !.
+constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Out) :-
+	cneg_aux:memberchk(Diseq, Constraints_In), !, % It is there.
+	constraints_sets_append_aux(Diseq_List, Constraints_In, Constraints_Out).
+constraints_sets_append_aux([(T1, T2) | Diseq_List], Constraints_In, Constraints_Out) :-
 %	attribute_disequality_contents(Diseq, T1, T2, EQV, UQV),
 %	attribute_disequality_contents(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
-	cneg_aux:memberchk((T2, T1), Diseq_Acc_In), !, % It is there.
-	constraints_sets_append_aux(Diseq_List, Diseq_Acc_In, Diseq_Acc_Out).
-constraints_sets_append_aux([Diseq | Diseq_List], Diseq_Acc_In, Diseq_Acc_Out) :-
-	constraints_sets_append_aux(Diseq_List, [Diseq | Diseq_Acc_In], Diseq_Acc_Out).
+	cneg_aux:memberchk((T2, T1), Constraints_In), !, % It is there.
+	constraints_sets_append_aux(Diseq_List, Constraints_In, Constraints_Out).
+constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Out) :-
+	constraints_sets_append_aux(Diseq_List, [Diseq | Constraints_In], Constraints_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% just for debug.
-diseqs_to_constraints(Diseqs, Constraints, EQV) :-
-	echo_msg(0, '', 'cneg_diseq', '', ''),
-	echo_msg(0, '', 'cneg_diseq', 'diseqs_to_constraints :: (Diseqs, ---, EQV)', (Diseqs, '---', EQV)),
-	diseqs_to_constraints_aux(Diseqs, Constraints, EQV),
-	echo_msg(0, '', 'cneg_diseq', 'diseqs_to_constraints :: Constraints', Constraints),
-	echo_msg(0, '', 'cneg_diseq', '', '').
 
 % For the case we do not have a disequality to simplify.
 % The answer is obviously empty, but we might fail because of Can_Fail = fail.
-diseqs_to_constraints_aux([], [], _EQV) :- 
+diseqs_to_constraints([], [], _EQV) :- 
 	!, 
-	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: Diseqs = []', ''),
+	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: Diseqs = [] ---- FAIL ', ''),
 	!, fail.
 	% Result = 'fail'. % We have failed.
 
-diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV) :- % Same var.
+diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % Same var.
         var(T1),
         var(T2), % Both are variables.
         T1==T2, !, % Both are the same variable.
-	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: SAME VAR, T1 == T2', (T1, T2)),
-	diseqs_to_constraints_aux(More_Diseqs, Constraints, EQV).
+	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: SAME VAR, T1 == T2', (T1, T2)),
+	diseqs_to_constraints(More_Diseqs, Constraints, EQV).
 
-diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Different vars.
+diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Different vars.
         var(T1),
         var(T2), !, % Both are variables, but not the same one.
 	T1 \== T2, % Not the same variable.
 	varsbag(EQV_In, [], [], EQV), % Remove anything there not a variable.
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
-%	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: var(T1) and var(T2)', (T1, T2)),
+%	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and var(T2)', (T1, T2)),
 	(
 	    (   % Both are UQ vars.
 		cneg_aux:memberchk(T1, UQV), 
 		cneg_aux:memberchk(T2, UQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
 		cneg_diseq_unify(T1, T2), % They can not be disunified, and they are still UQ vars.
-		diseqs_to_constraints_aux(More_Diseqs, Constraints, EQV)
+		diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 	    )
 	;
 	    (   % T1 is a UQ var, T2 is not a UQ var.
 		cneg_aux:memberchk(T1, UQV), !,
 %		cneg_aux:memberchk(T2, EQV), 
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UQV(T1) and var(T2)', (T1, T2)),
-		diseqs_to_constraints_aux_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV)
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and var(T2)', (T1, T2)),
+		diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV)
 	    )
 	;
 	    (   % T2 is a UQ var, T1 is not a UQ var.
 %		cneg_aux:memberchk(T1, EQV),
 		cneg_aux:memberchk(T2, UQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UQV(T2) and var(T1)', (T1, T2)),
-		diseqs_to_constraints_aux_uqvar_t1_var_t2([(T2, T1) | More_Diseqs], Constraints, EQV)
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T2) and var(T1)', (T1, T2)),
+		diseqs_to_constraints_uqvar_t1_var_t2([(T2, T1) | More_Diseqs], Constraints, EQV)
 	    )
 	;
 	    (   % T1 and T2 are NOT UQ vars. 2 solutions. 
@@ -588,38 +585,37 @@ diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Di
 		cneg_aux:memberchk(T2, EQV), !,
 		( 
 		    (   % First solution: T1 =/= T2.
-			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: var(T1) =/= var(T2)', (T1, T2)),
-			% cneg_diseq_unify('true', Result), % The solution is completely valid.
+			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) =/= var(T2)', (T1, T2)),
 			Constraints = [(T1, T2)]
 		    )
 		;
 		    (   % T1 and T2 can not be disunified. We test if we can fail.
-			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UNIFY var(T1) and var(T2)', (T1, T2)),
+			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY var(T1) and var(T2)', (T1, T2)),
 			cneg_diseq_unify(T1, T2), % Since they can not be disunified, unify them.
-			diseqs_to_constraints_aux(More_Diseqs, Constraints, EQV)
+			diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 		    )
 		)
 	    )	
 	).
 
-diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV) :- % var and nonvar.
+diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % var and nonvar.
 	(
 	    (   % T1 is a VAR. T2 is not a var.
 		var(T1), 
 		nonvar(T2), !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: var(T1) and nonvar(T2) ', (T1, T2)),
-		diseqs_to_constraints_aux_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV)
+%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and nonvar(T2) ', (T1, T2)),
+		diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
 		var(T2), 
 		nonvar(T1), !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: var(T2) and nonvar(T1) ', (T1, T2)),
-		diseqs_to_constraints_aux_var_nonvar([(T2, T1) | More_Diseqs], Constraints, EQV)
+%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T2) and nonvar(T1) ', (T1, T2)),
+		diseqs_to_constraints_var_nonvar([(T2, T1) | More_Diseqs], Constraints, EQV)
 	    )
 	).
 
-diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV):- 
+diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV):- 
 	nonvar(T1), 
 	nonvar(T2), !,
  	functor_local(T1, Name_1, Arity_1, Args_1),
@@ -628,17 +624,17 @@ diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV):-
 	    (   % Functors that unify.
 		Name_1 == Name_2, 
 		Arity_1 == Arity_2, !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: functor(T1) == functor(T2)', (T1, T2)),
+%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
 		disequalities_lists_product(Args_1, Args_2, Diseq_List),
 		cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
-		diseqs_to_constraints_aux(New_More_Diseqs, Constraints, EQV)
+		diseqs_to_constraints(New_More_Diseqs, Constraints, EQV)
 	    )
 	;
 	    (   % Functors that do not unify.
 		(
 		    (Name_1 \== Name_2) ; (Arity_1 \== Arity_2)
 		), !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: functor(T1) =/= functor(T2)', (T1, T2)),
+%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: functor(T1) =/= functor(T2)', (T1, T2)),
 %		Result = 'true', % Result is completely valid.
 		Constraints = [] % No constraints.
 	    )
@@ -658,24 +654,24 @@ disequalities_lists_product([T1 | Args_1], [T2 | Args_2], [(T1, T2) | More_Diseq
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-diseqs_to_constraints_aux_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV_In) :-
+diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV_In) :-
         var(T1),
         var(T2), 
 	varsbag(EQV_In, [], [], EQV), % Remove anything there not a variable.
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
 	cneg_aux:memberchk(T1, UQV), % T1 is a uq var, T2 is not a uqvar.
 	cneg_aux:memberchk(T2, EQV), !,
-	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UQV(T1) and var(T2) ', (T1, T2)),
+	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and var(T2) ', (T1, T2)),
 
 	% T1 can not be different from T2. We unify them (failing) and continue.
 	cneg_diseq_unify(T1, T2),
-	diseqs_to_constraints_aux(More_Diseqs, Constraints, EQV).
+	diseqs_to_constraints(More_Diseqs, Constraints, EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-diseqs_to_constraints_aux_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):- 
+diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):- 
         var(T1),
 	nonvar(T2),
         functor_local(T2, Name, Arity, _Args_T2), 
@@ -685,21 +681,21 @@ diseqs_to_constraints_aux_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
 		% cneg_diseq_unify('true', Result), % Result is completely valid.
 		Constraints = [] % No constraints.
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
 		cneg_aux:memberchk(T1, UQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UQV(T1) and functor(T2)', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
 		cneg_diseq_unify(T1, T2),
-		diseqs_to_constraints_aux(More_Diseqs, Constraints, EQV)
+		diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 	    )
 	;
 	    (   % The variable must not be the functor (use attributed variables).
 		cneg_aux:memberchk(T1, EQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: var(T1) =/= functor(T2)', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) =/= functor(T2)', (T1, T2)),
 		(
 		    (
 			functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
@@ -710,9 +706,9 @@ diseqs_to_constraints_aux_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_
 		    (   % Keep the functor but diseq between the arguments.
 			% We need to say that we have failed because if we are playing with attributed
 			% variables we have no way to get more information on the disequality.
-			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints_aux :: UNIFY var(T1) and functor(T2)', (T1, T2)),
+			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY var(T1) and functor(T2)', (T1, T2)),
 			functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
-			diseqs_to_constraints_aux([(T1, T2) | More_Diseqs], Constraints, EQV)
+			diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV)
 		    )
 		)
 	    )
