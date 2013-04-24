@@ -603,14 +603,14 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % var and n
 	    (   % T1 is a VAR. T2 is not a var.
 		var(T1), 
 		nonvar(T2), !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and nonvar(T2) ', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and nonvar(T2) ', (T1, T2)),
 		diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
 		var(T2), 
 		nonvar(T1), !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T2) and nonvar(T1) ', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T2) and nonvar(T1) ', (T1, T2)),
 		diseqs_to_constraints_var_nonvar([(T2, T1) | More_Diseqs], Constraints, EQV)
 	    )
 	).
@@ -624,7 +624,7 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV):-
 	    (   % Functors that unify.
 		Name_1 == Name_2, 
 		Arity_1 == Arity_2, !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
+		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
 		disequalities_lists_product(Args_1, Args_2, Diseq_List),
 		cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
 		diseqs_to_constraints(New_More_Diseqs, Constraints, EQV)
@@ -682,14 +682,19 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
 		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
-		% cneg_diseq_unify('true', Result), % Result is completely valid.
 		Constraints = [] % No constraints.
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify.
 		cneg_aux:memberchk(T1, UQV), !,
 		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
-		cneg_diseq_unify(T1, T2),
+		(
+		    (
+			T2 = 
+			)
+		;
+		cneg_diseq_unify(T1, T2)
+		),
 		diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 	    )
 	;
@@ -698,9 +703,10 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) =/= functor(T2)', (T1, T2)),
 		(
 		    (
-			functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
-%			cneg_diseq_unify(Result, 'true'), % Correct result if attr. var. satisfied.
-			Constraints = [(T1, New_T2)] % Constraints is (T1, T2).
+			% functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
+			% cneg_diseq_unify(Result, 'true'), % Correct result if attr. var. satisfied.
+			% Constraints = [(T1, New_T2)] % Constraints is (T1, T2).
+			Constraints = [(T1, Name/Arity)] % Constraints is (T1, functorT2/arityFunctorT2).
 		    )
 		;
 		    (   % Keep the functor but diseq between the arguments.
