@@ -2,7 +2,6 @@
 	[
  	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
-	    diseq_geuqv_adv/5, eq_geuqv_adv/5,
 	    get_disequalities_from_constraints_and_remove_them/2, 
  	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5
@@ -685,15 +684,20 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 		Constraints = [] % No constraints.
 	    )
 	;
-	    (   % T1 is a UQ var. Impossible to disunify.
+	    (   % T1 is a UQ var. Impossible to disunify. Unify !!
 		cneg_aux:memberchk(T1, UQV), !,
 		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
 		(
 		    (
-			T2 = 
-			)
+			T2 = Functor_Name/Functor_Arity, !,
+			functor_local(New_T2, Functor_Name, Functor_Arity, _Args_New_T2),
+			cneg_diseq_unify(T1, New_T2)
+		    )
 		;
-		cneg_diseq_unify(T1, T2)
+		    (
+			T2 \== Functor_Name/Functor_Arity, 
+			cneg_diseq_unify(T1, T2)
+		    )
 		),
 		diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 	    )
@@ -703,17 +707,31 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) =/= functor(T2)', (T1, T2)),
 		(
 		    (
+			T2 = Functor_Name/Functor_Arity, 
+			Constraints = [(T1, T2)]
+		    )
+		;
+		    (
 			% functor_local(New_T2, Name, Arity, _UQ_Vars_New_T2), 
 			% cneg_diseq_unify(Result, 'true'), % Correct result if attr. var. satisfied.
 			% Constraints = [(T1, New_T2)] % Constraints is (T1, T2).
+			T2 \== Functor_Name/Functor_Arity, 
 			Constraints = [(T1, Name/Arity)] % Constraints is (T1, functorT2/arityFunctorT2).
 		    )
 		;
 		    (   % Keep the functor but diseq between the arguments.
-			% We need to say that we have failed because if we are playing with attributed
-			% variables we have no way to get more information on the disequality.
 			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY var(T1) and functor(T2)', (T1, T2)),
-			functor_local(T1, Name, Arity, _Args_T1), % T1 = functor 
+			(
+			    (
+				T2 = Functor_Name/Functor_Arity, 
+				functor_local(T1, Functor_Name, Functor_Arity, _Args_T1) % T1 = functor 
+			    )
+			;
+			    (
+				T2 \== Functor_Name/Functor_Arity, 
+				functor_local(T1, Name, Arity, _Args_T1) % T1 = functor 
+			    )
+			),
 			diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV)
 		    )
 		)
@@ -929,9 +947,6 @@ disequality(T1,T2, UQV_In) :-
 	diseq_geuqv(T1,T2, [], EQV, UQV).
 
 diseq_geuqv(T1,T2, GoalVars_In, EQV_In, UQV_In) :- 
-	diseq_geuqv_adv(T1,T2, GoalVars_In, EQV_In, UQV_In). 
-
-diseq_geuqv_adv(T1,T2, GoalVars_In, EQV_In, UQV_In) :- 
 	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [in] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (GoalVars_In, EQV_In, UQV_In))),
 	adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV, UQV),
 	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [tmp] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
@@ -949,10 +964,7 @@ equality(T1,T2, UQV_In) :-
 	varsbag((T1, T2), UQV, [], EQV), % Only variables, please.
 	eq_geuqv(T1,T2, [], EQV, UQV).
 
-eq_geuqv(T1, T2, GoalVars_In, EQV_In, UQV_In) :- 
-	eq_geuqv_adv(T1, T2, GoalVars_In, EQV_In, UQV_In).
-
-eq_geuqv_adv(T1, T2, GoalVars, EQV_In, UQV_In) :- 
+eq_geuqv(T1, T2, GoalVars, EQV_In, UQV_In) :- 
 	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
 	echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [in] :: (T1, =, T2), ---, (GV, EQV, UQV)', ((T1, '=', T2), '---', (GoalVars, EQV_In, UQV_In))),
 	adequate_gv_eqv_uqv(T1, T2, GoalVars, EQV_In, UQV_In, EQV, UQV),

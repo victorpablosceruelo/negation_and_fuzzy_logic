@@ -35,11 +35,10 @@
 	[
 	    equality/3, disequality/3,
 	    diseq_geuqv/5, eq_geuqv/5,
-	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
 	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5
 	]).
-:- reexport(library('cneg/cneg_rt'), [cneg_rt/6]).
+:- reexport(library('cneg/cneg_rt'), [cneg_rt/5]).
 %:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
 % To access pre-frontiers from anywhere.
