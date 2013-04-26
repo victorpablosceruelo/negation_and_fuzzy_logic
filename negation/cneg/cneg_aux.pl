@@ -25,7 +25,8 @@
 	    replace_in_term_var_by_value/4,
 	    replace_in_terms_list_var_by_value/4,
 	    retrieve_element_from_list/2,
-	    split_goal_with_disjunctions_into_goals/2,
+	    split_body_with_disjunctions_into_bodies/2,
+	    split_body_into_E_IE_NIE_aux/7,
 	    goals_join_by_conjunction/3
 	],
 	[assertions]).
@@ -614,33 +615,33 @@ term_to_meta(X, '$:'(X)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%split_goal_with_disjunctions_into_goals(Body, Bodies)
-split_goal_with_disjunctions_into_goals(Body, Bodies) :- 
-	echo_msg(0, '', 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goal ', Body), 
-	split_goal_with_disjunctions_into_goals_aux(Body, Bodies),
-	echo_msg(0, '', 'cneg_aux', 'INFO :: split_goal_with_disjunctions_into_goals :: Goals ', Bodies), 
+%split_body_with_disjunctions_into_bodies(Body, Bodies)
+split_body_with_disjunctions_into_bodies(Body, Bodies) :- 
+	echo_msg(0, '', 'cneg_aux', 'INFO :: split_body_with_disjunctions_into_bodies :: Goal ', Body), 
+	split_body_with_disjunctions_into_bodies_aux(Body, Bodies),
+	echo_msg(0, '', 'cneg_aux', 'INFO :: split_body_with_disjunctions_into_bodies :: Goals ', Bodies), 
 	!.
 
-split_goal_with_disjunctions_into_goals_aux(Body, Bodies) :- 
+split_body_with_disjunctions_into_bodies_aux(Body, Bodies) :- 
 	goal_is_conjunction(Body, Body_Conj_1, Body_Conj_2), !,
-	split_goal_with_disjunctions_into_goals_aux(Body_Conj_1, Bodies_Conj_1),
-	split_goal_with_disjunctions_into_goals_aux(Body_Conj_2, Bodies_Conj_2),
+	split_body_with_disjunctions_into_bodies_aux(Body_Conj_1, Bodies_Conj_1),
+	split_body_with_disjunctions_into_bodies_aux(Body_Conj_2, Bodies_Conj_2),
 	combine_sub_bodies_by_conjunction(Bodies_Conj_1, Bodies_Conj_2, Bodies).
 
-split_goal_with_disjunctions_into_goals_aux(Body, Bodies) :- 
+split_body_with_disjunctions_into_bodies_aux(Body, Bodies) :- 
 	goal_is_disjunction(Body, Body_Disj_1, Body_Disj_2), !,
-	split_goal_with_disjunctions_into_goals_aux(Body_Disj_1, Body_Result_1),
-	split_goal_with_disjunctions_into_goals_aux(Body_Disj_2, Body_Result_2),
+	split_body_with_disjunctions_into_bodies_aux(Body_Disj_1, Body_Result_1),
+	split_body_with_disjunctions_into_bodies_aux(Body_Disj_2, Body_Result_2),
 	append(Body_Result_1, Body_Result_2, Bodies).
 
-split_goal_with_disjunctions_into_goals_aux(Body, [Body]) :- % Goal is something else.
+split_body_with_disjunctions_into_bodies_aux(Body, [Body]) :- % Goal is something else.
 	!,
-	split_goal_with_disjunctions_into_goals_by_pass(Body), 
+	split_body_with_disjunctions_into_bodies_by_pass(Body), 
 	!.
 
-split_goal_with_disjunctions_into_goals_by_pass(Body) :-
+split_body_with_disjunctions_into_bodies_by_pass(Body) :-
 	goal_is_cneg_rt(Body, _UQV, _GoalVars, _SubGoal).
-split_goal_with_disjunctions_into_goals_by_pass(Body) :- 
+split_body_with_disjunctions_into_bodies_by_pass(Body) :- 
 	goal_is_not_conj_disj_neg(Body), !.
 
 combine_sub_bodies_by_conjunction([], _List_2, []) :- !.
@@ -663,4 +664,34 @@ goals_join_by_conjunction(true, Goal_2, Goal_2) :- !.
 goals_join_by_conjunction(Goal_1, true, Goal_1) :- !.
 goals_join_by_conjunction(Goal_1, Goal_2, (Goal_1, Goal_2)) :- !.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+split_bodies_into_E_IE_NIE([], []) :- !.
+split_bodies_into_E_IE_NIE([Body | Bodies], [([E], [IE], [NIE], [Body]) | Split_Bodies]) :- !,
+	split_body_into_E_IE_NIE_aux(Body, true, true, true, E, IE, NIE),
+	split_bodies_into_E_IE_NIE(Bodies, Split_Bodies).
+
+split_body_into_E_IE_NIE_aux(Body, _E_In, _IE_In, _NIE_In, _E_Out, _IE_Out, _NIE_Out) :- 
+	goal_is_disjunction(Body, _G1, _G2), !, 
+	echo_msg(1, '', 'cneg_rt', 'ERROR: split_body_into_E_IE_NIE can not deal with disjunctions. Body', Body),
+	fail.
+
+split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_Out, NIE_Out) :- 
+	goal_is_conjunction(Body, G1, G2), !,
+	split_bodies_into_E_IE_NIE_aux(G1, E_In, IE_In, NIE_In, E_Aux, IE_Aux, NIE_Aux),
+	split_bodies_into_E_IE_NIE_aux(G2, E_Aux, IE_Aux, NIE_Aux, E_Out, IE_Out, NIE_Out).
+split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_In, NIE_In) :-
+	goal_is_equality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
+	goals_join_by_conjunction(E_In, Body, E_Out).
+split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_Out, NIE_In) :-
+	goal_is_disequality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
+	goals_join_by_conjunction(IE_In, Body, IE_Out).
+
+split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :- !,
+	goals_join_by_conjunction(NIE_In, Body, NIE_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
