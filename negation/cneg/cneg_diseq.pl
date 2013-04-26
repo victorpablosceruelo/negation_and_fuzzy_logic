@@ -1,7 +1,6 @@
 :- module(cneg_diseq, 
 	[
  	    equality/3, disequality/3,
-	    diseq_geuqv/5, eq_geuqv/5,
 	    get_disequalities_from_constraints_and_remove_them/2, 
  	    prepare_attributes_for_printing/2,
 	    cneg_diseq_echo/5

@@ -94,24 +94,6 @@ unifications_in_head_to_equality(Head, Clean_Head, Head_Name, Head_Arity, Equali
 	functor_local(Clean_Head, Head_Name, Head_Arity, New_Args), 
 	functor_local(Equality, '=', 2, [New_Args | [Args]]).
 
-split_bodies_into_E_IE_NIE([], []) :- !.
-split_bodies_into_E_IE_NIE([Body | Bodies], [([E], [IE], [NIE], [Body]) | Split_Bodies]) :- !,
-	split_bodies_into_E_IE_NIE_aux(Body, true, true, true, E, IE, NIE),
-	split_bodies_into_E_IE_NIE(Bodies, Split_Bodies).
-
-split_bodies_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_Out, NIE_Out) :- 
-	goal_is_conjunction(Body, G1, G2), !,
-	split_bodies_into_E_IE_NIE_aux(G1, E_In, IE_In, NIE_In, E_Aux, IE_Aux, NIE_Aux),
-	split_bodies_into_E_IE_NIE_aux(G2, E_Aux, IE_Aux, NIE_Aux, E_Out, IE_Out, NIE_Out).
-split_bodies_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_In, NIE_In) :-
-	goal_is_equality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
-	goals_join_by_conjunction(E_In, Body, E_Out).
-split_bodies_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_Out, NIE_In) :-
-	goal_is_disequality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
-	goals_join_by_conjunction(IE_In, Body, IE_Out).
-split_bodies_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :- !,
-	goals_join_by_conjunction(NIE_In, Body, NIE_Out).
-
 store_head_and_bodies_info(Head, Clean_Head, Head_Name, Head_Arity, Bodies) :-
 	echo_msg(2, '', 'cneg_tr', 'store_head_and_bodies_info(Head, Test, Bodies) ', store_head_and_bodies_info(Head, Clean_Head, Head_Name, Head_Arity, Bodies)),
 	store_head_and_bodies_info_aux(Head, Clean_Head, Head_Name, Head_Arity, Bodies).

@@ -11,80 +11,49 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%:- module(cneg,_).
-% To be able to call Pred from cneg
-
-% Needed to be able to compile the modules.
-:- use_module(library('cneg/cneg_aux')).
-% , [varsbag/4, varsbag_addition/3, append/3, goal_is_conjunction/3, goal_is_disjunction/3, functor_local/4, echo_msg/3]). 
-:- use_module(library('cneg/cneg_diseq')).
-%	[
-%	    equality/3, disequality/3, 
-%	    diseq_geuqv/5, eq_geuqv/5,
-%	    diseq_geuqv_adv/6, eq_geuqv_adv/6,
-%	    prepare_attributes_for_printing/2,
-%	    cneg_diseq_echo/5
-%	]).
 :- use_module(library('cneg/cneg_tr')).
+:- use_module(library('cneg/cneg_aux')).
+:- use_module(library('cneg/cneg_diseq')).
 :- use_module(library('cneg/cneg_rt')).
-%:- use_module(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
 
-% Re-export predicates to use them in console.
-%:- reexport(cneg_aux, [varsbag/4, varsbag_union/3]).    
-:- reexport(library('cneg/cneg_diseq'), 
-	[
-	    equality/3, disequality/3,
-	    diseq_geuqv/5, eq_geuqv/5,
-	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/5
-	]).
-:- reexport(library('cneg/cneg_rt'), [cneg_rt/5]).
-%:- reexport(cneg_rt_Stuckey, [cneg_rt_Stuckey/2]).
+:- reexport(library('cneg/cneg_diseq')).
+:- reexport(library('cneg/cneg_rt'), [cneg_rt/4]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_choosen_negation/1.
 :- multifile cneg_pre_frontier/6.
 :- multifile call_to_predicate/1.
 :- meta_predicate call_to_predicate(?). % /1.
-%:- export(call_to/3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg(UQV, Predicate) :-
+cneg(Predicate) :-
 
-	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg(UQV, Predicate))),
+	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg(Predicate))),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 
-	varsbag_clean_up(UQV, Real_UQV), % UQV is a list of variables. Remove anything else.
-	varsbag(Predicate, Real_UQV, [], GoalVars), % Compute goalvars. It is used by some methods.
-	generate_empty_trace(Trace), % This is for debugging and a future tabling mechanism.
+	varsbag(Predicate, [], [], GoalVars), % Compute goalvars. It is used by some methods.
+	generate_empty_trace(Trace), % This is for debugging.
+	cneg_aux(Predicate, GoalVars).
 
-	cneg_rt(UQV, GoalVars, Predicate, 0, Trace). % 0 is the depth level.
+cneg_aux(Predicate, GoalVars) :-
+	cneg_rt(Predicate, GoalVars, 0, Trace). % 0 is the depth level.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 call_to_predicate(Predicate) :- call(Predicate).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% cneg_tr contains the code transformation needed by Constructive Negation.
-% This includes all the all the transformations needed by each one of the proposals included,
-% i.e. Chan's proposal, Barbuti's proposal, the New proposal and the hybrid proposal.
-%:- load_compilation_module(library('cneg/cneg_tr')). CUANDO SEA LIBRERIA
-:- load_compilation_module(library('cneg/cneg_tr')).
-
+% cneg_tr contains the code transformations needed by Constructive Negation.
 % trans_sent/3 makes the transformation.
+:- load_compilation_module(library('cneg/cneg_tr')).
 :- add_sentence_trans(trans_sent/3, 740). % TODO: Right priority?
 % :- add_clause_trans(trans_clause/3). % Only for debug !!!

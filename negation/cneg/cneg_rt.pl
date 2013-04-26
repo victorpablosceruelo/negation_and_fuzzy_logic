@@ -1,5 +1,5 @@
 
-:- module(cneg_rt, [cneg_rt/5], [assertions]).
+:- module(cneg_rt, [cneg_rt/4], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
@@ -21,27 +21,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cneg_rt(UQV, GoalVars, Goal, Depth_Level, Trace) :-
+cneg_rt(Goal, GoalVars_In, Depth_Level, Trace) :-
 
 	% Save trace (for debugging and tabling usage)
-	CN_Call = (cneg_rt(UQV, GoalVars, Goal, Depth_Level)), 
+	CN_Call = (cneg_rt(Goal, GoalVars_In, Depth_Level)), 
 	add_predicate_to_trace(evaluating(CN_Call), Trace, NewTrace),
-	echo_msg(2, 'trace', 'cneg_rt', 'call to cneg_rt/6 with (updated) trace', NewTrace),
-	echo_msg(2, 'nl', 'calls_trace', '', ''),
-	echo_msg(2, '', 'calls_trace', 'cneg_rt', evaluating(CN_Call)),
-
+	echo_msg(2, 'trace', 'cneg_rt', 'call to cneg_rt/4 with (updated) trace', NewTrace),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt', CN_Call),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: (UQV_In, GoalVars_In)', (UQV_In, GoalVars_In)),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: Goal', Goal),
+
+	echo_msg(2, 'nl', 'calls_trace', '', ''),
+	echo_msg(2, '', 'calls_trace', 'cneg_rt', evaluating(CN_Call)),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
-	varsbag_clean_up(UQV_In, UQV), % Clean up non-vars in UQV (subterms are not in UQV).
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: (GoalVars)', GoalVars),
 	cneg_diseq_echo(2, '', 'cneg_rt', 'cneg_rt :: Goal with attrs', Goal),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	compute_frontier(UQV, GoalVars, Goal, Frontier),
+	compute_frontier(Goal, GoalVars, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt :: Frontier', Frontier),
@@ -50,8 +49,7 @@ cneg_rt(UQV, GoalVars, Goal, Depth_Level, Trace) :-
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: Goal', Goal),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: (UQV, GoalVars)', (UQV, GoalVars)),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt :: (Goal, GoalVars)', (Goal, GoalVars)),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt :: Frontier', Frontier),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
@@ -59,11 +57,8 @@ cneg_rt(UQV, GoalVars, Goal, Depth_Level, Trace) :-
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 
-%	!, % Reduce the stack's memory by forbidding backtracking.
-%	call_to_all_negated_subfrontiers(Result_List, Level, Trace_2, CN_Call).
-
-	    !, % Backtracking forbidden.
-	    call_to_conjunction_list(Result_List, Depth_Level, NewTrace, CN_Call).
+	!, % Backtracking forbidden.
+	call_to_conjunction_list(Result_List, Depth_Level, NewTrace, CN_Call).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -621,11 +616,11 @@ subfrontier_E_IE_NIE_ie_contents(subfrontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute_set_of_frontiers(Goal, Real_GoalVars, Proposal, Frontier)
-compute_frontier(UQV_In, GoalVars_In, Goal, Frontier) :-
+compute_frontier(Goal, GoalVars_In, Frontier) :-
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
-	varsbag_clean_up(UQV_In, UQV), % Clean up non-vars in UQV (subterms are not in UQV).
-	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (UQV, GoalVars, Goal)', (UQV, GoalVars, Goal)),
-	split_goal_with_disjunctions_into_goals(Goal, Goals),
+	echo_msg(2, '', 'cneg_rt', 'compute_set_of_frontiers :: (Goal, GoalVars)', (Goal, GoalVars)),
+	split_body_with_disjunctions_into_bodies(Goal, Goals),
+	
 	!,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_set_of_frontiers :: Goals', Goals),
 	compute_frontier_aux(Goals, UQV, GoalVars, [], Frontier),
@@ -799,14 +794,14 @@ compute_goal_pre_frontier(Goal, Frontier) :-
 
 % Manage true and fail ...
 compute_goal_pre_frontier('true', [F_Out]) :- !,
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
-	preFrontierNodeContents(F_Out, 'true', 'true', 'true', 'true').
+%	preFrontierNodeContents(Frontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(F_Out, 'true', 'true', 'true', 'true', 'true', 'true', 'true').
 compute_goal_pre_frontier('fail', [F_Out]) :- !,
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
-	preFrontierNodeContents(F_Out, 'fail', 'fail', 'fail', 'fail').
+%	preFrontierNodeContents(Frontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(F_Out, 'fail', 'fail', 'true', 'true', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
-% The frontiers need to evaluated one at a time. 
+% The frontiers need to evaluate one goal at a time. ERROR
 compute_goal_pre_frontier(Goal, _Frontier_Out):- 
 	goal_is_disjunction(Goal, _G1, _G2), !,
 	echo_msg(1, '', 'cneg_rt', 'ERROR: Not possible computing the frontier for a disjunction', Goal), 
@@ -847,7 +842,7 @@ compute_goal_pre_frontier(Goal, Frontier) :-
 	cneg_rt(UQV, GoalVars, SubGoal, 0, Conj_List_Result), !,
 	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
-	split_goal_with_disjunctions_into_goals(Conj_Of_Disjs_Frontier, List_Of_Conjs_Frontier), !,
+	split_body_with_disjunctions_into_bodies(Conj_Of_Disjs_Frontier, List_Of_Conjs_Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
 	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier), !,
 	echo_msg(2, 'list', 'cneg_rt', 'double neg :: Frontier', Frontier),
@@ -990,45 +985,6 @@ combine_frontiers_from_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-split_subfrontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :-
-	goal_is_disjunction(Frontier_In, _G1, _G2), !, 
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_subfrontier_into_E_IE_NIE can not deal with disjunctions. Frontier_In', Frontier_In),
-	fail.
-
-split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :-
-	goal_is_conjunction(Frontier_In, G1, G2), !,
-	split_subfrontier_into_E_IE_NIE(G1, Frontier_G1),
-	split_subfrontier_into_E_IE_NIE(G2, Frontier_G2),
-	subfrontier_E_IE_NIE_contents(Frontier_G1, E_G1, IE_G1, NIE_G1),
-	subfrontier_E_IE_NIE_contents(Frontier_G2, E_G2, IE_G2, NIE_G2),
-	rebuild_conjunction_of_goals(E_G1, E_G2, E_Out),
-	rebuild_conjunction_of_goals(IE_G1, IE_G2, IE_Out),
-	rebuild_conjunction_of_goals(NIE_G1, NIE_G2, NIE_Out),
-	subfrontier_E_IE_NIE_contents(Frontier_Out, E_Out, IE_Out, NIE_Out).
-
-split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_equality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
-	subfrontier_E_IE_NIE_contents(Frontier_Out, Frontier_In, [], []).
-
-split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_disequality(Frontier_In, _Term1, _Term2, _GV, _EQV, _UQV), !,
-	subfrontier_E_IE_NIE_contents(Frontier_Out, [], Frontier_In, []).
-
-% This leads to infinite loops because double negation 
-% sould be managed when generating the subfrontier.
-% The way to fix this is remove cneg(cneg(...))
-% when evaluating the subfrontier. To be done.
-split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_negation(Frontier_In, _UQV, _GoalVars, _SubGoal), !,
-	subfrontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
-
-split_subfrontier_into_E_IE_NIE(Frontier_In, Frontier_Out) :- 
-	goal_is_not_conj_disj_eq_diseq_dneg(Frontier_In), !,
-	subfrontier_E_IE_NIE_contents(Frontier_Out, [], [], Frontier_In).
-
-split_subfrontier_into_E_IE_NIE(Frontier_In, _Frontier_Out) :- 
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_subfrontier_into_E_IE_NIE can not deal with subfrontier. Frontier_In', Frontier_In),
-	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
