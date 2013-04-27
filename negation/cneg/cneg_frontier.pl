@@ -210,6 +210,56 @@ test_frontier_is_valid(PreFr, Goal) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% rebuild_prefrontier_conjunction(F1,F2,F3) returns F3 that is the resulting frontier
+% from combining the frontiers F1 and F2 in all possible ways.
+rebuild_prefrontier_conjunction([],_F2,[]) :- !, % Optimization
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty F1 -> empty F3'),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
+rebuild_prefrontier_conjunction(_F1,[],[]) :- !, % Optimization
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty F2 -> empty F3'),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
+rebuild_prefrontier_conjunction(F1,F2,F3) :-
+	F1 \== [], F2 \== [],
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'F1 /\\ F2 -> F3 '),
+	rebuild_prefrontier_conjunction_aux_1(F1,F2,F3),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'F3'),
+	echo_msg(2, 'list', 'cneg_rt', '', F3),
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
+	
+rebuild_prefrontier_conjunction_aux_1([],_F2,[]) :- !.
+rebuild_prefrontier_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
+        rebuild_prefrontier_conjunction_aux_2(F1_1, F2, F3_1),
+        rebuild_prefrontier_conjunction_aux_1(More_F1, F2, More_F3),
+        cneg_aux:append(F3_1, More_F3, F3).
+
+% combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
+% the result of combining F1_1 with each element of F2.
+rebuild_prefrontier_conjunction_aux_2(_F1_1, [], []).
+rebuild_prefrontier_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
+%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
+	preFrontierNodeContents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
+	preFrontierNodeContents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
+	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),
+	F3_Head = ((F1_1_Head), (F2_1_Head)),
+	F3_Body = ((F1_1_Body), (F2_1_Body)),
+	F3_F_Test = ((F1_1_F_Test), (F2_1_F_Test)),
+	preFrontierNodeContents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
+	test_frontier_is_valid(F3, F3_Real_Goal), !, 
+        rebuild_prefrontier_conjunction_aux_2(F1_1, More_F2, More_F3).
+rebuild_prefrontier_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
+	rebuild_prefrontier_conjunction_aux_2(F1_1, More_F2, More_F3).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, Frontier_In, Frontier_Out) :-
 	echo_msg(2, 'list', 'cneg_rt', 'pre_frontier_to_frontier :: Frontier_In', Frontier_In),
 	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_In, Frontier_Out), !,
@@ -300,56 +350,6 @@ pre_frontier_node_to_frontier_node_aux_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% combine_frontiers(F1,F2,F3) returns F3 that is the resulting frontier
-% from combining the frontiers F1 and F2 in all possible ways.
-rebuild_prefrontier_conjunction([],_F2,[]) :- !, % Optimization
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty F1 -> empty F3'),
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
-rebuild_prefrontier_conjunction(_F1,[],[]) :- !, % Optimization
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty F2 -> empty F3'),
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
-rebuild_prefrontier_conjunction(F1,F2,F3) :-
-	F1 \== [], F2 \== [],
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'F1 /\\ F2 -> F3 '),
-	rebuild_prefrontier_conjunction_aux_1(F1,F2,F3),
-	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'F3'),
-	echo_msg(2, 'list', 'cneg_rt', '', F3),
-	echo_msg(2, 'nl', 'cneg_rt', '', '').
-	
-rebuild_prefrontier_conjunction_aux_1([],_F2,[]) :- !.
-rebuild_prefrontier_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
-        rebuild_prefrontier_conjunction_aux_2(F1_1, F2, F3_1),
-        rebuild_prefrontier_conjunction_aux_1(More_F1, F2, More_F3),
-        cneg_aux:append(F3_1, More_F3, F3).
-
-% combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
-% the result of combining F1_1 with each element of F2.
-rebuild_prefrontier_conjunction_aux_2(_F1_1, [], []).
-rebuild_prefrontier_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
-	preFrontierNodeContents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
-	preFrontierNodeContents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
-	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),
-	F3_Head = ((F1_1_Head), (F2_1_Head)),
-	F3_Body = ((F1_1_Body), (F2_1_Body)),
-	F3_F_Test = ((F1_1_F_Test), (F2_1_F_Test)),
-	preFrontierNodeContents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
-	test_frontier_is_valid(F3, F3_Real_Goal), !, 
-        rebuild_prefrontier_conjunction_aux_2(F1_1, More_F2, More_F3).
-rebuild_prefrontier_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
-	rebuild_prefrontier_conjunction_aux_2(F1_1, More_F2, More_F3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
