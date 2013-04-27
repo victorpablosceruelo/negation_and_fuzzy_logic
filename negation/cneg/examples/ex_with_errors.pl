@@ -7,8 +7,8 @@ cneg_choosen_negation(cneg_rt_Chan).
 
 tests :- test_chan ; test_stuckey.
 
-test_chan :- cneg([], r(Y)), echo(r(Y)), r(Y), echo_error.
-test_stuckey :- cneg([], s(X)), echo(s(X)), s(X), echo_error.
+test_chan :- cneg(r(Y)), echo(r(Y)), r(Y), echo_error.
+test_stuckey :- cneg(s(X)), echo(s(X)), s(X), echo_error.
 
 echo(Term) :- 
 	cneg_diseq_echo(1, 'aux', 'ex_ancestor_and_grandparent', 'testing ', ''),
