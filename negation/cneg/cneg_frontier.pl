@@ -312,6 +312,16 @@ pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVar
 	append(Frontier_In, Goal_Frontier_Nodes, Frontier_Aux), !,
 	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_Aux, Frontier_Out).
 
+%
+% This is one of the most complicated predicates.
+% It has to  
+% (1) do a copy of the prefrontier and its real goal,
+% (2) retrieve the current status of the goals (the goalvars, the localvars and the constraints),
+% (3) unify the clean_head with the real_goal, 
+% (4) evaluate (E, IE),
+% (5) retrieve the current status of the goals (the goalvars, the localvars and the constraints),
+% (6) decide which unifications and constraints have been generated in step (4).
+%
 pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Frontier_In, Frontier_Out) :-
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
 	copy_term(Goal_PreFrontier_Node, Goal_PreFrontier_Node_Copy),
