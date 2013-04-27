@@ -74,7 +74,7 @@ compute_goal_pre_frontier('true', [F_Out]) :- !,
 	preFrontierNodeContents(F_Out, 'true', 'true', 'true', 'true', 'true', 'true', 'true').
 compute_goal_pre_frontier('fail', [F_Out]) :- !,
 %	preFrontierNodeContents(Frontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(F_Out, 'fail', 'fail', 'true', 'true', 'fail', 'fail', 'fail').
+	preFrontierNodeContents(F_Out, 'fail', 'fail', 'fail', 'fail', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
 % The frontiers need to evaluate one goal at a time. ERROR
@@ -90,7 +90,7 @@ compute_goal_pre_frontier(Goal, Frontier):-
 	compute_goal_pre_frontier(G1, Frontier_G1),
 	compute_goal_pre_frontier(G2, Frontier_G2),
 	!,
-	combine_frontiers_from_conjunction(Frontier_G1, Frontier_G2, Frontier),
+	rebuild_prefrontier_conjunction(Frontier_G1, Frontier_G2, Frontier),
 	!.
 
 % Now go for the functors for equality and disequality.
@@ -311,33 +311,33 @@ pre_frontier_node_to_frontier_node_aux_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE
 
 % combine_frontiers(F1,F2,F3) returns F3 that is the resulting frontier
 % from combining the frontiers F1 and F2 in all possible ways.
-combine_frontiers_from_conjunction([],_F2,[]) :- !, % Optimization
+rebuild_prefrontier_conjunction([],_F2,[]) :- !, % Optimization
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'empty F1 -> empty F3'),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty F1 -> empty F3'),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
-combine_frontiers_from_conjunction(_F1,[],[]) :- !, % Optimization
+rebuild_prefrontier_conjunction(_F1,[],[]) :- !, % Optimization
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'empty F2 -> empty F3'),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty F2 -> empty F3'),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
-combine_frontiers_from_conjunction(F1,F2,F3) :-
+rebuild_prefrontier_conjunction(F1,F2,F3) :-
 	F1 \== [], F2 \== [],
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'F1 /\\ F2 -> F3 '),
-	combine_frontiers_from_conjunction_aux_1(F1,F2,F3),
-	echo_msg(2, '', 'cneg_rt', 'combine_frontiers_from_conjunction', 'F3'),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'F1 /\\ F2 -> F3 '),
+	rebuild_prefrontier_conjunction_aux_1(F1,F2,F3),
+	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'F3'),
 	echo_msg(2, 'list', 'cneg_rt', '', F3),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
 	
-combine_frontiers_from_conjunction_aux_1([],_F2,[]) :- !.
-combine_frontiers_from_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
-        combine_frontiers_from_conjunction_aux_2(F1_1, F2, F3_1),
-        combine_frontiers_from_conjunction_aux_1(More_F1, F2, More_F3),
+rebuild_prefrontier_conjunction_aux_1([],_F2,[]) :- !.
+rebuild_prefrontier_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
+        rebuild_prefrontier_conjunction_aux_2(F1_1, F2, F3_1),
+        rebuild_prefrontier_conjunction_aux_1(More_F1, F2, More_F3),
         cneg_aux:append(F3_1, More_F3, F3).
 
 % combine_frontiers_aux_1(F1_1,F2, F3) returns F3 that is 
 % the result of combining F1_1 with each element of F2.
-combine_frontiers_from_conjunction_aux_2(_F1_1, [], []).
-combine_frontiers_from_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
+rebuild_prefrontier_conjunction_aux_2(_F1_1, [], []).
+rebuild_prefrontier_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
 %	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
 	preFrontierNodeContents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
 	preFrontierNodeContents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
@@ -347,9 +347,9 @@ combine_frontiers_from_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3])
 	F3_F_Test = ((F1_1_F_Test), (F2_1_F_Test)),
 	preFrontierNodeContents(F3, F3_Real_Goal, F3_Head, F3_Body, F3_F_Test),
 	test_frontier_is_valid(F3, F3_Real_Goal), !, 
-        combine_frontiers_from_conjunction_aux_2(F1_1, More_F2, More_F3).
-combine_frontiers_from_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
-	combine_frontiers_from_conjunction_aux_2(F1_1, More_F2, More_F3).
+        rebuild_prefrontier_conjunction_aux_2(F1_1, More_F2, More_F3).
+rebuild_prefrontier_conjunction_aux_2(F1_1, [_F2_1 | More_F2], More_F3) :-
+	rebuild_prefrontier_conjunction_aux_2(F1_1, More_F2, More_F3).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
