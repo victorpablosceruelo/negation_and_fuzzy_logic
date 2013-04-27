@@ -71,7 +71,7 @@ save_sent_info(Clause) :-
 	arg(1, Clause, Head),
 	arg(2, Clause, Body),
 	unifications_in_head_to_equality(Head, Clean_Head, Head_Name, Head_Arity, Equality),
-	split_goal_with_disjunctions_into_goals((Equality, Body), Bodies),
+	split_body_with_disjunctions_into_bodies((Equality, Body), Bodies),
 	echo_msg(2, '', 'cneg_tr', 'Bodies', Bodies),
 	split_bodies_into_E_IE_NIE(Bodies, Split_Bodies),
 	store_head_and_bodies_info(Head, Clean_Head, Head_Name, Head_Arity, Split_Bodies).

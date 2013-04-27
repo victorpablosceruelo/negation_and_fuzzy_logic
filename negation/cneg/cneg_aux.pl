@@ -26,6 +26,7 @@
 	    replace_in_terms_list_var_by_value/4,
 	    retrieve_element_from_list/2,
 	    split_body_with_disjunctions_into_bodies/2,
+	    split_bodies_into_E_IE_NIE/2,
 	    split_body_into_E_IE_NIE_aux/7,
 	    goals_join_by_conjunction/3
 	],
@@ -680,8 +681,8 @@ split_body_into_E_IE_NIE_aux(Body, _E_In, _IE_In, _NIE_In, _E_Out, _IE_Out, _NIE
 
 split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_Out, NIE_Out) :- 
 	goal_is_conjunction(Body, G1, G2), !,
-	split_bodies_into_E_IE_NIE_aux(G1, E_In, IE_In, NIE_In, E_Aux, IE_Aux, NIE_Aux),
-	split_bodies_into_E_IE_NIE_aux(G2, E_Aux, IE_Aux, NIE_Aux, E_Out, IE_Out, NIE_Out).
+	split_body_into_E_IE_NIE_aux(G1, E_In, IE_In, NIE_In, E_Aux, IE_Aux, NIE_Aux),
+	split_body_into_E_IE_NIE_aux(G2, E_Aux, IE_Aux, NIE_Aux, E_Out, IE_Out, NIE_Out).
 split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_In, NIE_In) :-
 	goal_is_equality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
 	goals_join_by_conjunction(E_In, Body, E_Out).
@@ -695,3 +696,4 @@ split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
