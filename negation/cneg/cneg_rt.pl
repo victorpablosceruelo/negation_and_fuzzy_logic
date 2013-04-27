@@ -1,5 +1,5 @@
 
-:- module(cneg_rt, [cneg_rt/4], [assertions]).
+:- module(cneg_rt, [cneg_rt/4, cneg_rt_aux/3], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
@@ -9,6 +9,7 @@
 :- use_module(library('cneg/cneg_aux')).
 % :- reexport(library('cneg/cneg_aux')).
 :- use_module(library('cneg/cneg_diseq')).
+:- use_module(library('cneg/cneg_frontier')).
 % :- reexport(cneg_diseq).
 
 % To access pre-frontiers from anywhere.
@@ -27,6 +28,12 @@ cneg_rt(Goal, GoalVars_In, Depth_Level, Trace) :-
 	CN_Call = (cneg_rt(Goal, GoalVars_In, Depth_Level)), 
 	add_predicate_to_trace(evaluating(CN_Call), Trace, NewTrace),
 	echo_msg(2, 'trace', 'cneg_rt', 'call to cneg_rt/4 with (updated) trace', NewTrace),
+
+	cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier),
+	!, % Backtracking forbidden.
+	evaluate_negated_frontier(Negated_Frontier, Depth_Level, NewTrace, CN_Call).
+
+cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'cneg_rt', CN_Call),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
@@ -45,7 +52,7 @@ cneg_rt(Goal, GoalVars_In, Depth_Level, Trace) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt :: Frontier', Frontier),
 	!,
-	negate_frontier(Frontier, GoalVars, Result_List),
+	negate_frontier(Frontier, GoalVars, Negated_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
@@ -53,20 +60,17 @@ cneg_rt(Goal, GoalVars_In, Depth_Level, Trace) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt :: Frontier', Frontier),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt :: Result (conj)', Result_List),
+	echo_msg(2, 'list', 'cneg_rt', 'cneg_rt :: Result (conj)', Negated_Frontier),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-
-	!, % Backtracking forbidden.
-	call_to_conjunction_list(Result_List, Depth_Level, NewTrace, CN_Call).
+	echo_msg(2, 'nl', 'cneg_rt', '', '').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% negate_frontier_list(Frontier, GoalVars, Proposal, Result_List),
-% returns in Result_List a list with the negation of each subfrontier in Frontier.
+% negate_frontier_list(Frontier, GoalVars, Proposal, Negated_Frontier),
+% returns in Negated_Frontier a list with the negation of each subfrontier in Frontier.
 
 negate_frontier([], _GoalVars, [true]) :- !. % Optimization.
 negate_frontier(Frontier, GoalVars, Negated_Frontier) :- 
@@ -101,28 +105,28 @@ negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Result_More_Front
 
 % Please note this mechanism wastes less memory and cpu, 
 % since it goes one by one, but allows backtracking.
-call_to_conjunction_list([], _Level, Trace, CN_Call) :- 
+evaluate_negated_frontier([], _Level, Trace, CN_Call) :- 
 	add_predicate_to_trace(ended_results_for(CN_Call), Trace, Trace_1),
 	prepare_attributes_for_printing(CN_Call, Attributes_For_Printing_Conj),
 	add_predicate_to_trace(current_attributes(Attributes_For_Printing_Conj), Trace_1, Trace_2),
 	add_predicate_to_trace('-----------------------', Trace_2, Trace_3),
 	end_trace(Trace_3),
-	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list ', 'EMPTY LIST'),
-	echo_msg(2, '', 'calls_trace', 'call_to_conjunction_list ', 'EMPTY LIST'),
+	echo_msg(2, '', 'cneg_rt', 'evaluate_negated_frontier ', 'EMPTY LIST'),
+	echo_msg(2, '', 'calls_trace', 'evaluate_negated_frontier ', 'EMPTY LIST'),
 	echo_msg(2, 'nl', 'calls_trace', '', ''),
 	echo_msg(2, 'nl', 'calls_trace', '', '').
 
-call_to_conjunction_list([Result | Result_List], Level, Trace, CN_Call) :-
+evaluate_negated_frontier([Result | Result_List], Level, Trace, CN_Call) :-
 	add_predicate_to_trace('-----------------------', Trace, Trace_1),
 	add_predicate_to_trace(result_for(CN_Call), Trace_1, Trace_2),
 	add_predicate_to_trace(subgoal(Result), Trace_2, Trace_3),
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
 	add_predicate_to_trace(with_attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
-	echo_msg(2, '', 'cneg_rt', 'call_to_conjunction_list :: goal', CN_Call),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'call_to_conjunction_list :: result', Result),
+	echo_msg(2, '', 'cneg_rt', 'evaluate_negated_frontier :: goal', CN_Call),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'evaluate_negated_frontier :: result', Result),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
 	local_call_to(Result, Level, Trace_5),
-	call_to_conjunction_list(Result_List, Level, Trace_6, CN_Call).
+	evaluate_negated_frontier(Result_List, Level, Trace_6, CN_Call).
 
 %generate_disjunction_from_list([], fail) :- !.
 %generate_disjunction_from_list([Goal], Goal) :- !.
@@ -660,28 +664,6 @@ get_equalities_list_from_lists([Elto_1 | List_1], [Elto_2 | List_2], List_In, Li
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
-
-generate_conjunction_from_list([], fail) :- !,
-	echo_msg(1, '', 'cneg_rt', 'ERROR: generate_conjunction_from_list can not generate a frontier from an empty list.', ''), 
-	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, fail. % Backtracking is forbidden.
-generate_conjunction_from_list([Goal], Goal) :- !.
-generate_conjunction_from_list([Goal | Goals], (Goal , Disj_Goals)) :-
-	Goals \== [],
-	generate_conjunction_from_list(Goals, Disj_Goals).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-build_a_frontier_from_each_result(_Real_Goal, [], []) :- !.
-build_a_frontier_from_each_result(Real_Goal, [Result | Results], [Frontier | Frontiers]) :-
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
-	preFrontierNodeContents(Frontier, Real_Goal, Real_Goal, Result, Real_Goal),
-	build_a_frontier_from_each_result(Real_Goal, Results, Frontiers).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 rebuild_conjunction_of_goals([], [], []) :- !. % Empty elements when re-joining
 rebuild_conjunction_of_goals(Goals, [], Goals) :- !. % Empty element when re-joining

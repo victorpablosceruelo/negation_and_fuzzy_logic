@@ -9,6 +9,7 @@
 :- use_module(library('cneg/cneg_aux')).
 % :- reexport(library('cneg/cneg_aux')).
 :- use_module(library('cneg/cneg_diseq')).
+:- use_module(library('cneg/cneg_rt')).
 % :- reexport(cneg_diseq).
 
 % To access pre-frontiers from anywhere.
@@ -70,10 +71,10 @@ compute_goal_pre_frontier(Goal, Frontier) :-
 
 % Manage true and fail ...
 compute_goal_pre_frontier('true', [F_Out]) :- !,
-%	preFrontierNodeContents(Frontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+%	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(F_Out, 'true', 'true', 'true', 'true', 'true', 'true', 'true').
 compute_goal_pre_frontier('fail', [F_Out]) :- !,
-%	preFrontierNodeContents(Frontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+%	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(F_Out, 'fail', 'fail', 'fail', 'fail', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
@@ -98,34 +99,26 @@ compute_goal_pre_frontier(Goal, Frontier):-
 compute_goal_pre_frontier(Goal, [F_Out]) :- 
 	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
-%	preFrontierNodeContents(Frontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
-	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal),
+%	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, 'true', Real_Goal, 'true', Real_Goal, Real_Goal),
 	!.
 
 compute_goal_pre_frontier(Goal, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
 	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
-	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, Real_Goal, Real_Goal), 
+%	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true', 'true', Real_Goal, Real_Goal),
 	!.
 
 % Double negation is not managed yet. Bypass it.
 %compute_goal_pre_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
-compute_goal_pre_frontier(Goal, Frontier) :- 
+compute_goal_pre_frontier(Goal, PreFrontier) :- 
 	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: double negation for (UQV, GoalVars, SubGoal)', (UQV, GoalVars, SubGoal)),
-%     cneg_rt(UQV, GoalVars, Goal, Proposal, Depth_Level, Trace) :-
-	cneg_rt(UQV, GoalVars, SubGoal, 0, Conj_List_Result), !,
-	generate_conjunction_from_list(Conj_List_Result, Conj_Of_Disjs_Frontier), !,
-	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Conj_Of_Disjs_Frontier', Conj_Of_Disjs_Frontier),
-	split_body_with_disjunctions_into_bodies(Conj_Of_Disjs_Frontier, List_Of_Conjs_Frontier), !,
-	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: List_Of_Conjs_Frontier', List_Of_Conjs_Frontier),
-	build_a_frontier_from_each_result(Goal, List_Of_Conjs_Frontier, Frontier), !,
-	echo_msg(2, 'list', 'cneg_rt', 'double neg :: Frontier', Frontier),
-	echo_msg(2, 'separation', 'cneg_rt', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	!.
+%     cneg_rt(Goal, GoalVars, Depth_Level, Trace) :-
+	cneg_rt_aux(SubGoal, GoalVars, Negated_PreFr), !,
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Negated_PreFr', Negated_PreFr),
+	convert_negPreFr_to_preFr(Goal, Negated_PreFr, PreFrontier).
 
 % Now go for other functors stored in our database.
 compute_goal_pre_frontier(Goal, Frontier_Out) :-
@@ -188,7 +181,7 @@ test_frontier_is_valid(PreFr, Goal) :-
 	Clean_Head = Goal_Copy, % Unify heads.
 	(
 	    (
-		call_to_predicate(E, IE), !, 
+		call_to_predicate((E, IE)), !, 
 		Real_Goal = Goal, !,
 		cneg_diseq_echo(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: Goal', Goal),
 		cneg_diseq_echo(2, '', 'cneg_rt', 'test_frontier_is_valid :: VALID :: PreFr', PreFr),
@@ -201,6 +194,35 @@ test_frontier_is_valid(PreFr, Goal) :-
 		!, fail
 	    )
 	), !. % Backtracking forbidden. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+convert_negPreFr_to_preFr(Goal, Negated_PreFr, PreFrontier) :-
+	generate_conjunction_from_list(Negated_PreFr, Conj_Of_Disjs_PreFr), !,
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Conj_Of_Disjs_PreFr', Conj_Of_Disjs_PreFr),
+	split_body_with_disjunctions_into_bodies(Conj_Of_Disjs_PreFr, List_Of_Conjs_PreFr), !,
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: List_Of_Conjs_PreFr', List_Of_Conjs_PreFr),
+	split_bodies_into_E_IE_NIE(List_Of_Conjs_PreFr, Split_Bodies),
+	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Split_Bodies', Split_Bodies),
+	split_bodies_to_prefrontier(Split_Bodies, Goal, PreFrontier), !,
+	echo_msg(2, 'list', 'cneg_rt', 'double neg :: PreFrontier', PreFrontier),
+	echo_msg(2, 'separation', 'cneg_rt', '', ''),
+	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	!.
+
+% split_bodies_to_prefrontier([([E], [IE], [NIE], [Body]) | Bodies], Real_Goal, [PreFr | PreFrs])
+split_bodies_to_prefrontier([], _Real_Goal, []) :- !.
+split_bodies_to_prefrontier([([E], [IE], [NIE], [Body]) | Split_Bodies], Real_Goal, [PreFr | PreFrs]) :-
+%	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(PreFr, Real_Goal, Real_Goal, E, IE, NIE, Real_Goal, Body),
+	% copy_term(PreFr_Aux, PreFrs), % Different PreFr must have different variables.
+	split_bodies_to_prefrontier(Split_Bodies, Real_Goal, PreFrs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -239,7 +261,7 @@ rebuild_prefrontier_conjunction_aux_1([F1_1 | More_F1], F2, F3):-
 % the result of combining F1_1 with each element of F2.
 rebuild_prefrontier_conjunction_aux_2(_F1_1, [], []).
 rebuild_prefrontier_conjunction_aux_2(F1_1, [F2_1 | More_F2], [F3 | More_F3]) :-
-%	preFrontierNodeContents(Frontier, Goal, Head, Body, FrontierTest).
+%	preFrontierNodeContents(PreFrontier, Goal, Head, Body, FrontierTest).
 	preFrontierNodeContents(F1_1, F1_1_Real_Goal, F1_1_Head, F1_1_Body, F1_1_F_Test),
 	preFrontierNodeContents(F2_1, F2_1_Real_Goal, F2_1_Head, F2_1_Body, F2_1_F_Test),
 	F3_Real_Goal = ((F1_1_Real_Goal), (F2_1_Real_Goal)),

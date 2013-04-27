@@ -28,7 +28,8 @@
 	    split_body_with_disjunctions_into_bodies/2,
 	    split_bodies_into_E_IE_NIE/2,
 	    split_body_into_E_IE_NIE_aux/7,
-	    goals_join_by_conjunction/3
+	    goals_join_by_conjunction/3,
+	    generate_conjunction_from_list/2
 	],
 	[assertions]).
 
@@ -697,3 +698,14 @@ split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+generate_conjunction_from_list([], fail) :- !,
+	echo_msg(1, '', 'cneg_rt', 'ERROR: generate_conjunction_from_list: empty list.', ''), 
+	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, fail. % Backtracking is forbidden.
+generate_conjunction_from_list([Goal], Goal) :- !.
+generate_conjunction_from_list([Goal | Goals], (Goal , More_Goals)) :-
+	Goals \== [],
+	generate_conjunction_from_list(Goals, More_Goals).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
