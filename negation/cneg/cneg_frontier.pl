@@ -9,7 +9,7 @@
 :- use_module(library('cneg/cneg_aux')).
 % :- reexport(library('cneg/cneg_aux')).
 :- use_module(library('cneg/cneg_diseq')).
-:- use_module(library('cneg/cneg_rt')).
+% :- use_module(library('cneg/cneg_rt')).
 % :- reexport(cneg_diseq).
 
 % To access pre-frontiers from anywhere.
@@ -113,13 +113,14 @@ compute_goal_pre_frontier(Goal, [F_Out]) :-
 % Double negation is not managed yet. Bypass it.
 %compute_goal_pre_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_pre_frontier(Goal, PreFrontier) :- 
-	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal), !,
-	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: double negation for (UQV, GoalVars, SubGoal)', (UQV, GoalVars, SubGoal)),
+	goal_is_negation(Goal, GoalVars, SubGoal), !,
+	functor_local(Real_Goal, 'cneg_aux', 2, [ SubGoal |[ GoalVars ]]),
+	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: double negation for (SubGoal, GoalVars)', (SubGoal, GoalVars)),
 %     cneg_rt(Goal, GoalVars, Depth_Level, Trace) :-
 	% copy_term(SubGoal, SubGoal_Copy), 
-	cneg_rt_aux(SubGoal, GoalVars, Negated_PreFr), !,
+	call_to_predicate(cneg_rt_aux(SubGoal, GoalVars, Negated_PreFr)), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Negated_PreFr', Negated_PreFr),
-	convert_negPreFr_to_preFr(Goal, Negated_PreFr, PreFrontier).
+	convert_negPreFr_to_preFr(Real_Goal, Negated_PreFr, PreFrontier).
 
 % Now go for other functors stored in our database.
 compute_goal_pre_frontier(Goal, Frontier_Out) :-
@@ -160,17 +161,17 @@ look_for_the_relevant_clauses(Goal, PreFrontier) :-
 % simplify_and_reorder_goal_prefrontier(Front,PreFr) simplifies the frontier Front.
 % Since the frontiers retrieved are in an inverted order, 
 % we must reorder them to keep procedural semantics unchanged.
-simplify_and_reorder_goal_prefrontier([], _Goal, PreFr_Acc, PreFr_Acc) :- !.
+simplify_and_reorder_goal_prefrontier([], _Real_Goal, PreFr_Acc, PreFr_Acc) :- !.
 %	echo_msg(2, 'nl', 'cneg_rt', '', '').
-simplify_and_reorder_goal_prefrontier([PreFr | PreFr_In], Goal, PreFr_Acc, PreFr_Out) :-
+simplify_and_reorder_goal_prefrontier([PreFr | PreFr_In], Real_Goal, PreFr_Acc, PreFr_Out) :-
 %	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(PreFr, Goal, _Clean_Head, _E, _IE, _NIE, _Head, _Body),
+	preFrontierNodeContents(PreFr, Real_Goal, _Clean_Head, _E, _IE, _NIE, _Head, _Body),
 	test_pre_frontier_validity(PreFr), !,
 %	echo_msg(2, '', 'cneg_rt', 'simplify_and_reorder_goal_prefrontier :: valid :: PreFr', PreFr),
-	simplify_and_reorder_goal_prefrontier(PreFr_In, Goal, [PreFr | PreFr_Acc], PreFr_Out).
-simplify_and_reorder_goal_prefrontier([_PreFr | PreFr_In], Goal, PreFr_Acc, PreFr_Out) :- !,
+	simplify_and_reorder_goal_prefrontier(PreFr_In, Real_Goal, [PreFr | PreFr_Acc], PreFr_Out).
+simplify_and_reorder_goal_prefrontier([_PreFr | PreFr_In], Real_Goal, PreFr_Acc, PreFr_Out) :- !,
 %	echo_msg(2, '', 'cneg_rt', 'simplify_and_reorder_goal_prefrontier :: not valid :: PreFr', PreFr),
-	simplify_and_reorder_goal_prefrontier(PreFr_In, Goal, PreFr_Acc, PreFr_Out).
+	simplify_and_reorder_goal_prefrontier(PreFr_In, Real_Goal, PreFr_Acc, PreFr_Out).
 
 % simplify_and_reorder_goal_prefrontier_unifying_variables(H, Body_In, G, Body_Out) 
 % returns in Body_Out the elements of Body whose head unifies with G.
@@ -236,24 +237,24 @@ split_bodies_to_prefrontier([([E], [IE], [NIE], [Body]) | Split_Bodies], Real_Go
 
 % rebuild_prefrontier_conjunction(F1,F2,F3) returns F3 that is the resulting frontier
 % from combining the frontiers F1 and F2 in all possible ways.
-rebuild_prefrontier_conjunction([],_PreFr_2,[]) :- !, % Optimization
+rebuild_prefrontier_conjunction([], _PreFr_2, []) :- !, % Optimization
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty PreFr_1 -> empty PreFr_3'),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
-rebuild_prefrontier_conjunction(_PreFr_1,[],[]) :- !, % Optimization
+rebuild_prefrontier_conjunction(_PreFr_1, [], []) :- !, % Optimization
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'empty PreFr_2 -> empty PreFr_3'),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
-rebuild_prefrontier_conjunction(PreFr_1,PreFr_2,PreFr_3) :-
+rebuild_prefrontier_conjunction(PreFr_1, PreFr_2, PreFr_3) :-
 	PreFr_1 \== [], PreFr_2 \== [],
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'PreFr_1 /\\ PreFr_2 -> PreFr_3 '),
-	rebuild_prefrontier_conjunction_aux_1(PreFr_1,PreFr_2,PreFr_3),
+	rebuild_prefrontier_conjunction_aux_1(PreFr_1, PreFr_2, PreFr_3),
 	echo_msg(2, '', 'cneg_rt', 'rebuild_prefrontier_conjunction', 'PreFr_3'),
 	echo_msg(2, 'list', 'cneg_rt', '', PreFr_3),
 	echo_msg(2, 'nl', 'cneg_rt', '', '').
 	
-rebuild_prefrontier_conjunction_aux_1([],_PreFr_2,[]) :- !.
+rebuild_prefrontier_conjunction_aux_1([], _PreFr_2, []) :- !.
 rebuild_prefrontier_conjunction_aux_1([PreFr_1_1 | More_PreFr_1], PreFr_2, PreFr_3):-
         rebuild_prefrontier_conjunction_aux_2(PreFr_1_1, PreFr_2, PreFr_3_1),
         rebuild_prefrontier_conjunction_aux_1(More_PreFr_1, PreFr_2, More_PreFr_3),
@@ -304,17 +305,19 @@ pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, Frontier_In, _Frontier_Out)
 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
 	!, fail.
 
-pre_frontier_to_frontier_aux([], _GoalVars, Frontier_N_Out, Frontier_N_Out) :- !.
-pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVars, Frontier_N_In, Frontier_N_Out) :-
+pre_frontier_to_frontier_aux([], _GoalVars, Frontier_Out, Frontier_Out) :- !.
+pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVars, Frontier_In, Frontier_Out) :-
 	pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, [], Goal_Frontier_Nodes), !,
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_to_frontier_aux :: Goal_Frontier_Nodes', Goal_Frontier_Nodes),
-	append(Frontier_N_In, Goal_Frontier_Nodes, Frontier_N_Aux), !,
-	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_N_Aux, Frontier_N_Out).
+	append(Frontier_In, Goal_Frontier_Nodes, Frontier_Aux), !,
+	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_Aux, Frontier_Out).
 
-pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Frontier_N_In, Frontier_N_Out) :-
+pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Frontier_In, Frontier_Out) :-
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
+	copy_term(Goal_PreFrontier_Node, Goal_PreFrontier_Node_Copy),
+
 %	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
+	preFrontierNodeContents(Goal_PreFrontier_Node_Copy, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: (Head, Body)', (Head, Body)),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Clean_Head', Clean_Head),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: E', E),
@@ -327,12 +330,11 @@ pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Frontier_N_I
 	Real_Goal_Copy = Clean_Head, % Unify head and goal, but not UQV.
 	!, % Backtracking is forbidden.
 
-	% Proposal == 'cneg_rt_Chan',
 	varsbag((Clean_Head, Body), GoalVars, [], PreFr_Node_UQV), % Identify UQV in Pre_Node
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: PreFr_Node_UQV', PreFr_Node_UQV),
 	pre_frontier_node_to_frontier_node_aux((E, IE), NIE, PreFr_Node_UQV, GoalVars, Frontier_Nodes),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Frontier_Nodes', Frontier_Nodes),
-	append(Frontier_N_In, Frontier_Nodes, Frontier_N_Out). % Is order really relevant ???
+	append(Frontier_In, Frontier_Nodes, Frontier_Out). % Is order really relevant ???
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

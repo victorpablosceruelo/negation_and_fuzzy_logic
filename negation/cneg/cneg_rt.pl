@@ -213,9 +213,9 @@ local_call_to_aux(Predicate, Level_In, Trace) :-
 
 local_call_to_aux(Predicate, Level_In, Trace) :-
 	Level is Level_In + 1,
-	goal_is_cneg_rt(Predicate, UQV, GoalVars, Goal),
+	goal_is_negation(Predicate, GoalVars, Goal),
 	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: Predicate', Predicate),
-	cneg_rt(UQV, GoalVars, Goal, Level, Trace),
+	cneg_rt(Goal, GoalVars, Level, Trace),
 	echo_msg_3pm(2, '', 'calls_trace', 'call_to (L', Level, ') :: SUCCEED Predicate call. Predicate', Predicate).
 
 local_call_to_aux(Predicate, Level_In, Trace) :-

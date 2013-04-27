@@ -15,8 +15,7 @@
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
 	    goal_is_not_conj_disj_neg/1,
 	    goal_is_not_negation/1,
-	    goal_is_negation/4,
-	    goal_is_cneg_rt/4,
+	    goal_is_negation/3,
 	    terms_are_equal/2, unify_terms/2,
 	    %	cneg_aux_equality/2,
 	    qualify_string_name/3, 
@@ -305,32 +304,34 @@ goal_is_aux_5a(Name, Goal, Arg_1, Arg_2, Arg_3, Arg_4, Arg_5) :-
 	arg(4, Goal, Arg_4),
 	arg(5, Goal, Arg_5).
 
-valid_negation_preds('cneg', 2).
-valid_negation_preds('cneg_tr', 2).
-valid_negation_preds('cneg_rt', 2).
-valid_negation_preds('cneg_rt', 5).
+valid_negation_preds('cneg', 1).
+valid_negation_preds('cneg_aux', 2).
+valid_negation_preds('cneg_rt', 4).
+valid_negation_preds('cneg_rt_aux', 3).
 
-goal_is_negation(Goal, UQV, 'compute', SubGoal) :-
-	valid_negation_preds(Proposal, Arity), 
-	Arity == 2,
-	functor(Goal, Proposal, Arity), !,
-	arg(1, Goal, UQV),
-	arg(2, Goal, SubGoal).
+goal_is_negation(Goal, GoalVars, SubGoal) :-
+	valid_negation_preds(Proposal, 1), 
+	functor(Goal, Proposal, 1), !,
+	arg(1, Goal, SubGoal),
+	varsbag(Goal, [], [], GoalVars).
+
+goal_is_negation(Goal, GoalVars, SubGoal) :-
+	valid_negation_preds(Proposal, 2), 
+	functor(Goal, Proposal, 2), !,
+	arg(1, Goal, SubGoal),
+	arg(2, Goal, GoalVars).
 
 % cneg_rt(UQV, GoalVars, Goal, Depth_Level, Trace)
-goal_is_negation(Goal, UQV, GoalVars, SubGoal) :-
+goal_is_negation(Goal, GoalVars, SubGoal) :-
 	valid_negation_preds(Name, Arity), 
-	Arity == 5,
+	(Arity = 5 ; Arity = 4),
 	functor(Goal, Name, Arity), !,
- 	arg(1, Goal, UQV),
- 	arg(2, Goal, GoalVars),
-	arg(3, Goal, SubGoal).
-% 	arg(4, Goal, Depth_Level),
-%	arg(5, Goal, Trace).
+	arg(1, Goal, SubGoal),
+ 	arg(2, Goal, GoalVars).
 
 goal_is_not_negation(Goal) :-
 	nonvar(Goal), % Security issues.
-	goal_is_negation(Goal, _UQV, _GoalVars, _SubGoal), !, fail.
+	goal_is_negation(Goal, _GoalVars, _SubGoal), !, fail.
 goal_is_not_negation(Goal) :-
 	nonvar(Goal), % Security issues.
 	!.
@@ -338,29 +339,6 @@ goal_is_not_negation(Goal) :-
 	var(Goal), 
 	echo_msg(1, '', 'cneg_aux', 'goal_is_not_negation', 'Goal can not be a variable. ERROR.'),
 	!, fail.
-
-goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal) :-
-	goal_is_negation(Goal, UQV_In, GoalVars_In, SubGoal), !,
- 	(
-	    (   % Need to compute GoalVars.
-		GoalVars_In == 'compute', !, 
-		varsbag_clean_up(UQV_In, UQV),
-		varsbag(SubGoal, UQV, [], GoalVars)
-	    )
-	;  
-	    (   % Need to compute UQV.
-		UQV_In == 'compute', !, 
-		varsbag(GoalVars_In, [], [], GoalVars),
-		varsbag(SubGoal, GoalVars, [], UQV) 
-	    )
-	;
-	    (   % Nothing to compute.
-		GoalVars_In \== 'compute', 
-		UQV_In \== 'compute', !, 
-		GoalVars = GoalVars_In, 
-		UQV = UQV_In
-	    )
-	), !.
 
 goal_is_not_conj_disj_neg(Goal) :-
 	nonvar(Goal),
@@ -642,7 +620,7 @@ split_body_with_disjunctions_into_bodies_aux(Body, [Body]) :- % Goal is somethin
 	!.
 
 split_body_with_disjunctions_into_bodies_by_pass(Body) :-
-	goal_is_cneg_rt(Body, _UQV, _GoalVars, _SubGoal).
+	goal_is_negation(Body, _GoalVars, _SubGoal).
 split_body_with_disjunctions_into_bodies_by_pass(Body) :- 
 	goal_is_not_conj_disj_neg(Body), !.
 
