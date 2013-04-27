@@ -116,6 +116,7 @@ compute_goal_pre_frontier(Goal, PreFrontier) :-
 	goal_is_cneg_rt(Goal, UQV, GoalVars, SubGoal), !,
 	echo_msg(2, '', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: double negation for (UQV, GoalVars, SubGoal)', (UQV, GoalVars, SubGoal)),
 %     cneg_rt(Goal, GoalVars, Depth_Level, Trace) :-
+	copy_term(SubGoal, SubGoal_Copy), !!!!
 	cneg_rt_aux(SubGoal, GoalVars, Negated_PreFr), !,
 	echo_msg(2, 'list', 'cneg_rt', 'compute_goal_pre_frontier :: dn :: Negated_PreFr', Negated_PreFr),
 	convert_negPreFr_to_preFr(Goal, Negated_PreFr, PreFrontier).
