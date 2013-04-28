@@ -147,16 +147,19 @@ compute_goal_pre_frontier(Goal, []) :-
 
 % Look for all the predicate definitions for the predicate with the name and arity of the one we want.
 % We use its name and arity to avoid problematic unifications.
-look_for_the_relevant_clauses(Goal, PreFrontier) :-
+look_for_the_relevant_clauses(Goal, PreFrontierNodes) :-
 	functor(Goal, Head_Name, Head_Arity),  % Security
 	Head_Name \== ',', Head_Name \== ';',    % Issues
 %	!, % Backtracking forbiden.
 	echo_msg(1, '', 'cneg_rt', 'look_for_the_relevant_clauses :: (Head_Name, Head_Arity)', (Head_Name, Head_Arity)), 
 	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName_, _Clean_Head_, _E_, _IE_, _NIE_, _Head_, _Body_), !,
 	echo_msg(1, '', 'cneg_rt', 'look_for_the_relevant_clauses :: (Head_Name, Head_Arity)', (Head_Name, Head_Arity)), 
-	setof(preFrontierNode(_Real_Goal, Clean_Head, E, IE, NIE, Head, Body), 
-	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
-	PreFrontier), 
+	setof(PFN, 
+	(
+	    cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
+	    preFrontierNodeContents(PFN, _Real_Goal, Clean_Head, E, IE, NIE, Head, Body)
+	),
+	PreFrontierNodes), 
 	!.
 look_for_the_relevant_clauses(_Goal, _PreFrontier) :-
 	echo_msg(1, '', 'cneg_rt', 'look_for_the_relevant_clauses :: ', 
@@ -334,7 +337,7 @@ pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVar
 % (5) retrieve the current status of the goals (the goalvars, the localvars and the constraints),
 % (6) decide which unifications and constraints have been generated in step (4).
 %
-:- meta_predicate pre_frontier_node_to_frontier_node(goal, ?, ?, ?).
+% :- meta_predicate pre_frontier_node_to_frontier_node(goal, ?, ?, ?).
 pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Frontier_In, Frontier_Out) :-
 %	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
@@ -373,7 +376,7 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- meta_predicate get_frontier_from_pre_frontier(goal, goal, goal, ?, ?, ?, ?).
+:- meta_predicate get_frontier_from_pre_frontier(goal, goal, ?, ?, ?, ?, ?).
 get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes) :-
 	setof((GoalVars, LocalVars, RG_Constraints, NIE), (E, IE), PreFr_Node_Answers), !,
 	echo_msg(2, 'list', 'cneg_rt', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
