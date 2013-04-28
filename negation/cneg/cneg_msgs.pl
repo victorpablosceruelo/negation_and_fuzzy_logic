@@ -1,7 +1,7 @@
 
 :- module(cneg_msgs,
 	[
-	    echo_msg/5, 
+	    print_msg/5, 
 	    get_trace_status_list/2,
 	    generate_empty_trace/1, end_trace/1,
 	    add_predicate_to_trace/3,
@@ -29,44 +29,44 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg(FI, FI, Mode, Pre_Msg, Msg) :- 
+print_msg(FI, FI, Mode, Pre_Msg, Msg) :- 
 	nonvar(FI), 
-	echo_msg_aux(FI, Mode, Pre_Msg, Msg).
+	print_msg_aux(FI, Mode, Pre_Msg, Msg).
 
-echo_msg(FI_1, FI_2, Mode, Pre_Msg, Msg) :- 
+print_msg(FI_1, FI_2, Mode, Pre_Msg, Msg) :- 
 	nonvar(FI_1), nonvar(FI_2),
 	FI_1 \== FI_2,
-	echo_msg_aux(FI_1, Mode, Pre_Msg, Msg),
-	echo_msg_aux(FI_2, Mode, Pre_Msg, Msg).
+	print_msg_aux(FI_1, Mode, Pre_Msg, Msg),
+	print_msg_aux(FI_2, Mode, Pre_Msg, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg_aux(0, _Mode, _Pre_Msg, _Msg) :- !. % No debugging.
+print_msg_aux(0, _Mode, _Pre_Msg, _Msg) :- !. % No debugging.
 
-echo_msg_aux(FI, 'nl', _Pre_Msg, _Msg) :-
-	echo_msg_real(FI, '\n'), !.
+print_msg_aux(FI, 'nl', _Pre_Msg, _Msg) :-
+	print_msg_real(FI, '\n'), !.
 
-echo_msg_aux(FI, 'aux', Pre_Msg, Msg) :-
-	echo_msg_real(FI, Pre_Msg),
-	echo_msg_real(FI, Msg).
+print_msg_aux(FI, 'aux', Pre_Msg, Msg) :-
+	print_msg_real(FI, Pre_Msg),
+	print_msg_real(FI, Msg).
 
-echo_msg_aux(FI, 'statistics', Pre_Msg, Msg) :-
-	echo_msg_aux(FI, '', Pre_Msg, Msg),
-	echo_msg_statistics(FI), !.
+print_msg_aux(FI, 'statistics', Pre_Msg, Msg) :-
+	print_msg_aux(FI, '', Pre_Msg, Msg),
+	print_msg_statistics(FI), !.
 
-echo_msg_aux(FI, 'separation', _Pre_Msg, _Msg) :-
-	echo_msg_aux(FI, 'nl', '', ''),
-	echo_msg_aux(FI, '', '', '-----------------------------------------------'),
-	echo_msg_aux(FI, '', '', '-----------------------------------------------'),
-	echo_msg_aux(FI, 'nl', '', '').
+print_msg_aux(FI, 'separation', _Pre_Msg, _Msg) :-
+	print_msg_aux(FI, 'nl', '', ''),
+	print_msg_aux(FI, '', '', '-----------------------------------------------'),
+	print_msg_aux(FI, '', '', '-----------------------------------------------'),
+	print_msg_aux(FI, 'nl', '', '').
 
-echo_msg_aux(FI, 'trace', Pre_Msg, Msg) :-
-	echo_msg_trace(FI, Pre_Msg, Msg).
+print_msg_aux(FI, 'trace', Pre_Msg, Msg) :-
+	print_msg_trace(FI, Pre_Msg, Msg).
 
-echo_msg_aux(FI, '', Pre_Msg, Msg) :-
-	  echo_msg_normal(FI, Pre_Msg, Msg).
+print_msg_aux(FI, '', Pre_Msg, Msg) :-
+	  print_msg_normal(FI, Pre_Msg, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,45 +76,45 @@ logo(0, '') :- !.
 logo(1, '') :- !.
 logo(_Any, '% ').
 
-echo_msg_normal(FI, Pre_Msg, Msg) :-
-	echo_msg_normal_pre_msg(FI, Pre_Msg),
-	echo_msg_normal_aux(FI, Pre_Msg, Msg).
+print_msg_normal(FI, Pre_Msg, Msg) :-
+	print_msg_normal_pre_msg(FI, Pre_Msg),
+	print_msg_normal_aux(FI, Pre_Msg, Msg).
 
-echo_msg_normal_pre_msg(_FI, []) :- !.
-echo_msg_normal_pre_msg(_FI, '') :- !.
-echo_msg_normal_pre_msg(FI, [Pre_Msg_1 | Pre_Msgs]) :-
-	echo_msg_normal_pre_msg(FI, Pre_Msg_1),
-	echo_msg_normal_pre_msg_list(FI, Pre_Msgs).
+print_msg_normal_pre_msg(_FI, []) :- !.
+print_msg_normal_pre_msg(_FI, '') :- !.
+print_msg_normal_pre_msg(FI, [Pre_Msg_1 | Pre_Msgs]) :-
+	print_msg_normal_pre_msg(FI, Pre_Msg_1),
+	print_msg_normal_pre_msg_list(FI, Pre_Msgs).
 
-echo_msg_normal_pre_msg(FI, Pre_Msg) :-
+print_msg_normal_pre_msg(FI, Pre_Msg) :-
 	logo(FI, Logo),
-	echo_msg_real(FI, Logo),
-	echo_msg_real(FI, Pre_Msg),
-	echo_msg_real(FI, ' :: '), !.
+	print_msg_real(FI, Logo),
+	print_msg_real(FI, Pre_Msg),
+	print_msg_real(FI, ' :: '), !.
 
-echo_msg_normal_pre_msg_list(_FI, []) :- !.
-echo_msg_normal_pre_msg_list(FI, [Pre_Msg | Pre_Msgs]) :- !,
-	echo_msg_real(FI, Pre_Msg),
-	echo_msg_real(FI, ' :: '), !,
-	echo_msg_normal_pre_msg_list(FI, Pre_Msgs).
+print_msg_normal_pre_msg_list(_FI, []) :- !.
+print_msg_normal_pre_msg_list(FI, [Pre_Msg | Pre_Msgs]) :- !,
+	print_msg_real(FI, Pre_Msg),
+	print_msg_real(FI, ' :: '), !,
+	print_msg_normal_pre_msg_list(FI, Pre_Msgs).
 
-echo_msg_normal_aux(_FI, _Pre_Msg, '') :- !.
-echo_msg_normal_aux(FI, _Pre_Msg, []) :- echo_msg_real(FI, '[]').
-echo_msg_normal_aux(FI,   Pre_Msg, [Msg_1 | Msgs]) :- !,
-	echo_msg_normal_aux(FI, Pre_Msg, Msg_1),
-	echo_msg_normal(FI, Pre_Msg, Msgs).
-echo_msg_normal_aux(FI, _Pre_Msg, Msg) :- !,
-	echo_msg_real(FI, Msg),
-	echo_msg_aux(FI, 'nl', '', '').
+print_msg_normal_aux(_FI, _Pre_Msg, '') :- !.
+print_msg_normal_aux(FI, _Pre_Msg, []) :- print_msg_real(FI, '[]').
+print_msg_normal_aux(FI,   Pre_Msg, [Msg_1 | Msgs]) :- !,
+	print_msg_normal_aux(FI, Pre_Msg, Msg_1),
+	print_msg_normal(FI, Pre_Msg, Msgs).
+print_msg_normal_aux(FI, _Pre_Msg, Msg) :- !,
+	print_msg_real(FI, Msg),
+	print_msg_aux(FI, 'nl', '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg_statistics(0) :- !. % No backtracking, please.
-echo_msg_statistics(1) :- !,
+print_msg_statistics(0) :- !. % No backtracking, please.
+print_msg_statistics(1) :- !,
 	nl, nl, statistics, nl, !.
-echo_msg_statistics(Any) :-
+print_msg_statistics(Any) :-
 	current_output(StdOut_Stream), % Save stdout stream.
 	get_stream_to_file(Any, Statistics_Stream),
 	set_output(Statistics_Stream), % Redirect stdout to stream.
@@ -126,12 +126,12 @@ echo_msg_statistics(Any) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg_trace(Any, Pre_Msg, Trace) :-
-	echo_msg_aux(Any, 'separation', '', ''),
-	echo_msg_aux(Any, 'nl', '', ''),
-	echo_msg_aux(Any, '', Pre_Msg, 'TRACE: '),
+print_msg_trace(Any, Pre_Msg, Trace) :-
+	print_msg_aux(Any, 'separation', '', ''),
+	print_msg_aux(Any, 'nl', '', ''),
+	print_msg_aux(Any, '', Pre_Msg, 'TRACE: '),
 	get_trace_status_list(Trace, Trace_Status_List),
-	echo_msg_aux(Any, 'list', '', Trace_Status_List),
+	print_msg_aux(Any, 'list', '', Trace_Status_List),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,15 +148,15 @@ echo_msg_trace(Any, Pre_Msg, Trace) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-echo_msg_real(0, _Msg) :- !.
-echo_msg_real(1, Msg) :- !,
+print_msg_real(0, _Msg) :- !.
+print_msg_real(1, Msg) :- !,
 	write(Msg).
-echo_msg_real(Any, Msg) :- 
+print_msg_real(Any, Msg) :- 
 	file_debug_is_activated(true), !,
 	get_file_name(Any, File_Name),
 	get_stream_to_file(File_Name, Stream),
 	write(Stream, Msg).
-echo_msg_real(_Any, _Msg) :- !.
+print_msg_real(_Any, _Msg) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,7 +173,7 @@ get_file_name(3, 'debug_pkg_cneg_file_statistics.pl').
 
 get_stream_to_file(File_Name_Atom, _Stream) :-
 	var(File_Name_Atom), !, 
-	echo_msg(1, '', 'fail', 'get_stream_to_file can not work if File_Name is a variable', ''),
+	print_msg(1, '', 'fail', 'get_stream_to_file can not work if File_Name is a variable', ''),
 	!, fail.
 get_stream_to_file(File_Name_Atom, Stream) :-
 	defined_stream_to_file(File_Name_Atom, Stream), !.
