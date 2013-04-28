@@ -325,6 +325,7 @@ pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVar
 % (5) retrieve the current status of the goals (the goalvars, the localvars and the constraints),
 % (6) decide which unifications and constraints have been generated in step (4).
 %
+:- meta_predicate pre_frontier_node_to_frontier_node(goal, ?, ?, ?).
 pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Frontier_In, Frontier_Out) :-
 %	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
@@ -363,6 +364,7 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+:- meta_predicate get_frontier_from_pre_frontier(goal, goal, goal, ?, ?, ?, ?).
 get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes) :-
 	setof((GoalVars, LocalVars, RG_Constraints, NIE), (E, IE), PreFr_Node_Answers), !,
 	echo_msg(2, 'list', 'cneg_rt', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
@@ -378,8 +380,8 @@ get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, LocalVars, RG_Cons
 	get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN), !,
 	get_eqs_and_diseqs_from_answers(Answers, GoalVars, LocalVars, RG_Constraints, [FN | FN_In], FN_Out).
 
-% get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN)
-get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN) :-
+% get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, Frontier_Node)
+get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, Frontier_Node) :-
 	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Constraints, Answ_NIE),
 	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars, LocalVars)', (GoalVars, LocalVars)),
 	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (Answ_GoalVars, Answ_LocalVars)', (Answ_GoalVars, Answ_LocalVars)),
@@ -392,21 +394,13 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, 
 	attributes_difference(Disequalities, RG_Constraints, New_Constraints),
 	attribute_diseq_to_executable_diseq(New_Constraints, New_IE),
 
-	% 
-	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answer_Vars', Answer_Vars),
-
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Disequalities', Disequalities),
-
-	% Ojo q al cambiar las UQV hemos de modificar las viejas por las nuevas en las desigualdades ... !!!
-	copy_term(UQV, Fresh_UQV),
-	get_equalities_list_from_lists(Fresh_UQV, Answer_UQV, Disequalities, Eqs_and_Diseqs_Tmp), 
-	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Eqs_and_Diseqs', Eqs_and_Diseqs),
-
-	append(Eqs_and_Diseqs, NIE_Body, Frontier_Node_Body_List),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node_Body_List', Frontier_Node_Body_List),
-	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
+	% The only equalities we are interested in are the ones concerning GoalVars, because
+	% Chan mechanism unifies the variables in LocalVars that occur in a equality.
+	% We are just saving execution time and memory space.
+	get_equalities_conj_from_lists(GoalVars, Answ_GoalVars, true, New_E), 
+	!, 
+	subfrontier_E_IE_NIE_contents(Frontier_Node, New_E, New_IE, Answ_NIE),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node', Frontier_Node),
 	!.
 
 
@@ -414,10 +408,12 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
 
-get_equalities_list_from_lists([], [], List_In, List_In) :- !.
-get_equalities_list_from_lists([Elto_1], [Elto_2], List_In, [(Elto_1 = Elto_2) | List_In]) :- !.
-get_equalities_list_from_lists([Elto_1 | List_1], [Elto_2 | List_2], List_In, List_Out) :- !,
-	get_equalities_list_from_lists(List_1, List_2, [(Elto_1 = Elto_2) | List_In], List_Out).
+get_equalities_conj_from_lists([], [], Conj, Conj) :- !.
+get_equalities_conj_from_lists([Elto_1], [Elto_2], Conj_In, Conj_Out) :- !,
+	goals_join_by_conjunction(Conj_In, (Elto_1 = Elto_2), Conj_Out), !.
+get_equalities_conj_from_lists([Elto_1 | List_1], [Elto_2 | List_2], Conj_In, Conj_Out) :- !,
+	goals_join_by_conjunction(Conj_In, (Elto_1 = Elto_2), Conj_Aux), !,
+	get_equalities_conj_from_lists(List_1, List_2, Conj_Aux, Conj_Out).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
