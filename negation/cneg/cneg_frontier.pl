@@ -380,30 +380,29 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes) :-
 	setof((GoalVars, LocalVars, RG_Constraints, NIE), (E, IE), PreFr_Node_Answers), !,
 	echo_msg(2, 'list', 'cneg_rt', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
-	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, LocalVars, RG_Constraints, [], Frontier_Nodes), !,
+	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
 	echo_msg(2, 'list', 'cneg_rt', 'get_frontier_from_pre_frontier :: Frontier_Nodes', Frontier_Nodes).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_eqs_and_diseqs_from_answers([], _GoalVars, _LocalVars, _RG_Constraints, Frontier_Nodes, Frontier_Nodes).
-get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, LocalVars, RG_Constraints, FN_In, FN_Out) :- !,
-	get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN), !,
-	get_eqs_and_diseqs_from_answers(Answers, GoalVars, LocalVars, RG_Constraints, [FN | FN_In], FN_Out).
+get_eqs_and_diseqs_from_answers([], _GoalVars, Frontier_Nodes, Frontier_Nodes).
+get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, FN_In, FN_Out) :- !,
+	get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, FN), !,
+	get_eqs_and_diseqs_from_answers(Answers, GoalVars, [FN | FN_In], FN_Out).
 
 % get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, Frontier_Node)
-get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, Frontier_Node) :-
+get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Constraints, Answ_NIE),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars, LocalVars)', (GoalVars, LocalVars)),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (Answ_GoalVars, Answ_LocalVars)', (Answ_GoalVars, Answ_LocalVars)),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: RG_Constraints', RG_Constraints),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answ_RG_Constraints', Answ_RG_Constraints),
+	echo_msg(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars)', (GoalVars)),
+	echo_msg(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (Answ_GoalVars, Answ_LocalVars)', (Answ_GoalVars, Answ_LocalVars)),
+	echo_msg(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answ_RG_Constraints', Answ_RG_Constraints),
 
 	% A variable can have attributes coming from a higher level, 
 	% and this ones are NOT part of the current frontier.
 	get_disequalities_from_constraints_and_remove_them((Answ_GoalVars, Answ_LocalVars), Disequalities),
-	attributes_difference(Disequalities, RG_Constraints, New_Constraints),
+	attributes_difference(Disequalities, Answ_RG_Constraints, New_Constraints),
 	attribute_diseq_to_executable_diseq(New_Constraints, New_IE),
 
 	% The only equalities we are interested in are the ones concerning GoalVars, because

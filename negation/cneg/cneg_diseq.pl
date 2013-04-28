@@ -220,13 +220,8 @@ prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
 
 get_attributes_in_term_vars(Term, All_Vars, Vars_With_Attrs, Vars_Without_Attrs) :-
 	cneg_aux:varsbag(Term, [], [], Vars),
-	get_attributes_in_term_vars_aux(Vars, [], All_Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs),
-	echo_msg(2, '', 'cneg_diseq', 'Variables visited', All_Vars), 
-%	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'Variables with attributes', Vars_With_Attrs), 
-%	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'Variables without attributes', Vars_Without_Attrs). 
-%	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+	get_attributes_in_term_vars_aux(Vars, [], All_Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs).
+%	echo_msg(2, '', 'cneg_diseq', 'Vars :: (visited, with attributes, without attributes)', (All_Vars, Vars_With_Attrs, Vars_Without_Attrs)). 
 
 % get_attributes_in_term_vars_aux(Vars_In, Visited_In, Visited_Out, VWA_In, VWA_Out, VWOA_In, VWOA_Out)
 % Vars_In -> Variables to check for attributes.
