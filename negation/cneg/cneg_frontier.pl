@@ -1,5 +1,5 @@
 
-:- module(cneg_frontier, [compute_frontier/3], [assertions]).
+:- module(cneg_frontier, [compute_frontier/3, subfrontier_E_IE_NIE_contents/4, subfrontier_E_IE_NIE_ie_contents/6], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library - Frontiers generation.").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
