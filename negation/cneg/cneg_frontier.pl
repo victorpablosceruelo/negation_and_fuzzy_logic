@@ -18,6 +18,9 @@
 :- multifile call_to_predicate/1.
 :- multifile file_debug_is_activated/1.
 
+%:- push_prolog_flag(unused_pred_warnings, no).
+%:- meta_predicate pre_frontier_node_to_frontier_node_aux_aux(?, ?, ?, goal, ?).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
@@ -322,38 +325,27 @@ pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVar
 % (5) retrieve the current status of the goals (the goalvars, the localvars and the constraints),
 % (6) decide which unifications and constraints have been generated in step (4).
 %
-pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node_In, GoalVars_In, Frontier_In, Frontier_Out) :-
-	varsbag(GoalVars_In, [], [], GoalVars_Aux),
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: GoalVars_Aux', GoalVars_Aux),
-
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node_In', Goal_PreFrontier_Node_In),
-	copy_term((Goal_PreFrontier_Node_In, GoalVars_Aux), (Goal_PreFrontier_Node, GoalVars)),
-
+pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Frontier_In, Frontier_Out) :-
 %	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
+	unify_real_goal_and_clean_head(Real_Goal, Clean_Head),
+
+	varsbag(GoalVars_In, [], [], GoalVars),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: GoalVars', GoalVars),
+	varsbag((E, IE, NIE), GoalVars, [], LocalVars),
+
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: (Head, Body)', (Head, Body)),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Clean_Head', Clean_Head),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: E', E),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: IE', IE),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: NIE', NIE),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: GoalVars', GoalVars),
-	varsbag((E, IE, NIE), GoalVars, [], LocalVars),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: LocalVars', LocalVars),
 
-	get_disequalities_from_constraints_and_remove_them(Real_Goal, RG_Constraints),
+	get_disequalities_from_constraints(Real_Goal, RG_Constraints),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: RG_Constraints', RG_Constraints),
 
-	
-
-	% Link the query and the pre-node (only goalvars, not uqv).
-	copy_term((Real_Goal, GoalVars), (Real_Goal_Copy, GoalVars_Copy)),
-	GoalVars_Copy = GoalVars, % Unify Goalvars_Copy, but not UQV_Copy.
-	Real_Goal_Copy = Clean_Head, % Unify head and goal, but not UQV.
-	!, % Backtracking is forbidden.
-
-	varsbag((Clean_Head, Body), GoalVars, [], PreFr_Node_UQV), % Identify UQV in Pre_Node
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: PreFr_Node_UQV', PreFr_Node_UQV),
-	pre_frontier_node_to_frontier_node_aux((E, IE), NIE, PreFr_Node_UQV, GoalVars, Frontier_Nodes),
+	get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Frontier_Nodes', Frontier_Nodes),
 	append(Frontier_In, Frontier_Nodes, Frontier_Out). % Is order really relevant ???
 
@@ -361,47 +353,72 @@ pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node_In, GoalVars_In, Fronti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pre_frontier_node_to_frontier_node_aux([], [], _UQV, _GoalVars, []) :- !.
-pre_frontier_node_to_frontier_node_aux([], NIE_Body, _UQV, _GoalVars, Frontier_Nodes) :- !,
-	generate_conjunction_from_list(NIE_Body, Frontier_Nodes).
-pre_frontier_node_to_frontier_node_aux(E_IE_Body, NIE_Body, UQV, GoalVars, Frontier_Nodes) :-
-	generate_conjunction_from_list(E_IE_Body, Conj_E_IE_Body),
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: Conj_E_IE_Body', Conj_E_IE_Body),
-	pre_frontier_node_to_frontier_node_aux_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers),
-	
-	get_eqs_and_diseqs_from_answers(Pre_Node_Answers, UQV, GoalVars, [], Frontier_Nodes), !,
-	echo_msg(2, 'list', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: Frontier_Nodes', Frontier_Nodes).
-
-%:- push_prolog_flag(unused_pred_warnings, no).
-%:- meta_predicate pre_frontier_node_to_frontier_node_aux_aux(?, ?, ?, goal, ?).
-pre_frontier_node_to_frontier_node_aux_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, Pre_Node_Answers) :-
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, [(UQV, GoalVars, NIE_Body)])'),
-	setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers), !,
-	cneg_diseq_echo(2, 'list', 'cneg_rt', 'setof :: [(UQV, GoalVars, NIE_Body)]', Pre_Node_Answers),
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: (UQV, GoalVars)', (UQV, GoalVars)),
-	!.
-
-pre_frontier_node_to_frontier_node_aux_aux(UQV, GoalVars, NIE_Body, Conj_E_IE_Body, _Pre_Node_Answers) :-
-	call(Conj_E_IE_Body), !, % If this succeeds there is an error.
-	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, '', 'cneg_rt', 'ERROR in pre_frontier_node_to_frontier_node_aux_aux', 'setof/3 has failed'),
-	echo_msg(1, 'nl', 'cneg_rt', '', ''),
-	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux', 'setof((UQV, GoalVars, NIE_Body), Conj_E_IE_Body, Pre_Node_Answers)'),
-	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: UQV', UQV),
-	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: GoalVars', GoalVars),
-	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: NIE_Body', NIE_Body),
-	echo_msg(1, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: setof :: Conj_E_IE_Body', Conj_E_IE_Body),
- 	echo_msg(1, 'nl', 'cneg_rt', '', ''),
+unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :- Real_Goal = Clean_Head, !.
+unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :- 
+	echo_msg(1, '', 'cneg_rt', 'unify_real_goal_and_clean_head :: Real_Goal', Real_Goal),
+	echo_msg(1, '', 'cneg_rt', 'unify_real_goal_and_clean_head :: Clean_Head', Clean_Head),
 	!, fail.
 
-pre_frontier_node_to_frontier_node_aux_aux(_UQV, _GoalVars, _NIE_Body, Conj_E_IE_Body, []) :-
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node_aux :: not satisfiable :: Conj_E_IE_Body', Conj_E_IE_Body), !.
-%:- pop_prolog_flag(unused_pred_warnings).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes) :-
+	setof((GoalVars, LocalVars, RG_Constraints, NIE), (E, IE), PreFr_Node_Answers), !,
+	echo_msg(2, 'list', 'cneg_rt', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
+	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, LocalVars, RG_Constraints, [], Frontier_Nodes), !,
+	echo_msg(2, 'list', 'cneg_rt', 'get_frontier_from_pre_frontier :: Frontier_Nodes', Frontier_Nodes).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_eqs_and_diseqs_from_answers([], _GoalVars, _LocalVars, _RG_Constraints, Frontier_Nodes, Frontier_Nodes).
+get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, LocalVars, RG_Constraints, FN_In, FN_Out) :- !,
+	get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN), !,
+	get_eqs_and_diseqs_from_answers(Answers, GoalVars, LocalVars, RG_Constraints, [FN | FN_In], FN_Out).
+
+% get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN)
+get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, FN) :-
+	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Constraints, Answ_NIE),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars, LocalVars)', (GoalVars, LocalVars)),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (Answ_GoalVars, Answ_LocalVars)', (Answ_GoalVars, Answ_LocalVars)),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: RG_Constraints', RG_Constraints),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answ_RG_Constraints', Answ_RG_Constraints),
+
+	% A variable can have attributes coming from a higher level, 
+	% and this ones are NOT part of the current frontier.
+	get_disequalities_from_constraints_and_remove_them((Answ_GoalVars, Answ_LocalVars), Disequalities),
+	attributes_difference(Disequalities, RG_Constraints, New_Constraints),
+	attribute_diseq_to_executable_diseq(New_Constraints, New_IE),
+
+	% 
+	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answer_Vars', Answer_Vars),
+
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Disequalities', Disequalities),
+
+	% Ojo q al cambiar las UQV hemos de modificar las viejas por las nuevas en las desigualdades ... !!!
+	copy_term(UQV, Fresh_UQV),
+	get_equalities_list_from_lists(Fresh_UQV, Answer_UQV, Disequalities, Eqs_and_Diseqs_Tmp), 
+	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Eqs_and_Diseqs', Eqs_and_Diseqs),
+
+	append(Eqs_and_Diseqs, NIE_Body, Frontier_Node_Body_List),
+	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node_Body_List', Frontier_Node_Body_List),
+	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
+	!.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
+
+get_equalities_list_from_lists([], [], List_In, List_In) :- !.
+get_equalities_list_from_lists([Elto_1], [Elto_2], List_In, [(Elto_1 = Elto_2) | List_In]) :- !.
+get_equalities_list_from_lists([Elto_1 | List_1], [Elto_2 | List_2], List_In, List_Out) :- !,
+	get_equalities_list_from_lists(List_1, List_2, [(Elto_1 = Elto_2) | List_In], List_Out).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

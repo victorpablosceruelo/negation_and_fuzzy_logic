@@ -615,51 +615,6 @@ negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_eqs_and_diseqs_from_answers([], _UQV, _GoalVars, Frontier_Nodes, Frontier_Nodes).
-get_eqs_and_diseqs_from_answers([(Answer_UQV, Answer_GoalVars, NIE_Body) | Answers], UQV, GoalVars, FN_In, FN_Out) :- !,
-	get_eqs_and_diseqs_from_one_answer(Answer_UQV, Answer_GoalVars, NIE_Body, UQV, GoalVars, Frontier_Node_Body), !,
-	get_eqs_and_diseqs_from_answers(Answers, UQV, GoalVars, [Frontier_Node_Body | FN_In], FN_Out).
-
-get_eqs_and_diseqs_from_answers(Answers, UQV, GoalVars, FN_In, _FN_Out) :- !,
-	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. Answers', Answers),
-	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. UQV', UQV),
-	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. GoalVars', GoalVars),
-	echo_msg(1, '', 'cneg_rt', 'ERROR in get_eqs_and_diseqs_from_answers. FN_In', FN_In),
-	!, fail.
-
-get_eqs_and_diseqs_from_one_answer([], [], [], _UQV, _GoalVars, true) :- !.
-get_eqs_and_diseqs_from_one_answer(Answer_UQV, Answer_GoalVars, NIE_Body, UQV, GoalVars, Frontier_Node_Body) :-
-
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (Answer_UQV, Answer_GoalVars)', (Answer_UQV, Answer_GoalVars)),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: (UQV, GoalVars)', (UQV, GoalVars)),
-
-	varsbag((Answer_UQV, Answer_GoalVars, NIE_Body), [], [], Answer_Vars),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Answer_Vars', Answer_Vars),
-	% There is a bug here: a variable can have attributes coming from a higher level, 
-	% and this ones are NOT part of the current frontier.
-	get_disequalities_from_constraints_and_remove_them(Answer_Vars, Disequalities),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Disequalities', Disequalities),
-
-	% Ojo q al cambiar las UQV hemos de modificar las viejas por las nuevas en las desigualdades ... !!!
-	copy_term(UQV, Fresh_UQV),
-	get_equalities_list_from_lists(Fresh_UQV, Answer_UQV, Disequalities, Eqs_and_Diseqs_Tmp), 
-	get_equalities_list_from_lists(GoalVars, Answer_GoalVars, Eqs_and_Diseqs_Tmp, Eqs_and_Diseqs), 
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Eqs_and_Diseqs', Eqs_and_Diseqs),
-
-	append(Eqs_and_Diseqs, NIE_Body, Frontier_Node_Body_List),
-	cneg_diseq_echo(2, '', 'cneg_rt', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node_Body_List', Frontier_Node_Body_List),
-	generate_conjunction_from_list(Frontier_Node_Body_List, Frontier_Node_Body),
-	!.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
-
-get_equalities_list_from_lists([], [], List_In, List_In) :- !.
-get_equalities_list_from_lists([Elto_1], [Elto_2], List_In, [(Elto_1 = Elto_2) | List_In]) :- !.
-get_equalities_list_from_lists([Elto_1 | List_1], [Elto_2 | List_2], List_In, List_Out) :- !,
-	get_equalities_list_from_lists(List_1, List_2, [(Elto_1 = Elto_2) | List_In], List_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
