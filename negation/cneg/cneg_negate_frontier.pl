@@ -6,7 +6,7 @@
 :- comment(summary, "This module implements negation predicates for runtime evaluation.").
 
 :- use_module(library('cneg/cneg_aux')).
-:- use_module(library('cneg/cneg_diseq')).
+%:- use_module(library('cneg/cneg_diseq')).
 :- use_module(library('cneg/cneg_frontier')).
 
 % To access pre-frontiers from anywhere.
@@ -52,11 +52,9 @@ negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Result_More_Front
 negate_subfrontier(SubFrontier_In, GoalVars_In, (Result)) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
-	split_subfrontier_into_E_IE_NIE(SubFrontier_In, SubFrontier_Aux_1),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier', (SubFrontier_Aux_1)),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	varsbag(GoalVars_In, [], [], GoalVars),
-	normalize_E_IE_NIE(SubFrontier_Aux_1, GoalVars, SubFrontier_Aux_2),
+	normalize_E_IE_NIE(SubFrontier_In, GoalVars, SubFrontier_Aux_2),
 	subfrontier_E_IE_NIE_contents(SubFrontier_Aux_2, E, _IE, NIE),
 	varsbag(E, [], GoalVars, ImpVars),
 	varsbag(NIE, ImpVars, [], ExpVars),
