@@ -322,17 +322,28 @@ pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVar
 % (5) retrieve the current status of the goals (the goalvars, the localvars and the constraints),
 % (6) decide which unifications and constraints have been generated in step (4).
 %
-pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Frontier_In, Frontier_Out) :-
-	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
-	copy_term(Goal_PreFrontier_Node, Goal_PreFrontier_Node_Copy),
+pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node_In, GoalVars_In, Frontier_In, Frontier_Out) :-
+	varsbag(GoalVars_In, [], [], GoalVars_Aux),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: GoalVars_Aux', GoalVars_Aux),
+
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node_In', Goal_PreFrontier_Node_In),
+	copy_term((Goal_PreFrontier_Node_In, GoalVars_Aux), (Goal_PreFrontier_Node, GoalVars)),
 
 %	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(Goal_PreFrontier_Node_Copy, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
+	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: (Head, Body)', (Head, Body)),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: Clean_Head', Clean_Head),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: E', E),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: IE', IE),
 	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: NIE', NIE),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: GoalVars', GoalVars),
+	varsbag((E, IE, NIE), GoalVars, [], LocalVars),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: LocalVars', LocalVars),
+
+	get_disequalities_from_constraints_and_remove_them(Real_Goal, RG_Constraints),
+	echo_msg(2, '', 'cneg_rt', 'pre_frontier_node_to_frontier_node :: RG_Constraints', RG_Constraints),
+
+	
 
 	% Link the query and the pre-node (only goalvars, not uqv).
 	copy_term((Real_Goal, GoalVars), (Real_Goal_Copy, GoalVars_Copy)),

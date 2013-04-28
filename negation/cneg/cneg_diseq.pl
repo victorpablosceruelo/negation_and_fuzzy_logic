@@ -1,9 +1,14 @@
 :- module(cneg_diseq, 
 	[
  	    equality/3, disequality/3,
-	    get_disequalities_from_constraints_and_remove_them/2, 
  	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/5
+	    cneg_diseq_echo/5,
+
+	    get_disequalities_from_constraints/2,
+	    get_disequalities_from_constraints_and_remove_them/2, 
+	    remove_all_constraints_in_variables/1,
+	    attributes_difference/3,	    
+	    attribute_diseq_to_executable_diseq/2
 	], 
 	[assertions]).
 
@@ -203,7 +208,7 @@ cneg_diseq_echo(Echo_Level, _Mode, File_Name, Msg, Term) :-
 	    
 prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
 	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Term', Term),
-	get_attributes_in_term_vars(Term, Vars_With_Attrs, _Vars_Without_Attrs), !,
+	get_attributes_in_term_vars(Term, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
 	format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing), !,
 	attrs_list_to_conj(Attributes_For_Printing, Attributes_For_Printing_Conj), !,
 	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj), 
@@ -213,20 +218,30 @@ prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_attributes_in_term_vars(Term, Vars_With_Attrs, Vars_Without_Attrs) :-
+get_attributes_in_term_vars(Term, All_Vars, Vars_With_Attrs, Vars_Without_Attrs) :-
 	cneg_aux:varsbag(Term, [], [], Vars),
-	get_attributes_in_term_vars_aux(Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs),
+	get_attributes_in_term_vars_aux(Vars, [], All_Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs),
+	echo_msg(2, '', 'cneg_diseq', 'Variables visited', All_Vars), 
+%	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
 	echo_msg(2, '', 'cneg_diseq', 'Variables with attributes', Vars_With_Attrs), 
 %	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
 	echo_msg(2, '', 'cneg_diseq', 'Variables without attributes', Vars_Without_Attrs). 
 %	echo_msg(2, 'nl', 'cneg_diseq', '', '').
 
-get_attributes_in_term_vars_aux([], Vars_WA, Vars_WA, Vars_WOA, Vars_WOA) :- !.
-get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
+% get_attributes_in_term_vars_aux(Vars_In, Visited_In, Visited_Out, VWA_In, VWA_Out, VWOA_In, VWOA_Out)
+% Vars_In -> Variables to check for attributes.
+% Visited_In -> The ones we have checked before.
+% Visited_Out -> The ones checked when this pred ends.
+% VWA_In, VWA_Out, -> The vars WITH attributes.
+% VWOA_In, VWOA_Out -> The vars WITHOUT attributes.
+%
+get_attributes_in_term_vars_aux([], Visited, Visited, VWA, VWA, VWOA, VWOA) :- !.
+get_attributes_in_term_vars_aux([Var | Vars_In], Visited_In, Visited_Out, VWA_In, VWA_Out, VWOA_In, VWOA_Out) :-
 	get_attribute_local(Var, Attr), !,
-	get_attributes_in_term_vars_aux(Vars, [Attr | Vars_WA_In], Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out).
-get_attributes_in_term_vars_aux([Var | Vars], Vars_WA_In, Vars_WA_Out, Vars_WOA_In, Vars_WOA_Out) :-
-	get_attributes_in_term_vars_aux(Vars, Vars_WA_In, Vars_WA_Out, [ Var | Vars_WOA_In ], Vars_WOA_Out).
+	varsbag(Attr, [Var | Visited_In], Vars_In, Vars_Out), !,
+	get_attributes_in_term_vars_aux(Vars_Out, [Var | Visited_In], Visited_Out, [Attr | VWA_In], VWA_Out, VWOA_In, VWOA_Out).
+get_attributes_in_term_vars_aux([Var | Vars], Visited_In, Visited_Out, VWA_In, VWA_Out, VWOA_In, VWOA_Out) :-
+	get_attributes_in_term_vars_aux(Vars, [Var | Visited_In], Visited_Out, VWA_In, VWA_Out, [ Var | VWOA_In ], VWOA_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -881,41 +896,46 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+get_disequalities_from_constraints(Anything, Vars_With_Attrs) :-
+	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
+	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints :: Vars_With_Attrs', Vars_With_Attrs).
+
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
-get_disequalities_from_constraints_and_remove_them(Anything, Disequalities) :-
+get_disequalities_from_constraints_and_remove_them(Anything, Vars_With_Attrs) :-
+	get_disequalities_from_constraints(Anything, Vars_With_Attrs),
+	varsbag(Vars_With_Attrs, [], [], Vars),
 	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
+	remove_all_constraints_in_variables(Vars), !.
 
-	varsbag(Anything, [], [], Vars),
-	get_disequalities_from_constraints_and_remove_them_aux(Vars, [], [], Disequalities), !,
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Disequalities', Disequalities),
-	!.
+remove_all_constraints_in_variables(Anything) :-
+	get_disequalities_from_constraints(Anything, Vars_With_Attrs),
+	remove_this_constraints_from_affected_variables(Vars_With_Attrs).
 
-get_disequalities_from_constraints_and_remove_them_aux([], _Visited, Disequalities, Disequalities) :- !.
-%  Optimization: If it has been visited it can not have attribute and this check is much more faster.
-%get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Diseqs_In, Diseqs_Out) :-
-%	cneg_aux:memberchk(Var, Visited), !, 
-%	get_disequalities_from_constraints_and_remove_them_aux(Vars, Visited, Diseqs_In, Diseqs_Out).
-get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Diseqs_In, Diseqs_Out) :-
+remove_this_constraints_from_affected_variables([]) :- !.
+remove_this_constraints_from_affected_variables([Var_With_Attrs | Vars_With_Attrs]) :-
+	remove_this_constraints_from_affected_variables_aux(Var_With_Attrs), !,
+	remove_this_constraints_from_affected_variables(Vars_With_Attrs).
+
+remove_this_constraints_from_affected_variables_aux(Var_With_Attrs) :-
+	varsbag(Var_With_Attrs, [], [], Vars),
+	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
+
+remove_this_constraints_from_variables(_Var_With_Attrs, []) :- !.
+remove_this_constraints_from_variables(Var_With_Attrs, [Var | Vars]) :-
 	get_attribute_local(Var, Attribute), !,
-	remove_attribute_local(Var),
-	varsbag(Attribute, [Var | Visited], [], More_Vars),
-	cneg_aux:append(More_Vars, Vars, New_Vars),
-	attribute_contents(Attribute, _Target, Disequalities),
-	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Aux),
-	get_disequalities_from_constraints_and_remove_them_aux(New_Vars, [Var | Visited], Diseqs_Aux, Diseqs_Out).
-get_disequalities_from_constraints_and_remove_them_aux([Var | Vars], Visited, Diseqs_In, Diseqs_Out) :- !,
-	% No attribute in variable.
-	get_disequalities_from_constraints_and_remove_them_aux(Vars, [Var | Visited], Diseqs_In, Diseqs_Out).
+	remove_attribute_local(Var), !,
+	attributes_difference(Attribute, Var_With_Attrs, Difference), !,
+	put_attribute_local(Var, Difference), !,
+	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
+remove_this_constraints_from_variables(Var_With_Attrs, [_Var | Vars]) :-
+	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
 
-disequalities_bag_add_diseqs([], Diseqs_In, Diseqs_In) :- !.
-disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :-
-	attribute_diseq_to_executable_diseq(Diseq, Real_Diseq),
-	cneg_aux:memberchk(Real_Diseq, Diseqs_In), !, 
-	disequalities_bag_add_diseqs(Disequalities, Diseqs_In, Diseqs_Out).
-disequalities_bag_add_diseqs([Diseq | Disequalities], Diseqs_In, Diseqs_Out) :- !,
-	attribute_diseq_to_executable_diseq(Diseq, Real_Diseq),
-	echo_msg(2, '', 'cneg_diseq', 'disequalities_bag_add_diseqs: adding', Real_Diseq), 
-	disequalities_bag_add_diseqs(Disequalities, [Real_Diseq | Diseqs_In], Diseqs_Out).
+attributes_difference(Attribute, Var_With_Attrs, Difference) :-
+	echo_msg(2, '', 'cneg_diseq', 'attributes_difference :: Attribute', Attribute),
+	echo_msg(2, '', 'cneg_diseq', 'attributes_difference :: Var_With_Attrs', Var_With_Attrs),
+	attribute_contents(Attribute, Target, Disequalities),
+	Var_With_Attrs = Disequalities,
+	attribute_contents(Difference, Target, []).
 
 attribute_diseq_to_executable_diseq(Constraint_Diseq, Executable_Diseq) :-
 	attribute_disequality_contents(Constraint_Diseq, Diseq_1, Diseq_2, EQ_Vars, UQ_Vars),
