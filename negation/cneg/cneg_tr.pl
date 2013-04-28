@@ -137,7 +137,7 @@ retract_all_fact_local(Store_Name, Result) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_auxiliary_code([ Multifile |[ end_of_file]]) :-
-	Multifile = (:- multifile cneg_pre_frontier/6).
+	Multifile = (:- multifile cneg_pre_frontier/9).
 %	Multifile = (:- multifile cneg_pre_frontier/6, call_to/3),
 %	Call_To_This_File_Pred = (call_to(Predicate) :- call(Predicate)).
 

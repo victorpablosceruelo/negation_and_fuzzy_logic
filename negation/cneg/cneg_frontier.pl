@@ -150,12 +150,21 @@ compute_goal_pre_frontier(Goal, []) :-
 look_for_the_relevant_clauses(Goal, PreFrontier) :-
 	functor(Goal, Head_Name, Head_Arity),  % Security
 	Head_Name \== ',', Head_Name \== ';',    % Issues
-	!, % Backtracking forbiden.
-	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName_, _Clean_Head_, _E_, _IE_, _NIE_, _Head_, _Body_),
-%	debug_clause('look_for_the_relevant_clauses :: (Name, Arity, SourceFileName)', (Name, Arity, SourceFileName)),
+%	!, % Backtracking forbiden.
+	echo_msg(1, '', 'cneg_rt', 'look_for_the_relevant_clauses :: (Head_Name, Head_Arity)', (Head_Name, Head_Arity)), 
+	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName_, _Clean_Head_, _E_, _IE_, _NIE_, _Head_, _Body_), !,
+	echo_msg(1, '', 'cneg_rt', 'look_for_the_relevant_clauses :: (Head_Name, Head_Arity)', (Head_Name, Head_Arity)), 
 	setof(preFrontierNode(_Real_Goal, Clean_Head, E, IE, NIE, Head, Body), 
 	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
-	PreFrontier).
+	PreFrontier), 
+	!.
+look_for_the_relevant_clauses(_Goal, _PreFrontier) :-
+	echo_msg(1, '', 'cneg_rt', 'look_for_the_relevant_clauses :: ', 
+	'cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body)'), 
+	cneg_pre_frontier(Name, Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body), 
+	echo_msg(1, '', 'cneg_rt', '', cneg_pre_frontier(Name, Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body)), 
+	fail.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -34,12 +34,8 @@ cneg_rt(Goal, GoalVars_In, Depth_Level, Trace) :-
 
 cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'cneg_rt', CN_Call),
+	echo_msg(2, '', 'cneg_rt', 'cneg_rt_aux :: Goal', Goal),
 	echo_msg(2, 'separation', 'cneg_rt', '', ''),
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-
-	echo_msg(2, 'nl', 'calls_trace', '', ''),
-	echo_msg(2, '', 'calls_trace', 'cneg_rt', evaluating(CN_Call)),
 	echo_msg(2, 'nl', 'cneg_rt', '', ''),
 
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.

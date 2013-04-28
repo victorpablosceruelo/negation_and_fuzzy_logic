@@ -1,4 +1,4 @@
-:- module(ex_peano_queens,_,[.(cneg)]).
+:- module(ex_peano_queens,_,[cneg]).
 % :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
@@ -14,7 +14,8 @@ echo_fail :-
 
 echo_test(Msg1, Msg2) :-
 	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', ''),
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', Msg1, Msg2).
+	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', Msg1, Msg2),
+	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', '').
 
 
 tests(N, C) :- 
@@ -28,7 +29,7 @@ tests(N, C) :-
 	).
 
 test_queens_1(N, Columns) :- % Let's see if we have invalid results.
-	cneg([], queens(N, Columns)), % First constraints.
+	cneg(queens(N, Columns)), % First constraints.
  	echo_test('test_queens_1 :: queens(N, Columns) :: ', queens(N, Columns)),
 	(
 	    queens(N, Columns) % Secondly values generator.
@@ -40,7 +41,7 @@ test_queens_2(N, Columns) :- % Let's see if we have invalid results.
 	queens(N, Columns), % First values generator.
  	echo_test('test_queens_2 :: queens(N, Columns) :: ', queens(N, Columns)),
 	(
-	    cneg([], queens(N, Columns)) % Second constraints.
+	    cneg(queens(N, Columns)) % Second constraints.
 	;
 	    echo_fail
 	).
