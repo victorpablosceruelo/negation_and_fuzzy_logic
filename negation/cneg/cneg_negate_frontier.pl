@@ -31,14 +31,14 @@ negate_frontier(Frontier, GoalVars, Negated_Frontier) :-
 
 negate_each_subfrontier([], _GoalVars, []) :- !.
 negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, [Result_Frontier | Result_More_Frontiers]) :-
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
+	print_msg(3, 3, '', 'negate_subfrontier: (Frontier, GoalVars)', (Frontier, GoalVars)),
 	negate_subfrontier(Frontier, GoalVars, Result_Frontier),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier: Result_Frontier', Result_Frontier),
+	print_msg(3, 3, '', 'negate_subfrontier: Result_Frontier', Result_Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_each_subfrontier(More_Frontiers, GoalVars, Result_More_Frontiers).
 
 negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Result_More_Frontiers) :-
-	echo_msg(1, '', 'cneg_rt', 'negate_each_subfrontier :: ERROR negating Frontier. Frontier', Frontier), !,
+	print_msg(1, 3, '', 'negate_each_subfrontier :: ERROR negating Frontier. Frontier', Frontier), !,
 	negate_each_subfrontier(More_Frontiers, GoalVars, Result_More_Frontiers).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,22 +50,22 @@ negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Result_More_Front
 
 % negate_subfrontier(SubFrontier_In, GoalVars_In, Proposal, (Result)) :-
 negate_subfrontier(SubFrontier_In, GoalVars_In, (Result)) :-
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
+	print_msg(3, 3, 'nl', '', ''),
+	print_msg(3, 3, '', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	varsbag(GoalVars_In, [], [], GoalVars),
 	normalize_E_IE_NIE(SubFrontier_In, GoalVars, SubFrontier_Aux_2),
 	subfrontier_E_IE_NIE_contents(SubFrontier_Aux_2, E, _IE, NIE),
 	varsbag(E, [], GoalVars, ImpVars),
 	varsbag(NIE, ImpVars, [], ExpVars),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: ExpVars', ExpVars),
+	print_msg(3, 3, '', 'negate_subfrontier :: ExpVars', ExpVars),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_2),
+	print_msg(3, 3, '', 'negate_subfrontier', SubFrontier_Aux_2),
 	split_IE_NIE_between_imp_and_exp(SubFrontier_Aux_2, ExpVars, SubFrontier_Aux_3),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier', SubFrontier_Aux_3),
+	print_msg(3, 3, '', 'negate_subfrontier', SubFrontier_Aux_3),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_formula(SubFrontier_Aux_3, GoalVars, Result),
-	echo_msg(2, '', 'cneg_rt', 'negate_subfrontier :: (Result)', (Result)),
+	print_msg(3, 3, '', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,11 +77,11 @@ negate_subfrontier(SubFrontier_In, GoalVars_In, (Result)) :-
 % returns In and Dn that are the equalities of I and the disequalities
 % of D but after normalizating them.
 normalize_E_IE_NIE(Formula_In, GoalVars, Formula_Out) :-
-	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_In', Formula_In),
+	print_msg(3, 3, '', 'normalize_E_IE_NIE :: Formula_In', Formula_In),
 	remove_from_E_redundant_eqs_and_vars(Formula_In, GoalVars, Formula_Aux),  
-	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
+	print_msg(3, 3, '', 'normalize_E_IE_NIE :: Formula_Aux', Formula_Aux),
 	remove_from_IE_irrelevant_disequalities(Formula_Aux, GoalVars, Formula_Out),
-	echo_msg(2, '', 'cneg_rt', 'normalize_E_IE_NIE :: Formula_Out', Formula_Out), 
+	print_msg(3, 3, '', 'normalize_E_IE_NIE :: Formula_Out', Formula_Out), 
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,8 +90,8 @@ normalize_E_IE_NIE(Formula_In, GoalVars, Formula_Out) :-
 
 % removes from E redundnant equalities and variables
 remove_from_E_redundant_eqs_and_vars(Formula_In, GoalVars, Formula_Out) :- 
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs_and_vars :: Formula_In', Formula_In),
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs_and_vars :: GoalVars', GoalVars),
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars :: Formula_In', Formula_In),
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars :: GoalVars', GoalVars),
 	subfrontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In), 
 	remove_from_E_redundant_vars(E_In, GoalVars, 'fail', Changes),
 	remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux),
@@ -131,18 +131,18 @@ remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :-
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV),
 	memberchk(E_In, Visited_In), !, % Eq has been seen before. Redundant.
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, Value_1, Value_2, GV, EQV, UQV),
 	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
 	memberchk(E_Tmp, Visited_In), !, % Eq has been seen before. Redundant.
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
 	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
 	Value_1 == Value_2, !, % Equality between same terms.
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_eqs :: redundant (eq between identical terms)', E_In).
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (eq between identical terms)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
 	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
@@ -172,16 +172,16 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true'
 	    (   % Value_1 is a var in Non_GoalVars
 		var(Value_1),
 		memberchk(Value_1, Non_GoalVars), !,
-		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: redundant (1st var not in GoalVars)', (Value_1, Value_2)),
-		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: GoalVars', GoalVars),
+		print_msg(3, 3, '', 'remove_from_E_redundant_vars :: redundant (1st var not in GoalVars)', (Value_1, Value_2)),
+		print_msg(3, 3, '', 'remove_from_E_redundant_vars :: GoalVars', GoalVars),
 		Value_1 = Value_2
 	    )
 	;
 	    (   % Value_2 is a var in Non_GoalVars
 		var(Value_2),
 		memberchk(Value_2, Non_GoalVars), !,
-		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: redundant (2nd var not in GoalVars)', (Value_1, Value_2)),
-		echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: GoalVars', GoalVars),
+		print_msg(3, 3, '', 'remove_from_E_redundant_vars :: redundant (2nd var not in GoalVars)', (Value_1, Value_2)),
+		print_msg(3, 3, '', 'remove_from_E_redundant_vars :: GoalVars', GoalVars),
 		Value_2 = Value_1
 	    )
 	).
@@ -193,8 +193,8 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Change
 remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out) :-
 	functor_local(Value_1, Name, Arity, Args1),
 	functor_local(Value_2, Name, Arity, Args2), !,
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: eq between functors :: erroneous frontier :: terms', (Value_1, Value_2)),
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars', 'ERROR computing the frontier.'),
+	print_msg(3, 3, '', 'remove_from_E_redundant_vars :: eq between functors :: erroneous frontier :: terms', (Value_1, Value_2)),
+	print_msg(3, 3, '', 'remove_from_E_redundant_vars', 'ERROR computing the frontier.'),
 	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_In, Changes_Out).
 
 remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
@@ -204,7 +204,7 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Change
 	    ( Name1 \== Name2) ;
 	    ( Arity1 \== Arity2)
 	),
-	echo_msg(2, '', 'cneg_rt', 'remove_from_E_redundant_vars :: eq between different terms :: failed frontier :: terms', (Value_1, Value_2)).
+	print_msg(3, 3, '', 'remove_from_E_redundant_vars :: eq between different terms :: failed frontier :: terms', (Value_1, Value_2)).
 
 remove_from_E_redundant_vars_aux_list([], [], _GoalVars, Changes_In, Changes_In) :- !.
 remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Changes_In, Changes_Out) :-
@@ -278,8 +278,8 @@ negate_formula(Frontier, GoalVars, Neg_E_IE_NIE) :-
 	rebuild_conjunction_of_goals(E, IE_Imp, E_IE_Imp),
 	rebuild_conjunction_of_goals(E_IE_Imp, NIE_Imp, E_IE_NIE_Imp),
 
-	echo_msg(2, '', 'cneg_rt', 'negate_formula :: E_IE_NIE_Imp', E_IE_NIE_Imp),
-	echo_msg(2, '', 'cneg_rt', 'negate_formula :: IE_NIE_Exp', IE_NIE_Exp),
+	print_msg(3, 3, '', 'negate_formula :: E_IE_NIE_Imp', E_IE_NIE_Imp),
+	print_msg(3, 3, '', 'negate_formula :: IE_NIE_Exp', IE_NIE_Exp),
  	negate_IE_NIE_exp(IE_NIE_Exp, GoalVars, Neg_IE_NIE_Exp),
 	negate_imp_form(E_IE_NIE_Imp, GoalVars, Neg_IE_NIE_Exp, Neg_E_IE_NIE),
 	!. % Backtracking forbidden.
@@ -296,7 +296,7 @@ negate_IE_NIE_exp(IE_NIE_exp, GoalVars_In, Neg_IE_NIE_exp) :-
 negate_imp_form([], _GoalVars, [], []) :- !. % Optimization.
 negate_imp_form(Formula, _GoalVars, _Next_Formula, _Neg_Formula) :-
 	goal_is_disjunction(Formula, _Formula_1, _Formula_2), !,
-	echo_msg(1, '', 'cneg_rt', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
+	print_msg(1, 3, '', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
 	fail.
 
 negate_imp_form(Formula, GoalVars, Next_Formula, Neg_Formula) :-
@@ -338,8 +338,8 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	(   (   Eq_UQV = [], !   )
 	;
 	    (
-		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the equality below, but ours can.', ''),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: eq_geuqv(T1, T2, GoalVars, EQV, UQV)', Formula)
+		print_msg(1, 3, '', 'WARNING: Chans proposal can not deal with the equality below, but ours can.', ''),
+		print_msg(1, 3, '', 'WARNING: eq_geuqv(T1, T2, GoalVars, EQV, UQV)', Formula)
 	    )
 	),
 
@@ -349,8 +349,8 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	(   (   Diseq_UQV = [], !   )
 	;
 	    (
-		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the disequality below, but ours can.', ''),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: diseq_geuqv(T1, T2, GoalVars, EQV, UQV)', Neg_Atom)
+		print_msg(1, 3, '', 'WARNING: Chans proposal can not deal with the disequality below, but ours can.', ''),
+		print_msg(1, 3, '', 'WARNING: diseq_geuqv(T1, T2, GoalVars, EQV, UQV)', Neg_Atom)
 	    )
 	).
 
@@ -368,9 +368,9 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	(   (   Diseq_UQV_Aux = [], !   )
 	;
 	    (
-		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the disequality', ''),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: diseq_geuqv(T1, T2, GoalVars, EQV, UQV)', Formula),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: but the current implementation can.', '')
+		print_msg(1, 3, '', 'WARNING: Chans proposal can not deal with the disequality', ''),
+		print_msg(1, 3, '', 'WARNING: diseq_geuqv(T1, T2, GoalVars, EQV, UQV)', Formula),
+		print_msg(1, 3, '', 'WARNING: but the current implementation can.', '')
 	    )
 	),
 
@@ -389,9 +389,9 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 	(   (   Eq_UQV = [], !   )
 	;
 	    (
-		echo_msg(1, '', 'cneg_rt', 'WARNING: Chans proposal can not deal with the resultant equality', ''),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: eq_geuqv(T1, T2, GoalVars, EQV, UQV)', Neg_Atom),
-		echo_msg(1, '', 'cneg_rt', 'WARNING: but the current implementation can.', '')
+		print_msg(1, 3, '', 'WARNING: Chans proposal can not deal with the resultant equality', ''),
+		print_msg(1, 3, '', 'WARNING: eq_geuqv(T1, T2, GoalVars, EQV, UQV)', Neg_Atom),
+		print_msg(1, 3, '', 'WARNING: but the current implementation can.', '')
 	    )
 	).
 
@@ -427,14 +427,14 @@ rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empt
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_and_exp(Frontier_In, ExpVars, Frontier_Out):-
 	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
-	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_exp :: (E, IE, NIE)', (E, IE, NIE)),
-	echo_msg(2, '', 'cneg_rt', 'split_IE_NIE_between_imp_and_exp :: ExpVars', ExpVars),
+	print_msg(3, 3, '', 'split_IE_NIE_between_imp_and_exp :: (E, IE, NIE)', (E, IE, NIE)),
+	print_msg(3, 3, '', 'split_IE_NIE_between_imp_and_exp :: ExpVars', ExpVars),
 
 	split_ie_or_nie_between_imp_and_exp(IE, ExpVars, IE_Imp, IE_Exp),
-	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),
+	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),
 
 	split_ie_or_nie_between_imp_and_exp(NIE, ExpVars, NIE_Imp, NIE_Exp),
-	echo_msg(2, '', 'cneg_rt', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
+	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	subfrontier_E_IE_NIE_ie_contents(Frontier_Out, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
@@ -452,7 +452,7 @@ split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
 
 split_ie_or_nie_between_imp_and_exp(Form, _ExpVars, _Form_imp, _Form_exp) :-
 	goal_is_disjunction(Form, _Form_1, _Form_2), !,
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_ie_or_nie_between_imp_and_exp can not deal with disjunctions. Form', Form),
+	print_msg(1, 3, '', 'ERROR: split_ie_or_nie_between_imp_and_exp can not deal with disjunctions. Form', Form),
 	fail.
 
 split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-

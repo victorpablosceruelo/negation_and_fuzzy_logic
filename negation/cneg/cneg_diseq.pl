@@ -57,12 +57,12 @@
 
 % Local predicates used to easy migration between prologs. 
 remove_attribute_local(Var) :- 
-	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
-	echo_msg(2, 'aux', 'cneg_diseq', 'remove_attribute_local :: Var :: ', Var),
+	print_msg(3, 4, 'logo', '', ''),
+	print_msg(3, 4, 'aux', 'remove_attribute_local :: Var :: ', Var),
 	del_attr_local(Var),
 %	detach_attribute(Var),
-	echo_msg(2, 'aux', 'cneg_diseq', '  -->> Var :: ', Var),
-	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+	print_msg(3, 4, 'aux', '  -->> Var :: ', Var),
+	print_msg(3, 4, 'nl', '', '').
 %	detach_attribute(Var).
 % XSB:	del_attr(Var, dist).
 
@@ -70,18 +70,18 @@ get_attribute_local(Var, Attribute) :-
 	get_attr_local(Var, Attribute),
 %	get_attribute(Var, Attribute),
 % XSB:	get_attr(Var, dist, Attribute),
- 	echo_msg(2, '', 'cneg_diseq', 'get_attribute_local :: Attribute', Attribute).
+ 	print_msg(3, 4, '', 'get_attribute_local :: Attribute', Attribute).
 
 put_attribute_local(Var, Attribute) :-
-	echo_msg(2, '', 'cneg_diseq', 'put_attribute_local :: Attribute', Attribute),
-	echo_msg(2, 'logo', 'cneg_diseq', '', ''),
-	echo_msg(2, 'aux', 'cneg_diseq', 'put_attribute_local', ''),
-	echo_msg(2, 'aux', 'cneg_diseq', ' :: Var :: ', Var), 
+	print_msg(3, 4, '', 'put_attribute_local :: Attribute', Attribute),
+	print_msg(3, 4, 'logo', '', ''),
+	print_msg(3, 4, 'aux', 'put_attribute_local', ''),
+	print_msg(3, 4, 'aux', ' :: Var :: ', Var), 
 %	get_attribute_if_any(Var), !,
 	put_attr_local(Var, Attribute),
 %	attach_attribute(Var, Attribute),
-	echo_msg(2, 'aux', 'cneg_diseq', '  -->> Var :: ', Var),
-	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+	print_msg(3, 4, 'aux', '  -->> Var :: ', Var),
+	print_msg(3, 4, 'nl', '', '').
 %	attach_attribute(Var, Attribute).
 %	put_attr(Var, dist, Attribute).
 
@@ -123,83 +123,83 @@ attribute_goals(Term) -->
 % portray(eqn_var(Self,A,B,R,Nl)) :- print(eqn_var(Self,A,B,R,Nl)).
 
 %attr_portray_hook(_Attribute, Var) :- 
-%	cneg_diseq_echo(2, '', 'cneg_diseq', 'attr_portray_hook(_Attribute, Var)'),
-%	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
+%	cneg_diseq_echo(2, '', 'attr_portray_hook(_Attribute, Var)'),
+%	cneg_diseq_echo(1, 'aux', Var).
 
 %portray_attribute(_Attribute, Var) :-
-%	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray_attribute(_Attribute, Var)'),
-%	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Var).
+%	cneg_diseq_echo(2, '', 'portray_attribute(_Attribute, Var)'),
+%	cneg_diseq_echo(1, 'aux', Var).
 
 %portray(Attribute) :-
-%	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Attribute)'),
+%	cneg_diseq_echo(2, '', 'portray(Attribute)'),
 %	attribute_contents(Attribute, Target, _Disequalities), !,
 %	portray(Target).
 
 %portray(Term) :-
-%	cneg_diseq_echo(2, '', 'cneg_diseq', 'portray(Term)'),
-%	cneg_diseq_echo(1, 'aux', 'cneg_diseq', Term).
+%	cneg_diseq_echo(2, '', 'portray(Term)'),
+%	cneg_diseq_echo(1, 'aux', Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
-%	echo_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
+%	print_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, _Msg, _Term) :-
+cneg_diseq_echo(FI_1, FI_2, Mode, _Msg, _Term) :-
 	(
 	    Mode == 'nl'
 	;
 	    Mode == 'logo'
 	), !,
-	echo_msg(Echo_Level, Mode, File_Name, '', '').
+	print_msg(FI_1, FI_2, Mode, '', '').
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
+cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
 	Mode == 'list',
 	Term == [], !,
-	echo_msg(Echo_Level, Mode, File_Name, Msg, '[] -- list end').
+	print_msg(FI_1, FI_2, Mode, Msg, '[] -- list end').
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
+cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
 	Mode == 'list',
 	list_head_and_tail(Term, Head, Tail), !,
-	cneg_diseq_echo(Echo_Level, '', File_Name, Msg, Head),
-	cneg_diseq_echo(Echo_Level, 'list', File_Name, Msg, Tail).
+	cneg_diseq_echo(FI_1, FI_2, '', Msg, Head),
+	cneg_diseq_echo(FI_1, FI_2, 'list', Msg, Tail).
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Term, Unused) :-
+cneg_diseq_echo(FI_1, FI_2, Mode, Term, Unused) :-
 	Mode == 'aux', 
 	Unused == '',
 	!, 
-	echo_msg(Echo_Level, 'aux', File_Name, Term, ''),
+	print_msg(FI_1, FI_2, 'aux', Term, ''),
 	prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
 	(
 	    (   Attributes_For_Printing_Conj == [], !   )  % No attrs -> No printing.
 	;
 	    (   Attributes_For_Printing_Conj \== [], !, 
-		echo_msg(Echo_Level, 'aux', File_Name, ' : ', Attributes_For_Printing_Conj)
+		print_msg(FI_1, FI_2, 'aux', ' : ', Attributes_For_Printing_Conj)
 	    )
 	).
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
+cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
 	Mode == 'aux', 
 	Term \== '',
 	!, 
-	cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, ''),
-	cneg_diseq_echo(Echo_Level, Mode, File_Name, Term, '').
+	cneg_diseq_echo(FI_1, FI_2, Mode, Msg, ''),
+	cneg_diseq_echo(FI_1, FI_2, Mode, Term, '').
 
-cneg_diseq_echo(Echo_Level, Mode, File_Name, Msg, Term) :-
+cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
 	Mode \== 'nl', 
 	Mode \== 'logo',
  	Mode \== 'list', 
  	Mode \== 'aux', 
 	!,
-	cneg_diseq_echo(Echo_Level, 'logo', File_Name, '', ''),
-	cneg_diseq_echo(Echo_Level, 'aux', File_Name, Msg, ' :: '),
-	cneg_diseq_echo(Echo_Level, 'aux', File_Name, Term, ''),
-	echo_msg(Echo_Level, 'nl', File_Name, '', '').
+	cneg_diseq_echo(FI_1, FI_2, 'logo', '', ''),
+	cneg_diseq_echo(FI_1, FI_2, 'aux', Msg, ' :: '),
+	cneg_diseq_echo(FI_1, FI_2, 'aux', Term, ''),
+	print_msg(FI_1, FI_2, 'nl', '', '').
 
 cneg_diseq_echo(Echo_Level, _Mode, File_Name, Msg, Term) :-
-	echo_msg(1, '', 'cneg_diseq', 'ERROR in cneg_diseq_echo printing', Msg), 
-	echo_msg(1, '', 'cneg_diseq', 'ERROR in cneg_diseq_echo printing', Term), !,
+	print_msg(1, 3, '', 'ERROR in cneg_diseq_echo printing', Msg), 
+	print_msg(1, 3, '', 'ERROR in cneg_diseq_echo printing', Term), !,
 	cneg_diseq_echo(Echo_Level, '', File_Name, Msg, Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,11 +207,11 @@ cneg_diseq_echo(Echo_Level, _Mode, File_Name, Msg, Term) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	    
 prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
-	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Term', Term),
+	print_msg(3, 4, '', 'attribute_goals :: Term', Term),
 	get_attributes_in_term_vars(Term, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
 	format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing), !,
 	attrs_list_to_conj(Attributes_For_Printing, Attributes_For_Printing_Conj), !,
-	echo_msg(2, '', 'cneg_diseq', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj), 
+	print_msg(3, 4, '', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj), 
 	!. % Backtracking forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,7 +221,7 @@ prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
 get_attributes_in_term_vars(Term, All_Vars, Vars_With_Attrs, Vars_Without_Attrs) :-
 	cneg_aux:varsbag(Term, [], [], Vars),
 	get_attributes_in_term_vars_aux(Vars, [], All_Vars, [], Vars_With_Attrs, [], Vars_Without_Attrs).
-%	echo_msg(2, '', 'cneg_diseq', 'Vars :: (visited, with attributes, without attributes)', (All_Vars, Vars_With_Attrs, Vars_Without_Attrs)). 
+%	print_msg(3, 4, '', 'Vars :: (visited, with attributes, without attributes)', (All_Vars, Vars_With_Attrs, Vars_Without_Attrs)). 
 
 % get_attributes_in_term_vars_aux(Vars_In, Visited_In, Visited_Out, VWA_In, VWA_Out, VWOA_In, VWOA_Out)
 % Vars_In -> Variables to check for attributes.
@@ -244,9 +244,9 @@ get_attributes_in_term_vars_aux([Var | Vars], Visited_In, Visited_Out, VWA_In, V
 
 format_attributes_for_printing([], []) :- !.
 format_attributes_for_printing([Attribute|Attributes], [Printing_Attribute|Printing_Attributes]) :-
-%	echo_msg(2, '', 'cneg_diseq', 'format_attribute_for_printing :: Attribute', Attribute), 
+%	print_msg(3, 4, '', 'format_attribute_for_printing :: Attribute', Attribute), 
 	format_attribute_for_printing(Attribute, Printing_Attribute),
-%	echo_msg(2, '', 'cneg_diseq', 'format_attribute_for_printing :: Printing_Attribute', Printing_Attribute),
+%	print_msg(3, 4, '', 'format_attribute_for_printing :: Printing_Attribute', Printing_Attribute),
 	format_attributes_for_printing(Attributes, Printing_Attributes).
 
 format_attribute_for_printing(Attribute, Printing_Attribute) :-
@@ -255,9 +255,9 @@ format_attribute_for_printing(Attribute, Printing_Attribute) :-
 
 format_diseqs_list_for_printing([], []) :- !.
 format_diseqs_list_for_printing([Disequality | Disequalities], [Print_Disequality | Print_Disequalities]) :-
-%	echo_msg(2, '', 'cneg_diseq', 'format_diseq_for_printing :: Disequality', Disequality), 
+%	print_msg(3, 4, '', 'format_diseq_for_printing :: Disequality', Disequality), 
 	format_diseq_for_printing(Disequality, Print_Disequality),
-%	echo_msg(2, '', 'cneg_diseq', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
+%	print_msg(3, 4, '', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
 	format_diseqs_list_for_printing(Disequalities, Print_Disequalities).
 
 % Need to convert to a single term everything.
@@ -298,16 +298,16 @@ attrs_list_to_conj_aux(Elto, Elto) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 attr_unify_hook(Attribute, Value) :-
-	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attr_Fomat', 'var_attribute(Target, [disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars)])'),
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: (Attribute, Value)', (Attribute, Value)),
+	print_msg(3, 4, 'nl', '', ''),
+	print_msg(3, 4, '', 'attr_unify_hook :: Attr_Fomat', 'var_attribute(Target, [disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars)])'),
+	print_msg(3, 4, '', 'attr_unify_hook :: (Attribute, Value)', (Attribute, Value)),
 	attr_unify_hook_aux(Attribute, Value).
 
 attr_unify_hook_aux(Attribute, Value) :-
 	var(Value),
 	get_attribute_local(Value, Attribute_Value), !,
 	remove_attribute_local(Value), 
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Attribute_Value', Attribute_Value),
+	print_msg(3, 4, '', 'attr_unify_hook :: Attribute_Value', Attribute_Value),
 	attribute_contents(Attribute, _OldTarget_Var_1, Diseqs_Var_1), 
 	attribute_contents(Attribute_Value, _OldTarget_Var_2, Diseqs_Var_2), 
 	!,
@@ -316,16 +316,16 @@ attr_unify_hook_aux(Attribute, Value) :-
 
 attr_unify_hook_aux(Attribute, Value) :-
 	var(Value), !,
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Var_Value (no attr)', Value),
+	print_msg(3, 4, '', 'attr_unify_hook :: Var_Value (no attr)', Value),
 	attribute_contents(Attribute, _OldTarget_Var_1, Diseqs), 
-	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
 	test_and_update_vars_attributes(Diseqs).
 
 attr_unify_hook_aux(Attribute, Value) :-
 	!,
-	echo_msg(2, '', 'cneg_diseq', 'attr_unify_hook :: Nonvar_Value (no attr)', Value),
+	print_msg(3, 4, '', 'attr_unify_hook :: Nonvar_Value (no attr)', Value),
 	attribute_contents(Attribute, _OldTarget_Var_1, Diseqs), 
-	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: (Disequalities)', (Diseqs)), 
 	test_and_update_vars_attributes(Diseqs).
 
 
@@ -349,7 +349,7 @@ attr_unify_hook_aux(Attribute, Value) :-
 %	;
 %	    (
 %		Intersection \== [], !,
-%		echo_msg(2, '', 'cneg_diseq', 'perform_substitutions :: Impossible :: (OldTarget, NewTarget, EQV, UQV)', (OldTarget, NewTarget, EQV_Aux, UQV_Aux)),
+%		print_msg(3, 4, '', 'perform_substitutions :: Impossible :: (OldTarget, NewTarget, EQV, UQV)', (OldTarget, NewTarget, EQV_Aux, UQV_Aux)),
 %		!, fail
 %	    )
 %	).
@@ -376,23 +376,23 @@ get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
 test_and_update_vars_attributes(New_Diseqs) :-
-	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: New_Diseqs', New_Diseqs),  
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: New_Diseqs', New_Diseqs),  
 
 	cneg_aux:varsbag(New_Diseqs, [], [], New_Diseqs_Vars), !,
 	retrieve_affected_disequalities(New_Diseqs_Vars, [], [], Old_Diseqs), !,
-	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: Old_Diseqs', Old_Diseqs),
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs', Old_Diseqs),
 
 	% Get which variables are EQV so we distinguish them from UQV.
 	get_and_remove_eqv_and_uqv_from_diseqs(New_Diseqs, [], ND_EQV, [], ND_UQV, New_Diseqs_Aux),
 	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, [], OD_EQV, [], OD_UQV, Old_Diseqs_Aux),
 	
 	test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV), % The sets must be exclusive.
-	echo_msg(2, '', 'cneg_diseq', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
 
 	% At first we check that the new disequalities can be added to the old ones.
 	set_of_diseqs_to_constraints(New_Diseqs_Aux, Old_Diseqs_Aux, [], Simplified_Diseqs, All_EQV),
 
-%	echo_msg(1, '', 'cneg_diseq', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
+%	print_msg(1, 3, '', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
 	restore_attributes(Simplified_Diseqs, All_EQV, All_UQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -422,29 +422,29 @@ test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV) :
 	(
 	    (varsbag_intersection(ND_EQV, ND_UQV, []), !)
 	;
-	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (ND_EQV, ND_UQV)', (ND_EQV, ND_UQV))
+	    print_msg(3, 4, '', 'Error: common var in (ND_EQV, ND_UQV)', (ND_EQV, ND_UQV))
 	),
 	(
 	    (varsbag_intersection(OD_EQV, OD_UQV, []), !)
 	;
-	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (OD_EQV, OD_UQV)', (OD_EQV, OD_UQV))
+	    print_msg(3, 4, '', 'Error: common var in (OD_EQV, OD_UQV)', (OD_EQV, OD_UQV))
 	),
 	(
 	    (varsbag_intersection(OD_EQV, ND_UQV, []), !)
 	;
-	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (OD_EQV, ND_UQV)', (OD_EQV, ND_UQV))
+	    print_msg(3, 4, '', 'Error: common var in (OD_EQV, ND_UQV)', (OD_EQV, ND_UQV))
 	),
 	(
 	    (varsbag_intersection(ND_EQV, OD_UQV, []), !)
 	;
-	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (ND_EQV, OD_UQV)', (ND_EQV, OD_UQV))
+	    print_msg(3, 4, '', 'Error: common var in (ND_EQV, OD_UQV)', (ND_EQV, OD_UQV))
 	),
 	varsbag_union(ND_EQV, OD_EQV, All_EQV),
 	varsbag_union(ND_UQV, OD_UQV, All_UQV),
 	(
 	    (varsbag_intersection(All_EQV, All_UQV, []), !)
 	;
-	    echo_msg(2, '', 'cneg_diseq', 'Error: common var in (All_EQV, All_UQV)', (All_EQV, All_UQV))
+	    print_msg(3, 4, '', 'Error: common var in (All_EQV, All_UQV)', (All_EQV, All_UQV))
 	), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -455,7 +455,7 @@ restore_attributes(Diseqs_In, All_EQV, All_UQV) :-
 	cneg_aux:varsbag(All_EQV, [], [], EQV),
 	cneg_aux:varsbag(All_UQV, EQV, [], UQV), % Exhaustive sets, please.
 	prepare_diseqs_for_restore(Diseqs_In, Diseqs, EQV, UQV, [], Affected_Vars),
-%	echo_msg(1, '', 'cneg_diseq', 'restore_attributes_vars(Affected_Vars, Diseqs)', (Affected_Vars, Diseqs)),
+%	print_msg(1, 3, '', 'restore_attributes_vars(Affected_Vars, Diseqs)', (Affected_Vars, Diseqs)),
 	restore_attributes_vars(Affected_Vars, Diseqs).
 
 prepare_diseqs_for_restore([], [], _EQV, _UQV, Affected_Vars, Affected_Vars) :- !.
@@ -481,9 +481,9 @@ affected_diseqs(Var, [_Diseq | Diseqs], Affected_Diseqs) :-
 restore_attributes_var(Var, _Diseqs) :-
 	var(Var),
 	get_attribute_local(Var, Attribute), !,
-	echo_msg(1, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(1, '', 'cneg_diseq', 'ERROR: var has an attribute. Attribute: ', Attribute),
-	echo_msg(1, 'nl', 'cneg_diseq', '', ''),
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, '', 'ERROR: var has an attribute. Attribute: ', Attribute),
+	print_msg(1, 3, 'nl', '', ''),
 	fail.
 
 restore_attributes_var(Var, Diseqs) :-
@@ -508,11 +508,11 @@ set_of_diseqs_to_constraints([], [], Constraints, Constraints, _All_EQV) :- !.
 set_of_diseqs_to_constraints([], [Diseq|Diseqs_List], Constraints_In, Constraints_Out, All_EQV) :- !,
 	set_of_diseqs_to_constraints([Diseq|Diseqs_List], [], Constraints_In, Constraints_Out, All_EQV).
 set_of_diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Constraints_In, Constraints_Out, All_EQV) :- !,
-	echo_msg(0, '', 'cneg_diseq', '', ''),
-	echo_msg(0, '', 'cneg_diseq', 'diseqs_to_constraints :: (Diseqs, ---, EQV)', ([Diseq], '---', All_EQV)),
+	print_msg(0, 0, '', '', ''),
+	print_msg(0, 0, '', 'diseqs_to_constraints :: (Diseqs, ---, EQV)', ([Diseq], '---', All_EQV)),
 	diseqs_to_constraints([Diseq], Constraints, All_EQV),
-	echo_msg(0, '', 'cneg_diseq', 'diseqs_to_constraints :: Constraints', Constraints),
-	echo_msg(0, '', 'cneg_diseq', '', ''),
+	print_msg(0, 0, '', 'diseqs_to_constraints :: Constraints', Constraints),
+	print_msg(0, 0, '', '', ''),
 
 	constraints_sets_append(Constraints, Constraints_In, Constraints_Aux),
 	set_of_diseqs_to_constraints(Diseqs_List, Old_Diseqs, Constraints_Aux, Constraints_Out, All_EQV).
@@ -522,10 +522,10 @@ set_of_diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Constraints_In, Co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 constraints_sets_append(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
-	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_In', Diseqs_In),
-	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
+	print_msg(0, 0, '', 'accumulate_disequations :: Diseqs_In', Diseqs_In),
+	print_msg(0, 0, '', 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
 	constraints_sets_append_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
-	echo_msg(0, '', 'cneg_diseq', 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
+	print_msg(0, 0, '', 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
 
 constraints_sets_append_aux([], Constraints_Out, Constraints_Out) :- !.
 constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Out) :-
@@ -547,7 +547,7 @@ constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Ou
 % It is obvious that we must fail.
 diseqs_to_constraints([], [], _EQV) :- 
 	!, 
-	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: Diseqs = [] ---- FAIL ', ''),
+	print_msg(3, 4, '', 'diseqs_to_constraints :: Diseqs = [] ---- FAIL ', ''),
 	!, fail.
 	% Result = 'fail'. % We have failed.
 
@@ -555,7 +555,7 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % Same var.
         var(T1),
         var(T2), % Both are variables.
         T1==T2, !, % Both are the same variable.
-	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: SAME VAR, T1 == T2', (T1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_constraints :: SAME VAR, T1 == T2', (T1, T2)),
 	diseqs_to_constraints(More_Diseqs, Constraints, EQV).
 
 diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Different vars.
@@ -564,12 +564,12 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Differ
 	T1 \== T2, % Not the same variable.
 	varsbag(EQV_In, [], [], EQV), % Remove anything there not a variable.
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
-%	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and var(T2)', (T1, T2)),
+%	print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and var(T2)', (T1, T2)),
 	(
 	    (   % Both are UQ vars.
 		cneg_aux:memberchk(T1, UQV), 
 		cneg_aux:memberchk(T2, UQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
 		cneg_diseq_unify(T1, T2), % They can not be disunified, and they are still UQ vars.
 		diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 	    )
@@ -577,14 +577,14 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Differ
 	    (   % T1 is a UQ var, T2 is not a UQ var.
 		cneg_aux:memberchk(T1, UQV), !,
 %		cneg_aux:memberchk(T2, EQV), 
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and var(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and var(T2)', (T1, T2)),
 		diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV)
 	    )
 	;
 	    (   % T2 is a UQ var, T1 is not a UQ var.
 %		cneg_aux:memberchk(T1, EQV),
 		cneg_aux:memberchk(T2, UQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T2) and var(T1)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T2) and var(T1)', (T1, T2)),
 		diseqs_to_constraints_uqvar_t1_var_t2([(T2, T1) | More_Diseqs], Constraints, EQV)
 	    )
 	;
@@ -593,12 +593,12 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Differ
 		cneg_aux:memberchk(T2, EQV), !,
 		( 
 		    (   % First solution: T1 =/= T2.
-			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) =/= var(T2)', (T1, T2)),
+			print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) =/= var(T2)', (T1, T2)),
 			Constraints = [(T1, T2)]
 		    )
 		;
 		    (   % T1 and T2 can not be disunified. We test if we can fail.
-			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY var(T1) and var(T2)', (T1, T2)),
+			print_msg(3, 4, '', 'diseqs_to_constraints :: UNIFY var(T1) and var(T2)', (T1, T2)),
 			cneg_diseq_unify(T1, T2), % Since they can not be disunified, unify them.
 			diseqs_to_constraints(More_Diseqs, Constraints, EQV)
 		    )
@@ -611,14 +611,14 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % var and n
 	    (   % T1 is a VAR. T2 is not a var.
 		var(T1), 
 		nonvar(T2), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and nonvar(T2) ', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and nonvar(T2) ', (T1, T2)),
 		diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
 		var(T2), 
 		nonvar(T1), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T2) and nonvar(T1) ', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T2) and nonvar(T1) ', (T1, T2)),
 		diseqs_to_constraints_var_nonvar([(T2, T1) | More_Diseqs], Constraints, EQV)
 	    )
 	).
@@ -632,7 +632,7 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV):-
 	    (   % Functors that unify.
 		Name_1 == Name_2, 
 		Arity_1 == Arity_2, !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
 		disequalities_lists_product(Args_1, Args_2, Diseq_List),
 		cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
 		diseqs_to_constraints(New_More_Diseqs, Constraints, EQV)
@@ -642,7 +642,7 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV):-
 		(
 		    (Name_1 \== Name_2) ; (Arity_1 \== Arity_2)
 		), !,
-%		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: functor(T1) =/= functor(T2)', (T1, T2)),
+%		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) =/= functor(T2)', (T1, T2)),
 %		Result = 'true', % Result is completely valid.
 		Constraints = [] % No constraints.
 	    )
@@ -669,7 +669,7 @@ diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
 	cneg_aux:memberchk(T1, UQV), % T1 is a uq var, T2 is not a uqvar.
 	cneg_aux:memberchk(T2, EQV), !,
-	echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and var(T2) ', (T1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and var(T2) ', (T1, T2)),
 
 	% T1 can not be different from T2. We unify them (failing) and continue.
 	cneg_diseq_unify(T1, T2),
@@ -689,13 +689,13 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
 		Constraints = [] % No constraints.
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify. Unify !!
 		cneg_aux:memberchk(T1, UQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
 		(
 		    (
 			T2 = Functor_Name/Functor_Arity, !,
@@ -713,7 +713,7 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 	;
 	    (   % The variable must not be the functor (use attributed variables).
 		cneg_aux:memberchk(T1, EQV), !,
-		echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: var(T1) =/= functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) =/= functor(T2)', (T1, T2)),
 		(
 		    (
 			T2 = Functor_Name/Functor_Arity, 
@@ -729,7 +729,7 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 		    )
 		;
 		    (   % Keep the functor but diseq between the arguments.
-			echo_msg(2, '', 'cneg_diseq', 'diseqs_to_constraints :: UNIFY var(T1) and functor(T2)', (T1, T2)),
+			print_msg(3, 4, '', 'diseqs_to_constraints :: UNIFY var(T1) and functor(T2)', (T1, T2)),
 			(
 			    (
 				T2 = Functor_Name/Functor_Arity, 
@@ -773,39 +773,39 @@ cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T1),
 	var(T2),
 	T1 == T2, % Both are the same var. This is valid if they are in UQV too.
-	echo_msg(2, '', 'cneg_diseq', 'cneg_diseq_eq: same var. ok.', (T1, T2)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: same var. ok.', (T1, T2)),
 	!.
 
 cneg_diseq_eq(T1, _T2, UQV) :-
 	var(T1),
 	memberchk(T1, UQV),
-	echo_msg(2, '', 'cneg_diseq', 'cneg_diseq_eq: T1 in UQV. fail.', (T1, UQV)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 in UQV. fail.', (T1, UQV)),
 	!, fail.
 
 cneg_diseq_eq(_T1, T2, UQV) :-
 	var(T2),
 	memberchk(T2, UQV),
-	echo_msg(2, '', 'cneg_diseq', 'cneg_diseq_eq: T2 in UQV. fail.', (T2, UQV)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T2 in UQV. fail.', (T2, UQV)),
 	!, fail.
 
 cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T1),
 	var(T2), !, % Both vars and not in UQV.
-	echo_msg(2, '', 'cneg_diseq', 'T1 and T2 not in UQV. ok.', (T1, T2)),
+	print_msg(3, 4, '', 'T1 and T2 not in UQV. ok.', (T1, T2)),
 	cneg_diseq_unify(T1, T2), !.
 
 cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T1), % Var vs functor using var.
 	varsbag(T2, [], [], Vars),
 	memberchk(T1, Vars), !,
-	echo_msg(2, '', 'cneg_diseq', 'T1 appears in T2. fail.', (T1, T2)),
+	print_msg(3, 4, '', 'T1 appears in T2. fail.', (T1, T2)),
 	!, fail.
 
 cneg_diseq_eq(T1, T2, UQV) :-
 	var(T1), !, % Var vs functor
 	functor_local(T2, Name, Arity, Args_T2),
 	functor_local(T1, Name, Arity, Args_T1),
-	echo_msg(2, '', 'cneg_diseq', 'T1 var, T2 functor. ok.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'T1 var, T2 functor. ok.', (T1, T2, UQV)),
 	!, 
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
@@ -813,21 +813,21 @@ cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T2), % Var vs functor using var.
 	varsbag(T1, [], [], Vars),
 	memberchk(T2, Vars), !,
-	echo_msg(2, '', 'cneg_diseq', 'T2 appears in T1. fail.', (T1, T2)),
+	print_msg(3, 4, '', 'T2 appears in T1. fail.', (T1, T2)),
 	!, fail.
 
 cneg_diseq_eq(T1, T2, UQV) :-
 	var(T2), !, % Var vs functor
 	functor_local(T1, Name, Arity, Args_T1),
 	functor_local(T2, Name, Arity, Args_T2),
-	echo_msg(2, '', 'cneg_diseq', 'T2 var, T1 functor. ok.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'T2 var, T1 functor. ok.', (T1, T2, UQV)),
 	!, 
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
 cneg_diseq_eq(T1, T2, UQV) :-
 	functor_local(T1, Name, Arity, Args_T1),
 	functor_local(T2, Name, Arity, Args_T2), 
-	echo_msg(2, '', 'cneg_diseq', 'T1 and T2 functors. ok.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'T1 and T2 functors. ok.', (T1, T2, UQV)),
 	!, % functor vs functor.
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
@@ -839,7 +839,7 @@ cneg_diseq_eq(T1, T2, UQV) :-
 	;
 	    (   Arity_T1 \== Arity_T2  )
 	),
-	echo_msg(2, '', 'cneg_diseq', 'T1 and T2 different functors. fail.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'T1 and T2 different functors. fail.', (T1, T2, UQV)),
 	!, % functor vs functor.
 	fail.
 
@@ -864,18 +864,18 @@ adequate_gv_eqv_uqv(_T1, _T2, GoalVars_In, EQV_In, UQV_In, _EQV_Out, _UQV_Out) :
 	;
 	    UQV_In == 'compute'
 	), 
-	echo_msg(1, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: ERROR :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
+	print_msg(1, 3, '', 'adequate_gv_eqv_uqv :: ERROR :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
 	!, fail.
 
 adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	GoalVars_In \== 'compute',
 	EQV_In \== 'compute', 
 	UQV_In \== 'compute',
-	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: In :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
+	print_msg(3, 4, '', 'adequate_gv_eqv_uqv :: In :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
 	varsbag(GoalVars_In, [], [], GoalVars), % Only variables, please.
 	varsbag_clean_up(EQV_In, EQV_Tmp), % Only variables, please.
 	varsbag_clean_up(UQV_In, UQV_Tmp), % Only variables, please. EQV /\ UQV = empty.
-%	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: (GoalVars, EQV_Aux, UQV_Tmp)', (GoalVars, EQV_Tmp, UQV_Tmp)),
+%	print_msg(3, 4, '', 'adequate_gv_eqv_uqv :: (GoalVars, EQV_Aux, UQV_Tmp)', (GoalVars, EQV_Tmp, UQV_Tmp)),
 
 	varsbag_union(GoalVars, EQV_Tmp, EQV_Aux),
 	varsbag(UQV_Tmp, EQV_Aux, [], UQV_Aux), % A var marked existential becomes existential.
@@ -884,7 +884,7 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
 	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out), % Only UQV affected variables.
 
-	echo_msg(2, '', 'cneg_diseq', 'adequate_gv_eqv_uqv :: Out :: (EQV, UQV)', (EQV_Out, UQV_Out)).
+	print_msg(3, 4, '', 'adequate_gv_eqv_uqv :: Out :: (EQV, UQV)', (EQV_Out, UQV_Out)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -893,13 +893,13 @@ adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
 
 get_disequalities_from_constraints(Anything, Vars_With_Attrs) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints :: Vars_With_Attrs', Vars_With_Attrs).
+	cneg_diseq_echo(3, 4, '', 'get_disequalities_from_constraints :: Vars_With_Attrs', Vars_With_Attrs).
 
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
 get_disequalities_from_constraints_and_remove_them(Anything, Vars_With_Attrs) :-
 	get_disequalities_from_constraints(Anything, Vars_With_Attrs),
 	varsbag(Vars_With_Attrs, [], [], Vars),
-	cneg_diseq_echo(2, '', 'cneg_diseq', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
+	cneg_diseq_echo(3, 4, '', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
 	remove_all_constraints_in_variables(Vars), !.
 
 remove_all_constraints_in_variables(Anything) :-
@@ -926,8 +926,8 @@ remove_this_constraints_from_variables(Var_With_Attrs, [_Var | Vars]) :-
 	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
 
 attributes_difference(Attribute, Var_With_Attrs, Difference) :-
-	echo_msg(2, '', 'cneg_diseq', 'attributes_difference :: Attribute', Attribute),
-	echo_msg(2, '', 'cneg_diseq', 'attributes_difference :: Var_With_Attrs', Var_With_Attrs),
+	print_msg(3, 4, '', 'attributes_difference :: Attribute', Attribute),
+	print_msg(3, 4, '', 'attributes_difference :: Var_With_Attrs', Var_With_Attrs),
 	attribute_contents(Attribute, Target, Disequalities),
 	Var_With_Attrs = Disequalities,
 	attribute_contents(Difference, Target, []).
@@ -961,13 +961,13 @@ disequality(T1,T2, UQV_In) :-
 	diseq_geuqv(T1,T2, [], EQV, UQV).
 
 diseq_geuqv(T1,T2, GoalVars_In, EQV_In, UQV_In) :- 
-	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [in] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (GoalVars_In, EQV_In, UQV_In))),
+	print_msg(3, 4, '', 'diseq_geuqv [in] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (GoalVars_In, EQV_In, UQV_In))),
 	adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV, UQV),
-	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [tmp] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
+	print_msg(3, 4, '', 'diseq_geuqv [tmp] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	attribute_disequality_contents(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality]),
-	echo_msg(2, '', 'cneg_diseq', 'diseq_geuqv [out] :: ((T1, =/=, T2))', ((T1, '=/=', T2))),
-	echo_msg(2, 'nl', 'cneg_diseq', '', '').
+	print_msg(3, 4, '', 'diseq_geuqv [out] :: ((T1, =/=, T2))', ((T1, '=/=', T2))),
+	print_msg(3, 4, 'nl', '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -979,21 +979,21 @@ equality(T1,T2, UQV_In) :-
 	eq_geuqv(T1,T2, [], EQV, UQV).
 
 eq_geuqv(T1, T2, GoalVars, EQV_In, UQV_In) :- 
-	echo_msg(2, 'nl', 'cneg_diseq', '', ''),
-	echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [in] :: (T1, =, T2), ---, (GV, EQV, UQV)', ((T1, '=', T2), '---', (GoalVars, EQV_In, UQV_In))),
+	print_msg(3, 4, 'nl', '', ''),
+	print_msg(3, 4, '', 'eq_geuqv [in] :: (T1, =, T2), ---, (GV, EQV, UQV)', ((T1, '=', T2), '---', (GoalVars, EQV_In, UQV_In))),
 	adequate_gv_eqv_uqv(T1, T2, GoalVars, EQV_In, UQV_In, EQV, UQV),
-	echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [tmp] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
+	print_msg(3, 4, '', 'eq_geuqv [tmp] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
 	!,
 	(
 	    ( 
 		cneg_diseq_eq(T1, T2, UQV),
-		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
-		echo_msg(2, 'nl', 'cneg_diseq', '', '')
+		print_msg(3, 4, '', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
+		print_msg(3, 4, 'nl', '', '')
 	    )
 	;
 	    (
-		echo_msg(2, '', 'cneg_diseq', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
-		echo_msg(2, '', 'cneg_diseq', 'continues', '...'),
+		print_msg(3, 4, '', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
+		print_msg(3, 4, '', 'continues', '...'),
 		diseq_geuqv(T1, T2, GoalVars, UQV, 'compute') 
 	    )
 	).

@@ -165,7 +165,8 @@ print_msg_real(_Any, _Msg) :- !.
 % get_file_name(Any, File_Name),
 get_file_name(2, 'debug_pkg_cneg_tr.pl').
 get_file_name(3, 'debug_pkg_cneg_rt.pl').
-get_file_name(4, 'debug_pkg_cneg_statistics.pl').
+get_file_name(4, 'debug_pkg_cneg_diseqs.pl').
+get_file_name(5, 'debug_pkg_cneg_statistics.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

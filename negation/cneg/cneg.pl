@@ -31,8 +31,8 @@
 
 cneg(Predicate) :-
 
-	echo_msg(2, 'statistics', 'cneg_rt', '', (cneg(Predicate))),
-	echo_msg(2, 'nl', 'cneg_rt', '', ''),
+	print_msg(3, 3, 'statistics', '', (cneg(Predicate))),
+	print_msg(3, 3, 'nl', '', ''),
 
 	varsbag(Predicate, [], [], GoalVars), % Compute goalvars. It is used by some methods.
 	cneg_aux(Predicate, GoalVars).

@@ -229,7 +229,7 @@ goal_is_not_disjunction(Goal) :-
 	!.
 goal_is_not_disjunction(Goal) :-
 	var(Goal), 
-	echo_msg(1, '', 'cneg_aux', 'goal_is_not_disjunction', 'Goal can not be a variable. ERROR.'),
+	print_msg(1, 3, '', 'goal_is_not_disjunction', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
 goal_is_conjunction((G1,G2), G1, G2) :- !.
@@ -244,7 +244,7 @@ goal_is_not_conjunction(Goal) :-
 	!.
 goal_is_not_conjunction(Goal) :-
 	var(Goal), 
-	echo_msg(1, '', 'cneg_aux', 'goal_is_not_conjunction', 'Goal can not be a variable. ERROR.'),
+	print_msg(1, 3, '', 'goal_is_not_conjunction', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
 % goal_is_disequality(Goal, Arg_1, Arg_2, EQV, UQV) 
@@ -263,7 +263,7 @@ goal_is_not_disequality(Goal) :-
 	!.
 goal_is_not_disequality(Goal) :-
 	var(Goal), 
-	echo_msg(1, '', 'cneg_aux', 'goal_is_not_disequality', 'Goal can not be a variable. ERROR.'),
+	print_msg(1, 3, '', 'goal_is_not_disequality', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
 % goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) 
@@ -282,7 +282,7 @@ goal_is_not_equality(Goal) :-
 	!.
 goal_is_not_equality(Goal) :-
 	var(Goal), 
-	echo_msg(1, '', 'cneg_aux', 'goal_is_not_equality', 'Goal can not be a variable. ERROR.'),
+	print_msg(1, 3, '', 'goal_is_not_equality', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
 goal_is_aux_2a(Name, Goal, Arg_1, Arg_2) :-
@@ -337,7 +337,7 @@ goal_is_not_negation(Goal) :-
 	!.
 goal_is_not_negation(Goal) :-
 	var(Goal), 
-	echo_msg(1, '', 'cneg_aux', 'goal_is_not_negation', 'Goal can not be a variable. ERROR.'),
+	print_msg(1, 3, '', 'goal_is_not_negation', 'Goal can not be a variable. ERROR.'),
 	!, fail.
 
 goal_is_not_conj_disj_neg(Goal) :-
@@ -379,9 +379,9 @@ qualify_string_name_not_qualified(Qualification, Name, NewName) :-
 	!.
 
 qualify_string_name_not_qualified(Qualification, Name, NewName) :-
-	echo_msg(0, '', 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
-	echo_msg(0, '', 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
-	echo_msg(0, '', 'cneg_aux', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
+	print_msg(0, 0, '', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Qualification', Qualification), 
+	print_msg(0, 0, '', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: Name', Name), 
+	print_msg(0, 0, '', 'qualify_string_name_not_qualified :: FAILED (ensure args are string) :: NewName', NewName), 
 	!.
 
 %	name(Name, NameString),
@@ -394,7 +394,7 @@ name_has_semicolon(Any) :-
 	string(Any), !, 
 	name_has_semicolon_aux(Any).
 name_has_semicolon(Any) :-
-	echo_msg(0, '', 'cneg_aux', 'name_has_semicolon :: NOT a string', Any), fail.
+	print_msg(0, 0, '', 'name_has_semicolon :: NOT a string', Any), fail.
 
 name_has_semicolon_aux([]) :- !, fail.
 name_has_semicolon_aux([A]) :- 
@@ -544,9 +544,9 @@ varsbag_intersection([_Var_1 | VarsBag_In_1], VarsBag_In_2, VarsBag_Out) :-
 
 varsbag(X, OtherBag, Bag_In, Bag_Out) :- 
         var(X), !,
-	echo_msg(0, '', 'cneg_aux', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	print_msg(0, 0, '', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out),
-	echo_msg(0, '', 'cneg_aux', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	print_msg(0, 0, '', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
 	!.
 
 varsbag(Term, OtherBag, Bag_In, Bag_Out) :-
@@ -597,9 +597,9 @@ term_to_meta(X, '$:'(X)).
 
 %split_body_with_disjunctions_into_bodies(Body, Bodies)
 split_body_with_disjunctions_into_bodies(Body, Bodies) :- 
-	echo_msg(0, '', 'cneg_aux', 'INFO :: split_body_with_disjunctions_into_bodies :: Goal ', Body), 
+	print_msg(0, 0, '', 'INFO :: split_body_with_disjunctions_into_bodies :: Goal ', Body), 
 	split_body_with_disjunctions_into_bodies_aux(Body, Bodies),
-	echo_msg(0, '', 'cneg_aux', 'INFO :: split_body_with_disjunctions_into_bodies :: Goals ', Bodies), 
+	print_msg(0, 0, '', 'INFO :: split_body_with_disjunctions_into_bodies :: Goals ', Bodies), 
 	!.
 
 split_body_with_disjunctions_into_bodies_aux(Body, Bodies) :- 
@@ -655,7 +655,7 @@ split_bodies_into_E_IE_NIE([Body | Bodies], [([E], [IE], [NIE], [Body]) | Split_
 
 split_body_into_E_IE_NIE_aux(Body, _E_In, _IE_In, _NIE_In, _E_Out, _IE_Out, _NIE_Out) :- 
 	goal_is_disjunction(Body, _G1, _G2), !, 
-	echo_msg(1, '', 'cneg_rt', 'ERROR: split_body_into_E_IE_NIE can not deal with disjunctions. Body', Body),
+	print_msg(1, 3, '', 'ERROR: split_body_into_E_IE_NIE can not deal with disjunctions. Body', Body),
 	fail.
 
 split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_Out, NIE_Out) :- 
@@ -677,8 +677,8 @@ split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_conjunction_from_list([], fail) :- !,
-	echo_msg(1, '', 'cneg_rt', 'ERROR: generate_conjunction_from_list: empty list.', ''), 
-	echo_msg(1, 'nl', 'cneg_rt', '', ''), !, fail. % Backtracking is forbidden.
+	print_msg(1, 3, '', 'ERROR: generate_conjunction_from_list: empty list.', ''), 
+	print_msg(1, 3, 'nl', '', ''), !, fail. % Backtracking is forbidden.
 generate_conjunction_from_list([Goal], Goal) :- !.
 generate_conjunction_from_list([Goal | Goals], (Goal , More_Goals)) :-
 	Goals \== [],
