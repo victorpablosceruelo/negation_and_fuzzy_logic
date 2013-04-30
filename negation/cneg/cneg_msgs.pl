@@ -29,6 +29,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+print_msg(FI_1, FI_2, Mode, Pre_Msg, Msg) :- 
+	var(FI_1), var(FI_2),
+	print_msg_aux(1, Mode, Pre_Msg, Msg).
+
+print_msg(FI_1, FI_2, Mode, Pre_Msg, Msg) :- 
+	var(FI_1), nonvar(FI_2),
+	print_msg_aux(FI_2, Mode, Pre_Msg, Msg).
+
+print_msg(FI_1, FI_2, Mode, Pre_Msg, Msg) :- 
+	nonvar(FI_1), var(FI_2),
+	print_msg_aux(FI_1, Mode, Pre_Msg, Msg).
+
 print_msg(FI, FI, Mode, Pre_Msg, Msg) :- 
 	nonvar(FI), 
 	print_msg_aux(FI, Mode, Pre_Msg, Msg).
@@ -45,28 +57,39 @@ print_msg(FI_1, FI_2, Mode, Pre_Msg, Msg) :-
 
 print_msg_aux(0, _Mode, _Pre_Msg, _Msg) :- !. % No debugging.
 
-print_msg_aux(FI, 'nl', _Pre_Msg, _Msg) :-
-	print_msg_real(FI, '\n'), !.
+print_msg_aux(FI, 'nl', _Pre_Msg, _Msg) :- !, 
+	print_msg_real(FI, '\n').
 
-print_msg_aux(FI, 'aux', Pre_Msg, Msg) :-
+print_msg_aux(FI, 'logo', _Pre_Msg, _Msg) :- !, 
+	logo(FI, Logo),
+	print_msg_real(FI, Logo).
+
+print_msg_aux(FI, 'aux', Pre_Msg, Msg) :- !, 
 	print_msg_real(FI, Pre_Msg),
 	print_msg_real(FI, Msg).
 
-print_msg_aux(FI, 'statistics', Pre_Msg, Msg) :-
+print_msg_aux(FI, 'statistics', Pre_Msg, Msg) :- !, 
 	print_msg_aux(FI, '', Pre_Msg, Msg),
 	print_msg_statistics(FI), !.
 
-print_msg_aux(FI, 'separation', _Pre_Msg, _Msg) :-
+print_msg_aux(FI, 'separation', _Pre_Msg, _Msg) :- !, 
 	print_msg_aux(FI, 'nl', '', ''),
 	print_msg_aux(FI, '', '', '-----------------------------------------------'),
 	print_msg_aux(FI, '', '', '-----------------------------------------------'),
 	print_msg_aux(FI, 'nl', '', '').
 
-print_msg_aux(FI, 'trace', Pre_Msg, Msg) :-
+print_msg_aux(FI, 'trace', Pre_Msg, Msg) :- !, 
 	print_msg_trace(FI, Pre_Msg, Msg).
 
-print_msg_aux(FI, '', Pre_Msg, Msg) :-
+print_msg_aux(FI, 'list', Pre_Msg, Msg) :- !,
+	print_msg_aux(FI, '', Pre_Msg, Msg).
+
+print_msg_aux(FI, '', Pre_Msg, Msg) :- !,
 	  print_msg_normal(FI, Pre_Msg, Msg).
+
+print_msg_aux(_FI, Mode, Pre_Msg, Msg) :-
+	  print_msg_normal('error', 'Erroneous mode', Mode),
+	  print_msg_normal('error', Pre_Msg, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,10 +186,11 @@ print_msg_real(_Any, _Msg) :- !.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get_file_name(Any, File_Name),
-get_file_name(2, 'debug_pkg_cneg_tr.pl').
-get_file_name(3, 'debug_pkg_cneg_rt.pl').
-get_file_name(4, 'debug_pkg_cneg_diseqs.pl').
-get_file_name(5, 'debug_pkg_cneg_statistics.pl').
+get_file_name(2, 'debug_pkg_cneg_tr.pl') :- !.
+get_file_name(3, 'debug_pkg_cneg_rt.pl') :- !.
+get_file_name(4, 'debug_pkg_cneg_diseqs.pl') :- !.
+get_file_name(5, 'debug_pkg_cneg_statistics.pl') :- !.
+get_file_name(_Any, 'debug_pkg_cneg_errors.pl') :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
