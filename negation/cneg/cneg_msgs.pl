@@ -106,35 +106,37 @@ logo(_Any, '% ').
 
 print_msg_normal(FI, Pre_Msg, Var) :- 
 	var(Var), !,
-	print_msg_normal_pre_msg(_FI, Pre_Msg), !,
+	print_msg_normal_pre_msg(FI, Pre_Msg, ''), !,
 	print_msg_normal_aux(FI, Var).
 
 print_msg_normal(FI, Pre_Msg, []) :- !,
-	print_msg_normal_pre_msg(_FI, Pre_Msg), !,
-	print_msg_normal_aux(FI, '[]').
+	print_msg_normal_pre_msg(FI, Pre_Msg, ' (l) '), !,
+	print_msg_normal_aux(FI, ' [] ').
 
 print_msg_normal(FI, Pre_Msg, [Msg | Msgs]) :- !,
-	print_msg_normal_pre_msg(FI, Pre_Msg), !,
+	print_msg_normal_pre_msg(FI, Pre_Msg, ' (l) '), !,
 	print_msg_normal_aux(FI, Msg), !,
 	print_msg_normal_aux(FI, ' \n'), !,
 	print_msg_normal(FI, Pre_Msg, Msgs), !.
 
 print_msg_normal(FI, Pre_Msg, Msg) :- !,
-	print_msg_normal_pre_msg(FI, Pre_Msg), !,
+	print_msg_normal_pre_msg(FI, Pre_Msg, ''), !,
 	print_msg_normal_aux(FI, Msg), !.
 
-print_msg_normal_pre_msg(_FI, Var) :- 
+print_msg_normal_pre_msg(FI, Var, Identifier) :- 
 	var(Var), 
 	logo(FI, Logo), !, 
 	print_msg_normal_aux(FI, Logo), !,
 	print_msg_normal_aux(FI, Var), !,
+	print_msg_normal_aux(FI, Identifier), !,
 	print_msg_normal_aux(FI, ' :: '), !.
 
-print_msg_normal_pre_msg(_FI, '') :- !.
-print_msg_normal_pre_msg(FI, Pre_Msg) :- !,
+print_msg_normal_pre_msg(_FI, '', _Identifier) :- !.
+print_msg_normal_pre_msg(FI, Pre_Msg, Identifier) :- !,
 	logo(FI, Logo), !, 
 	print_msg_normal_aux(FI, Logo), !,
 	print_msg_normal_aux(FI, Pre_Msg), !,
+	print_msg_normal_aux(FI, Identifier), !,
 	print_msg_normal_aux(FI, ' :: '), !.
 
 print_msg_normal_aux(FI, Var) :- 

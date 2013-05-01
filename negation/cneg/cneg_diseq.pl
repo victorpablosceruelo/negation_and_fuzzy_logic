@@ -356,11 +356,13 @@ test_and_update_vars_attributes(New_Diseqs) :-
 	
 	test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV), % The sets must be exclusive.
 	print_msg(3, 4, '', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: New_Diseqs_Aux', New_Diseqs_Aux),
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs_Aux', Old_Diseqs_Aux), !,
 
 	% At first we check that the new disequalities can be added to the old ones.
 	set_of_diseqs_to_constraints(New_Diseqs_Aux, Old_Diseqs_Aux, [], Simplified_Diseqs, All_EQV),
 
-%	print_msg(1, 3, '', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
 	restore_attributes(Simplified_Diseqs, All_EQV, All_UQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -759,14 +761,14 @@ cneg_diseq_eq(_T1, T2, UQV) :-
 cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T1),
 	var(T2), !, % Both vars and not in UQV.
-	print_msg(3, 4, '', 'T1 and T2 not in UQV. ok.', (T1, T2)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 and T2 not in UQV. ok.', (T1, T2)),
 	cneg_diseq_unify(T1, T2), !.
 
 cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T1), % Var vs functor using var.
 	varsbag(T2, [], [], Vars),
 	memberchk(T1, Vars), !,
-	print_msg(3, 4, '', 'T1 appears in T2. fail.', (T1, T2)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 appears in T2. fail.', (T1, T2)),
 	!, fail.
 
 cneg_diseq_eq(T1, T2, UQV) :-
@@ -782,20 +784,20 @@ cneg_diseq_eq(T1, T2, UQV) :-
 	var(T1), !, % Var vs functor
 	functor_local(T2, Name, Arity, Args_T2),
 	functor_local(T1, Name, Arity, Args_T1), !,
-	print_msg(3, 4, '', 'T1 var, T2 functor. continue.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 var, T2 functor. continue.', (T1, T2, UQV)),
 	!, 
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
 cneg_diseq_eq(T1, T2, UQV) :-
 	var(T2), !, % Var vs something. Order inversion.
-	print_msg(3, 4, '', 'T2 var. order inversion. continue.', (T1, T2)), !,
+	print_msg(3, 4, '', 'cneg_diseq_eq: T2 var. order inversion. continue.', (T1, T2)), !,
 	cneg_diseq_eq(T2, T1, UQV),
 	!.
 
 cneg_diseq_eq(T1, T2, UQV) :-
 	functor_local(T1, Name, Arity, Args_T1),
 	functor_local(T2, Name, Arity, Args_T2), !,
-	print_msg(3, 4, '', 'T1 and T2 functors. continue.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 and T2 functors. continue.', (T1, T2, UQV)),
 	!, % functor vs functor.
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
@@ -807,7 +809,7 @@ cneg_diseq_eq(T1, T2, UQV) :-
 	;
 	    (   Arity_T1 \== Arity_T2  )
 	),
-	print_msg(3, 4, '', 'T1 and T2 different functors. fail.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 and T2 different functors. fail.', (T1, T2, UQV)),
 	!, % functor vs functor.
 	fail.
 
