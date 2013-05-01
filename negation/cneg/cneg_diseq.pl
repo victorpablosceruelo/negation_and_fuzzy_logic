@@ -777,7 +777,7 @@ cneg_diseq_eq(T1, T2, UQV) :-
 	arg(1, T2, Name),
 	arg(2, T2, Arity),
 	functor_local(T1, Name, Arity, _Args_T1), !,
-	print_msg(3, 4, '', 'T1 var, T2 functor definition. ok.', (T1, T2, UQV)),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 var, T2 functor definition. ok.', (T1, T2, UQV)),
 	!.
 
 cneg_diseq_eq(T1, T2, UQV) :-
