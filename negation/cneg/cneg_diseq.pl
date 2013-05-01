@@ -2,7 +2,7 @@
 	[
  	    equality/3, disequality/3,
  	    prepare_attributes_for_printing/2,
-	    cneg_diseq_echo/5,
+	    print_vars_diseqs/3,
 
 	    get_disequalities_from_constraints/2,
 	    get_disequalities_from_constraints_and_remove_them/2, 
@@ -123,84 +123,52 @@ attribute_goals(Term) -->
 % portray(eqn_var(Self,A,B,R,Nl)) :- print(eqn_var(Self,A,B,R,Nl)).
 
 %attr_portray_hook(_Attribute, Var) :- 
-%	cneg_diseq_echo(2, '', 'attr_portray_hook(_Attribute, Var)'),
-%	cneg_diseq_echo(1, 'aux', Var).
+%	print_vars_diseqs(2, '', 'attr_portray_hook(_Attribute, Var)'),
+%	print_vars_diseqs(1, 'aux', Var).
 
 %portray_attribute(_Attribute, Var) :-
-%	cneg_diseq_echo(2, '', 'portray_attribute(_Attribute, Var)'),
-%	cneg_diseq_echo(1, 'aux', Var).
+%	print_vars_diseqs(2, '', 'portray_attribute(_Attribute, Var)'),
+%	print_vars_diseqs(1, 'aux', Var).
 
 %portray(Attribute) :-
-%	cneg_diseq_echo(2, '', 'portray(Attribute)'),
+%	print_vars_diseqs(2, '', 'portray(Attribute)'),
 %	attribute_contents(Attribute, Target, _Disequalities), !,
 %	portray(Target).
 
 %portray(Term) :-
-%	cneg_diseq_echo(2, '', 'portray(Term)'),
-%	cneg_diseq_echo(1, 'aux', Term).
+%	print_vars_diseqs(2, '', 'portray(Term)'),
+%	print_vars_diseqs(1, 'aux', Term).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%cneg_diseq_echo(Echo_Level, Mode, File_Name, Term) :-
+%print_vars_diseqs(Echo_Level, Mode, File_Name, Term) :-
 %	print_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
 
-cneg_diseq_echo(FI_1, FI_2, Mode, _Msg, _Term) :-
-	(
-	    Mode == 'nl'
-	;
-	    Mode == 'logo'
-	), !,
-	print_msg(FI_1, FI_2, Mode, '', '').
+print_vars_diseqs(_FI, '', []) :- !.
+print_vars_diseqs(FI, Pre_Msg, []) :- 
+	Pre_Msg \== '', !,
+	print_msg(FI, 3, '', Pre_Msg, '[]'), !.
 
-cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
-	Mode == 'list',
-	Term == [], !,
-	print_msg(FI_1, FI_2, Mode, Msg, '[] -- list end').
+print_vars_diseqs(FI, '', [Var | Vars]) :- !,
+	prepare_attributes_for_printing(Var, Attributes_For_Printing_Conj),
+	print_msg(FI, 3, 'aux', Var, ': '),
+	print_msg(FI, 3, 'aux', Attributes_For_Printing_Conj, '  '), !,
+	print_vars_diseqs(FI, '', Vars), !.
+print_vars_diseqs(FI, Pre_Msg, [Var | Vars]) :-
+	Pre_Msg \== '',
+	prepare_attributes_for_printing(Var, Attributes_For_Printing_Conj),
+	print_msg(FI, 3, 'nl', '', ''),
+	print_msg(FI, 3, 'aux', Pre_Msg, ''),
+	print_msg(FI, 3, 'aux', Var, ': '),
+	print_msg(FI, 3, 'aux', Attributes_For_Printing_Conj, '  '), !,
+	print_vars_diseqs(FI, '', Vars), !.
 
-cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
-	Mode == 'list',
-	list_head_and_tail(Term, Head, Tail), !,
-	cneg_diseq_echo(FI_1, FI_2, '', Msg, Head),
-	cneg_diseq_echo(FI_1, FI_2, 'list', Msg, Tail).
-
-cneg_diseq_echo(FI_1, FI_2, Mode, Term, Unused) :-
-	Mode == 'aux', 
-	Unused == '',
-	!, 
-	print_msg(FI_1, FI_2, 'aux', Term, ''),
-	prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj),
-	(
-	    (   Attributes_For_Printing_Conj == [], !   )  % No attrs -> No printing.
-	;
-	    (   Attributes_For_Printing_Conj \== [], !, 
-		print_msg(FI_1, FI_2, 'aux', ' : ', Attributes_For_Printing_Conj)
-	    )
-	).
-
-cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
-	Mode == 'aux', 
-	Term \== '',
-	!, 
-	cneg_diseq_echo(FI_1, FI_2, Mode, Msg, ''),
-	cneg_diseq_echo(FI_1, FI_2, Mode, Term, '').
-
-cneg_diseq_echo(FI_1, FI_2, Mode, Msg, Term) :-
-	Mode \== 'nl', 
-	Mode \== 'logo',
- 	Mode \== 'list', 
- 	Mode \== 'aux', 
-	!,
-	cneg_diseq_echo(FI_1, FI_2, 'logo', '', ''),
-	cneg_diseq_echo(FI_1, FI_2, 'aux', Msg, ' :: '),
-	cneg_diseq_echo(FI_1, FI_2, 'aux', Term, ''),
-	print_msg(FI_1, FI_2, 'nl', '', '').
-
-cneg_diseq_echo(Echo_Level, _Mode, File_Name, Msg, Term) :-
-	print_msg(1, 3, '', 'ERROR in cneg_diseq_echo printing', Msg), 
-	print_msg(1, 3, '', 'ERROR in cneg_diseq_echo printing', Term), !,
-	cneg_diseq_echo(Echo_Level, '', File_Name, Msg, Term).
+print_vars_diseqs(FI, Msg, Term) :- !,
+	varsbag(Term, [], [], Vars), !,
+	print_vars_diseqs(FI, Msg, Vars), !.
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -772,19 +740,19 @@ cneg_diseq_unify(T, T).
 cneg_diseq_eq(T1, T2, _UQV) :-
 	var(T1),
 	var(T2),
-	T1 == T2, % Both are the same var. This is valid if they are in UQV too.
+	T1 == T2, !, % Both are the same var. This is valid if they are in UQV too.
 	print_msg(3, 4, '', 'cneg_diseq_eq: same var. ok.', (T1, T2)),
 	!.
 
 cneg_diseq_eq(T1, _T2, UQV) :-
 	var(T1),
-	memberchk(T1, UQV),
+	memberchk(T1, UQV), !,
 	print_msg(3, 4, '', 'cneg_diseq_eq: T1 in UQV. fail.', (T1, UQV)),
 	!, fail.
 
 cneg_diseq_eq(_T1, T2, UQV) :-
 	var(T2),
-	memberchk(T2, UQV),
+	memberchk(T2, UQV), !,
 	print_msg(3, 4, '', 'cneg_diseq_eq: T2 in UQV. fail.', (T2, UQV)),
 	!, fail.
 
@@ -802,32 +770,32 @@ cneg_diseq_eq(T1, T2, _UQV) :-
 	!, fail.
 
 cneg_diseq_eq(T1, T2, UQV) :-
+	var(T1), !, % Var vs functor definition.
+	functor_local(T2, '/', 2, _Args_T2),
+	arg(1, T2, Name),
+	arg(2, T2, Arity),
+	functor_local(T1, Name, Arity, _Args_T1), !,
+	print_msg(3, 4, '', 'T1 var, T2 functor definition. ok.', (T1, T2, UQV)),
+	!.
+
+cneg_diseq_eq(T1, T2, UQV) :-
 	var(T1), !, % Var vs functor
 	functor_local(T2, Name, Arity, Args_T2),
-	functor_local(T1, Name, Arity, Args_T1),
-	print_msg(3, 4, '', 'T1 var, T2 functor. ok.', (T1, T2, UQV)),
-	!, 
-	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
-
-cneg_diseq_eq(T1, T2, _UQV) :-
-	var(T2), % Var vs functor using var.
-	varsbag(T1, [], [], Vars),
-	memberchk(T2, Vars), !,
-	print_msg(3, 4, '', 'T2 appears in T1. fail.', (T1, T2)),
-	!, fail.
-
-cneg_diseq_eq(T1, T2, UQV) :-
-	var(T2), !, % Var vs functor
-	functor_local(T1, Name, Arity, Args_T1),
-	functor_local(T2, Name, Arity, Args_T2),
-	print_msg(3, 4, '', 'T2 var, T1 functor. ok.', (T1, T2, UQV)),
+	functor_local(T1, Name, Arity, Args_T1), !,
+	print_msg(3, 4, '', 'T1 var, T2 functor. continue.', (T1, T2, UQV)),
 	!, 
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
 cneg_diseq_eq(T1, T2, UQV) :-
+	var(T2), !, % Var vs something. Order inversion.
+	print_msg(3, 4, '', 'T2 var. order inversion. continue.', (T1, T2)), !,
+	cneg_diseq_eq(T2, T1, UQV),
+	!.
+
+cneg_diseq_eq(T1, T2, UQV) :-
 	functor_local(T1, Name, Arity, Args_T1),
-	functor_local(T2, Name, Arity, Args_T2), 
-	print_msg(3, 4, '', 'T1 and T2 functors. ok.', (T1, T2, UQV)),
+	functor_local(T2, Name, Arity, Args_T2), !,
+	print_msg(3, 4, '', 'T1 and T2 functors. continue.', (T1, T2, UQV)),
 	!, % functor vs functor.
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
@@ -856,50 +824,15 @@ cneg_diseq_eq_args([Arg_T1 | Args_T1], [Arg_T2 | Args_T2], UQV) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-adequate_gv_eqv_uqv(_T1, _T2, GoalVars_In, EQV_In, UQV_In, _EQV_Out, _UQV_Out) :-
-	(
-	    GoalVars_In == 'compute' 
-	;
-	    EQV_In == 'compute' 
-	;
-	    UQV_In == 'compute'
-	), 
-	print_msg(1, 3, '', 'adequate_gv_eqv_uqv :: ERROR :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
-	!, fail.
-
-adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV_Out, UQV_Out) :-
-	GoalVars_In \== 'compute',
-	EQV_In \== 'compute', 
-	UQV_In \== 'compute',
-	print_msg(3, 4, '', 'adequate_gv_eqv_uqv :: In :: (GV, EQV, UQV)', (GoalVars_In, EQV_In, UQV_In)),
-	varsbag(GoalVars_In, [], [], GoalVars), % Only variables, please.
-	varsbag_clean_up(EQV_In, EQV_Tmp), % Only variables, please.
-	varsbag_clean_up(UQV_In, UQV_Tmp), % Only variables, please. EQV /\ UQV = empty.
-%	print_msg(3, 4, '', 'adequate_gv_eqv_uqv :: (GoalVars, EQV_Aux, UQV_Tmp)', (GoalVars, EQV_Tmp, UQV_Tmp)),
-
-	varsbag_union(GoalVars, EQV_Tmp, EQV_Aux),
-	varsbag(UQV_Tmp, EQV_Aux, [], UQV_Aux), % A var marked existential becomes existential.
-
-	varsbag((T1, T2), [], [], Affected_Vars), % Affected variables.
-	varsbag_intersection(Affected_Vars, EQV_Aux, EQV_Out), % Only EQV affected variables.
-	varsbag_intersection(Affected_Vars, UQV_Aux, UQV_Out), % Only UQV affected variables.
-
-	print_msg(3, 4, '', 'adequate_gv_eqv_uqv :: Out :: (EQV, UQV)', (EQV_Out, UQV_Out)).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 get_disequalities_from_constraints(Anything, Vars_With_Attrs) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
-	cneg_diseq_echo(3, 4, '', 'get_disequalities_from_constraints :: Vars_With_Attrs', Vars_With_Attrs).
+	print_msg(3, 4, '', 'get_disequalities_from_constraints :: Vars_With_Attrs', Vars_With_Attrs).
 
 get_disequalities_from_constraints_and_remove_them([], []) :- !.
 get_disequalities_from_constraints_and_remove_them(Anything, Vars_With_Attrs) :-
 	get_disequalities_from_constraints(Anything, Vars_With_Attrs),
 	varsbag(Vars_With_Attrs, [], [], Vars),
-	cneg_diseq_echo(3, 4, '', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
+	print_msg(3, 4, '', 'get_disequalities_from_constraints_and_remove_them :: Vars', Vars),
 	remove_all_constraints_in_variables(Vars), !.
 
 remove_all_constraints_in_variables(Anything) :-
@@ -958,11 +891,10 @@ attribute_diseq_to_executable_diseq(Constraint_Diseq, Executable_Diseq) :-
 disequality(T1,T2, UQV_In) :- 
 	varsbag_clean_up(UQV_In, UQV), % Only variables, please.	
 	varsbag((T1, T2), UQV, [], EQV), % Only variables, please.
-	diseq_geuqv(T1,T2, [], EQV, UQV).
+	diseq_geuqv(T1,T2, EQV, UQV).
 
-diseq_geuqv(T1,T2, GoalVars_In, EQV_In, UQV_In) :- 
-	print_msg(3, 4, '', 'diseq_geuqv [in] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (GoalVars_In, EQV_In, UQV_In))),
-	adequate_gv_eqv_uqv(T1, T2, GoalVars_In, EQV_In, UQV_In, EQV, UQV),
+diseq_geuqv(T1,T2, EQV, UQV) :- 
+	print_msg(3, 4, 'nl', '', ''),
 	print_msg(3, 4, '', 'diseq_geuqv [tmp] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
 	attribute_disequality_contents(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality]),
@@ -976,27 +908,14 @@ diseq_geuqv(T1,T2, GoalVars_In, EQV_In, UQV_In) :-
 equality(T1,T2, UQV_In) :- 
 	varsbag_clean_up(UQV_In, UQV), % Only variables, please.	
 	varsbag((T1, T2), UQV, [], EQV), % Only variables, please.
-	eq_geuqv(T1,T2, [], EQV, UQV).
+	eq_geuqv(T1,T2, EQV, UQV).
 
-eq_geuqv(T1, T2, GoalVars, EQV_In, UQV_In) :- 
+eq_geuqv(T1, T2, EQV, UQV) :- 
 	print_msg(3, 4, 'nl', '', ''),
-	print_msg(3, 4, '', 'eq_geuqv [in] :: (T1, =, T2), ---, (GV, EQV, UQV)', ((T1, '=', T2), '---', (GoalVars, EQV_In, UQV_In))),
-	adequate_gv_eqv_uqv(T1, T2, GoalVars, EQV_In, UQV_In, EQV, UQV),
 	print_msg(3, 4, '', 'eq_geuqv [tmp] :: (T1, =, T2), ---, (EQV, UQV)', ((T1, '=', T2), '---', (EQV, UQV))),
-	!,
-	(
-	    ( 
-		cneg_diseq_eq(T1, T2, UQV),
-		print_msg(3, 4, '', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
-		print_msg(3, 4, 'nl', '', '')
-	    )
-	;
-	    (
-		print_msg(3, 4, '', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
-		print_msg(3, 4, '', 'continues', '...'),
-		diseq_geuqv(T1, T2, GoalVars, UQV, 'compute') 
-	    )
-	).
+	cneg_diseq_eq(T1, T2, UQV),
+	print_msg(3, 4, '', 'eq_geuqv [out] :: ((T1, =, T2))', ((T1, '=', T2))),
+	print_msg(3, 4, 'nl', '', '').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
