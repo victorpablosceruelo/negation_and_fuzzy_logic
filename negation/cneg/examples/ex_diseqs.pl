@@ -24,60 +24,6 @@ tests :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test_execution(Logo, Vars, First_Part, Second_Part, Should_What) :-
-	(
-	    (
-		print_msg(1, 3, 'nl', '', ''),
-		print_msg(1, 3, '', 'Test', Logo),
-		print_msg(3, 3, 'aux', '', '(vars with attrs) '),
-		print_vars_diseqs(3, '', Vars), 
-		print_msg(3, 3, 'nl', '', ''),
-		print_msg(3, 3, 'aux', '1st: ', First_Part), 
-		call(First_Part),
-		print_msg(3, 3, 'aux', '', ' --> (vars with attrs) '),
-		print_vars_diseqs(3, '', Vars), 
-		print_msg(3, 3, 'nl', '', ''),
-		print_msg(3, 3, 'aux', '2nd: ', Second_Part), 
-		call(Second_Part),
-		print_msg(3, 3, 'aux', ' --> (vars with attrs) ', ''), 
-		print_vars_diseqs(3, '', Vars), 
-		print_msg(3, 3, 'nl', '', ''), !,
-		
-		(
-		    (
-			Should_What = 'should_succeed',
-			print_msg(1, 3, '', 'PASS', '')
-		    )
-		;
-		    (
-			Should_What = 'should_fail',
-			print_msg(1, 3, '', 'ERROR', '')
-		    )
-		),
-		!
-	    )
-	;
-	    (
-		(
-		    (
-			Should_What = 'should_succeed',
-			print_msg(1, 3, '', 'ERROR', '')
-		    )
-		;
-		    (
-			Should_What = 'should_fail',
-			print_msg(1, 3, '', 'PASS', '')
-		    )
-		)
-	    )
-	), !.
-
-	    
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 tests_fail('f01', [T1 |[ T2]], (T1 = a, T2 = b), equality(T1, T2, [])).
 tests_fail('f02', [T1 |[ T2]], (T1 = a, T2 = a), disequality(T1, T2, [])).
 tests_fail('f03', [T1 |[ T2]], equality(T1, T2, []), disequality(T1, T2, [])).

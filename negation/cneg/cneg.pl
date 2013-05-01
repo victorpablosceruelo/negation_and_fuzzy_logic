@@ -11,15 +11,17 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- use_module(library('cneg/cneg_tr')).
+:- use_module(library('cneg/cneg_msgs'), [print_msg/5]).
 :- use_module(library('cneg/cneg_aux')).
 :- use_module(library('cneg/cneg_diseq')).
 :- use_module(library('cneg/cneg_rt')).
-:- use_module(library('cneg/cneg_msgs'), [print_msg/5]).
+:- use_module(library('cneg/cneg_tr')).
 
-:- reexport(library('cneg/cneg_diseq')).
-:- reexport(library('cneg/cneg_rt'), [cneg_rt/4]).
 :- reexport(library('cneg/cneg_msgs'), [print_msg/5]).
+:- reexport(library('cneg/cneg_aux')).
+:- reexport(library('cneg/cneg_diseq')).
+:- use_module(library('cneg/cneg_rt'), [test_execution/5]).
+%:- reexport(library('cneg/cneg_rt'), [cneg_rt/4]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_choosen_negation/1.

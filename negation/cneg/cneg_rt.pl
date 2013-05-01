@@ -1,5 +1,5 @@
 
-:- module(cneg_rt, [cneg_rt/4, cneg_rt_aux/3], [assertions]).
+:- module(cneg_rt, [cneg_rt/4, cneg_rt_aux/3, test_execution/5], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
@@ -198,6 +198,62 @@ local_call_to_aux(Predicate, Level_In, Trace) :-
 %	Level is Level_In + 1,
 %	print_msg(3, 3, '', 'call_to (L', Level, ') :: Predicate - FAILED -', Predicate),
 %	!, fail. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+test_execution(Logo, Vars, First_Part, Second_Part, Should_What) :-
+	(
+	    (
+		print_msg(1, 3, 'nl', '', ''),
+		print_msg(1, 3, '', 'Test', Logo),
+		print_msg(3, 3, 'aux', '', '(vars with attrs) '),
+		print_vars_diseqs(3, '', Vars), 
+		print_msg(3, 3, 'nl', '', ''),
+		print_msg(3, 3, 'aux', '1st: ', First_Part), 
+		call(First_Part),
+		print_msg(3, 3, 'aux', '', ' --> (vars with attrs) '),
+		print_vars_diseqs(3, '', Vars), 
+		print_msg(3, 3, 'nl', '', ''),
+		print_msg(3, 3, 'aux', '2nd: ', Second_Part), 
+		call(Second_Part),
+		print_msg(3, 3, 'aux', ' --> (vars with attrs) ', ''), 
+		print_vars_diseqs(3, '', Vars), 
+		print_msg(3, 3, 'nl', '', ''), !,
+		
+		(
+		    (
+			Should_What = 'should_succeed',
+			print_msg(1, 3, '', 'PASS', '')
+		    )
+		;
+		    (
+			Should_What = 'should_fail',
+			print_msg(1, 3, '', 'ERROR', '')
+		    )
+		),
+		!
+	    )
+	;
+	    (
+		(
+		    (
+			Should_What = 'should_succeed',
+			print_msg(1, 3, '', 'ERROR', '')
+		    )
+		;
+		    (
+			Should_What = 'should_fail',
+			print_msg(1, 3, '', 'PASS', '')
+		    )
+		)
+	    )
+	), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
