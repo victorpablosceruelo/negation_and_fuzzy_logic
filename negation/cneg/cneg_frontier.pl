@@ -201,14 +201,22 @@ test_pre_frontier_validity(PreFr) :-
 	(
 	    (
 		call_to_predicate((E, IE)), !, 
-		cneg_diseq_echo(3, 3, '', 'test_pre_frontier_validity :: VALID :: Goal', Goal),
-		cneg_diseq_echo(3, 3, '', 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
+		print_msg(3, 3, '', 'test_pre_frontier_validity :: VALID :: Goal', Goal),
+		print_vars_diseqs(3, '', Goal), 
+		print_msg(3, 3, 'nl', '', ''),
+		print_msg(3, 3, '', 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
+		print_vars_diseqs(3, '', PreFr), 
+		print_msg(3, 3, 'nl', '', ''),
 		! % Backtracking forbidden.
 	    )
 	;
 	    (
-		cneg_diseq_echo(3, 3, '', 'test_pre_frontier_validity :: NOT VALID :: Goal', Goal),
-		cneg_diseq_echo(3, 3, '', 'test_pre_frontier_validity :: NOT VALID :: PreFr', PreFr),
+		print_msg(3, 3, '', 'test_pre_frontier_validity :: NOT VALID :: Goal', Goal),
+		print_vars_diseqs(3, '', Goal), 
+		print_msg(3, 3, 'nl', '', ''),
+		print_msg(3, 3, '', 'test_pre_frontier_validity :: NOT VALID :: PreFr', PreFr),
+		print_vars_diseqs(3, '', PreFr), 
+		print_msg(3, 3, 'nl', '', ''),
 		!, fail
 	    )
 	), !. % Backtracking forbidden. 
@@ -411,7 +419,9 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	get_equalities_conj_from_lists(GoalVars, Answ_GoalVars, true, New_E), 
 	!, 
 	subfrontier_E_IE_NIE_contents(Frontier_Node, New_E, New_IE, Answ_NIE),
-	cneg_diseq_echo(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node', Frontier_Node),
+	print_msg(3, 3, 'aux', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node', Frontier_Node),
+	print_vars_diseqs(3, '', Frontier_Node), 
+	print_msg(3, 3, 'nl', '', ''),
 	!.
 
 

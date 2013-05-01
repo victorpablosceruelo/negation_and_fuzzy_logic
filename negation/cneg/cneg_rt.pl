@@ -40,7 +40,9 @@ cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
 	print_msg(3, 3, '', 'cneg_rt :: (GoalVars)', GoalVars),
-	cneg_diseq_echo(3, 3, '', 'cneg_rt :: Goal with attrs', Goal),
+	print_msg(3, 3, 'aux', 'cneg_rt :: Goal', Goal),
+	print_vars_diseqs(3, '', Goal),
+	print_msg(3, 3, 'nl', '', ''),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	compute_frontier(Goal, GoalVars, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
@@ -83,7 +85,9 @@ evaluate_negated_frontier([Result | Result_List], Level, Trace, CN_Call) :-
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
 	add_predicate_to_trace(with_attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
 	print_msg(3, 3, '', 'evaluate_negated_frontier :: goal', CN_Call),
-	cneg_diseq_echo(3, 3, '', 'evaluate_negated_frontier :: result', Result),
+	print_msg(3, 3, 'aux', 'evaluate_negated_frontier :: result', Result),
+	print_vars_diseqs(3, '', Result), 
+	print_msg(3, 3, 'nl', '', ''),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),
 	local_call_to(Result, Level, Trace_5),
 	evaluate_negated_frontier(Result_List, Level, Trace_6, CN_Call).
@@ -105,7 +109,9 @@ local_call_to(Predicate, Level_In, Trace) :-
 	print_msg(3, 3, 'nl', '', ''), 
 	print_msg(3, 3, 'nl', '', ''), 
 	print_msg(3, 3, '', ['call_to (L' |[ Level |[ ') :: Predicate']]], Predicate), 
-	cneg_diseq_echo(3, 3, '', 'Predicate with attrs', Predicate),
+	print_msg(3, 3, 'aux', 'Predicate with attrs', Predicate),
+	print_vars_diseqs(3, '', Predicate), 
+	print_msg(3, 3, 'nl', '', ''), 
 	get_trace_status_list(Trace, Trace_Status_List),
 	print_msg(3, 3, 'list', 'call_to :: TRACE ', Trace_Status_List),
 	print_msg(3, 3, 'nl', '', ''), 
