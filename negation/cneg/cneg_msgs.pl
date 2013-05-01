@@ -85,7 +85,8 @@ print_msg_aux(FI, 'list', Pre_Msg, Msg) :- !,
 	print_msg_aux(FI, '', Pre_Msg, Msg).
 
 print_msg_aux(FI, '', Pre_Msg, Msg) :- !,
-	  print_msg_normal(FI, Pre_Msg, Msg).
+	  print_msg_normal(FI, Pre_Msg, Msg),
+	  print_msg_aux(FI, 'nl', '', '').
 
 print_msg_aux(_FI, Mode, Pre_Msg, Msg) :-
 	  print_msg_normal('error', 'Erroneous mode', Mode),
