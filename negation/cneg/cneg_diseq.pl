@@ -534,7 +534,7 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV_In) :- % Differ
 	T1 \== T2, % Not the same variable.
 	varsbag(EQV_In, [], [], EQV), % Remove anything there not a variable.
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
-%	print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and var(T2)', (T1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and var(T2)', (T1, T2)),
 	(
 	    (   % Both are UQ vars.
 		cneg_aux:memberchk(T1, UQV), 
@@ -593,6 +593,7 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % var and n
 	    )
 	).
 
+!!!!!!!!!!!!!!
 diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV):- 
 	nonvar(T1), 
 	nonvar(T2), !,
