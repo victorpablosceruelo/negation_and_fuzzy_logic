@@ -99,36 +99,43 @@ logo(0, '') :- !.
 logo(1, '') :- !.
 logo(_Any, '% ').
 
-print_msg_normal(FI, Pre_Msg, Msg) :-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+print_msg_normal(FI, Pre_Msg, []) :- !,
 	print_msg_normal_pre_msg(FI, Pre_Msg),
-	print_msg_normal_aux(FI, Pre_Msg, Msg).
+	print_msg_real(FI, '[]').
+
+print_msg_normal(FI, Pre_Msg, [Msg | Msgs]) :- !,
+	print_msg_normal_pre_msg(FI, Pre_Msg),
+	print_msg_normal_aux(FI, Msg),
+	print_msg_normal(FI, Pre_Msg, Msgs).
+
+print_msg_normal(FI, Pre_Msg, Msg) :- !,
+	print_msg_normal_pre_msg(FI, Pre_Msg),
+	print_msg_normal_aux(FI, Msg).
 
 print_msg_normal_pre_msg(_FI, []) :- !.
 print_msg_normal_pre_msg(_FI, '') :- !.
-print_msg_normal_pre_msg(FI, [Pre_Msg_1 | Pre_Msgs]) :-
-	print_msg_normal_pre_msg(FI, Pre_Msg_1),
-	print_msg_normal_pre_msg_list(FI, Pre_Msgs).
-
+print_msg_normal_pre_msg(FI, [Pre_Msg | Pre_Msgs]) :- !,
+	print_msg_normal_aux(FI, Pre_Msg), !,
+	print_msg_normal_pre_msg(FI, Pre_Msgs), !.
 print_msg_normal_pre_msg(FI, Pre_Msg) :-
 	logo(FI, Logo),
-	print_msg_real(FI, Logo),
-	print_msg_real(FI, Pre_Msg),
-	print_msg_real(FI, ' :: '), !.
+	print_msg_normal_aux(FI, Logo),
+	print_msg_normal_aux(FI, Pre_Msg),
+	print_msg_normal_aux(FI, ' :: '), !.
 
-print_msg_normal_pre_msg_list(_FI, []) :- !.
-print_msg_normal_pre_msg_list(FI, [Pre_Msg | Pre_Msgs]) :- !,
-	print_msg_real(FI, Pre_Msg),
-	print_msg_real(FI, ' :: '), !,
-	print_msg_normal_pre_msg_list(FI, Pre_Msgs).
-
-print_msg_normal_aux(_FI, _Pre_Msg, '') :- !.
-print_msg_normal_aux(FI, _Pre_Msg, []) :- print_msg_real(FI, '[]').
-print_msg_normal_aux(FI,   Pre_Msg, [Msg_1 | Msgs]) :- !,
-	print_msg_normal_aux(FI, Pre_Msg, Msg_1),
-	print_msg_normal(FI, Pre_Msg, Msgs).
-print_msg_normal_aux(FI, _Pre_Msg, Msg) :- !,
-	print_msg_real(FI, Msg),
-	print_msg_aux(FI, 'nl', '', '').
+print_msg_normal_aux(_FI, '') :- !.
+print_msg_normal_aux(_FI, []) :- !.
+%	print_msg_normal_aux(FI, '[]').
+print_msg_normal_aux(FI, [Msg | Msgs]) :- !,
+	print_msg_normal_aux(FI, Msg),
+	print_msg_normal_aux(FI, ' '),
+	print_msg_normal_aux(FI, Msgs).
+print_msg_normal_aux(FI, Msg) :- !,
+	print_msg_real(FI, Msg).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
