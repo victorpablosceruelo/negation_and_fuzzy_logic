@@ -15,9 +15,11 @@
 :- use_module(library('cneg/cneg_aux')).
 :- use_module(library('cneg/cneg_diseq')).
 :- use_module(library('cneg/cneg_rt')).
+:- use_module(library('cneg/cneg_msgs'), [print_msg/5]).
 
 :- reexport(library('cneg/cneg_diseq')).
 :- reexport(library('cneg/cneg_rt'), [cneg_rt/4]).
+:- reexport(library('cneg/cneg_msgs'), [print_msg/5]).
 
 % To access pre-frontiers from anywhere.
 :- multifile cneg_choosen_negation/1.
