@@ -593,41 +593,10 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- % var and n
 	    )
 	).
 
-!!!!!!!!!!!!!!
-diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV):- 
+diseqs_to_constraints([(T1, T2) | More_Diseqs], Constraints, EQV) :- 
 	nonvar(T1), 
 	nonvar(T2), !,
- 	functor_local(T1, Name_1, Arity_1, Args_1),
-	functor_local(T2, Name_2, Arity_2, Args_2), 
-	(
-	    (   % Functors that unify.
-		Name_1 == Name_2, 
-		Arity_1 == Arity_2, !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
-		disequalities_lists_product(Args_1, Args_2, Diseq_List),
-		cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
-		diseqs_to_constraints(New_More_Diseqs, Constraints, EQV)
-	    )
-	;
-	    (   % Functors that do not unify.
-		(
-		    (Name_1 \== Name_2) ; (Arity_1 \== Arity_2)
-		), !,
-%		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) =/= functor(T2)', (T1, T2)),
-%		Result = 'true', % Result is completely valid.
-		Constraints = [] % No constraints.
-	    )
-	).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Esto NO es producto cartesiano.
-disequalities_lists_product([], [], []) :- !.
-disequalities_lists_product([T1], [T2], [(T1, T2)]) :- !.
-disequalities_lists_product([T1 | Args_1], [T2 | Args_2], [(T1, T2) | More_Diseqs]) :- !,
-	disequalities_lists_product(Args_1, Args_2, More_Diseqs).
+	diseqs_to_constraints_nonvars(T1, T2, More_Diseqs, Constraints, EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -650,7 +619,24 @@ diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Constraints, EQV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+diseqs_to_constraints_var_nonvar([(T1, Name2/Arity2) | _More_Diseqs], Constraints, EQV_In):- !,
+	var(T1),
+	T2 = Name2/Arity2, % T2 is a functor definition.
+	(
+	    (
+		cneg_aux:memberchk(T1, EQV_In), !,
+		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and functor(T2)', (T1, T2)),
+		Constraints = [(T1, T2)]
+	    )
+	;
+	    (   % A universally quantified var cannot have restrictions.
+		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
+		fail
+	    )
+	).
+
 diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):- 
+	T2 \== _FunctorName2/_FunctorArity2,
         var(T1),
 	nonvar(T2),
         functor_local(T2, Name, Arity, _Args_T2), 
@@ -722,6 +708,89 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Constraints, EQV_In):
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+diseqs_to_constraints_nonvars(T1, T2, _More_Diseqs, _Constraints, _EQV) :-
+	(  
+	    var(T1) 
+	; 
+	    var(T2)  
+	),
+	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: T1 or T2 are vars. (T1, T2)', (T1, T2)),
+	!, fail.
+
+diseqs_to_constraints_nonvars(Name/Arity, Name/Arity, More_Diseqs, Constraints, EQV) :- !,
+	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) == functor(T2). (T1)', (Name/Arity)),
+	%functor_local(T1, Name, Arity, Args_1),
+	%functor_local(T2, Name, Arity, Args_2), 
+	%disequalities_lists_product(Args_1, Args_2, Diseq_List),
+	%cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs), !,
+	%diseqs_to_constraints(New_More_Diseqs, Constraints, EQV).
+	diseqs_to_constraints(More_Diseqs, Constraints, EQV).
+	
+diseqs_to_constraints_nonvars(Name1/Arity1, Name2/Arity2, _More_Diseqs, Constraints, _EQV) :-
+	(
+	    Name1 \== Name2
+	;
+	    Arity1 \== Arity2
+	), !,
+	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) =/= functor(T2). (T1, T2)', (Name1/Arity1, Name2/Arity2)),
+	Constraints = [].
+
+diseqs_to_constraints_nonvars(Name1/Arity1, T2, More_Diseqs, Constraints, EQV) :-
+	functor_local(T2, Name2, Arity2, _Args_2), 
+	Name1 == Name2,
+	Arity1 == Arity2, !,
+	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) == functor(T2). (T1, T2)', (Name1/Arity1, T2)),
+	diseqs_to_constraints(More_Diseqs, Constraints, EQV).
+
+diseqs_to_constraints_nonvars(Name1/Arity1, T2, _More_Diseqs, Constraints, _EQV) :-
+	functor_local(T2, Name2, Arity2, _Args_2), 
+	Name1 \== Name2,
+	Arity1 \== Arity2, !,
+	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) =/= functor(T2). (T1, T2)', (Name1/Arity1, T2)),
+	Constraints = [].
+
+diseqs_to_constraints_nonvars(T1, Name2/Arity2, More_Diseqs, Constraints, EQV) :- !,
+	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: inversion :: (T1, T2)', (T1, Name2/Arity2)),
+	diseqs_to_constraints_nonvars(Name2/Arity2, T1, More_Diseqs, Constraints, EQV).
+
+diseqs_to_constraints_nonvars(T1, T2, More_Diseqs, Constraints, EQV) :-
+	T1 \== _TF1/_TA1,
+	T2 \== _TF2/_TA2,
+	functor_local(T1, Name_1, Arity_1, Args_1),
+	functor_local(T2, Name_2, Arity_2, Args_2), 
+	(
+	    (   % Functors that unify.
+		Name_1 == Name_2, 
+		Arity_1 == Arity_2, !,
+		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
+		disequalities_lists_product(Args_1, Args_2, Diseq_List),
+		cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
+		diseqs_to_constraints(New_More_Diseqs, Constraints, EQV)
+	    )
+	;
+	    (   % Functors that do not unify.
+		(
+		    (Name_1 \== Name_2) ; (Arity_1 \== Arity_2)
+		), !,
+		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) =/= functor(T2)', (T1, T2)),
+		Constraints = [] % No constraints.
+	    )
+	).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Esto NO es producto cartesiano.
+disequalities_lists_product([], [], []) :- !.
+disequalities_lists_product([T1], [T2], [(T1, T2)]) :- !.
+disequalities_lists_product([T1 | Args_1], [T2 | Args_2], [(T1, T2) | More_Diseqs]) :- !,
+	disequalities_lists_product(Args_1, Args_2, More_Diseqs).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %remove_vars_with_attributes([], []) :- !.
 %remove_vars_with_attributes([Var|List_In], List_Out) :-   % If variables have attributes, remove them from the bag.
 %	get_attribute_local(Var, _Attribute), !,
@@ -772,17 +841,15 @@ cneg_diseq_eq(T1, T2, _UQV) :-
 	print_msg(3, 4, '', 'cneg_diseq_eq: T1 appears in T2. fail.', (T1, T2)),
 	!, fail.
 
-cneg_diseq_eq(T1, T2, UQV) :-
+cneg_diseq_eq(T1, Name2/Arity2, UQV) :-
 	var(T1), !, % Var vs functor definition.
-	functor_local(T2, '/', 2, _Args_T2),
-	arg(1, T2, Name),
-	arg(2, T2, Arity),
-	functor_local(T1, Name, Arity, _Args_T1), !,
-	print_msg(3, 4, '', 'cneg_diseq_eq: T1 var, T2 functor definition. ok.', (T1, T2, UQV)),
-	!.
+	functor_local(T2, Name2, Arity2, _Args_T2),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 var, T2 functor definition. conversion.', (T1, Name2/Arity2, UQV)),
+	!,
+	cneg_diseq_eq(T1, T2, UQV).
 
 cneg_diseq_eq(T1, T2, UQV) :-
-	var(T1), !, % Var vs functor
+	var(T1), T2 \== _FunctorName2/_FunctorArity2, !, % Var vs functor
 	functor_local(T2, Name, Arity, Args_T2),
 	functor_local(T1, Name, Arity, Args_T1), !,
 	print_msg(3, 4, '', 'cneg_diseq_eq: T1 var, T2 functor. continue.', (T1, T2, UQV)),
@@ -790,10 +857,31 @@ cneg_diseq_eq(T1, T2, UQV) :-
 	cneg_diseq_eq_args(Args_T1, Args_T2, UQV), !.
 
 cneg_diseq_eq(T1, T2, UQV) :-
-	var(T2), !, % Var vs something. Order inversion.
+	var(T2), !, % Something vs Var. Order inversion.
 	print_msg(3, 4, '', 'cneg_diseq_eq: T2 var. order inversion. continue.', (T1, T2)), !,
 	cneg_diseq_eq(T2, T1, UQV),
 	!.
+
+cneg_diseq_eq(T1, T2, UQV) :- % T1 is a functor definition.
+	(
+	    var(T1) 
+	; 
+	    var(T2)
+	),
+	print_msg(3, 4, '', 'cneg_diseq_eq: ERROR: T1 or T2 still vars.', (T1, T2, UQV)),
+	!, fail.
+
+cneg_diseq_eq(Name1/Arity1, T2, UQV) :- % T1 is a functor definition.
+	functor_local(T1, Name1, Arity1, _Args_T1),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 functor definition. conversion. (T1, T2)', (Name1/Arity1, T2, UQV)),
+	!,
+	cneg_diseq_eq(T1, T2, UQV).
+
+cneg_diseq_eq(T1, Name2/Arity2, UQV) :- % T2 is a functor definition.
+	functor_local(T2, Name2, Arity2, _Args_T2),
+	print_msg(3, 4, '', 'cneg_diseq_eq: T1 var, T2 functor definition. conversion.', (T1, Name2/Arity2, UQV)),
+	!,
+	cneg_diseq_eq(T1, T2, UQV).
 
 cneg_diseq_eq(T1, T2, UQV) :-
 	functor_local(T1, Name, Arity, Args_T1),

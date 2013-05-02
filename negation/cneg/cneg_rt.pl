@@ -211,7 +211,8 @@ test_execution(Logo, Vars, First_Part, Second_Part, Should_What) :-
 	(
 	    (
 		print_msg(1, 3, 'nl', '', ''),
-		print_msg(1, 3, '', 'Test', Logo),
+		print_msg(1, 3, 'aux', 'Test: ', Logo),
+		print_msg(3, 3, 'nl', '', ''),
 		print_msg(3, 3, 'aux', '', '(vars with attrs) '),
 		print_vars_diseqs(3, '', Vars), 
 		print_msg(3, 3, 'nl', '', ''),
@@ -229,12 +230,14 @@ test_execution(Logo, Vars, First_Part, Second_Part, Should_What) :-
 		(
 		    (
 			Should_What = 'should_succeed',
-			print_msg(1, 3, '', 'PASS', '')
+			print_msg(1, 3, 'aux', ' -> PASS', ''),
+			print_msg(3, 3, 'nl', '', '')
 		    )
 		;
 		    (
 			Should_What = 'should_fail',
-			print_msg(1, 3, '', 'ERROR', '')
+			print_msg(1, 3, 'aux', ' -> ERROR', ''),
+			print_msg(3, 3, 'nl', '', '')
 		    )
 		),
 		!
@@ -244,12 +247,14 @@ test_execution(Logo, Vars, First_Part, Second_Part, Should_What) :-
 		(
 		    (
 			Should_What = 'should_succeed',
-			print_msg(1, 3, '', 'ERROR', '')
+			print_msg(1, 3, 'aux', ' -> ERROR', ''),
+			print_msg(3, 3, 'nl', '', '')
 		    )
 		;
 		    (
 			Should_What = 'should_fail',
-			print_msg(1, 3, '', 'PASS', '')
+			print_msg(1, 3, 'aux', ' -> PASS', ''),
+			print_msg(3, 3, 'nl', '', '')
 		    )
 		)
 	    )

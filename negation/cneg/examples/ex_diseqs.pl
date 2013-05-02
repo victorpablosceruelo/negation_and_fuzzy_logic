@@ -5,8 +5,7 @@ cneg_ignores_preds([tests/0, logo/1, tests_fail/2, tests_succeed/2]).
 
 tests :- 
 	print_msg(1, 3, 'nl', '', ''),
-	print_msg(1, 3, 'nl', 'Tests that should fail:', ''), 
-	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, '', 'Tests that should fail', ''), 
 	tests_fail(Logo, Vars, First_Part, Second_Part), 
 	test_execution(Logo, Vars, First_Part, Second_Part, 'should_fail'),
 	fail.
@@ -14,8 +13,7 @@ tests :-
 tests :- 
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'nl', '', ''),
-	print_msg(1, 3, 'nl', 'Tests that should succeed:', ''),
-	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, '', 'Tests that should succeed', ''),
 	tests_succeed(Logo, Vars, First_Part, Second_Part), 
 	test_execution(Logo, Vars, First_Part, Second_Part, 'should_succeed'),
 	fail.
