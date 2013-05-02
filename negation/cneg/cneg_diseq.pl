@@ -8,7 +8,7 @@
 	    get_disequalities_from_constraints_and_remove_them/2, 
 	    remove_all_constraints_in_variables/1,
 	    constraints_lists_difference/3,	    
-	    constraint_diseq_to_executable_diseq/2
+	    constraints_list_to_executable_diseqs/2
 	], 
 	[assertions]).
 
@@ -93,7 +93,7 @@ put_attribute_local(Var, Attribute) :-
 
 %:- dynamic var_attribute/2.
 attribute_contents(var_attribute(Target, Disequalities), Target, Disequalities).
-attribute_disequality_contents(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
+constraint(disequality(Diseq_1, Diseq_2, EQ_Vars, UQ_Vars), Diseq_1, Diseq_2, EQ_Vars, UQ_Vars).
 % equality_contents(equality(T1, T2), T1, T2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,7 +231,7 @@ format_diseqs_list_for_printing([Disequality | Disequalities], [Print_Disequalit
 % Need to convert to a single term everything.
 % This predicate is not working as expected.
 format_diseq_for_printing(Disequality, Print_Disequality) :-
-	attribute_disequality_contents(Disequality, T1, T2, _EQ_Vars_In, UQ_Vars_In),
+	constraint(Disequality, T1, T2, _EQ_Vars_In, UQ_Vars_In),
 	varsbag_clean_up(UQ_Vars_In, UQ_Vars),
 	varsbag((T1, T2), [], [], Terms_Vars), 
 	varsbag_intersection(UQ_Vars, Terms_Vars, Real_UQ_Vars),
@@ -328,7 +328,7 @@ attr_unify_hook_aux(Attribute, Value) :-
 
 get_and_remove_eqv_and_uqv_from_diseqs([], EQV_In, EQV_In, UQV_In, UQV_In, []) :- !.
 get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In, UQV_Out, [(T1, T2) | More_Ts]) :-
-	attribute_disequality_contents(Diseq, T1, T2, Diseq_EQV_In, Diseq_UQV_In),
+	constraint(Diseq, T1, T2, Diseq_EQV_In, Diseq_UQV_In),
 	varsbag_clean_up(Diseq_EQV_In, Diseq_EQV),
 	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV),
 	varsbag(Diseq_EQV, [], EQV_In, EQV_Aux),
@@ -432,7 +432,7 @@ prepare_diseqs_for_restore([], [], _EQV, _UQV, Affected_Vars, Affected_Vars) :- 
 prepare_diseqs_for_restore([(T1, T2) | Diseqs_In], [(Diseq, Vars) | Diseqs_Out], EQV, UQV, Aff_Vars_In, Aff_Vars_Out) :-
 	cneg_aux:varsbag((T1, T2), [], [], Vars), 
 	cneg_aux:varsbag(Vars, [], Aff_Vars_In, Aff_Vars_Aux), !,
-	attribute_disequality_contents(Diseq, T1, T2, EQV, UQV),
+	constraint(Diseq, T1, T2, EQV, UQV),
 	prepare_diseqs_for_restore(Diseqs_In, Diseqs_Out, EQV, UQV, Aff_Vars_Aux, Aff_Vars_Out).
 
 restore_attributes_vars([], _Diseqs) :- !.
@@ -502,8 +502,8 @@ constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Ou
 	cneg_aux:memberchk(Diseq, Constraints_In), !, % It is there.
 	constraints_sets_append_aux(Diseq_List, Constraints_In, Constraints_Out).
 constraints_sets_append_aux([(T1, T2) | Diseq_List], Constraints_In, Constraints_Out) :-
-%	attribute_disequality_contents(Diseq, T1, T2, EQV, UQV),
-%	attribute_disequality_contents(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
+%	constraint(Diseq, T1, T2, EQV, UQV),
+%	constraint(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
 	cneg_aux:memberchk((T2, T1), Constraints_In), !, % It is there.
 	constraints_sets_append_aux(Diseq_List, Constraints_In, Constraints_Out).
 constraints_sets_append_aux([Diseq | Diseq_List], Constraints_In, Constraints_Out) :-
@@ -984,9 +984,20 @@ constraints_lists_difference_aux_3(Attr_In, Attr_Aux) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-constraint_diseq_to_executable_diseq(Constraint_Diseq, Executable_Diseq) :-
-	attribute_disequality_contents(Constraint_Diseq, Diseq_1, Diseq_2, EQ_Vars, UQ_Vars),
-	functor_local(Executable_Diseq, 'diseq_geuqv', 5, [Diseq_1 |[ Diseq_2 |[ [] |[ EQ_Vars |[ UQ_Vars ]]]]]).
+constraints_list_to_executable_diseqs(Constraints, Executable_Diseqs) :- 
+	constraints_list_to_executable_diseqs_aux(Constraints, true, Executable_Diseqs), !.
+
+constraints_list_to_executable_diseqs_aux([], Executable_Diseqs, Executable_Diseqs) :- !.
+constraints_list_to_executable_diseqs_aux([Constraint], Executable_Diseqs_In, Executable_Diseqs_Out) :-
+	constraint_to_executable_diseqs(Constraint, Executable_Diseqs_In, Executable_Diseqs_Out), !.
+constraints_list_to_executable_diseqs_aux([Constraint | Constraints], Executable_Diseqs_In, Executable_Diseqs_Out) :-
+	constraint_to_executable_diseqs(Constraint, Executable_Diseqs_In, Executable_Diseqs_Aux), !,
+	constraints_list_to_executable_diseqs_aux(Constraints, Executable_Diseqs_Aux, Executable_Diseqs_Out), !.
+
+constraint_to_executable_diseqs(Constraint, Executable_Diseqs_In, Executable_Diseqs_Out) :-
+	constraint(Constraint, Diseq_1, Diseq_2, EQ_Vars, UQ_Vars),
+	functor_local(Executable_Diseq, 'diseq_geuqv', 5, [Diseq_1 |[ Diseq_2 |[ [] |[ EQ_Vars |[ UQ_Vars ]]]]]), !, 
+	goals_join_by_conjunction(Executable_Diseqs_In, Executable_Diseq, Executable_Diseqs_Out), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1015,7 +1026,7 @@ disequality(T1,T2, UQV_In) :-
 diseq_geuqv(T1,T2, EQV, UQV) :- 
 	print_msg(3, 4, 'nl', '', ''),
 	print_msg(3, 4, '', 'diseq_geuqv [tmp] :: ((T1, =/=, T2), ---, (GV, EQV, UQV))', ((T1, '=/=', T2), '---', (EQV, UQV))),
-	attribute_disequality_contents(Disequality, T1, T2, EQV, UQV),
+	constraint(Disequality, T1, T2, EQV, UQV),
         test_and_update_vars_attributes([Disequality]),
 	print_msg(3, 4, '', 'diseq_geuqv [out] :: ((T1, =/=, T2))', ((T1, '=/=', T2))),
 	print_msg(3, 4, 'nl', '', '').
