@@ -100,15 +100,15 @@ compute_goal_pre_frontier(Goal, Frontier):-
 % Now go for the functors for equality and disequality.
 % None of them is managed yet, so just bypass them.
 compute_goal_pre_frontier(Goal, [F_Out]) :- 
-	goal_is_disequality(Goal, T1, T2, GV, EQV, UQV), !,
-	functor_local(Real_Goal, 'diseq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
+	goal_is_disequality(Goal, T1, T2, UQV), !,
+	functor_local(Real_Goal, 'disequality', 3, [ T1 |[ T2 |[ UQV ]]]),
 %	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, 'true', Real_Goal, 'true', Real_Goal, Real_Goal),
 	!.
 
 compute_goal_pre_frontier(Goal, [F_Out]) :- 
-	goal_is_equality(Goal, T1, T2, GV, EQV, UQV), !,
-	functor_local(Real_Goal, 'eq_geuqv', 5, [ T1 |[ T2 |[ GV |[ EQV |[ UQV ]]]]]),
+	goal_is_equality(Goal, T1, T2, UQV), !,
+	functor_local(Real_Goal, 'equality', 3, [ T1 |[ T2 |[ UQV ]]]),
 %	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true', 'true', Real_Goal, Real_Goal),
 	!.

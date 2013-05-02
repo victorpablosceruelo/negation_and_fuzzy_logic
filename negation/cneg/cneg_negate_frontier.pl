@@ -135,7 +135,7 @@ remove_from_E_redundant_vars(E_In, GoalVars) :-
 	), !.
 
 remove_from_E_redundant_vars(E_In, GoalVars) :- 
-	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
+	goal_is_equality(E_In, Value_1, Value_2, _UQV),
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag((Value_1, Value_2), Real_GoalVars, [], Non_GoalVars),
 	(
@@ -168,23 +168,23 @@ remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :-
 	goals_join_by_conjunction(E_Out_Left, E_Out_Right, E_Out), !.
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, true) :- 
-	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV),
+	goal_is_equality(E_In, _Value_1, _Value_2, _UQV),
 	memberchk(E_In, Visited_In), !, % Eq has been seen before. Redundant.
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, true) :- 
-	goal_is_equality(E_In, Value_1, Value_2, GV, EQV, UQV),
-	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
+	goal_is_equality(E_In, Value_1, Value_2, UQV),
+	goal_is_equality(E_Tmp, Value_2, Value_1, UQV), % Args interchanged.
 	memberchk(E_Tmp, Visited_In), !, % Eq has been seen before. Redundant.
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, true) :- 
-	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
+	goal_is_equality(E_In, Value_1, Value_2, _UQV),
 	Value_1 == Value_2, !, % Equality between same terms.
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (eq between identical terms)', E_In).
 
 remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
-	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
+	goal_is_equality(E_In, _Value_1, _Value_2, _UQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -222,7 +222,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out) :-
 	goals_join_by_conjunction(IE_Out_1, IE_Out_2, IE_Out).
 
 remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out):-
-	goal_is_disequality(IE_In, _Term1, _Term2, _GV_IE_In, _EQV_IE_In, _UQV_IE_In), !,
+	goal_is_disequality(IE_In, _Term1, _Term2, _UQV_IE_In), !,
 
 	varsbag(IE_In, [], [], Vars_IE_In),
 	varsbag_intersection(Vars_IE_In, Irrelevant_Vars, Intersection),
