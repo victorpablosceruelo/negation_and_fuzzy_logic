@@ -23,8 +23,8 @@ tests :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-tests_fail('generic', [T1 |[ T2]], (T1 = a, T2 = b), equality(T1, T2, [])).
-tests_succeed('s01', [T1 |[ T2]], (T1 = a, T2 = a), equality(T1, T2, [])).
+tests_fail('generic', [C], (queens(0, C)), (cneg(queens(0, C)))).
+tests_succeed('s01', [C], (queens(0, C)), true).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
