@@ -292,14 +292,6 @@ goal_is_aux_3a(Name, Goal, Arg_1, Arg_2, Arg_3) :-
 	arg(2, Goal, Arg_2),
 	arg(3, Goal, Arg_3).
 
-goal_is_aux_5a(Name, Goal, Arg_1, Arg_2, Arg_3, Arg_4, Arg_5) :-
-	functor(Goal, Name, 5), !,
-	arg(1, Goal, Arg_1),
-	arg(2, Goal, Arg_2),
-	arg(3, Goal, Arg_3),
-	arg(4, Goal, Arg_4),
-	arg(5, Goal, Arg_5).
-
 valid_negation_preds('cneg', 1).
 valid_negation_preds('cneg_aux', 2).
 % valid_negation_preds('cneg_rt', 4).
