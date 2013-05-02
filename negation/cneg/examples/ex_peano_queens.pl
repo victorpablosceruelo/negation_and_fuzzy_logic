@@ -37,39 +37,54 @@ complex_tests(N, Columns) :-
 	print_msg(1, 3, 'nl', '', ''),
 	(
 	    (
-		print_msg(1, 3, '', ' -- STARTED -- ', cneg(queens(N, Columns))), 
+		print_msg(1, 3, '', ' -- STARTED (-) -- ', cneg(queens(N, Columns))), 
 		cneg(queens(N, Columns)), % First constraints.
-		print_msg(1, 3, '', ' -- PASSED -- ', cneg(queens(N, Columns))),	 
-		(
-		    (
-			queens(N, Columns), % Secondly values generator.
-			print_msg(1, 3, '', ' -- FAILED -- ', queens(N, Columns)),
-			fail
-		    )
-		;
-		    (
-			print_msg(1, 3, '', ' -- ENDED OK -- ', queens(N, Columns)),
-			fail
-		    )
-		)
+		print_msg(1, 3, 'aux', ' -- READY (-) -- ', cneg(queens(N, Columns))),
+		print_msg(1, 3, 'aux', '', ' '),
+		print_vars_diseqs(1, '', (N, Columns)),
+		print_msg(1, 3, 'nl', '', ''),
+		complex_tests_aux_for_negative(N, Columns)
 	    )
 	;
 	    (
-		print_msg(1, 3, '', ' -- STARTED -- ', cneg(queens(N, Columns))), 
+		print_msg(1, 3, '', ' -- STARTED (+) -- ', cneg(queens(N, Columns))), 
 		queens(N, Columns), % First values generator.
-		print_msg(1, 3, '', ' -- PASSED -- ', cneg(queens(N, Columns))),	 
-		(
-		    (
-			cneg(queens(N, Columns)), % Second constraints.
-			print_msg(1, 3, '', ' -- FAILED -- ', queens(N, Columns)),
-			fail
-		    )
-		;
-		    (
-			print_msg(1, 3, '', ' -- ENDED OK -- ', queens(N, Columns)),
-			fail
-		    )
-		)
+		print_msg(1, 3, '', ' -- READY (+) -- ', cneg(queens(N, Columns))),
+		complex_tests_aux_for_positive(N, Columns)
+	    )
+	).
+
+complex_tests_aux_for_negative(N, Columns) :-
+	(
+	    (
+		queens(N, Columns), % Secondly values generator.
+		print_msg(1, 3, 'aux', ' -- FAILED (-) -- ', queens(N, Columns)),
+		print_msg(1, 3, 'aux', '', ' '),
+		print_vars_diseqs(1, '', (N, Columns)),
+		print_msg(1, 3, 'nl', '', ''),
+		!, fail
+	    )
+	;
+	    (
+		print_msg(1, 3, '', ' -- PASSED (-) -- ', queens(N, Columns)),
+		!, fail
+	    )
+	).
+
+complex_tests_aux_for_positive(N, Columns) :-
+	(
+	    (
+		cneg(queens(N, Columns)), % Second constraints.
+		print_msg(1, 3, 'aux', ' -- FAILED (+) -- ', queens(N, Columns)), 
+		print_msg(1, 3, 'aux', '', ' '),
+		print_vars_diseqs(1, '', (N, Columns)),
+		print_msg(1, 3, 'nl', '', ''),
+		!, fail
+	    )
+	;
+	    (
+		print_msg(1, 3, '', ' -- PASSED (+) -- ', queens(N, Columns)),
+		!, fail
 	    )
 	).
 
