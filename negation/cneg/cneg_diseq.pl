@@ -7,8 +7,8 @@
 	    get_disequalities_from_constraints/2,
 	    get_disequalities_from_constraints_and_remove_them/2, 
 	    remove_all_constraints_in_variables/1,
-	    attributes_difference/3,	    
-	    attribute_diseq_to_executable_diseq/2
+	    constraints_lists_difference/3,	    
+	    constraint_diseq_to_executable_diseq/2
 	], 
 	[assertions]).
 
@@ -943,20 +943,48 @@ remove_this_constraints_from_variables(_Var_With_Attrs, []) :- !.
 remove_this_constraints_from_variables(Var_With_Attrs, [Var | Vars]) :-
 	get_attribute_local(Var, Attribute), !,
 	remove_attribute_local(Var), !,
-	attributes_difference(Attribute, Var_With_Attrs, Difference), !,
-	put_attribute_local(Var, Difference), !,
+	attribute_contents(Attribute, Target, Disequalities),
+	constraints_lists_difference(Disequalities, Var_With_Attrs, Difference), !,
+	attribute_contents(New_Attribute, Target, Difference),
+	put_attribute_local(Var, New_Attribute), !,
 	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
 remove_this_constraints_from_variables(Var_With_Attrs, [_Var | Vars]) :-
 	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
 
-attributes_difference(Attribute, Var_With_Attrs, Difference) :-
-	print_msg(3, 4, '', 'attributes_difference :: Attribute', Attribute),
-	print_msg(3, 4, '', 'attributes_difference :: Var_With_Attrs', Var_With_Attrs),
-	attribute_contents(Attribute, Target, Disequalities),
-	Var_With_Attrs = Disequalities,
-	attribute_contents(Difference, Target, []).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-attribute_diseq_to_executable_diseq(Constraint_Diseq, Executable_Diseq) :-
+constraints_lists_difference(Attributes_1, Attributes_2, Difference) :-
+	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_1', Attributes_1),
+	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_2', Attributes_2),
+	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, Difference),
+	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_2', Attributes_2).
+
+constraints_lists_difference_aux_1([], _Attributes_2, []) :- !.
+constraints_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
+	constraints_lists_difference_aux_2(Attr_In, Attributes_2), !,
+	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
+constraints_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
+	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, [Attr_In | Difference]).
+
+constraints_lists_difference_aux_2(_Attr_In, []) :- !, fail. % Not found.
+constraints_lists_difference_aux_2(Attr_In, [Attr_Aux | _Attributes_2]) :-
+	constraints_lists_difference_aux_3(Attr_In, Attr_Aux), !, % Found coincidence
+	print_msg(3, 4, '', 'constraints_lists_difference :: coincidence :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
+	!.
+constraints_lists_difference_aux_2(Attr_In, [_Attr_Aux | Attributes_2]) :-
+	constraints_lists_difference_aux_2(Attr_In, Attributes_2).
+
+constraints_lists_difference_aux_3(Attr_In, Attr_Aux) :-
+	print_msg(3, 4, '', 'constraints_lists_difference :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
+	Attr_In == Attr_Aux.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+constraint_diseq_to_executable_diseq(Constraint_Diseq, Executable_Diseq) :-
 	attribute_disequality_contents(Constraint_Diseq, Diseq_1, Diseq_2, EQ_Vars, UQ_Vars),
 	functor_local(Executable_Diseq, 'diseq_geuqv', 5, [Diseq_1 |[ Diseq_2 |[ [] |[ EQ_Vars |[ UQ_Vars ]]]]]).
 
