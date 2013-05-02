@@ -410,8 +410,8 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	% A variable can have attributes coming from a higher level, 
 	% and this ones are NOT part of the current frontier.
 	get_disequalities_from_constraints_and_remove_them((Answ_GoalVars, Answ_LocalVars), Disequalities),
-	attributes_difference(Disequalities, Answ_RG_Constraints, New_Constraints),
-	attribute_diseq_to_executable_diseq(New_Constraints, New_IE),
+	constraints_lists_difference(Disequalities, Answ_RG_Constraints, New_Constraints),
+	constraints_list_to_executable_diseqs(New_Constraints, New_IE),
 
 	% The only equalities we are interested in are the ones concerning GoalVars, because
 	% Chan mechanism unifies the variables in LocalVars that occur in a equality.
