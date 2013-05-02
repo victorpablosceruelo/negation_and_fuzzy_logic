@@ -11,7 +11,7 @@
 	    varsbag_clean_up/2,
 	    goal_clean_up/2,
 	    goal_is_conjunction/3, goal_is_disjunction/3, 
-	    goal_is_disequality/6, goal_is_equality/6,
+	    goal_is_disequality/4, goal_is_equality/4,
 	    goal_is_not_conj_disj_eq_diseq_dneg/1,
 	    goal_is_not_conj_disj_neg/1,
 	    goal_is_not_negation/1,
@@ -248,16 +248,14 @@ goal_is_not_conjunction(Goal) :-
 	!, fail.
 
 % goal_is_disequality(Goal, Arg_1, Arg_2, EQV, UQV) 
-goal_is_disequality(Goal, Arg_1, Arg_2, [], [], []) :- 
+goal_is_disequality(Goal, Arg_1, Arg_2, []) :- 
 	goal_is_aux_2a('=/=', Goal, Arg_1, Arg_2), !.
-goal_is_disequality(Goal, Arg_1, Arg_2, [], [], UQV) :- 
+goal_is_disequality(Goal, Arg_1, Arg_2, UQV) :- 
 	goal_is_aux_3a('disequality', Goal, Arg_1, Arg_2, UQV), !.
-goal_is_disequality(Goal, Arg_1, Arg_2, GV, EQV, UQV) :- 
-	goal_is_aux_5a('diseq_geuqv', Goal, Arg_1, Arg_2, GV, EQV, UQV), !.
 
 goal_is_not_disequality(Goal) :-
 	nonvar(Goal), % Security issues.
-	goal_is_disequality(Goal, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !, fail.
+	goal_is_disequality(Goal, _Arg_1, _Arg_2, _UQV), !, fail.
 goal_is_not_disequality(Goal) :-
 	nonvar(Goal), % Security issues.
 	!.
@@ -267,16 +265,14 @@ goal_is_not_disequality(Goal) :-
 	!, fail.
 
 % goal_is_equality(Goal, Arg_1, Arg_2, EQV, UQV) 
-goal_is_equality(Goal, Arg_1, Arg_2, [], [], []) :- 
+goal_is_equality(Goal, Arg_1, Arg_2, []) :- 
 	goal_is_aux_2a('=', Goal, Arg_1, Arg_2), !.
-goal_is_equality(Goal, Arg_1, Arg_2, [], [], UQV) :- 
+goal_is_equality(Goal, Arg_1, Arg_2, UQV) :- 
 	goal_is_aux_3a('equality', Goal, Arg_1, Arg_2, UQV), !.
-goal_is_equality(Goal, Arg_1, Arg_2, GV, EQV, UQV) :- 
-	goal_is_aux_5a('eq_geuqv', Goal, Arg_1, Arg_2, GV, EQV, UQV), !.
 
 goal_is_not_equality(Goal) :-
 	nonvar(Goal), % Security issues.
-	goal_is_equality(Goal, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !, fail.
+	goal_is_equality(Goal, _Arg_1, _Arg_2, _UQV), !, fail.
 goal_is_not_equality(Goal) :-
 	nonvar(Goal), % Security issues.
 	!.
@@ -663,10 +659,10 @@ split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_Out, NIE_Out) 
 	split_body_into_E_IE_NIE_aux(G1, E_In, IE_In, NIE_In, E_Aux, IE_Aux, NIE_Aux),
 	split_body_into_E_IE_NIE_aux(G2, E_Aux, IE_Aux, NIE_Aux, E_Out, IE_Out, NIE_Out).
 split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_In, NIE_In) :-
-	goal_is_equality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
+	goal_is_equality(Body, _Arg_1, _Arg_2, _UQV), !,
 	goals_join_by_conjunction(E_In, Body, E_Out).
 split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_Out, NIE_In) :-
-	goal_is_disequality(Body, _Arg_1, _Arg_2, _GV, _EQV, _UQV), !,
+	goal_is_disequality(Body, _Arg_1, _Arg_2, _UQV), !,
 	goals_join_by_conjunction(IE_In, Body, IE_Out).
 
 split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :- !,
