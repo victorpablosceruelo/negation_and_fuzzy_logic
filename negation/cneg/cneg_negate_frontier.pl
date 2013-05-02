@@ -93,79 +93,49 @@ remove_from_E_redundant_eqs_and_vars(Formula_In, GoalVars, Formula_Out) :-
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars :: Formula_In', Formula_In),
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars :: GoalVars', GoalVars),
 	subfrontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In), 
-	remove_from_E_redundant_vars(E_In, GoalVars, 'fail', Changes),
-	remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux),
 	subfrontier_E_IE_NIE_contents(Formula_Aux, E_Aux, IE_In, NIE_In), 
 	(
-	    (   % There are changes. We need to iterate again.
-		(
-		    Changes == 'true' % There was redundant vars.
-		;
-		    E_In \== E_Aux % There was redundant eqs.
-		), !,
-		remove_from_E_redundant_eqs_and_vars(Formula_Aux, GoalVars, Formula_Out)	 
+	    (
+		remove_from_E_redundant_eqs_and_vars_aux(E_In, GoalVars, E_Aux), !,
+		remove_from_E_redundant_eqs_and_vars(Formula_Aux, GoalVars, Formula_Out), !
 	    )
 	;
 	    (   % If there are no changes then we have a fixed point.
-		Changes \== 'true', % No redundant vars.
-		E_In == E_Aux, !, % No redundant eqs.
+		print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars', 'END'),
+		E_Aux = E_In, !, % No redundant eqs.
 		Formula_Out = Formula_Aux
 	    )
 	).
 
-remove_from_E_redundant_eqs([], Visited, Visited, []) :- !. % Empty E
-remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :- 
-	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
-	remove_from_E_redundant_eqs(E_In_Left, Visited_In, Visited_Aux, E_Out_Left),
-	remove_from_E_redundant_eqs(E_In_Right, Visited_Aux, Visited_Out, E_Out_Right),
+remove_from_E_redundant_eqs_and_vars_aux(E_In, GoalVars, E_Aux) :-
 	(
-	    ( E_Out_Left == [], E_Out_Right == [], !, E_Out = [] )
+	    (
+		print_msg(3, 3, '', 'remove_from_E_redundant_vars :: (E_In, GoalVars)', (E_In, GoalVars)),
+		remove_from_E_redundant_vars(E_In, GoalVars), !,
+		E_Aux = E_In
+	    )
 	;
-	    ( E_Out_Left == [], !, E_Out = E_Out_Right )
-	;
-	    ( E_Out_Right == [], !, E_Out = E_Out_Left )
-	;
-	    ( E_Out = (E_Out_Left, E_Out_Right) )
+	    (
+		print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: (E_In)', (E_In)),
+		remove_from_E_redundant_eqs(E_In, [], _Visited, E_Aux), 
+		E_In \== E_Aux, !
+	    )
 	).
 
-remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
-	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV),
-	memberchk(E_In, Visited_In), !, % Eq has been seen before. Redundant.
-	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
-	goal_is_equality(E_In, Value_1, Value_2, GV, EQV, UQV),
-	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
-	memberchk(E_Tmp, Visited_In), !, % Eq has been seen before. Redundant.
-	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
-
-remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, []) :- 
-	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
-	Value_1 == Value_2, !, % Equality between same terms.
-	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (eq between identical terms)', E_In).
-
-remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
-	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
-
-remove_from_E_redundant_vars([], _GoalVars, Changes, Changes) :- !. % Empty E
-remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
+remove_from_E_redundant_vars(E_In, GoalVars) :- 
 	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
-	remove_from_E_redundant_vars(E_In_Left, GoalVars, Changes_In, Changes_Aux),
-	remove_from_E_redundant_vars(E_In_Right, GoalVars, Changes_Aux, Changes_Out),
-	!.
+	(
+	    remove_from_E_redundant_vars(E_In_Left, GoalVars)
+	;
+	    remove_from_E_redundant_vars(E_In_Right, GoalVars)
+	), !.
 
-remove_from_E_redundant_vars(E_In, GoalVars, Changes_In, Changes_Out) :- 
+remove_from_E_redundant_vars(E_In, GoalVars) :- 
 	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
-	remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out).
-
-remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
-	var(Value_1), 
-	var(Value_2),
-	Value_1 == Value_2, % Same var. This can be a redundant eq.
-	!.
-
-remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true') :-
-	(   var(Value_1)  ;  var(Value_2)   ), % One of them needs to be a variable.
 	varsbag(GoalVars, [], [], Real_GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag((Value_1, Value_2), Real_GoalVars, [], Non_GoalVars),
 	(
@@ -186,30 +156,40 @@ remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, _Changes_In, 'true'
 	    )
 	).
 
-remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
-	(   var(Value_1) ; var(Value_2)   ),
-	!. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-remove_from_E_redundant_vars_aux(Value_1, Value_2, GoalVars, Changes_In, Changes_Out) :-
-	functor_local(Value_1, Name, Arity, Args1),
-	functor_local(Value_2, Name, Arity, Args2), !,
-	print_msg(3, 3, '', 'remove_from_E_redundant_vars :: eq between functors :: erroneous frontier :: terms', (Value_1, Value_2)),
-	print_msg(3, 3, '', 'remove_from_E_redundant_vars', 'ERROR computing the frontier.'),
-	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_In, Changes_Out).
+remove_from_E_redundant_eqs(true, Visited, Visited, true) :- !. % Empty E
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_Out, E_Out) :- 
+	goal_is_conjunction(E_In, E_In_Left, E_In_Right), !,
+	remove_from_E_redundant_eqs(E_In_Left, Visited_In, Visited_Aux, E_Out_Left),
+	remove_from_E_redundant_eqs(E_In_Right, Visited_Aux, Visited_Out, E_Out_Right),
+	goals_join_by_conjunction(E_Out_Left, E_Out_Right, E_Out), !.
 
-remove_from_E_redundant_vars_aux(Value_1, Value_2, _GoalVars, Changes_In, Changes_In) :-
-	functor(Value_1, Name1, Arity1),
-	functor(Value_2, Name2, Arity2), 
-	(
-	    ( Name1 \== Name2) ;
-	    ( Arity1 \== Arity2)
-	),
-	print_msg(3, 3, '', 'remove_from_E_redundant_vars :: eq between different terms :: failed frontier :: terms', (Value_1, Value_2)).
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, true) :- 
+	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV),
+	memberchk(E_In, Visited_In), !, % Eq has been seen before. Redundant.
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
 
-remove_from_E_redundant_vars_aux_list([], [], _GoalVars, Changes_In, Changes_In) :- !.
-remove_from_E_redundant_vars_aux_list([Arg1|Args1], [Arg2|Args2], GoalVars, Changes_In, Changes_Out) :-
-	remove_from_E_redundant_vars_aux(Arg1, Arg2, GoalVars, Changes_In, Changes_Aux), 
-	remove_from_E_redundant_vars_aux_list(Args1, Args2, GoalVars, Changes_Aux, Changes_Out).
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, true) :- 
+	goal_is_equality(E_In, Value_1, Value_2, GV, EQV, UQV),
+	goal_is_equality(E_Tmp, Value_2, Value_1, GV, EQV, UQV), % Args interchanged.
+	memberchk(E_Tmp, Visited_In), !, % Eq has been seen before. Redundant.
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (seen before)', E_In).
+
+remove_from_E_redundant_eqs(E_In, Visited_In, Visited_In, true) :- 
+	goal_is_equality(E_In, Value_1, Value_2, _GV, _EQV, _UQV),
+	Value_1 == Value_2, !, % Equality between same terms.
+	print_msg(3, 3, '', 'remove_from_E_redundant_eqs :: redundant (eq between identical terms)', E_In).
+
+remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :- 
+	goal_is_equality(E_In, _Value_1, _Value_2, _GV, _EQV, _UQV).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -239,7 +219,7 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out) :-
 	goal_is_conjunction(IE_In, IE_In_1, IE_In_2), !,
 	remove_from_IE_irrelevant_disequalities_aux(IE_In_1, Irrelevant_Vars, IE_Out_1),
 	remove_from_IE_irrelevant_disequalities_aux(IE_In_2, Irrelevant_Vars, IE_Out_2),
-	rebuild_conjunction_of_goals(IE_Out_1, IE_Out_2, IE_Out).
+	goals_join_by_conjunction(IE_Out_1, IE_Out_2, IE_Out).
 
 remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out):-
 	goal_is_disequality(IE_In, _Term1, _Term2, _GV_IE_In, _EQV_IE_In, _UQV_IE_In), !,
@@ -267,16 +247,16 @@ remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out):-
 % returns Result that is the result from negating the frontier.
 negate_formula(Frontier, _GoalVars, fail) :- 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
-	subfrontier_E_IE_NIE_ie_contents(Frontier, [], [], [], [], []), % Equivalent to true, nothing to negate.
+	subfrontier_E_IE_NIE_ie_contents(Frontier, true, true, true, true, true), % Equivalent to true, nothing to negate.
 	!. % Optimization
 
 negate_formula(Frontier, GoalVars, Neg_E_IE_NIE) :-
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	subfrontier_E_IE_NIE_ie_contents(Frontier, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp),
 
-	rebuild_conjunction_of_goals(IE_Exp, NIE_Exp, IE_NIE_Exp), 
-	rebuild_conjunction_of_goals(E, IE_Imp, E_IE_Imp),
-	rebuild_conjunction_of_goals(E_IE_Imp, NIE_Imp, E_IE_NIE_Imp),
+	goals_join_by_conjunction(IE_Exp, NIE_Exp, IE_NIE_Exp), 
+	goals_join_by_conjunction(E, IE_Imp, E_IE_Imp),
+	goals_join_by_conjunction(E_IE_Imp, NIE_Imp, E_IE_NIE_Imp),
 
 	print_msg(3, 3, '', 'negate_formula :: E_IE_NIE_Imp', E_IE_NIE_Imp),
 	print_msg(3, 3, '', 'negate_formula :: IE_NIE_Exp', IE_NIE_Exp),
@@ -286,14 +266,13 @@ negate_formula(Frontier, GoalVars, Neg_E_IE_NIE) :-
 
 % negate_Dexp_Rexp(DRexp,ImpVars,ExpVars,SolC) obtain in
 % SolC a solution of negating Dexp y Rexp juntos.
-negate_IE_NIE_exp([], _GoalVars, []):- !.
+negate_IE_NIE_exp(true, _GoalVars, true):- !.
 negate_IE_NIE_exp(IE_NIE_exp, GoalVars_In, Neg_IE_NIE_exp) :-
-	IE_NIE_exp \== [],
+	IE_NIE_exp \== [], IE_NIE_exp \== true,
 	varsbag(GoalVars_In, [], [], GoalVars),
-	varsbag(IE_NIE_exp, GoalVars, [], UQV),
-	functor_local(Neg_IE_NIE_exp, 'cneg_rt', 4, [ UQV |[ GoalVars |[ IE_NIE_exp |[ 'cneg_rt_Chan' ]]]]), !.
+	functor_local(Neg_IE_NIE_exp, 'cneg_aux', 2, [ IE_NIE_exp |[ GoalVars ]]), !.
 
-negate_imp_form([], _GoalVars, [], []) :- !. % Optimization.
+negate_imp_form(true, _GoalVars, true, true) :- !. % Optimization.
 negate_imp_form(Formula, _GoalVars, _Next_Formula, _Neg_Formula) :-
 	goal_is_disjunction(Formula, _Formula_1, _Formula_2), !,
 	print_msg(1, 3, '', 'ERROR: negate_imp_form can not deal with disjunctions. Formula', Formula),
@@ -309,14 +288,16 @@ negate_imp_form(Formula, GoalVars, Next_Formula, Neg_Formula) :-
 	combine_negated(Neg_Atom, Keep_Atom, Next_Formula, Neg_Formula), 
 	!.
 
-combine_negated([], [], Neg_Formula, Neg_Formula) :- !.
+combine_negated([], [], Next_Formula, Next_Formula) :- !.
+combine_negated(fail, true, Next_Formula, Next_Formula) :- !.
 combine_negated(Neg_Formula, _Keep_Formula, [], Neg_Formula) :- !.
-combine_negated(Neg_Formula_1, Keep_Formula_1, Neg_Formula_2, Neg_Formula) :- 
-	Neg_Formula_1 \== [],
-	Keep_Formula_1 \== [],
-	Neg_Formula_2 \== [],
+combine_negated(Neg_Formula, _Keep_Formula, true, Neg_Formula) :- !.
+combine_negated(Neg_Formula, Keep_Formula, Next_Formula, Neg_Formula_Out) :- 
+	Neg_Formula \== [], 	Neg_Formula \== true,
+	Keep_Formula \== [],	Keep_Formula \== fail,
+	Next_Formula \== [],	Next_Formula \== [],
 	!,
-	Neg_Formula = (Neg_Formula_1 ; (Keep_Formula_1, Neg_Formula_2)).
+	Neg_Formula_Out = (Neg_Formula ; (Keep_Formula, Next_Formula)).
 
 % negate_I(I,ImpVars,Sol) obtains in Sol a solution of negating I
 negate_imp_atom([], _GoalVars, [], []) :- !. % Obvious.
@@ -410,18 +391,6 @@ negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-rebuild_conjunction_of_goals([], [], []) :- !. % Empty elements when re-joining
-rebuild_conjunction_of_goals(Goals, [], Goals) :- !. % Empty element when re-joining
-rebuild_conjunction_of_goals([], Goals, Goals) :- !. % Empty element when re-joining
-rebuild_conjunction_of_goals(Goals_1, Goals_2, (Goals_1, Goals_2)) :- % Non-empty elements.
-	Goals_1 \== [], 
-	Goals_2 \== [], !.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % split_IE_NIE_between_imp_and_exp(Frontier_In, ImpVars, ExpVars, UQ_to_EQ_Vars, Dumb_Vars, Frontier_Out)
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
@@ -431,10 +400,12 @@ split_IE_NIE_between_imp_and_exp(Frontier_In, ExpVars, Frontier_Out):-
 	print_msg(3, 3, '', 'split_IE_NIE_between_imp_and_exp :: ExpVars', ExpVars),
 
 	split_ie_or_nie_between_imp_and_exp(IE, ExpVars, IE_Imp, IE_Exp),
-	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: (IE_Imp, IE_Exp)', (IE_Imp, IE_Exp)),
+	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: IE_Imp', IE_Imp),
+	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: IE_Exp', IE_Exp),
 
 	split_ie_or_nie_between_imp_and_exp(NIE, ExpVars, NIE_Imp, NIE_Exp),
-	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: (NIE_Imp, NIE_Exp)', (NIE_Imp, NIE_Exp)),
+	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: NIE_Imp', NIE_Imp),
+	print_msg(3, 3, '', 'split_ie_or_nie_between_imp_and_exp :: NIE_Exp', NIE_Exp),
 
 	% frontier_E_IE_NIE_ied_contents(frontier, E, IE_Imp, IE_Exp, IE_Dumb, NIE_Imp, NIE_Exp, NIE_Dumb).
 	subfrontier_E_IE_NIE_ie_contents(Frontier_Out, E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
@@ -442,13 +413,13 @@ split_IE_NIE_between_imp_and_exp(Frontier_In, ExpVars, Frontier_Out):-
 % split_formula_between_imp_and_exp(F,ExpVars,Fimp,Fexp) divide F between Fimp and Fexp.
 % In Fexp are the elements of F with any variables of ExpVars and
 % the rest of elements of F will be in Fimp
-split_ie_or_nie_between_imp_and_exp([], _ExpVars, [], []) :- !. % Optimization.
+split_ie_or_nie_between_imp_and_exp(true, _ExpVars, true, true) :- !. % Optimization.
 split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
 	goal_is_conjunction(Form, Form_1, Form_2), !,
 	split_ie_or_nie_between_imp_and_exp(Form_1, ExpVars, Form_imp_1, Form_exp_1),
 	split_ie_or_nie_between_imp_and_exp(Form_2, ExpVars, Form_imp_2, Form_exp_2),
-	rebuild_conjunction_of_goals(Form_imp_1, Form_imp_2, Form_imp),
-	rebuild_conjunction_of_goals(Form_exp_1, Form_exp_2, Form_exp).
+	goals_join_by_conjunction(Form_imp_1, Form_imp_2, Form_imp),
+	goals_join_by_conjunction(Form_exp_1, Form_exp_2, Form_exp).
 
 split_ie_or_nie_between_imp_and_exp(Form, _ExpVars, _Form_imp, _Form_exp) :-
 	goal_is_disjunction(Form, _Form_1, _Form_2), !,
@@ -461,12 +432,12 @@ split_ie_or_nie_between_imp_and_exp(Form, ExpVars, Form_imp, Form_exp) :-
 	(
 	    (   % Form has some ExpVars
 		Intersection \== [], !,
-		Form_exp = Form, Form_imp = []
+		Form_exp = Form, Form_imp = true
 	    )
 	;
 	    (   % Form has no ExpVars 
 		Intersection == [], !,
-		Form_exp = [], Form_imp = Form
+		Form_exp = true, Form_imp = Form
 	    )
 	).
 
