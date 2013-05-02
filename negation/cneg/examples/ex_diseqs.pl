@@ -35,6 +35,9 @@ tests_fail('f10', [T1 |[ T2]], disequality(T1, T2, [T2]), true).
 tests_fail('f20', [], disequality(f/1, f/1, []), true).
 tests_fail('f21', [], disequality(T1, f/1, []), equality(T1, f/1, [])).
 tests_fail('f22', [], disequality(T1, f/1, []), equality(T1, f(a), [])).
+tests_fail('f23', [], equality(T1, f/1, []), disequality(T1, f/1, [])).
+tests_fail('f24', [], equality(T1, f(a), []), disequality(T1, f/1, [])).
+
 
 tests_succeed('s01', [T1 |[ T2]], (T1 = a, T2 = a), equality(T1, T2, [])).
 tests_succeed('s02', [T1 |[ T2]], equality(T1, T2, []), equality(T1, T2, [])).
@@ -47,6 +50,7 @@ tests_succeed('f21', [T1], disequality(T1, f/1, []), true).
 tests_succeed('f22', [], disequality(g/1, f/1, []), true).
 tests_succeed('f22', [T1], disequality(T1, f/1, []), disequality(T1, g/1, [])).
 tests_succeed('f23', [], disequality(T1, f/1, []), equality(T1, f(a, b, c), [])).
+tests_succeed('f23', [], equality(T1, f(a, b, c), []), disequality(T1, f/1, [])).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

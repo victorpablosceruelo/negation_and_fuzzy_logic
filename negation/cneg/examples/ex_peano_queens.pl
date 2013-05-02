@@ -3,48 +3,79 @@
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
 cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2, echo_fail/0, echo_test/2, echo_nl/0]).
-cneg_choosen_negation(cneg_rt_Chan).
 
-echo_nl :- cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', '').
-echo_fail :-
-		cneg_diseq_echo(1, 'aux', 'ex_peano_queens', ' -- FAILED', ''),
-		echo_nl,
-		!,
-		fail.
+tests :- 
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, '', 'Tests that should fail', ''), 
+	tests_fail(Logo, Vars, First_Part, Second_Part), 
+	test_execution(Logo, Vars, First_Part, Second_Part, 'should_fail'),
+	fail.
 
-echo_test(Msg1, Msg2) :-
-	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', ''),
-	cneg_diseq_echo(1, 'aux', 'ex_peano_queens', Msg1, Msg2),
-	cneg_diseq_echo(1, 'nl', 'ex_peano_queens', '', '').
+tests :- 
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, '', 'Tests that should succeed', ''),
+	tests_succeed(Logo, Vars, First_Part, Second_Part), 
+	test_execution(Logo, Vars, First_Part, Second_Part, 'should_succeed'),
+	fail.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-tests(N, C) :- 
-	queens_list(N, _Unused_List), % This avoids an infinite number of sols problem.
-	echo_nl,
-	echo_test('tests(N, C) :: value for N :: ', N),
+tests_fail('generic', [T1 |[ T2]], (T1 = a, T2 = b), equality(T1, T2, [])).
+tests_succeed('s01', [T1 |[ T2]], (T1 = a, T2 = a), equality(T1, T2, [])).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+complex_tests(N, Columns) :- 
+	queens_list(N, List), % This avoids an infinite number of sols problem.
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'aux', 'tests(N, List) :: (N, List) :: ', (N, List)),
+	print_msg(1, 3, 'nl', '', ''),
 	(
-	    test_queens_1(N, C)
+	    (
+		print_msg(1, 3, '', ' -- STARTED -- ', cneg(queens(N, Columns))), 
+		cneg(queens(N, Columns)), % First constraints.
+		print_msg(1, 3, '', ' -- PASSED -- ', cneg(queens(N, Columns))),	 
+		(
+		    (
+			queens(N, Columns), % Secondly values generator.
+			print_msg(1, 3, '', ' -- FAILED -- ', queens(N, Columns)),
+			fail
+		    )
+		;
+		    (
+			print_msg(1, 3, '', ' -- ENDED OK -- ', queens(N, Columns)),
+			fail
+		    )
+		)
+	    )
 	;
-	    test_queens_2(N, C)
+	    (
+		print_msg(1, 3, '', ' -- STARTED -- ', cneg(queens(N, Columns))), 
+		queens(N, Columns), % First values generator.
+		print_msg(1, 3, '', ' -- PASSED -- ', cneg(queens(N, Columns))),	 
+		(
+		    (
+			cneg(queens(N, Columns)), % Second constraints.
+			print_msg(1, 3, '', ' -- FAILED -- ', queens(N, Columns)),
+			fail
+		    )
+		;
+		    (
+			print_msg(1, 3, '', ' -- ENDED OK -- ', queens(N, Columns)),
+			fail
+		    )
+		)
+	    )
 	).
 
-test_queens_1(N, Columns) :- % Let's see if we have invalid results.
-	cneg(queens(N, Columns)), % First constraints.
- 	echo_test('test_queens_1 :: queens(N, Columns) :: ', queens(N, Columns)),
-	(
-	    queens(N, Columns) % Secondly values generator.
-	;
-	    echo_fail
-	).
-
-test_queens_2(N, Columns) :- % Let's see if we have invalid results.
-	queens(N, Columns), % First values generator.
- 	echo_test('test_queens_2 :: queens(N, Columns) :: ', queens(N, Columns)),
-	(
-	    cneg(queens(N, Columns)) % Second constraints.
-	;
-	    echo_fail
-	).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % queens(N,Columns) returns in Columns the column where we must place each of N
 % queens in a Checkerboard of NxN assuming each position in the list 
