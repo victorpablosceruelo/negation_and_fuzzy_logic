@@ -160,7 +160,8 @@ print_msg_statistics(1) :- !,
 	nl, nl, statistics, nl, !.
 print_msg_statistics(Any) :-
 	current_output(StdOut_Stream), % Save stdout stream.
-	get_stream_to_file(Any, Statistics_Stream),
+	get_file_name(Any, File_Name),
+	get_stream_to_file(File_Name, Statistics_Stream),
 	set_output(Statistics_Stream), % Redirect stdout to stream.
 	nl, nl, statistics, nl, !, % Write statistics to file.
 	set_output(StdOut_Stream), % Recover stdout stream.
