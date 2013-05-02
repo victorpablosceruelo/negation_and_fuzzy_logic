@@ -175,11 +175,11 @@ print_vars_diseqs(FI, Msg, Term) :- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	    
 prepare_attributes_for_printing(Term, Attributes_For_Printing_Conj) :-
-	print_msg(3, 4, '', 'attribute_goals :: Term', Term),
+	print_msg(4, 4, '', 'attribute_goals :: Term', Term),
 	get_attributes_in_term_vars(Term, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
 	format_attributes_for_printing(Vars_With_Attrs, Attributes_For_Printing), !,
 	attrs_list_to_conj(Attributes_For_Printing, Attributes_For_Printing_Conj), !,
-	print_msg(3, 4, '', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj), 
+	print_msg(4, 4, '', 'attribute_goals :: Attrs', Attributes_For_Printing_Conj), 
 	!. % Backtracking forbidden.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -959,7 +959,7 @@ constraints_lists_difference(Attributes_1, Attributes_2, Difference) :-
 	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_1', Attributes_1),
 	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_2', Attributes_2),
 	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, Difference),
-	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_2', Attributes_2).
+	print_msg(3, 4, '', 'constraints_lists_difference :: Difference', Difference).
 
 constraints_lists_difference_aux_1([], _Attributes_2, []) :- !.
 constraints_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
