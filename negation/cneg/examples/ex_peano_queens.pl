@@ -24,8 +24,12 @@ tests :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 tests_succeed('s01', [C], (queens(0, C)), true).
-tests_fail('0 queens', [C], (queens(0, C)), (cneg(queens(0, C)))).
-tests_fail('1 queen', [C], (queens(s(0), C)), (cneg(queens(s(0), C)))).
+tests_fail('0 queens +-', [C], (queens(0, C)), (cneg(queens(0, C)))).
+tests_fail('0 queens -+', [C], (cneg(queens(0, C))), (queens(0, C))).
+tests_fail('1 queen +-', [C], (queens(s(0), C)), (cneg(queens(s(0), C)))).
+tests_fail('1 queen -+', [C], (cneg(queens(s(0), C))), (queens(s(0), C))).
+tests_fail('2 queens +-', [C], (queens(s(s(0)), C)), (cneg(queens(s(s(0)), C)))).
+tests_fail('2 queens -+', [C], (cneg(queens(s(s(0)), C))), (queens(s(s(0)), C))).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
