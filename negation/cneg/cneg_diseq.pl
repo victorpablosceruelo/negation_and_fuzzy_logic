@@ -964,6 +964,9 @@ disequalities_lists_difference_aux_2(Attr_In, [Attr_Aux | _Attributes_2]) :-
 disequalities_lists_difference_aux_2(Attr_In, [_Attr_Aux | Attributes_2]) :-
 	disequalities_lists_difference_aux_2(Attr_In, Attributes_2).
 
+% Aqui el filtro no hace falta que sea muy complejo pq las disequalities son
+% sencillas: nunca nos vamos a encontrar con X =/= f(a) /\ X =/= f/1
+% porque lo primero no se puede representar a pelo en constraints.
 disequalities_lists_difference_aux_3(Attr_In, Attr_Aux) :-
 	print_msg(3, 4, '', 'disequalities_lists_difference :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
 	Attr_In == Attr_Aux.
