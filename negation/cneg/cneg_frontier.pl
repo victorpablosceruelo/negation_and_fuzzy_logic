@@ -367,10 +367,10 @@ pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Frontier_
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: GoalVars', GoalVars),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: LocalVars', LocalVars),
 
-	get_disequalities_from_constraints(Real_Goal, RG_Constraints),
-	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: RG_Constraints', RG_Constraints),
+	get_list_of_disequalities_in_vars(Real_Goal, RG_Diseqs),
+	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: RG_Diseqs', RG_Diseqs),
 
-	get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes),
+	get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: Frontier_Nodes', Frontier_Nodes),
 	append(Frontier_In, Frontier_Nodes, Frontier_Out). % Is order really relevant ???
 
@@ -389,9 +389,9 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- meta_predicate get_frontier_from_pre_frontier(goal, goal, ?, ?, ?, ?, ?).
-get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Constraints, Frontier_Nodes) :-
-	setof((GoalVars, LocalVars, RG_Constraints, NIE), (E, IE), PreFr_Node_Answers), !,
-	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Constraints, NIE)'),
+get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
+	setof((GoalVars, LocalVars, RG_Diseqs, NIE), (E, IE), PreFr_Node_Answers), !,
+	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
 	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
 	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: Frontier_Nodes', Frontier_Nodes).
@@ -405,18 +405,18 @@ get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, FN_In, FN_Out) :- 
 	get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, FN), !,
 	get_eqs_and_diseqs_from_answers(Answers, GoalVars, [FN | FN_In], FN_Out).
 
-% get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Constraints, Frontier_Node)
+% get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Diseqs, Frontier_Node)
 get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
-	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Constraints, Answ_NIE),
+	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Diseqs, Answ_NIE),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars)', (GoalVars)),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: (Answ_GoalVars, Answ_LocalVars)', (Answ_GoalVars, Answ_LocalVars)),
-	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_RG_Constraints', Answ_RG_Constraints),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_RG_Diseqs', Answ_RG_Diseqs),
 
 	% A variable can have attributes coming from a higher level, 
 	% and this ones are NOT part of the current frontier.
-	get_disequalities_from_constraints_and_remove_them((Answ_GoalVars, Answ_LocalVars), Disequalities),
-	constraints_lists_difference(Disequalities, Answ_RG_Constraints, New_Constraints),
-	constraints_list_to_executable_diseqs(New_Constraints, New_IE),
+	get_list_of_disequalities_in_vars_and_remove_them((Answ_GoalVars, Answ_LocalVars), Disequalities),
+	disequalities_lists_difference(Disequalities, Answ_RG_Diseqs, New_Disequalities),
+	disequalities_list_to_disequalities_conjunction(New_Disequalities, New_IE),
 
 	% The only equalities we are interested in are the ones concerning GoalVars, because
 	% Chan mechanism unifies the variables in LocalVars that occur in a equality.

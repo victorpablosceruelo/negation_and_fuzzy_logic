@@ -45,12 +45,14 @@ tests_succeed('s03', [T1 |[ T2]], disequality(T1, T2, []), disequality(T1, T2, [
 tests_succeed('s04', [T1 |[ T2]], equality(T1, T2, []), equality(T1, T2, [T1])).
 % tests_succeed('s05', [T1 |[ T2]], equality(T1, s(T3), []), disequality(T1, T2, [T3])).
 tests_succeed('s06', [T1 |[ T2]], (disequality(T1, s(T3), [T3]), disequality(T1, s(T2), [T2])), equality(T1, T2, [])).
-tests_succeed('f20', [], disequality(a, f/1, []), true).
-tests_succeed('f21', [T1], disequality(T1, f/1, []), true).
-tests_succeed('f22', [], disequality(g/1, f/1, []), true).
-tests_succeed('f22', [T1], disequality(T1, f/1, []), disequality(T1, g/1, [])).
-tests_succeed('f23', [], disequality(T1, f/1, []), equality(T1, f(a, b, c), [])).
-tests_succeed('f23', [], equality(T1, f(a, b, c), []), disequality(T1, f/1, [])).
+tests_succeed('s07', [X], true, (disequality(X, a, []), disequality(X, b, []), disequality(X, c, []))).
+tests_succeed('s20', [], disequality(a, f/1, []), true).
+tests_succeed('s21', [T1], disequality(T1, f/1, []), true).
+tests_succeed('s22', [], disequality(g/1, f/1, []), true).
+tests_succeed('s23', [T1], disequality(T1, f/1, []), disequality(T1, g/1, [])).
+tests_succeed('s24', [T1], disequality(T1, f/1, []), equality(T1, f(a, b, c), [])).
+tests_succeed('s25', [T1], equality(T1, f(a, b, c), []), disequality(T1, f/1, [])).
+tests_succeed('s30', [X], disequality(X, f(a, b, c), []), (disequality(X, f/1, []), disequality(X, f/3, []))).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

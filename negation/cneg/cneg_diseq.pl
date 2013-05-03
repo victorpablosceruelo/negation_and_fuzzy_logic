@@ -7,8 +7,7 @@
 	    get_list_of_disequalities_in_vars/2,
 	    get_list_of_disequalities_in_vars_and_remove_them/2, 
 	    disequalities_list_to_disequalities_conjunction/2,
-	    constraints_lists_difference/3,	    
-	    constraints_list_to_executable_diseqs/2
+	    disequalities_lists_difference/3
 	], 
 	[assertions]).
 
@@ -944,49 +943,30 @@ remove_constraints_in_vars([_Var | Vars]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-constraints_lists_difference(Attributes_1, Attributes_2, Difference) :-
-	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_1', Attributes_1),
-	print_msg(3, 4, '', 'constraints_lists_difference :: Attributes_2', Attributes_2),
-	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, Difference),
-	print_msg(3, 4, '', 'constraints_lists_difference :: Difference', Difference).
+disequalities_lists_difference(Attributes_1, Attributes_2, Difference) :-
+	print_msg(3, 4, '', 'disequalities_lists_difference :: Attributes_1', Attributes_1),
+	print_msg(3, 4, '', 'disequalities_lists_difference :: Attributes_2', Attributes_2),
+	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference),
+	print_msg(3, 4, '', 'disequalities_lists_difference :: Difference', Difference).
 
-constraints_lists_difference_aux_1([], _Attributes_2, []) :- !.
-constraints_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
-	constraints_lists_difference_aux_2(Attr_In, Attributes_2), !,
-	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
-constraints_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
-	constraints_lists_difference_aux_1(Attributes_1, Attributes_2, [Attr_In | Difference]).
+disequalities_lists_difference_aux_1([], _Attributes_2, []) :- !.
+disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
+	disequalities_lists_difference_aux_2(Attr_In, Attributes_2), !,
+	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
+disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
+	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, [Attr_In | Difference]).
 
-constraints_lists_difference_aux_2(_Attr_In, []) :- !, fail. % Not found.
-constraints_lists_difference_aux_2(Attr_In, [Attr_Aux | _Attributes_2]) :-
-	constraints_lists_difference_aux_3(Attr_In, Attr_Aux), !, % Found coincidence
-	print_msg(3, 4, '', 'constraints_lists_difference :: coincidence :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
+disequalities_lists_difference_aux_2(_Attr_In, []) :- !, fail. % Not found.
+disequalities_lists_difference_aux_2(Attr_In, [Attr_Aux | _Attributes_2]) :-
+	disequalities_lists_difference_aux_3(Attr_In, Attr_Aux), !, % Found coincidence
+	print_msg(3, 4, '', 'disequalities_lists_difference :: coincidence :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
 	!.
-constraints_lists_difference_aux_2(Attr_In, [_Attr_Aux | Attributes_2]) :-
-	constraints_lists_difference_aux_2(Attr_In, Attributes_2).
+disequalities_lists_difference_aux_2(Attr_In, [_Attr_Aux | Attributes_2]) :-
+	disequalities_lists_difference_aux_2(Attr_In, Attributes_2).
 
-constraints_lists_difference_aux_3(Attr_In, Attr_Aux) :-
-	print_msg(3, 4, '', 'constraints_lists_difference :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
+disequalities_lists_difference_aux_3(Attr_In, Attr_Aux) :-
+	print_msg(3, 4, '', 'disequalities_lists_difference :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
 	Attr_In == Attr_Aux.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-constraints_list_to_executable_diseqs(Constraints, Executable_Diseqs) :- 
-	constraints_list_to_executable_diseqs_aux(Constraints, true, Executable_Diseqs), !.
-
-constraints_list_to_executable_diseqs_aux([], Executable_Diseqs, Executable_Diseqs) :- !.
-constraints_list_to_executable_diseqs_aux([Constraint], Executable_Diseqs_In, Executable_Diseqs_Out) :-
-	constraint_to_executable_diseqs(Constraint, Executable_Diseqs_In, Executable_Diseqs_Out), !.
-constraints_list_to_executable_diseqs_aux([Constraint | Constraints], Executable_Diseqs_In, Executable_Diseqs_Out) :-
-	constraint_to_executable_diseqs(Constraint, Executable_Diseqs_In, Executable_Diseqs_Aux), !,
-	constraints_list_to_executable_diseqs_aux(Constraints, Executable_Diseqs_Aux, Executable_Diseqs_Out), !.
-
-constraint_to_executable_diseqs(Constraint, Executable_Diseqs_In, Executable_Diseqs_Out) :-
-	constraint(Constraint, Diseq_1, Diseq_2, EQ_Vars, UQ_Vars),
-	functor_local(Executable_Diseq, 'diseq_geuqv', 5, [Diseq_1 |[ Diseq_2 |[ [] |[ EQ_Vars |[ UQ_Vars ]]]]]), !, 
-	goals_join_by_conjunction(Executable_Diseqs_In, Executable_Diseq, Executable_Diseqs_Out), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
