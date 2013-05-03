@@ -4,8 +4,9 @@
  	    prepare_attributes_for_printing/2,
 	    print_vars_diseqs/3,
 
-	    get_disequalities_in_vars/2,
-	    get_disequalities_in_vars_and_remove_them/2, 
+	    get_list_of_disequalities_in_vars/2,
+	    get_list_of_disequalities_in_vars_and_remove_them/2, 
+	    disequalities_list_to_disequalities_conjunction/2,
 	    constraints_lists_difference/3,	    
 	    constraints_list_to_executable_diseqs/2
 	], 
@@ -176,7 +177,7 @@ print_vars_diseqs(FI, Msg, Term) :- !,
 prepare_attributes_for_printing(Term, Disequalities_Conj) :-
 	print_msg(4, 4, '', 'attribute_goals :: Term', Term),
 	get_attributes_in_term_vars(Term, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
-	attributes_to_disequalities_conjunction(Vars_With_Attrs, Disequalities_Conj),
+	attributes_list_to_disequalities_conjunction(Vars_With_Attrs, Disequalities_Conj),
 	print_msg(4, 4, '', 'attribute_goals :: Attrs', Disequalities_Conj), 
 	!. % Backtracking forbidden.
 
@@ -208,32 +209,32 @@ get_attributes_in_term_vars_aux([Var | Vars], Visited_In, Visited_Out, VWA_In, V
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-attributes_to_disequalities_conjunction(Vars_With_Attrs, Disequalities_Conj) :-
-	attributes_to_disequalities(Vars_With_Attrs, Disequalities_List), !,
+attributes_list_to_disequalities_conjunction(Vars_With_Attrs, Disequalities_Conj) :-
+	attributes_list_to_disequalities_list(Vars_With_Attrs, Disequalities_List), !,
 	disequalities_list_to_disequalities_conjunction(Disequalities_List, Disequalities_Conj), !.
 
-attributes_to_disequalities([], []) :- !.
-attributes_to_disequalities([Attribute|Attributes], Disequalities_Out) :-
-%	print_msg(3, 4, '', 'attribute_to_disequalities :: Attribute', Attribute), 
-	attribute_to_disequalities(Attribute, Disequalities_Aux),
-%	print_msg(3, 4, '', 'attribute_to_disequalities :: Disequality', Disequality),
-	attributes_to_disequalities(Attributes, Disequalities_In),
+attributes_list_to_disequalities_list([], []) :- !.
+attributes_list_to_disequalities_list([Attribute|Attributes], Disequalities_Out) :-
+%	print_msg(3, 4, '', 'attribute_to_disequalities_list :: Attribute', Attribute), 
+	attribute_to_disequalities_list(Attribute, Disequalities_Aux),
+%	print_msg(3, 4, '', 'attribute_to_disequalities_list :: Disequality', Disequality),
+	attributes_list_to_disequalities_list(Attributes, Disequalities_In),
 	append(Disequalities_Aux, Disequalities_In, Disequalities_Out).
 
-attribute_to_disequalities(Attribute, Disequalities) :-
+attribute_to_disequalities_list(Attribute, Disequalities) :-
 	attribute_contents(Attribute, _Target, Constraints),
-	constraints_to_disequalities(Constraints, Disequalities).
+	constraints_list_to_disequalities_list(Constraints, Disequalities).
 
-constraints_to_disequalities([], []) :- !.
-constraints_to_disequalities([Constraint | Constraints], [Disequality | Disequalities]) :-
+constraints_list_to_disequalities_list([], []) :- !.
+constraints_list_to_disequalities_list([Constraint | Constraints], [Disequality | Disequalities]) :-
 %	print_msg(3, 4, '', 'format_diseq_for_printing :: Disequality', Disequality), 
-	attribute_to_disequality_constraint(Constraint, Disequality),
+	attribute_to_constraints_list(Constraint, Disequality),
 %	print_msg(3, 4, '', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
-	constraints_to_disequalities(Constraints, Disequalities).
+	constraints_list_to_disequalities_list(Constraints, Disequalities).
 
 % Need to convert to a single term everything.
 % This predicate is not working as expected.
-attribute_to_disequality_constraint(Constraint, Disequality) :-
+attribute_to_constraints_list(Constraint, Disequality) :-
 	constraint(Constraint, T1, T2, _EQ_Vars_In, UQ_Vars_In),
 	varsbag_clean_up(UQ_Vars_In, UQ_Vars),
 	varsbag((T1, T2), [], [], Terms_Vars), 
@@ -919,43 +920,25 @@ cneg_diseq_eq_args([Arg_T1 | Args_T1], [Arg_T2 | Args_T2], UQV) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-get_disequalities_in_vars(Anything, Vars_With_Attrs) :-
+get_list_of_disequalities_in_vars(Anything, Vars_With_Attrs) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
-	print_msg(3, 4, '', 'get_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
-	attributes_to_disequalities(Vars_With_Attrs, Disequalities), !,
-	print_msg(3, 4, '', 'get_disequalities_in_vars :: Disequalities', Disequalities), !.
+	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
+	attributes_list_to_disequalities_list(Vars_With_Attrs, Disequalities), !,
+	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Disequalities', Disequalities), !.
 
-get_disequalities_in_vars_and_remove_them([], []) :- !.
-get_disequalities_in_vars_and_remove_them(Anything, Vars_With_Attrs) :-
-	get_disequalities_in_vars(Anything, Vars_With_Attrs),
+get_list_of_disequalities_in_vars_and_remove_them([], []) :- !.
+get_list_of_disequalities_in_vars_and_remove_them(Anything, Vars_With_Attrs) :-
+	get_list_of_disequalities_in_vars(Anything, Vars_With_Attrs),
 	varsbag(Vars_With_Attrs, [], [], Vars),
-	print_msg(3, 4, '', 'get_disequalities_in_vars_and_remove_them :: Vars', Vars),
-	remove_all_constraints_in_variables(Vars), !.
+	remove_constraints_in_vars(Vars).
 
-remove_all_constraints_in_variables(Anything) :-
-	get_disequalities_in_vars(Anything, Vars_With_Attrs),
-	remove_this_constraints_from_affected_variables(Vars_With_Attrs).
-
-remove_this_constraints_from_affected_variables([]) :- !.
-remove_this_constraints_from_affected_variables([Var_With_Attrs | Vars_With_Attrs]) :-
-	remove_this_constraints_from_affected_variables_aux(Var_With_Attrs), !,
-	remove_this_constraints_from_affected_variables(Vars_With_Attrs).
-
-remove_this_constraints_from_affected_variables_aux(Var_With_Attrs) :-
-	varsbag(Var_With_Attrs, [], [], Vars),
-	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
-
-remove_this_constraints_from_variables(_Var_With_Attrs, []) :- !.
-remove_this_constraints_from_variables(Var_With_Attrs, [Var | Vars]) :-
-	get_attribute_local(Var, Attribute), !,
+remove_constraints_in_vars([]).
+remove_constraints_in_vars([Var | Vars]) :-
+	get_attribute_local(Var, _Attribute), !,
 	remove_attribute_local(Var), !,
-	attribute_contents(Attribute, Target, Disequalities),
-	constraints_lists_difference(Disequalities, Var_With_Attrs, Difference), !,
-	attribute_contents(New_Attribute, Target, Difference),
-	put_attribute_local(Var, New_Attribute), !,
-	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
-remove_this_constraints_from_variables(Var_With_Attrs, [_Var | Vars]) :-
-	remove_this_constraints_from_variables(Var_With_Attrs, Vars).
+	remove_constraints_in_vars(Vars).
+remove_constraints_in_vars([_Var | Vars]) :-
+	remove_constraints_in_vars(Vars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
