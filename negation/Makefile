@@ -6,6 +6,7 @@ clean:
 	echo " " 1>&2
 
 cleanall:
+	make -i -s clean
 	cd examples; make -i -s clean
 
 kill:
