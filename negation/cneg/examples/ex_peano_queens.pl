@@ -6,25 +6,27 @@ cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2, echo_fail/0, echo
 
 tests :- 
 	print_msg(1, 3, 'nl', '', ''),
-	print_msg(1, 3, '', 'Tests that should fail', ''), 
-	tests_fail(Logo, Vars, First_Part, Second_Part), 
-	test_execution(Logo, Vars, First_Part, Second_Part, 'should_fail'),
-	fail.
-
-tests :- 
-	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, '', 'Tests that should succeed', ''),
 	tests_succeed(Logo, Vars, First_Part, Second_Part), 
 	test_execution(Logo, Vars, First_Part, Second_Part, 'should_succeed'),
 	fail.
 
+tests :- 
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, '', 'Tests that should fail', ''), 
+	tests_fail(Logo, Vars, First_Part, Second_Part), 
+	test_execution(Logo, Vars, First_Part, Second_Part, 'should_fail'),
+	fail.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-tests_fail('generic', [C], (queens(0, C)), (cneg(queens(0, C)))).
 tests_succeed('s01', [C], (queens(0, C)), true).
+tests_fail('0 queens', [C], (queens(0, C)), (cneg(queens(0, C)))).
+tests_fail('1 queen', [C], (queens(s(0), C)), (cneg(queens(s(0), C)))).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -24,7 +24,7 @@
 cneg_rt(Goal, GoalVars_In, Depth_Level, Trace) :-
 
 	% Save trace (for debugging and tabling usage)
-	CN_Call = (cneg_rt(Goal, GoalVars_In, Depth_Level)), 
+	CN_Call = (cneg_rt(Goal, GoalVars_In, Depth_Level, 'trace')), 
 	add_predicate_to_trace(evaluating(CN_Call), Trace, NewTrace),
 	print_msg(3, 3, 'trace', 'call to cneg_rt/4 with (updated) trace', NewTrace),
 
