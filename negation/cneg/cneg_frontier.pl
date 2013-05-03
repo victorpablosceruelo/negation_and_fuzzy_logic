@@ -152,14 +152,9 @@ look_for_the_relevant_clauses(Goal, PreFrontierNodes) :-
 	Head_Name \== ',', Head_Name \== ';',    % Issues
 %	!, % Backtracking forbiden.
 	print_msg(3, 3, '', 'look_for_the_relevant_clauses :: (Head_Name, Head_Arity)', (Head_Name, Head_Arity)), 
-	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName_, _Clean_Head_, _E_, _IE_, _NIE_, _Head_, _Body_), !,
-	print_msg(3, 3, '', 'look_for_the_relevant_clauses :: (Head_Name, Head_Arity)', (Head_Name, Head_Arity)), 
-	setof(PFN, 
-	(
-	    cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
-	    preFrontierNodeContents(PFN, _Real_Goal, Clean_Head, E, IE, NIE, Head, Body)
-	),
-	PreFrontierNodes), 
+	look_for_the_relevant_clauses_aux(Head_Name, Head_Arity),
+	print_msg(3, 3, '', 'look_for_the_relevant_clauses', 'getting coincidences list'), 
+	setof(PFN, pre_frontier_search(Head_Name, Head_Arity, PFN), PreFrontierNodes), 
 	!.
 look_for_the_relevant_clauses(_Goal, _PreFrontier) :-
 	print_msg(1, 3, '', 'look_for_the_relevant_clauses :: ', 
@@ -168,6 +163,13 @@ look_for_the_relevant_clauses(_Goal, _PreFrontier) :-
 	print_msg(1, 3, '', '', cneg_pre_frontier(Name, Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body)), 
 	fail.
 
+look_for_the_relevant_clauses_aux(Head_Name, Head_Arity) :-
+	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, _Clean_Head, _E, _IE, _NIE, _Head, _Body), !.
+
+pre_frontier_search(Head_Name, Head_Arity, PFN) :-
+	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
+	preFrontierNodeContents(PFN, _Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

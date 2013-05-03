@@ -51,6 +51,8 @@ cneg_aux(Predicate, GoalVars) :-
 
 goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
 call_to_predicate(Predicate) :- call(Predicate).
+examine_cneg_pre_frontier(V1, V2, V3, V4, V5, V6, V7, V8, V9) :-
+	cneg_pre_frontier(V1, V2, V3, V4, V5, V6, V7, V8, V9).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
