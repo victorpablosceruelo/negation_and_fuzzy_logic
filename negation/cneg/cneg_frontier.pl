@@ -323,8 +323,11 @@ pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, _Frontier_Out) :-
 
 pre_frontier_to_frontier_aux([], _GoalVars, Frontier_Out, Frontier_Out) :- !.
 pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVars, Frontier_In, Frontier_Out) :-
+	print_msg(3, 3, 'nl', '', ''),
+	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
 	pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, [], Goal_Frontier_Nodes), !,
 	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux :: Goal_Frontier_Nodes', Goal_Frontier_Nodes),
+	print_msg(3, 3, 'nl', '', ''),
 	append(Frontier_In, Goal_Frontier_Nodes, Frontier_Aux), !,
 	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_Aux, Frontier_Out).
 
