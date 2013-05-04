@@ -1,0 +1,84 @@
+(Experimental) Monads for Prolog
+
+Jose F. Morales
+Mon Feb 23 14:03:32 CET 2009
+---------------------------------------------------------------------------
+
+MONADS:
+
+(from http://www.haskell.org/tutorial/monads.html)
+The Monad class defines two basic operators: >>= (bind) and return.
+
+infixl 1  >>, >>=
+class  Monad m  where
+    (>>=)            :: m a -> (a -> m b) -> m b
+    (>>)             :: m a -> m b -> m b
+    return           :: a -> m a
+    fail             :: String -> m a
+
+    m >> k           =  m >>= \_ -> k
+
+The bind operations, >> and >>=, combine two monadic values while the
+return operation injects a value into the monad (container). The
+signature of >>= helps us to understand this operation: ma >>= \v ->
+mb combines a monadic value ma containing values of type a and a
+function which operates on a value v of type a, returning the monadic
+value mb. The result is to combine ma and mb into a monadic value
+containing b. The >> function is used when the function does not need
+the value produced by the first monadic operator.
+
+THE DO NOTATION:
+
+The do syntax provides a simple shorthand for chains of monadic
+operations. The essential translation of do is captured in the
+following two rules:
+
+  do e1 ; e2      =        e1 >> e2
+  do p <- e1; e2  =        e1 >>= \p -> e2
+
+---------------------------------------------------------------------------
+
+TRANSLATION TO PROLOG
+
+Each monad is defined by the following predicates:
+
+  '>>='(S0, Bind, S) :- ...
+  return(A, S) :- ...
+  '>>'(M, K, S) :- '>>='(M, ignore(K), S).
+  ignore(K, _, K).
+
+One attractive point of using monads is the reuse of programming
+patterns. Monadic functions are defined on type class M. We avoid
+however the use of type classes. To distinguish the monad type (the
+instance of the Monad type class) we introduce an extra argument
+called MonadType in every definition. Note that this argument is only
+necessary to allow the same data constructors belong to different
+monads (and avoid nondeterminism):
+
+  '>>='(MonadType, S0, Bind, S) :- ...
+  return(MonadType, A, S) :- ...
+  '>>'(MonadType, M, K, S) :- '>>='(MonadType, M, ignore(K), S).
+  ignore(K, _, K).
+
+DO NOTATION FOR PROLOG
+
+  do e1 ; e2      =        e1 >> e2
+  do p <- e1; e2  =        e1 >>= \p -> e2
+
+====>
+  (introduce the extra argument)
+
+  do(MonadType, {E1, E2}, S) === E1(S1), E2(S2), '>>'(MonadType, S1, S2, S)
+  %%% However, lack of lazy evaluation executes E2 even if it is not
+  %%% necessary! That is solved if >>= is used instead
+
+  do(MonadType, {P <- E1, E2}, S) === E1(S1), '>>='(MonadType, S1, (''(P, S2) :- E2(S2)), S)
+  %%% However, lack of lazy evaluation executes E2 even if it is not necessary!  
+
+
+FIX ~/svn/ciaode/ciao/library/fsyntax/functionstr.pl
+  Add support for predicate abstractions
+  And functional predicate abstractions
+  A = (''(F) := foo)
+  A = (''(F) := ~do(MonadType, {...}))
+  

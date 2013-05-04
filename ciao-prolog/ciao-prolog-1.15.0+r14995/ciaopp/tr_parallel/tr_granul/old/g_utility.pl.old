@@ -1,0 +1,214 @@
+get_clauses_mode_from_st(ST, Pred, Clauses, Mode):-
+  find_symbol_entry(ST,Pred,Entry),
+  Entry = st(Pred, Clauses, Mode,_,_,_,_,_,_,_).
+
+
+%----------------------------------------------------------
+% A simple pretty printer: used to output annotated clauses
+%----------------------------------------------------------
+
+%
+% Print a clause.
+%
+pretty_print_clause(2,AnnClause,SouClause,Dic):-
+        set_of_variables(SouClause,VarSet),
+	pretty_print(AnnClause,Dic,VarSet).
+
+%
+% Print a fact.
+%
+pretty_print_clause(3,AnnClause,_,Dic):-
+        pretty_print(AnnClause,Dic,anonymous).
+
+
+
+% Use pretty_print/3 if you've got a Dictionary with names of variables,
+% otherwise use pretty_print/1 (PBC)
+% If "VarSet" is an atom then print variables that aren't in the
+% dictionary as '_'.
+
+pretty_print(X,_Dict,_VarSet):-
+	% rename(X,Y,Dict,VarSet),
+	pretty_print(X),
+	!.
+ %% Commented out by PLG 1 Oct 97
+ %% pretty_print(X,Dict,VarSet):-
+ %% 	rename(X,Y,Dict,VarSet),
+ %% 	pretty_print(Y),
+ %% 	!.
+ %% 
+pretty_print([]).
+pretty_print([H|T]) :-
+	pretty_print(H), !,
+	pretty_print(T).
+pretty_print( directive(D) ):-
+	(
+	    D=='$VAR'('_'),!      % this will work with renamed variables (PBC)
+	;
+	    nonvar(D),!,
+	    numbervars(D,0,_),
+	    ( D = succmode(A,B,C) ->
+		 tab(8),write('% Query       = '),writeq(A),write(','),nl,
+		 tab(8),write('% Lambda Call = '),writeq(B),write(','),nl,
+		 tab(8),write('% Lambda Succ = '),writeq(C)
+	     ; write(':- '), 
+	       writeq(D)
+	    ),	
+	    write('.'),nl,nl
+	;
+	    true
+	).
+pretty_print( Clause ):-
+%	numbervars(Clause,0,_),	
+	pp(Clause),
+	write('.'),
+	nl,nl.
+
+pp((Head :- Body)) :-
+	pp(clause(Head,Body)).
+pp(clause(Head,(true:true))) :-
+	writeq(Head).
+pp(clause(Head,Body)) :-
+	writeq(Head),
+	write(' :-'),nl,
+	ppb(Body,8),!.
+pp(Clause):-
+	functor(Clause,F,_),
+	F \== (':-'), F \== clause,!,
+	writeq(Clause).
+pp(_) :- !.
+
+ppb( (X:K),Tab ) :- 
+	inverse_rewrite_source_body(NX,(X:K)), !,
+	tab(Tab),writeq(NX).
+
+ppb( (X:_),Tab ) :- !,
+	tab(Tab),writeq(X).
+
+ppb((A,B),Tab) :-
+	ppb(A,Tab),
+	write(','),nl,
+	ppb(B,Tab),!.
+
+ppb((A//B),Tab) :-
+	ppb(A,Tab),
+	write('//'),nl,
+	ppb(B,Tab),!.
+
+ppb('&'(A,B),Tab) :-
+	ppc(A,Tab),
+	write('&'),nl,
+	ppc(B,Tab),!.
+
+ppb((A->B;C),Tab) :-
+	tab(Tab),
+	write('('),nl,
+	NewTab1 is Tab+2,
+	NewTab2 is Tab+5,
+	ppd(A,NewTab1),
+	write('  ->'),nl,
+	ppb(B,NewTab2),nl,
+	tab(Tab),
+	write(';'),nl,
+	ppb(C,NewTab2),nl,
+	tab(Tab),
+	write(')'),!.
+
+ppb((A;B),Tab) :-
+	tab(Tab),
+	write('('),nl,
+	NewTab is Tab+5,
+	ppb(A,NewTab),nl,
+	tab(Tab),write(';'),nl,
+	ppb(B,NewTab),nl,
+	tab(Tab),write(')'),!.
+
+ppb('=>'(A,B),Tab) :-
+	tab(Tab),
+	write('('),nl,
+	NewTab is Tab+5,
+	ppd(A,NewTab),nl,
+	tab(Tab),write('=>'),nl,
+	ppb(B,NewTab),nl,
+	tab(Tab),write(')'),!.
+
+ppb(X,Tab):-
+	tab(Tab),writeq(X),!.
+	
+
+ppd( (X,Y),Tab ) :- !,
+	ppd(X,Tab),
+	write(','),nl,
+	ppd(Y,Tab).
+ppd( X,Tab ) :- 
+	tab(Tab),writeq(X).
+%
+%
+
+ppc('&'(A,B),Tab) :-
+	ppc(A,Tab), % antes habia ppb(A,Tab)
+	write('&'),nl,
+	ppc(B,Tab),!.
+ppc((A:K),Tab) :-
+	ppb((A:K),Tab).
+ppc(X,Tab):-
+        functor(X,F,_),
+        F\==',',F\==';',F\=='->',F\=='=>',F\=='//',
+	tab(Tab),writeq(X),!.
+
+ppc(X,Tab) :-
+	tab(Tab),write('('),nl,
+	NewTab is Tab+1,
+	ppb(X,NewTab),nl,
+	tab(Tab),write(')'),!.
+
+%-----------------------------------------------------------------------------
+%'$VAR'(Xn)
+rename(X,Xn,Dic,VarSet):-
+     var(X),!,
+     find_name(X,Name,Dic,VarSet),
+     (var(Name)->
+         Xn=Name;
+         Xn='$VAR'(Name)
+     ).
+rename([],[],_,_):- !.
+rename([X|Xs],[Xn|Xns],Dic,VarSet):- !,
+     rename(X,Xn,Dic,VarSet),          
+     rename(Xs,Xns,Dic,VarSet).
+rename(X,Xn,Dic,VarSet):-
+     X=..[Fun|Args],
+     rename(Args,ArgsNames,Dic,VarSet),
+     Xn=..[Fun|ArgsNames].
+
+
+
+find_name(X,Xn,[],VarSet):-
+    ((is_in_open_list(VarSet,X);atom(VarSet))->
+           Xn = '_'
+           ;
+           Xn = X).
+%find_name(_,'_',[],_).
+find_name(X,Xn,[V=Y|More],VarSet):-
+     X==V -> Xn=Y
+           ; find_name(X,Xn,More,VarSet).
+
+%-----------------------------------------------------------------------------
+
+
+%
+% Creates an open list with the set of variables of a general term.
+%
+
+set_of_variables(X,VarSet):-
+     var(X),!,
+     ins_without_dup(VarSet,X).
+
+set_of_variables([],_):- !.
+
+set_of_variables([X|Xs],VarSet):- !,
+     set_of_variables(X,VarSet),          
+     set_of_variables(Xs,VarSet).
+
+set_of_variables(X,VarSet):-
+     X=..[_|Args],
+     set_of_variables(Args,VarSet).

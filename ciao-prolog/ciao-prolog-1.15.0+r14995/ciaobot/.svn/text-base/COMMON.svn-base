@@ -1,0 +1,87 @@
+# -*- mode: Makefile; -*-
+##
+## COMMON
+##
+## Made by Edison Mera
+##
+## Started on  Wed Oct 20 18:47:44 2006 Edison Mera
+## Last update Fri Aug 27 09:12:41 2010 Edison Mera
+##
+
+## ----------------------------------------------------------------------------
+## Note: This file is part of the Ciao Bot. Its source is in the
+## Ciao repository, only change it in a working copy, otherwise the
+## changes made by you will be lost.
+## ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Options common to all Makefiles
+# ----------------------------------------------------------------------------
+
+CIAOSETUP=./ciaosetup
+# CIAOSETUP=echo
+
+RUN_AT_PBUNDLE_REPO_HOST:=$(RUN_AT_HOST[$(PBUNDLE_REPO_HOST)])
+
+RUN_AT_LOG_REPO_HOST:=$(RUN_AT_HOST[$(LOG_REPO_HOST)])
+
+BRANCHROOTDIR:=$(BUILDROOTDIR)$(BRANCH)/
+BUILDBASE:=$(BRANCHROOTDIR)auto/
+LOGSRC:=$(BRANCHROOTDIR)$(LOGBASE)
+LOCKDIR:=$(BRANCHROOTDIR)log/
+VERSIONDIR:=$(BRANCHROOTDIR)log/
+MAKEFILE:=$(firstword $(MAKEFILE_LIST))
+TIMESTAMP?=$(shell date +%G%m%d_%H%M%S)
+
+TAR=$(TAR[$(HOSTNAME)])
+
+TARGETDIR[checkout_ciao]=regr
+TARGETDIR[configure]=diff
+TARGETDIR[build]=diff
+TARGETDIR[build_nolibs]=diff
+TARGETDIR[build_platdep]=diff
+TARGETDIR[install]=diff
+TARGETDIR[uninstall]=diff
+TARGETDIR[docs]=diff
+TARGETDIR[realclean_svn]=diff
+TARGETDIR[realclean_src]=diff
+TARGETDIR[realclean_noa]=diff
+TARGETDIR[realclean_bin]=diff
+TARGETDIR[build_engine_profile]=diff
+TARGETDIR[build_engine_profile_debug]=diff
+TARGETDIR[build_engine_nodebug]=diff
+TARGETDIR[distclean]=diff
+TARGETDIR[build_timingmodel]=diff
+TARGETDIR[calibrateciaopp_svn]=diff
+TARGETDIR[runtests]=regr
+TARGETDIR[runbenchmarks]=regr
+TARGETDIR[prepare_bootstrap]=regr
+TARGETDIR[gen_bundle_revision]=regr
+TARGETDIR[gen_pbundle__rpm]=regr
+TARGETDIR[gen_pbundle__rpm_version]=regr
+TARGETDIR[gen_pbundle__rpm_separated]=regr
+TARGETDIR[gen_pbundle__osarch_DARWINi386]=regr
+TARGETDIR[gen_pbundle__osarch_Win32i86]=regr
+TARGETDIR[gen_pbundle__bin_tgz]=regr
+TARGETDIR[gen_pbundle__raw_tgz]=regr
+TARGETDIR[gen_pbundle__noa_tgz]=regr
+TARGETDIR[gen_pbundle__src]=regr
+TARGETDIR[gen_pbundle__macport]=regr
+TARGETDIR[gen_pbundle__descfile]=regr
+TARGETDIR[gen_pbundle__osarch_cross_debian]=regr
+TARGETDIR[install_pbundle__osarch_Win32i86]=regr
+TARGETDIR[uninstall_pbundle__osarch_Win32i86]=regr
+
+SAVELOGFILE=$(LOGSRCPATH)$(TARGETDIR[$@])/$@.log
+
+ifeq ($(SAVELOGFILES),yes)
+
+SAVELOGFILECMD=  > $(SAVELOGFILE) 2>&1
+ADDLOGFILECMD=  >> $(SAVELOGFILE) 2>&1
+SAVELOGSLAVE=   >> $(LOGSRCVERSION)$*/regr/$(COMMANDSLAVES)/$(TIMESTAMP).log 2>&1
+
+endif
+
+SVN_REPO_USERHOST:=$(SVN_REPO_USER)@$(SVN_REPO_HOST)
+REPOSITORYROOT:=svn+ssh://$(SVN_REPO_USERHOST)$(SVN_REPO_ROOT)
+REPOSITORY:=$(REPOSITORYROOT)$(BRANCH)

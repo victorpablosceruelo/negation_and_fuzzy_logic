@@ -1,0 +1,64 @@
+               An experimental engine monitoring tool
+               ======================================
+
+  Date: Wed Oct 19 18:48:59 CEST 2011
+  Author: Jose F. Morales
+
+IDEA
+
+  This is an experimental implementation of an engine monitoring tool.
+  It works by starting a monitoring (Prolog) thread in addition to the
+  program thread.
+
+  The monitoring thread open a graphical window (using fast and
+  portable OpenGL) to visualize at runtime information about the
+  execution of a program. The visualizations gives a global view of
+  what is happening inside the stacks of big programs (e.g., it should
+  be simple to see spurious choice points, etc.).
+
+  This tool can be included as part of a real low-level debugger or
+  profiler (useful for runtime-based optimization techniques).
+
+STATUS
+
+  - Using GLUT, portability is not a problem. However, it is quite
+    limited.
+
+  - Performance is good. Even showing a small portion of the heap
+    (256KB) in 10ms intervals incurs in small program overhead (around
+    16% in 'boyer').
+
+TODO
+
+  - Zoom in: view current data contents
+  - Zoom out: visualize the entire stacks
+
+  - Display all stacks
+  - Display the values of all WAM registers
+  - Display all threads
+  - Mark and color stacks depending on values
+
+  - Display graphs of instruction execution frequency?
+    (by polling the value of P)
+
+  - Record/save traces?
+  - Other related tools? (visandor?)
+
+  - Interaction (e.g. pause, stop the execution, etc.)
+
+  - Due to limitations of GLUT, the interface is not very nice...
+
+EXAMPLES
+
+  [library(bundle_registry(bundle_registry_load))]. % load alias paths
+
+  [ciaopp(ciaopp)]. % load ciaopp
+
+  [ciaosrc(benchmark(suite(speed)))].
+  speed.
+
+  [ciaodesrc(optim_comp(testsuite(tests(deriv))))].
+  deriv:main.
+
+  [ciaodesrc(optim_comp(testsuite(tests(boyer))))].
+  boyer:main.

@@ -1,0 +1,126 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/optim_comp/modules/core/library/foreign_interface/examples
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2011-03-12T16:29:37.100754Z
+13128
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+bignums
+dir
+
+int_lists
+dir
+
+math
+dir
+
+foreign_low
+dir
+
+foreign_init
+dir
+
+addresses
+dir
+
+Makefile
+file
+
+
+
+
+2012-09-17T18:11:25.783651Z
+3016850e279ea4f61465a42b857b6aef
+2006-07-15T12:10:47.090678Z
+6601
+edison
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+157
+
+any_term
+dir
+
+strings_and_atoms
+dir
+
+byte_lists
+dir
+
+exceptions
+dir
+
+test_all.pl
+file
+
+
+
+
+2012-09-17T18:11:25.783651Z
+efcad154647d771035bf56ad302a5fcc
+2009-12-28T21:34:11.642502Z
+11544
+edison
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4201
+

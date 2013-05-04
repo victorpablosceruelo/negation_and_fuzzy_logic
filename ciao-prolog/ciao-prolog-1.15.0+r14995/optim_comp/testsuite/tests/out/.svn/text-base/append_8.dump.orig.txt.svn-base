@@ -1,0 +1,40 @@
+Analysis info for domain sht
+Predicate: /(multifile:$initialization,1)
+  calltypes: [~t0]
+  exittypes: $bottom
+Types: 
+  t0 := ~mode(any) && #any
+Predicate: /(multifile:$on_abort,1)
+  calltypes: [~t1]
+  exittypes: $bottom
+Types: 
+  t1 := ~mode(any) && #any
+Predicate: /(append_8:main,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(append_8:a#3,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(append_8:##0#3,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(append_8:k#3,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Analysis info for domain idet
+Predicate: /(multifile:$initialization,1)
+  imp: nondet
+Predicate: /(multifile:$on_abort,1)
+  imp: nondet
+Predicate: /(append_8:main,0)
+  imp: det
+Predicate: /(append_8:a#3,0)
+  imp: det
+Predicate: /(append_8:##0#3,0)
+  imp: det
+Predicate: /(append_8:k#3,0)
+  imp: det

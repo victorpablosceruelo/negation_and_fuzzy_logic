@@ -1,0 +1,11 @@
+K 10
+svn:ignore
+V 8
+*.class
+
+K 11
+svn:ignores
+V 8
+*.class
+
+END

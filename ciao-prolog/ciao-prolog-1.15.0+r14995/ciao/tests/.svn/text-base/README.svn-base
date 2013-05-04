@@ -1,0 +1,24 @@
+
+Detailed instructions are in 
+
+    http://clip.dia.fi.upm.es/Local/ciao_distributions/index.html
+
+Remember to try some tests where the user who compiles and installs is
+not the one which makes the tests, in order to ensure that all of the
+pieces are compiled correctly!!!
+
+How to use those tests
+----------------------
+
+Since something strange is happening (repeated partial compilations
+make user C files not to be loaded), I recomment to use:
+
+    make test-local
+
+and 
+
+    make test
+
+which clean, build, and execute, either using the same installation
+the tests are in, or some default installations (i.e., using whatever
+ciaoc is in the path).

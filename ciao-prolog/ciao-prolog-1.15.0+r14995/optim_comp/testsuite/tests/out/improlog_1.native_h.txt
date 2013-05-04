@@ -1,0 +1,34 @@
+#if !defined(__CIAO_HEADER__improlog__1)
+#define __CIAO_HEADER__improlog__1 1
+typedef struct coord coord_t;
+typedef struct point point_t;
+struct coord {
+  int32_t a;
+};
+struct point {
+  int32_t a;
+  int32_t *b;
+  int32_t c;
+  int32_t *d;
+  int32_t e[3];
+  int32_t f[3];
+  coord_t a1;
+  coord_t *b1;
+  coord_t c1;
+  coord_t *d1;
+  coord_t e1[3];
+  coord_t f1[3];
+  coord_t *g1[3];
+  coord_t *h1[3];
+  point_t *b2;
+  point_t *d2;
+  point_t *g2[3];
+  point_t *h2[3];
+  int32_t i[3][3];
+  int32_t (*j)[3];
+  int32_t **k;
+  int32_t *l;
+  unsigned int m:1;
+};
+#define zero 0
+#endif

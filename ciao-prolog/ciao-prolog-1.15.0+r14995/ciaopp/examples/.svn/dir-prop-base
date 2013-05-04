@@ -1,0 +1,10 @@
+K 10
+svn:ignore
+V 39
+*.ast
+*.po
+*.itf
+*.reg
+*_opt.pl
+*_co.pl
+END

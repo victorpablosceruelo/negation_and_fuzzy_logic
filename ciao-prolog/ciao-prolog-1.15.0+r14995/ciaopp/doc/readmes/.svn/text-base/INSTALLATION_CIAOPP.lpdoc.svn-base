@@ -1,0 +1,24 @@
+
+The distribution of CiaoPP consists of its source files, written in Ciao.
+Thus, you need to have Ciao (version 1.11 or higher) installed.
+
+Once you have the source files in an installation directory, please,
+run the @tt{./ciaosetup configure} utility in order to set the required options
+(you can use the option @tt{--help} to know about the command-line options
+of that utility; look at the Ciao manual for more information). Then,
+run:
+
+@begin{verbatim}
+lpmake all
+lpmake install
+@end{verbatim}
+(lpmake is an utility that comes with the Ciao distribution).
+This will:
+@begin{enumerate}
+@item Create an executable @tt{ciaopp} that you can run under Unix.
+@item Create an executable @tt{ciaopp.bat} that you can run under Windows.
+@item Set up things so that you can use CiaoPP as a library module
+      from, e.g., the Ciao shell. In order to do this, please follow
+      the (short) instructions that @tt{lpmake install} prints out at the
+      end when you run it.
+@end{enumerate}

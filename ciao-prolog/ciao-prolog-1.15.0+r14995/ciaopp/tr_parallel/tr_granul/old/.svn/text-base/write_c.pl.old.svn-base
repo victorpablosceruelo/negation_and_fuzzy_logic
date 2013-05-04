@@ -1,0 +1,35 @@
+-----------------------------------------------------------------------------------
+From write_c.pl
+-----------------------------------------------------------------------------------
+%gen_c_ex(Exp):-
+
+%trans_c(Exp,AV,IT,1,IL,NTVT,TExp),write_c_code(IL,0),nl,nl,write(AV).
+
+%
+%gen_c_expre(Size):-
+%	trans_c(Size,AV,IT,0,IL,TV,ESize),
+%	write_c_function(eval_func,AV,IT,TV,IL,ESize).
+	
+
+
+
+%
+%
+% Commented by PLG on 28-Jul-99 (currently is dead code)
+ %% gen_c_expre(GI,Size,Name,HeadVars,Exp,SizeArg):-
+ %% 	trans_c(Size,AV,IT,0,IL,TV,ESize),
+ %% 	number_of_items(AV,Arity),
+ %%         NArity is Arity + 1,
+ %%         create_exp_size(Name,NArity,HeadVars,AV,Exp,SizeArg),
+ %%         find_C_stream(GI,CS),
+ %%         current_output(PStream),
+ %%         set_output(CS),
+ %%         write_c_function(Name,AV,IT,TV,IL,ESize),
+ %%         set_output(PStream).
+ %% 
+ %% %
+ %% %
+% End Commented by PLG on 28-Jul-99
+
+find_C_stream(gi(OuCStrm,_),OuCStrm).
+--------------------------------------------------------------------------------

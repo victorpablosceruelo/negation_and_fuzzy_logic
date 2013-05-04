@@ -1,0 +1,218 @@
+NOTE: This style guide is for now just a proposal -- several points
+      need to be discussed (we are not in agreement yet about them).
+
+* Policies
+  In addition to the formal verification done by CiaoPP, it would be
+  nice to develop a tool that helps the developer to check that a
+  piece of code meets certain style policies, like those in this
+  document (a la the C coding rules checker that was developed also in
+  Ciao).  Some ideas have been inspired by the reference links [1] and
+  [2].
+
+* General conventions
+  The official language is English, so that means, the name of
+  variables, the documentation, comments, and so on must be written in
+  English, preferrable American English.
+
+  The format of text files is Unix.  Be carefully when uploading files
+  to the repository: if you have created a file in a DOS/Windows
+  operating system, it must be converted to unix format.
+
+* Module declaration
+  In the declaration:
+  
+     :- module(ModuleName, ExportList, Packages).
+  
+  All should be instantiated, i.e., you cannot use _ as ModuleName,
+  ExportList or Packages.  The only allowed module declaration in ciao
+  should be ground and of arity 3.
+
+* Assertions
+
+** Documentation
+   All exported predicates must have at least one assertion
+   documenting what they do, and also types, properties, etc. Verify
+   that lpdoc can generate the documentation.
+   
+** Run-time checks
+   Verify that the the program can be compiled with the run-time
+   checks enabled: set_prolog_flag(runtime_checks, yes).
+
+** Software testing
+  Instead of writing examples, you must write tests.  Tests that
+  cannot be written as a unit-test assertion must be placed in a
+  subdirectory caled *tests*, inside the directory containing the
+  involved library.  Suggestion: to allow the test be executed by
+  "./ciaosetup runtests", you can create a dummy test ":- test
+  startpoint.", where startpoint is the name of the predicate that
+  launches the tests.
+
+  Some tests require loading certain libraries that are not used by
+  the program itself.  In this case it is better to load such
+  libraries with the :- load_test_module/1 or :- load_test_module/2
+  directives, because they are loaded only when you launch the tests
+  without overloading your program.
+
+  In case you need to write examples for your module, they must be
+  placed in a subdirectory called *examples*.
+
+* Avoiding dead code
+  
+  A module should not contain predicates that are not being used.  To
+  help the developer, we need a tool that verifies this
+  *automatically*.  A predicate is being used if it is exported, it
+  appears in the clause body of a predicate being used, in a multifile
+  predicate, in a predicate used in an :- initialization(...) or :-
+  on_abort(...)  declaration, in the body of an assertion referred to
+  a predicate being used, or if it is the meta-argument of a
+  metapredicate.  Note: CiaoPP can do dead code identification and
+  elimination. We also have an option in the compiler that shows a
+  warning if this restriction is violated, but it makes the compiler a
+  bit slower:
+
+  ciaoc --unused-pred-warnings ...
+  
+  Note that it reports also unused imported predicates (to avoid to
+  load modules that are not required).
+
+* Importing/Exporting from/to other modules.
+  
+  You should use only the declaration
+
+      :- use_module(AliasName, PredicateList).
+
+  to import predicates.  To import all the predicates from a module is
+  forbidden.
+
+  Importing predicates that are not being used in the module should
+  not be allowed.  To help the developer, the compiler option
+  --unused-pred-warnings can help to verify this requirement.  Note that
+  such option is still in deveopment and currently do not support
+  assertions. (TODO: check if CiaoPP can do it easily).
+
+* Reexporting predicates
+
+  Using the declaration:
+  
+      :- reexport(AliasName, PredicateList).
+      
+  to reexport all predicates from a module should be forbidden?
+  (Actually this is useful to implement inheritance).
+  
+* Variable Names
+
+  All the *words* that are part of variable names should begin with
+  upper case, for example: ObjectList, VariableName.
+
+* Predicate Names
+
+  The words that are part of predicate names are in lower case,
+  separated by an underscore, for example: get_variable_name,
+  put_variable_name, and so on.  There are some prefixes that indicate
+  the behavior of a predicate.
+
+**get_
+
+  Specifies that such predicate obtains certain information.
+
+**put_
+
+  Specifies that such predicate puts certain information somewhere.
+
+**current_
+
+  Says that the predicate returns certain information, but it is non
+  deterministic and we can find more information through backtracking.
+
+  The name of a C function that implements a native predicate must be
+  'prolog_' plus the name of such predicate.
+
+(This needs to be revised)
+
+* Prolog file names
+
+  The file names should be in lower case, and if it is composed by
+  more than two words, it should be separated by underscores.
+  Example: foreign_compilation.pl.  Note: I see that there are a lot
+  of module names composed by several names without underscores, may
+  be this point should be revised. CamelCase can also be used.
+   
+  In the case of packages, they are composed of several files.  The
+  package file should be in a directory with the same name as the
+  file.  Inside it, the module that implements the expansions should
+  be the same name of the package plus _tr as postfix.  If the package
+  requires to import the predicates of other module at run time, it
+  should be named as the package plus _rt as postfix.
+
+  The examples of a module or package must be in a subdirectory called
+  *examples*, but remember always that whenever is possible, is better
+  to write a unit test.
+
+** Example:
+  There is a package named rtchecks.pl inside the directory rtchecks,
+  the expansions are implemented in rtchecks_tr.pl and the auxiliary
+  predicates are in rtchecks_rt.pl:
+   
+   rtchecks/rtchecks.pl
+   rtchecks/rtchecks_tr.pl
+   rtchecks/rtchecks_tr.pl
+   
+   There could be additional files if required.
+
+* Automatically generated prolog file names
+
+  Prolog files resulting of program transformations not intended to be
+  used by the user should end with _co.pl.  For example, results of
+  analyzers, transformation tools, code expansions, etc. This is also,
+  e.g., the convention that CiaoPP uses.
+
+  If the generated prolog files are intended to be used in the system,
+  and they are intended to be visible to the user, they should end
+  with _auto.pl.  For example, files that are automatically generated
+  as part of a library that depends on certain configuration,
+  environment, architecture, etc.
+
+  If you have several files generated automatically, you can avoid the
+  mandatory extension _auto.pl putting all of them in a folder called
+  auto, without the _auto.pl extension.
+
+* Module dependencies.
+
+  Circular dependencies between modules are forbidden.  Why?, because
+  we should avoid strongly coupled modules.  This restriction makes it
+  more difficult to violate the 'Law of Demeter', which applied to our
+  context, says that in a low level module, we cannot use things
+  defined in a more complex module.  This is for example, one thing
+  that makes the current implementation of ciaopp overly complicated.
+  We need a tool to verify this requirement (CiaoPP does the analysis
+  when detecting strongly connected components).
+  
+  Perhaps we need to define a new declaration to say that a module can
+  (or cannot) be part of a circular dependency.
+
+* Indentation and formatting style.
+
+  Use the automatic indenter defined in the emacs-mode - the plindent
+  program (see the '<C-c> i' keys).  The automatic indenter frees the
+  programmer from worrying about formatting and line length limits
+  (normally 80), and speeds up typing.
+
+* Allowed tools to develop software.
+
+  In order to develop software, we recommend using standard tools for
+  Free Software development.  Avoid the 'not invented here' syndrome,
+  i.e., don't try to implement anything (software or metodology) that
+  already was implemented outside.
+
+  Opossed to this, with respect to the in-house tools that are the
+  most representative products we develop (Ciao, CiaoPP, LPDoc, etc.),
+  we must prefer its use instead of competitor's software.  If you see
+  a problem in any tool and you think a competitor's equivalent is
+  better, first try to see if you (or a clip developer) can improve
+  such tool in order to solve the problem.  Remember the expression
+  "Eat your own dog food".
+
+* References
+  [1] http://willcode4beer.com/design.jsp?set=codeReduction
+  [2] http://www.extremeprogramming.org/
+  

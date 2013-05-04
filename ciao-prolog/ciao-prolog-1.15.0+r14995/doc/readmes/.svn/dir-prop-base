@@ -1,0 +1,12 @@
+K 10
+svn:ignore
+V 72
+*.ascii
+*.refs
+*.texic
+INSTALLATION.pl
+README.pl
+tmp
+configure_help.tmp
+
+END

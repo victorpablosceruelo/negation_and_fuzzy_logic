@@ -1,0 +1,80 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao/library/agents/protocols/fipa
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2009-12-28T21:34:11.642502Z
+11544
+edison
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+messages.pl
+file
+
+
+
+
+2012-09-17T18:11:46.719755Z
+241636c36b1345ec9c1109913a03ab49
+2004-12-07T00:31:42.323416Z
+191
+mcarro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+792
+
+contract_net
+dir
+
+iterated_contract_net
+dir
+
+query
+dir
+
+request
+dir
+
+request_when
+dir
+
+englisg_auction
+dir
+

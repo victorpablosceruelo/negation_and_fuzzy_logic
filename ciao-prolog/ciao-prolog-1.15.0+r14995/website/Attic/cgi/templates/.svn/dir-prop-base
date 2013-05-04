@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 112
+ciaopp_customize_template.html
+ciaopp_files_template.html
+ciaopp_init_template.html
+ciaopp_output_template.html
+
+END

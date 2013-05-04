@@ -1,0 +1,75 @@
+INSTRUCTIONS TO OPTIMIZE SEARCH ENGINE RESULTS
+==============================================
+(Work in Progress - Internal notes for Ciao developers)
+
+In order to optimize the results of Web search engines of our domain
+for Ciao (http://www.ciaohome.org), I registered to Google Webmaster
+Tools (http://www.google.com/webmasters/tools) and followed the steps
+indicated there.
+
+Lets assume in the following text that WEBROOT is the directory in our
+server where the web site is stored (i.e.,
+/home/clip/public_html/Software/Ciao).
+
+1) Prove to Google that we are the owners of http://www.ciaohome.org
+
+   To do that, I upload a file that Google provided me
+   (google45e109def1915150.html) in WEBROOT/
+   
+   =================================================
+   = Ask me if you wish to be included as an owner =
+   =================================================
+
+2) Setup a robots.txt file and place it in WEBROOT/
+
+   The contents are:
+
+User-agent: *
+Allow: /
+
+3) Wait... :)
+
+
+clip SERVER REDIRECTION
+=======================
+
+Traditionally Ciao software has been hosted in
+http://clip.dia.fi.upm.es/Software/Ciao. In order to use homonegeous
+addresses (which I believe is better for users and search engines), we
+redirect that address to http://www.ciaohome.org . I describe here how
+it can be configured in Apache.
+
+1) Add symbolic links to Software/ and Mail/:
+
+   $ cd /home/clip/public_html/Software/Ciao
+   $ ln -s ../../Software .
+   $ ln -s ../../Main .
+
+   Those are necessary for ancillary links that are not trivial to
+   change, such as mailing lists and parameters passed to the CGI
+   download application. Hopefully we could avoid this step in the
+   future.
+
+2) Include these lines in the httpd configuration
+(/etc/apache2/sites-enabled/000-default):
+
+<Directory /home/clip/public_html/Software/Ciao>
+    AllowOverride All
+</Directory>
+
+   Remember to restart the server if necessary, e.g., by issuing the
+   command '/etc/init.d/apache2 restart'.
+
+3) Create a .htaccess in /home/clip/public_html/Software/Ciao
+   with the following line:
+ 
+redirectMatch 301 ^/Software/Ciao/(.*)$ http://www.ciaohome.org/$1
+
+   At this moment, all accesses to the Ciao pages under
+   clip.dia.fi.upm.es should be redirected to www.ciaohome.org.
+
+
+
+
+
+

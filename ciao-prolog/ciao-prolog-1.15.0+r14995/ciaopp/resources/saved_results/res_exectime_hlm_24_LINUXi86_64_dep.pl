@@ -1,0 +1,12 @@
+/* WARNING: This file was automatically generated
+Model    = 	[gounif,nargs]
+K        = 	[62.65880971858159,177.9032160852083]
+lower(K) = 	[52.16059756415949,159.2755499475138]
+upper(K) = 	[73.15702187300369,196.5308822229029]
+error(K) = 	[3.190945943593343,5.661904601122963]
+  %      = 	[5.092573507101049,3.182575742987773]
+MRSS     = 	51645192579.79237
+*/
+:-platform_constants('LINUXi86_64',exectime_hlm_24,lb,[52.16059756415949,159.2755499475138]).
+:-platform_constants('LINUXi86_64',exectime_hlm_24,me,[62.65880971858159,177.9032160852083]).
+:-platform_constants('LINUXi86_64',exectime_hlm_24,ub,[73.15702187300369,196.5308822229029]).

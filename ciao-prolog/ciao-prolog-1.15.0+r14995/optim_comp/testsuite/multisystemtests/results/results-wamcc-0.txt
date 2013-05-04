@@ -1,0 +1,20 @@
+t(wamcc,queens11,10,3782).
+object_size(queens11, 17088).
+t(wamcc,crypt,10000,9666).
+object_size(crypt, 38692).
+t(wamcc,primes,10000,730).
+object_size(primes, 15112).
+t(wamcc,tak,1000,7362).
+object_size(tak, 12840).
+t(wamcc,deriv,100000,1266).
+object_size(deriv, 23152).
+t(wamcc,poly,100,448).
+object_size(poly, 34612).
+t(wamcc,qsort,100000,5228).
+object_size(qsort, 17780).
+t(wamcc,exp,10,9).
+object_size(exp, 15508).
+t(wamcc,fib,1000,105).
+object_size(fib, 11720).
+t(wamcc,knights,10,5450).
+object_size(knights, 19360).

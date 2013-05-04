@@ -1,0 +1,3 @@
+#!/bin/sh
+# workaround foreign interface bug...
+ciaoc -c engine_monitor; ciaoc test 

@@ -1,0 +1,64 @@
+#+TITLE:     Ciao Literate Programming with Org-mode
+#+AUTHOR:    Jose F. Morales
+#+EMAIL:     jfran@clip.dia.fi.upm.es
+#+DATE:      2012-07-13 Fri
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+* README
+  This is a example of literate programming in Ciao using =org-mode=.
+  
+** How can I extract the program from emacs?
+   
+   The program can be extracted using =M-x org-babel-tangle=
+
+** How can I extract the program from the command line?
+
+   You can use the following command:
+   #+begin_src sh :tangle no
+FILES="\"literateciao.org\""; emacs -Q --batch \
+     --eval "(progn \
+     (require 'org)(require 'org-exp)(require 'ob)(require 'ob-tangle) \
+     (mapc (lambda (file) \
+            (find-file file) \
+            (org-babel-tangle) \
+            (kill-buffer)) '($FILES)))"
+   #+end_src sh
+
+** How to enable font-lock inside code blocks.
+
+   Please, include the following lines in your =.emacs.el= configuration:
+   
+: (setq org-src-fontify-natively t)
+
+* Introduction
+
+  We describe in this document a simple /Hello World/ program.
+
+  #+begin_src ciao :tangle literateciao.pl
+:- module(literateciao, [main/0], []).
+  #+end_src ciao
+
+  The second line of the =module/3= declarations indicates the
+  exported predicates.
+
+* Our =main/0= predicate
+
+  This predicate uses the =display/1= predicate, which is imported by
+  default:
+  
+  #+begin_src ciao :tangle literateciao.pl
+% The main predicate
+main :-
+    display('Hello world'), nl.
+  #+end_src ciao
+
+

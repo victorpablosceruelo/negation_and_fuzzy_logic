@@ -1,0 +1,93 @@
+Analysis info for domain sht
+Predicate: /(multifile:$initialization,1)
+  calltypes: [~t0]
+  exittypes: $bottom
+Types: 
+  t0 := ~mode(any) && #any
+Predicate: /(multifile:$on_abort,1)
+  calltypes: [~t1]
+  exittypes: $bottom
+Types: 
+  t1 := ~mode(any) && #any
+Predicate: /(imp_c:test3,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(imp_c:test3__2#3,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(imp_c:test3__3#3,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(imp_c:ndi,1)
+  calltypes: [~t2]
+  exittypes: [~t3]
+Types: 
+  t2 := ~mode(var) && #any
+  t3 := ~mode(nva) && #atom(~t4) | #smallint(~t5)
+  t4 := ~mode(nva) && a
+  t5 := ~mode(nva) && 1 | 2
+Predicate: /(imp_c:b,1)
+  calltypes: [~t6]
+  exittypes: [~t7]
+Types: 
+  t6 := ~mode(any) && #any
+  t7 := ~mode(nva) && #list(~t8)
+  t8 := ~mode(nva) && .(~t9, ~t10)
+  t9 := ~mode(nva) && #float(~t11)
+  t11 := ~mode(nva) && #any
+  t10 := ~mode(nva) && #list(~t12)
+  t12 := ~mode(nva) && .(~t13, ~t14)
+  t13 := ~mode(nva) && #float(~t15)
+  t15 := ~mode(nva) && #any
+  t14 := ~mode(nva) && #atom(~t16)
+  t16 := ~mode(nva) && []
+Predicate: /(imp_c:a,2)
+  calltypes: [~t17, ~t18]
+  exittypes: [~t19, ~t20]
+Types: 
+  t17 := ~mode(any) && #any
+  t18 := ~mode(any) && #any
+  t19 := ~mode(nva) && #smallint(~t21)
+  t21 := ~mode(nva) && #any
+  t20 := ~mode(nva) && #smallint(~t22)
+  t22 := ~mode(nva) && #any
+Predicate: /(imp_c:mypr#3,1)
+  calltypes: [~t23]
+  exittypes: [~t24]
+Types: 
+  t23 := ~mode(nva) && #native(~t25)
+  t25 := ~mode(nva) && #cstring()
+  t24 := ~mode(nva) && #native(~t26)
+  t26 := ~mode(nva) && #cstring()
+Predicate: /(imp_c:d#3,1)
+  calltypes: [~t27]
+  exittypes: [~t28]
+Types: 
+  t27 := ~mode(nva) && #smallint(~t29)
+  t29 := ~mode(nva) && #any
+  t28 := ~mode(nva) && #smallint(~t30)
+  t30 := ~mode(nva) && #any
+Analysis info for domain idet
+Predicate: /(multifile:$initialization,1)
+  imp: nondet
+Predicate: /(multifile:$on_abort,1)
+  imp: nondet
+Predicate: /(imp_c:test3,0)
+  imp: det
+Predicate: /(imp_c:test3__2#3,0)
+  imp: det
+Predicate: /(imp_c:test3__3#3,0)
+  imp: det
+Predicate: /(imp_c:ndi,1)
+  imp: nondet
+Predicate: /(imp_c:b,1)
+  imp: semidet
+Predicate: /(imp_c:a,2)
+  imp: semidet
+Predicate: /(imp_c:mypr#3,1)
+  imp: det
+Predicate: /(imp_c:d#3,1)
+  imp: semidet

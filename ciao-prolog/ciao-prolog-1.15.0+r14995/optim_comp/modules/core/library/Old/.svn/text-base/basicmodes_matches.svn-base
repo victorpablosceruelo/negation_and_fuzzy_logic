@@ -1,0 +1,74 @@
+./library/assertions/assrt_lib.pl
+	    assertions, basicmodes, regtypes
+./library/objects/objects_rt.pl
+        ],[assertions,basicmodes,regtypes]).
+./library/persdb_sql/db_client.pl
+ :- include(library(basicmodes)).
+./library/persdb_sql/pl2sql.pl
+ :- include(library(basicmodes)).
+./library/persdb_sql/persdbrt_sql.pl
+        ],[assertions, regtypes, basicmodes]).
+./library/atom2term.pl
+	  basicmodes
+./library/sets.pl
+	[ assertions,basicmodes
+./library/vndict.pl
+	[ assertions, basicmodes, regtypes
+./library/foreign_interface/examples/math/math.pl
+	 basicmodes,
+./library/foreign_interface/examples/strings_and_atoms/strings_and_atoms.pl
+	 basicmodes,
+./library/foreign_interface/examples/addresses/objects.pl
+	 basicmodes,
+./library/foreign_interface/examples/byte_lists/byte_lists.pl
+	 basicmodes,
+./library/foreign_interface/foreign_interface.pl
+	 basicmodes,
+	 basicmodes,
+	 basicmodes,
+	 basicmodes,
+	 basicmodes,
+./library.development/vrml/FDvis/curve.pl
+ :- include(library(basicmodes)).
+./library.development/vrml/FDvis/internal_types.pl
+ :- include(library(basicmodes)).
+./library.development/vrml/FDvis/vis.pl
+ :- include(library(basicmodes)).
+./library.development/vrml/FDvis/vrml_communication.pl
+:- include(library(basicmodes)).
+./library.development/vrml/FDvis/vrml_socket_communication.pl
+:- include(library(basicmodes)).
+./library.development/vrml/FDvis/vrml_sockets.pl
+:- include(library(basicmodes)).
+./library.development/vrml/ProVRML.pl
+		basicmodes,
+./library.development/vrml/boundary.pl
+		    [assertions,basicmodes,regtypes]).
+./library.development/vrml/dictionary.pl
+	              [assertions,basicmodes,regtypes]).
+./library.development/vrml/dictionary_tree.pl
+	[assertions,basicmodes,regtypes]).
+./library.development/vrml/field_value.pl
+%:- include(library(basicmodes)).
+./library.development/vrml/io.pl
+	        basicmodes,
+./library.development/vrml/generator.pl
+	             [assertions,basicmodes,dcg,regtypes]).
+./library.development/vrml/internal_types.pl
+	 whitespace/1],[assertions,basicmodes,regtypes]).
+./library.development/vrml/lookup.pl
+ :- include(library(basicmodes)).
+./library.development/vrml/parser.pl
+	[assertions,basicmodes,dcg,regtypes]).
+./library.development/vrml/parser_util.pl
+:- include(library(basicmodes)).
+./library.development/vrml/tokeniser.pl
+:- include(library(basicmodes)).
+./library.development/vrml/vrml.pl
+			  basicmodes,
+./library.development/xrefs/make.pl
+:- ensure_loaded(library(basicmodes)).
+./tmp/addition.pl
+	 basicmodes,
+./tmp/add.pl
+	 basicmodes,

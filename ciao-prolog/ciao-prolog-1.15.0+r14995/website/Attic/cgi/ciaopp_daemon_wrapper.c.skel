@@ -1,0 +1,38 @@
+#include <unistd.h>
+#include <fcntl.h>
+
+int main ( )
+{
+  int i       , /* counter      */
+      null_fd ; /* /dev/null FD */
+
+  /*int chapu ;*/
+
+  switch ( fork( ) )
+        {
+  	   case -1: 
+                    perror( "ciaopp_daemon_wrapper: " ) ; 
+	            return -1 ;
+
+	   case  0: break ;    /* deamon */
+
+	   default: return 0 ; /* father */
+	}
+
+  for ( i = getdtablesize( )  ;  i --> 0  ; )
+        close( i ) ;
+
+  null_fd = open( "/dev/null" , O_RDWR ) ; 
+/*
+    chapu = open( "/tmp/cpp_d.log" , O_WRONLY | O_CREAT , 0666 ) ;
+    dup( chapu ) ;
+*/
+  dup( null_fd ) ; /* "re-create" our standart input and output */
+  dup( null_fd ) ;
+
+  execl( "<bindir>ciaopp_daemon" , 0 ) ;
+
+/*  close( chapu ) ;*/
+  return -1 ;
+}
+

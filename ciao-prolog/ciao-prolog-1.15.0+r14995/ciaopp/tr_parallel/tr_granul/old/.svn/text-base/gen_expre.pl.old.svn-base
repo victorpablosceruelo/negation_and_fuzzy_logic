@@ -1,0 +1,69 @@
+%
+% Test if the size of an input argument don't have to be  calculated
+% in run-time in function of the sizes of input arguments in the head,
+% e.d. it isn't necesary to put any expresion that compute such sizes
+% before a call to the input argument's literal.
+% It is suposed that the expresion is simplified e.d. is is a number,
+% a variable or an expresion with operators an variables. 
+%
+
+without_eval(bot,bot).
+without_eval(inf,inf).
+%__________________________
+
+without_eval(X):-
+	number(X).
+
+without_eval(X) :-
+	variable(X).
+
+
+%
+% Test if an expresion don't contains variables. 
+%
+
+without_vars(Size):- set_of_vars(Size,[]).
+
+%
+% Creates the set of variables contained in an expresion .
+% These variables may be input positions in the head or input position in
+% the body literals.
+%
+
+set_of_vars(X, Y):- set_of_vars(X, [], Y).
+set_of_vars(X, Y, Y) :-
+	number(X), !.
+set_of_vars($(N), Y, Z):- number(N),!, insert_var(N,Y,Z).
+set_of_vars($(0,M),Y,Z):- number(M),!, insert_var(M,Y,Z).
+set_of_vars($(N,M),Y,Z):- number(N), N =\= 0,number(M),!,
+                          insert_var($(N,M),Y,Z).
+% Is an index variable.
+set_of_vars($(I),Y,Y):- atom(I), !.
+
+%% Review this
+%% 
+%% set_of_vars(arg(_,_), Y, Z):- !, insert_var(arg(_,_) ,Y,Z).
+%% set_of_vars(arity(_), Y, Z):- !, insert_var(arity(_) ,Y,Z).
+%% set_of_vars(head(_), Y, Z):- !, insert_var(head(_) ,Y,Z).
+%% set_of_vars(tail(_), Y, Z):- !, insert_var(tail(_) ,Y,Z).
+
+set_of_vars(X,Y,Z):-
+	functor(X,F,N),
+        N>0,F \== $,F \== arg, F \== arity, F \== head, F \== tail,
+ 	function_set_of_vars(N,X,Y,Z).
+
+
+function_set_of_vars(0,_,L,L).
+function_set_of_vars(N,X,Y,Z) :-
+	N > 0,
+	arg(N,X,Arg),
+	set_of_vars(Arg,Y,Y1),
+	N1 is N-1,
+	function_set_of_vars(N1,X,Y1,Z).
+
+
+insert_var(V,L,NL):- 
+	(member(V,L)->
+             NL = L;
+             NL = [V|L]).
+

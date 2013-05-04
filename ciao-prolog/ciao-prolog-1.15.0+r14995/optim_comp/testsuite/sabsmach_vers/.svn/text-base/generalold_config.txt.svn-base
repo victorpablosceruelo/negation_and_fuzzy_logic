@@ -1,0 +1,30 @@
+% Configuration file for old sabsmach-vers reports for general options
+% (Ciao-on-Ciao paper)
+
+optmask([varops,iblt,omerg,tagswc,joinconts,urules,specmode]).
+
+ho_description('options that affect the instruction set').
+optmask_ho([varops,omerg,iblt]).
+
+lo_description('options that affect the engine code generation for each instruction').
+optmask_lo([tagswc,joinconts,urules,specmode]).
+
+def_opts([varops,omerg,joinconts,urules,specmode]).
+
+optbit(varops,1).
+optbit(iblt,2).
+optbit(omerg,4).
+optbit(tagswc,8).
+optbit(joinconts,16).
+optbit(urules,32).
+optbit(specmode,64).
+
+optcode(varops,0'v).
+optcode(iblt,0'i).
+optcode(omerg,0'o).
+optcode(tagswc,0't).
+optcode(joinconts,0'j).
+optcode(urules,0'u).
+optcode(specmode,0's).
+
+xrange(time, 0.5, 1.3).

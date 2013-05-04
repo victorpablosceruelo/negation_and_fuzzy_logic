@@ -1,0 +1,20 @@
+t(ctocop,queens11,1,260).
+object_size(queens11, 24576)
+t(ctocop,crypt,1000,920).
+object_size(crypt, 81920)
+t(ctocop,primes,10000,820).
+object_size(primes, 20480)
+t(ctocop,tak,100,640).
+object_size(tak, 20480)
+t(ctocop,deriv,10000,270).
+object_size(deriv, 32768)
+t(ctocop,poly,100,440).
+object_size(poly, 81920)
+t(ctocop,qsort,10000,370).
+object_size(qsort, 73728)
+t(ctocop,exp,10,540).
+object_size(exp, 24576)
+t(ctocop,fib,1000,380).
+object_size(fib, 16384)
+t(ctocop,knights,1,600).
+object_size(knights, 32768)

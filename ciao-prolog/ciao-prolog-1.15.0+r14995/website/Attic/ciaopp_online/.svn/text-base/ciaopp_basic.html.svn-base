@@ -1,0 +1,28 @@
+<!--  <div>
+    <h1><v>title</v></h1>
+  </div>
+-->
+<div align="center">
+     <form name="toolbar" 
+           enctype="multipart/form-data"
+           action="<v>dirIndex</v>cgi/buttonbar.cgi" 
+	   method="post">
+
+  <div id="main">
+
+    <div><img src="<v>dirIndex</v>images/top.png"
+              alt="[TOP]"
+              style="width:580px;border:none;" /></div>
+<v>buttonbar</v>
+
+    <div>
+        <!-- emacs inside -->
+        <div>
+<v>inside_emacs</v>
+        </div>
+<v>bottom_line</v>
+    </div>
+  </div> <!-- main -->
+
+     </form>
+</div>

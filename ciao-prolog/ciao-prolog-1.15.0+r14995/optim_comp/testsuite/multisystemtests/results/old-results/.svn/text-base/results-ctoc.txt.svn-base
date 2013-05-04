@@ -1,0 +1,20 @@
+t(ctoc,queens11,1,457).
+object_size(queens11, 36104).
+t(ctoc,crypt,1000,978).
+object_size(crypt, 139496).
+t(ctoc,primes,10000,784).
+object_size(primes, 37680).
+t(ctoc,tak,1000,2182).
+object_size(tak, 32200).
+t(ctoc,deriv,10000,95).
+object_size(deriv, 46868).
+t(ctoc,poly,100,255).
+object_size(poly, 163180).
+t(ctoc,qsort,10000,307).
+object_size(qsort, 90980).
+t(ctoc,exp,10,582).
+object_size(exp, 28484).
+t(ctoc,fib,1000,271).
+object_size(fib, 16156).
+t(ctoc,knights,1,505).
+object_size(knights, 39560).

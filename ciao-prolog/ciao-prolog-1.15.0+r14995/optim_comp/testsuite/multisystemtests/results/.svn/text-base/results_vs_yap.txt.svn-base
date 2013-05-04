@@ -1,0 +1,229 @@
+           Performance comparison between Yap and optim-Ciao
+---------------------------------------------------------------------------
+
+Machine: Intel Core Duo (my huygens laptop machine)
+
+Conclusions: Ciao wins in some benchmarks, Yap in others. Yap wins in
+the more interesting benchmarks (but Yap contains a lot of
+optimizations that have not been included in Ciao) so I'd say that
+Ciao may be a little slower than Yap but their performance are
+comparable.
+
+Of course, those results are limited to this benchmark set. With other
+benchmarks that favor JIT-indexing and other Yap optimizations, Ciao
+would probably not win.
+
+-- Jose Morales
+-- Fri May  9 18:05:01 CEST 2008
+
+---------------------------------------------------------------------------
+(Yap compiled without BIGNUM support)
+name: fft	system: yap	count: 5	time: 1044
+name: queens11	system: yap	count: 5	time: 1372
+name: crypt	system: yap	count: 5000	time: 3048
+name: primes	system: yap	count: 50000	time: 4052
+name: tak	system: yap	count: 500	time: 3128
+name: deriv	system: yap	count: 500000	time: 4020
+name: poly	system: yap	count: 500	time: 1224
+name: qsort	system: yap	count: 50000	time: 1620
+name: exp	system: yap	count: 50	time: 60 WRONG
+name: factorial	system: yap	count: 100000	time: 892 WRONG
+name: fib	system: yap	count: 5000	time: 336 WRONG
+name: knights	system: yap	count: 5	time: 2224
+name: nreverse	system: yap	count: 500	time: 1884
+name: query	system: yap	count: 5000	time: 616
+name: queens	system: yap	count: 250	time: 2916
+name: boyer	system: yap	count: 50	time: 1432
+
+---------------------------------------------------------------------------
+(Yap compiled with BIGNUM support (using -lgmp))
+name: fft       system: yap	count: 5        time: 1020
+name: queens11	system: yap	count: 5	time: 1408
+name: crypt	system: yap	count: 5000	time: 3208
+name: primes	system: yap	count: 50000	time: 4060
+name: tak	system: yap	count: 500	time: 3068
+name: deriv	system: yap	count: 500000	time: 3924
+name: poly	system: yap	count: 500	time: 1328
+name: qsort	system: yap	count: 50000	time: 1604
+name: exp	system: yap	count: 50	time: 1308
+name: factorial	system: yap	count: 100000	time: 4928
+name: fib	system: yap	count: 5000	time: 2424
+name: knights	system: yap	count: 5	time: 2116
+name: nreverse	system: yap	count: 500	time: 1820
+name: query	system: yap	count: 5000	time: 632
+name: queens	system: yap	count: 250	time: 2840
+name: boyer	system: yap	count: 50	time: 1392
+
+---------------------------------------------------------------------------
+(optim ciao)
+name: fft	system: ciao2	count: 5	time: 1592.101
+name: queens11	system: ciao2	count: 5	time: 1688.105
+name: crypt	system: ciao2	count: 5000	time: 3380.211
+name: primes	system: ciao2	count: 50000	time: 2484.155
+name: tak	system: ciao2	count: 500	time: 2892.181
+name: deriv	system: ciao2	count: 500000	time: 3908.244
+name: poly	system: ciao2	count: 500	time: 1160.072
+name: qsort	system: ciao2	count: 50000	time: 1728.108
+name: exp	system: ciao2	count: 50	time: 1660.104
+name: factorial	system: ciao2	count: 100000	time: 2760.172
+name: fib	system: ciao2	count: 5000	time: 1316.082
+name: knights	system: ciao2	count: 5	time: 2280.142
+name: nreverse	system: ciao2	count: 500	time: 2256.141
+name: query	system: ciao2	count: 5000	time: 976.061
+name: queens	system: ciao2	count: 250	time: 3572.223
+name: boyer	system: ciao2	count: 50	time: 1544.096
+
+(optim ciao - Ciao 1.13jf (r8522M): Sat May 17 04:34:06 CEST 2008)
+
+name: fft        time: 1548.1
+name: queens11 	 time: 1676.104
+name: crypt 	 time: 3460.217
+name: primes 	 time: 2520.157
+name: tak 	 time: 2964.185
+name: deriv 	 time: 3860.242
+name: poly 	 time: 1160.072
+name: qsort 	 time: 1704.107
+name: exp 	 time: 1624.093
+name: factorial  time: 2736.171
+name: fib 	 time: 1332.083
+name: knights 	 time: 2352.147
+name: nreverse 	 time: 2216.138
+name: query 	 time: 968.061
+name: queens 	 time: 3520.22
+name: boyer 	 time: 1604.101
+
+---------------------------------------------------------------------------
+      
+(yap time / ciao time) = speedup of ciao w.r.t. yap
+name: fft   	 (/ 1020.0 1592.101) 0.6406628725187661
+name: queens11 	 (/ 1408.0 1688.105) 0.8340713403490897
+name: crypt 	 (/ 3208.0 3380.211) 0.9490531804079687
+name: primes 	 (/ 4060.0 2484.155) 1.6343585645823226
+name: tak 	 (/ 3068.0 2892.181) 1.0607911468888012
+name: deriv 	 (/ 3924.0 3908.244) 1.0040314780755757
+name: poly 	 (/ 1328.0 1160.072) 1.1447565323531643
+name: qsort 	 (/ 1604.0 1728.108) 0.9281827293201582
+name: exp 	 (/ 1308.0 1660.104) 0.7879024446661173
+name: factorial  (/ 4928.0 2760.172) 1.7853959825692023
+name: fib 	 (/ 2424.0 1316.082) 1.8418305242378512
+name: knights 	 (/ 2116.0 2280.142) 0.928012378176447
+name: nreverse 	 (/ 1820.0 2256.141) 0.8066871707043132
+name: query 	 (/ 632.0 976.061)   0.6475005148243809
+name: queens 	 (/ 2840.0 3572.223) 0.7950231550493908
+name: boyer 	 (/ 1392.0 1544.096) 0.9014983524340455
+
+arithmetic mean: ciao2 is 1.0431098979473497 faster than yap on average
+---------------------------------------------------------------------------
+
+Newer results of optim_comp using op32+no specmode+threaded bytecode
+Fri May 16 20:01:17 CEST 2008
+
+name: fft        time: 1476.088
+name: queens11	 time: 1664.104
+name: crypt	 time: 3312.207
+name: primes	 time: 2416.151
+name: tak	 time: 2824.176
+name: deriv	 time: 3556.222
+name: poly	 time: 1128.07
+name: qsort	 time: 1728.108
+name: exp	 time: 1660.105
+name: factorial	 time: 2760.172
+name: fib	 time: 1312.082
+name: knights	 time: 2276.142
+name: nreverse	 time: 2188.137
+name: query	 time: 948.059
+name: queens	 time: 3640.227
+name: boyer	 time: 1460.089
+
+---------------------------------------------------------------------------
+
+hProlog 2.7-53-32
+name: fft	time: 1652
+name: queens11	time: 1308
+name: crypt	time: 2108
+name: primes	time: 2004
+name: tak	time: 1816
+name: deriv	time: 3824
+name: poly	time: 1104
+name: qsort	time: 1528
+name: exp	time: 1740
+name: factorial	time: 2368
+name: fib	time: 1180
+name: knights	time: 1968
+name: nreverse	time: 908
+name: query	time: 676
+name: queens	time: 2544
+name: boyer	time: 1532
+
+---------------------------------------------------------------------------
+
+Default Ciao
+Fri May 16 21:00:11 CEST 2008
+
+name: fft  	 time: 2236
+name: queens11 	 time: 3200
+name: crypt 	 time: 6308
+name: primes 	 time: 3936
+name: tak 	 time: 5124
+name: deriv 	 time: 6676
+name: poly 	 time: 1896
+name: qsort 	 time: 2600
+name: exp 	 time: 1400
+name: factorial  time: 3404
+name: fib 	 time: 1416
+name: knights 	 time: 3432
+name: nreverse 	 time: 3900
+name: query 	 time: 1448
+name: queens 	 time: 6208
+name: boyer 	 time: 2560
+
+---------------------------------------------------------------------------
+
+SWI Prolog 5.6.55
+
+name: fft	  time: 14351
+name: queens11 	  time: 24669
+name: crypt 	  time: 36159
+name: primes 	  time: 28050
+name: tak 	  time: 27500
+name: deriv 	  time: 12610
+name: poly 	  time: 6850
+name: qsort 	  time: 8810
+name: exp 	  time: 2599
+name: factorial   time: 16979
+name: fib 	  time: 8159
+name: knights 	  time: 11980
+name: nreverse 	  time: 18950
+name: query 	  time: 6180
+name: queens 	  time: 36750
+name: boyer 	  time: 11169
+
+---------------------------------------------------------------------------
+
+Compilation to C (evalmods3)
+(Wed Sep 17 12:10:09 CEST 2008)
+name: fft   	  time: 560.035
+name: queens11 	  time: 732.045
+name: crypt 	  time: 1724.108
+name: primes 	  time: 772.048
+name: tak 	  time: 616.038
+name: tak_ip 	  time: 284.017
+name: deriv 	  time: 3152.197
+name: poly 	  time: 764.048
+name: qsort 	  time: 1004.063
+name: exp 	  time: 1432.088
+name: factorial   time: 2400.15
+name: fib 	  time: 1276.08
+name: knights 	  time: 2028.127
+name: nreverse 	  time: 920.058
+name: query 	  time: 628.039
+name: queens 	  time: 2748.172
+name: boyer 	  time: 1448.09
+
+
+
+
+
+
+
+

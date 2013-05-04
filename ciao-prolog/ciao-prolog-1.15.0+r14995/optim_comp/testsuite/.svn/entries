@@ -1,0 +1,79 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/optim_comp/testsuite
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2012-06-21T16:31:37.817037Z
+14747
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+sabsmach_min
+dir
+
+context
+dir
+
+meta
+dir
+
+contpass
+dir
+
+fsyntax
+dir
+
+tests
+dir
+
+unsorted
+dir
+
+shootout-c
+dir
+
+emucomp
+dir
+
+assoc
+dir
+
+mutables
+dir
+
+ecrctest
+dir
+
+oo
+dir
+
+condcode
+dir
+
+sabsmach_vers
+dir
+
+other
+dir
+
+multisystemtests
+dir
+

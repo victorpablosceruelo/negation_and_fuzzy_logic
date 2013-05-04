@@ -1,0 +1,60 @@
+#+TITLE: ImProlog
+#+AUTHOR: Jose F. Morales
+#+EMAIL:  jfmc@fdi.ucm.es
+#+TEXT: ImProlog language extension
+#+SETUPFILE: ../org-templates/level-0.org
+
+* What is ImProlog
+
+  ImProlog is an experimental extension of Prolog that combines logic
+  and imperative programming. Its design goals are:
+
+  - pure logic programs can run as efficent as in state-of-the art
+    Prolog emulators.
+
+  - programs with imperative style:
+
+    + they are written by modelling changes of state, without
+      polluting the language pureness (a-la monads in functional
+      programming).
+
+    + they preserves the algorithmic complexity of their imperative
+      counterparts.
+    
+    + they are not much more difficult to read than their imperative
+      counterparts.
+
+    + can be combined with logic programs.
+
+    + (hopefully) can run efficiently (by using analysis information
+      and/or user assertions).
+ 
+  - avoid as much as possible non-pure features! (which are mostly
+    used as a last resort to use imperative features or communicate
+    with the real world)
+
+* COMMENT Why?
+
+  ImProlog was born as an experiment to check if efficient emulators
+  for Prolog can be written in Prolog. Instead of optimizing logic
+  programs to make them run fast, it optimizes a logic model of an
+  imperative program to make it run fast.
+
+* COMMENT Restrictions to lift from ImProlog
+
+  - Dynamic typing
+  - Automatic memory management
+  - Backtracking? Not so important for a general purpose applications.
+    + Backtracking+IO: ugly
+
+* Current limitations
+
+  Not all user annotations can be easily checked. Any incorrect but
+  trusted assertion will make the program unsecure and unreliable
+  (just like wrong C programs). 
+
+* Where is ImProlog used in OptimComp
+
+  The abstract machine itself is written in ImProlog. The [[file:prolog_to_c.org][Prolog-to-C]]
+  compilation generates ImProlog code, which is finally translated to
+  C code.

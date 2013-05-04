@@ -1,0 +1,20 @@
+t(sicstus,queens11,1,572).
+object_size(queens11, 42824).
+t(sicstus,crypt,1000,1517).
+object_size(crypt, 146212).
+t(sicstus,primes,10000,797).
+object_size(primes, 6428).
+t(sicstus,tak,1000,6869).
+object_size(tak, 25308).
+t(sicstus,deriv,10000,121).
+object_size(deriv, 46644).
+t(sicstus,poly,100,420).
+object_size(poly, 112704).
+t(sicstus,qsort,10000,523).
+object_size(qsort, 76560).
+t(sicstus,exp,10,415).
+object_size(exp, 28284).
+t(sicstus,fib,1000,285).
+object_size(fib, 18240).
+t(sicstus,knights,1,631).
+object_size(knights, 39016).

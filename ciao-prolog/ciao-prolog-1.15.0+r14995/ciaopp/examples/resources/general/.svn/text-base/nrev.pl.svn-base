@@ -1,0 +1,9 @@
+:- module(_, [nrev/2], [assertions,regtypes,fsyntax,nativeprops, predefres(res_steps)]).
+
+:- entry nrev/2 : {list, ground} * var.
+
+nrev( [] )    := [].
+nrev( [H|L] ) := ~conc( ~nrev(L),[H] ).
+
+conc( [],    L ) := L.
+conc( [H|L], K ) := [ H | ~conc(L,K) ]. 

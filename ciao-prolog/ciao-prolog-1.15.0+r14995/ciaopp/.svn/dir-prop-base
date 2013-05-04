@@ -1,0 +1,15 @@
+K 10
+svn:ignore
+V 122
+path_setup_auto.pl
+path_setup_src_auto.pl
+path_init_auto.pl
+ciaopp_exe_auto.pl
+INSTALLATION
+README
+*.itf
+*.po
+*.asr
+*.tmp
+
+END

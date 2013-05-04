@@ -1,0 +1,53 @@
+@title{Multi-system Tests}
+@author{Jose F. Morales}
+
+The @apl{ciaotool multisystemtests} command allows the evaluation of a
+set of tests in several @bf{Prolog} systems.
+
+@section{Usage}
+  
+  @tt{ciaotool multisystemtests ACTION}
+
+@section{Available actions}
+
+@begin{itemize}
+@item Compile and check the compiler output
+  @begin{itemize}
+  @item @tt{checkmodsSUFFIX}: check all modules
+  @item @tt{checkmodSUFFIX NAME}: check the module =NAME=
+  @end{itemize}
+@item Evaluate (execute and measure time)
+  @begin{itemize}
+  @item @tt{evalmodsSUFFIX}: evaluate all modules
+  @item @tt{evalmodSUFFIX NAME}: evaluate the module =NAME=
+  @end{itemize}
+@item Save output
+  @begin{itemize}
+  @item @tt{savemodsSUFFIX}: save output for all modules
+  @item @tt{savemodSUFFIX NAME}: save output for module =NAME=
+  @end{itemize}
+@item View differences
+  @begin{itemize}
+  @item @tt{comparemodsSUFFIX}: view differences for all modules
+  @item @tt{comparemodSUFFIX NAME}: view differences for the module =NAME=
+  @end{itemize}
+@item Summarize differences
+  @begin{itemize}
+  @item @tt{briefcomparemodsSUFFIX}: briefly summarize differences for all modules
+  @item @tt{briefcomparemodSUFFIX NAME}: briefly summarize differences for module =NAME=
+  @end{itemize}
+@end{itemize}
+
+Where @tt{SUFFIX} may be one of:
+
+@begin{itemize}
+@item @tt{-yap}: @bf{Yap Prolog}
+@item @tt{-hprolog}: @bf{hProlog}
+@item @tt{-sicstus}: @bf{SICStus Prolog}
+@item @tt{-swiprolog}: @bf{SWI-Prolog}
+@item @tt{2}: @bf{Ciao} (OptimComp bytecode)
+@item @tt{3}: @bf{Ciao} (OptimComp native)
+@item (nothing): @bf{Ciao 1.13}
+@end{itemize}
+
+

@@ -1,0 +1,17 @@
+To reproduce, with b.pl containing 'q(a)':
+
+?- debug_module('a').
+?- use_module(a).
+?- p(X).
+X = a ? 
+yes
+
+Now, modify b.pl to contain 'q(b)' and reload a:
+
+?- use_module(a).
+?- p(X).
+X = a ? 
+
+I.e., b.pl does not get reloaded.
+
+--MH

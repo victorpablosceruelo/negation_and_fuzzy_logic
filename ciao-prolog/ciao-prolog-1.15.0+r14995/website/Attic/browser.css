@@ -1,0 +1,306 @@
+/*
+ * Default Style Sheet for lpdoc and patched version of texi2html
+ *
+ * Version:    1.2
+ * Date:       November 3, 1999
+ * Author(s):  Per Cederberg & Manuel Hermenegildo, 
+ *             per@clip.dia.fi.upm.es, herme@fi.upm.es
+ * Modified by: Jose F. Morales (jfran@clip.dia.fi.upm.es)
+ * Modified on: March 15, 2009
+ *
+ *
+ *  This shyle sheet defines CSS styles for the HTML output from
+ *  the 'texi2html' application when used in the context of the 
+ *  lpdoc auto-documenter, and also in some lpdoc indices.  All 
+ *  special markup tags are defined in a special section.
+ *
+ */
+
+
+/*
+ *  GLOBAL DOCUMENT STYLE
+ */
+
+/* Heading style */
+h1 {
+//    font-family: "Palatino Linotype", "Book Antiqua", "Palatino", "serif";
+//    font-weight: normal;
+//    font-size: 24pt;
+}
+
+/* Heading 2 size change */
+h2 {
+//    font-family: "Palatino Linotype", "Book Antiqua", "Palatino", "serif";
+//    font-weight: normal;
+//    font-size: 16pt;
+//    color: #535;
+}
+
+h3 {
+    font-size: 10pt;
+}
+
+h4 {
+    font-size: 10pt;
+}
+
+// a {
+//     text-decoration: none;
+//     border-bottom: 1px dotted #aa99aa;
+//     color: #663366
+// }
+// 
+// a:visited {
+//     text-decoration: none; 
+//     color: #440044
+// }
+// 
+// a:hover {
+//     text-decoration: none; 
+//     border-bottom: 1px solid #663366;
+//     color: #663366
+// }
+
+hr {
+    border-top: 1px solid #aaa;
+    border-bottom: 0px;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+/*
+ *  SPECIAL OUTPUT MARKUP
+ */
+
+/* Boxed title */
+div.boxedtitle {
+  width:		100%;
+  background:	#fffff0;
+  padding-right:	1em;
+  border-style:	solid;
+  border-width:	3pt;
+  border-color:	#000088;
+  text-align:	center;
+}
+
+/* Document title */
+b.applname {
+  color:		#505050;
+}
+
+/* Document title */
+h1.title {
+  color:		#505050;
+  font-size:	32pt;
+}
+
+/* Application title */
+h1.appltitle {
+  font-size: 32pt;
+}
+
+/* Application name */
+h1.applname {
+  color: #505050;
+  font-size: 32pt;
+}
+
+/* Predicate definitions, etc */
+span.define {
+//    font-family: "Palatino Linotype", "Book Antiqua", "Palatino", "serif";
+//  font-weight: bold;
+//  text-decoration: underline;
+//  color: #996699;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 8pt;
+  padding: 2px;
+  padding: 2px;
+  background: #835;
+  color: #fff;
+}
+
+/* Cartouche environment formatting */
+div.cartouche {
+  background: #f8f0f8;
+  padding-right: 1em;
+  padding-top: 1ex;
+  padding-bottom: 1ex;
+  border-left: 8px solid #d0c0d0;
+  border-bottom: 1px solid #d0c0d0;
+  border-top: 1px solid #d0c0d0;
+  border-right: 1px solid #d0c0d0;
+}
+
+/* Cartouche environment formatting */
+.note {
+  background: #eee;
+  padding-right: 1em;
+  padding-top: 1ex;
+  padding-bottom: 1ex;
+  border-left: 8px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+/*
+ * SPECIAL STYLE FIXES
+ */
+
+/* Fixes for top level menu lists */
+ul {
+  margin-top: 0.5em;	/* A small margin before */
+  margin-bottom: 0.5em;	/* A small margin after */
+  line-height: 1.2em;	/* Space in between lines */
+}
+
+/* Fixes for second level menus */
+ul il {
+  line-height:	1.2em;	/* No space between lines */
+}
+
+/* Fixes for description lists */
+DL {
+  margin-top: 0.5em;	/* A small margin before */
+  margin-bottom: 0.5em;	/* A small margin after */
+}
+
+/* Fixes for examples and code parts */
+code, tt {
+  color: #904040;
+}
+
+pre {
+  color: #404040;
+      /*        font-weight:	bold; */
+//      font-size:	80%;
+  font-family:	monospace;
+  border: 1px solid #a0a0a0;
+  background:	#f8f8f8;
+  padding-top: 0.5ex;
+  padding-bottom: 0.5ex;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+/* Fixes to avoid visible links in titles 
+   H1 A, H2 A, H3 A, H4 A {
+                            color:			black;	/* No link coloring 
+                                                                   text-decoration:	normal;	/* No link underlining 
+                                                                                                   }
+*/
+
+/* --------------------------------------------------------------------------- */
+/* (New stuff) */
+
+.authors {
+  font-size: 8pt;
+  padding-top: 0.5ex;
+  padding-bottom: 0.5ex;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-right: 2em;
+  margin-bottom: 2em;
+//  border-left: 8px solid #ddd;
+//  border-top: 1px solid #ddd;
+//  border-bottom: 1px solid #ddd;
+//  border-right: 1px solid #ddd;
+  border-top: 1px dotted #ddd;
+  border-bottom: 1px dotted #ddd;
+  color: #888;
+//  background-color: #eee;
+}
+
+#status {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 1em;
+  padding-right: 1em;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+.iso-keyword {
+  font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
+  background-color: #fff;
+  border: 1px solid #f40;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 3px;
+  padding-right: 3px;
+  margin-left: 1em;
+  color: #f40;
+}
+
+#navigation {
+  font-size: 8pt;
+//  text-transform: uppercase;
+  color: #000;
+}
+
+#navigation a {
+  color: #000;
+  border-bottom: 1px dotted #000;
+}
+
+#navigation a:hover {
+  color: #000;
+  border-bottom: 1px solid #000;
+}
+
+#contents-caption {
+  font-weight: bold;                   
+  font-size: 8pt;
+  text-transform: uppercase;
+  padding-left: 8px;
+  color: #a40;
+}
+
+#contents {
+  margin-right: 2em;
+  margin-bottom: 2em;
+  border-left: 8px solid #ffe0a0;
+  border-top: 1px solid #ffe0a0;
+  border-bottom: 1px solid #ffe0a0;
+  border-right: 1px solid #ffe0a0;
+}
+
+#contents li {
+  display: inline;
+  margin: 0px;
+}
+
+#contents ul a:hover {
+  text-decoration: underline;
+}
+
+#contents ul a.stripe1 {
+  border: 0px;                        
+  color: #a40;
+}
+
+#contents ul a.stripe2 {
+  border: 0px;                        
+  color: #a40;
+  background-color: #fff8df;
+}
+
+#contents ul {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+}
+
+#contents ul a {
+  display: block;
+  border: none;
+  margin: 0px;
+  padding: 1px;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+

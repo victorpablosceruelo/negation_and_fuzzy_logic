@@ -1,0 +1,16 @@
+# -*- mode: Makefile; -*-
+
+# Generate here all files that are architecture-independent
+
+include $(SRCDIR)/SHARED
+include $(SRCDIR)/miniprolog/SETTINGS
+
+.PHONY: common
+
+VPATH +=:$(SRCDIR)/bin/$(MPARCH)
+
+
+common:: $(CONFIGOUT)
+
+$(CONFIGOUT): $(CONFIGURE)
+	$(CONFIGURE) $@

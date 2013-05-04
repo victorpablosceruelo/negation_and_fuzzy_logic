@@ -1,0 +1,46 @@
+wxCiao - Port of wxWidgets to Ciao programming enviroment 
+Written by Erik Lee
+
+This library provides a set of commonly used widgets and operations on
+those widgets intended to make GUI building in Ciao easy.  It relies
+on the Foreign function interface of Ciao, which currently has a few
+bugs.  These will probably be fixed very soon, however.  The current
+limitations imposed by these bugs mean that GUIs created using this
+toolkit are limited to handling one user interface event successfully
+(it will crash on the second event right now).
+
+Building:
+
+You will need to edit the makefile so that CIAO_ENGINE points to the
+ciao/engine subdirectory of the CiaoDE 1.13 (or later) source tree.
+After that, just type make.  The build requires the following software
+to function properly:
+
+CiaoDE 1.13 or higher
+wxGTK 2.6 or higher
+gnu make
+
+Running:
+
+The build will create a file called libwxCiao.so in the same directory
+as the makefile.  You will need to put this file into your library
+path somehow before running the gui code from ciao.  There are at
+least two ways to do this:
+
+1) Using LD_LIBRARY_PATH
+
+prompt$ LD_LIBRARY_PATH=. ciao go.pl
+
+This tells linux to load libraries from the current directory.  go.pl
+is a simple demonstration application for wxCiao, so running it like
+this will launch a GUI window with a few widgets in it.
+
+This is a good way to just give it a quick test.
+
+
+2) Putting the library somewhere in your search path.  If you will be
+running lots of programs using wxCiao, this is the recommended
+approach.  In my opinion, the best thing to do is to install wxCiao
+source somewhere, build the library, and make a symlink to it from one
+of the lib directories (such as /usr/lib).  That way updates to wxCiao
+will be installed automatically simply by building the new source.

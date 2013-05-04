@@ -1,0 +1,10 @@
+K 10
+svn:ignore
+V 54
+*.po
+*.itf
+*.asr
+*.ast
+selected_ppl_interface_auto.pl
+
+END

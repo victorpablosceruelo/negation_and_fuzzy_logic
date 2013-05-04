@@ -1,0 +1,76 @@
+:- module(backtr_init, [main/0], []).
+
+
+:- use_module(library(system)).
+:- use_module(library(apll_parback)).
+:- use_module(library(odd)).
+
+
+main :-
+	set_prolog_flag(gc, off),
+
+	push_goal(p(_X),nondet,H1),
+	push_goal(q(_Y),nondet,H2),
+
+	my_call(H1),nl,
+	my_call(H2),nl,
+
+	backtrack(H1),nl,
+	backtrack(H1),nl,
+	backtrack(H1),nl,
+	backtrack(H1),nl,
+	backtrack(H1),nl,
+	backtrack(H1),nl,
+% 	backtrack(H2),nl,
+% 	backtrack(H2),nl,
+% 	backtrack(H1),nl,
+
+	display(end_of_main), nl.
+
+
+my_call(Handler) :-
+	retrieve_goal(Handler,Goal),
+
+	push_choice_point,
+	call(Goal),
+	display(goal(Goal)),nl,
+	push_choice_point,
+
+	save_choice_point(Handler),
+% 	'$metachoice'(M), display(metachoice(M)), nl,
+
+	(
+	    goal_backtracked(Handler) ->
+	    restore_pointers,
+	    fail
+	;
+	    set_goal_finished(Handler)
+	).
+my_call(Handler) :-
+	set_goal_failed(Handler),
+	restore_pointers,
+	fail.
+
+
+backtrack(Handler) :-
+	set_goal_backtracked(Handler),
+	push_choice_point,
+	pushdown_pointers(Handler),
+	fail.
+backtrack(_).
+
+
+push_choice_point :- true.
+push_choice_point :- false.
+
+
+p(a).
+p(b).
+p(c).
+p(d).
+
+q(1).
+q(2).
+q(3).
+q(4).
+

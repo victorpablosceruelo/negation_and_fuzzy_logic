@@ -1,0 +1,205 @@
+:- module(backtr_move_to_top_multiagent, [main/0,main/2], []).
+
+
+:- use_module(library(system)).
+:- use_module(library(apll)).
+:- use_module(library(odd)).
+
+
+main :-
+	main(_,_).
+
+main(X,Y) :-
+	set_prolog_flag(gc, off),
+
+	start_thread(new_thread),
+
+	publish(p(X), Hp),
+	publish(q(Y), Hq),
+
+	read(Hq),
+	read(Hp).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% &>/2 and <&/1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+publish(Goal,Handler) :-
+	push_goal(Goal,nondet,Handler),
+	release_some_suspended_thread,
+	pause(1),
+	continue_publish(Handler).
+continue_publish(_).
+continue_publish(Handler) :-  % Backtrack over goal in Handler:
+	enter_mutex(Handler),
+	(   % goal has already failed => keep failing
+	    goal_failed(Handler) ->
+	    exit_mutex(Handler),
+	    move_choice_point_to_top(Handler),
+	    fail
+	;
+	    (   % goal not stolen => backtracking with no need of events
+		goal_available(Handler) ->
+		exit_mutex(Handler),
+		backtrack(Handler)
+	    ;   % goal stolen => send event to backtrack
+		exit_mutex(Handler),
+		send_event(Handler),
+		perform_some_work_until_finished_or_failed(Handler)
+	    )
+	),
+	continue_publish(Handler).
+
+read(Handler) :-
+	enter_mutex_self,
+        (   % goal not stolen:
+            goal_available(Handler) ->
+	    save_wam_state(Handler),
+	    (   % first time it is executed => call/1 + saving choice-points
+		goal_not_executed(Handler) ->
+		exit_mutex_self,
+		my_call(Handler)
+	    ;   % backtracking already done over not stolen goal => do nothing
+		exit_mutex_self
+	    ),
+	    continue_read(Handler)
+        ;   % goal stolen => do some work until goal has finished or failed
+	    exit_mutex_self,
+            perform_some_work_until_finished_or_failed(Handler)
+        ).
+continue_read(_).
+continue_read(Handler) :-
+	set_goal_backtracked(Handler),
+	load_wam_state(Handler),
+	fail.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Common predicates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+perform_some_work_until_finished_or_failed(Handler) :-
+	enter_mutex_self,
+	(
+	    goal_finished(Handler) ->
+	    exit_mutex_self
+	;
+	    (
+		goal_failed(Handler) ->
+		exit_mutex_self,
+		fail
+	    ;
+		exit_mutex_self,
+		work,
+		perform_some_work_until_finished_or_failed(Handler)
+	    )
+	).
+
+work :-
+	enter_mutex_self,
+	(
+	    read_event(Handler) ->
+	    exit_mutex_self,
+	    backtrack(Handler)
+	;
+	    (
+		find_goal(lifo,Handler) ->
+		exit_mutex_self,
+		display(handler_found(Handler)), nl,
+		my_call(Handler), nl
+	    ;
+		suspend
+	    )
+	).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code for backtracking
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+my_call(Handler) :-
+	'$metachoice'(InitialChP),
+	perform_call(Handler,InitialChP).
+my_call(Handler) :-
+	enter_mutex(Handler),
+	set_goal_failed(Handler),
+	exit_mutex(Handler),
+
+	load_wam_state(Handler),
+	fail.
+
+backtrack(Handler) :-
+	set_goal_backtracked(Handler),
+	save_wam_state(Handler),
+	move_choice_point_to_top(Handler),
+	fail.
+backtrack(Handler) :-
+	enter_mutex(Handler),
+	(
+	    waiting(Handler) -> release(Handler)
+	;
+	    true
+	),
+	exit_mutex(Handler).
+
+perform_call(Handler,InitialChP) :-
+	retrieve_goal(Handler,Goal),
+
+	call(Goal),
+	display(Goal), nl,
+
+	save_choice_point(Handler),
+	(
+	    not_last_alternative(Handler) -> true
+	;
+	    save_choice_point(Handler,InitialChP)
+	),
+	restore_execution(Handler).
+
+restore_execution(Handler) :-
+	enter_mutex(Handler),
+	goal_backtracked(Handler),
+	set_goal_finished(Handler),
+	exit_mutex(Handler),
+
+	load_wam_state(Handler),
+	fail.
+restore_execution(Handler) :-
+	set_goal_finished(Handler),
+	exit_mutex(Handler).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New threads
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+new_thread :-
+	work,
+	new_thread.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Facts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+p(a).
+p(b).
+p(c).
+p(d).
+
+q(1).
+q(2).
+q(3).
+q(4).
+

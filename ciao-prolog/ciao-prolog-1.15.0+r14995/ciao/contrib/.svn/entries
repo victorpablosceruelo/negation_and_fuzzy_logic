@@ -1,0 +1,505 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao/contrib
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2012-09-17T18:09:29.424736Z
+14995
+vpablos
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+minisat
+dir
+
+global_vars.pl
+file
+
+
+
+
+2012-09-17T18:11:46.211753Z
+52543d2309130b13c8d45b2a9a5e9ba1
+2012-02-24T08:56:14.208662Z
+14517
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5023
+
+bu
+dir
+
+persvalue
+dir
+
+rfuzzy
+dir
+
+engine_monitor
+dir
+
+optim_byte_code.pl
+file
+
+
+
+
+2012-09-17T18:11:46.211753Z
+d41d8cd98f00b204e9800998ecf8427e
+2006-01-16T18:56:48.203788Z
+5274
+german
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+
+ams
+dir
+
+dblp
+dir
+
+types.old
+dir
+
+shvarcom
+dir
+
+ddlist
+dir
+
+gecode
+dir
+
+chartlib
+dir
+
+andprolog_d
+dir
+
+block
+dir
+
+regexp
+dir
+
+hashtable
+dir
+
+elisp_interface
+dir
+
+contextcore
+dir
+
+provrml
+dir
+
+time_analyzer
+dir
+
+fol_checker
+dir
+
+modtester
+dir
+
+srcbyrd
+dir
+
+timingmodel
+dir
+
+iso_tests
+dir
+
+tdg
+dir
+
+lazy
+dir
+
+dht
+dir
+
+difference_constraints
+dir
+
+profiler
+dir
+
+codecoverage
+dir
+
+chat80
+dir
+
+clpfd
+dir
+
+math
+dir
+
+color_space
+dir
+
+benchmark
+dir
+
+wxCiao
+dir
+
+corec
+dir
+
+ppl
+dir
+
+disequality
+dir
+
+monad
+dir
+
+optim_c_code.pl
+file
+
+
+
+
+2012-09-17T18:11:46.211753Z
+d41d8cd98f00b204e9800998ecf8427e
+2006-01-16T18:56:48.203788Z
+5274
+german
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+
+subversion
+dir
+
+case_tester
+dir
+
+debugpred
+dir
+
+oldt
+dir
+
+parback
+dir
+
+ppl.pl
+file
+
+
+
+
+2012-09-17T18:11:46.211753Z
+d70f9df2c9ad0f4b693b5ab0951c98c2
+2012-08-15T13:15:45.349683Z
+14862
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+824
+
+tester
+dir
+
+transactions
+dir
+
+xdr_handle
+dir
+
+pythonll
+dir
+
+term_filtering
+dir
+
+doccomments
+dir
+
+apll_parback
+dir
+
+xml_path
+dir
+
+jvm_in_ciao
+dir
+
+bibutils
+dir
+
+stdprolog
+dir
+
+mycin
+dir
+
+miniprolog
+dir
+
+ontologies
+dir
+
+dclp
+dir
+
+pcpe_rtquery
+dir
+
+chip
+dir
+
+asp
+dir
+
+and_sim_plan
+dir
+
+debugger_pkg
+dir
+
+contextual
+dir
+
+hrtime
+dir
+
+gnuplot
+dir
+
+integer_factorization
+dir
+
+costmodel
+dir
+
+layout_dcg
+dir
+
+mycin_rulebase
+dir
+
+gsl_imports
+dir
+
+yap_libs
+dir
+
+andprolog_nd
+dir
+
+optim_c_code_spec.pl
+file
+
+
+
+
+2012-09-17T18:11:46.211753Z
+d41d8cd98f00b204e9800998ecf8427e
+2006-01-23T11:43:07.797876Z
+5339
+german
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+
+catcher
+dir
+
+hrtimer
+dir
+
+global.pl
+file
+
+
+
+
+2012-09-17T18:11:46.211753Z
+218bf8f3a31e2eb3b0231bcd69dbd10b
+2012-02-23T17:36:48.723871Z
+14515
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+830
+
+plindent
+dir
+
+zeromq
+dir
+
+lprolog
+dir
+
+gendot
+dir
+
+tabling
+dir
+
+persvalue.old
+dir
+
+sicstus-ugraphs-other
+dir
+
+hmtypes_check
+dir
+
+pe_types
+dir
+
+fd
+dir
+
+pkgs_output_debug
+dir
+
+colp
+dir
+
+time
+dir
+

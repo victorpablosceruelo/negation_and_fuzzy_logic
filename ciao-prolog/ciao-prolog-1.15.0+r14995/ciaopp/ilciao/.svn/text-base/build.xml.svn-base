@@ -1,0 +1,159 @@
+<project name="Ilciao" default="run" basedir=".">
+
+  <property file="ant.properties"/>
+
+  <property name="src" value="java"/>
+  <property name="test" value="test"/>
+  <property name="examples" value="examples"/>
+
+  <path id="classpath.core">
+    <pathelement path="${annotations}"/>
+    <pathelement path="${classes}"/>
+    <pathelement path="${jasmin}"/>
+    <pathelement path="${jce}"/>
+    <pathelement path="${junit}"/>
+    <pathelement path="${polyglot}"/>
+    <pathelement path="${soot}"/>
+  </path>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${classes}"/>
+  </target>
+
+  <!--<fileset id="lib.jars" dir="lib/groovy">-->
+  <!--<include name="**/*.jar"/>-->
+  <!--</fileset>-->
+
+  <!--<path id="lib.path">-->
+  <!--<pathelement location="lib/groovy-all-1.5.4.jar"/>-->
+  <!--<pathelement path="${annotations}"/>-->
+  <!--<pathelement path="${jasmin}"/>-->
+  <!--<pathelement path="${jce}"/>-->
+  <!--<pathelement path="${junit}"/>-->
+  <!--<pathelement path="${polyglot}"/>-->
+  <!--<pathelement path="${soot}"/>-->
+  <!--<pathelement path="${classes}"/>-->
+  <!--<fileset refid="lib.jars"/>-->
+  <!--</path>-->
+
+  <!--<taskdef name="groovyc"-->
+  <!--classname="org.codehaus.groovy.ant.Groovyc"-->
+  <!--classpathref="classpath.core"/>-->
+
+  <!--<target name="compile-ilciao-groovy" depends="init">-->
+  <!--<groovyc-->
+  <!--srcdir="examples"-->
+  <!--destdir="${classes}"-->
+  <!--verbose="true"-->
+  <!--classpathref="classpath.core">      -->
+  <!--<javac source="1.5" target="1.5" debug="on" />-->
+  <!--</groovyc>-->
+  <!--</target>-->
+
+  <target name="compile-ilciao" depends="init">
+    <javac
+        srcdir="${src}"
+        destdir="${classes}"
+        classpathref="classpath.core"
+        debug="true"
+        />
+  </target>
+
+  <target name="compile-examples" depends="compile-ilciao">
+    <javac
+        srcdir="${examples}"
+        destdir="${classes}"
+        classpath="${classes}"
+        debug="true"
+        />
+  </target>
+
+  <target name="compile-tests" depends="compile-ilciao">
+    <javac
+        srcdir="${test}"
+        destdir="${classes}"
+        classpath="${classes}"
+        classpathref="classpath.core"
+        debug="true"
+        />
+  </target>
+
+  <target name="compile" depends="compile-examples, compile-tests"/>
+
+  <target name="run" depends="compile">
+    <java classname="soot.CiaoMain"
+          classpathref="classpath.core"
+          maxmemory="600m"
+          fork="true"
+        >
+      <arg line="-resources-mode on"/>
+      <arg line="-verbose-ilciao on"/>
+      <arg line="-base-dir ${classes}"/>
+      <arg line="-main-class examples.Fib"/>
+    </java>
+  </target>
+
+  <target name="run-tests" depends="compile-tests">
+    <junit printsummary="yes"
+           fork="yes"
+           haltonfailure="yes">
+      <classpath refid="classpath.core"/>
+      <formatter type="plain"/>
+      <test name="soot.CiaoMainTest"/>
+    </junit>
+  </target>
+
+  <target name="mytest" description="test whatever" depends="compile">
+    <java classname="soot.ciao.CiaoInterface"
+          classpathref="classpath.core"
+          maxmemory="600m"
+          fork="true"
+        >
+    </java>
+  </target>
+
+  <target name="clean" description="clean up">
+    <delete>
+      <fileset dir="${examples}">
+        <include name="**/Resources/*_co.java"/>
+        <include name="**/Resources/examples.*.pl"/>
+      </fileset>
+    </delete>
+    <delete dir="${classes}" />
+<!--
+    <delete includeemptydirs="true">
+      <fileset dir="${classes}">
+        <exclude name="**/NOCOMPILE"/>
+        <exclude name="**/*.jar"/>
+      </fileset>
+    </delete>
+
+    <delete>
+      <fileset dir="${classes}">
+        <include name="**/*.shimple"/>
+        <include name="**/*.jimple"/>
+        <include name="**/*.itf"/>
+        <include name="**/*.po"/>
+        <include name="**/#*#"/>
+      </fileset>
+    </delete>
+    -->
+  </target>
+
+  <target name="test-soot" depends="compile">
+    <java classname="soot.CiaoMain"
+          classpathref="classpath.core"
+          maxmemory="600m"
+          fork="true"
+        >
+      <arg value="-f"/>
+      <arg value="shimple"/>
+      <!--<arg value="-via-shimple"/>-->
+      <arg value="-app"/>
+      <arg line="-output-dir ${classes}"/>
+      <arg value="examples.Gcd"/>
+    </java>
+  </target>
+
+</project>

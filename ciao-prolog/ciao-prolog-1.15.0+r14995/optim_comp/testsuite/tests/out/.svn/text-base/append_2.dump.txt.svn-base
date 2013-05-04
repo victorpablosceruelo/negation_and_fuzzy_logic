@@ -1,0 +1,233 @@
+Analysis info for domain sht
+Predicate: /(multifile:$initialization,1)
+  calltypes: [~t0]
+  exittypes: $bottom
+Types: 
+  t0 := ~mode(any) && #any
+Predicate: /(multifile:$on_abort,1)
+  calltypes: [~t1]
+  exittypes: $bottom
+Types: 
+  t1 := ~mode(any) && #any
+Predicate: /(append_2:l,1)
+  calltypes: [~t2]
+  exittypes: [~t3]
+Types: 
+  t2 := ~mode(any) && #any
+  t3 := ~mode(nva) && #reclist(~t4)
+  t4 := ~mode(any) && #any
+Predicate: /(append_2:l#0,1)
+  calltypes: [~t5]
+  exittypes: [~t6]
+Types: 
+  t5 := ~mode(var) && #any
+  t6 := ~mode(nva) && #reclist(~t7)
+  t7 := ~mode(any) && #any
+Predicate: /(append_2:l#1,1)
+  calltypes: [~t8]
+  exittypes: [~t9]
+Types: 
+  t8 := ~mode(nva) && #atom(~t10)
+  t10 := ~mode(nva) && []
+  t9 := ~mode(nva) && #atom(~t11)
+  t11 := ~mode(nva) && []
+Predicate: /(append_2:l#2,1)
+  calltypes: [~t12]
+  exittypes: [~t13]
+Types: 
+  t12 := ~mode(nva) && #list(~t14)
+  t14 := ~mode(nva) && .(~t15, ~t16)
+  t15 := ~mode(any) && #any
+  t16 := ~mode(any) && #any
+  t13 := ~mode(nva) && #list(~t17)
+  t17 := ~mode(nva) && .(~t18, ~t19)
+  t18 := ~mode(any) && #any
+  t19 := ~mode(nva) && #reclist(~t20)
+  t20 := ~mode(any) && #any
+Predicate: /(append_2:l#3,1)
+  calltypes: [~t21]
+  exittypes: [~t22]
+Types: 
+  t21 := ~mode(any) && #any
+  t22 := ~mode(nva) && #reclist(~t23)
+  t23 := ~mode(any) && #any
+Predicate: /(append_2:reverse,3)
+  calltypes: [~t24, ~t25, ~t26]
+  exittypes: [~t27, ~t28, ~t29]
+Types: 
+  t24 := ~mode(any) && #any
+  t25 := ~mode(any) && #any
+  t26 := ~mode(any) && #any
+  t27 := ~mode(nva) && #reclist(~t30)
+  t30 := ~mode(any) && #any
+  t28 := ~mode(any) && #any
+  t29 := ~mode(any) && #any
+Predicate: /(append_2:reverse#0,3)
+  calltypes: [~t31, ~t32, ~t33]
+  exittypes: [~t34, ~t35, ~t36]
+Types: 
+  t31 := ~mode(var) && #any
+  t32 := ~mode(any) && #any
+  t33 := ~mode(any) && #any
+  t34 := ~mode(nva) && #reclist(~t37)
+  t37 := ~mode(any) && #any
+  t35 := ~mode(any) && #any
+  t36 := ~mode(any) && #any
+Predicate: /(append_2:reverse#1,3)
+  calltypes: [~t38, ~t39, ~t40]
+  exittypes: [~t41, ~t42, ~t43]
+Types: 
+  t38 := ~mode(nva) && #atom(~t44)
+  t44 := ~mode(nva) && []
+  t39 := ~mode(any) && #any
+  t40 := ~mode(any) && #any
+  t41 := ~mode(nva) && #atom(~t45)
+  t45 := ~mode(nva) && []
+  t42 := ~mode(any) && #any
+  t43 := ~mode(any) && #any
+Predicate: /(append_2:reverse#2,3)
+  calltypes: [~t46, ~t47, ~t48]
+  exittypes: [~t49, ~t50, ~t51]
+Types: 
+  t46 := ~mode(nva) && #list(~t52)
+  t52 := ~mode(nva) && .(~t53, ~t54)
+  t53 := ~mode(any) && #any
+  t54 := ~mode(any) && #any
+  t47 := ~mode(any) && #any
+  t48 := ~mode(any) && #any
+  t49 := ~mode(nva) && #list(~t55)
+  t55 := ~mode(nva) && .(~t56, ~t57)
+  t56 := ~mode(any) && #any
+  t57 := ~mode(nva) && #reclist(~t58)
+  t58 := ~mode(any) && #any
+  t50 := ~mode(any) && #any
+  t51 := ~mode(any) && #any
+Predicate: /(append_2:reverse#3,3)
+  calltypes: [~t59, ~t60, ~t61]
+  exittypes: [~t62, ~t63, ~t64]
+Types: 
+  t59 := ~mode(any) && #any
+  t60 := ~mode(any) && #any
+  t61 := ~mode(any) && #any
+  t62 := ~mode(nva) && #reclist(~t65)
+  t65 := ~mode(any) && #any
+  t63 := ~mode(any) && #any
+  t64 := ~mode(any) && #any
+Predicate: /(append_2:dummy,1)
+  calltypes: [~t66]
+  exittypes: [~t67]
+Types: 
+  t66 := ~mode(any) && #any
+  t67 := ~mode(nva) && #list(~t68)
+  t68 := ~mode(nva) && .(~t69, ~t70)
+  t69 := ~mode(nva) && #smallint(~t71)
+  t71 := ~mode(nva) && 3
+  t70 := ~mode(nva) && #list(~t72)
+  t72 := ~mode(nva) && .(~t73, ~t74)
+  t73 := ~mode(any) && #any
+  t74 := ~mode(nva) && #atom(~t75)
+  t75 := ~mode(nva) && []
+Predicate: /(append_2:dummy2,4)
+  calltypes: [~t76, ~t77, ~t78, ~t79]
+  exittypes: [~t80, ~t81, ~t82, ~t83]
+Types: 
+  t76 := ~mode(var) && #any
+  t77 := ~mode(var) && #any
+  t78 := ~mode(var) && #any
+  t79 := ~mode(var) && #any
+  t80 := ~mode(nva) && #smallint(~t84)
+  t84 := ~mode(nva) && 1
+  t81 := ~mode(nva) && #smallint(~t85)
+  t85 := ~mode(nva) && 2
+  t82 := ~mode(any) && #any
+  t83 := ~mode(any) && #any
+Predicate: /(append_2:rec,0)
+  calltypes: []
+  exittypes: $bottom
+Types: 
+Predicate: /(append_2:rec1,1)
+  calltypes: [~t86]
+  exittypes: $bottom
+Types: 
+  t86 := ~mode(any) && #any
+Predicate: /(append_2:new_sample,3)
+  calltypes: [~t87, ~t88, ~t89]
+  exittypes: [~t90, ~t91, ~t92]
+Types: 
+  t87 := ~mode(any) && #any
+  t88 := ~mode(any) && #any
+  t89 := ~mode(any) && #any
+  t90 := ~mode(nva) && #list(~t93)
+  t93 := ~mode(nva) && .(~t94, ~t95)
+  t94 := ~mode(any) && #any
+  t95 := ~mode(any) && #any
+  t91 := ~mode(any) && #any
+  t92 := ~mode(any) && #any
+Predicate: /(append_2:tev,2)
+  calltypes: [~t96, ~t97]
+  exittypes: [~t98, ~t99]
+Types: 
+  t96 := ~mode(any) && #any
+  t97 := ~mode(any) && #any
+  t98 := ~mode(any) && #any
+  t99 := ~mode(nva) && #atom(~t100)
+  t100 := ~mode(nva) && no | yes
+Predicate: /(append_2:tev#0,2)
+  calltypes: [~t101, ~t102]
+  exittypes: [~t103, ~t104]
+Types: 
+  t101 := ~mode(var) && #any
+  t102 := ~mode(any) && #any
+  t103 := ~mode(any) && #any
+  t104 := ~mode(nva) && #atom(~t105)
+  t105 := ~mode(nva) && no | yes
+Predicate: /(append_2:tev#1,2)
+  calltypes: [~t106, ~t107]
+  exittypes: [~t108, ~t109]
+Types: 
+  t106 := ~mode(any) && #any
+  t107 := ~mode(any) && #any
+  t108 := ~mode(any) && #any
+  t109 := ~mode(nva) && #atom(~t110)
+  t110 := ~mode(nva) && no | yes
+Analysis info for domain idet
+Predicate: /(multifile:$initialization,1)
+  imp: nondet
+Predicate: /(multifile:$on_abort,1)
+  imp: nondet
+Predicate: /(append_2:l,1)
+  imp: nondet
+Predicate: /(append_2:l#0,1)
+  imp: nondet
+Predicate: /(append_2:l#1,1)
+  imp: semidet
+Predicate: /(append_2:l#2,1)
+  imp: nondet
+Predicate: /(append_2:l#3,1)
+  imp: nondet
+Predicate: /(append_2:reverse,3)
+  imp: nondet
+Predicate: /(append_2:reverse#0,3)
+  imp: nondet
+Predicate: /(append_2:reverse#1,3)
+  imp: semidet
+Predicate: /(append_2:reverse#2,3)
+  imp: nondet
+Predicate: /(append_2:reverse#3,3)
+  imp: nondet
+Predicate: /(append_2:dummy,1)
+  imp: semidet
+Predicate: /(append_2:dummy2,4)
+  imp: semidet
+Predicate: /(append_2:rec,0)
+  imp: nondet
+Predicate: /(append_2:rec1,1)
+  imp: nondet
+Predicate: /(append_2:new_sample,3)
+  imp: semidet
+Predicate: /(append_2:tev,2)
+  imp: semidet
+Predicate: /(append_2:tev#0,2)
+  imp: semidet
+Predicate: /(append_2:tev#1,2)
+  imp: semidet

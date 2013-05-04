@@ -1,0 +1,288 @@
+		 CIAO-PROLOG LICENSE GRANTED TO MOTOROLA
+
+[This license is a modified version of the GNU Lesser General Public
+ License version 2.1]
+
+       TERMS AND CONDITIONS UNDER WHICH MOTOROLA MAY COPY, 
+             DISTRIBUTE AND MODIFY CIAO-PROLOG
+
+  0. This License ("Agreement") applies to all software distributed by
+Contractor to Motorola as part of the services to be provided by
+contractor.  This software is collectively referred to as
+"Ciao-Prolog".
+
+  A "work based on Ciao-Prolog" means either Ciao-Prolog or any
+derivative work under copyright law: that is to say, a work containing
+Ciao-Prolog or a portion of it, either verbatim or with modifications
+and/or translated straightforwardly into another language.
+(Hereinafter, translation is included without limitation in the term
+"modification".)
+
+  A "library" means a collection of software functions and/or data
+prepared so as to be conveniently linked with application programs
+(which use some of those functions and data) to form executables.
+
+  "Source code" for a work means the preferred form of the work for
+making modifications to it.  For Ciao-Prolog, complete source code means
+all the source code for all modules it contains, plus any associated
+interface definition files, plus the scripts used to control compilation
+and installation of Ciao-Prolog.
+
+  The "GNU LGPL" means the GNU Lesser General Public License version
+2.1 as published by the Free Software Foundation, Inc., 59 Temple
+Place, Suite 330, Boston, MA 02111-1307 USA.
+
+  Activities other than copying, distribution and modification are not
+covered by this Agreement; they are outside its scope.  The act of
+running a program using Ciao-Prolog is not restricted, and output from
+such a program is covered only if its contents constitute a work based
+on Ciao-Prolog (independent of the use of Ciao-Prolog in a tool for
+writing it).  Whether that is true depends on what Ciao-Prolog does
+and what the program that uses Ciao-Prolog does.
+  
+  1. Motorola may copy and distribute verbatim copies of Ciao-Prolog's
+complete source code as Motorola receives it, in any medium, provided
+that Motorola conspicuously and appropriately publishes on each copy
+an appropriate copyright notice and disclaimer of warranty; keep
+intact all the notices that refer to the GNU LGPL and to the absence
+of any warranty; and distribute a copy of the GNU LGPL along with
+Ciao-Prolog.
+
+  Motorola may charge a fee for the physical act of transferring a
+copy, and Motorola may at Motorola's option offer warranty protection
+in exchange for a fee.
+
+  2. Motorola may modify Motorola's copy or copies of Ciao-Prolog or
+any portion of it, thus forming a work based on Ciao-Prolog, and copy
+and distribute such modifications or work under the terms of Section 1
+above, provided that Motorola also meet all of these conditions:
+
+    a) The modified work must itself be a software library.
+
+    b) Motorola must cause the files modified to carry prominent notices
+    stating that Motorola changed the files and the date of any change.
+
+    c) Motorola must cause the whole of the work to be licensed at no
+    charge to all third parties under the terms of GNU LGPL.
+
+    d) If a facility in the modified Ciao-Prolog refers to a function
+    or a table of data to be supplied by an application program that
+    uses the facility, other than as an argument passed when the
+    facility is invoked, then Motorola must make a good faith effort
+    to ensure that, in the event an application does not supply such
+    function or table, the facility still operates, and performs
+    whatever part of its purpose remains meaningful.
+
+    (For example, a function in a library to compute square roots has
+    a purpose that is entirely well-defined independent of the
+    application.  Therefore, Subsection 2d requires that any
+    application-supplied function or table used by this function must
+    be optional: if the application does not supply it, the square
+    root function must still compute square roots.)
+
+These requirements apply to the modified work as a whole.  If
+identifiable sections of that work are not derived from Ciao-Prolog,
+and can be reasonably considered independent and separate works in
+themselves, then this Agreement, and its terms, do not apply to those
+sections when Motorola distribute them as separate works.  But when
+Motorola distributes the same sections as part of a whole which is a
+work based on Ciao-Prolog, the distribution of the whole must be on
+the terms of the GNU LGPL, whose permissions for other licensees
+extend to the entire whole, and thus to each and every part regardless
+of who wrote it.
+
+Thus, it is not the intent of this section to claim rights or contest
+Motorola's rights to work written entirely by Motorola; rather, the
+intent is to exercise the right to control the distribution of
+derivative or collective works based on Ciao-Prolog.
+
+In addition, mere aggregation of another work not based on Ciao-Prolog
+with Ciao-Prolog (or with a work based on Ciao-Prolog) on a volume of
+a storage or distribution medium does not bring the other work under
+the scope of the GNU LGPL.
+
+  3. Motorola may opt to apply the terms of the ordinary GNU General
+Public License instead of the GNU LGPL to a given copy of Ciao-Prolog.
+To do this, Motorola must alter all the notices that refer to the
+LGPL, so that they refer to the ordinary GNU General Public License,
+version 2, instead of to the GNU LGPL.  (If a newer version than
+version 2 of the ordinary GNU General Public License has appeared,
+then Motorola can specify that version instead if Motorola wishes.)
+Do not make any other change in these notices.
+
+  Once this change is made in a given copy, it is irreversible for
+that copy, so the ordinary GNU General Public License applies to all
+subsequent copies and derivative works made from that copy.
+
+  This option is useful when Motorola wish to copy part of the code of
+Ciao-Prolog into a program that is not a library.
+
+  4. Motorola may copy and distribute Ciao-Prolog (or a portion or
+derivative of it, under Section 2) in object code or executable form
+under the terms of Sections 1 and 2 above provided that Motorola
+accompanies it with the complete corresponding machine-readable source
+code, which must be distributed under the terms of Sections 1 and 2
+above on a medium customarily used for software interchange.
+
+  If distribution of object code is made by offering access to copy
+from a designated place, then offering equivalent access to copy the
+source code from the same place satisfies the requirement to
+distribute the source code, even though third parties are not
+compelled to copy the source along with the object code.
+
+  5. A program that contains no derivative of any portion of
+Ciao-Prolog, but is designed to work with Ciao-Prolog by being
+compiled or linked with it, is called a "work that uses Ciao-Prolog".
+Such a work, in isolation, is not a derivative work of Ciao-Prolog,
+and therefore falls outside the scope of this Agreement.
+
+  However, linking a "work that uses Ciao-Prolog" with Ciao-Prolog
+creates an executable that is a derivative of Ciao-Prolog (because it
+contains portions of Ciao-Prolog), rather than a "work that uses
+Ciao-Prolog".  The executable is therefore covered by this
+Agreement. Note, however, that the use of such executable is not
+restricted by this agreement. If the executable is distributed, then
+Section 6 states terms for distribution of such executables.
+
+  If such an object file uses only numerical parameters, data
+structure layouts and accessors, and small macros and small inline
+functions (ten lines or less in length), then the use of the object
+file is unrestricted, regardless of whether it is legally a derivative
+work.  (Executables containing this object code plus portions of
+Ciao-Prolog will still fall under Section 6.)
+
+  Otherwise, if the work is a derivative of Ciao-Prolog, Motorola may
+distribute the object code for the work under the terms of Section 6.
+Any executables containing that work also fall under Section 6,
+whether or not they are linked directly with Ciao-Prolog itself.
+
+  6. As an exception to the Sections above, Motorola may also combine
+or link a "work that uses Ciao-Prolog" with Ciao-Prolog to produce a
+work containing portions of Ciao-Prolog, and distribute that work
+under terms of Motorola's choice, provided that:
+
+ a) Motorola includes in a conspicuous location in the distribution of
+ the "work that uses Ciao-Prolog" a file named README whose contents
+ are the following:
+
+   Parts of this program have been generated using the Ciao-Prolog
+   system.
+
+   The Ciao-Prolog system is 
+   Copyright (c) 1990-2000 Technical University of Madrid.
+
+   The Ciao-Prolog system is available at no charge from
+   http://www.ciaoprolog.org in either source-code or precompiled form
+   for several widely used platforms.
+
+   The file CIAO-LICENSE contains terms and conditions for copying,
+   distribution and modification of Ciao-Prolog.
+
+   Note, however that this application contains parts which are 
+   Copyright (C) Motorola and thus the exact terms for copying,
+   distribution and modification of this program are those stated in
+   MOTOROLA-LICENSE.
+
+ b)  Motorola must supply a copy of the GNU LGPL in the distribution,
+ in a file named CIAO-LICENSE.
+
+  7. Motorola may place library facilities that are a work based on
+Ciao-Prolog side-by-side in a single library together with other
+library facilities not covered by this Agreement, and distribute such a
+combined library, provided that the separate distribution of the work
+based on Ciao-Prolog and of the other library facilities is otherwise
+permitted, and provided that Motorola does these two things:
+
+    a) Accompany the combined library with a copy of the same work
+    based on Ciao-Prolog, uncombined with any other library
+    facilities.  This must be distributed under the terms of the
+    GNU LGLP.
+
+    b) Give prominent notice with the combined library of the fact
+    that part of it is a work based on Ciao-Prolog, and explaining
+    where to find the accompanying uncombined form of the same work.
+
+  8. Motorola may not copy, modify, sublicense, link with, or
+distribute Ciao-Prolog except as expressly provided under this
+Agreement.  Any attempt otherwise to copy, modify, sublicense, link
+with, or distribute Ciao-Prolog is void, and will automatically
+terminate Motorola's rights under this License.  However, parties who
+have received copies, or rights, from Motorola under this Agreement
+will not have their licenses terminated so long as such parties remain
+in full compliance.
+
+  9. Each time Motorola redistributes Ciao-Prolog (or any work based
+on Ciao-Prolog), the recipient automatically receives a license from
+the original licensor to copy, distribute, link with or modify
+Ciao-Prolog subject to the terms and conditions of the GNU LGPL.
+Motorola may not impose any further restrictions on the recipients'
+exercise of the rights granted herein.  Motorola is not responsible
+for enforcing compliance by third parties with the GNU LGPL.
+
+  10. If, as a consequence of a court judgment or allegation of patent
+infringement or for any other reason (not limited to patent issues),
+conditions are imposed on Motorola (whether by court order, agreement
+or otherwise) that contradict the conditions of this Agreement, they
+do not excuse Motorola from the conditions of this Agreement.  If
+Motorola cannot distribute so as to satisfy simultaneously Motorola's
+obligations under this Agreement and any other pertinent obligations,
+then as a consequence Motorola may not distribute Ciao-Prolog at all.
+For example, if a patent license would not permit royalty-free
+redistribution of Ciao-Prolog by all those who receive copies directly
+or indirectly through Motorola, then the only way Motorola could
+satisfy both it and this Agreement would be to refrain entirely from
+distribution of Ciao-Prolog.
+
+If any portion of this section is held invalid or unenforceable under any
+particular circumstance, the balance of the section is intended to apply,
+and the section as a whole is intended to apply in other circumstances.
+
+  11. If the distribution and/or use of Ciao-Prolog is restricted in
+certain countries either by patents or by copyrighted interfaces, the
+original copyright holder who places Ciao-Prolog under this Agreement may add
+an explicit geographical distribution limitation excluding those countries,
+so that distribution is permitted only in or among countries not thus
+excluded.  In such case, this Agreement incorporates the limitation as if
+written in the body of this Agreement.
+
+  12. The Free Software Foundation may publish revised and/or new
+versions of the GNU LGPL from time to time.  Such new versions will be
+similar in spirit to the current version, but may differ in detail
+to address new problems or concerns.
+
+Each version is given a distinguishing version number. Motorola has
+the option of following the terms and conditions either of version 2.1
+or of any later version published by the Free Software Foundation.
+
+  14. If Motorola wishes to incorporate parts of Ciao-Prolog into
+other free programs whose distribution conditions are incompatible
+with these, Motorola must write to the authors of Ciao-Prolog to ask
+for permission.  
+
+			    NO WARRANTY
+
+  15. BECAUSE Ciao-Prolog IS LICENSED FREE OF CHARGE, THERE IS NO
+WARRANTY FOR Ciao-Prolog, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+OTHER PARTIES PROVIDE Ciao-Prolog "AS IS" WITHOUT WARRANTY OF ANY
+KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+LIBRARY IS WITH YOU.  SHOULD Ciao-Prolog PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+  16. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
+WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+AND/OR REDISTRIBUTE Ciao-Prolog AS PERMITTED ABOVE, BE LIABLE TO YOU
+FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+LIBRARY (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF Ciao-Prolog TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+		     END OF TERMS AND CONDITIONS
+
+
+

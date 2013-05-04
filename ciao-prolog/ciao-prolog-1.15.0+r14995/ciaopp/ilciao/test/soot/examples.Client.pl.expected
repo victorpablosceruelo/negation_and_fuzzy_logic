@@ -1,0 +1,152 @@
+:-module(_,['annot_java.io.Connector.<init>.2081191489#0'/2, 'annot_java.io.SocketConnection.<init>.209694567#0'/2, 'annot_java.lang.InputStream.<init>.-931726554#0'/2, 'annot_java.lang.StringBuffer.<init>.1639361247#0'/2, 'examples.Client.<init>.1859818041#0'/2, 'examples.Client.readFromServer.-808539627#0#1'/3, 'examples.Client.timeClient.1712464627#0'/2],[assertions , nativeprops , regtypes]).
+
+:-set_prolog_flag(multi_arity_warnings,off).
+:-set_prolog_flag(discontiguous_warnings,off).
+:-set_prolog_flag(single_var_warnings,off).
+
+:-include(resources(res_assrt_defs)).
+
+:-impl_defined(['annot_java.io.Connector.open.1147179533#0'/2, 'annot_java.io.SocketConnection.close.2095345449#0'/2, 'annot_java.io.SocketConnection.openInputStream.956230216#0'/2, 'annot_java.lang.InputStream.close.-989515894#0'/2, 'annot_java.lang.InputStream.next.983239648#0'/2, 'annot_java.lang.InputStream.read.1123197956#0'/2, 'annot_java.lang.StringBuffer.append.976745175#0'/3, 'annot_java.lang.StringBuffer.read.-576918019#0'/2, 'annot_java.lang.StringBuffer.toString.-47073546#0'/2, 'java.lang.Object.<init>.-279557996#0'/2, 'java.lang.StringBuilder.<init>.1968657023#0'/2, 'java.lang.StringBuilder.append.672562846#0'/3, 'java.lang.StringBuilder.toString.-2075883882#0'/2, 'lang.Builtin.<init>.-1030814460#0'/2, 'lang.Builtin.add.-1651192795#0'/6, 'lang.Builtin.asg.-1766990365#0'/4, 'lang.Builtin.asg_int.-1058346971#0'/4, 'lang.Builtin.asg_size.1684082621#0'/4, 'lang.Builtin.cast.-1260246903#0'/4, 'lang.Builtin.div.1189692981#0'/6, 'lang.Builtin.eq.1340449196#0'/5, 'lang.Builtin.eq_int.-700529700#0'/5, 'lang.Builtin.eq_size.-1989450746#0'/5, 'lang.Builtin.ge.1079751518#0'/5, 'lang.Builtin.gt.1338448109#0'/5, 'lang.Builtin.gta.-1105758335#0'/5, 'lang.Builtin.gtf.2016141599#0'/6, 'lang.Builtin.le.-542017671#0'/5, 'lang.Builtin.lt.-283321080#0'/5, 'lang.Builtin.mul.1486634978#0'/6, 'lang.Builtin.ne.1048155767#0'/5, 'lang.Builtin.ne_int.1522688743#0'/5, 'lang.Builtin.ne_size.2006431259#0'/5, 'lang.Builtin.newa.-1979007126#0'/3, 'lang.Builtin.newb.-1139856570#0'/2, 'lang.Builtin.rem.734494412#0'/6, 'lang.Builtin.shl.2033939393#0'/6, 'lang.Builtin.shr.-950141701#0'/6, 'lang.Builtin.sta.-1099032395#0'/5, 'lang.Builtin.stf.1664825750#0'/7, 'lang.Builtin.sub.-2072904986#0'/6, 'lang.Builtin.unk.-1132872297#0'/2]).
+
+:-java_mode('annot_java.io.Connector.<init>.2081191489#0'/2,[-, +]).
+:-java_measure('annot_java.io.Connector.<init>.2081191489#0'/2,[size, size]).
+'annot_java.io.Connector.<init>.2081191489#0'(void, R0):-
+	'java.lang.Object.<init>.-279557996#0'(void, R0).
+
+:-java_mode('examples.Client.timeClient.1712464627#0'/2,[-, +]).
+:-java_measure('examples.Client.timeClient.1712464627#0'/2,[size, size]).
+'examples.Client.timeClient.1712464627#0'(void, R0):-
+	'lang.Builtin.newb.-1139856570#0'(R1, 'java.lang.StringBuilder'),
+	'java.lang.StringBuilder.<init>.1968657023#0'(void, R1),
+	'java.lang.StringBuilder.append.672562846#0'(R5, R1, 'socket://'),
+	'lang.Builtin.gtf.2016141599#0'(R6, 'java.lang.String', R0, 'examples.Client', 'remoteTimeServerAddress', 'java.lang.String'),
+	'java.lang.StringBuilder.append.672562846#0'(R7, R5, R6),
+	'java.lang.StringBuilder.append.672562846#0'(R8, R7, ':13'),
+	'java.lang.StringBuilder.toString.-2075883882#0'(R9, R8),
+	'annot_java.io.Connector.open.1147179533#0'(R10, R9),
+	'lang.Builtin.cast.-1260246903#0'(R2, 'annot_java.io.SocketConnection', R10, 'java.lang.Object'),
+	'annot_java.io.SocketConnection.openInputStream.956230216#0'(R3, R2),
+	'examples.Client.readFromServer.-808539627#0#1'(void, R0, R3),
+	'annot_java.lang.InputStream.close.-989515894#0'(void, R3),
+	'annot_java.io.SocketConnection.close.2095345449#0'(void, R2).
+
+:-java_mode('annot_java.lang.InputStream.<init>.-931726554#0'/2,[-, +]).
+:-java_measure('annot_java.lang.InputStream.<init>.-931726554#0'/2,[size, size]).
+'annot_java.lang.InputStream.<init>.-931726554#0'(void, R0):-
+	'java.lang.Object.<init>.-279557996#0'(void, R0).
+
+:-java_mode('examples.Client.readFromServer.-808539627#0#1'/3,[-, +, +]).
+:-java_measure('examples.Client.readFromServer.-808539627#0#1'/3,[size, size, size]).
+'examples.Client.readFromServer.-808539627#0#1'(Ret, R0, R1):-
+	'lang.Builtin.eq_size.-1989450746#0'(void, R1, 'annot_java.lang.InputStream', null, 'null_type'),
+	'lang.Builtin.newb.-1139856570#0'(R3, 'annot_java.lang.StringBuffer'),
+	'annot_java.lang.StringBuffer.<init>.1639361247#0'(void, R3),
+	'lang.Builtin.asg_size.1684082621#0'(Ret, 'annot_java.lang.StringBuffer', R3, 'annot_java.lang.StringBuffer').
+
+'examples.Client.readFromServer.-808539627#0#1'(Ret, R0, R1):-
+	'lang.Builtin.ne_size.2006431259#0'(void, R1, 'annot_java.lang.InputStream', null, 'null_type'),
+	'annot_java.lang.InputStream.read.1123197956#0'(C0, R1),
+	'annot_java.lang.InputStream.next.983239648#0'(R4, R1),
+	'examples.Client.readFromServer.-808539627#0#1'(R2, R0, R4),
+	'annot_java.lang.StringBuffer.append.976745175#0'(R5, R2, C0),
+	'lang.Builtin.asg_size.1684082621#0'(Ret, 'annot_java.lang.StringBuffer', R5, 'annot_java.lang.StringBuffer').
+
+:-java_mode('examples.Client.<init>.1859818041#0'/2,[-, +]).
+:-java_measure('examples.Client.<init>.1859818041#0'/2,[size, size]).
+'examples.Client.<init>.1859818041#0'(void, R0):-
+	'java.lang.Object.<init>.-279557996#0'(void, R0).
+
+:-java_mode('annot_java.lang.StringBuffer.<init>.1639361247#0'/2,[-, +]).
+:-java_measure('annot_java.lang.StringBuffer.<init>.1639361247#0'/2,[size, size]).
+'annot_java.lang.StringBuffer.<init>.1639361247#0'(void, R0):-
+	'java.lang.Object.<init>.-279557996#0'(void, R0).
+
+:-java_mode('annot_java.io.SocketConnection.<init>.209694567#0'/2,[-, +]).
+:-java_measure('annot_java.io.SocketConnection.<init>.209694567#0'/2,[size, size]).
+'annot_java.io.SocketConnection.<init>.209694567#0'(void, R0):-
+	'java.lang.Object.<init>.-279557996#0'(void, R0).
+
+:-java_mode('annot_java.io.Connector.open.1147179533#0'/2,[-, +]).
+:-java_measure('annot_java.io.Connector.open.1147179533#0'/2,[size, size]).
+:-java_mode('annot_java.io.SocketConnection.close.2095345449#0'/2,[-, +]).
+:-java_measure('annot_java.io.SocketConnection.close.2095345449#0'/2,[size, size]).
+:-java_mode('annot_java.io.SocketConnection.openInputStream.956230216#0'/2,[-, +]).
+:-java_measure('annot_java.io.SocketConnection.openInputStream.956230216#0'/2,[size, size]).
+:-java_mode('annot_java.lang.InputStream.close.-989515894#0'/2,[-, +]).
+:-java_measure('annot_java.lang.InputStream.close.-989515894#0'/2,[size, size]).
+:-java_mode('annot_java.lang.InputStream.next.983239648#0'/2,[-, +]).
+:-java_measure('annot_java.lang.InputStream.next.983239648#0'/2,[size, size]).
+:-java_mode('annot_java.lang.InputStream.read.1123197956#0'/2,[-, +]).
+:-java_measure('annot_java.lang.InputStream.read.1123197956#0'/2,[size, size]).
+:-java_mode('annot_java.lang.StringBuffer.append.976745175#0'/3,[-, +, +]).
+:-java_measure('annot_java.lang.StringBuffer.append.976745175#0'/3,[size, size, size]).
+:-java_mode('annot_java.lang.StringBuffer.read.-576918019#0'/2,[-, +]).
+:-java_measure('annot_java.lang.StringBuffer.read.-576918019#0'/2,[size, size]).
+:-java_mode('annot_java.lang.StringBuffer.toString.-47073546#0'/2,[-, +]).
+:-java_measure('annot_java.lang.StringBuffer.toString.-47073546#0'/2,[size, size]).
+:-java_mode('java.lang.Object.<init>.-279557996#0'/2,[-, +]).
+:-java_measure('java.lang.Object.<init>.-279557996#0'/2,[size, size]).
+:-java_mode('java.lang.StringBuilder.<init>.1968657023#0'/2,[-, +]).
+:-java_measure('java.lang.StringBuilder.<init>.1968657023#0'/2,[size, size]).
+:-java_mode('java.lang.StringBuilder.append.672562846#0'/3,[-, +, +]).
+:-java_measure('java.lang.StringBuilder.append.672562846#0'/3,[size, size, size]).
+:-java_mode('java.lang.StringBuilder.toString.-2075883882#0'/2,[-, +]).
+:-java_measure('java.lang.StringBuilder.toString.-2075883882#0'/2,[size, size]).
+:-java_mode('lang.Builtin.<init>.-1030814460#0'/2,[-, +]).
+:-java_measure('lang.Builtin.<init>.-1030814460#0'/2,[size, size]).
+:-java_mode('lang.Builtin.add.-1651192795#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.add.-1651192795#0'/6,[int, void, int, void, int, void]).
+:-java_mode('lang.Builtin.asg.-1766990365#0'/4,[-, +, +, +]).
+:-java_measure('lang.Builtin.asg.-1766990365#0'/4,[size, void, size, void]).
+:-java_mode('lang.Builtin.asg_int.-1058346971#0'/4,[-, +, +, +]).
+:-java_measure('lang.Builtin.asg_int.-1058346971#0'/4,[int, void, int, void]).
+:-java_mode('lang.Builtin.asg_size.1684082621#0'/4,[-, +, +, +]).
+:-java_measure('lang.Builtin.asg_size.1684082621#0'/4,[size, void, size, void]).
+:-java_mode('lang.Builtin.cast.-1260246903#0'/4,[-, +, +, +]).
+:-java_measure('lang.Builtin.cast.-1260246903#0'/4,[size, void, size, void]).
+:-java_mode('lang.Builtin.div.1189692981#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.div.1189692981#0'/6,[int, void, int, void, int, void]).
+:-java_mode('lang.Builtin.eq.1340449196#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.eq.1340449196#0'/5,[void, size, void, size, void]).
+:-java_mode('lang.Builtin.eq_int.-700529700#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.eq_int.-700529700#0'/5,[void, int, void, int, void]).
+:-java_mode('lang.Builtin.eq_size.-1989450746#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.eq_size.-1989450746#0'/5,[void, size, void, size, void]).
+:-java_mode('lang.Builtin.ge.1079751518#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.ge.1079751518#0'/5,[size, int, void, int, void]).
+:-java_mode('lang.Builtin.gt.1338448109#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.gt.1338448109#0'/5,[size, int, void, int, void]).
+:-java_mode('lang.Builtin.gta.-1105758335#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.gta.-1105758335#0'/5,[size, size, size, int, size]).
+:-java_mode('lang.Builtin.gtf.2016141599#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.gtf.2016141599#0'/6,[size, void, size, void, void, void]).
+:-java_mode('lang.Builtin.le.-542017671#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.le.-542017671#0'/5,[size, int, void, int, void]).
+:-java_mode('lang.Builtin.lt.-283321080#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.lt.-283321080#0'/5,[size, int, void, int, void]).
+:-java_mode('lang.Builtin.mul.1486634978#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.mul.1486634978#0'/6,[int, void, int, void, int, void]).
+:-java_mode('lang.Builtin.ne.1048155767#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.ne.1048155767#0'/5,[void, size, void, size, void]).
+:-java_mode('lang.Builtin.ne_int.1522688743#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.ne_int.1522688743#0'/5,[void, int, void, int, void]).
+:-java_mode('lang.Builtin.ne_size.2006431259#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.ne_size.2006431259#0'/5,[void, size, void, size, void]).
+:-java_mode('lang.Builtin.newa.-1979007126#0'/3,[-, +, +]).
+:-java_measure('lang.Builtin.newa.-1979007126#0'/3,[size, size, int]).
+:-java_mode('lang.Builtin.newb.-1139856570#0'/2,[-, +]).
+:-java_measure('lang.Builtin.newb.-1139856570#0'/2,[size, size]).
+:-java_mode('lang.Builtin.rem.734494412#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.rem.734494412#0'/6,[int, void, int, void, int, void]).
+:-java_mode('lang.Builtin.shl.2033939393#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.shl.2033939393#0'/6,[size, size, size, size, size, size]).
+:-java_mode('lang.Builtin.shr.-950141701#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.shr.-950141701#0'/6,[size, size, size, size, size, size]).
+:-java_mode('lang.Builtin.sta.-1099032395#0'/5,[-, +, +, +, +]).
+:-java_measure('lang.Builtin.sta.-1099032395#0'/5,[size, int, size, size, size]).
+:-java_mode('lang.Builtin.stf.1664825750#0'/7,[-, +, +, +, +, +, +]).
+:-java_measure('lang.Builtin.stf.1664825750#0'/7,[size, size, void, void, void, size, void]).
+:-java_mode('lang.Builtin.sub.-2072904986#0'/6,[-, +, +, +, +, +]).
+:-java_measure('lang.Builtin.sub.-2072904986#0'/6,[int, void, int, void, int, void]).
+:-java_mode('lang.Builtin.unk.-1132872297#0'/2,[-, +]).
+:-java_measure('lang.Builtin.unk.-1132872297#0'/2,[size, void]).

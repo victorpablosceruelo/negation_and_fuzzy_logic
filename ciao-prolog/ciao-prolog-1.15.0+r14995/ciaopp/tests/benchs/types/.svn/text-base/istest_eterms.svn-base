@@ -1,0 +1,9 @@
+complete('istest:p/3',eterms,'istest:p'(_18898,_18899,_18900),[_18898:(name3,num),_18899:(name4,num),_18900:(name5,term)],[[_18898:(name3,num),_18899:(name4,num),_18900:(name5,num)]],1,[('istest:p/3/0',0)]).
+complete('arithmetic:is/2',eterms,'arithmetic:is'(_18898,_18901+_18902),[_18901:(name38,num),_18902:(name39,num),_18898:(name40,term)],[[_18901:(name47,num),_18902:(name48,num),_18898:(name49,num)]],4,[('istest:p/3/2/1',1)]).
+complete('arithmetic:is/2',eterms,'arithmetic:is'(_18898,_18901+1),[_18901:(name27,num),_18898:(name28,term)],[[_18901:(name33,num),_18898:(name34,num)]],3,[('istest:p/3/1/2',1)]).
+complete('arithmetic:is/2',eterms,'arithmetic:is'(_18898,_18901+2),[_18898:(name9,num),_18901:(name10,num)],[[_18898:(name25,num),_18901:(name26,num)]],2,[('istest:p/3/1/1',1)]).
+memo_table('istest:p/3/2',eterms,1,no,[_18893,_18895,_18897],[[_18893:(name35,num),_18895:(name36,num),_18897:(name37,num)]]).
+memo_table('istest:p/3/2/1',eterms,1,4,[_18893,_18895,_18897],[[_18893:(name35,num),_18895:(name36,num),_18897:(name37,term)]]).
+memo_table('istest:p/3/1',eterms,1,no,[_18893,_18895,_18897],[[_18893:(name6,num),_18895:(name7,num),_18897:(name8,num)]]).
+memo_table('istest:p/3/1/2',eterms,1,3,[_18893,_18895,_18897],[[_18893:(name6,num),_18895:(name7,num),_18897:(name8,term)]]).
+memo_table('istest:p/3/1/1',eterms,1,2,[_18893,_18895,_18897],[[_18893:(name6,num),_18895:(name7,num),_18897:(name8,term)]]).

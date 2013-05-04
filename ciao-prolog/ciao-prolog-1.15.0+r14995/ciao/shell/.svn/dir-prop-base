@@ -1,0 +1,10 @@
+K 10
+svn:ignore
+V 52
+ciao-shell-1.11
+ciaosh-1.11
+ciao-shell
+ciaosh
+*.bat
+
+END

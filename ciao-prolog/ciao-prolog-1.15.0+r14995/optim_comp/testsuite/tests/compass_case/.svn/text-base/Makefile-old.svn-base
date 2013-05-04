@@ -1,0 +1,75 @@
+LOCALTIX=localhost
+GUMSTIX=root@gumstix
+CIAOC=ciaoc-1.13
+SOUNDS= dies_irae*
+
+phony:
+
+compile: to_dsp usleep
+	$(CIAOC) -s compass_simul_8000
+	$(CIAOC) -s compass_read_8000
+	$(CIAOC) -s compass_simul_44100
+	$(CIAOC) -s compass_read_44100
+	rm -f read_compass_prolog init_compass
+	$(MAKE) -C ReducedCompassProgram read_compass_prolog init_compass
+	ln -s ReducedCompassProgram/read_compass_prolog .
+	ln -s ReducedCompassProgram/init_compass .
+
+usleep:
+	gcc -o simul_compass.linux simul_compass.c
+	arm-linux-gcc -o simul_compass.arm simul_compass.c
+
+clean:
+	rm -f *.itf *.po
+
+to_dsp: to_dsp.c
+	gcc -o to_dsp to_dsp.c
+
+setup_gumstix:
+	scp read_compass_prolog init_compass ciaoengine.arm $(SOUNDS) $(GUMSTIX):/tmp
+	ssh root@gumstix /tmp/init_compass
+
+run_local-8000: compile
+	scp compass_simul_8000 $(SOUNDS) $(LOCALTIX):/tmp
+	/usr/bin/ssh $(LOCALTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.linux ; /tmp/compass_simul_8000 /tmp/dies_irae_8000_16s.sw" | ./to_dsp -b 9 -r 8000
+
+run_local-8000-simul: compile
+	rsync -a simul_compass.linux compass_read_8000 $(SOUNDS) $(LOCALTIX):/tmp
+	/usr/bin/ssh $(LOCALTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.linux ; /tmp/simul_compass.linux | /tmp/compass_read_8000 /tmp/dies_irae_8000_16s.sw" | ./to_dsp -b 9 -r 8000
+
+run_local-cd: compile
+	scp compass_simul_44100 $(SOUNDS) $(LOCALTIX):/tmp
+	/usr/bin/ssh $(LOCALTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.linux ; /tmp/compass_simul_44100 /tmp/dies_irae_44100_16s.sw" | ./to_dsp -b 9 -r 44100
+
+run_local-cd-simul: compile
+	rsync -a simul_compass.linux compass_read_44100 $(SOUNDS) $(LOCALTIX):/tmp
+	/usr/bin/ssh $(LOCALTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.linux ; /tmp/simul_compass.linux | /tmp/compass_read_44100 /tmp/dies_irae_44100_16s.sw" | ./to_dsp -b 9 -r 44100
+
+run_gumstix-8000: compile
+	scp compass_simul_8000 $(GUMSTIX):/tmp
+	/usr/bin/ssh $(GUMSTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.arm ; /tmp/compass_simul_8000 /tmp/dies_irae_8000_16s.sw" | ./to_dsp -b 9 -r 8000
+
+run_gumstix-8000-simul: compile
+	scp simul_compass.arm compass_read_8000 $(GUMSTIX):/tmp
+	/usr/bin/ssh $(GUMSTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.arm ; /tmp/simul_compass.arm | /tmp/compass_read_8000 /tmp/dies_irae_8000_16s.sw" | ./to_dsp -b 9 -r 8000
+
+run_gumstix-8000-compass: compile
+	scp read_compass_prolog compass_read_8000 $(GUMSTIX):/tmp
+	/usr/bin/ssh $(GUMSTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.arm ; /tmp/read_compass_prolog | /tmp/compass_read_8000 /tmp/dies_irae_8000_16s.sw" | ./to_dsp -b 6 -r 8000
+
+run_gumstix-cd: compile
+	scp compass_simul_44100 $(GUMSTIX):/tmp
+	/usr/bin/ssh $(GUMSTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.arm ; /tmp/compass_simul_44100 /tmp/dies_irae_44100_16s.sw" | ./to_dsp -b 11 -r 44100
+
+run_gumstix-cd-compass: compile
+	scp read_compass_prolog compass_read_44100 $(GUMSTIX):/tmp
+	/usr/bin/ssh $(GUMSTIX) \
+	       "export CIAOENGINE=/tmp/ciaoengine.arm ; /tmp/read_compass_prolog | /tmp/compass_read_44100 /tmp/dies_irae_44100_16s.sw" | ./to_dsp -b 11 -r 44100

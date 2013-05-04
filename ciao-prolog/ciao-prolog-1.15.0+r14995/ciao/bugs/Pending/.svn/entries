@@ -1,0 +1,251 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao/bugs/Pending
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2012-09-11T14:32:22.801920Z
+14966
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+arithmetic
+dir
+
+jsabater
+dir
+
+topleveldecl.pl
+file
+
+
+
+
+2012-09-17T18:11:33.855691Z
+4d09a496551a0401ad9cd532464e8490
+2005-06-03T17:43:26.619447Z
+2400
+herme
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+283
+
+amosbug
+dir
+
+embedded_debugger
+dir
+
+no_comma.pl
+file
+
+
+
+
+2012-09-17T18:11:33.855691Z
+9e69c4fc16d8465f61d2fbbf23923748
+2006-07-21T10:44:06.519317Z
+6617
+pchico
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+61
+
+conc_assert
+dir
+
+segv
+dir
+
+attach
+dir
+
+library
+dir
+
+engine
+dir
+
+modules
+dir
+
+var_assert
+dir
+
+use_mod_leaks
+dir
+
+sformat
+dir
+
+debugger
+dir
+
+lib_modules_test
+dir
+
+compiler_hooks_conflict
+dir
+
+conc_term_indexing
+dir
+
+debug_multifile
+dir
+
+win32
+dir
+
+segv-backup
+dir
+
+fastrw_conc
+dir
+
+compmod_deps
+dir
+
+varmodulename.pl
+file
+
+
+
+
+2012-09-17T18:11:33.855691Z
+c195db1ef217df0b9d7539c3cd4c80fb
+2006-07-21T10:44:06.519317Z
+6617
+pchico
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+245
+
+data_reexp
+dir
+
+reexports_not_made_visible
+dir
+
+exec
+dir
+
+hiord_bugs
+dir
+
+conc_backtracking
+dir
+
+chptabort
+dir
+
+bug_list.txt
+file
+
+
+
+
+2012-09-17T18:11:33.859692Z
+a1ddebbcccc1a00b881dacdc95d2b45d
+2005-06-27T10:20:51.679681Z
+2544
+jcorreas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4139
+
+debugger_include
+dir
+

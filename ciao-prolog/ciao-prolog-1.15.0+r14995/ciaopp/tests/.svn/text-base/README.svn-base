@@ -1,0 +1,24 @@
+
+- test_all.pl  main program which calls all other testing subprograms.
+
+- settings_test.pl  contains settings for the test collections.
+
+- generate_benchmarks.pl  generates the file benchmarks.pl
+
+- benchmarks.pl is not in CVS since it is automatically generated
+
+- Several subdirectories with the testing subprograms.
+
+  Each one of them should contain (at least) a program called
+  test_XXX.pl which exports the predicate main.
+
+  This predicate should call test_options:get_test_options(TEST,Opts).
+  This call gives on backtracking all test collections that have to be
+  processed for test TEST.
+
+  The test collections are defined in settings:test_options(TEST,...).
+  One fact for each collection per TEST.
+
+
+IMPORTANT NOTE: In order to make the test works, you have to run
+generate_benchmark.pl file first.

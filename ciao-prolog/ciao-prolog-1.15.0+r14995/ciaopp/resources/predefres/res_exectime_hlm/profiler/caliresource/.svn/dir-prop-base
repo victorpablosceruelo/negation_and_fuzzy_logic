@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 88
+caliresource_cost_auto.pl
+caliresource_bench_auto.pl
+caliresource_measure_auto.pl
+*.wam
+
+END

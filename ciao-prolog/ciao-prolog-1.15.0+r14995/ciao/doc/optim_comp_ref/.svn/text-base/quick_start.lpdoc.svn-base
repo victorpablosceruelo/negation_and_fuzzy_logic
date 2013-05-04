@@ -1,0 +1,79 @@
+@title{Quick Start}
+
+@section{Build and use the system} 
+
+If you are a user or you are not doing any internal change in the
+system, the following command is enough to compile the system:
+
+  @tt{$ ciaotool build}
+
+To build a dynamic executable @tt{EXECNAME} for a program with a main
+module @tt{MODULE}:
+  
+  @tt{$ ciaotool comp --dynexec EXECNAME MODULE}
+
+@section{Special Configuration Options} 
+
+The following are global environment variables that need to be set
+before compiling the system:
+
+@begin{itemize}
+
+@item Options to select a different C compiler (for Mac OS X with
+      based on buggy gcc-llvm)
+
+  @tt{export CIAOOPTS="--with-cc=gcc-4.2"}
+
+@item Options to select a 64-bit native tag scheme, you can use:
+
+  @tt{export ABSMACH_OPTGRP=tags ABSMACH_OPTS=tagscheme28}
+
+@end{itemize}
+
+@section{Workflow for System Developers}
+
+Modifying the compiler or engine requires a precise workflow that is
+detailed below:
+
+@begin{itemize}
+
+@item @bf{Compile the compiler} until a fixpoint is reached (from the
+      bootstrap compiler to the candidate compiler):
+
+      @tt{$ ciaotool update-comp}
+
+      Depending on the nature of the changes, it is recommended to use
+      an extended command that compares the compilation output
+      w.r.t. a previous version:
+
+      @tt{$ ciaotool tests comp}
+
+      Note: this may include some profiling code in the compiler
+      executable, although it does not affect compilation performance
+        
+@item Each time the compiler, engine or a library are modified, it is
+      recommended to run the testsuite to @bf{validate} them:
+
+      @begin{itemize}
+      @item Check compiler output of the programs in the testsuite:
+            @tt{$ ciaotool tests check}
+      @item View differences between compiler output
+            @tt{$ ciaotool tests compare}
+      @item Save differences in compiler output
+            @tt{$ ciaotool tests save}
+      @item Check performance of the programs in the testsuite
+            @tt{$ ciaotool tests eval}
+      @end{itemize}
+
+      The tests may not exhaustive, but highly recommended to catch
+      bugs in the new code. 
+
+@item Finally, if the changes in the compiler are acceptable, it is
+      required to @bf{promote} the compiler to raise its status as
+      the default (bootstrap) compiler. That will also make visible
+      changes in the language or abstract machine.
+
+      @tt{$ ciaotool promote }
+
+@end{itemize}    
+

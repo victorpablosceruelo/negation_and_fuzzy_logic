@@ -1,0 +1,125 @@
+a(nil)
+b(node(nil,2,nil))
+c1([1,2,6])
+c2([1,2,6])
+d(1)
+d(2)
+d(6)
+c(node(node(nil,1,nil),2,node(nil,6,nil)))
+e(1)
+e(2)
+e(6)
+this_should_be_text(text)
+this_should_be_4(4)
+this_should_be_2_1(2,1)
+this_should_be_1_2_3(1,2,3)
+this_should_be_10_2_3(10,2,3)
+this_should_be_foo_1_2_3(foo(1,2,3))
+z(9)
+m(text,1)
+m(text,2)
+m(text,3)
+sum(3)
+list([1,2,3])
+m(text)
+m(text,1,1)
+m(text,1,2)
+m(text,1,3)
+m(text)
+m(text,2,1)
+m(text,2,2)
+m(text,2,3)
+m(text)
+m(text,3,1)
+m(text,3,2)
+m(text,3,3)
+sum(9)
+[a,b,c,d]
+123456789
+                                                                 
+                     ooooooooooooooooooooooo                     
+                 ooooooooooooooooooooooooooooooo                 
+              oooooooo.....................oooooooo              
+           ooooooo.............................ooooooo           
+         oooooo...................................oooooo         
+        ooooo.......................................ooooo        
+      ooooo...........................................ooooo      
+     ooooo.............................................ooooo     
+    oooo.................................................oooo    
+   oooo...................................................oooo   
+  oooo.....................................................oooo  
+  oooo.....................................................oooo  
+ oooo.......................................................oooo 
+ oooo.......................................................oooo 
+ oooo.......................................................oooo 
+ oooo.......................................................oooo 
+ oooo.......................................................oooo 
+ oooo.......................................................oooo 
+ oooo.......................................................oooo 
+  oooo.....................................................oooo  
+  oooo.....................................................oooo  
+   oooo...................................................oooo   
+    oooo.................................................oooo    
+     ooooo.............................................ooooo     
+      ooooo...........................................ooooo      
+        ooooo.......................................ooooo        
+         oooooo...................................oooooo         
+           ooooooo.............................ooooooo           
+              oooooooo.....................oooooooo              
+                 ooooooooooooooooooooooooooooooo                 
+                     ooooooooooooooooooooooo                     
+                                                                 
+foo
+123
+dad: `Hello!'
+daughter: `Hello!'
+dad: `Are you there my child?'
+daughter: `Yes, I am.'
+daughter: `Are you there Daddy? (implicit qualification)'
+dad: `Yes, I am.'
+daughter: `Are you there Daddy? (explicit qualification)'
+dad: `Yes, I am.'
+[1]
+node(nil,1,nil)
+auxname(1,1,aux0)
+auxname(1,2,aux1)
+auxname(1,3,aux2)
+auxname(2,1,aux0)
+auxname(2,2,aux1)
+auxname(2,3,aux2)
+auxname(3,1,aux0)
+auxname(3,2,aux1)
+auxname(3,3,aux2)
+p([const(1),const(2),addition,dup,store(x),dup,mul])
+r(m([9],[=(x,3)]))
+ ............................................................
+   .................PROLOGPROLOGPROLOGPRO....................
+     ...........LOGPROLOGPROLOGPROLOGPROLOGPR................
+       ......OLOGPROLOGPROLOGPROLOGPROLOGPROLOGP.............
+         .ROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOG..........
+        PROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGP..........
+       ROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGP............
+     ROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGP..............
+    ROLOGPROLOGPROLOGPROLciaociaociaOGPROLOGP................
+   ROLOGPROLOGPROLOGPRociaociaociaociaoOLOG..................
+  PROLOGPROLOGPROLOciaociaociaociaociaocia...................
+  GPROLOGPROLOGPROociaociaociaociaociaociao..................
+ LOGPROLOGPROLOGPciaociaociaociaociaociaocia.................
+ ROLOGPROLOGPROLociaociaociaociaociaociaociao................
+ OGPROLOGPROLOGPciaociaociaociaociaociaociaoc................
+ ROLOGPROLOGPROLiaociaociaociaociaociaociaoci................
+ OGPROLOGPROLOGPaociaociaociaociaociaociaocia................
+ ROLOGPROLOGPROLociaociaociaociaociaociaociao................
+ OGPROLOGPROLOGPRciaociaociaociaociaociaocia.................
+  OLOGPROLOGPROLOGociaociaociaociaociaociao..................
+  PROLOGPROLOGPROLOciaociaociaociaociaocia...................
+   GPROLOGPROLOGPROLOGociaociaociaociaoPROL..................
+    OGPROLOGPROLOGPROLOGPciaociaociaROLOGPROL................
+     OGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROL..............
+       OGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROL............
+        OGPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROLO..........
+          GPROLOGPROLOGPROLOGPROLOGPROLOGPROLOGPROL  ........
+             OGPROLOGPROLOGPROLOGPROLOGPROLOGPRO       ......
+                LOGPROLOGPROLOGPROLOGPROLOGPR            ....
+                    OLOGPROLOGPROLOGPROLO                  ..
+                                                             
