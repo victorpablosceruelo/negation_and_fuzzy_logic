@@ -67,8 +67,8 @@ complex_tests_aux_for_negative(N, Columns) :-
 		print_msg(1, 3, 'aux', ' -- FAILED (-) -- ', queens(N, Columns)),
 		print_msg(1, 3, 'aux', '', ' '),
 		print_vars_diseqs(1, '', (N, Columns)),
-		print_msg(1, 3, 'nl', '', ''),
-		!, fail
+		print_msg(1, 3, 'nl', '', '')
+		% !, fail
 	    )
 	;
 	    (
@@ -84,8 +84,8 @@ complex_tests_aux_for_positive(N, Columns) :-
 		print_msg(1, 3, 'aux', ' -- FAILED (+) -- ', queens(N, Columns)), 
 		print_msg(1, 3, 'aux', '', ' '),
 		print_vars_diseqs(1, '', (N, Columns)),
-		print_msg(1, 3, 'nl', '', ''),
-		!, fail
+		print_msg(1, 3, 'nl', '', '')
+		% !, fail
 	    )
 	;
 	    (
