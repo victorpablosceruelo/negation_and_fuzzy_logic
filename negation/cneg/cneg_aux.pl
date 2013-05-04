@@ -664,13 +664,17 @@ split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_conjunction_from_list([], fail) :- !,
-	print_msg(1, 3, '', 'ERROR: generate_conjunction_from_list: empty list.', ''), 
-	print_msg(1, 3, 'nl', '', ''), !, fail. % Backtracking is forbidden.
-generate_conjunction_from_list([Goal], Goal) :- !.
-generate_conjunction_from_list([Goal | Goals], (Goal , More_Goals)) :-
+generate_conjunction_from_list([], fail) :- !.
+	print_msg(1, 3, '', 'WARNING: generate_conjunction_from_list: empty list.', ''), 
+	print_msg(1, 3, 'nl', '', ''), !. % Backtracking is forbidden.
+generate_conjunction_from_list(List, Conjunction) :- 
+	List \== [], !,
+	generate_conjunction_from_list_aux(List, Conjunction), !.
+ 
+generate_conjunction_from_list_aux([Goal], Goal) :- !.
+generate_conjunction_from_list_aux([Goal | Goals], (Goal , More_Goals)) :-
 	Goals \== [],
-	generate_conjunction_from_list(Goals, More_Goals).
+	generate_conjunction_from_list_aux(Goals, More_Goals).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
