@@ -39,11 +39,7 @@ cneg(Predicate) :-
 	print_msg(3, 3, 'nl', '', ''),
 
 	varsbag(Predicate, [], [], GoalVars), % Compute goalvars. It is used by some methods.
-	cneg_aux(Predicate, GoalVars).
-
-cneg_aux(Predicate, GoalVars) :-
-	generate_empty_trace(Trace), % This is for debugging.
-	cneg_rt(Predicate, GoalVars, 0, Trace). % 0 is the depth level.
+	cneg_rt(Predicate, GoalVars).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

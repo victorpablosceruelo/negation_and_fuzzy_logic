@@ -664,7 +664,7 @@ split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_conjunction_from_list([], fail) :- !.
+generate_conjunction_from_list([], fail) :- !,
 	print_msg(1, 3, '', 'WARNING: generate_conjunction_from_list: empty list.', ''), 
 	print_msg(1, 3, 'nl', '', ''), !. % Backtracking is forbidden.
 generate_conjunction_from_list(List, Conjunction) :- 

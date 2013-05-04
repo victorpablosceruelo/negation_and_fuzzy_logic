@@ -2,22 +2,22 @@
 :- module(cneg_msgs,
 	[
 	    print_msg/5, 
-	    get_trace_status_list/2,
-	    generate_empty_trace/1, end_trace/1,
-	    add_predicate_to_trace/3,
-	    generate_traces_for_conjunction/3
+	    add_to_evaluation_trace/1,
+	    get_evaluation_trace/1
 	],
 	[assertions]).
 
-% :- use_module(library(aggregates),[setof/3]).
+:- use_module(library(aggregates),[setof/3]).
 :- use_module(library(prolog_sys), [statistics/0]).
 :- use_module(library(write), [write/1, write/2]).
-:- use_module(library('cneg/cneg_basics')).
+%:- use_module(library('cneg/cneg_basics')).
 
 % To access pre-frontiers from anywhere.
 %:- multifile cneg_pre_frontier/9.
 %:- multifile call_to/3.
 :- multifile file_debug_is_activated/1.
+:- dynamic trace_index/1.
+:- dynamic trace_info/2.
 
 :- comment(title, "Auxiliary predicates for printing msgs.").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
@@ -174,12 +174,12 @@ print_msg_statistics(Any) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-print_msg_trace(Any, Pre_Msg, Trace) :-
-	print_msg_aux(Any, 'separation', '', ''),
-	print_msg_aux(Any, 'nl', '', ''),
-	print_msg_aux(Any, '', Pre_Msg, 'TRACE: '),
-	get_trace_status_list(Trace, Trace_Status_List),
-	print_msg_aux(Any, 'list', '', Trace_Status_List),
+print_msg_trace(Any, Pre_Msg, Msg) :-
+	print_msg(Any, Any, 'separation', '', ''),
+	print_msg(Any, Any, 'nl', '', ''),
+	print_msg(Any, Any, '', Pre_Msg, Msg),
+	get_evaluation_trace(Trace_Status_List),
+	print_msg(Any, Any, '', 'TRACE: ', Trace_Status_List),
 	!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -237,20 +237,20 @@ get_stream_to_file(File_Name_Atom, Stream) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_empty_trace(trace([], _Out)) :- !.
-generate_traces_for_conjunction(trace(In, Out), trace(In, Aux), trace(Aux, Out)) :- !.
-add_predicate_to_trace(Predicate, trace(In, Out), trace([Predicate | In], Out)) :- !.
-end_trace(trace(In, In)) :- !.
-
-% They should be converted to an string to avoid problems ...
-%	name(Predicate, Predicate_String), !. 
-get_trace_status_list(trace(In, Out), List_Reversed) :- !,
+add_to_evaluation_trace(Info) :- 
 	(
-	    (   var(Out), !, List = In   )  % Get current status.
+	    (
+		retract_fact(trace_index(Index)), !
+	    )
 	;
-	    (   nonvar(Out), !, List = Out   )   % Get final status.
+	    Index = 0
 	),
-	reverse_list(List, [], List_Reversed), !.
+	NewIndex is Index + 1, !,
+	assertz_fact(trace_info(NewIndex, Info)), !,
+	assertz_fact(trace_index(Index)), !.
+
+get_evaluation_trace(Evaluation_Trace) :- !,
+	setof((Index, Info), trace_info(Index, Info), Evaluation_Trace), !. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
