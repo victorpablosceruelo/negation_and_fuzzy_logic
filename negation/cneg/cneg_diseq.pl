@@ -6,7 +6,7 @@
 
 	    get_list_of_disequalities_in_vars/2,
 	    get_list_of_disequalities_in_vars_and_remove_them/2, 
-	    disequalities_list_to_disequalities_conjunction/2,
+	    disequalities_list_to_disequalities_conjunction/3,
 	    disequalities_lists_difference/3
 	], 
 	[assertions]).
@@ -176,7 +176,7 @@ print_vars_diseqs(FI, Msg, Term) :- !,
 prepare_attributes_for_printing(Term, Disequalities_Conj) :-
 	print_msg(4, 4, '', 'attribute_goals :: Term', Term),
 	get_attributes_in_term_vars(Term, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
-	attributes_list_to_disequalities_conjunction(Vars_With_Attrs, Disequalities_Conj),
+	attributes_list_to_disequalities_conjunction(Vars_With_Attrs, [], Disequalities_Conj),
 	print_msg(4, 4, '', 'attribute_goals :: Attrs', Disequalities_Conj), 
 	!. % Backtracking forbidden.
 
@@ -208,9 +208,9 @@ get_attributes_in_term_vars_aux([Var | Vars], Visited_In, Visited_Out, VWA_In, V
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-attributes_list_to_disequalities_conjunction(Vars_With_Attrs, Disequalities_Conj) :-
+attributes_list_to_disequalities_conjunction(Vars_With_Attrs, Empty_Result, Disequalities_Conj) :-
 	attributes_list_to_disequalities_list(Vars_With_Attrs, Disequalities_List), !,
-	disequalities_list_to_disequalities_conjunction(Disequalities_List, Disequalities_Conj), !.
+	disequalities_list_to_disequalities_conjunction(Disequalities_List, Empty_Result, Disequalities_Conj), !.
 
 attributes_list_to_disequalities_list([], []) :- !.
 attributes_list_to_disequalities_list([Attribute|Attributes], Disequalities_Out) :-
@@ -247,20 +247,20 @@ attribute_to_constraints_list(Constraint, Disequality) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-disequalities_list_to_disequalities_conjunction([], true) :- !. % No attributes.
-disequalities_list_to_disequalities_conjunction(Diseqs_List, Diseqs_Conj) :- % One or more attributes.
+disequalities_list_to_disequalities_conjunction([], Empty_Result, Empty_Result) :- !. % No attributes.
+disequalities_list_to_disequalities_conjunction(Diseqs_List, Empty_Result, Diseqs_Conj) :- % One or more attributes.
 	Diseqs_List \== [], !,
-	disequalities_list_to_disequalities_conjunction_aux(Diseqs_List, Diseqs_Conj).
+	disequalities_list_to_disequalities_conjunction_aux(Diseqs_List, Empty_Result, Diseqs_Conj).
 
-disequalities_list_to_disequalities_conjunction_aux([], true) :- !, fail.
-disequalities_list_to_disequalities_conjunction_aux([Diseq], Diseq) :- !,
+disequalities_list_to_disequalities_conjunction_aux([], Empty_Result, Empty_Result) :- !, fail.
+disequalities_list_to_disequalities_conjunction_aux([Diseq], _Empty_Result, Diseq) :- !,
 	goal_is_disequality(Diseq, _Term1, _Term2, _UQV).
-disequalities_list_to_disequalities_conjunction_aux([Diseq | Diseqs_List], Diseqs_Conjunction) :- !,
+disequalities_list_to_disequalities_conjunction_aux([Diseq | Diseqs_List], _Empty_Result, Diseqs_Conjunction) :- !,
 	goal_is_disequality(Diseq, _Term1, _Term2, _UQV),
 	functor(Diseqs_Conjunction, ',', 2),
 	arg(1, Diseqs_Conjunction, Diseq), 
 	arg(2, Diseqs_Conjunction, More_Diseqs_Conjunction), 
-	disequalities_list_to_disequalities_conjunction(Diseqs_List, More_Diseqs_Conjunction).
+	disequalities_list_to_disequalities_conjunction(Diseqs_List, _Empty_Result, More_Diseqs_Conjunction).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%

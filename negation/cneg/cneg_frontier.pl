@@ -412,7 +412,7 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	% and this ones are NOT part of the current frontier.
 	get_list_of_disequalities_in_vars_and_remove_them((Answ_GoalVars, Answ_LocalVars), Disequalities),
 	disequalities_lists_difference(Disequalities, Answ_RG_Diseqs, New_Disequalities),
-	disequalities_list_to_disequalities_conjunction(New_Disequalities, New_IE),
+	disequalities_list_to_disequalities_conjunction(New_Disequalities, true, New_IE),
 
 	% The only equalities we are interested in are the ones concerning GoalVars, because
 	% Chan mechanism unifies the variables in LocalVars that occur in a equality.
