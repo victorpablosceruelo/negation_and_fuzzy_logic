@@ -270,7 +270,7 @@ negate_IE_NIE_exp(true, _GoalVars, true):- !.
 negate_IE_NIE_exp(IE_NIE_exp, GoalVars_In, Neg_IE_NIE_exp) :-
 	IE_NIE_exp \== [], IE_NIE_exp \== true,
 	varsbag(GoalVars_In, [], [], GoalVars),
-	functor_local(Neg_IE_NIE_exp, 'cneg_aux', 2, [ IE_NIE_exp |[ GoalVars ]]), !.
+	functor_local(Neg_IE_NIE_exp, 'cneg_rt', 2, [ IE_NIE_exp |[ GoalVars ]]), !.
 
 negate_imp_form(true, _GoalVars, true, true) :- !. % Optimization.
 negate_imp_form(Formula, _GoalVars, _Next_Formula, _Neg_Formula) :-
@@ -357,7 +357,7 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 	print_msg(3, 3, '', 'negate_imp_atom :: Formula', Formula),
 	varsbag(GoalVars_In, [], [], GoalVars),
-	functor_local(Neg_Atom, 'cneg_aux', 2, [ Formula |[ GoalVars ]]),
+	functor_local(Neg_Atom, 'cneg_rt', 2, [ Formula |[ GoalVars ]]),
 	Keep_Atom = (Formula),
 	print_msg(3, 3, '', 'negate_imp_atom :: Neg_Atom', Neg_Atom). 
 

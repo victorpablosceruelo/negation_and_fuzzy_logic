@@ -293,7 +293,7 @@ goal_is_aux_3a(Name, Goal, Arg_1, Arg_2, Arg_3) :-
 	arg(3, Goal, Arg_3).
 
 valid_negation_preds('cneg', 1).
-valid_negation_preds('cneg_aux', 2).
+valid_negation_preds('cneg_rt', 2).
 % valid_negation_preds('cneg_rt', 4).
 % valid_negation_preds('cneg_rt_aux', 3).
 

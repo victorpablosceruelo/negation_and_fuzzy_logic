@@ -117,7 +117,7 @@ compute_goal_pre_frontier(Goal, [F_Out]) :-
 %compute_goal_pre_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_pre_frontier(Goal, PreFrontier) :- 
 	goal_is_negation(Goal, GoalVars, SubGoal), !,
-	functor_local(Real_Goal, 'cneg_aux', 2, [ SubGoal |[ GoalVars ]]),
+	functor_local(Real_Goal, 'cneg_rt', 2, [ SubGoal |[ GoalVars ]]),
 	print_msg(3, 3, '', 'compute_goal_pre_frontier :: dn :: double negation for (SubGoal, GoalVars)', (SubGoal, GoalVars)),
 %     cneg_rt(Goal, GoalVars, Depth_Level, Trace) :-
 	% copy_term(SubGoal, SubGoal_Copy), 
@@ -199,27 +199,18 @@ test_pre_frontier_validity(PreFr) :-
 	(
 	    (
 		call_to_predicate((E, IE)), !, 
-		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: VALID :: Goal', Goal),
-		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
-		print_vars_diseqs(3, '', Goal), 
-		print_msg(3, 3, 'nl', '', ''),
-		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
-		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
-		print_vars_diseqs(3, '', PreFr), 
+		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: Real_Goal', Real_Goal),
+		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: (E, IE)', (E, IE)),
+		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
 		print_msg(3, 3, 'nl', '', ''),
 		! % Backtracking forbidden.
 	    )
 	;
 	    (
-		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: NOT VALID :: Goal', Goal),
-		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
-		print_vars_diseqs(3, '', Goal), 
-		print_msg(3, 3, 'nl', '', ''),
-		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: NOT VALID :: PreFr', PreFr),
-		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
-		print_vars_diseqs(3, '', PreFr), 
-		print_msg(3, 3, 'nl', '', ''),
-		!, fail
+		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: Real_Goal', Real_Goal),
+		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: (E, IE)', (E, IE)),
+		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
+		print_msg(3, 3, 'nl', '', '')
 	    )
 	), !. % Backtracking forbidden. 
 

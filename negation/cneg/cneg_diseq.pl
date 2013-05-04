@@ -3,7 +3,7 @@
  	    equality/3, disequality/3,
  	    prepare_attributes_for_printing/2,
 	    print_vars_diseqs/3,
-
+	    print_msg_with_diseqs/3,
 	    get_list_of_disequalities_in_vars/2,
 	    get_list_of_disequalities_in_vars_and_remove_them/2, 
 	    disequalities_list_to_disequalities_conjunction/3,
@@ -141,6 +141,13 @@ attribute_goals(Term) -->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+print_msg_with_diseqs(FI, Pre_Msg, Msg) :-
+	print_msg(FI, 4, 'no-nl', Pre_Msg, Msg),
+	print_msg(3, 3, 'aux', '', ' (diseqs:) '),
+	print_vars_diseqs(3, '', Msg), 
+	print_msg(3, 3, 'nl', '', ''), !.
+
 
 %print_vars_diseqs(Echo_Level, Mode, File_Name, Term) :-
 %	print_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
