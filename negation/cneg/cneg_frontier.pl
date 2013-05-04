@@ -383,11 +383,23 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 
 :- meta_predicate get_frontier_from_pre_frontier(goal, goal, ?, ?, ?, ?, ?).
 get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
+	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier :: testing :: (E, IE)', (E, IE)),
+	copy_term((E, IE), (E_Copy, IE_Copy)),
+ 	call_to_predicate((E_Copy, IE_Copy)), !,
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E, IE)), !,
+	get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes).
+
+get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, []) :-
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has NO answers :: (E, IE)', (E, IE)), !.
+
+:- meta_predicate get_frontier_from_pre_frontier_aux(goal, goal, ?, ?, ?, ?, ?).
+get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: (E, IE)', (E, IE)),
 	setof((GoalVars, LocalVars, RG_Diseqs, NIE), (E, IE), PreFr_Node_Answers), !,
-	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
-	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
-	print_msg(3, 3, 'list', 'get_frontier_from_pre_frontier :: Frontier_Nodes', Frontier_Nodes).
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: Frontier_Nodes', Frontier_Nodes).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
