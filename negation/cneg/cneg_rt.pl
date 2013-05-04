@@ -85,7 +85,7 @@ evaluate_negated_frontier([Result | Result_List], Level, Trace, CN_Call) :-
 	prepare_attributes_for_printing(Result, Attributes_For_Printing_Conj),
 	add_predicate_to_trace(with_attributes(Attributes_For_Printing_Conj), Trace_3, Trace_4),
 	print_msg(3, 3, '', 'evaluate_negated_frontier :: goal', CN_Call),
-	print_msg(3, 3, 'aux', 'evaluate_negated_frontier :: result', Result),
+	print_msg(3, 3, 'aux', 'evaluate_negated_frontier :: result :: ', Result),
 	print_vars_diseqs(3, '', Result), 
 	print_msg(3, 3, 'nl', '', ''),
 	generate_traces_for_conjunction(Trace_4, Trace_5, Trace_6),

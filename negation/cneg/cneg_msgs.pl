@@ -84,6 +84,9 @@ print_msg_aux(FI, 'trace', Pre_Msg, Msg) :- !,
 print_msg_aux(FI, 'list', Pre_Msg, Msg) :- !,
 	print_msg_aux(FI, '', Pre_Msg, Msg).
 
+print_msg_aux(FI, 'no-nl', Pre_Msg, Msg) :- !,
+	  print_msg_normal(FI, Pre_Msg, Msg).
+
 print_msg_aux(FI, '', Pre_Msg, Msg) :- !,
 	  print_msg_normal(FI, Pre_Msg, Msg),
 	  print_msg_aux(FI, 'nl', '', '').

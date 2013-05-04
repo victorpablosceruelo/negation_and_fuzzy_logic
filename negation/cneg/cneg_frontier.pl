@@ -199,22 +199,24 @@ test_pre_frontier_validity(PreFr) :-
 	(
 	    (
 		call_to_predicate((E, IE)), !, 
-		print_msg(3, 3, 'aux', 'test_pre_frontier_validity :: VALID :: Goal :: ', Goal),
-		print_msg(3, 3, 'aux', '', ' '),
+		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: VALID :: Goal', Goal),
+		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
 		print_vars_diseqs(3, '', Goal), 
 		print_msg(3, 3, 'nl', '', ''),
-		print_msg(3, 3, 'aux', 'test_pre_frontier_validity :: VALID :: PreFr :: ', PreFr),
-		print_msg(3, 3, 'aux', '', ' '),
+		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
+		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
 		print_vars_diseqs(3, '', PreFr), 
 		print_msg(3, 3, 'nl', '', ''),
 		! % Backtracking forbidden.
 	    )
 	;
 	    (
-		print_msg(3, 3, '', 'test_pre_frontier_validity :: NOT VALID :: Goal', Goal),
+		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: NOT VALID :: Goal', Goal),
+		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
 		print_vars_diseqs(3, '', Goal), 
 		print_msg(3, 3, 'nl', '', ''),
-		print_msg(3, 3, '', 'test_pre_frontier_validity :: NOT VALID :: PreFr', PreFr),
+		print_msg(3, 3, 'no-nl', 'test_pre_frontier_validity :: NOT VALID :: PreFr', PreFr),
+		print_msg(3, 3, 'aux', '', ' (diseqs:) '),
 		print_vars_diseqs(3, '', PreFr), 
 		print_msg(3, 3, 'nl', '', ''),
 		!, fail
@@ -273,8 +275,9 @@ rebuild_prefrontier_conjunction(PreFr_1, PreFr_2, PreFr_3) :-
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, '', 'rebuild_prefrontier_conjunction', 'PreFr_1 /\\ PreFr_2 -> PreFr_3 '),
 	rebuild_prefrontier_conjunction_aux_1(PreFr_1, PreFr_2, PreFr_3),
-	print_msg(3, 3, '', 'rebuild_prefrontier_conjunction', 'PreFr_3'),
-	print_msg(3, 3, 'list', '', PreFr_3),
+	print_msg(3, 3, '', 'rebuild_prefrontier_conjunction :: PreFr_3', PreFr_3),
+%	print_msg(3, 3, 'aux', '', ' (diseqs:) '),
+%	print_msg(3, 3, 'list', '', PreFr_3),
 	print_msg(3, 3, 'nl', '', '').
 	
 rebuild_prefrontier_conjunction_aux_1([], _PreFr_2, []) :- !.
@@ -421,7 +424,7 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	!, 
 	subfrontier_E_IE_NIE_contents(Frontier_Node, New_E, New_IE, Answ_NIE),
 	print_msg(3, 3, 'nl', '', ''),
-	print_msg(3, 3, 'aux', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node),
+	print_msg(3, 3, 'no-nl', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node),
 	print_vars_diseqs(3, '', Frontier_Node), 
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, 'nl', '', ''),
