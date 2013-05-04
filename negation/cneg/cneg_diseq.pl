@@ -247,22 +247,20 @@ attribute_to_constraints_list(Constraint, Disequality) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-disequalities_list_to_disequalities_conjunction([], []) :- !. % No attributes.
-disequalities_list_to_disequalities_conjunction(Attrs_List, Attrs_Conj) :- % One or more attributes.
-	Attrs_List \== [], !,
-	disequalities_list_to_disequalities_conjunction_aux(Attrs_List, Attrs_Conj).
+disequalities_list_to_disequalities_conjunction([], true) :- !. % No attributes.
+disequalities_list_to_disequalities_conjunction(Diseqs_List, Diseqs_Conj) :- % One or more attributes.
+	Diseqs_List \== [], !,
+	disequalities_list_to_disequalities_conjunction_aux(Diseqs_List, Diseqs_Conj).
 
-disequalities_list_to_disequalities_conjunction_aux([Elto], Real_Elto) :- !,
-	disequalities_list_to_disequalities_conjunction_aux(Elto, Real_Elto).
-disequalities_list_to_disequalities_conjunction_aux([Elto | List], New_Elto) :- !,
-	functor(New_Elto, ',', 2),
-	disequalities_list_to_disequalities_conjunction_aux(Elto, Real_Elto),
-	arg(1, New_Elto, Real_Elto), 
-	arg(2, New_Elto, More_Eltos), 
-	disequalities_list_to_disequalities_conjunction(List, More_Eltos).
-disequalities_list_to_disequalities_conjunction_aux(Elto, Elto) :- 
-	Elto \== [], !. % An empty list is not an individual.
-	
+disequalities_list_to_disequalities_conjunction_aux([], true) :- !, fail.
+disequalities_list_to_disequalities_conjunction_aux([Diseq], Diseq) :- !,
+	goal_is_disequality(Diseq, _Term1, _Term2, _UQV).
+disequalities_list_to_disequalities_conjunction_aux([Diseq | Diseqs_List], Diseqs_Conjunction) :- !,
+	goal_is_disequality(Diseq, _Term1, _Term2, _UQV),
+	functor(Diseqs_Conjunction, ',', 2),
+	arg(1, Diseqs_Conjunction, Diseq), 
+	arg(2, Diseqs_Conjunction, More_Diseqs_Conjunction), 
+	disequalities_list_to_disequalities_conjunction(Diseqs_List, More_Diseqs_Conjunction).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% CONSTRAINT VERIFICATION %%%%%%%%%%%%%%%%%%
