@@ -919,16 +919,16 @@ cneg_diseq_eq_args([Arg_T1 | Args_T1], [Arg_T2 | Args_T2], UQV) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-get_list_of_disequalities_in_vars(Anything, Vars_With_Attrs) :-
+get_list_of_disequalities_in_vars(Anything, Disequalities) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
 	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
 	attributes_list_to_disequalities_list(Vars_With_Attrs, Disequalities), !,
 	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Disequalities', Disequalities), !.
 
 get_list_of_disequalities_in_vars_and_remove_them([], []) :- !.
-get_list_of_disequalities_in_vars_and_remove_them(Anything, Vars_With_Attrs) :-
-	get_list_of_disequalities_in_vars(Anything, Vars_With_Attrs),
-	varsbag(Vars_With_Attrs, [], [], Vars),
+get_list_of_disequalities_in_vars_and_remove_them(Anything, Disequalities) :-
+	get_list_of_disequalities_in_vars(Anything, Disequalities),
+	varsbag(Disequalities, [], [], Vars),
 	remove_constraints_in_vars(Vars).
 
 remove_constraints_in_vars([]).
@@ -953,8 +953,8 @@ disequalities_lists_difference_aux_1([], _Attributes_2, []) :- !.
 disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
 	disequalities_lists_difference_aux_2(Attr_In, Attributes_2), !,
 	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
-disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
-	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, [Attr_In | Difference]).
+disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, [Attr_In | Difference]) :-
+	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
 
 disequalities_lists_difference_aux_2(_Attr_In, []) :- !, fail. % Not found.
 disequalities_lists_difference_aux_2(Attr_In, [Attr_Aux | _Attributes_2]) :-

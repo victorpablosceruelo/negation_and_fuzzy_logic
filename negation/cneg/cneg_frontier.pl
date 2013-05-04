@@ -156,15 +156,11 @@ look_for_the_relevant_clauses(Goal, PreFrontierNodes) :-
 	print_msg(3, 3, '', 'look_for_the_relevant_clauses', 'getting coincidences list'), 
 	setof(PFN, pre_frontier_search(Head_Name, Head_Arity, PFN), PreFrontierNodes), 
 	!.
-look_for_the_relevant_clauses(_Goal, _PreFrontier) :-
-	print_msg(1, 3, '', 'look_for_the_relevant_clauses :: ', 
-	'cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body)'), 
-	cneg_pre_frontier(Name, Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body), 
-	print_msg(1, 3, '', '', cneg_pre_frontier(Name, Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body)), 
-	fail.
 
 look_for_the_relevant_clauses_aux(Head_Name, Head_Arity) :-
 	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, _Clean_Head, _E, _IE, _NIE, _Head, _Body), !.
+look_for_the_relevant_clauses_aux(Head_Name, Head_Arity) :-
+	print_msg(1, 3, '', 'No definition for predicate ', Head_Name/Head_Arity), !, fail.
 
 pre_frontier_search(Head_Name, Head_Arity, PFN) :-
 	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, Head, Body),
@@ -424,8 +420,10 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	get_equalities_conj_from_lists(GoalVars, Answ_GoalVars, true, New_E), 
 	!, 
 	subfrontier_E_IE_NIE_contents(Frontier_Node, New_E, New_IE, Answ_NIE),
+	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, 'aux', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node),
 	print_vars_diseqs(3, '', Frontier_Node), 
+	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, 'nl', '', ''),
 	!.
 
