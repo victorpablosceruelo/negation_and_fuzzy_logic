@@ -941,33 +941,41 @@ remove_constraints_in_vars([_Var | Vars]) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-disequalities_lists_difference(Attributes_1, Attributes_2, Difference) :-
-	print_msg(3, 4, '', 'disequalities_lists_difference :: Attributes_1', Attributes_1),
-	print_msg(3, 4, '', 'disequalities_lists_difference :: Attributes_2', Attributes_2),
-	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference),
+disequalities_lists_difference(Diseqs_List_1, Diseqs_List_2, Difference) :-
+	print_msg(3, 4, '', 'disequalities_lists_difference :: Diseqs_List_1', Diseqs_List_1),
+	print_msg(3, 4, '', 'disequalities_lists_difference :: Diseqs_List_2', Diseqs_List_2),
+	disequalities_lists_difference_aux_1(Diseqs_List_1, Diseqs_List_2, Difference),
 	print_msg(3, 4, '', 'disequalities_lists_difference :: Difference', Difference).
 
-disequalities_lists_difference_aux_1([], _Attributes_2, []) :- !.
-disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, Difference) :-
-	disequalities_lists_difference_aux_2(Attr_In, Attributes_2), !,
-	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
-disequalities_lists_difference_aux_1([Attr_In | Attributes_1], Attributes_2, [Attr_In | Difference]) :-
-	disequalities_lists_difference_aux_1(Attributes_1, Attributes_2, Difference).
+disequalities_lists_difference_aux_1([], _Diseqs_List_2, []) :- !.
+disequalities_lists_difference_aux_1([Diseq_In | Diseqs_List_1], Diseqs_List_2, Difference) :-
+	disequalities_lists_difference_aux_2(Diseq_In, Diseqs_List_2), !,
+	disequalities_lists_difference_aux_1(Diseqs_List_1, Diseqs_List_2, Difference).
+disequalities_lists_difference_aux_1([Diseq_In | Diseqs_List_1], Diseqs_List_2, [Diseq_In | Difference]) :-
+	disequalities_lists_difference_aux_1(Diseqs_List_1, Diseqs_List_2, Difference).
 
-disequalities_lists_difference_aux_2(_Attr_In, []) :- !, fail. % Not found.
-disequalities_lists_difference_aux_2(Attr_In, [Attr_Aux | _Attributes_2]) :-
-	disequalities_lists_difference_aux_3(Attr_In, Attr_Aux), !, % Found coincidence
-	print_msg(3, 4, '', 'disequalities_lists_difference :: coincidence :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
+disequalities_lists_difference_aux_2(_Diseq_In, []) :- !, fail. % Not found.
+disequalities_lists_difference_aux_2(Diseq_In, [Diseq_Aux | _Diseqs_List_2]) :-
+	goal_is_disequality(Diseq_In, _DI_T1, _DI_T2, _DI_UQ),
+	goal_is_disequality(Diseq_Aux, _DA_T1, _DA_T2, _DA_UQ),
+	disequalities_lists_difference_aux_3(Diseq_In, Diseq_Aux), !, % Found coincidence
+	print_msg(3, 4, '', 'disequalities_lists_difference :: coincidence :: (Diseq_In, Diseq_Aux)', (Diseq_In, Diseq_Aux)),
 	!.
-disequalities_lists_difference_aux_2(Attr_In, [_Attr_Aux | Attributes_2]) :-
-	disequalities_lists_difference_aux_2(Attr_In, Attributes_2).
+disequalities_lists_difference_aux_2(Diseq_In, [Diseq_Aux | Diseqs_List_2]) :-
+	goal_is_disequality(Diseq_In, _DI_T1, _DI_T2, _DI_UQ),
+	goal_is_disequality(Diseq_Aux, _DA_T1, _DA_T2, _DA_UQ), !,
+	disequalities_lists_difference_aux_2(Diseq_In, Diseqs_List_2).
+
+disequalities_lists_difference_aux_2(Diseq_In, [Diseq_Aux | _Diseqs_List_2]) :-
+	print_msg(1, 3, '', 'ERROR: disequalities_lists_difference :: not a diseq :: (Diseq_In, Diseq_Aux)', (Diseq_In, Diseq_Aux)),
+	!, fail.
 
 % Aqui el filtro no hace falta que sea muy complejo pq las disequalities son
 % sencillas: nunca nos vamos a encontrar con X =/= f(a) /\ X =/= f/1
 % porque lo primero no se puede representar a pelo en constraints.
-disequalities_lists_difference_aux_3(Attr_In, Attr_Aux) :-
-	print_msg(3, 4, '', 'disequalities_lists_difference :: (Attr_In, Attr_Aux)', (Attr_In, Attr_Aux)),
-	Attr_In == Attr_Aux.
+disequalities_lists_difference_aux_3(Diseq_In, Diseq_Aux) :-
+	print_msg(3, 4, '', 'disequalities_lists_difference :: (Diseq_In, Diseq_Aux)', (Diseq_In, Diseq_Aux)),
+	Diseq_In == Diseq_Aux.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
