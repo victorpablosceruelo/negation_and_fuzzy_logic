@@ -59,5 +59,5 @@ testing_call_to(Predicate) :-
 % cneg_tr contains the code transformations needed by Constructive Negation.
 % trans_sent/3 makes the transformation.
 :- load_compilation_module(library('cneg/cneg_tr')).
-:- add_sentence_trans(trans_sent/3, 740). % TODO: Right priority?
+:- add_sentence_trans(cneg_tr:trans_sent/3, 740). % TODO: Right priority?
 % :- add_clause_trans(trans_clause/3). % Only for debug !!!
