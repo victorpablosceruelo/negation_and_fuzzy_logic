@@ -315,9 +315,14 @@ pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, Frontier_Out) :-
 pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, _Frontier_Out) :-
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'list', 'ERROR: pre_frontier_to_frontier :: Goal_PreFrontier', Goal_PreFrontier),
 	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, '', 'ERROR: pre_frontier_to_frontier :: GoalVars', GoalVars),
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'nl', '', ''),
 	!, fail.
 
@@ -407,10 +412,18 @@ get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, F
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_eqs_and_diseqs_from_answers([], _GoalVars, Frontier_Nodes, Frontier_Nodes).
-get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, FN_In, FN_Out) :- !,
+get_eqs_and_diseqs_from_answers(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_Out) :-
+	get_eqs_and_diseqs_from_answers_aux(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_Out).
+get_eqs_and_diseqs_from_answers(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_In) :-
+	print_msg(1, 3, '', 'ERROR: get_eqs_and_diseqs_from_answers :: Answers', Answers),
+	print_msg(1, 3, '', 'ERROR: get_eqs_and_diseqs_from_answers :: GoalVars', GoalVars),
+	print_msg(1, 3, '', 'ERROR: get_eqs_and_diseqs_from_answers :: Frontier_Nodes_In', Frontier_Nodes_In),
+	!, fail.
+
+get_eqs_and_diseqs_from_answers_aux([], _GoalVars, Frontier_Nodes, Frontier_Nodes).
+get_eqs_and_diseqs_from_answers_aux([Answer | Answers], GoalVars, FN_In, FN_Out) :- !,
 	get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, FN), !,
-	get_eqs_and_diseqs_from_answers(Answers, GoalVars, [FN | FN_In], FN_Out).
+	get_eqs_and_diseqs_from_answers_aux(Answers, GoalVars, [FN | FN_In], FN_Out).
 
 % get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Diseqs, Frontier_Node)
 get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-

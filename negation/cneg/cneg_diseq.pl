@@ -934,6 +934,12 @@ cneg_diseq_eq_args([Arg_T1 | Args_T1], [Arg_T2 | Args_T2], UQV) :-
 
 
 get_list_of_disequalities_in_vars(Anything, Disequalities) :-
+	get_list_of_disequalities_in_vars_aux(Anything, Disequalities), !.
+
+get_list_of_disequalities_in_vars(Anything, []) :-
+	print_msg(1, 3, '', 'ERROR: get_list_of_disequalities_in_vars :: for', Anything), !, fail.
+
+get_list_of_disequalities_in_vars_aux(Anything, Disequalities) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
 	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
 	attributes_list_to_disequalities_list(Vars_With_Attrs, [], Disequalities), !,
