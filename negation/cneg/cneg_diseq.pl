@@ -216,27 +216,27 @@ get_attributes_in_term_vars_aux([Var | Vars], Visited_In, Visited_Out, VWA_In, V
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 attributes_list_to_disequalities_conjunction(Vars_With_Attrs, Empty_Result, Disequalities_Conj) :-
-	attributes_list_to_disequalities_list(Vars_With_Attrs, Disequalities_List), !,
+	attributes_list_to_disequalities_list(Vars_With_Attrs, [], Disequalities_List), !,
 	disequalities_list_to_disequalities_conjunction(Disequalities_List, Empty_Result, Disequalities_Conj), !.
 
-attributes_list_to_disequalities_list([], []) :- !.
-attributes_list_to_disequalities_list([Attribute|Attributes], Disequalities_Out) :-
+attributes_list_to_disequalities_list([], Disequalities_List, Disequalities_List) :- !.
+attributes_list_to_disequalities_list([Attribute|Attributes], Disequalities_List_In, Disequalities_List_Out) :-
 %	print_msg(3, 4, '', 'attribute_to_disequalities_list :: Attribute', Attribute), 
-	attribute_to_disequalities_list(Attribute, Disequalities_Aux),
+	attribute_to_disequalities_list(Attribute, Disequalities_List_In, Disequalities_List_Aux), !,
 %	print_msg(3, 4, '', 'attribute_to_disequalities_list :: Disequality', Disequality),
-	attributes_list_to_disequalities_list(Attributes, Disequalities_In),
-	append(Disequalities_Aux, Disequalities_In, Disequalities_Out).
+	attributes_list_to_disequalities_list(Attributes, Disequalities_List_Aux, Disequalities_List_Out).
 
-attribute_to_disequalities_list(Attribute, Disequalities) :-
+attribute_to_disequalities_list(Attribute, Disequalities_List_In, Disequalities_List_Out) :-
 	attribute_contents(Attribute, _Target, Constraints),
-	constraints_list_to_disequalities_list(Constraints, Disequalities).
+	constraints_list_to_disequalities_list(Constraints, Disequalities_List_In, Disequalities_List_Out).
 
-constraints_list_to_disequalities_list([], []) :- !.
-constraints_list_to_disequalities_list([Constraint | Constraints], [Disequality | Disequalities]) :-
+constraints_list_to_disequalities_list([], Disequalities_List_In, Disequalities_List_In) :- !.
+constraints_list_to_disequalities_list([Constraint | Constraints], Disequalities_List_In, Disequalities_List_Out) :-
 %	print_msg(3, 4, '', 'format_diseq_for_printing :: Disequality', Disequality), 
-	attribute_to_constraints_list(Constraint, Disequality),
+	attribute_to_constraints_list(Constraint, Disequality), !,
+	add_to_list_if_not_there(Disequality, Disequalities_List_In, Disequalities_List_Aux), !,
 %	print_msg(3, 4, '', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
-	constraints_list_to_disequalities_list(Constraints, Disequalities).
+	constraints_list_to_disequalities_list(Constraints, Disequalities_List_Aux, Disequalities_List_Out).
 
 % Need to convert to a single term everything.
 % This predicate is not working as expected.
@@ -927,7 +927,7 @@ cneg_diseq_eq_args([Arg_T1 | Args_T1], [Arg_T2 | Args_T2], UQV) :-
 get_list_of_disequalities_in_vars(Anything, Disequalities) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
 	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
-	attributes_list_to_disequalities_list(Vars_With_Attrs, Disequalities), !,
+	attributes_list_to_disequalities_list(Vars_With_Attrs, [], Disequalities), !,
 	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Disequalities', Disequalities), !.
 
 get_list_of_disequalities_in_vars_and_remove_them([], []) :- !.
