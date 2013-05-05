@@ -1,13 +1,11 @@
 
 :- module(cneg_msgs,
 	[
-	    print_msg/5, 
-	    add_to_evaluation_trace/1,
-	    get_evaluation_trace/1
+	    print_msg/5
 	],
 	[assertions]).
 
-:- use_module(library(aggregates),[setof/3]).
+% :- use_module(library(aggregates),[setof/3]).
 :- use_module(library(prolog_sys), [statistics/0]).
 :- use_module(library(write), [write/1, write/2]).
 %:- use_module(library('cneg/cneg_basics')).
@@ -77,9 +75,6 @@ print_msg_aux(FI, 'separation', _Pre_Msg, _Msg) :- !,
 	print_msg_aux(FI, '', '', '-----------------------------------------------'),
 	print_msg_aux(FI, '', '', '-----------------------------------------------'),
 	print_msg_aux(FI, 'nl', '', '').
-
-print_msg_aux(FI, 'trace', Pre_Msg, Msg) :- !, 
-	print_msg_trace(FI, Pre_Msg, Msg).
 
 print_msg_aux(FI, 'list', Pre_Msg, Msg) :- !,
 	print_msg_aux(FI, '', Pre_Msg, Msg).
@@ -174,18 +169,6 @@ print_msg_statistics(Any) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-print_msg_trace(Any, Pre_Msg, Msg) :-
-	print_msg(Any, Any, 'separation', '', ''),
-	print_msg(Any, Any, 'nl', '', ''),
-	print_msg(Any, Any, '', Pre_Msg, Msg),
-	get_evaluation_trace(Trace_Status_List),
-	print_msg(Any, Any, '', 'TRACE: ', Trace_Status_List),
-	!.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % Meaning of values for variable Echo_Level:
 %
 % 0 -> no debug.
@@ -237,21 +220,3 @@ get_stream_to_file(File_Name_Atom, Stream) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-add_to_evaluation_trace(Info) :- 
-	(
-	    (
-		retract_fact(trace_index(Index)), !
-	    )
-	;
-	    Index = 0
-	),
-	NewIndex is Index + 1, !,
-	assertz_fact(trace_info(NewIndex, Info)), !,
-	assertz_fact(trace_index(Index)), !.
-
-get_evaluation_trace(Evaluation_Trace) :- !,
-	setof((Index, Info), trace_info(Index, Info), Evaluation_Trace), !. 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
