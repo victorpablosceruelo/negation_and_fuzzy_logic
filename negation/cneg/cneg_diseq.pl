@@ -496,35 +496,35 @@ restore_attributes_var(Var, Diseqs) :-
 diseqs_list_to_basic_diseqs_list([], Basic_Diseqs, Basic_Diseqs, _All_EQV) :- !.
 diseqs_list_to_basic_diseqs_list([Diseq|Diseqs_List], Basic_Diseqs_In, Basic_Diseqs_Out, All_EQV) :- !,
 	print_msg(0, 0, '', '', ''),
-	print_msg(0, 0, '', 'diseqs_to_constraints :: (Diseqs, ---, EQV)', ([Diseq], '---', All_EQV)),
-	diseqs_to_constraints([Diseq], Basic_Diseqs, All_EQV),
-	print_msg(0, 0, '', 'diseqs_to_constraints :: Basic_Diseqs', Basic_Diseqs),
+	print_msg(0, 0, '', 'diseqs_to_basic_diseqs :: (Diseqs, ---, EQV)', ([Diseq], '---', All_EQV)),
+	diseqs_to_basic_diseqs([Diseq], Basic_Diseqs, All_EQV),
+	print_msg(0, 0, '', 'diseqs_to_basic_diseqs :: Basic_Diseqs', Basic_Diseqs),
 	print_msg(0, 0, '', '', ''),
 
-	constraints_sets_append(Basic_Diseqs, Basic_Diseqs_In, Basic_Diseqs_Aux),
+	basic_diseqs_sets_union(Basic_Diseqs, Basic_Diseqs_In, Basic_Diseqs_Aux),
 	diseqs_list_to_basic_diseqs_list(Diseqs_List, Basic_Diseqs_Aux, Basic_Diseqs_Out, All_EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-constraints_sets_append(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
-	print_msg(0, 0, '', 'accumulate_disequations :: Diseqs_In', Diseqs_In),
-	print_msg(0, 0, '', 'accumulate_disequations :: Diseqs_Acc', Diseqs_Acc),
-	constraints_sets_append_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
-	print_msg(0, 0, '', 'accumulate_disequations :: Diseqs_Out', Diseqs_Out).
+basic_diseqs_sets_union(Diseqs_In, Diseqs_Acc, Diseqs_Out) :-
+	print_msg(0, 0, '', 'basic_diseqs_sets_union :: Diseqs_In', Diseqs_In),
+	print_msg(0, 0, '', 'basic_diseqs_sets_union :: Diseqs_Acc', Diseqs_Acc),
+	basic_diseqs_sets_union_aux(Diseqs_In, Diseqs_Acc, Diseqs_Out),
+	print_msg(0, 0, '', 'basic_diseqs_sets_union :: Diseqs_Out', Diseqs_Out).
 
-constraints_sets_append_aux([], Basic_Diseqs_Out, Basic_Diseqs_Out) :- !.
-constraints_sets_append_aux([Diseq | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_Out) :-
+basic_diseqs_sets_union_aux([], Basic_Diseqs_Out, Basic_Diseqs_Out) :- !.
+basic_diseqs_sets_union_aux([Diseq | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_Out) :-
 	cneg_aux:memberchk(Diseq, Basic_Diseqs_In), !, % It is there.
-	constraints_sets_append_aux(Diseq_List, Basic_Diseqs_In, Basic_Diseqs_Out).
-constraints_sets_append_aux([(T1, T2) | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_Out) :-
+	basic_diseqs_sets_union_aux(Diseq_List, Basic_Diseqs_In, Basic_Diseqs_Out).
+basic_diseqs_sets_union_aux([(T1, T2) | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_Out) :-
 %	constraint(Diseq, T1, T2, EQV, UQV),
 %	constraint(Diseq_Aux, T2, T1, EQV, UQV), % Order inversion.
 	cneg_aux:memberchk((T2, T1), Basic_Diseqs_In), !, % It is there.
-	constraints_sets_append_aux(Diseq_List, Basic_Diseqs_In, Basic_Diseqs_Out).
-constraints_sets_append_aux([Diseq | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_Out) :-
-	constraints_sets_append_aux(Diseq_List, [Diseq | Basic_Diseqs_In], Basic_Diseqs_Out).
+	basic_diseqs_sets_union_aux(Diseq_List, Basic_Diseqs_In, Basic_Diseqs_Out).
+basic_diseqs_sets_union_aux([Diseq | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_Out) :-
+	basic_diseqs_sets_union_aux(Diseq_List, [Diseq | Basic_Diseqs_In], Basic_Diseqs_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -532,47 +532,47 @@ constraints_sets_append_aux([Diseq | Diseq_List], Basic_Diseqs_In, Basic_Diseqs_
 
 % For the case we do not have a disequality to simplify.
 % It is obvious that we must fail.
-diseqs_to_constraints([], [], _EQV) :- 
+diseqs_to_basic_diseqs([], [], _EQV) :- 
 	!, 
-	print_msg(3, 4, '', 'diseqs_to_constraints :: Diseqs = [] ---- FAIL ', ''),
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: Diseqs = [] ---- FAIL ', ''),
 	!, fail.
 	% Result = 'fail'. % We have failed.
 
-diseqs_to_constraints([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV) :- % Same var.
+diseqs_to_basic_diseqs([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV) :- % Same var.
         var(T1),
         var(T2), % Both are variables.
         T1==T2, !, % Both are the same variable.
-	print_msg(3, 4, '', 'diseqs_to_constraints :: SAME VAR, T1 == T2', (T1, T2)),
-	diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV).
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: SAME VAR, T1 == T2', (T1, T2)),
+	diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV).
 
-diseqs_to_constraints([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In) :- % Different vars.
+diseqs_to_basic_diseqs([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In) :- % Different vars.
         var(T1),
         var(T2), !, % Both are variables, but not the same one.
 	T1 \== T2, % Not the same variable.
 	varsbag(EQV_In, [], [], EQV), % Remove anything there not a variable.
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
-	print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and var(T2)', (T1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T1) and var(T2)', (T1, T2)),
 	(
 	    (   % Both are UQ vars.
 		cneg_aux:memberchk(T1, UQV), 
 		cneg_aux:memberchk(T2, UQV), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UNIFY UQV(T1) and UQV(T2)', (T1, T2)),
 		cneg_diseq_unify(T1, T2), % They can not be disunified, and they are still UQ vars.
-		diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV)
+		diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV)
 	    )
 	;
 	    (   % T1 is a UQ var, T2 is not a UQ var.
 		cneg_aux:memberchk(T1, UQV), !,
 %		cneg_aux:memberchk(T2, EQV), 
-		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and var(T2)', (T1, T2)),
-		diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV)
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UQV(T1) and var(T2)', (T1, T2)),
+		diseqs_to_basic_diseqs_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV)
 	    )
 	;
 	    (   % T2 is a UQ var, T1 is not a UQ var.
 %		cneg_aux:memberchk(T1, EQV),
 		cneg_aux:memberchk(T2, UQV), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T2) and var(T1)', (T1, T2)),
-		diseqs_to_constraints_uqvar_t1_var_t2([(T2, T1) | More_Diseqs], Basic_Diseqs, EQV)
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UQV(T2) and var(T1)', (T1, T2)),
+		diseqs_to_basic_diseqs_uqvar_t1_var_t2([(T2, T1) | More_Diseqs], Basic_Diseqs, EQV)
 	    )
 	;
 	    (   % T1 and T2 are NOT UQ vars. 2 solutions. 
@@ -580,79 +580,79 @@ diseqs_to_constraints([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In) :- % Diffe
 		cneg_aux:memberchk(T2, EQV), !,
 		( 
 		    (   % First solution: T1 =/= T2.
-			print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) =/= var(T2)', (T1, T2)),
+			print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T1) =/= var(T2)', (T1, T2)),
 			Basic_Diseqs = [(T1, T2)]
 		    )
 		;
 		    (   % T1 and T2 can not be disunified. We test if we can fail.
-			print_msg(3, 4, '', 'diseqs_to_constraints :: UNIFY var(T1) and var(T2)', (T1, T2)),
+			print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UNIFY var(T1) and var(T2)', (T1, T2)),
 			cneg_diseq_unify(T1, T2), % Since they can not be disunified, unify them.
-			diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV)
+			diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV)
 		    )
 		)
 	    )	
 	).
 
-diseqs_to_constraints([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV) :- % var and nonvar.
+diseqs_to_basic_diseqs([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV) :- % var and nonvar.
 	(
 	    (   % T1 is a VAR. T2 is not a var.
 		var(T1), 
 		nonvar(T2), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and nonvar(T2) ', (T1, T2)),
-		diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV)
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T1) and nonvar(T2) ', (T1, T2)),
+		diseqs_to_basic_diseqs_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV)
 	    )
 	;
 	    (   % T2 is a VAR. T1 is not a var.
 		var(T2), 
 		nonvar(T1), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T2) and nonvar(T1) ', (T1, T2)),
-		diseqs_to_constraints_var_nonvar([(T2, T1) | More_Diseqs], Basic_Diseqs, EQV)
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T2) and nonvar(T1) ', (T1, T2)),
+		diseqs_to_basic_diseqs_var_nonvar([(T2, T1) | More_Diseqs], Basic_Diseqs, EQV)
 	    )
 	).
 
-diseqs_to_constraints([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV) :- 
+diseqs_to_basic_diseqs([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV) :- 
 	nonvar(T1), 
 	nonvar(T2), !,
-	diseqs_to_constraints_nonvars(T1, T2, More_Diseqs, Basic_Diseqs, EQV).
+	diseqs_to_basic_diseqs_nonvars(T1, T2, More_Diseqs, Basic_Diseqs, EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-diseqs_to_constraints_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In) :-
+diseqs_to_basic_diseqs_uqvar_t1_var_t2([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In) :-
         var(T1),
         var(T2), 
 	varsbag(EQV_In, [], [], EQV), % Remove anything there not a variable.
 	varsbag((T1, T2), EQV, [], UQV), % Compute UQ vars.
 	cneg_aux:memberchk(T1, UQV), % T1 is a uq var, T2 is not a uqvar.
 	cneg_aux:memberchk(T2, EQV), !,
-	print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and var(T2) ', (T1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UQV(T1) and var(T2) ', (T1, T2)),
 
 	% T1 can not be different from T2. We unify them (failing) and continue.
 	cneg_diseq_unify(T1, T2),
-	diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV).
+	diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-diseqs_to_constraints_var_nonvar([(T1, Name2/Arity2) | _More_Diseqs], Basic_Diseqs, EQV_In):- !,
+diseqs_to_basic_diseqs_var_nonvar([(T1, Name2/Arity2) | _More_Diseqs], Basic_Diseqs, EQV_In):- !,
 	var(T1),
 	T2 = Name2/Arity2, % T2 is a functor definition.
 	(
 	    (
 		cneg_aux:memberchk(T1, EQV_In), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T1) and functor(T2)', (T1, T2)),
 		Basic_Diseqs = [(T1, T2)]
 	    )
 	;
 	    (   % A universally quantified var cannot have restrictions.
-		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UQV(T1) and functor(T2)', (T1, T2)),
 		fail
 	    )
 	).
 
-diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In):- 
+diseqs_to_basic_diseqs_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In):- 
 	T2 \== _FunctorName2/_FunctorArity2,
         var(T1),
 	nonvar(T2),
@@ -663,13 +663,13 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In)
 	    (   % A variable is always different from a functor making use of it.
 		cneg_aux:varsbag(T2, [], [], Vars_T2),
 		cneg_aux:memberchk(T1, Vars_T2), !, % e.g. X =/= s(s(X)).
-		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T1) and functor(T2) and T1 in vars(T2)', (T1, T2)),
 		Basic_Diseqs = [] % No constraints.
 	    )
 	;
 	    (   % T1 is a UQ var. Impossible to disunify. Unify !!
 		cneg_aux:memberchk(T1, UQV), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: UQV(T1) and functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UQV(T1) and functor(T2)', (T1, T2)),
 		(
 		    (
 			T2 = Functor_Name/Functor_Arity, !,
@@ -682,12 +682,12 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In)
 			cneg_diseq_unify(T1, T2)
 		    )
 		),
-		diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV)
+		diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV)
 	    )
 	;
 	    (   % The variable must not be the functor (use attributed variables).
 		cneg_aux:memberchk(T1, EQV), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: var(T1) =/= functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: var(T1) =/= functor(T2)', (T1, T2)),
 		(
 		    (
 			T2 = Functor_Name/Functor_Arity, 
@@ -703,7 +703,7 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In)
 		    )
 		;
 		    (   % Keep the functor but diseq between the arguments.
-			print_msg(3, 4, '', 'diseqs_to_constraints :: UNIFY var(T1) and functor(T2)', (T1, T2)),
+			print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: UNIFY var(T1) and functor(T2)', (T1, T2)),
 			(
 			    (
 				T2 = Functor_Name/Functor_Arity, 
@@ -715,7 +715,7 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In)
 				functor_local(T1, Name, Arity, _Args_T1) % T1 = functor 
 			    )
 			),
-			diseqs_to_constraints([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV)
+			diseqs_to_basic_diseqs([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV)
 		    )
 		)
 	    )
@@ -725,52 +725,52 @@ diseqs_to_constraints_var_nonvar([(T1, T2) | More_Diseqs], Basic_Diseqs, EQV_In)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-diseqs_to_constraints_nonvars(T1, T2, _More_Diseqs, _Basic_Diseqs, _EQV) :-
+diseqs_to_basic_diseqs_nonvars(T1, T2, _More_Diseqs, _Basic_Diseqs, _EQV) :-
 	(  
 	    var(T1) 
 	; 
 	    var(T2)  
 	),
-	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: T1 or T2 are vars. (T1, T2)', (T1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs_nonvars :: T1 or T2 are vars. (T1, T2)', (T1, T2)),
 	!, fail.
 
-diseqs_to_constraints_nonvars(Name/Arity, Name/Arity, More_Diseqs, Basic_Diseqs, EQV) :- !,
-	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) == functor(T2). (T1)', (Name/Arity)),
+diseqs_to_basic_diseqs_nonvars(Name/Arity, Name/Arity, More_Diseqs, Basic_Diseqs, EQV) :- !,
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs_nonvars :: functor(T1) == functor(T2). (T1)', (Name/Arity)),
 	%functor_local(T1, Name, Arity, Args_1),
 	%functor_local(T2, Name, Arity, Args_2), 
 	%disequalities_lists_product(Args_1, Args_2, Diseq_List),
 	%cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs), !,
-	%diseqs_to_constraints(New_More_Diseqs, Basic_Diseqs, EQV).
-	diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV).
+	%diseqs_to_basic_diseqs(New_More_Diseqs, Basic_Diseqs, EQV).
+	diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV).
 	
-diseqs_to_constraints_nonvars(Name1/Arity1, Name2/Arity2, _More_Diseqs, Basic_Diseqs, _EQV) :-
+diseqs_to_basic_diseqs_nonvars(Name1/Arity1, Name2/Arity2, _More_Diseqs, Basic_Diseqs, _EQV) :-
 	(
 	    Name1 \== Name2
 	;
 	    Arity1 \== Arity2
 	), !,
-	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) =/= functor(T2). (T1, T2)', (Name1/Arity1, Name2/Arity2)),
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs_nonvars :: functor(T1) =/= functor(T2). (T1, T2)', (Name1/Arity1, Name2/Arity2)),
 	Basic_Diseqs = [].
 
-diseqs_to_constraints_nonvars(Name1/Arity1, T2, More_Diseqs, Basic_Diseqs, EQV) :-
+diseqs_to_basic_diseqs_nonvars(Name1/Arity1, T2, More_Diseqs, Basic_Diseqs, EQV) :-
 	functor_local(T2, Name2, Arity2, _Args_2), 
 	Name1 == Name2,
 	Arity1 == Arity2, !,
-	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) == functor(T2). (T1, T2)', (Name1/Arity1, T2)),
-	diseqs_to_constraints(More_Diseqs, Basic_Diseqs, EQV).
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs_nonvars :: functor(T1) == functor(T2). (T1, T2)', (Name1/Arity1, T2)),
+	diseqs_to_basic_diseqs(More_Diseqs, Basic_Diseqs, EQV).
 
-diseqs_to_constraints_nonvars(Name1/Arity1, T2, _More_Diseqs, Basic_Diseqs, _EQV) :-
+diseqs_to_basic_diseqs_nonvars(Name1/Arity1, T2, _More_Diseqs, Basic_Diseqs, _EQV) :-
 	functor_local(T2, Name2, Arity2, _Args_2), 
 	Name1 \== Name2,
 	Arity1 \== Arity2, !,
-	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: functor(T1) =/= functor(T2). (T1, T2)', (Name1/Arity1, T2)),
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs_nonvars :: functor(T1) =/= functor(T2). (T1, T2)', (Name1/Arity1, T2)),
 	Basic_Diseqs = [].
 
-diseqs_to_constraints_nonvars(T1, Name2/Arity2, More_Diseqs, Basic_Diseqs, EQV) :- !,
-	print_msg(3, 4, '', 'diseqs_to_constraints_nonvars :: inversion :: (T1, T2)', (T1, Name2/Arity2)),
-	diseqs_to_constraints_nonvars(Name2/Arity2, T1, More_Diseqs, Basic_Diseqs, EQV).
+diseqs_to_basic_diseqs_nonvars(T1, Name2/Arity2, More_Diseqs, Basic_Diseqs, EQV) :- !,
+	print_msg(3, 4, '', 'diseqs_to_basic_diseqs_nonvars :: inversion :: (T1, T2)', (T1, Name2/Arity2)),
+	diseqs_to_basic_diseqs_nonvars(Name2/Arity2, T1, More_Diseqs, Basic_Diseqs, EQV).
 
-diseqs_to_constraints_nonvars(T1, T2, More_Diseqs, Basic_Diseqs, EQV) :-
+diseqs_to_basic_diseqs_nonvars(T1, T2, More_Diseqs, Basic_Diseqs, EQV) :-
 	T1 \== _TF1/_TA1,
 	T2 \== _TF2/_TA2,
 	functor_local(T1, Name_1, Arity_1, Args_1),
@@ -779,17 +779,17 @@ diseqs_to_constraints_nonvars(T1, T2, More_Diseqs, Basic_Diseqs, EQV) :-
 	    (   % Functors that unify.
 		Name_1 == Name_2, 
 		Arity_1 == Arity_2, !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) == functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: functor(T1) == functor(T2)', (T1, T2)),
 		disequalities_lists_product(Args_1, Args_2, Diseq_List),
 		cneg_aux:append(Diseq_List, More_Diseqs, New_More_Diseqs),
-		diseqs_to_constraints(New_More_Diseqs, Basic_Diseqs, EQV)
+		diseqs_to_basic_diseqs(New_More_Diseqs, Basic_Diseqs, EQV)
 	    )
 	;
 	    (   % Functors that do not unify.
 		(
 		    (Name_1 \== Name_2) ; (Arity_1 \== Arity_2)
 		), !,
-		print_msg(3, 4, '', 'diseqs_to_constraints :: functor(T1) =/= functor(T2)', (T1, T2)),
+		print_msg(3, 4, '', 'diseqs_to_basic_diseqs :: functor(T1) =/= functor(T2)', (T1, T2)),
 		Basic_Diseqs = [] % No constraints.
 	    )
 	).
