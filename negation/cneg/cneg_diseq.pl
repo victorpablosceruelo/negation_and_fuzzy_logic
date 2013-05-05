@@ -369,15 +369,17 @@ test_and_update_vars_attributes(New_Diseqs) :-
 
 	% Get which variables are EQV so we distinguish them from UQV.
 	get_and_remove_eqv_and_uqv_from_diseqs(New_Diseqs, [], ND_EQV, [], ND_UQV, New_Diseqs_Aux),
-	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, [], OD_EQV, [], OD_UQV, Old_Diseqs_Aux),
+	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, [], OD_EQV, [], OD_UQV, Old_Diseqs_Aux), !,
 	
-	test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV), % The sets must be exclusive.
+	test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV), !, % The sets must be exclusive.
 	print_msg(3, 4, '', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
 	print_msg(3, 4, '', 'test_and_update_vars_attributes :: New_Diseqs_Aux', New_Diseqs_Aux),
 	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs_Aux', Old_Diseqs_Aux), !,
+	append(New_Diseqs_Aux, Old_Diseqs_Aux, All_Diseqs),
+	print_msg(3, 4, '', 'test_and_update_vars_attributes :: All_Diseqs', All_Diseqs), !,
 
 	% At first we check that the new disequalities can be added to the old ones.
-	set_of_diseqs_to_constraints(New_Diseqs_Aux, Old_Diseqs_Aux, [], Simplified_Diseqs, All_EQV),
+	diseqs_list_to_basic_diseqs_list(All_Diseqs, [], Simplified_Diseqs, All_EQV), 
 
 	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
 	restore_attributes(Simplified_Diseqs, All_EQV, All_UQV).
@@ -490,11 +492,11 @@ restore_attributes_var(Var, Diseqs) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set_of_diseqs_to_constraints(New_Diseqs, Old_Diseqs, Constraints_In, Constraints_Out, All_EQV),
-set_of_diseqs_to_constraints([], [], Constraints, Constraints, _All_EQV) :- !.
-set_of_diseqs_to_constraints([], [Diseq|Diseqs_List], Constraints_In, Constraints_Out, All_EQV) :- !,
-	set_of_diseqs_to_constraints([Diseq|Diseqs_List], [], Constraints_In, Constraints_Out, All_EQV).
-set_of_diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Constraints_In, Constraints_Out, All_EQV) :- !,
+% diseqs_list_to_basic_diseqs_list(New_Diseqs, Old_Diseqs, Constraints_In, Constraints_Out, All_EQV),
+diseqs_list_to_basic_diseqs_list([], [], Constraints, Constraints, _All_EQV) :- !.
+diseqs_list_to_basic_diseqs_list([], [Diseq|Diseqs_List], Constraints_In, Constraints_Out, All_EQV) :- !,
+	diseqs_list_to_basic_diseqs_list([Diseq|Diseqs_List], [], Constraints_In, Constraints_Out, All_EQV).
+diseqs_list_to_basic_diseqs_list([Diseq|Diseqs_List], Old_Diseqs, Constraints_In, Constraints_Out, All_EQV) :- !,
 	print_msg(0, 0, '', '', ''),
 	print_msg(0, 0, '', 'diseqs_to_constraints :: (Diseqs, ---, EQV)', ([Diseq], '---', All_EQV)),
 	diseqs_to_constraints([Diseq], Constraints, All_EQV),
@@ -502,7 +504,7 @@ set_of_diseqs_to_constraints([Diseq|Diseqs_List], Old_Diseqs, Constraints_In, Co
 	print_msg(0, 0, '', '', ''),
 
 	constraints_sets_append(Constraints, Constraints_In, Constraints_Aux),
-	set_of_diseqs_to_constraints(Diseqs_List, Old_Diseqs, Constraints_Aux, Constraints_Out, All_EQV).
+	diseqs_list_to_basic_diseqs_list(Diseqs_List, Old_Diseqs, Constraints_Aux, Constraints_Out, All_EQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
