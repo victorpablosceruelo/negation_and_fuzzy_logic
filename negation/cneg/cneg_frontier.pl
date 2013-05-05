@@ -309,7 +309,7 @@ rebuild_prefrontier_conjunction_aux_2(PreFr_1, [_PreFr_2 | More_PreFr_2], More_P
 
 pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, Frontier_Out) :-
 	print_msg(3, 3, 'list', 'pre_frontier_to_frontier :: Goal_PreFrontier', Goal_PreFrontier),
-	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, [], Frontier_Out), !,
+	pre_frontier_to_frontier_aux_1(Goal_PreFrontier, GoalVars, [], Frontier_Out), !,
 	print_msg(3, 3, 'list', 'pre_frontier_to_frontier :: Frontier_Out', Frontier_Out).
 
 pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, _Frontier_Out) :-
@@ -326,15 +326,24 @@ pre_frontier_to_frontier(Goal_PreFrontier, GoalVars, _Frontier_Out) :-
 	print_msg(1, 3, 'nl', '', ''),
 	!, fail.
 
-pre_frontier_to_frontier_aux([], _GoalVars, Frontier_Out, Frontier_Out) :- !.
-pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVars, Frontier_In, Frontier_Out) :-
+pre_frontier_to_frontier_aux_1([], _GoalVars, Frontier_Out, Frontier_Out) :- !.
+pre_frontier_to_frontier_aux_1([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVars, Frontier_In, Frontier_Out) :-
+	pre_frontier_to_frontier_aux_2(Goal_PreFrontier_Node, GoalVars, Frontier_In, Frontier_Aux), !,
+	pre_frontier_to_frontier_aux_1(Goal_PreFrontier, GoalVars, Frontier_Aux, Frontier_Out).
+
+pre_frontier_to_frontier_aux_2(Goal_PreFrontier_Node, GoalVars, Frontier_In, Frontier_Aux) :-
 	print_msg(3, 3, 'nl', '', ''),
-	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
-	pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Goal_Frontier_Nodes), !,
-	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux :: Goal_Frontier_Nodes', Goal_Frontier_Nodes),
+	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux_2 :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
+	pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Goal_Frontier_Nodes), 
+	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux_2 :: Goal_Frontier_Nodes', Goal_Frontier_Nodes),
 	print_msg(3, 3, 'nl', '', ''),
-	append(Goal_Frontier_Nodes, Frontier_In, Frontier_Aux), !,
-	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_Aux, Frontier_Out).
+	append(Goal_Frontier_Nodes, Frontier_In, Frontier_Aux), !.
+
+pre_frontier_to_frontier_aux_2(Goal_PreFrontier_Node, GoalVars, Frontier_In, Frontier_In) :-
+	print_msg(1, 3, '', 'ERROR: pre_frontier_to_frontier_aux_2 :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
+	print_msg(1, 3, '', 'ERROR: pre_frontier_to_frontier_aux_2 :: GoalVars', GoalVars),
+	print_msg(1, 3, '', 'ERROR: pre_frontier_to_frontier_aux_2 :: Frontier_In', Frontier_In),
+	!, fail.
 
 %
 % This is one of the most complicated predicates.
@@ -392,7 +401,8 @@ get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Front
  	call_to_predicate((E_Copy, IE_Copy)), !,
 	print_msg(3, 3, 'nl', '', ''), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers', 'construction with goal terms'), !,
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E, IE)), !,
+	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E_Copy, IE_Copy)),
+	% print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E, IE)), !,
 	print_msg(3, 3, 'nl', '', ''), !,
 	get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes).
 
@@ -402,18 +412,27 @@ get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, [
 :- meta_predicate get_frontier_from_pre_frontier_aux(goal, goal, ?, ?, ?, ?, ?).
 get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
+	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	setof((GoalVars, LocalVars, RG_Diseqs, NIE), (E, IE), PreFr_Node_Answers), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: Frontier_Nodes', Frontier_Nodes).
 
+get_frontier_from_pre_frontier_aux(E, IE, _NIE, GoalVars, LocalVars, _RG_Diseqs, _Frontier_Nodes) :-
+	print_msg(3, 3, '', 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
+	print_msg_with_diseqs(3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
+	print_msg_with_diseqs(3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: GoalVars', GoalVars),
+	print_msg_with_diseqs(3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: LocalVars', LocalVars),
+	!, fail.
+	
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_eqs_and_diseqs_from_answers(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_Out) :-
-	get_eqs_and_diseqs_from_answers_aux(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_Out).
+	get_eqs_and_diseqs_from_answers_aux(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_Out), !.
 get_eqs_and_diseqs_from_answers(Answers, GoalVars, Frontier_Nodes_In, Frontier_Nodes_In) :-
 	print_msg(1, 3, '', 'ERROR: get_eqs_and_diseqs_from_answers :: Answers', Answers),
 	print_msg(1, 3, '', 'ERROR: get_eqs_and_diseqs_from_answers :: GoalVars', GoalVars),

@@ -361,27 +361,27 @@ get_and_remove_eqv_and_uqv_from_diseqs([Diseq | Diseqs], EQV_In, EQV_Out, UQV_In
 % Como cada uno tiene su manejador, tratar de mezclar los atributos no aporta nada.
 
 test_and_update_vars_attributes(New_Diseqs) :-
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: New_Diseqs', New_Diseqs),  
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: New_Diseqs', New_Diseqs),  
 
 	cneg_aux:varsbag(New_Diseqs, [], [], New_Diseqs_Vars), !,
 	retrieve_affected_disequalities(New_Diseqs_Vars, [], [], Old_Diseqs), !,
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs', Old_Diseqs),
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs', Old_Diseqs),
 
 	% Get which variables are EQV so we distinguish them from UQV.
 	get_and_remove_eqv_and_uqv_from_diseqs(New_Diseqs, [], ND_EQV, [], ND_UQV, New_Diseqs_Aux),
 	get_and_remove_eqv_and_uqv_from_diseqs(Old_Diseqs, [], OD_EQV, [], OD_UQV, Old_Diseqs_Aux), !,
 	
 	test_vars_sets_are_exclusive(ND_EQV, ND_UQV, OD_EQV, OD_UQV, All_EQV, All_UQV), !, % The sets must be exclusive.
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: New_Diseqs_Aux', New_Diseqs_Aux),
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs_Aux', Old_Diseqs_Aux), !,
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: (All_EQV, All_UQV)', (All_EQV, All_UQV)),
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: New_Diseqs_Aux', New_Diseqs_Aux),
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: Old_Diseqs_Aux', Old_Diseqs_Aux), !,
 	append(New_Diseqs_Aux, Old_Diseqs_Aux, All_Diseqs),
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: All_Diseqs', All_Diseqs), !,
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: All_Diseqs', All_Diseqs), !,
 
 	% At first we check that the new disequalities can be added to the old ones.
 	diseqs_list_to_basic_diseqs_list(All_Diseqs, [], Simplified_Diseqs, All_EQV), 
 
-	print_msg(3, 4, '', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
+	print_msg(4, 4, '', 'test_and_update_vars_attributes :: Simplified_Diseqs', Simplified_Diseqs),
 	restore_attributes(Simplified_Diseqs, All_EQV, All_UQV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
