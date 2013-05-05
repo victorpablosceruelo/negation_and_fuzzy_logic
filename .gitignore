@@ -5,6 +5,7 @@
 *.itf
 *_co.pl
 *.ast
+*.asr
 *_shfr_co.pl 
 *_co.pl 
 *_shfr_co* 
