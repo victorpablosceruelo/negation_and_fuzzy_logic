@@ -23,15 +23,14 @@
 
 cneg_rt(Goal, GoalVars_In) :-
 	% print_msg(3, 3, '', 'cneg_rt', cneg_rt(Goal, GoalVars_In)),
-	print_msg(3, 3, '', 'trace', cneg_rt(Goal, GoalVars_In)),
-	print_msg(3, 3, 'trace', 'cneg_rt', cneg_rt(Goal, GoalVars_In)),
+	print_msg(3, 6, '', 'cneg_rt :: trace', cneg_rt(Goal, GoalVars_In)),
 
 	cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier),
 	!, % Backtracking forbidden.
 	generate_conjunction_from_list(Negated_Frontier, Conjunction),
-	print_msg(3, 3, '', 'trace', 'evaluating result of cneg_rt(Goal, GoalVars_In)'),
-	print_msg(3, 3, '', 'trace', cneg_rt(Goal, GoalVars_In)),
-	print_msg(3, 3, '', 'trace', Conjunction),
+	print_msg(3, 6, '', 'trace', 'evaluating result of cneg_rt(Goal, GoalVars_In)'),
+	print_msg(3, 6, '', 'trace', cneg_rt(Goal, GoalVars_In)),
+	print_msg(3, 6, '', 'trace', Conjunction),
 	call_to_predicate(Conjunction).	
 
 cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-

@@ -14,8 +14,6 @@
 %:- multifile cneg_pre_frontier/9.
 %:- multifile call_to/3.
 :- multifile file_debug_is_activated/1.
-:- dynamic trace_index/1.
-:- dynamic trace_info/2.
 
 :- comment(title, "Auxiliary predicates for printing msgs.").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
