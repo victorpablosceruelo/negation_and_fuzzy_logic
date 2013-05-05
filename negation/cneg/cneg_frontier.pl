@@ -413,7 +413,7 @@ get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, [
 get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
-	setof((GoalVars, LocalVars, RG_Diseqs, NIE), (E, IE), PreFr_Node_Answers), !,
+	setof((GoalVars, LocalVars, RG_Diseqs, NIE), call_to_predicate((E, IE)), PreFr_Node_Answers), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
