@@ -325,10 +325,10 @@ pre_frontier_to_frontier_aux([], _GoalVars, Frontier_Out, Frontier_Out) :- !.
 pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVars, Frontier_In, Frontier_Out) :-
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
-	pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, [], Goal_Frontier_Nodes), !,
+	pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars, Goal_Frontier_Nodes), !,
 	print_msg(3, 3, '', 'pre_frontier_to_frontier_aux :: Goal_Frontier_Nodes', Goal_Frontier_Nodes),
 	print_msg(3, 3, 'nl', '', ''),
-	append(Frontier_In, Goal_Frontier_Nodes, Frontier_Aux), !,
+	append(Goal_Frontier_Nodes, Frontier_In, Frontier_Aux), !,
 	pre_frontier_to_frontier_aux(Goal_PreFrontier, GoalVars, Frontier_Aux, Frontier_Out).
 
 %
@@ -342,7 +342,7 @@ pre_frontier_to_frontier_aux([Goal_PreFrontier_Node | Goal_PreFrontier], GoalVar
 % (6) decide which unifications and constraints have been generated in step (4).
 %
 % :- meta_predicate pre_frontier_node_to_frontier_node(goal, ?, ?, ?).
-pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Frontier_In, Frontier_Out) :-
+pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Goal_Frontier_Nodes) :-
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
 %	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
@@ -363,9 +363,8 @@ pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Frontier_
 	get_list_of_disequalities_in_vars(Real_Goal, RG_Diseqs),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: RG_Diseqs', RG_Diseqs),
 
-	get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes),
-	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: Frontier_Nodes', Frontier_Nodes),
-	append(Frontier_In, Frontier_Nodes, Frontier_Out). % Is order really relevant ???
+	get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Goal_Frontier_Nodes),
+	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: Goal_Frontier_Nodes', Goal_Frontier_Nodes), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -386,7 +385,10 @@ get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Front
 	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier :: testing :: (E, IE)', (E, IE)),
 	copy_term((E, IE), (E_Copy, IE_Copy)),
  	call_to_predicate((E_Copy, IE_Copy)), !,
+	print_msg(3, 3, 'nl', '', ''), !,
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers', 'construction with goal terms'), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E, IE)), !,
+	print_msg(3, 3, 'nl', '', ''), !,
 	get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes).
 
 get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, []) :-
@@ -394,12 +396,12 @@ get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, [
 
 :- meta_predicate get_frontier_from_pre_frontier_aux(goal, goal, ?, ?, ?, ?, ?).
 get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: (E, IE)', (E, IE)),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	setof((GoalVars, LocalVars, RG_Diseqs, NIE), (E, IE), PreFr_Node_Answers), !,
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: PreFr_Node_Answers', PreFr_Node_Answers),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: Frontier_Nodes', Frontier_Nodes).
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: Frontier_Nodes', Frontier_Nodes).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -414,7 +416,8 @@ get_eqs_and_diseqs_from_answers([Answer | Answers], GoalVars, FN_In, FN_Out) :- 
 get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Diseqs, Answ_NIE),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars)', (GoalVars)),
-	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: (Answ_GoalVars, Answ_LocalVars)', (Answ_GoalVars, Answ_LocalVars)),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_GoalVars', Answ_GoalVars),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_LocalVars', Answ_LocalVars),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_RG_Diseqs', Answ_RG_Diseqs),
 
 	% A variable can have attributes coming from a higher level, 
@@ -429,6 +432,10 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	get_equalities_conj_from_lists(GoalVars, Answ_GoalVars, true, New_E), 
 	!, 
 	subfrontier_E_IE_NIE_contents(Frontier_Node, New_E, New_IE, Answ_NIE),
+	print_msg(3, 3, 'nl', '', ''),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_E', New_E),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_IE', New_IE),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_NIE', Answ_NIE),
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, 'no-nl', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node),
 	print_vars_diseqs(3, '', Frontier_Node), 
