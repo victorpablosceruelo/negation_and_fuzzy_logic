@@ -234,7 +234,7 @@ constraints_list_to_disequalities_list([], Disequalities_List_In, Disequalities_
 constraints_list_to_disequalities_list([Constraint | Constraints], Disequalities_List_In, Disequalities_List_Out) :-
 %	print_msg(3, 4, '', 'format_diseq_for_printing :: Disequality', Disequality), 
 	attribute_to_constraints_list(Constraint, Disequality), !,
-	add_to_list_if_not_there(Disequality, Disequalities_List_In, Disequalities_List_Aux), !,
+	add_to_diseqs_list_if_not_there(Disequality, Disequalities_List_In, Disequalities_List_Aux), !,
 %	print_msg(3, 4, '', 'format_diseq_for_printing :: Print_Disequality', Print_Disequality), 
 	constraints_list_to_disequalities_list(Constraints, Disequalities_List_Aux, Disequalities_List_Out).
 
@@ -249,6 +249,15 @@ attribute_to_constraints_list(Constraint, Disequality) :-
 	arg(1, Disequality, T1), 
 	arg(2, Disequality, T2), 
 	arg(3, Disequality, Real_UQ_Vars).
+
+add_to_diseqs_list_if_not_there(Disequality, Disequalities_List, Disequalities_List) :- 
+	memberchk(Disequality, Disequalities_List), !.
+add_to_diseqs_list_if_not_there(Disequality, Disequalities_List, Disequalities_List) :- 
+	functor_local(Disequality, 'disequality', 3, [T1 |[ T2 |[ UQ_Vars ]]]),
+	functor_local(Disequality_Aux, 'disequality', 3, [T2 |[ T1 |[ UQ_Vars ]]]),
+	memberchk(Disequality_Aux, Disequalities_List), !.
+add_to_diseqs_list_if_not_there(Disequality, Disequalities_List, [Disequality | Disequalities_List]) :- !.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
