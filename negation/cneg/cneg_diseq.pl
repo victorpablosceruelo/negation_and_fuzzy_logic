@@ -5,7 +5,8 @@
 	    get_list_of_disequalities_in_vars/2,
 	    get_list_of_disequalities_in_vars_and_remove_them/2, 
 	    disequalities_list_to_disequalities_conjunction/3,
-	    disequalities_lists_difference/3
+	    disequalities_lists_difference/3,
+	    print_msg_with_diseqs/4
 	], 
 	[assertions]).
 
@@ -146,6 +147,13 @@ prepare_attributes_for_printing(Term, Disequalities_Conj) :-
 	attributes_list_to_disequalities_conjunction(Vars_With_Attrs, [], Disequalities_Conj),
 	print_msg(4, 4, '', 'attribute_goals :: Attrs', Disequalities_Conj), 
 	!. % Backtracking forbidden.
+
+print_msg_with_diseqs(FI_1, FI_2, Msg, Term) :-
+	print_msg(FI_1, FI_2, 'aux', '', Msg),
+	print_msg(FI_1, FI_2, 'aux', '', ' '),
+	print_msg(FI_1, FI_2, 'aux', '', Term),
+	get_list_of_disequalities_in_vars(Term, Diseqs),
+	print_msg(FI_1, FI_2, 'one-line', ' (diseqs) ', Diseqs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

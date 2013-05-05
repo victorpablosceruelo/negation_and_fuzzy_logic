@@ -7,29 +7,25 @@ cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2, echo_fail/0, echo
 tests :- 
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'nl', '', ''),
-	print_msg(1, 3, '', 'Tests that should succeed', ''),
-	tests_succeed(Logo, Vars, First_Part, Second_Part), 
-	test_execution(Logo, Vars, First_Part, Second_Part, 'should_succeed'),
-	fail.
-
-tests :- 
-	print_msg(1, 3, 'nl', '', ''),
-	print_msg(1, 3, '', 'Tests that should fail', ''), 
-	tests_fail(Logo, Vars, First_Part, Second_Part), 
-	test_execution(Logo, Vars, First_Part, Second_Part, 'should_fail'),
+	test(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What), 
+	test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What),
 	fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-tests_succeed('s01', [C], (queens(0, C)), true).
-tests_fail('0 queens +-', [C], (queens(0, C)), (cneg(queens(0, C)))).
-tests_fail('0 queens -+', [C], (cneg(queens(0, C))), (queens(0, C))).
-tests_fail('1 queen +-', [C], (queens(s(0), C)), (cneg(queens(s(0), C)))).
-tests_fail('1 queen -+', [C], (cneg(queens(s(0), C))), (queens(s(0), C))).
-tests_fail('2 queens +-', [C], (queens(s(s(0)), C)), (cneg(queens(s(s(0)), C)))).
-tests_fail('2 queens -+', [C], (cneg(queens(s(s(0)), C))), (queens(s(s(0)), C))).
+test('0 queens', (queens(0, C)), 'should_succeed', forget_it(C), 'should_succeed').
+test('1 queens', (queens(s(0), C)), 'should_succeed', forget_it(C), 'should_succeed').
+test('2 queens', (queens(s(s(0)), C)), 'should_fail', forget_it(C), 'should_succeed').
+test('3 queens', (queens(s(s(s(0))), C)), 'should_fail', forget_it(C), 'should_succeed').
+
+test('0 queens +-', (queens(0, C)), 'should_succeed', (cneg(queens(0, C))), 'should_fail').
+test('0 queens -+', (cneg(queens(0, C))), 'should_succeed', (queens(0, C)), 'should_fail').
+test('1 queen +-', (queens(s(0), C)), 'should_succeed', (cneg(queens(s(0), C))), 'should_fail').
+test('1 queen -+', (cneg(queens(s(0), C))), 'should_succeed', (queens(s(0), C)), 'should_fail').
+test('2 queens +-', (queens(s(s(0)), C)), 'should_succeed', (cneg(queens(s(s(0)), C))), 'should_fail').
+test('2 queens -+', (cneg(queens(s(s(0)), C))), 'should_succeed', (queens(s(s(0)), C)), 'should_fail').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,10 +41,7 @@ complex_tests(N, Columns) :-
 	    (
 		print_msg(1, 3, '', ' -- STARTED (-) -- ', cneg(queens(N, Columns))), 
 		cneg(queens(N, Columns)), % First constraints.
-		print_msg(1, 3, 'aux', ' -- READY (-) -- ', cneg(queens(N, Columns))),
-		print_msg(1, 3, 'aux', '', ' '),
-		print_vars_diseqs(1, '', (N, Columns)),
-		print_msg(1, 3, 'nl', '', ''),
+		print_msg_with_diseqs(1, 3, ' -- READY (-) -- ', cneg(queens(N, Columns))),
 		complex_tests_aux_for_negative(N, Columns)
 	    )
 	;
@@ -64,10 +57,7 @@ complex_tests_aux_for_negative(N, Columns) :-
 	(
 	    (
 		queens(N, Columns), % Secondly values generator.
-		print_msg(1, 3, 'aux', ' -- FAILED (-) -- ', queens(N, Columns)),
-		print_msg(1, 3, 'aux', '', ' '),
-		print_vars_diseqs(1, '', (N, Columns)),
-		print_msg(1, 3, 'nl', '', '')
+		print_msg_with_diseqs(1, 3, ' -- FAILED (-) -- ', queens(N, Columns))
 		% !, fail
 	    )
 	;
@@ -81,10 +71,7 @@ complex_tests_aux_for_positive(N, Columns) :-
 	(
 	    (
 		cneg(queens(N, Columns)), % Second constraints.
-		print_msg(1, 3, 'aux', ' -- FAILED (+) -- ', queens(N, Columns)), 
-		print_msg(1, 3, 'aux', '', ' '),
-		print_vars_diseqs(1, '', (N, Columns)),
-		print_msg(1, 3, 'nl', '', '')
+		print_msg_with_diseqs(1, 3, ' -- FAILED (+) -- ', queens(N, Columns))
 		% !, fail
 	    )
 	;

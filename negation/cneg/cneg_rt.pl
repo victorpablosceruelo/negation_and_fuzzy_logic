@@ -5,6 +5,7 @@
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
 :- comment(summary, "This module implements negation predicates for runtime evaluation.").
 
+:- use_module(library(engine(data_facts)),[retractall_fact/1]).
 :- use_module(library('cneg/cneg_aux')).
 :- use_module(library('cneg/cneg_diseq')).
 :- use_module(library('cneg/cneg_frontier')).
@@ -16,6 +17,8 @@
 :- multifile call_to_predicate/1.
 % Debugging or not ... that is the question.
 :- multifile file_debug_is_activated/1.
+% To determine if a predicate passed or not
+:- dynamic test/1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +45,8 @@ cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
 	print_msg(3, 3, '', 'cneg_rt :: (GoalVars)', GoalVars),
 	print_msg(3, 3, 'aux', 'cneg_rt :: Goal', Goal),
-	print_vars_diseqs(3, '', Goal),
+	get_list_of_disequalities_in_vars(Goal, Goal_Diseqs_For_Printing),
+	print_msg(1, 3, 'one-line', ' (diseqs) ', Goal_Diseqs_For_Printing),
 	print_msg(3, 3, 'nl', '', ''),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	compute_frontier(Goal, GoalVars, Frontier),
@@ -70,61 +74,68 @@ cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test_execution(Logo, Vars, First_Part, Second_Part, Should_What) :-
+test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What) :-
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg(1, 3, 'aux', '', 'Test: '),
+	print_msg_with_diseqs(1, 3, Logo, (Part_1, Part_2)),
+	print_msg(1, 3, 'nl', '', ''),
+	
+	test_execution_by_part('1st part: ', Part_1, Part_1_Should_What),
+	test_execution_by_part('2nd part: ', Part_2, Part_2_Should_What).
+
+
+test_execution_by_part(Logo, Part, Should_What) :-
+	print_msg(1, 3, 'nl', '', ''),
+	print_msg_with_diseqs(1, 3, Logo, Part),
+	retractall_fact(test(_Whatever)),
 	(
 	    (
-		print_msg(1, 3, 'nl', '', ''),
-		print_msg(1, 3, 'aux', 'Test: ', Logo),
-		print_msg(1, 3, 'aux', '', ' (vars with attrs) '),
-		print_vars_diseqs(1, '', Vars), 
-		print_msg(1, 3, 'nl', '', ''),
-		print_msg(1, 3, 'aux', '1st: ', First_Part), 
-		call_to_predicate(First_Part),
-		print_msg(1, 3, 'aux', '', ' --> (vars with attrs) '),
-		print_vars_diseqs(1, '', Vars), 
-		print_msg(1, 3, 'nl', '', ''),
-		print_msg(1, 3, 'aux', '2nd: ', Second_Part), 
-		call_to_predicate(Second_Part),
-		print_msg(1, 3, 'aux', ' --> (vars with attrs) ', ''), 
-		print_vars_diseqs(1, '', Vars), 
-		print_msg(1, 3, 'nl', '', ''), !,
-		
+		call_to_predicate(Part),
+		assertz_fact(test('passed')),
+		print_msg_with_diseqs(1, 3, '', Part), 
 		(
 		    (
 			Should_What = 'should_succeed',
-			print_msg(1, 3, 'aux', ' -> PASS', ''),
-			print_msg(1, 3, 'nl', '', ''),
-			print_msg(1, 3, 'nl', '', '')
+			print_msg(1, 3, '', ' -> PASS', '')
 		    )
 		;
 		    (
 			Should_What = 'should_fail',
-			print_msg(1, 3, 'aux', ' -> ERROR', ''),
-			print_msg(1, 3, 'nl', '', ''),
-			print_msg(1, 3, 'nl', '', '')
+			print_msg(1, 3, '', ' -> ERROR', ''),
+			print_msg_with_diseqs(1, 3, '', (Part))
 		    )
-		),
-		!
+		)
 	    )
 	;
 	    (
 		(
+		    Should_What = 'should_fail',
 		    (
-			Should_What = 'should_succeed',
-			print_msg(1, 3, 'aux', ' -> ERROR', ''),
-			print_msg(1, 3, 'nl', '', ''), 
-			print_msg(1, 3, 'nl', '', '')
+			(
+			    test(_Whatever_passed), !, 
+			    print_msg(1, 3, '', ' -> ERROR', '')
+			)
+		    ;
+			(
+			    print_msg(1, 3, '', ' -> PASS', '')
+			)
 		    )
-		;
+		)
+	    ;
+		(
+		    Should_What = 'should_succeed',
 		    (
-			Should_What = 'should_fail',
-			print_msg(1, 3, 'aux', ' -> PASS', ''),
-			print_msg(1, 3, 'nl', '', ''), 
-			print_msg(1, 3, 'nl', '', '')
+			(
+			    test(_Whatever_passed), !
+			)
+		    ;
+			(
+			    print_msg(1, 3, '', ' -> ERROR', '')
+			)
 		    )
 		)
 	    )
-	), !.
+	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

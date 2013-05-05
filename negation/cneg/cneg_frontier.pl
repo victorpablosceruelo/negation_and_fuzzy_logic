@@ -199,17 +199,17 @@ test_pre_frontier_validity(PreFr) :-
 	(
 	    (
 		call_to_predicate((E, IE)), !, 
-		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: Real_Goal', Real_Goal),
-		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: (E, IE)', (E, IE)),
-		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
+		print_msg_with_diseqs(3, 3, 'test_pre_frontier_validity :: VALID :: Real_Goal', Real_Goal),
+		print_msg_with_diseqs(3, 3, 'test_pre_frontier_validity :: VALID :: (E, IE)', (E, IE)),
+		print_msg_with_diseqs(3, 3, 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
 		print_msg(3, 3, 'nl', '', ''),
 		! % Backtracking forbidden.
 	    )
 	;
 	    (
-		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: Real_Goal', Real_Goal),
-		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: (E, IE)', (E, IE)),
-		print_msg_with_diseqs(3, 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
+		print_msg_with_diseqs(3, 3, 'test_pre_frontier_validity :: VALID :: Real_Goal', Real_Goal),
+		print_msg_with_diseqs(3, 3, 'test_pre_frontier_validity :: VALID :: (E, IE)', (E, IE)),
+		print_msg_with_diseqs(3, 3, 'test_pre_frontier_validity :: VALID :: PreFr', PreFr),
 		print_msg(3, 3, 'nl', '', '')
 	    )
 	), !. % Backtracking forbidden. 
@@ -396,12 +396,12 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 
 :- meta_predicate get_frontier_from_pre_frontier(goal, goal, ?, ?, ?, ?, ?).
 get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
-	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier :: testing :: (E, IE)', (E, IE)),
+	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier :: testing :: (E, IE)', (E, IE)),
 	copy_term((E, IE), (E_Copy, IE_Copy)),
  	call_to_predicate((E_Copy, IE_Copy)), !,
 	print_msg(3, 3, 'nl', '', ''), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers', 'construction with goal terms'), !,
-	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E_Copy, IE_Copy)),
+	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E_Copy, IE_Copy)),
 	% print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E, IE)), !,
 	print_msg(3, 3, 'nl', '', ''), !,
 	get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes).
@@ -412,7 +412,7 @@ get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, [
 :- meta_predicate get_frontier_from_pre_frontier_aux(goal, goal, ?, ?, ?, ?, ?).
 get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
-	print_msg_with_diseqs(3, 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
+	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	setof((GoalVars, LocalVars, RG_Diseqs, NIE), call_to_predicate((E, IE)), PreFr_Node_Answers), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', PreFr_Node_Answers),
@@ -421,9 +421,9 @@ get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, F
 
 get_frontier_from_pre_frontier_aux(E, IE, _NIE, GoalVars, LocalVars, _RG_Diseqs, _Frontier_Nodes) :-
 	print_msg(3, 3, '', 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
-	print_msg_with_diseqs(3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
-	print_msg_with_diseqs(3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: GoalVars', GoalVars),
-	print_msg_with_diseqs(3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: LocalVars', LocalVars),
+	print_msg_with_diseqs(3, 3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
+	print_msg_with_diseqs(3, 3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: GoalVars', GoalVars),
+	print_msg_with_diseqs(3, 3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: LocalVars', LocalVars),
 	!, fail.
 	
 
@@ -469,8 +469,7 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_IE', New_IE),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_NIE', Answ_NIE),
 	print_msg(3, 3, 'nl', '', ''),
-	print_msg(3, 3, 'no-nl', 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node),
-	print_vars_diseqs(3, '', Frontier_Node), 
+	print_msg_with_diseqs(3, 3, 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node), 
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, 'nl', '', ''),
 	!.

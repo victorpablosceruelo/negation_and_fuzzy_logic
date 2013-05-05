@@ -80,6 +80,11 @@ print_msg_aux(FI, 'list', Pre_Msg, Msg) :- !,
 print_msg_aux(FI, 'no-nl', Pre_Msg, Msg) :- !,
 	  print_msg_normal(FI, Pre_Msg, Msg).
 
+print_msg_aux(FI, 'one-line', Pre_Msg, Msg) :- !,
+	print_msg_normal_aux(FI, Pre_Msg), 
+	print_msg_normal_aux(FI, Msg), 
+	print_msg_aux(FI, 'nl', '', '').
+
 print_msg_aux(FI, '', Pre_Msg, Msg) :- !,
 	  print_msg_normal(FI, Pre_Msg, Msg),
 	  print_msg_aux(FI, 'nl', '', '').
