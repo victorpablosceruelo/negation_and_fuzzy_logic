@@ -2,8 +2,6 @@
 	[
  	    equality/3, disequality/3,
  	    prepare_attributes_for_printing/2,
-	    print_vars_diseqs/3,
-	    print_msg_with_diseqs/3,
 	    get_list_of_disequalities_in_vars/2,
 	    get_list_of_disequalities_in_vars_and_remove_them/2, 
 	    disequalities_list_to_disequalities_conjunction/3,
@@ -142,44 +140,6 @@ attribute_goals(Term) -->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-print_msg_with_diseqs(FI, Pre_Msg, Msg) :-
-	print_msg(FI, 4, 'no-nl', Pre_Msg, Msg),
-	print_msg(3, 3, 'aux', '', ' (diseqs:) '),
-	print_vars_diseqs(3, '', Msg), 
-	print_msg(3, 3, 'nl', '', ''), !.
-
-
-%print_vars_diseqs(Echo_Level, Mode, File_Name, Term) :-
-%	print_msg(Echo_Level, Mode, File_Name, Term, ' '). % Space for reading.
-
-print_vars_diseqs(_FI, '', []) :- !.
-print_vars_diseqs(FI, Pre_Msg, []) :- 
-	Pre_Msg \== '', !,
-	print_msg(FI, 3, '', Pre_Msg, '[]'), !.
-
-print_vars_diseqs(FI, '', [Var | Vars]) :- !,
-	prepare_attributes_for_printing(Var, Attributes_For_Printing_Conj),
-	print_msg(FI, 3, 'aux', Var, ': '),
-	print_msg(FI, 3, 'aux', Attributes_For_Printing_Conj, '  '), !,
-	print_vars_diseqs(FI, '', Vars), !.
-print_vars_diseqs(FI, Pre_Msg, [Var | Vars]) :-
-	Pre_Msg \== '',
-	prepare_attributes_for_printing(Var, Attributes_For_Printing_Conj),
-	print_msg(FI, 3, 'nl', '', ''),
-	print_msg(FI, 3, 'aux', Pre_Msg, ''),
-	print_msg(FI, 3, 'aux', Var, ': '),
-	print_msg(FI, 3, 'aux', Attributes_For_Printing_Conj, '  '), !,
-	print_vars_diseqs(FI, '', Vars), !.
-
-print_vars_diseqs(FI, Msg, Term) :- !,
-	varsbag(Term, [], [], Vars), !,
-	print_vars_diseqs(FI, Msg, Vars), !.
-	
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	    
 prepare_attributes_for_printing(Term, Disequalities_Conj) :-
 	print_msg(4, 4, '', 'attribute_goals :: Term', Term),
 	get_attributes_in_term_vars(Term, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
