@@ -198,6 +198,7 @@ get_file_name(2, 'debug_pkg_cneg_tr.pl') :- !.
 get_file_name(3, 'debug_pkg_cneg_rt.pl') :- !.
 get_file_name(4, 'debug_pkg_cneg_diseqs.pl') :- !.
 get_file_name(5, 'debug_pkg_cneg_statistics.pl') :- !.
+get_file_name(6, 'debug_pkg_cneg_trace.pl') :- !.
 get_file_name(_Any, 'debug_pkg_cneg_errors.pl') :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
