@@ -8,8 +8,18 @@ tests :-
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'nl', '', ''),
 	test(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What), 
-	test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What),
-	fail.
+	test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What, Result),
+	(
+	    (
+		Result = true,
+		fail % Go for more tests
+	    )
+	;
+	    (
+		Result = fail,
+		!, fail % Stop testing.
+	    )
+	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

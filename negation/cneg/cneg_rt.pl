@@ -1,5 +1,5 @@
 
-:- module(cneg_rt, [cneg_rt/2, cneg_rt_aux/3, test_execution/5], [assertions]).
+:- module(cneg_rt, [cneg_rt/2, cneg_rt_aux/3, test_execution/6], [assertions]).
 
 :- comment(title, "Contructive Negation Runtime Library").
 :- comment(author, "V@'{i}ctor Pablos Ceruelo").
@@ -74,35 +74,40 @@ cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What) :-
+test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What, Result) :-
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg(1, 3, 'aux', '', 'Test: '),
 	print_msg_with_diseqs(1, 3, Logo, (Part_1, Part_2)),
 	print_msg(1, 3, 'nl', '', ''),
 	
-	test_execution_by_part('1st part: ', Part_1, Part_1_Should_What),
-	test_execution_by_part('2nd part: ', Part_2, Part_2_Should_What).
+	test_execution_by_part('1st part: ', Part_1, Part_1_Should_What, Result_Part_1),
+	test_execution_by_part('2nd part: ', Part_2, Part_2_Should_What, Result_Part_2),
+	goals_join_by_conjunction(Result_Part_1, Result_Part_2, Result).
 
 
-test_execution_by_part(Logo, Part, Should_What) :-
+test_execution_by_part(Logo, Part, Should_What, Result) :-
 	print_msg(1, 3, 'nl', '', ''),
 	print_msg_with_diseqs(1, 3, Logo, Part),
-	retractall_fact(test(_Whatever)),
+	retractall_fact(test(Logo)),
 	(
 	    (
 		call_to_predicate(Part),
-		assertz_fact(test('passed')),
+		assertz_fact(test(Logo)),
 		print_msg_with_diseqs(1, 3, '', Part), 
 		(
 		    (
 			Should_What = 'should_succeed',
-			print_msg(1, 3, '', ' -> PASS', '')
+			print_msg(1, 3, 'aux', ' -> PASS (', Should_What),
+			print_msg(1, 3, '', '', ')'),
+			Result = true
 		    )
 		;
 		    (
 			Should_What = 'should_fail',
-			print_msg(1, 3, '', ' -> ERROR', ''),
-			print_msg_with_diseqs(1, 3, '', (Part))
+			print_msg(1, 3, 'aux', ' -> ERROR (', Should_What),
+			print_msg(1, 3, '', '', ')'),
+			print_msg_with_diseqs(1, 3, '', (Part)),
+			Result = fail
 		    )
 		)
 	    )
@@ -112,12 +117,16 @@ test_execution_by_part(Logo, Part, Should_What) :-
 		    Should_What = 'should_fail',
 		    (
 			(
-			    test(_Whatever_passed), !, 
-			    print_msg(1, 3, '', ' -> ERROR', '')
+			    test(Logo), !, 
+			    print_msg(1, 3, 'aux', ' -> ERROR (', Should_What),
+			    print_msg(1, 3, '', '', ')'),
+			    Result = fail
 			)
 		    ;
 			(
-			    print_msg(1, 3, '', ' -> PASS', '')
+			    print_msg(1, 3, 'aux', ' -> PASS (', Should_What),
+			    print_msg(1, 3, '', '', ')'),
+			    Result = true
 			)
 		    )
 		)
@@ -126,11 +135,14 @@ test_execution_by_part(Logo, Part, Should_What) :-
 		    Should_What = 'should_succeed',
 		    (
 			(
-			    test(_Whatever_passed), !
+			    test(_Whatever_passed), !,
+			    Result = true
 			)
 		    ;
 			(
-			    print_msg(1, 3, '', ' -> ERROR', '')
+			    print_msg(1, 3, 'aux', ' -> ERROR (', Should_What),
+			    print_msg(1, 3, '', '', ')'),
+			    Result = fail
 			)
 		    )
 		)

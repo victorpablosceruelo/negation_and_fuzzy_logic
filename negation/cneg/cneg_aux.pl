@@ -630,6 +630,8 @@ combine_sub_bodies_by_conjunction_aux(Elto_1, [Elto_2 | List], [(Elto_1, Elto_2)
 goals_join_by_conjunction(true, true, true) :- !.
 goals_join_by_conjunction(true, Goal_2, Goal_2) :- !.
 goals_join_by_conjunction(Goal_1, true, Goal_1) :- !.
+goals_join_by_conjunction(fail, _Goal_2, fail) :- !.
+goals_join_by_conjunction(_Goal_1, fail, fail) :- !.
 goals_join_by_conjunction(Goal_1, Goal_2, (Goal_1, Goal_2)) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
