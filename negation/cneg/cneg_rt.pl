@@ -44,10 +44,7 @@ cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 
 	varsbag(GoalVars_In, [], [], GoalVars), % Clean up non-vars in GoalVars.
 	print_msg(3, 3, '', 'cneg_rt :: (GoalVars)', GoalVars),
-	print_msg(3, 3, 'aux', 'cneg_rt :: Goal', Goal),
-	get_list_of_disequalities_in_vars(Goal, Goal_Diseqs_For_Printing),
-	print_msg(1, 3, 'one-line', ' (diseqs) ', Goal_Diseqs_For_Printing),
-	print_msg(3, 3, 'nl', '', ''),
+	print_msg_with_diseqs(3, 3, 'cneg_rt :: Goal', Goal),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	compute_frontier(Goal, GoalVars, Frontier),
 	!, % Reduce the stack's memory by forbidding backtracking.
