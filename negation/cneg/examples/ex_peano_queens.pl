@@ -149,7 +149,3 @@ subst(X,0,X).
 subst(s(X),s(Y),Z) :-
 	subst(X,Y,Z).
 
-
-
-
-
