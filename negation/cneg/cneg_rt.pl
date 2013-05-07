@@ -81,7 +81,17 @@ test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What, Res
 	print_msg(1, 3, 'nl', '', ''),
 	
 	test_execution_by_part('1st part: ', Part_1, Part_1_Should_What, Result_Part_1),
-	test_execution_by_part('2nd part: ', Part_2, Part_2_Should_What, Result_Part_2),
+	(
+	    (
+		Result_Part_1 = true,
+		test_execution_by_part('2nd part: ', Part_2, Part_2_Should_What, Result_Part_2)
+	    )
+	;
+	    (
+		Result_Part_1 = fail, Result_Part_2 = fail, 
+		print_msg(1, 3, 'aux', '', 'Not evaluating the 2nd part.')
+	    )
+	),
 	goals_join_by_conjunction(Result_Part_1, Result_Part_2, Result).
 
 
@@ -120,7 +130,7 @@ test_execution_by_part(Logo, Part, Should_What, Result) :-
 			    test(Logo), !, 
 			    print_msg(1, 3, 'aux', ' -> ERROR (', Should_What),
 			    print_msg(1, 3, '', '', ')'),
-			    Result = fail
+			    Result = fail, !, fail
 			)
 		    ;
 			(
@@ -136,13 +146,13 @@ test_execution_by_part(Logo, Part, Should_What, Result) :-
 		    (
 			(
 			    test(_Whatever_passed), !,
-			    Result = true
+			    Result = true, !, fail
 			)
 		    ;
 			(
 			    print_msg(1, 3, 'aux', ' -> ERROR (', Should_What),
 			    print_msg(1, 3, '', '', ')'),
-			    Result = fail
+			    Result = fail, !, fail
 			)
 		    )
 		)
