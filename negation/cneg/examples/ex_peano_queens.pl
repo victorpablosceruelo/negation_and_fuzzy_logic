@@ -6,7 +6,8 @@ cneg_ignores_preds(
 	[
 	    tests/0, complex_tests/2, 
 	    complex_tests_aux_for_negative/2,
-	    complex_tests_aux_for_positive/2
+	    complex_tests_aux_for_positive/2,
+	    queens_list/2
 	]).
 
 tests :- 
