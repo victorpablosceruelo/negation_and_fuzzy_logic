@@ -137,8 +137,8 @@ retract_all_fact_local(Store_Name, Result) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 generate_auxiliary_code([ Multifile |[ end_of_file]]) :-
-	Multifile = (:- multifile cneg_pre_frontier/9).
-%	Multifile = (:- multifile cneg_pre_frontier/9, call_to/3),
+	Multifile = (:- multifile cneg_pre_frontier/10).
+%	Multifile = (:- multifile cneg_pre_frontier/10, call_to/3),
 %	Call_To_This_File_Pred = (call_to(Predicate) :- call(Predicate)).
 
 trans_sent_eof(Cls_Out, SourceFileName) :-
@@ -158,7 +158,7 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 	print_msg(2, 2, 'list', 'To_Ignore_List', To_Ignore_List), 
 	print_msg(2, 2, 'nl', '', ''), !,
 
-	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, To_Ignore_List, Aux_Code, Cls_Out),
+	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, To_Ignore_List, [], Aux_Code, Cls_Out),
 	print_msg(2, 2, 'nl', '', ''), 
 	print_msg(2, 2, 'list', 'Cls_Out', Cls_Out),
 	print_msg(2, 2, 'nl', '', ''), 
@@ -168,16 +168,23 @@ trans_sent_eof(Cls_Out, SourceFileName) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_pre_frontiers([], _SourceFileName, _To_Ignore_List, Cls, Cls) :- !.
-generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFileName, To_Ignore_List, Cls_In, Cls_Out) :-
+generate_pre_frontiers([], _SourceFN, _To_Ignore_List, _Done, Cls, Cls) :- !.
+generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out) :-
 	H_and_B = (_Clean_Head, _E, _IE, _NIE, _Head, _Body, Head_Name, Head_Arity, _Counter),
-	memberchk(Head_Name/Head_Arity, To_Ignore_List), !,
-	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, To_Ignore_List, Cls_In, Cls_Out).
+	memberchk(Head_Name/Head_Arity, To_Ignore_List), 
+	memberchk(Head_Name/Head_Arity, Done), !,
+	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out).
 
-generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFileName, To_Ignore_List, Cls_In, Cls_Out) :-
+generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out) :-
+	H_and_B = (Clean_Head, _E, _IE, _NIE, _Head, _Body, Head_Name, Head_Arity, _Counter),
+	memberchk(Head_Name/Head_Arity, To_Ignore_List), !,
+	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFN, Clean_Head, true, true, true, Head, Head, true)),
+	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, [Head_Name/Head_Arity | Done], [CL | Cls_In], Cls_Out).
+
+generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out) :-
 	H_and_B = (Clean_Head, E, IE, NIE, Head, Body, Head_Name, Head_Arity, _Counter),
-	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFileName, Clean_Head, E, IE, NIE, Head, Body)),
-	generate_pre_frontiers(List_Of_H_and_B, SourceFileName, To_Ignore_List, [CL | Cls_In], Cls_Out).
+	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFN, Clean_Head, E, IE, NIE, true, Head, Body)),
+	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, Done, [CL | Cls_In], Cls_Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

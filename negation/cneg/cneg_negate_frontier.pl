@@ -10,7 +10,7 @@
 :- use_module(library('cneg/cneg_frontier')).
 
 % To access pre-frontiers from anywhere.
-:- multifile cneg_pre_frontier/9.
+% :- multifile cneg_pre_frontier/10.
 % To evaluate predicates only from the top package.
 :- multifile call_to_predicate/1.
 % Debugging or not ... that is the question.

@@ -11,7 +11,7 @@
 %:- use_module(library('cneg/cneg_basics')).
 
 % To access pre-frontiers from anywhere.
-%:- multifile cneg_pre_frontier/9.
+%:- multifile cneg_pre_frontier/10.
 %:- multifile call_to/3.
 :- multifile file_debug_is_activated/1.
 
