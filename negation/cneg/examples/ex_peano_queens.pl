@@ -2,7 +2,12 @@
 % :- module(ex_peano_queens,_,[.(cneg), .(debugger_pkg)]).
 % :- module(queensPeano, [queens/2], [.(cneg)]).
 
-cneg_ignores_preds([tests/2, test_queens_1/2, test_queens_2/2, echo_fail/0, echo_test/2, echo_nl/0]).
+cneg_ignores_preds(
+	[
+	    tests/0, complex_tests/2, 
+	    complex_tests_aux_for_negative/2,
+	    complex_tests_aux_for_positive/2
+	]).
 
 tests :- 
 	print_msg(1, 3, 'nl', '', ''),

@@ -36,6 +36,8 @@ trans_clause(Whatever, Whatever, _) :-
 % the program Module that is being compilated by the list of 
 % sentences SentList. The result clauses are continous
 trans_sent(Input, Output, SourceFileName) :-
+	print_msg(2, 2, 'nl', '', ''), 
+	print_msg(2, 2, '', 'trans_sent(Input)', trans_sent(Input)), 
 	trans_sent_aux(Input, Output, SourceFileName), !,
 	print_msg(2, 2, '', 'trans_sent(Input, Output, SourceFileName)', trans_sent(Input, Output, SourceFileName)), !.
 
@@ -176,7 +178,7 @@ generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Do
 	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out).
 
 generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out) :-
-	H_and_B = (Clean_Head, _E, _IE, _NIE, _Head, _Body, Head_Name, Head_Arity, _Counter),
+	H_and_B = (Clean_Head, _E, _IE, _NIE, Head, _Body, Head_Name, Head_Arity, _Counter),
 	memberchk(Head_Name/Head_Arity, To_Ignore_List), !,
 	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFN, Clean_Head, true, true, true, Head, Head, true)),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, [Head_Name/Head_Arity | Done], [CL | Cls_In], Cls_Out).
@@ -197,7 +199,7 @@ get_list_of_preds_to_ignore([ H_and_B | _List_Of_H_and_B], List) :-
 	Head_Name = 'cneg_ignores_preds', 
 	Head_Arity = 1, !,
 	arg(1, Head, List_Tmp),
-	List = ['cneg_ignores_preds'/1 | [ 'file_debug_is_activated'/1 | List_Tmp ]].
+	List = [ 'print_msg_with_diseqs'/4 |[ 'print_msg'/5 |[ 'cneg_ignores_preds'/1 |[ 'file_debug_is_activated'/1 | List_Tmp ]]]].
 %	List = ['cneg_ignores_preds'/1 | [ 'cneg_choosen_negation'/1 | List_Tmp ]].
 get_list_of_preds_to_ignore([ _H_and_B | List_Of_H_and_B], List) :-
 	get_list_of_preds_to_ignore(List_Of_H_and_B, List).

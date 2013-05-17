@@ -46,7 +46,9 @@ cneg(Predicate) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 goalvars(Term, GoalVars) :- varsbag(Term, [], [], GoalVars).
-call_to_predicate(Predicate) :- call(Predicate).
+call_to_predicate(Predicate) :- 
+	print_msg(3, 3, '', 'call(Predicate)', (call(Predicate))),
+	call(Predicate).
 examine_cneg_pre_frontier(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10) :-
 	cneg_pre_frontier(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10).
 testing_call_to(Predicate) :-

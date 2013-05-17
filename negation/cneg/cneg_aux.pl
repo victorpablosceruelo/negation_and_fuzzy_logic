@@ -26,7 +26,7 @@
 	    retrieve_element_from_list/2,
 	    split_body_with_disjunctions_into_bodies/2,
 	    split_bodies_into_E_IE_NIE/2,
-	    split_body_into_E_IE_NIE_aux/7,
+	    split_body_into_E_IE_NIE/4,
 	    goals_join_by_conjunction/3,
 	    generate_conjunction_from_list/2
 	],
@@ -640,27 +640,27 @@ goals_join_by_conjunction(Goal_1, Goal_2, (Goal_1, Goal_2)) :- !.
 
 split_bodies_into_E_IE_NIE([], []) :- !.
 split_bodies_into_E_IE_NIE([Body | Bodies], [([E], [IE], [NIE], [Body]) | Split_Bodies]) :- !,
-	split_body_into_E_IE_NIE_aux(Body, true, true, true, E, IE, NIE),
+	split_body_into_E_IE_NIE(Body, E, IE, NIE),
 	split_bodies_into_E_IE_NIE(Bodies, Split_Bodies).
 
-split_body_into_E_IE_NIE_aux(Body, _E_In, _IE_In, _NIE_In, _E_Out, _IE_Out, _NIE_Out) :- 
+split_body_into_E_IE_NIE(Body, _E, _IE, _NIE) :- 
 	goal_is_disjunction(Body, _G1, _G2), !, 
 	print_msg(1, 3, '', 'ERROR: split_body_into_E_IE_NIE can not deal with disjunctions. Body', Body),
 	fail.
 
-split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_Out, NIE_Out) :- 
+split_body_into_E_IE_NIE(Body, E_Out, IE_Out, NIE_Out) :- 
 	goal_is_conjunction(Body, G1, G2), !,
-	split_body_into_E_IE_NIE_aux(G1, E_In, IE_In, NIE_In, E_Aux, IE_Aux, NIE_Aux),
-	split_body_into_E_IE_NIE_aux(G2, E_Aux, IE_Aux, NIE_Aux, E_Out, IE_Out, NIE_Out).
-split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_Out, IE_In, NIE_In) :-
-	goal_is_equality(Body, _Arg_1, _Arg_2, _UQV), !,
-	goals_join_by_conjunction(E_In, Body, E_Out).
-split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_Out, NIE_In) :-
-	goal_is_disequality(Body, _Arg_1, _Arg_2, _UQV), !,
-	goals_join_by_conjunction(IE_In, Body, IE_Out).
+	split_body_into_E_IE_NIE(G1, E_Out_G1, IE_Out_G1, NIE_Out_G1),
+	split_body_into_E_IE_NIE(G2, E_Out_G2, IE_Out_G2, NIE_Out_G2),
+	goals_join_by_conjunction(E_Out_G1, E_Out_G2, E_Out),
+	goals_join_by_conjunction(IE_Out_G1, IE_Out_G2, IE_Out),
+	goals_join_by_conjunction(NIE_Out_G1, NIE_Out_G2, NIE_Out), !.
 
-split_body_into_E_IE_NIE_aux(Body, E_In, IE_In, NIE_In, E_In, IE_In, NIE_Out) :- !,
-	goals_join_by_conjunction(NIE_In, Body, NIE_Out).
+split_body_into_E_IE_NIE(Body, Body, 'true', 'true') :-
+	goal_is_equality(Body, _Arg_1, _Arg_2, _UQV), !.
+split_body_into_E_IE_NIE(Body, 'true', Body, 'true') :-
+	goal_is_disequality(Body, _Arg_1, _Arg_2, _UQV), !.
+split_body_into_E_IE_NIE(Body, 'true', 'true', Body) :- !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
