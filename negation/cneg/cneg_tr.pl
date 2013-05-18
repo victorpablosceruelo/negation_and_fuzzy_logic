@@ -178,9 +178,9 @@ generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Do
 	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out).
 
 generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out) :-
-	H_and_B = (Clean_Head, _E, _IE, _NIE, Head, _Body, Head_Name, Head_Arity, _Counter),
+	H_and_B = (Clean_Head, _E, _IE, _NIE, _Head, _Body, Head_Name, Head_Arity, _Counter),
 	memberchk(Head_Name/Head_Arity, To_Ignore_List), !,
-	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFN, Clean_Head, true, true, true, Head, Head, true)),
+	CL = (cneg_pre_frontier(Head_Name, Head_Arity, SourceFN, Clean_Head, true, true, true, Clean_Head, Clean_Head, true)),
 	generate_pre_frontiers(List_Of_H_and_B, SourceFN, To_Ignore_List, [Head_Name/Head_Arity | Done], [CL | Cls_In], Cls_Out).
 
 generate_pre_frontiers([H_and_B | List_Of_H_and_B], SourceFN, To_Ignore_List, Done, Cls_In, Cls_Out) :-

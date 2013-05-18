@@ -377,6 +377,7 @@ pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Goal_Fron
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: E', E),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: IE', IE),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: NIE', NIE),
+	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: NNSB', NNSB),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: GoalVars', GoalVars),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: LocalVars', LocalVars),
 
@@ -419,9 +420,10 @@ get_frontier_from_pre_frontier(E, IE, _NIE, _NNSB, _GoalVars, _LocalVars, _RG_Di
 get_frontier_from_pre_frontier_aux(E, IE, NIE, NNSB, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (NIE, NNSB)', (NIE, NNSB)),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: NIE', NIE),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: NNSB', NNSB),
 	setof((GoalVars, LocalVars, RG_Diseqs, NIE, NNSB), call_to_predicate((E, IE)), PreFr_Node_Answers), !,
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE, NNSB)'),
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: Frontier_Nodes', Frontier_Nodes).
@@ -475,6 +477,7 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_E', New_E),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_IE', New_IE),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_NIE', Answ_NIE),
+	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_NNSB', Answ_NNSB),
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg_with_diseqs(3, 3, 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node), 
 	print_msg(3, 3, 'nl', '', ''),

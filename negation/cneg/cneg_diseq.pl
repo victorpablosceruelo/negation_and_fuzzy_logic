@@ -909,9 +909,9 @@ get_list_of_disequalities_in_vars(Anything, []) :-
 
 get_list_of_disequalities_in_vars_aux(Anything, Disequalities) :-
 	get_attributes_in_term_vars(Anything, _All_Vars, Vars_With_Attrs, _Vars_Without_Attrs), !,
-	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
+	print_msg(4, 4, '', 'get_list_of_disequalities_in_vars :: Vars_With_Attrs', Vars_With_Attrs), !,
 	attributes_list_to_disequalities_list(Vars_With_Attrs, [], Disequalities), !,
-	print_msg(3, 4, '', 'get_list_of_disequalities_in_vars :: Disequalities', Disequalities), !.
+	print_msg(4, 4, '', 'get_list_of_disequalities_in_vars :: Disequalities', Disequalities), !.
 
 get_list_of_disequalities_in_vars_and_remove_them([], []) :- !.
 get_list_of_disequalities_in_vars_and_remove_them(Anything, Disequalities) :-
