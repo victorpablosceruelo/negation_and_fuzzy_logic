@@ -9,42 +9,25 @@ cneg_ignores_preds(
 	    complex_tests_aux_for_positive/2
 	]).
 
-tests :- 
-	print_msg(1, 3, 'nl', '', ''),
-	print_msg(1, 3, 'nl', '', ''),
-	test(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What), 
-	test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What, Result),
-	(
-	    (
-		Result = true,
-		fail % Go for more tests
-	    )
-	;
-	    (
-		Result = fail,
-		!, fail % Stop testing.
-	    )
-	).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test('0 queens', (queens(0, C)), 'should_succeed', fail_and_forget_it(C), 'should_fail').
-test('1 queens', (queens(s(0), C)), 'should_succeed', fail_and_forget_it(C), 'should_fail').
-test('2 queens', (queens(s(s(0)), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
-test('3 queens', (queens(s(s(s(0))), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
+test('0 queens', (queens1(0, C)), 'should_succeed', fail_and_forget_it(C), 'should_fail').
+test('1 queens', (queens1(s(0), C)), 'should_succeed', fail_and_forget_it(C), 'should_fail').
+test('2 queens', (queens1(s(s(0)), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
+test('3 queens', (queens1(s(s(s(0))), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
 
-test('0 queens +-', (queens(0, C)), 'should_succeed', (cneg(queens(0, C))), 'should_fail').
+test('0 queens +-', (queens1(0, C)), 'should_succeed', (cneg(queens1(0, C))), 'should_fail').
 test('0 queens -+ (this one depends on using types for queens_list or not)', 
-	(cneg(queens(0, C))), 'should_succeed', (queens(0, C)), 'should_fail').
-test('1 queen +-', (queens(s(0), C)), 'should_succeed', (cneg(queens(s(0), C))), 'should_fail').
+	(cneg(queens1(0, C))), 'should_succeed', (queens1(0, C)), 'should_fail').
+test('1 queen +-', (queens1(s(0), C)), 'should_succeed', (cneg(queens1(s(0), C))), 'should_fail').
 test('1 queen -+ (this one depends on using types for queens_list or not)', 
-	(cneg(queens(s(0), C))), 'should_succeed', (queens(s(0), C)), 'should_fail').
-test('2 queens +-', (queens(s(s(0)), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
-test('2 queens -+', (cneg(queens(s(s(0)), C))), 'should_succeed', (queens(s(s(0)), C)), 'should_fail').
-test('3 queens +-', (queens(s(s(s(0))), C)), 'should_succeed', (cneg(queens(s(s(s(0))), C))), 'should_fail').
-test('3 queens -+', (cneg(queens(s(s(s(0))), C))), 'should_succeed', (queens(s(s(s(0))), C)), 'should_fail').
+	(cneg(queens1(s(0), C))), 'should_succeed', (queens1(s(0), C)), 'should_fail').
+test('2 queens +-', (queens1(s(s(0)), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
+test('2 queens -+', (cneg(queens1(s(s(0)), C))), 'should_succeed', (queens1(s(s(0)), C)), 'should_fail').
+test('3 queens +-', (queens1(s(s(s(0))), C)), 'should_succeed', (cneg(queens1(s(s(s(0))), C))), 'should_fail').
+test('3 queens -+', (cneg(queens1(s(s(s(0))), C))), 'should_succeed', (queens1(s(s(s(0))), C)), 'should_fail').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,10 +87,10 @@ complex_tests_aux_for_positive(N, Columns) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% queens(N,Columns) returns in Columns the column where we must place each of N
+% queens1(N,Columns) returns in Columns the column where we must place each of N
 % queens in a Checkerboard of NxN assuming each position in the list 
 % is a different row. For example :   
-%        queens(s(s(s(s(0)))),[s(s(0)),s(s(s(s(0)))),s(0),s(s(s(0)))])
+%        queens1(s(s(s(s(0)))),[s(s(0)),s(s(s(s(0)))),s(0),s(s(s(0)))])
 % means that the 4 queens are placed in positions (1,2),(2,4),(3,1) and (4,3). 
 
 queens1(N, Columns):- 
