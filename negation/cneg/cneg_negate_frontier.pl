@@ -332,10 +332,10 @@ negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
 
 % Idem for disequalities.
 negate_imp_atom(Formula, GoalVars, Neg_Atom, Keep_Atom) :-
-	goal_is_disequality(Formula, T1_In, T2_In, Diseq_UQV_In), !,
+	goal_is_disequality(Formula, T1, T2, Diseq_UQV_In), !,
 	print_msg(3, 3, '', 'negate_imp_atom :: Formula', Formula),
 
-	varsbag((T1_In, T2_In), [], [], Vars_Diseq), % Just variables
+	varsbag((T1, T2), [], [], Vars_Diseq), % Just variables
 	varsbag_clean_up(Diseq_UQV_In, Diseq_UQV), % Just variables
 	varsbag_difference(Vars_Diseq, GoalVars, Eq_UQV_Tmp), % GoalVars are not free vars.
 	varsbag_difference(Eq_UQV_Tmp, Diseq_UQV, Eq_UQV), % Previous UQV are not free vars.
