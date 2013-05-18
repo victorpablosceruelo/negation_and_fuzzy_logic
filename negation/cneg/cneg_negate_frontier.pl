@@ -49,13 +49,13 @@ negate_each_subfrontier([Frontier | More_Frontiers], GoalVars, Result_More_Front
 % returns in Result_Frontier the negation of the subfrontier in SubFrontier
 
 % negate_subfrontier(SubFrontier_In, GoalVars_In, Proposal, (Result)) :-
-negate_subfrontier(SubFrontier_In, GoalVars_In, (NNSB, Result)) :-
+negate_subfrontier(SubFrontier_In, GoalVars_In, (Result)) :-
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, '', 'negate_subfrontier :: SubFrontier_In', (SubFrontier_In)),
 	!, % Reduce the stack's memory by forbidding backtracking.
 	varsbag(GoalVars_In, [], [], GoalVars),
 	normalize_E_IE_NIE(SubFrontier_In, GoalVars, SubFrontier_Aux_2),
-	subfrontier_E_IE_NIE_NNSB_contents(SubFrontier_Aux_2, E, _IE, NIE, NNSB),
+	subfrontier_E_IE_NIE_contents(SubFrontier_Aux_2, E, _IE, NIE),
 	varsbag(E, [], GoalVars, ImpVars),
 	varsbag(NIE, ImpVars, [], ExpVars),
 	print_msg(3, 3, '', 'negate_subfrontier :: ExpVars', ExpVars),
@@ -64,9 +64,7 @@ negate_subfrontier(SubFrontier_In, GoalVars_In, (NNSB, Result)) :-
 	split_IE_NIE_between_imp_and_exp(SubFrontier_Aux_2, ExpVars, SubFrontier_Aux_3),
 	print_msg(3, 3, '', 'negate_subfrontier', SubFrontier_Aux_3),
 	!, % Reduce the stack's memory by forbidding backtracking.
-	negate_formula(SubFrontier_Aux_3, GoalVars, Result_Tmp),
-	print_msg(3, 3, '', 'negate_subfrontier :: (Result_Tmp)', (Result_Tmp)),
-	goals_join_by_conjunction(NNSB, Result_Tmp, Result),
+	negate_formula(SubFrontier_Aux_3, GoalVars, Result),
 	print_msg(3, 3, '', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
 
@@ -94,8 +92,8 @@ normalize_E_IE_NIE(Formula_In, GoalVars, Formula_Out) :-
 remove_from_E_redundant_eqs_and_vars(Formula_In, GoalVars, Formula_Out) :- 
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars :: Formula_In', Formula_In),
 	print_msg(3, 3, '', 'remove_from_E_redundant_eqs_and_vars :: GoalVars', GoalVars),
-	subfrontier_E_IE_NIE_NNSB_contents(Formula_In, E_In, IE_In, NIE_In, NNSB), 
-	subfrontier_E_IE_NIE_NNSB_contents(Formula_Aux, E_Aux, IE_In, NIE_In, NNSB), 
+	subfrontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In), 
+	subfrontier_E_IE_NIE_contents(Formula_Aux, E_Aux, IE_In, NIE_In), 
 	(
 	    (
 		remove_from_E_redundant_eqs_and_vars_aux(E_In, GoalVars, E_Aux), !,
@@ -203,19 +201,17 @@ remove_from_E_redundant_eqs(E_In, Visited_In, [ E_In | Visited_In ], E_In) :-
 % In practice we unify each var in Dumb_Vars to avoid a result after its negation.
 
 remove_from_IE_irrelevant_disequalities(Formula_In, GoalVars_In, Formula_Out) :-
-	subfrontier_E_IE_NIE_NNSB_contents(Formula_In, E_In, IE_In, NIE_In, NNSB),
+	subfrontier_E_IE_NIE_contents(Formula_In, E_In, IE_In, NIE_In),
 
 	varsbag(GoalVars_In, [], [], GoalVars), % Sometimes we have non vars in GoalVars.
 	varsbag(NIE_In, GoalVars, [], RelVars), % RelVars = vars(NIE) - GoalVars
 	varsbag(E_In, GoalVars, [], Vars_E), % Vars equality part
-	varsbag(NNSB, [], [], Vars_NNSB),
 	varsbag_union(GoalVars, RelVars, Valid_Vars_Tmp_1), % GoalVars + RelVars
-	varsbag_union(Valid_Vars_Tmp_1, Vars_E, Valid_Vars_Tmp_2), % GoalVars + RelVars + vars(E)
-	varsbag_union(Valid_Vars_Tmp_2, Vars_NNSB, Valid_Vars),
+	varsbag_union(Valid_Vars_Tmp_1, Vars_E, Valid_Vars), % GoalVars + RelVars + vars(E)
 	varsbag(IE_In, Valid_Vars, [], Irrelevant_Vars), % vars(IE) - (GoalVars + RelVars + vars(E)).
 
 	remove_from_IE_irrelevant_disequalities_aux(IE_In, Irrelevant_Vars, IE_Out),
-	subfrontier_E_IE_NIE_NNSB_contents(Formula_Out, E_In, IE_Out, NIE_In, NNSB). 
+	subfrontier_E_IE_NIE_contents(Formula_Out, E_In, IE_Out, NIE_In). 
 
 remove_from_IE_irrelevant_disequalities_aux(IE, [], IE) :- !. % Optimization.
 remove_from_IE_irrelevant_disequalities_aux([], _Irrelevant_Vars, []) :- !.
@@ -377,7 +373,7 @@ negate_imp_atom(Formula, GoalVars_In, Neg_Atom, Keep_Atom) :-
 % returns Frontier_Out that is the frontier divided betwen 
 % ImpVars, ExpVars and UQ_Vars.
 split_IE_NIE_between_imp_and_exp(Frontier_In, ExpVars, Frontier_Out):-
-	subfrontier_E_IE_NIE_NNSB_contents(Frontier_In, E, IE, NIE, _NNSB),
+	subfrontier_E_IE_NIE_contents(Frontier_In, E, IE, NIE),
 	print_msg(3, 3, '', 'split_IE_NIE_between_imp_and_exp :: (E, IE, NIE)', (E, IE, NIE)),
 	print_msg(3, 3, '', 'split_IE_NIE_between_imp_and_exp :: ExpVars', ExpVars),
 

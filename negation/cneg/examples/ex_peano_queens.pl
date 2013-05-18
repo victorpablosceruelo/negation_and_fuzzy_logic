@@ -31,17 +31,21 @@ tests :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-test('0 queens', (queens(0, C)), 'should_succeed', forget_it(C), 'should_succeed').
-test('1 queens', (queens(s(0), C)), 'should_succeed', forget_it(C), 'should_succeed').
-test('2 queens', (queens(s(s(0)), C)), 'should_fail', forget_it(C), 'should_succeed').
-test('3 queens', (queens(s(s(s(0))), C)), 'should_fail', forget_it(C), 'should_succeed').
+test('0 queens', (queens(0, C)), 'should_succeed', fail_and_forget_it(C), 'should_fail').
+test('1 queens', (queens(s(0), C)), 'should_succeed', fail_and_forget_it(C), 'should_fail').
+test('2 queens', (queens(s(s(0)), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
+test('3 queens', (queens(s(s(s(0))), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
 
 test('0 queens +-', (queens(0, C)), 'should_succeed', (cneg(queens(0, C))), 'should_fail').
-test('0 queens -+', (cneg(queens(0, C))), 'should_succeed', (queens(0, C)), 'should_fail').
+test('0 queens -+ (this one depends on using types for queens_list or not)', 
+	(cneg(queens(0, C))), 'should_succeed', (queens(0, C)), 'should_fail').
 test('1 queen +-', (queens(s(0), C)), 'should_succeed', (cneg(queens(s(0), C))), 'should_fail').
-test('1 queen -+', (cneg(queens(s(0), C))), 'should_succeed', (queens(s(0), C)), 'should_fail').
-test('2 queens +-', (queens(s(s(0)), C)), 'should_succeed', (cneg(queens(s(s(0)), C))), 'should_fail').
+test('1 queen -+ (this one depends on using types for queens_list or not)', 
+	(cneg(queens(s(0), C))), 'should_succeed', (queens(s(0), C)), 'should_fail').
+test('2 queens +-', (queens(s(s(0)), C)), 'should_fail', fail_and_forget_it(C), 'should_fail').
 test('2 queens -+', (cneg(queens(s(s(0)), C))), 'should_succeed', (queens(s(s(0)), C)), 'should_fail').
+test('3 queens +-', (queens(s(s(s(0))), C)), 'should_succeed', (cneg(queens(s(s(s(0))), C))), 'should_fail').
+test('3 queens -+', (cneg(queens(s(s(s(0))), C))), 'should_succeed', (queens(s(s(s(0))), C)), 'should_fail').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

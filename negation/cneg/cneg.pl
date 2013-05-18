@@ -53,7 +53,7 @@ examine_cneg_pre_frontier(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10) :-
 	cneg_pre_frontier(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10).
 testing_call_to(Predicate) :-
 	call_to_predicate(Predicate).
-forget_it(_Whatever).
+fail_and_forget_it(_Whatever) :- fail.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

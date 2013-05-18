@@ -2,7 +2,7 @@
 :- module(cneg_frontier, 
 	[
 	    compute_frontier/3, 
-	    subfrontier_E_IE_NIE_NNSB_contents/5, 
+	    subfrontier_E_IE_NIE_contents/4, 
 	    subfrontier_E_IE_NIE_ie_contents/6
 	], [assertions]).
 
@@ -31,9 +31,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	 
 
 % Structures to manage all the info about the subfrontier in an easy way.
-preFrontierNodeContents(preFrontierNode(Real_Goal, Clean_Head, E, IE, NIE, NNSB, Head, Body),
-	Real_Goal, Clean_Head, E, IE, NIE, NNSB, Head, Body).
-subfrontier_E_IE_NIE_NNSB_contents(subfrontier_E_IE_NIE(E, IE, NIE, NNSB), E, IE, NIE, NNSB).
+preFrontierNodeContents(preFrontierNode(Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
+	Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+subfrontier_E_IE_NIE_contents(subfrontier_E_IE_NIE(E, IE, NIE), E, IE, NIE).
 subfrontier_E_IE_NIE_ie_contents(subfrontier_E_IE_NIE_ie(E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp), E, IE_Imp, IE_Exp, NIE_Imp, NIE_Exp).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,10 +80,10 @@ compute_goal_pre_frontier(Goal, Frontier) :-
 % Manage true and fail ...
 compute_goal_pre_frontier('true', [F_Out]) :- !,
 %	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(F_Out, 'true', 'true', 'true', 'true', 'true', 'true', 'true', 'true').
+	preFrontierNodeContents(F_Out, 'true', 'true', 'true', 'true', 'true', 'true', 'true').
 compute_goal_pre_frontier('fail', [F_Out]) :- !,
 %	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(F_Out, 'fail', 'fail', 'fail', 'fail', 'fail', 'true', 'fail', 'fail').
+	preFrontierNodeContents(F_Out, 'fail', 'fail', 'fail', 'fail', 'fail', 'fail', 'fail').
 
 % Now go for the disjunctions.
 % The frontiers need to evaluate one goal at a time. ERROR
@@ -108,14 +108,14 @@ compute_goal_pre_frontier(Goal, [F_Out]) :-
 	goal_is_disequality(Goal, T1, T2, UQV), !,
 	functor_local(Real_Goal, 'disequality', 3, [ T1 |[ T2 |[ UQV ]]]),
 %	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, 'true', Real_Goal, 'true', 'true', Real_Goal, Real_Goal),
+	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, 'true', Real_Goal, 'true', Real_Goal, Real_Goal),
 	!.
 
 compute_goal_pre_frontier(Goal, [F_Out]) :- 
 	goal_is_equality(Goal, T1, T2, UQV), !,
 	functor_local(Real_Goal, 'equality', 3, [ T1 |[ T2 |[ UQV ]]]),
 %	preFrontierNodeContents(PreFrontier, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true', 'true', 'true', Real_Goal, Real_Goal),
+	preFrontierNodeContents(F_Out, Real_Goal, Real_Goal, Real_Goal, 'true', 'true', Real_Goal, Real_Goal),
 	!.
 
 % Double negation is not managed yet. Bypass it.
@@ -168,8 +168,8 @@ look_for_the_relevant_clauses_aux(Head_Name, Head_Arity) :-
 	print_msg(1, 3, '', 'No definition for predicate ', Head_Name/Head_Arity), !, fail.
 
 pre_frontier_search(Head_Name, Head_Arity, PFN) :-
-	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, NNSB, Head, Body),
-	preFrontierNodeContents(PFN, _Real_Goal, Clean_Head, E, IE, NIE, NNSB, Head, Body).
+	cneg_pre_frontier(Head_Name, Head_Arity, _SourceFileName, Clean_Head, E, IE, NIE, _NNSB, Head, Body),
+	preFrontierNodeContents(PFN, _Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
 	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -182,8 +182,8 @@ pre_frontier_search(Head_Name, Head_Arity, PFN) :-
 simplify_and_reorder_goal_prefrontier([], _Real_Goal, PreFr_Acc, PreFr_Acc) :- !.
 %	print_msg(3, 3, 'nl', '', '').
 simplify_and_reorder_goal_prefrontier([PreFr | PreFr_In], Real_Goal, PreFr_Acc, PreFr_Out) :-
-%	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, NNSB, Head, Body).
-	preFrontierNodeContents(PreFr, Real_Goal, _Clean_Head, _E, _IE, _NIE, _NNSB, _Head, _Body),
+%	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(PreFr, Real_Goal, _Clean_Head, _E, _IE, _NIE, _Head, _Body),
 	test_pre_frontier_validity(PreFr), !,
 %	print_msg(3, 3, '', 'simplify_and_reorder_goal_prefrontier :: valid :: PreFr', PreFr),
 	simplify_and_reorder_goal_prefrontier(PreFr_In, Real_Goal, [PreFr | PreFr_Acc], PreFr_Out).
@@ -198,7 +198,7 @@ test_pre_frontier_validity(PreFr) :-
 	copy_term(PreFr, PreFr_Copy),
 
 %	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(PreFr_Copy, Real_Goal, Clean_Head, E, IE, _NIE, _NNSB, _Head, _Body),
+	preFrontierNodeContents(PreFr_Copy, Real_Goal, Clean_Head, E, IE, _NIE, _Head, _Body),
 
 	Clean_Head = Real_Goal, % Unify heads.
 	(
@@ -244,7 +244,7 @@ convert_negPreFr_to_preFr(Goal, Negated_PreFr, PreFrontier) :-
 split_bodies_to_prefrontier([], _Real_Goal, []) :- !.
 split_bodies_to_prefrontier([([E], [IE], [NIE], [Body]) | Split_Bodies], Real_Goal, [PreFr | PreFrs]) :-
 %	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(PreFr, Real_Goal, Real_Goal, E, IE, NIE, 'true', Real_Goal, Body),
+	preFrontierNodeContents(PreFr, Real_Goal, Real_Goal, E, IE, NIE, Real_Goal, Body),
 	% copy_term(PreFr_Aux, PreFrs), % Different PreFr must have different variables.
 	split_bodies_to_prefrontier(Split_Bodies, Real_Goal, PreFrs).
 
@@ -287,19 +287,18 @@ rebuild_prefrontier_conjunction_aux_1([PreFr_1_1 | More_PreFr_1], PreFr_2, PreFr
 rebuild_prefrontier_conjunction_aux_2(_PreFr_1, [], []).
 rebuild_prefrontier_conjunction_aux_2(PreFr_1, [PreFr_2 | More_PreFr_2], [PreFr_3 | More_PreFr_3]) :-
 %	preFrontierNodeContents(PreFr, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
-	preFrontierNodeContents(PreFr_1, PF1_RG, PF1_CH, PF1_E, PF1_IE, PF1_NIE, PF1_NNSB, PF1_Head, PF1_Body),
-	preFrontierNodeContents(PreFr_2, PF2_RG, PF2_CH, PF2_E, PF2_IE, PF2_NIE, PF2_NNSB, PF2_Head, PF2_Body),
+	preFrontierNodeContents(PreFr_1, PF1_RG, PF1_CH, PF1_E, PF1_IE, PF1_NIE, PF1_Head, PF1_Body),
+	preFrontierNodeContents(PreFr_2, PF2_RG, PF2_CH, PF2_E, PF2_IE, PF2_NIE, PF2_Head, PF2_Body),
 
 	goals_join_by_conjunction(PF1_RG, PF2_RG, PF3_RG),
 	goals_join_by_conjunction(PF1_CH, PF2_CH, PF3_CH),
 	goals_join_by_conjunction(PF1_E, PF2_E, PF3_E),
 	goals_join_by_conjunction(PF1_IE, PF2_IE, PF3_IE),
 	goals_join_by_conjunction(PF1_NIE, PF2_NIE, PF3_NIE),
-	goals_join_by_conjunction(PF1_NNSB, PF2_NNSB, PF3_NNSB),
 	goals_join_by_conjunction(PF1_Head, PF2_Head, PF3_Head),
 	goals_join_by_conjunction(PF1_Body, PF2_Body, PF3_Body),
 
-	preFrontierNodeContents(PreFr_3, PF3_RG, PF3_CH, PF3_E, PF3_IE, PF3_NIE, PF3_NNSB, PF3_Head, PF3_Body),
+	preFrontierNodeContents(PreFr_3, PF3_RG, PF3_CH, PF3_E, PF3_IE, PF3_NIE, PF3_Head, PF3_Body),
 	test_pre_frontier_validity(PreFr_3), !, 
         rebuild_prefrontier_conjunction_aux_2(PreFr_1, More_PreFr_2, More_PreFr_3).
 rebuild_prefrontier_conjunction_aux_2(PreFr_1, [_PreFr_2 | More_PreFr_2], More_PreFr_3) :-
@@ -364,8 +363,8 @@ pre_frontier_to_frontier_aux_2(Goal_PreFrontier_Node, GoalVars, Frontier_In, Fro
 % :- meta_predicate pre_frontier_node_to_frontier_node(goal, ?, ?, ?).
 pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Goal_Frontier_Nodes) :-
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: Goal_PreFrontier_Node', Goal_PreFrontier_Node),
-%	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, NNSB, Head, Body).
-	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, NNSB, Head, Body),
+%	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body).
+	preFrontierNodeContents(Goal_PreFrontier_Node, Real_Goal, Clean_Head, E, IE, NIE, Head, Body),
 	unify_real_goal_and_clean_head(Real_Goal, Clean_Head),
 
 	varsbag(GoalVars_In, [], [], GoalVars),
@@ -377,14 +376,13 @@ pre_frontier_node_to_frontier_node(Goal_PreFrontier_Node, GoalVars_In, Goal_Fron
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: E', E),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: IE', IE),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: NIE', NIE),
-	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: NNSB', NNSB),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: GoalVars', GoalVars),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: LocalVars', LocalVars),
 
 	get_list_of_disequalities_in_vars(Real_Goal, RG_Diseqs),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: RG_Diseqs', RG_Diseqs),
 
-	get_frontier_from_pre_frontier(E, IE, NIE, NNSB, GoalVars, LocalVars, RG_Diseqs, Goal_Frontier_Nodes),
+	get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Goal_Frontier_Nodes),
 	print_msg(3, 3, '', 'pre_frontier_node_to_frontier_node :: Goal_Frontier_Nodes', Goal_Frontier_Nodes), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -402,7 +400,7 @@ unify_real_goal_and_clean_head(Real_Goal, Clean_Head) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- meta_predicate get_frontier_from_pre_frontier(goal, goal, ?, ?, ?, ?, ?).
-get_frontier_from_pre_frontier(E, IE, NIE, NNSB, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
+get_frontier_from_pre_frontier(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
 	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier :: testing :: (E, IE)', (E, IE)),
 	copy_term((E, IE), (E_Copy, IE_Copy)),
  	call_to_predicate((E_Copy, IE_Copy)), !,
@@ -411,24 +409,23 @@ get_frontier_from_pre_frontier(E, IE, NIE, NNSB, GoalVars, LocalVars, RG_Diseqs,
 	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E_Copy, IE_Copy)),
 	% print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has answers :: (E, IE)', (E, IE)), !,
 	print_msg(3, 3, 'nl', '', ''), !,
-	get_frontier_from_pre_frontier_aux(E, IE, NIE, NNSB, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes).
+	get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes).
 
-get_frontier_from_pre_frontier(E, IE, _NIE, _NNSB, _GoalVars, _LocalVars, _RG_Diseqs, []) :-
+get_frontier_from_pre_frontier(E, IE, _NIE, _GoalVars, _LocalVars, _RG_Diseqs, []) :-
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier :: has NO answers :: (E, IE)', (E, IE)), !.
 
 :- meta_predicate get_frontier_from_pre_frontier_aux(goal, goal, ?, ?, ?, ?, ?).
-get_frontier_from_pre_frontier_aux(E, IE, NIE, NNSB, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
+get_frontier_from_pre_frontier_aux(E, IE, NIE, GoalVars, LocalVars, RG_Diseqs, Frontier_Nodes) :-
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	print_msg_with_diseqs(3, 3, 'get_frontier_from_pre_frontier_aux :: (E, IE)', (E, IE)),
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: NIE', NIE),
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: NNSB', NNSB),
-	setof((GoalVars, LocalVars, RG_Diseqs, NIE, NNSB), call_to_predicate((E, IE)), PreFr_Node_Answers), !,
-	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE, NNSB)'),
+	setof((GoalVars, LocalVars, RG_Diseqs, NIE), call_to_predicate((E, IE)), PreFr_Node_Answers), !,
+	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', '(GoalVars, LocalVars, RG_Diseqs, NIE)'),
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: PreFr_Node_Answers', PreFr_Node_Answers),
 	get_eqs_and_diseqs_from_answers(PreFr_Node_Answers, GoalVars, [], Frontier_Nodes), !,
 	print_msg(3, 3, '', 'get_frontier_from_pre_frontier_aux :: Frontier_Nodes', Frontier_Nodes).
 
-get_frontier_from_pre_frontier_aux(E, IE, _NIE, _NNSB, GoalVars, LocalVars, _RG_Diseqs, _Frontier_Nodes) :-
+get_frontier_from_pre_frontier_aux(E, IE, _NIE, GoalVars, LocalVars, _RG_Diseqs, _Frontier_Nodes) :-
 	print_msg(3, 3, '', 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
 	print_msg_with_diseqs(3, 3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: (E, IE)', (E, IE)),
 	print_msg_with_diseqs(3, 3, 'ERROR: get_frontier_from_pre_frontier_aux :: setof failed :: GoalVars', GoalVars),
@@ -455,7 +452,7 @@ get_eqs_and_diseqs_from_answers_aux([Answer | Answers], GoalVars, FN_In, FN_Out)
 
 % get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, LocalVars, RG_Diseqs, Frontier_Node)
 get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
-	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Diseqs, Answ_NIE, Answ_NNSB),
+	Answer = (Answ_GoalVars, Answ_LocalVars, Answ_RG_Diseqs, Answ_NIE),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: (GoalVars)', (GoalVars)),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_GoalVars', Answ_GoalVars),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_LocalVars', Answ_LocalVars),
@@ -472,12 +469,11 @@ get_eqs_and_diseqs_from_one_answer(Answer, GoalVars, Frontier_Node) :-
 	% We are just saving execution time and memory space.
 	get_equalities_conj_from_lists(GoalVars, Answ_GoalVars, true, New_E), 
 	!, 
-	subfrontier_E_IE_NIE_NNSB_contents(Frontier_Node, New_E, New_IE, Answ_NIE, Answ_NNSB),
+	subfrontier_E_IE_NIE_contents(Frontier_Node, New_E, New_IE, Answ_NIE),
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_E', New_E),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: New_IE', New_IE),
 	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_NIE', Answ_NIE),
-	print_msg(3, 3, '', 'get_eqs_and_diseqs_from_one_answer :: Answ_NNSB', Answ_NNSB),
 	print_msg(3, 3, 'nl', '', ''),
 	print_msg_with_diseqs(3, 3, 'get_eqs_and_diseqs_from_one_answer :: Frontier_Node :: ', Frontier_Node), 
 	print_msg(3, 3, 'nl', '', ''),
