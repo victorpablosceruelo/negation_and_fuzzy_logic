@@ -121,12 +121,13 @@ compute_goal_pre_frontier(Goal, [F_Out]) :-
 % Double negation is not managed yet. Bypass it.
 %compute_goal_pre_frontier(Goal, Proposal, Real_Goal, [F_Out]) :- 
 compute_goal_pre_frontier(Goal, PreFrontier) :- 
-	goal_is_negation(Goal, GoalVars, SubGoal), !,
-	functor_local(Real_Goal, 'cneg_rt', 2, [ SubGoal |[ GoalVars ]]),
-	print_msg(3, 3, '', 'compute_goal_pre_frontier :: dn :: double negation for (SubGoal, GoalVars)', (SubGoal, GoalVars)),
+	goal_is_negation(Goal, GoalVars_In, SubGoal), !,
+	functor_local(Real_Goal, 'cneg_rt', 2, [ SubGoal |[ GoalVars_In ]]),
+	print_msg(3, 3, '', 'compute_goal_pre_frontier :: dn :: double negation for (SubGoal, GoalVars)', (SubGoal, GoalVars_In)),
 %     cneg_rt(Goal, GoalVars, Depth_Level, Trace) :-
 	% copy_term(SubGoal, SubGoal_Copy), 
-	call_to_predicate(cneg_rt_aux(SubGoal, GoalVars, Negated_PreFr)), !,
+	varsbag(SubGoal, [], [], GoalVars_SubGoal)
+	call_to_predicate(cneg_rt_aux(SubGoal, GoalVars_SubGoal, Negated_PreFr)), !,
 	print_msg(3, 3, 'list', 'compute_goal_pre_frontier :: dn :: Negated_PreFr', Negated_PreFr),
 	convert_negPreFr_to_preFr(Real_Goal, Negated_PreFr, PreFrontier).
 
