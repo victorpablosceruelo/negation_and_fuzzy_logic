@@ -55,6 +55,9 @@ testing_call_to(Predicate) :-
 	call_to_predicate(Predicate).
 fail_and_forget_it(_Whatever) :- fail.
 
+maximum_value(0, _Max).
+maximum_value(s(X), s(Y)) :- maximum_value(X, Y).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
