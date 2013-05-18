@@ -23,9 +23,11 @@
 :- use_module(library('cneg/cneg_rt'), [test_execution/6]).
 %:- reexport(library('cneg/cneg_rt'), [cneg_rt/4]).
 
+% To avoid problems when test is not defined.
+:- multifile test/5.
 % To access pre-frontiers from anywhere.
-:- multifile cneg_choosen_negation/1.
 :- multifile cneg_pre_frontier/10.
+% To be able to call predicates in the main file.
 :- multifile call_to_predicate/1.
 :- meta_predicate call_to_predicate(?). % /1.
 

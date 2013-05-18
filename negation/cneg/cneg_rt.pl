@@ -11,6 +11,8 @@
 :- use_module(library('cneg/cneg_frontier')).
 :- use_module(library('cneg/cneg_negate_frontier')).
 
+% To avoid problems when test is not defined.
+:- multifile test/5.
 % To access pre-frontiers from anywhere.
 :- multifile cneg_pre_frontier/10.
 % To evaluate predicates only from the top package.
@@ -72,6 +74,8 @@ cneg_rt_aux(Goal, GoalVars_In, Negated_Frontier) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+test(_Logo, _Part_1, _Part_1_Should_What, _Part_2, _Part_2_Should_What) :- fail.
 
 test_execution(Logo, Part_1, Part_1_Should_What, Part_2, Part_2_Should_What, Result) :-
 	print_msg(1, 3, 'nl', '', ''),
