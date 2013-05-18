@@ -66,7 +66,7 @@ negate_subfrontier(SubFrontier_In, GoalVars_In, (NNSB, Result)) :-
 	!, % Reduce the stack's memory by forbidding backtracking.
 	negate_formula(SubFrontier_Aux_3, GoalVars, Result_Tmp),
 	print_msg(3, 3, '', 'negate_subfrontier :: (Result_Tmp)', (Result_Tmp)),
-	goals_join_by_conjunction(Result_Tmp, NNSB, Result),
+	goals_join_by_conjunction(NNSB, Result_Tmp, Result),
 	print_msg(3, 3, '', 'negate_subfrontier :: (Result)', (Result)),
 	!. % Reduce the stack's memory by forbidding backtracking.
 
