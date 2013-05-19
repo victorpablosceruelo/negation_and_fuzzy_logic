@@ -1,4 +1,4 @@
-:- module(prog_teresa,_,[rfuzzy, clpr]).
+:- module(ex_prog_teresa,_,[rfuzzy, clpr]).
 % :- use_module(library(write),[write/1]).
 
 rel_ex_time(_Whatever).
