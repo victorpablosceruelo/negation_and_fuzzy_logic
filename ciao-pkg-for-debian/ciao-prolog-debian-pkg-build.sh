@@ -8,9 +8,8 @@ if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ]
 	echo " "
 	echo "This is an utility to build Ciao Prolog debian packages."
 	echo "usage: $0 BASE_FOLDER SOURCE_FOLDER VERSION"
-	echo "example: $0 ~/tmp CiaoDE-1.15-1712-ga8c821b 1.15.0+r14992"
-	echo "example: $0 ~/tmp CiaoDE-1.15-1712-ga8c821b 1.15.0+r14995"
 	echo "example: $0 ~/tmp CiaoDE-1.15-1712-ga8c821b 1.15.0"
+	echo "result: a debian package with version 1.15.0+r{current_date}"
 	echo " "
 	exit 0
 else
@@ -19,7 +18,7 @@ else
     DISTRO_VERSION="$3"
 fi;
 
-DATE=`date +%Y%m%d`
+DATE=`date +%Y%m%d.%Hh`
 VERSION=${DISTRO_VERSION}+r${DATE}
 FILE_NAME=ciao-prolog_${VERSION}
 BUILD_TGZ=${FILE_NAME}.orig.tar.gz
@@ -32,7 +31,7 @@ SCRIPT_DIR=`dirname $0`
 # ${SCRIPT_DIR}/ciao-prolog-debian-pkg-build-apply-patches.sh ${BASE_FOLDER}/${SOURCE_FOLDER} do_not_apply
 
 # FIXES.
-# ${SCRIPT_DIR}/ciao-prolog-debian-pkg-build-fixes.sh ${BASE_FOLDER}/${SOURCE_FOLDER}
+${SCRIPT_DIR}/ciao-prolog-debian-pkg-build-fixes.sh ${BASE_FOLDER}/${SOURCE_FOLDER}
 
 if [ ! -f changelog ] || [ ! -f compat ] || [ ! -f control ]; then 
     echo "This script must be run from the folder containing changelog, compat and control files. "

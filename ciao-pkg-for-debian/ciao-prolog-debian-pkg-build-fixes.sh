@@ -22,11 +22,15 @@ function nocompile_nor_distribute () {
 }
 
 echo "FIXES:"
-nocompile_nor_distribute ciao/contrib/clpfd
-nocompile_nor_distribute ciao/contrib/difference_constraints
-nocompile_nor_distribute ciao/contrib/ppl/0_10
-nocompile_nor_distribute ciao/contrib/ppl/0_9
-rm -fv ciao/contrib/cneg/NOCOMPILE ciao/contrib/cneg/NODISTRIBUTE
+# nocompile_nor_distribute ciao/contrib/clpfd
+# nocompile_nor_distribute ciao/contrib/difference_constraints
+# nocompile_nor_distribute ciao/contrib/ppl/0_10
+# nocompile_nor_distribute ciao/contrib/ppl/0_9
+# rm -fv ciao/contrib/cneg/NOCOMPILE ciao/contrib/cneg/NODISTRIBUTE
+
+# Do not include my packages in Ciao Prolog. I'll do it by hand.
+rm -frv ciao/contrib/cneg
+rm -frv ciao/contrib/rfuzzy
 
 popd
 # EOF
