@@ -112,6 +112,8 @@ echo " "
 
 test_retval $?
 
+./${CIAOSETUP} configure --menu
+
 	# New in version 1.15.0 r14285
 #	./${CIAOSETUP} configure 
 #	./${CIAOSETUP} configure --setup
