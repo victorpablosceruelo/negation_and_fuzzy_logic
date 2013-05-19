@@ -1,42 +1,21 @@
-:- module(jobs,_,[rfuzzy, clpr]).
+:- module(ex_job_selection,_,[rfuzzy, clpr]).
 
-position(consultant).
-position(systems_analyst).
-position(developer).
-position(programmer).
-position(teacher).
+rfuzzy_define_database(position/5, 
+	[(id, rfuzzy_string_type), 
+	  (interest, rfuzzy_truth_value_type), 
+	   (distance, rfuzzy_truth_value_type),
+	    (salary, rfuzzy_truth_value_type),
+	     (future_development, rfuzzy_truth_value_type)]).
 
-rfuzzy_type_for(interest/1, [position/1]).
-rfuzzy_default_value_for(interest/1, 0.1).
-interest(consultant) value 0.6 .
-interest(systems_analyst) value 0.8 .
-interest(developer) value 0.6 .
-interest(programmer) value 0.4.
-interest(teacher) value 0.4.
+position(consultant,              0.6,   0.4,  0.8,  0.5).
+position(systems_analyst,   0.8,   0.1,   0.9,  0.3).
+position(developer,              0.6,   0.5,   0.6,  0.8).
+position(programmer,          0.4,   0.5,   0.5,  0.7).
+position(teacher,                  0.4 ,  0.85, 0.3,  0.5).
 
-rfuzzy_type_for(distance/1, [position/1]).
-rfuzzy_default_value_for(distance/1, 0.1).
-distance(consultant) value 0.4.
-distance(systems_analyst) value 0.1 .
-distance(developer) value 0.5 .
-distance(programmer) value 0.5.
-distance(teacher) value 0.85.
+interest(position) :~ defaults_to(0.1).
+distance(position) :~ defaults_to(0.1).
+salary(position) :~ defaults_to(0.1).
+future_development(position) :~ defaults_to(0.1).
 
-rfuzzy_type_for(salary/1, [position/1]).
-rfuzzy_default_value_for(salary/1, 0.1).
-salary(consultant) value 0.8.
-salary(systems_analyst) value 0.9 .
-salary(developer) value 0.6 .
-salary(programmer) value 0.5.
-salary(teacher) value 0.3.
-
-rfuzzy_type_for(future_development/1, [position/1]).
-rfuzzy_default_value_for(future_development/1, 0.1).
-future_development(consultant) value 0.5.
-future_development(systems_analyst) value 0.3 .
-future_development(developer) value 0.8 .
-future_development(programmer) value 0.7.
-future_development(teacher) value 0.5.
-
-rfuzzy_type_for(job_offer/1, [position/1]).
-(job_offer(J) cred (min,0.8)) :~ prod((interest(J), distance(J), salary(J), future_development(J))).
+job_offer(position) :~ rule(prod, (interest(position), distance(position), salary(position), future_development(position))) with_credibility (min, 0.8).
