@@ -8,10 +8,10 @@ fi
 
 PWD=`pwd`
 
-javac -classpath ${CLASSPATH_JAVALL} javaLoader.java
-javac -classpath ${CLASSPATH_JAVALL} example0.java
+javac -classpath ${CLASSPATH_JAVALL} javaInterface_javaLoader.java
+javac -classpath ${CLASSPATH_JAVALL} javaInterface_example0.java
 
-java -cp ${CLASSPATH_JAVALL}:./ example0 ${CLASSPATH_JAVALL}/plserver 
+java -cp ${CLASSPATH_JAVALL}:./ javaInterface_example0 ${CLASSPATH_JAVALL}/plserver 
 
 
 # /home/vpablos/secured/negation_and_fuzzy_logic/fuzzy_logic/rfuzzy/rfuzzy_ciao/examples/restaurant.pl
@@ -21,7 +21,7 @@ for file in *.pl ; do
 	echo " "
 	echo " -> Trying with example file ${moduleToLoad} "
 	echo " "
-	java -cp ${CLASSPATH_JAVALL}:./ javaLoader ${CLASSPATH_JAVALL}/plserver ${moduleToLoad}
+	java -cp ${CLASSPATH_JAVALL}:./ javaInterface_javaLoader ${CLASSPATH_JAVALL}/plserver ${moduleToLoad}
 	echo " "
 	read -p "enter to continue ..."
 done
