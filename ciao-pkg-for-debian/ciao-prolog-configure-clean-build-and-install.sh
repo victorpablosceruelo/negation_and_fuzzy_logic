@@ -107,7 +107,7 @@ echo " "
     --with_chr=no \
     --compress_lib=no \
     --unused_pred_warnings=yes \
-    --runtime_checks=yes \
+    --runtime_checks=no \
     --set_flag_options=yes 
 
 test_retval $?
