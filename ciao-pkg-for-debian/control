@@ -1,7 +1,7 @@
 Source: ciao-prolog
 Priority: optional
 Maintainer: Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>
-Build-Depends: build-essential, debhelper (>= 5.0.0), texinfo, texi2html, texlive-latex-base | tetex-bin, texlive-latex-extra | tetex-extra, dvi2ps, dvi2dvi, gs-gpl | gs, gs-common, subversion, locate, emacs | emacs23 | emacs23-nox | emacs22 | emacs22-nox | emacs21 | emacs21-nox | emacsen, imagemagick, gcc-multilib, libc6-dev-i386 [amd64], ia32-libs [amd64], g++-multilib, libgsl0-dev, virtual-mysql-client, virtual-mysql-server | mysql-server, mysql-common, libmysql-java, libmysql++-dev, libmysqlclient16 | libmysqlclient, libmysqlclient-dev, libmysqld-dev, libmysql-cil-dev, libppl-c-dev, ant, sun-java6-demo, sun-java6-javadb, sun-java6-source, sun-java6-jdk, bash, bash-static, tar, bzip2
+Build-Depends: build-essential, debhelper (>= 5.0.0), texinfo, texi2html, texlive-latex-base | tetex-bin, texlive-latex-extra | tetex-extra, dvi2ps, dvi2dvi, gs-gpl | gs, gs-common, subversion, locate, emacs | emacs23 | emacs23-nox | emacs22 | emacs22-nox | emacs21 | emacs21-nox | emacsen, imagemagick, gcc-multilib, libc6-dev-i386 [amd64], ia32-libs [amd64], g++-multilib, libgsl0-dev, virtual-mysql-client, virtual-mysql-server | mysql-server, mysql-common, libmysql-java, libmysql++-dev, libmysqlclient16 | libmysqlclient, libmysqlclient-dev, libmysqld-dev, libmysql-cil-dev, libppl-c-dev, ant, sun-java6-demo, sun-java6-javadb, sun-java6-source, sun-java6-jdk, bash, bash-static, tar, bzip2, whiptail | dialog
 Standards-Version: 3.7.2
 Section: devel
 

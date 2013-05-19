@@ -43,8 +43,8 @@ BUILDRESULT=/var/cache/pbuilder/result/
 
 # make debconf not interact with user
 # export DEBIAN_FRONTEND=noninteractive
-export DEBIAN_FRONTEND="readline"
-# export DEBIAN_FRONTEND="dialog"
+# export DEBIAN_FRONTEND="readline"
+export DEBIAN_FRONTEND="dialog"
 
 DEBEMAIL=""
 
