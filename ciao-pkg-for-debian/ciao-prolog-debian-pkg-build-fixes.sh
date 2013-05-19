@@ -31,6 +31,7 @@ echo "FIXES:"
 # Do not include my packages in Ciao Prolog. I'll do it by hand.
 rm -frv ciao/contrib/cneg
 rm -frv ciao/contrib/rfuzzy
+rm -frv ciao/contrib/pkgs_output_debug
 
 popd
 # EOF
