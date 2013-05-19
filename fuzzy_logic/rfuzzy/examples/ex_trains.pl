@@ -1,4 +1,4 @@
-:- module(trains, _, [rfuzzy, clpr]).
+:- module(ex_trains, _, [rfuzzy, clpr]).
 
 % Activate/Deactivate debug.
 % :- activate_rfuzzy_debug.
@@ -9,11 +9,11 @@
 %	speed(Y), number(Y),
 %	X .=. Y + 1,
 %	(   X =< 500 ; ( X > 500, !, fail) ).
-speed(X) :- X .>=. 0.
+% speed(X) :- X .>=. 0.
+rfuzzy_define_database(speed/1, [(speed_value, rfuzzy_integer_type)]).
+speed(X) :- current_input(S), get_code(S, X).
 
-speed_function :# ([(0, 0), (100, 0.5), (200, 1), (250, 0.5), (300, 0)]).
-current_speed(X, X). 
-rfuzzy_define_fuzzification(fast/1, current_speed/2, speed_function/2).
+fast(speed) :~ function(speed_value(speed), [(0, 0), (100, 0.5), (200, 1), (250, 0.5), (300, 0)]).
 
 rfuzzy_quantifier(not_so/1, under, 0.4).
 rfuzzy_quantifier(very/1, over, 0.5).
@@ -24,27 +24,22 @@ rfuzzy_quantifier(too_much/1, over, 0.7).
 %	distance(Y), number(Y),
 %	X .=. Y + 1,
 %	(   X =< 500 ; ( X > 500, !, fail) ).
-distance(X) :- X .>=. 0.
+rfuzzy_define_database(distance/1, [(distance_value, rfuzzy_integer_type)]).
+distance(X) :- current_input(S), get_code(S, X).
 
-far_function :# ([(0, 1), (1, 0.75), (2, 0.5), (3, 0.25), (5, 0)]).
-current_distance(X, X). 
-rfuzzy_define_fuzzification(far/1, current_distance/2, far_function/2).
+far(distance) :~ function(distance_value(distance), [(0, 1), (1, 0.75), (2, 0.5), (3, 0.25), (5, 0)]).
 rfuzzy_antonym(far/1, close/1, prod, 1).
 
-% D is distance, S is speed.
-rfuzzy_type_for(reduce_speed/2, [distance/1, speed/1]).
-rfuzzy_default_value_for(reduce_speed/2, 1).
-reduce_speed(D, S) :~ prod((far(D), very(fast(S)))).
+reduce_speed(distance, speed) :~ defaults_to(1).
+reduce_speed(distance, speed) :~ rule(prod, (far(distance), very(fast(speed)))).
 
-rfuzzy_type_for(activate_brakes/2, [distance/1, speed/1]).
-rfuzzy_default_value_for(activate_brakes/2, 0.5) .
-activate_brakes(D, S) :~ max((close(D), reduce_speed(D, S))).
+activate_brakes(distance, speed) :~ defaults_to(0.5) .
+activate_brakes(distance, speed) :~ rule(max, (close(distance), reduce_speed(distance, speed))).
 
 rfuzzy_antonym(activate_brakes/2, disable_brakes/2, prod, 1).
 % disable_brakes(D, S) cred (complement, 1) :~ max((activate_brakes(D, S), activate_brakes(D, S))).
 
-rfuzzy_type_for(accelerate/2, [distance/1, speed/1]).
-rfuzzy_default_value_for(accelerate/2, 1) .
-accelerate(D, S)  :~ min((disable_brakes(D, S), very(far(D)))).
+accelerate(distance, speed) :~ defaults_to(1) .
+accelerate(distance, speed)  :~ rule(min, (disable_brakes(distance, speed), very(far(D)))).
 
 
