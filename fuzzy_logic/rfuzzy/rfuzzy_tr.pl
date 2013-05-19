@@ -222,7 +222,7 @@ rfuzzy_trans_sent_aux(end_of_file, Code_Before_EOF_with_EOF):-
 	clean_up_asserted_facts.
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
-	% activate_rfuzzy_debug,
+%	activate_rfuzzy_debug,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
@@ -934,7 +934,7 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _NP_Arg_Input, _P_TN, _Truth_
 % ------------------------------------------------------
 
 test_type_definition(P_A, Actual, [Type]) :-
-	print_msg('debug', 'test_type_definition(Functor, P_A, Actual, Type)', (P_A, Actual, [Type]) ),
+	print_msg('debug', 'test_type_definition(P_A, Actual, Type)', (P_A, Actual, [Type]) ),
 	Actual = P_A, !, % Security conditions.
 	test_type_definition_aux(Type),
 	!. % Backtracking not allowed.
@@ -954,7 +954,8 @@ test_type_definition(_P_A, _Actual, Types) :-
 
 test_type_definition_aux(Type) :-
 	print_msg('debug', 'test_type_definition_aux :: Type', Type),
-	functor(Type, P_N, _Fake_P_A),
+	functor(Type, P_N, Fake_P_A),
+	print_msg('debug', 'test_type_definition_aux :: (P_N, Fake_P_A)', (P_N, Fake_P_A)),
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(P_N, _P_A, _P_T, 'true'),
 	!.
