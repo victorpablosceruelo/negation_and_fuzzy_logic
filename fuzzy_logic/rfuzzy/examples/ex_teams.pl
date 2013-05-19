@@ -1,4 +1,4 @@
-:- module(teams,_,[rfuzzy, clpr]).
+:- module(ex_teams,_,[rfuzzy, clpr]).
 
 type_Candidate(john).
 type_Candidate(ken).
