@@ -36,14 +36,13 @@ house(lfs1939,'town_house',860,9,1800000,14,2400).
 house(lfs1938,'town_house',520,11,1990000,19,80).
 
 % FUZZY FUNCTIONS OVER QUANTITATIVE ATTRIBUTES USING INFO FROM THE DATABASE
-rfuzzy_fuzzification(expensive(house), price(house)) :- function([(50000,0),(100000,0.1),(250000,0.2),(350000,0.3),(450000,0.5),(550000,0.6),(800000,0.7),(1000000,0.8),(1500000,0.9),(2500000,1)]).
-rfuzzy_fuzzification(cheap(house), price(house)) :- function([(0,1),(30000,1),(50000,0.8),(100000,0.7),(250000,0.5),(350000,0.3),
-	            (450000,0.1),(550000,0)]).
-rfuzzy_fuzzification(big(house), size(house)) :- function([(0,0),(50,0.1),(80,0.2),(120,0.3),(200,0.4),(300,0.5),(500,0.7),(1000,0.8),(1500,0.9),(2500,1)]).
-rfuzzy_fuzzification(small(house), size(house)) :- function([(0,1),(50,1),(80,0.9),(100,0.8),(150,0.7),(200,0.5),(300,0.2),(400,0.1),(500,0)]).
-rfuzzy_fuzzification(close_to_center(house), distance_to_the_center(house)) :- function([(0,1),(2,1),(4,0.8),(7,0.6),(10,0.5),(12,0.3),(15,0.2),(20,0)]).
-rfuzzy_fuzzification(far_from_center(house), distance_to_the_center(house)) :- function([(0,0),(7,0),(8,0.1),(10,0.3),(14,0.4),(20,0.7),(25,0.8),(30,1)]).
-rfuzzy_fuzzification(close_to_beach(house), distance_to_the_beach(house)) :- function([(0,1),(100,1),(1000,0.5),(2000,0)]).
+expensive(house) :~ function(price(house), [(50000,0),(100000,0.1),(250000,0.2),(350000,0.3),(450000,0.5),(550000,0.6),(800000,0.7),(1000000,0.8),(1500000,0.9),(2500000,1)]).
+cheap(house) :~ function(price(house), [(0,1),(30000,1),(50000,0.8),(100000,0.7),(250000,0.5),(350000,0.3),(450000,0.1),(550000,0)]).
+big(house) :~ function(size(house), [(0,0),(50,0.1),(80,0.2),(120,0.3),(200,0.4),(300,0.5),(500,0.7),(1000,0.8),(1500,0.9),(2500,1)]).
+small(house) :~ function(size(house), [(0,1),(50,1),(80,0.9),(100,0.8),(150,0.7),(200,0.5),(300,0.2),(400,0.1),(500,0)]).
+close_to_center(house) :~ function(distance_to_the_center(house), [(0,1),(2,1),(4,0.8),(7,0.6),(10,0.5),(12,0.3),(15,0.2),(20,0)]).
+far_from_center(house) :~ function(distance_to_the_center(house), [(0,0),(7,0),(8,0.1),(10,0.3),(14,0.4),(20,0.7),(25,0.8),(30,1)]).
+close_to_beach(house) :~ function(distance_to_the_beach(house), [(0,1),(100,1),(1000,0.5),(2000,0)]).
 
 % CRISP FUNCTIONS
 equal(X,X).
@@ -59,19 +58,19 @@ rfuzzy_aggregator(special_prod/3, TV_In_1, TV_In_2, TV_Out) :-
 
 % Rules
 rfuzzy_default_value_for(cheap_and_close_to_the_center(house),0.5).
-cheap_and_close_to_the_center(house):~ special_prod((cheap(house), close_to_center(house))).
+cheap_and_close_to_the_center(house):~ rule(special_prod, (cheap(house), close_to_center(house))).
 
-rfuzzy_default_value_for(not_very_expensive(house),0.5).
-not_very_expensive(house):~ fnot(very(expensive(house))).
+not_very_expensive(house) :~ defaults_to(0.5).
+not_very_expensive(house) :~ rule(fnot(very(expensive(house)))).
 
-rfuzzy_default_value_for(big_and_very_close_to_the_beach(house),0.5).
-big_and_very_close_to_the_beach(house):~ special_prod((big(house), very(close_to_beach(house)))).% missing crisp and not* parts 
+big_and_very_close_to_the_beach(house) :~ defaults_to(0.5).
+big_and_very_close_to_the_beach(house) :~ rule(special_prod, (big(house), very(close_to_beach(house)))).% missing crisp and not* parts 
 
-rfuzzy_default_value_for(very_cheap_house(house),0.5).
-very_cheap_house(house):~ prod((very(cheap(house)))). % 2 missing crisp parts
+very_cheap_house(house) :~ defaults_to(0.5).
+very_cheap_house(house) :~ rule(prod, (very(cheap(house)))). % 2 missing crisp parts
 
-rfuzzy_default_value_for(close_to_the_center_and_the_beach(house),0.5).
-close_to_the_center_and_the_beach(house):~ prod((close_to_center(house), close_to_beach(house))). % 2 missing crisp parts
+close_to_the_center_and_the_beach(house) :~ defaults_to(0.5).
+close_to_the_center_and_the_beach(house) :~ rule(prod, (close_to_center(house), close_to_beach(house))). % 2 missing crisp parts
 
 % This will be changed in a future version of rfuzzy.
 %rfuzzy_type_for(is_apartment/1, [house]).
