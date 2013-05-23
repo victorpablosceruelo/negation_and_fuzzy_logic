@@ -223,6 +223,7 @@ rfuzzy_trans_sent_aux(end_of_file, Code_Before_EOF_with_EOF):-
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
 %	activate_rfuzzy_debug,
+	clean_up_asserted_facts,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
