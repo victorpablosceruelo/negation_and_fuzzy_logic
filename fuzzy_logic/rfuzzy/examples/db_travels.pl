@@ -1,39 +1,27 @@
-:- module(good_destination,_,[rfuzzy, clpr]).
+:- module(db_travels,_,[rfuzzy, clpr]).
+
+% Define the database.
+rfuzzy_define_database(city/3, 
+	[(id, rfuzzy_enum_type), 
+	  (nice_weather, rfuzzy_truth_value_type),
+	   (many_sights,  rfuzzy_truth_value_type)]).
 
 % Define the individuals belonging to the set cities.
-city(madrid).
-city(istambul).
-city(moscow).
-city(sydney).
+city(madrid, 0.8, 0.6).
+city(istambul, 0.7, 0.7).
+city(moscow, 0.2, null).
+city(sydney, null, 0.6).
 
-rfuzzy_type_for(nice_weather/1, [city/1]).
-rfuzzy_default_value_for(nice_weather/1, 0.5).
-
-nice_weather(madrid) value 0.8.
-nice_weather(madrid) value 0.7.
-nice_weather(madrid) value 0.2.
-
-rfuzzy_type_for(many_sights/1, [city/1]).
-rfuzzy_default_value_for(many_sights/1, 0.2).
-
-many_sights(madrid) value 0.6.
-many_sights(istambul) value 0.7.
-many_sights(sydney) value 0.6.
-
-% Define that only cities are valid individuals for
-% the fuzzy set good_destination.
-rfuzzy_type_for(good_destination/1, [city/1]).
+nice_weather(city) :~ defaults_to(0.5).
+many_sights(city) :~ defaults_to(0.2).
 
 % A city is a good destination with a truth value of 0.1
 % if we can not compute a more accurate value.
-rfuzzy_default_value_for(good_destination/1, 0.3).
+good_destination(city) :~ defaults_to(0.3).
 
-% The rule to determine the grade of belonging of 
-% a player to the fuzzy set of good_player has a 
-% confidence of 0.8. Its result is a combination of 
-% how much (the truth value) he/she is swift, tall and 
-% an experienced player. 
-good_destination(Place) cred (prod,1) :~ prod((nice_weather(Place), many_sights(Place))).
+% A city is a good destination if it has nice_weather and many_sights
+% We 
+good_destination(city)  :~ rule(prod, (nice_weather(city), many_sights(city))) with_credibility (prod,1).
 
 % Queries (examples).
 
