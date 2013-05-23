@@ -26,8 +26,8 @@ car('Ford Fiesta', 'Ford Motor Company', 'City Car', 1976, null, 3924, 1685, 146
 %  vw_phaeton.
 % ferrari
 
-rfuzzy_fuzzification(expensive(car), price_in_euros(car)) :- function([ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
+expensive(car) :~ function(price_in_euros(car), [ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
 % Future syntax
 % expensive(car) :~ function(price_in_euros(car), [(0, 0), (10000, 0.5), (30000, 1)]).
 
-rfuzzy_fuzzification(fast(car), max_speed_in_mph(car)) :- function([ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
+fast(car) :~ function(max_speed_in_mph(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
