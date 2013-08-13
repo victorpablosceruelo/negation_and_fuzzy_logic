@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import constants.KConstants;
 import constants.UrlMappingClass;
+import constants.UrlMappingsClass;
 
 
 public class ServletsAuxMethodsClass {
@@ -66,7 +67,7 @@ public class ServletsAuxMethodsClass {
 			LOG.error("-------------------------------------------------------------------");
 			
 			try {
-				actionOnExceptionAux(KConstants.Pages.SignOutRequest, "", e, request, response, LOG);
+				actionOnExceptionAux(UrlMappingsClass.Pages.SignOutRequest, "", e, request, response, LOG);
 			}
 			catch (Exception e3) {
 				LOG.error("-------------------------------------------------------------------");
@@ -253,17 +254,16 @@ public class ServletsAuxMethodsClass {
 	 */
 	private static String appMappingForUriNickName(int uriNickName) throws Exception {
 
-		UrlMappingClass [] urlsMappings = urlsMappings();
+		UrlMappingClass urlsMapping = UrlMappingsClass.getMapping(uriNickName);
 
-		if ((uriNickName > urlsMappings.length) || 
-			(urlsMappings[uriNickName] == null) ||
-			(urlsMappings[uriNickName].getKeyString() == null) ||
-			(urlsMappings[uriNickName].getUrl() == null) ||
-			(("".equals(urlsMappings[uriNickName].getUrl())) && (uriNickName != KConstants.TheSamePage))) {
+		if ((urlsMapping == null) ||
+			(urlsMapping.getKeyString() == null) ||
+			(urlsMapping.getUrl() == null) ||
+			(("".equals(urlsMapping.getUrl())) && (uriNickName != UrlMappingsClass.Pages.TheSamePage))) {
 			throw new Exception("Unknown UriNickName: " + uriNickName);
 		}
 		// LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);
-		return urlsMappings[uriNickName].getUrl();
+		return urlsMapping.getUrl();
 	}
 	
 	public static int uriNickNameForOpValue (String op) throws Exception {
