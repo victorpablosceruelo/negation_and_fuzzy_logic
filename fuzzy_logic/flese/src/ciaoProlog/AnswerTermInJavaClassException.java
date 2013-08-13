@@ -1,4 +1,4 @@
-package auxiliar;
+package ciaoProlog;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

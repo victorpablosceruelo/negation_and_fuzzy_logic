@@ -1,4 +1,4 @@
-package auxiliar;
+package ciaoProlog;
 
 public class QueryConversorExceptionClass extends Exception {
 

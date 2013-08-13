@@ -1,4 +1,4 @@
-<%@page import="auxiliar.CiaoPrologConnectionClass"%>
+<%@page import="ciaoProlog.CiaoPrologConnectionClass"%>
 
 // This file contains only JavaScript, and you should not see this.
 

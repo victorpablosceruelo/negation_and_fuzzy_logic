@@ -1,4 +1,4 @@
-package auxiliar;
+package ciaoProlog;
 
 import java.util.ArrayList;
 import java.util.Iterator;

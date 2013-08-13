@@ -8,6 +8,10 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 
+import filters.OnlyCiaoPrologFilesFilterClass;
+import filters.OnlyLocalUserNameFolderFilterClass;
+import filters.OnlyNotLocalUserNameFolderFilterClass;
+
 public class FilesMgmtClass {
 	
 	/**
