@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import constants.KConstants;
+import constants.UrlMappingClass;
+
+
 public class ServletsAuxMethodsClass {
 
 	final static Log LOG = LogFactory.getLog(ServletsAuxMethodsClass.class);
@@ -62,7 +66,7 @@ public class ServletsAuxMethodsClass {
 			LOG.error("-------------------------------------------------------------------");
 			
 			try {
-				actionOnExceptionAux(ServletsAuxMethodsClass.SignOutRequest, "", e, request, response, LOG);
+				actionOnExceptionAux(KConstants.Pages.SignOutRequest, "", e, request, response, LOG);
 			}
 			catch (Exception e3) {
 				LOG.error("-------------------------------------------------------------------");
@@ -239,82 +243,7 @@ public class ServletsAuxMethodsClass {
 	    return appUrl;
 	}
 	
-	// ----------------------------------------------------------------------------------------------
-	// ----------------------------------------------------------------------------------------------
-	// ----------------------------------------------------------------------------------------------
-	public static final int TheSamePage = 0;
-	public static final int IndexPage = 1;
-	public static final int ExceptionAjaxPage = 2;
-	public static final int NullSessionAjaxPage = 3;
-	
-	public static final int SocialAuthenticationCallBackRequest = 4;
-	public static final int SignInRequest = 5;
-	public static final int SignOutRequest = 6;
-	public static final int SignedInAnswer = 7;
-	public static final int SignedOutAnswer = 8;
-	public static final int UserOptionsRequest = 9;
-	public static final int UserOptionsAnswer = 10;
-	
-	public static final int FilesListRequest = 11;
-	public static final int FilesListAnswer = 12;
-	public static final int FileUploadRequest = 13;
-	public static final int FileUploadAnswer = 14;
-	public static final int FileViewRequest = 15;
-	public static final int FileViewAnswer = 16;
-	public static final int FileDownloadRequest = 17;
-	public static final int FileDownloadAnswer = 18;
-	public static final int FileRemoveRequest = 19;
-	public static final int FileRemoveAnswer = 20;
-	
-	public static final int ProgramFileIntrospectionRequest = 21;
-	public static final int ProgramFileIntrospectionAnswer = 22;
-	public static final int RunQueryRequest = 23;
-	public static final int RunQueryAnswer = 24;
 
-	public static final int ListProgramFuzzificationsRequest = 25;
-	public static final int ListProgramFuzzificationsAnswer = 26;	
-	public static final int SaveProgramFuzzificationRequest  = 27;
-	public static final int SaveProgramFuzzificationAnswer  = 28;
-	
-	public static UrlMappingClass [] urlsMappings() throws Exception {
-		UrlMappingClass [] urlsMappings = new UrlMappingClass[29];
-		
-		urlsMappings[TheSamePage] = new UrlMappingClass(TheSamePage, "theSamePage", "", "");
-		urlsMappings[IndexPage] = new UrlMappingClass(IndexPage, "IndexPage", "", "index.jsp");
-		urlsMappings[ExceptionAjaxPage] = new UrlMappingClass(ExceptionAjaxPage, "ExceptionAjaxPage", "", "WEB-INF/exceptionAjaxPage.jsp");
-		urlsMappings[NullSessionAjaxPage] = new UrlMappingClass(NullSessionAjaxPage, "NullSessionAjaxPage", "", "WEB-INF/nullSessionAjaxPage.jsp");
-		
-		urlsMappings[SocialAuthenticationCallBackRequest] = new UrlMappingClass(SocialAuthenticationCallBackRequest, "SocialAuthenticationCallBackRequest", "", "SocialAuthCallBackServlet");
-		urlsMappings[SignInRequest] = new UrlMappingClass(SignInRequest, "SignInRequest", "signin", "SocialAuthCallBackServlet");
-		urlsMappings[SignOutRequest] = new UrlMappingClass(SignOutRequest, "SignOutRequest", "signout", "SocialAuthCallBackServlet");
-		urlsMappings[SignedInAnswer] = new UrlMappingClass(SignedInAnswer, "SignedInAnswer", "", "WEB-INF/signedIn.jsp");
-		urlsMappings[SignedOutAnswer] = new UrlMappingClass(SignedOutAnswer, "SignedOutAnswer", "", "WEB-INF/signedOut.jsp");
-		urlsMappings[UserOptionsRequest] = new UrlMappingClass(UserOptionsRequest, "UserOptionsRequest", "userInfo", "DispatcherServlet");
-		urlsMappings[UserOptionsAnswer] = new UrlMappingClass(UserOptionsAnswer, "UserOptionsAnswer", "", "WEB-INF/userOptions.jsp");
-		
-		urlsMappings[FilesListRequest] = new UrlMappingClass(FilesListRequest, "FilesListRequest", "filesList", "DispatcherServlet");
-		urlsMappings[FilesListAnswer] = new UrlMappingClass(FilesListAnswer, "FilesListAnswer", "", "WEB-INF/filesList.jsp");
-		urlsMappings[FileUploadRequest] = new UrlMappingClass(FileUploadRequest, "FileUploadRequest", "fileUpload", "DispatcherServlet");
-		urlsMappings[FileUploadAnswer] = new UrlMappingClass(FileUploadAnswer, "FileUploadAnswer", "", "WEB-INF/fileUpload.jsp");
-		urlsMappings[FileViewRequest] = new UrlMappingClass(FileViewRequest, "FileViewRequest", "fileView", "DispatcherServlet");
-		urlsMappings[FileViewAnswer] = new UrlMappingClass(FileViewAnswer, "FileViewAnswer", "", "WEB-INF/fileView.jsp");
-		urlsMappings[FileDownloadRequest] = new UrlMappingClass(FileDownloadRequest, "FileDownloadRequest", "fileDownload", "DispatcherServlet");
-		urlsMappings[FileDownloadAnswer] = new UrlMappingClass(FileDownloadAnswer, "FileDownloadAnswer", "", "WEB-INF/fileDownload.jsp");
-		urlsMappings[FileRemoveRequest] = new UrlMappingClass(FileRemoveRequest, "FileRemoveRequest", "fileRemove", "DispatcherServlet");
-		urlsMappings[FileRemoveAnswer] = new UrlMappingClass(FileRemoveAnswer, "FileRemoveAnswer", "", "WEB-INF/fileRemove.jsp");
-		
-		urlsMappings[ProgramFileIntrospectionRequest] = new UrlMappingClass(ProgramFileIntrospectionRequest, "ProgramFileIntrospectionRequest", "programFileIntrospection", "DispatcherServlet");
-		urlsMappings[ProgramFileIntrospectionAnswer] = new UrlMappingClass(ProgramFileIntrospectionAnswer, "ProgramFileIntrospectionAnswer", "", "WEB-INF/programFileIntrospection.jsp");
-		urlsMappings[RunQueryRequest] = new UrlMappingClass(RunQueryRequest, "RunQueryRequest", "runQuery", "DispatcherServlet");
-		urlsMappings[RunQueryAnswer] = new UrlMappingClass(RunQueryAnswer, "RunQueryAnswer", "", "WEB-INF/runQuery.jsp");
-		
-		urlsMappings[ListProgramFuzzificationsRequest] = new UrlMappingClass(ListProgramFuzzificationsRequest, "ListProgramFuzzificationsRequest", "listProgramFuzzifications", "DispatcherServlet");
-		urlsMappings[ListProgramFuzzificationsAnswer] = new UrlMappingClass(ListProgramFuzzificationsAnswer, "ListProgramFuzzificationsAnswer", "", "WEB-INF/listFuzzifications.jsp");
-		urlsMappings[SaveProgramFuzzificationRequest] = new UrlMappingClass(SaveProgramFuzzificationRequest, "SaveProgramFuzzificationRequest", "saveProgramFuzzification", "DispatcherServlet");
-		urlsMappings[SaveProgramFuzzificationAnswer] = new UrlMappingClass(SaveProgramFuzzificationAnswer, "SaveProgramFuzzificationAnswer", "", "WEB-INF/saveFuzzification.jsp");
-		
-		return urlsMappings;
-	}
 	
 	/**
 	 * Returns the app mapping for uriNickName.
@@ -330,7 +259,7 @@ public class ServletsAuxMethodsClass {
 			(urlsMappings[uriNickName] == null) ||
 			(urlsMappings[uriNickName].getKeyString() == null) ||
 			(urlsMappings[uriNickName].getUrl() == null) ||
-			(("".equals(urlsMappings[uriNickName].getUrl())) && (uriNickName != TheSamePage))) {
+			(("".equals(urlsMappings[uriNickName].getUrl())) && (uriNickName != KConstants.TheSamePage))) {
 			throw new Exception("Unknown UriNickName: " + uriNickName);
 		}
 		// LOG.info("uriNickName: " +uriNickName+ " -> " + retVal);

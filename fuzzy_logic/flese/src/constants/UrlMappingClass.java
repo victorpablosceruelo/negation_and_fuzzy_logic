@@ -1,4 +1,4 @@
-package auxiliar;
+package constants;
 
 public class UrlMappingClass {
 	
@@ -8,9 +8,12 @@ public class UrlMappingClass {
 	private String incompleteUrl = null;
 	
 	UrlMappingClass (int key, String keyString, String opValue, String incompleteUrl) throws Exception {
-		if ((keyString == null) || (opValue == null) || (incompleteUrl == null)) 
-			throw new Exception("no parameter can be null. keyString: " + keyString + " opValue: "+ opValue + 
-								" incompleteUrl: " + incompleteUrl);
+		if (key < 0) throw new Exception("key cannot be negative");
+		if (keyString == null) throw new Exception("keyString cannot be null");
+		if ("".equals(keyString)) throw new Exception("keyString cannot be empty string");
+		if (opValue == null) throw new Exception("opValue cannot be null");
+		if (incompleteUrl == null) throw new Exception("incompleteUrl cannot be null");
+		
 		this.key = key;
 		this.keyString = keyString;
 		this.opValue = opValue;

@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import constants.KConstants;
+
 
 import auxiliar.DispatchersClass;
 import auxiliar.LocalUserNameClass;
@@ -108,7 +110,7 @@ public class DispatcherServlet extends HttpServlet {
 			break;
 		case ServletsAuxMethodsClass.RunQueryRequest: dispatcherObject.runProgramQuery();
 			break;
-		case ServletsAuxMethodsClass.TheSamePage:
+		case KConstants.TheSamePage:
 		default: dispatcherObject.emptyRequest();
 			break;
 		}

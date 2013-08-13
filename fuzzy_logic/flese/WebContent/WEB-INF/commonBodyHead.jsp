@@ -2,7 +2,7 @@
 <!-- beginning of commonBodyHead -->
 
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<%@page import="auxiliar.UrlMappingClass"%>
+<%@page import="constants.UrlMappingClass"%>
 <script type="text/javascript">
 
 	function isString(o) {
