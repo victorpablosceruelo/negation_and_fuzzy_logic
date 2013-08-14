@@ -43,7 +43,7 @@ public class StoreHouseClass {
 		HashMap<String, Object> storeHouseAux = storeHouseStringKeys.get(className);
 		if (storeHouseAux == null) throw new Exception("No storeHouse for the class.");
 		Object object = storeHouseStringKeys.get(key);
-		if (object == null) throw new Exception("No object for the key.");
+		if (object == null) throw new Exception("No object for the key. key: " + key);
 		return object;
 	}
 

@@ -1,3 +1,4 @@
+<%@page import="constants.KConstants"%>
 <jsp:include page="WEB-INF/commonHtmlHead.jsp" />
 
 <body>
@@ -12,7 +13,7 @@
 <br /><br />
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <div class='indexPageImportantLink'>
-<a class='indexPageImportantLink' href="<%=ServletsAuxMethodsClass.getFullPathForUriNickName(ServletsAuxMethodsClass.SignOutRequest, request, null) %>">Go to the application</a>
+<a class='indexPageImportantLink' href="<%=KConstants.Pages.SignOutRequest.getFullUrl(request, null) %>">Go to the application</a>
 </div>
 <br />
 <br />

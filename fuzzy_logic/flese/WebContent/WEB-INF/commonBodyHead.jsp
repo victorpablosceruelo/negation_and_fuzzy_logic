@@ -1,8 +1,9 @@
 
 <!-- beginning of commonBodyHead -->
 
+<%@page import="constants.KConstants"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
-<%@page import="constants.UrlMappingClass"%>
+<%@page import="urls.UrlMap"%>
 <script type="text/javascript">
 
 	function isString(o) {
@@ -20,7 +21,7 @@
 	}
 	var urlsMappings = new Array();
 <%
-	UrlMappingClass[] urlsMappings = ServletsAuxMethodsClass.urlsMappings();
+	UrlMap[] urlsMappings = KConstants.Pages.pagesList;
 	for (int i=0; i<urlsMappings.length; i++) {
 		out.write("    urlsMappings["+i+"] = new urlMapping('" + urlsMappings[i].getKeyString() + "', '" + urlsMappings[i].getUrl() + "');\n");
 	}

@@ -20,11 +20,11 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ciaoProlog.CiaoPrologConnectionClass;
-import ciaoProlog.QueryConversorClass;
-
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
+import ciaoProlog.CiaoPrologConnectionClass;
+import ciaoProlog.QueryConversorClass;
+import constants.KConstants;
 
 public class DispatchersClass {
 	private static final Log LOG = LogFactory.getLog(DispatchersClass.class);
@@ -32,10 +32,10 @@ public class DispatchersClass {
 	private int BUFSIZE = 4096;
 	private int maxFileSize = 50000 * 1024;
 	private int maxMemSize = 50000 * 1024;
-	
+
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
-	
+
 	private ServletContext servletContext = null;
 	private String doMethod = null;
 	private HttpServletRequest request = null;
@@ -45,65 +45,62 @@ public class DispatchersClass {
 	private String fileName = null;
 	private String fileOwner = null;
 	private CiaoPrologConnectionClass connection = null;
-	
-	public DispatchersClass(ServletContext servletContext, String doMethod, LocalUserNameClass localUserName, HttpServletRequest request, HttpServletResponse response) 
-			throws Exception {
-		
+
+	public DispatchersClass(ServletContext servletContext, String doMethod, LocalUserNameClass localUserName, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
 		this.servletContext = servletContext;
-		if (servletContext == null) throw new Exception("servletContext is null.");
-		
+		if (servletContext == null)
+			throw new Exception("servletContext is null.");
+
 		this.doMethod = doMethod;
-		if (doMethod == null) throw new Exception("doMethod is null.");
-		if ((! "doGet".equals(doMethod)) && (! "doPost".equals(doMethod))) throw new Exception("doMethod is not doGet nor doPost.");
-		
+		if (doMethod == null)
+			throw new Exception("doMethod is null.");
+		if ((!"doGet".equals(doMethod)) && (!"doPost".equals(doMethod)))
+			throw new Exception("doMethod is not doGet nor doPost.");
+
 		this.request = request;
-		if (request == null) throw new Exception("request is null.");
-		
+		if (request == null)
+			throw new Exception("request is null.");
+
 		// Debugging information.
 		LOG.info(ServletsAuxMethodsClass.requestParametersToString(request));
-		
+
 		this.response = response;
-		if (response == null) throw new Exception("response is null.");
+		if (response == null)
+			throw new Exception("response is null.");
 
 		// Ask for the previously created session.
 		session = request.getSession(false);
-		if (session == null) throw new Exception("session is null.");
+		if (session == null)
+			throw new Exception("session is null.");
 
 		this.localUserName = localUserName;
-		if (localUserName == null) throw new Exception("localUserName is null.");
-		
-		String [] programFilesValidPaths = {	
-				"/home/java-apps/fuzzy-search/", 
+		if (localUserName == null)
+			throw new Exception("localUserName is null.");
+
+		String[] programFilesValidPaths = { "/home/java-apps/fuzzy-search/",
 				System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/",
 				// servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"),
-				"/tmp/java-apps/fuzzy-search/"
-		};
-		
+				"/tmp/java-apps/fuzzy-search/" };
+
 		if (programFilesPath == null) {
 			programFilesPath = FilesMgmtClass.returnProgramFilesValidPath(programFilesValidPaths, LOG);
 			LOG.info("programFilesPath: " + programFilesPath);
 		}
-		
-		
-		String [] plServerValidSubPaths = {	
-				"/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
-				"/usr/share/CiaoDE/ciao/library/javall/plserver",
-				"/usr/lib/ciao",
-				"/usr/share/CiaoDE",
-				"/usr", 
-				"/opt", 
-				"/home", 
-				"/"
-		};
-		
+
+		String[] plServerValidSubPaths = { "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
+				"/usr/share/CiaoDE/ciao/library/javall/plserver", "/usr/lib/ciao", "/usr/share/CiaoDE", "/usr", "/opt", "/home", "/" };
+
 		if (plServerPath == null) {
 			plServerPath = FilesMgmtClass.returnPlServerValidPath(plServerValidSubPaths, LOG);
 			LOG.info("plServerPath: " + plServerPath);
 		}
-		
-		// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar la query "fileNameIntrospectionQuery"
+
+		// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar
+		// la query "fileNameIntrospectionQuery"
 		connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
-		
+
 		if (connection == null) {
 			connection = new CiaoPrologConnectionClass();
 		}
@@ -112,135 +109,167 @@ public class DispatchersClass {
 
 	private void testAndInitialize_fileName_and_fileOwner() throws Exception {
 		fileName = request.getParameter("fileName");
-		if (fileName == null) throw new Exception("fileName is null.");
+		if (fileName == null)
+			throw new Exception("fileName is null.");
 		request.setAttribute("fileName", fileName);
-		
+
 		fileOwner = request.getParameter("fileOwner");
-		if (fileOwner == null) throw new Exception("fileOwner is null.");
+		if (fileOwner == null)
+			throw new Exception("fileOwner is null.");
 		request.setAttribute("fileOwner", fileOwner);
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Generates the static html page seen by the user.
-	 * Still needs some clean up !!!
+	 * Generates the static html page seen by the user. Still needs some clean
+	 * up !!!
+	 * 
 	 * @throws Exception
 	 */
 	public void emptyRequest() throws Exception {
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SignedInAnswer, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.SignedInAnswer, "", request, response, LOG);
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Executes the introspection query and puts the connection object into the connection session attibute,
-	 * so the results can be obtained in any jsp page.
+	 * Returns the page showing the user information.
+	 * 
+	 * @throws Exception
+	 */
+	public void userOptions() throws Exception {
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.UserOptionsAnswer, "", request, response, LOG);
+	}
+
+	/**
+	 * Executes the introspection query and puts the connection object into the
+	 * connection session attibute, so the results can be obtained in any jsp
+	 * page.
+	 * 
+	 * @throws Exception
+	 */
+	public void runProgramIntrospectionQuery() throws Exception {
+		runProgramIntrospectionQuery(true);
+	}
+
+	/**
+	 * Executes the introspection query and puts the connection object into the
+	 * connection session attibute, so the results can be obtained in any jsp
+	 * page.
+	 * 
 	 * @throws Exception
 	 */
 	public void runProgramIntrospectionQuery(boolean doForward) throws Exception {
-		
+
 		testAndInitialize_fileName_and_fileOwner();
 		connection.programFileIntrospectionQuery(plServerPath, programFilesPath, fileOwner, fileName);
 		/*
-		LOG.info("------");
-		LOG.info("------");
-		LOG.info("--------> testing query !!! <-----------");
-		LOG.info("------");
-		LOG.info("------");
-		connection.testingQuery(fileOwner, fileName);
-		*/
-		
+		 * LOG.info("------"); LOG.info("------");
+		 * LOG.info("--------> testing query !!! <-----------");
+		 * LOG.info("------"); LOG.info("------");
+		 * connection.testingQuery(fileOwner, fileName);
+		 */
+
 		// Update the connection object in the session.
-		session.removeAttribute("connection"); 
+		session.removeAttribute("connection");
 		session.setAttribute("connection", connection);
 
 		if (doForward) {
 			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ProgramFileIntrospectionAnswer, "", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(KConstants.Pages.ProgramFileIntrospectionAnswer, "", request, response, LOG);
 		}
 	}
-	
+
 	/**
-	 * Executes any generic query and puts the connection object into the connection session attibute,
-	 * so the results can be obtained in any jsp page.
+	 * Executes any generic query and puts the connection object into the
+	 * connection session attibute, so the results can be obtained in any jsp
+	 * page.
+	 * 
 	 * @throws Exception
 	 */
 	public void runProgramQuery() throws Exception {
-		
+
 		testAndInitialize_fileName_and_fileOwner();
 		runProgramIntrospectionQuery(false);
-		
+
 		String formParameters = " --- Parameters Names and Values --- \n";
-	    Enumeration<String> paramNames = request.getParameterNames();
-	    while(paramNames.hasMoreElements()) {
-	    	String paramName = (String)paramNames.nextElement();
-	    	String[] paramValues = request.getParameterValues(paramName);
-	    	for(int i=0; i<paramValues.length; i++) {
-	    		formParameters += "paramName: " + paramName + " paramValue: " + paramValues[i] + " \n";
-	    	}
-	    }
-	    LOG.info(formParameters);
-	    
-	    if (request.getParameter("queryLinesCounter") == null) {
-	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ExceptionAjaxPage, "", request, response, LOG);
-	    }
-	    else {
-	    	int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
-	    	QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
-	    	String msg = "";
+		Enumeration<String> paramNames = request.getParameterNames();
+		while (paramNames.hasMoreElements()) {
+			String paramName = (String) paramNames.nextElement();
+			String[] paramValues = request.getParameterValues(paramName);
+			for (int i = 0; i < paramValues.length; i++) {
+				formParameters += "paramName: " + paramName + " paramValue: " + paramValues[i] + " \n";
+			}
+		}
+		LOG.info(formParameters);
 
-	    	// Parameters to be retrieved and saved:
-	    	// quantifier0, quantifier1, predicate, rfuzzyComputeOperator, rfuzzyComputeValue, aggregator;
+		if (request.getParameter("queryLinesCounter") == null) {
+			ServletsAuxMethodsClass.forward_to(KConstants.Pages.ExceptionAjaxPage, "", request, response, LOG);
+		} else {
+			int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
+			QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
+			String msg = "";
 
-	    	conversor.subqueryEndTestAndSave();
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("selectQueryStartupType", request, QueryConversorClass.initialPredicate);
-	    	msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
+			// Parameters to be retrieved and saved:
+			// quantifier0, quantifier1, predicate, rfuzzyComputeOperator,
+			// rfuzzyComputeValue, aggregator;
 
-	    	for (int i=0; i<queryLinesCounter; i++) {
-	    		conversor.subqueryEndTestAndSave();
+			conversor.subqueryEndTestAndSave();
+			msg += conversor.subqueryRetrieveAndSaveSubpart("selectQueryStartupType", request, QueryConversorClass.initialPredicate);
+			msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
 
-	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_0", request, QueryConversorClass.quantifier0);
-	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectQuantifier_1", request, QueryConversorClass.quantifier1);
-	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectPredicate", request, QueryConversorClass.predicate);
-	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeOperator", request, QueryConversorClass.rfuzzyComputeOperator);
-	    		msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine["+i+"].selectRfuzzyComputeValue", request, QueryConversorClass.rfuzzyComputeValue);
-	    	}
-	    	LOG.info(msg);
+			for (int i = 0; i < queryLinesCounter; i++) {
+				conversor.subqueryEndTestAndSave();
 
-	    	conversor.subqueryEndTestAndSave();
-	    	PLStructure query = conversor.queryConvert();
-	    	PLVariable [] variables = conversor.getListOfVariables();
-	    	String [] variablesNames = conversor.getListOfNamesForVariables();
+				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectQuantifier_0", request,
+						QueryConversorClass.quantifier0);
+				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectQuantifier_1", request,
+						QueryConversorClass.quantifier1);
+				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectPredicate", request,
+						QueryConversorClass.predicate);
+				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectRfuzzyComputeOperator", request,
+						QueryConversorClass.rfuzzyComputeOperator);
+				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectRfuzzyComputeValue", request,
+						QueryConversorClass.rfuzzyComputeValue);
+			}
+			LOG.info(msg);
 
-	    	connection.performQuery(plServerPath, query, programFilesPath, fileOwner, fileName, variables, variablesNames);
-	    	// performQuery(PLStructure query, String fileOwner, String fileName, PLVariable [] variables)
+			conversor.subqueryEndTestAndSave();
+			PLStructure query = conversor.queryConvert();
+			PLVariable[] variables = conversor.getListOfVariables();
+			String[] variablesNames = conversor.getListOfNamesForVariables();
 
-	    	// Update the connection object in the session.
-	    	session.removeAttribute("connection"); 
-	    	session.setAttribute("connection", connection);
+			connection.performQuery(plServerPath, query, programFilesPath, fileOwner, fileName, variables, variablesNames);
+			// performQuery(PLStructure query, String fileOwner, String
+			// fileName, PLVariable [] variables)
 
-	    	// Forward to the jsp page.
-	    	ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.RunQueryAnswer, "", request, response, LOG);
-	    }
+			// Update the connection object in the session.
+			session.removeAttribute("connection");
+			session.setAttribute("connection", connection);
+
+			// Forward to the jsp page.
+			ServletsAuxMethodsClass.forward_to(KConstants.Pages.RunQueryAnswer, "", request, response, LOG);
+		}
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public void filesList() throws Exception {
-		Iterator<FileInfoClass> filesListIterator = FilesMgmtClass.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(), LOG);
+		Iterator<FileInfoClass> filesListIterator = FilesMgmtClass.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(),
+				LOG);
 		request.setAttribute("filesListIterator", filesListIterator);
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FilesListAnswer, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FilesListAnswer, "", request, response, LOG);
 	}
-	
+
 	public void uploadFile() throws Exception {
 		String msg = "Program File has been uploaded.";
 		try {
@@ -250,18 +279,18 @@ public class DispatchersClass {
 		}
 		LOG.info(msg);
 		request.setAttribute("uploadResult", msg);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileUploadAnswer, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FileUploadAnswer, "", request, response, LOG);
 	}
-	
+
 	public void uploadFileAux() throws Exception {
 		LOG.info("--- uploadFileAux invocation ---");
 		if ((doMethod == null) || ("doGet".equals(doMethod))) {
-			throw new ServletException("Uploads are only allowed using http post method.");	
+			throw new ServletException("Uploads are only allowed using http post method.");
 		}
-			
+
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		if( !isMultipart ){
+		if (!isMultipart) {
 			throw new Exception("We cannot upload because the content of the request is not multipart.");
 		}
 
@@ -275,16 +304,15 @@ public class DispatchersClass {
 		// Create a new file upload handler
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		// maximum file size to be uploaded.
-		upload.setSizeMax( maxFileSize );
-
+		upload.setSizeMax(maxFileSize);
 
 		// Get the path where we are going to upload the file.
 		String filesPath = FilesMgmtClass.getFullPath(programFilesPath, localUserName.getLocalUserName(), null, true);
-		if ((filesPath == null) || ("".equals(filesPath))){
+		if ((filesPath == null) || ("".equals(filesPath))) {
 			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
-		}
-		else {
-			if (! (filesPath.endsWith("/"))) filesPath += "/";
+		} else {
+			if (!(filesPath.endsWith("/")))
+				filesPath += "/";
 		}
 
 		// Parse the request to get file items.
@@ -293,75 +321,73 @@ public class DispatchersClass {
 		// Process the uploaded file items
 		// Iterator<FileItem> i = fileItems.iterator();
 
-		//while ( i.hasNext () )
-		for (int i=0; i<fileItems.size(); i++)
-		{
+		// while ( i.hasNext () )
+		for (int i = 0; i < fileItems.size(); i++) {
 			// FileItem fileItem = (FileItem)i.next();
 			FileItem fileItem = fileItems.get(i);
-			if ( !fileItem.isFormField () )	
-			{
+			if (!fileItem.isFormField()) {
 				// Get the uploaded file parameters
-				//	            String fieldName = fi.getFieldName();
+				// String fieldName = fi.getFieldName();
 				String fileName = fileItem.getName();
 				if (fileName == null) {
 					throw new Exception("The name of the program file to upload is null.");
 				}
-				if  ("".equals(fileName)) {
+				if ("".equals(fileName)) {
 					throw new Exception("The name of the program file to upload is an empty string.");
 				}
-				if (! fileName.endsWith(".pl")) {
+				if (!fileName.endsWith(".pl")) {
 					throw new Exception("The name of the program file to upload must have the extension '.pl'.");
 				}
-				//	ServletsAuxMethodsClass.addMessageToTheUser(request, "Please choose a correct program file. Allowed file extension is \'.pl\'", LOG);
+				// ServletsAuxMethodsClass.addMessageToTheUser(request,
+				// "Please choose a correct program file. Allowed file extension is \'.pl\'",
+				// LOG);
 
-				// String fileNameReal = ""; 
-				//	            String contentType = fi.getContentType();
-				//	            boolean isInMemory = fi.isInMemory();
-				//	            long sizeInBytes = fi.getSize();
+				// String fileNameReal = "";
+				// String contentType = fi.getContentType();
+				// boolean isInMemory = fi.isInMemory();
+				// long sizeInBytes = fi.getSize();
 				// Write the file
-				if( fileName.lastIndexOf("\\") >= 0 ){
-					fileName = filesPath + fileName.substring( fileName.lastIndexOf("\\"));
-				}
-				else fileName = filesPath + fileName;
-				
+				if (fileName.lastIndexOf("\\") >= 0) {
+					fileName = filesPath + fileName.substring(fileName.lastIndexOf("\\"));
+				} else
+					fileName = filesPath + fileName;
 
 				LOG.info("realFileName: " + fileName);
-				File file = new File( fileName ) ;
-				fileItem.write( file );
+				File file = new File(fileName);
+				fileItem.write(file);
 			}
 		}
-	}	
+	}
 
 	public void downloadFile() throws Exception {
-		
+
 		testAndInitialize_fileName_and_fileOwner();
 
 		String FileNameWithPath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		// request.getParameter("filename");
 		String browser_filename = fileName;
 
-		File                f        = new File(FileNameWithPath);
-		int                 length   = 0;
-		ServletOutputStream op       = response.getOutputStream();
-		String              mimetype = servletContext.getMimeType( FileNameWithPath );
+		File f = new File(FileNameWithPath);
+		int length = 0;
+		ServletOutputStream op = response.getOutputStream();
+		String mimetype = servletContext.getMimeType(FileNameWithPath);
 
 		//
-		//  Set the response and go!
+		// Set the response and go!
 		//
 		//
-		response.setContentType( (mimetype != null) ? mimetype : "application/octet-stream" );
-		response.setContentLength( (int)f.length() );
-		response.setHeader( "Content-Disposition", "attachment; filename=\"" + browser_filename + "\"" );
+		response.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
+		response.setContentLength((int) f.length());
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + browser_filename + "\"");
 
 		//
-		//  Stream to the requester.
+		// Stream to the requester.
 		//
 		byte[] bbuf = new byte[BUFSIZE];
 		DataInputStream in = new DataInputStream(new FileInputStream(f));
 
-		while ((in != null) && ((length = in.read(bbuf)) != -1))
-		{
-			op.write(bbuf,0,length);
+		while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+			op.write(bbuf, 0, length);
 		}
 
 		in.close();
@@ -370,16 +396,16 @@ public class DispatchersClass {
 	}
 
 	public void removeFile() throws Exception {
-		
+
 		testAndInitialize_fileName_and_fileOwner();
-		
+
 		FilesMgmtClass.removeProgramFile(programFilesPath, fileOwner, fileName, localUserName.getLocalUserName());
-		ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file "+fileName+" has been removed. ", LOG);
-		
+		ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file " + fileName + " has been removed. ", LOG);
+
 	}
-	
+
 	public void viewFile() throws Exception {
-		
+
 		testAndInitialize_fileName_and_fileOwner();
 
 		String filePath = null;
@@ -387,84 +413,77 @@ public class DispatchersClass {
 			filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		}
 		request.setAttribute("filePath", filePath);
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.FileViewAnswer, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FileViewAnswer, "", request, response, LOG);
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public void listProgramFuzzifications () throws Exception {
-		
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public void ListProgramFuzzificationsRequest() throws Exception {
+
 		testAndInitialize_fileName_and_fileOwner();
-		
+
 		String filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		request.setAttribute("filePath", filePath);
-		
+
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.ListProgramFuzzificationsAnswer, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.ListProgramFuzzificationsAnswer, "", request, response, LOG);
 	}
-	
-	public void saveProgramFuzzification () throws Exception {
-		
+
+	public void saveProgramFuzzification() throws Exception {
+
 		testAndInitialize_fileName_and_fileOwner();
-		
+
 		String filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
 		request.setAttribute("filePath", filePath);
-		
+
 		String predDefined = request.getParameter("predDefined");
-		if (predDefined == null) throw new Exception("predDefined is null.");
-		
+		if (predDefined == null)
+			throw new Exception("predDefined is null.");
+
 		String predNecessary = request.getParameter("predNecessary");
-		if (predNecessary == null) throw new Exception("predNecessary is null.");
-		
+		if (predNecessary == null)
+			throw new Exception("predNecessary is null.");
+
 		String predOwner = request.getParameter("predOwner");
-		if (predOwner == null) throw new Exception("predOwner is null.");
-		
-		int counter=0;
-		String [] [] params = null;
+		if (predOwner == null)
+			throw new Exception("predOwner is null.");
+
+		int counter = 0;
+		String[][] params = null;
 		String paramsDebug = "Function definition to save: ";
-		
-		while ( (request.getParameter("fpx["+counter+"]") != null) && 
-				(request.getParameter("fpy["+counter+"]") != null)) {
+
+		while ((request.getParameter("fpx[" + counter + "]") != null) && (request.getParameter("fpy[" + counter + "]") != null)) {
 			counter++;
 		}
-		
-		if (counter>0) { 
+
+		if (counter > 0) {
 			params = new String[counter][2];
-			for (int i=0; i<counter; i++) {
-				params[i][0] = request.getParameter("fpx["+i+"]");
-				params[i][1] = request.getParameter("fpy["+i+"]");
+			for (int i = 0; i < counter; i++) {
+				params[i][0] = request.getParameter("fpx[" + i + "]");
+				params[i][1] = request.getParameter("fpy[" + i + "]");
 				paramsDebug += "\n" + params[i][0] + " -> " + params[i][1] + " ";
 			}
 		}
-		
+
 		LOG.info(paramsDebug);
-		
+
 		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
 		programAnalized.updateProgramFile(predDefined, predNecessary, predOwner, params);
-		
+
 		connection.clearCacheInCiaoPrologConnectionClass();
-		
-		/* This is just to test if the send button produces errors.
-		int j = 0;
-		while (true) {
-			j++;
-		}
-		*/
-		
+
+		/*
+		 * This is just to test if the send button produces errors. int j = 0;
+		 * while (true) { j++; }
+		 */
+
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(ServletsAuxMethodsClass.SaveProgramFuzzificationAnswer, "", request, response, LOG);
+		ServletsAuxMethodsClass.forward_to(KConstants.Pages.SaveProgramFuzzificationAnswer, "", request, response, LOG);
 
 	}
-	
+
 }
 
-
-
-
-
-
-
-
-/////
+// ///
