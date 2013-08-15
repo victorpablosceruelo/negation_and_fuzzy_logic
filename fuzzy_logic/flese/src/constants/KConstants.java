@@ -5,10 +5,10 @@ import urls.UrlMap;
 public class KConstants {
 
 	public static class Pages {
-		public static final UrlMap TheSamePage = new UrlMap("theSamePage", "", "");
-		public static final UrlMap IndexPage = new UrlMap("IndexPage", "", "index.jsp");
-		public static final UrlMap ExceptionAjaxPage = new UrlMap("ExceptionAjaxPage", "", "WEB-INF/exceptionAjaxPage.jsp");
-		public static final UrlMap NullSessionAjaxPage = new UrlMap("NullSessionAjaxPage", "", "WEB-INF/nullSessionAjaxPage.jsp");
+		public static final UrlMap TheSamePage = new UrlMap("theSamePage", "", "", null);
+		public static final UrlMap IndexPage = new UrlMap("IndexPage", "", "index.jsp", null);
+		public static final UrlMap ExceptionAjaxPage = new UrlMap("ExceptionAjaxPage", "", "WEB-INF/exceptionAjaxPage.jsp", null);
+		public static final UrlMap NullSessionAjaxPage = new UrlMap("NullSessionAjaxPage", "", "WEB-INF/nullSessionAjaxPage.jsp", null);
 
 		public static final UrlMap SocialAuthenticationCallBackRequest = new UrlMap("SocialAuthenticationCallBackRequest", "",
 				"SocialAuthCallBackServlet");

@@ -15,7 +15,9 @@ public class StoreHouseClass {
 	 * @param object
 	 * @throws Exception 
 	 */
-	public static void store(String className, String key, Object object) throws Exception {
+	public static void store(@SuppressWarnings("rawtypes") Class classObject, String key, Object object) throws Exception {
+		if (classObject == null) throw new Exception("class cannot be null.");
+		String className = classObject.getName();
 		if (className == null) throw new Exception("className cannot be null.");
 		if (key == null) throw new Exception("key cannot be null.");
 		if (object == null) throw new Exception("object cannot be null.");
@@ -36,13 +38,15 @@ public class StoreHouseClass {
 	 * @return returns the stored object.
 	 * @throws Exception 
 	 */
-	public static Object retrieve(String className, String key) throws Exception {
+	public static Object retrieve(@SuppressWarnings("rawtypes") Class classObject, String key) throws Exception {
+		if (classObject == null) throw new Exception("class cannot be null.");
+		String className = classObject.getName();
 		if (className == null) throw new Exception("className cannot be null.");
 		if (key == null) throw new Exception("key cannot be null.");
 
 		HashMap<String, Object> storeHouseAux = storeHouseStringKeys.get(className);
 		if (storeHouseAux == null) throw new Exception("No storeHouse for the class.");
-		Object object = storeHouseStringKeys.get(key);
+		Object object = storeHouseAux.get(key);
 		if (object == null) throw new Exception("No object for the key. key: " + key);
 		return object;
 	}
