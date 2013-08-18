@@ -5,54 +5,54 @@ import urls.UrlMap;
 public class KConstants {
 
 	public static class Pages {
-		public static final UrlMap TheSamePage = new UrlMap("theSamePage", "", "", null);
-		public static final UrlMap IndexPage = new UrlMap("IndexPage", "", "index.jsp", null);
-		public static final UrlMap ExceptionAjaxPage = new UrlMap("ExceptionAjaxPage", "", "WEB-INF/exceptionAjaxPage.jsp", null);
-		public static final UrlMap NullSessionAjaxPage = new UrlMap("NullSessionAjaxPage", "", "WEB-INF/nullSessionAjaxPage.jsp", null);
+		public static final UrlMap EmptyPage = new UrlMap("emptyPage", "", "");
+		public static final UrlMap IndexPage = new UrlMap("indexPage", "", "index.jsp");
+		public static final UrlMap ExceptionAjaxPage = new UrlMap("exceptionAjaxPage", "", "WEB-INF/exceptionAjaxPage.jsp");
+		public static final UrlMap NullSessionAjaxPage = new UrlMap("nullSessionAjaxPage", "", "WEB-INF/nullSessionAjaxPage.jsp");
 
 		public static final UrlMap SocialAuthenticationCallBackRequest = new UrlMap("SocialAuthenticationCallBackRequest", "",
 				"SocialAuthCallBackServlet");
-		public static final UrlMap SignInRequest = new UrlMap("SignInRequest", "signin", "SocialAuthCallBackServlet");
-		public static final UrlMap SignOutRequest = new UrlMap("SignOutRequest", "signout", "SocialAuthCallBackServlet");
-		public static final UrlMap SignedInAnswer = new UrlMap("SignedInAnswer", "", "WEB-INF/signedIn.jsp");
-		public static final UrlMap SignedOutAnswer = new UrlMap("SignedOutAnswer", "", "WEB-INF/signedOut.jsp");
-		public static final UrlMap UserOptionsRequest = new UrlMap("UserOptionsRequest", "userInfo", "DispatcherServlet");
-		public static final UrlMap UserOptionsAnswer = new UrlMap("UserOptionsAnswer", "", "WEB-INF/userOptions.jsp");
+		public static final UrlMap SignInRequest = new UrlMap("signInRequest", "signin", "SocialAuthCallBackServlet");
+		public static final UrlMap SignOutRequest = new UrlMap("signOutRequest", "signout", "SocialAuthCallBackServlet");
+		public static final UrlMap SignedInAnswer = new UrlMap("signedInAnswer", "", "WEB-INF/signedIn.jsp");
+		public static final UrlMap SignedOutAnswer = new UrlMap("signedOutAnswer", "", "WEB-INF/signedOut.jsp");
+		public static final UrlMap UserOptionsRequest = new UrlMap("userOptionsRequest", "userInfo", "DispatcherServlet");
+		public static final UrlMap UserOptionsAnswer = new UrlMap("userOptionsAnswer", "", "WEB-INF/userOptions.jsp");
 
-		public static final UrlMap FilesListRequest = new UrlMap("FilesListRequest", "filesList", "DispatcherServlet");
-		public static final UrlMap FilesListAnswer = new UrlMap("FilesListAnswer", "", "WEB-INF/filesList.jsp");
-		public static final UrlMap FileUploadRequest = new UrlMap("FileUploadRequest", "fileUpload", "DispatcherServlet");
-		public static final UrlMap FileUploadAnswer = new UrlMap("FileUploadAnswer", "", "WEB-INF/fileUpload.jsp");
-		public static final UrlMap FileViewRequest = new UrlMap("FileViewRequest", "fileView", "DispatcherServlet");
-		public static final UrlMap FileViewAnswer = new UrlMap("FileViewAnswer", "", "WEB-INF/fileView.jsp");
-		public static final UrlMap FileDownloadRequest = new UrlMap("FileDownloadRequest", "fileDownload", "DispatcherServlet");
-		public static final UrlMap FileDownloadAnswer = new UrlMap("FileDownloadAnswer", "", "WEB-INF/fileDownload.jsp");
-		public static final UrlMap FileRemoveRequest = new UrlMap("FileRemoveRequest", "fileRemove", "DispatcherServlet");
-		public static final UrlMap FileRemoveAnswer = new UrlMap("FileRemoveAnswer", "", "WEB-INF/fileRemove.jsp");
+		public static final UrlMap FilesListRequest = new UrlMap("filesListRequest", "filesList", "DispatcherServlet");
+		public static final UrlMap FilesListAnswer = new UrlMap("filesListAnswer", "", "WEB-INF/filesList.jsp");
+		public static final UrlMap FileUploadRequest = new UrlMap("fileUploadRequest", "fileUpload", "DispatcherServlet");
+		public static final UrlMap FileUploadAnswer = new UrlMap("fileUploadAnswer", "", "WEB-INF/fileUpload.jsp");
+		public static final UrlMap FileViewRequest = new UrlMap("fileViewRequest", "fileView", "DispatcherServlet");
+		public static final UrlMap FileViewAnswer = new UrlMap("fileViewAnswer", "", "WEB-INF/fileView.jsp");
+		public static final UrlMap FileDownloadRequest = new UrlMap("fileDownloadRequest", "fileDownload", "DispatcherServlet");
+		public static final UrlMap FileDownloadAnswer = new UrlMap("fileDownloadAnswer", "", "WEB-INF/fileDownload.jsp");
+		public static final UrlMap FileRemoveRequest = new UrlMap("fileRemoveRequest", "fileRemove", "DispatcherServlet");
+		public static final UrlMap FileRemoveAnswer = new UrlMap("fileRemoveAnswer", "", "WEB-INF/fileRemove.jsp");
 
-		public static final UrlMap ProgramFileIntrospectionRequest = new UrlMap("ProgramFileIntrospectionRequest",
-				"programFileIntrospection", "DispatcherServlet");
-		public static final UrlMap ProgramFileIntrospectionAnswer = new UrlMap("ProgramFileIntrospectionAnswer", "",
+		public static final UrlMap introspectionQueryRequest = new UrlMap("introspectionQueryRequest", "programFileIntrospection",
+				"DispatcherServlet");
+		public static final UrlMap introspectionQueryAnswer = new UrlMap("introspectionQueryAnswer", "",
 				"WEB-INF/programFileIntrospection.jsp");
-		public static final UrlMap RunQueryRequest = new UrlMap("RunQueryRequest", "runQuery", "DispatcherServlet");
-		public static final UrlMap RunQueryAnswer = new UrlMap("RunQueryAnswer", "", "WEB-INF/runQuery.jsp");
+		public static final UrlMap RunQueryRequest = new UrlMap("runQueryRequest", "runQuery", "DispatcherServlet");
+		public static final UrlMap RunQueryAnswer = new UrlMap("runQueryAnswer", "", "WEB-INF/runQuery.jsp");
 
-		public static final UrlMap ListProgramFuzzificationsRequest = new UrlMap("ListProgramFuzzificationsRequest",
+		public static final UrlMap ListProgramFuzzificationsRequest = new UrlMap("listProgramFuzzificationsRequest",
 				"listProgramFuzzifications", "DispatcherServlet");
-		public static final UrlMap ListProgramFuzzificationsAnswer = new UrlMap("ListProgramFuzzificationsAnswer", "",
+		public static final UrlMap ListProgramFuzzificationsAnswer = new UrlMap("listProgramFuzzificationsAnswer", "",
 				"WEB-INF/listFuzzifications.jsp");
-		public static final UrlMap SaveProgramFuzzificationRequest = new UrlMap("SaveProgramFuzzificationRequest",
+		public static final UrlMap SaveProgramFuzzificationRequest = new UrlMap("saveProgramFuzzificationRequest",
 				"saveProgramFuzzification", "DispatcherServlet");
-		public static final UrlMap SaveProgramFuzzificationAnswer = new UrlMap("SaveProgramFuzzificationAnswer", "",
+		public static final UrlMap SaveProgramFuzzificationAnswer = new UrlMap("saveProgramFuzzificationAnswer", "",
 				"WEB-INF/saveFuzzification.jsp");
 
-		public static final UrlMap[] pagesList = { TheSamePage, IndexPage, ExceptionAjaxPage, NullSessionAjaxPage,
+		public static final UrlMap[] pagesList = { EmptyPage, IndexPage, ExceptionAjaxPage, NullSessionAjaxPage,
 				SocialAuthenticationCallBackRequest, SignInRequest, SignOutRequest, SignedInAnswer, SignedOutAnswer, UserOptionsRequest,
 				FilesListRequest, FilesListAnswer, FileUploadRequest, FileUploadAnswer, FileViewRequest, FileViewAnswer,
-				FileDownloadRequest, FileDownloadAnswer, ProgramFileIntrospectionRequest, ProgramFileIntrospectionAnswer, RunQueryRequest,
+				FileDownloadRequest, FileDownloadAnswer, introspectionQueryRequest, introspectionQueryAnswer, RunQueryRequest,
 				RunQueryAnswer, ListProgramFuzzificationsRequest, ListProgramFuzzificationsAnswer, SaveProgramFuzzificationRequest,
 				SaveProgramFuzzificationAnswer };
 	}
-	
+
 	public static String appPath = "flese/";
 }

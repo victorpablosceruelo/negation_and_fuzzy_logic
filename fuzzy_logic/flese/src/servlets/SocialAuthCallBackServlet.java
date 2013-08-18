@@ -1,33 +1,25 @@
-
 package servlets;
-
-import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-// import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.brickred.socialauth.AuthProvider;
 import org.brickred.socialauth.Permission;
+import org.brickred.socialauth.SocialAuthConfig;
+import org.brickred.socialauth.SocialAuthManager;
+
+import storeHouse.SessionStoreHouse;
+import auxiliar.LocalUserInfo;
+import auxiliar.NextStep;
+import auxiliar.ServletsAuxMethodsClass;
+import constants.KConstants;
+// import org.apache.commons.lang.StringUtils;
 // import org.brickred.socialauth.Profile;
 // import org.brickred.socialauth.Contact;
 // import org.brickred.socialauth.Profile;
-import org.brickred.socialauth.SocialAuthConfig;
-import org.brickred.socialauth.SocialAuthManager;
-import org.brickred.socialauth.util.SocialAuthUtil;
-
-import constants.KConstants;
-
-import auxiliar.LocalUserNameClass;
-import auxiliar.ServletsAuxMethodsClass;
-
-
 
 /**
  * 
@@ -54,206 +46,147 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		doGetAndDoPost("doGet", request, response);
 	}
-	
+
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		doGetAndDoPost("doPost", request, response);
 	}
-	
-	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- "+doAction+" invocation ---");
-		//	ServletsAuxMethodsClass.logRequestParameters(request, LOG);
-		HttpSession session = null;
-		
-		try {
-			// Ask for an existing session or create a new one.
-			session = request.getSession(true);
 
-			socialAuthentication(request, response, session);
+	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("--- " + doAction + " invocation ---");
+		NextStep nextStep = null;
+
+		try {
+			// Sessions management.
+			SessionStoreHouse sessionStoreHouse = new SessionStoreHouse(request, response, true);
+
+			nextStep = socialAuthentication(sessionStoreHouse);
+			nextStep.takeAction(request, response);
+
 		} catch (Exception e) {
 			// socialAuthenticationSignOut(request, response, session);
 			ServletsAuxMethodsClass.actionOnException(KConstants.Pages.SignOutRequest, "", e, request, response, LOG);
 		}
-		LOG.info("--- "+doAction+" end ---");
+		LOG.info("--- " + doAction + " end ---");
 	}
-	
-	private void socialAuthentication(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-		
+
+	private NextStep socialAuthentication(SessionStoreHouse sessionStoreHouse) throws Exception {
+
 		// The parameter that tells us the operation.
-		String request_op = request.getParameter("op");
-		if ((request_op != null) && (! "".equals(request_op)) &&
-				(("signout".equals(request_op) || ("signin".equals(request_op))))) { 
-			request.removeAttribute("op");
-			if ("signout".equals(request_op)) { 
-				socialAuthenticationSignOut(request, response, session);
-			}
+		if ("".equals(sessionStoreHouse.getRequestOp())) {
+			return socialAuthenticationAuthenticate(sessionStoreHouse);
+		}
 
-			if ("signin".equals(request_op)) { 
-				socialAuthenticationSignInOrContinue(request, response, session);
-			}
+		if ("signout".equals(sessionStoreHouse.getRequestOp())) {
+			sessionStoreHouse.setRequestOp("");
+			return socialAuthenticationSignOut(sessionStoreHouse);
 		}
-		else {
-			socialAuthenticationAuthenticate(request, response, session);
+
+		if ("signin".equals(sessionStoreHouse.getRequestOp())) {
+			sessionStoreHouse.setRequestOp("");
+			return socialAuthenticationSignInOrContinue(sessionStoreHouse);
 		}
+
+		return null;
+
 	}
-	
-	private void socialAuthenticationAuthenticate(HttpServletRequest request, HttpServletResponse response, HttpSession session)
-			throws Exception {
-		
+
+	private NextStep socialAuthenticationAuthenticate(SessionStoreHouse sessionStoreHouse) throws Exception {
+
 		LOG.info("socialAuthenticationAuthenticate method call. ");
-		if (session == null) throw new Exception("Session is null");
+		String providerId = "";
 
-		String id="none";
-		String isInTestingMode = (String) session.getAttribute("testingMode");
-		if ((isInTestingMode != null) && ("true".equals(isInTestingMode))) {
-	    	ServletsAuxMethodsClass.addMessageToTheUser(request, "INFO: Social Authentication in Testing mode.", LOG);
-		}
-		else {
+		if (sessionStoreHouse.appIsInTestingMode()) {
+			sessionStoreHouse.addMessageForTheUser("INFO: Social Authentication in Testing mode.");
+		} else {
 			// get the social auth manager from session
-			SocialAuthManager authManager = (SocialAuthManager)session.getAttribute("authManager");
-			if (authManager == null) throw new Exception("authManager is null");
-			session.removeAttribute("authManager");
-
-			// call connect method of manager which returns the provider object. 
-			// Pass request parameter map while calling connect method.
-			AuthProvider provider = null;
-			try {
-				provider = authManager.connect(SocialAuthUtil.getRequestParametersMap(request));
-			}
-			catch (Exception e) {
-				LOG.info("Error connecting social authentication provider.");
-				LOG.info(e);
-				if (e != null) {
-					LOG.info(e.getMessage());
-					LOG.info(e.toString());
-				}
-				provider = null;
-				throw new Exception("Impossible to connect with service provider.");
-			}
-			if (provider == null) throw new Exception("provider is null");
-			
-			// Retrieve the provider id to rebuild the initial query.
-			// NO: authManager.getCurrentAuthProvider().getProviderId();
-			id = provider.getProviderId();
-
-			// Save new computed results in session.
-			session.setAttribute("authManager", authManager);
-			session.setAttribute("provider", provider);
+			providerId = sessionStoreHouse.tryAuthenticationWithSocialAuthManager();
 		}
-		
+
 		// Test if we have an username or not.
 		@SuppressWarnings("unused")
-		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-				
-		ServletsAuxMethodsClass.addMessageToTheUser(request, "Welcome to the FleSe application !!", LOG);
-		ServletsAuxMethodsClass.redirect_to(KConstants.Pages.SignInRequest, "&id=" + id, request, response, LOG);
+		LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
+
+		sessionStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
+		return new NextStep(NextStep.Constants.redirect_to, KConstants.Pages.SignInRequest, "&id=" + providerId);
 	}
-	
-	private void socialAuthenticationSignInOrContinue(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
-			throws Exception {
-		
+
+	private NextStep socialAuthenticationSignInOrContinue(SessionStoreHouse sessionStoreHouse) throws Exception {
+
 		LOG.info("socialAuthenticationSignIn method call. ");
-		if (session == null) throw new Exception("Session is null");
 
 		// Get the value of the parameter; the name is case-sensitive
-		String id = (String) request.getParameter("id");
-		if ((id == null) || ("".equals(id))) throw new Exception("id is null");
 
 		// Test if we have signed in before and the session contains the info.
-		boolean userIsAuthenticated = false;
 		try {
 			@SuppressWarnings("unused")
-			LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
-			userIsAuthenticated = true;
+			LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
+			return new NextStep(NextStep.Constants.forward_to, KConstants.Pages.SignedInAnswer, "");
+		} catch (Exception e) {
 		}
-		catch (Exception e) {
-			userIsAuthenticated = false;
-		}
-		
-		if (userIsAuthenticated) {
-			ServletsAuxMethodsClass.forward_to(KConstants.Pages.SignedInAnswer, "", request, response, LOG);
-		}
-		else {
-			// URL of YOUR application which will be called after authentication
-			String nextURL = KConstants.Pages.SocialAuthenticationCallBackRequest.getFullUrl(request, LOG);
-			
-		    // Returns the host name of the server to which the request was sent.
-		    
-		    if ((request.getServerName() != null) && ("localhost".equals(request.getServerName()))) {
-		    	LOG.info("request.getServerName(): " + request.getServerName());
-		    	session.setAttribute("testingMode", "true");
-			} 
-		    else {
-				SocialAuthManager authManager = (SocialAuthManager) session.getAttribute("authManager");
-				if (authManager != null) {
-					session.removeAttribute("authManager");
-				}
-				else {
-					LOG.info("INFO: creating a new auth manager because it was null. ");
 
-					//Create an instance of SocialAuthConfgi object
-					SocialAuthConfig config = SocialAuthConfig.getDefault();
-					// config.setApplicationProperties()
-					//load configuration. By default load the configuration from oauth_consumer.properties. 
-					//You can also pass input stream, properties object or properties file name.
-					config.load();
+		// URL of YOUR application which will be called after authentication
+		String requestUrl = sessionStoreHouse.getRequestUrlString();
+		String serverName = sessionStoreHouse.getServerName();
+		String nextURL = KConstants.Pages.SocialAuthenticationCallBackRequest.getFullUrl(requestUrl, serverName);
 
-					//Create an instance of SocialAuthManager and set config
-					authManager = new SocialAuthManager();
-					authManager.setSocialAuthConfig(config);
-				}
+		// Returns the host name of the server to which the request was
+		// sent.
 
-				// get Provider URL to which you should redirect for authentication.
-				// id can have values "facebook", "twitter", "yahoo" etc. or the OpenID URL
-				authManager.setPermission(id, Permission.AUTHENTICATE_ONLY);
-				nextURL = authManager.getAuthenticationUrl(id, nextURL);
+		if ((serverName != null) && ("localhost".equals(serverName))) {
+			LOG.info("request.getServerName(): " + serverName);
+			sessionStoreHouse.setAppInTestingMode(true);
+		} else {
+			SocialAuthManager socialAuthManager = sessionStoreHouse.getSocialAuthManager();
 
-				// Store in session.
-				session.setAttribute("authManager", authManager);
+			if (socialAuthManager == null) {
+				// Create an instance of SocialAuthConfgi object
+				SocialAuthConfig config = SocialAuthConfig.getDefault();
+				// config.setApplicationProperties()
+				// load configuration. By default load the configuration
+				// from oauth_consumer.properties.
+				// You can also pass input stream, properties object or
+				// properties file name.
+				config.load();
 
+				// Create an instance of SocialAuthManager and set config
+				socialAuthManager = new SocialAuthManager();
+				socialAuthManager.setSocialAuthConfig(config);
 			}
-		    
-			if (nextURL == null) throw new Exception("nextURL is null."); 
-			if ("".equals(nextURL)) throw new Exception("nextURL is empty string."); 
 
-	    	response.sendRedirect( nextURL );
-			// response.encodeRedirectURL( athenticationUrl );
+			// get Provider URL to which you should redirect for
+			// authentication.
+			// id can have values "facebook", "twitter", "yahoo" etc. or the
+			// OpenID URL
+			String providerId = sessionStoreHouse.getProviderId();
+			socialAuthManager.setPermission(providerId, Permission.AUTHENTICATE_ONLY);
+			nextURL = socialAuthManager.getAuthenticationUrl(providerId, nextURL);
+
+			// Store in session.
+			sessionStoreHouse.setSocialAuthManager(socialAuthManager);
 
 		}
+
+		if (nextURL == null)
+			throw new Exception("nextURL is null.");
+		if ("".equals(nextURL))
+			throw new Exception("nextURL is empty string.");
+
+		return new NextStep(NextStep.Constants.sendRedirect_to, KConstants.Pages.EmptyPage, nextURL);
+		// response.sendRedirect(nextURL);
+		// response.encodeRedirectURL( athenticationUrl );
+
 	}
-	
-	private void socialAuthenticationSignOut(HttpServletRequest request, HttpServletResponse response, HttpSession session) 
-			throws Exception {
-		
+
+	private NextStep socialAuthenticationSignOut(SessionStoreHouse sessionStoreHouse) throws Exception {
+
 		LOG.info("socialAuthenticationSignOut method call. ");
 
-		if (session != null) {
-			SocialAuthManager authManager = (SocialAuthManager) session.getAttribute("authManager");
-			if (authManager != null) {
-				List <String> connectedProvidersIds = authManager.getConnectedProvidersIds();
-				if (connectedProvidersIds != null) {
-					Iterator <String> connectedProvidersIdsIterator = connectedProvidersIds.iterator();
-					if (connectedProvidersIdsIterator != null) {
-						while(connectedProvidersIdsIterator.hasNext()) {
-							String id = connectedProvidersIdsIterator.next();
-							if (id != null) {
-								authManager.disconnectProvider(id);
-							}
-						}
-					}
-				}
-			}
-			// Invalidate the session.
-			session.invalidate();
-		}
-		
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.SignedOutAnswer, "", request, response, LOG);
+		sessionStoreHouse.invalidateSession();
+
+		return new NextStep(NextStep.Constants.forward_to, KConstants.Pages.SignedOutAnswer, "");
 	}
-	
+
 }
 
-
-
-
-//// EOF
-
+// // EOF
 

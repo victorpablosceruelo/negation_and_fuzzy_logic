@@ -1,17 +1,12 @@
 package urls;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.Log;
-
 public class UrlMap {
 
 	private String keyString = null;
 	private String opValue = null;
 	private String incompleteUrl = null;
-	private String method = null;
 
-	public UrlMap(String keyString, String opValue, String incompleteUrl, String method) {
+	public UrlMap(String keyString, String opValue, String incompleteUrl) {
 
 		if (keyString == null)
 			keyString = "";
@@ -23,7 +18,6 @@ public class UrlMap {
 		this.keyString = keyString;
 		this.opValue = opValue;
 		this.incompleteUrl = incompleteUrl;
-		this.method = method;
 	}
 
 	public String getKeyString() {
@@ -42,18 +36,12 @@ public class UrlMap {
 		return url;
 	};
 
-	public String getFullUrl(HttpServletRequest request, Log LOG) {
-		String appUrl = AppUrl.getAppUrl(request, LOG);
-		String url = "";
+	public String getFullUrl(String requestUrl, String serverName) {
+		String appUrl = AppUrl.getAppUrl(requestUrl, serverName);
+		String url = appUrl;
 		if (!"".equals(getUrl()))
 			url = appUrl + getUrl();
-		if (LOG != null)
-			LOG.info("url: " + url);
 		return url;
 	}
-	
-	public String getMethod() {
-		return this.method;
-	}
-	
+
 }

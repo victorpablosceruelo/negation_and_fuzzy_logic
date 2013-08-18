@@ -8,15 +8,16 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import storeHouse.SessionStoreHouse;
 import urls.UrlMap;
 import urls.UrlsMaps;
 import auxiliar.DispatchersClass;
-import auxiliar.LocalUserNameClass;
+import auxiliar.LocalUserInfo;
+import auxiliar.NextStep;
 import auxiliar.ServletsAuxMethodsClass;
 import constants.KConstants;
 
@@ -60,31 +61,38 @@ public class DispatcherServlet extends HttpServlet {
 
 	private void dispatchQuery(String doAction, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// Ask for an existing session.
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			ServletsAuxMethodsClass.forward_to(KConstants.Pages.NullSessionAjaxPage, "", request, response, LOG);
-		} else {
-			dispatchQueryWithSession(doAction, request, response, session);
+		SessionStoreHouse sessionStoreHouse = null;
+		NextStep nextStep = null;
+
+		try {
+			// Sessions management.
+			sessionStoreHouse = new SessionStoreHouse(request, response, false);
+		} catch (Exception e) {
+			sessionStoreHouse = null;
+			nextStep = new NextStep(NextStep.Constants.forward_to, KConstants.Pages.NullSessionAjaxPage, "");
+			nextStep.takeAction(request, response);
+
+		}
+
+		if (sessionStoreHouse != null) {
+			nextStep = dispatchQueryWithSession(doAction, sessionStoreHouse);
+			nextStep.takeAction(request, response);
 		}
 
 	}
 
-	private void dispatchQueryWithSession(String doAction, HttpServletRequest request, HttpServletResponse response, HttpSession session)
-			throws Exception {
-
-		if (session == null)
-			throw new Exception("Session is null");
+	private NextStep dispatchQueryWithSession(String doAction, SessionStoreHouse sessionStoreHouse) throws Exception {
 
 		// Tests if we have logged in.
-		LocalUserNameClass localUserName = new LocalUserNameClass(request, response);
+		LocalUserInfo localUserInfo = sessionStoreHouse.getLocalUserInfo();
 
 		// Needed to work.
 		ServletContext servletContext = getServletConfig().getServletContext();
-		DispatchersClass dispatcherObject = new DispatchersClass(servletContext, doAction, localUserName, request, response);
+		DispatchersClass dispatcherObject = new DispatchersClass(servletContext, doAction, sessionStoreHouse);
 
-		String request_op = request.getParameter("op");
+		NextStep nextStep = null;
 
+		String request_op = sessionStoreHouse.getRequestOp();
 		if ((request_op != null) && (!"".equals(request_op))) {
 
 			String requestName = request_op + "Request";
@@ -92,7 +100,7 @@ public class DispatcherServlet extends HttpServlet {
 			String methodName = urlMap.getKeyString();
 
 			try {
-				dispatcherObject.getClass().getMethod(methodName, (Class<?>) null);
+				nextStep = dispatcherObject.getClass().getMethod(methodName, (Class<?>) null).invoke(null, null);
 			} catch (NoSuchMethodException e) {
 				e.printStackTrace();
 				System.out.println(e.toString());
@@ -101,7 +109,7 @@ public class DispatcherServlet extends HttpServlet {
 		}
 
 		if (request_op == null) {
-			dispatcherObject.emptyRequest();
+			nextStep = dispatcherObject.emptyRequest();
 		}
 	}
 }

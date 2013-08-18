@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import storeHouse.SessionStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import ciaoProlog.CiaoPrologConnectionClass;
@@ -41,13 +42,13 @@ public class DispatchersClass {
 	private HttpServletRequest request = null;
 	private HttpServletResponse response = null;
 	private HttpSession session = null;
-	private LocalUserNameClass localUserName = null;
+	private LocalUserInfo localUserName = null;
 	private String fileName = null;
 	private String fileOwner = null;
 	private CiaoPrologConnectionClass connection = null;
 
-	public DispatchersClass(ServletContext servletContext, String doMethod, LocalUserNameClass localUserName, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	public DispatchersClass(ServletContext servletContext, String doMethod, SessionStoreHouse sessionStoreHouse)
+			throws Exception {
 
 		this.servletContext = servletContext;
 		if (servletContext == null)
@@ -129,7 +130,7 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void emptyRequest() throws Exception {
+	public NextStep emptyRequest() throws Exception {
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(KConstants.Pages.SignedInAnswer, "", request, response, LOG);
 	}
@@ -143,7 +144,7 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void userOptions() throws Exception {
+	public void userOptionsRequest() throws Exception {
 		ServletsAuxMethodsClass.forward_to(KConstants.Pages.UserOptionsAnswer, "", request, response, LOG);
 	}
 
@@ -154,8 +155,8 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void runProgramIntrospectionQuery() throws Exception {
-		runProgramIntrospectionQuery(true);
+	public void introspectionQueryRequest() throws Exception {
+		introspectionQueryRequest(true);
 	}
 
 	/**
@@ -165,7 +166,7 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void runProgramIntrospectionQuery(boolean doForward) throws Exception {
+	public void introspectionQueryRequest(boolean doForward) throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
 		connection.programFileIntrospectionQuery(plServerPath, programFilesPath, fileOwner, fileName);
@@ -182,7 +183,7 @@ public class DispatchersClass {
 
 		if (doForward) {
 			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(KConstants.Pages.ProgramFileIntrospectionAnswer, "", request, response, LOG);
+			ServletsAuxMethodsClass.forward_to(KConstants.Pages.introspectionQueryAnswer, "", request, response, LOG);
 		}
 	}
 
@@ -193,10 +194,10 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void runProgramQuery() throws Exception {
+	public void runQuery() throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
-		runProgramIntrospectionQuery(false);
+		introspectionQueryRequest(false);
 
 		String formParameters = " --- Parameters Names and Values --- \n";
 		Enumeration<String> paramNames = request.getParameterNames();

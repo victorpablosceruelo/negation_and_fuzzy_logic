@@ -1,6 +1,6 @@
 package urls;
 
-import storeHouse.StoreHouseClass;
+import storeHouse.CacheStoreHouse;
 import constants.KConstants;
 
 public class UrlsMaps {
@@ -12,7 +12,7 @@ public class UrlsMaps {
 			load(KConstants.Pages.pagesList);
 		}
 		String auxKey = key.toUpperCase(); // HashMap keys in uppercase.
-		return (UrlMap) StoreHouseClass.retrieve(UrlsMaps.class, auxKey);
+		return (UrlMap) CacheStoreHouse.retrieve(UrlsMaps.class, auxKey);
 	}
 
 	private static void load(UrlMap[] pagesList) throws Exception {
@@ -25,7 +25,7 @@ public class UrlsMaps {
 	private static void storeMapping(UrlMap urlMap) throws Exception {
 		String key = urlMap.getKeyString();
 		String auxKey = key.toUpperCase(); // HashMap keys in uppercase.
-		StoreHouseClass.store(UrlsMaps.class, auxKey, urlMap);
+		CacheStoreHouse.store(UrlsMaps.class, auxKey, urlMap);
 	}
 
 }

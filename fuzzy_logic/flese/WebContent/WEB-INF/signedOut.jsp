@@ -1,5 +1,6 @@
 <jsp:include page="commonHtmlHead.jsp" />
 
+<%@page import="constants.KConstants"%>
 <%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
 	<script type="text/javascript">
@@ -94,15 +95,15 @@
     </div>
 
 	<script type="text/javascript">
-		setupHref ('facebookLink', urlMappingFor('SignInRequest') + "&id=facebook");
-		setupHref ('twitterLink', urlMappingFor('SignInRequest') + "&id=twitter");
-		setupHref ('gmailLink', urlMappingFor('SignInRequest') + "&id=google");
-		setupHref ('yahooLink', urlMappingFor('SignInRequest') + "&id=yahoo");
-		setupHref ('hotmailLink', urlMappingFor('SignInRequest') + "&id=hotmail");
-		setupHref ('linkedinLink', urlMappingFor('SignInRequest') + "&id=linkedin");
-		setupHref ('foursquareLink', urlMappingFor('SignInRequest') + "&id=foursquare");
-		setupHref ('myspaceLink', urlMappingFor('SignInRequest') + "&id=myspace");
-		setupHref ('mendeleyLink', urlMappingFor('SignInRequest') + "&id=mendeley");
+		setupHref ('facebookLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=facebook");
+		setupHref ('twitterLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=twitter");
+		setupHref ('gmailLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=google");
+		setupHref ('yahooLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=yahoo");
+		setupHref ('hotmailLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=hotmail");
+		setupHref ('linkedinLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=linkedin");
+		setupHref ('foursquareLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=foursquare");
+		setupHref ('myspaceLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=myspace");
+		setupHref ('mendeleyLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=mendeley");
 		showMsgsToTheUser();
 	</script>
 	

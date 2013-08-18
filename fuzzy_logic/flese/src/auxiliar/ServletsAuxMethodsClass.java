@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import urls.UrlMap;
+import auxiliar.NextStep.Constants;
 import constants.KConstants;
 
 public class ServletsAuxMethodsClass {
@@ -62,10 +62,10 @@ public class ServletsAuxMethodsClass {
 	 * @param LOG
 	 *            is the Log facility. Can be null.
 	 */
-	static public void actionOnException(UrlMap map, String addToUri, Exception e, HttpServletRequest request,
+	static public void actionOnException(UrlMap urlMap, String addToUri, Exception e, HttpServletRequest request,
 			HttpServletResponse response, Log LOG) {
 		try {
-			actionOnExceptionAux(map, addToUri, e, request, response, LOG);
+			actionOnExceptionAux(urlMap, addToUri, e, request, response, LOG);
 		} catch (java.lang.IllegalStateException e1) {
 			LOG.error("-------------------------------------------------------------------");
 			LOG.error("Exception thrown inside actionOnException: " + e);
@@ -88,7 +88,7 @@ public class ServletsAuxMethodsClass {
 		}
 	}
 
-	static private void actionOnExceptionAux(UrlMap map, String addToUri, Exception e, HttpServletRequest request,
+	static private void actionOnExceptionAux(UrlMap urlMap, String addToUri, Exception e, HttpServletRequest request,
 			HttpServletResponse response, Log LOG) throws Exception {
 		if (e != null) {
 			if (LOG != null) {
@@ -96,57 +96,12 @@ public class ServletsAuxMethodsClass {
 				LOG.error("Exception trace: ");
 			}
 			e.printStackTrace();
-			if (e.getMessage() != null) {
-				ServletsAuxMethodsClass.addMessageToTheUser(request, e.getMessage(), LOG);
-			} else {
-				ServletsAuxMethodsClass.addMessageToTheUser(request, e.toString(), LOG);
-			}
-		} else
-			ServletsAuxMethodsClass.addMessageToTheUser(request, "Internal problem: thrown exception is null.", LOG);
-
-		if (request == null)
+		} else if (request == null)
 			throw new Exception("request is null.");
 		if (response == null)
 			throw new Exception("response is null.");
-		ServletsAuxMethodsClass.forward_to(map, addToUri, request, response, LOG);
-	}
-
-	/**
-	 * Adds a msg to the request session attribute msgs.
-	 * 
-	 * @param request
-	 *            is the HttpServletRequest
-	 * @param msg
-	 *            is the message to be added. Cannot be null.
-	 * @param LOG
-	 *            is the servlet logging facility. Can be null (but it is not
-	 *            recommended).
-	 */
-	public static void addMessageToTheUser(HttpServletRequest request, String msg, Log LOG) {
-		if (request != null) {
-			String[] currentMsgs = (String[]) request.getAttribute("msgs");
-			String[] newMsgs;
-			if (currentMsgs != null) {
-				newMsgs = new String[currentMsgs.length + 1];
-				for (int i = 0; i < currentMsgs.length; i++) {
-					newMsgs[i] = currentMsgs[i];
-				}
-				newMsgs[currentMsgs.length] = msg;
-				// Remove the old messages array.
-				request.removeAttribute("msgs");
-			} else {
-				newMsgs = new String[1];
-				newMsgs[0] = msg;
-			}
-			// Save the new messages array.
-			request.setAttribute("msgs", newMsgs);
-			// Log
-			if (LOG != null)
-				LOG.info("Added to the msgs session attribute in the request the msg \'" + msg + "\'");
-		} else {
-			if (LOG != null)
-				LOG.error("request is null. ERROR");
-		}
+		NextStep nextStep = new NextStep(Constants.forward_to, urlMap, addToUri);
+		nextStep.takeAction(request, response);
 	}
 
 	public static String getCurrentDate() {
@@ -214,96 +169,5 @@ public class ServletsAuxMethodsClass {
 		}
 		LOG.info("<end of attributes list>");
 		return retString;
-	}
-
-	// ----------------------------------------------------------------------------------------------
-	// ----------------------------------------------------------------------------------------------
-	// ----------------------------------------------------------------------------------------------
-
-	/**
-	 * Server side change of the requested page into a new one. It keeps the
-	 * current context so you can share the same session.
-	 * 
-	 * @param where
-	 *            is the new page to which we are going.
-	 * @param addToUri
-	 *            is the string added to the where, for adding additional
-	 *            parameters to the request.
-	 * @param request
-	 *            is the servlet request parameter.
-	 * @param response
-	 *            is the servlet response parameter.
-	 * @param LOG
-	 *            is the LOG object (can be null).
-	 * @throws Exception
-	 *             when the nick name is unknown.
-	 */
-	public static void forward_to(UrlMap map, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG)
-			throws Exception {
-		String url = map.getUrl();
-		if (addToUri != null)
-			url += addToUri;
-		if (LOG != null)
-			LOG.info("forwarding_to: " + url);
-		RequestDispatcher dispatcher = request.getRequestDispatcher(url);
-		dispatcher.forward(request, response);
-	}
-
-	/**
-	 * Client side change of the requested page into a new one. It generates a
-	 * different context so you can not share the same session.
-	 * 
-	 * @param where
-	 *            is the new page to which we are going.
-	 * @param addToUri
-	 *            is the string added to the where, for adding additional
-	 *            parameters to the request.
-	 * @param request
-	 *            is the servlet request parameter.
-	 * @param response
-	 *            is the servlet response parameter.
-	 * @param LOG
-	 *            is the LOG object (can be null).
-	 * @throws Exception
-	 *             when the nick name is unknown or the operation is not
-	 *             possible.
-	 */
-	public static void redirect_to(UrlMap map, String addToUri, HttpServletRequest request, HttpServletResponse response, Log LOG)
-			throws Exception {
-		String url = map.getFullUrl(request, LOG);
-		if (addToUri != null)
-			url += addToUri;
-		if (LOG != null)
-			LOG.info("redirecting_to: " + url);
-		response.sendRedirect(url);
-	}
-
-	/**
-	 * Client side change of the requested page into a new one. It keeps the
-	 * context by using encodeRedirectURL so you can not share the same session.
-	 * 
-	 * @param where
-	 *            is the new page to which we are going.
-	 * @param addToUri
-	 *            is the string added to the where, for adding additional
-	 *            parameters to the request.
-	 * @param request
-	 *            is the servlet request parameter.
-	 * @param response
-	 *            is the servlet response parameter.
-	 * @param LOG
-	 *            is the LOG object (can be null).
-	 * @throws Exception
-	 *             when the nick name is unknown or the operation is not
-	 *             possible.
-	 */
-	public static void redirect_to_with_session(UrlMap map, String addToUri, HttpServletRequest request, HttpServletResponse response,
-			Log LOG) throws Exception {
-		String url = map.getFullUrl(request, LOG);
-		if (addToUri != null)
-			url += addToUri;
-		if (LOG != null)
-			LOG.info("encodeRedirectURL: redirecting_to: " + url);
-		response.encodeRedirectURL(url);
 	}
 }
