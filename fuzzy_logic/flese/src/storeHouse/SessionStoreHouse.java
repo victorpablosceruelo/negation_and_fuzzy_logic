@@ -1,8 +1,11 @@
 package storeHouse;
 
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,7 +21,11 @@ public class SessionStoreHouse {
 
 	private HttpServletRequest request = null;
 	private HttpServletResponse response = null;
+	private ServletContext servletContext = null;
+	private String doMethod = null;
 	private HttpSession session = null;
+
+	private HashMap<String, String[]> requestParams = null;
 
 	private static class Constants {
 		public static class Session {
@@ -33,22 +40,65 @@ public class SessionStoreHouse {
 
 		public static class Request {
 			public static String operation = "op";
-			public static String providerId = "id";
+			
 		}
 	}
 
-	public SessionStoreHouse(HttpServletRequest request, HttpServletResponse response, boolean create) throws Exception {
+	public SessionStoreHouse(HttpServletRequest request, HttpServletResponse response, boolean create, ServletContext servletContext,
+			String doMethod) throws Exception {
 
 		if (request == null)
 			throw new Exception("request is null");
 		if (response == null)
 			throw new Exception("response is null");
+		if (servletContext == null)
+			throw new Exception("servletContext is null");
+		if (doMethod == null)
+			throw new Exception("doMethod is null");
+		if ((!"doGet".equals(doMethod)) && (!"doPost".equals(doMethod)))
+			throw new Exception("doMethod is not doGet nor doPost.");
 
 		this.request = request;
 		this.response = response;
+		this.servletContext = servletContext;
+		this.doMethod = doMethod;
+
 		session = request.getSession(create);
 		if (session == null)
 			throw new Exception("session is null. 'Create if null' has the value: " + create);
+
+		getRequestParameters();
+	}
+
+	private void getRequestParameters() {
+
+		requestParams = new HashMap<String, String[]>();
+
+		String parameterName = null;
+		String[] valuesArrayIn = null;
+		String[] valuesArrayTmp = null;
+
+		if (request != null) {
+			// Get the values of all request parameters
+			Enumeration<String> parametersEnum = request.getParameterNames();
+
+			if (parametersEnum != null) {
+				while (parametersEnum.hasMoreElements()) {
+					// Get the name of the request parameter
+					parameterName = (parametersEnum.nextElement()).toString();
+					valuesArrayIn = request.getParameterValues(parameterName);
+
+					if (valuesArrayIn != null) {
+						valuesArrayTmp = new String[valuesArrayIn.length];
+						for (int i = 0; i < valuesArrayIn.length; i++) {
+							valuesArrayTmp[i] = valuesArrayIn[i];
+						}
+						requestParams.put(parameterName, valuesArrayTmp);
+					}
+					request.removeAttribute(parameterName);
+				}
+			}
+		}
 	}
 
 	public void setAppInTestingMode(boolean value) {
@@ -62,12 +112,11 @@ public class SessionStoreHouse {
 		return false;
 	}
 
-	public String getRequestOp() {
-		String requestOp = request.getParameter(Constants.Request.operation);
-		if (requestOp == null)
-			return "";
-		else
-			return requestOp;
+	public String getRequestParameter(String paramName) {
+		String[] values = requestParams.get(paramName);
+		if (values.length > 0)
+			return values[0];
+		return "";
 	}
 
 	public void setRequestOp(String value) {
@@ -212,7 +261,7 @@ public class SessionStoreHouse {
 			// Invalidate the session.
 			session.invalidate();
 		}
-		
+
 	}
 
 }

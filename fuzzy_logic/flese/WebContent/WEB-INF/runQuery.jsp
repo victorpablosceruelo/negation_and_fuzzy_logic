@@ -1,4 +1,4 @@
-<%@page import="ciaoProlog.CiaoPrologConnectionClass"%>
+<%@page import="prologConnector.CiaoPrologConnectionClass"%>
 
 <% 
 	// Debug msg...

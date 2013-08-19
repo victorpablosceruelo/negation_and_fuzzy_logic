@@ -16,10 +16,9 @@ import storeHouse.SessionStoreHouse;
 import urls.UrlMap;
 import urls.UrlsMaps;
 import auxiliar.DispatchersClass;
-import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import auxiliar.ServletsAuxMethodsClass;
-import constants.KConstants;
+import constants.KPages;
 
 /**
  * Servlet implementation class SearchServlet
@@ -28,6 +27,10 @@ import constants.KConstants;
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(DispatcherServlet.class);
+
+	private static class Constants {
+		public static final String Operation = "op";
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -54,7 +57,7 @@ public class DispatcherServlet extends HttpServlet {
 			dispatchQuery(doAction, request, response);
 
 		} catch (Exception e) {
-			ServletsAuxMethodsClass.actionOnException(KConstants.Pages.ExceptionAjaxPage, "", e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(KPages.ExceptionAjaxPage, "", e, request, response, LOG);
 		}
 		LOG.info("--- " + doAction + " end ---");
 	}
@@ -66,33 +69,31 @@ public class DispatcherServlet extends HttpServlet {
 
 		try {
 			// Sessions management.
-			sessionStoreHouse = new SessionStoreHouse(request, response, false);
+			ServletContext servletContext = getServletConfig().getServletContext();
+			sessionStoreHouse = new SessionStoreHouse(request, response, false, servletContext, doAction);
 		} catch (Exception e) {
 			sessionStoreHouse = null;
-			nextStep = new NextStep(NextStep.Constants.forward_to, KConstants.Pages.NullSessionAjaxPage, "");
+			nextStep = new NextStep(NextStep.Constants.forward_to, KPages.NullSessionAjaxPage, "");
 			nextStep.takeAction(request, response);
 
 		}
 
 		if (sessionStoreHouse != null) {
-			nextStep = dispatchQueryWithSession(doAction, sessionStoreHouse);
+			nextStep = dispatchQueryWithSession(sessionStoreHouse);
 			nextStep.takeAction(request, response);
 		}
 
 	}
 
-	private NextStep dispatchQueryWithSession(String doAction, SessionStoreHouse sessionStoreHouse) throws Exception {
-
-		// Tests if we have logged in.
-		LocalUserInfo localUserInfo = sessionStoreHouse.getLocalUserInfo();
+	private NextStep dispatchQueryWithSession(SessionStoreHouse sessionStoreHouse) throws Exception {
 
 		// Needed to work.
-		ServletContext servletContext = getServletConfig().getServletContext();
-		DispatchersClass dispatcherObject = new DispatchersClass(servletContext, doAction, sessionStoreHouse);
+
+		DispatchersClass dispatcherObject = new DispatchersClass(sessionStoreHouse);
 
 		NextStep nextStep = null;
 
-		String request_op = sessionStoreHouse.getRequestOp();
+		String request_op = sessionStoreHouse.getRequestParameter(Constants.Operation);
 		if ((request_op != null) && (!"".equals(request_op))) {
 
 			String requestName = request_op + "Request";
@@ -100,7 +101,9 @@ public class DispatcherServlet extends HttpServlet {
 			String methodName = urlMap.getKeyString();
 
 			try {
-				nextStep = dispatcherObject.getClass().getMethod(methodName, (Class<?>) null).invoke(null, null);
+				nextStep = (NextStep) dispatcherObject.getClass().getMethod(methodName, (Class<?>) null)
+						.invoke((Object) null, (Object) null);
+				return nextStep;
 			} catch (NoSuchMethodException e) {
 				e.printStackTrace();
 				System.out.println(e.toString());
@@ -108,8 +111,7 @@ public class DispatcherServlet extends HttpServlet {
 			}
 		}
 
-		if (request_op == null) {
-			nextStep = dispatcherObject.emptyRequest();
-		}
+		nextStep = dispatcherObject.emptyRequest();
+		return nextStep;
 	}
 }

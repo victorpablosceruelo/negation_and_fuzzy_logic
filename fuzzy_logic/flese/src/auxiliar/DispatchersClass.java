@@ -20,104 +20,32 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import prologConnector.CiaoPrologConnectionClass;
+import prologConnector.ConnectionsPool;
+import prologConnector.QueryConversorClass;
+
 import storeHouse.SessionStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
-import ciaoProlog.CiaoPrologConnectionClass;
-import ciaoProlog.QueryConversorClass;
 import constants.KConstants;
+import filesAndPaths.FilesMgmt;
 
 public class DispatchersClass {
 	private static final Log LOG = LogFactory.getLog(DispatchersClass.class);
-
-	private int BUFSIZE = 4096;
-	private int maxFileSize = 50000 * 1024;
-	private int maxMemSize = 50000 * 1024;
-
-	private static String programFilesPath = null;
-	private static String plServerPath = null;
-
-	private ServletContext servletContext = null;
-	private String doMethod = null;
-	private HttpServletRequest request = null;
-	private HttpServletResponse response = null;
-	private HttpSession session = null;
-	private LocalUserInfo localUserName = null;
-	private String fileName = null;
-	private String fileOwner = null;
+	private SessionStoreHouse sessionStoreHouse = null;
 	private CiaoPrologConnectionClass connection = null;
 
-	public DispatchersClass(ServletContext servletContext, String doMethod, SessionStoreHouse sessionStoreHouse)
+	
+	
+	public DispatchersClass(SessionStoreHouse sessionStoreHouse)
 			throws Exception {
-
-		this.servletContext = servletContext;
-		if (servletContext == null)
-			throw new Exception("servletContext is null.");
-
-		this.doMethod = doMethod;
-		if (doMethod == null)
-			throw new Exception("doMethod is null.");
-		if ((!"doGet".equals(doMethod)) && (!"doPost".equals(doMethod)))
-			throw new Exception("doMethod is not doGet nor doPost.");
-
-		this.request = request;
-		if (request == null)
-			throw new Exception("request is null.");
-
-		// Debugging information.
-		LOG.info(ServletsAuxMethodsClass.requestParametersToString(request));
-
-		this.response = response;
-		if (response == null)
-			throw new Exception("response is null.");
-
-		// Ask for the previously created session.
-		session = request.getSession(false);
-		if (session == null)
-			throw new Exception("session is null.");
-
-		this.localUserName = localUserName;
-		if (localUserName == null)
-			throw new Exception("localUserName is null.");
-
-		String[] programFilesValidPaths = { "/home/java-apps/fuzzy-search/",
-				System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/",
-				// servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"),
-				"/tmp/java-apps/fuzzy-search/" };
-
-		if (programFilesPath == null) {
-			programFilesPath = FilesMgmtClass.returnProgramFilesValidPath(programFilesValidPaths, LOG);
-			LOG.info("programFilesPath: " + programFilesPath);
-		}
-
-		String[] plServerValidSubPaths = { "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
-				"/usr/share/CiaoDE/ciao/library/javall/plserver", "/usr/lib/ciao", "/usr/share/CiaoDE", "/usr", "/opt", "/home", "/" };
-
-		if (plServerPath == null) {
-			plServerPath = FilesMgmtClass.returnPlServerValidPath(plServerValidSubPaths, LOG);
-			LOG.info("plServerPath: " + plServerPath);
-		}
-
-		// Aqui tendriamos que decidir si hay query o nos limitamos a ejecutar
-		// la query "fileNameIntrospectionQuery"
-		connection = (CiaoPrologConnectionClass) session.getAttribute("connection");
-
-		if (connection == null) {
-			connection = new CiaoPrologConnectionClass();
-		}
+		connection = ConnectionsPool.getConnection();
 
 	}
 
 	private void testAndInitialize_fileName_and_fileOwner() throws Exception {
-		fileName = request.getParameter("fileName");
-		if (fileName == null)
-			throw new Exception("fileName is null.");
-		request.setAttribute("fileName", fileName);
-
-		fileOwner = request.getParameter("fileOwner");
-		if (fileOwner == null)
-			throw new Exception("fileOwner is null.");
-		request.setAttribute("fileOwner", fileOwner);
+		String fileName = sessionStoreHouse.getRequestParameter(KConstants.request.fileNameParam);
+		String fileOwner = sessionStoreHouse.getRequestParameter(KConstants.request.fileOwnerParam);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +60,8 @@ public class DispatchersClass {
 	 */
 	public NextStep emptyRequest() throws Exception {
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.SignedInAnswer, "", request, response, LOG);
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.SignedInAnswer, "");
+		return nextStep;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,8 +73,9 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void userOptionsRequest() throws Exception {
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.UserOptionsAnswer, "", request, response, LOG);
+	public NextStep userOptionsRequest() throws Exception {
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.UserOptionsAnswer, "");
+		return nextStep;
 	}
 
 	/**
@@ -155,8 +85,8 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void introspectionQueryRequest() throws Exception {
-		introspectionQueryRequest(true);
+	public NextStep introspectionQueryRequest() throws Exception {
+		return introspectionQueryRequest(true);
 	}
 
 	/**
@@ -166,7 +96,7 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void introspectionQueryRequest(boolean doForward) throws Exception {
+	public NextStep introspectionQueryRequest(boolean doForward) throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
 		connection.programFileIntrospectionQuery(plServerPath, programFilesPath, fileOwner, fileName);
@@ -183,7 +113,8 @@ public class DispatchersClass {
 
 		if (doForward) {
 			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(KConstants.Pages.introspectionQueryAnswer, "", request, response, LOG);
+			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KConstants.Pages.introspectionQueryAnswer, "");
+			return nextStep;
 		}
 	}
 
@@ -194,7 +125,7 @@ public class DispatchersClass {
 	 * 
 	 * @throws Exception
 	 */
-	public void runQuery() throws Exception {
+	public NextStep runQuery() throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
 		introspectionQueryRequest(false);
@@ -211,7 +142,8 @@ public class DispatchersClass {
 		LOG.info(formParameters);
 
 		if (request.getParameter("queryLinesCounter") == null) {
-			ServletsAuxMethodsClass.forward_to(KConstants.Pages.ExceptionAjaxPage, "", request, response, LOG);
+			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KConstants.Pages.ExceptionAjaxPage, "");
+			return nextStep;
 		} else {
 			int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
 			QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
@@ -264,7 +196,7 @@ public class DispatchersClass {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void filesList() throws Exception {
-		Iterator<FileInfoClass> filesListIterator = FilesMgmtClass.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(),
+		Iterator<FileInfoClass> filesListIterator = FilesMgmt.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(),
 				LOG);
 		request.setAttribute("filesListIterator", filesListIterator);
 		// Forward to the jsp page.
@@ -308,7 +240,7 @@ public class DispatchersClass {
 		upload.setSizeMax(maxFileSize);
 
 		// Get the path where we are going to upload the file.
-		String filesPath = FilesMgmtClass.getFullPath(programFilesPath, localUserName.getLocalUserName(), null, true);
+		String filesPath = FilesMgmt.getFullPath(programFilesPath, localUserName.getLocalUserName(), null, true);
 		if ((filesPath == null) || ("".equals(filesPath))) {
 			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
 		} else {
@@ -364,7 +296,7 @@ public class DispatchersClass {
 
 		testAndInitialize_fileName_and_fileOwner();
 
-		String FileNameWithPath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
+		String FileNameWithPath = FilesMgmt.getFullPath(programFilesPath, fileOwner, fileName, false);
 		// request.getParameter("filename");
 		String browser_filename = fileName;
 
@@ -400,7 +332,7 @@ public class DispatchersClass {
 
 		testAndInitialize_fileName_and_fileOwner();
 
-		FilesMgmtClass.removeProgramFile(programFilesPath, fileOwner, fileName, localUserName.getLocalUserName());
+		FilesMgmt.removeProgramFile(programFilesPath, fileOwner, fileName, localUserName.getLocalUserName());
 		ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file " + fileName + " has been removed. ", LOG);
 
 	}
@@ -411,7 +343,7 @@ public class DispatchersClass {
 
 		String filePath = null;
 		if (localUserName.getLocalUserName().equals(fileOwner)) {
-			filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
+			filePath = FilesMgmt.getFullPath(programFilesPath, fileOwner, fileName, false);
 		}
 		request.setAttribute("filePath", filePath);
 		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FileViewAnswer, "", request, response, LOG);
@@ -425,7 +357,7 @@ public class DispatchersClass {
 
 		testAndInitialize_fileName_and_fileOwner();
 
-		String filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
+		String filePath = FilesMgmt.getFullPath(programFilesPath, fileOwner, fileName, false);
 		request.setAttribute("filePath", filePath);
 
 		// Forward to the jsp page.
@@ -436,7 +368,7 @@ public class DispatchersClass {
 
 		testAndInitialize_fileName_and_fileOwner();
 
-		String filePath = FilesMgmtClass.getFullPath(programFilesPath, fileOwner, fileName, false);
+		String filePath = FilesMgmt.getFullPath(programFilesPath, fileOwner, fileName, false);
 		request.setAttribute("filePath", filePath);
 
 		String predDefined = request.getParameter("predDefined");

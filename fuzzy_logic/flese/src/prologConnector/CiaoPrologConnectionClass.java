@@ -1,4 +1,4 @@
-package ciaoProlog;
+package prologConnector;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,7 +7,9 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.FilesMgmtClass;
+import filesAndPaths.FilesMgmt;
+
+
 
 import CiaoJava.*;
 
@@ -254,7 +256,7 @@ public class CiaoPrologConnectionClass {
 		}
 				
 		// Adequate the value of programFileOwner (it was relative until here).
-		String programFileOwnerWithPath = FilesMgmtClass.getFullPath(programFilesPath, programFileOwner, null, false);
+		String programFileOwnerWithPath = FilesMgmt.getFullPath(programFilesPath, programFileOwner, null, false);
 		
 		// Change working folder.
 		PLVariable [] variables = new PLVariable[1];

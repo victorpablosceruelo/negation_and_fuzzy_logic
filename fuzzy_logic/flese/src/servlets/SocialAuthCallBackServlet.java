@@ -1,5 +1,6 @@
 package servlets;
 
+import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import auxiliar.ServletsAuxMethodsClass;
 import constants.KConstants;
+import constants.KPages;
 // import org.apache.commons.lang.StringUtils;
 // import org.brickred.socialauth.Profile;
 // import org.brickred.socialauth.Contact;
@@ -57,14 +59,15 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 
 		try {
 			// Sessions management.
-			SessionStoreHouse sessionStoreHouse = new SessionStoreHouse(request, response, true);
+			ServletContext servletContext = getServletConfig().getServletContext();
+			SessionStoreHouse sessionStoreHouse = new SessionStoreHouse(request, response, true, servletContext, doAction);
 
 			nextStep = socialAuthentication(sessionStoreHouse);
 			nextStep.takeAction(request, response);
 
 		} catch (Exception e) {
 			// socialAuthenticationSignOut(request, response, session);
-			ServletsAuxMethodsClass.actionOnException(KConstants.Pages.SignOutRequest, "", e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(KPages.SignOutRequest, "", e, request, response, LOG);
 		}
 		LOG.info("--- " + doAction + " end ---");
 	}
@@ -72,16 +75,16 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	private NextStep socialAuthentication(SessionStoreHouse sessionStoreHouse) throws Exception {
 
 		// The parameter that tells us the operation.
-		if ("".equals(sessionStoreHouse.getRequestOp())) {
+		if ("".equals(sessionStoreHouse.getRequestParameter(KConstants.requestOperationParam))) {
 			return socialAuthenticationAuthenticate(sessionStoreHouse);
 		}
 
-		if ("signout".equals(sessionStoreHouse.getRequestOp())) {
+		if ("signout".equals(sessionStoreHouse.getRequestParameter(KConstants.requestOperationParam))) {
 			sessionStoreHouse.setRequestOp("");
 			return socialAuthenticationSignOut(sessionStoreHouse);
 		}
 
-		if ("signin".equals(sessionStoreHouse.getRequestOp())) {
+		if ("signin".equals(sessionStoreHouse.getRequestParameter(KConstants.requestOperationParam))) {
 			sessionStoreHouse.setRequestOp("");
 			return socialAuthenticationSignInOrContinue(sessionStoreHouse);
 		}
@@ -107,7 +110,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
 
 		sessionStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
-		return new NextStep(NextStep.Constants.redirect_to, KConstants.Pages.SignInRequest, "&id=" + providerId);
+		return new NextStep(NextStep.Constants.redirect_to, KPages.SignInRequest, "&id=" + providerId);
 	}
 
 	private NextStep socialAuthenticationSignInOrContinue(SessionStoreHouse sessionStoreHouse) throws Exception {
@@ -120,14 +123,14 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		try {
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
-			return new NextStep(NextStep.Constants.forward_to, KConstants.Pages.SignedInAnswer, "");
+			return new NextStep(NextStep.Constants.forward_to, KPages.SignedInAnswer, "");
 		} catch (Exception e) {
 		}
 
 		// URL of YOUR application which will be called after authentication
 		String requestUrl = sessionStoreHouse.getRequestUrlString();
 		String serverName = sessionStoreHouse.getServerName();
-		String nextURL = KConstants.Pages.SocialAuthenticationCallBackRequest.getFullUrl(requestUrl, serverName);
+		String nextURL = KPages.SocialAuthenticationCallBackRequest.getFullUrl(requestUrl, serverName);
 
 		// Returns the host name of the server to which the request was
 		// sent.
@@ -171,7 +174,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		if ("".equals(nextURL))
 			throw new Exception("nextURL is empty string.");
 
-		return new NextStep(NextStep.Constants.sendRedirect_to, KConstants.Pages.EmptyPage, nextURL);
+		return new NextStep(NextStep.Constants.sendRedirect_to, KPages.EmptyPage, nextURL);
 		// response.sendRedirect(nextURL);
 		// response.encodeRedirectURL( athenticationUrl );
 
@@ -183,7 +186,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 
 		sessionStoreHouse.invalidateSession();
 
-		return new NextStep(NextStep.Constants.forward_to, KConstants.Pages.SignedOutAnswer, "");
+		return new NextStep(NextStep.Constants.forward_to, KPages.SignedOutAnswer, "");
 	}
 
 }

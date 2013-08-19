@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import urls.UrlMap;
 import auxiliar.NextStep.Constants;
-import constants.KConstants;
+import constants.KPages;
 
 public class ServletsAuxMethodsClass {
 
@@ -78,7 +78,7 @@ public class ServletsAuxMethodsClass {
 			LOG.error("-------------------------------------------------------------------");
 
 			try {
-				actionOnExceptionAux(KConstants.Pages.SignOutRequest, "", e, request, response, LOG);
+				actionOnExceptionAux(KPages.SignOutRequest, "", e, request, response, LOG);
 			} catch (Exception e3) {
 				LOG.error("-------------------------------------------------------------------");
 				LOG.error("Exception thrown inside actionOnException: " + e);
@@ -109,39 +109,6 @@ public class ServletsAuxMethodsClass {
 		Date date = new Date();
 		// System.out.println(dateFormat.format(date));
 		return (dateFormat.format(date));
-	}
-
-	public static String requestParametersToString(HttpServletRequest request) {
-
-		String result = "\n ";
-
-		if ((request != null) && (LOG != null)) {
-			// Get the values of all request parameters
-			Enumeration<String> parametersEnum = request.getParameterNames();
-			String parameterName;
-
-			if (parametersEnum != null) {
-				while (parametersEnum.hasMoreElements()) {
-					// Get the name of the request parameter
-					parameterName = (parametersEnum.nextElement()).toString();
-					result += "\n - Values for parameter: " + parameterName + " :: ";
-
-					String[] values = request.getParameterValues(parameterName);
-					if (values != null) {
-						for (int i = 0; i < values.length; i++) {
-							result += "[" + i + "]: " + values[i];
-						}
-					} else
-						result += "values list is null.";
-				}
-				result += "\n - <END>";
-			} else
-				result += "\n - parametersEnum is null.";
-		} else {
-			result += "\n - request is null.";
-		}
-		result += "\n";
-		return result;
 	}
 
 	public static String requestParametersToString(HttpServletRequest request, Log LOG) {

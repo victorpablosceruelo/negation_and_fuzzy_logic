@@ -1,4 +1,4 @@
-package ciaoProlog;
+package prologConnector;
 
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
