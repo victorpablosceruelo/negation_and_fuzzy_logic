@@ -11,7 +11,7 @@ public class KConstants {
 		public static final String providerId = "id";
 	}
 
-	public static class filesMgmt {
+	public static class pathsMgmt {
 		public static final String[] programFilesValidPaths = { "/home/java-apps/fuzzy-search/",
 				System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/",
 				// servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"),
@@ -20,6 +20,7 @@ public class KConstants {
 		public static final String[] plServerValidSubPaths = { "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
 				"/usr/share/CiaoDE/ciao/library/javall/plserver", "/usr/lib/ciao", "/usr/share/CiaoDE", "/usr", "/opt", "/home", "/" };
 
+		public static final String plServerProgramFileName = "plserver"; 
 	}
 	
 	public static class communications {

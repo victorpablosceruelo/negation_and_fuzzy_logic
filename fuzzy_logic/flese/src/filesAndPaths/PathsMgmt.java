@@ -5,115 +5,290 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.ServletsAuxMethodsClass;
 import constants.KConstants;
 
 public class PathsMgmt {
 
-	private static String programFilesPath = null;
 	private static final Log LOG = LogFactory.getLog(FilesMgmt.class);
-	
-	public PathsMgmt () throws Exception {
+
+	private static String programFilesPath = null;
+	private static String plServerPath = null;
+
+	public PathsMgmt() throws Exception {
 		if (programFilesPath == null) {
-			String tmpProgramFilesPath = determineProgramFilesValidPath(KConstants.filesMgmt.programFilesValidPaths); 
+			String tmpProgramFilesPath = determineProgramFilesValidPath(KConstants.pathsMgmt.programFilesValidPaths);
 			setProgramFilesPath(tmpProgramFilesPath);
 			LOG.info("programFilesPath: " + programFilesPath);
 		}
-	}
-	
-	private synchronized void setProgramFilesPath (String tmpProgramFilesPath) throws Exception {
-		if (programFilesPath == null) {
-		programFilesPath = tmpProgramFilesPath;
+
+		if (plServerPath == null) {
+			String tmpPlServerPath = determinePlServerValidPath(KConstants.pathsMgmt.plServerValidSubPaths);
+			setPlServerPath(tmpPlServerPath);
+			LOG.info("plServerPath: " + plServerPath);
 		}
 	}
+
+	public String getProgramFilesPath() {
+		return programFilesPath;
+	}
+
+	public String getPlServerPath() {
+		return plServerPath;
+	}
+
 	
+	private synchronized void setProgramFilesPath(String tmpProgramFilesPath) throws Exception {
+		if (programFilesPath == null) {
+			programFilesPath = tmpProgramFilesPath;
+		}
+	}
+
+	private synchronized void setPlServerPath(String tmpPlServerPath) throws Exception {
+		if (programFilesPath == null) {
+			plServerPath = tmpPlServerPath;
+		}
+	}
+
 	/**
-	 * Returns which one of the programFilesValidPaths is the adequate one.
-	 * It is recommended not to run this method more than once.
+	 * Returns which one of the programFilesValidPaths is the adequate one. It
+	 * is recommended not to run this method more than once.
 	 * 
-	 * @param programFilesValidPaths is a list with the paths to test.
+	 * @param programFilesValidPaths
+	 *            is a list with the paths to test.
 	 */
-	private String determineProgramFilesValidPath(String [] programFilesValidPaths) throws Exception {
+	private String determineProgramFilesValidPath(String[] programFilesValidPaths) throws Exception {
 		String programFilesValidPath = null;
 		int index = 0;
-				
-		while (((programFilesValidPath == null) || ("".equals(programFilesValidPath))) && 
-				(index < programFilesValidPaths.length)) {
+
+		while (((programFilesValidPath == null) || ("".equals(programFilesValidPath))) && (index < programFilesValidPaths.length)) {
 			LOG.info(programFilesValidPaths[index]);
 			try {
-				programFilesValidPath = getFullPath(programFilesValidPaths[index], null, null, true);
-			}
-			catch (Exception e) {
+				if (testIfFolderExists(programFilesValidPaths[index], true)) {
+					programFilesValidPath = programFilesValidPaths[index];
+				}
+			} catch (Exception e) {
 				programFilesValidPath = null;
 			}
-			if (programFilesValidPath == null) index++;
+			if (programFilesValidPath == null)
+				index++;
 		}
-		
-		if ((programFilesValidPath == null) || ("".equals(programFilesValidPath))) 
+
+		if ((programFilesValidPath == null) || ("".equals(programFilesValidPath)))
 			throw new Exception("programFilesValidPath cannot be null.");
 		return programFilesValidPath;
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Looks which one of the proposed subPaths for the plServer is the correct one.
+	 * Looks which one of the proposed subPaths for the plServer is the correct
+	 * one.
 	 * 
-	 * @param plServerValidSubPaths are the new proposed subpaths for the plServer.
-	 * @throws Exception when none is valid.
+	 * @param plServerValidSubPaths
+	 *            are the new proposed subpaths for the plServer.
+	 * @throws Exception
+	 *             when none is valid.
 	 * 
 	 */
-	public static String returnPlServerValidPath(String [] plServerValidSubPaths, Log LOG) throws Exception {
+	private String determinePlServerValidPath(String[] plServerValidSubPaths) throws Exception {
 		String plServerPath = null;
 		int index = 0;
-		
-		while (((plServerPath == null) || ("".equals(plServerPath))) &&
-				(index < plServerValidSubPaths.length)) {
+
+		while (((plServerPath == null) || ("".equals(plServerPath))) && (index < plServerValidSubPaths.length)) {
 			LOG.info(plServerValidSubPaths[index]);
-			
-			plServerPath = lookForFileInSubDir("plserver", plServerValidSubPaths[index], LOG);
-			
-			if (plServerPath == null) index++;
+
+			plServerPath = lookForPlServerFileInSubDir(plServerValidSubPaths[index]);
+
+			if (plServerPath == null)
+				index++;
 		}
-		
+
 		if (plServerPath == null) {
-			throw new Exception("plServerPath is null.");
+			throw new Exception("plServerPath cannot be null.");
 		}
 		return plServerPath;
 	}
-	
-	private static String lookForFileInSubDir(String fileName, String subPath, Log LOG) {
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private String lookForPlServerFileInSubDir(String subPath) {
 		String result = null;
-		
+
 		if (subPath != null) {
-			File file_1 = new File(subPath);
-			
-			if ((file_1.exists()) && (file_1.canRead()) || (file_1.canExecute())) {
-				if (file_1.isFile()) {
-					if (fileName.equals(file_1.getName())) {
+			File file = new File(subPath);
+
+			if ((file.exists()) && (file.canRead()) || (file.canExecute())) {
+				if (file.isFile()) {
+					if (KConstants.pathsMgmt.plServerProgramFileName.equals(file.getName())) {
 						result = subPath;
 					}
-				}
-				else {
-					if (file_1.isDirectory()) {
-						File[] subFiles = file_1.listFiles();
+				} else {
+					if (file.isDirectory()) {
+						File[] subFiles = file.listFiles();
 						int index = 0;
 						while ((result == null) && (index < subFiles.length)) {
-							result = lookForFileInSubDir(fileName, subFiles[index].getAbsolutePath(), LOG);
+							result = lookForPlServerFileInSubDir(subFiles[index].getAbsolutePath());
 						}
-					}
-					else {
+					} else {
 						LOG.info("Impossible to process path (not a file nor a directory): " + subPath);
 					}
 				}
-			}
-			else {
+			} else {
 				LOG.info("Impossible to process path (not exists, not readable or not executable): " + subPath);
 			}
 		}
 		return result;
-	}	
-	
-	
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Obtains the complete path of the program file.
+	 * 
+	 * @param fileOwner
+	 *            It is the owner of the program file.
+	 * @param fileName
+	 *            It is the name of the file for which we are computing the
+	 *            path.
+	 * @param createFolderIfDoesNotExist
+	 *            allows to create the folder if it does not exist.
+	 * @return the complete path for the fileName (if it is not null) or for the
+	 *         fileOwner.
+	 * @exception LocalUserNameFixesClassException
+	 *                if the owner string is empty or null
+	 * @exception Exception
+	 *                if programFilesPath is null, if fileOwner is null or if
+	 *                the program file does not exist or is invalid.
+	 */
+	public String getFullPathOf(String fileOwner, String fileName, Boolean createFolderIfDoesNotExist) throws Exception {
+
+		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
+			throw new Exception("programFilesPath is empty string or null.");
+		}
+
+		if (fileOwner == null) {
+			throw new Exception("fileOwner cannot be null.");
+		}
+		if (fileName == null) {
+			throw new Exception("fileName cannot be null.");
+		}
+		if ("".equals(fileOwner)) {
+			throw new Exception("fileOwner cannot be empty string.");
+		}
+		if ("".equals(fileName)) {
+			throw new Exception("fileName cannot be empty string.");
+		}
+
+		String fullPath = null;
+		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
+		String subPath = concatSubPaths(programFilesPath, fileOwner);
+		if (testIfFolderExists(subPath, createFolderIfDoesNotExist)) {
+			fullPath = concatSubPaths(subPath, fileName);
+			if (testIfFileExists(fullPath, true)) {
+				return fullPath;
+			} else
+				return null;
+		} else
+			return null;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean testIfFolderExists(String folderName, boolean createFolderIfDoesNotExist) throws Exception {
+		boolean retVal = false;
+
+		File dir = new File(folderName);
+		if (dir.exists()) {
+			if (dir.isDirectory() && dir.canRead() && dir.canWrite() && dir.canExecute()) {
+				retVal = true;
+			}
+		} else {
+			if (createFolderIfDoesNotExist) {
+				try {
+					retVal = dir.mkdirs();
+				} catch (Exception ex) {
+					throw new Exception("The folder " + folderName + "can not be created.");
+				}
+			}
+		}
+		return retVal;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public Boolean testIfFileExists(String subPath, boolean launchException) throws Exception {
+
+		if (subPath == null) {
+			throw new Exception("subPath cannot be null.");
+		}
+
+		if ("".equals(subPath)) {
+			throw new Exception("subPath cannot be empty string.");
+		}
+
+		String fullPath = concatSubPaths(programFilesPath, subPath);
+		return testIfFileExistsAux(fullPath, launchException);
+
+	}
+
+	private boolean testIfFileExistsAux(String fullPath, boolean launchException) throws Exception {
+		if (fullPath == null)
+			throw new Exception("fullPath cannot be null.");
+		if ("".equals(fullPath))
+			throw new Exception("fullPath cannot be empty string.");
+		if ("/".equals(fullPath))
+			throw new Exception("fullPath cannot be the string /.");
+
+		File file = new File(fullPath);
+		if (!file.exists()) {
+			if (launchException)
+				throw new Exception("file does not exist. file: " + fullPath);
+			return false;
+		}
+		if (!file.isFile()) {
+			if (launchException)
+				throw new Exception("file is not a file. file: " + fullPath);
+			return false;
+		}
+		if (!file.canRead()) {
+			if (launchException)
+				throw new Exception("file is not readable. file: " + fullPath);
+			return false;
+		}
+		return true;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public static String concatSubPaths(String head, String tail) {
+		String result = null;
+		if (head.endsWith("/")) {
+			if (tail.startsWith("/")) {
+				result = head + tail.substring(1, tail.length() - 1);
+			} else {
+				result = head + tail;
+			}
+		} else {
+			if (tail.startsWith("/")) {
+				result = head + tail;
+			} else {
+				result = head + "/" + tail;
+			}
+		}
+
+		return result;
+	}
 }
