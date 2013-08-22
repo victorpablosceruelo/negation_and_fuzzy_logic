@@ -15,6 +15,8 @@ import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
+import constants.KConstants;
+
 import auxiliar.LocalUserInfo;
 
 public class SessionStoreHouse {
@@ -36,11 +38,6 @@ public class SessionStoreHouse {
 			public static String socialAuthProfile = "socialAuthProfile";
 			public static String localUserInfo = "localUserInfo";
 
-		}
-
-		public static class Request {
-			public static String operation = "op";
-			
 		}
 	}
 
@@ -214,7 +211,7 @@ public class SessionStoreHouse {
 		return providerId;
 	}
 
-	public Profile getUserProfile() throws Exception {
+	public Profile getUserProfile() {
 		return (Profile) session.getAttribute(Constants.Session.socialAuthProfile);
 	}
 
@@ -232,7 +229,7 @@ public class SessionStoreHouse {
 		String providerId = (String) session.getAttribute(Constants.Session.socialAuthProviderId);
 
 		if ((providerId == null) || ("".equals(providerId)))
-			providerId = (String) request.getParameter(Constants.Request.providerId);
+			providerId = (String) request.getParameter(KConstants.Request.providerId);
 
 		if ((providerId == null) || ("".equals(providerId)))
 			throw new Exception("providerId is null in session and in request.");

@@ -21,13 +21,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import prologConnector.CiaoPrologConnectionClass;
-import prologConnector.ConnectionsPool;
+import prologConnector.PlConnectionPool;
 import prologConnector.QueryConversorClass;
 
 import storeHouse.SessionStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import constants.KConstants;
+import constants.KPages;
 import filesAndPaths.FilesMgmt;
 
 public class DispatchersClass {
@@ -39,13 +40,13 @@ public class DispatchersClass {
 	
 	public DispatchersClass(SessionStoreHouse sessionStoreHouse)
 			throws Exception {
-		connection = ConnectionsPool.getConnection();
+		connection = PlConnectionPool.getConnection();
 
 	}
 
 	private void testAndInitialize_fileName_and_fileOwner() throws Exception {
-		String fileName = sessionStoreHouse.getRequestParameter(KConstants.request.fileNameParam);
-		String fileOwner = sessionStoreHouse.getRequestParameter(KConstants.request.fileOwnerParam);
+		String fileName = sessionStoreHouse.getRequestParameter(KConstants.Request.fileNameParam);
+		String fileOwner = sessionStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

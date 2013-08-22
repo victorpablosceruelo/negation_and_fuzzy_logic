@@ -75,16 +75,16 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 	private NextStep socialAuthentication(SessionStoreHouse sessionStoreHouse) throws Exception {
 
 		// The parameter that tells us the operation.
-		if ("".equals(sessionStoreHouse.getRequestParameter(KConstants.requestOperationParam))) {
+		if ("".equals(sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam))) {
 			return socialAuthenticationAuthenticate(sessionStoreHouse);
 		}
 
-		if ("signout".equals(sessionStoreHouse.getRequestParameter(KConstants.requestOperationParam))) {
+		if ("signout".equals(sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam))) {
 			sessionStoreHouse.setRequestOp("");
 			return socialAuthenticationSignOut(sessionStoreHouse);
 		}
 
-		if ("signin".equals(sessionStoreHouse.getRequestParameter(KConstants.requestOperationParam))) {
+		if ("signin".equals(sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam))) {
 			sessionStoreHouse.setRequestOp("");
 			return socialAuthenticationSignInOrContinue(sessionStoreHouse);
 		}

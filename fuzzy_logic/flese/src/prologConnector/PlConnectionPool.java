@@ -2,7 +2,7 @@ package prologConnector;
 
 import filesAndPaths.FilesMgmt;
 
-public class ConnectionsPool {
+public class PlConnectionPool {
 
 
 

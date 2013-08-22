@@ -1,7 +1,7 @@
 package urls;
 
 import storeHouse.CacheStoreHouse;
-import constants.KConstants;
+import constants.KPages;
 
 public class UrlsMaps {
 
@@ -9,7 +9,7 @@ public class UrlsMaps {
 
 	public static UrlMap getUrlMap(String key) throws Exception {
 		if (!loaded) {
-			load(KConstants.Pages.pagesList);
+			load(KPages.pagesList);
 		}
 		String auxKey = key.toUpperCase(); // HashMap keys in uppercase.
 		return (UrlMap) CacheStoreHouse.retrieve(UrlsMaps.class, auxKey);

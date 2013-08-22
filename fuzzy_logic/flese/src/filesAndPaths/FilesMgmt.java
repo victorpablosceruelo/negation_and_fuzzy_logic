@@ -8,6 +8,8 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 
 import auxiliar.FileInfoClass;
+import auxiliar.LocalUserInfo;
+import auxiliar.LocalUserInfoException;
 import auxiliar.ServletsAuxMethodsClass;
 import filters.OnlyCiaoPrologFilesFilterClass;
 import filters.OnlyLocalUserNameFolderFilterClass;
@@ -28,18 +30,20 @@ public class FilesMgmt {
 	 *            is the owner of the file to be removed, and its relative path.
 	 * @param localUserName
 	 *            is the name of the user that requests its removal.
+	 * @throws LocalUserInfoException 
+	 * @throws PathsMgmtException 
 	 * @exception LocalUserNameFixesClassException
 	 *                if owner is empty or null.
 	 * @exception Exception
 	 *                if it cannot be removed.
 	 */
-	public static void removeProgramFile(String fileOwner, String fileName, String localUserName) throws Exception {
+	public static void removeProgramFile(String fileOwner, String fileName, String localUserName) throws FilesMgmtException, LocalUserInfoException, PathsMgmtException {
 
 		if (fileName == null) {
-			throw new Exception("fileName is null");
+			throw new FilesMgmtException("fileName is null");
 		}
-		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
-		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);
+		LocalUserInfo.checkUserNameIsValid(fileOwner);
+		LocalUserInfo.checkUserNameIsValid(localUserName);
 
 		Boolean retVal = false;
 		if (fileOwner.equals(localUserName)) {
@@ -49,14 +53,14 @@ public class FilesMgmt {
 			File file = new File(fullPath);
 			retVal = file.exists();
 			if (!retVal) {
-				throw new Exception("The program file" + fullPath + "does not exist.");
+				throw new FilesMgmtException("The program file" + fullPath + "does not exist.");
 			}
 			retVal = file.delete();
 			if (!retVal) {
-				throw new Exception("The program file" + fullPath + "can not be removed.");
+				throw new FilesMgmtException("The program file" + fullPath + "can not be removed.");
 			}
 		} else {
-			throw new Exception("You do not own the program file.");
+			throw new FilesMgmtException("You do not own the program file.");
 		}
 	}
 
@@ -71,12 +75,14 @@ public class FilesMgmt {
 	 *            is the name of the user that is logged in.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
+	 * @throws LocalUserInfoException 
+	 * @throws PathsMgmtException 
 	 * @throws Exception
 	 */
-	public static Iterator<FileInfoClass> returnFilesIterator(String localUserName, Log LOG) throws Exception {
+	public static Iterator<FileInfoClass> returnFilesIterator(String localUserName, Log LOG) throws FilesMgmtException, LocalUserInfoException, PathsMgmtException {
 
 		LOG.info("localUserName: " + localUserName);
-		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);
+		LocalUserInfo.checkUserNameIsValid(localUserName);
 
 		Iterator<FileInfoClass> programFilesIterator = null;
 		ArrayList<FileInfoClass> programFilesList = listProgramFiles(localUserName, LOG);
@@ -93,12 +99,14 @@ public class FilesMgmt {
 	 *            is the name of the user that is logged in.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
+	 * @throws PathsMgmtException 
+	 * @throws LocalUserInfoException 
 	 * @exception LocalUserNameFixesClassException
 	 *                if owner is empty or null.
 	 * @exception Exception
 	 *                if there is some problem with a subfolder.
 	 */
-	private static ArrayList<FileInfoClass> listProgramFiles(String localUserName, Log LOG) throws Exception {
+	private static ArrayList<FileInfoClass> listProgramFiles(String localUserName, Log LOG) throws FilesMgmtException, PathsMgmtException, LocalUserInfoException {
 
 		LOG.info("localUserName: " + localUserName);
 
@@ -111,7 +119,7 @@ public class FilesMgmt {
 		String[] subDirs;
 
 		// We list first the localUserName program files.
-		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);
+		LocalUserInfo.checkUserNameIsValid(localUserName);
 		filter = (FilenameFilter) new OnlyLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
 
@@ -123,7 +131,7 @@ public class FilesMgmt {
 		}
 
 		// We list in second (and last) place the other program files.
-		ServletsAuxMethodsClass.checkUserNameIsValid(localUserName);
+		LocalUserInfo.checkUserNameIsValid(localUserName);
 		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserName);
 		subDirs = dir.list(filter);
 
@@ -144,15 +152,16 @@ public class FilesMgmt {
 	 *            is the full path of the subdirectory we are listing.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
+	 * @throws PathsMgmtException 
 	 * @exception LocalUserNameFixesClassException
 	 *                if owner is empty or null.
 	 * @exception Exception
 	 *                if there is some problem with a subfolder.
 	 */
-	private static ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) throws Exception {
+	private static ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) throws FilesMgmtException, PathsMgmtException {
 
 		if ((subDir == null) || ("".equals(subDir))) {
-			throw new Exception("listProgramFilesInSubDir: subDir cannot be null nor empty string.");
+			throw new FilesMgmtException("listProgramFilesInSubDir: subDir cannot be null nor empty string.");
 		}
 
 		PathsMgmt pathsMgmt = new PathsMgmt();

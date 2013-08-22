@@ -19,31 +19,7 @@ public class ServletsAuxMethodsClass {
 
 	final static Log LOG = LogFactory.getLog(ServletsAuxMethodsClass.class);
 
-	/**
-	 * Checks if an user name is valid.
-	 * 
-	 * @param localUserName
-	 *            is the name of the user that we are checking.
-	 * @exception LocalUserNameFixesClassException
-	 *                if localUserName is empty, null or invalid.
-	 */
-	public static boolean checkUserNameIsValid(String userName) throws Exception {
 
-		if (userName == null)
-			throw new Exception("userName is null");
-		if ("".equals(userName))
-			throw new Exception("userName is empty");
-		if (userName.contains("\\s"))
-			throw new Exception("userName contains \\s");
-		if (userName.contains("\\@"))
-			throw new Exception("userName contains \\@");
-		if (userName.contains("\\."))
-			throw new Exception("userName contains \\.");
-		if (userName.contains("/"))
-			throw new Exception("userName contains /.");
-
-		return true;
-	}
 
 	/**
 	 * Executes default actions when an exception is thrown.

@@ -5,7 +5,8 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.ServletsAuxMethodsClass;
+import auxiliar.LocalUserInfo;
+import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 
 public class PathsMgmt {
@@ -15,15 +16,15 @@ public class PathsMgmt {
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
 
-	public PathsMgmt() throws Exception {
+	public PathsMgmt() throws PathsMgmtException {
 		if (programFilesPath == null) {
-			String tmpProgramFilesPath = determineProgramFilesValidPath(KConstants.pathsMgmt.programFilesValidPaths);
+			String tmpProgramFilesPath = determineProgramFilesValidPath(KConstants.PathsMgmt.programFilesValidPaths);
 			setProgramFilesPath(tmpProgramFilesPath);
 			LOG.info("programFilesPath: " + programFilesPath);
 		}
 
 		if (plServerPath == null) {
-			String tmpPlServerPath = determinePlServerValidPath(KConstants.pathsMgmt.plServerValidSubPaths);
+			String tmpPlServerPath = determinePlServerValidPath(KConstants.PathsMgmt.plServerValidSubPaths);
 			setPlServerPath(tmpPlServerPath);
 			LOG.info("plServerPath: " + plServerPath);
 		}
@@ -37,14 +38,13 @@ public class PathsMgmt {
 		return plServerPath;
 	}
 
-	
-	private synchronized void setProgramFilesPath(String tmpProgramFilesPath) throws Exception {
+	private synchronized void setProgramFilesPath(String tmpProgramFilesPath) throws PathsMgmtException {
 		if (programFilesPath == null) {
 			programFilesPath = tmpProgramFilesPath;
 		}
 	}
 
-	private synchronized void setPlServerPath(String tmpPlServerPath) throws Exception {
+	private synchronized void setPlServerPath(String tmpPlServerPath) throws PathsMgmtException {
 		if (programFilesPath == null) {
 			plServerPath = tmpPlServerPath;
 		}
@@ -57,7 +57,7 @@ public class PathsMgmt {
 	 * @param programFilesValidPaths
 	 *            is a list with the paths to test.
 	 */
-	private String determineProgramFilesValidPath(String[] programFilesValidPaths) throws Exception {
+	private String determineProgramFilesValidPath(String[] programFilesValidPaths) throws PathsMgmtException {
 		String programFilesValidPath = null;
 		int index = 0;
 
@@ -75,7 +75,7 @@ public class PathsMgmt {
 		}
 
 		if ((programFilesValidPath == null) || ("".equals(programFilesValidPath)))
-			throw new Exception("programFilesValidPath cannot be null.");
+			throw new PathsMgmtException("programFilesValidPath cannot be null.");
 		return programFilesValidPath;
 	}
 
@@ -89,11 +89,11 @@ public class PathsMgmt {
 	 * 
 	 * @param plServerValidSubPaths
 	 *            are the new proposed subpaths for the plServer.
-	 * @throws Exception
+	 * @throws PathsMgmtException
 	 *             when none is valid.
 	 * 
 	 */
-	private String determinePlServerValidPath(String[] plServerValidSubPaths) throws Exception {
+	private String determinePlServerValidPath(String[] plServerValidSubPaths) throws PathsMgmtException {
 		String plServerPath = null;
 		int index = 0;
 
@@ -107,7 +107,7 @@ public class PathsMgmt {
 		}
 
 		if (plServerPath == null) {
-			throw new Exception("plServerPath cannot be null.");
+			throw new PathsMgmtException("plServerPath cannot be null.");
 		}
 		return plServerPath;
 	}
@@ -124,7 +124,7 @@ public class PathsMgmt {
 
 			if ((file.exists()) && (file.canRead()) || (file.canExecute())) {
 				if (file.isFile()) {
-					if (KConstants.pathsMgmt.plServerProgramFileName.equals(file.getName())) {
+					if (KConstants.PathsMgmt.plServerProgramFileName.equals(file.getName())) {
 						result = subPath;
 					}
 				} else {
@@ -161,33 +161,33 @@ public class PathsMgmt {
 	 *            allows to create the folder if it does not exist.
 	 * @return the complete path for the fileName (if it is not null) or for the
 	 *         fileOwner.
-	 * @exception LocalUserNameFixesClassException
-	 *                if the owner string is empty or null
-	 * @exception Exception
+	 * @exception PathsMgmtException
 	 *                if programFilesPath is null, if fileOwner is null or if
 	 *                the program file does not exist or is invalid.
+	 * @throws LocalUserInfoException
 	 */
-	public String getFullPathOf(String fileOwner, String fileName, Boolean createFolderIfDoesNotExist) throws Exception {
+	public String getFullPathOf(String fileOwner, String fileName, Boolean createFolderIfDoesNotExist) throws PathsMgmtException,
+			LocalUserInfoException {
 
 		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
-			throw new Exception("programFilesPath is empty string or null.");
+			throw new PathsMgmtException("programFilesPath is empty string or null.");
 		}
 
 		if (fileOwner == null) {
-			throw new Exception("fileOwner cannot be null.");
+			throw new PathsMgmtException("fileOwner cannot be null.");
 		}
 		if (fileName == null) {
-			throw new Exception("fileName cannot be null.");
+			throw new PathsMgmtException("fileName cannot be null.");
 		}
 		if ("".equals(fileOwner)) {
-			throw new Exception("fileOwner cannot be empty string.");
+			throw new PathsMgmtException("fileOwner cannot be empty string.");
 		}
 		if ("".equals(fileName)) {
-			throw new Exception("fileName cannot be empty string.");
+			throw new PathsMgmtException("fileName cannot be empty string.");
 		}
 
 		String fullPath = null;
-		ServletsAuxMethodsClass.checkUserNameIsValid(fileOwner);
+		LocalUserInfo.checkUserNameIsValid(fileOwner);
 		String subPath = concatSubPaths(programFilesPath, fileOwner);
 		if (testIfFolderExists(subPath, createFolderIfDoesNotExist)) {
 			fullPath = concatSubPaths(subPath, fileName);
@@ -203,7 +203,7 @@ public class PathsMgmt {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private boolean testIfFolderExists(String folderName, boolean createFolderIfDoesNotExist) throws Exception {
+	private boolean testIfFolderExists(String folderName, boolean createFolderIfDoesNotExist) throws PathsMgmtException {
 		boolean retVal = false;
 
 		File dir = new File(folderName);
@@ -216,7 +216,7 @@ public class PathsMgmt {
 				try {
 					retVal = dir.mkdirs();
 				} catch (Exception ex) {
-					throw new Exception("The folder " + folderName + "can not be created.");
+					throw new PathsMgmtException("The folder " + folderName + "can not be created.");
 				}
 			}
 		}
@@ -227,14 +227,14 @@ public class PathsMgmt {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Boolean testIfFileExists(String subPath, boolean launchException) throws Exception {
+	public Boolean testIfFileExists(String subPath, boolean launchException) throws PathsMgmtException {
 
 		if (subPath == null) {
-			throw new Exception("subPath cannot be null.");
+			throw new PathsMgmtException("subPath cannot be null.");
 		}
 
 		if ("".equals(subPath)) {
-			throw new Exception("subPath cannot be empty string.");
+			throw new PathsMgmtException("subPath cannot be empty string.");
 		}
 
 		String fullPath = concatSubPaths(programFilesPath, subPath);
@@ -242,28 +242,28 @@ public class PathsMgmt {
 
 	}
 
-	private boolean testIfFileExistsAux(String fullPath, boolean launchException) throws Exception {
+	private boolean testIfFileExistsAux(String fullPath, boolean launchException) throws PathsMgmtException {
 		if (fullPath == null)
-			throw new Exception("fullPath cannot be null.");
+			throw new PathsMgmtException("fullPath cannot be null.");
 		if ("".equals(fullPath))
-			throw new Exception("fullPath cannot be empty string.");
+			throw new PathsMgmtException("fullPath cannot be empty string.");
 		if ("/".equals(fullPath))
-			throw new Exception("fullPath cannot be the string /.");
+			throw new PathsMgmtException("fullPath cannot be the string /.");
 
 		File file = new File(fullPath);
 		if (!file.exists()) {
 			if (launchException)
-				throw new Exception("file does not exist. file: " + fullPath);
+				throw new PathsMgmtException("file does not exist. file: " + fullPath);
 			return false;
 		}
 		if (!file.isFile()) {
 			if (launchException)
-				throw new Exception("file is not a file. file: " + fullPath);
+				throw new PathsMgmtException("file is not a file. file: " + fullPath);
 			return false;
 		}
 		if (!file.canRead()) {
 			if (launchException)
-				throw new Exception("file is not readable. file: " + fullPath);
+				throw new PathsMgmtException("file is not readable. file: " + fullPath);
 			return false;
 		}
 		return true;
