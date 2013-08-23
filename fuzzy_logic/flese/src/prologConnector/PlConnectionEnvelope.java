@@ -1,5 +1,7 @@
 package prologConnector;
 
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -8,8 +10,10 @@ import CiaoJava.PLException;
 import CiaoJava.PLGoal;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
+import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.PathsMgmt;
+import filesAndPaths.PathsMgmtException;
 
 public class PlConnectionEnvelope {
 
@@ -20,19 +24,16 @@ public class PlConnectionEnvelope {
 	private boolean isAvailable = false;
 	PathsMgmt pathsMgmt = null;
 
-	public PlConnectionEnvelope(int connectionId) throws Exception {
+	public PlConnectionEnvelope(int connectionId) throws PlConnectionEnvelopeException, PathsMgmtException {
 		if (connectionId <= 0) {
-			throw new Exception("connectionId cannot be <= 0");
+			throw new PlConnectionEnvelopeException("connectionId cannot be <= 0");
 		}
 
 		this.connectionId = connectionId;
 		this.pathsMgmt = new PathsMgmt();
-
-		String[] argv = new String[1];
-		argv[0] = this.pathsMgmt.getPlServerPath();
-		this.plConnection = new PLConnection(argv);
-
 		this.isAvailable = true;
+
+		createPlConnection();
 	}
 
 	synchronized public boolean testAndSet(boolean setAvailableTo) {
@@ -62,24 +63,35 @@ public class PlConnectionEnvelope {
 		return this.connectionId;
 	}
 
-	public void runPrologQuery(CiaoPrologQuery query) throws Exception {
+	public void runPrologQuery(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+		
+		changeCiaoPrologWorkingFolder(query);
+		runPrologQueryAux(query);
+
+	}
+	
+	private void changeCiaoPrologWorkingFolder(CiaoPrologQuery realQuery) {
+
+		
+		CiaoPrologQuery folderChangeQuery = new CiaoPrologQuery(query, programFilesPath, fileOwner, fileName, variables, variablesNames);
+		
+	}
+	
+	private void runPrologQueryAux(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+		if (this.isAvailable) {
+
+		}
 		if (this.plConnection == null)
-			throw new PLException("runQuery: plConnection is null.");
+			throw new PlConnectionEnvelopeException("runQuery: plConnection is null.");
 
-		PLGoal currentGoal = null;
+		PLGoal evaluatedGoal = evaluateGoal(query);
 		long answersCounter = 0;
-
-		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
-		currentGoal = new PLGoal(this.plConnection, query.getQuery());
-
-		LOG.info("runQuery: changing programFile to: " + query.getProgramFileName() + ".");
-		currentGoal.useModule(query.getProgramFileName());
-		currentGoal.query();
 
 		LOG.info("performQueryAux: getting answers ... ");
 		PLTerm prologQueryAnswer;
 		AnswerTermInJavaClass[] answerTermInJava = null;
 		long timesCounter;
+		boolean queryIsStillRunning = true;
 
 		String msgsAccumulator = "";
 		do { // Get all the answers you can.
@@ -93,16 +105,17 @@ public class PlConnectionEnvelope {
 			// msgsAccumulator = "";
 
 			do { // Get the current answer.
-				prologQueryAnswer = currentGoal.nextSolution();
+				prologQueryAnswer = getNextSolution(evaluatedGoal);
+				queryIsStillRunning = getQueryIsStillRunning(evaluatedGoal);
 				timesCounter++;
-			} while ((prologQueryAnswer == null) && (currentGoal.isStillRunning())
-					&& (timesCounter < KConstants.Queries.maximumNumberOfRetries));
+
+			} while ((prologQueryAnswer == null) && queryIsStillRunning && (timesCounter < KConstants.Queries.maximumNumberOfRetries));
 
 			if (timesCounter >= KConstants.Queries.maximumNumberOfRetries) {
 				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + KConstants.Queries.maximumNumberOfRetries);
 			}
 
-			msgsAccumulator += "goal: " + currentGoal.toString() + "\n";
+			msgsAccumulator += "goal: " + evaluatedGoal.toString() + "\n";
 			if (prologQueryAnswer != null) {
 				int variablesLength = query.getVariablesLength();
 				answerTermInJava = new AnswerTermInJavaClass[variablesLength];
@@ -138,17 +151,90 @@ public class PlConnectionEnvelope {
 
 		LOG.info(msgsAccumulator);
 		// LOG.info("performQueryAux: terminating goal execution ...");
-		if (currentGoal != null) {
+		if (evaluatedGoal != null) {
 			try {
-				currentGoal.terminate();
+				evaluatedGoal.terminate();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			currentGoal = null;
+			evaluatedGoal = null;
 			answersCounter = -1; // Notify that there is no currentGoal.
 		}
 
 		// LOG.info("performQueryAux: end.");
 
 	}
+
+	private void createPlConnection() throws PlConnectionEnvelopeException {
+		String[] argv = new String[1];
+		argv[0] = this.pathsMgmt.getPlServerPath();
+
+		try {
+			this.plConnection = new PLConnection(argv);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("IOException");
+		} catch (PLException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("PLException");
+		}
+	}
+
+	private PLGoal evaluateGoal(CiaoPrologQuery query) throws PlConnectionEnvelopeException {
+		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
+		PLGoal evaluatedGoal = new PLGoal(this.plConnection, query.getQuery());
+		String programFileName = null;
+
+		try {
+			programFileName = query.getProgramFileName();
+		} catch (PathsMgmtException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("PathsMgmtException");
+		} catch (LocalUserInfoException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("LocalUserInfoException");
+		}
+
+		LOG.info("runQuery: changing programFile to: " + programFileName + ".");
+		try {
+			evaluatedGoal.useModule(programFileName);
+			evaluatedGoal.query();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("IOException");
+		} catch (PLException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("PLException");
+		}
+		return evaluatedGoal;
+	}
+
+	private PLTerm getNextSolution(PLGoal evaluatedGoal) throws PlConnectionEnvelopeException {
+		PLTerm prologQueryAnswer = null;
+		try {
+			prologQueryAnswer = evaluatedGoal.nextSolution();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("IOException");
+		} catch (PLException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("PLException");
+		}
+		return prologQueryAnswer;
+	}
+
+	private boolean getQueryIsStillRunning(PLGoal evaluatedGoal) throws PlConnectionEnvelopeException {
+		boolean queryIsStillRunning = false;
+		try {
+			queryIsStillRunning = evaluatedGoal.isStillRunning();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("IOException");
+		} catch (PLException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("PLException");
+		}
+		return queryIsStillRunning;
+	}
+
 }

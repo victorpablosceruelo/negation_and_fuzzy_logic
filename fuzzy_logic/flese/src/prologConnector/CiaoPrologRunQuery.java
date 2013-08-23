@@ -74,7 +74,7 @@ public class CiaoPrologRunQuery {
 	
 		// Adequate the value of programFileOwner (it was relative until here).
 		PathsMgmt pathsMgmt = new PathsMgmt();
-		String programFileOwnerWithPath = pathsMgmt.getFullPathOf(programFileOwner, null, false);
+		String programFileOwnerWithPath = pathsMgmt.getFullPathOfFile(programFileOwner, null, false);
 	
 		// Change working folder.
 		PLVariable[] variables = new PLVariable[1];

@@ -48,7 +48,7 @@ public class FilesMgmt {
 		Boolean retVal = false;
 		if (fileOwner.equals(localUserName)) {
 			PathsMgmt pathsMgmt = new PathsMgmt();
-			String fullPath = pathsMgmt.getFullPathOf(fileOwner, fileName, false);
+			String fullPath = pathsMgmt.getFullPathOfFile(fileOwner, fileName, false);
 
 			File file = new File(fullPath);
 			retVal = file.exists();
