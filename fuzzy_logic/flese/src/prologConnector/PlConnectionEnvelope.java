@@ -5,9 +5,11 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import CiaoJava.PLAtom;
 import CiaoJava.PLConnection;
 import CiaoJava.PLException;
 import CiaoJava.PLGoal;
+import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfoException;
@@ -63,21 +65,52 @@ public class PlConnectionEnvelope {
 		return this.connectionId;
 	}
 
-	public void runPrologQuery(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException {
-		
+	public void runPrologQuery(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+			CiaoPrologQueryException, PathsMgmtException, LocalUserInfoException {
+
+		if (plConnection == null) {
+			createPlConnection();
+		}
+
 		changeCiaoPrologWorkingFolder(query);
 		runPrologQueryAux(query);
 
+		if (plConnection != null) {
+			try {
+				plConnection.stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		plConnection = null;
+		testAndSet(true);
 	}
-	
-	private void changeCiaoPrologWorkingFolder(CiaoPrologQuery realQuery) {
 
-		
-		CiaoPrologQuery folderChangeQuery = new CiaoPrologQuery(query, programFilesPath, fileOwner, fileName, variables, variablesNames);
-		
+	private void changeCiaoPrologWorkingFolder(CiaoPrologQuery realQuery) throws CiaoPrologQueryException, PathsMgmtException,
+			LocalUserInfoException, PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+
+		// Prepare the variables to get the result
+		PLVariable[] variables = new PLVariable[1];
+		variables[0] = new PLVariable();
+
+		String[] variablesNames = new String[1];
+		variablesNames[0] = "result";
+
+		String fileOwner = realQuery.getFileOwner();
+		String fileName = "";
+		CiaoPrologQuery folderChangeQuery = new CiaoPrologQuery(fileOwner, fileName, variables, variablesNames);
+
+		String programFileFolderName = folderChangeQuery.getProgramFileFolderName();
+
+		// Change working folder.
+		PLStructure query = new PLStructure("working_directory", new PLTerm[] { variables[0], new PLAtom(programFileFolderName) });
+
+		folderChangeQuery.setQuery(query);
+		runPrologQueryAux(folderChangeQuery);
 	}
-	
-	private void runPrologQueryAux(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+
+	private void runPrologQueryAux(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+			CiaoPrologQueryException {
 		if (this.isAvailable) {
 
 		}
@@ -180,7 +213,7 @@ public class PlConnectionEnvelope {
 		}
 	}
 
-	private PLGoal evaluateGoal(CiaoPrologQuery query) throws PlConnectionEnvelopeException {
+	private PLGoal evaluateGoal(CiaoPrologQuery query) throws PlConnectionEnvelopeException, CiaoPrologQueryException {
 		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
 		PLGoal evaluatedGoal = new PLGoal(this.plConnection, query.getQuery());
 		String programFileName = null;

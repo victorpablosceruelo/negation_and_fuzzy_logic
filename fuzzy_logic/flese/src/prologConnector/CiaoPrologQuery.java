@@ -18,17 +18,17 @@ public class CiaoPrologQuery {
 
 	private ArrayList<AnswerTermInJavaClass[]> queryAnswers = null;
 
-	public CiaoPrologQuery(PLStructure query, String fileOwner, String fileName, PLVariable[] variables,
-			String[] variablesNames) throws Exception {
+	public CiaoPrologQuery(String fileOwner, String fileName, PLVariable[] variables,
+			String[] variablesNames) throws CiaoPrologQueryException {
 
 		if (fileOwner == null)
 			throw new CiaoPrologQueryException("fileOwner cannot be null.");
 		if (fileName == null)
 			throw new CiaoPrologQueryException("fileName cannot be null.");
-		if (query == null)
-			throw new CiaoPrologQueryException("query cannot be null.");
 		if ("".equals(fileOwner))
 			throw new CiaoPrologQueryException("fileOwner cannot be empty string.");
+		if ("".equals(fileName))
+			throw new CiaoPrologQueryException("fileName cannot be empty string.");
 		if (variables == null)
 			throw new CiaoPrologQueryException("variables cannot be null.");
 		if (variablesNames == null)
@@ -50,7 +50,6 @@ public class CiaoPrologQuery {
 			throw new CiaoPrologQueryException("variables and variablesNames have different length.");
 		}
 
-		this.query = query;
 		this.fileOwner = fileOwner;
 		this.fileName = fileName;
 		this.variables = variables;
@@ -59,7 +58,16 @@ public class CiaoPrologQuery {
 		this.queryAnswers = new ArrayList<AnswerTermInJavaClass[]>();
 	}
 
-	public PLStructure getQuery() {
+	
+	public void setQuery(PLStructure query) throws CiaoPrologQueryException {
+		if (query == null)
+			throw new CiaoPrologQueryException("query cannot be null.");
+		this.query = query;
+	}
+	
+	public PLStructure getQuery() throws CiaoPrologQueryException {
+		if (this.query == null)
+			throw new CiaoPrologQueryException("query cannot be null.");
 		return query;
 	}
 
@@ -90,6 +98,11 @@ public class CiaoPrologQuery {
 	public String getProgramFileName() throws PathsMgmtException, LocalUserInfoException {
 		PathsMgmt pathsMgmt = new PathsMgmt();
 		return pathsMgmt.getFullPathOfFile(this.fileOwner, this.fileName, false);
+	}
+	
+	public String getProgramFileFolderName() throws PathsMgmtException, LocalUserInfoException {
+		PathsMgmt pathsMgmt = new PathsMgmt();
+		return pathsMgmt.getFullPathOfFile(this.fileOwner, "", false);
 	}
 
 	public String toString() {
