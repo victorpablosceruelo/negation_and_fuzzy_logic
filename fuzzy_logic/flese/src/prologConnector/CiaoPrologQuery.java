@@ -29,8 +29,6 @@ public class CiaoPrologQuery {
 			throw new CiaoPrologQueryException("query cannot be null.");
 		if ("".equals(fileOwner))
 			throw new CiaoPrologQueryException("fileOwner cannot be empty string.");
-		if ("".equals(fileName))
-			throw new CiaoPrologQueryException("fileName cannot be empty string.");
 		if (variables == null)
 			throw new CiaoPrologQueryException("variables cannot be null.");
 		if (variablesNames == null)
