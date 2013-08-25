@@ -1,0 +1,56 @@
+package prologConnector;
+
+import CiaoJava.PLStructure;
+import CiaoJava.PLTerm;
+import CiaoJava.PLVariable;
+import auxiliar.LocalUserInfoException;
+import filesAndPaths.PathsMgmtException;
+
+public class CiaoPrologTestingQuery extends CiaoPrologQuery {
+
+	public CiaoPrologTestingQuery(String fileOwner, String fileName) throws CiaoPrologQueryException, PathsMgmtException,
+			LocalUserInfoException {
+		super(fileOwner, fileName);
+
+		String testFileName = "restaurant.pl";
+		LOG.info("testingQuery ...");
+		if (testFileName.equals(fileName)) {
+			PLVariable[] variables = new PLVariable[6];
+			variables[0] = new PLVariable(); // X
+			variables[1] = new PLVariable(); // V1
+			variables[2] = new PLVariable(); // V2
+			variables[3] = new PLVariable(); // V3
+			variables[4] = new PLVariable(); // Condition -
+												// rfuzzy_var_truth_value
+			variables[5] = new PLVariable(); // V - rfuzzy_var_truth_value
+
+			String[] variablesNames = { "X", "V1", "V2", "V3", "Condition", "V" };
+
+			PLTerm[] args_expensive = { variables[0], variables[1] };
+			PLStructure query_expensive = new PLStructure("expensive", args_expensive);
+			PLTerm[] args_very = { query_expensive, variables[2] };
+			PLStructure query_very_expensive = new PLStructure("very", args_very);
+			PLTerm[] args_fnot = { query_very_expensive, variables[3] };
+			PLStructure query_not_very_expensive = new PLStructure("fnot", args_fnot);
+
+			// PLTerm[] dump_constraints_vars_java_list = {variables[3]};
+			// PLList dump_constraints_vars_list = null;
+			// try {
+			// dump_constraints_vars_list= new
+			// PLList(dump_constraints_vars_java_list);
+			// } catch (PLException e) {}
+
+			PLTerm[] args_rfuzzy_var_truth_value = { variables[3], variables[4], variables[5] };
+			PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
+
+			PLTerm[] args_conjunction = { query_not_very_expensive, query_dump_constraints };
+			PLStructure query = new PLStructure(",", args_conjunction);
+
+			setRealQuery(query, variables, variablesNames);
+		} else {
+			throw new CiaoPrologQueryException("fileName is not " + testFileName);
+		}
+
+	}
+
+}

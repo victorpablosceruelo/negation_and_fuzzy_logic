@@ -5,11 +5,9 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import CiaoJava.PLAtom;
 import CiaoJava.PLConnection;
 import CiaoJava.PLException;
 import CiaoJava.PLGoal;
-import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfoException;
@@ -89,23 +87,7 @@ public class PlConnectionEnvelope {
 	private void changeCiaoPrologWorkingFolder(CiaoPrologQuery realQuery) throws CiaoPrologQueryException, PathsMgmtException,
 			LocalUserInfoException, PlConnectionEnvelopeException, AnswerTermInJavaClassException {
 
-		// Prepare the variables to get the result
-		PLVariable[] variables = new PLVariable[1];
-		variables[0] = new PLVariable();
-
-		String[] variablesNames = new String[1];
-		variablesNames[0] = "result";
-
-		String fileOwner = realQuery.getFileOwner();
-		String fileName = "";
-		CiaoPrologQuery folderChangeQuery = new CiaoPrologQuery(fileOwner, fileName, variables, variablesNames);
-
-		String programFileFolderName = folderChangeQuery.getProgramFileFolderName();
-
-		// Change working folder.
-		PLStructure query = new PLStructure("working_directory", new PLTerm[] { variables[0], new PLAtom(programFileFolderName) });
-
-		folderChangeQuery.setQuery(query);
+		CiaoPrologQuery folderChangeQuery = new CiaoPrologChangeWorkingFolderQuery(realQuery.getFileOwner(), realQuery.getFileName());
 		runPrologQueryAux(folderChangeQuery);
 	}
 

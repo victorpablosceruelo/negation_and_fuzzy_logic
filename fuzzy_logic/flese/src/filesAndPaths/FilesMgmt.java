@@ -7,10 +7,8 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 
-import auxiliar.FileInfoClass;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
-import auxiliar.ServletsAuxMethodsClass;
 import filters.OnlyCiaoPrologFilesFilterClass;
 import filters.OnlyLocalUserNameFolderFilterClass;
 import filters.OnlyNotLocalUserNameFolderFilterClass;
@@ -30,14 +28,15 @@ public class FilesMgmt {
 	 *            is the owner of the file to be removed, and its relative path.
 	 * @param localUserName
 	 *            is the name of the user that requests its removal.
-	 * @throws LocalUserInfoException 
-	 * @throws PathsMgmtException 
+	 * @throws LocalUserInfoException
+	 * @throws PathsMgmtException
 	 * @exception LocalUserNameFixesClassException
 	 *                if owner is empty or null.
 	 * @exception Exception
 	 *                if it cannot be removed.
 	 */
-	public static void removeProgramFile(String fileOwner, String fileName, String localUserName) throws FilesMgmtException, LocalUserInfoException, PathsMgmtException {
+	public static void removeProgramFile(String fileOwner, String fileName, String localUserName) throws FilesMgmtException,
+			LocalUserInfoException, PathsMgmtException {
 
 		if (fileName == null) {
 			throw new FilesMgmtException("fileName is null");
@@ -75,11 +74,13 @@ public class FilesMgmt {
 	 *            is the name of the user that is logged in.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
-	 * @throws LocalUserInfoException 
-	 * @throws PathsMgmtException 
+	 * @throws LocalUserInfoException
+	 * @throws PathsMgmtException
+	 * @throws FileInfoException
 	 * @throws Exception
 	 */
-	public static Iterator<FileInfoClass> returnFilesIterator(String localUserName, Log LOG) throws FilesMgmtException, LocalUserInfoException, PathsMgmtException {
+	public static Iterator<FileInfoClass> returnFilesIterator(String localUserName, Log LOG) throws FilesMgmtException,
+			LocalUserInfoException, PathsMgmtException, FileInfoException {
 
 		LOG.info("localUserName: " + localUserName);
 		LocalUserInfo.checkUserNameIsValid(localUserName);
@@ -99,14 +100,16 @@ public class FilesMgmt {
 	 *            is the name of the user that is logged in.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
-	 * @throws PathsMgmtException 
-	 * @throws LocalUserInfoException 
+	 * @throws PathsMgmtException
+	 * @throws LocalUserInfoException
+	 * @throws FileInfoException
 	 * @exception LocalUserNameFixesClassException
 	 *                if owner is empty or null.
 	 * @exception Exception
 	 *                if there is some problem with a subfolder.
 	 */
-	private static ArrayList<FileInfoClass> listProgramFiles(String localUserName, Log LOG) throws FilesMgmtException, PathsMgmtException, LocalUserInfoException {
+	private static ArrayList<FileInfoClass> listProgramFiles(String localUserName, Log LOG) throws FilesMgmtException, PathsMgmtException,
+			LocalUserInfoException, FileInfoException {
 
 		LOG.info("localUserName: " + localUserName);
 
@@ -152,13 +155,14 @@ public class FilesMgmt {
 	 *            is the full path of the subdirectory we are listing.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
-	 * @throws PathsMgmtException 
+	 * @throws PathsMgmtException
 	 * @exception LocalUserNameFixesClassException
 	 *                if owner is empty or null.
 	 * @exception Exception
 	 *                if there is some problem with a subfolder.
 	 */
-	private static ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList) throws FilesMgmtException, PathsMgmtException {
+	private static ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList)
+			throws FilesMgmtException, PathsMgmtException, FileInfoException {
 
 		if ((subDir == null) || ("".equals(subDir))) {
 			throw new FilesMgmtException("listProgramFilesInSubDir: subDir cannot be null nor empty string.");

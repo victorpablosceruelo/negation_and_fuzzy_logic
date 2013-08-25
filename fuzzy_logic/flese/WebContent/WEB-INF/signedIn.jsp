@@ -1,6 +1,6 @@
 <jsp:include page="commonHtmlHead.jsp" />
 <%@page import="java.util.Iterator"%>
-<%@page import="auxiliar.FileInfoClass"%>
+<%@page import="filesAndPaths.FileInfoClass"%>
 
 <%
 	@SuppressWarnings("unchecked")

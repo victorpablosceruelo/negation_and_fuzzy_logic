@@ -34,4 +34,8 @@ public class KConstants {
 		public static long maximumNumberOfAnswers = 9223372036854775807L;
 		
 	}
+	
+	public static class PlConnectionsPool {
+		public static int maxNumOfConnections = 10;
+	}
 }

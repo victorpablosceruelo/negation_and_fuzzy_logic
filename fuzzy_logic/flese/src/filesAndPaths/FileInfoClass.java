@@ -1,16 +1,16 @@
-package auxiliar;
+package filesAndPaths;
 
 public class FileInfoClass {
 
 	private String fileName = null;
 	private String fileOwner = null;
 	
-	public FileInfoClass(String fileName, String fileOwner) throws Exception {
+	public FileInfoClass(String fileName, String fileOwner) throws FileInfoException {
 		if (fileName == null)  {
-			throw new Exception("FileInfoClass constructor: fileName can not be null.");
+			throw new FileInfoException("FileInfoClass constructor: fileName can not be null.");
 		}
 		if (fileOwner == null) {
-			throw new Exception("FileInfoClass constructor: fileOwner can not be null.");
+			throw new FileInfoException("FileInfoClass constructor: fileOwner can not be null.");
 		}
 		this.fileName = fileName;
 		this.fileOwner = fileOwner;

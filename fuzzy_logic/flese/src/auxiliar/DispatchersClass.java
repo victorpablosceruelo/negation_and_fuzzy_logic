@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import prologConnector.CiaoPrologConnectionClass;
-import prologConnector.PlConnectionPool;
+import prologConnector.PlConnectionsPool;
 import prologConnector.QueryConversorClass;
 
 import storeHouse.SessionStoreHouse;
@@ -29,6 +29,7 @@ import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import constants.KConstants;
 import constants.KPages;
+import filesAndPaths.FileInfoClass;
 import filesAndPaths.FilesMgmt;
 
 public class DispatchersClass {
@@ -40,7 +41,7 @@ public class DispatchersClass {
 	
 	public DispatchersClass(SessionStoreHouse sessionStoreHouse)
 			throws Exception {
-		connection = PlConnectionPool.getConnection();
+		connection = PlConnectionsPool.getConnection();
 
 	}
 

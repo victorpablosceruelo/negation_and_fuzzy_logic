@@ -2,24 +2,29 @@ package prologConnector;
 
 import java.util.ArrayList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfoException;
 import filesAndPaths.PathsMgmt;
 import filesAndPaths.PathsMgmtException;
 
-public class CiaoPrologQuery {
+public abstract class CiaoPrologQuery {
 
+	final static protected Log LOG = LogFactory.getLog(CiaoPrologQuery.class);
+	
 	private PLStructure query = null;
 	private String fileOwner = null;
 	private String fileName = null;
 	private PLVariable[] variables = null;
 	private String[] variablesNames = null;
-
 	private ArrayList<AnswerTermInJavaClass[]> queryAnswers = null;
+	
+	protected boolean isProgramIntrospectionQuery = false;
 
-	public CiaoPrologQuery(String fileOwner, String fileName, PLVariable[] variables,
-			String[] variablesNames) throws CiaoPrologQueryException {
+	public CiaoPrologQuery(String fileOwner, String fileName) throws CiaoPrologQueryException, PathsMgmtException, LocalUserInfoException {
 
 		if (fileOwner == null)
 			throw new CiaoPrologQueryException("fileOwner cannot be null.");
@@ -29,6 +34,18 @@ public class CiaoPrologQuery {
 			throw new CiaoPrologQueryException("fileOwner cannot be empty string.");
 		if ("".equals(fileName))
 			throw new CiaoPrologQueryException("fileName cannot be empty string.");
+
+		this.fileOwner = fileOwner;
+		this.fileName = fileName;
+
+		this.queryAnswers = new ArrayList<AnswerTermInJavaClass[]>();
+	}
+
+	
+	protected void setRealQuery(PLStructure query, PLVariable[] variables,
+			String[] variablesNames) throws CiaoPrologQueryException {
+		if (query == null)
+			throw new CiaoPrologQueryException("query cannot be null.");
 		if (variables == null)
 			throw new CiaoPrologQueryException("variables cannot be null.");
 		if (variablesNames == null)
@@ -49,20 +66,12 @@ public class CiaoPrologQuery {
 		if (variables.length != variablesNames.length) {
 			throw new CiaoPrologQueryException("variables and variablesNames have different length.");
 		}
-
-		this.fileOwner = fileOwner;
-		this.fileName = fileName;
+		
+		this.query = query;
 		this.variables = variables;
 		this.variablesNames = variablesNames;
 
-		this.queryAnswers = new ArrayList<AnswerTermInJavaClass[]>();
-	}
-
-	
-	public void setQuery(PLStructure query) throws CiaoPrologQueryException {
-		if (query == null)
-			throw new CiaoPrologQueryException("query cannot be null.");
-		this.query = query;
+		LOG.info(query.toString());
 	}
 	
 	public PLStructure getQuery() throws CiaoPrologQueryException {
@@ -105,6 +114,15 @@ public class CiaoPrologQuery {
 		return pathsMgmt.getFullPathOfFile(this.fileOwner, "", false);
 	}
 
+	public String [] getKeyForCache() {
+		if (! isProgramIntrospectionQuery) {
+			return new String [] { fileName, fileOwner };
+		}
+		else {
+			return new String [] { fileName, null };
+		}
+	}
+	
 	public String toString() {
 		return this.query.toString();
 	}

@@ -66,18 +66,6 @@ public class CiaoPrologConnectionClass {
 				&& (latestEvaluatedQueryProgramFileName.equals(fileName)) && (latestEvaluatedQueryProgramFileOwner.equals(fileOwner))) {
 			LOG.info("programFileIntrospectionQuery: using the last query results.");
 		} else {
-			// Prepare the query structure.
-			// rfuzzy_introspection(PClass, PName, PArity, PType).
-			PLVariable[] variables = new PLVariable[4];
-			variables[0] = new PLVariable(); // predicateType
-			variables[1] = new PLVariable(); // predicateName
-			variables[2] = new PLVariable(); // predicateArity
-			variables[3] = new PLVariable(); // predicateType
-			PLTerm[] args = { variables[0], variables[1], variables[2], variables[3] };
-			PLStructure query = new PLStructure("rfuzzy_introspection", args);
-
-			// Run the query and save the results in programIntrospection
-			performQuery(plServerPath, query, programFilesPath, fileOwner, fileName, variables, null);
 			programIntrospection = latestEvaluatedQueryAnswers;
 
 			/*
@@ -238,40 +226,7 @@ public class CiaoPrologConnectionClass {
 	 * @throws AnswerTermInJavaClassException
 	 */
 	public void testingQuery(String plServerPath, String programFilesPath, String owner, String programFile) throws Exception {
-		LOG.info("testingQuery ...");
-		if ("restaurant.pl".equals(programFile)) {
-			PLVariable[] variables = new PLVariable[6];
-			variables[0] = new PLVariable(); // X
-			variables[1] = new PLVariable(); // V1
-			variables[2] = new PLVariable(); // V2
-			variables[3] = new PLVariable(); // V3
-			variables[4] = new PLVariable(); // Condition -
-												// rfuzzy_var_truth_value
-			variables[5] = new PLVariable(); // V - rfuzzy_var_truth_value
 
-			PLTerm[] args_expensive = { variables[0], variables[1] };
-			PLStructure query_expensive = new PLStructure("expensive", args_expensive);
-			PLTerm[] args_very = { query_expensive, variables[2] };
-			PLStructure query_very_expensive = new PLStructure("very", args_very);
-			PLTerm[] args_fnot = { query_very_expensive, variables[3] };
-			PLStructure query_not_very_expensive = new PLStructure("fnot", args_fnot);
-
-			// PLTerm[] dump_constraints_vars_java_list = {variables[3]};
-			// PLList dump_constraints_vars_list = null;
-			// try {
-			// dump_constraints_vars_list= new
-			// PLList(dump_constraints_vars_java_list);
-			// } catch (PLException e) {}
-
-			PLTerm[] args_rfuzzy_var_truth_value = { variables[3], variables[4], variables[5] };
-			PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
-
-			PLTerm[] args_conjunction = { query_not_very_expensive, query_dump_constraints };
-			PLStructure query = new PLStructure(",", args_conjunction);
-
-			performQuery(plServerPath, query, programFilesPath, owner, programFile, variables, null);
-			LOG.info("testingQuery ... num of answers: " + latestEvaluatedQueryAnswers.size());
-		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
