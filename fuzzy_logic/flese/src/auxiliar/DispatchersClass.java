@@ -22,14 +22,14 @@ import org.apache.commons.logging.LogFactory;
 
 import prologConnector.CiaoPrologConnectionClass;
 import prologConnector.PlConnectionsPool;
-import prologConnector.QueryConversorClass;
 
 import storeHouse.SessionStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import constants.KConstants;
 import constants.KPages;
-import filesAndPaths.FileInfoClass;
+import conversors.QueryConversorClass;
+import filesAndPaths.ProgramFileInfo;
 import filesAndPaths.FilesMgmt;
 
 public class DispatchersClass {
@@ -198,7 +198,7 @@ public class DispatchersClass {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void filesList() throws Exception {
-		Iterator<FileInfoClass> filesListIterator = FilesMgmt.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(),
+		Iterator<ProgramFileInfo> filesListIterator = FilesMgmt.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(),
 				LOG);
 		request.setAttribute("filesListIterator", filesListIterator);
 		// Forward to the jsp page.

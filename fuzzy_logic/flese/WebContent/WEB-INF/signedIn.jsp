@@ -1,10 +1,10 @@
 <jsp:include page="commonHtmlHead.jsp" />
 <%@page import="java.util.Iterator"%>
-<%@page import="filesAndPaths.FileInfoClass"%>
+<%@page import="filesAndPaths.ProgramFileInfo"%>
 
 <%
 	@SuppressWarnings("unchecked")
-	Iterator<FileInfoClass> filesIterator = (Iterator<FileInfoClass>) request.getAttribute("filesIterator"); 
+	Iterator<ProgramFileInfo> filesIterator = (Iterator<ProgramFileInfo>) request.getAttribute("filesIterator");
 %>
 
 <body>

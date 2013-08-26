@@ -5,16 +5,17 @@ import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfoException;
 import filesAndPaths.PathsMgmtException;
+import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologTestingQuery extends CiaoPrologQuery {
 
-	public CiaoPrologTestingQuery(String fileOwner, String fileName) throws CiaoPrologQueryException, PathsMgmtException,
+	public CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
 			LocalUserInfoException {
-		super(fileOwner, fileName);
+		super(programFileInfo);
 
 		String testFileName = "restaurant.pl";
 		LOG.info("testingQuery ...");
-		if (testFileName.equals(fileName)) {
+		if (testFileName.equals(programFileInfo.getFileName())) {
 			PLVariable[] variables = new PLVariable[6];
 			variables[0] = new PLVariable(); // X
 			variables[1] = new PLVariable(); // V1

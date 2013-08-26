@@ -1,4 +1,4 @@
-package prologConnector;
+package conversors;
 
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;

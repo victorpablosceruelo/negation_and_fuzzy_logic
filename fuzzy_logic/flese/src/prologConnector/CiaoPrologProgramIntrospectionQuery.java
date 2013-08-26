@@ -2,17 +2,18 @@ package prologConnector;
 
 import java.util.Iterator;
 
+import storeHouse.CacheStoreHouse;
+import storeHouse.CacheStoreHouseException;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
-import auxiliar.LocalUserInfoException;
 import filesAndPaths.PathsMgmtException;
+import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 
-	public CiaoPrologProgramIntrospectionQuery(String fileOwner, String fileName) throws CiaoPrologQueryException, PathsMgmtException,
-			LocalUserInfoException {
-		super(fileOwner, fileName);
+	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologQueryException, PathsMgmtException {
+		super(fileInfo);
 
 		// Prepare the query structure.
 		// rfuzzy_introspection(PClass, PName, PArity, PType).
@@ -31,10 +32,29 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 		isProgramIntrospectionQuery = true;
 	}
 
+	public static CiaoPrologQueryInterface getInstance(ProgramFileInfo fileInfo) throws CacheStoreHouseException, PathsMgmtException,
+			CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+		String fullPath = fileInfo.getProgramFileFullPath();
+		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
+
+		Object o = CacheStoreHouse.retrieve(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key);
+		CiaoPrologQueryInterface query = (CiaoPrologQueryInterface) o;
+		if (query == null) {
+			query = new CiaoPrologProgramIntrospectionQuery(fileInfo);
+			PlConnectionsPool.launchQuery(query);
+			CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, query);
+		}
+		return query;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public String[] getQueryAnswersInJS() {
 		if (queryAnswers == null)
 			return null;
-		
+
 		Iterator<AnswerTermInJavaClass[]> queryAnswersIterator = queryAnswers.iterator();
 		if (queryAnswersIterator == null)
 			return null;
@@ -94,11 +114,11 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 		}
 		return answer;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	public String[] getProgramIntrospectionInJS() {
 		if (queryAnswers == null)
 			return null;

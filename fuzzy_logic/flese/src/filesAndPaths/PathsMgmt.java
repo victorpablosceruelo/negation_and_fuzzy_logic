@@ -166,8 +166,7 @@ public class PathsMgmt {
 	 *                the program file does not exist or is invalid.
 	 * @throws LocalUserInfoException
 	 */
-	public String getFullPathOfFile(String fileOwner, String fileName, Boolean createFolderIfDoesNotExist) throws PathsMgmtException,
-			LocalUserInfoException {
+	public String getFullPathOfFile(String fileOwner, String fileName, Boolean createFolderIfDoesNotExist) throws PathsMgmtException {
 
 		if ((programFilesPath == null) || ("".equals(programFilesPath))) {
 			throw new PathsMgmtException("programFilesPath is empty string or null.");
@@ -184,7 +183,12 @@ public class PathsMgmt {
 			fileName = "";
 
 		String fullPath = null;
-		LocalUserInfo.checkUserNameIsValid(fileOwner);
+		try {
+			LocalUserInfo.checkUserNameIsValid(fileOwner);
+		} catch (LocalUserInfoException e) {
+			e.printStackTrace();
+			throw new PathsMgmtException(e.getMessage());
+		}
 		String subPath = concatSubPaths(programFilesPath, fileOwner);
 		if (testIfFolderExists(subPath, createFolderIfDoesNotExist)) {
 			if (!"".equals(fileName)) {

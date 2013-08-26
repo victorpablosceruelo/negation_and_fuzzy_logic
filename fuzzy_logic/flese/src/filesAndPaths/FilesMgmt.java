@@ -79,14 +79,14 @@ public class FilesMgmt {
 	 * @throws FileInfoException
 	 * @throws Exception
 	 */
-	public static Iterator<FileInfoClass> returnFilesIterator(String localUserName, Log LOG) throws FilesMgmtException,
+	public static Iterator<ProgramFileInfo> returnFilesIterator(String localUserName, Log LOG) throws FilesMgmtException,
 			LocalUserInfoException, PathsMgmtException, FileInfoException {
 
 		LOG.info("localUserName: " + localUserName);
 		LocalUserInfo.checkUserNameIsValid(localUserName);
 
-		Iterator<FileInfoClass> programFilesIterator = null;
-		ArrayList<FileInfoClass> programFilesList = listProgramFiles(localUserName, LOG);
+		Iterator<ProgramFileInfo> programFilesIterator = null;
+		ArrayList<ProgramFileInfo> programFilesList = listProgramFiles(localUserName, LOG);
 		if ((programFilesList != null) && (!programFilesList.isEmpty())) {
 			programFilesIterator = programFilesList.iterator();
 		}
@@ -108,7 +108,7 @@ public class FilesMgmt {
 	 * @exception Exception
 	 *                if there is some problem with a subfolder.
 	 */
-	private static ArrayList<FileInfoClass> listProgramFiles(String localUserName, Log LOG) throws FilesMgmtException, PathsMgmtException,
+	private static ArrayList<ProgramFileInfo> listProgramFiles(String localUserName, Log LOG) throws FilesMgmtException, PathsMgmtException,
 			LocalUserInfoException, FileInfoException {
 
 		LOG.info("localUserName: " + localUserName);
@@ -116,7 +116,7 @@ public class FilesMgmt {
 		PathsMgmt pathsMgmt = new PathsMgmt();
 		File dir = new File(pathsMgmt.getProgramFilesPath());
 
-		ArrayList<FileInfoClass> currentList = new ArrayList<FileInfoClass>();
+		ArrayList<ProgramFileInfo> currentList = new ArrayList<ProgramFileInfo>();
 
 		FilenameFilter filter;
 		String[] subDirs;
@@ -161,7 +161,7 @@ public class FilesMgmt {
 	 * @exception Exception
 	 *                if there is some problem with a subfolder.
 	 */
-	private static ArrayList<FileInfoClass> listProgramFilesInSubDir(String subDir, ArrayList<FileInfoClass> currentList)
+	private static ArrayList<ProgramFileInfo> listProgramFilesInSubDir(String subDir, ArrayList<ProgramFileInfo> currentList)
 			throws FilesMgmtException, PathsMgmtException, FileInfoException {
 
 		if ((subDir == null) || ("".equals(subDir))) {
@@ -178,7 +178,7 @@ public class FilesMgmt {
 		if (files != null) {
 			for (int i = 0; i < files.length; i++) {
 				// Get filename of file or directory
-				currentList.add(new FileInfoClass(files[i], subDir));
+				currentList.add(new ProgramFileInfo(subDir, files[i]));
 			}
 		}
 		return currentList;

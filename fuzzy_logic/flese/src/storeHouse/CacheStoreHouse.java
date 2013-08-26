@@ -86,20 +86,15 @@ public class CacheStoreHouse {
 		String className = getKeyLevel1(keyLevel1);
 
 		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(className);
-		if (storeHouseL2 == null)
-			throw new CacheStoreHouseException("No level 2 storeHouse for the key.");
+		if (storeHouseL2 == null) return null;
 
 		HashMap<String, HashMap<String, Object>> storeHouseL3 = storeHouseL2.get(keyLevel2);
-		if (storeHouseL3 == null)
-			throw new CacheStoreHouseException("No level 3 storeHouse for the key.");
+		if (storeHouseL3 == null) return null;
 
 		HashMap<String, Object> storeHouseL4 = storeHouseL3.get(keyLevel3);
-		if (storeHouseL4 == null)
-			throw new CacheStoreHouseException("No level 4 storeHouse for the key.");
+		if (storeHouseL4 == null) return null;
 
 		Object object = storeHouseL4.get(keyLevel4);
-		if (object == null)
-			throw new CacheStoreHouseException("No object for the key. key: " + keyLevel4);
 		return object;
 	}
 

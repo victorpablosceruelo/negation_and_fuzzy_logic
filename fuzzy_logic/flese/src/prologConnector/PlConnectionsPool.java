@@ -1,6 +1,5 @@
 package prologConnector;
 
-import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.PathsMgmtException;
 
@@ -17,7 +16,8 @@ public class PlConnectionsPool {
 		}
 	}
 
-	public void launchQuery(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException, CiaoPrologQueryException, PathsMgmtException, LocalUserInfoException {
+	public static void launchQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+			CiaoPrologQueryException, PathsMgmtException {
 
 		PlConnectionEnvelope connection = null;
 		boolean found = false;

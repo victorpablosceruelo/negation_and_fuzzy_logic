@@ -10,7 +10,6 @@ import CiaoJava.PLException;
 import CiaoJava.PLGoal;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
-import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.PathsMgmt;
 import filesAndPaths.PathsMgmtException;
@@ -63,8 +62,8 @@ public class PlConnectionEnvelope {
 		return this.connectionId;
 	}
 
-	public void runPrologQuery(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
-			CiaoPrologQueryException, PathsMgmtException, LocalUserInfoException {
+	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+			CiaoPrologQueryException, PathsMgmtException {
 
 		if (plConnection == null) {
 			createPlConnection();
@@ -84,14 +83,14 @@ public class PlConnectionEnvelope {
 		testAndSet(true);
 	}
 
-	private void changeCiaoPrologWorkingFolder(CiaoPrologQuery realQuery) throws CiaoPrologQueryException, PathsMgmtException,
-			LocalUserInfoException, PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologQueryException, PathsMgmtException,
+			PlConnectionEnvelopeException, AnswerTermInJavaClassException {
 
-		CiaoPrologQuery folderChangeQuery = new CiaoPrologChangeWorkingFolderQuery(realQuery.getFileOwner(), realQuery.getFileName());
+		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
 		runPrologQueryAux(folderChangeQuery);
 	}
 
-	private void runPrologQueryAux(CiaoPrologQuery query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
 			CiaoPrologQueryException {
 		if (this.isAvailable) {
 
@@ -195,20 +194,12 @@ public class PlConnectionEnvelope {
 		}
 	}
 
-	private PLGoal evaluateGoal(CiaoPrologQuery query) throws PlConnectionEnvelopeException, CiaoPrologQueryException {
+	private PLGoal evaluateGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologQueryException {
 		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
 		PLGoal evaluatedGoal = new PLGoal(this.plConnection, query.getQuery());
 		String programFileName = null;
 
-		try {
-			programFileName = query.getProgramFileName();
-		} catch (PathsMgmtException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("PathsMgmtException");
-		} catch (LocalUserInfoException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("LocalUserInfoException");
-		}
+		programFileName = query.getProgramFileInfo().getFileName();
 
 		LOG.info("runQuery: changing programFile to: " + programFileName + ".");
 		try {

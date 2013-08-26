@@ -1,4 +1,4 @@
-package prologConnector;
+package conversors;
 
 public class QueryConversorExceptionClass extends Exception {
 

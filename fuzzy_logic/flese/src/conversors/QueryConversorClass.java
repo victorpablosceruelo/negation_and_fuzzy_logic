@@ -1,4 +1,4 @@
-package prologConnector;
+package conversors;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import prologConnector.AnswerTermInJavaClass;
+import prologConnector.AnswerTermInJavaClassException;
 
 import CiaoJava.PLAtom;
 import CiaoJava.PLFloat;
