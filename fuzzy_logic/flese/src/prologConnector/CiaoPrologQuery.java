@@ -18,10 +18,11 @@ public abstract class CiaoPrologQuery {
 	private PLStructure query = null;
 	private String fileOwner = null;
 	private String fileName = null;
-	private PLVariable[] variables = null;
-	private String[] variablesNames = null;
-	private ArrayList<AnswerTermInJavaClass[]> queryAnswers = null;
 	
+	private PLVariable[] variables = null;
+	
+	protected String[] variablesNames = null;
+	protected ArrayList<AnswerTermInJavaClass[]> queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
 
 	public CiaoPrologQuery(String fileOwner, String fileName) throws CiaoPrologQueryException, PathsMgmtException, LocalUserInfoException {

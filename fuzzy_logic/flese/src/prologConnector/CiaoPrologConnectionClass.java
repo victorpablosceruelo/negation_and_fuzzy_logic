@@ -86,105 +86,13 @@ public class CiaoPrologConnectionClass {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public String[] getProgramIntrospectionInJS() {
-		if (programIntrospection == null)
-			return null;
-		Iterator<AnswerTermInJavaClass[]> programIntrospectionIterator = null;
-		if (programIntrospection != null)
-			programIntrospectionIterator = programIntrospection.iterator();
 
-		if (programIntrospectionIterator == null)
-			return null;
-
-		String[] result = new String[programIntrospection.size()];
-
-		int counter = 0;
-		String tmp = null;
-		AnswerTermInJavaClass[] predInfo;
-		while (programIntrospectionIterator.hasNext()) {
-			predInfo = programIntrospectionIterator.next();
-			tmp = "";
-			tmp += "addToProgramIntrospection(" + counter + ", new predInfo(";
-			for (int i = 0; i < predInfo.length; i++) {
-				tmp += predInfo[i].toJavaScript();
-				if (i + 1 < predInfo.length)
-					tmp += ",";
-			}
-			tmp += "));";
-			result[counter] = tmp;
-			counter++;
-		}
-		return result;
-	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public String[] getQueryAnswersInJS() {
-		if (latestEvaluatedQueryAnswers == null)
-			return null;
-		Iterator<AnswerTermInJavaClass[]> latestEvaluatedQueryAnswersIterator = null;
-		if (latestEvaluatedQueryAnswers != null)
-			latestEvaluatedQueryAnswersIterator = latestEvaluatedQueryAnswers.iterator();
-		if (latestEvaluatedQueryAnswersIterator == null)
-			return null;
 
-		String[] result = new String[latestEvaluatedQueryAnswers.size() + 1];
-		int answersCounter = 0;
-
-		if (variablesNames != null) {
-			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";
-			for (int i = 0; i < variablesNames.length; i++) {
-				result[answersCounter] += "'" + variablesNames[i] + "'";
-				if ((i + 1) < variablesNames.length)
-					result[answersCounter] += ", ";
-			}
-			result[answersCounter] += ")); ";
-		}
-
-		answersCounter++;
-		AnswerTermInJavaClass[] answer;
-		while (latestEvaluatedQueryAnswersIterator.hasNext()) {
-			answer = latestEvaluatedQueryAnswersIterator.next();
-			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";
-			for (int i = 0; i < answer.length; i++) {
-				result[answersCounter] += answer[i].toJavaScript();
-				if ((i + 1) < answer.length)
-					result[answersCounter] += ", ";
-			}
-			result[answersCounter] += ")); ";
-			answersCounter++;
-		}
-		return result;
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public AnswerTermInJavaClass[] getPredicateInfo(String predicateName) {
-		Iterator<AnswerTermInJavaClass[]> iterator = null;
-		if (programIntrospection != null)
-			iterator = programIntrospection.iterator();
-
-		if ((predicateName == null) || ("".equals(predicateName))) {
-			LOG.info("Predicate Name is not valid. predicateName: " + predicateName);
-		}
-		if (iterator == null) {
-			LOG.error("Iterator of Program Introspection is NULL!! ");
-		}
-
-		AnswerTermInJavaClass[] answer = null;
-		if ((predicateName != null) && (iterator != null)) {
-			while ((iterator.hasNext()) && (answer == null)) {
-				answer = iterator.next();
-				if (!predicateName.equals(answer[0].toString()))
-					answer = null;
-			}
-		}
-		return answer;
-	}
 
 	public String getLatestEvaluatedQueryProgramFileName() {
 		return latestEvaluatedQueryProgramFileName;
