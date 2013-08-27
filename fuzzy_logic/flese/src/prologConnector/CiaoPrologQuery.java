@@ -1,6 +1,7 @@
 package prologConnector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -92,5 +93,43 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 	public String toString() {
 		return this.query.toString();
 	}
+	
+	public String[] getQueryAnswersInJS() {
+		if (queryAnswers == null)
+			return null;
 
+		Iterator<AnswerTermInJavaClass[]> queryAnswersIterator = queryAnswers.iterator();
+		if (queryAnswersIterator == null)
+			return null;
+
+		String[] result = new String[queryAnswers.size() + 1];
+		int answersCounter = 0;
+
+		if (variablesNames != null) {
+			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";
+			for (int i = 0; i < variablesNames.length; i++) {
+				result[answersCounter] += "'" + variablesNames[i] + "'";
+				if ((i + 1) < variablesNames.length)
+					result[answersCounter] += ", ";
+			}
+			result[answersCounter] += ")); ";
+		}
+
+		answersCounter++;
+		AnswerTermInJavaClass[] answer;
+		while (queryAnswersIterator.hasNext()) {
+			answer = queryAnswersIterator.next();
+			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";
+			for (int i = 0; i < answer.length; i++) {
+				result[answersCounter] += answer[i].toJavaScript();
+				if ((i + 1) < answer.length)
+					result[answersCounter] += ", ";
+			}
+			result[answersCounter] += ")); ";
+			answersCounter++;
+		}
+		return result;
+	}
+
+	
 }

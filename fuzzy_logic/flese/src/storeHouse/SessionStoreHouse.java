@@ -15,9 +15,10 @@ import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
-import constants.KConstants;
-
 import auxiliar.LocalUserInfo;
+import constants.KConstants;
+import filesAndPaths.FileInfoException;
+import filesAndPaths.ProgramFileInfo;
 
 public class SessionStoreHouse {
 
@@ -111,8 +112,10 @@ public class SessionStoreHouse {
 
 	public String getRequestParameter(String paramName) {
 		String[] values = requestParams.get(paramName);
-		if (values.length > 0)
-			return values[0];
+		if (values != null) {
+			if (values.length > 0)
+				return values[0];
+		}
 		return "";
 	}
 
@@ -235,6 +238,13 @@ public class SessionStoreHouse {
 			throw new Exception("providerId is null in session and in request.");
 
 		return providerId;
+	}
+
+	public ProgramFileInfo getProgramFileInfo() throws FileInfoException {
+		String fileName = getRequestParameter(KConstants.Request.fileNameParam);
+		String fileOwner = getRequestParameter(KConstants.Request.fileOwnerParam);
+
+		return new ProgramFileInfo(fileOwner, fileName);
 	}
 
 	public void invalidateSession() {

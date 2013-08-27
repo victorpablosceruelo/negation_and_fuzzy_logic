@@ -3,16 +3,11 @@ package auxiliar;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -20,34 +15,23 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import prologConnector.CiaoPrologConnectionClass;
-import prologConnector.PlConnectionsPool;
-
+import prologConnector.CiaoPrologNormalQuery;
+import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import storeHouse.SessionStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import constants.KConstants;
 import constants.KPages;
-import conversors.QueryConversorClass;
-import filesAndPaths.ProgramFileInfo;
+import conversors.ConversorToPrologQuery;
 import filesAndPaths.FilesMgmt;
+import filesAndPaths.ProgramFileInfo;
 
 public class DispatchersClass {
 	private static final Log LOG = LogFactory.getLog(DispatchersClass.class);
 	private SessionStoreHouse sessionStoreHouse = null;
-	private CiaoPrologConnectionClass connection = null;
 
-	
-	
-	public DispatchersClass(SessionStoreHouse sessionStoreHouse)
-			throws Exception {
-		connection = PlConnectionsPool.getConnection();
-
-	}
-
-	private void testAndInitialize_fileName_and_fileOwner() throws Exception {
-		String fileName = sessionStoreHouse.getRequestParameter(KConstants.Request.fileNameParam);
-		String fileOwner = sessionStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
+	public DispatchersClass(SessionStoreHouse sessionStoreHouse) throws Exception {
+		this.sessionStoreHouse = sessionStoreHouse;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,20 +72,9 @@ public class DispatchersClass {
 	 * @throws Exception
 	 */
 	public NextStep introspectionQueryRequest() throws Exception {
-		return introspectionQueryRequest(true);
-	}
+		
+		CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
 
-	/**
-	 * Executes the introspection query and puts the connection object into the
-	 * connection session attibute, so the results can be obtained in any jsp
-	 * page.
-	 * 
-	 * @throws Exception
-	 */
-	public NextStep introspectionQueryRequest(boolean doForward) throws Exception {
-
-		testAndInitialize_fileName_and_fileOwner();
-		connection.programFileIntrospectionQuery(plServerPath, programFilesPath, fileOwner, fileName);
 		/*
 		 * LOG.info("------"); LOG.info("------");
 		 * LOG.info("--------> testing query !!! <-----------");
@@ -109,16 +82,11 @@ public class DispatchersClass {
 		 * connection.testingQuery(fileOwner, fileName);
 		 */
 
-		// Update the connection object in the session.
-		session.removeAttribute("connection");
-		session.setAttribute("connection", connection);
-
-		if (doForward) {
 			// Forward to the jsp page.
-			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KConstants.Pages.introspectionQueryAnswer, "");
+			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.introspectionQueryAnswer, "");
 			return nextStep;
-		}
 	}
+
 
 	/**
 	 * Executes any generic query and puts the connection object into the
@@ -129,68 +97,19 @@ public class DispatchersClass {
 	 */
 	public NextStep runQuery() throws Exception {
 
-		testAndInitialize_fileName_and_fileOwner();
-		introspectionQueryRequest(false);
+		// CiaoPrologNormalQuery query = 
+		CiaoPrologNormalQuery.getInstance(sessionStoreHouse);
 
-		String formParameters = " --- Parameters Names and Values --- \n";
-		Enumeration<String> paramNames = request.getParameterNames();
-		while (paramNames.hasMoreElements()) {
-			String paramName = (String) paramNames.nextElement();
-			String[] paramValues = request.getParameterValues(paramName);
-			for (int i = 0; i < paramValues.length; i++) {
-				formParameters += "paramName: " + paramName + " paramValue: " + paramValues[i] + " \n";
-			}
-		}
-		LOG.info(formParameters);
+		// Forward to the jsp page.
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.RunQueryAnswer, "");
+		return nextStep;
 
-		if (request.getParameter("queryLinesCounter") == null) {
-			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KConstants.Pages.ExceptionAjaxPage, "");
+		/*
+		if (nextStep == null) {
+			nextStep = new NextStep(NextStep.Constants.forward_to, KPages.ExceptionAjaxPage, "");
 			return nextStep;
-		} else {
-			int queryLinesCounter = Integer.parseInt(request.getParameter("queryLinesCounter"));
-			QueryConversorClass conversor = new QueryConversorClass(connection, localUserName.getLocalUserName());
-			String msg = "";
+		}*/
 
-			// Parameters to be retrieved and saved:
-			// quantifier0, quantifier1, predicate, rfuzzyComputeOperator,
-			// rfuzzyComputeValue, aggregator;
-
-			conversor.subqueryEndTestAndSave();
-			msg += conversor.subqueryRetrieveAndSaveSubpart("selectQueryStartupType", request, QueryConversorClass.initialPredicate);
-			msg += conversor.subqueryRetrieveAndSaveSubpart("queryLines.selectAggregator", request, QueryConversorClass.aggregator);
-
-			for (int i = 0; i < queryLinesCounter; i++) {
-				conversor.subqueryEndTestAndSave();
-
-				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectQuantifier_0", request,
-						QueryConversorClass.quantifier0);
-				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectQuantifier_1", request,
-						QueryConversorClass.quantifier1);
-				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectPredicate", request,
-						QueryConversorClass.predicate);
-				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectRfuzzyComputeOperator", request,
-						QueryConversorClass.rfuzzyComputeOperator);
-				msg += conversor.subqueryRetrieveAndSaveSubpart("queryLine[" + i + "].selectRfuzzyComputeValue", request,
-						QueryConversorClass.rfuzzyComputeValue);
-			}
-			LOG.info(msg);
-
-			conversor.subqueryEndTestAndSave();
-			PLStructure query = conversor.queryConvert();
-			PLVariable[] variables = conversor.getListOfVariables();
-			String[] variablesNames = conversor.getListOfNamesForVariables();
-
-			connection.performQuery(plServerPath, query, programFilesPath, fileOwner, fileName, variables, variablesNames);
-			// performQuery(PLStructure query, String fileOwner, String
-			// fileName, PLVariable [] variables)
-
-			// Update the connection object in the session.
-			session.removeAttribute("connection");
-			session.setAttribute("connection", connection);
-
-			// Forward to the jsp page.
-			ServletsAuxMethodsClass.forward_to(KConstants.Pages.RunQueryAnswer, "", request, response, LOG);
-		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,8 +117,8 @@ public class DispatchersClass {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void filesList() throws Exception {
-		Iterator<ProgramFileInfo> filesListIterator = FilesMgmt.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(),
-				LOG);
+		Iterator<ProgramFileInfo> filesListIterator = FilesMgmt
+				.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(), LOG);
 		request.setAttribute("filesListIterator", filesListIterator);
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FilesListAnswer, "", request, response, LOG);

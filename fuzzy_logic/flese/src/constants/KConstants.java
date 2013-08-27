@@ -29,7 +29,7 @@ public class KConstants {
 		public static final int maxMemSize = 50000 * 1024;
 	}
 	
-	public static class Queries {
+	public static class CiaoPrologQuery {
 		public static long maximumNumberOfRetries = 9223372036854775807L;
 		public static long maximumNumberOfAnswers = 9223372036854775807L;
 		
@@ -38,4 +38,13 @@ public class KConstants {
 	public static class PlConnectionsPool {
 		public static int maxNumOfConnections = 10;
 	}
+	
+	public static class QueryParams {
+		public static String queryLinesCounter = "queryLinesCounter";
+	}
 }
+
+// **********************************
+// **********************************
+// **********************************
+

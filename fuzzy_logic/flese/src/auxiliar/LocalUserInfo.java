@@ -44,8 +44,8 @@ public class LocalUserInfo {
 		sessionStoreHouse.setLocalUserInfo(this);
 	}
 
-	public String setLocalUserName() {
-		return localUserName;
+	public String getLocalUserName() {
+		return this.localUserName;
 	}
 
 	/**

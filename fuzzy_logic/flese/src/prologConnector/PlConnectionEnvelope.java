@@ -123,10 +123,10 @@ public class PlConnectionEnvelope {
 				queryIsStillRunning = getQueryIsStillRunning(evaluatedGoal);
 				timesCounter++;
 
-			} while ((prologQueryAnswer == null) && queryIsStillRunning && (timesCounter < KConstants.Queries.maximumNumberOfRetries));
+			} while ((prologQueryAnswer == null) && queryIsStillRunning && (timesCounter < KConstants.CiaoPrologQuery.maximumNumberOfRetries));
 
-			if (timesCounter >= KConstants.Queries.maximumNumberOfRetries) {
-				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + KConstants.Queries.maximumNumberOfRetries);
+			if (timesCounter >= KConstants.CiaoPrologQuery.maximumNumberOfRetries) {
+				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + KConstants.CiaoPrologQuery.maximumNumberOfRetries);
 			}
 
 			msgsAccumulator += "goal: " + evaluatedGoal.toString() + "\n";
@@ -161,7 +161,7 @@ public class PlConnectionEnvelope {
 				msgsAccumulator += "answer obtained: null \n";
 			}
 
-		} while ((prologQueryAnswer != null) && (answersCounter < KConstants.Queries.maximumNumberOfAnswers));
+		} while ((prologQueryAnswer != null) && (answersCounter < KConstants.CiaoPrologQuery.maximumNumberOfAnswers));
 
 		LOG.info(msgsAccumulator);
 		// LOG.info("performQueryAux: terminating goal execution ...");
