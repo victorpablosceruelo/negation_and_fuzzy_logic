@@ -5,8 +5,9 @@ public class UrlMap {
 	private String keyString = null;
 	private String opValue = null;
 	private String incompleteUrl = null;
+	private String nextUrl = null;
 
-	public UrlMap(String keyString, String opValue, String incompleteUrl) {
+	public UrlMap(String keyString, String opValue, String incompleteUrl, String nextUrl) {
 
 		if (keyString == null)
 			keyString = "";
@@ -14,10 +15,13 @@ public class UrlMap {
 			opValue = "";
 		if (incompleteUrl == null)
 			incompleteUrl = "";
+		if (nextUrl == null)
+			nextUrl = "";
 
 		this.keyString = keyString;
 		this.opValue = opValue;
 		this.incompleteUrl = incompleteUrl;
+		this.nextUrl = nextUrl;
 	}
 
 	public String getKeyString() {

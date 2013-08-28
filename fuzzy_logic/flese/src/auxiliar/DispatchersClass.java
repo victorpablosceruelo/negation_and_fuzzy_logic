@@ -21,7 +21,7 @@ import storeHouse.SessionStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import constants.KConstants;
-import constants.KPages;
+import constants.KUrls;
 import conversors.ConversorToPrologQuery;
 import filesAndPaths.FilesMgmt;
 import filesAndPaths.ProgramFileInfo;
@@ -46,7 +46,7 @@ public class DispatchersClass {
 	 */
 	public NextStep emptyRequest() throws Exception {
 		// Forward to the jsp page.
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.SignedInAnswer, "");
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.SignedInAnswer, "");
 		return nextStep;
 	}
 
@@ -60,7 +60,7 @@ public class DispatchersClass {
 	 * @throws Exception
 	 */
 	public NextStep userOptionsRequest() throws Exception {
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.UserOptionsAnswer, "");
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.UserOptionsAnswer, "");
 		return nextStep;
 	}
 
@@ -83,7 +83,7 @@ public class DispatchersClass {
 		 */
 
 			// Forward to the jsp page.
-			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.introspectionQueryAnswer, "");
+			NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.introspectionQueryAnswer, "");
 			return nextStep;
 	}
 
@@ -101,7 +101,7 @@ public class DispatchersClass {
 		CiaoPrologNormalQuery.getInstance(sessionStoreHouse);
 
 		// Forward to the jsp page.
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KPages.RunQueryAnswer, "");
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.RunQueryAnswer, "");
 		return nextStep;
 
 		/*
@@ -117,8 +117,7 @@ public class DispatchersClass {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void filesList() throws Exception {
-		Iterator<ProgramFileInfo> filesListIterator = FilesMgmt
-				.returnFilesIterator(programFilesPath, localUserName.getLocalUserName(), LOG);
+		ProgramFileInfo [] programFiles = FilesMgmt.returnFilesIterator(sessionStoreHouse);
 		request.setAttribute("filesListIterator", filesListIterator);
 		// Forward to the jsp page.
 		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FilesListAnswer, "", request, response, LOG);

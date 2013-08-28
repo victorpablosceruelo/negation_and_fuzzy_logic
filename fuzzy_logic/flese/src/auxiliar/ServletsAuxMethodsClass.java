@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import urls.UrlMap;
 import auxiliar.NextStep.Constants;
-import constants.KPages;
+import constants.KUrls;
 
 public class ServletsAuxMethodsClass {
 
@@ -54,7 +54,7 @@ public class ServletsAuxMethodsClass {
 			LOG.error("-------------------------------------------------------------------");
 
 			try {
-				actionOnExceptionAux(KPages.SignOutRequest, "", e, request, response, LOG);
+				actionOnExceptionAux(KUrls.SignOutRequest, "", e, request, response, LOG);
 			} catch (Exception e3) {
 				LOG.error("-------------------------------------------------------------------");
 				LOG.error("Exception thrown inside actionOnException: " + e);

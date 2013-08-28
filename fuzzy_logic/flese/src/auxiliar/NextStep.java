@@ -7,12 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import servlets.DispatcherServlet;
+import servlets.Servlet;
 import urls.UrlMap;
 
 public class NextStep {
 
-	final Log LOG = LogFactory.getLog(DispatcherServlet.class);
+	final Log LOG = LogFactory.getLog(Servlet.class);
 
 	public static class Constants {
 		public final static int none = 0;

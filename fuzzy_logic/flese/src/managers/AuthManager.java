@@ -1,4 +1,4 @@
-package servlets;
+package managers;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
@@ -11,13 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.Permission;
 import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
+import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 
 import storeHouse.SessionStoreHouse;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import auxiliar.ServletsAuxMethodsClass;
 import constants.KConstants;
-import constants.KPages;
+import constants.KUrls;
 // import org.apache.commons.lang.StringUtils;
 // import org.brickred.socialauth.Profile;
 // import org.brickred.socialauth.Contact;
@@ -36,22 +37,15 @@ import constants.KPages;
  */
 // public class SocialAuthenticationAction extends Action {
 
-@WebServlet("/SocialAuthCallBackServlet")
-public class SocialAuthCallBackServlet extends HttpServlet {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(SocialAuthCallBackServlet.class);
-
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		doGetAndDoPost("doGet", request, response);
+public class AuthManager extends AbstractManager {
+ 
+	public AuthManager(String doAction, HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) {
+		super(doAction, request, response, servletContext);
 	}
 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		doGetAndDoPost("doPost", request, response);
-	}
+	private static final Log LOG = LogFactory.getLog(AuthManager.class);
+
+
 
 	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("--- " + doAction + " invocation ---");
@@ -67,7 +61,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 
 		} catch (Exception e) {
 			// socialAuthenticationSignOut(request, response, session);
-			ServletsAuxMethodsClass.actionOnException(KPages.SignOutRequest, "", e, request, response, LOG);
+			ServletsAuxMethodsClass.actionOnException(KUrls.SignOut, "", e, request, response, LOG);
 		}
 		LOG.info("--- " + doAction + " end ---");
 	}
@@ -110,7 +104,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
 
 		sessionStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
-		return new NextStep(NextStep.Constants.redirect_to, KPages.SignInRequest, "&id=" + providerId);
+		return new NextStep(NextStep.Constants.redirect_to, KUrls.SignInRequest, "&id=" + providerId);
 	}
 
 	private NextStep socialAuthenticationSignInOrContinue(SessionStoreHouse sessionStoreHouse) throws Exception {
@@ -123,14 +117,14 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		try {
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
-			return new NextStep(NextStep.Constants.forward_to, KPages.SignedInAnswer, "");
+			return new NextStep(NextStep.Constants.forward_to, KUrls.SignedInAnswer, "");
 		} catch (Exception e) {
 		}
 
 		// URL of YOUR application which will be called after authentication
 		String requestUrl = sessionStoreHouse.getRequestUrlString();
 		String serverName = sessionStoreHouse.getServerName();
-		String nextURL = KPages.SocialAuthenticationCallBackRequest.getFullUrl(requestUrl, serverName);
+		String nextURL = KUrls.SocialAuthenticationCallBackRequest.getFullUrl(requestUrl, serverName);
 
 		// Returns the host name of the server to which the request was
 		// sent.
@@ -174,7 +168,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 		if ("".equals(nextURL))
 			throw new Exception("nextURL is empty string.");
 
-		return new NextStep(NextStep.Constants.sendRedirect_to, KPages.EmptyPage, nextURL);
+		return new NextStep(NextStep.Constants.sendRedirect_to, KUrls.EmptyPage, nextURL);
 		// response.sendRedirect(nextURL);
 		// response.encodeRedirectURL( athenticationUrl );
 
@@ -186,7 +180,7 @@ public class SocialAuthCallBackServlet extends HttpServlet {
 
 		sessionStoreHouse.invalidateSession();
 
-		return new NextStep(NextStep.Constants.forward_to, KPages.SignedOutAnswer, "");
+		return new NextStep(NextStep.Constants.forward_to, KUrls.SignedOutAnswer, "");
 	}
 
 }
