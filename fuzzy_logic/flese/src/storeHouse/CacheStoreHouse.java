@@ -2,8 +2,12 @@ package storeHouse;
 
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class CacheStoreHouse {
 
+	private static final Log LOG = LogFactory.getLog(CacheStoreHouse.class);
 	private static HashMap<String, HashMap<String, HashMap<String, HashMap<String, Object>>>> storeHouse = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, Object>>>>();
 
 	/**
@@ -26,14 +30,17 @@ public class CacheStoreHouse {
 		boolean resetLevel4 = false;
 
 		if ((keyLevel2 == null) || ("".equals(keyLevel2))) {
+			LOG.info("Level 2 reset.");
 			resetLevel2 = true;
 		}
 
 		if ((keyLevel3 == null) || ("".equals(keyLevel3))) {
+			LOG.info("Level 3 reset.");
 			resetLevel3 = true;
 		}
 
 		if ((keyLevel4 == null) || ("".equals(keyLevel4))) {
+			LOG.info("Level 4 reset.");
 			resetLevel4 = true;
 		}
 
@@ -86,13 +93,16 @@ public class CacheStoreHouse {
 		String className = getKeyLevel1(keyLevel1);
 
 		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(className);
-		if (storeHouseL2 == null) return null;
+		if (storeHouseL2 == null)
+			return null;
 
 		HashMap<String, HashMap<String, Object>> storeHouseL3 = storeHouseL2.get(keyLevel2);
-		if (storeHouseL3 == null) return null;
+		if (storeHouseL3 == null)
+			return null;
 
 		HashMap<String, Object> storeHouseL4 = storeHouseL3.get(keyLevel3);
-		if (storeHouseL4 == null) return null;
+		if (storeHouseL4 == null)
+			return null;
 
 		Object object = storeHouseL4.get(keyLevel4);
 		return object;

@@ -23,7 +23,9 @@ public class UrlsMaps {
 	}
 
 	private static void storeMapping(UrlMap urlMap) throws Exception {
-		String key = urlMap.getKeyString();
+		String manager = urlMap.getManager();
+		String op = urlMap.getOp();
+		
 		String auxKey = key.toUpperCase(); // HashMap keys in uppercase.
 		CacheStoreHouse.store(UrlsMaps.class, auxKey, auxKey, auxKey, urlMap);
 	}

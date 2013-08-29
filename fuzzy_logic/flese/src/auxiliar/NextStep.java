@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import servlets.Servlet;
+import urls.AppUrl;
 import urls.UrlMap;
 
 public class NextStep {
@@ -46,10 +47,12 @@ public class NextStep {
 		if (response == null)
 			throw new Exception("response is null.");
 
-		String auxUrl = url.getUrl() + appended;
 		String requestUrl = request.getRequestURL().toString();
 		String serverName = request.getServerName();
-		String auxFullUrl = url.getFullUrl(requestUrl, serverName);
+		String appUrl = AppUrl.getAppUrl(requestUrl, serverName);
+
+		String auxUrl = url.getUrl() + appended;
+		String auxFullUrl = appUrl + auxUrl;
 
 		switch (this.action) {
 		case Constants.sendRedirect_to:

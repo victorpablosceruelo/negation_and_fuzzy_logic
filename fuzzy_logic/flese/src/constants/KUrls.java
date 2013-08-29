@@ -4,58 +4,86 @@ import urls.UrlMap;
 
 public class KUrls {
 
-	public static class Servlets {
-		public static final String MainServlet = "MainServlet";
-		public static final String AuthServlet = "AuthServlet";
-	}
 	public static class Pages {
-		public static final UrlMap EmptyPage = new UrlMap("emptyPage", "", "", "");
-		public static final UrlMap IndexPage = new UrlMap("indexPage", "", "", "index.jsp");
-		public static final UrlMap ExceptionAjaxPage = new UrlMap("exceptionAjaxPage", "", "", "WEB-INF/exceptionAjaxPage.jsp");
-		public static final UrlMap NullSessionAjaxPage = new UrlMap("nullSessionAjaxPage", "", "", "WEB-INF/nullSessionAjaxPage.jsp");
+		public static final UrlMap Empty = new UrlMap("", "emptyPage", null, null, "");
+		public static final UrlMap Index = new UrlMap("", "indexPage", null, null, "index.jsp");
+		public static final UrlMap Exception = new UrlMap("", "exception", null, null, "WEB-INF/exceptionAjaxPage.jsp");
+		public static final UrlMap NullSession = new UrlMap("", "nullSession", null, null, "WEB-INF/nullSessionAjaxPage.jsp");
+
+		public static UrlMap[] list = { Empty, Index, Exception, NullSession };
 	}
 
 	public static class Auth {
-		public static String servlet = Servlets.AuthServlet;
-		public static String manager = "";
-		public static final UrlMap AuthServlet = new UrlMap(servlet, manager, "", "", "", "");
-		public static final UrlMap SignIn = new UrlMap("signIn", "signin", AuthServlet.getKeyString(), "WEB-INF/signedIn.jsp");
-		public static final UrlMap SignOut = new UrlMap("signOut", "signout", "SocialAuthCallBackServlet", "WEB-INF/signedOut.jsp");
-		
-		public static UrlMap [] opsList = {AuthServlet, SignIn, SignOut};
+		public static String manager = "AuthManager";
+		public static final UrlMap SocialAuthCallback = new UrlMap("", "", null, null, "");
+
+		public static final UrlMap SignInPage = new UrlMap(manager, "signInPage", null, null, "WEB-INF/signedIn.jsp");
+		public static final UrlMap SignIn = new UrlMap(manager, "signIn", SignInPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/signedOut.jsp");
+		public static final UrlMap SignOut = new UrlMap(manager, "signOut", SignOutPage, KUrls.Pages.Exception, "");
+
+		public static UrlMap[] list = { SocialAuthCallback, SignInPage, SignIn, SignOutPage, SignOut };
 	}
 
 	public static class User {
 		public static String manager = "UserManager";
-		public static final UrlMap UserOptions = new UrlMap("userOptions", "userInfo", "DispatcherServlet", "WEB-INF/userOptions.jsp");
+
+		public static final UrlMap UserOptionsPage = new UrlMap(manager, "userOptionsPage", null, null, "WEB-INF/userOptions.jsp");
+		public static final UrlMap UserOptions = new UrlMap(manager, "userOptions", UserOptionsPage, KUrls.Pages.Exception, "");
+
+		public static UrlMap[] list = { UserOptionsPage, UserOptions };
 	}
 
 	public static class Files {
 		public static String manager = "FilesManager";
-		public static final UrlMap List = new UrlMap(manager, "list", "listProgramFiles", ,
-				"WEB-INF/filesList.jsp");
-		public static final UrlMap Upload = new UrlMap("fileUploadRequest", "fileUpload", "DispatcherServlet", "WEB-INF/fileUpload.jsp");
-		public static final UrlMap View = new UrlMap("fileViewRequest", "fileView", "DispatcherServlet", "WEB-INF/fileView.jsp");
-		public static final UrlMap Download = new UrlMap("fileDownloadRequest", "fileDownload", "DispatcherServlet",
-				"WEB-INF/fileDownload.jsp");
-		public static final UrlMap FileRemove = new UrlMap("fileRemoveRequest", "fileRemove", "DispatcherServlet", "WEB-INF/fileRemove.jsp");
+		public static final UrlMap ListPage = new UrlMap(manager, "listPage", null, null, "WEB-INF/files/list.jsp");
+		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap UploadPage = new UrlMap(manager, "uploadPage", null, null, "WEB-INF/files/upload.jsp");
+		public static final UrlMap Upload = new UrlMap(manager, "upload", UploadPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap ViewPage = new UrlMap(manager, "viewPage", null, null, "WEB-INF/files/view.jsp");
+		public static final UrlMap View = new UrlMap(manager, "view", ViewPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap DownloadPage = new UrlMap(manager, "downloadPage", null, null, "WEB-INF/files/download.jsp");
+		public static final UrlMap Download = new UrlMap(manager, "download", DownloadPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap RemovePage = new UrlMap(manager, "removePage", null, null, "WEB-INF/files/remove.jsp");
+		public static final UrlMap Remove = new UrlMap(manager, "remove", RemovePage, KUrls.Pages.Exception, "");
+
+		public static UrlMap[] list = { ListPage, List, UploadPage, Upload, ViewPage, View, DownloadPage, Download, RemovePage, Remove };
 	}
 
 	public static class Queries {
-		public static final UrlMap IntrospectionQuery = new UrlMap("introspectionQuery", "introspectionQuery", "DispatcherServlet",
-				"WEB-INF/programFileIntrospection.jsp");
-		public static final UrlMap RunQuery = new UrlMap("runQuery", "runQuery", "DispatcherServlet", "WEB-INF/runQuery.jsp");
+		public static String manager = "QueriesManager";
+
+		public static final UrlMap IntrospectionPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/introspection.jsp");
+		public static final UrlMap Introspection = new UrlMap(manager, "introspection", IntrospectionPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/runQuery.jsp");
+		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
+
+		public static UrlMap[] list = { IntrospectionPage, Introspection, EvaluatePage, Evaluate };
 	}
 
-	public static class Edit {
-		public static final UrlMap ListProgramFuzzifications = new UrlMap("listProgramFuzzifications", "listProgramFuzzifications",
-				"DispatcherServlet", "WEB-INF/listFuzzifications.jsp");
-		public static final UrlMap SaveProgramFuzzification = new UrlMap("saveProgramFuzzification", "saveProgramFuzzification",
-				"DispatcherServlet", "WEB-INF/saveFuzzification.jsp");
+	public static class Fuzzifications {
+		public static String manager = "FuzzificationsManager";
+
+		public static final UrlMap ListPage = new UrlMap(manager, "", null, null, "WEB-INF/listFuzzifications.jsp");
+		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap SavePage = new UrlMap(manager, "", null, null, "WEB-INF/saveFuzzification.jsp");
+		public static final UrlMap Save = new UrlMap(manager, "save", SavePage, KUrls.Pages.Exception, "");
+
+		public static UrlMap[] list = { ListPage, List, SavePage, Save };
 	}
 
-	public static final UrlMap[] pagesList = { EmptyPage, IndexPage, ExceptionAjaxPage, NullSessionAjaxPage, SocialAuthenticationCallBack,
-			SignIn, SignOut, UserOptions, ListProgramFiles, FileUpload, FileView, FileDownload, IntrospectionQuery, RunQuery,
-			ListProgramFuzzifications, SaveProgramFuzzification };
+	public static final UrlMap[] list() {
+		int size = Pages.list.length + Auth.list.length + User.list.length + Files.list.length + Queries.list.length
+				+ Fuzzifications.list.length;
+		UrlMap[] tmpList = new UrlMap[size];
+		return tmpList;
+	}
 
 }

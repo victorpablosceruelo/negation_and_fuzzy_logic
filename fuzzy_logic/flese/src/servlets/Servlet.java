@@ -82,7 +82,7 @@ public class Servlet extends HttpServlet {
 				nextStep = managerObject.getExceptionPage();
 			} else {
 				try {
-					nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.ExceptionAjaxPage, "");
+					nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
