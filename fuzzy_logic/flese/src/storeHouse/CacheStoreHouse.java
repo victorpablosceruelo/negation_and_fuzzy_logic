@@ -24,6 +24,10 @@ public class CacheStoreHouse {
 			String keyLevel4, Object object) throws CacheStoreHouseException {
 
 		String className = getKeyLevel1(keyLevel1);
+		className = getKey(className);
+		keyLevel2 = getKey(keyLevel2);
+		keyLevel3 = getKey(keyLevel3);
+		keyLevel4 = getKey(keyLevel4);
 
 		boolean resetLevel2 = false;
 		boolean resetLevel3 = false;
@@ -91,6 +95,11 @@ public class CacheStoreHouse {
 			throws CacheStoreHouseException {
 
 		String className = getKeyLevel1(keyLevel1);
+		className = getKey(className);
+		keyLevel2 = getKey(keyLevel2);
+		keyLevel3 = getKey(keyLevel3);
+		keyLevel4 = getKey(keyLevel4);
+
 
 		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(className);
 		if (storeHouseL2 == null)
@@ -139,6 +148,13 @@ public class CacheStoreHouse {
 		if ("".equals(className))
 			throw new CacheStoreHouseException("keyLevel1.getName cannot be empty string.");
 		return className;
+	}
+
+	
+	private static String getKey(String input) {
+		if (input == null) return "";
+		if ("".equals(input)) return "";
+		return input.toUpperCase();
 	}
 
 	// --------------

@@ -1,32 +1,35 @@
 package urls;
 
-public class UrlMap {
+import storeHouse.SessionStoreHouse;
+import constants.KConstants;
 
+public class UrlMap {
+	
 	private String manager = null;
 	private String op = null;
 	private UrlMap nextPage = null;
 	private UrlMap exceptionPage = null;
 	private String currentUrl = null;
 
-	protected UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage) throws UrlMapException {
+	protected UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage) {
 		initializeUrlMap(manager, op, nextPage, exceptionPage, "");
 	}
 
-	public UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) throws UrlMapException {
+	public UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) {
 		initializeUrlMap(manager, op, nextPage, exceptionPage, currentUrl);
 	}
+	
+	public UrlMap(SessionStoreHouse sessionStoreHouse) {
+		String manager = sessionStoreHouse.getRequestParameter(KConstants.Request.managerParam);
+		String op = sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam);
+		initializeUrlMap(manager, op, null, null, null);
+	}
 
-	private void initializeUrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) throws UrlMapException {
+	private void initializeUrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) {
 		if (manager == null)
-			throw new UrlMapException("manager cannot be null");
+			manager = "";
 		if (op == null)
-			throw new UrlMapException("op cannot be null");
-
-		if ("".equals(manager))
-			throw new UrlMapException("manager cannot be empty string");
-		if ("".equals(op))
-			throw new UrlMapException("op cannot be empty string");
-		
+			op = "";		
 		if (currentUrl == null)
 			currentUrl = "";
 
@@ -46,36 +49,21 @@ public class UrlMap {
 	};
 
 	public String getUrl(boolean isAjax) {
-		String url = null;
-		String opParam = null;
-		String isAjaxParam = null;
-
-		if (this.manager == "")
-			url = this.currentUrl;
-		else {
-			url = this.manager;
-		}
-
-		if (!"".equals(this.op)) {
-			opParam = "op=" + this.op;
-		}
-
-		if (isAjax) {
-			isAjaxParam = "ajax=true";
-		}
+				
+		UrlsTools urlTool = null;
 		
-		if ((opParam != null) && (isAjaxParam != null)) {
-			return url + "?" + opParam + "&" + isAjaxParam;
+		if ((this.currentUrl != null) && (! "".equals(this.currentUrl))) {
+			urlTool = new UrlsTools(this.currentUrl);
 		}
 		else {
-			if (opParam != null) {
-				return url + "?" + opParam;
-			}
-			if (isAjaxParam != null) {
-				return url + "?" + isAjaxParam;
-			}
+			urlTool = new UrlsTools(KConstants.servletName);
 		}
-		return url;
+
+		urlTool.addParam(KConstants.Request.managerParam, this.manager);
+		urlTool.addParam(KConstants.Request.operationParam, this.op);
+		urlTool.addParam(KConstants.Request.isAjaxParam, isAjax ? KConstants.Values.True : KConstants.Values.False);
+		
+		return urlTool.getResult();
 	};
 
 	public String getCurrentUrl() {

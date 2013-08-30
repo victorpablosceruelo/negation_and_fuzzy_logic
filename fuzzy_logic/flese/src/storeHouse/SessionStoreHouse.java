@@ -43,18 +43,18 @@ public class SessionStoreHouse {
 	}
 
 	public SessionStoreHouse(HttpServletRequest request, HttpServletResponse response, boolean create, ServletContext servletContext,
-			String doMethod) throws Exception {
+			String doMethod) throws SessionStoreHouseException {
 
 		if (request == null)
-			throw new Exception("request is null");
+			throw new SessionStoreHouseException("request is null");
 		if (response == null)
-			throw new Exception("response is null");
+			throw new SessionStoreHouseException("response is null");
 		if (servletContext == null)
-			throw new Exception("servletContext is null");
+			throw new SessionStoreHouseException("servletContext is null");
 		if (doMethod == null)
-			throw new Exception("doMethod is null");
+			throw new SessionStoreHouseException("doMethod is null");
 		if ((!"doGet".equals(doMethod)) && (!"doPost".equals(doMethod)))
-			throw new Exception("doMethod is not doGet nor doPost.");
+			throw new SessionStoreHouseException("doMethod is not doGet nor doPost.");
 
 		this.request = request;
 		this.response = response;
@@ -63,11 +63,27 @@ public class SessionStoreHouse {
 
 		session = request.getSession(create);
 		if (session == null)
-			throw new Exception("session is null. 'Create if null' has the value: " + create);
+			throw new SessionStoreHouseException("session is null. 'Create if null' has the value: " + create);
 
 		getRequestParameters();
 	}
 
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+	
+	public HttpServletResponse getResponse() {
+		return response;
+	}
+	
+	public ServletContext getServletContext() {
+		return servletContext;
+	}
+	
+	public String getDoMethod() {
+		return doMethod;
+	}
+	
 	private void getRequestParameters() {
 
 		requestParams = new HashMap<String, String[]>();
@@ -228,14 +244,14 @@ public class SessionStoreHouse {
 		return (LocalUserInfo) request.getAttribute(Constants.Session.localUserInfo);
 	}
 
-	public String getProviderId() throws Exception {
+	public String getProviderId() throws SessionStoreHouseException {
 		String providerId = (String) session.getAttribute(Constants.Session.socialAuthProviderId);
 
 		if ((providerId == null) || ("".equals(providerId)))
 			providerId = (String) request.getParameter(KConstants.Request.providerId);
 
 		if ((providerId == null) || ("".equals(providerId)))
-			throw new Exception("providerId is null in session and in request.");
+			throw new SessionStoreHouseException("providerId is null in session and in request.");
 
 		return providerId;
 	}

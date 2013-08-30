@@ -3,12 +3,24 @@ package constants;
 public class KConstants {
 
 	public static final String appPath = "flese/";
+	public static final String servletName = "/Servlet";
+	
+	public static final class Managers {
+		public static final String managerSuffix = "Manager";
+	}
 
+	public static class Values {
+		public static final String True = "true";
+		public static final String False = "false";
+	}
 	public static class Request {
+		public static final String managerParam = "manager";
 		public static final String operationParam = "op";
 		public static final String fileNameParam = "fileName";
 		public static final String fileOwnerParam = "fileOwner";
 		public static final String providerId = "id";
+		public static final String isAjaxParam = "ajax";
+		
 	}
 
 	public static class PathsMgmt {

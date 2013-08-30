@@ -1,5 +1,8 @@
 package constants;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
 import urls.UrlMap;
 
 public class KUrls {
@@ -10,7 +13,7 @@ public class KUrls {
 		public static final UrlMap Exception = new UrlMap("", "exception", null, null, "WEB-INF/exceptionAjaxPage.jsp");
 		public static final UrlMap NullSession = new UrlMap("", "nullSession", null, null, "WEB-INF/nullSessionAjaxPage.jsp");
 
-		public static UrlMap[] list = { Empty, Index, Exception, NullSession };
+		public static UrlMap[] urlsList = { Empty, Index, Exception, NullSession };
 	}
 
 	public static class Auth {
@@ -23,7 +26,7 @@ public class KUrls {
 		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/signedOut.jsp");
 		public static final UrlMap SignOut = new UrlMap(manager, "signOut", SignOutPage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] list = { SocialAuthCallback, SignInPage, SignIn, SignOutPage, SignOut };
+		public static UrlMap[] urlsList = { SocialAuthCallback, SignInPage, SignIn, SignOutPage, SignOut };
 	}
 
 	public static class User {
@@ -32,7 +35,7 @@ public class KUrls {
 		public static final UrlMap UserOptionsPage = new UrlMap(manager, "userOptionsPage", null, null, "WEB-INF/userOptions.jsp");
 		public static final UrlMap UserOptions = new UrlMap(manager, "userOptions", UserOptionsPage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] list = { UserOptionsPage, UserOptions };
+		public static UrlMap[] urlsList = { UserOptionsPage, UserOptions };
 	}
 
 	public static class Files {
@@ -52,7 +55,7 @@ public class KUrls {
 		public static final UrlMap RemovePage = new UrlMap(manager, "removePage", null, null, "WEB-INF/files/remove.jsp");
 		public static final UrlMap Remove = new UrlMap(manager, "remove", RemovePage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] list = { ListPage, List, UploadPage, Upload, ViewPage, View, DownloadPage, Download, RemovePage, Remove };
+		public static UrlMap[] urlsList = { ListPage, List, UploadPage, Upload, ViewPage, View, DownloadPage, Download, RemovePage, Remove };
 	}
 
 	public static class Queries {
@@ -64,7 +67,7 @@ public class KUrls {
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/runQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] list = { IntrospectionPage, Introspection, EvaluatePage, Evaluate };
+		public static UrlMap[] urlsList = { IntrospectionPage, Introspection, EvaluatePage, Evaluate };
 	}
 
 	public static class Fuzzifications {
@@ -76,14 +79,42 @@ public class KUrls {
 		public static final UrlMap SavePage = new UrlMap(manager, "", null, null, "WEB-INF/saveFuzzification.jsp");
 		public static final UrlMap Save = new UrlMap(manager, "save", SavePage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] list = { ListPage, List, SavePage, Save };
+		public static UrlMap[] urlsList = { ListPage, List, SavePage, Save };
 	}
 
-	public static final UrlMap[] list() {
-		int size = Pages.list.length + Auth.list.length + User.list.length + Files.list.length + Queries.list.length
-				+ Fuzzifications.list.length;
-		UrlMap[] tmpList = new UrlMap[size];
-		return tmpList;
+	public static final UrlMap[] urlsList() {
+		Class<?> [] subClasses = KUrls.class.getClasses();
+		ArrayList<UrlMap> fullList = new ArrayList<UrlMap>();
+		Field urlsListObject = null;
+		Object urlsListValues = null;
+		
+		for (int i=0; i<subClasses.length; i++) {
+			urlsListObject = null;
+			urlsListValues = null;
+			try {
+				urlsListObject = subClasses[i].getDeclaredField("urlsList");
+				if (urlsListObject != null) {
+					urlsListValues = urlsListObject.get(null);
+				}
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			
+			if ((urlsListValues != null) && (urlsListValues instanceof UrlMap[])) {
+				UrlMap[] aux = (UrlMap[]) urlsListValues;
+				for (int j=0; j<aux.length; j++) {
+					fullList.add(aux[j]);
+				}
+			}
+		}
+		
+		return fullList.toArray(new UrlMap [fullList.size()]);
 	}
 
 }

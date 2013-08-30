@@ -1,23 +1,13 @@
 package managers;
 
-import javax.servlet.ServletContext;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.Permission;
 import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
-import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 
-import storeHouse.SessionStoreHouse;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
-import auxiliar.ServletsAuxMethodsClass;
-import constants.KConstants;
 import constants.KUrls;
 // import org.apache.commons.lang.StringUtils;
 // import org.brickred.socialauth.Profile;
@@ -38,56 +28,14 @@ import constants.KUrls;
 // public class SocialAuthenticationAction extends Action {
 
 public class AuthManager extends AbstractManager {
- 
-	public AuthManager(String doAction, HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) {
-		super(doAction, request, response, servletContext);
+
+	public AuthManager() {
+		super();
 	}
 
 	private static final Log LOG = LogFactory.getLog(AuthManager.class);
 
-
-
-	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("--- " + doAction + " invocation ---");
-		NextStep nextStep = null;
-
-		try {
-			// Sessions management.
-			ServletContext servletContext = getServletConfig().getServletContext();
-			SessionStoreHouse sessionStoreHouse = new SessionStoreHouse(request, response, true, servletContext, doAction);
-
-			nextStep = socialAuthentication(sessionStoreHouse);
-			nextStep.takeAction(request, response);
-
-		} catch (Exception e) {
-			// socialAuthenticationSignOut(request, response, session);
-			ServletsAuxMethodsClass.actionOnException(KUrls.SignOut, "", e, request, response, LOG);
-		}
-		LOG.info("--- " + doAction + " end ---");
-	}
-
-	private NextStep socialAuthentication(SessionStoreHouse sessionStoreHouse) throws Exception {
-
-		// The parameter that tells us the operation.
-		if ("".equals(sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam))) {
-			return socialAuthenticationAuthenticate(sessionStoreHouse);
-		}
-
-		if ("signout".equals(sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam))) {
-			sessionStoreHouse.setRequestOp("");
-			return socialAuthenticationSignOut(sessionStoreHouse);
-		}
-
-		if ("signin".equals(sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam))) {
-			sessionStoreHouse.setRequestOp("");
-			return socialAuthenticationSignInOrContinue(sessionStoreHouse);
-		}
-
-		return null;
-
-	}
-
-	private NextStep socialAuthenticationAuthenticate(SessionStoreHouse sessionStoreHouse) throws Exception {
+	public NextStep authenticate() throws Exception {
 
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		String providerId = "";
@@ -104,10 +52,10 @@ public class AuthManager extends AbstractManager {
 		LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
 
 		sessionStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
-		return new NextStep(NextStep.Constants.redirect_to, KUrls.SignInRequest, "&id=" + providerId);
+		return new NextStep(NextStep.Constants.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId);
 	}
 
-	private NextStep socialAuthenticationSignInOrContinue(SessionStoreHouse sessionStoreHouse) throws Exception {
+	public NextStep signIn() throws Exception {
 
 		LOG.info("socialAuthenticationSignIn method call. ");
 
@@ -117,18 +65,18 @@ public class AuthManager extends AbstractManager {
 		try {
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
-			return new NextStep(NextStep.Constants.forward_to, KUrls.SignedInAnswer, "");
+			return new NextStep(NextStep.Constants.forward_to, KUrls.Auth.SignInPage, "");
 		} catch (Exception e) {
 		}
 
 		// URL of YOUR application which will be called after authentication
-		String requestUrl = sessionStoreHouse.getRequestUrlString();
-		String serverName = sessionStoreHouse.getServerName();
-		String nextURL = KUrls.SocialAuthenticationCallBackRequest.getFullUrl(requestUrl, serverName);
+		NextStep nextStep = new NextStep(NextStep.Constants.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
+		String nextURL = nextStep.getFullUrl(sessionStoreHouse.getRequest(), sessionStoreHouse.getResponse(), false);
 
 		// Returns the host name of the server to which the request was
 		// sent.
 
+		String serverName = sessionStoreHouse.getRequest().getServerName();
 		if ((serverName != null) && ("localhost".equals(serverName))) {
 			LOG.info("request.getServerName(): " + serverName);
 			sessionStoreHouse.setAppInTestingMode(true);
@@ -168,19 +116,32 @@ public class AuthManager extends AbstractManager {
 		if ("".equals(nextURL))
 			throw new Exception("nextURL is empty string.");
 
-		return new NextStep(NextStep.Constants.sendRedirect_to, KUrls.EmptyPage, nextURL);
+		return new NextStep(NextStep.Constants.sendRedirect_to, KUrls.Pages.Empty, nextURL);
 		// response.sendRedirect(nextURL);
 		// response.encodeRedirectURL( athenticationUrl );
 
 	}
 
-	private NextStep socialAuthenticationSignOut(SessionStoreHouse sessionStoreHouse) throws Exception {
+	public NextStep signOut() throws Exception {
 
 		LOG.info("socialAuthenticationSignOut method call. ");
 
 		sessionStoreHouse.invalidateSession();
 
-		return new NextStep(NextStep.Constants.forward_to, KUrls.SignedOutAnswer, "");
+		return new NextStep(NextStep.Constants.forward_to, KUrls.Auth.SignOutPage, "");
+	}
+
+	public NextStep getExceptionPage() {
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
+		return nextStep;
+	}
+
+	public NextStep byDefaultMethod() throws Exception {
+		return authenticate();
+	}
+
+	public boolean createSessionIfNull() {
+		return true;
 	}
 
 }
