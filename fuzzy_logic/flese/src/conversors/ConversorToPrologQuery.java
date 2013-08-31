@@ -12,7 +12,7 @@ import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import prologConnector.CiaoPrologQueryException;
 import prologConnector.PlConnectionEnvelopeException;
 import storeHouse.CacheStoreHouseException;
-import storeHouse.SessionStoreHouse;
+import storeHouse.RequestStoreHouse;
 import CiaoJava.PLAtom;
 import CiaoJava.PLFloat;
 import CiaoJava.PLInteger;
@@ -62,12 +62,12 @@ public class ConversorToPrologQuery {
 	private String queryComplexInfoString = null;
 	private String querySimpleInfoString = null;
 	private CiaoPrologProgramIntrospectionQuery ciaoPrologIntrospectionQuery = null;
-	private SessionStoreHouse sessionStoreHouse = null;
+	private RequestStoreHouse requestStoreHouse = null;
 
-	public ConversorToPrologQuery(SessionStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
+	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
 			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException {
 
-		this.sessionStoreHouse = sessionStoreHouse;
+		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
 
 		String queryLinesCounterString = sessionStoreHouse.getRequestParameter(KConstants.QueryParams.queryLinesCounter);
@@ -220,7 +220,7 @@ public class ConversorToPrologQuery {
 
 		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
 
-		String localUserName = sessionStoreHouse.getLocalUserInfo().getLocalUserName();
+		String localUserName = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
 		PLStructure subGoal3 = new PLStructure("assertLocalUserName", new PLTerm[] { new PLAtom("'" + localUserName + "'") });
 
 		initialSubQuery = new PrologSubQuery();

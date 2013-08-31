@@ -54,6 +54,16 @@ public class KConstants {
 	public static class QueryParams {
 		public static String queryLinesCounter = "queryLinesCounter";
 	}
+	
+	public static class Session {
+		public static String swAppInTestingMode = "swAppInTestingMode";
+		public static String socialAuthManager = "socialAuthManager";
+		public static String socialAuthProvider = "socialAuthProvider";
+		public static String socialAuthProviderId = "socialAuthProviderId";
+		public static String socialAuthProfile = "socialAuthProfile";
+		public static String localUserInfo = "localUserInfo";
+
+	}
 }
 
 // **********************************

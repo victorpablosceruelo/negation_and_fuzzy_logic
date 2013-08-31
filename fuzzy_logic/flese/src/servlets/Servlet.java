@@ -16,8 +16,8 @@ import managers.InterfaceManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import storeHouse.SessionStoreHouse;
-import storeHouse.SessionStoreHouseException;
+import storeHouse.RequestStoreHouse;
+import storeHouse.RequestStoreHouseException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
@@ -46,15 +46,15 @@ public class Servlet extends HttpServlet {
 		doGetAndDoPost("doPost", request, response);
 	}
 
-	private void doGetAndDoPost(String doAction, HttpServletRequest request, HttpServletResponse response) throws ServletException,
+	private void doGetAndDoPost(String doMethod, HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 
 		String managerName = request.getParameter(KConstants.Request.managerParam);
-		LOG.info("STARTS Servlet. doAction: " + doAction + " manager: " + (managerName != null ? managerName : ""));
+		LOG.info("STARTS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : ""));
 
 		NextStep nextStep;
 		InterfaceManager managerObject = getManager(managerName);
-		nextStep = processRequest(managerObject, doAction, request, response);
+		nextStep = processRequest(managerObject, doMethod, request, response);
 
 		if (nextStep == null) {
 			nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
@@ -67,10 +67,10 @@ public class Servlet extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		LOG.info("ENDS Servlet. doAction: " + doAction + " manager: " + (managerName != null ? managerName : ""));
+		LOG.info("ENDS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : ""));
 	}
 
-	private NextStep processRequest(InterfaceManager managerObject, String doAction, HttpServletRequest request,
+	private NextStep processRequest(InterfaceManager managerObject, String doMethod, HttpServletRequest request,
 			HttpServletResponse response) {
 		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
 		if (managerObject == null) {
@@ -81,10 +81,13 @@ public class Servlet extends HttpServlet {
 		// Create the session if the manager needs it.
 		boolean createSessionIfNull = managerObject.createSessionIfNull();
 		ServletContext servletContext = getServletConfig().getServletContext();
-		SessionStoreHouse sessionStoreHouse;
+		RequestStoreHouse sessionStoreHouse;
 		try {
-			sessionStoreHouse = new SessionStoreHouse(request, response, createSessionIfNull, servletContext, doAction);
-		} catch (SessionStoreHouseException e) {
+			sessionStoreHouse = new RequestStoreHouse(request, createSessionIfNull);
+			sessionStoreHouse.setResponse(response);
+			sessionStoreHouse.setServletContext(servletContext);
+			sessionStoreHouse.setDoMethod(doMethod);
+		} catch (RequestStoreHouseException e) {
 			e.printStackTrace();
 			return nextStep;
 		}

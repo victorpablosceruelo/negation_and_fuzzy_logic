@@ -1,6 +1,6 @@
 package managers;
 
-import storeHouse.SessionStoreHouse;
+import storeHouse.RequestStoreHouse;
 import auxiliar.NextStep;
 
 public interface InterfaceManager {
@@ -13,5 +13,5 @@ public interface InterfaceManager {
 
 	public boolean createSessionIfNull();
 
-	public void setSessionStoreHouse(SessionStoreHouse sessionStoreHouse);
+	public void setSessionStoreHouse(RequestStoreHouse sessionStoreHouse);
 }

@@ -1,10 +1,16 @@
 package managers;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.brickred.socialauth.AuthProvider;
 import org.brickred.socialauth.Permission;
+import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
+import org.brickred.socialauth.util.SocialAuthUtil;
 
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
@@ -29,31 +35,90 @@ import constants.KUrls;
 
 public class AuthManager extends AbstractManager {
 
+	private static final Log LOG = LogFactory.getLog(AuthManager.class);
+
 	public AuthManager() {
 		super();
 	}
 
-	private static final Log LOG = LogFactory.getLog(AuthManager.class);
+	public NextStep getExceptionPage() {
+		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
+		return nextStep;
+	}
+
+	public NextStep byDefaultMethod() throws Exception {
+		return authenticate();
+	}
+
+	public boolean createSessionIfNull() {
+		return true;
+	}
+	
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	public NextStep authenticate() throws Exception {
 
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		String providerId = "";
 
-		if (sessionStoreHouse.appIsInTestingMode()) {
-			sessionStoreHouse.addMessageForTheUser("INFO: Social Authentication in Testing mode.");
+		if (requestStoreHouse.session.appIsInTestingMode()) {
+			requestStoreHouse.addMessageForTheUser("INFO: Social Authentication in Testing mode.");
 		} else {
 			// get the social auth manager from session
-			providerId = sessionStoreHouse.tryAuthenticationWithSocialAuthManager();
+			providerId = tryAuthenticationWithSocialAuthManager();
 		}
 
 		// Test if we have an username or not.
 		@SuppressWarnings("unused")
-		LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
+		LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
 
-		sessionStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
+		requestStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
 		return new NextStep(NextStep.Constants.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId);
 	}
+	
+	private String tryAuthenticationWithSocialAuthManager() throws Exception {
+		SocialAuthManager socialAuthManager = requestStoreHouse.session.getSocialAuthManager();
+		if (socialAuthManager == null)
+			throw new Exception("Social Auth Manager is null");
+		else
+			requestStoreHouse.session.setSocialAuthManager(null);
+
+		// call connect method of manager which returns the provider object.
+		// Pass request parameter map while calling connect method.
+		AuthProvider authProvider = null;
+		try {
+			authProvider = socialAuthManager.connect(SocialAuthUtil.getRequestParametersMap(requestStoreHouse.getRequest()));
+		} catch (Exception e) {
+			authProvider = null;
+			e.printStackTrace();
+			throw new Exception("Error connecting social authentication provider.");
+		}
+
+		if (authProvider == null)
+			throw new Exception("provider is null");
+
+		// Retrieve the provider id to rebuild the initial query.
+		// NO: authManager.getCurrentAuthProvider().getProviderId();
+		String providerId = authProvider.getProviderId();
+		if (providerId == null)
+			throw new Exception("providerId is null");
+
+		Profile profile = authProvider.getUserProfile();
+		if (profile == null)
+			throw new Exception("profile is null");
+
+		// Save new computed results in session.
+		requestStoreHouse.session.setSocialAuthManager(socialAuthManager);
+		requestStoreHouse.session.setAuthProvider(authProvider);
+		requestStoreHouse.session.setProviderId(providerId);
+		requestStoreHouse.session.setUserProfile(profile);
+
+		return providerId;
+	}
+	
 
 	public NextStep signIn() throws Exception {
 
@@ -64,24 +129,24 @@ public class AuthManager extends AbstractManager {
 		// Test if we have signed in before and the session contains the info.
 		try {
 			@SuppressWarnings("unused")
-			LocalUserInfo localUserName = new LocalUserInfo(sessionStoreHouse);
+			LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
 			return new NextStep(NextStep.Constants.forward_to, KUrls.Auth.SignInPage, "");
 		} catch (Exception e) {
 		}
 
 		// URL of YOUR application which will be called after authentication
 		NextStep nextStep = new NextStep(NextStep.Constants.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
-		String nextURL = nextStep.getFullUrl(sessionStoreHouse.getRequest(), sessionStoreHouse.getResponse(), false);
+		String nextURL = nextStep.getFullUrl(requestStoreHouse.getRequest(), requestStoreHouse.getResponse(), false);
 
 		// Returns the host name of the server to which the request was
 		// sent.
 
-		String serverName = sessionStoreHouse.getRequest().getServerName();
+		String serverName = requestStoreHouse.getRequest().getServerName();
 		if ((serverName != null) && ("localhost".equals(serverName))) {
 			LOG.info("request.getServerName(): " + serverName);
-			sessionStoreHouse.setAppInTestingMode(true);
+			requestStoreHouse.session.setAppInTestingMode(true);
 		} else {
-			SocialAuthManager socialAuthManager = sessionStoreHouse.getSocialAuthManager();
+			SocialAuthManager socialAuthManager = requestStoreHouse.session.getSocialAuthManager();
 
 			if (socialAuthManager == null) {
 				// Create an instance of SocialAuthConfgi object
@@ -102,12 +167,12 @@ public class AuthManager extends AbstractManager {
 			// authentication.
 			// id can have values "facebook", "twitter", "yahoo" etc. or the
 			// OpenID URL
-			String providerId = sessionStoreHouse.getProviderId();
+			String providerId = requestStoreHouse.getProviderId();
 			socialAuthManager.setPermission(providerId, Permission.AUTHENTICATE_ONLY);
 			nextURL = socialAuthManager.getAuthenticationUrl(providerId, nextURL);
 
 			// Store in session.
-			sessionStoreHouse.setSocialAuthManager(socialAuthManager);
+			requestStoreHouse.session.setSocialAuthManager(socialAuthManager);
 
 		}
 
@@ -126,24 +191,35 @@ public class AuthManager extends AbstractManager {
 
 		LOG.info("socialAuthenticationSignOut method call. ");
 
-		sessionStoreHouse.invalidateSession();
+		invalidateSession();
 
 		return new NextStep(NextStep.Constants.forward_to, KUrls.Auth.SignOutPage, "");
 	}
 
-	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
-		return nextStep;
-	}
+	
+	private void invalidateSession() {
 
-	public NextStep byDefaultMethod() throws Exception {
-		return authenticate();
-	}
+		if (! requestStoreHouse.session.isNull()) {
+			SocialAuthManager authManager = requestStoreHouse.session.getSocialAuthManager();
+			if (authManager != null) {
+				List<String> connectedProvidersIds = authManager.getConnectedProvidersIds();
+				if (connectedProvidersIds != null) {
+					Iterator<String> connectedProvidersIdsIterator = connectedProvidersIds.iterator();
+					if (connectedProvidersIdsIterator != null) {
+						while (connectedProvidersIdsIterator.hasNext()) {
+							String id = connectedProvidersIdsIterator.next();
+							if (id != null) {
+								authManager.disconnectProvider(id);
+							}
+						}
+					}
+				}
+			}
+			// Invalidate the session.
+			requestStoreHouse.session.invalidateSession();
+		}
 
-	public boolean createSessionIfNull() {
-		return true;
 	}
-
 }
 
 // // EOF

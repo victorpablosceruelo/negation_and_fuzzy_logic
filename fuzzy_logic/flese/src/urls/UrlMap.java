@@ -1,6 +1,6 @@
 package urls;
 
-import storeHouse.SessionStoreHouse;
+import storeHouse.RequestStoreHouse;
 import constants.KConstants;
 
 public class UrlMap {
@@ -19,7 +19,7 @@ public class UrlMap {
 		initializeUrlMap(manager, op, nextPage, exceptionPage, currentUrl);
 	}
 	
-	public UrlMap(SessionStoreHouse sessionStoreHouse) {
+	public UrlMap(RequestStoreHouse sessionStoreHouse) {
 		String manager = sessionStoreHouse.getRequestParameter(KConstants.Request.managerParam);
 		String op = sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam);
 		initializeUrlMap(manager, op, null, null, null);
