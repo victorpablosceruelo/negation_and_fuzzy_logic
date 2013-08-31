@@ -21,22 +21,13 @@ public class NextStep {
 
 	final Log LOG = LogFactory.getLog(Servlet.class);
 
-	public static class Constants {
-		public final static int none = 0;
-		public final static int forward_to = 1;
-		public final static int redirect_to = 2;
-		public final static int redirect_to_with_session = 3;
-		public final static int sendRedirect_to = 4;
-		public final static int invalidAction = 5;
-	}
-
 	private int action = 0;
 	private UrlMap url = null;
 	private String appended = "";
 
 	public NextStep(int action, UrlMap url, String append) {
-		if ((action <= Constants.none) || (action >= Constants.invalidAction))
-			action = Constants.forward_to;
+		if ((action <= KConstants.NextStep.none) || (action >= KConstants.NextStep.invalidAction))
+			action = KConstants.NextStep.forward_to;
 		if (url == null)
 			url = KUrls.Pages.Exception;
 
@@ -56,24 +47,24 @@ public class NextStep {
 		String auxFullUrl = getFullUrl(request, response, isAjax);
 
 		switch (this.action) {
-		case Constants.sendRedirect_to:
+		case KConstants.NextStep.sendRedirect_to:
 			LOG.info("sendRedirect_to: " + auxUrl);
 			response.sendRedirect(auxUrl);
 			break;
-		case Constants.forward_to:
+		case KConstants.NextStep.forward_to:
 			LOG.info("forward_to: " + auxUrl);
 			RequestDispatcher dispatcher = request.getRequestDispatcher(auxUrl);
 			dispatcher.forward(request, response);
 			break;
-		case Constants.redirect_to:
+		case KConstants.NextStep.redirect_to:
 			LOG.info("redirect_to: " + auxFullUrl);
 			response.sendRedirect(auxFullUrl);
 			break;
-		case Constants.redirect_to_with_session:
+		case KConstants.NextStep.redirect_to_with_session:
 			LOG.info("redirect_to_with_session: " + auxFullUrl);
 			response.encodeRedirectURL(auxFullUrl);
 			break;
-		case Constants.none:
+		case KConstants.NextStep.none:
 		default:
 			LOG.info("No action to take. ");
 		}

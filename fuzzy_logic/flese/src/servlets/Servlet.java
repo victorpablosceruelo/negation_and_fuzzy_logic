@@ -57,7 +57,7 @@ public class Servlet extends HttpServlet {
 		nextStep = processRequest(managerObject, doMethod, request, response);
 
 		if (nextStep == null) {
-			nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
+			nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 			;
 		}
 		
@@ -72,7 +72,7 @@ public class Servlet extends HttpServlet {
 
 	private NextStep processRequest(InterfaceManager managerObject, String doMethod, HttpServletRequest request,
 			HttpServletResponse response) {
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		if (managerObject == null) {
 			return nextStep;
 		}

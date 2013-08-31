@@ -20,9 +20,9 @@ public class KConstants {
 		public static final String fileOwnerParam = "fileOwner";
 		public static final String providerId = "id";
 		public static final String isAjaxParam = "ajax";
-		
+		public static final String resultsStoreHouse = "resultsStoreHouse";
 	}
-
+	
 	public static class PathsMgmt {
 		public static final String[] programFilesValidPaths = { "/home/java-apps/fuzzy-search/",
 				System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/",
@@ -63,6 +63,15 @@ public class KConstants {
 		public static String socialAuthProfile = "socialAuthProfile";
 		public static String localUserInfo = "localUserInfo";
 
+	}
+	
+	public static class NextStep {
+		public final static int none = 0;
+		public final static int forward_to = 1;
+		public final static int redirect_to = 2;
+		public final static int redirect_to_with_session = 3;
+		public final static int sendRedirect_to = 4;
+		public final static int invalidAction = 5;
 	}
 }
 

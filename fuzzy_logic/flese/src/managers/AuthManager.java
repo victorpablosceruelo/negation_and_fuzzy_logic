@@ -12,8 +12,10 @@ import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
+import results.ResultsStoreHouseUtils;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
+import constants.KConstants;
 import constants.KUrls;
 // import org.apache.commons.lang.StringUtils;
 // import org.brickred.socialauth.Profile;
@@ -42,7 +44,7 @@ public class AuthManager extends AbstractManager {
 	}
 
 	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		return nextStep;
 	}
 
@@ -65,7 +67,7 @@ public class AuthManager extends AbstractManager {
 		String providerId = "";
 
 		if (requestStoreHouse.session.appIsInTestingMode()) {
-			requestStoreHouse.addMessageForTheUser("INFO: Social Authentication in Testing mode.");
+			ResultsStoreHouseUtils.addMessage(requestStoreHouse, "INFO: Social Authentication in Testing mode.");
 		} else {
 			// get the social auth manager from session
 			providerId = tryAuthenticationWithSocialAuthManager();
@@ -75,8 +77,8 @@ public class AuthManager extends AbstractManager {
 		@SuppressWarnings("unused")
 		LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
 
-		requestStoreHouse.addMessageForTheUser("Welcome to the FleSe application !!");
-		return new NextStep(NextStep.Constants.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId);
+		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Welcome to the FleSe application !!");
+		return new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId);
 	}
 	
 	private String tryAuthenticationWithSocialAuthManager() throws Exception {
@@ -130,12 +132,12 @@ public class AuthManager extends AbstractManager {
 		try {
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
-			return new NextStep(NextStep.Constants.forward_to, KUrls.Auth.SignInPage, "");
+			return new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignInPage, "");
 		} catch (Exception e) {
 		}
 
 		// URL of YOUR application which will be called after authentication
-		NextStep nextStep = new NextStep(NextStep.Constants.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
+		NextStep nextStep = new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
 		String nextURL = nextStep.getFullUrl(requestStoreHouse.getRequest(), requestStoreHouse.getResponse(), false);
 
 		// Returns the host name of the server to which the request was
@@ -181,7 +183,7 @@ public class AuthManager extends AbstractManager {
 		if ("".equals(nextURL))
 			throw new Exception("nextURL is empty string.");
 
-		return new NextStep(NextStep.Constants.sendRedirect_to, KUrls.Pages.Empty, nextURL);
+		return new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Pages.Empty, nextURL);
 		// response.sendRedirect(nextURL);
 		// response.encodeRedirectURL( athenticationUrl );
 
@@ -193,7 +195,7 @@ public class AuthManager extends AbstractManager {
 
 		invalidateSession();
 
-		return new NextStep(NextStep.Constants.forward_to, KUrls.Auth.SignOutPage, "");
+		return new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignOutPage, "");
 	}
 
 	

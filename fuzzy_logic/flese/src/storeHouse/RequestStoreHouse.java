@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import results.ResultsStoreHouse;
 import constants.KConstants;
 import filesAndPaths.FileInfoException;
 import filesAndPaths.ProgramFileInfo;
@@ -132,34 +133,17 @@ public class RequestStoreHouse {
 		return this.request.getServerName();
 	}
 
-	/**
-	 * Adds a message to the request session attribute msgs.
-	 * 
-	 * @param msg
-	 *            is the message to be added. Cannot be null.
-	 * @param LOG
-	 *            is the servlet logging facility. Can be null (but it is not
-	 *            recommended).
-	 */
-	public void addMessageForTheUser(String msg) {
+	public ResultsStoreHouse getResultsStoreHouse() {
+		ResultsStoreHouse resultsStoreHouse = (ResultsStoreHouse) request.getAttribute(KConstants.Request.resultsStoreHouse);
+		if (resultsStoreHouse == null)
+			resultsStoreHouse = new ResultsStoreHouse();
+		return resultsStoreHouse;
+	}
 
-		String[] currentMsgs = (String[]) request.getAttribute("msgs");
-		String[] newMsgs;
-		if (currentMsgs != null) {
-			newMsgs = new String[currentMsgs.length + 1];
-			for (int i = 0; i < currentMsgs.length; i++) {
-				newMsgs[i] = currentMsgs[i];
-			}
-			newMsgs[currentMsgs.length] = msg;
-			// Remove the old messages array.
-			request.removeAttribute("msgs");
-		} else {
-			newMsgs = new String[1];
-			newMsgs[0] = msg;
-		}
-		// Save the new messages array.
-		request.setAttribute("msgs", newMsgs);
-		// Log
+	public void setResultsStoreHouse(ResultsStoreHouse resultsStoreHouse) {
+		this.request.removeAttribute(KConstants.Request.resultsStoreHouse);
+		if (resultsStoreHouse != null)
+			this.request.setAttribute(KConstants.Request.resultsStoreHouse, resultsStoreHouse);
 	}
 
 	public String getProviderId() throws RequestStoreHouseException {

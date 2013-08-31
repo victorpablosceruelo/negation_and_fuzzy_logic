@@ -12,9 +12,11 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import results.ResultsStoreHouseUtils;
 import constants.KConstants;
 import constants.KUrls;
 import filesAndPaths.FilesMgmt;
+import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
 import auxiliar.CastingsClass;
 import auxiliar.NextStep;
@@ -27,7 +29,7 @@ public class FilesManager extends AbstractManager {
 
 	@Override
 	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(NextStep.Constants.forward_to, KUrls.Pages.Exception, "");
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		return nextStep;
 	}
 
@@ -47,14 +49,16 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	
-	public void filesList() throws Exception {
-		ProgramFileInfo [] programFiles = FilesMgmt.returnFilesIterator(requestStoreHouse);
-		request.setAttribute("filesListIterator", filesListIterator);
+	public NextStep list() throws PathsMgmtException {
+		ProgramFileInfo [] filesList = FilesMgmt.list(requestStoreHouse);
+		ResultsStoreHouseUtils.updateFilesList(requestStoreHouse, filesList);
+
 		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FilesListAnswer, "", request, response, LOG);
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.List, "");
+		return nextStep;
 	}
 
-	public void uploadFile() throws Exception {
+	public NextStep uploadFile() throws Exception {
 		String msg = "Program File has been uploaded.";
 		try {
 			uploadFileAux();
@@ -66,7 +70,7 @@ public class FilesManager extends AbstractManager {
 		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FileUploadAnswer, "", request, response, LOG);
 	}
 
-	public void uploadFileAux() throws Exception {
+	public NextStep uploadFileAux() throws Exception {
 		LOG.info("--- uploadFileAux invocation ---");
 		if ((doMethod == null) || ("doGet".equals(doMethod))) {
 			throw new ServletException("Uploads are only allowed using http post method.");
@@ -143,7 +147,7 @@ public class FilesManager extends AbstractManager {
 		}
 	}
 
-	public void downloadFile() throws Exception {
+	public NextStep downloadFile() throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
 
@@ -179,7 +183,7 @@ public class FilesManager extends AbstractManager {
 		op.close();
 	}
 
-	public void removeFile() throws Exception {
+	public NextStep removeFile() throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
 
@@ -188,7 +192,7 @@ public class FilesManager extends AbstractManager {
 
 	}
 
-	public void viewFile() throws Exception {
+	public NextStep viewFile() throws Exception {
 
 		testAndInitialize_fileName_and_fileOwner();
 
