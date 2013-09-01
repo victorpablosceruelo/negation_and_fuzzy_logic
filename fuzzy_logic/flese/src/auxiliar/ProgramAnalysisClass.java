@@ -188,7 +188,7 @@ public class ProgramAnalysisClass {
 			if (filePathAux.endsWith(".pl"))  filePathAux = filePathAux.substring(0, filePathAux.length() - ".pl".length());
 			
 			// Add the new suffix.
-			filePathAux = filePathAux + "_backup_" + ServletsAuxMethodsClass.getCurrentDate() + ".txt";
+			filePathAux = filePathAux + "_backup_" + Dates.getCurrentDate() + ".txt";
 			
 			// Rename the original file.
 			LOG.info("renaming " + filePath + " into " + filePathAux);
