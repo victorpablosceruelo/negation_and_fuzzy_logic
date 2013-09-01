@@ -1,11 +1,11 @@
 package managers;
 
+import storeHouse.CacheStoreHouseCleaner;
+import auxiliar.NextStep;
+import auxiliar.ProgramAnalysisClass;
 import constants.KConstants;
 import constants.KUrls;
 import filesAndPaths.ProgramFileInfo;
-import auxiliar.NextStep;
-import auxiliar.ProgramAnalysisClass;
-import auxiliar.ServletsAuxMethodsClass;
 
 public class FuzzificationsManager extends AbstractManager {
 
@@ -21,8 +21,7 @@ public class FuzzificationsManager extends AbstractManager {
 
 	@Override
 	public NextStep byDefaultMethod() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return list();
 	}
 
 	@Override
@@ -34,37 +33,40 @@ public class FuzzificationsManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void list() throws Exception {
+	public NextStep list() throws Exception {
 
-		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 
-		String filePath = FilesManagerAux.getFullPath(programFilesPath, fileOwner, fileName, false);
-		request.setAttribute("filePath", filePath);
+		// String filePath = FilesManagerAux.getFullPath(programFilesPath,
+		// fileOwner, fileName, false);
+		// request.setAttribute("filePath", filePath);
 
-		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.ListProgramFuzzificationsAnswer, "", request, response, LOG);
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.ListPage, "");
+		return nextStep;
+
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void saveProgramFuzzification() throws Exception {
+	public NextStep saveProgramFuzzification() throws Exception {
 
-		testAndInitialize_fileName_and_fileOwner();
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 
-		String filePath = FilesManagerAux.getFullPath(programFilesPath, fileOwner, fileName, false);
-		request.setAttribute("filePath", filePath);
+		// String filePath = FilesManagerAux.getFullPath(programFilesPath,
+		// fileOwner, fileName, false);
+		// request.setAttribute("filePath", filePath);
 
-		String predDefined = request.getParameter("predDefined");
+		String predDefined = requestStoreHouse.getRequestParameter("predDefined");
 		if (predDefined == null)
 			throw new Exception("predDefined is null.");
 
-		String predNecessary = request.getParameter("predNecessary");
+		String predNecessary = requestStoreHouse.getRequestParameter("predNecessary");
 		if (predNecessary == null)
 			throw new Exception("predNecessary is null.");
 
-		String predOwner = request.getParameter("predOwner");
+		String predOwner = requestStoreHouse.getRequestParameter("predOwner");
 		if (predOwner == null)
 			throw new Exception("predOwner is null.");
 
@@ -72,36 +74,35 @@ public class FuzzificationsManager extends AbstractManager {
 		String[][] params = null;
 		String paramsDebug = "Function definition to save: ";
 
-		while ((request.getParameter("fpx[" + counter + "]") != null) && (request.getParameter("fpy[" + counter + "]") != null)) {
+		while ((requestStoreHouse.getRequestParameter("fpx[" + counter + "]") != null)
+				&& (requestStoreHouse.getRequestParameter("fpy[" + counter + "]") != null)) {
 			counter++;
 		}
 
 		if (counter > 0) {
 			params = new String[counter][2];
 			for (int i = 0; i < counter; i++) {
-				params[i][0] = request.getParameter("fpx[" + i + "]");
-				params[i][1] = request.getParameter("fpy[" + i + "]");
+				params[i][0] = requestStoreHouse.getRequestParameter("fpx[" + i + "]");
+				params[i][1] = requestStoreHouse.getRequestParameter("fpy[" + i + "]");
 				paramsDebug += "\n" + params[i][0] + " -> " + params[i][1] + " ";
 			}
 		}
 
-		LOG.info(paramsDebug);
-
-		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(localUserName.getLocalUserName(), fileName, fileOwner, filePath);
+		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(requestStoreHouse);
 		programAnalized.updateProgramFile(predDefined, predNecessary, predOwner, params);
 
-		connection.clearCacheInCiaoPrologConnectionClass();
+		CacheStoreHouseCleaner.clean(requestStoreHouse);
 
 		/*
 		 * This is just to test if the send button produces errors. int j = 0;
 		 * while (true) { j++; }
 		 */
 
-		// Forward to the jsp page.
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.SaveProgramFuzzificationAnswer, "", request, response, LOG);
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, "");
+		return nextStep;
 
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

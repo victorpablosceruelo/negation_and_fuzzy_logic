@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 
 import results.ResultsStoreHouseUtils;
+import storeHouse.CacheStoreHouseCleaner;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
@@ -115,6 +116,8 @@ public class FilesManager extends AbstractManager {
 
 		programFileInfo.remove();
 		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "The program file " + programFileInfo.getFileName() + " has been removed. ");
+
+		CacheStoreHouseCleaner.clean(requestStoreHouse);
 
 		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, "");
 		return nextStep;

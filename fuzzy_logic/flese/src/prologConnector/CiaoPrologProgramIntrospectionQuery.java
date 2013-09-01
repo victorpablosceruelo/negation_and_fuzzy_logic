@@ -32,19 +32,25 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 		isProgramIntrospectionQuery = true;
 	}
 
-	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo fileInfo) throws CacheStoreHouseException, PathsMgmtException,
+	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException, PathsMgmtException,
 			CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException {
-		String fullPath = fileInfo.getProgramFileFullPath();
+		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
 
 		Object o = CacheStoreHouse.retrieve(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key);
 		CiaoPrologProgramIntrospectionQuery query = (CiaoPrologProgramIntrospectionQuery) o;
 		if (query == null) {
-			query = new CiaoPrologProgramIntrospectionQuery(fileInfo);
+			query = new CiaoPrologProgramIntrospectionQuery(programFileInfo);
 			PlConnectionsPool.launchQuery(query);
 			CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, query);
 		}
 		return query;
+	}
+	
+	public static void clearCacheInstance(ProgramFileInfo programFileInfo) throws PathsMgmtException, CacheStoreHouseException {
+		String fullPath = programFileInfo.getProgramFileFullPath();
+		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
+		CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, null);		
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

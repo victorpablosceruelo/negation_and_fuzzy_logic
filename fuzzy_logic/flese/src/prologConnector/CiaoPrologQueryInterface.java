@@ -7,12 +7,15 @@ import filesAndPaths.ProgramFileInfo;
 public interface CiaoPrologQueryInterface {
 
 	public PLStructure getQuery() throws CiaoPrologQueryException;
+
 	public ProgramFileInfo getProgramFileInfo();
-	
+
 	public PLVariable[] getVariables();
+
 	public String[] getVariablesNames();
+
 	public int getVariablesLength();
 
 	public void addQueryAnswer(AnswerTermInJavaClass answerTerm[]);
-	
+
 }

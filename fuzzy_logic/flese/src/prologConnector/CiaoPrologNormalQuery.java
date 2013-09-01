@@ -1,11 +1,11 @@
 package prologConnector;
 
-import auxiliar.LocalUserInfoException;
-import conversors.ConversorToPrologQuery;
-import conversors.QueryConversorException;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
+import auxiliar.LocalUserInfoException;
+import conversors.ConversorToPrologQuery;
+import conversors.QueryConversorException;
 import filesAndPaths.FileInfoException;
 import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
@@ -13,17 +13,18 @@ import filesAndPaths.ProgramFileInfo;
 public class CiaoPrologNormalQuery extends CiaoPrologQuery {
 
 	private CiaoPrologNormalQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
-		super(programFileInfo);		
+		super(programFileInfo);
 	}
 
-	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException, PathsMgmtException,
-			CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException, QueryConversorException, LocalUserInfoException {
-		
-		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
-		ConversorToPrologQuery conversor = new ConversorToPrologQuery(requestStoreHouse);
+	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException,
+			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException,
+			QueryConversorException, LocalUserInfoException {
 
+		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
 		String key1 = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
-		String key2 = conversor.getQueryComplexInfoString(); 
+
+		ConversorToPrologQuery conversor = new ConversorToPrologQuery(requestStoreHouse);
+		String key2 = conversor.getQueryComplexInfoString();
 
 		Object o = CacheStoreHouse.retrieve(CiaoPrologNormalQuery.class, fullPath, key1, key2);
 		CiaoPrologNormalQuery query = (CiaoPrologNormalQuery) o;
@@ -40,8 +41,14 @@ public class CiaoPrologNormalQuery extends CiaoPrologQuery {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
-	
+	public static void clearCacheInstance(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, CacheStoreHouseException,
+			FileInfoException, LocalUserInfoException {
+		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
+		// String key1 = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
+		String key1 = null;
+		CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, null, null);
+	}
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

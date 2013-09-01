@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import storeHouse.RequestStoreHouse;
+
 public class ProgramAnalysisClass {
 	final Log LOG = LogFactory.getLog(ProgramAnalysisClass.class);
 	
@@ -25,8 +27,9 @@ public class ProgramAnalysisClass {
 	 * @param filePath
 	 * @throws Exception when any of the previous is null or empty string.
 	 */
-	public ProgramAnalysisClass (String localUserName, String fileName, String fileOwner, String filePath) throws Exception {
+	public ProgramAnalysisClass (RequestStoreHouse requestStoreHouse) throws Exception {
 		
+		String localUserName; String fileName; String fileOwner; String filePath;
 		if (localUserName == null) throw new Exception("localUserName cannot be null.");
 		if (fileName == null) throw new Exception("fileName cannot be null.");
 		if (fileOwner == null) throw new Exception("fileOwner cannot be null.");
