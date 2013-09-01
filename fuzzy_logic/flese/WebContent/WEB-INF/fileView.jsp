@@ -10,19 +10,7 @@
 			<div class="fileViewTableRow">
 				<div class="fileViewTableCell">
 		<%
-			String filePath = (String) request.getAttribute("filePath");
-			if ((filePath != null) && ( ! ("".equals(filePath)))) {
-				BufferedReader reader = new BufferedReader(new FileReader(filePath));
-				String line;
-				while ((line = reader.readLine()) != null) {
-       				out.println(line);
-       				out.println("<br />");
-				}
-				reader.close();
-			}
-			else {
-				out.println("You are not allowed to see the contents of the file " + request.getAttribute("fileName"));
-			}
+
 				
 		%>
 				</div>

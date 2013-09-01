@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.LocalUserInfoException;
 import prologConnector.AnswerTermInJavaClass;
 import prologConnector.AnswerTermInJavaClassException;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
@@ -65,7 +66,7 @@ public class ConversorToPrologQuery {
 	private RequestStoreHouse requestStoreHouse = null;
 
 	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException {
+			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException, LocalUserInfoException {
 
 		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());

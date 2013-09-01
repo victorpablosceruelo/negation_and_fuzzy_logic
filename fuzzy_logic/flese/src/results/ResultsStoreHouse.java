@@ -8,6 +8,7 @@ public class ResultsStoreHouse {
 
 	ArrayList<String> messages = new ArrayList<String>();
 	ProgramFileInfo[] filesList = new ProgramFileInfo[0];
+	String [] fileContents = null;
 
 	/**
 	 * Adds a message to the request session attribute msgs.
@@ -22,10 +23,18 @@ public class ResultsStoreHouse {
 	}
 
 	public void setFilesList(ProgramFileInfo[] filesList) {
+		this.filesList = null;
 		if (filesList != null) {
 			this.filesList = filesList;
 		}
 		
+	}
+
+	public void setFileContents(String[] fileContents) {
+		this.fileContents = null;
+		if (fileContents != null) {
+			this.fileContents = fileContents;
+		}
 	}
 
 }

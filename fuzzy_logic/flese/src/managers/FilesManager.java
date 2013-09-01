@@ -3,24 +3,19 @@ package managers;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.List;
+import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import results.ResultsStoreHouseUtils;
+import auxiliar.LocalUserInfo;
+import auxiliar.LocalUserInfoException;
+import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
-import filesAndPaths.FilesMgmt;
+import filesAndPaths.FileInfoException;
 import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
-import auxiliar.CastingsClass;
-import auxiliar.NextStep;
-import auxiliar.ServletsAuxMethodsClass;
 
 public class FilesManager extends AbstractManager {
 
@@ -48,9 +43,8 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
-	public NextStep list() throws PathsMgmtException {
-		ProgramFileInfo [] filesList = FilesMgmt.list(requestStoreHouse);
+	public NextStep list() throws PathsMgmtException, LocalUserInfoException {
+		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		ResultsStoreHouseUtils.updateFilesList(requestStoreHouse, filesList);
 
 		// Forward to the jsp page.
@@ -60,118 +54,42 @@ public class FilesManager extends AbstractManager {
 
 	public NextStep uploadFile() throws Exception {
 		String msg = "Program File has been uploaded.";
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, "");
+
 		try {
-			uploadFileAux();
+			FilesManagerAux.uploadFileAux(requestStoreHouse);
 		} catch (Exception e) {
 			msg = "Error: " + e.getMessage();
+			nextStep = null;
 		}
-		LOG.info(msg);
-		request.setAttribute("uploadResult", msg);
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FileUploadAnswer, "", request, response, LOG);
+
+		ResultsStoreHouseUtils.addMessage(requestStoreHouse, msg);
+		return nextStep;
 	}
 
-	public NextStep uploadFileAux() throws Exception {
-		LOG.info("--- uploadFileAux invocation ---");
-		if ((doMethod == null) || ("doGet".equals(doMethod))) {
-			throw new ServletException("Uploads are only allowed using http post method.");
-		}
+	public NextStep download() throws Exception {
 
-		// Check that we have a file upload request
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		if (!isMultipart) {
-			throw new Exception("We cannot upload because the content of the request is not multipart.");
-		}
-
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		// maximum size that will be stored in memory
-		factory.setSizeThreshold(maxMemSize);
-		// Location to save data that is larger than maxMemSize.
-		// factory.setRepository(new File("/tmp/uploads"));
-		factory.setRepository(new File(programFilesPath));
-
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-		// maximum file size to be uploaded.
-		upload.setSizeMax(maxFileSize);
-
-		// Get the path where we are going to upload the file.
-		String filesPath = FilesMgmt.getFullPath(programFilesPath, localUserName.getLocalUserName(), null, true);
-		if ((filesPath == null) || ("".equals(filesPath))) {
-			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
-		} else {
-			if (!(filesPath.endsWith("/")))
-				filesPath += "/";
-		}
-
-		// Parse the request to get file items.
-		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(request));
-
-		// Process the uploaded file items
-		// Iterator<FileItem> i = fileItems.iterator();
-
-		// while ( i.hasNext () )
-		for (int i = 0; i < fileItems.size(); i++) {
-			// FileItem fileItem = (FileItem)i.next();
-			FileItem fileItem = fileItems.get(i);
-			if (!fileItem.isFormField()) {
-				// Get the uploaded file parameters
-				// String fieldName = fi.getFieldName();
-				String fileName = fileItem.getName();
-				if (fileName == null) {
-					throw new Exception("The name of the program file to upload is null.");
-				}
-				if ("".equals(fileName)) {
-					throw new Exception("The name of the program file to upload is an empty string.");
-				}
-				if (!fileName.endsWith(".pl")) {
-					throw new Exception("The name of the program file to upload must have the extension '.pl'.");
-				}
-				// ServletsAuxMethodsClass.addMessageToTheUser(request,
-				// "Please choose a correct program file. Allowed file extension is \'.pl\'",
-				// LOG);
-
-				// String fileNameReal = "";
-				// String contentType = fi.getContentType();
-				// boolean isInMemory = fi.isInMemory();
-				// long sizeInBytes = fi.getSize();
-				// Write the file
-				if (fileName.lastIndexOf("\\") >= 0) {
-					fileName = filesPath + fileName.substring(fileName.lastIndexOf("\\"));
-				} else
-					fileName = filesPath + fileName;
-
-				LOG.info("realFileName: " + fileName);
-				File file = new File(fileName);
-				fileItem.write(file);
-			}
-		}
-	}
-
-	public NextStep downloadFile() throws Exception {
-
-		testAndInitialize_fileName_and_fileOwner();
-
-		String FileNameWithPath = FilesMgmt.getFullPath(programFilesPath, fileOwner, fileName, false);
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		// request.getParameter("filename");
-		String browser_filename = fileName;
+		String browser_filename = programFileInfo.getProgramFileFullPath();
 
-		File f = new File(FileNameWithPath);
+		File f = new File(programFileInfo.getProgramFileFullPath());
 		int length = 0;
-		ServletOutputStream op = response.getOutputStream();
-		String mimetype = servletContext.getMimeType(FileNameWithPath);
+		ServletOutputStream op = requestStoreHouse.getResponse().getOutputStream();
+		String mimetype = requestStoreHouse.getServletContext().getMimeType(programFileInfo.getProgramFileFullPath());
 
 		//
 		// Set the response and go!
 		//
 		//
-		response.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
-		response.setContentLength((int) f.length());
-		response.setHeader("Content-Disposition", "attachment; filename=\"" + browser_filename + "\"");
+		requestStoreHouse.getResponse().setContentType((mimetype != null) ? mimetype : "application/octet-stream");
+		requestStoreHouse.getResponse().setContentLength((int) f.length());
+		requestStoreHouse.getResponse().setHeader("Content-Disposition", "attachment; filename=\"" + browser_filename + "\"");
 
 		//
 		// Stream to the requester.
 		//
-		byte[] bbuf = new byte[BUFSIZE];
+		byte[] bbuf = new byte[KConstants.Communications.BUFSIZE];
 		DataInputStream in = new DataInputStream(new FileInputStream(f));
 
 		while ((in != null) && ((length = in.read(bbuf)) != -1)) {
@@ -181,28 +99,52 @@ public class FilesManager extends AbstractManager {
 		in.close();
 		op.flush();
 		op.close();
+
+		NextStep nextStep = null;
+		return (nextStep);
 	}
 
-	public NextStep removeFile() throws Exception {
+	public NextStep remove() throws Exception {
 
-		testAndInitialize_fileName_and_fileOwner();
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
 
-		FilesMgmt.removeProgramFile(programFilesPath, fileOwner, fileName, localUserName.getLocalUserName());
-		ServletsAuxMethodsClass.addMessageToTheUser(request, "The program file " + fileName + " has been removed. ", LOG);
-
-	}
-
-	public NextStep viewFile() throws Exception {
-
-		testAndInitialize_fileName_and_fileOwner();
-
-		String filePath = null;
-		if (localUserName.getLocalUserName().equals(fileOwner)) {
-			filePath = FilesMgmt.getFullPath(programFilesPath, fileOwner, fileName, false);
+		if (!(localUserInfo.equals(programFileInfo.getFileOwner()))) {
+			throw new Exception("Logged user does not own the program file.");
 		}
-		request.setAttribute("filePath", filePath);
-		ServletsAuxMethodsClass.forward_to(KConstants.Pages.FileViewAnswer, "", request, response, LOG);
+
+		programFileInfo.remove();
+		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "The program file " + programFileInfo.getFileName() + " has been removed. ");
+
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, "");
+		return nextStep;
 	}
 
-	
+	public NextStep viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException {
+
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
+
+		String[] fileContents = null;
+		if (localUserInfo.equals(programFileInfo.getFileOwner())) {
+			try {
+				fileContents = programFileInfo.getFileContents();
+			} catch (PathsMgmtException e) {
+				e.printStackTrace();
+				throw e;
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new FilesManagerException(e.getMessage());
+			}
+			ResultsStoreHouseUtils.updateFileContents(requestStoreHouse, fileContents);
+		} else {
+			ResultsStoreHouseUtils.addMessage(requestStoreHouse,
+					"You are not allowed to see the contents of the file " + programFileInfo.getFileName());
+		}
+
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, "");
+		return nextStep;
+
+	}
+
 }

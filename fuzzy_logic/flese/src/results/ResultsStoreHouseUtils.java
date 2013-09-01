@@ -19,4 +19,11 @@ public class ResultsStoreHouseUtils {
 		requestStoreHouse.setResultsStoreHouse(resultsStoreHouse);
 	}
 
+	public static void updateFileContents(RequestStoreHouse requestStoreHouse, String[] fileContents) {
+
+		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse();
+		resultsStoreHouse.setFileContents(fileContents);
+		requestStoreHouse.setResultsStoreHouse(resultsStoreHouse);		
+	}
+
 }

@@ -7,6 +7,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import auxiliar.LocalUserInfoException;
 import results.ResultsStoreHouse;
 import constants.KConstants;
 import filesAndPaths.FileInfoException;
@@ -14,6 +19,7 @@ import filesAndPaths.ProgramFileInfo;
 
 public class RequestStoreHouse {
 
+	final Log LOG = LogFactory.getLog(RequestStoreHouse.class);
 	private HttpServletRequest request = null;
 	private HttpServletResponse response = null;
 	private ServletContext servletContext = null;
@@ -29,7 +35,7 @@ public class RequestStoreHouse {
 
 		this.request = request;
 		session = new SessionStoreHouse(request, create);
-		getRequestParameters();
+		copyRequestParameters();
 	}
 
 	public HttpServletRequest getRequest() {
@@ -83,13 +89,14 @@ public class RequestStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void getRequestParameters() {
+	private void copyRequestParameters() {
 
 		this.requestParams = new HashMap<String, String[]>();
 
 		String parameterName = null;
 		String[] valuesArrayIn = null;
 		String[] valuesArrayTmp = null;
+		StringBuilder logMsg = new StringBuilder();
 
 		if (this.request != null) {
 			// Get the values of all request parameters
@@ -100,18 +107,35 @@ public class RequestStoreHouse {
 					// Get the name of the request parameter
 					parameterName = (parametersEnum.nextElement()).toString();
 					valuesArrayIn = this.request.getParameterValues(parameterName);
-
+					logMsg.append("\n");
+					logMsg.append(parameterName);
+					logMsg.append(" = ");
 					if (valuesArrayIn != null) {
 						valuesArrayTmp = new String[valuesArrayIn.length];
+						int j = 0;
 						for (int i = 0; i < valuesArrayIn.length; i++) {
-							valuesArrayTmp[i] = valuesArrayIn[i];
+							if (i != 0)
+								logMsg.append(", ");
+							logMsg.append(valuesArrayIn[i]);
+							if ((valuesArrayIn[i] != null) && (!"".equals(valuesArrayIn[i]))) {
+								valuesArrayTmp[j] = valuesArrayIn[i];
+								j++;
+							}
 						}
-						this.requestParams.put(parameterName, valuesArrayTmp);
+						if (j != 0) {
+							this.requestParams.put(parameterName, valuesArrayTmp);
+						}
 					}
 					this.request.removeAttribute(parameterName);
 				}
 			}
 		}
+		LOG.info("copyRequestParameters: " + logMsg.toString());
+	}
+
+	public boolean requestIsMultipartContent() {
+		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+		return isMultipart;
 	}
 
 	public String getRequestParameter(String paramName) {
@@ -158,7 +182,7 @@ public class RequestStoreHouse {
 		return providerId;
 	}
 
-	public ProgramFileInfo getProgramFileInfo() throws FileInfoException {
+	public ProgramFileInfo getProgramFileInfo() throws FileInfoException, LocalUserInfoException {
 		String fileName = getRequestParameter(KConstants.Request.fileNameParam);
 		String fileOwner = getRequestParameter(KConstants.Request.fileOwnerParam);
 

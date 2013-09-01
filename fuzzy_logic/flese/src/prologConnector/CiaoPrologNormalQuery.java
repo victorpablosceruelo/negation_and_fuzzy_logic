@@ -1,5 +1,6 @@
 package prologConnector;
 
+import auxiliar.LocalUserInfoException;
 import conversors.ConversorToPrologQuery;
 import conversors.QueryConversorException;
 import storeHouse.CacheStoreHouse;
@@ -16,7 +17,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQuery {
 	}
 
 	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException, PathsMgmtException,
-			CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException, QueryConversorException {
+			CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException, QueryConversorException, LocalUserInfoException {
 		
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
 		ConversorToPrologQuery conversor = new ConversorToPrologQuery(requestStoreHouse);

@@ -179,7 +179,7 @@ public class PlConnectionEnvelope {
 
 	}
 
-	private void createPlConnection() throws PlConnectionEnvelopeException {
+	private void createPlConnection() throws PlConnectionEnvelopeException, PathsMgmtException {
 		String[] argv = new String[1];
 		argv[0] = this.pathsMgmt.getPlServerPath();
 

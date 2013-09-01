@@ -58,7 +58,6 @@ public class Servlet extends HttpServlet {
 
 		if (nextStep == null) {
 			nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
-			;
 		}
 		
 		try {

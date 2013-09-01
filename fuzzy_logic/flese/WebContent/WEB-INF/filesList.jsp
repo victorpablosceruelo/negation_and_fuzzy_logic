@@ -1,5 +1,5 @@
 <%@page import="java.util.Iterator"%> 
-<%@page import="filesAndPaths.FilesMgmt"%>
+<%@page import="managers.FilesManagerAux"%>
 <%@page import="filesAndPaths.ProgramFileInfo"%>
 
 // This file contains only JavaScript, and you should not see this.

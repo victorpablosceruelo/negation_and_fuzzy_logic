@@ -32,10 +32,10 @@ public class KUrls {
 	public static class User {
 		public static String manager = "UserManager";
 
-		public static final UrlMap UserOptionsPage = new UrlMap(manager, "userOptionsPage", null, null, "WEB-INF/userOptions.jsp");
-		public static final UrlMap UserOptions = new UrlMap(manager, "userOptions", UserOptionsPage, KUrls.Pages.Exception, "");
+		public static final UrlMap OptionsPage = new UrlMap(manager, "optionsPage", null, null, "WEB-INF/userOptions.jsp");
+		public static final UrlMap Options = new UrlMap(manager, "options", OptionsPage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] urlsList = { UserOptionsPage, UserOptions };
+		public static UrlMap[] urlsList = { OptionsPage, Options };
 	}
 
 	public static class Files {
