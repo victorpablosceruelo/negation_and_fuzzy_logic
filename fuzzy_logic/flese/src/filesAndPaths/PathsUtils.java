@@ -12,7 +12,7 @@ public class PathsUtils {
 		String result = null;
 		if (head.endsWith("/")) {
 			if (tail.startsWith("/")) {
-				result = head + tail.substring(1, tail.length() - 1);
+				result = head + tail.substring(1, tail.length());
 			} else {
 				result = head + tail;
 			}

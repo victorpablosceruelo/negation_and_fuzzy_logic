@@ -2,10 +2,11 @@ package constants;
 
 public class KConstants {
 
-	public static final String appPath = "flese/";
+	public static final String appPath = "/flese/";
 	public static final String servletName = "/Servlet";
 	
 	public static final class Managers {
+		public static final String managersPackage = "managers";
 		public static final String managerSuffix = "Manager";
 	}
 

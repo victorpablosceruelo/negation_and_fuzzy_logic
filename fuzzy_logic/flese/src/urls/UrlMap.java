@@ -59,12 +59,22 @@ public class UrlMap {
 			urlTool = new UrlsTools(KConstants.servletName);
 		}
 
-		urlTool.addParam(KConstants.Request.managerParam, this.manager);
+		urlTool.addParam(KConstants.Request.managerParam, removeManagerTail(this.manager));
 		urlTool.addParam(KConstants.Request.operationParam, this.op);
 		urlTool.addParam(KConstants.Request.isAjaxParam, isAjax ? KConstants.Values.True : KConstants.Values.False);
 		
 		return urlTool.getResult();
 	};
+	
+	private String removeManagerTail(String managerName) {
+		if ((managerName != null) && (!"".equals(managerName))) {
+			if (managerName.endsWith(KConstants.Managers.managerSuffix)) {
+				int end = managerName.length() - KConstants.Managers.managerSuffix.length();
+				managerName = managerName.substring(0, end);
+			}
+		}
+		return managerName;
+	}
 
 	public String getCurrentUrl() {
 		return this.currentUrl;

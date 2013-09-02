@@ -21,11 +21,13 @@ import storeHouse.RequestStoreHouseException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
+import filesAndPaths.PathsUtils;
 
 /**
  * Servlet implementation class
  */
-@WebServlet(KConstants.servletName)
+// @WebServlet(KConstants.servletName)
+@WebServlet("/Servlet")
 public class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	final Log LOG = LogFactory.getLog(Servlet.class);
@@ -113,7 +115,13 @@ public class Servlet extends HttpServlet {
 		InterfaceManager managerObject = null;
 
 		if (managerName != null) {
-			managerClass = (managerName + KConstants.Managers.managerSuffix).getClass();
+			String managerClassFullName = KConstants.Managers.managersPackage + "." + managerName + KConstants.Managers.managerSuffix;
+			try {
+				managerClass =  Class.forName(managerClassFullName);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				managerClass = null;
+			}
 		}
 
 		if (managerClass == null) {

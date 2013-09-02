@@ -1,7 +1,11 @@
 package urls;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
+import constants.KConstants;
 import constants.KUrls;
 
 public class UrlsMaps {
@@ -11,39 +15,52 @@ public class UrlsMaps {
 	private static String getManager(UrlMap urlMap) {
 		String manager = urlMap.getManager();
 		if ((manager == null) || ("".equals(manager)))
-			manager = "defaultManager";	
+			manager = "defaultManager";
 		return manager;
 	}
-	
+
 	private static String getOp(UrlMap urlMap) {
 		String op = urlMap.getOp();
 		if ((op == null) || ("".equals(op)))
-				op = "defaultOp";
+			op = "defaultOp";
 		return op;
 	}
-	
-	public static UrlMap getUrlMap(UrlMap urlMap) throws CacheStoreHouseException {
-		String manager = getManager(urlMap);
+
+	public static UrlMap getUrlMap(UrlMap urlMap) throws UrlMapException {
+		String manager = getManager(urlMap) + KConstants.Managers.managerSuffix;
 		String op = getOp(urlMap);
-		
+
 		if (!loaded) {
 			load(KUrls.urlsList());
 		}
 
-		return (UrlMap) CacheStoreHouse.retrieve(UrlsMaps.class, manager, manager, op);
+		try {
+			urlMap = (UrlMap) CacheStoreHouse.retrieve(UrlsMaps.class, manager, manager, op);
+		} catch (CacheStoreHouseException e) {
+			e.printStackTrace();
+			urlMap = null;
+		}
+		if (urlMap == null)
+			throw new UrlMapException("urlMap cannot be null.");
+		return urlMap;
 	}
 
-	private static void load(UrlMap[] pagesList) throws CacheStoreHouseException {
+	private static void load(UrlMap[] pagesList) {
 
 		for (int i = 0; i < pagesList.length; i++) {
-			storeMapping(pagesList[i]);
+			UrlMap page = pagesList[i];
+			try {
+				storeMapping(page);
+			} catch (CacheStoreHouseException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private static void storeMapping(UrlMap urlMap) throws CacheStoreHouseException {
 		String manager = getManager(urlMap);
 		String op = getOp(urlMap);
-		
+
 		CacheStoreHouse.store(UrlsMaps.class, manager, manager, op, urlMap);
 	}
 }

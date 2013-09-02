@@ -10,10 +10,9 @@
 	String fileOwner = (String) request.getAttribute("fileOwner");
 	String filePath = (String) request.getAttribute("filePath");
 	
-	ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(localUserName, fileName, fileOwner, filePath);
 	out.println("cleanUpFuzzificationFunctionsDefinitions();");
 	if (programAnalized != null) {
-		String [] fuzzifications = programAnalized.getProgramFuzzificationsInJS();
+		
 		if (fuzzifications != null) {
 	for (int i=0; i<fuzzifications.length; i++) {
 		out.println(fuzzifications[i]);

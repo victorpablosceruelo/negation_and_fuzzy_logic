@@ -1,5 +1,8 @@
 package urls;
 
+import constants.KConstants;
+import filesAndPaths.PathsUtils;
+
 public class UrlsTools {
 
 	private boolean hasParams;
@@ -7,7 +10,7 @@ public class UrlsTools {
 	
 	public UrlsTools(String url) {
 		this.url = new StringBuilder();
-		this.url.append(url);
+		this.url.append(PathsUtils.concatPathsStrings(KConstants.appPath, url));
 		hasParams = false;
 	}
 	
