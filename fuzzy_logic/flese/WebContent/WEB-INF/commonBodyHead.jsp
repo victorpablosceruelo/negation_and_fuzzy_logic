@@ -2,7 +2,7 @@
 <!-- beginning of commonBodyHead -->
 
 <%@page import="constants.KConstants"%>
-<%@page import="auxiliar.ServletsAuxMethodsClass"%>
+<%@page import="constants.KUrls"%>
 <script type="text/javascript">
 
 	function isString(o) {
@@ -18,10 +18,7 @@
 		var aLink = document.getElementById(aId);
 		if (aLink != null) aLink.href = href;
 	}
-
-<%
-
-%>
+	
 	function setupBodyHeadLoggedDiv(mainSectionDivId) {
 		var bodyHeadLoggedDiv = document.getElementById("bodyHeadLogged");
 		if (localUserName == null) {
@@ -33,11 +30,7 @@
 			"<a id='newQuery' title='new query' href='' onclick='return insertProgramFileSelection(\""+mainSectionDivId+"\");'>new query</a>";
 		}
 	}
-	
 
-	
-
-	
 </script>
 
 
@@ -58,32 +51,16 @@
 	else {
 		out.write("    var localUserName = null;\n");
 	}	
+				%>
 		</div>
-		<div id="bodyHeadLogout" class="bodyHeadTable"><a id="signOut" title="Sign out" 
-				href="<%= KConstants.Pages.SignOutRequest.getUrl() %>">Sign out</a>
+		<div id="bodyHeadLogout" class="bodyHeadTable">
+		<a id="signOut" title="Sign out" href="<%=KUrls.Auth.SignOut.getUrl(false)%>">Sign out</a>
 		</div>
 	</div>
 </header>
 <br />
 <section id="bodyToUserMsgs" class="bodyToUserMsgs">
-<%
-	if (request != null) {
-		if (request.getAttribute("msgs") != null) {
-			String [] msgs = (String []) request.getAttribute("msgs");
-			if (msgs.length > 0) {
-				out.write("<ul>");
-				for (int i=0; i<msgs.length; i++) {
-					out.write("<li>" + msgs[i] + "</li>");
-				}
-				out.write("</ul>");
-			}
-			request.removeAttribute("msgs");
-		}			
-	}
-	else {
-		out.write("ERROR: request is null.");
-	}
-%>
+
 </section>
 <br />
 

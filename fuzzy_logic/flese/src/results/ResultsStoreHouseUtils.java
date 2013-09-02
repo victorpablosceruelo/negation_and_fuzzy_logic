@@ -26,4 +26,11 @@ public class ResultsStoreHouseUtils {
 		requestStoreHouse.setResultsStoreHouse(resultsStoreHouse);		
 	}
 
+	public static void updateFuzzificationsList(RequestStoreHouse requestStoreHouse, String[] fuzzificationsList) {
+		
+		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse();
+		resultsStoreHouse.setFuzzificationsList(fuzzificationsList);
+		requestStoreHouse.setResultsStoreHouse(resultsStoreHouse);				
+	}
+
 }

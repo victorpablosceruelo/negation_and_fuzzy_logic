@@ -73,6 +73,12 @@ public class KConstants {
 		public final static int sendRedirect_to = 4;
 		public final static int invalidAction = 5;
 	}
+	
+	public static class Fuzzifications {
+		public final static String predDefined = "predDefined";
+		public final static String predNecessary = "predNecessary";
+		public final static String predOwner = "predOwner";
+	}
 }
 
 // **********************************

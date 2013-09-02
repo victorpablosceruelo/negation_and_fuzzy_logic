@@ -1,7 +1,7 @@
+<%@page import="constants.KUrls"%>
 <jsp:include page="commonHtmlHead.jsp" />
 
 <%@page import="constants.KConstants"%>
-<%@page import="auxiliar.ServletsAuxMethodsClass"%>
 
 	<script type="text/javascript">
 		function validate(obj){
@@ -95,15 +95,15 @@
     </div>
 
 	<script type="text/javascript">
-		setupHref ('facebookLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=facebook");
-		setupHref ('twitterLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=twitter");
-		setupHref ('gmailLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=google");
-		setupHref ('yahooLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=yahoo");
-		setupHref ('hotmailLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=hotmail");
-		setupHref ('linkedinLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=linkedin");
-		setupHref ('foursquareLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=foursquare");
-		setupHref ('myspaceLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=myspace");
-		setupHref ('mendeleyLink', "<%= KConstants.Pages.SignInRequest.getUrl() %>" + "&id=mendeley");
+		setupHref ('facebookLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=facebook");
+		setupHref ('twitterLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=twitter");
+		setupHref ('gmailLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=google");
+		setupHref ('yahooLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=yahoo");
+		setupHref ('hotmailLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=hotmail");
+		setupHref ('linkedinLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=linkedin");
+		setupHref ('foursquareLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=foursquare");
+		setupHref ('myspaceLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=myspace");
+		setupHref ('mendeleyLink', "<%= KUrls.Auth.SignIn.getUrl(false) %>" + "&id=mendeley");
 		showMsgsToTheUser();
 	</script>
 	

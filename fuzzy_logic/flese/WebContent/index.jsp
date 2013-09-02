@@ -1,3 +1,4 @@
+<%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <jsp:include page="WEB-INF/commonHtmlHead.jsp" />
 
@@ -11,9 +12,8 @@
 	<span class="underline">Se</span>arches in Databases
 </div>
 <br /><br />
-<%@page import="auxiliar.ServletsAuxMethodsClass"%>
 <div class='indexPageImportantLink'>
-<a class='indexPageImportantLink' href="<%=KConstants.Pages.SignOutRequest.getFullUrl(request, null) %>">Go to the application</a>
+<a class='indexPageImportantLink' href="<%=KUrls.Auth.SignOut.getUrl(false) %>">Go to the application</a>
 </div>
 <br />
 <br />
