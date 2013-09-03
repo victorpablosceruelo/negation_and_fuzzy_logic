@@ -48,8 +48,8 @@ public class AuthManager extends AbstractManager {
 		return nextStep;
 	}
 
-	public NextStep byDefaultMethod() throws Exception {
-		return authenticate();
+	public void byDefaultMethod() throws Exception {
+		authenticate();
 	}
 
 	public boolean createSessionIfNull() {
@@ -61,7 +61,7 @@ public class AuthManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	public NextStep authenticate() throws Exception {
+	public void authenticate() throws Exception {
 
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		String providerId = "";
@@ -78,7 +78,7 @@ public class AuthManager extends AbstractManager {
 		LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
 
 		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Welcome to the FleSe application !!");
-		return new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId);
+		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
 	}
 	
 	private String tryAuthenticationWithSocialAuthManager() throws Exception {
@@ -122,7 +122,7 @@ public class AuthManager extends AbstractManager {
 	}
 	
 
-	public NextStep signIn() throws Exception {
+	public void signIn() throws Exception {
 
 		LOG.info("socialAuthenticationSignIn method call. ");
 
@@ -132,7 +132,7 @@ public class AuthManager extends AbstractManager {
 		try {
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
-			return new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignInPage, "");
+			setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignInPage, ""));
 		} catch (Exception e) {
 		}
 
@@ -183,19 +183,19 @@ public class AuthManager extends AbstractManager {
 		if ("".equals(nextURL))
 			throw new Exception("nextURL is empty string.");
 
-		return new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Pages.Empty, nextURL);
+		setNextStep(new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Pages.Empty, nextURL));
 		// response.sendRedirect(nextURL);
 		// response.encodeRedirectURL( athenticationUrl );
 
 	}
 
-	public NextStep signOut() throws Exception {
+	public void signOut() throws Exception {
 
 		LOG.info("socialAuthenticationSignOut method call. ");
 
 		invalidateSession();
 
-		return new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignOutPage, "");
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignOutPage, ""));
 	}
 
 	

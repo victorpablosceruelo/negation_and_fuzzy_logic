@@ -1,8 +1,5 @@
 package urls;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import constants.KConstants;

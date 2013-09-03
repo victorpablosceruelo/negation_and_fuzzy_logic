@@ -17,8 +17,8 @@ public class UserManager extends AbstractManager {
 	}
 
 	@Override
-	public NextStep byDefaultMethod() throws Exception {
-		return options();
+	public void byDefaultMethod() throws Exception {
+		options();
 	}
 
 	@Override
@@ -30,9 +30,8 @@ public class UserManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public NextStep options() throws Exception {
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.User.OptionsPage, "");
-		return nextStep;
+	public void options() throws Exception {
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.User.OptionsPage, ""));
 	}
 
 }

@@ -5,11 +5,15 @@ import auxiliar.NextStep;
 
 public interface InterfaceManager {
 
-	public NextStep processRequest() throws Exception;
+	public NextStep processRequest();
+	
+	public NextStep getNextStep();
+	
+	public void setNextStep(NextStep nextStep);
 
 	public NextStep getExceptionPage();
 	
-	public NextStep byDefaultMethod() throws Exception;
+	public void byDefaultMethod() throws Exception;
 
 	public boolean createSessionIfNull();
 

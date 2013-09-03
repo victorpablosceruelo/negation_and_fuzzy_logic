@@ -20,8 +20,8 @@ public class FuzzificationsManager extends AbstractManager {
 	}
 
 	@Override
-	public NextStep byDefaultMethod() throws Exception {
-		return list();
+	public void byDefaultMethod() throws Exception {
+		list();
 	}
 
 	@Override
@@ -33,14 +33,13 @@ public class FuzzificationsManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public NextStep list() throws Exception {
+	public void list() throws Exception {
 
 		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(requestStoreHouse);
 		String[] fuzzificationsList = programAnalized.getProgramFuzzificationsInJS();
 		ResultsStoreHouseUtils.updateFuzzificationsList(requestStoreHouse, fuzzificationsList);
 
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.ListPage, "");
-		return nextStep;
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.ListPage, ""));
 
 	}
 
@@ -48,7 +47,7 @@ public class FuzzificationsManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public NextStep saveProgramFuzzification() throws Exception {
+	public void saveProgramFuzzification() throws Exception {
 
 		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(requestStoreHouse);
 		programAnalized.updateProgramFile();
@@ -60,8 +59,7 @@ public class FuzzificationsManager extends AbstractManager {
 		 * while (true) { j++; }
 		 */
 
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, "");
-		return nextStep;
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, ""));
 
 	}
 

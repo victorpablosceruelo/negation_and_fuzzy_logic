@@ -30,9 +30,8 @@ public class FilesManager extends AbstractManager {
 	}
 
 	@Override
-	public NextStep byDefaultMethod() throws Exception {
-
-		return null;
+	public void byDefaultMethod() throws Exception {
+		list();
 	}
 
 	@Override
@@ -44,31 +43,30 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public NextStep list() throws PathsMgmtException, LocalUserInfoException {
+	public void list() throws PathsMgmtException, LocalUserInfoException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		ResultsStoreHouseUtils.updateFilesList(requestStoreHouse, filesList);
 
 		// Forward to the jsp page.
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.List, "");
-		return nextStep;
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.List, ""));
 	}
 
-	public NextStep uploadFile() throws Exception {
+	public void uploadFile() throws Exception {
 		String msg = "Program File has been uploaded.";
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, "");
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
 
 		try {
 			FilesManagerAux.uploadFileAux(requestStoreHouse);
 		} catch (Exception e) {
 			msg = "Error: " + e.getMessage();
-			nextStep = null;
+			setNextStep(null);
 		}
 
 		ResultsStoreHouseUtils.addMessage(requestStoreHouse, msg);
-		return nextStep;
+
 	}
 
-	public NextStep download() throws Exception {
+	public void download() throws Exception {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		// request.getParameter("filename");
@@ -101,11 +99,11 @@ public class FilesManager extends AbstractManager {
 		op.flush();
 		op.close();
 
-		NextStep nextStep = null;
-		return (nextStep);
+		// We write the destiny. Do not look for a Next Step.
+		setNextStep(null);
 	}
 
-	public NextStep remove() throws Exception {
+	public void remove() throws Exception {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
@@ -119,11 +117,10 @@ public class FilesManager extends AbstractManager {
 
 		CacheStoreHouseCleaner.clean(requestStoreHouse);
 
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, "");
-		return nextStep;
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 
-	public NextStep viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException {
+	public void viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
@@ -145,9 +142,7 @@ public class FilesManager extends AbstractManager {
 					"You are not allowed to see the contents of the file " + programFileInfo.getFileName());
 		}
 
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, "");
-		return nextStep;
-
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, ""));
 	}
 
 }

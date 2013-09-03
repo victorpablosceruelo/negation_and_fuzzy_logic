@@ -19,8 +19,8 @@ public class QueriesManager extends AbstractManager {
 	}
 
 	@Override
-	public NextStep byDefaultMethod() throws Exception {
-		return introspection();
+	public void byDefaultMethod() throws Exception {
+		introspection();
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class QueriesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public NextStep introspection() throws Exception {
+	public void introspection() throws Exception {
 
 		CiaoPrologProgramIntrospectionQuery.getInstance(requestStoreHouse.getProgramFileInfo());
 
@@ -44,19 +44,16 @@ public class QueriesManager extends AbstractManager {
 		 */
 
 		// Forward to the jsp page.
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.IntrospectionPage, "");
-		return nextStep;
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.IntrospectionPage, ""));
 	}
 	
-	public NextStep evaluate() throws Exception {
+	public void evaluate() throws Exception {
 
 		// CiaoPrologNormalQuery query = 
 		CiaoPrologNormalQuery.getInstance(requestStoreHouse);
 
 		// Forward to the jsp page.
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, "");
-		return nextStep;
-
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, ""));
 	}
 	
 }

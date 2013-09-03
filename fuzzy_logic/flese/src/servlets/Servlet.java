@@ -21,7 +21,6 @@ import storeHouse.RequestStoreHouseException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
-import filesAndPaths.PathsUtils;
 
 /**
  * Servlet implementation class
@@ -54,18 +53,15 @@ public class Servlet extends HttpServlet {
 		String managerName = request.getParameter(KConstants.Request.managerParam);
 		LOG.info("STARTS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : ""));
 
-		NextStep nextStep;
 		InterfaceManager managerObject = getManager(managerName);
-		nextStep = processRequest(managerObject, doMethod, request, response);
+		NextStep nextStep = processRequest(managerObject, doMethod, request, response);
 
-		if (nextStep == null) {
-			nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
-		}
-		
-		try {
-			nextStep.takeAction(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (nextStep != null) {
+			try {
+				nextStep.takeAction(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		LOG.info("ENDS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : ""));
@@ -73,11 +69,10 @@ public class Servlet extends HttpServlet {
 
 	private NextStep processRequest(InterfaceManager managerObject, String doMethod, HttpServletRequest request,
 			HttpServletResponse response) {
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
+
 		if (managerObject == null) {
-			return nextStep;
+			return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		}
-		nextStep = managerObject.getExceptionPage();
 
 		// Create the session if the manager needs it.
 		boolean createSessionIfNull = managerObject.createSessionIfNull();
@@ -90,22 +85,14 @@ public class Servlet extends HttpServlet {
 			sessionStoreHouse.setDoMethod(doMethod);
 		} catch (RequestStoreHouseException e) {
 			e.printStackTrace();
-			return nextStep;
+			return managerObject.getExceptionPage();
 		}
 
 		// By-pass parameters to the manager.
 		managerObject.setSessionStoreHouse(sessionStoreHouse);
 
 		// Dispatch the query.
-		try {
-			nextStep = managerObject.processRequest();
-		} catch (Exception e) {
-			e.printStackTrace();
-			nextStep = null;
-		}
-		if (nextStep == null)
-			nextStep = managerObject.getExceptionPage();
-		return nextStep;
+		return managerObject.processRequest();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -117,7 +104,7 @@ public class Servlet extends HttpServlet {
 		if (managerName != null) {
 			String managerClassFullName = KConstants.Managers.managersPackage + "." + managerName + KConstants.Managers.managerSuffix;
 			try {
-				managerClass =  Class.forName(managerClassFullName);
+				managerClass = Class.forName(managerClassFullName);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				managerClass = null;

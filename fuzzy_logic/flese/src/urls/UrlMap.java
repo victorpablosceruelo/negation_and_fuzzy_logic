@@ -48,15 +48,15 @@ public class UrlMap {
 		return this.op;
 	};
 
-	public String getUrl(boolean isAjax) {
+	public String getUrl(boolean withSubPath, boolean isAjax) {
 				
 		UrlsTools urlTool = null;
 		
 		if ((this.currentUrl != null) && (! "".equals(this.currentUrl))) {
-			urlTool = new UrlsTools(this.currentUrl);
+			urlTool = new UrlsTools(withSubPath, this.currentUrl);
 		}
 		else {
-			urlTool = new UrlsTools(KConstants.servletName);
+			urlTool = new UrlsTools(withSubPath, KConstants.servletName);
 		}
 
 		urlTool.addParam(KConstants.Request.managerParam, removeManagerTail(this.manager));

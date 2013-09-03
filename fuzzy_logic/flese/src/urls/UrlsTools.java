@@ -8,9 +8,16 @@ public class UrlsTools {
 	private boolean hasParams;
 	private StringBuilder url;
 	
-	public UrlsTools(String url) {
+	public UrlsTools(boolean withSubPath, String url) {
 		this.url = new StringBuilder();
-		this.url.append(PathsUtils.concatPathsStrings(KConstants.appPath, url));
+		String path;
+		if (withSubPath) {
+			path = PathsUtils.concatPathsStrings(KConstants.appPath, url);
+		}
+		else {
+			path = url;
+		}
+		this.url.append(path);
 		hasParams = false;
 	}
 	

@@ -52,6 +52,7 @@ public class NextStep {
 			response.sendRedirect(auxUrl);
 			break;
 		case KConstants.NextStep.forward_to:
+			auxUrl = getUrl(false, isAjax);
 			LOG.info("forward_to: " + auxUrl);
 			RequestDispatcher dispatcher = request.getRequestDispatcher(auxUrl);
 			dispatcher.forward(request, response);
@@ -71,7 +72,11 @@ public class NextStep {
 	}
 
 	public String getUrl(boolean isAjax) {
-		return url.getUrl(isAjax) + appended;
+		return getUrl(true, isAjax);
+	}
+	
+	public String getUrl(boolean withSubPath, boolean isAjax) {
+		return url.getUrl(withSubPath, isAjax) + appended;
 	}
 	
 	public String getFullUrl(HttpServletRequest request, HttpServletResponse response, boolean isAjax) throws NextStepException {

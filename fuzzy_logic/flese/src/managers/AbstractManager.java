@@ -3,16 +3,31 @@ package managers;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import storeHouse.RequestStoreHouse;
 import urls.UrlMap;
 import urls.UrlMapException;
 import urls.UrlsMaps;
 import auxiliar.NextStep;
 import constants.KConstants;
+import constants.KUrls;
 
 public abstract class AbstractManager implements InterfaceManager {
 
+	private static final Log LogAbstractManager = LogFactory.getLog(AbstractManager.class);
+	
 	protected RequestStoreHouse requestStoreHouse;
+	private NextStep nextStep;
+	
+	public NextStep getNextStep() {
+		return nextStep;
+	}
+
+	public void setNextStep(NextStep nextStep) {
+		this.nextStep = nextStep;
+	}
 
 	public void setSessionStoreHouse(RequestStoreHouse sessionStoreHouse) {
 		this.requestStoreHouse = sessionStoreHouse;
@@ -28,8 +43,10 @@ public abstract class AbstractManager implements InterfaceManager {
 
 	public NextStep processRequest() {
 
-		NextStep nextStep = null;
 		String op = null;
+		Method method = null;
+		
+		setNextStep(null);
 
 		UrlMap urlMap = new UrlMap(requestStoreHouse);
 		try {
@@ -43,48 +60,46 @@ public abstract class AbstractManager implements InterfaceManager {
 			op = urlMap.getOp();
 			if ((op != null) && (!"".equals(op))) {
 
-				@SuppressWarnings("rawtypes")
-				Class[] argTypes = new Class[] {};
-				Method method = null;
 				try {
-					method = this.getClass().getMethod(op, argTypes);
+					LogAbstractManager.info("Looking for method " + op);
+					method = this.getClass().getMethod(op, new Class[] {});
 				} catch (NoSuchMethodException e) {
-					// TODO Auto-generated catch block
+					setNextStep(null);
 					e.printStackTrace();
 				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
+					setNextStep(null);
 					e.printStackTrace();
 				}
 				if (method != null) {
 					try {
-						nextStep = (NextStep) method.invoke((Object) this, new Object [0]);
+						LogAbstractManager.info("Invoke method " + method.getName());
+						method.invoke((Object) this, new Object [0]);
 					} catch (IllegalAccessException e) {
-						// TODO Auto-generated catch block
+						setNextStep(null);
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
+						setNextStep(null);
 						e.printStackTrace();
 					} catch (InvocationTargetException e) {
-						// TODO Auto-generated catch block
+						setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, ""));
 						e.printStackTrace();
-					} catch (Exception e) {
-						e.printStackTrace();
-						// throw e;
-					}
+					} 
 				}
 
 			}
 		}
 		// This allows a failsafe when the method is not found or there is no
 		// method.
-		if ((urlMap == null) || (op == null) || ("".equals(op))) {
+		if ((urlMap == null) || (method == null) || (op == null) || ("".equals(op))) {
 			try {
-				nextStep = byDefaultMethod();
+				LogAbstractManager.info("Invoke byDefaultMethod ");
+				byDefaultMethod();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		
 		return nextStep;
 	}
 }
