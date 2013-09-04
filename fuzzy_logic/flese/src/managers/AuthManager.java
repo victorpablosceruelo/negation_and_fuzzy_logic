@@ -78,7 +78,7 @@ public class AuthManager extends AbstractManager {
 		LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
 
 		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Welcome to the FleSe application !!");
-		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignInPage, "&id=" + providerId));
 	}
 	
 	private String tryAuthenticationWithSocialAuthManager() throws Exception {
@@ -126,19 +126,19 @@ public class AuthManager extends AbstractManager {
 
 		LOG.info("socialAuthenticationSignIn method call. ");
 
-		// Get the value of the parameter; the name is case-sensitive
-
-		// Test if we have signed in before and the session contains the info.
-		try {
-			@SuppressWarnings("unused")
-			LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
-			setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignInPage, ""));
-		} catch (Exception e) {
-		}
-
 		// URL of YOUR application which will be called after authentication
 		NextStep nextStep = new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
 		String nextURL = nextStep.getFullUrl(requestStoreHouse.getRequest(), requestStoreHouse.getResponse(), false);
+
+		// Test if we have signed in before and the session contains the info.
+		// In that case we by-pass signIn and go directly to authentication.
+		try {
+			@SuppressWarnings("unused")
+			LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
+			setNextStep(nextStep);
+		} catch (Exception e) {
+		}
+
 
 		// Returns the host name of the server to which the request was
 		// sent.
@@ -176,14 +176,14 @@ public class AuthManager extends AbstractManager {
 			// Store in session.
 			requestStoreHouse.session.setSocialAuthManager(socialAuthManager);
 
+			if (nextURL == null)
+				throw new Exception("nextURL is null.");
+			if ("".equals(nextURL))
+				throw new Exception("nextURL is empty string.");
+
+			setNextStep(new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Pages.Empty, nextURL));
 		}
 
-		if (nextURL == null)
-			throw new Exception("nextURL is null.");
-		if ("".equals(nextURL))
-			throw new Exception("nextURL is empty string.");
-
-		setNextStep(new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Pages.Empty, nextURL));
 		// response.sendRedirect(nextURL);
 		// response.encodeRedirectURL( athenticationUrl );
 

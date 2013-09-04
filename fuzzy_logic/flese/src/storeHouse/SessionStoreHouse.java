@@ -28,17 +28,16 @@ public class SessionStoreHouse {
 		this.session.invalidate();
 		this.session = null;
 	}
-	
+
 	public void setAppInTestingMode(boolean value) {
 		session.removeAttribute(KConstants.Session.swAppInTestingMode);
-		session.setAttribute(KConstants.Session.swAppInTestingMode, value);
+		session.setAttribute(KConstants.Session.swAppInTestingMode, value ? "true" : "false");
 	}
 
 	public boolean appIsInTestingMode() {
 		String isInTestingMode = (String) session.getAttribute(KConstants.Session.swAppInTestingMode);
-		if ((isInTestingMode != null) && ("true".equals(isInTestingMode)))
-			return true;
-		return false;
+		if (isInTestingMode == null) return false;
+		return "true".equals(isInTestingMode);
 	}
 
 	public void setSocialAuthManager(SocialAuthManager socialAuthManager) {
@@ -59,7 +58,7 @@ public class SessionStoreHouse {
 	}
 
 	public Profile getUserProfile() {
-		Profile profile = (Profile) session.getAttribute(KConstants.Session.socialAuthProfile); 
+		Profile profile = (Profile) session.getAttribute(KConstants.Session.socialAuthProfile);
 		return profile;
 	}
 
@@ -68,9 +67,9 @@ public class SessionStoreHouse {
 		if (localUserInfo != null)
 			session.setAttribute(KConstants.Session.localUserInfo, localUserInfo);
 	}
-	
+
 	public LocalUserInfo getLocalUserInfo() {
-		LocalUserInfo localUserInfo = (LocalUserInfo) session.getAttribute(KConstants.Session.localUserInfo); 
+		LocalUserInfo localUserInfo = (LocalUserInfo) session.getAttribute(KConstants.Session.localUserInfo);
 		return localUserInfo;
 	}
 
@@ -79,18 +78,18 @@ public class SessionStoreHouse {
 		if (authProvider != null)
 			session.setAttribute(KConstants.Session.socialAuthProvider, authProvider);
 	}
-	
+
 	public AuthProvider getAuthProvider() {
 		AuthProvider authProvider = (AuthProvider) session.getAttribute(KConstants.Session.socialAuthProvider);
 		return authProvider;
 	}
-	
+
 	public void setProviderId(String providerId) {
 		session.removeAttribute(KConstants.Session.socialAuthProviderId);
 		if (providerId != null)
 			session.setAttribute(KConstants.Session.socialAuthProviderId, providerId);
 	}
-	
+
 	public String getProviderId() {
 		String providerId = (String) session.getAttribute(KConstants.Session.socialAuthProviderId);
 		return (providerId == null) ? "" : providerId;

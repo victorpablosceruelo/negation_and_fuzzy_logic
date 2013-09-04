@@ -11,20 +11,16 @@ public class UrlsMaps {
 
 	private static String getManager(UrlMap urlMap) {
 		String manager = urlMap.getManager();
-		if ((manager == null) || ("".equals(manager)))
-			manager = "defaultManager";
 		return manager;
 	}
 
 	private static String getOp(UrlMap urlMap) {
 		String op = urlMap.getOp();
-		if ((op == null) || ("".equals(op)))
-			op = "defaultOp";
 		return op;
 	}
 
 	public static UrlMap getUrlMap(UrlMap urlMap) throws UrlMapException {
-		String manager = getManager(urlMap) + KConstants.Managers.managerSuffix;
+		String manager = getManager(urlMap);
 		String op = getOp(urlMap);
 
 		if (!loaded) {

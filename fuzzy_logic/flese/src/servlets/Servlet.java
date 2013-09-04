@@ -77,19 +77,19 @@ public class Servlet extends HttpServlet {
 		// Create the session if the manager needs it.
 		boolean createSessionIfNull = managerObject.createSessionIfNull();
 		ServletContext servletContext = getServletConfig().getServletContext();
-		RequestStoreHouse sessionStoreHouse;
+		RequestStoreHouse requestStoreHouse;
 		try {
-			sessionStoreHouse = new RequestStoreHouse(request, createSessionIfNull);
-			sessionStoreHouse.setResponse(response);
-			sessionStoreHouse.setServletContext(servletContext);
-			sessionStoreHouse.setDoMethod(doMethod);
+			requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull);
+			requestStoreHouse.setResponse(response);
+			requestStoreHouse.setServletContext(servletContext);
+			requestStoreHouse.setDoMethod(doMethod);
 		} catch (RequestStoreHouseException e) {
 			e.printStackTrace();
 			return managerObject.getExceptionPage();
 		}
 
 		// By-pass parameters to the manager.
-		managerObject.setSessionStoreHouse(sessionStoreHouse);
+		managerObject.setSessionStoreHouse(requestStoreHouse);
 
 		// Dispatch the query.
 		return managerObject.processRequest();

@@ -9,10 +9,16 @@ public class UrlsTools {
 	private StringBuilder url;
 	
 	public UrlsTools(boolean withSubPath, String url) {
+		if (url == null) url = "";
 		this.url = new StringBuilder();
 		String path;
 		if (withSubPath) {
-			path = PathsUtils.concatPathsStrings(KConstants.appPath, url);
+			if (! url.startsWith(KConstants.appPath)) {
+				path = PathsUtils.concatPathsStrings(KConstants.appPath, url);
+			}
+			else {
+				path = url;
+			}
 		}
 		else {
 			path = url;
@@ -22,6 +28,7 @@ public class UrlsTools {
 	}
 	
 	public void addParam(String paramName, String paramValue) {
+		if ((paramName == null) || ("".equals(paramName))) return;
 		if ((paramValue == null) || ("".equals(paramValue))) return;
 		
 		if (! this.hasParams) {

@@ -27,7 +27,7 @@ function insertProgramFileSelection(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
 	parentDiv.innerHTML = loadingImageHtml(true);
 	
-	$.getScript(<%= KConstants.Pages.SignInRequest.getUrl() %>urlMappingFor('FilesListRequest'), 
+	$.getScript(urlMappingFor('FilesListRequest'), 
 			function(data, textStatus, jqxhr) {
 		parentDiv.innerHTML = "";
 		

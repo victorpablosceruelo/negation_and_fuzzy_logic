@@ -1,6 +1,7 @@
 
 <!-- beginning of commonBodyHead -->
 
+<%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KConstants"%>
 <%@page import="constants.KUrls"%>
 <script type="text/javascript">
@@ -42,16 +43,7 @@
 			<span class="underline">Se</span>arches in Databases
 		</div>
 		<div id="bodyHeadLogged" class="bodyHeadTable">
-		<%
-			if (request != null) {
-				String localUserName = (String) request.getAttribute("localUserName");
-				if (localUserName != null) {
-					out.write("    var localUserName = '" + localUserName + "';\n");
-	} 
-	else {
-		out.write("    var localUserName = null;\n");
-	}	
-				%>
+		<%= JspsUtils.getLocalUserInfoName(request, false) %>
 		</div>
 		<div id="bodyHeadLogout" class="bodyHeadTable">
 		<a id="signOut" title="Sign out" href="<%=KUrls.Auth.SignOut.getUrl(false)%>">Sign out</a>

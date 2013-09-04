@@ -18,7 +18,7 @@ public class KUrls {
 
 	public static class Auth {
 		public static String manager = "AuthManager";
-		public static final UrlMap SocialAuthCallback = new UrlMap("", "", null, null, "");
+		public static final UrlMap SocialAuthCallback = new UrlMap(manager, "authenticate", null, null, "");
 
 		public static final UrlMap SignInPage = new UrlMap(manager, "signInPage", null, null, "WEB-INF/signedIn.jsp");
 		public static final UrlMap SignIn = new UrlMap(manager, "signIn", SignInPage, KUrls.Pages.Exception, "");

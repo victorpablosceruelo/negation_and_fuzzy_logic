@@ -10,6 +10,11 @@ public class UrlMap {
 	private UrlMap nextPage = null;
 	private UrlMap exceptionPage = null;
 	private String currentUrl = null;
+	
+	private class Constants {
+		public static final String defaultManager = "defaultManager";
+		public static final String defaultOp = "defaultOp";
+		}
 
 	protected UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage) {
 		initializeUrlMap(manager, op, nextPage, exceptionPage, "");
@@ -33,13 +38,30 @@ public class UrlMap {
 		if (currentUrl == null)
 			currentUrl = "";
 
-		this.manager = manager;
-		this.op = op;
+		this.manager = adequateManagerName(manager);
+		this.op = adequateOpName(op);
 		this.nextPage = nextPage;
 		this.exceptionPage = exceptionPage;
 		this.currentUrl = currentUrl;
 	}
 
+	private String adequateManagerName(String managerName) {
+		if ((managerName == null) || ("".equals(managerName))) {
+			return Constants.defaultManager;
+		}
+		if (! managerName.endsWith(KConstants.Managers.managerSuffix)) {
+			return managerName + KConstants.Managers.managerSuffix;
+		}
+		return managerName;
+	}
+	
+	private String adequateOpName(String op) {
+		if ((op == null) || ("".equals(op))) {
+			return Constants.defaultOp;
+		}
+		return op;
+	}	
+	
 	public String getManager() {
 		return this.manager;
 	};
@@ -48,34 +70,52 @@ public class UrlMap {
 		return this.op;
 	};
 
-	public String getUrl(boolean withSubPath, boolean isAjax) {
+	public String getUrl(boolean isAjax) {
+		return getUrl(true, isAjax);
+	}
+	
+	public String getUrl(boolean prependSubPath, boolean isAjax) {
 				
 		UrlsTools urlTool = null;
 		
 		if ((this.currentUrl != null) && (! "".equals(this.currentUrl))) {
-			urlTool = new UrlsTools(withSubPath, this.currentUrl);
+			urlTool = new UrlsTools(prependSubPath, this.currentUrl);
 		}
 		else {
-			urlTool = new UrlsTools(withSubPath, KConstants.servletName);
+			urlTool = new UrlsTools(prependSubPath, KConstants.servletName);
 		}
 
-		urlTool.addParam(KConstants.Request.managerParam, removeManagerTail(this.manager));
-		urlTool.addParam(KConstants.Request.operationParam, this.op);
+		urlTool.addParam(KConstants.Request.managerParam, managerNameToParam(this.manager));
+		urlTool.addParam(KConstants.Request.operationParam, operationNameToParam(this.op));
 		urlTool.addParam(KConstants.Request.isAjaxParam, isAjax ? KConstants.Values.True : KConstants.Values.False);
 		
 		return urlTool.getResult();
 	};
 	
-	private String removeManagerTail(String managerName) {
+	private String managerNameToParam(String managerName) {
 		if ((managerName != null) && (!"".equals(managerName))) {
+			if (Constants.defaultManager.equals(managerName)) {
+				managerName = "";
+			}
+			else {
 			if (managerName.endsWith(KConstants.Managers.managerSuffix)) {
 				int end = managerName.length() - KConstants.Managers.managerSuffix.length();
 				managerName = managerName.substring(0, end);
 			}
+			}
 		}
 		return managerName;
 	}
-
+	
+	private String operationNameToParam(String opName) {
+		if ((opName != null) && (!"".equals(opName))) {
+			if (Constants.defaultManager.equals(opName)) {
+				opName = "";
+			}
+		}
+		return opName;
+	}
+			
 	public String getCurrentUrl() {
 		return this.currentUrl;
 	}
