@@ -18,7 +18,7 @@ public class AppUrl {
 				Integer index = requestUrl.lastIndexOf(KConstants.appPath); // http://
 																			// ...
 																			// /page
-				appUrl = requestUrl.substring(0, index + KConstants.appPath.length());
+				appUrl = requestUrl.substring(0, index);
 			}
 
 			if ((serverName == null) || (!("localhost".equals(serverName)))) {

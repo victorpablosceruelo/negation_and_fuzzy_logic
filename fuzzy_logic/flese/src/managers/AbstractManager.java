@@ -61,26 +61,30 @@ public abstract class AbstractManager implements InterfaceManager {
 			if ((op != null) && (!"".equals(op))) {
 
 				try {
-					LogAbstractManager.info("Looking for method " + op);
 					method = this.getClass().getMethod(op, new Class[] {});
 				} catch (NoSuchMethodException e) {
+					LogAbstractManager.error("ERROR looking for method " + op + " in class " + this.getClass().getName());
 					setNextStep(null);
 					e.printStackTrace();
 				} catch (SecurityException e) {
+					LogAbstractManager.error("ERROR looking for method " + op + " in class " + this.getClass().getName());
 					setNextStep(null);
 					e.printStackTrace();
 				}
 				if (method != null) {
 					try {
-						LogAbstractManager.info("Invoke method " + method.getName());
+						LogAbstractManager.info("Calling method " + method.getName() + " in class " + this.getClass().getName());
 						method.invoke((Object) this, new Object [0]);
 					} catch (IllegalAccessException e) {
+						LogAbstractManager.error("ERROR invoking method " + method.getName() + " in class " + this.getClass().getName());
 						setNextStep(null);
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
+						LogAbstractManager.error("ERROR invoking method " + method.getName() + " in class " + this.getClass().getName());
 						setNextStep(null);
 						e.printStackTrace();
 					} catch (InvocationTargetException e) {
+						LogAbstractManager.error("Exception executing method " + method.getName() + " in class " + this.getClass().getName());
 						setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, ""));
 						e.printStackTrace();
 					} 

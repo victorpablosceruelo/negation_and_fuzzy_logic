@@ -47,11 +47,16 @@ public class Servlet extends HttpServlet {
 		doGetAndDoPost("doPost", request, response);
 	}
 
+	private String formatMsg(String msg) {
+		String line = "------------------------------------------------------------\n";
+		return "\n" + line + msg + "\n" + line;
+	}
+	
 	private void doGetAndDoPost(String doMethod, HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 
 		String managerName = request.getParameter(KConstants.Request.managerParam);
-		LOG.info("STARTS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : ""));
+		LOG.info(formatMsg("STARTS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : "")));
 
 		InterfaceManager managerObject = getManager(managerName);
 		NextStep nextStep = processRequest(managerObject, doMethod, request, response);
@@ -64,7 +69,7 @@ public class Servlet extends HttpServlet {
 			}
 		}
 
-		LOG.info("ENDS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : ""));
+		LOG.info(formatMsg("ENDS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : "")));
 	}
 
 	private NextStep processRequest(InterfaceManager managerObject, String doMethod, HttpServletRequest request,

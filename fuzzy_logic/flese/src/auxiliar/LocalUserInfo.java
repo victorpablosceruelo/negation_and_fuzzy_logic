@@ -17,16 +17,18 @@ public class LocalUserInfo {
 	 *            is the HttpServletRequest
 	 * @param response
 	 *            is the HttpServletResponse
-	 * @throws RequestStoreHouseException 
+	 * @throws RequestStoreHouseException
 	 * @throws Exception
 	 *             if request is null, response is null, session is null or
 	 *             localUserName can not be set.
 	 */
-	public LocalUserInfo(RequestStoreHouse requestStoreHouse) throws LocalUserInfoException, RequestStoreHouseException {
+	private LocalUserInfo(RequestStoreHouse requestStoreHouse) throws LocalUserInfoException, RequestStoreHouseException {
 
 		Profile profile = requestStoreHouse.getSession().getUserProfile();
 		if (profile == null) {
-			ifNullThenSetUserNameFrom("Testing User", "localhost.localnet", "testing", "testing");
+			if (requestStoreHouse.getSession().appIsInTestingMode()) {
+				ifNullThenSetUserNameFrom("Testing User", "localhost.localnet", "testing", "testing");
+			}
 		} else {
 			ifNullThenSetUserNameFrom(profile.getEmail(), profile.getProviderId(), "email", "providerId");
 			ifNullThenSetUserNameFrom(profile.getDisplayName(), profile.getProviderId(), "displayName", "providerId");
@@ -42,8 +44,17 @@ public class LocalUserInfo {
 
 		if (localUserName == null)
 			throw new LocalUserInfoException("localUserName is null");
+
+	}
+	
+	public static LocalUserInfo getLocalUserInfo(RequestStoreHouse requestStoreHouse) throws RequestStoreHouseException, LocalUserInfoException {
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+		if (localUserInfo == null) {
+			localUserInfo = new LocalUserInfo(requestStoreHouse);
+			requestStoreHouse.getSession().setLocalUserInfo(localUserInfo);
+		}
+		return localUserInfo;
 		
-		requestStoreHouse.getSession().setLocalUserInfo(this);
 	}
 
 	public String getLocalUserName() {
@@ -63,7 +74,8 @@ public class LocalUserInfo {
 	 * @throws LocalUserInfoException
 	 * 
 	 */
-	private void ifNullThenSetUserNameFrom(String beforeAt, String afterAt, String msgForBeforeAt, String msgForAfterAt) throws LocalUserInfoException {
+	private void ifNullThenSetUserNameFrom(String beforeAt, String afterAt, String msgForBeforeAt, String msgForAfterAt)
+			throws LocalUserInfoException {
 		if (localUserName == null) {
 			if ((beforeAt != null) && (afterAt != null)) {
 				if (beforeAt.contains(afterAt)) {
@@ -106,7 +118,7 @@ public class LocalUserInfo {
 			newLocalUserName = null;
 		return newLocalUserName;
 	}
-	
+
 	/**
 	 * Checks if an user name is valid.
 	 * 

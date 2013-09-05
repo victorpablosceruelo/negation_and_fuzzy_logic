@@ -11,8 +11,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.LocalUserInfoException;
 import results.ResultsStoreHouse;
+import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FileInfoException;
 import filesAndPaths.ProgramFileInfo;
@@ -59,7 +59,7 @@ public class RequestStoreHouse {
 			throw new RequestStoreHouseException("session is null");
 		return this.session;
 	}
-	
+
 	public void setServletContext(ServletContext servletContext) throws RequestStoreHouseException {
 		if (servletContext == null)
 			throw new RequestStoreHouseException("servletContext is null");
@@ -177,10 +177,15 @@ public class RequestStoreHouse {
 	}
 
 	public String getProviderId() throws RequestStoreHouseException {
-		String providerId = session.getProviderId();
+		String providerId = "";
+		if (session != null)
+			providerId = session.getProviderId();
 
-		if ((providerId == null) || ("".equals(providerId)))
+		if ((providerId == null) || ("".equals(providerId))) {
 			providerId = (String) request.getParameter(KConstants.Request.providerId);
+			if (session != null)
+				session.setProviderId(providerId);
+		}
 
 		if ((providerId == null) || ("".equals(providerId)))
 			throw new RequestStoreHouseException("providerId is null in session and in request.");
