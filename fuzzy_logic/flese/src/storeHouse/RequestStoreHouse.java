@@ -24,7 +24,7 @@ public class RequestStoreHouse {
 	private HttpServletResponse response = null;
 	private ServletContext servletContext = null;
 	private String doMethod = null;
-	public SessionStoreHouse session = null;
+	private SessionStoreHouse session = null;
 
 	private HashMap<String, String[]> requestParams = null;
 
@@ -54,6 +54,12 @@ public class RequestStoreHouse {
 		return this.response;
 	}
 
+	public SessionStoreHouse getSession() throws RequestStoreHouseException {
+		if (this.session == null)
+			throw new RequestStoreHouseException("session is null");
+		return this.session;
+	}
+	
 	public void setServletContext(ServletContext servletContext) throws RequestStoreHouseException {
 		if (servletContext == null)
 			throw new RequestStoreHouseException("servletContext is null");

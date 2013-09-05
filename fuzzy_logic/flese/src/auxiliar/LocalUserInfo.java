@@ -3,6 +3,7 @@ package auxiliar;
 import org.brickred.socialauth.Profile;
 
 import storeHouse.RequestStoreHouse;
+import storeHouse.RequestStoreHouseException;
 
 public class LocalUserInfo {
 
@@ -16,13 +17,14 @@ public class LocalUserInfo {
 	 *            is the HttpServletRequest
 	 * @param response
 	 *            is the HttpServletResponse
+	 * @throws RequestStoreHouseException 
 	 * @throws Exception
 	 *             if request is null, response is null, session is null or
 	 *             localUserName can not be set.
 	 */
-	public LocalUserInfo(RequestStoreHouse requestStoreHouse) throws LocalUserInfoException {
+	public LocalUserInfo(RequestStoreHouse requestStoreHouse) throws LocalUserInfoException, RequestStoreHouseException {
 
-		Profile profile = requestStoreHouse.session.getUserProfile();
+		Profile profile = requestStoreHouse.getSession().getUserProfile();
 		if (profile == null) {
 			ifNullThenSetUserNameFrom("Testing User", "localhost.localnet", "testing", "testing");
 		} else {
@@ -41,7 +43,7 @@ public class LocalUserInfo {
 		if (localUserName == null)
 			throw new LocalUserInfoException("localUserName is null");
 		
-		requestStoreHouse.session.setLocalUserInfo(this);
+		requestStoreHouse.getSession().setLocalUserInfo(this);
 	}
 
 	public String getLocalUserName() {

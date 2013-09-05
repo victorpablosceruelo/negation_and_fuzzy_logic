@@ -14,6 +14,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import constants.KConstants;
 import results.ResultsStoreHouseUtils;
 import storeHouse.RequestStoreHouse;
+import storeHouse.RequestStoreHouseException;
 import auxiliar.CastingsClass;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
@@ -41,10 +42,11 @@ public class FilesManagerAux {
 	 *         iterate.
 	 * @throws PathsMgmtException
 	 * @throws LocalUserInfoException 
+	 * @throws RequestStoreHouseException 
 	 */
-	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, LocalUserInfoException {
+	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
 
-		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		PathsMgmt pathsMgmt = new PathsMgmt();
 		File dir = new File(pathsMgmt.getProgramFilesPath());
@@ -135,7 +137,7 @@ public class FilesManagerAux {
 
 		// Folder checks
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
-		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		
 		if (! (localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
 			throw new Exception("The user must be the owner of the destiny folder.");

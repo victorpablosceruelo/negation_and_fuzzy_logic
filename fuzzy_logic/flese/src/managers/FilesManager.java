@@ -9,6 +9,7 @@ import javax.servlet.ServletOutputStream;
 
 import results.ResultsStoreHouseUtils;
 import storeHouse.CacheStoreHouseCleaner;
+import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
@@ -43,7 +44,7 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void list() throws PathsMgmtException, LocalUserInfoException {
+	public void list() throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		ResultsStoreHouseUtils.updateFilesList(requestStoreHouse, filesList);
 
@@ -106,7 +107,7 @@ public class FilesManager extends AbstractManager {
 	public void remove() throws Exception {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
-		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		if (!(localUserInfo.equals(programFileInfo.getFileOwner()))) {
 			throw new Exception("Logged user does not own the program file.");
@@ -120,10 +121,10 @@ public class FilesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 
-	public void viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException {
+	public void viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
-		LocalUserInfo localUserInfo = requestStoreHouse.session.getLocalUserInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		String[] fileContents = null;
 		if (localUserInfo.equals(programFileInfo.getFileOwner())) {

@@ -14,6 +14,7 @@ import prologConnector.CiaoPrologQueryException;
 import prologConnector.PlConnectionEnvelopeException;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
+import storeHouse.RequestStoreHouseException;
 import CiaoJava.PLAtom;
 import CiaoJava.PLFloat;
 import CiaoJava.PLInteger;
@@ -66,7 +67,7 @@ public class ConversorToPrologQuery {
 	private RequestStoreHouse requestStoreHouse = null;
 
 	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException, LocalUserInfoException {
+			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException, LocalUserInfoException, RequestStoreHouseException {
 
 		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
@@ -109,7 +110,7 @@ public class ConversorToPrologQuery {
 		queryConvert();
 	}
 
-	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, AnswerTermInJavaClassException {
+	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, AnswerTermInJavaClassException, RequestStoreHouseException {
 		ConversionInput input = prologSubQuery.input;
 		String msg = "";
 		msg += ("\n  fp: " + input.quantifier0 + "(" + input.quantifier1 + "(" + input.predicate + "))");
@@ -178,7 +179,7 @@ public class ConversorToPrologQuery {
 	}
 
 	private void subQueryInitialEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
-			AnswerTermInJavaClassException {
+			AnswerTermInJavaClassException, RequestStoreHouseException {
 		ConversionInput input = prologSubQuery.input;
 		if (input.initialPredicate == null) {
 			throw new QueryConversorException("No initial predicate for the query.");
@@ -221,7 +222,7 @@ public class ConversorToPrologQuery {
 
 		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
 
-		String localUserName = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
+		String localUserName = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
 		PLStructure subGoal3 = new PLStructure("assertLocalUserName", new PLTerm[] { new PLAtom("'" + localUserName + "'") });
 
 		initialSubQuery = new PrologSubQuery();

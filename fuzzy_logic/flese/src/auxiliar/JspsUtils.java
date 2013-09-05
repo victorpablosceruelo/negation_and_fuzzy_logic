@@ -11,7 +11,7 @@ public class JspsUtils {
 		String localUserInfoName = null;
 		try {
 			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
-			localUserInfoName = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
+			localUserInfoName = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
 		} catch (Exception e) {
 			if (nameOrEmpty) {
 				localUserInfoName = "";

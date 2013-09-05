@@ -13,6 +13,7 @@ import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
 import results.ResultsStoreHouseUtils;
+import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import constants.KConstants;
@@ -66,7 +67,7 @@ public class AuthManager extends AbstractManager {
 		LOG.info("socialAuthenticationAuthenticate method call. ");
 		String providerId = "";
 
-		if (requestStoreHouse.session.appIsInTestingMode()) {
+		if (requestStoreHouse.getSession().appIsInTestingMode()) {
 			ResultsStoreHouseUtils.addMessage(requestStoreHouse, "INFO: Social Authentication in Testing mode.");
 		} else {
 			// get the social auth manager from session
@@ -82,11 +83,11 @@ public class AuthManager extends AbstractManager {
 	}
 	
 	private String tryAuthenticationWithSocialAuthManager() throws Exception {
-		SocialAuthManager socialAuthManager = requestStoreHouse.session.getSocialAuthManager();
+		SocialAuthManager socialAuthManager = requestStoreHouse.getSession().getSocialAuthManager();
 		if (socialAuthManager == null)
 			throw new Exception("Social Auth Manager is null");
 		else
-			requestStoreHouse.session.setSocialAuthManager(null);
+			requestStoreHouse.getSession().setSocialAuthManager(null);
 
 		// call connect method of manager which returns the provider object.
 		// Pass request parameter map while calling connect method.
@@ -113,10 +114,10 @@ public class AuthManager extends AbstractManager {
 			throw new Exception("profile is null");
 
 		// Save new computed results in session.
-		requestStoreHouse.session.setSocialAuthManager(socialAuthManager);
-		requestStoreHouse.session.setAuthProvider(authProvider);
-		requestStoreHouse.session.setProviderId(providerId);
-		requestStoreHouse.session.setUserProfile(profile);
+		requestStoreHouse.getSession().setSocialAuthManager(socialAuthManager);
+		requestStoreHouse.getSession().setAuthProvider(authProvider);
+		requestStoreHouse.getSession().setProviderId(providerId);
+		requestStoreHouse.getSession().setUserProfile(profile);
 
 		return providerId;
 	}
@@ -136,6 +137,7 @@ public class AuthManager extends AbstractManager {
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = new LocalUserInfo(requestStoreHouse);
 			setNextStep(nextStep);
+			return;
 		} catch (Exception e) {
 		}
 
@@ -146,9 +148,9 @@ public class AuthManager extends AbstractManager {
 		String serverName = requestStoreHouse.getRequest().getServerName();
 		if ((serverName != null) && ("localhost".equals(serverName))) {
 			LOG.info("request.getServerName(): " + serverName);
-			requestStoreHouse.session.setAppInTestingMode(true);
+			requestStoreHouse.getSession().setAppInTestingMode(true);
 		} else {
-			SocialAuthManager socialAuthManager = requestStoreHouse.session.getSocialAuthManager();
+			SocialAuthManager socialAuthManager = requestStoreHouse.getSession().getSocialAuthManager();
 
 			if (socialAuthManager == null) {
 				// Create an instance of SocialAuthConfgi object
@@ -174,7 +176,7 @@ public class AuthManager extends AbstractManager {
 			nextURL = socialAuthManager.getAuthenticationUrl(providerId, nextURL);
 
 			// Store in session.
-			requestStoreHouse.session.setSocialAuthManager(socialAuthManager);
+			requestStoreHouse.getSession().setSocialAuthManager(socialAuthManager);
 
 			if (nextURL == null)
 				throw new Exception("nextURL is null.");
@@ -199,10 +201,10 @@ public class AuthManager extends AbstractManager {
 	}
 
 	
-	private void invalidateSession() {
+	private void invalidateSession() throws RequestStoreHouseException {
 
-		if (! requestStoreHouse.session.isNull()) {
-			SocialAuthManager authManager = requestStoreHouse.session.getSocialAuthManager();
+		if (! requestStoreHouse.getSession().isNull()) {
+			SocialAuthManager authManager = requestStoreHouse.getSession().getSocialAuthManager();
 			if (authManager != null) {
 				List<String> connectedProvidersIds = authManager.getConnectedProvidersIds();
 				if (connectedProvidersIds != null) {
@@ -218,7 +220,7 @@ public class AuthManager extends AbstractManager {
 				}
 			}
 			// Invalidate the session.
-			requestStoreHouse.session.invalidateSession();
+			requestStoreHouse.getSession().invalidateSession();
 		}
 
 	}

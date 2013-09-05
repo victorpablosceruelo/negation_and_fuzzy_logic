@@ -75,9 +75,9 @@ public class ProgramAnalysisClass {
 		for (i = 0; i < programParts.size(); i++) {
 			programPart = programParts.get(i);
 			if (programPart.isFunction()) {
-				if ((requestStoreHouse.session.getLocalUserInfo().getLocalUserName().equals(requestStoreHouse.getProgramFileInfo()
+				if ((requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName().equals(requestStoreHouse.getProgramFileInfo()
 						.getFileOwner()))
-						|| (programPart.getPredOwner().equals(requestStoreHouse.session.getLocalUserInfo().getLocalUserName()))
+						|| (programPart.getPredOwner().equals(requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName()))
 						|| (programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
 
 					boolean placed = false;
@@ -145,7 +145,7 @@ public class ProgramAnalysisClass {
 		String[][] functionDefinition = getFunctionDefinition();
 
 		LOG.info("saving fuzzification: " + predDefined + " depending on " + predNecessary + " personalized for username: " + predOwner
-				+ " by username: " + requestStoreHouse.session.getLocalUserInfo().getLocalUserName() + "\n\n");
+				+ " by username: " + requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName() + "\n\n");
 
 		// Security issues ("" strings).
 		if ("".equals(predDefined))
@@ -158,9 +158,9 @@ public class ProgramAnalysisClass {
 		// If I'm not the owner I can change only my fuzzification.
 		// If I'm the owner I can change mine and the default one, but no other
 		// one.
-		if ((!requestStoreHouse.session.getLocalUserInfo().getLocalUserName().equals(requestStoreHouse.getProgramFileInfo().getFileOwner()))
+		if ((!requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName().equals(requestStoreHouse.getProgramFileInfo().getFileOwner()))
 				|| (!predOwner.equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
-			predOwner = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
+			predOwner = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
 		}
 
 		ProgramPartAnalysisClass programPart = null;
