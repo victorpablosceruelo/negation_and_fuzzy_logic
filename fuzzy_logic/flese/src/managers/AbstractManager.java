@@ -85,7 +85,8 @@ public abstract class AbstractManager implements InterfaceManager {
 						e.printStackTrace();
 					} catch (InvocationTargetException e) {
 						LogAbstractManager.error("Exception executing method " + method.getName() + " in class " + this.getClass().getName());
-						setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, ""));
+						NextStep onExceptionNextStep = getExceptionPage();
+						setNextStep(onExceptionNextStep);
 						e.printStackTrace();
 					} 
 				}

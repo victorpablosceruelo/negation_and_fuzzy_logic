@@ -41,7 +41,7 @@ public class AuthManager extends AbstractManager {
 	}
 
 	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
+		NextStep nextStep = new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignOut, "");
 		return nextStep;
 	}
 
@@ -62,21 +62,18 @@ public class AuthManager extends AbstractManager {
 		if (requestStoreHouse.getSession().appIsInTestingMode()) {
 			ResultsStoreHouseUtils.addMessage(requestStoreHouse, "INFO: Social Authentication in Testing mode.");
 		} else {
-			try {
-				// get the social auth manager from session
-				tryAuthenticationWithSocialAuthManager();
-			} catch (Exception e) {
-				setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignOut, ""));
-				return;
-			}
+			// get the social auth manager from session
+			tryAuthenticationWithSocialAuthManager();
 		}
 
 		// Test if we have an username or not.
 		@SuppressWarnings("unused")
 		LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
 
+		String providerId = requestStoreHouse.getRequestParameter(KConstants.Request.providerId);
+		
 		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Welcome to the FleSe application !!");
-		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, ""));
+		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
 	}
 
 	private void tryAuthenticationWithSocialAuthManager() throws Exception {
