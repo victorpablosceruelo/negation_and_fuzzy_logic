@@ -6,18 +6,14 @@ import storeHouse.RequestStoreHouse;
 
 public class JspsUtils {
 
-	public static String getLocalUserInfoName(HttpServletRequest request, boolean nameOrEmpty) {
+	public static String getLocalUserInfoName(HttpServletRequest request) {
 
 		String localUserInfoName = null;
 		try {
 			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 			localUserInfoName = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
 		} catch (Exception e) {
-			if (nameOrEmpty) {
-				localUserInfoName = "";
-			} else {
-				localUserInfoName = "Not logged in";
-			}
+			localUserInfoName = "";
 		}
 		return localUserInfoName;
 	}

@@ -20,10 +20,10 @@ public class KUrls {
 		public static String manager = "AuthManager";
 		public static final UrlMap SocialAuthCallback = new UrlMap(manager, "authenticate", null, null, "");
 
-		public static final UrlMap SignInPage = new UrlMap(manager, "signInPage", null, null, "WEB-INF/signedIn.jsp");
+		public static final UrlMap SignInPage = new UrlMap(manager, "signInPage", null, null, "WEB-INF/main.jsp");
 		public static final UrlMap SignIn = new UrlMap(manager, "signIn", SignInPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/signedOut.jsp");
+		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/main.jsp");
 		public static final UrlMap SignOut = new UrlMap(manager, "signOut", SignOutPage, KUrls.Pages.Exception, "");
 
 		public static UrlMap[] urlsList = { SocialAuthCallback, SignInPage, SignIn, SignOutPage, SignOut };

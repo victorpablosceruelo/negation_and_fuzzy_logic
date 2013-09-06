@@ -6,10 +6,10 @@ import filesAndPaths.ProgramFileInfo;
 
 public class ResultsStoreHouse {
 
-	ArrayList<String> messages = new ArrayList<String>();
-	ProgramFileInfo[] filesList = new ProgramFileInfo[0];
-	String [] fileContents = null;
-	String [] fuzzificationsList = null;
+	private ArrayList<String> messages = new ArrayList<String>();
+	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
+	private String [] fileContents = null;
+	private String [] fuzzificationsList = null;
 
 	/**
 	 * Adds a message to the request session attribute msgs.
@@ -30,6 +30,10 @@ public class ResultsStoreHouse {
 		}
 		
 	}
+	
+	public ProgramFileInfo[] getFilesList() {
+		return filesList;
+	}
 
 	public void setFileContents(String[] fileContents) {
 		this.fileContents = null;
@@ -38,12 +42,19 @@ public class ResultsStoreHouse {
 		}
 	}
 
+	public String [] getfileContents() {
+		return fileContents;
+	}
+	
 	public void setFuzzificationsList(String[] fuzzificationsList) {
 		this.fuzzificationsList = null;
 		if (fuzzificationsList != null) {
 			this.fuzzificationsList = fuzzificationsList;
 		}
-		
+	}
+	
+	public String [] getFuzzificationsList() {
+		return fuzzificationsList;
 	}
 
 }

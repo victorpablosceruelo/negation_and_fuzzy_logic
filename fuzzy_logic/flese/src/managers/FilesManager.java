@@ -49,7 +49,7 @@ public class FilesManager extends AbstractManager {
 		ResultsStoreHouseUtils.updateFilesList(requestStoreHouse, filesList);
 
 		// Forward to the jsp page.
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.List, ""));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ListPage, ""));
 	}
 
 	public void uploadFile() throws Exception {

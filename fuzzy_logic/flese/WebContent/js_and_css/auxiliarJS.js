@@ -14,77 +14,56 @@ function loadingImageHtml(withNewLine) {
 	else return result;
 }
 
+function loadAjaxIn(containerName, ajaxPageUrl) {
+	debug.info("loadAjaxIn("+containerName + ", " + ajaxPageUrl + ")");
+	var container = document.getElementById(containerName);
+	if (container == null) {
+		debug.info("Container with name " + containerName + " does not exist.");
+	}
+	else {
+		container.innerHTML=loadingImageHtml(true);
+	    $.ajax({
+	        method: 'get',
+	        url: ajaxPageUrl,
+	        data: 'page=' + $(this).attr('rel'),
+	        beforeSend: function() {
+	            container.innerHTML=loadingImageHtml(true);
+	        },
+	        complete: function() {
+	        	debug.info("load of html is complete.");
+	        	// container.innerHTML=loadingImageHtml(true);
+	        },
+	        success: function(html) {
+	        	debug.info("loading html: " + html);
+	        	container.innerHTML=html;
+	        },
+	        fail: function() { alert("error"); }
+	    });
+	}
+	
+}
+
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
+
+function isString(o) {
+	var result = false;
+	if ((o != null) && (o != undefined)) {
+		result = (typeof o == "string") || (o instanceof String) || (typeof o == "object" && o.constructor === String);
+	}
+	// alert("isString returns " + result);
+	return result;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 
 function fileInfo(fileName, fileOwner) {
 	this.fileName = fileName;
 	this.fileOwner = fileOwner;
-}
-
-function insertProgramFileSelection(parentDivId) {
-	var parentDiv = document.getElementById(parentDivId);
-	parentDiv.innerHTML = loadingImageHtml(true);
-	
-	$.getScript(urlMappingFor('FilesListRequest'), 
-			function(data, textStatus, jqxhr) {
-		parentDiv.innerHTML = "";
-		
-
-		var selectDatabaseContainer = document.createElement('div');
-		selectDatabaseContainer.id = "selectDatabaseContainerDiv";
-		selectDatabaseContainer.className = "selectDatabaseTable";
-		parentDiv.appendChild(selectDatabaseContainer);
-		
-		var row = document.createElement('div');
-		row.className = "selectDatabaseTableRow";
-		selectDatabaseContainer.appendChild(row);
-		
-		var cell = null;
-		
-		if ((filesList == null) || (filesList.length == 0)) {
-			cell = document.createElement('div');
-			cell.className = "selectDatabaseTableCell";
-			cell.innerHTML = "No databases. Please upload one via your user options.";
-			row.appendChild(cell);
-		}
-		else {
-			cell = document.createElement('div');
-			cell.className = "selectDatabaseTableCell1";
-			cell.innerHTML="Please, choose a database to load: ";
-			row.appendChild(cell);
-			
-			cell = document.createElement('div');
-			cell.className = "selectDatabaseTableCell2";
-			cell.id = "selectDatabaseDiv";
-			row.appendChild(cell);
-
-			var chooseProgramFileId = "selectProgramFile";
-			var html = "";
-			html += "<select name='"+chooseProgramFileId+"' id='"+chooseProgramFileId+"' ";
-			html += "onchange='selectedProgramDatabaseChanged(this, \""+parentDivId+"\")' >";
-			html += "<option id='----' name='----' title='----' value='----'>----</option>";
-			for (var i=0; i<filesList.length; i++) {
-				html += "<option id='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
-						"name='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
-						"title='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "' " +
-						"value='" + filesList[i].fileName + "-owned-by-" + filesList[i].fileOwner + "'>" + 
-						filesList[i].fileName + " ( owned by " + filesList[i].fileOwner + " ) " +
-						"</option>";
-			}
-			html += "</select>";
-			cell.innerHTML = html;
-			
-			//cell = document.createElement('div');
-			//cell.className = "selectDatabaseTableCell";
-			//cell.id = "personalizationButtonContainer";
-			//row.appendChild(cell);
-			
-			//cell.innerHTML = "<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(\"" +
-			//				 chooseProgramFileId + "\", \"basic\");'>";
-		}
-	});
 }
 
 // Declare as global the variable containing the files list.
