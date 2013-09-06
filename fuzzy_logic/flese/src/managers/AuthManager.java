@@ -70,7 +70,7 @@ public class AuthManager extends AbstractManager {
 		@SuppressWarnings("unused")
 		LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
 
-		String providerId = requestStoreHouse.getRequestParameter(KConstants.Request.providerId);
+		String providerId = requestStoreHouse.getProviderId();
 		
 		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Welcome to the FleSe application !!");
 		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
@@ -120,7 +120,6 @@ public class AuthManager extends AbstractManager {
 		NextStep nextStep = new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
 		String nextURL = nextStep.getFullUrl(requestStoreHouse.getRequest(), requestStoreHouse.getResponse(), false);
 
-		String providerId = requestStoreHouse.getProviderId();
 		// Test if we have signed in before and the session contains the info.
 		// In that case we by-pass signIn and go directly to authentication.
 		try {
@@ -131,14 +130,16 @@ public class AuthManager extends AbstractManager {
 		} catch (Exception e) {
 		}
 
-		// Returns the host name of the server to which the request was
-		// sent.
-
+		// Get the provider id.
+		String providerId = requestStoreHouse.getProviderId();
+		
+		// Returns the host name of the server to which the request was sent.
 		String serverName = requestStoreHouse.getRequest().getServerName();
 		if ((serverName != null) && ("localhost".equals(serverName))) {
 			requestStoreHouse.getSession().setAppInTestingMode(true);
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
+			requestStoreHouse.getSession().setProviderId("localhost");
 			setNextStep(nextStep);
 		} else {
 			SocialAuthManager socialAuthManager = requestStoreHouse.getSession().getSocialAuthManager();
