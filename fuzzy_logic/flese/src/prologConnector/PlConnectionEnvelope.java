@@ -66,7 +66,7 @@ public class PlConnectionEnvelope {
 	}
 
 	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
-			CiaoPrologQueryException, PathsMgmtException {
+			CiaoPrologQueryException, PathsMgmtException, CiaoPrologQueryAnswerException {
 
 		if (plConnection == null) {
 			createPlConnection();
@@ -87,14 +87,14 @@ public class PlConnectionEnvelope {
 	}
 
 	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologQueryException, PathsMgmtException,
-			PlConnectionEnvelopeException, CiaoPrologTermInJavaException {
+			PlConnectionEnvelopeException, CiaoPrologTermInJavaException, CiaoPrologQueryAnswerException {
 
 		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
 		runPrologQueryAux(folderChangeQuery);
 	}
 
 	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
-			CiaoPrologQueryException {
+			CiaoPrologQueryException, CiaoPrologQueryAnswerException {
 		if (this.isAvailable) {
 
 		}

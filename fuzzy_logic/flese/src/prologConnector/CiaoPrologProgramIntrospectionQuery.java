@@ -1,7 +1,5 @@
 package prologConnector;
 
-import java.util.Iterator;
-
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import CiaoJava.PLStructure;
@@ -10,7 +8,14 @@ import CiaoJava.PLVariable;
 import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
 
-public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
+public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract {
+
+	public static class Constants {
+		public static final String predicateType = "predicateType";
+		public static final String predicateName = "predicateName";
+		public static final String predicateArity = "predicateArity";
+		public static final String predicateTypes = "predicateTypes";
+	}
 
 	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologQueryException, PathsMgmtException {
 		super(fileInfo);
@@ -25,15 +30,15 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 		PLTerm[] args = { variables[0], variables[1], variables[2], variables[3] };
 		PLStructure query = new PLStructure("rfuzzy_introspection", args);
 
-		String[] variablesNames = { "predicateType", "predicateName", "predicateArity", "predicateType" };
+		String[] variablesNames = { Constants.predicateType, Constants.predicateName, Constants.predicateArity, Constants.predicateTypes };
 
 		setRealQuery(query, variables, variablesNames);
 
 		isProgramIntrospectionQuery = true;
 	}
 
-	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException, PathsMgmtException,
-			CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException {
+	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException,
+			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, CiaoPrologQueryAnswerException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
 
@@ -46,36 +51,36 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 		}
 		return query;
 	}
-	
-	public static void clearCacheInstance(ProgramFileInfo programFileInfo) throws PathsMgmtException, CacheStoreHouseException {
+
+	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws PathsMgmtException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
-		CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, null);		
+		CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, null);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public CiaoPrologTermInJava[] getPredicateInfo(String predicateName) {
-		Iterator<CiaoPrologTermInJava[]> iterator = null;
-		if (queryAnswers != null)
-			iterator = queryAnswers.iterator();
-
-		if ((predicateName == null) || ("".equals(predicateName))) {
-			LOG.info("Predicate Name is not valid. predicateName: " + predicateName);
+	public CiaoPrologQueryAnswer getPredicateInfo(String predicateName) throws CiaoPrologQueryException, CiaoPrologQueryAnswerException {
+		if (predicateName == null) {
+			throw new CiaoPrologQueryException("predicateName cannot be null.");
 		}
-		if (iterator == null) {
-			LOG.error("Iterator of Program Introspection is NULL!! ");
+		if ("".equals(predicateName)) {
+			throw new CiaoPrologQueryException("predicateName cannot be empty string.");
 		}
 
-		CiaoPrologTermInJava[] answer = null;
-		if ((predicateName != null) && (iterator != null)) {
-			while ((iterator.hasNext()) && (answer == null)) {
-				answer = iterator.next();
-				if (!predicateName.equals(answer[0].toString()))
-					answer = null;
-			}
+		CiaoPrologQueryAnswer answer = null;
+		int i = 0;
+		boolean found = false;
+		while (i < queryAnswers.size() && (!found)) {
+			answer = queryAnswers.get(i);
+			CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(Constants.predicateName);
+			String currentDefPredicateName = term.toString();
+			if (predicateName.equals(currentDefPredicateName))
+				found = true;
+			else
+				i++;
 		}
 		return answer;
 	}
@@ -84,32 +89,4 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public String[] getProgramIntrospectionInJS() {
-		if (queryAnswers == null)
-			return null;
-		Iterator<CiaoPrologTermInJava[]> queryAnswersIterator = queryAnswers.iterator();
-
-		if (queryAnswersIterator == null)
-			return null;
-
-		String[] result = new String[queryAnswers.size()];
-
-		int counter = 0;
-		String tmp = null;
-		CiaoPrologTermInJava[] predInfo;
-		while (queryAnswersIterator.hasNext()) {
-			predInfo = queryAnswersIterator.next();
-			tmp = "";
-			tmp += "addToProgramIntrospection(" + counter + ", new predInfo(";
-			for (int i = 0; i < predInfo.length; i++) {
-				tmp += predInfo[i].toJavaScript();
-				if (i + 1 < predInfo.length)
-					tmp += ",";
-			}
-			tmp += "));";
-			result[counter] = tmp;
-			counter++;
-		}
-		return result;
-	}
 }

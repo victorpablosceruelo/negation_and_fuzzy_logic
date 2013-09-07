@@ -13,8 +13,9 @@ public class CacheStoreHouseCleaner {
 			LocalUserInfoException {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
-		CiaoPrologProgramIntrospectionQuery.clearCacheInstance(programFileInfo);
-		CiaoPrologNormalQuery.clearCacheInstance(requestStoreHouse);
+		
+		CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(programFileInfo);
+		CiaoPrologNormalQuery.clearCacheInstancesFor(programFileInfo);
 
 	}
 

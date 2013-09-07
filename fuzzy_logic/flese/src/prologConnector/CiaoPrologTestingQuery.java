@@ -7,7 +7,7 @@ import auxiliar.LocalUserInfoException;
 import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
 
-public class CiaoPrologTestingQuery extends CiaoPrologQuery {
+public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
 	public CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
 			LocalUserInfoException {

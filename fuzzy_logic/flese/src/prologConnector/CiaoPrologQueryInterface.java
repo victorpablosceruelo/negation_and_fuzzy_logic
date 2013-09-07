@@ -17,5 +17,7 @@ public interface CiaoPrologQueryInterface {
 	public int getVariablesLength();
 
 	public void addQueryAnswer(CiaoPrologQueryAnswer ciaoPrologQueryAnswer);
+	
+	public CiaoPrologQueryAnswer[] getQueryAnswers();
 
 }

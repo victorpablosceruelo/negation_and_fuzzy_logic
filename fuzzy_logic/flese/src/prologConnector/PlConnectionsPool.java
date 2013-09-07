@@ -51,7 +51,7 @@ public class PlConnectionsPool {
 	}
 
 	public static void launchQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
-			CiaoPrologQueryException, PathsMgmtException {
+			CiaoPrologQueryException, PathsMgmtException, CiaoPrologQueryAnswerException {
 
 		if (connections == null) {
 			initializeConnectionsPool();

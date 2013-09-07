@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class CiaoPrologQueryAnswer {
 
-	HashMap<String, CiaoPrologTermInJava> varsAnswers = null;
+	private HashMap<String, CiaoPrologTermInJava> varsAnswers = null;
 	public CiaoPrologQueryAnswer() {
 		varsAnswers = new HashMap<String, CiaoPrologTermInJava>();
 	}
@@ -23,7 +23,7 @@ public class CiaoPrologQueryAnswer {
 		this.varsAnswers.put(variableName, variableAnswer);
 	}
 
-	public CiaoPrologTermInJava getCiaoPrologQueryAnswer(String variableName) throws CiaoPrologQueryAnswerException {
+	public CiaoPrologTermInJava getCiaoPrologQueryVariableAnswer(String variableName) throws CiaoPrologQueryAnswerException {
 		if (variableName == null) {
 			throw new CiaoPrologQueryAnswerException("variableName cannot be null");
 		}

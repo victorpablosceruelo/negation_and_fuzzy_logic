@@ -11,7 +11,7 @@ import filesAndPaths.FileInfoException;
 import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
 
-public class CiaoPrologNormalQuery extends CiaoPrologQuery {
+public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 
 	private CiaoPrologNormalQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
 		super(programFileInfo);
@@ -19,7 +19,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQuery {
 
 	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException,
 			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, FileInfoException,
-			QueryConversorException, LocalUserInfoException, RequestStoreHouseException {
+			QueryConversorException, LocalUserInfoException, RequestStoreHouseException, CiaoPrologQueryAnswerException {
 
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
 		String key1 = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
@@ -42,9 +42,9 @@ public class CiaoPrologNormalQuery extends CiaoPrologQuery {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static void clearCacheInstance(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, CacheStoreHouseException,
+	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws PathsMgmtException, CacheStoreHouseException,
 			FileInfoException, LocalUserInfoException {
-		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
+		String fullPath = programFileInfo.getProgramFileFullPath();
 		// String key1 = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
 		String key1 = null;
 		CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, null, null);

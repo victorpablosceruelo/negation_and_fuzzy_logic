@@ -1,7 +1,6 @@
 package prologConnector;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,9 +9,9 @@ import CiaoJava.PLStructure;
 import CiaoJava.PLVariable;
 import filesAndPaths.ProgramFileInfo;
 
-public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
+public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterface {
 
-	final static protected Log LOG = LogFactory.getLog(CiaoPrologQuery.class);
+	final static protected Log LOG = LogFactory.getLog(CiaoPrologQueryAbstract.class);
 
 	private PLStructure query = null;
 	private ProgramFileInfo programFileInfo = null;
@@ -23,7 +22,7 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 	protected ArrayList<CiaoPrologQueryAnswer> queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
 
-	protected CiaoPrologQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
+	protected CiaoPrologQueryAbstract(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
 
 		if (programFileInfo == null)
 			throw new CiaoPrologQueryException("programFileInfo cannot be null.");
@@ -89,52 +88,13 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 	public void addQueryAnswer(CiaoPrologQueryAnswer ciaoPrologQueryAnswer) {
 		this.queryAnswers.add(ciaoPrologQueryAnswer);
 	}
-	
-	public CiaoPrologTermInJava[][] getQueryAnswers() {
-		return null;
-		// this.queryAnswers.toArray(new AnswerTermInJavaClass[][this.queryAnswers.size()]);
+
+	public CiaoPrologQueryAnswer[] getQueryAnswers() {
+		return this.queryAnswers.toArray(new CiaoPrologQueryAnswer[this.queryAnswers.size()]);
 	}
 
 	public String toString() {
 		return this.query.toString();
 	}
-	
-	public String[] getQueryAnswersInJS() {
-		if (queryAnswers == null)
-			return null;
 
-		Iterator<CiaoPrologTermInJava[]> queryAnswersIterator = queryAnswers.iterator();
-		if (queryAnswersIterator == null)
-			return null;
-
-		String[] result = new String[queryAnswers.size() + 1];
-		int answersCounter = 0;
-
-		if (variablesNames != null) {
-			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";
-			for (int i = 0; i < variablesNames.length; i++) {
-				result[answersCounter] += "'" + variablesNames[i] + "'";
-				if ((i + 1) < variablesNames.length)
-					result[answersCounter] += ", ";
-			}
-			result[answersCounter] += ")); ";
-		}
-
-		answersCounter++;
-		CiaoPrologTermInJava[] answer;
-		while (queryAnswersIterator.hasNext()) {
-			answer = queryAnswersIterator.next();
-			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";
-			for (int i = 0; i < answer.length; i++) {
-				result[answersCounter] += answer[i].toJavaScript();
-				if ((i + 1) < answer.length)
-					result[answersCounter] += ", ";
-			}
-			result[answersCounter] += ")); ";
-			answersCounter++;
-		}
-		return result;
-	}
-
-	
 }

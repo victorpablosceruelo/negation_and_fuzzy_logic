@@ -7,7 +7,7 @@ import CiaoJava.PLVariable;
 import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
 
-public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQuery {
+public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract {
 
 	private CiaoPrologChangeWorkingFolderQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException {
 		super(programFileInfo);
