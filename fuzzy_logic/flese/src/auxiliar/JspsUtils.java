@@ -2,6 +2,8 @@ package auxiliar;
 
 import javax.servlet.http.HttpServletRequest;
 
+import constants.KConstants;
+import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
 
 public class JspsUtils {
@@ -17,7 +19,15 @@ public class JspsUtils {
 		}
 		return localUserInfoName;
 	}
-
+	
+	public static ResultsStoreHouse getResultsStoreHouse(HttpServletRequest request) {
+		ResultsStoreHouse resultsStoreHouse = (ResultsStoreHouse) request.getAttribute(KConstants.Request.resultsStoreHouse);
+		if (resultsStoreHouse == null) {
+			resultsStoreHouse = new ResultsStoreHouse();
+		}
+		return resultsStoreHouse;
+	}
+	
 	public static String comboBoxDefaultValue() {
 		return "<option id='----' title='----' value='----'>----</option>";
 	}

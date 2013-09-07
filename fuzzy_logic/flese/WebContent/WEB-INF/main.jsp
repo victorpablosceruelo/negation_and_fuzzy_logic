@@ -51,7 +51,7 @@
 
 	<% if (! "".equals(localUserInfoName)) { %>
 	<script type="text/javascript">
-		loadAjaxIn('mainSecDiv', "<%=KUrls.Files.List.getUrl(true) %>");		
+		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.ListDBs.getUrl(true) %>");		
 	</script>
 	<% } %>
 </body>

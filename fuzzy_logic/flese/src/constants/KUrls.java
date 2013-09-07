@@ -1,8 +1,5 @@
 package constants;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-
 import urls.UrlMap;
 
 public class KUrls {
@@ -12,8 +9,6 @@ public class KUrls {
 		public static final UrlMap Index = new UrlMap("", "indexPage", null, null, "index.jsp");
 		public static final UrlMap Exception = new UrlMap("", "exception", null, null, "WEB-INF/exceptionAjaxPage.jsp");
 		public static final UrlMap NullSession = new UrlMap("", "nullSession", null, null, "WEB-INF/nullSessionAjaxPage.jsp");
-
-		public static UrlMap[] urlsList = { Empty, Index, Exception, NullSession };
 	}
 
 	public static class Auth {
@@ -25,8 +20,6 @@ public class KUrls {
 
 		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/main.jsp");
 		public static final UrlMap SignOut = new UrlMap(manager, "signOut", SignOutPage, KUrls.Pages.Exception, "");
-
-		public static UrlMap[] urlsList = { SocialAuthCallback, SignInPage, SignIn, SignOutPage, SignOut };
 	}
 
 	public static class User {
@@ -34,8 +27,6 @@ public class KUrls {
 
 		public static final UrlMap OptionsPage = new UrlMap(manager, "optionsPage", null, null, "WEB-INF/userOptions.jsp");
 		public static final UrlMap Options = new UrlMap(manager, "options", OptionsPage, KUrls.Pages.Exception, "");
-
-		public static UrlMap[] urlsList = { OptionsPage, Options };
 	}
 
 	public static class Files {
@@ -54,14 +45,12 @@ public class KUrls {
 
 		public static final UrlMap RemovePage = new UrlMap(manager, "removePage", null, null, "WEB-INF/files/remove.jsp");
 		public static final UrlMap Remove = new UrlMap(manager, "remove", RemovePage, KUrls.Pages.Exception, "");
-
-		public static UrlMap[] urlsList = { ListPage, List, UploadPage, Upload, ViewPage, View, DownloadPage, Download, RemovePage, Remove };
 	}
 
 	public static class Queries {
 		public static String manager = "QueriesManager";
 
-		public static final UrlMap ListDBsPage = new UrlMap(manager, "listDBsPage", null, null, "WEB-INF/files/listDBs.jsp");
+		public static final UrlMap ListDBsPage = new UrlMap(manager, "listDBsPage", null, null, "WEB-INF/queries/listDBs.jsp");
 		public static final UrlMap ListDBs = new UrlMap(manager, "listDBs", ListDBsPage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap TestQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
@@ -75,8 +64,6 @@ public class KUrls {
 
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
-
-		public static UrlMap[] urlsList = { BuildQueryPage, BuildQuery, EvaluatePage, Evaluate };
 	}
 
 	public static class Fuzzifications {
@@ -87,39 +74,6 @@ public class KUrls {
 
 		public static final UrlMap SavePage = new UrlMap(manager, "", null, null, "WEB-INF/saveFuzzification.jsp");
 		public static final UrlMap Save = new UrlMap(manager, "save", SavePage, KUrls.Pages.Exception, "");
-
-		public static UrlMap[] urlsList = { ListPage, List, SavePage, Save };
-	}
-
-	public static final UrlMap[] urlsList() {
-		Class<?>[] subClasses = KUrls.class.getClasses();
-		ArrayList<UrlMap> fullList = new ArrayList<UrlMap>();
-		Field[] urlMapList = null;
-
-		for (int i = 0; i < subClasses.length; i++) {
-			urlMapList = null;
-			urlMapList = subClasses[i].getFields();
-
-			for (int j = 0; j < urlMapList.length; j++) {
-				Object objectDefined;
-				try {
-					objectDefined = urlMapList[j].get(null);
-				} catch (IllegalArgumentException e) {
-					objectDefined = null;
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					objectDefined = null;
-					e.printStackTrace();
-				}
-				UrlMap value = null;
-				if (objectDefined != null) {
-					value = (UrlMap) ((objectDefined instanceof UrlMap) ? objectDefined : null);
-				}
-				fullList.add(value);
-			}
-		}
-
-		return fullList.toArray(new UrlMap[fullList.size()]);
 	}
 
 }

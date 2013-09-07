@@ -1,5 +1,5 @@
+<%@page import="results.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
-<%@page import="org.apache.jasper.compiler.JspUtil"%>
 <%@page import="constants.KUrls"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="java.util.Iterator"%> 
@@ -10,7 +10,8 @@
 <%
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
-	ProgramFileInfo[] filesList = requestStoreHouse.getResultsStoreHouse().getFilesList();
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 
 	if (filesList.length == 0) {
 %>

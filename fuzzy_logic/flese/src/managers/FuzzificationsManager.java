@@ -1,6 +1,5 @@
 package managers;
 
-import results.ResultsStoreHouseUtils;
 import storeHouse.CacheStoreHouseCleaner;
 import auxiliar.NextStep;
 import auxiliar.ProgramAnalysisClass;
@@ -37,7 +36,7 @@ public class FuzzificationsManager extends AbstractManager {
 
 		ProgramAnalysisClass programAnalized = new ProgramAnalysisClass(requestStoreHouse);
 		String[] fuzzificationsList = programAnalized.getProgramFuzzificationsInJS();
-		ResultsStoreHouseUtils.updateFuzzificationsList(requestStoreHouse, fuzzificationsList);
+		resultsStoreHouse.setFuzzificationsList(fuzzificationsList);
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.ListPage, ""));
 

@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
 
-import results.ResultsStoreHouseUtils;
 import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfo;
@@ -46,7 +45,7 @@ public class FilesManager extends AbstractManager {
 
 	public void list() throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
-		ResultsStoreHouseUtils.updateFilesList(requestStoreHouse, filesList);
+		resultsStoreHouse.setFilesList(filesList);
 
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ListPage, ""));
@@ -57,13 +56,14 @@ public class FilesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
 
 		try {
-			FilesManagerAux.uploadFileAux(requestStoreHouse);
+			String filesNames = FilesManagerAux.uploadFileAux(requestStoreHouse);
+			resultsStoreHouse.addMessage("Name of the uploaded file: " + filesNames);
 		} catch (Exception e) {
 			msg = "Error: " + e.getMessage();
 			setNextStep(null);
 		}
 
-		ResultsStoreHouseUtils.addMessage(requestStoreHouse, msg);
+		resultsStoreHouse.addMessage(msg);
 
 	}
 
@@ -114,14 +114,15 @@ public class FilesManager extends AbstractManager {
 		}
 
 		programFileInfo.remove();
-		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "The program file " + programFileInfo.getFileName() + " has been removed. ");
+		resultsStoreHouse.addMessage("The program file " + programFileInfo.getFileName() + " has been removed. ");
 
 		CacheStoreHouseCleaner.clean(requestStoreHouse);
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 
-	public void viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
+	public void viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException,
+			RequestStoreHouseException {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
@@ -137,10 +138,9 @@ public class FilesManager extends AbstractManager {
 				e.printStackTrace();
 				throw new FilesManagerException(e.getMessage());
 			}
-			ResultsStoreHouseUtils.updateFileContents(requestStoreHouse, fileContents);
+			resultsStoreHouse.setFileContents(fileContents);
 		} else {
-			ResultsStoreHouseUtils.addMessage(requestStoreHouse,
-					"You are not allowed to see the contents of the file " + programFileInfo.getFileName());
+			resultsStoreHouse.addMessage("You are not allowed to see the contents of the file " + programFileInfo.getFileName());
 		}
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, ""));

@@ -3,9 +3,14 @@ package managers;
 import prologConnector.CiaoPrologNormalQuery;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import prologConnector.CiaoPrologQueryAnswer;
+import prologConnector.CiaoPrologTestingQuery;
+import storeHouse.RequestStoreHouseException;
+import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
+import filesAndPaths.PathsMgmtException;
+import filesAndPaths.ProgramFileInfo;
 
 public class QueriesManager extends AbstractManager {
 
@@ -34,29 +39,41 @@ public class QueriesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void buildQuery() throws Exception {
-
-		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(requestStoreHouse.getProgramFileInfo());
-		CiaoPrologQueryAnswer [] queryAnswers = ciaoPrologProgramIntrospectionQuery.getQueryAnswers();
-		requestStoreHouse.getResultsStoreHouse().setCiaoPrologQueryAnswers(queryAnswers);
-		
-		/*
-		 * LOG.info("------"); LOG.info("------");
-		 * LOG.info("--------> testing query !!! <-----------");
-		 * LOG.info("------"); LOG.info("------");
-		 * connection.testingQuery(fileOwner, fileName);
-		 */
-
-		// Forward to the jsp page.
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		CiaoPrologQueryAnswer[] queryAnswers = ciaoPrologProgramIntrospectionQuery.getQueryAnswers();
+		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.BuildQueryPage, ""));
 	}
-	
+
+	public void addLineToQuery() throws Exception {
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		CiaoPrologQueryAnswer[] queryAnswers = ciaoPrologProgramIntrospectionQuery.getQueryAnswers();
+		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.AddLineToQueryPage, ""));
+	}
+
 	public void evaluate() throws Exception {
-
-		// CiaoPrologNormalQuery query = 
-		CiaoPrologNormalQuery.getInstance(requestStoreHouse);
-
-		// Forward to the jsp page.
+		CiaoPrologNormalQuery query = CiaoPrologNormalQuery.getInstance(requestStoreHouse);
+		CiaoPrologQueryAnswer[] queryAnswers = query.getQueryAnswers();
+		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, ""));
 	}
-	
+
+	public void test() throws Exception {
+		CiaoPrologTestingQuery query = CiaoPrologTestingQuery.getInstance(requestStoreHouse.getProgramFileInfo());
+		CiaoPrologQueryAnswer[] queryAnswers = query.getQueryAnswers();
+		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, ""));
+	}
+
+	public void listDBs() throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
+		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
+		resultsStoreHouse.setFilesList(filesList);
+
+		// Forward to the jsp page.
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.ListDBsPage, ""));
+	}
+
 }

@@ -11,7 +11,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import results.ResultsStoreHouse;
 import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FileInfoException;
@@ -161,19 +160,6 @@ public class RequestStoreHouse {
 
 	public String getRequestServerName() {
 		return this.request.getServerName();
-	}
-
-	public ResultsStoreHouse getResultsStoreHouse() {
-		ResultsStoreHouse resultsStoreHouse = (ResultsStoreHouse) request.getAttribute(KConstants.Request.resultsStoreHouse);
-		if (resultsStoreHouse == null)
-			resultsStoreHouse = new ResultsStoreHouse();
-		return resultsStoreHouse;
-	}
-
-	public void setResultsStoreHouse(ResultsStoreHouse resultsStoreHouse) {
-		this.request.removeAttribute(KConstants.Request.resultsStoreHouse);
-		if (resultsStoreHouse != null)
-			this.request.setAttribute(KConstants.Request.resultsStoreHouse, resultsStoreHouse);
 	}
 
 	public String getProviderId() throws RequestStoreHouseException {

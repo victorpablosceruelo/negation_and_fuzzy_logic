@@ -9,7 +9,7 @@ import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
-	public CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
+	private CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
 			LocalUserInfoException {
 		super(programFileInfo);
 
@@ -54,4 +54,8 @@ public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
 	}
 
+	public static CiaoPrologTestingQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
+			LocalUserInfoException {
+		return new CiaoPrologTestingQuery(programFileInfo);
+	}
 }

@@ -1,5 +1,6 @@
 package prologConnector;
 
+import constants.KConstants;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import CiaoJava.PLStructure;
@@ -9,13 +10,6 @@ import filesAndPaths.PathsMgmtException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract {
-
-	public static class Constants {
-		public static final String predicateType = "predicateType";
-		public static final String predicateName = "predicateName";
-		public static final String predicateArity = "predicateArity";
-		public static final String predicateTypes = "predicateTypes";
-	}
 
 	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologQueryException, PathsMgmtException {
 		super(fileInfo);
@@ -30,7 +24,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		PLTerm[] args = { variables[0], variables[1], variables[2], variables[3] };
 		PLStructure query = new PLStructure("rfuzzy_introspection", args);
 
-		String[] variablesNames = { Constants.predicateType, Constants.predicateName, Constants.predicateArity, Constants.predicateTypes };
+		String[] variablesNames = { KConstants.ProgramIntrospectionFields.predicateType, KConstants.ProgramIntrospectionFields.predicateName, KConstants.ProgramIntrospectionFields.predicateArity, KConstants.ProgramIntrospectionFields.predicateMoreInfo };
 
 		setRealQuery(query, variables, variablesNames);
 
@@ -75,12 +69,15 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		boolean found = false;
 		while (i < queryAnswers.size() && (!found)) {
 			answer = queryAnswers.get(i);
-			CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(Constants.predicateName);
+			CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateName);
 			String currentDefPredicateName = term.toString();
 			if (predicateName.equals(currentDefPredicateName))
 				found = true;
 			else
 				i++;
+		}
+		if (answer == null) {
+			throw new CiaoPrologQueryException("returned answer cannot be null.");
 		}
 		return answer;
 	}

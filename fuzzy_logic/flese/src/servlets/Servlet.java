@@ -95,7 +95,7 @@ public class Servlet extends HttpServlet {
 
 		// By-pass parameters to the manager.
 		managerObject.setSessionStoreHouse(requestStoreHouse);
-
+		
 		// Dispatch the query.
 		return managerObject.processRequest();
 	}

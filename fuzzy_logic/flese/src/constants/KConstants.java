@@ -80,6 +80,13 @@ public class KConstants {
 		public final static String predNecessary = "predNecessary";
 		public final static String predOwner = "predOwner";
 	}
+	
+	public static class ProgramIntrospectionFields {
+		public static final String predicateType = "predicateType";
+		public static final String predicateName = "predicateName";
+		public static final String predicateArity = "predicateArity";
+		public static final String predicateMoreInfo = "predicateMoreInfo";
+	}
 }
 
 // **********************************

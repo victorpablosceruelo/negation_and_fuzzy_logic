@@ -11,13 +11,12 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import constants.KConstants;
-import results.ResultsStoreHouseUtils;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.CastingsClass;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
+import constants.KConstants;
 import filesAndPaths.FileInfoException;
 import filesAndPaths.PathsMgmt;
 import filesAndPaths.PathsMgmtException;
@@ -41,10 +40,11 @@ public class FilesManagerAux {
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
 	 * @throws PathsMgmtException
-	 * @throws LocalUserInfoException 
-	 * @throws RequestStoreHouseException 
+	 * @throws LocalUserInfoException
+	 * @throws RequestStoreHouseException
 	 */
-	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
+	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, LocalUserInfoException,
+			RequestStoreHouseException {
 
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
@@ -87,8 +87,8 @@ public class FilesManagerAux {
 	 * @param subDir
 	 *            is the full path of the subdirectory we are listing.
 	 * @return the program files list.
-	 * @throws PathsMgmtException 
-	 * @throws LocalUserInfoException 
+	 * @throws PathsMgmtException
+	 * @throws LocalUserInfoException
 	 */
 	private static ArrayList<ProgramFileInfo> listProgramFilesInSubDir(String subDir, PathsMgmt pathsMgmt,
 			ArrayList<ProgramFileInfo> currentList) throws PathsMgmtException, LocalUserInfoException {
@@ -124,7 +124,7 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static void uploadFileAux(RequestStoreHouse requestStoreHouse) throws Exception {
+	public static String uploadFileAux(RequestStoreHouse requestStoreHouse) throws Exception {
 		if ((requestStoreHouse.getDoMethod() == null) || ("doGet".equals(requestStoreHouse.getDoMethod()))) {
 			throw new ServletException("Uploads are only allowed using http post method.");
 		}
@@ -138,11 +138,11 @@ public class FilesManagerAux {
 		// Folder checks
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
-		
-		if (! (localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
+
+		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
 			throw new Exception("The user must be the owner of the destiny folder.");
 		}
-		
+
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// maximum size that will be stored in memory
 		factory.setSizeThreshold(KConstants.Communications.maxMemSize);
@@ -160,20 +160,19 @@ public class FilesManagerAux {
 		String filesPath = programFileInfo.getProgramFileFolderFullPath();
 		if ((filesPath == null) || ("".equals(filesPath))) {
 			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
-		} 
-		
-		// Adequate 
+		}
+
+		// Adequate
 		if (!(filesPath.endsWith("/"))) {
-				filesPath += "/";
+			filesPath += "/";
 		}
 
 		// Parse the request to get file items.
 		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(requestStoreHouse.getRequest()));
 
-		// Process the uploaded file items
-		// Iterator<FileItem> i = fileItems.iterator();
 
-		// while ( i.hasNext () )
+		StringBuilder fileNames = new StringBuilder();
+		
 		for (int i = 0; i < fileItems.size(); i++) {
 			// FileItem fileItem = (FileItem)i.next();
 			FileItem fileItem = fileItems.get(i);
@@ -206,11 +205,16 @@ public class FilesManagerAux {
 
 				File file = new File(fileName);
 				fileItem.write(file);
-				ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Name of the uploaded file: " + fileName);
+				
+				if (i>0) {
+				fileNames.append(", ");
+				}
+				fileNames.append(fileName);
 			}
 		}
+		return fileNames.toString();
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

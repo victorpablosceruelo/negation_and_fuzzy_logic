@@ -7,6 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import auxiliar.LocalUserInfoException;
+import prologConnector.CiaoPrologQueryAnswer;
+import prologConnector.CiaoPrologQueryAnswerException;
 import prologConnector.CiaoPrologTermInJava;
 import prologConnector.CiaoPrologTermInJavaException;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
@@ -67,7 +69,7 @@ public class ConversorToPrologQuery {
 	private RequestStoreHouse requestStoreHouse = null;
 
 	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, FileInfoException, LocalUserInfoException, RequestStoreHouseException {
+			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, FileInfoException, LocalUserInfoException, RequestStoreHouseException, CiaoPrologQueryAnswerException {
 
 		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
@@ -110,7 +112,7 @@ public class ConversorToPrologQuery {
 		queryConvert();
 	}
 
-	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologTermInJavaException, RequestStoreHouseException {
+	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologTermInJavaException, RequestStoreHouseException, CiaoPrologQueryAnswerException, CiaoPrologQueryException {
 		ConversionInput input = prologSubQuery.input;
 		String msg = "";
 		msg += ("\n  fp: " + input.quantifier0 + "(" + input.quantifier1 + "(" + input.predicate + "))");
@@ -131,8 +133,8 @@ public class ConversorToPrologQuery {
 			if ((input.rfuzzyComputeOperator != null) && (input.rfuzzyComputeValue != null)) {
 				subqueryRfuzzyComputeOperatorEndTestAndSave(prologSubQuery);
 			} else {
-				CiaoPrologTermInJava[] predInfo = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
-				if (hasTruthValueTypeAsReturnType(predInfo[2], input)) {
+				CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
+				if (hasTruthValueTypeAsReturnType(queryAnswer, input)) {
 					subqueryFuzzyEndTestAndSave(prologSubQuery);
 				} else {
 					throw new QueryConversorException("You need to fill all the fields for non-fuzzy queries.");
@@ -145,7 +147,8 @@ public class ConversorToPrologQuery {
 		}
 	}
 
-	private boolean hasTruthValueTypeAsReturnType(CiaoPrologTermInJava predInfoType, ConversionInput input) throws QueryConversorException {
+	private boolean hasTruthValueTypeAsReturnType(CiaoPrologQueryAnswer queryAnswer, ConversionInput input) throws QueryConversorException, CiaoPrologQueryAnswerException {
+		CiaoPrologTermInJava predInfoType = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateType);
 		boolean found = false;
 		String msg = "";
 		if (predInfoType == null)
@@ -179,7 +182,7 @@ public class ConversorToPrologQuery {
 	}
 
 	private void subQueryInitialEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
-			CiaoPrologTermInJavaException, RequestStoreHouseException {
+			CiaoPrologTermInJavaException, RequestStoreHouseException, CiaoPrologQueryAnswerException, CiaoPrologQueryException {
 		ConversionInput input = prologSubQuery.input;
 		if (input.initialPredicate == null) {
 			throw new QueryConversorException("No initial predicate for the query.");
@@ -187,20 +190,20 @@ public class ConversorToPrologQuery {
 		if (showVariables != null) {
 			throw new QueryConversorException("You cannot configure twice the initial subquery.");
 		}
-		CiaoPrologTermInJava[] PredInfo = ciaoPrologIntrospectionQuery.getPredicateInfo(input.initialPredicate);
-		if (PredInfo == null)
+		
+		CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.initialPredicate);
+		CiaoPrologTermInJava predArity = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateType);
+		if (predArity == null)
 			throw new QueryConversorException("No possible conversion for the initial predicate.");
-		if (PredInfo[1] == null)
-			throw new QueryConversorException("No defined arity for the initial predicate.");
-		if (PredInfo[1].toString() == null)
+		if (predArity.toString() == null)
 			throw new QueryConversorException("No defined arity for the initial predicate.");
 
-		LOG.info("PredInfo[1].toString(): " + PredInfo[1].toString());
+		LOG.info("predArity.toString(): " + predArity.toString());
 
 		// SubGoal1: call the typing predicate.
-		int PredArity = Integer.parseInt(PredInfo[1].toString());
-		PLVariable[] plArgsSubGoal1 = new PLVariable[PredArity];
-		for (int i = 0; i < PredArity; i++) {
+		int predArityInt = Integer.parseInt(predArity.toString());
+		PLVariable[] plArgsSubGoal1 = new PLVariable[predArityInt];
+		for (int i = 0; i < predArityInt; i++) {
 			plArgsSubGoal1[i] = new PLVariable();
 		}
 
@@ -210,7 +213,8 @@ public class ConversorToPrologQuery {
 			showVariables[i + 1] = plArgsSubGoal1[i];
 		}
 
-		copyVariablesNamesToo(input.initialPredicate, PredInfo[3]);
+		CiaoPrologTermInJava predMoreInfo = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateMoreInfo);
+		copyVariablesNamesToo(input.initialPredicate, predMoreInfo);
 
 		PLStructure subGoal1 = new PLStructure(input.initialPredicate, plArgsSubGoal1);
 
@@ -290,13 +294,14 @@ public class ConversorToPrologQuery {
 	}
 
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
-			CiaoPrologTermInJavaException {
+			CiaoPrologTermInJavaException, CiaoPrologQueryException, CiaoPrologQueryAnswerException {
 		ConversionInput input = prologSubQuery.input;
-		CiaoPrologTermInJava[] PredInfo = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
-		if ((PredInfo == null) || (PredInfo[1] == null) || (PredInfo[1].toString() == null)) {
+		CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
+		CiaoPrologTermInJava predArity = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateArity);
+		if ((predArity == null) || (predArity.toString() == null)) {
 			throw new QueryConversorException("No defined arity for the predicate " + input.predicate);
 		} else {
-			int PredArity = Integer.parseInt(PredInfo[1].toString());
+			int PredArity = Integer.parseInt(predArity.toString());
 			if (PredArity != 2)
 				throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
@@ -347,15 +352,15 @@ public class ConversorToPrologQuery {
 
 	}
 
-	private void subqueryFuzzyEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologTermInJavaException {
+	private void subqueryFuzzyEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologTermInJavaException, CiaoPrologQueryException, CiaoPrologQueryAnswerException {
 		ConversionInput input = prologSubQuery.input;
-		CiaoPrologTermInJava[] PredInfo = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
-		if (PredInfo == null)
-			throw new QueryConversorException("Predicate is not in database. Predicate: " + input.predicate);
-		if (PredInfo[1].toString() == null) {
+		CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
+		CiaoPrologTermInJava predArity = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateArity);
+
+		if (predArity.toString() == null) {
 			throw new QueryConversorException("No defined arity for the predicate " + input.predicate);
 		} else {
-			int PredArity = Integer.parseInt(PredInfo[1].toString());
+			int PredArity = Integer.parseInt(predArity.toString());
 			if (PredArity != 2)
 				throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}

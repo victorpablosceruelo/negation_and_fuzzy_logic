@@ -1,8 +1,10 @@
 package urls;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
-import constants.KConstants;
 import constants.KUrls;
 
 public class UrlsMaps {
@@ -24,7 +26,7 @@ public class UrlsMaps {
 		String op = getOp(urlMap);
 
 		if (!loaded) {
-			load(KUrls.urlsList());
+			load();
 		}
 
 		try {
@@ -38,7 +40,51 @@ public class UrlsMaps {
 		return urlMap;
 	}
 
-	private static void load(UrlMap[] pagesList) {
+	/**
+	 * This predicate uses Java reflection to get all the urls defined in it.
+	 * 
+	 * @return
+	 */
+	public static final UrlMap[] retrieveDefinedUrls() {
+		Class<?>[] subClasses = KUrls.class.getClasses();
+		ArrayList<UrlMap> fullList = new ArrayList<UrlMap>();
+		Field[] urlMapList = null;
+
+		for (int i = 0; i < subClasses.length; i++) {
+			urlMapList = null;
+			urlMapList = subClasses[i].getFields();
+
+			for (int j = 0; j < urlMapList.length; j++) {
+				Object objectDefined;
+				try {
+					objectDefined = urlMapList[j].get(null);
+				} catch (IllegalArgumentException e) {
+					objectDefined = null;
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					objectDefined = null;
+					e.printStackTrace();
+				}
+				UrlMap value = null;
+				if (objectDefined != null) {
+					value = (UrlMap) ((objectDefined instanceof UrlMap) ? objectDefined : null);
+				}
+				if (value != null) {
+					fullList.add(value);
+				}
+			}
+		}
+
+		return fullList.toArray(new UrlMap[fullList.size()]);
+	}
+
+	/**
+	 * This predicate loads all the defined pages in KUrls so that we ca access
+	 * dynamically to them.
+	 */
+	private static void load() {
+
+		UrlMap[] pagesList = retrieveDefinedUrls();
 
 		for (int i = 0; i < pagesList.length; i++) {
 			UrlMap page = pagesList[i];

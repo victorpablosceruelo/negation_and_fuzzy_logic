@@ -19,7 +19,7 @@ public class ResultsStoreHouse {
 	 * @param msg
 	 *            is the message to be added. Cannot be null.
 	 */
-	protected void addMessage(String msg) {
+	public void addMessage(String msg) {
 		if ((msg != null) && (!"".equals(msg))) {
 			messages.add(msg);
 		}

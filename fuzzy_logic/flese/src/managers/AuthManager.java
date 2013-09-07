@@ -10,7 +10,6 @@ import org.brickred.socialauth.SocialAuthConfig;
 import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
-import results.ResultsStoreHouseUtils;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
@@ -60,7 +59,7 @@ public class AuthManager extends AbstractManager {
 	public void authenticate() throws Exception {
 
 		if (requestStoreHouse.getSession().appIsInTestingMode()) {
-			ResultsStoreHouseUtils.addMessage(requestStoreHouse, "INFO: Social Authentication in Testing mode.");
+			resultsStoreHouse.addMessage("INFO: Social Authentication in Testing mode.");
 		} else {
 			// get the social auth manager from session
 			tryAuthenticationWithSocialAuthManager();
@@ -71,8 +70,8 @@ public class AuthManager extends AbstractManager {
 		LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
 
 		String providerId = requestStoreHouse.getProviderId();
-		
-		ResultsStoreHouseUtils.addMessage(requestStoreHouse, "Welcome to the FleSe application !!");
+
+		resultsStoreHouse.addMessage("Welcome to the FleSe application !!");
 		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
 	}
 
@@ -132,7 +131,7 @@ public class AuthManager extends AbstractManager {
 
 		// Get the provider id.
 		String providerId = requestStoreHouse.getProviderId();
-		
+
 		// Returns the host name of the server to which the request was sent.
 		String serverName = requestStoreHouse.getRequest().getServerName();
 		if ((serverName != null) && ("localhost".equals(serverName))) {
