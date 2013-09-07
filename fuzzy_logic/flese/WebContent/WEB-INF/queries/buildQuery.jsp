@@ -6,10 +6,7 @@
 <%
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
-	CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = requestStoreHouse.getResultsStoreHouse().getCiaoPrologProgramIntrospectionQuery();
-
-	CiaoPrologQueryAnswer [] queryAnswers = ciaoPrologProgramIntrospectionQuery.getQueryAnswers();
-	
+	CiaoPrologQueryAnswer [] queryAnswers = requestStoreHouse.getResultsStoreHouse().getCiaoPrologQueryAnswers();	
 	
 %>
 

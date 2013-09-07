@@ -62,7 +62,7 @@ public class KUrls {
 		public static String manager = "QueriesManager";
 
 		public static final UrlMap BuildQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/buildQuery.jsp");
-		public static final UrlMap BuildQuery = new UrlMap(manager, "introspection", BuildQueryPage, KUrls.Pages.Exception, "");
+		public static final UrlMap BuildQuery = new UrlMap(manager, "buildQuery", BuildQueryPage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/runQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");

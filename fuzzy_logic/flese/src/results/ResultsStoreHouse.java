@@ -2,7 +2,7 @@ package results;
 
 import java.util.ArrayList;
 
-import prologConnector.CiaoPrologProgramIntrospectionQuery;
+import prologConnector.CiaoPrologQueryAnswer;
 import filesAndPaths.ProgramFileInfo;
 
 public class ResultsStoreHouse {
@@ -11,7 +11,7 @@ public class ResultsStoreHouse {
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
 	private String[] fileContents = null;
 	private String[] fuzzificationsList = null;
-	private CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = null;
+	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
 
 	/**
 	 * Adds a message to the request session attribute msgs.
@@ -59,15 +59,15 @@ public class ResultsStoreHouse {
 		return fuzzificationsList;
 	}
 
-	public void setCiaoPrologProgramIntrospectionQuery(CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery) {
-		this.ciaoPrologProgramIntrospectionQuery = null;
-		if (ciaoPrologProgramIntrospectionQuery != null) {
-			this.ciaoPrologProgramIntrospectionQuery = ciaoPrologProgramIntrospectionQuery;
+	public void setCiaoPrologQueryAnswers(CiaoPrologQueryAnswer[] queryAnswers) {
+		this.queryAnswers = new CiaoPrologQueryAnswer[0];
+		if (queryAnswers != null) {
+			this.queryAnswers = queryAnswers;
 		}
 
 	}
 
-	public CiaoPrologProgramIntrospectionQuery getCiaoPrologProgramIntrospectionQuery() {
-		return this.ciaoPrologProgramIntrospectionQuery;
+	public CiaoPrologQueryAnswer[] getCiaoPrologQueryAnswers() {
+		return this.queryAnswers;
 	}
 }

@@ -2,6 +2,7 @@ package managers;
 
 import prologConnector.CiaoPrologNormalQuery;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
+import prologConnector.CiaoPrologQueryAnswer;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
@@ -35,7 +36,8 @@ public class QueriesManager extends AbstractManager {
 	public void buildQuery() throws Exception {
 
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(requestStoreHouse.getProgramFileInfo());
-		requestStoreHouse.getResultsStoreHouse().setCiaoPrologProgramIntrospectionQuery(ciaoPrologProgramIntrospectionQuery);
+		CiaoPrologQueryAnswer [] queryAnswers = ciaoPrologProgramIntrospectionQuery.getQueryAnswers();
+		requestStoreHouse.getResultsStoreHouse().setCiaoPrologQueryAnswers(queryAnswers);
 		
 		/*
 		 * LOG.info("------"); LOG.info("------");
