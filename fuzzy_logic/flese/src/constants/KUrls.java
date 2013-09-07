@@ -61,10 +61,19 @@ public class KUrls {
 	public static class Queries {
 		public static String manager = "QueriesManager";
 
+		public static final UrlMap ListDBsPage = new UrlMap(manager, "listDBsPage", null, null, "WEB-INF/files/listDBs.jsp");
+		public static final UrlMap ListDBs = new UrlMap(manager, "listDBs", ListDBsPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap TestQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
+		public static final UrlMap TestQuery = new UrlMap(manager, "test", TestQueryPage, KUrls.Pages.Exception, "");
+
 		public static final UrlMap BuildQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/buildQuery.jsp");
 		public static final UrlMap BuildQuery = new UrlMap(manager, "buildQuery", BuildQueryPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/runQuery.jsp");
+		public static final UrlMap AddLineToQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/addLineToQuery.jsp");
+		public static final UrlMap AddLineToQuery = new UrlMap(manager, "addLineToQuery", AddLineToQueryPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
 
 		public static UrlMap[] urlsList = { BuildQueryPage, BuildQuery, EvaluatePage, Evaluate };
@@ -83,38 +92,34 @@ public class KUrls {
 	}
 
 	public static final UrlMap[] urlsList() {
-		Class<?> [] subClasses = KUrls.class.getClasses();
+		Class<?>[] subClasses = KUrls.class.getClasses();
 		ArrayList<UrlMap> fullList = new ArrayList<UrlMap>();
-		Field urlsListObject = null;
-		Object urlsListValues = null;
-		
-		for (int i=0; i<subClasses.length; i++) {
-			urlsListObject = null;
-			urlsListValues = null;
-			try {
-				urlsListObject = subClasses[i].getDeclaredField("urlsList");
-				if (urlsListObject != null) {
-					urlsListValues = urlsListObject.get(null);
+		Field[] urlMapList = null;
+
+		for (int i = 0; i < subClasses.length; i++) {
+			urlMapList = null;
+			urlMapList = subClasses[i].getFields();
+
+			for (int j = 0; j < urlMapList.length; j++) {
+				Object objectDefined;
+				try {
+					objectDefined = urlMapList[j].get(null);
+				} catch (IllegalArgumentException e) {
+					objectDefined = null;
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					objectDefined = null;
+					e.printStackTrace();
 				}
-			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			
-			if ((urlsListValues != null) && (urlsListValues instanceof UrlMap[])) {
-				UrlMap[] aux = (UrlMap[]) urlsListValues;
-				for (int j=0; j<aux.length; j++) {
-					fullList.add(aux[j]);
+				UrlMap value = null;
+				if (objectDefined != null) {
+					value = (UrlMap) ((objectDefined instanceof UrlMap) ? objectDefined : null);
 				}
+				fullList.add(value);
 			}
 		}
-		
-		return fullList.toArray(new UrlMap [fullList.size()]);
+
+		return fullList.toArray(new UrlMap[fullList.size()]);
 	}
 
 }
