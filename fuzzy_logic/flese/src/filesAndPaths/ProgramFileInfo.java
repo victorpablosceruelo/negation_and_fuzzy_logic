@@ -43,6 +43,10 @@ public class ProgramFileInfo {
 	public String getFileOwner() {
 		return fileOwner;
 	}
+	
+	public String getInfoForUrls() {
+		return "&fileName="+getFileName()+"&fileOwner="+getFileOwner();
+	}
 
 	public String getProgramFileFullPath() throws PathsMgmtException {
 		return PathsUtils.concatPathsStrings(getProgramFileFolderFullPath(), fileName);

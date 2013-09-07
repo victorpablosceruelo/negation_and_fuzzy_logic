@@ -18,7 +18,7 @@ function loadAjaxIn(containerName, ajaxPageUrl) {
 	debug.info("loadAjaxIn("+containerName + ", " + ajaxPageUrl + ")");
 	var container = document.getElementById(containerName);
 	if (container == null) {
-		debug.info("Container with name " + containerName + " does not exist.");
+		debug.info("loadAjaxIn: Container with name " + containerName + " does not exist.");
 	}
 	else {
 		container.innerHTML=loadingImageHtml(true);
@@ -60,6 +60,47 @@ function isString(o) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+function getComboBoxValue(comboBox) {
+	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+	
+	// alert("comboBoxValue: " + comboBoxValue);
+	if (comboBoxValue == null) {
+		debug.info("getComboBoxValue: comboBoxValue is null.");
+		return "";
+	}
+	
+	if (comboBoxValue == "") {
+		debug.info("getComboBoxValue: comboBoxValue is empty string.");
+		return "";
+	} 
+	
+	if (comboBoxValue == "----") {
+		debug.info("getComboBoxValue: comboBoxValue is default value (----).");
+		return "";
+	}
+	
+	return comboBoxValue;
+}
+
+function splitStringResult(head, tail) {
+	this.head = head;
+	this.tail = tail;
+}
+
+function splitString(inputString, separation) {
+	var splitStringResult = inputString;
+	var i = comboBoxValue.indexOf(separation);
+	if (i != -1) {
+		splitStringResult = new splitStringResult('', '');
+		splitStringResult.head = comboBoxValue.substring(0, i);
+		splitStringResult.tail = comboBoxValue.substring(i+separation.length);
+	}
+	return splitStringResult;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
 
 function fileInfo(fileName, fileOwner) {
 	this.fileName = fileName;
@@ -136,42 +177,28 @@ function getProgramDatabaseComboBoxValue(comboBox) {
 	return selectedProgramDatabase;
 }
 
-function selectedProgramDatabaseChanged(comboBox, parentDivId) {
-	// debug.info("parentDivId: " + parentDivId);
-	var parentDiv = document.getElementById(parentDivId);
-	
-	var selectQueryDiv = document.getElementById('selectQueryDiv');
+function selectedProgramDatabaseChanged(comboBox, selectQueryDivId, runQueryDivId, url) {
+	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	if (selectQueryDiv == null) {
-		selectQueryDiv = document.createElement('div');
-		selectQueryDiv.id = 'selectQueryDiv';
-		parentDiv.appendChild(selectQueryDiv);
+		debug.info("selectedProgramDatabaseChanged: selectQueryDiv is null.");
+		return;
 	}
-
 	selectQueryDiv.innerHTML = loadingImageHtml(true);
 	
-	runQueryDivId = 'runQueryDiv';
 	var runQueryDiv = document.getElementById(runQueryDivId);
 	if (runQueryDiv == null) {
-		runQueryDiv = document.createElement('div');
-		runQueryDiv.id = runQueryDivId;
-		parentDiv.appendChild(runQueryDiv);
+		debug.info("selectedProgramDatabaseChanged: runQueryDiv is null.");
+		return;		
 	}
 	runQueryDiv.innerHTML = "";
 	
-	var selectedProgramDatabase = getProgramDatabaseComboBoxValue(comboBox);
+	var selectedProgramDatabaseUrl = getComboBoxValue(comboBox);
 	
-	if (selectedProgramDatabase == null) {
+	if (selectedProgramDatabaseUrl == "") {
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
-		$.getScript(urlMappingFor('ProgramFileIntrospectionRequest') + 
-				"&fileName="+selectedProgramDatabase.fileName+"&fileOwner="+selectedProgramDatabase.fileOwner, 
-				function(data, textStatus, jqxhr) {
-					// debug.info("ProgramFileIntrospectionRequest done ... ");
-		   			// alert("ProgramFileIntrospectionRequest done ... ");
-					// alert("data: " + data);
-		   			insertQuerySelection(parentDivId, runQueryDivId, selectQueryDiv.id, selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner);
-				});
+		loadAjaxIn(runQueryDivId, selectedProgramDatabaseUrl);
 	}
 	
 }

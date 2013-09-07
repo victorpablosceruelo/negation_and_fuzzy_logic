@@ -1,3 +1,6 @@
+<%@page import="auxiliar.JspsUtils"%>
+<%@page import="org.apache.jasper.compiler.JspUtil"%>
+<%@page import="constants.KUrls"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="java.util.Iterator"%> 
 <%@page import="managers.FilesManagerAux"%>
@@ -21,18 +24,17 @@
 %>
 	<div class="selectDatabaseTableRow">
 		<div class="selectDatabaseTableCell1">
-			Please, choose a database to load: 
+			Please, select a database to load: 
 		</div>
 		<div class="selectDatabaseTableCell2">
-			<select name="chooseProgramFileId" id="chooseProgramFileId" onchange='selectedProgramDatabaseChanged(this, "parentDivId")' >
-			<option id='choose' title='choose' value=''>choose</option>
+			<select name="chooseProgramFileId" id="chooseProgramFileId" onchange='selectedProgramDatabaseChanged(this, "selectQueryDivId", "runQueryDivId")' >
+			<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 			for (int i=0; i<filesList.length; i++) { 
-				String name = filesList[i].getFileName() + "-owned-by-" + filesList[i].getFileOwner();
-				String id = filesList[i].getFileName() + "-owned-by-" + filesList[i].getFileOwner();
+				String value = KUrls.Queries.Introspection.getUrl(true) + filesList[i].getInfoForUrls();
 				String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
 %>	
-				<option id='<%=id %>' title='<%=name %>' value='<%=id %>'><%=desc %></option>
+				<option id='<%=value %>' title='<%=value %>' value='<%=value %>'><%=desc %></option>
 <%
 			}
 %>			</select>
@@ -41,5 +43,10 @@
 <%
 	}
 %>
+</div>
 
+<div id="selectQueryDivId" class="selectDatabaseTable">
+</div>
+
+<div id="runQueryDivId" class="selectDatabaseTable">
 </div>

@@ -18,4 +18,7 @@ public class JspsUtils {
 		return localUserInfoName;
 	}
 
+	public static String comboBoxDefaultValue() {
+		return "<option id='----' title='----' value='----'>----</option>";
+	}
 }
