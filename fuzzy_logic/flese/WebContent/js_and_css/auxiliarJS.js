@@ -14,11 +14,11 @@ function loadingImageHtml(withNewLine) {
 	else return result;
 }
 
-function loadAjaxIn(containerName, ajaxPageUrl) {
-	debug.info("loadAjaxIn("+containerName + ", " + ajaxPageUrl + ")");
-	var container = document.getElementById(containerName);
+function loadAjaxIn(containerId, ajaxPageUrl) {
+	debug.info("loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
+	var container = document.getElementById(containerId);
 	if (container == null) {
-		debug.info("loadAjaxIn: Container with name " + containerName + " does not exist.");
+		debug.info("loadAjaxIn: Container with id " + containerId + " does not exist.");
 	}
 	else {
 		container.innerHTML=loadingImageHtml(true);
@@ -198,7 +198,7 @@ function selectedProgramDatabaseChanged(comboBox, selectQueryDivId, runQueryDivI
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
-		loadAjaxIn(runQueryDivId, selectedProgramDatabaseUrl);
+		loadAjaxIn(selectQueryDivId, selectedProgramDatabaseUrl);
 	}
 	
 }
