@@ -28,6 +28,14 @@ public class PathsMgmt {
 			setPlServerPath(tmpPlServerPath);
 			LOG.info("plServerPath: " + plServerPath);
 		}
+		
+		if (programFilesPath == null) {
+			throw new PathsMgmtException("programFilesPath cannot be null.");
+		}
+		
+		if (plServerPath == null) {
+			throw new PathsMgmtException("plServerPath cannot be null.");
+		}
 	}
 
 	public String getProgramFilesPath() throws PathsMgmtException {
@@ -49,7 +57,7 @@ public class PathsMgmt {
 	}
 
 	private synchronized void setPlServerPath(String tmpPlServerPath) throws PathsMgmtException {
-		if (programFilesPath == null) {
+		if (plServerPath == null) {
 			plServerPath = tmpPlServerPath;
 		}
 	}

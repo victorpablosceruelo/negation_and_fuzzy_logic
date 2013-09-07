@@ -9,21 +9,21 @@ import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 
-public class AnswerTermInJavaClass {
+public class CiaoPrologTermInJava {
 
 	private String singleAnswerTerm = null; // It can be . (list) or , (structure). 
-	private AnswerTermInJavaClass[] compositeAnswerTerm = null;
+	private CiaoPrologTermInJava[] compositeAnswerTerm = null;
 	
 	private PLTerm prologQueryAnswer = null;
 	private String creationMsgs = "";
 	
-	public AnswerTermInJavaClass(PLTerm term, PLTerm prologQueryAnswer) throws AnswerTermInJavaClassException {
+	public CiaoPrologTermInJava(PLTerm term, PLTerm prologQueryAnswer) throws CiaoPrologTermInJavaException {
 		creationMsgs += " ";
 		conversion(term, prologQueryAnswer);
 	}
 	
-	private void conversion(PLTerm term, PLTerm prologQueryAnswer) throws AnswerTermInJavaClassException {
-		if (term == null) throw new AnswerTermInJavaClassException("term is null.");
+	private void conversion(PLTerm term, PLTerm prologQueryAnswer) throws CiaoPrologTermInJavaException {
+		if (term == null) throw new CiaoPrologTermInJavaException("term is null.");
 		// Log ...
 		creationMsgs += "\nTerm: " + term.toString() + " ";
 		// For variables.
@@ -47,9 +47,9 @@ public class AnswerTermInJavaClass {
 			PLList prologList = (PLList) term;
 			int listLength = prologList.length();
 			if (listLength > 0) {
-				compositeAnswerTerm = new AnswerTermInJavaClass [listLength];
+				compositeAnswerTerm = new CiaoPrologTermInJava [listLength];
 				for (int i=0; i<listLength; i++) {
-					compositeAnswerTerm[i] = new AnswerTermInJavaClass(prologList.getHead(), prologQueryAnswer);
+					compositeAnswerTerm[i] = new CiaoPrologTermInJava(prologList.getHead(), prologQueryAnswer);
 					creationMsgs += compositeAnswerTerm[i].getCreationMsgs();
 					if ((prologList.getTail() != null) && (prologList.getTail().isList())) {
 						prologList = (PLList) prologList.getTail();
@@ -86,10 +86,10 @@ public class AnswerTermInJavaClass {
 			
 			int listLength = prologStructure.getArity();
 			if (listLength > 0) {
-				compositeAnswerTerm = new AnswerTermInJavaClass [listLength];
+				compositeAnswerTerm = new CiaoPrologTermInJava [listLength];
 
 				for (int i=0; i<listLength; i++) {
-					compositeAnswerTerm[i] = new AnswerTermInJavaClass(prologStructure.getArg(i), prologQueryAnswer);
+					compositeAnswerTerm[i] = new CiaoPrologTermInJava(prologStructure.getArg(i), prologQueryAnswer);
 					creationMsgs += compositeAnswerTerm[i].getCreationMsgs();
 				}
 			}
@@ -161,7 +161,7 @@ public class AnswerTermInJavaClass {
 		else
 			return compositeAnswerTerm.length;
 	}
-	public AnswerTermInJavaClass atPosition(int i) {
+	public CiaoPrologTermInJava atPosition(int i) {
 		if (((isList()) || (isArray())) && (i >= 0) && (i < length())) {
 			return compositeAnswerTerm[i];
 		}

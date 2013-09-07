@@ -2,14 +2,16 @@ package results;
 
 import java.util.ArrayList;
 
+import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import filesAndPaths.ProgramFileInfo;
 
 public class ResultsStoreHouse {
 
 	private ArrayList<String> messages = new ArrayList<String>();
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
-	private String [] fileContents = null;
-	private String [] fuzzificationsList = null;
+	private String[] fileContents = null;
+	private String[] fuzzificationsList = null;
+	private CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = null;
 
 	/**
 	 * Adds a message to the request session attribute msgs.
@@ -28,9 +30,9 @@ public class ResultsStoreHouse {
 		if (filesList != null) {
 			this.filesList = filesList;
 		}
-		
+
 	}
-	
+
 	public ProgramFileInfo[] getFilesList() {
 		return filesList;
 	}
@@ -42,19 +44,30 @@ public class ResultsStoreHouse {
 		}
 	}
 
-	public String [] getfileContents() {
+	public String[] getfileContents() {
 		return fileContents;
 	}
-	
+
 	public void setFuzzificationsList(String[] fuzzificationsList) {
 		this.fuzzificationsList = null;
 		if (fuzzificationsList != null) {
 			this.fuzzificationsList = fuzzificationsList;
 		}
 	}
-	
-	public String [] getFuzzificationsList() {
+
+	public String[] getFuzzificationsList() {
 		return fuzzificationsList;
 	}
 
+	public void setCiaoPrologProgramIntrospectionQuery(CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery) {
+		this.ciaoPrologProgramIntrospectionQuery = null;
+		if (ciaoPrologProgramIntrospectionQuery != null) {
+			this.ciaoPrologProgramIntrospectionQuery = ciaoPrologProgramIntrospectionQuery;
+		}
+
+	}
+
+	public CiaoPrologProgramIntrospectionQuery getCiaoPrologProgramIntrospectionQuery() {
+		return this.ciaoPrologProgramIntrospectionQuery;
+	}
 }

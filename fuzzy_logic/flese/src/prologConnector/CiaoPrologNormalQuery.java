@@ -18,7 +18,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQuery {
 	}
 
 	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException, FileInfoException,
+			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, FileInfoException,
 			QueryConversorException, LocalUserInfoException, RequestStoreHouseException {
 
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();

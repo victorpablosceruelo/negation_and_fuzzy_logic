@@ -24,8 +24,11 @@ public class PlConnectionEnvelope {
 	PathsMgmt pathsMgmt = null;
 
 	public PlConnectionEnvelope(int connectionId) throws PlConnectionEnvelopeException, PathsMgmtException {
-		if (connectionId <= 0) {
-			throw new PlConnectionEnvelopeException("connectionId cannot be <= 0");
+		if (connectionId < 0) {
+			throw new PlConnectionEnvelopeException("connectionId cannot be < 0");
+		}
+		if (connectionId >= KConstants.PlConnectionsPool.maxNumOfConnections) {
+			throw new PlConnectionEnvelopeException("connectionId cannot be >= " + KConstants.PlConnectionsPool.maxNumOfConnections);
 		}
 
 		this.connectionId = connectionId;
@@ -62,7 +65,7 @@ public class PlConnectionEnvelope {
 		return this.connectionId;
 	}
 
-	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
 			CiaoPrologQueryException, PathsMgmtException {
 
 		if (plConnection == null) {
@@ -84,13 +87,13 @@ public class PlConnectionEnvelope {
 	}
 
 	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologQueryException, PathsMgmtException,
-			PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+			PlConnectionEnvelopeException, CiaoPrologTermInJavaException {
 
 		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
 		runPrologQueryAux(folderChangeQuery);
 	}
 
-	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, AnswerTermInJavaClassException,
+	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
 			CiaoPrologQueryException {
 		if (this.isAvailable) {
 
@@ -103,14 +106,12 @@ public class PlConnectionEnvelope {
 
 		LOG.info("performQueryAux: getting answers ... ");
 		PLTerm prologQueryAnswer;
-		AnswerTermInJavaClass[] answerTermInJava = null;
 		long timesCounter;
 		boolean queryIsStillRunning = true;
 
 		String msgsAccumulator = "";
 		do { // Get all the answers you can.
 			prologQueryAnswer = null;
-			answerTermInJava = null;
 			timesCounter = 0;
 			// Save the current answer.
 			answersCounter++;
@@ -123,38 +124,37 @@ public class PlConnectionEnvelope {
 				queryIsStillRunning = getQueryIsStillRunning(evaluatedGoal);
 				timesCounter++;
 
-			} while ((prologQueryAnswer == null) && queryIsStillRunning && (timesCounter < KConstants.CiaoPrologQuery.maximumNumberOfRetries));
+			} while ((prologQueryAnswer == null) && queryIsStillRunning
+					&& (timesCounter < KConstants.CiaoPrologQuery.maximumNumberOfRetries));
 
 			if (timesCounter >= KConstants.CiaoPrologQuery.maximumNumberOfRetries) {
-				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= " + KConstants.CiaoPrologQuery.maximumNumberOfRetries);
+				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= "
+						+ KConstants.CiaoPrologQuery.maximumNumberOfRetries);
 			}
 
 			msgsAccumulator += "goal: " + evaluatedGoal.toString() + "\n";
 			if (prologQueryAnswer != null) {
+				CiaoPrologQueryAnswer ciaoPrologQueryAnswer = new CiaoPrologQueryAnswer();
 				int variablesLength = query.getVariablesLength();
-				answerTermInJava = new AnswerTermInJavaClass[variablesLength];
 				for (int i = 0; i < variablesLength; i++) {
-					// if (i != 0) msgsAccumulator += "\t";
 					msgsAccumulator += "      var[" + i + "]: ";
 
 					PLVariable variable = query.getVariables()[i];
+					String variableName = query.getVariablesNames()[i];
+					CiaoPrologTermInJava ciaoPrologTermInJava = null;
+					
 					if (variable != null) {
 						msgsAccumulator += (variable.toString() + " bind: " + variable.getBinding());
-						answerTermInJava[i] = new AnswerTermInJavaClass(variable, prologQueryAnswer);
-						msgsAccumulator += " -> " + answerTermInJava[i].toString() + " \n";
+						ciaoPrologTermInJava = new CiaoPrologTermInJava(variable, prologQueryAnswer);
+						msgsAccumulator += " -> " + ciaoPrologTermInJava.toString() + " \n";
 					} else {
-						answerTermInJava[i] = null;
+						ciaoPrologTermInJava = null;
 						msgsAccumulator += "null -> null \n";
 					}
+					
+					ciaoPrologQueryAnswer.addCiaoPrologVariableAnswer(variableName, ciaoPrologTermInJava);
 				}
-				// msgsAccumulator += "\n";
-				/*
-				 * preMsg += "\n   Creation MSGS: "; for (int i=0;
-				 * i<variables.length; i++) { if (answerTermInJava[i] != null) {
-				 * preMsg += answerTermInJava[i].getCreationMsgs(); } else {
-				 * preMsg += " answerTermInJava["+i+"] is null "; } }
-				 */
-				query.addQueryAnswer(answerTermInJava);
+				query.addQueryAnswer(ciaoPrologQueryAnswer);
 				// LOG.info(msgsAccumulator);
 			} else {
 				// LOG.info("performQueryAux: answer obtained: null ");

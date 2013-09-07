@@ -20,7 +20,7 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 	private PLVariable[] variables = null;
 
 	protected String[] variablesNames = null;
-	protected ArrayList<AnswerTermInJavaClass[]> queryAnswers = null;
+	protected ArrayList<CiaoPrologQueryAnswer> queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
 
 	protected CiaoPrologQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
@@ -30,7 +30,7 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 
 		this.programFileInfo = programFileInfo;
 
-		this.queryAnswers = new ArrayList<AnswerTermInJavaClass[]>();
+		this.queryAnswers = new ArrayList<CiaoPrologQueryAnswer>();
 	}
 
 	protected void setRealQuery(PLStructure query, PLVariable[] variables, String[] variablesNames) throws CiaoPrologQueryException {
@@ -86,8 +86,13 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 		return variablesNames.length;
 	}
 
-	public void addQueryAnswer(AnswerTermInJavaClass answerTerm[]) {
-		this.queryAnswers.add(answerTerm);
+	public void addQueryAnswer(CiaoPrologQueryAnswer ciaoPrologQueryAnswer) {
+		this.queryAnswers.add(ciaoPrologQueryAnswer);
+	}
+	
+	public CiaoPrologTermInJava[][] getQueryAnswers() {
+		return null;
+		// this.queryAnswers.toArray(new AnswerTermInJavaClass[][this.queryAnswers.size()]);
 	}
 
 	public String toString() {
@@ -98,7 +103,7 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 		if (queryAnswers == null)
 			return null;
 
-		Iterator<AnswerTermInJavaClass[]> queryAnswersIterator = queryAnswers.iterator();
+		Iterator<CiaoPrologTermInJava[]> queryAnswersIterator = queryAnswers.iterator();
 		if (queryAnswersIterator == null)
 			return null;
 
@@ -116,7 +121,7 @@ public abstract class CiaoPrologQuery implements CiaoPrologQueryInterface {
 		}
 
 		answersCounter++;
-		AnswerTermInJavaClass[] answer;
+		CiaoPrologTermInJava[] answer;
 		while (queryAnswersIterator.hasNext()) {
 			answer = queryAnswersIterator.next();
 			result[answersCounter] = "addToProgramQueryAnsers(" + answersCounter + ", new Array(";

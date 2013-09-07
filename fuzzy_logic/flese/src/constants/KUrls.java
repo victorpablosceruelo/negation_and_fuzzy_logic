@@ -61,13 +61,13 @@ public class KUrls {
 	public static class Queries {
 		public static String manager = "QueriesManager";
 
-		public static final UrlMap IntrospectionPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/introspection.jsp");
-		public static final UrlMap Introspection = new UrlMap(manager, "introspection", IntrospectionPage, KUrls.Pages.Exception, "");
+		public static final UrlMap BuildQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/buildQuery.jsp");
+		public static final UrlMap BuildQuery = new UrlMap(manager, "introspection", BuildQueryPage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/runQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
 
-		public static UrlMap[] urlsList = { IntrospectionPage, Introspection, EvaluatePage, Evaluate };
+		public static UrlMap[] urlsList = { BuildQueryPage, BuildQuery, EvaluatePage, Evaluate };
 	}
 
 	public static class Fuzzifications {

@@ -33,7 +33,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 	}
 
 	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException, PathsMgmtException,
-			CiaoPrologQueryException, PlConnectionEnvelopeException, AnswerTermInJavaClassException {
+			CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
 
@@ -57,8 +57,8 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public AnswerTermInJavaClass[] getPredicateInfo(String predicateName) {
-		Iterator<AnswerTermInJavaClass[]> iterator = null;
+	public CiaoPrologTermInJava[] getPredicateInfo(String predicateName) {
+		Iterator<CiaoPrologTermInJava[]> iterator = null;
 		if (queryAnswers != null)
 			iterator = queryAnswers.iterator();
 
@@ -69,7 +69,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 			LOG.error("Iterator of Program Introspection is NULL!! ");
 		}
 
-		AnswerTermInJavaClass[] answer = null;
+		CiaoPrologTermInJava[] answer = null;
 		if ((predicateName != null) && (iterator != null)) {
 			while ((iterator.hasNext()) && (answer == null)) {
 				answer = iterator.next();
@@ -87,7 +87,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 	public String[] getProgramIntrospectionInJS() {
 		if (queryAnswers == null)
 			return null;
-		Iterator<AnswerTermInJavaClass[]> queryAnswersIterator = queryAnswers.iterator();
+		Iterator<CiaoPrologTermInJava[]> queryAnswersIterator = queryAnswers.iterator();
 
 		if (queryAnswersIterator == null)
 			return null;
@@ -96,7 +96,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQuery {
 
 		int counter = 0;
 		String tmp = null;
-		AnswerTermInJavaClass[] predInfo;
+		CiaoPrologTermInJava[] predInfo;
 		while (queryAnswersIterator.hasNext()) {
 			predInfo = queryAnswersIterator.next();
 			tmp = "";

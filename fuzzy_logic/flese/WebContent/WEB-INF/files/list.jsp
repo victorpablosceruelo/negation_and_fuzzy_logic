@@ -30,9 +30,9 @@
 			<select name="chooseProgramFileId" id="chooseProgramFileId" onchange='selectedProgramDatabaseChanged(this, "selectQueryDivId", "runQueryDivId")' >
 			<%=JspsUtils.comboBoxDefaultValue() %>
 <%
-			for (int i=0; i<filesList.length; i++) { 
-				String value = KUrls.Queries.Introspection.getUrl(true) + filesList[i].getInfoForUrls();
-				String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
+	for (int i=0; i<filesList.length; i++) { 
+		String value = KUrls.Queries.BuildQuery.getUrl(true) + filesList[i].getInfoForUrls();
+		String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
 %>	
 				<option id='<%=value %>' title='<%=value %>' value='<%=value %>'><%=desc %></option>
 <%
