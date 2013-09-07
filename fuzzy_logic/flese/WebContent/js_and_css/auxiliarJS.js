@@ -216,36 +216,6 @@ function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, file
 	var chooseQueryStartTypeContainerId = "chooseQueryStartTypeDiv";
 	var queryLinesContainerId = "queryLinesContainer";
 	var queryLinesCounterFieldId = "queryLinesCounter";
-	
-	var html = "";
-	// html += "<form id='queryForm' action='' method='POST' accept-charset='utf-8'> ";
-	// 
-	// html += "      action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
-	// html += "      target='" + runQueryTargetiFrameId+ "'>";
-	html += "     <div id='queryStartContainer' class='queryStartContainerTable'>";
-	html += "          <div class='queryStartContainerTableRow'>";
-	html += "               <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>";
-	html += "               <div class='queryStartContainerTableCell2' id='"+ chooseQueryStartTypeContainerId +"'></div>";
-	html += "          </div>";
-	html += "     </div>";
-    html += "     <input type='hidden' name='"+ queryLinesCounterFieldId +"' value='0' id='"+ queryLinesCounterFieldId +"'>";
-    html += "     <div id='"+ queryLinesContainerId +"' class='"+queryLinesContainerId+"Table'></div>";
-    html += "     <div class='searchOrPersonalizeTable'>";
-    html += "          <div class='searchOrPersonalizeTableRow'>";
-    html += "               <div class='searchOrPersonalizeTableCell'>";
-	html += "                    <INPUT type='submit' value='Search' "+
-									"onclick='return runQueryAfterSoftTests(\"" + parentDivId + "\", \"" + runQueryDivId +  
-									"\", \"" + chooseQueryStartTypeId + 
-									"\", \"" + queryLinesCounterFieldId+"\", \""+fileName+"\", \""+fileOwner+"\");' >";
-	html += "               </div>";
-	html += "               <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;</div>";
-	html += "               <div class='searchOrPersonalizeTableCell'>";
-	html += "                    <INPUT type='submit' value='Personalize Program File' " +
-									"onclick='return personalizeProgramFile(\"" + fileName + "\", \"" + fileOwner + "\", \"basic\");'>";
-	html += "               </div>";
-	html += "          </div>";
-	html += "     </div>";
-	// html += "</form><br />";
     	
 	selectQueryDiv.innerHTML = html;
 	document.getElementById(queryLinesContainerId).style.display='none';
