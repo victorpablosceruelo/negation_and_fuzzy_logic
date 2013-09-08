@@ -6,7 +6,7 @@ import filesAndPaths.ProgramFileInfo;
 
 public interface CiaoPrologQueryInterface {
 
-	public PLStructure getQuery() throws CiaoPrologQueryException;
+	public PLStructure getQuery() throws CiaoPrologConnectorException;
 
 	public ProgramFileInfo getProgramFileInfo();
 

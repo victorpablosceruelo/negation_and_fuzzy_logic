@@ -31,28 +31,28 @@ public class PathsUtils {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public static boolean testIfFileExists(String fullPath, boolean launchException) throws PathsMgmtException {
+	public static boolean testIfFileExists(String fullPath, boolean launchException) throws FilesAndPathsException {
 		if (fullPath == null)
-			throw new PathsMgmtException("fullPath cannot be null.");
+			throw new FilesAndPathsException("fullPath cannot be null.");
 		if ("".equals(fullPath))
-			throw new PathsMgmtException("fullPath cannot be empty string.");
+			throw new FilesAndPathsException("fullPath cannot be empty string.");
 		if ("/".equals(fullPath))
-			throw new PathsMgmtException("fullPath cannot be the string /.");
+			throw new FilesAndPathsException("fullPath cannot be the string /.");
 
 		File file = new File(fullPath);
 		if (!file.exists()) {
 			if (launchException)
-				throw new PathsMgmtException("file does not exist. file: " + fullPath);
+				throw new FilesAndPathsException("file does not exist. file: " + fullPath);
 			return false;
 		}
 		if (!file.isFile()) {
 			if (launchException)
-				throw new PathsMgmtException("file is not a file. file: " + fullPath);
+				throw new FilesAndPathsException("file is not a file. file: " + fullPath);
 			return false;
 		}
 		if (!file.canRead()) {
 			if (launchException)
-				throw new PathsMgmtException("file is not readable. file: " + fullPath);
+				throw new FilesAndPathsException("file is not readable. file: " + fullPath);
 			return false;
 		}
 		return true;
@@ -62,7 +62,7 @@ public class PathsUtils {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static boolean testIfFolderExists(String folderName, boolean createFolderIfDoesNotExist) throws PathsMgmtException {
+	public static boolean testIfFolderExists(String folderName, boolean createFolderIfDoesNotExist) throws FilesAndPathsException {
 		boolean retVal = false;
 
 		File dir = new File(folderName);
@@ -75,7 +75,7 @@ public class PathsUtils {
 				try {
 					retVal = dir.mkdirs();
 				} catch (Exception ex) {
-					throw new PathsMgmtException("The folder " + folderName + "can not be created.");
+					throw new FilesAndPathsException("The folder " + folderName + "can not be created.");
 				}
 			}
 		}

@@ -12,7 +12,7 @@ import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import constants.KConstants;
 import filesAndPaths.PathsMgmt;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 
 public class PlConnectionEnvelope {
 
@@ -23,7 +23,7 @@ public class PlConnectionEnvelope {
 	private boolean isAvailable = false;
 	PathsMgmt pathsMgmt = null;
 
-	public PlConnectionEnvelope(int connectionId) throws PlConnectionEnvelopeException, PathsMgmtException {
+	public PlConnectionEnvelope(int connectionId) throws PlConnectionEnvelopeException, FilesAndPathsException {
 		if (connectionId < 0) {
 			throw new PlConnectionEnvelopeException("connectionId cannot be < 0");
 		}
@@ -65,8 +65,8 @@ public class PlConnectionEnvelope {
 		return this.connectionId;
 	}
 
-	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
-			CiaoPrologQueryException, PathsMgmtException, CiaoPrologQueryAnswerException {
+	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
+			FilesAndPathsException {
 
 		if (plConnection == null) {
 			createPlConnection();
@@ -86,15 +86,14 @@ public class PlConnectionEnvelope {
 		testAndSet(true);
 	}
 
-	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologQueryException, PathsMgmtException,
-			PlConnectionEnvelopeException, CiaoPrologTermInJavaException, CiaoPrologQueryAnswerException {
+	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologConnectorException, FilesAndPathsException,
+			PlConnectionEnvelopeException {
 
 		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
 		runPrologQueryAux(folderChangeQuery);
 	}
 
-	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
-			CiaoPrologQueryException, CiaoPrologQueryAnswerException {
+	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		if (this.isAvailable) {
 
 		}
@@ -142,7 +141,7 @@ public class PlConnectionEnvelope {
 					PLVariable variable = query.getVariables()[i];
 					String variableName = query.getVariablesNames()[i];
 					CiaoPrologTermInJava ciaoPrologTermInJava = null;
-					
+
 					if (variable != null) {
 						msgsAccumulator += (variable.toString() + " bind: " + variable.getBinding());
 						ciaoPrologTermInJava = new CiaoPrologTermInJava(variable, prologQueryAnswer);
@@ -151,7 +150,7 @@ public class PlConnectionEnvelope {
 						ciaoPrologTermInJava = null;
 						msgsAccumulator += "null -> null \n";
 					}
-					
+
 					ciaoPrologQueryAnswer.addCiaoPrologVariableAnswer(variableName, ciaoPrologTermInJava);
 				}
 				query.addQueryAnswer(ciaoPrologQueryAnswer);
@@ -179,7 +178,7 @@ public class PlConnectionEnvelope {
 
 	}
 
-	private void createPlConnection() throws PlConnectionEnvelopeException, PathsMgmtException {
+	private void createPlConnection() throws PlConnectionEnvelopeException, FilesAndPathsException {
 		String[] argv = new String[1];
 		argv[0] = this.pathsMgmt.getPlServerPath();
 
@@ -194,7 +193,7 @@ public class PlConnectionEnvelope {
 		}
 	}
 
-	private PLGoal evaluateGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologQueryException {
+	private PLGoal evaluateGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
 		PLGoal evaluatedGoal = new PLGoal(this.plConnection, query.getQuery());
 		String programFileName = null;

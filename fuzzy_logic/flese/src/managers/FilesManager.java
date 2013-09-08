@@ -14,8 +14,8 @@ import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
-import filesAndPaths.FileInfoException;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class FilesManager extends AbstractManager {
@@ -43,7 +43,7 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void list() throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
+	public void list() throws FilesAndPathsException, LocalUserInfoException, RequestStoreHouseException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
 
@@ -121,7 +121,7 @@ public class FilesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 
-	public void viewFile() throws FileInfoException, FilesManagerException, PathsMgmtException, LocalUserInfoException,
+	public void viewFile() throws FilesAndPathsException, FilesManagerException, FilesAndPathsException, LocalUserInfoException,
 			RequestStoreHouseException {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
@@ -131,7 +131,7 @@ public class FilesManager extends AbstractManager {
 		if (localUserInfo.equals(programFileInfo.getFileOwner())) {
 			try {
 				fileContents = programFileInfo.getFileContents();
-			} catch (PathsMgmtException e) {
+			} catch (FilesAndPathsException e) {
 				e.printStackTrace();
 				throw e;
 			} catch (IOException e) {

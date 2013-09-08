@@ -20,14 +20,14 @@ public class CiaoPrologTermInJava {
 	private PLTerm prologQueryAnswer = null;
 	private String creationMsgs = "";
 
-	public CiaoPrologTermInJava(PLTerm term, PLTerm prologQueryAnswer) throws CiaoPrologTermInJavaException {
+	public CiaoPrologTermInJava(PLTerm term, PLTerm prologQueryAnswer) throws CiaoPrologConnectorException {
 		creationMsgs += " ";
 		conversion(term, prologQueryAnswer);
 	}
 
-	private void conversion(PLTerm term, PLTerm prologQueryAnswer) throws CiaoPrologTermInJavaException {
+	private void conversion(PLTerm term, PLTerm prologQueryAnswer) throws CiaoPrologConnectorException {
 		if (term == null)
-			throw new CiaoPrologTermInJavaException("term is null.");
+			throw new CiaoPrologConnectorException("term is null.");
 		// Log ...
 		creationMsgs += "\nTerm: " + term.toString() + " ";
 		// For variables.

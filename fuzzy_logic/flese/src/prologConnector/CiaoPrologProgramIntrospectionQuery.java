@@ -6,12 +6,14 @@ import storeHouse.CacheStoreHouseException;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract {
 
-	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologQueryException, PathsMgmtException {
+	ProgramIntrospection programIntrospection = null;
+	
+	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(fileInfo);
 
 		// Prepare the query structure.
@@ -24,7 +26,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		PLTerm[] args = { variables[0], variables[1], variables[2], variables[3] };
 		PLStructure query = new PLStructure("rfuzzy_introspection", args);
 
-		String[] variablesNames = { KConstants.ProgramIntrospectionFields.predicateType, KConstants.ProgramIntrospectionFields.predicateName, KConstants.ProgramIntrospectionFields.predicateArity, KConstants.ProgramIntrospectionFields.predicateMoreInfo };
+		String[] variablesNames = { KConstants.ProgramIntrospectionFields.predicateTypes, KConstants.ProgramIntrospectionFields.predicateName, KConstants.ProgramIntrospectionFields.predicateArity, KConstants.ProgramIntrospectionFields.predicateMoreInfo };
 
 		setRealQuery(query, variables, variablesNames);
 
@@ -32,7 +34,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 	}
 
 	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, CiaoPrologQueryAnswerException {
+			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
 
@@ -46,7 +48,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		return query;
 	}
 
-	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws PathsMgmtException, CacheStoreHouseException {
+	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();
 		CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, null);
@@ -56,32 +58,19 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public CiaoPrologQueryAnswer getPredicateInfo(String predicateName) throws CiaoPrologQueryException, CiaoPrologQueryAnswerException {
-		if (predicateName == null) {
-			throw new CiaoPrologQueryException("predicateName cannot be null.");
-		}
-		if ("".equals(predicateName)) {
-			throw new CiaoPrologQueryException("predicateName cannot be empty string.");
-		}
-
+	
+	public ProgramIntrospection getProgramIntrospection () {
+		if (programIntrospection != null) return programIntrospection;
+		
+		programIntrospection = new ProgramIntrospection();
 		CiaoPrologQueryAnswer answer = null;
-		int i = 0;
-		boolean found = false;
-		while (i < queryAnswers.size() && (!found)) {
+		for (int i=0; i<queryAnswers.size(); i++) {
 			answer = queryAnswers.get(i);
-			CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateName);
-			String currentDefPredicateName = term.toString();
-			if (predicateName.equals(currentDefPredicateName))
-				found = true;
-			else
-				i++;
+			programIntrospection.addAnswerInfo(answer);
 		}
-		if (answer == null) {
-			throw new CiaoPrologQueryException("returned answer cannot be null.");
-		}
-		return answer;
+		return programIntrospection;
 	}
-
+	
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@ import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class QueriesManager extends AbstractManager {
@@ -68,7 +68,7 @@ public class QueriesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, ""));
 	}
 
-	public void listDBs() throws PathsMgmtException, LocalUserInfoException, RequestStoreHouseException {
+	public void listDBs() throws FilesAndPathsException, LocalUserInfoException, RequestStoreHouseException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
 

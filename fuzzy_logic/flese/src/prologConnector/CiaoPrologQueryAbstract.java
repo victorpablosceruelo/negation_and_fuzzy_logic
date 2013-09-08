@@ -22,38 +22,38 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 	protected ArrayList<CiaoPrologQueryAnswer> queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
 
-	protected CiaoPrologQueryAbstract(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
+	protected CiaoPrologQueryAbstract(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
 
 		if (programFileInfo == null)
-			throw new CiaoPrologQueryException("programFileInfo cannot be null.");
+			throw new CiaoPrologConnectorException("programFileInfo cannot be null.");
 
 		this.programFileInfo = programFileInfo;
 
 		this.queryAnswers = new ArrayList<CiaoPrologQueryAnswer>();
 	}
 
-	protected void setRealQuery(PLStructure query, PLVariable[] variables, String[] variablesNames) throws CiaoPrologQueryException {
+	protected void setRealQuery(PLStructure query, PLVariable[] variables, String[] variablesNames) throws CiaoPrologConnectorException {
 		if (query == null)
-			throw new CiaoPrologQueryException("query cannot be null.");
+			throw new CiaoPrologConnectorException("query cannot be null.");
 		if (variables == null)
-			throw new CiaoPrologQueryException("variables cannot be null.");
+			throw new CiaoPrologConnectorException("variables cannot be null.");
 		if (variablesNames == null)
-			throw new CiaoPrologQueryException("variablesNames cannot be null.");
+			throw new CiaoPrologConnectorException("variablesNames cannot be null.");
 
 		for (int i = 0; i < variables.length; i++) {
 			if (variables[i] == null) {
-				throw new CiaoPrologQueryException("variables[" + i + "] is null.");
+				throw new CiaoPrologConnectorException("variables[" + i + "] is null.");
 			}
 		}
 
 		for (int i = 0; i < variablesNames.length; i++) {
 			if (variablesNames[i] == null) {
-				throw new CiaoPrologQueryException("variablesNames[" + i + "] is null.");
+				throw new CiaoPrologConnectorException("variablesNames[" + i + "] is null.");
 			}
 		}
 
 		if (variables.length != variablesNames.length) {
-			throw new CiaoPrologQueryException("variables and variablesNames have different length.");
+			throw new CiaoPrologConnectorException("variables and variablesNames have different length.");
 		}
 
 		this.query = query;
@@ -63,9 +63,9 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 		LOG.info(query.toString());
 	}
 
-	public PLStructure getQuery() throws CiaoPrologQueryException {
+	public PLStructure getQuery() throws CiaoPrologConnectorException {
 		if (this.query == null)
-			throw new CiaoPrologQueryException("query cannot be null.");
+			throw new CiaoPrologConnectorException("query cannot be null.");
 		return query;
 	}
 

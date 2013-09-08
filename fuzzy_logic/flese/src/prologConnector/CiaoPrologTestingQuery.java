@@ -4,12 +4,12 @@ import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfoException;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
-	private CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
+	private CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException,
 			LocalUserInfoException {
 		super(programFileInfo);
 
@@ -49,12 +49,12 @@ public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
 			setRealQuery(query, variables, variablesNames);
 		} else {
-			throw new CiaoPrologQueryException("fileName is not " + testFileName);
+			throw new CiaoPrologConnectorException("fileName is not " + testFileName);
 		}
 
 	}
 
-	public static CiaoPrologTestingQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException,
+	public static CiaoPrologTestingQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException,
 			LocalUserInfoException {
 		return new CiaoPrologTestingQuery(programFileInfo);
 	}

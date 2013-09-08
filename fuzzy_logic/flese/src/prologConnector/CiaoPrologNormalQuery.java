@@ -7,19 +7,19 @@ import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfoException;
 import conversors.ConversorToPrologQuery;
 import conversors.QueryConversorException;
-import filesAndPaths.FileInfoException;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 
-	private CiaoPrologNormalQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException {
+	private CiaoPrologNormalQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
 		super(programFileInfo);
 	}
 
 	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, FileInfoException,
-			QueryConversorException, LocalUserInfoException, RequestStoreHouseException, CiaoPrologQueryAnswerException {
+			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException, FilesAndPathsException,
+			QueryConversorException, LocalUserInfoException, RequestStoreHouseException {
 
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
 		String key1 = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
@@ -42,8 +42,8 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws PathsMgmtException, CacheStoreHouseException,
-			FileInfoException, LocalUserInfoException {
+	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException,
+			FilesAndPathsException, LocalUserInfoException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		// String key1 = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
 		String key1 = null;

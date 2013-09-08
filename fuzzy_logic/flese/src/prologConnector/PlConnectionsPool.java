@@ -1,7 +1,7 @@
 package prologConnector;
 
 import constants.KConstants;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 
 public class PlConnectionsPool {
 
@@ -16,7 +16,7 @@ public class PlConnectionsPool {
 		}
 	}
 
-	private synchronized static PlConnectionEnvelope initializeConnection(int i) throws PlConnectionEnvelopeException, PathsMgmtException {
+	private synchronized static PlConnectionEnvelope initializeConnection(int i) throws PlConnectionEnvelopeException, FilesAndPathsException {
 		if (connections == null) {
 			throw new PlConnectionEnvelopeException("connections is null.");
 		}
@@ -27,7 +27,7 @@ public class PlConnectionsPool {
 		return connections[i];
 	}
 
-	private static PlConnectionEnvelope getConnection() throws PlConnectionEnvelopeException, PathsMgmtException {
+	private static PlConnectionEnvelope getConnection() throws PlConnectionEnvelopeException, FilesAndPathsException {
 		boolean found = false;
 		int i = 0;
 		PlConnectionEnvelope connection = null;
@@ -50,8 +50,8 @@ public class PlConnectionsPool {
 		return connection;
 	}
 
-	public static void launchQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologTermInJavaException,
-			CiaoPrologQueryException, PathsMgmtException, CiaoPrologQueryAnswerException {
+	public static void launchQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
+			FilesAndPathsException {
 
 		if (connections == null) {
 			initializeConnectionsPool();

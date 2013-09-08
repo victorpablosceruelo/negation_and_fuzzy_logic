@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import auxiliar.LocalUserInfoException;
 import constants.KConstants;
-import filesAndPaths.FileInfoException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class RequestStoreHouse {
@@ -179,7 +179,7 @@ public class RequestStoreHouse {
 		return providerId;
 	}
 
-	public ProgramFileInfo getProgramFileInfo() throws FileInfoException, LocalUserInfoException {
+	public ProgramFileInfo getProgramFileInfo() throws FilesAndPathsException, LocalUserInfoException {
 		String fileName = getRequestParameter(KConstants.Request.fileNameParam);
 		String fileOwner = getRequestParameter(KConstants.Request.fileOwnerParam);
 

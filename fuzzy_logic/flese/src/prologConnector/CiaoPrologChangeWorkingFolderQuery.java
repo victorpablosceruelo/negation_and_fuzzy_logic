@@ -4,12 +4,12 @@ import CiaoJava.PLAtom;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract {
 
-	private CiaoPrologChangeWorkingFolderQuery(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException, PathsMgmtException {
+	private CiaoPrologChangeWorkingFolderQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(programFileInfo);
 
 		String programFileFolderName = programFileInfo.getProgramFileFolderFullPath();
@@ -29,8 +29,8 @@ public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract 
 
 	}
 
-	public static CiaoPrologChangeWorkingFolderQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologQueryException,
-			PathsMgmtException {
+	public static CiaoPrologChangeWorkingFolderQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException,
+			FilesAndPathsException {
 		return new CiaoPrologChangeWorkingFolderQuery(programFileInfo);
 	}
 

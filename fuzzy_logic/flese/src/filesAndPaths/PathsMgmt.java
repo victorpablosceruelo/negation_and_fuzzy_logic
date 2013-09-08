@@ -16,7 +16,7 @@ public class PathsMgmt {
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
 
-	public PathsMgmt() throws PathsMgmtException {
+	public PathsMgmt() throws FilesAndPathsException {
 		if (programFilesPath == null) {
 			String tmpProgramFilesPath = determineProgramFilesValidPath(KConstants.PathsMgmt.programFilesValidPaths);
 			setProgramFilesPath(tmpProgramFilesPath);
@@ -30,33 +30,33 @@ public class PathsMgmt {
 		}
 		
 		if (programFilesPath == null) {
-			throw new PathsMgmtException("programFilesPath cannot be null.");
+			throw new FilesAndPathsException("programFilesPath cannot be null.");
 		}
 		
 		if (plServerPath == null) {
-			throw new PathsMgmtException("plServerPath cannot be null.");
+			throw new FilesAndPathsException("plServerPath cannot be null.");
 		}
 	}
 
-	public String getProgramFilesPath() throws PathsMgmtException {
+	public String getProgramFilesPath() throws FilesAndPathsException {
 		if (programFilesPath == null)
-			throw new PathsMgmtException("programFilesPath cannot be null.");
+			throw new FilesAndPathsException("programFilesPath cannot be null.");
 		return programFilesPath;
 	}
 
-	public String getPlServerPath() throws PathsMgmtException {
+	public String getPlServerPath() throws FilesAndPathsException {
 		if (plServerPath == null)
-			throw new PathsMgmtException("plServerPath cannot be null.");
+			throw new FilesAndPathsException("plServerPath cannot be null.");
 		return plServerPath;
 	}
 
-	private synchronized void setProgramFilesPath(String tmpProgramFilesPath) throws PathsMgmtException {
+	private synchronized void setProgramFilesPath(String tmpProgramFilesPath) throws FilesAndPathsException {
 		if (programFilesPath == null) {
 			programFilesPath = tmpProgramFilesPath;
 		}
 	}
 
-	private synchronized void setPlServerPath(String tmpPlServerPath) throws PathsMgmtException {
+	private synchronized void setPlServerPath(String tmpPlServerPath) throws FilesAndPathsException {
 		if (plServerPath == null) {
 			plServerPath = tmpPlServerPath;
 		}
@@ -69,7 +69,7 @@ public class PathsMgmt {
 	 * @param programFilesValidPaths
 	 *            is a list with the paths to test.
 	 */
-	private String determineProgramFilesValidPath(String[] programFilesValidPaths) throws PathsMgmtException {
+	private String determineProgramFilesValidPath(String[] programFilesValidPaths) throws FilesAndPathsException {
 		String programFilesValidPath = null;
 		int index = 0;
 
@@ -87,7 +87,7 @@ public class PathsMgmt {
 		}
 
 		if ((programFilesValidPath == null) || ("".equals(programFilesValidPath)))
-			throw new PathsMgmtException("programFilesValidPath cannot be null.");
+			throw new FilesAndPathsException("programFilesValidPath cannot be null.");
 		return programFilesValidPath;
 	}
 
@@ -101,11 +101,11 @@ public class PathsMgmt {
 	 * 
 	 * @param plServerValidSubPaths
 	 *            are the new proposed subpaths for the plServer.
-	 * @throws PathsMgmtException
+	 * @throws FilesAndPathsException
 	 *             when none is valid.
 	 * 
 	 */
-	private String determinePlServerValidPath(String[] plServerValidSubPaths) throws PathsMgmtException {
+	private String determinePlServerValidPath(String[] plServerValidSubPaths) throws FilesAndPathsException {
 		String plServerPath = null;
 		int index = 0;
 
@@ -119,7 +119,7 @@ public class PathsMgmt {
 		}
 
 		if (plServerPath == null) {
-			throw new PathsMgmtException("plServerPath cannot be null.");
+			throw new FilesAndPathsException("plServerPath cannot be null.");
 		}
 		return plServerPath;
 	}

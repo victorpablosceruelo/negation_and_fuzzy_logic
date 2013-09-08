@@ -17,9 +17,9 @@ import auxiliar.CastingsClass;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
 import constants.KConstants;
-import filesAndPaths.FileInfoException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsMgmt;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsUtils;
 import filesAndPaths.ProgramFileInfo;
 import filters.OnlyCiaoPrologFilesFilterClass;
@@ -39,11 +39,11 @@ public class FilesManagerAux {
 	 *            is the name of the user that is logged in.
 	 * @return the program files iterator, null if there are no program files to
 	 *         iterate.
-	 * @throws PathsMgmtException
+	 * @throws FilesAndPathsException
 	 * @throws LocalUserInfoException
 	 * @throws RequestStoreHouseException
 	 */
-	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws PathsMgmtException, LocalUserInfoException,
+	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,
 			RequestStoreHouseException {
 
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
@@ -87,11 +87,11 @@ public class FilesManagerAux {
 	 * @param subDir
 	 *            is the full path of the subdirectory we are listing.
 	 * @return the program files list.
-	 * @throws PathsMgmtException
+	 * @throws FilesAndPathsException
 	 * @throws LocalUserInfoException
 	 */
 	private static ArrayList<ProgramFileInfo> listProgramFilesInSubDir(String subDir, PathsMgmt pathsMgmt,
-			ArrayList<ProgramFileInfo> currentList) throws PathsMgmtException, LocalUserInfoException {
+			ArrayList<ProgramFileInfo> currentList) throws FilesAndPathsException, LocalUserInfoException {
 
 		if ((subDir == null) || ("".equals(subDir))) {
 			return currentList;
@@ -108,7 +108,7 @@ public class FilesManagerAux {
 			for (int i = 0; i < files.length; i++) {
 				try {
 					programFileInfo = new ProgramFileInfo(subDir, files[i]);
-				} catch (FileInfoException e) {
+				} catch (FilesAndPathsException e) {
 					e.printStackTrace();
 					programFileInfo = null;
 				}

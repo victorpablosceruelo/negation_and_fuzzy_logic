@@ -6,14 +6,12 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.LocalUserInfoException;
-import prologConnector.CiaoPrologQueryAnswer;
-import prologConnector.CiaoPrologQueryAnswerException;
-import prologConnector.CiaoPrologTermInJava;
-import prologConnector.CiaoPrologTermInJavaException;
+import prologConnector.CiaoPrologConnectorException;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
-import prologConnector.CiaoPrologQueryException;
+import prologConnector.CiaoPrologTermInJava;
 import prologConnector.PlConnectionEnvelopeException;
+import prologConnector.PredicateInfo;
+import prologConnector.moreInfo.PredMoreInfoInterface;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
@@ -23,9 +21,9 @@ import CiaoJava.PLInteger;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
+import auxiliar.LocalUserInfoException;
 import constants.KConstants;
-import filesAndPaths.FileInfoException;
-import filesAndPaths.PathsMgmtException;
+import filesAndPaths.FilesAndPathsException;
 
 public class ConversorToPrologQuery {
 
@@ -69,7 +67,8 @@ public class ConversorToPrologQuery {
 	private RequestStoreHouse requestStoreHouse = null;
 
 	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
-			PathsMgmtException, CiaoPrologQueryException, PlConnectionEnvelopeException, CiaoPrologTermInJavaException, FileInfoException, LocalUserInfoException, RequestStoreHouseException, CiaoPrologQueryAnswerException {
+			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException, FilesAndPathsException,
+			LocalUserInfoException, RequestStoreHouseException {
 
 		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
@@ -112,7 +111,8 @@ public class ConversorToPrologQuery {
 		queryConvert();
 	}
 
-	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologTermInJavaException, RequestStoreHouseException, CiaoPrologQueryAnswerException, CiaoPrologQueryException {
+	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, RequestStoreHouseException,
+			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
 		String msg = "";
 		msg += ("\n  fp: " + input.quantifier0 + "(" + input.quantifier1 + "(" + input.predicate + "))");
@@ -133,8 +133,9 @@ public class ConversorToPrologQuery {
 			if ((input.rfuzzyComputeOperator != null) && (input.rfuzzyComputeValue != null)) {
 				subqueryRfuzzyComputeOperatorEndTestAndSave(prologSubQuery);
 			} else {
-				CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
-				if (hasTruthValueTypeAsReturnType(queryAnswer, input)) {
+				PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.predicate);
+				String[] type = { input.initialPredicate, KConstants.PrologTypes.rfuzzy_truth_value_type };
+				if (predicateInfo.hasType(type)) {
 					subqueryFuzzyEndTestAndSave(prologSubQuery);
 				} else {
 					throw new QueryConversorException("You need to fill all the fields for non-fuzzy queries.");
@@ -147,42 +148,8 @@ public class ConversorToPrologQuery {
 		}
 	}
 
-	private boolean hasTruthValueTypeAsReturnType(CiaoPrologQueryAnswer queryAnswer, ConversionInput input) throws QueryConversorException, CiaoPrologQueryAnswerException {
-		CiaoPrologTermInJava predInfoType = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateType);
-		boolean found = false;
-		String msg = "";
-		if (predInfoType == null)
-			throw new QueryConversorException("predInfoType is null.");
-		msg += "tmpInitialPredicate: " + input.initialPredicate;
-		msg += "\n predInfoType: " + predInfoType.toString();
-		if (!predInfoType.isList())
-			throw new QueryConversorException("predInfoType is not a list.");
-
-		int predInfoTypeLength = predInfoType.length();
-		int predInfoTypeIndex = 0;
-		while ((predInfoTypeIndex < predInfoTypeLength) && (!found)) {
-			CiaoPrologTermInJava type = predInfoType.atPosition(predInfoTypeIndex);
-			if (type == null)
-				throw new QueryConversorException("predInfoType type is null.");
-			LOG.info("type: " + type.toString());
-			if (!type.isList())
-				throw new QueryConversorException("predInfoType type is not a list. type: " + type.toString());
-			if ((type.length() == 2) && (type.atPosition(0) != null) && (type.atPosition(1) != null)
-					&& (input.initialPredicate.equals(type.atPosition(0).toString()))
-					&& ("rfuzzy_truth_value_type".equals(type.atPosition(1).toString()))) {
-				found = true;
-				msg += "\n valid type: " + type.toString();
-			} else
-				msg += "\n NOT valid type: " + type.toString();
-			if (!found)
-				predInfoTypeIndex++;
-		}
-		LOG.info(msg);
-		return found;
-	}
-
-	private void subQueryInitialEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
-			CiaoPrologTermInJavaException, RequestStoreHouseException, CiaoPrologQueryAnswerException, CiaoPrologQueryException {
+	private void subQueryInitialEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, RequestStoreHouseException,
+			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
 		if (input.initialPredicate == null) {
 			throw new QueryConversorException("No initial predicate for the query.");
@@ -190,18 +157,10 @@ public class ConversorToPrologQuery {
 		if (showVariables != null) {
 			throw new QueryConversorException("You cannot configure twice the initial subquery.");
 		}
-		
-		CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.initialPredicate);
-		CiaoPrologTermInJava predArity = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateType);
-		if (predArity == null)
-			throw new QueryConversorException("No possible conversion for the initial predicate.");
-		if (predArity.toString() == null)
-			throw new QueryConversorException("No defined arity for the initial predicate.");
 
-		LOG.info("predArity.toString(): " + predArity.toString());
-
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.initialPredicate);
 		// SubGoal1: call the typing predicate.
-		int predArityInt = Integer.parseInt(predArity.toString());
+		int predArityInt = predicateInfo.getPredicateArity();
 		PLVariable[] plArgsSubGoal1 = new PLVariable[predArityInt];
 		for (int i = 0; i < predArityInt; i++) {
 			plArgsSubGoal1[i] = new PLVariable();
@@ -213,8 +172,8 @@ public class ConversorToPrologQuery {
 			showVariables[i + 1] = plArgsSubGoal1[i];
 		}
 
-		CiaoPrologTermInJava predMoreInfo = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateMoreInfo);
-		copyVariablesNamesToo(input.initialPredicate, predMoreInfo);
+		PredMoreInfoInterface predMoreInfo = predicateInfo.getPredicateMoreInfoAs("database");
+		showVariablesNames = predMoreInfo.generateVariablesNames(input.initialPredicate);
 
 		PLStructure subGoal1 = new PLStructure(input.initialPredicate, plArgsSubGoal1);
 
@@ -238,72 +197,12 @@ public class ConversorToPrologQuery {
 		initialSubQuery.resultVariable = showVariables[0];
 	}
 
-	private void copyVariablesNamesToo(String firstVarName, CiaoPrologTermInJava predInfoMoreInfo) throws QueryConversorException {
-		if (predInfoMoreInfo == null) {
-			throw new QueryConversorException("predInfoMoreInfo is null.");
-		}
-		LOG.info("copyVariablesNamesToo: firstVarName: " + firstVarName + " predInfoMoreInfo: " + predInfoMoreInfo);
-		// latestEvaluatedQueryAnswersIteratorLOG.info("copyVariablesNamesToo: firstVarName: "
-		// + firstVarName + " predInfoMoreInfo: "+ predInfoMoreInfo.toString());
-
-		int i = 0;
-		int j = 0;
-		boolean found = false;
-		CiaoPrologTermInJava aux1 = null;
-		CiaoPrologTermInJava aux2 = null;
-
-		if (predInfoMoreInfo.isList()) {
-			while (i < predInfoMoreInfo.length() && (!found)) {
-				aux1 = predInfoMoreInfo.atPosition(i);
-
-				if (aux1 == null)
-					LOG.info("ERROR: aux1 is NULL.");
-				else {
-					if (aux1.isArray()) {
-						if ((aux1.atPosition(0) != null) && (aux1.atPosition(0).toString() != null)
-								&& ("database".equals(aux1.atPosition(0).toString()))) {
-							LOG.info("Found database information: " + aux1.toString());
-							found = true;
-							aux2 = aux1.atPosition(1);
-						} else
-							LOG.info("ERROR: not valid value for aux1.atPosition(0)");
-					} else
-						LOG.info("ERROR: aux1 is NOT an array.");
-				}
-
-				if (!found)
-					i++;
-			}
-		} else
-			LOG.info("ERROR: predInfoMoreInfo is NOT a list.");
-
-		showVariablesNames = null;
-		if (aux2 != null) {
-			if (aux2.isList()) {
-				showVariablesNames = new String[aux2.length() + 1];
-				showVariablesNames[0] = firstVarName;
-				for (j = 0; j <= aux2.length(); j++) {
-					if ((aux2 != null) && (aux2.atPosition(j) != null)) {
-						showVariablesNames[j + 1] = aux2.atPosition(j).toString();
-					}
-				}
-			} else
-				LOG.info("ERROR: aux2 is not a list. aux2: " + aux2.toString());
-		} else
-			LOG.info("ERROR: aux2 is null.");
-	}
-
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
-			CiaoPrologTermInJavaException, CiaoPrologQueryException, CiaoPrologQueryAnswerException {
+			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
-		CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
-		CiaoPrologTermInJava predArity = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateArity);
-		if ((predArity == null) || (predArity.toString() == null)) {
-			throw new QueryConversorException("No defined arity for the predicate " + input.predicate);
-		} else {
-			int PredArity = Integer.parseInt(predArity.toString());
-			if (PredArity != 2)
-				throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.initialPredicate);
+		if (predicateInfo.getPredicateArity() != 2) {
+			throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
 
 		PLTerm database = new PLAtom(input.initialPredicate);
@@ -352,17 +251,12 @@ public class ConversorToPrologQuery {
 
 	}
 
-	private void subqueryFuzzyEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologTermInJavaException, CiaoPrologQueryException, CiaoPrologQueryAnswerException {
+	private void subqueryFuzzyEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
-		CiaoPrologQueryAnswer queryAnswer = ciaoPrologIntrospectionQuery.getPredicateInfo(input.predicate);
-		CiaoPrologTermInJava predArity = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateArity);
 
-		if (predArity.toString() == null) {
-			throw new QueryConversorException("No defined arity for the predicate " + input.predicate);
-		} else {
-			int PredArity = Integer.parseInt(predArity.toString());
-			if (PredArity != 2)
-				throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.initialPredicate);
+		if (predicateInfo.getPredicateArity() != 2) {
+			throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
 
 		PLVariable tmpVar1 = new PLVariable();
@@ -408,7 +302,7 @@ public class ConversorToPrologQuery {
 
 	}
 
-	private void queryConvert() throws QueryConversorException, CiaoPrologTermInJavaException {
+	private void queryConvert() throws QueryConversorException, CiaoPrologConnectorException {
 
 		if (initialSubQuery == null) {
 			throw new QueryConversorException("No initial subQuery to convert.");
@@ -538,11 +432,10 @@ public class ConversorToPrologQuery {
 	public String getQueryComplexInfoString() {
 		return queryComplexInfoString;
 	};
-	
+
 	public PLStructure getConvertedQuery() {
 		return finalQuery;
 	};
-
 
 }
 

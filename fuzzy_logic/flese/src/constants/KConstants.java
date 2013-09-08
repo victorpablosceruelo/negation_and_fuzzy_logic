@@ -82,10 +82,14 @@ public class KConstants {
 	}
 	
 	public static class ProgramIntrospectionFields {
-		public static final String predicateType = "predicateType";
+		public static final String predicateTypes = "predicateTypes";
 		public static final String predicateName = "predicateName";
 		public static final String predicateArity = "predicateArity";
 		public static final String predicateMoreInfo = "predicateMoreInfo";
+	}
+	
+	public static class PrologTypes {
+		public static final String rfuzzy_truth_value_type = "rfuzzy_truth_value_type";
 	}
 }
 
