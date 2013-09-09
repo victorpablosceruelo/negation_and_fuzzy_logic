@@ -30,7 +30,7 @@
 	     <div class='queryStartContainerTableRow'>
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
 	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
-					<select name="chooseQueryStartType" id="chooseQueryStartType" onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer");' >
+					<select name="chooseQueryStartType" id="chooseQueryStartType" onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer", "queryLinesCounterField");' >
 						<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 	for (int i=0; i<predicatesInfos.length; i++) {
@@ -45,7 +45,7 @@
 	</div>
 
 	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name="queryLinesCounterFieldId" value="0" id="queryLinesCounterFieldId">
+	<input type="hidden" name="queryLinesCounterField" value="0" id="queryLinesCounterField">
               
 	<div id='queryLinesContainer' class='queryLinesContainerTable'>
 	</div>

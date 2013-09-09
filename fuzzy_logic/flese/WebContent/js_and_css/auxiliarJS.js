@@ -267,15 +267,15 @@ function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTy
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectQueryStartupTypeChanged(comboBox, queryLinesContainerId, queryLinesCounterFieldId) {
-	var startupType = comboBox.options[comboBox.selectedIndex].value;
+function selectedQueryStartTypeChanged(comboBox, queryLinesContainerId, queryLinesCounterFieldId) {
+	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
 	
 	resetQueryLinesCounterField(queryLinesCounterFieldId);
 	var queryLinesContainerDiv = document.getElementById(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
-	if (startupType == "----") {
+	if ((startupType == "") || (startupType == '')) {
 		queryLinesContainerDiv.innerHTML="You cannot be looking for that.";
 		queryLinesContainerDiv.style.display='none';
 	}
