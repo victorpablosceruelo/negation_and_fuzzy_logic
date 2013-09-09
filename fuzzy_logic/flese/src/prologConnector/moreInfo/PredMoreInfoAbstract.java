@@ -2,6 +2,7 @@ package prologConnector.moreInfo;
 
 import java.util.HashMap;
 
+import constants.KConstants;
 import prologConnector.CiaoPrologTermInJava;
 import prologConnector.PredicateInfoException;
 
@@ -74,7 +75,7 @@ public abstract class PredMoreInfoAbstract implements PredMoreInfoInterface {
 
 		PredMoreInfoInterface predMoreInfo = getPredMoreInfoObjectFor(type);
 		if (predMoreInfo == null) {
-			throw new PredicateInfoException("no class to store PredicateMoreInfo information");
+			throw new PredicateInfoException("no class to store PredicateMoreInfo information for type " + type);
 		} else {
 			predMoreInfo.setMoreInfo(type, predMoreInfoInfo);
 		}
@@ -84,15 +85,33 @@ public abstract class PredMoreInfoAbstract implements PredMoreInfoInterface {
 	private static PredMoreInfoInterface getPredMoreInfoObjectFor(String type) {
 		PredMoreInfoInterface predMoreInfo = null;
 
-		if (type.equals("fuzzy_rule")) {
+		if (type.equals(KConstants.MoreInfoTypes.fuzzyRule)) {
 			predMoreInfo = new PredMoreInfoFuzzyRule();
 		}
 
-		if (type.equals("database")) {
+		if (type.equals(KConstants.MoreInfoTypes.database)) {
 			predMoreInfo = new PredMoreInfoDatabase();
+		}
+
+		if (type.equals(KConstants.MoreInfoTypes.enumTypeValues)) {
+			predMoreInfo = new PredMoreInfoEnumTypeValues();
+		}
+		
+		if (type.equals(KConstants.MoreInfoTypes.dbField)) {
+			predMoreInfo = new PredMoreInfoDbField();
+		}
+		
+		if (type.equals(KConstants.MoreInfoTypes.definedOperators)) {
+			predMoreInfo = new PredMoreInfoDefinedOperators();
+		}
+
+		if (type.equals(KConstants.MoreInfoTypes.similarityClause)) {
+			predMoreInfo = new PredMoreInfoSimilarityClause();
 		}
 
 		return predMoreInfo;
 	}
+	
+	
 
 }

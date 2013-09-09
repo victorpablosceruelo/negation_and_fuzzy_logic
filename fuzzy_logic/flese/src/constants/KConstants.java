@@ -82,14 +82,23 @@ public class KConstants {
 	}
 	
 	public static class ProgramIntrospectionFields {
-		public static final String predicateTypes = "predicateTypes";
 		public static final String predicateName = "predicateName";
 		public static final String predicateArity = "predicateArity";
+		public static final String predicateTypes = "predicateTypes";
 		public static final String predicateMoreInfo = "predicateMoreInfo";
 	}
 	
 	public static class PrologTypes {
 		public static final String rfuzzy_truth_value_type = "rfuzzy_truth_value_type";
+	}
+	
+	public static class MoreInfoTypes {
+		public static final String fuzzyRule = "fuzzy_rule";
+		public static final String database = "database";
+		public static final String enumTypeValues = "rfuzzy_enum_type_values";
+		public static final String dbField = "rfuzzy_db_field";
+		public static final String definedOperators = "defined_operators";
+		public static final String similarityClause = "rfuzzy_similarity_clause";
 	}
 }
 

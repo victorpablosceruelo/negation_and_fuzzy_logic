@@ -1,6 +1,7 @@
 package prologConnector;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import prologConnector.moreInfo.PredMoreInfoAbstract;
 import prologConnector.moreInfo.PredMoreInfoInterface;
@@ -95,6 +96,11 @@ public class PredicateInfo {
 
 	public PredMoreInfoInterface getPredicateMoreInfoAs(String type) {
 		return predicateMoreInfo.get(type);
+	}
+	
+	public Set<String> getPredicateMoreInfoKeys() {
+		Set<String> keysSet = predicateMoreInfo.keySet();
+		return keysSet;
 	}
 	
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

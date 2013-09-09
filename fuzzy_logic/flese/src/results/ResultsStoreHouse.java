@@ -3,6 +3,7 @@ package results;
 import java.util.ArrayList;
 
 import prologConnector.CiaoPrologQueryAnswer;
+import prologConnector.ProgramIntrospection;
 import filesAndPaths.ProgramFileInfo;
 
 public class ResultsStoreHouse {
@@ -11,6 +12,7 @@ public class ResultsStoreHouse {
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
 	private String[] fileContents = null;
 	private String[] fuzzificationsList = null;
+	private ProgramIntrospection programIntrospection = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
 
 	/**
@@ -69,5 +71,17 @@ public class ResultsStoreHouse {
 
 	public CiaoPrologQueryAnswer[] getCiaoPrologQueryAnswers() {
 		return this.queryAnswers;
+	}
+	
+	public void setCiaoPrologProgramIntrospection(ProgramIntrospection programIntrospection) {
+		this.programIntrospection = null;
+		if (programIntrospection != null) {
+			this.programIntrospection = programIntrospection;
+		}
+
+	}
+
+	public ProgramIntrospection getCiaoPrologProgramIntrospection() {
+		return this.programIntrospection;
 	}
 }

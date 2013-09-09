@@ -1,4 +1,6 @@
 
+<%@page import="prologConnector.PredicateInfo"%>
+<%@page import="prologConnector.ProgramIntrospection"%>
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.HashMap"%>
@@ -14,19 +16,8 @@
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	CiaoPrologQueryAnswer [] queryAnswers = resultsStoreHouse.getCiaoPrologQueryAnswers();	
-	ArrayList<String> arrayList = new ArrayList<String>(); 
-			
-	for (int i=0; i<queryAnswers.length; i++) { 
-		CiaoPrologQueryAnswer queryAnswer = queryAnswers[i];
-		CiaoPrologTermInJava predInfo = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateMoreInfo);
-		CiaoPrologTermInJava predName = queryAnswer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateName);
-		HashMap<String, String> hashMap = predInfo.toHashMap();
-		boolean isDatabase = (hashMap.get("database") != null);
-		if (isDatabase) {
-			arrayList.add(predName.toString());
-		}
-	}
+	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
+	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
 %>
 
 
@@ -42,8 +33,8 @@
 					<select name="chooseQueryStartType" id="chooseQueryStartType" onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer");' >
 						<%=JspsUtils.comboBoxDefaultValue() %>
 <%
-	for (int i=0; i<arrayList.size(); i++) {
-		String value = arrayList.get(i);
+	for (int i=0; i<predicatesInfos.length; i++) {
+		String value = predicatesInfos[i].getPredicateName();
 %>	
 						<option id='<%=value %>' title='<%=value %>' value='<%=value %>'><%=value %></option>
 <%

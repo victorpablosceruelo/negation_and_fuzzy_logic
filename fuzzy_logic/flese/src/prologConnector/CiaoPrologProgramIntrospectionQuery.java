@@ -1,18 +1,18 @@
 package prologConnector;
 
-import constants.KConstants;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
+import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract {
 
 	ProgramIntrospection programIntrospection = null;
-	
+
 	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(fileInfo);
 
@@ -26,7 +26,9 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		PLTerm[] args = { variables[0], variables[1], variables[2], variables[3] };
 		PLStructure query = new PLStructure("rfuzzy_introspection", args);
 
-		String[] variablesNames = { KConstants.ProgramIntrospectionFields.predicateTypes, KConstants.ProgramIntrospectionFields.predicateName, KConstants.ProgramIntrospectionFields.predicateArity, KConstants.ProgramIntrospectionFields.predicateMoreInfo };
+		String[] variablesNames = { KConstants.ProgramIntrospectionFields.predicateName,
+				KConstants.ProgramIntrospectionFields.predicateArity, KConstants.ProgramIntrospectionFields.predicateTypes,
+				KConstants.ProgramIntrospectionFields.predicateMoreInfo };
 
 		setRealQuery(query, variables, variablesNames);
 
@@ -58,19 +60,18 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
-	public ProgramIntrospection getProgramIntrospection () {
-		if (programIntrospection != null) return programIntrospection;
-		
+	public ProgramIntrospection getProgramIntrospection() {
+		// if (programIntrospection != null) return programIntrospection;
+
 		programIntrospection = new ProgramIntrospection();
 		CiaoPrologQueryAnswer answer = null;
-		for (int i=0; i<queryAnswers.size(); i++) {
+		for (int i = 0; i < queryAnswers.size(); i++) {
 			answer = queryAnswers.get(i);
 			programIntrospection.addAnswerInfo(answer);
 		}
 		return programIntrospection;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,7 @@ import prologConnector.CiaoPrologNormalQuery;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.CiaoPrologTestingQuery;
+import prologConnector.ProgramIntrospection;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
@@ -41,8 +42,8 @@ public class QueriesManager extends AbstractManager {
 	public void buildQuery() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
-		CiaoPrologQueryAnswer[] queryAnswers = ciaoPrologProgramIntrospectionQuery.getQueryAnswers();
-		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
+		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
+		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.BuildQueryPage, ""));
 	}
 

@@ -1,6 +1,7 @@
 package prologConnector;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class ProgramIntrospection {
 
@@ -61,4 +62,39 @@ public class ProgramIntrospection {
 		}
 		return predicateInfo;
 	}
+	
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public PredicateInfo [] getPredicatesInfosByMoreInfoKey(String key) throws CiaoPrologConnectorException {
+		if (key == null) {
+			throw new CiaoPrologConnectorException("key cannot be null.");
+		}
+		if ("".equals(key)) {
+			throw new CiaoPrologConnectorException("key cannot be empty string.");
+		}
+		ArrayList<PredicateInfo> predicatesArrayList = new ArrayList<PredicateInfo>();
+		PredicateInfo predicateInfo = null;
+		Set<String> keys = null;
+		int i = 0;
+		boolean valid = false;
+		
+		while (i < predicatesInfos.size()) {
+			predicateInfo = predicatesInfos.get(i);
+			keys = predicateInfo.getPredicateMoreInfoKeys();
+			valid = keys.contains(key); 
+			if (valid) {
+				predicatesArrayList.add(predicateInfo);
+			}
+				i++;
+		}
+		
+		return predicatesArrayList.toArray(new PredicateInfo[predicatesArrayList.size()]);
+	}
+	
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
