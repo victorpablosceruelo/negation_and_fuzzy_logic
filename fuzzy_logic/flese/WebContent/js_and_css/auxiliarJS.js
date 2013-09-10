@@ -61,6 +61,7 @@ function isString(o) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function getComboBoxValue(comboBox) {
+	if (comboBox == null) return "";
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 	
 	// alert("comboBoxValue: " + comboBoxValue);
@@ -267,7 +268,11 @@ function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTy
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectedQueryStartTypeChanged(comboBox, queryLinesContainerId, queryLinesCounterFieldId) {
+function selectedQueryStartTypeChanged(comboBox) {
+	var queryLinesContainerId = "queryLinesContainer";
+	var queryLinesCounterFieldId = "queryLinesCounterField";
+	var searchOrPersonalizeTableId = "searchOrPersonalizeTable";
+	
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
 	
@@ -275,41 +280,18 @@ function selectedQueryStartTypeChanged(comboBox, queryLinesContainerId, queryLin
 	var queryLinesContainerDiv = document.getElementById(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
+	var searchOrPersonalizeTable = document.getElementById(searchOrPersonalizeTableId);
+	
 	if ((startupType == "") || (startupType == '')) {
 		queryLinesContainerDiv.innerHTML="You cannot be looking for that.";
 		queryLinesContainerDiv.style.display='none';
+		searchOrPersonalizeTable.style.visibility = 'hidden'; 
 	}
 	else {
+		searchOrPersonalizeTable.style.visibility = 'visible'; 
 		queryLinesContainerDiv.style.display='block';
 		
-		var row = null;
-		var cell = null;
-		var cellContents = null;
-		var queryLinesTableId = "queryLinesTable";
-		var queryLinesAggregatorTableId = "queryLinesAggregatorTable";
-	
-		row = document.createElement('div');
-		row.className = queryLinesContainerId + "TableRow";
-		queryLinesContainerDiv.appendChild(row);
-	
-		cell = document.createElement('div');
-		cell.className = queryLinesContainerId + "TableCell";
-		row.appendChild(cell);
-	
-		cellContents = document.createElement('div');
-		cellContents.className = queryLinesTableId;
-		cellContents.id = queryLinesTableId;
-		cell.appendChild(cellContents);
-	
-		cell = document.createElement('div');
-		cell.className = queryLinesContainerId + "TableCell";
-		row.appendChild(cell);
-	
-		cellContents = document.createElement('div');
-		cellContents.className = queryLinesAggregatorTableId;
-		cellContents.id = queryLinesAggregatorTableId;
-		cell.appendChild(cellContents);
-	
+		// To be migrated !!!
 		insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
 		// insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
 	}

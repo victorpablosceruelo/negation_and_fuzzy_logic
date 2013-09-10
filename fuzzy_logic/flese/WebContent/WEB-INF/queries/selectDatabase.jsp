@@ -65,5 +65,5 @@
 	<!--  </form><br />  -->
 
 	<script type="text/javascript">
-		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");		
+		selectedQueryStartTypeChanged("");		
 	</script>

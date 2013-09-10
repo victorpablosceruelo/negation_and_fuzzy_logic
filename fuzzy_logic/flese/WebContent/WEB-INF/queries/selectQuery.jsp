@@ -20,45 +20,18 @@
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
 %>
 
-
-	<div id='queryStartContainer' class='queryStartContainerTable'>
-	     <div class='queryStartContainerTableRow'>
-	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
-	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
-					<select name="chooseQueryStartType" id="chooseQueryStartType" onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer", "queryLinesCounterField");' >
-						<%=JspsUtils.comboBoxDefaultValue() %>
-<%
-	for (int i=0; i<predicatesInfos.length; i++) {
-		String value = predicatesInfos[i].getPredicateName();
-%>	
-						<option id='<%=value %>' title='<%=value %>' value='<%=value %>'><%=value %></option>
-<%
-	}
-%>					</select>
-	          </div>
-		 </div>
-	</div>
-
-	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name="queryLinesCounterField" value="0" id="queryLinesCounterField">
-              
-	<div id='queryLinesContainer' class='queryLinesContainerTable'>
-	</div>
-    
-	<div class='searchOrPersonalizeTable'>
-		 <div class='searchOrPersonalizeTableRow'>
-			  <div class='searchOrPersonalizeTableCell'>
-					<input type='submit' value='Search' onclick='return runQueryAfterSoftTests("parentDivId", "runQueryDivId", "chooseQueryStartTypeId", "queryLinesCounterFieldId", "fileName", "fileOwner");' >
-			  </div>
-			  <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;
-			  </div>
-			  <div class='searchOrPersonalizeTableCell'>
-					<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(fileName, fileOwner, basic);'>
-			  </div>
+	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
+		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
+			<div id="queryLinesTable" class="queryLinesTable">
+			</div>
 		</div>
+		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
+			<div id="queryLinesAggregatorTable" class="queryLinesAggregatorTable">
+			</div>
+		</div>
+		
 	</div>
 
 	<script type="text/javascript">
-		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");
-		
+		loadAjaxIn('queryLinesTable', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");
 	</script>
