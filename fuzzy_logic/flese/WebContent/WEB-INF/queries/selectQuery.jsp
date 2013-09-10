@@ -21,11 +21,6 @@
 %>
 
 
-<!-- <form id='queryForm' action='' method='POST' accept-charset='utf-8'>  -->
-<!-- 
-// action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
-// target='" + runQueryTargetiFrameId+ "'>";
- -->
 	<div id='queryStartContainer' class='queryStartContainerTable'>
 	     <div class='queryStartContainerTableRow'>
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
@@ -62,8 +57,8 @@
 			  </div>
 		</div>
 	</div>
-	<!--  </form><br />  -->
 
 	<script type="text/javascript">
-		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.AddLineToQuery.getUrl(true) %>");		
+		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");
+		
 	</script>

@@ -50,20 +50,24 @@ public class KUrls {
 	public static class Queries {
 		public static String manager = "QueriesManager";
 
-		public static final UrlMap ListDBsPage = new UrlMap(manager, "listDBsPage", null, null, "WEB-INF/queries/listDBs.jsp");
-		public static final UrlMap ListDBs = new UrlMap(manager, "listDBs", ListDBsPage, KUrls.Pages.Exception, "");
+		public static final UrlMap SelectProgramFilePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectProgramFile.jsp");
+		public static final UrlMap SelectProgramFile = new UrlMap(manager, "selectProgramFile", SelectProgramFilePage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap TestQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
-		public static final UrlMap TestQuery = new UrlMap(manager, "test", TestQueryPage, KUrls.Pages.Exception, "");
+		public static final UrlMap SelectDatabasePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectDatabase.jsp");
+		public static final UrlMap SelectDatabase = new UrlMap(manager, "selectDatabase", SelectDatabasePage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap BuildQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/buildQuery.jsp");
-		public static final UrlMap BuildQuery = new UrlMap(manager, "buildQuery", BuildQueryPage, KUrls.Pages.Exception, "");
+		public static final UrlMap SelectQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQuery.jsp");
+		public static final UrlMap SelectQuery = new UrlMap(manager, "selectQuery", SelectQueryPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap AddLineToQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/addLineToQuery.jsp");
-		public static final UrlMap AddLineToQuery = new UrlMap(manager, "addLineToQuery", AddLineToQueryPage, KUrls.Pages.Exception, "");
+		public static final UrlMap SelectQueryAddLinePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQueryAddLine.jsp");
+		public static final UrlMap SelectQueryAddLine = new UrlMap(manager, "selectQueryAddLine", SelectQueryAddLinePage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
+		
+		public static final UrlMap TestQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
+		public static final UrlMap TestQuery = new UrlMap(manager, "test", TestQueryPage, KUrls.Pages.Exception, "");
+
 	}
 
 	public static class Fuzzifications {
