@@ -1,11 +1,16 @@
 /*!
  * auxiliarJS Library v1
+ * auxiliar javascript code
  * Author: Victor Pablos Ceruelo
  */
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
+
+<% if (false) { %>
+<script type="text/javascript">
+<% } %>
 
 function loadingImageHtml(withNewLine) {
 	var result = "<img src=\"images/loading.gif\" width=\"200\" alt=\"loading\" title=\"loading\" />";
@@ -199,69 +204,9 @@ function selectedProgramDatabaseChanged(comboBox, selectQueryDivId, runQueryDivI
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
-		loadAjaxIn(selectQueryDivId, selectedProgramDatabaseUrl);
+		loadAjaxIn(, selectedProgramDatabaseUrl);
 	}
 	
-}
-
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-
-function insertQuerySelection(parentDivId, runQueryDivId, selectQueryDivId, fileName, fileOwner) {
-	// alert("Running insertQuerySelection ... ");
-	var selectQueryDiv = document.getElementById(selectQueryDivId);
-	selectQueryDiv.innerHTML = "";
-	
-	var chooseQueryStartTypeId = "selectQueryStartupType";
-	var chooseQueryStartTypeContainerId = "chooseQueryStartTypeDiv";
-	var queryLinesContainerId = "queryLinesContainer";
-	var queryLinesCounterFieldId = "queryLinesCounter";
-    	
-	selectQueryDiv.innerHTML = html;
-	document.getElementById(queryLinesContainerId).style.display='none';
-	
-	insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId);
-	
-}
-
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-
-function insertChooseQueryStartupType(chooseQueryStartTypeId, chooseQueryStartTypeContainerId, queryLinesContainerId, queryLinesCounterFieldId) {
-	var validTypesArray = new Array();
-	var valid = false;
-	for (var i=0; i<programIntrospection.length; i++) {
-		valid = false;
-		for (var j=0; j<programIntrospection[i].predMoreInfo.length; j++) {
-			if (programIntrospection[i].predMoreInfo[j].key == 'database') {
-				valid = true;
-			}
-		}
-		
-		if (valid) {
-			var k=0;
-			var found=false;
-			while ((k < validTypesArray.length) && (! found)) {
-				if (validTypesArray[k] == programIntrospection[i].predName)	found = true;
-				else k++;
-			}
-			if (! found) {
-				validTypesArray[validTypesArray.length] = prologNameInColloquialLanguage(programIntrospection[i].predName);
-			}
-		}
-	}
-	
-	var html = "<select id='"+chooseQueryStartTypeId+"' name='"+chooseQueryStartTypeId+"' "+
-				"onchange=\"selectQueryStartupTypeChanged(this, \'"+queryLinesContainerId+
-				"\', \'"+queryLinesCounterFieldId+"\');\">";
-	html += "<option name=\'----\' value=\'----\''>----</option>";
-	for (var i=0; i<validTypesArray.length; i++) {
-		html += "<option name=\'"+validTypesArray[i]+"\' value=\'"+validTypesArray[i]+"\''>"+validTypesArray[i]+"</option>";
-	}
-	html += "</select>";
-	document.getElementById(chooseQueryStartTypeContainerId).innerHTML = html;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -283,17 +228,14 @@ function selectedQueryStartTypeChanged(comboBox) {
 	var searchOrPersonalizeTable = document.getElementById(searchOrPersonalizeTableId);
 	
 	if ((startupType == "") || (startupType == '')) {
-		queryLinesContainerDiv.innerHTML="You cannot be looking for that.";
+		queryLinesContainerDiv.innerHTML="Please select what are you looking for.";
 		queryLinesContainerDiv.style.display='none';
 		searchOrPersonalizeTable.style.visibility = 'hidden'; 
 	}
 	else {
 		searchOrPersonalizeTable.style.visibility = 'visible'; 
 		queryLinesContainerDiv.style.display='block';
-		
-		// To be migrated !!!
-		insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
-		// insertAggregatorTable(queryLinesTableId, queryLinesAggregatorTableId, comboBoxValue);
+		loadAjaxIn(queryLinesContainerId, startupType);
 	}
 }
 
@@ -321,32 +263,25 @@ function getQueryLinesCounterField(queryLinesCounterFieldId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-// Constant 
-var queryLinesCounterLimit = 100;
-
-function insertQueryLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType) {
+function selectQueryAddLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType) {
 	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
-	if (queryLinesCounter == queryLinesCounterLimit) {
-		alert("You cannot add more subqueries. Maximum number of allowed subqueries is: " + queryLinesCounterLimit);
-	} else {
-		var queryLineId = "queryLine[" + queryLinesCounter + "]";			
+	var queryLineId = "queryLine[" + queryLinesCounter + "]";			
 
-		var row = document.createElement('div');
-		row.className = queryLinesTableId + "Row";
-		row.id = queryLineId + ".row";
-		document.getElementById(queryLinesTableId).appendChild(row);
+	var row = document.createElement('div');
+	row.className = queryLinesTableId + "Row";
+	row.id = queryLineId + ".row";
+	document.getElementById(queryLinesTableId).appendChild(row);
 		
-		// Playing with styles ... best to use CSS.
-		// document.getElementById(queryLineTableId).style.border = "none";
-		// document.getElementById(queryLineTableId).style.border = "hidden";
-		// document.getElementById(queryLineTableId).style.borderColor = "white";
-		// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
+	// Playing with styles ... best to use CSS.
+	// document.getElementById(queryLineTableId).style.border = "none";
+	// document.getElementById(queryLineTableId).style.border = "hidden";
+	// document.getElementById(queryLineTableId).style.borderColor = "white";
+	// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
 							
-		insertChooseRule(row.id, queryLineId, queryLinesTableId, startupType);
+	insertChooseRule(row.id, queryLineId, queryLinesTableId, startupType);
 		
-		queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
-		insertAggregatorTable(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
-	}
+	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
+	insertAggregatorTable(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
 	
 	// Do not allow navigator to call url.
 	return false;
@@ -2156,5 +2091,9 @@ function barValueChanged(barObject, i, indexOfMine, index, fuzzificationGraphicD
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
+
+<% if (false) { %>
+</script>
+<% } %>
 
 

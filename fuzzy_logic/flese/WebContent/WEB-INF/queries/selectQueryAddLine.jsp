@@ -1,4 +1,6 @@
 
+<%@page import="auxiliar.Conversors"%>
+<%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="constants.KUrls"%>
@@ -10,10 +12,11 @@
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.QueryLines.counter);
+	// int lineIndex = Conversors.toInt(lineIndexString);
 %>
 
-<div id="queryLinesTableRow" class="queryLinesTableRow">
+<div id="queryLines[<%=lineIndexString %>].row" class="queryLinesTableRow">
 
 </div>
 

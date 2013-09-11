@@ -1,3 +1,4 @@
+<%@page import="auxiliar.Dates"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <!-- beginning of commonHtmlHead -->
@@ -17,6 +18,6 @@
 	
 	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
 	<script type="text/javascript" src="js_and_css/highcharts.js" ></script>
-	<script type="text/javascript" src="js_and_css/auxiliarJS.js"></script>
+	<script type="text/javascript" src="js_and_css/auxiliarJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 </head>
 <!-- end of commonHtmlHead -->

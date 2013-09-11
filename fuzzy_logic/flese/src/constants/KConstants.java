@@ -21,6 +21,7 @@ public class KConstants {
 		public static final String fileOwnerParam = "fileOwner";
 		public static final String providerId = "id";
 		public static final String isAjaxParam = "ajax";
+		public static final String database = "db";
 		public static final String resultsStoreHouse = "resultsStoreHouse";
 	}
 	
@@ -99,6 +100,12 @@ public class KConstants {
 		public static final String dbField = "rfuzzy_db_field";
 		public static final String definedOperators = "defined_operators";
 		public static final String similarityClause = "rfuzzy_similarity_clause";
+	}
+	
+	public static class JspsDivs {
+		public static final String selectQueryDiv = "selectQueryDiv";
+		
+		public static final String counter = "QueryLinesCounter";
 	}
 }
 

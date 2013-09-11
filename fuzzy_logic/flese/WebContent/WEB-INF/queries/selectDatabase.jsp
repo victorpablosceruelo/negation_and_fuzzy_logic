@@ -18,6 +18,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
+	String url = KUrls.Queries.SelectQuery.getUrl(true) + "&" + KConstants.Request.database; 
 %>
 
 
@@ -30,13 +31,15 @@
 	     <div class='queryStartContainerTableRow'>
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
 	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
-					<select name="chooseQueryStartType" id="chooseQueryStartType" onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer", "queryLinesCounterField");' >
+					<select name="chooseQueryStartType" id="chooseQueryStartType" 
+					        onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer", "queryLinesCounterField");' >
 						<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 	for (int i=0; i<predicatesInfos.length; i++) {
-		String value = predicatesInfos[i].getPredicateName();
+		String desc = predicatesInfos[i].getPredicateName();
+		String value = url + desc;
 %>	
-						<option id='<%=value %>' title='<%=value %>' value='<%=value %>'><%=value %></option>
+						<option id='<%=desc %>' title='<%=desc %>' value='<%=value %>'><%=desc %></option>
 <%
 	}
 %>					</select>
@@ -45,7 +48,7 @@
 	</div>
 
 	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name="queryLinesCounterField" value="0" id="queryLinesCounterField">
+	<input type="hidden" name="<%=KConstants.QueryLines.counter %>" value="0" id="<%=KConstants.QueryLines.counter %>">
               
 	<div id='queryLinesContainer' class='queryLinesContainerTable'>
 	</div>

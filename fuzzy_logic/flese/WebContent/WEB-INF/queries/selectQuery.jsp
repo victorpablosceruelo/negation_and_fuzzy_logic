@@ -18,6 +18,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
+	String database = requestStoreHouse.getRequestParameter(KConstants.Request.database);
 %>
 
 	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
@@ -33,5 +34,6 @@
 	</div>
 
 	<script type="text/javascript">
-		loadAjaxIn('queryLinesTable', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");
+		setConstant("", "<%=KConstants.. %>")
+		selectQueryAddLine('queryLinesTable', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");
 	</script>
