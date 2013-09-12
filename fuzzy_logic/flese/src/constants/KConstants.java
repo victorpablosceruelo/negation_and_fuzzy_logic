@@ -103,9 +103,13 @@ public class KConstants {
 	}
 	
 	public static class JspsDivs {
-		public static final String selectQueryDiv = "selectQueryDiv";
 		
-		public static final String counter = "QueryLinesCounter";
+		public static final String selectQueryDivId = "selectQueryDiv";
+		public static final String runQueryDivId = "runQueryDiv";
+		public static final String counterId = "QueryLinesCounter";
+		public static final String queryLinesContainerId = "queryLinesContainerId";
+		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTableId";
+		
 	}
 }
 

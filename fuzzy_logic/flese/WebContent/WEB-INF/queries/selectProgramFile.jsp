@@ -1,3 +1,4 @@
+<%@page import="constants.KConstants"%>
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
@@ -28,7 +29,7 @@
 			Please, select a database to load: 
 		</div>
 		<div class="selectDatabaseTableCell2">
-			<select name="chooseProgramFileId" id="chooseProgramFileId" onchange='selectedProgramDatabaseChanged(this, "selectQueryDivId", "runQueryDivId")' >
+			<select name="chooseProgramFileId" id="chooseProgramFileId" onchange='selectedProgramDatabaseChanged(this)' >
 			<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 	for (int i=0; i<filesList.length; i++) { 
@@ -46,8 +47,8 @@
 %>
 </div>
 
-<div id="selectQueryDivId" class="selectDatabaseTable">
+<div id="<%=KConstants.JspsDivs.selectQueryDivId %>" class="selectDatabaseTable">
 </div>
 
-<div id="runQueryDivId" class="selectDatabaseTable">
+<div id="<%=KConstants.JspsDivs.runQueryDivId %>" class="selectDatabaseTable">
 </div>

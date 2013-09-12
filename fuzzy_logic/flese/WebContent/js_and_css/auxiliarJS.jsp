@@ -8,6 +8,8 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+<%@page import="constants.KConstants"%>
+
 <% if (false) { %>
 <script type="text/javascript">
 <% } %>
@@ -23,7 +25,7 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 	debug.info("loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
 	var container = document.getElementById(containerId);
 	if (container == null) {
-		debug.info("loadAjaxIn: Container with id " + containerId + " does not exist.");
+		debug.info("loadAjaxIn: containerId invalid: " + containerId);
 	}
 	else {
 		container.innerHTML=loadingImageHtml(true);
@@ -183,7 +185,10 @@ function getProgramDatabaseComboBoxValue(comboBox) {
 	return selectedProgramDatabase;
 }
 
-function selectedProgramDatabaseChanged(comboBox, selectQueryDivId, runQueryDivId, url) {
+function selectedProgramDatabaseChanged(comboBox) {
+	var selectQueryDivId = '<%= KConstants.JspsDivs.selectQueryDivId %>'; 
+	var runQueryDivId = '<%= KConstants.JspsDivs.runQueryDivId %>';
+	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	if (selectQueryDiv == null) {
 		debug.info("selectedProgramDatabaseChanged: selectQueryDiv is null.");
@@ -204,7 +209,7 @@ function selectedProgramDatabaseChanged(comboBox, selectQueryDivId, runQueryDivI
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
-		loadAjaxIn(, selectedProgramDatabaseUrl);
+		loadAjaxIn(selectQueryDivId, selectedProgramDatabaseUrl);
 	}
 	
 }
@@ -214,9 +219,9 @@ function selectedProgramDatabaseChanged(comboBox, selectQueryDivId, runQueryDivI
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function selectedQueryStartTypeChanged(comboBox) {
-	var queryLinesContainerId = "queryLinesContainer";
-	var queryLinesCounterFieldId = "queryLinesCounterField";
-	var searchOrPersonalizeTableId = "searchOrPersonalizeTable";
+	var queryLinesContainerId = "<%=KConstants.JspsDivs.queryLinesContainerId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterId %>";
+	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivs.searchOrPersonalizeTableId %>";
 	
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);

@@ -48,12 +48,12 @@
 	</div>
 
 	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name="<%=KConstants.QueryLines.counter %>" value="0" id="<%=KConstants.QueryLines.counter %>">
+	<input type="hidden" name="<%=KConstants.JspsDivs.counterId %>" value="0" id="<%=KConstants.JspsDivs.counterId %>">
               
-	<div id='queryLinesContainer' class='queryLinesContainerTable'>
+	<div id='<%=KConstants.JspsDivs.queryLinesContainerId %>' class='queryLinesContainerTable'>
 	</div>
     
-	<div class='searchOrPersonalizeTable'>
+	<div id='<%=KConstants.JspsDivs.searchOrPersonalizeTableId %>' class='searchOrPersonalizeTable'>
 		 <div class='searchOrPersonalizeTableRow'>
 			  <div class='searchOrPersonalizeTableCell'>
 					<input type='submit' value='Search' onclick='return runQueryAfterSoftTests("parentDivId", "runQueryDivId", "chooseQueryStartTypeId", "queryLinesCounterFieldId", "fileName", "fileOwner");' >
