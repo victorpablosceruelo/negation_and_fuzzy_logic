@@ -19,21 +19,25 @@
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.database);
+	String selectQueryAddLineUrl = KUrls.Queries.SelectQueryAddLine.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
+			"&" + KConstants.Request.database + "=" + database + KConstants.Request.line + "=";
+	String selectQueryAddAggrUrl = KUrls.Queries.SelectQueryAddAggr.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
+			"&" + KConstants.Request.database + "=" + database + KConstants.Request.line + "=";
+	
 %>
 
 	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
 		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
-			<div id="queryLinesTable" class="queryLinesTable">
+			<div id="<%=KConstants.JspsDivs.queryLinesTableId %>" class="queryLinesTable">
 			</div>
 		</div>
 		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
-			<div id="queryLinesAggregatorTable" class="queryLinesAggregatorTable">
+			<div id="<%=KConstants.JspsDivs.queryLinesAggregatorTableId %>" class="queryLinesAggregatorTable">
 			</div>
 		</div>
 		
 	</div>
 
 	<script type="text/javascript">
-		setConstant("", "<%=KConstants.. %>")
-		selectQueryAddLine('queryLinesTable', "<%=KUrls.Queries.SelectQueryAddLine.getUrl(true)%>");
+		selectQueryAddLine("<%=selectQueryAddLineUrl %>", "<%=selectQueryAddAggrUrl %>");
 	</script>

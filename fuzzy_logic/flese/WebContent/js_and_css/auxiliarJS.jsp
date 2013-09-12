@@ -268,7 +268,11 @@ function getQueryLinesCounterField(queryLinesCounterFieldId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectQueryAddLine(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType) {
+function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterId %>";
+	var queryLinesTableId = "<%=KConstants.JspsDivs.queryLinesTableId %>";
+	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivs.queryLinesAggregatorTableId %>";
+	
 	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
 	var queryLineId = "queryLine[" + queryLinesCounter + "]";			
 
@@ -276,13 +280,7 @@ function selectQueryAddLine(queryLinesCounterFieldId, queryLinesTableId, queryLi
 	row.className = queryLinesTableId + "Row";
 	row.id = queryLineId + ".row";
 	document.getElementById(queryLinesTableId).appendChild(row);
-		
-	// Playing with styles ... best to use CSS.
-	// document.getElementById(queryLineTableId).style.border = "none";
-	// document.getElementById(queryLineTableId).style.border = "hidden";
-	// document.getElementById(queryLineTableId).style.borderColor = "white";
-	// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
-							
+	
 	insertChooseRule(row.id, queryLineId, queryLinesTableId, startupType);
 		
 	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
@@ -291,6 +289,12 @@ function selectQueryAddLine(queryLinesCounterFieldId, queryLinesTableId, queryLi
 	// Do not allow navigator to call url.
 	return false;
 }
+
+// Playing with styles ... best to use CSS.
+// document.getElementById(queryLineTableId).style.border = "none";
+// document.getElementById(queryLineTableId).style.border = "hidden";
+// document.getElementById(queryLineTableId).style.borderColor = "white";
+// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */

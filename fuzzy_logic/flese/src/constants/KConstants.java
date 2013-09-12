@@ -23,6 +23,7 @@ public class KConstants {
 		public static final String isAjaxParam = "ajax";
 		public static final String database = "db";
 		public static final String resultsStoreHouse = "resultsStoreHouse";
+		public static final String line = "line";
 	}
 	
 	public static class PathsMgmt {
@@ -107,8 +108,10 @@ public class KConstants {
 		public static final String selectQueryDivId = "selectQueryDiv";
 		public static final String runQueryDivId = "runQueryDiv";
 		public static final String counterId = "QueryLinesCounter";
-		public static final String queryLinesContainerId = "queryLinesContainerId";
-		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTableId";
+		public static final String queryLinesContainerId = "queryLinesContainer";
+		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
+		public static final String queryLinesTableId = "queryLinesTable"; 
+		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 		
 	}
 }

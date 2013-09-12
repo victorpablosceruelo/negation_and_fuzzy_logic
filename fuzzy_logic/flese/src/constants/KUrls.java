@@ -62,6 +62,9 @@ public class KUrls {
 		public static final UrlMap SelectQueryAddLinePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQueryAddLine.jsp");
 		public static final UrlMap SelectQueryAddLine = new UrlMap(manager, "selectQueryAddLine", SelectQueryAddLinePage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap SelectQueryAddAggrPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQueryAddAggr.jsp");
+		public static final UrlMap SelectQueryAddAggr = new UrlMap(manager, "selectQueryAddAggr", SelectQueryAddAggrPage, KUrls.Pages.Exception, "");
+
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
 		
