@@ -10,7 +10,7 @@
 
 <%@page import="constants.KConstants"%>
 
-<% if (false) { %>
+<% if (false == true) { %>
 <script type="text/javascript">
 <% } %>
 
@@ -274,18 +274,18 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivs.queryLinesAggregatorTableId %>";
 	
 	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
-	var queryLineId = "queryLine[" + queryLinesCounter + "]";			
+	var queryLineId = "queryLine[" + queryLinesCounter + "]";
+	var destinyAddLine = queryLineId + ".row";
 
 	var row = document.createElement('div');
 	row.className = queryLinesTableId + "Row";
-	row.id = queryLineId + ".row";
+	row.id = destinyAddLine;
 	document.getElementById(queryLinesTableId).appendChild(row);
 	
-	insertChooseRule(row.id, queryLineId, queryLinesTableId, startupType);
-		
-	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
-	insertAggregatorTable(queryLinesCounterFieldId, queryLinesTableId, queryLinesAggregatorTableId, startupType);
+	loadAjaxIn(destinyAddLine, urlQueryAddLine);
+	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + queryLinesCounter);
 	
+	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
 	// Do not allow navigator to call url.
 	return false;
 }
