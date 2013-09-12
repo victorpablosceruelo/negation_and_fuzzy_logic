@@ -290,12 +290,6 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	return false;
 }
 
-// Playing with styles ... best to use CSS.
-// document.getElementById(queryLineTableId).style.border = "none";
-// document.getElementById(queryLineTableId).style.border = "hidden";
-// document.getElementById(queryLineTableId).style.borderColor = "white";
-// document.getElementById(queryLineTableId).style.borderCollapse="collapse";
-
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
