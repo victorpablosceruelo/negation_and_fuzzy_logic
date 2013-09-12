@@ -12,7 +12,7 @@
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.QueryLines.counter);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivs.counterId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 %>
 

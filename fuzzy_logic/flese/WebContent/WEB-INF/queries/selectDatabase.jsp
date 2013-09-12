@@ -18,7 +18,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
-	String url = KUrls.Queries.SelectQuery.getUrl(true) + "&" + KConstants.Request.database; 
+	String url = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + "&" + KConstants.Request.database + "="; 
 %>
 
 
@@ -32,7 +32,7 @@
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
 	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
 					<select name="chooseQueryStartType" id="chooseQueryStartType" 
-					        onchange='selectedQueryStartTypeChanged(this, "queryLinesContainer", "queryLinesCounterField");' >
+					        onchange='selectedQueryStartTypeChanged(this);' >
 						<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 	for (int i=0; i<predicatesInfos.length; i++) {

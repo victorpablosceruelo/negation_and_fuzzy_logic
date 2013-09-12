@@ -13,8 +13,8 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 
 	ProgramIntrospection programIntrospection = null;
 
-	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo fileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
-		super(fileInfo);
+	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
+		super(programFileInfo);
 
 		// Prepare the query structure.
 		// rfuzzy_introspection(PClass, PName, PArity, PType).
@@ -63,7 +63,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 	public ProgramIntrospection getProgramIntrospection() {
 		// if (programIntrospection != null) return programIntrospection;
 
-		programIntrospection = new ProgramIntrospection();
+		programIntrospection = new ProgramIntrospection(getProgramFileInfo());
 		CiaoPrologQueryAnswer answer = null;
 		for (int i = 0; i < queryAnswers.size(); i++) {
 			answer = queryAnswers.get(i);
