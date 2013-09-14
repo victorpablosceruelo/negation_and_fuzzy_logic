@@ -6,7 +6,7 @@ echo "running $0 $* ... "
 
 if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
 	echo " "
-	echo "This is an utility to build Ciao Prolog debian packages."
+	echo "This is an utility to build Java debian packages."
 	echo "usage: $0 ORIG_FOLDER DEST_FOLDER  "
 	echo "example: $0 . ~/tmp "
 	echo " "
@@ -17,7 +17,7 @@ else
 fi;
 
 DATE=`date +%Y%m%d`
-PKG_VERSION="1.0.4"
+PKG_VERSION="2.0.0"
 FOLDER_NAME="oracle-java-pkg-for-debian-${PKG_VERSION}"
 FILE_NAME=oracle-java-pkg-for-debian_${PKG_VERSION}
 BUILD_TGZ=${FILE_NAME}.orig.tar.gz

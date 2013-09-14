@@ -23,10 +23,11 @@ export SHELL=/bin/sh
 # Example of destiny folder.
 # /tmp/buildd/oracle-java-pkg-for-debian-1.0/debian/oracle-java-pkg-for-debian/usr/share/doc/oracle-java-pkg-for-debian/changelog.gz
 
+FILES_NAMES_PREFIX=update-java-oracle
 PKG_NAME=oracle-java-pkg-for-debian
 PKG_FAKE_PATH=$(CURDIR)/debian/tmp
 PKG_FINAL_PATH=$(CURDIR)/debian/$(PKG_NAME)
-PKG_FINAL_SUBPATH=/usr/share/oracle-java-pkg-for-debian
+PKG_FINAL_SUBPATH=/usr/sbin
 
 clean:
 	@echo "Makefile :: clean (it does nothing)"
@@ -41,11 +42,11 @@ build-and-install:
 
 	# Fake installation.
 	mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
-	cp debian/*.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
+	cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
 
 	# Real installation.
 	mkdir -p $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
-	cp debian/*.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
+	cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
 
 	# See what it is really doing ... (debug)
 	find / | grep -iv 'proc' | grep -i 'oracle-java'
