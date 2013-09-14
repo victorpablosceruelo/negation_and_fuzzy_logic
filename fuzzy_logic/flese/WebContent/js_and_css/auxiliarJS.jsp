@@ -21,33 +21,53 @@ function loadingImageHtml(withNewLine) {
 	else return result;
 }
 
-function loadAjaxIn(containerId, ajaxPageUrl) {
-	debug.info("loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
-	var container = document.getElementById(containerId);
-	if (container == null) {
-		debug.info("loadAjaxIn: containerId invalid: " + containerId);
+function getContainer(containerId) {
+	var container = null;
+	if (containerId === null) {
+		debug.info("getContainer: containerId is null");
 	}
 	else {
-		container.innerHTML=loadingImageHtml(true);
-	    $.ajax({
-	        method: 'get',
-	        url: ajaxPageUrl,
-	        data: 'page=' + $(this).attr('rel'),
-	        beforeSend: function() {
-	            container.innerHTML=loadingImageHtml(true);
-	        },
-	        complete: function() {
-	        	debug.info("load of html is complete.");
-	        	// container.innerHTML=loadingImageHtml(true);
-	        },
-	        success: function(html) {
-	        	debug.info("loading html: " + html);
-	        	container.innerHTML=html;
-	        },
-	        fail: function() { alert("error"); }
-	    });
+		container = document.getElementById(containerId);
+		if (container === null) {
+			debug.info("getContainer: container is null");
+			debug.info("getContainer: containerId is " + containerId);
+		}
 	}
-	
+	return container;
+}
+
+function debugInfoIfVarIsNull(varValue, varName, preMsg) {
+	if (varValue === null) {
+		debug.info(preMsg + ": " + varName + " is null.");
+	}
+}
+
+function loadAjaxIn(containerId, ajaxPageUrl) {
+	// debug.info("loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
+	var container = getContainer(containerId);
+	if (container === null) {
+		debug.info("aborted loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
+		return;
+	}
+
+	container.innerHTML=loadingImageHtml(true);
+    $.ajax({
+        method: 'get',
+        url: ajaxPageUrl,
+        data: 'page=' + $(this).attr('rel'),
+        beforeSend: function() {
+            container.innerHTML=loadingImageHtml(true);
+        },
+        complete: function() {
+        	debug.info("load of html is complete.");
+        	// container.innerHTML=loadingImageHtml(true);
+        },
+        success: function(html) {
+        	debug.info("loading html: " + html);
+        	container.innerHTML=html;
+        },
+        fail: function() { alert("error"); }
+    });
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -70,10 +90,15 @@ function isString(o) {
 function getComboBoxValue(comboBox) {
 	if (comboBox == null) return "";
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+
+	if (comboBoxValue === null) {
+		debug.info("getComboBoxValue: comboBoxValue is null (===).");
+		return "";
+	}
 	
 	// alert("comboBoxValue: " + comboBoxValue);
 	if (comboBoxValue == null) {
-		debug.info("getComboBoxValue: comboBoxValue is null.");
+		debug.info("getComboBoxValue: comboBoxValue is null (==).");
 		return "";
 	}
 	
@@ -190,17 +215,11 @@ function selectedProgramDatabaseChanged(comboBox) {
 	var runQueryDivId = '<%= KConstants.JspsDivs.runQueryDivId %>';
 	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
-	if (selectQueryDiv == null) {
-		debug.info("selectedProgramDatabaseChanged: selectQueryDiv is null.");
-		return;
-	}
+	debugInfoIfVarIsNull(selectQueryDiv, "selectQueryDiv", "selectedProgramDatabaseChanged");
 	selectQueryDiv.innerHTML = loadingImageHtml(true);
 	
 	var runQueryDiv = document.getElementById(runQueryDivId);
-	if (runQueryDiv == null) {
-		debug.info("selectedProgramDatabaseChanged: runQueryDiv is null.");
-		return;		
-	}
+	debugInfoIfVarIsNull(runQueryDiv, "runQueryDiv", "selectedProgramDatabaseChanged");
 	runQueryDiv.innerHTML = "";
 	
 	var selectedProgramDatabaseUrl = getComboBoxValue(comboBox);
@@ -227,7 +246,7 @@ function selectedQueryStartTypeChanged(comboBox) {
 	debug.info("startupType changed to " + startupType);
 	
 	resetQueryLinesCounterField(queryLinesCounterFieldId);
-	var queryLinesContainerDiv = document.getElementById(queryLinesContainerId); 
+	var queryLinesContainerDiv = getContainer(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
 	var searchOrPersonalizeTable = document.getElementById(searchOrPersonalizeTableId);

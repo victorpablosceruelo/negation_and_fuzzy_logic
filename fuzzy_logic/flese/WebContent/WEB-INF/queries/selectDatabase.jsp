@@ -27,7 +27,7 @@
 // action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
 // target='" + runQueryTargetiFrameId+ "'>";
  -->
-	<div id='queryStartContainer' class='queryStartContainerTable'>
+	<div id='<%=KConstants.JspsDivs.queryStartContainerId %>' class='queryStartContainerTable'>
 	     <div class='queryStartContainerTableRow'>
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
 	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
@@ -48,7 +48,7 @@
 	</div>
 
 	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name="<%=KConstants.JspsDivs.counterId %>" value="0" id="<%=KConstants.JspsDivs.counterId %>">
+	<input type="hidden" name='<%=KConstants.JspsDivs.counterId %>' value="0" id='<%=KConstants.JspsDivs.counterId %>'>
               
 	<div id='<%=KConstants.JspsDivs.queryLinesContainerId %>' class='queryLinesContainerTable'>
 	</div>
