@@ -27,6 +27,14 @@
 
 <div id="<%=lineId %>.row" class="queryLinesTableRow">
 
+	<!-- Negation -->
+	<div id="<%=lineId %>.negation" class="queryLinesTableCell">
+	</div>
+
+	<!-- Quantifier -->
+	<div id="<%=lineId %>.quantifier" class="queryLinesTableCell">
+	</div>
+
 	<!-- Predicate -->
 	<div id="<%=lineId %>.predicate" class="queryLinesTableCell">
 	
@@ -41,6 +49,15 @@
 				<% } %>
 		</select>
 	</div>
+	
+	<!-- Operator -->
+	<div id="<%=lineId %>.operator" class="queryLinesTableCell">
+	</div>
+
+	<!-- Value -->
+	<div id="<%=lineId %>.value" class="queryLinesTableCell">
+	</div>
+	
 </div>
 
 

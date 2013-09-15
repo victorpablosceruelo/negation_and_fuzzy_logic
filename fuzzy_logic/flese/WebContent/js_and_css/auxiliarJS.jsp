@@ -137,6 +137,13 @@ function getComboBoxValue(comboBox) {
 	var comboBoxSelectedField = comboBox.options[comboBoxSelectedIndex];
 	if (comboBoxSelectedField == null) return "";
 	var comboBoxValue = comboBoxSelectedField.value;
+	var comboBoxText = comboBoxSelectedField.text;
+	var comboBoxName = comboBoxSelectedField.name;
+	var comboBoxTitle = comboBoxSelectedField.title;
+	debug.info("getComboBoxValue: value: " + comboBoxValue);
+	debug.info("getComboBoxValue: text: " + comboBoxText);
+	debug.info("getComboBoxValue: name: " + comboBoxName);
+	debug.info("getComboBoxValue: title: " + comboBoxTitle);
 
 	if (comboBoxValue === null) {
 		debug.info("getComboBoxValue: comboBoxValue is null (===).");
@@ -383,14 +390,6 @@ function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 
 function selectPredicateChanged(comboBox, queryLineId, rowId, startupType, queryLinesTableId) {
 	// var comboBox = document.getElementById('fuzzyRule[' + fuzzyRuleIndex + ']');
-	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	var comboBoxText = comboBox.options[comboBox.selectedIndex].text;
-	var comboBoxName = comboBox.options[comboBox.selectedIndex].name;
-	var comboBoxTitle = comboBox.options[comboBox.selectedIndex].title;
-	debug.info("changeInChooseRule: comboBoxValue: " + comboBoxValue);
-	debug.info("changeInChooseRule: comboBoxText: " + comboBoxText);
-	debug.info("changeInChooseRule: comboBoxName: " + comboBoxName);
-	debug.info("changeInChooseRule: comboBoxTitle: " + comboBoxTitle);
 	
 	var index = comboBoxTitle;
 	
