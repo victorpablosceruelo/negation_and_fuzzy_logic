@@ -98,9 +98,9 @@ popd
 
 echo " "
 echo "Updating alternatives using the script" 
-echo "/usr/share/oracle-java-pkg-for-debian/update-java-oracle-nondebian-installation-aux.sh ... "
+echo "/usr/sbin/update-java-oracle-nondebian-installation-aux.sh ... "
 echo " "
-/usr/share/oracle-java-pkg-for-debian/update-java-oracle-nondebian-installation-aux.sh ${JAVA_INSTALLATION_DIR} ${DIRNAME}
+/usr/sbin/update-java-oracle-nondebian-installation-aux.sh ${JAVA_INSTALLATION_DIR} ${DIRNAME}
 echo "END."
 
 #EOF
