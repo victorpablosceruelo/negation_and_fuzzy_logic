@@ -103,6 +103,11 @@ public class KConstants {
 		public static final String similarityClause = "rfuzzy_similarity_clause";
 	}
 	
+	public static class JavaScriptScripts {
+		public static final String jsRegex = "<script[^>]*>[^<]*</script>";
+		public static final String jsStart = "<script type=\"text/javascript\">";
+		public static final String jsEnd = "</script>";
+	}
 	public static class JspsDivs {
 		public static final String queryStartContainerId = "queryStartContainer";
 		public static final String selectQueryDivId = "selectQueryDiv";

@@ -7,8 +7,8 @@ public class KUrls {
 	public static class Pages {
 		public static final UrlMap Empty = new UrlMap("", "emptyPage", null, null, "");
 		public static final UrlMap Index = new UrlMap("", "indexPage", null, null, "index.jsp");
-		public static final UrlMap Exception = new UrlMap("", "exception", null, null, "WEB-INF/exceptionAjaxPage.jsp");
-		public static final UrlMap NullSession = new UrlMap("", "nullSession", null, null, "WEB-INF/nullSessionAjaxPage.jsp");
+		public static final UrlMap Exception = new UrlMap("", "exception", null, null, "WEB-INF/errorException.jsp");
+		public static final UrlMap NullSession = new UrlMap("", "nullSession", null, null, "WEB-INF/errorNullSession.jsp");
 	}
 
 	public static class Auth {

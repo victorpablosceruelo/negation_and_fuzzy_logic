@@ -8,6 +8,10 @@ import storeHouse.RequestStoreHouse;
 
 public class JspsUtils {
 
+	public static String getStringWithValueS() {
+		return "S";
+	}
+	
 	public static String getLocalUserInfoName(HttpServletRequest request) {
 
 		String localUserInfoName = null;

@@ -70,6 +70,15 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddLinePage, ""));
 	}
+	
+	public void selectQueryAddAggr() throws Exception {
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
+		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddAggrPage, ""));
+	}
+	
 
 	public void evaluate() throws Exception {
 		CiaoPrologNormalQuery query = CiaoPrologNormalQuery.getInstance(requestStoreHouse);

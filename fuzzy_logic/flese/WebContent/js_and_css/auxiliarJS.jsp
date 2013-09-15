@@ -9,8 +9,9 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 <%@page import="constants.KConstants"%>
+<%@page import="auxiliar.JspsUtils"%>
 
-<% if (false == true) { %>
+<% if (JspsUtils.getStringWithValueS().equals("N")) { %>
 <script type="text/javascript">
 <% } %>
 
@@ -47,10 +48,13 @@ function executeAjaxLoadedPageJS(loadedContent) {
 	var content = loadedContent;
 	// xmlhttp.responseText;
 
-    var script = content.match("<script[^>]*>[^<]*</script>");
+	var scriptStart = '<%=KConstants.JavaScriptScripts.jsStart %>';
+	var scriptEnd = '<%=KConstants.JavaScriptScripts.jsEnd %>';
+	
+    var script = content.match("<%=KConstants.JavaScriptScripts.jsRegex %>");
     if (script != null) {
-		script = script.toString().replace('<script type="text/javascript">', '');
-		script = script.replace('</script>', '');
+		script = script.toString().replace(scriptStart, '');
+		script = script.replace(scriptEnd, '');
 		eval(script);
 	}
 }
@@ -78,9 +82,11 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
         success: function(html) {
         	console.log("loading html: " + html);
         	container.innerHTML=html;
-        	executeAjaxLoadedPageJS(html)
+        	executeAjaxLoadedPageJS(html);
         },
-        fail: function() { alert("error"); }
+        fail: function() { 
+        	alert("error: Impossible to load page " + ajaxPageUrl); 
+        }
     });
 }
 
@@ -2135,7 +2141,7 @@ function barValueChanged(barObject, i, indexOfMine, index, fuzzificationGraphicD
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-<% if (false) { %>
+<% if (JspsUtils.getStringWithValueS().equals("N")) { %>
 </script>
 <% } %>
 
