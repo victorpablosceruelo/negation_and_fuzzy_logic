@@ -99,6 +99,22 @@ function clearScreen() {
 	mainSection.innerHTML = "";
 }
 
+function showMsgs(msgs) {
+	var msgsContainerId = 'msgs';
+	var msgsContainer = getContainer(msgsContainerId);
+
+	msgsContainer.innerHTML = "";
+	if (Array.isArray(msgs)) {
+		for (i=0; i<msgs.length; i++) {
+			var subDiv = document.createElement('div');
+			// row.className = "";
+			// row.id = destinyAddLine;
+			// document.getElementById(msgsContainerId)
+			msgsContainer.appendChild(row);
+		}
+	}
+}
+
 
 function isString(o) {
 	var result = false;

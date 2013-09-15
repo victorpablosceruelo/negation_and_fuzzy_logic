@@ -32,7 +32,7 @@
 		</div>
 	</header>
 	<br />
-	<section id="bodyToUserMsgs" class="bodyToUserMsgs">
+	<section id="msgs" class="bodyToUserMsgs">
 
 	</section>
 	<br />
