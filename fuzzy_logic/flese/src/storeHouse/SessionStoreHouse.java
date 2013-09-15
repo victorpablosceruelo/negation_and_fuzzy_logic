@@ -14,10 +14,11 @@ public class SessionStoreHouse {
 
 	private HttpSession session = null;
 
-	public SessionStoreHouse(HttpServletRequest request, boolean create) throws RequestStoreHouseException {
+	public SessionStoreHouse(HttpServletRequest request, boolean create) throws RequestStoreHouseException, RequestStoreHouseSessionException {
 		this.session = request.getSession(create);
-		if (session == null)
-			throw new RequestStoreHouseException("session is null. 'Create if null' has the value: " + create);
+		if (session == null) {
+			throw new RequestStoreHouseSessionException("session is null. 'Create if null' has the value: " + create);
+		}
 	}
 
 	public boolean isNull() {

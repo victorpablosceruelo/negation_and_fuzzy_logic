@@ -27,7 +27,7 @@ public class RequestStoreHouse {
 
 	private HashMap<String, String[]> requestParams = null;
 
-	public RequestStoreHouse(HttpServletRequest request, boolean create) throws RequestStoreHouseException {
+	public RequestStoreHouse(HttpServletRequest request, boolean create) throws RequestStoreHouseException, RequestStoreHouseSessionException {
 
 		if (request == null)
 			throw new RequestStoreHouseException("request is null");

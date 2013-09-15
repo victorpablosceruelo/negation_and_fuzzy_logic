@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
+import storeHouse.RequestStoreHouseSessionException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
@@ -84,7 +85,12 @@ public class Servlet extends HttpServlet {
 		ServletContext servletContext = getServletConfig().getServletContext();
 		RequestStoreHouse requestStoreHouse;
 		try {
-			requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull);
+			try {
+				requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull);
+			} catch (RequestStoreHouseSessionException e) {
+				e.printStackTrace();
+				return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.NullSession, "");
+			}
 			requestStoreHouse.setResponse(response);
 			requestStoreHouse.setServletContext(servletContext);
 			requestStoreHouse.setDoMethod(doMethod);
