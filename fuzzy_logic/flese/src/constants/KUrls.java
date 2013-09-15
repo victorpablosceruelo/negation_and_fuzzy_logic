@@ -65,6 +65,18 @@ public class KUrls {
 		public static final UrlMap SelectQueryAddAggrPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQueryAddAggr.jsp");
 		public static final UrlMap SelectQueryAddAggr = new UrlMap(manager, "selectQueryAddAggr", SelectQueryAddAggrPage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap SelectNegationPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectNegation.jsp");
+		public static final UrlMap SelectNegation = new UrlMap(manager, "selectNegation", SelectNegationPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap SelectQuantifierPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQuantifier.jsp");
+		public static final UrlMap SelectQuantifier = new UrlMap(manager, "selectQuantifier", SelectQuantifierPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap SelectOperatorPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectOperator.jsp");
+		public static final UrlMap SelectOperator = new UrlMap(manager, "selectOperator", SelectOperatorPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap SelectValuePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectValue.jsp");
+		public static final UrlMap SelectValue = new UrlMap(manager, "selectValue", SelectValuePage, KUrls.Pages.Exception, "");
+
 		public static final UrlMap EvaluatePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/evaluateQuery.jsp");
 		public static final UrlMap Evaluate = new UrlMap(manager, "evaluate", EvaluatePage, KUrls.Pages.Exception, "");
 		

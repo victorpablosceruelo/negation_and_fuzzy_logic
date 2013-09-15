@@ -79,6 +79,37 @@ public class QueriesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddAggrPage, ""));
 	}
 	
+	public void selectNegation() throws Exception {
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
+		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectNegationPage, ""));
+	}
+	
+	public void selectQuantifier() throws Exception {
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
+		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQuantifierPage, ""));
+	}
+	
+	public void selectOperator() throws Exception {
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
+		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectOperatorPage, ""));
+	}
+	
+	public void selectValue() throws Exception {
+		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
+				.getInstance(requestStoreHouse.getProgramFileInfo());
+		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
+		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectValuePage, ""));
+	}
 
 	public void evaluate() throws Exception {
 		CiaoPrologNormalQuery query = CiaoPrologNormalQuery.getInstance(requestStoreHouse);

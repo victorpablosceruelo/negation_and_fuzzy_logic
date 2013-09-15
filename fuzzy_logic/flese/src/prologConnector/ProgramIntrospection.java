@@ -117,31 +117,11 @@ public class ProgramIntrospection {
 		}
 		ArrayList<PredicateInfo> predicatesArrayList = new ArrayList<PredicateInfo>();
 		PredicateInfo predicateInfo = null;
-		String[][] types = null;
 		int i = 0;
-		boolean valid = false;
 
 		while (i < predicatesInfos.size()) {
 			predicateInfo = predicatesInfos.get(i);
-			types = predicateInfo.getPredicateTypes();
-			valid = false;
-
-			for (int j = 0; j < types.length; j++) {
-				if (types[j].length == type.length) {
-					int length = types[j].length;
-					valid = true;
-
-					// All the types I can compare must be equal to the ones I
-					// have.
-					for (int k = 0; k < length; k++) {
-						if (type[k] != null) { // If null, do not compare.
-							valid = valid && types[j][k].equals(type[k]);
-						}
-					}
-				}
-			}
-
-			if (valid) {
+			if (predicateInfo.getFullyDefinedTypes(type).length > 0) {
 				predicatesArrayList.add(predicateInfo);
 			}
 			i++;

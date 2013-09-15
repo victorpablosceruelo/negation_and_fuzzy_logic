@@ -26,10 +26,10 @@
 	
 	String common = programIntrospection.getProgramFileInfo().getInfoForUrls() + "&" + KConstants.Request.databaseParam + 
 			"=" + database + "&" + KConstants.Request.predicateParam + "=";
-	String negUrl = KUrls.Queries.SelectNegation.getUrl(true) + common;
-	String quantUrl = KUrls.Queries.SelectQuantifier.getUrl(true) + common;
-	String opUrl = KUrls.Queries.SelectOperator.getUrl(true) + common;
-	String valueUrl = KUrls.Queries.SelectValue.getUrl(true) + common;
+	String negUrl = KUrls.Queries.SelectQuery.getUrl(true) + common;
+	String quantUrl = KUrls.Queries.SelectQuery.getUrl(true) + common;
+	String opUrl = KUrls.Queries.SelectQuery.getUrl(true) + common;
+	String valueUrl = KUrls.Queries.SelectQuery.getUrl(true) + common;
 %>
 
 <div id="<%=lineId %>.row" class="queryLinesTableRow">
@@ -45,7 +45,7 @@
 	<!-- Predicate -->
 	<div id="<%=lineId %>.predicateDiv" class="queryLinesTableCell">
 	
-		<select name="<%=lineId %>.predicate" id="<%=lineId %>.predicate" 
+		<select name="<%=lineId %>.predicate" id="<%=lineId %>.selectPredicate" 
 				onchange="selectPredicateChanged(this, '<%=lineId %>', '<%=negUrl %>', '<%=quantUrl %>', '<%=opUrl %>', '<%=valueUrl %>');">
 				<%=JspsUtils.comboBoxDefaultValue() %>
 

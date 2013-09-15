@@ -11,4 +11,7 @@ public interface PredMoreInfoInterface {
 
 	public String[] generateVariablesNames(String initialPredicate);
 	
+	public String[][] getMoreInfo();
+	
+	public String [][] getOperatorsFor(String [][] types);
 }

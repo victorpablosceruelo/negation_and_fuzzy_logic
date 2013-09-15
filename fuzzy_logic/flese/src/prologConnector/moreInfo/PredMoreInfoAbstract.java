@@ -9,6 +9,7 @@ import prologConnector.PredicateInfoException;
 public abstract class PredMoreInfoAbstract implements PredMoreInfoInterface {
 
 	private String type = null;
+	String [][] moreInfo = new String[0][];
 
 	protected PredMoreInfoAbstract() {
 		type = null;
@@ -24,6 +25,14 @@ public abstract class PredMoreInfoAbstract implements PredMoreInfoInterface {
 	
 	public String[] generateVariablesNames(String initialPredicate) {
 		return new String[0];
+	}
+	
+	public String[][] getMoreInfo() {
+		return moreInfo;
+	}
+	
+	public String [][] getOperatorsFor(String [][] types) {
+		return new String[0][];
 	}
 	
 
