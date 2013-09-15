@@ -94,6 +94,12 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+function clearScreen()
+	var mainSection = getContainer('mainSecDiv');
+	mainSection.innerHTML = "";
+}
+
+
 function isString(o) {
 	var result = false;
 	if ((o != null) && (o != undefined)) {
@@ -287,6 +293,10 @@ function selectedQueryStartTypeChanged(comboBox) {
 	}
 }
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 function resetQueryLinesCounterField(queryLinesCounterFieldId) {
 	document.getElementById(queryLinesCounterFieldId).value = 0;
 }
@@ -305,7 +315,6 @@ function getQueryLinesCounterField(queryLinesCounterFieldId) {
 	}
 	else return 0;
 }
-
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -328,8 +337,11 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	row.id = destinyAddLine;
 	document.getElementById(queryLinesTableId).appendChild(row);
 	
-	loadAjaxIn(destinyAddLine, urlQueryAddLine);
-	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + queryLinesCounter);
+	var lineInfo = "&" + "<%= KConstants.Request.lineNumberParam %>" + "=" + queryLinesCounter;
+	var lineId = "&" + "<%= KConstants.Request.lineIdParam %>" + "=" + queryLinesCounter;
+	
+	loadAjaxIn(destinyAddLine, urlQueryAddLine + lineInfo + lineId);
+	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + queryLinesCounter + lineInfo + lineId);
 	
 	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
 	// Do not allow navigator to call url.
@@ -343,31 +355,7 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 function insertChooseRule(rowId, queryLineId, queryLinesTableId, startupType) {
 	
 	var row = document.getElementById(rowId);
-	var cell = document.createElement('div');
-	cell.id = queryLineId + ".predicate";
-	cell.className = queryLinesTableId + "Cell";
-	row.appendChild(cell);
-	
-	var queryLineSelectPredicateId = queryLineId + ".selectPredicate";
-	var html = "<select name=\'"+queryLineSelectPredicateId+"\' id=\'"+queryLineSelectPredicateId+"\' "+
-				"onchange=\"selectPredicateChanged(this, \'" + queryLineId + "\', \'"+rowId+ "\', \'"+startupType+"\', \'" + queryLinesTableId + "');\">";
-	html += "<option name=\'----\' value=\'----\''>----</option>";
-	var addOption=false;
-	for (var i=0; i<programIntrospection.length; i++){
-		addOption=false;
-		for (var j=0; j<programIntrospection[i].predType.length; j++){
-			addOption = addOption || 
-				((startupType == programIntrospection[i].predType[j][0]) && (programIntrospection[i].predArity == "2"));
-		}
-		if (addOption) {
-			html += "<option title=\'" + i + "\' value=\'" + programIntrospection[i].predName + "\'>"+
-					prologNameInColloquialLanguage(programIntrospection[i].predName) + "</option>";
-		}
-//		else {
-//			debug.info("invalid: " + programIntrospection[i].predName + "/" + programIntrospection[i].predArity);
-//		}
-	}
-	html += "</select>";
+
 	
 	cell.innerHTML = html;
 }

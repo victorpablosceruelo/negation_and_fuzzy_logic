@@ -13,17 +13,15 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <%
-	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
-	String database = requestStoreHouse.getRequestParameter(KConstants.Request.database);
+	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String selectQueryAddLineUrl = KUrls.Queries.SelectQueryAddLine.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
-			"&" + KConstants.Request.database + "=" + database + KConstants.Request.line + "=";
+	"&" + KConstants.Request.databaseParam + "=" + database;
 	String selectQueryAddAggrUrl = KUrls.Queries.SelectQueryAddAggr.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
-			"&" + KConstants.Request.database + "=" + database + KConstants.Request.line + "=";
-	
+	"&" + KConstants.Request.databaseParam + "=" + database;
 %>
 
 	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
@@ -39,5 +37,5 @@
 	</div>
 
 	<script type="text/javascript">
-		document.onload=selectQueryAddLine("<%=selectQueryAddLineUrl %>", "<%=selectQueryAddAggrUrl %>");
+		selectQueryAddLine("<%=selectQueryAddLineUrl %>", "<%=selectQueryAddAggrUrl %>");
 	</script>

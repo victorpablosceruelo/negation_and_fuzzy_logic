@@ -13,12 +13,11 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <%
-	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
-	String url = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + "&" + KConstants.Request.database + "="; 
+	String url = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + "&" + KConstants.Request.databaseParam + "=";
 %>
 
 

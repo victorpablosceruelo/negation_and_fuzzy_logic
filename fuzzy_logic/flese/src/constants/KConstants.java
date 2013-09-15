@@ -21,9 +21,10 @@ public class KConstants {
 		public static final String fileOwnerParam = "fileOwner";
 		public static final String providerId = "id";
 		public static final String isAjaxParam = "ajax";
-		public static final String database = "db";
+		public static final String databaseParam = "db";
 		public static final String resultsStoreHouse = "resultsStoreHouse";
-		public static final String line = "line";
+		public static final String lineNumberParam = "lineNum";
+		public static final String lineIdParam = "lineId";
 	}
 	
 	public static class PathsMgmt {

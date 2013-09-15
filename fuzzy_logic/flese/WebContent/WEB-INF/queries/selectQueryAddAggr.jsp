@@ -16,8 +16,6 @@
 	// int lineIndex = Conversors.toInt(lineIndexString);
 %>
 
-<div id="queryLines[<%=lineIndexString %>].row" class="queryLinesTableRow">
-
-</div>
+QQQ
 
 

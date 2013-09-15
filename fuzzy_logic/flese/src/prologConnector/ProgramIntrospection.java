@@ -9,7 +9,6 @@ public class ProgramIntrospection {
 
 	private ArrayList<PredicateInfo> predicatesInfos = null;
 	private ProgramFileInfo programFileInfo = null;
-	
 
 	public ProgramIntrospection(ProgramFileInfo programFileInfo) {
 		this.programFileInfo = programFileInfo;
@@ -39,13 +38,14 @@ public class ProgramIntrospection {
 			e.printStackTrace();
 		}
 	}
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public ProgramFileInfo getProgramFileInfo() {
 		return this.programFileInfo;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,12 +73,12 @@ public class ProgramIntrospection {
 		}
 		return predicateInfo;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public PredicateInfo [] getPredicatesInfosByMoreInfoKey(String key) throws CiaoPrologConnectorException {
+	public PredicateInfo[] getPredicatesInfosByMoreInfoKey(String key) throws CiaoPrologConnectorException {
 		if (key == null) {
 			throw new CiaoPrologConnectorException("key cannot be null.");
 		}
@@ -90,20 +90,66 @@ public class ProgramIntrospection {
 		Set<String> keys = null;
 		int i = 0;
 		boolean valid = false;
-		
+
 		while (i < predicatesInfos.size()) {
 			predicateInfo = predicatesInfos.get(i);
 			keys = predicateInfo.getPredicateMoreInfoKeys();
-			valid = keys.contains(key); 
+			valid = keys.contains(key);
 			if (valid) {
 				predicatesArrayList.add(predicateInfo);
 			}
-				i++;
+			i++;
 		}
-		
+
 		return predicatesArrayList.toArray(new PredicateInfo[predicatesArrayList.size()]);
 	}
-	
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public PredicateInfo[] getPredicatesInfosByType(String[] type) throws CiaoPrologConnectorException {
+		if (type == null) {
+			throw new CiaoPrologConnectorException("type cannot be null.");
+		}
+		if (type.length == 0) {
+			throw new CiaoPrologConnectorException("type cannot be of length 0.");
+		}
+		ArrayList<PredicateInfo> predicatesArrayList = new ArrayList<PredicateInfo>();
+		PredicateInfo predicateInfo = null;
+		String[][] types = null;
+		int i = 0;
+		boolean valid = false;
+
+		while (i < predicatesInfos.size()) {
+			predicateInfo = predicatesInfos.get(i);
+			types = predicateInfo.getPredicateTypes();
+			valid = false;
+
+			for (int j = 0; j < types.length; j++) {
+				if (types[j].length == type.length) {
+					int length = types[j].length;
+					valid = true;
+
+					// All the types I can compare must be equal to the ones I
+					// have.
+					for (int k = 0; k < length; k++) {
+						if (type[k] != null) { // If null, do not compare.
+							valid = valid && types[j][k].equals(type[k]);
+						}
+					}
+				}
+			}
+
+			if (valid) {
+				predicatesArrayList.add(predicateInfo);
+			}
+			i++;
+		}
+
+		return predicatesArrayList.toArray(new PredicateInfo[predicatesArrayList.size()]);
+	}
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
