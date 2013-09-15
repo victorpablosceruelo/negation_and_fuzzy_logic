@@ -94,7 +94,7 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function clearScreen()
+function clearScreen() {
 	var mainSection = getContainer('mainSecDiv');
 	mainSection.innerHTML = "";
 }

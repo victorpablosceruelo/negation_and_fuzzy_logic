@@ -34,11 +34,11 @@
 				onchange="selectPredicateChanged(this, '<%=lineId %>', '<%=database %>');">
 				<%=JspsUtils.comboBoxDefaultValue() %>
 
-<% for (int i=0; i<predicatesInfos.length; i++) { %>
-				<option title='<%=i %>' value='<%=predicatesInfos[i].getPredicateName() %>'>
-					prologNameInColloquialLanguage(programIntrospection[i].predName)
-				</option>
-<% } %>
+				<% for (int i=0; i<predicatesInfos.length; i++) { %>
+					<option title='<%=i %>' value='<%=predicatesInfos[i].getPredicateName() %>'>
+						<%=JspsUtils.getPrologNameInColloquialLanguage(predicatesInfos[i].getPredicateName()) %>
+					</option>
+				<% } %>
 		</select>
 	</div>
 </div>
