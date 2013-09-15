@@ -105,12 +105,13 @@ function showMsgs(msgs) {
 
 	msgsContainer.innerHTML = "";
 	if (Array.isArray(msgs)) {
-		for (i=0; i<msgs.length; i++) {
+		for (var i=0; i<msgs.length; i++) {
 			var subDiv = document.createElement('div');
 			// row.className = "";
 			// row.id = destinyAddLine;
 			// document.getElementById(msgsContainerId)
-			msgsContainer.appendChild(row);
+			subDiv.innerHTML = msgs[i];
+			msgsContainer.appendChild(subDiv);
 		}
 	}
 }
