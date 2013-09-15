@@ -39,5 +39,5 @@
 	</div>
 
 	<script type="text/javascript">
-		selectQueryAddLine("<%=selectQueryAddLineUrl %>", "<%=selectQueryAddAggrUrl %>");
+		document.onload=selectQueryAddLine("<%=selectQueryAddLineUrl %>", "<%=selectQueryAddAggrUrl %>");
 	</script>

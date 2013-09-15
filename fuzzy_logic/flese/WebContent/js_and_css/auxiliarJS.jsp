@@ -42,6 +42,19 @@ function debugInfoIfVarIsNull(varValue, varName, preMsg) {
 	}
 }
 
+function executeAjaxLoadedPageJS(loadedContent) {
+	// From http://stackoverflow.com/questions/10888326/executing-javascript-script-after-ajax-loaded-a-page-doesnt-work
+	var content = loadedContent;
+	// xmlhttp.responseText;
+
+    var script = content.match("<script[^>]*>[^<]*</script>");
+    if (script != null) {
+		script = script.toString().replace('<script type="text/javascript">', '');
+		script = script.replace('</script>', '');
+		eval(script);
+	}
+}
+
 function loadAjaxIn(containerId, ajaxPageUrl) {
 	// debug.info("loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
 	var container = getContainer(containerId);
@@ -63,8 +76,9 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
         	// container.innerHTML=loadingImageHtml(true);
         },
         success: function(html) {
-        	debug.info("loading html: " + html);
+        	console.log("loading html: " + html);
         	container.innerHTML=html;
+        	executeAjaxLoadedPageJS(html)
         },
         fail: function() { alert("error"); }
     });
@@ -89,7 +103,11 @@ function isString(o) {
 
 function getComboBoxValue(comboBox) {
 	if (comboBox == null) return "";
-	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
+	var comboBoxSelectedIndex = comboBox.selectedIndex;
+	if (comboBoxSelectedIndex == null) return "";
+	var comboBoxSelectedField = comboBox.options[comboBoxSelectedIndex];
+	if (comboBoxSelectedField == null) return "";
+	var comboBoxValue = comboBoxSelectedField.value;
 
 	if (comboBoxValue === null) {
 		debug.info("getComboBoxValue: comboBoxValue is null (===).");
@@ -288,6 +306,9 @@ function getQueryLinesCounterField(queryLinesCounterFieldId) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
+	debug.info("selectQueryAddLine");
+	debug.info(urlQueryAddLine);
+	debug.info(urlQueryAddAggregator);
 	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterId %>";
 	var queryLinesTableId = "<%=KConstants.JspsDivs.queryLinesTableId %>";
 	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivs.queryLinesAggregatorTableId %>";
