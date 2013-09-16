@@ -35,7 +35,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		isProgramIntrospectionQuery = true;
 	}
 
-	public static CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException,
+	public static synchronized CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException,
 			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 		String key = CiaoPrologProgramIntrospectionQuery.class.getName();

@@ -18,15 +18,20 @@
 	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivs.counterId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
+	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
 	String lineNumber = requestStoreHouse.getRequestParameter(KConstants.Request.lineNumberParam);
 	String lineId = requestStoreHouse.getRequestParameter(KConstants.Request.lineIdParam);
-	
+
+	PredicateInfo predicatePredicateInfo = programIntrospection.getPredicateInfo(predicate);
+	String [] neededType = {database, "rfuzzy_truth_value_type"};
+
 	String [] type = {"rfuzzy_predicate_type", "rfuzzy_truth_value_type"};
 	PredicateInfo[] predicatesInfos = programIntrospection.getPredicatesInfosByType(type);
 	
 %>
 
-<select name="<%=lineId %>.quantifier" id="<%=lineId %>.quantifier">
+<% if (predicatePredicateInfo.hasType(neededType)) { %>
+	<select name="<%=lineId %>.quantifier" id="<%=lineId %>.quantifier">
 		<%=JspsUtils.comboBoxDefaultValue() %>
 
 		<% for (int i=0; i<predicatesInfos.length; i++) { %>
@@ -36,4 +41,5 @@
 				</option>
 			<% } %>	
 		<% } %>
-</select>
+	</select>
+<% } else { %>&nbsp;<% } %>

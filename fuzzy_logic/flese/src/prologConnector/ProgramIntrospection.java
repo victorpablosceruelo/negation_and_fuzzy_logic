@@ -1,6 +1,7 @@
 package prologConnector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import filesAndPaths.ProgramFileInfo;
@@ -115,19 +116,23 @@ public class ProgramIntrospection {
 		if (type.length == 0) {
 			throw new CiaoPrologConnectorException("type cannot be of length 0.");
 		}
-		ArrayList<PredicateInfo> predicatesArrayList = new ArrayList<PredicateInfo>();
+		HashMap<String, PredicateInfo> predicatesList = new HashMap<String, PredicateInfo>();
 		PredicateInfo predicateInfo = null;
 		int i = 0;
 
 		while (i < predicatesInfos.size()) {
 			predicateInfo = predicatesInfos.get(i);
-			if (predicateInfo.getFullyDefinedTypes(type).length > 0) {
-				predicatesArrayList.add(predicateInfo);
+			if (predicateInfo != null) {
+				String [][] predicateFullyDefinedTypes = predicateInfo.getFullyDefinedTypes(type);
+				if ((predicateFullyDefinedTypes != null) && (predicateFullyDefinedTypes.length > 0)) {
+					predicatesList.put(predicateInfo.getPredicateName() + predicateInfo.getPredicateArity(), predicateInfo);
+				}
 			}
 			i++;
 		}
 
-		return predicatesArrayList.toArray(new PredicateInfo[predicatesArrayList.size()]);
+		PredicateInfo [] predicatesArray = predicatesList.values().toArray(new PredicateInfo[predicatesList.size()]); 
+		return predicatesArray;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

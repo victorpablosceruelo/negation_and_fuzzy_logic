@@ -8,7 +8,6 @@ import auxiliar.LocalUserInfoException;
 import conversors.ConversorToPrologQuery;
 import conversors.QueryConversorException;
 import filesAndPaths.FilesAndPathsException;
-import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
@@ -45,7 +44,8 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException,
 			FilesAndPathsException, LocalUserInfoException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
-		// String key1 = requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
+		// String key1 =
+		// requestStoreHouse.session.getLocalUserInfo().getLocalUserName();
 		String key1 = null;
 		CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, null, null);
 	}

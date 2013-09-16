@@ -31,9 +31,14 @@
 	PredicateInfo predicateInfoOperators = programIntrospection.getPredicateInfo("rfuzzy_compute_defined_operators");
 	PredMoreInfoInterface predMoreInfo = predicateInfoOperators.getPredicateMoreInfoAs("defined_operators");
 	String [][] operators = predMoreInfo.getOperatorsFor(predicateType);
+	
+	String [] neededType1 = {database, "rfuzzy_enum_type"};
+	String [] neededType2 = {database, "rfuzzy_integer_type"};
+	String [] neededType3 = {database, "rfuzzy_string_type"};
 %>
 
-<select name="<%=lineId %>.operator" id="<%=lineId %>.operator">
+<% if ((predicateInfo.hasType(neededType1)) || (predicateInfo.hasType(neededType2)) || (predicateInfo.hasType(neededType3))) { %>
+	<select name="<%=lineId %>.operator" id="<%=lineId %>.operator">
 		<%=JspsUtils.comboBoxDefaultValue() %>
 
 		<% for (int i=0; i<operators.length; i++) {	%>
@@ -41,6 +46,5 @@
 					<%= JspsUtils.getPrologNameInColloquialLanguage(operators[i][0])  %>
 				</option>
 		<% } %>
-</select>
-
-
+	</select>
+<% } else { %>&nbsp;<% } %>

@@ -140,6 +140,7 @@ public class PredicateInfo {
 					found = true;
 				}
 			}
+			i++;
 		}
 		return found;
 	}

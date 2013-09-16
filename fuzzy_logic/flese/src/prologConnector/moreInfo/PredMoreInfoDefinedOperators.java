@@ -42,7 +42,7 @@ public class PredMoreInfoDefinedOperators extends PredMoreInfoAbstract {
 	public String[][] getOperatorsFor(String[][] types) {
 		ArrayList<String[]> result = new ArrayList<String[]>();
 
-		if ((types == null) || (types[0].length <= 0) || (types[0][types[0].length] == null)) {
+		if ((types == null) || (types[0].length <= 0) || (types[0][types[0].length -1] == null)) {
 			return new String[0][];
 		}
 
@@ -62,14 +62,21 @@ public class PredMoreInfoDefinedOperators extends PredMoreInfoAbstract {
 	}
 
 	private boolean testIfOperatorIsOkForType(String[] typeOp, String[] typeIn) {
-		boolean ok = false;
-		String lastType = typeIn[typeIn.length];
+		boolean ok1 = false;
+		boolean ok2 = false;
+		boolean ok3 = false;
+		boolean ok4 = false;
+		String lastType = typeIn[typeIn.length -1];
 		if ("rfuzzy_enum_type".equals(lastType)) {
-			ok = (("rfuzzy_enum_type".equals(typeOp[1])) || ("rfuzzy_any_type".equals(typeOp[1])));
+			ok1 = "rfuzzy_enum_type".equals(typeOp[1]);
+			ok2 = "rfuzzy_any_type".equals(typeOp[1]);
 		} else {
-			ok = (!"rfuzzy_enum_type".equals(typeOp[1]));
+			ok1 = ((!"rfuzzy_enum_type".equals(typeOp[1])) && ("rfuzzy_any_type".equals(typeOp[1])));
+			ok2 = ((!"rfuzzy_enum_type".equals(typeOp[1])) && (typeOp[1].equals(lastType)));
+			ok3 = (("rfuzzy_number_type".equals(typeOp[1])) && ("rfuzzy_integer_type".equals(lastType)));
+			ok3 = (("rfuzzy_number_type".equals(typeOp[1])) && ("rfuzzy_float_type".equals(lastType)));
 		}
-		return ok;
+		return (ok1 || ok2 || ok3 || ok4);
 
 	}
 
