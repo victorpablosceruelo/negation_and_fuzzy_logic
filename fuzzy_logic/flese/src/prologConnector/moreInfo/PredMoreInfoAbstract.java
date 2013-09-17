@@ -35,6 +35,9 @@ public abstract class PredMoreInfoAbstract implements PredMoreInfoInterface {
 		return new String[0][];
 	}
 	
+	public String [] getValuesFor(String database) {
+		return new String[0];
+	}
 
 	public static HashMap<String, PredMoreInfoInterface> getHashMapWithMoreInfoObjects(CiaoPrologTermInJava term)
 			throws PredicateInfoException {

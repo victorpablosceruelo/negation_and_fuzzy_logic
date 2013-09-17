@@ -14,4 +14,6 @@ public interface PredMoreInfoInterface {
 	public String[][] getMoreInfo();
 	
 	public String [][] getOperatorsFor(String [][] types);
+	
+	public String [] getValuesFor(String database);
 }
