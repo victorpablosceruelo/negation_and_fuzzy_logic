@@ -2,6 +2,7 @@ package prologConnector.moreInfo;
 
 import java.util.ArrayList;
 
+import constants.KConstants;
 import prologConnector.CiaoPrologTermInJava;
 
 public class PredMoreInfoDefinedOperators extends PredMoreInfoAbstract {
@@ -62,21 +63,28 @@ public class PredMoreInfoDefinedOperators extends PredMoreInfoAbstract {
 	}
 
 	private boolean testIfOperatorIsOkForType(String[] typeOp, String[] typeIn) {
-		boolean ok1 = false;
-		boolean ok2 = false;
-		boolean ok3 = false;
-		boolean ok4 = false;
-		String lastType = typeIn[typeIn.length -1];
-		if ("rfuzzy_enum_type".equals(lastType)) {
-			ok1 = "rfuzzy_enum_type".equals(typeOp[1]);
-			ok2 = "rfuzzy_any_type".equals(typeOp[1]);
-		} else {
-			ok1 = ((!"rfuzzy_enum_type".equals(typeOp[1])) && ("rfuzzy_any_type".equals(typeOp[1])));
-			ok2 = ((!"rfuzzy_enum_type".equals(typeOp[1])) && (typeOp[1].equals(lastType)));
-			ok3 = (("rfuzzy_number_type".equals(typeOp[1])) && ("rfuzzy_integer_type".equals(lastType)));
-			ok3 = (("rfuzzy_number_type".equals(typeOp[1])) && ("rfuzzy_float_type".equals(lastType)));
+
+		String typeInType = typeIn[typeIn.length -1];
+		String typeOpType = typeOp[typeOp.length -1];
+		
+		if (KConstants.PrologTypes.rfuzzy_any_type.equals(typeOpType))
+			return true;
+		if (KConstants.PrologTypes.rfuzzy_any_type.equals(typeInType))
+			return true;
+
+		if (KConstants.PrologTypes.rfuzzy_number_type.equals(typeOpType)) {
+			if (KConstants.PrologTypes.rfuzzy_number_type.equals(typeInType))
+				return true;
+			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(typeInType))
+				return true;
+			if (KConstants.PrologTypes.rfuzzy_float_type.equals(typeInType))
+				return true;
+
 		}
-		return (ok1 || ok2 || ok3 || ok4);
+		
+		if (typeOpType.equals(typeInType)) 
+			return true;
+		return false;
 
 	}
 

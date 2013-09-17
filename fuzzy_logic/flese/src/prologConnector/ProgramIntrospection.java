@@ -64,7 +64,7 @@ public class ProgramIntrospection {
 		boolean found = false;
 		while (i < predicatesInfos.size() && (!found)) {
 			predicateInfo = predicatesInfos.get(i);
-			if (predicateName.equals(predicateInfo.getPredicateName()))
+			if ((predicateInfo != null) && (predicateName.equals(predicateInfo.getPredicateName())))
 				found = true;
 			else
 				i++;
