@@ -362,7 +362,7 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	document.getElementById(queryLinesTableId).appendChild(row);
 	
 	var lineInfo = "&" + "<%= KConstants.Request.lineNumberParam %>" + "=" + queryLinesCounter;
-	var lineId = "&" + "<%= KConstants.Request.lineIdParam %>" + "=" + queryLinesCounter;
+	var lineId = "&" + "<%= KConstants.Request.lineIdParam %>" + "=" + queryLineId;
 	
 	loadAjaxIn(destinyAddLine, urlQueryAddLine + lineInfo + lineId);
 	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + queryLinesCounter + lineInfo + lineId);

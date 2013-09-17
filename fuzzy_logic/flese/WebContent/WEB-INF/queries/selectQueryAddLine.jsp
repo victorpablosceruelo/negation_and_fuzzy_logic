@@ -24,8 +24,11 @@
 	String [] type = {database, null};
 	PredicateInfo[] predicatesInfos = programIntrospection.getPredicatesInfosByType(type);
 	
-	String common = programIntrospection.getProgramFileInfo().getInfoForUrls() + "&" + KConstants.Request.databaseParam + 
-			"=" + database + "&" + KConstants.Request.predicateParam + "=";
+	String common = programIntrospection.getProgramFileInfo().getInfoForUrls() +
+			"&" + KConstants.Request.lineNumberParam + "=" + lineNumber +
+			"&" + KConstants.Request.lineIdParam + "=" + lineId +
+			"&" + KConstants.Request.databaseParam + "=" + database + 
+			"&" + KConstants.Request.predicateParam + "=";
 	String negUrl = KUrls.Queries.SelectNegation.getUrl(true) + common;
 	String quantUrl = KUrls.Queries.SelectQuantifier.getUrl(true) + common;
 	String opUrl = KUrls.Queries.SelectOperator.getUrl(true) + common;

@@ -31,7 +31,7 @@
 %>
 
 <% if (predicatePredicateInfo.hasType(neededType)) { %>
-	<select name="<%=lineId %>.quantifier" id="<%=lineId %>.quantifier">
+	<select name="<%=lineId %>.negation" id="<%=lineId %>.negation">
 		<%=JspsUtils.comboBoxDefaultValue() %>
 
 		<% for (int i=0; i<predicatesInfos.length; i++) { %>
