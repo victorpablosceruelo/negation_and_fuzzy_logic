@@ -56,4 +56,8 @@ public class JspsUtils {
 		}
 		return textIn;
 	}
+	
+	public static String getValue(String value) {
+		return value;
+	}
 }

@@ -17,7 +17,8 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
-	String url = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + "&" + KConstants.Request.databaseParam + "=";
+	String url = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
+			"&" + KConstants.Request.databaseParam + "=";
 %>
 
 
@@ -37,6 +38,7 @@
 	for (int i=0; i<predicatesInfos.length; i++) {
 		String desc = predicatesInfos[i].getPredicateName();
 		String value = url + desc;
+		// JspsUtils.getValue(value);
 %>	
 						<option id='<%=desc %>' title='<%=desc %>' value='<%=value %>'><%=desc %></option>
 <%

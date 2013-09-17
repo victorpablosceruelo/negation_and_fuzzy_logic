@@ -59,6 +59,7 @@ public class KConstants {
 
 	public static class QueryParams {
 		public static String queryLinesCounter = "queryLinesCounter";
+		public static String queryLinesAggregator = "queryLines.selectAggregator";
 	}
 
 	public static class Session {

@@ -29,6 +29,7 @@
 			"&" + KConstants.Request.lineIdParam + "=" + lineId +
 			"&" + KConstants.Request.databaseParam + "=" + database + 
 			"&" + KConstants.Request.predicateParam + "=";
+	// JspsUtils.getValue(common);
 	String negUrl = KUrls.Queries.SelectNegation.getUrl(true) + common;
 	String quantUrl = KUrls.Queries.SelectQuantifier.getUrl(true) + common;
 	String opUrl = KUrls.Queries.SelectOperator.getUrl(true) + common;

@@ -22,6 +22,9 @@
 	"&" + KConstants.Request.databaseParam + "=" + database;
 	String selectQueryAddAggrUrl = KUrls.Queries.SelectQueryAddAggr.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
 	"&" + KConstants.Request.databaseParam + "=" + database;
+	
+	// JspsUtils.getValue(selectQueryAddLineUrl);
+	// JspsUtils.getValue(selectQueryAddAggrUrl);
 %>
 
 	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
