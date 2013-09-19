@@ -122,16 +122,16 @@ public class KConstants {
 		public static final String jsEnd = "</script>";
 	}
 
-	public static class JspsDivs {
+	public static class JspsDivsAndFields {
 		public static final String queryStartContainerId = "queryStartContainer";
 		public static final String selectQueryDivId = "selectQueryDiv";
 		public static final String runQueryDivId = "runQueryDiv";
-		public static final String counterId = "QueryLinesCounter";
 		public static final String queryLinesContainerId = "queryLinesContainer";
 		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
 		public static final String queryLinesTableId = "queryLinesTable";
 		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 
+		public static final String counterFieldId = "QueryLinesCounter";
 	}
 }
 
