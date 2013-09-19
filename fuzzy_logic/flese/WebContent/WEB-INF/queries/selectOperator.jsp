@@ -16,7 +16,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterId);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterFieldId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
@@ -47,4 +47,11 @@
 				</option>
 		<% } %>
 	</select>
-<% } else { %>&nbsp;<% } %>
+	<script type="text/javascript">
+		document.getElementById('<%= lineId %>.operatorDiv').style.display='inline';
+	</script>
+<% } else { %>
+	<script type="text/javascript">
+		document.getElementById('<%= lineId %>.operatorDiv').style.display='none';
+	</script>	
+<% } %>

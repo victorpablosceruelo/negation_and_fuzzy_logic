@@ -15,7 +15,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterId);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterFieldId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
@@ -28,7 +28,6 @@
 	String [] type = {"rfuzzy_predicate_type", "rfuzzy_truth_value_type"};
 	PredicateInfo[] predicatesInfos = programIntrospection.getPredicatesInfosByType(type);
 %>
-
 <% if (predicatePredicateInfo.hasType(neededType, false)) { %>
 	<select name="<%=lineId %>.quantifier" id="<%=lineId %>.quantifier">
 		<%=JspsUtils.comboBoxDefaultValue() %>
@@ -41,4 +40,11 @@
 			<% } %>	
 		<% } %>
 	</select>
+	<script type="text/javascript">
+		document.getElementById('<%= lineId %>.quantifierDiv').style.display='inline';
+	</script>
+<% } else { %>
+	<script type="text/javascript">
+		document.getElementById('<%= lineId %>.quantifierDiv').style.display='none';
+	</script>	
 <% } %>

@@ -15,7 +15,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterId);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterFieldId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String lineNumber = requestStoreHouse.getRequestParameter(KConstants.Request.lineNumberParam);
@@ -71,4 +71,10 @@
 	
 </div>
 
+	<script type="text/javascript">
+		document.getElementById('<%= lineId %>.negationDiv').style.display='none';
+		document.getElementById('<%= lineId %>.quantifierDiv').style.display='none';
+		document.getElementById('<%= lineId %>.operatorDiv').style.display='none';
+		document.getElementById('<%= lineId %>.valueDiv').style.display='none';
+	</script>
 

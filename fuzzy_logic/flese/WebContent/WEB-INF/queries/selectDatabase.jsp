@@ -52,7 +52,7 @@
 	</div>
 
 	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name='<%=KConstants.JspsDivsAndFields.counterId%>' value="0" id='<%=KConstants.JspsDivsAndFields.counterId%>'>
+	<input type="hidden" name='<%=KConstants.JspsDivsAndFields.counterFieldId %>' value="0" id='<%=KConstants.JspsDivsAndFields.counterFieldId%>'>
               
 	<div id='<%=KConstants.JspsDivsAndFields.queryLinesContainerId%>' class='queryLinesContainerTable'>
 	</div>
