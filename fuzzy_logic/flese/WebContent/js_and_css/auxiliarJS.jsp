@@ -47,10 +47,10 @@ function executeAjaxLoadedPageJS(loadedContent) {
 	// From http://stackoverflow.com/questions/10888326/executing-javascript-script-after-ajax-loaded-a-page-doesnt-work
 	var content = loadedContent;
 	// xmlhttp.responseText;
-
+	
 	var scriptStart = '<%=KConstants.JavaScriptScripts.jsStart %>';
 	var scriptEnd = '<%=KConstants.JavaScriptScripts.jsEnd %>';
-	
+
     var script = content.match("<%=KConstants.JavaScriptScripts.jsRegex %>");
     if (script != null) {
 		script = script.toString().replace(scriptStart, '');
@@ -83,11 +83,12 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
         	console.log("loading html: " + html);
         	container.innerHTML=html;
         	executeAjaxLoadedPageJS(html);
-        },
-        fail: function() { 
-        	alert("error: Impossible to load page " + ajaxPageUrl); 
-        }
-    });
+		},
+		fail: function() { 
+			alert("error: Impossible to load page " + ajaxPageUrl); 
+		}
+	});
+
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -160,7 +161,7 @@ function getComboBoxValue(comboBox) {
 		debug.info("getComboBoxValue: comboBoxValue is empty string.");
 		return "";
 	} 
-	
+
 	if (comboBoxValue == "----") {
 		debug.info("getComboBoxValue: comboBoxValue is default value (----).");
 		return "";
@@ -299,7 +300,7 @@ function selectedQueryStartTypeChanged(comboBox) {
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
 	
-	resetQueryLinesCounterField(queryLinesCounterFieldId);
+	resetQueryLinesCounterFieldValue();
 	var queryLinesContainerDiv = getContainer(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
@@ -321,16 +322,19 @@ function selectedQueryStartTypeChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function resetQueryLinesCounterField(queryLinesCounterFieldId) {
+function resetQueryLinesCounterFieldValue() {
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterFieldId %>";
 	document.getElementById(queryLinesCounterFieldId).value = 0;
 }
 
-function incrementQueryLinesCounterField(queryLinesCounterFieldId) {
+function incrementQueryLinesCounterFieldValue() {
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterFieldId %>";
 	document.getElementById(queryLinesCounterFieldId).value ++;
-	return getQueryLinesCounterField(queryLinesCounterFieldId);
+	return getQueryLinesCounterFieldValue();
 }
 
-function getQueryLinesCounterField(queryLinesCounterFieldId) {
+function getQueryLinesCounterFieldValue() {
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterFieldId %>";
 	if ((document.getElementById(queryLinesCounterFieldId) != null) &&
 		(document.getElementById(queryLinesCounterFieldId) != undefined) &&
 		(document.getElementById(queryLinesCounterFieldId).value != null) &&
@@ -348,11 +352,10 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	debug.info("selectQueryAddLine");
 	debug.info(urlQueryAddLine);
 	debug.info(urlQueryAddAggregator);
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterId %>";
 	var queryLinesTableId = "<%=KConstants.JspsDivs.queryLinesTableId %>";
 	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivs.queryLinesAggregatorTableId %>";
 	
-	var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
+	var queryLinesCounter = getQueryLinesCounterFieldValue();
 	var queryLineId = "queryLine[" + queryLinesCounter + "]";
 	var destinyAddLine = queryLineId + ".row";
 
@@ -368,7 +371,7 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	loadAjaxIn(destinyAddLine, urlQueryAddLine + lineInfo + lineId);
 	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + lineInfo + lineId + linesCounter);
 	
-	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
+	queryLinesCounter = incrementQueryLinesCounterFieldValue();
 	// Do not allow navigator to call url.
 	return false;
 }
@@ -522,18 +525,14 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
-function runQueryAfterSoftTests(parentDivId, runQueryDivId, chooseQueryStartTypeId, queryLinesCounterFieldId, fileName, fileOwner) {
+function runQueryAfterSoftTests(url) {
+	var parentDivId = "parentDivId";
+	var runQueryDivId = "runQueryDivId";
+	var chooseQueryStartTypeId = "chooseQueryStartTypeId"; 
 	debug.info("runQueryAfterSoftTests");
 	
 	var error = false;
-	var action = urlMappingFor('RunQueryRequest');
-	if (isString(action) && isString(fileName) && isString(fileOwner)) {
-		action += "&fileName=" + fileName + "&fileOwner="+fileOwner;
-	}
-	else {
-		error = true;
-		alert("ERROR: form action, fileName or fileOwner are not a string.");
-	}
+	var action = url;
 	
 	var chooseQueryStartType = comboBoxCheckValue(chooseQueryStartTypeId, "Please, say what you are looking for.");
 	if (chooseQueryStartType == null) {
@@ -547,7 +546,7 @@ function runQueryAfterSoftTests(parentDivId, runQueryDivId, chooseQueryStartType
 		else error = true;		
 		
 		var actionTmp = null;
-		var queryLinesCounter = getQueryLinesCounterField(queryLinesCounterFieldId);
+		var queryLinesCounter = getQueryLinesCounterFieldValue();
 		for (var i=0; i < queryLinesCounter; i++) {
 			// predicate
 			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectPredicate", null);
