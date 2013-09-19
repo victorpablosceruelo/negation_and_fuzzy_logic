@@ -32,12 +32,12 @@
 	PredMoreInfoInterface predMoreInfo = predicateInfoOperators.getPredicateMoreInfoAs("defined_operators");
 	String [][] operators = predMoreInfo.getOperatorsFor(predicateType);
 	
-	String [] neededType1 = {database, "rfuzzy_enum_type"};
-	String [] neededType2 = {database, "rfuzzy_integer_type"};
-	String [] neededType3 = {database, "rfuzzy_string_type"};
+	String [] neededType1 = {database, KConstants.PrologTypes.rfuzzy_enum_type};
+	String [] neededType2 = {database, KConstants.PrologTypes.rfuzzy_integer_type};
+	String [] neededType3 = {database, KConstants.PrologTypes.rfuzzy_string_type};
 %>
 
-<% if ((predicateInfo.hasType(neededType1)) || (predicateInfo.hasType(neededType2)) || (predicateInfo.hasType(neededType3))) { %>
+<% if ((predicateInfo.hasType(neededType1, false)) || (predicateInfo.hasType(neededType2, false)) || (predicateInfo.hasType(neededType3, false))) { %>
 	<select name="<%=lineId %>.operator" id="<%=lineId %>.operator">
 		<%=JspsUtils.comboBoxDefaultValue() %>
 

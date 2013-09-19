@@ -14,7 +14,7 @@
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivs.counterId);
+	String queryLinesCounter = requestStoreHouse.getRequestParameter(KConstants.QueryParams.queryLinesCounter);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
@@ -32,10 +32,10 @@
 	
 	String [] neededType = {KConstants.PrologTypes.rfuzzy_truth_value_type, KConstants.PrologTypes.rfuzzy_truth_value_type, KConstants.PrologTypes.rfuzzy_truth_value_type};
 	PredicateInfo [] aggregators = programIntrospection.getPredicatesInfosByType(neededType);
-	JspsUtils.getValue(lineIndexString);
+	JspsUtils.getValue(queryLinesCounter);
 %>
 
-<% if ((lineIndexString == null) || ("".equals(lineIndexString)) || ("0".equals(lineIndexString))) { %>
+<% if ((queryLinesCounter == null) || ("".equals(queryLinesCounter)) || ("0".equals(queryLinesCounter))) { %>
 	<div class='queryLinesAggregatorTableRow'>
 		<div class='queryLinesAggregatorTableCell'>
 			<a href="#" onClick="selectQueryAddLine('<%=selectQueryAddLineUrl %>', '<%=selectQueryAddAggrUrl %>');" >
@@ -57,13 +57,13 @@
 	<div class='queryLinesAggregatorTableRow'>
 		<div class='queryLinesAggregatorTableCell'>
 			<a id='<%=queryLinesSelectAggregatorShowOptionsId %>' href='' 
-				onclick="return aggregatorDetailsShow('<%= queryLinesSelectAggregatorShowOptionsId %>', '
-						<%= queryLinesSelectAggregatorHideOptionsId %>', '
-						<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');"> show options</a>
+				onclick="return aggregatorDetailsShow('<%= queryLinesSelectAggregatorShowOptionsId %>', 
+						'<%= queryLinesSelectAggregatorHideOptionsId %>', 
+						'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');"> show options</a>
 			<a id='<%=queryLinesSelectAggregatorHideOptionsId %>' href='' 
-				onclick="return aggregatorDetailsHide('<%=	queryLinesSelectAggregatorShowOptionsId %>', '
-						<%= queryLinesSelectAggregatorHideOptionsId %>', '
-						<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');"> hide options</a>
+				onclick="return aggregatorDetailsHide('<%=	queryLinesSelectAggregatorShowOptionsId %>', 
+						'<%= queryLinesSelectAggregatorHideOptionsId %>', 
+						'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');"> hide options</a>
 		</div>
 	</div>
 
@@ -95,9 +95,12 @@
 	</div>
 	
 	<script type="text/javascript">
-		document.getElementById(<%= queryLinesSelectAggregatorHideOptionsId  %>).style.display='none';
-		document.getElementById(<%= chooseAgregatorInfoCellId  %>).style.display='none';
-		document.getElementById(<%= chooseAgregatorCellId  %>).style.display='none';
+		document.getElementById('<%= queryLinesSelectAggregatorHideOptionsId %>').style.display='none';
+		document.getElementById('<%= chooseAgregatorInfoCellId  %>').style.display='none';
+		document.getElementById('<%= chooseAgregatorCellId  %>').style.display='none';
+		aggregatorDetailsHide('<%=	queryLinesSelectAggregatorShowOptionsId %>', 
+				'<%= queryLinesSelectAggregatorHideOptionsId %>', 
+				'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');
 	</script>
 <% } %>
 

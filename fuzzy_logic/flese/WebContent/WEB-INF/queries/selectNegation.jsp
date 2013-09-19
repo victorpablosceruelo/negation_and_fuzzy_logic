@@ -30,7 +30,7 @@
 	
 %>
 
-<% if (predicatePredicateInfo.hasType(neededType)) { %>
+<% if (predicatePredicateInfo.hasType(neededType, false)) { %>
 	<select name="<%=lineId %>.negation" id="<%=lineId %>.negation">
 		<%=JspsUtils.comboBoxDefaultValue() %>
 
@@ -42,4 +42,4 @@
 			<% } %>	
 		<% } %>
 	</select>
-<% } else { %>&nbsp;<% } %>
+<% } %>

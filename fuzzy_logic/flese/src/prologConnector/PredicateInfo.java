@@ -124,7 +124,7 @@ public class PredicateInfo {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public boolean hasType(String[] type) {
+	public boolean hasType(String[] type, boolean exactMatch) {
 		int i = 0;
 		int typesLength = predicateTypes.length;
 		boolean found = false;
@@ -132,7 +132,7 @@ public class PredicateInfo {
 			if (predicateTypes[i].length == type.length) {
 				boolean isThisOne = true;
 				for (int j = 0; j < predicateTypes[i].length; j++) {
-					if (!predicateTypes[i][j].equals(type[j])) {
+					if (!(typeComparison(predicateTypes[i][j], type[j], exactMatch))) {
 						isThisOne = false;
 					}
 				}
@@ -143,6 +143,30 @@ public class PredicateInfo {
 			i++;
 		}
 		return found;
+	}
+	
+	private boolean typeComparison(String type1, String type2, boolean exactMatch) {
+		if ((type1 == null) || ("".equals(type1))) return false;
+		if ((type2 == null) || ("".equals(type2))) return false;
+		
+		if (exactMatch) {
+			return type1.equals(type2);
+		}
+
+		if (KConstants.PrologTypes.rfuzzy_any_type.equals(type1)) return true;
+		if (KConstants.PrologTypes.rfuzzy_any_type.equals(type2)) return true;
+		
+		if (KConstants.PrologTypes.rfuzzy_number_type.equals(type1)) {
+			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(type2)) return true;
+			if (KConstants.PrologTypes.rfuzzy_float_type.equals(type2)) return true;
+		}
+		
+		if (KConstants.PrologTypes.rfuzzy_number_type.equals(type2)) {
+			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(type1)) return true;
+			if (KConstants.PrologTypes.rfuzzy_float_type.equals(type1)) return true;
+		}
+		
+		return type1.equals(type2);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

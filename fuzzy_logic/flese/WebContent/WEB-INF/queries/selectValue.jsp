@@ -23,11 +23,13 @@
 	String lineId = requestStoreHouse.getRequestParameter(KConstants.Request.lineIdParam);
 	
 	PredicateInfo predicatePredicateInfo = programIntrospection.getPredicateInfo(predicate);
-	String [] neededType = {database, KConstants.PrologTypes.rfuzzy_enum_type};	
+	String [] neededType1 = {database, KConstants.PrologTypes.rfuzzy_enum_type};
+	String [] neededType2 = {database, KConstants.PrologTypes.rfuzzy_number_type};
+	String [] neededType3 = {database, KConstants.PrologTypes.rfuzzy_string_type};
 
 %>
 
-<% if (predicatePredicateInfo.hasType(neededType)) { %>
+<% if (predicatePredicateInfo.hasType(neededType1, false)) { %>
 	<% 
 		PredMoreInfoInterface pmi = predicatePredicateInfo.getPredicateMoreInfoAs(KConstants.MoreInfoTypes.enumTypeValues);
 		if (pmi != null) {
@@ -50,7 +52,9 @@
 		</select>
 	<% } %>
 <% } else { %>
-	<input type='text' value='' name="<%=lineId %>.value" id="<%=lineId %>.value" />
+	<% if ((predicatePredicateInfo.hasType(neededType2, false)) || (predicatePredicateInfo.hasType(neededType3, false))) { %>
+		<input type='text' value='' name="<%=lineId %>.value" id="<%=lineId %>.value" />
+	<% } %>
 <% } %>
 
 

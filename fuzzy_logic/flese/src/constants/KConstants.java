@@ -97,7 +97,9 @@ public class KConstants {
 	public static class PrologTypes {
 		public static final String rfuzzy_any_type = "rfuzzy_any_type";
 		public static final String rfuzzy_truth_value_type = "rfuzzy_truth_value_type";
+		
 		public static final String rfuzzy_enum_type = "rfuzzy_enum_type";
+		public static final String rfuzzy_string_type = "rfuzzy_string_type";
 
 		public static final String rfuzzy_number_type = "rfuzzy_number_type";
 		public static final String rfuzzy_integer_type = "rfuzzy_integer_type";

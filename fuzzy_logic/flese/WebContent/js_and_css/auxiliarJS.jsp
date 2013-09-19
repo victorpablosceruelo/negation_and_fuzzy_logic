@@ -363,9 +363,10 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	
 	var lineInfo = "&" + "<%= KConstants.Request.lineNumberParam %>" + "=" + queryLinesCounter;
 	var lineId = "&" + "<%= KConstants.Request.lineIdParam %>" + "=" + queryLineId;
+	var linesCounter = "&" + "<%= KConstants.QueryParams.queryLinesCounter %>" + "=" + queryLinesCounter;
 	
 	loadAjaxIn(destinyAddLine, urlQueryAddLine + lineInfo + lineId);
-	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + lineInfo + lineId);
+	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + lineInfo + lineId + linesCounter);
 	
 	queryLinesCounter = incrementQueryLinesCounterField(queryLinesCounterFieldId);
 	// Do not allow navigator to call url.
