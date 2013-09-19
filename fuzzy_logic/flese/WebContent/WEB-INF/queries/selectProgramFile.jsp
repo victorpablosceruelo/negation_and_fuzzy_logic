@@ -47,8 +47,8 @@
 %>
 </div>
 
-<div id="<%=KConstants.JspsDivs.selectQueryDivId %>" class="selectDatabaseTable">
+<div id="<%=KConstants.JspsDivsAndFields.selectQueryDivId%>" class="selectDatabaseTable">
 </div>
 
-<div id="<%=KConstants.JspsDivs.runQueryDivId %>" class="selectDatabaseTable">
+<div id="<%=KConstants.JspsDivsAndFields.runQueryDivId%>" class="selectDatabaseTable">
 </div>

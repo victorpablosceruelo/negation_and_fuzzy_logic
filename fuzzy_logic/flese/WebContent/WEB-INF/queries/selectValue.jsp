@@ -16,7 +16,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivs.counterId);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterId);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
 	String lineNumber = requestStoreHouse.getRequestParameter(KConstants.Request.lineNumberParam);
@@ -26,7 +26,6 @@
 	String [] neededType1 = {database, KConstants.PrologTypes.rfuzzy_enum_type};
 	String [] neededType2 = {database, KConstants.PrologTypes.rfuzzy_number_type};
 	String [] neededType3 = {database, KConstants.PrologTypes.rfuzzy_string_type};
-
 %>
 
 <% if (predicatePredicateInfo.hasType(neededType1, false)) { %>

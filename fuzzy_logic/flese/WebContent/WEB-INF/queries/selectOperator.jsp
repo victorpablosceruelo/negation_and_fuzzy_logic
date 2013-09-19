@@ -16,7 +16,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivs.counterId);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
@@ -27,7 +27,7 @@
 	String [] type = {database, null};
 	PredicateInfo predicateInfo = programIntrospection.getPredicateInfo(predicate);
 	String [] [] predicateType = predicateInfo.getFullyDefinedTypes(type);
-			
+	
 	PredicateInfo predicateInfoOperators = programIntrospection.getPredicateInfo("rfuzzy_compute_defined_operators");
 	PredMoreInfoInterface predMoreInfo = predicateInfoOperators.getPredicateMoreInfoAs("defined_operators");
 	String [][] operators = predMoreInfo.getOperatorsFor(predicateType);

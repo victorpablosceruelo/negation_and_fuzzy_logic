@@ -15,7 +15,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivs.counterId);
+	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterId);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String lineNumber = requestStoreHouse.getRequestParameter(KConstants.Request.lineNumberParam);
@@ -25,10 +25,10 @@
 	PredicateInfo[] predicatesInfos = programIntrospection.getPredicatesInfosByType(type);
 	
 	String common = programIntrospection.getProgramFileInfo().getInfoForUrls() +
-			"&" + KConstants.Request.lineNumberParam + "=" + lineNumber +
-			"&" + KConstants.Request.lineIdParam + "=" + lineId +
-			"&" + KConstants.Request.databaseParam + "=" + database + 
-			"&" + KConstants.Request.predicateParam + "=";
+	"&" + KConstants.Request.lineNumberParam + "=" + lineNumber +
+	"&" + KConstants.Request.lineIdParam + "=" + lineId +
+	"&" + KConstants.Request.databaseParam + "=" + database + 
+	"&" + KConstants.Request.predicateParam + "=";
 	// JspsUtils.getValue(common);
 	String negUrl = KUrls.Queries.SelectNegation.getUrl(true) + common;
 	String quantUrl = KUrls.Queries.SelectQuantifier.getUrl(true) + common;
