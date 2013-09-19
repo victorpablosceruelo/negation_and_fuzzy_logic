@@ -48,8 +48,8 @@ function executeAjaxLoadedPageJS(loadedContent) {
 	var content = loadedContent;
 	// xmlhttp.responseText;
 	
-	var scriptStart = '<%=KConstants.JavaScriptScripts.jsStart %>';
-	var scriptEnd = '<%=KConstants.JavaScriptScripts.jsEnd %>';
+	var scriptStart = '<%= KConstants.JavaScriptScripts.jsStart %>';
+	var scriptEnd = '<%= KConstants.JavaScriptScripts.jsEnd %>';
 
     var script = content.match("<%=KConstants.JavaScriptScripts.jsRegex %>");
     if (script != null) {
@@ -266,8 +266,8 @@ function getProgramDatabaseComboBoxValue(comboBox) {
 }
 
 function selectedProgramDatabaseChanged(comboBox) {
-	var selectQueryDivId = '<%= KConstants.JspsDivs.selectQueryDivId %>'; 
-	var runQueryDivId = '<%= KConstants.JspsDivs.runQueryDivId %>';
+	var selectQueryDivId = '<%= KConstants.JspsDivsAndFields.selectQueryDivId %>'; 
+	var runQueryDivId = '<%= KConstants.JspsDivsAndFields.runQueryDivId %>';
 	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	debugInfoIfVarIsNull(selectQueryDiv, "selectQueryDiv", "selectedProgramDatabaseChanged");
@@ -293,9 +293,8 @@ function selectedProgramDatabaseChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function selectedQueryStartTypeChanged(comboBox) {
-	var queryLinesContainerId = "<%=KConstants.JspsDivs.queryLinesContainerId %>";
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterId %>";
-	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivs.searchOrPersonalizeTableId %>";
+	var queryLinesContainerId = "<%=KConstants.JspsDivsAndFields.queryLinesContainerId %>";
+	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsAndFields.searchOrPersonalizeTableId %>";
 	
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
@@ -323,18 +322,18 @@ function selectedQueryStartTypeChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function resetQueryLinesCounterFieldValue() {
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterFieldId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivsAndFields.counterFieldId %>";
 	document.getElementById(queryLinesCounterFieldId).value = 0;
 }
 
 function incrementQueryLinesCounterFieldValue() {
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterFieldId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivsAndFields.counterFieldId %>";
 	document.getElementById(queryLinesCounterFieldId).value ++;
 	return getQueryLinesCounterFieldValue();
 }
 
 function getQueryLinesCounterFieldValue() {
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivs.counterFieldId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.JspsDivsAndFields.counterFieldId %>";
 	if ((document.getElementById(queryLinesCounterFieldId) != null) &&
 		(document.getElementById(queryLinesCounterFieldId) != undefined) &&
 		(document.getElementById(queryLinesCounterFieldId).value != null) &&
@@ -352,8 +351,8 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	debug.info("selectQueryAddLine");
 	debug.info(urlQueryAddLine);
 	debug.info(urlQueryAddAggregator);
-	var queryLinesTableId = "<%=KConstants.JspsDivs.queryLinesTableId %>";
-	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivs.queryLinesAggregatorTableId %>";
+	var queryLinesTableId = "<%=KConstants.JspsDivsAndFields.queryLinesTableId %>";
+	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivsAndFields.queryLinesAggregatorTableId %>";
 	
 	var queryLinesCounter = getQueryLinesCounterFieldValue();
 	var queryLineId = "queryLine[" + queryLinesCounter + "]";
@@ -526,7 +525,6 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
 function runQueryAfterSoftTests(url) {
-	var parentDivId = "parentDivId";
 	var runQueryDivId = "runQueryDivId";
 	var chooseQueryStartTypeId = "chooseQueryStartTypeId"; 
 	debug.info("runQueryAfterSoftTests");
