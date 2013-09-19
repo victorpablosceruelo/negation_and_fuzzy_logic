@@ -28,10 +28,15 @@ function getContainer(containerId) {
 		debug.info("getContainer: containerId is null");
 	}
 	else {
-		container = document.getElementById(containerId);
-		if (container === null) {
-			debug.info("getContainer: container is null");
-			debug.info("getContainer: containerId is " + containerId);
+		if (!isString(containerId)) {
+			debug.info("getContainer: containerId is not a string.");
+		}
+		else {
+			container = document.getElementById(containerId);
+			if (container === null) {
+				debug.info("getContainer: container is null");
+				debug.info("getContainer: containerId is " + containerId);
+			}
 		}
 	}
 	return container;
@@ -292,6 +297,20 @@ function selectedProgramDatabaseChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+var databaseName = "";
+
+function setDatabaseParam(databaseNameIn) {
+	databaseName = databaseNameIn;
+}
+
+function getDatabaseParam() {
+	return databaseName;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 function selectedQueryStartTypeChanged(comboBox) {
 	var queryLinesContainerId = "<%=KConstants.JspsDivsAndFields.queryLinesContainerId %>";
 	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsAndFields.searchOrPersonalizeTableId %>";
@@ -525,14 +544,14 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
 function runQueryAfterSoftTests(url) {
-	var runQueryDivId = "runQueryDivId";
-	var chooseQueryStartTypeId = "chooseQueryStartTypeId"; 
+
+	var runQueryDivId = "<%= KConstants.JspsDivsAndFields.runQueryDivId %>";
 	debug.info("runQueryAfterSoftTests");
 	
 	var error = false;
 	var action = url;
 	
-	var chooseQueryStartType = comboBoxCheckValue(chooseQueryStartTypeId, "Please, say what you are looking for.");
+	var chooseQueryStartType = getDatabaseParam();
 	if (chooseQueryStartType == null) {
 		error = true;
 	}
@@ -571,40 +590,13 @@ function runQueryAfterSoftTests(url) {
 		}
 	}
 	
-	if (!isString(runQueryDivId)) {
-		debug.info("ERROR: runQueryDivId is not a string.");
-		alert("ERROR: runQueryDivId is not a string.");
-		return false;
-	}
-	var runQueryDiv = document.getElementById(runQueryDivId);
-	if ((runQueryDiv == null) || (runQueryDiv == undefined)) {
-		debug.info("ERROR: runQueryDiv is null or undefined.");
-		alert("ERROR: runQueryDiv is null or undefined.");
-		return false;		
-	}
-	
 	if (error) {
+		var runQueryDiv = getContainer(runQueryDivId);
 		runQueryDiv.innerHTML = "Your query contains errors. Please, fix them and press the search button again.";
 	}
 	else {
-		runQueryDiv.innerHTML = loadingImageHtml(true);
-		runQueryDiv.style.display='block'; 
-		// runQueryDiv.style.display='inline';
-		
-		// alert("Sending search query.");
-		$.getScript(action, 
-				function(data, textStatus, jqxhr) {
-					// debug.info("ProgramFileIntrospectionRequest done ... ");
-		   			// alert("ProgramFileIntrospectionRequest done ... ");
-					// alert("data: " + data);
-			
-					// Show the answers retrieved to the user.
-					showQueryAnswers(runQueryDivId);
-				});
+		loadAjaxIn(runQueryDivId, action);
 	}
-	
-	// Used to debug
-	// alert("Stop");
 
 	// Tell the navigator not to follow the link !!!
 	return false;
