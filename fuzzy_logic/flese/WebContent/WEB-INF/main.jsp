@@ -23,7 +23,7 @@
 					<%= localUserInfoName %>
 					<br />
 					<a id='userOptions' title='user options' href='' onclick='return loadAjaxIn("mainSecDiv", <%=KUrls.User.Options %>);'>user options</a> | 
-					<a id='newQuery' title='new query' href='' onclick='return loadAjaxIn("mainSecDiv", <%=KUrls.Files.List %>);'>new query</a>
+					<a id='newQuery' title='new query' href='' onclick='return loadAjaxIn("mainSecDiv", <%=KUrls.Queries.SelectProgramFile %>);'>new query</a>
 			<%  } %>
 			</div>
 			<div id="bodyHeadLogout" class="bodyHeadTable">
