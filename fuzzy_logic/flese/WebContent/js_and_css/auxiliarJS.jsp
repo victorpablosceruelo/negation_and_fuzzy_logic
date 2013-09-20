@@ -424,10 +424,13 @@ function evaluateQuery(url) {
 	var database = getFieldValue("<%=KConstants.Request.databaseParam %>");
 	url += "&<%=KConstants.Request.databaseParam %>=" + database; 
 	
+	var aggregator = getFieldValue("<%=KConstants.Request.aggregatorParam %>");
+	url += "&<%=KConstants.Request.aggregatorParam %>=" + aggregator; 
+	
 	var linesCounter = getQueryLinesCounterFieldValue();
 	url += "&<%=KConstants.Request.linesCounterParam %>=" + linesCounter;
-	
-	var fields = ["<%=KConstants.Request.predicateParam %>", "<%=KConstants.Request.aggregatorParam %>",
+		
+	var fields = ["<%=KConstants.Request.predicateParam %>", 
 	              "<%=KConstants.Request.negationParam %>", "<%=KConstants.Request.quantifierParam %>",
 	              "<%=KConstants.Request.operatorParam %>", "<%=KConstants.Request.valueParam %>"];
 		

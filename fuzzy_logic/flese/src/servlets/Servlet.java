@@ -37,7 +37,7 @@ public class Servlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGetAndDoPost("doGet", request, response);
+		doGetAndDoPostProtected("doGet", request, response);
 	}
 
 	/**
@@ -45,9 +45,22 @@ public class Servlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGetAndDoPost("doPost", request, response);
+		doGetAndDoPostProtected("doPost", request, response);
 	}
 
+	private void doGetAndDoPostProtected(String doMethod, HttpServletRequest request, HttpServletResponse response) {
+		try {
+			doGetAndDoPost("doPost", request, response);
+		} catch (ServletException e) {
+			LOG.error("doGetAndDoPostProtected: ServletException EXCEPTION");
+			e.printStackTrace();
+			
+		} catch (IOException e) {
+			LOG.error("doGetAndDoPostProtected: IOException EXCEPTION");
+			e.printStackTrace();
+		}
+	}
+	
 	private String formatMsg(String msg) {
 		String line = "------------------------------------------------------------\n";
 		return "\n" + line + msg + "\n" + line;

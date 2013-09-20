@@ -96,7 +96,7 @@ public class ConversorToPrologQuery {
 			input = prologSubQuery.input;
 			String lineHead = "queryLine[" + i + "].";
 
-			input.lineIndex = i;
+			input.lineIndex = i + 1;
 			input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 			input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
 			
@@ -133,6 +133,9 @@ public class ConversorToPrologQuery {
 		}
 		else {
 			if ("".equals(input.predicate)) throw new QueryConversorException("You must refine your search.");
+			if (1 < input.lineIndex) {
+				if ("".equals(input.aggregator)) throw new QueryConversorException("You must choose an aggregator.");
+			}
 		
 			if (((!"".equals(input.operator)) || (!"".equals(input.value)))
 					&& ((!"".equals(input.quantifier0)) || (!"".equals(input.quantifier1)))) {
@@ -205,7 +208,7 @@ public class ConversorToPrologQuery {
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
 			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
-		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.database);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.predicate);
 		if (predicateInfo.getPredicateArity() != 2) {
 			throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
@@ -259,7 +262,7 @@ public class ConversorToPrologQuery {
 	private void subqueryFuzzyEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
 
-		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.database);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.predicate);
 		if (predicateInfo.getPredicateArity() != 2) {
 			throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
@@ -272,7 +275,7 @@ public class ConversorToPrologQuery {
 		PLStructure subGoal2 = null;
 		PLStructure subGoal3 = null;
 
-		if (input.quantifier1 != null) {
+		if (! "".equals(input.quantifier1)) {
 			tmpVar2 = new PLVariable();
 			subGoal2 = new PLStructure(input.quantifier1, new PLTerm[] { subGoal1, tmpVar2 });
 		} else {
@@ -280,7 +283,7 @@ public class ConversorToPrologQuery {
 			tmpVar2 = tmpVar1;
 		}
 
-		if (input.quantifier0 != null) {
+		if (! "".equals(input.quantifier0)) {
 			tmpVar3 = new PLVariable();
 			subGoal3 = new PLStructure(input.quantifier0, new PLTerm[] { subGoal2, tmpVar3 });
 		} else {

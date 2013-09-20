@@ -14,12 +14,20 @@ cleanUpQueryAnswers();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();
 	
 	if (answers.length > 0) {
+		out.print("addToProgramQueryAnsers(0, [");
+		for (int j=0; j<variablesNames.length; j++) {
+			out.print("'" + variablesNames[j] + "'");
+			if (j+1 < variablesNames.length) {
+				out.print(", ");
+			}
+		}
+		out.println("]);");
 		for (int i=0; i< answers.length; i++) {
-			out.println("addToProgramQueryAnsers(" + i + ", [");
+			out.print("addToProgramQueryAnsers(" + (i + 1) + ", [");
 			for (int j=0; j<variablesNames.length; j++) {
-				out.println(answers[i].getCiaoPrologQueryVariableAnswer(variablesNames[j]));
+				out.print("'" + answers[i].getCiaoPrologQueryVariableAnswer(variablesNames[j]) + "'");
 				if (j+1 < variablesNames.length) {
-					out.println(", ");
+					out.print(", ");
 				}
 			}
 			out.println("]);");
