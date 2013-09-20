@@ -27,6 +27,10 @@ public class ResultsStoreHouse {
 			messages.add(msg);
 		}
 	}
+	
+	public String [] getMessages() {
+		return messages.toArray(new String [messages.size()]);
+	}
 
 	public void setFilesList(ProgramFileInfo[] filesList) {
 		this.filesList = null;

@@ -153,7 +153,6 @@ function showQueryAnswers(runQueryDivId) {
 		alert("ERROR: runQueryDiv is null or undefined.");
 		return;
 	}
-	runQueryDiv.innerHTML = "";
 	
 	// Initialize.
 	infosForQueryAnswers = null;
@@ -192,10 +191,13 @@ function showQueryAnswers(runQueryDivId) {
 		}
 	}
 	
-	if (noAnswers) {
-		runQueryDiv.innerHTML = "The query has no answers. Maybe the database is empty? ";
-	}
-	else {
+	// if (noAnswers) {
+	// 	runQueryDiv.innerHTML = "The query has no answers. Maybe the database is empty? ";
+	// }
+	// else {
+	if (! noAnswers) {	
+		runQueryDiv.innerHTML = "";
+
 		var tabsDiv = document.createElement('div');
 		tabsDiv.id = "tabs";
 		runQueryDiv.appendChild(tabsDiv);

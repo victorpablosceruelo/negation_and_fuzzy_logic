@@ -93,7 +93,9 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 			alert("error: Impossible to load page " + ajaxPageUrl); 
 		}
 	});
-
+    
+    // Do not let the navigator to follow links !!!
+	return false;
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
