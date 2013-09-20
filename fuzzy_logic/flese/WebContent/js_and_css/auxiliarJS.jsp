@@ -243,43 +243,6 @@ function addToFilesList(index, fileName, fileOwner) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-var programIntrospection = new Array();
-
-function cleanUpProgramIntrospection() {
-	programIntrospection = null;
-	programIntrospection = new Array();
-}
-
-function addToProgramIntrospection(index, predInfo) {
-	programIntrospection[index] = predInfo;
-}
-
-function predMoreInfoClass(key, value) {
-	this.key = key;
-	this.value = value;
-}
-
-function predInfo(predName, predArity, predType, predMoreInfo) {
-	this.predName = predName;
-	this.predArity = predArity;
-	this.predType = predType;
-	this.predMoreInfo = new Array();
-	for (var i=0; i<predMoreInfo.length; i++) {
-		if (predMoreInfo[i].length >= 2) {
-			this.predMoreInfo[i] = new predMoreInfoClass(predMoreInfo[i][0], predMoreInfo[i][1]);
-			for (var j=2; j<predMoreInfo[i].length; j++) {
-				alert("predMoreInfo["+i+"][" +j +"]: " + predMoreInfo[i][j]);
-			}
-		}
-	}
-	
-}
-
-function selectedProgramDatabaseInfo(fileName, fileOwner) {
-	this.fileName = fileName;
-	this.fileOwner = fileOwner;
-}
-
 function getProgramDatabaseComboBoxValue(comboBox) {
 	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
 	var selectedProgramDatabase = null;
