@@ -33,4 +33,8 @@ public class CiaoPrologQueryAnswer {
 
 		return this.varsAnswers.get(variableName);
 	}
+	
+	public String [] getCiaoPrologQueryAnswerVariablesNames() {
+		return varsAnswers.keySet().toArray(new String[varsAnswers.keySet().size()]);
+	}
 }

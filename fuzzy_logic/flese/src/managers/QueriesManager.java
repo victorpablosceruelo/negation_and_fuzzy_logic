@@ -1,5 +1,6 @@
 package managers;
 
+import prologConnector.CiaoPrologConnectorException;
 import prologConnector.CiaoPrologNormalQuery;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import prologConnector.CiaoPrologQueryAnswer;
@@ -10,6 +11,7 @@ import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
+import conversors.QueryConversorException;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
@@ -112,9 +114,25 @@ public class QueriesManager extends AbstractManager {
 	}
 
 	public void evaluate() throws Exception {
-		CiaoPrologNormalQuery query = CiaoPrologNormalQuery.getInstance(requestStoreHouse);
-		CiaoPrologQueryAnswer[] queryAnswers = query.getQueryAnswers();
+		CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
+		String [] queryVariablesNames = new String[0];
+		try {
+			CiaoPrologNormalQuery query = CiaoPrologNormalQuery.getInstance(requestStoreHouse);
+			queryAnswers = query.getQueryAnswers();
+			queryVariablesNames = query.getVariablesNames();
+		} catch (QueryConversorException e) {
+			queryAnswers = new CiaoPrologQueryAnswer[0];
+			queryVariablesNames = new String[0];
+			String msg = e.getMessage();
+			resultsStoreHouse.addMessage(msg);
+		} catch (CiaoPrologConnectorException e) {
+			queryAnswers = new CiaoPrologQueryAnswer[0];
+			queryVariablesNames = new String[0];
+			String msg = e.getMessage();
+			resultsStoreHouse.addMessage(msg);
+		}
 		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
+		resultsStoreHouse.setCiaoPrologQueryVariablesNames(queryVariablesNames);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, ""));
 	}
 

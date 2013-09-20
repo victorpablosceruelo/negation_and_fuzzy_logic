@@ -30,7 +30,8 @@ public class ConversorToPrologQuery {
 	final Log LOG = LogFactory.getLog(ConversorToPrologQuery.class);
 
 	public class ConversionInput {
-		public String initialPredicate = null;
+		public int lineIndex = 0;
+		public String database = null;
 		public String aggregator = null;
 
 		// Parameters to be retrieved, converted and saved:
@@ -39,8 +40,8 @@ public class ConversorToPrologQuery {
 		public String quantifier0 = null;
 		public String quantifier1 = null;
 		public String predicate = null;
-		public String rfuzzyComputeOperator = null;
-		public String rfuzzyComputeValue = null;
+		public String operator = null;
+		public String value = null;
 
 	}
 
@@ -85,21 +86,25 @@ public class ConversorToPrologQuery {
 
 		PrologSubQuery prologSubQuery = new PrologSubQuery();
 		ConversionInput input = prologSubQuery.input;
-		input.initialPredicate = sessionStoreHouse.getRequestParameter("selectQueryStartupType");
-		input.aggregator = sessionStoreHouse.getRequestParameter("queryLines.selectAggregator");
+		input.lineIndex = 0; 
+		input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
+		input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
 		testConversionInput(prologSubQuery);
 
 		for (int i = 0; i < queryLinesCounter; i++) {
 			prologSubQuery = new PrologSubQuery();
 			input = prologSubQuery.input;
+			String lineHead = "queryLine[" + i + "].";
 
-			input.initialPredicate = sessionStoreHouse.getRequestParameter("selectQueryStartupType");
-			input.aggregator = sessionStoreHouse.getRequestParameter("queryLines.selectAggregator");
-			input.quantifier0 = sessionStoreHouse.getRequestParameter("queryLine[" + i + "].selectQuantifier_0");
-			input.quantifier1 = sessionStoreHouse.getRequestParameter("queryLine[" + i + "].selectQuantifier_1");
-			input.predicate = sessionStoreHouse.getRequestParameter("queryLine[" + i + "].selectPredicate");
-			input.rfuzzyComputeOperator = sessionStoreHouse.getRequestParameter("queryLine[" + i + "].selectRfuzzyComputeOperator");
-			input.rfuzzyComputeValue = sessionStoreHouse.getRequestParameter("queryLine[" + i + "].selectRfuzzyComputeValue");
+			input.lineIndex = i;
+			input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
+			input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
+			
+			input.quantifier0 = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.negationParam);
+			input.quantifier1 = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.quantifierParam);
+			input.predicate = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.predicateParam);
+			input.operator = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.operatorParam);
+			input.value = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.valueParam);
 
 			testConversionInput(prologSubQuery);
 			// We only initialize the list if we really need it.
@@ -114,36 +119,36 @@ public class ConversorToPrologQuery {
 	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, RequestStoreHouseException,
 			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
+		if ("".equals(input.database)) throw new QueryConversorException("You must say what you are looking for.");
+		
 		String msg = "";
 		msg += ("\n  fp: " + input.quantifier0 + "(" + input.quantifier1 + "(" + input.predicate + "))");
-		msg += ("\n  cp: " + input.predicate + " " + input.rfuzzyComputeOperator + " " + input.rfuzzyComputeValue);
+		msg += ("\n  cp: " + input.predicate + " " + input.operator + " " + input.value);
 		msg += ("\n  aggregator: " + input.aggregator);
-		msg += ("\n  tmpInitialPredicate: " + input.initialPredicate);
+		msg += ("\n  database: " + input.database);
 		LOG.info(msg);
-		if ((input.quantifier0 != null) || (input.quantifier1 != null) || (input.predicate != null)
-				|| (input.rfuzzyComputeOperator != null) || (input.rfuzzyComputeValue != null)) {
-			if (input.predicate == null) {
-				throw new QueryConversorException("Cannot build a query without a predicate.");
-			}
-			if (((input.rfuzzyComputeOperator != null) || (input.rfuzzyComputeValue != null))
-					&& ((input.quantifier0 != null) || (input.quantifier1 != null))) {
-				throw new QueryConversorException("Cannot build a so complex query.");
+		
+		if (0 == input.lineIndex) {
+			subQueryInitialEndTestAndSave(prologSubQuery);
+		}
+		else {
+			if ("".equals(input.predicate)) throw new QueryConversorException("You must refine your search.");
+		
+			if (((!"".equals(input.operator)) || (!"".equals(input.value)))
+					&& ((!"".equals(input.quantifier0)) || (!"".equals(input.quantifier1)))) {
+				throw new QueryConversorException("We cannot process a so complex query.");
 			}
 
-			if ((input.rfuzzyComputeOperator != null) && (input.rfuzzyComputeValue != null)) {
+			if ((!"".equals(input.operator)) && (!"".equals(input.value))) {
 				subqueryRfuzzyComputeOperatorEndTestAndSave(prologSubQuery);
 			} else {
 				PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.predicate);
-				String[] type = { input.initialPredicate, KConstants.PrologTypes.rfuzzy_truth_value_type };
+				String[] type = { input.database, KConstants.PrologTypes.rfuzzy_truth_value_type };
 				if (predicateInfo.hasType(type, false)) {
 					subqueryFuzzyEndTestAndSave(prologSubQuery);
 				} else {
 					throw new QueryConversorException("You need to fill all the fields for non-fuzzy queries.");
 				}
-			}
-		} else {
-			if ((input.initialPredicate != null) && (showVariables == null)) {
-				subQueryInitialEndTestAndSave(prologSubQuery);
 			}
 		}
 	}
@@ -151,14 +156,14 @@ public class ConversorToPrologQuery {
 	private void subQueryInitialEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, RequestStoreHouseException,
 			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
-		if (input.initialPredicate == null) {
+		if (input.database == null) {
 			throw new QueryConversorException("No initial predicate for the query.");
 		}
 		if (showVariables != null) {
 			throw new QueryConversorException("You cannot configure twice the initial subquery.");
 		}
 
-		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.initialPredicate);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.database);
 		// SubGoal1: call the typing predicate.
 		int predArityInt = predicateInfo.getPredicateArity();
 		PLVariable[] plArgsSubGoal1 = new PLVariable[predArityInt];
@@ -173,9 +178,9 @@ public class ConversorToPrologQuery {
 		}
 
 		PredMoreInfoInterface predMoreInfo = predicateInfo.getPredicateMoreInfoAs("database");
-		showVariablesNames = predMoreInfo.generateVariablesNames(input.initialPredicate);
+		showVariablesNames = predMoreInfo.generateVariablesNames(input.database);
 
-		PLStructure subGoal1 = new PLStructure(input.initialPredicate, plArgsSubGoal1);
+		PLStructure subGoal1 = new PLStructure(input.database, plArgsSubGoal1);
 
 		// SubGoal2: ensure the input variable always has values from the typing
 		// predicate.
@@ -200,20 +205,20 @@ public class ConversorToPrologQuery {
 	private void subqueryRfuzzyComputeOperatorEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException,
 			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
-		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.initialPredicate);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.database);
 		if (predicateInfo.getPredicateArity() != 2) {
 			throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
 
-		PLTerm database = new PLAtom(input.initialPredicate);
+		PLTerm database = new PLAtom(input.database);
 		PLVariable resultVar = new PLVariable();
 		PLStructure origin = new PLStructure(input.predicate, new PLTerm[] { showVariables[0] });
-		PLAtom operator = new PLAtom(input.rfuzzyComputeOperator);
+		PLAtom operator = new PLAtom(input.operator);
 
 		boolean isInteger = true;
 		int valueInt = 0;
 		try {
-			valueInt = Integer.parseInt(input.rfuzzyComputeValue);
+			valueInt = Integer.parseInt(input.value);
 		} catch (Exception e) {
 			isInteger = false;
 		}
@@ -221,14 +226,14 @@ public class ConversorToPrologQuery {
 		boolean isDouble = true;
 		double valueDouble = 0;
 		try {
-			valueDouble = Double.parseDouble(input.rfuzzyComputeValue);
+			valueDouble = Double.parseDouble(input.value);
 		} catch (Exception e) {
 			isDouble = false;
 		}
 
 		PLTerm value = null;
 		if ((!isInteger) && (!isDouble)) {
-			value = new PLAtom(input.rfuzzyComputeValue);
+			value = new PLAtom(input.value);
 		} else {
 			if (isInteger) {
 				value = new PLInteger(valueInt);
@@ -243,8 +248,8 @@ public class ConversorToPrologQuery {
 		 */
 
 		prologSubQuery.subQuery = new PLStructure("rfuzzy_compute", new PLTerm[] { operator, origin, value, database, resultVar });
-		prologSubQuery.SubQuerySimpleInfoString = " " + input.predicate + "(" + input.initialPredicate + ")" + " "
-				+ input.rfuzzyComputeOperator + " " + input.rfuzzyComputeValue;
+		prologSubQuery.SubQuerySimpleInfoString = " " + input.predicate + "(" + input.database + ")" + " "
+				+ input.operator + " " + input.value;
 		CiaoPrologTermInJava tmpQuery = new CiaoPrologTermInJava(prologSubQuery.subQuery, null);
 		prologSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		prologSubQuery.resultVariable = resultVar;
@@ -254,7 +259,7 @@ public class ConversorToPrologQuery {
 	private void subqueryFuzzyEndTestAndSave(PrologSubQuery prologSubQuery) throws QueryConversorException, CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
 
-		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.initialPredicate);
+		PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.database);
 		if (predicateInfo.getPredicateArity() != 2) {
 			throw new QueryConversorException("Arity of predicate is not 2. Predicate " + input.predicate);
 		}
@@ -289,7 +294,7 @@ public class ConversorToPrologQuery {
 			prologSubQuery.SubQuerySimpleInfoString += input.quantifier0 + "(";
 		if (input.quantifier1 != null)
 			prologSubQuery.SubQuerySimpleInfoString += input.quantifier1 + "(";
-		prologSubQuery.SubQuerySimpleInfoString += input.predicate + "(" + input.initialPredicate + ")";
+		prologSubQuery.SubQuerySimpleInfoString += input.predicate + "(" + input.database + ")";
 
 		if (input.quantifier0 != null)
 			prologSubQuery.SubQuerySimpleInfoString += ")";

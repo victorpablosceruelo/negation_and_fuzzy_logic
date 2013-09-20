@@ -175,6 +175,34 @@ function getComboBoxValue(comboBox) {
 	return comboBoxValue;
 }
 
+function getFieldValue(fieldName) {
+	if (! isString(fieldName)) return null;
+	var field = document.getElementById(fieldName);
+	if (field == null) {
+		debug.info("null field for fieldName "+fieldName);
+		return "";
+	}
+	if (field.value == null) {
+		debug.info("null field value for fieldName "+fieldName);
+		if (field.selectedIndex != null) {
+			return getComboBoxValue(field);
+		}
+		else {
+			return "";
+		}
+	}
+	if (field.value == undefined) {
+		debug.info("undefined field value for "+fieldName);
+		return "";
+	}
+	
+	if (field.value == '----') {
+		return "";
+	}
+	
+	return (field.value);
+}
+
 function splitStringResult(head, tail) {
 	this.head = head;
 	this.tail = tail;
@@ -441,31 +469,6 @@ function aggregatorDetailsHide(toShowMsgId, toHideMsgId, chooseAgregatorInfoCell
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function getFieldValue(fieldName) {
-	if (! isString(fieldName)) return null;
-	var field = document.getElementById(fieldName);
-	if (field == null) {
-		debug.info("null field for fieldName "+fieldName);
-		return "";
-	}
-	if (field.value == null) {
-		debug.info("null field value for fieldName "+fieldName);
-		if (field.selectedIndex != null) {
-			return getComboBoxValue(field);
-		}
-		else {
-			return "";
-		}
-	}
-	if (field.value == undefined) {
-		debug.info("undefined field value for "+fieldName);
-		return "";
-	}
-	
-	return (field.value);
-}
-
-/* This function makes a soft test of the query. The one in charge of running the query is below. */
 function evaluateQuery(url) {
 
 	var runQueryDivId = "<%= KConstants.JspsDivsIds.runQueryDivId %>";
