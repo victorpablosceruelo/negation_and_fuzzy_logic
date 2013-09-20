@@ -304,7 +304,10 @@ function setDatabaseParam(databaseNameIn) {
 }
 
 function getDatabaseParam() {
-	return databaseName;
+	if (database != null) {
+		return databaseName;
+	}
+	return "";
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -551,12 +554,8 @@ function runQueryAfterSoftTests(url) {
 	var error = false;
 	var action = url;
 	
-	var chooseQueryStartType = getDatabaseParam();
-	if (chooseQueryStartType == null) {
-		error = true;
-	}
-	else {
-		action += "&selectQueryStartupType=" + chooseQueryStartType; 
+	var database = getDatabaseParam();
+	action += "&<%=KConstants.Request.databaseParam %>=" + database; 
 	
 		actionTmp = comboBoxOrTextBoxCheckValue("queryLinesCounter", null);
 		if (actionTmp != null) action += "&queryLinesCounter=" +actionTmp;
