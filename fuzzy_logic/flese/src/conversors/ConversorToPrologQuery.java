@@ -73,7 +73,7 @@ public class ConversorToPrologQuery {
 		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
 
-		String queryLinesCounterString = sessionStoreHouse.getRequestParameter(KConstants.QueryParams.queryLinesCounter);
+		String queryLinesCounterString = sessionStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 
 		int queryLinesCounter = Integer.parseInt(queryLinesCounterString);
 
@@ -135,7 +135,7 @@ public class ConversorToPrologQuery {
 			} else {
 				PredicateInfo predicateInfo = ciaoPrologIntrospectionQuery.getProgramIntrospection().getPredicateInfo(input.predicate);
 				String[] type = { input.initialPredicate, KConstants.PrologTypes.rfuzzy_truth_value_type };
-				if (predicateInfo.hasType(type)) {
+				if (predicateInfo.hasType(type, false)) {
 					subqueryFuzzyEndTestAndSave(prologSubQuery);
 				} else {
 					throw new QueryConversorException("You need to fill all the fields for non-fuzzy queries.");
