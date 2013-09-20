@@ -16,17 +16,30 @@ public class KConstants {
 	}
 
 	public static class Request {
+		// Objects stored in the request.
+		public static final String resultsStoreHouse = "resultsStoreHouse";
+		
+		// General parameters
 		public static final String managerParam = "manager";
 		public static final String operationParam = "op";
 		public static final String fileNameParam = "fileName";
 		public static final String fileOwnerParam = "fileOwner";
 		public static final String providerId = "id";
 		public static final String isAjaxParam = "ajax";
+
+		// Query parameters.
 		public static final String databaseParam = "db";
 		public static final String predicateParam = "pred";
-		public static final String resultsStoreHouse = "resultsStoreHouse";
+		public static final String linesCounterParam = "linesCount";
 		public static final String lineNumberParam = "lineNum";
 		public static final String lineIdParam = "lineId";
+		public static final String aggregatorParam = "queryLines.selectAggregator";
+		public static final String programParam = "chooseProgram";
+		public static final String negationParam = "negation";
+		public static final String quantifierParam = "quantifier";
+		public static final String operatorParam = "operator";
+		public static final String valueParam = "value";
+
 	}
 
 	public static class PathsMgmt {
@@ -48,43 +61,38 @@ public class KConstants {
 	}
 
 	public static class CiaoPrologQuery {
-		public static long maximumNumberOfRetries = 9223372036854775807L;
-		public static long maximumNumberOfAnswers = 9223372036854775807L;
+		public static final long maximumNumberOfRetries = 9223372036854775807L;
+		public static final long maximumNumberOfAnswers = 9223372036854775807L;
 
 	}
 
 	public static class PlConnectionsPool {
-		public static int maxNumOfConnections = 10;
-	}
-
-	public static class QueryParams {
-		public static String queryLinesCounter = "queryLinesCounter";
-		public static String queryLinesAggregator = "queryLines.selectAggregator";
+		public static final int maxNumOfConnections = 10;
 	}
 
 	public static class Session {
-		public static String swAppInTestingMode = "swAppInTestingMode";
-		public static String socialAuthManager = "socialAuthManager";
-		public static String socialAuthProvider = "socialAuthProvider";
-		public static String socialAuthProviderId = "socialAuthProviderId";
-		public static String socialAuthProfile = "socialAuthProfile";
-		public static String localUserInfo = "localUserInfo";
+		public static final String swAppInTestingMode = "swAppInTestingMode";
+		public static final String socialAuthManager = "socialAuthManager";
+		public static final String socialAuthProvider = "socialAuthProvider";
+		public static final String socialAuthProviderId = "socialAuthProviderId";
+		public static final String socialAuthProfile = "socialAuthProfile";
+		public static final String localUserInfo = "localUserInfo";
 
 	}
 
 	public static class NextStep {
-		public final static int none = 0;
-		public final static int forward_to = 1;
-		public final static int redirect_to = 2;
-		public final static int redirect_to_with_session = 3;
-		public final static int sendRedirect_to = 4;
-		public final static int invalidAction = 5;
+		public static final int none = 0;
+		public static final int forward_to = 1;
+		public static final int redirect_to = 2;
+		public static final int redirect_to_with_session = 3;
+		public static final int sendRedirect_to = 4;
+		public static final int invalidAction = 5;
 	}
 
 	public static class Fuzzifications {
-		public final static String predDefined = "predDefined";
-		public final static String predNecessary = "predNecessary";
-		public final static String predOwner = "predOwner";
+		public static final String predDefined = "predDefined";
+		public static final String predNecessary = "predNecessary";
+		public static final String predOwner = "predOwner";
 	}
 
 	public static class ProgramIntrospectionFields {
@@ -122,16 +130,14 @@ public class KConstants {
 		public static final String jsEnd = "</script>";
 	}
 
-	public static class JspsDivsAndFields {
+	public static class JspsDivsIds {
 		public static final String queryStartContainerId = "queryStartContainer";
 		public static final String selectQueryDivId = "selectQueryDiv";
 		public static final String runQueryDivId = "runQueryDiv";
 		public static final String queryLinesContainerId = "queryLinesContainer";
 		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
 		public static final String queryLinesTableId = "queryLinesTable";
-		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
-
-		public static final String counterFieldId = "QueryLinesCounter";
+		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";		
 	}
 }
 
