@@ -271,8 +271,8 @@ function getProgramDatabaseComboBoxValue(comboBox) {
 }
 
 function selectedProgramDatabaseChanged(comboBox) {
-	var selectQueryDivId = '<%= KConstants.JspsDivsAndFields.selectQueryDivId %>'; 
-	var runQueryDivId = '<%= KConstants.JspsDivsAndFields.runQueryDivId %>';
+	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
+	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';
 	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	debugInfoIfVarIsNull(selectQueryDiv, "selectQueryDiv", "selectedProgramDatabaseChanged");
@@ -312,8 +312,8 @@ function getDatabaseParam() {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function selectedQueryStartTypeChanged(comboBox) {
-	var queryLinesContainerId = "<%=KConstants.JspsDivsAndFields.queryLinesContainerId %>";
-	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsAndFields.searchOrPersonalizeTableId %>";
+	var queryLinesContainerId = "<%=KConstants.JspsDivsIds.queryLinesContainerId %>";
+	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId %>";
 	
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
@@ -341,18 +341,18 @@ function selectedQueryStartTypeChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function resetQueryLinesCounterFieldValue() {
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivsAndFields.counterFieldId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.Request.linesCounterParam %>";
 	document.getElementById(queryLinesCounterFieldId).value = 0;
 }
 
 function incrementQueryLinesCounterFieldValue() {
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivsAndFields.counterFieldId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.Request.linesCounterParam %>";
 	document.getElementById(queryLinesCounterFieldId).value ++;
 	return getQueryLinesCounterFieldValue();
 }
 
 function getQueryLinesCounterFieldValue() {
-	var queryLinesCounterFieldId = "<%=KConstants.JspsDivsAndFields.counterFieldId %>";
+	var queryLinesCounterFieldId = "<%=KConstants.Request.linesCounterParam %>";
 	if ((document.getElementById(queryLinesCounterFieldId) != null) &&
 		(document.getElementById(queryLinesCounterFieldId) != undefined) &&
 		(document.getElementById(queryLinesCounterFieldId).value != null) &&
@@ -370,8 +370,8 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	debug.info("selectQueryAddLine");
 	debug.info(urlQueryAddLine);
 	debug.info(urlQueryAddAggregator);
-	var queryLinesTableId = "<%=KConstants.JspsDivsAndFields.queryLinesTableId %>";
-	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivsAndFields.queryLinesAggregatorTableId %>";
+	var queryLinesTableId = "<%=KConstants.JspsDivsIds.queryLinesTableId %>";
+	var queryLinesAggregatorTableId = "<%=KConstants.JspsDivsIds.queryLinesAggregatorTableId %>";
 	
 	var queryLinesCounter = getQueryLinesCounterFieldValue();
 	var queryLineId = "queryLine[" + queryLinesCounter + "]";
@@ -384,7 +384,7 @@ function selectQueryAddLine(urlQueryAddLine, urlQueryAddAggregator) {
 	
 	var lineInfo = "&" + "<%= KConstants.Request.lineNumberParam %>" + "=" + queryLinesCounter;
 	var lineId = "&" + "<%= KConstants.Request.lineIdParam %>" + "=" + queryLineId;
-	var linesCounter = "&" + "<%= KConstants.QueryParams.queryLinesCounter %>" + "=" + queryLinesCounter;
+	var linesCounter = "&" + "<%= KConstants.Request.linesCounterParam %>" + "=" + queryLinesCounter;
 	
 	loadAjaxIn(destinyAddLine, urlQueryAddLine + lineInfo + lineId);
 	loadAjaxIn(queryLinesAggregatorTableId, urlQueryAddAggregator + lineInfo + lineId + linesCounter);
@@ -545,7 +545,7 @@ function comboBoxOrTextBoxCheckValue(fieldName, errorText) {
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
 function runQueryAfterSoftTests(url) {
 
-	var runQueryDivId = "<%= KConstants.JspsDivsAndFields.runQueryDivId %>";
+	var runQueryDivId = "<%= KConstants.JspsDivsIds.runQueryDivId %>";
 	debug.info("runQueryAfterSoftTests");
 	
 	var error = false;
