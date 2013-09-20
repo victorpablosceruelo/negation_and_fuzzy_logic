@@ -30,11 +30,12 @@
 // action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
 // target='" + runQueryTargetiFrameId+ "'>";
  -->
-	<div id='<%=KConstants.JspsDivsAndFields.queryStartContainerId%>' class='queryStartContainerTable'>
+	<div id='<%=KConstants.JspsDivsIds.queryStartContainerId%>' class='queryStartContainerTable'>
 	     <div class='queryStartContainerTableRow'>
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
 	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
-					<select name="chooseQueryStartType" id="chooseQueryStartType" 
+					<select name="<%=KConstants.Request.databaseParam %>" 
+							id="<%=KConstants.Request.databaseParam %>" 
 					        onchange='selectedQueryStartTypeChanged(this);' >
 						<%=JspsUtils.comboBoxDefaultValue()%>
 <%
@@ -52,12 +53,12 @@
 	</div>
 
 	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name='<%=KConstants.JspsDivsAndFields.counterFieldId %>' value="0" id='<%=KConstants.JspsDivsAndFields.counterFieldId%>'>
+	<input type="hidden" name='<%=KConstants.Request.linesCounterParam %>' value="0" id='<%=KConstants.Request.linesCounterParam %>'>
               
-	<div id='<%=KConstants.JspsDivsAndFields.queryLinesContainerId%>' class='queryLinesContainerTable'>
+	<div id='<%=KConstants.JspsDivsIds.queryLinesContainerId%>' class='queryLinesContainerTable'>
 	</div>
     
-	<div id='<%=KConstants.JspsDivsAndFields.searchOrPersonalizeTableId%>' class='searchOrPersonalizeTable'>
+	<div id='<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId%>' class='searchOrPersonalizeTable'>
 		 <div class='searchOrPersonalizeTableRow'>
 			  <div class='searchOrPersonalizeTableCell'>
 					<input type='submit' value='Search' onclick="return runQueryAfterSoftTests('<%=url2 %>');" >

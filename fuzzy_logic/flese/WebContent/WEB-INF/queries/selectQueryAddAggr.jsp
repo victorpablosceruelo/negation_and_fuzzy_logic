@@ -14,7 +14,7 @@
 	
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	String queryLinesCounter = requestStoreHouse.getRequestParameter(KConstants.QueryParams.queryLinesCounter);
+	String linesCounter = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
@@ -32,10 +32,10 @@
 	
 	String [] neededType = {KConstants.PrologTypes.rfuzzy_truth_value_type, KConstants.PrologTypes.rfuzzy_truth_value_type, KConstants.PrologTypes.rfuzzy_truth_value_type};
 	PredicateInfo [] aggregators = programIntrospection.getPredicatesInfosByType(neededType);
-	JspsUtils.getValue(queryLinesCounter);
+	// JspsUtils.getValue(linesCounter);
 %>
 
-<% if ((queryLinesCounter == null) || ("".equals(queryLinesCounter)) || ("0".equals(queryLinesCounter))) { %>
+<% if ((linesCounter == null) || ("".equals(linesCounter)) || ("0".equals(linesCounter))) { %>
 	<div class='queryLinesAggregatorTableRow'>
 		<div class='queryLinesAggregatorTableCell'>
 			<a href="#" onClick="selectQueryAddLine('<%=selectQueryAddLineUrl %>', '<%=selectQueryAddAggrUrl %>');" >
@@ -75,7 +75,7 @@
 
 	<div class='queryLinesAggregatorTableRow'>
 		<div class='queryLinesAggregatorTableCell' id=<%= chooseAgregatorCellId %>>
-			<select name='<%= KConstants.QueryParams.queryLinesAggregator %>'>
+			<select name='<%= KConstants.Request.aggregatorParam %>' id='<%= KConstants.Request.aggregatorParam %>'>
 				<% 
 					for (int i=0; i<aggregators.length; i++) {
 						String name = aggregators[i].getPredicateName(); 

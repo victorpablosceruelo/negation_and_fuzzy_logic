@@ -15,8 +15,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterFieldId);
-	// int lineIndex = Conversors.toInt(lineIndexString);
+	String linesCounter = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String lineNumber = requestStoreHouse.getRequestParameter(KConstants.Request.lineNumberParam);
 	String lineId = requestStoreHouse.getRequestParameter(KConstants.Request.lineIdParam);
@@ -49,7 +48,7 @@
 	<!-- Predicate -->
 	<div id="<%=lineId %>.predicateDiv" class="queryLinesTableCell">
 	
-		<select name="<%=lineId %>.predicate" id="<%=lineId %>.predicate" 
+		<select name="<%=lineId %>.<%=KConstants.Request.predicateParam %>" id="<%=lineId %>.<%=KConstants.Request.predicateParam %>" 
 				onchange="selectPredicateChanged(this, '<%=lineId %>', '<%=negUrl %>', '<%=quantUrl %>', '<%=opUrl %>', '<%=valueUrl %>');">
 				<%=JspsUtils.comboBoxDefaultValue() %>
 

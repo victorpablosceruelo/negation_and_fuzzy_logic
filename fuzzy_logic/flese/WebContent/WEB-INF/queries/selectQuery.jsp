@@ -29,11 +29,11 @@
 
 	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
 		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
-			<div id="<%=KConstants.JspsDivsAndFields.queryLinesTableId%>" class="queryLinesTable">
+			<div id="<%=KConstants.JspsDivsIds.queryLinesTableId%>" class="queryLinesTable">
 			</div>
 		</div>
 		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
-			<div id="<%=KConstants.JspsDivsAndFields.queryLinesAggregatorTableId%>" class="queryLinesAggregatorTable">
+			<div id="<%=KConstants.JspsDivsIds.queryLinesAggregatorTableId%>" class="queryLinesAggregatorTable">
 			</div>
 		</div>
 		

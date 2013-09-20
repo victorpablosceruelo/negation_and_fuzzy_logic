@@ -16,7 +16,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterFieldId);
+	String linesCounter = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
 	String lineNumber = requestStoreHouse.getRequestParameter(KConstants.Request.lineNumberParam);
@@ -33,7 +33,7 @@
 		PredMoreInfoInterface pmi = predicatePredicateInfo.getPredicateMoreInfoAs(KConstants.MoreInfoTypes.enumTypeValues);
 		if (pmi != null) {
 	%>
-		<select name="<%=lineId %>.value" id="<%=lineId %>.value">
+		<select name="<%=lineId %>.<%=KConstants.Request.valueParam %>" id="<%=lineId %>.<%=KConstants.Request.valueParam %>">
 			<%=JspsUtils.comboBoxDefaultValue() %>
 
 			<% 
@@ -56,7 +56,9 @@
 	<% } %>
 <% } else { %>
 	<% if ((predicatePredicateInfo.hasType(neededType2, false)) || (predicatePredicateInfo.hasType(neededType3, false))) { %>
-		<input type='text' value='' name="<%=lineId %>.value" id="<%=lineId %>.value" />
+		<input type='text' value='' 
+				name="<%=lineId %>.<%=KConstants.Request.valueParam %>" 
+				id="<%=lineId %>.<%=KConstants.Request.valueParam %>" />
 		<script type="text/javascript">
 			document.getElementById('<%= lineId %>.valueDiv').style.display='inline';
 		</script>

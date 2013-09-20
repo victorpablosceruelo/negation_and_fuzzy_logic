@@ -16,7 +16,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
-	String lineIndexString = requestStoreHouse.getRequestParameter(KConstants.JspsDivsAndFields.counterFieldId);
+	String linesCounter = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 	String predicate = requestStoreHouse.getRequestParameter(KConstants.Request.predicateParam);
@@ -37,8 +37,11 @@
 	String [] neededType3 = {database, KConstants.PrologTypes.rfuzzy_string_type};
 %>
 
-<% if ((predicateInfo.hasType(neededType1, false)) || (predicateInfo.hasType(neededType2, false)) || (predicateInfo.hasType(neededType3, false))) { %>
-	<select name="<%=lineId %>.operator" id="<%=lineId %>.operator">
+<%
+	if ((predicateInfo.hasType(neededType1, false)) || (predicateInfo.hasType(neededType2, false)) || (predicateInfo.hasType(neededType3, false))) {
+%>
+	<select name="<%=lineId%>.<%=KConstants.Request.operatorParam %>" 
+			id="<%=lineId%>.<%=KConstants.Request.operatorParam %>">
 		<%=JspsUtils.comboBoxDefaultValue() %>
 
 		<% for (int i=0; i<operators.length; i++) {	%>

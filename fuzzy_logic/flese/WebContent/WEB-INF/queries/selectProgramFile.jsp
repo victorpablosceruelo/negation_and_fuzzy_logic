@@ -29,16 +29,18 @@
 			Please, select a database to load: 
 		</div>
 		<div class="selectDatabaseTableCell2">
-			<select name="chooseProgramFileId" id="chooseProgramFileId" onchange='selectedProgramDatabaseChanged(this)' >
-			<%=JspsUtils.comboBoxDefaultValue() %>
+			<select name="<%=KConstants.Request.programParam %>" 
+					id="<%=KConstants.Request.programParam %>" 
+					onchange='selectedProgramDatabaseChanged(this)' >
+			<%=JspsUtils.comboBoxDefaultValue()%>
 <%
 	for (int i=0; i<filesList.length; i++) { 
 		String value = KUrls.Queries.SelectDatabase.getUrl(true) + filesList[i].getInfoForUrls();
 		String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
 %>	
-				<option id='<%=value %>' title='<%=value %>' value='<%=value %>'><%=desc %></option>
+				<option id='<%=value%>' title='<%=value%>' value='<%=value%>'><%=desc%></option>
 <%
-			}
+	}
 %>			</select>
 		</div>
 	</div>
@@ -47,8 +49,8 @@
 %>
 </div>
 
-<div id="<%=KConstants.JspsDivsAndFields.selectQueryDivId%>" class="selectDatabaseTable">
+<div id="<%=KConstants.JspsDivsIds.selectQueryDivId%>" class="selectDatabaseTable">
 </div>
 
-<div id="<%=KConstants.JspsDivsAndFields.runQueryDivId%>" class="selectDatabaseTable">
+<div id="<%=KConstants.JspsDivsIds.runQueryDivId%>" class="selectDatabaseTable">
 </div>
