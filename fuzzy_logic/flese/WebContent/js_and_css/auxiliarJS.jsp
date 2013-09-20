@@ -243,24 +243,6 @@ function addToFilesList(index, fileName, fileOwner) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function getProgramDatabaseComboBoxValue(comboBox) {
-	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	var selectedProgramDatabase = null;
-	
-	// alert("comboBoxValue: " + comboBoxValue);
-	if ((comboBoxValue != null) && (comboBoxValue != "") && (comboBoxValue != "----")) {
-		var separation = "-owned-by-";
-	
-		i = comboBoxValue.indexOf(separation);
-		if (i != -1) {
-			selectedProgramDatabase = new selectedProgramDatabaseInfo('', '');
-			selectedProgramDatabase.fileName = comboBoxValue.substring(0, i);
-			selectedProgramDatabase.fileOwner = comboBoxValue.substring(i+separation.length);
-		}
-	}
-	return selectedProgramDatabase;
-}
-
 function selectedProgramDatabaseChanged(comboBox) {
 	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
 	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';
