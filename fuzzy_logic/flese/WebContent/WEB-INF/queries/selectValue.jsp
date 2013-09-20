@@ -50,7 +50,7 @@
 			%>
 		</select>
 		<script type="text/javascript">
-			document.getElementById('<%= lineId %>.quantifierDiv').style.display='inline';
+			document.getElementById('<%= lineId %>.valueDiv').style.display='inline';
 		</script>
 		
 	<% } %>
