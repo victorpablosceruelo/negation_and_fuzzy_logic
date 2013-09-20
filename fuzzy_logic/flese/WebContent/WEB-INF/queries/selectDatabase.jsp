@@ -19,9 +19,7 @@
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
 	String url1 = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
 			"&" + KConstants.Request.databaseParam + "=";
-	String url2 = KUrls.Queries.Evaluate.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
-			"&" + KConstants.Request.databaseParam + "=";
-	
+	String url2 = KUrls.Queries.Evaluate.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls();
 %>
 
 
@@ -36,15 +34,13 @@
 	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
 					<select name="<%=KConstants.Request.databaseParam %>" 
 							id="<%=KConstants.Request.databaseParam %>" 
-					        onchange='selectedQueryStartTypeChanged(this);' >
+					        onchange="selectedQueryStartTypeChanged(this, '<%=url1 %>');" >
 						<%=JspsUtils.comboBoxDefaultValue()%>
 <%
 	for (int i=0; i<predicatesInfos.length; i++) {
 		String desc = predicatesInfos[i].getPredicateName();
-		String value = url1 + desc;
-		// JspsUtils.getValue(value);
 %>	
-						<option id='<%=desc%>' title='<%=desc%>' value='<%=value%>'><%=desc%></option>
+						<option id='<%=desc%>' title='<%=desc%>' value='<%=desc%>'><%=JspsUtils.getPrologNameInColloquialLanguage(desc)%></option>
 <%
 	}
 %>					</select>
@@ -61,7 +57,7 @@
 	<div id='<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId%>' class='searchOrPersonalizeTable'>
 		 <div class='searchOrPersonalizeTableRow'>
 			  <div class='searchOrPersonalizeTableCell'>
-					<input type='submit' value='Search' onclick="return runQueryAfterSoftTests('<%=url2 %>');" >
+					<input type='submit' value='Search' onclick="return evaluateQuery('<%=url2 %>');" >
 			  </div>
 			  <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;
 			  </div>

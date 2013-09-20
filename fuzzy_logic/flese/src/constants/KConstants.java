@@ -26,15 +26,17 @@ public class KConstants {
 		public static final String fileOwnerParam = "fileOwner";
 		public static final String providerId = "id";
 		public static final String isAjaxParam = "ajax";
+		public static final String programParam = "chooseProgram";
+
+		// Lines Counters
+		public static final String linesCounterParam = "linesCount";
+		public static final String lineNumberParam = "lineNum";
+		public static final String lineIdParam = "lineId";
 
 		// Query parameters.
 		public static final String databaseParam = "db";
 		public static final String predicateParam = "pred";
-		public static final String linesCounterParam = "linesCount";
-		public static final String lineNumberParam = "lineNum";
-		public static final String lineIdParam = "lineId";
 		public static final String aggregatorParam = "queryLines.selectAggregator";
-		public static final String programParam = "chooseProgram";
 		public static final String negationParam = "negation";
 		public static final String quantifierParam = "quantifier";
 		public static final String operatorParam = "operator";

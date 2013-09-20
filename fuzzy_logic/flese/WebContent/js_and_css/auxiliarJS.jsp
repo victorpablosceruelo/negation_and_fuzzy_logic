@@ -297,24 +297,7 @@ function selectedProgramDatabaseChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-var databaseName = "";
-
-function setDatabaseParam(databaseNameIn) {
-	databaseName = databaseNameIn;
-}
-
-function getDatabaseParam() {
-	if (database != null) {
-		return databaseName;
-	}
-	return "";
-}
-
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-
-function selectedQueryStartTypeChanged(comboBox) {
+function selectedQueryStartTypeChanged(comboBox, url1) {
 	var queryLinesContainerId = "<%=KConstants.JspsDivsIds.queryLinesContainerId %>";
 	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId %>";
 	
@@ -335,7 +318,7 @@ function selectedQueryStartTypeChanged(comboBox) {
 	else {
 		searchOrPersonalizeTable.style.visibility = 'visible'; 
 		queryLinesContainerDiv.style.display='block';
-		loadAjaxIn(queryLinesContainerId, startupType);
+		loadAjaxIn(queryLinesContainerId, url1 + startupType);
 	}
 }
 
@@ -458,92 +441,64 @@ function aggregatorDetailsHide(toShowMsgId, toHideMsgId, chooseAgregatorInfoCell
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+function getFieldValue(fieldName) {
+	if (! isString(fieldName)) return null;
+	var field = document.getElementById(fieldName);
+	if (field == null) {
+		debug.info("null field for fieldName "+fieldName);
+		return "";
+	}
+	if (field.value == null) {
+		debug.info("null field value for fieldName "+fieldName);
+		if (field.selectedIndex != null) {
+			return getComboBoxValue(field);
+		}
+		else {
+			return "";
+		}
+	}
+	if (field.value == undefined) {
+		debug.info("undefined field value for "+fieldName);
+		return "";
+	}
+	
+	return (field.value);
+}
+
 /* This function makes a soft test of the query. The one in charge of running the query is below. */
-function runQueryAfterSoftTests(url) {
+function evaluateQuery(url) {
 
 	var runQueryDivId = "<%= KConstants.JspsDivsIds.runQueryDivId %>";
 	debug.info("runQueryAfterSoftTests");
 	
-	var error = false;
-	var action = url;
+	var database = getFieldValue("<%=KConstants.Request.databaseParam %>");
+	url += "&<%=KConstants.Request.databaseParam %>=" + database; 
 	
-	var database = getDatabaseParam();
-	action += "&<%=KConstants.Request.databaseParam %>=" + database; 
+	var linesCounter = getQueryLinesCounterFieldValue();
+	url += "&<%=KConstants.Request.linesCounterParam %>=" + linesCounter;
 	
-		actionTmp = comboBoxOrTextBoxCheckValue("queryLinesCounter", null);
-		if (actionTmp != null) action += "&queryLinesCounter=" +actionTmp;
-		else error = true;		
+	var fields = ["<%=KConstants.Request.predicateParam %>", "<%=KConstants.Request.aggregatorParam %>",
+	              "<%=KConstants.Request.negationParam %>", "<%=KConstants.Request.quantifierParam %>",
+	              "<%=KConstants.Request.operatorParam %>", "<%=KConstants.Request.valueParam %>"];
 		
-		var actionTmp = null;
-		var queryLinesCounter = getQueryLinesCounterFieldValue();
-		for (var i=0; i < queryLinesCounter; i++) {
-			// predicate
-			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectPredicate", null);
-			if (actionTmp != null) action += "&queryLine["+i+"].selectPredicate=" + actionTmp;
-			
-			if (needsComputeFields(actionTmp, chooseQueryStartType)) {
-				// operator 
-				actionTmp = comboBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeOperator", "Please fill the operator in subquery number " + (i+1));
-				if (actionTmp != null) action += "&queryLine["+i+"].selectRfuzzyComputeOperator=" + actionTmp;
-				else error = true;
+	var tmp = null;
 		
-				// value 
-				actionTmp = comboBoxOrTextBoxCheckValue("queryLine["+i+"].selectRfuzzyComputeValue", "Please fill the value in subquery number " + (i+1));
-				if (actionTmp != null) action += "&queryLine["+i+"].selectRfuzzyComputeValue=" +actionTmp;
-				else error = true;
-			}
-			// quantifier 0
-			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectQuantifier_0", null);
-			if (actionTmp != null) action += "&queryLine["+i+"].selectQuantifier_0=" + actionTmp;
+	for (var i=0; i < linesCounter; i++) {
+		for (var j=0; j < fields.length; j++) {
 
-			// quantifier 1
-			actionTmp = comboBoxCheckValue("queryLine["+i+"].selectQuantifier_1", null);
-			if (actionTmp != null) action += "&queryLine["+i+"].selectQuantifier_1=" + actionTmp;
+			tmp = getFieldValue("queryLine["+i+"]." + fields[j]);
+			if ((tmp != null) && (tmp != "")) {
+				url += "&queryLine["+i+"]." + fields[j] + "=" + tmp;
+			}
 		}
 	}
 	
-	if (error) {
-		var runQueryDiv = getContainer(runQueryDivId);
-		runQueryDiv.innerHTML = "Your query contains errors. Please, fix them and press the search button again.";
-	}
-	else {
-		loadAjaxIn(runQueryDivId, action);
-	}
+	loadAjaxIn(runQueryDivId, url);
 
 	// Tell the navigator not to follow the link !!!
 	return false;
 }
 
-function needsComputeFields(actionTmp, chooseQueryStartType) {
-	var i = 0;
-	var found = false;
-	while (i<programIntrospection.length && ! found){
-		if (programIntrospection[i].predName == actionTmp) found = true;
-		else i++;
-	}
-	if (! found) {
-		debug.info("Predicate " + actionTmp + "could not be found.");
-		return false;
-	}
-	else {
-		var j = 0;
-		found = false;
-		while (j<programIntrospection[i].predType.length && ! found) {
-			if (programIntrospection[i].predType[j][0] == chooseQueryStartType) found = true;
-			else j++;
-		}
-		if (! found) {
-			alert("Predicate " + actionTmp + "does not work for type " + chooseQueryStartType);
-			return false;
-		}
-		else {
-			if (programIntrospection[i].predType[j][programIntrospection[i].predType[j].length -1] != 'rfuzzy_truth_value_type') {
-				return true;
-			}
-		}
-	}
-	return false;
-}
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */

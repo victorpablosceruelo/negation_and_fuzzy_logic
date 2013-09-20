@@ -75,6 +75,5 @@
 		document.getElementById('<%= lineId %>.quantifierDiv').style.display='none';
 		document.getElementById('<%= lineId %>.operatorDiv').style.display='none';
 		document.getElementById('<%= lineId %>.valueDiv').style.display='none';
-		setDatabaseParam('<%=database %>');
 	</script>
 
