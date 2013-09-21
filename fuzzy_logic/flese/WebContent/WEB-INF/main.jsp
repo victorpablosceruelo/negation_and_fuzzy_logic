@@ -22,8 +22,8 @@
 					logged as <br /> 
 					<%= localUserInfoName %>
 					<br />
-					<a id='userOptions' title='user options' href='' onclick='return loadAjaxIn("mainSecDiv", <%=KUrls.User.Options %>);'>user options</a> | 
-					<a id='newQuery' title='new query' href='' onclick='return loadAjaxIn("mainSecDiv", <%=KUrls.Queries.SelectProgramFile %>);'>new query</a>
+					<a id='userOptions' title='user options' href='#' onclick="return loadAjaxIn('mainSecDiv', '<%=KUrls.User.Options.getUrl(true) %>');">user options</a> | 
+					<a id='newQuery' title='new query' href='#' onclick="return loadAjaxIn('mainSecDiv', '<%=KUrls.Queries.SelectProgramFile.getUrl(true) %>');">new query</a>
 			<%  } %>
 			</div>
 			<div id="bodyHeadLogout" class="bodyHeadTable">
