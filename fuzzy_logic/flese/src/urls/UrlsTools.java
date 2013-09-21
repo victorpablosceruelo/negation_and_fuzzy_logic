@@ -28,6 +28,12 @@ public class UrlsTools {
 		if (withServletPath) {
 			urlAux = PathsUtils.concatPathsStrings(urlAux, KConstants.servletName);
 		}
+		
+		// We do not want the url without the server info !!!
+		while (urlAux.startsWith("/")) {
+			urlAux = urlAux.substring(1);
+		}
+		
 		this.currentUrl = new StringBuilder();
 		this.currentUrl.append(urlAux);
 		isFirstParam = true;

@@ -85,7 +85,7 @@ public class UrlMap {
 	};
 
 	public String getUrl(boolean isAjax) {
-		return getUrl(false, true, isAjax, null);
+		return getUrl(false, false, isAjax, null);
 	}
 
 	public String getUrl(boolean withServerPath, boolean withAppPath, boolean isAjax, HttpServletRequest request) {
