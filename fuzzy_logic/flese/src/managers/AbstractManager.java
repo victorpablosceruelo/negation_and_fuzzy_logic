@@ -53,7 +53,7 @@ public abstract class AbstractManager implements InterfaceManager {
 		this.getResultsStoreHouse();
 
 		if (urlMap != null) {
-			op = urlMap.getOp();
+			op = urlMap.getOp(false);
 			if ((op != null) && (!"".equals(op))) {
 				method = getMethod(op);
 				invokeMethod(method);

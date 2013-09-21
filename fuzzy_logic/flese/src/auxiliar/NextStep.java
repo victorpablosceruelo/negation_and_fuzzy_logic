@@ -47,7 +47,7 @@ public class NextStep {
 
 		switch (this.action) {
 		case KConstants.NextStep.sendRedirect_to:
-			url = getUrl(false, true, isAjax, request);
+			url = getUrl(true, true, isAjax, request);
 			LOG.info("sendRedirect_to: " + url);
 			response.sendRedirect(url);
 			break;
@@ -78,6 +78,6 @@ public class NextStep {
 			return appended;
 		}
 
-		return url.getUrl(withServerPath, true, isAjax, request) + appended;
+		return url.getUrl(withServerPath, withAppPath, isAjax, request) + appended;
 	}
 }

@@ -101,13 +101,16 @@ public class AppUrl {
 			return;
 		}
 
+		String serverUrl = "";
 		boolean isHTTPS = requestUrl.startsWith(PrivateConstants.httpsPrefix);
 		boolean isHTTP = requestUrl.startsWith(PrivateConstants.httpPrefix);
 		if (isHTTP) {
 			requestUrl = requestUrl.substring(PrivateConstants.httpPrefix.length());
+			serverUrl += PrivateConstants.httpPrefix;
 		}
 		if (isHTTPS) {
 			requestUrl = requestUrl.substring(PrivateConstants.httpsPrefix.length());
+			serverUrl += PrivateConstants.httpsPrefix;
 		}
 
 		while (requestUrl.startsWith("/")) {
@@ -118,12 +121,12 @@ public class AppUrl {
 		// Remove the invalid ends.
 		requestUrl = removeInvalidTails(requestUrl);
 
-		String serverUrl = "";
+		
 		// Now remove the server name, but save it !!!
 		index = requestUrl.indexOf(serverName);
 		if (index > -1) {
 			index = index + serverName.length();
-			serverUrl = requestUrl.substring(0, index);
+			serverUrl += requestUrl.substring(0, index);
 			requestUrl = requestUrl.substring(index);
 		}
 

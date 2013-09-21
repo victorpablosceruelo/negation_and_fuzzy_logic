@@ -12,12 +12,12 @@ public class UrlsMaps {
 	private static boolean loaded = false;
 
 	private static String getManager(UrlMap urlMap) {
-		String manager = urlMap.getManager();
+		String manager = urlMap.getManager(true);
 		return manager;
 	}
 
 	private static String getOp(UrlMap urlMap) {
-		String op = urlMap.getOp();
+		String op = urlMap.getOp(true);
 		return op;
 	}
 

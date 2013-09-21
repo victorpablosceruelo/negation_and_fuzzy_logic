@@ -64,11 +64,23 @@ public class UrlMap {
 		return op;
 	}
 
-	public String getManager() {
+	public String getManager(boolean acceptDefaults) {
+		if (acceptDefaults) {
+			return this.manager;
+		}
+		if (Constants.defaultManager.equals(this.manager)) {
+			return "";
+		}
 		return this.manager;
 	};
 
-	public String getOp() {
+	public String getOp(boolean acceptDefaults) {
+		if (acceptDefaults) {
+			return this.op;
+		}
+		if (Constants.defaultOp.equals(this.op)) {
+			return "";
+		}
 		return this.op;
 	};
 
@@ -77,41 +89,37 @@ public class UrlMap {
 	}
 
 	public String getUrl(boolean withServerPath, boolean withAppPath, boolean isAjax, HttpServletRequest request) {
-		boolean withServletPath = ("".equals(this.currentUrl)); // If empty we need the servlet !!!
+		boolean withServletPath = ("".equals(this.currentUrl)); // If empty we
+																// need the
+																// servlet !!!
 		return getUrl(withServerPath, withAppPath, withServletPath, isAjax, null);
 	}
-	
+
 	public String getUrl(boolean withServerPath, boolean withAppPath, boolean withServletPath, boolean isAjax, HttpServletRequest request) {
 
 		UrlsTools urlTool = new UrlsTools(withServerPath, withAppPath, withServletPath, this.currentUrl, request);
 
-		urlTool.addParam(KConstants.Request.managerParam, managerNameToParam(this.manager));
-		urlTool.addParam(KConstants.Request.operationParam, operationNameToParam(this.op));
-		urlTool.addParam(KConstants.Request.isAjaxParam, isAjax ? KConstants.Values.True : KConstants.Values.False);
+		urlTool.addParam(KConstants.Request.managerParam, managerNameToParam());
+		urlTool.addParam(KConstants.Request.operationParam, operationNameToParam());
+		urlTool.addParam(KConstants.Request.isAjaxParam, isAjax ? KConstants.Values.True : "");
 
 		return urlTool.getResult();
 	};
 
-	private String managerNameToParam(String managerName) {
-		if ((managerName != null) && (!"".equals(managerName))) {
-			if (Constants.defaultManager.equals(managerName)) {
-				managerName = "";
-			} else {
-				if (managerName.endsWith(KConstants.Managers.managerSuffix)) {
-					int end = managerName.length() - KConstants.Managers.managerSuffix.length();
-					managerName = managerName.substring(0, end);
-				}
+	private String managerNameToParam() {
+		String managerName = getManager(false);
+		if (!"".equals(managerName)) {
+
+			if (managerName.endsWith(KConstants.Managers.managerSuffix)) {
+				int end = managerName.length() - KConstants.Managers.managerSuffix.length();
+				managerName = managerName.substring(0, end);
 			}
 		}
 		return managerName;
 	}
 
-	private String operationNameToParam(String opName) {
-		if ((opName != null) && (!"".equals(opName))) {
-			if (Constants.defaultOp.equals(opName)) {
-				opName = "";
-			}
-		}
+	private String operationNameToParam() {
+		String opName = getOp(false);
 		return opName;
 	}
 
