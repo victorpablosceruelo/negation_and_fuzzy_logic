@@ -1,3 +1,4 @@
+<%@page import="urls.AppUrl"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <jsp:include page="WEB-INF/commonHtmlHead.jsp" />
@@ -8,8 +9,8 @@
 </div>
 <br /><br />
 <div class="indexPageTitleExplanation">
-	<span class="underline">Fle</span>xible 
-	<span class="underline">Se</span>arches in Databases
+	<%= KConstants.Titles.FirstLine %> 
+	<%= KConstants.Titles.SecondLine %>
 </div>
 <br /><br />
 <div class='indexPageImportantLink'>
