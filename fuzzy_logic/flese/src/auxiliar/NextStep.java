@@ -20,18 +20,18 @@ public class NextStep {
 	final Log LOG = LogFactory.getLog(Servlet.class);
 
 	private int action = 0;
-	private UrlMap url = null;
+	private UrlMap urlMap = null;
 	private String appended = "";
 
-	public NextStep(int action, UrlMap url, String append) {
+	public NextStep(int action, UrlMap urlMap, String append) {
 		if ((action <= KConstants.NextStep.none) || (action >= KConstants.NextStep.invalidAction))
 			action = KConstants.NextStep.forward_to;
-		if ((url == null) && ((append == null) || ("".equals(append)))) {
+		if ((urlMap == null) && ((append == null) || ("".equals(append)))) {
 			// If we do not know where to go, exception page.
-			url = KUrls.Pages.Exception;
+			urlMap = KUrls.Pages.Exception;
 		}
 
-		this.url = url;
+		this.urlMap = urlMap;
 		this.action = action;
 		if (append != null)
 			this.appended = append;
@@ -74,10 +74,10 @@ public class NextStep {
 	}
 
 	public String getUrl(boolean withServerPath, boolean withAppPath, boolean isAjax, HttpServletRequest request) {
-		if (url == null) {
+		if (urlMap == null) {
 			return appended;
 		}
 
-		return url.getUrl(withServerPath, withAppPath, isAjax, request) + appended;
+		return urlMap.getUrl(withServerPath, withAppPath, isAjax, request) + appended;
 	}
 }

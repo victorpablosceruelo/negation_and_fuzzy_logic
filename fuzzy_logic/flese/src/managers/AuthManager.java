@@ -173,7 +173,7 @@ public class AuthManager extends AbstractManager {
 			if ("".equals(nextURL))
 				throw new Exception("nextURL is empty string.");
 
-			setNextStep(new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Pages.Empty, nextURL));
+			setNextStep(new NextStep(KConstants.NextStep.sendRedirect_to, null, nextURL));
 		}
 
 		// response.sendRedirect(nextURL);
