@@ -1,4 +1,4 @@
-<%@page import="urls.AppUrl"%>
+<%@page import="urls.ServerAndAppUrls"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <jsp:include page="WEB-INF/commonHtmlHead.jsp" />

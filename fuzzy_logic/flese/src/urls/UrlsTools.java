@@ -16,10 +16,10 @@ public class UrlsTools {
 		}
 		String urlAux;
 		if (withServerPath) {
-			urlAux = PathsUtils.concatPathsStrings(AppUrl.getAppFullUrl(request), url);
+			urlAux = PathsUtils.concatPathsStrings(ServerAndAppUrls.getAppFullUrl(request), url);
 		} else {
 			if (withAppPath) {
-				urlAux = PathsUtils.concatPathsStrings(AppUrl.getAppUrl(request), url);
+				urlAux = PathsUtils.concatPathsStrings(ServerAndAppUrls.getAppUrl(request), url);
 			}
 			else {
 				urlAux = url;

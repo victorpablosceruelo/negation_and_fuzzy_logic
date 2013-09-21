@@ -2,7 +2,10 @@ package urls;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class AppUrl {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class ServerAndAppUrls {
 
 	private static final class PrivateConstants {
 		public static final String httpsPrefix = "https://";
@@ -17,6 +20,8 @@ public class AppUrl {
 	}
 
 	private static class ServerAndAppUrlsMaintenance {
+		static final Log LOG = LogFactory.getLog(ServerAndAppUrlsMaintenance.class);
+
 		private static class hiddenVariables {
 			private static String serverUrl = "";
 			private static String appUrl = "";
@@ -27,6 +32,7 @@ public class AppUrl {
 		}
 
 		public static void setServerUrl(String url) {
+			LOG.info("setServerUrl: " + url);
 			getOrSetServerUrl(url);
 		}
 
@@ -35,6 +41,7 @@ public class AppUrl {
 		}
 
 		public static void setAppUrl(String url) {
+			LOG.info("setAppUrl: " + url);
 			getOrSetAppUrl(url);
 		}
 
@@ -121,7 +128,6 @@ public class AppUrl {
 		// Remove the invalid ends.
 		requestUrl = removeInvalidTails(requestUrl);
 
-		
 		// Now remove the server name, but save it !!!
 		index = requestUrl.indexOf(serverName);
 		if (index > -1) {
