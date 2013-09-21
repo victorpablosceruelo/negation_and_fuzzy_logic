@@ -5,9 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AppUrl {
 
 	private static final class PrivateConstants {
-		public static final String appSubPath = "/flese/";
-		public static final String appSubPathInTest = "/fleseTest/";
-
 		public static final String httpsPrefix = "https://";
 		public static final String httpPrefix = "http://";
 
