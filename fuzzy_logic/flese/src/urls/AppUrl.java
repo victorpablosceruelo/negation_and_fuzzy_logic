@@ -4,105 +4,165 @@ import javax.servlet.http.HttpServletRequest;
 
 public class AppUrl {
 
-	private static String appUrl = null;
-	private static String appPath = null;
-	private static String httpsPrefix = "https://";
-	private static String httpPrefix = "http://";
-
 	private static final class PrivateConstants {
-		public static final String appPath = "/flese/";
-		public static final String appPathInTest = "/fleseTest/";
+		public static final String appSubPath = "/flese/";
+		public static final String appSubPathInTest = "/fleseTest/";
+
+		public static final String httpsPrefix = "https://";
+		public static final String httpPrefix = "http://";
+
+		/**
+		 * This are the invalid ends for the serverUrl computed. Be carefull:
+		 * removal order matters.
+		 */
+		public static final String[] invalidTailsStarts = { "?", "index.jsp", "WEB-INF", "servlets", "images", "js_and_css" };
+
 	}
 
-	public static String getAppUrl(String requestUrl, String serverName) {
-		if ((appUrl == null) || ("".equals(appUrl))) {
-			computeAppUrl(requestUrl, serverName);
+	private static class ServerAndAppUrlsMaintenance {
+		private static class hiddenVariables {
+			private static String serverUrl = "";
+			private static String appUrl = "";
 		}
 
-		if (appUrl == null)
-			appUrl = ""; // Better an empty stream than a null pointer !!!
-		return appUrl;
-	}
+		public static String getServerUrl() {
+			return getOrSetServerUrl(null);
+		}
 
-	private static synchronized void computeAppUrl(String requestUrl, String serverName) {
-		if ((appUrl == null) || ("".equals(appUrl))) {
-			// String requestUrl = request.getRequestURL().toString();
-			// String queryString = request.getQueryString(); // d=789
-			// String serverName = request.getServerName()
+		public static void setServerUrl(String url) {
+			getOrSetServerUrl(url);
+		}
 
-			if (requestUrl != null) {
-				// appPath = http://.../page
-				Integer index = requestUrl.lastIndexOf(getAppPath(requestUrl));
-				appUrl = requestUrl.substring(0, index);
+		public static String getAppUrl() {
+			return getOrSetAppUrl(null);
+		}
+
+		public static void setAppUrl(String url) {
+			getOrSetAppUrl(url);
+		}
+
+		private static synchronized String getOrSetServerUrl(String url) {
+			if (url != null) {
+				hiddenVariables.serverUrl = url;
 			}
+			return hiddenVariables.serverUrl;
+		}
 
-			if ((serverName == null) || (!("localhost".equals(serverName)))) {
-				if (!appUrl.startsWith(httpsPrefix)) {
-					if (appUrl.startsWith(httpPrefix)) {
-						appUrl = appUrl.substring(httpPrefix.length());
-					}
-
-					while (appUrl.startsWith("/")) {
-						appUrl = appUrl.substring(1);
-					}
-
-					appUrl = httpsPrefix + appUrl;
-				}
+		private static synchronized String getOrSetAppUrl(String url) {
+			if (url != null) {
+				hiddenVariables.appUrl = url;
 			}
+			return hiddenVariables.appUrl;
 		}
+
 	}
 
-	public static String getAppPath() {
-		if (appPath == null) {
-			return PrivateConstants.appPath;
-		}
-		return appPath;
+	public static String getAppUrl() {
+		return getAppUrl(null);
 	}
 
-	public static String getAppPath(HttpServletRequest request) {
-		if (appPath == null) {
-			computeAppPath(request);
+	public static String getAppUrl(HttpServletRequest request) {
+		if ("".equals(ServerAndAppUrlsMaintenance.getAppUrl())) {
+			computeAppAndServerUrls(request);
 		}
-		return getAppPath();
-	}
-	
-	public static String getAppPath(String requestUrl) {
-		if (appPath == null) {
-			computeAppPath(requestUrl);
-		}
-		return getAppPath();
+
+		return ServerAndAppUrlsMaintenance.getAppUrl();
 	}
 
-	private static synchronized void computeAppPath(HttpServletRequest request) {
+	public static String getAppFullUrl() {
+		return getAppUrl(null);
+	}
+
+	public static String getAppFullUrl(HttpServletRequest request) {
+		String appUrl = getAppUrl(request);
+		String serverUrl = ServerAndAppUrlsMaintenance.getServerUrl();
+
+		return ("".equals(appUrl)) ? "" : serverUrl + appUrl;
+	}
+
+	private static void computeAppAndServerUrls(HttpServletRequest request) {
+
+		if (!"".equals(ServerAndAppUrlsMaintenance.getAppUrl())) {
+			return;
+		}
+
+		if (!"".equals(ServerAndAppUrlsMaintenance.getServerUrl())) {
+			return;
+		}
+
 		if (request == null) {
 			return;
 		}
-		StringBuffer requestUrlSB = request.getRequestURL();
-		if (requestUrlSB == null) {
-			return;
-		}
-		
-		String requestUrl = requestUrlSB.toString();
-		computeAppPath(requestUrl);
-	}
-	
-	private static synchronized void computeAppPath(String requestUrl) {
-		if (appPath != null) {
-			return;
-		}
-		
-		if ((requestUrl == null) || "".equals(requestUrl)) {
+
+		String serverName = request.getServerName();
+		if ((serverName == null) || ("".equals(serverName))) {
 			return;
 		}
 
-		if (requestUrl.contains(PrivateConstants.appPath)) {
-			appPath = PrivateConstants.appPath;
+		String requestUrl = request.getRequestURL().toString();
+		if ((requestUrl == null) || ("".equals(requestUrl))) {
 			return;
 		}
-		if (requestUrl.contains(PrivateConstants.appPathInTest)) {
-			appPath = PrivateConstants.appPathInTest;
-			return;
+
+		boolean isHTTPS = requestUrl.startsWith(PrivateConstants.httpsPrefix);
+		boolean isHTTP = requestUrl.startsWith(PrivateConstants.httpPrefix);
+		if (isHTTP) {
+			requestUrl = requestUrl.substring(PrivateConstants.httpPrefix.length());
 		}
+		if (isHTTPS) {
+			requestUrl = requestUrl.substring(PrivateConstants.httpsPrefix.length());
+		}
+
+		while (requestUrl.startsWith("/")) {
+			requestUrl = requestUrl.substring(1);
+		}
+
+		int index = 0;
+		// Remove the invalid ends.
+		requestUrl = removeInvalidTails(requestUrl);
+
+		String serverUrl = "";
+		// Now remove the server name, but save it !!!
+		index = requestUrl.indexOf(serverName);
+		if (index > -1) {
+			index = index + serverName.length();
+			serverUrl = requestUrl.substring(0, index);
+			requestUrl = requestUrl.substring(index);
+		}
+
+		// We consider the server port as part of the server name.
+		index = requestUrl.indexOf(':');
+		if (index > -1) {
+			index = requestUrl.indexOf('/');
+			if (index > -1) {
+				serverUrl += requestUrl.substring(0, index);
+				requestUrl = requestUrl.substring(index);
+			}
+		}
+
+		ServerAndAppUrlsMaintenance.setServerUrl(serverUrl);
+		ServerAndAppUrlsMaintenance.setAppUrl(requestUrl);
+
 	}
 
+	/**
+	 * Looks for the invalid ends defined in invalidEnds and removes the tail of
+	 * the string, including the invalid end.
+	 * 
+	 * @param url
+	 *            is the input string.
+	 * @return the url without the invalid ends.
+	 */
+	private static String removeInvalidTails(String url) {
+		int index = -1;
+		String invalidEnd = null;
+		for (int i = 0; i < PrivateConstants.invalidTailsStarts.length; i++) {
+			invalidEnd = PrivateConstants.invalidTailsStarts[i];
+			index = url.indexOf(invalidEnd);
+			if (index > -1) {
+				url = url.substring(0, index);
+			}
+		}
+		return url;
+	}
 }

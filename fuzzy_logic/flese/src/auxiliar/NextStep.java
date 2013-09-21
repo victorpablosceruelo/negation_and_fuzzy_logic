@@ -84,11 +84,8 @@ public class NextStep {
 			throw new NextStepException("request is null.");
 		if (response == null)
 			throw new NextStepException("response is null.");
-		
-		String requestUrl = request.getRequestURL().toString();
-		String serverName = request.getServerName();
-		
-		String appUrl = AppUrl.getAppUrl(requestUrl, serverName);
+				
+		String appUrl = AppUrl.getAppUrl(request);
 		return appUrl + getUrl(isAjax);
 	}
 	

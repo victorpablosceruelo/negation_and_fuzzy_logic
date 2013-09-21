@@ -4,25 +4,21 @@ import filesAndPaths.PathsUtils;
 
 public class UrlsTools {
 
-	private boolean hasParams;
-	private StringBuilder url;
+	private boolean isFirstParam = true;
+	private StringBuilder currentUrl = null;
 
 	public UrlsTools(boolean withSubPath, String url) {
 		if (url == null)
 			url = "";
-		this.url = new StringBuilder();
 		String path;
 		if (withSubPath) {
-			if (!url.startsWith(AppUrl.getAppPath())) {
-				path = PathsUtils.concatPathsStrings(AppUrl.getAppPath(), url);
-			} else {
-				path = url;
-			}
+			path = PathsUtils.concatPathsStrings(AppUrl.getAppUrl(), url);
 		} else {
 			path = url;
 		}
-		this.url.append(path);
-		hasParams = false;
+		this.currentUrl = new StringBuilder();
+		this.currentUrl.append(path);
+		isFirstParam = true;
 	}
 
 	public void addParam(String paramName, String paramValue) {
@@ -31,16 +27,16 @@ public class UrlsTools {
 		if ((paramValue == null) || ("".equals(paramValue)))
 			return;
 
-		if (!this.hasParams) {
-			this.hasParams = true;
-			this.url.append("?");
+		if (this.isFirstParam) {
+			this.isFirstParam = false;
+			this.currentUrl.append("?");
 		} else {
-			this.url.append("&");
+			this.currentUrl.append("&");
 		}
-		this.url.append(paramName + "=" + paramValue);
+		this.currentUrl.append(paramName + "=" + paramValue);
 	}
 
 	public String getResult() {
-		return this.url.toString();
+		return this.currentUrl.toString();
 	}
 }

@@ -3,7 +3,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 	// This sets the app path for all the application.
-	AppUrl.getAppPath(request);
+	AppUrl.getAppUrl(request);
 %>
 
 <!DOCTYPE html>
