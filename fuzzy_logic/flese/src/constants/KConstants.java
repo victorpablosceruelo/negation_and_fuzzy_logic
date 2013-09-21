@@ -137,6 +137,7 @@ public class KConstants {
 	}
 
 	public static class JspsDivsIds {
+		public static final String mainSecDivId = "mainSecDiv";
 		public static final String queryStartContainerId = "queryStartContainer";
 		public static final String selectQueryDivId = "selectQueryDiv";
 		public static final String runQueryDivId = "runQueryDiv";

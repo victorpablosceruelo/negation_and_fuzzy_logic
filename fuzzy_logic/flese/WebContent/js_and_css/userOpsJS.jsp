@@ -38,10 +38,6 @@ function addToUserInformation(index, fieldName, fieldValue) {
 function insertUserOptions(parentDivId) {
 	var parentDiv = document.getElementById(parentDivId);
 	
-	parentDiv.innerHTML = loadingImageHtml(true);
-	
-	$.getScript(urlMappingFor('UserOptionsRequest'), 
-			function(data, textStatus, jqxhr) {
 	   			parentDiv.innerHTML = "";
 	   			
 	   			var userInformationDiv = document.getElementById("userInformationDiv");
@@ -88,7 +84,6 @@ function insertUserOptions(parentDivId) {
 	   			
 	   			insertFilesList(parentDivId);
 	   			insertFileUploadFacility(parentDivId);
-			});
 	
 	return false;
 }

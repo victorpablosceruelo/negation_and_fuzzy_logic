@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
+import storeHouse.SessionStoreHouse;
 import constants.KConstants;
 
 public class JspsUtils {
@@ -22,6 +23,17 @@ public class JspsUtils {
 			localUserInfoName = "";
 		}
 		return localUserInfoName;
+	}
+	
+	public static SessionStoreHouse getSessionStoreHouse(HttpServletRequest request) {
+		SessionStoreHouse sessionStoreHouse = null;
+		try {
+			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
+			sessionStoreHouse = requestStoreHouse.getSession();
+		} catch (Exception e) {
+			sessionStoreHouse = null;
+		}
+		return sessionStoreHouse;
 	}
 
 	public static ResultsStoreHouse getResultsStoreHouse(HttpServletRequest request) {

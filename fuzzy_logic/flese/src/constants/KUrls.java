@@ -25,7 +25,7 @@ public class KUrls {
 	public static class User {
 		public static String manager = "UserManager";
 
-		public static final UrlMap OptionsPage = new UrlMap(manager, "optionsPage", null, null, "WEB-INF/userOptions.jsp");
+		public static final UrlMap OptionsPage = new UrlMap(manager, "optionsPage", null, null, "WEB-INF/user/userOptions.jsp");
 		public static final UrlMap Options = new UrlMap(manager, "options", OptionsPage, KUrls.Pages.Exception, "");
 	}
 

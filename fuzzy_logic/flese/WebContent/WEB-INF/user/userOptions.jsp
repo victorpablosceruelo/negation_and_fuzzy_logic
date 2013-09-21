@@ -1,11 +1,16 @@
+<%@page import="constants.KConstants"%>
+<%@page import="storeHouse.SessionStoreHouse"%>
+<%@page import="auxiliar.JspsUtils"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="org.brickred.socialauth.Profile"%>
 <%@page import="org.brickred.socialauth.Contact"%>
 <%@page import="org.brickred.socialauth.AuthProvider"%>
 
+<script type="text/javascript">
 <%
-	AuthProvider provider = (AuthProvider) session.getAttribute("provider");
+	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(request);
+	AuthProvider provider = sessionStoreHouse.getAuthProvider();
 	Profile profile = null;
 	if (provider != null) profile = provider.getUserProfile();
 
@@ -57,3 +62,5 @@
 	}
 	*/
 %>
+	insertUserOptions('<%= KConstants.JspsDivsIds.mainSecDivId %>');
+</script>
