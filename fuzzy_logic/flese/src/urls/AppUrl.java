@@ -15,9 +15,12 @@ public class AppUrl {
 			// String serverName = request.getServerName()
 
 			if (requestUrl != null) {
-				Integer index = requestUrl.lastIndexOf(KConstants.appPath); // http://
-																			// ...
-																			// /page
+				// appPath = http://.../page
+				Integer index = requestUrl.lastIndexOf(KConstants.appPath);
+				// Just in case we are still in testing.
+				if (index == -1) {
+					index = requestUrl.lastIndexOf(KConstants.appPathInTest);
+				}
 				appUrl = requestUrl.substring(0, index);
 			}
 

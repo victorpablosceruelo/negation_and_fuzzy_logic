@@ -3,6 +3,7 @@ package constants;
 public class KConstants {
 
 	public static final String appPath = "/flese/";
+	public static final String appPathInTest = "/fleseTest/";
 	public static final String servletName = "/Servlet";
 
 	public static final class Managers {
