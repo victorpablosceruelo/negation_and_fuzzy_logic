@@ -1,5 +1,7 @@
 package urls;
 
+import javax.servlet.http.HttpServletRequest;
+
 import storeHouse.RequestStoreHouse;
 import constants.KConstants;
 
@@ -71,20 +73,17 @@ public class UrlMap {
 	};
 
 	public String getUrl(boolean isAjax) {
-		return getUrl(true, isAjax);
+		return getUrl(false, true, isAjax, null);
 	}
 
-	public String getUrl(boolean prependSubPath, boolean isAjax) {
+	public String getUrl(boolean withServerPath, boolean withAppPath, boolean isAjax, HttpServletRequest request) {
+		boolean withServletPath = ("".equals(this.currentUrl)); // If empty we need the servlet !!!
+		return getUrl(withServerPath, withAppPath, withServletPath, isAjax, null);
+	}
+	
+	public String getUrl(boolean withServerPath, boolean withAppPath, boolean withServletPath, boolean isAjax, HttpServletRequest request) {
 
-		String url = null;
-
-		// If there is no current url, take the main servlet as the url.
-		if ((this.currentUrl == null) || ("".equals(this.currentUrl))) {
-			url = KConstants.servletName;
-		} else {
-			url = this.currentUrl;
-		}
-		UrlsTools urlTool = new UrlsTools(prependSubPath, url);
+		UrlsTools urlTool = new UrlsTools(withServerPath, withAppPath, withServletPath, this.currentUrl, request);
 
 		urlTool.addParam(KConstants.Request.managerParam, managerNameToParam(this.manager));
 		urlTool.addParam(KConstants.Request.operationParam, operationNameToParam(this.op));
@@ -109,7 +108,7 @@ public class UrlMap {
 
 	private String operationNameToParam(String opName) {
 		if ((opName != null) && (!"".equals(opName))) {
-			if (Constants.defaultManager.equals(opName)) {
+			if (Constants.defaultOp.equals(opName)) {
 				opName = "";
 			}
 		}

@@ -1,5 +1,8 @@
 package urls;
 
+import javax.servlet.http.HttpServletRequest;
+
+import constants.KConstants;
 import filesAndPaths.PathsUtils;
 
 public class UrlsTools {
@@ -7,17 +10,26 @@ public class UrlsTools {
 	private boolean isFirstParam = true;
 	private StringBuilder currentUrl = null;
 
-	public UrlsTools(boolean withSubPath, String url) {
-		if (url == null)
+	public UrlsTools(boolean withServerPath, boolean withAppPath, boolean withServletPath, String url, HttpServletRequest request) {
+		if (url == null) {
 			url = "";
-		String path;
-		if (withSubPath) {
-			path = PathsUtils.concatPathsStrings(AppUrl.getAppUrl(), url);
+		}
+		String urlAux;
+		if (withServerPath) {
+			urlAux = PathsUtils.concatPathsStrings(AppUrl.getAppFullUrl(request), url);
 		} else {
-			path = url;
+			if (withAppPath) {
+				urlAux = PathsUtils.concatPathsStrings(AppUrl.getAppUrl(request), url);
+			}
+			else {
+				urlAux = url;
+			}
+		}
+		if (withServletPath) {
+			urlAux = PathsUtils.concatPathsStrings(urlAux, KConstants.servletName);
 		}
 		this.currentUrl = new StringBuilder();
-		this.currentUrl.append(path);
+		this.currentUrl.append(urlAux);
 		isFirstParam = true;
 	}
 

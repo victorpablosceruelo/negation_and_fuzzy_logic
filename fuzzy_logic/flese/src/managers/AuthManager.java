@@ -117,7 +117,7 @@ public class AuthManager extends AbstractManager {
 
 		// URL of YOUR application which will be called after authentication
 		NextStep nextStep = new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
-		String nextURL = nextStep.getFullUrl(requestStoreHouse.getRequest(), requestStoreHouse.getResponse(), false);
+		String nextURL = nextStep.getUrl(true, false, requestStoreHouse.getRequest());
 
 		// Test if we have signed in before and the session contains the info.
 		// In that case we by-pass signIn and go directly to authentication.
