@@ -134,7 +134,7 @@ public class AuthManager extends AbstractManager {
 
 		// Returns the host name of the server to which the request was sent.
 		String serverName = requestStoreHouse.getRequest().getServerName();
-		if ((serverName != null) && ("localhost".equals(serverName))) {
+		if ((serverName != null) && (("localhost".equals(serverName)) || KConstants.inTestMode)) {
 			requestStoreHouse.getSession().setAppInTestingMode(true);
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);

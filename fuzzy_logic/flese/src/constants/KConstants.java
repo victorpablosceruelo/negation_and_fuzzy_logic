@@ -3,6 +3,7 @@ package constants;
 public class KConstants {
 
 	public static final String servletName = "/Servlet";
+	public static boolean inTestMode = true;
 
 	public static final class Titles {
 		public static final String FirstLine = "<span class='underline'>Fle</span>xible";
