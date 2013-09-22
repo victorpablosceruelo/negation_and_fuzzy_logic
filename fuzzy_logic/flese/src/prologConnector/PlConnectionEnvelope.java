@@ -7,12 +7,9 @@ import org.apache.commons.logging.LogFactory;
 
 import CiaoJava.PLConnection;
 import CiaoJava.PLException;
-import CiaoJava.PLGoal;
-import CiaoJava.PLTerm;
-import CiaoJava.PLVariable;
 import constants.KConstants;
-import filesAndPaths.PathsMgmt;
 import filesAndPaths.FilesAndPathsException;
+import filesAndPaths.PathsMgmt;
 
 public class PlConnectionEnvelope {
 
@@ -20,8 +17,14 @@ public class PlConnectionEnvelope {
 
 	private int connectionId = 0;
 	private PLConnection plConnection = null;
-	private boolean isAvailable = false;
+	private boolean isReserved = true;
 	PathsMgmt pathsMgmt = null;
+
+	private static class Constants {
+		public static int query = 0;
+		public static int reserve = 1;
+		public static int free = 2;
+	}
 
 	public PlConnectionEnvelope(int connectionId) throws PlConnectionEnvelopeException, FilesAndPathsException {
 		if (connectionId < 0) {
@@ -31,153 +34,10 @@ public class PlConnectionEnvelope {
 			throw new PlConnectionEnvelopeException("connectionId cannot be >= " + KConstants.PlConnectionsPool.maxNumOfConnections);
 		}
 
-		this.isAvailable = false;
+		this.isReserved = false;
 		this.connectionId = connectionId;
 		this.pathsMgmt = new PathsMgmt();
-
-		createPlConnection();
-		this.isAvailable = true;
-	}
-
-	synchronized public boolean testAndSet(boolean setAvailableTo) {
-		if (this.isAvailable) {
-			if (!setAvailableTo) {
-				// Capture it
-				this.isAvailable = setAvailableTo;
-				return true;
-			} else {
-				// Re-free it (stupid but valid).
-				this.isAvailable = setAvailableTo;
-				return true;
-			}
-		} else {
-			if (setAvailableTo) {
-				// Free it
-				this.isAvailable = setAvailableTo;
-				return true;
-			} else {
-				// Impossible to re-capture it (it is in use).
-			}
-		}
-		return false;
-	}
-
-	public int getConnectionId() {
-		return this.connectionId;
-	}
-
-	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
-			FilesAndPathsException {
-
-		if (plConnection == null) {
-			createPlConnection();
-		}
-
-		changeCiaoPrologWorkingFolder(query);
-		runPrologQueryAux(query);
-
-		if (plConnection != null) {
-			try {
-				plConnection.stop();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		plConnection = null;
-		testAndSet(true);
-	}
-
-	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologConnectorException, FilesAndPathsException,
-			PlConnectionEnvelopeException {
-
-		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
-		runPrologQueryAux(folderChangeQuery);
-	}
-
-	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
-		LOG.info(query.getQuery().toString());
-		if (this.isAvailable) {
-			throw new PlConnectionEnvelopeException("ERROR: connection is available.");
-		}
-		if (this.plConnection == null)
-			throw new PlConnectionEnvelopeException("ERROR: plConnection is null.");
-
-		PLGoal evaluatedGoal = evaluateGoal(query);
-		long answersCounter = 0;
-
-		LOG.info("performQueryAux: getting answers ... ");
-		PLTerm prologQueryAnswer;
-		long timesCounter;
-		boolean queryIsStillRunning = true;
-
-		String msgsAccumulator = "";
-		do { // Get all the answers you can.
-			prologQueryAnswer = null;
-			timesCounter = 0;
-			// Save the current answer.
-			answersCounter++;
-			msgsAccumulator += "getting answer number: " + answersCounter + "\n";
-			// LOG.info(msgsAccumulator);
-			// msgsAccumulator = "";
-
-			do { // Get the current answer.
-				prologQueryAnswer = getNextSolution(evaluatedGoal);
-				queryIsStillRunning = getQueryIsStillRunning(evaluatedGoal);
-				timesCounter++;
-
-			} while ((prologQueryAnswer == null) && queryIsStillRunning
-					&& (timesCounter < KConstants.CiaoPrologQuery.maximumNumberOfRetries));
-
-			if (timesCounter >= KConstants.CiaoPrologQuery.maximumNumberOfRetries) {
-				LOG.info("performQueryAux: reached maxNumberOfTries: " + timesCounter + " >= "
-						+ KConstants.CiaoPrologQuery.maximumNumberOfRetries);
-			}
-
-			msgsAccumulator += "goal: " + evaluatedGoal.toString() + "\n";
-			if (prologQueryAnswer != null) {
-				CiaoPrologQueryAnswer ciaoPrologQueryAnswer = new CiaoPrologQueryAnswer();
-				int variablesLength = query.getVariablesLength();
-				for (int i = 0; i < variablesLength; i++) {
-					msgsAccumulator += "      var[" + i + "]: ";
-
-					PLVariable variable = query.getVariables()[i];
-					String variableName = query.getVariablesNames()[i];
-					CiaoPrologTermInJava ciaoPrologTermInJava = null;
-
-					if (variable != null) {
-						msgsAccumulator += (variable.toString() + " bind: " + variable.getBinding());
-						ciaoPrologTermInJava = new CiaoPrologTermInJava(variable, prologQueryAnswer);
-						msgsAccumulator += " -> " + ciaoPrologTermInJava.toString() + " \n";
-					} else {
-						ciaoPrologTermInJava = null;
-						msgsAccumulator += "null -> null \n";
-					}
-
-					ciaoPrologQueryAnswer.addCiaoPrologVariableAnswer(variableName, ciaoPrologTermInJava);
-				}
-				query.addQueryAnswer(ciaoPrologQueryAnswer);
-				// LOG.info(msgsAccumulator);
-			} else {
-				// LOG.info("performQueryAux: answer obtained: null ");
-				msgsAccumulator += "answer obtained: null \n";
-			}
-
-		} while ((prologQueryAnswer != null) && (answersCounter < KConstants.CiaoPrologQuery.maximumNumberOfAnswers));
-
-		LOG.info(msgsAccumulator);
-		// LOG.info("performQueryAux: terminating goal execution ...");
-		if (evaluatedGoal != null) {
-			try {
-				evaluatedGoal.terminate();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			evaluatedGoal = null;
-			answersCounter = -1; // Notify that there is no currentGoal.
-		}
-
-		// LOG.info("performQueryAux: end.");
-
+		this.plConnection = null;
 	}
 
 	private void createPlConnection() throws PlConnectionEnvelopeException, FilesAndPathsException {
@@ -188,60 +48,112 @@ public class PlConnectionEnvelope {
 			this.plConnection = new PLConnection(argv);
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("IOException");
+			throw new PlConnectionEnvelopeException("IOException: " + e.getMessage());
 		} catch (PLException e) {
 			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("PLException");
+			throw new PlConnectionEnvelopeException("PLException: " + e.getMessage());
 		}
 	}
 
-	private PLGoal evaluateGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
-		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
-		PLGoal evaluatedGoal = new PLGoal(this.plConnection, query.getQuery());
-		String programFileName = null;
-
-		programFileName = query.getProgramFileInfo().getFileName();
-
-		LOG.info("runQuery: changing programFile to: " + programFileName + ".");
-		try {
-			evaluatedGoal.useModule(programFileName);
-			evaluatedGoal.query();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("IOException");
-		} catch (PLException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("PLException");
+	private void destroyPlConnection() throws PlConnectionEnvelopeException {
+		if (this.plConnection != null) {
+			try {
+				this.plConnection.stop();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new PlConnectionEnvelopeException("InterruptedException: " + e.getMessage());
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new PlConnectionEnvelopeException("IOException: " + e.getMessage());
+			} catch (PLException e) {
+				e.printStackTrace();
+				throw new PlConnectionEnvelopeException("PLException: " + e.getMessage());
+			}
 		}
-		return evaluatedGoal;
 	}
 
-	private PLTerm getNextSolution(PLGoal evaluatedGoal) throws PlConnectionEnvelopeException {
-		PLTerm prologQueryAnswer = null;
-		try {
-			prologQueryAnswer = evaluatedGoal.nextSolution();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("IOException");
-		} catch (PLException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("PLException");
-		}
-		return prologQueryAnswer;
+	public boolean reservate() {
+		return testOrSetStatus(Constants.reserve);
 	}
 
-	private boolean getQueryIsStillRunning(PLGoal evaluatedGoal) throws PlConnectionEnvelopeException {
-		boolean queryIsStillRunning = false;
-		try {
-			queryIsStillRunning = evaluatedGoal.isStillRunning();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("IOException");
-		} catch (PLException e) {
-			e.printStackTrace();
-			throw new PlConnectionEnvelopeException("PLException");
+	public boolean free(boolean destroyConnection) {
+		if (testOrSetStatus(Constants.query)) {
+			if (destroyConnection) {
+				try {
+					destroyPlConnection();
+				} catch (PlConnectionEnvelopeException e) {
+					e.printStackTrace();
+				}
+				this.plConnection = null;
+			}
 		}
-		return queryIsStillRunning;
+		return testOrSetStatus(Constants.free);
+	}
+
+	synchronized private boolean testOrSetStatus(int action) {
+		if (Constants.query == action) {
+			return this.isReserved;
+		}
+		if (Constants.reserve == action) {
+			if (!this.isReserved) {
+				// Capture it
+				this.isReserved = true;
+				// LOG.info("connection " + getConnectionId() +
+				// " has been reserved.");
+				return true;
+			}
+		}
+		if (Constants.free == action) {
+			if (this.isReserved) {
+				// Free it
+				this.isReserved = false;
+				// LOG.info("connection " + getConnectionId() +
+				// " has been freed.");
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int getConnectionId() {
+		return this.connectionId;
+	}
+
+	public PLConnection getPlConnection() throws PlConnectionEnvelopeException, FilesAndPathsException {
+		if (!testOrSetStatus(Constants.query)) {
+			return null;
+		}
+
+		if (this.plConnection == null) {
+			LOG.info("Creating connection for envelope with id: " + getConnectionId());
+			createPlConnection();
+		}
+		return this.plConnection;
+	}
+
+	public void reinitializeConnection() {
+		if (!testOrSetStatus(Constants.query)) {
+			return;
+		}
+
+		try {
+			destroyPlConnection();
+		} catch (PlConnectionEnvelopeException e) {
+			e.printStackTrace();
+		}
+
+		this.plConnection = null;
+
+		try {
+			createPlConnection();
+		} catch (PlConnectionEnvelopeException e) {
+			e.printStackTrace();
+			this.plConnection = null;
+		} catch (FilesAndPathsException e) {
+			e.printStackTrace();
+			this.plConnection = null;
+		}
+
 	}
 
 }
