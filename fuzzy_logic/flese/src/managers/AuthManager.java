@@ -116,7 +116,7 @@ public class AuthManager extends AbstractManager {
 	public void signIn() throws Exception {
 
 		// URL of YOUR application which will be called after authentication
-		NextStep nextStep = new NextStep(KConstants.NextStep.sendRedirect_to, KUrls.Auth.SocialAuthCallback, "");
+		NextStep nextStep = new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SocialAuthCallback, "");
 		String nextURL = nextStep.getUrl(true, true, false, requestStoreHouse.getRequest());
 
 		// Test if we have signed in before and the session contains the info.
@@ -134,7 +134,7 @@ public class AuthManager extends AbstractManager {
 
 		// Returns the host name of the server to which the request was sent.
 		String serverName = requestStoreHouse.getRequest().getServerName();
-		if ((serverName != null) && (("localhost".equals(serverName)) || KConstants.inTestMode)) {
+		if ((serverName != null) && (("localhost".equals(serverName)) || KConstants.Application.inTestMode)) {
 			requestStoreHouse.getSession().setAppInTestingMode(true);
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
@@ -173,7 +173,7 @@ public class AuthManager extends AbstractManager {
 			if ("".equals(nextURL))
 				throw new Exception("nextURL is empty string.");
 
-			setNextStep(new NextStep(KConstants.NextStep.sendRedirect_to, null, nextURL));
+			setNextStep(new NextStep(KConstants.NextStep.redirect_to, null, nextURL));
 		}
 
 		// response.sendRedirect(nextURL);

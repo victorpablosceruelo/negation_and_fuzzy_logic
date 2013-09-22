@@ -125,6 +125,8 @@ public abstract class AbstractManager implements InterfaceManager {
 			LogAbstractManager.info("Invoke byDefaultMethod ");
 			byDefaultMethod();
 		} catch (Exception e) {
+			NextStep onExceptionNextStep = getExceptionPage();
+			setNextStep(onExceptionNextStep);
 			e.printStackTrace();
 		}
 	}

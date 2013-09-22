@@ -46,11 +46,6 @@ public class NextStep {
 		String url = null;
 
 		switch (this.action) {
-		case KConstants.NextStep.sendRedirect_to:
-			url = getUrl(true, true, isAjax, request);
-			LOG.info("sendRedirect_to: " + url);
-			response.sendRedirect(url);
-			break;
 		case KConstants.NextStep.forward_to:
 			url = getUrl(false, false, isAjax, request);
 			LOG.info("forward_to: " + url);

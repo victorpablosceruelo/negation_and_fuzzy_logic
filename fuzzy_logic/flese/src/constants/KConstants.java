@@ -2,14 +2,18 @@ package constants;
 
 public class KConstants {
 
-	public static final String servletName = "/Servlet";
-	public static boolean inTestMode = true;
+	public static final class Application {
+		public static final String servletName = "/Servlet";
+		public static boolean inTestMode = true;
+		public static final String httpsPrefix = "https://";
+		public static final String httpPrefix = "http://";
+	}
 
 	public static final class Titles {
 		public static final String FirstLine = "<span class='underline'>Fle</span>xible";
 		public static final String SecondLine = "<span class='underline'>Se</span>arches in Databases";
 	}
-	
+
 	public static final class Managers {
 		public static final String managersPackage = "managers";
 		public static final String managerSuffix = "Manager";
@@ -23,7 +27,7 @@ public class KConstants {
 	public static class Request {
 		// Objects stored in the request.
 		public static final String resultsStoreHouse = "resultsStoreHouse";
-		
+
 		// General parameters
 		public static final String managerParam = "manager";
 		public static final String operationParam = "op";
@@ -92,8 +96,7 @@ public class KConstants {
 		public static final int forward_to = 1;
 		public static final int redirect_to = 2;
 		public static final int redirect_to_with_session = 3;
-		public static final int sendRedirect_to = 4;
-		public static final int invalidAction = 5;
+		public static final int invalidAction = 4;
 	}
 
 	public static class Fuzzifications {
@@ -112,7 +115,7 @@ public class KConstants {
 	public static class PrologTypes {
 		public static final String rfuzzy_any_type = "rfuzzy_any_type";
 		public static final String rfuzzy_truth_value_type = "rfuzzy_truth_value_type";
-		
+
 		public static final String rfuzzy_enum_type = "rfuzzy_enum_type";
 		public static final String rfuzzy_string_type = "rfuzzy_string_type";
 
@@ -145,7 +148,7 @@ public class KConstants {
 		public static final String queryLinesContainerId = "queryLinesContainer";
 		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
 		public static final String queryLinesTableId = "queryLinesTable";
-		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";		
+		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 	}
 }
 

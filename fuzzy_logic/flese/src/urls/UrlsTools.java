@@ -26,7 +26,7 @@ public class UrlsTools {
 			}
 		}
 		if (withServletPath) {
-			urlAux = PathsUtils.concatPathsStrings(urlAux, KConstants.servletName);
+			urlAux = PathsUtils.concatPathsStrings(urlAux, KConstants.Application.servletName);
 		}
 		
 		// We do not want the url without the server info !!!

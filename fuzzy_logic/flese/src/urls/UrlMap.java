@@ -92,7 +92,7 @@ public class UrlMap {
 		boolean withServletPath = ("".equals(this.currentUrl)); // If empty we
 																// need the
 																// servlet !!!
-		return getUrl(withServerPath, withAppPath, withServletPath, isAjax, null);
+		return getUrl(withServerPath, withAppPath, withServletPath, isAjax, request);
 	}
 
 	public String getUrl(boolean withServerPath, boolean withAppPath, boolean withServletPath, boolean isAjax, HttpServletRequest request) {

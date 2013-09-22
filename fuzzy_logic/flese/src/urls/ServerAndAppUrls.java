@@ -5,72 +5,23 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import constants.KConstants;
+
 public class ServerAndAppUrls {
-
-	private static final class PrivateConstants {
-		public static final String httpsPrefix = "https://";
-		public static final String httpPrefix = "http://";
-
-		/**
-		 * This are the invalid ends for the serverUrl computed. Be carefull:
-		 * removal order matters.
-		 */
-		public static final String[] invalidTailsStarts = { "?", "index.jsp", "WEB-INF", "servlets", "images", "js_and_css" };
-
-	}
-
-	private static class ServerAndAppUrlsMaintenance {
-		static final Log LOG = LogFactory.getLog(ServerAndAppUrlsMaintenance.class);
-
-		private static class hiddenVariables {
-			private static String serverUrl = "";
-			private static String appUrl = "";
-		}
-
-		public static String getServerUrl() {
-			return getOrSetServerUrl(null);
-		}
-
-		public static void setServerUrl(String url) {
-			LOG.info("setServerUrl: " + url);
-			getOrSetServerUrl(url);
-		}
-
-		public static String getAppUrl() {
-			return getOrSetAppUrl(null);
-		}
-
-		public static void setAppUrl(String url) {
-			LOG.info("setAppUrl: " + url);
-			getOrSetAppUrl(url);
-		}
-
-		private static synchronized String getOrSetServerUrl(String url) {
-			if (url != null) {
-				hiddenVariables.serverUrl = url;
-			}
-			return hiddenVariables.serverUrl;
-		}
-
-		private static synchronized String getOrSetAppUrl(String url) {
-			if (url != null) {
-				hiddenVariables.appUrl = url;
-			}
-			return hiddenVariables.appUrl;
-		}
-
-	}
+	static final Log LOG = LogFactory.getLog(ServerAndAppUrls.class);
+	
+	private static ServerAndAppUrlsData serverAndAppUrlsData = new ServerAndAppUrlsData(null);
 
 	public static String getAppUrl() {
 		return getAppUrl(null);
 	}
 
 	public static String getAppUrl(HttpServletRequest request) {
-		if ("".equals(ServerAndAppUrlsMaintenance.getAppUrl())) {
+		if (! serverAndAppUrlsData.isValid()) {
 			computeAppAndServerUrls(request);
 		}
 
-		return ServerAndAppUrlsMaintenance.getAppUrl();
+		return serverAndAppUrlsData.getAppUrl();
 	}
 
 	public static String getAppFullUrl() {
@@ -78,19 +29,16 @@ public class ServerAndAppUrls {
 	}
 
 	public static String getAppFullUrl(HttpServletRequest request) {
-		String appUrl = getAppUrl(request);
-		String serverUrl = ServerAndAppUrlsMaintenance.getServerUrl();
-
-		return ("".equals(appUrl)) ? "" : serverUrl + appUrl;
+		if (! serverAndAppUrlsData.isValid()) {
+			computeAppAndServerUrls(request);
+		}
+		
+		return serverAndAppUrlsData.toString();
 	}
 
 	private static void computeAppAndServerUrls(HttpServletRequest request) {
 
-		if (!"".equals(ServerAndAppUrlsMaintenance.getAppUrl())) {
-			return;
-		}
-
-		if (!"".equals(ServerAndAppUrlsMaintenance.getServerUrl())) {
+		if (serverAndAppUrlsData.isValid()) {
 			return;
 		}
 
@@ -98,77 +46,41 @@ public class ServerAndAppUrls {
 			return;
 		}
 
-		String serverName = request.getServerName();
-		if ((serverName == null) || ("".equals(serverName))) {
+		// No usar (serverName = moises.ls.fi.upm.es/java-apps no me sirve !!!): 
+		// String serverName = request.getServerName();
+		// if ((serverName == null) || ("".equals(serverName))) {
+		//	 return;
+		// }
+		// LOG.info("serverName: " + serverName);
+
+		String url = request.getRequestURL().toString();
+		if ((url == null) || ("".equals(url))) {
 			return;
 		}
 
-		String requestUrl = request.getRequestURL().toString();
-		if ((requestUrl == null) || ("".equals(requestUrl))) {
+		ServerAndAppUrlsData tmp = new ServerAndAppUrlsData(url);
+		tmp = fixValuesWhenInMoises(tmp);
+		set(tmp);
+		LOG.info("set: ServerAndAppUrlsData: " + tmp.toString());
+	}
+
+	private static synchronized void set(ServerAndAppUrlsData tmp) {
+		if (serverAndAppUrlsData.isValid()) {
 			return;
 		}
-
-		String serverUrl = "";
-		boolean isHTTPS = requestUrl.startsWith(PrivateConstants.httpsPrefix);
-		boolean isHTTP = requestUrl.startsWith(PrivateConstants.httpPrefix);
-		if (isHTTP) {
-			requestUrl = requestUrl.substring(PrivateConstants.httpPrefix.length());
-			serverUrl += PrivateConstants.httpPrefix;
-		}
-		if (isHTTPS) {
-			requestUrl = requestUrl.substring(PrivateConstants.httpsPrefix.length());
-			serverUrl += PrivateConstants.httpsPrefix;
-		}
-
-		while (requestUrl.startsWith("/")) {
-			requestUrl = requestUrl.substring(1);
-		}
-
-		int index = 0;
-		// Remove the invalid ends.
-		requestUrl = removeInvalidTails(requestUrl);
-
-		// Now remove the server name, but save it !!!
-		index = requestUrl.indexOf(serverName);
-		if (index > -1) {
-			index = index + serverName.length();
-			serverUrl += requestUrl.substring(0, index);
-			requestUrl = requestUrl.substring(index);
-		}
-
-		// We consider the server port as part of the server name.
-		index = requestUrl.indexOf(':');
-		if (index > -1) {
-			index = requestUrl.indexOf('/');
-			if (index > -1) {
-				serverUrl += requestUrl.substring(0, index);
-				requestUrl = requestUrl.substring(index);
-			}
-		}
-
-		ServerAndAppUrlsMaintenance.setServerUrl(serverUrl);
-		ServerAndAppUrlsMaintenance.setAppUrl(requestUrl);
-
+		serverAndAppUrlsData = tmp;
 	}
-
-	/**
-	 * Looks for the invalid ends defined in invalidEnds and removes the tail of
-	 * the string, including the invalid end.
-	 * 
-	 * @param url
-	 *            is the input string.
-	 * @return the url without the invalid ends.
-	 */
-	private static String removeInvalidTails(String url) {
-		int index = -1;
-		String invalidEnd = null;
-		for (int i = 0; i < PrivateConstants.invalidTailsStarts.length; i++) {
-			invalidEnd = PrivateConstants.invalidTailsStarts[i];
-			index = url.indexOf(invalidEnd);
-			if (index > -1) {
-				url = url.substring(0, index);
-			}
+	
+	private static ServerAndAppUrlsData fixValuesWhenInMoises(ServerAndAppUrlsData tmp) {
+		if ("moises.ls.fi.upm.es".equals(tmp.getServerUrl())) {
+			String preUrl = KConstants.Application.httpsPrefix;
+			String serverUrl = tmp.getServerUrl();
+			String serverPort = "443";
+			String appUrl = tmp.getAppUrl();
+			ServerAndAppUrlsData aux = new ServerAndAppUrlsData(preUrl + serverUrl + ":" + serverPort + appUrl);
+			return aux;
 		}
-		return url;
+		return tmp;
 	}
+	
 }
