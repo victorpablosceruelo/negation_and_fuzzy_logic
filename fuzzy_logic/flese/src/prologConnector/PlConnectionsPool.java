@@ -7,24 +7,13 @@ public class PlConnectionsPool {
 
 	private static PlConnectionEnvelope[] connections = null;
 
-	private synchronized static void initializeConnectionsPool() {
+	private synchronized static void initializeConnectionsPool() throws PlConnectionEnvelopeException, FilesAndPathsException {
 		if (connections == null) {
 			connections = new PlConnectionEnvelope[KConstants.PlConnectionsPool.maxNumOfConnections];
 			for (int i = 0; i < KConstants.PlConnectionsPool.maxNumOfConnections; i++) {
-				connections[i] = null;
+				connections[i] = new PlConnectionEnvelope(i);
 			}
 		}
-	}
-
-	private synchronized static PlConnectionEnvelope initializeConnection(int i) throws PlConnectionEnvelopeException, FilesAndPathsException {
-		if (connections == null) {
-			throw new PlConnectionEnvelopeException("connections is null.");
-		}
-
-		if (connections[i] == null) {
-			connections[i] = new PlConnectionEnvelope(i);
-		}
-		return connections[i];
 	}
 
 	private static PlConnectionEnvelope getConnection() throws PlConnectionEnvelopeException, FilesAndPathsException {
@@ -38,14 +27,14 @@ public class PlConnectionsPool {
 			}
 
 			connection = connections[i];
-			if (connection == null) {
-				connection = initializeConnection(i);
+			if (connection != null) {
+				found = connection.testAndSet(true);
 			}
-
-			found = connection.testAndSet(true);
+			
 			if (!found) {
 				i++;
 			}
+
 		}
 		return connection;
 	}

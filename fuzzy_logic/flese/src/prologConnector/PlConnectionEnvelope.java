@@ -31,11 +31,12 @@ public class PlConnectionEnvelope {
 			throw new PlConnectionEnvelopeException("connectionId cannot be >= " + KConstants.PlConnectionsPool.maxNumOfConnections);
 		}
 
+		this.isAvailable = false;
 		this.connectionId = connectionId;
 		this.pathsMgmt = new PathsMgmt();
-		this.isAvailable = true;
 
 		createPlConnection();
+		this.isAvailable = true;
 	}
 
 	synchronized public boolean testAndSet(boolean setAvailableTo) {
@@ -94,11 +95,12 @@ public class PlConnectionEnvelope {
 	}
 
 	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+		LOG.info(query.getQuery().toString());
 		if (this.isAvailable) {
-
+			throw new PlConnectionEnvelopeException("ERROR: connection is available.");
 		}
 		if (this.plConnection == null)
-			throw new PlConnectionEnvelopeException("runQuery: plConnection is null.");
+			throw new PlConnectionEnvelopeException("ERROR: plConnection is null.");
 
 		PLGoal evaluatedGoal = evaluateGoal(query);
 		long answersCounter = 0;
