@@ -131,9 +131,9 @@ public class PlConnectionEnvelope {
 		return this.plConnection;
 	}
 
-	public void reinitializeConnection() {
+	public String reinitializeConnection() {
 		if (!testOrSetStatus(Constants.query)) {
-			return;
+			return " *" + getConnectionId() + ", ";
 		}
 
 		try {
@@ -153,6 +153,7 @@ public class PlConnectionEnvelope {
 			e.printStackTrace();
 			this.plConnection = null;
 		}
+		return " " + getConnectionId() + ", ";
 
 	}
 

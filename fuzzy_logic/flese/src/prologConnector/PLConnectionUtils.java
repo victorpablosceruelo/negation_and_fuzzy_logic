@@ -17,29 +17,29 @@ public class PLConnectionUtils {
 
 	final static private Log LOG = LogFactory.getLog(PLConnectionUtils.class);
 
-	public static void runPrologQuery(CiaoPrologQueryInterface query, PlConnectionEnvelope connectionEnvelope)
+	public static void runPrologQuery(CiaoPrologQueryInterface query, PLConnection plConnection)
 			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
 
-		changeCiaoPrologWorkingFolder(query, connectionEnvelope);
-		runPrologQueryAux(query, connectionEnvelope);
+		changeCiaoPrologWorkingFolder(query, plConnection);
+		runPrologQueryAux(query, plConnection);
 
 	}
 
-	private static void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery, PlConnectionEnvelope connectionEnvelope)
+	private static void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery, PLConnection plConnection)
 			throws CiaoPrologConnectorException, FilesAndPathsException, PlConnectionEnvelopeException {
 
 		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
-		runPrologQueryAux(folderChangeQuery, connectionEnvelope);
+		runPrologQueryAux(folderChangeQuery, plConnection);
 	}
 
-	private static void runPrologQueryAux(CiaoPrologQueryInterface query, PlConnectionEnvelope connectionEnvelope)
+	private static void runPrologQueryAux(CiaoPrologQueryInterface query, PLConnection plConnection)
 			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
 		LOG.info(query.getQuery().toString());
-		if (connectionEnvelope.reservate()) {
-			throw new PlConnectionEnvelopeException("ERROR: connection was available when it should be captured at this point.");
+		if (plConnection == null) {
+			throw new PlConnectionEnvelopeException("ERROR: plConnection is null.");
 		}
 
-		PLGoal evaluatedGoal = evaluateGoal(query, connectionEnvelope);
+		PLGoal evaluatedGoal = evaluateGoal(query, plConnection);
 		long answersCounter = 0;
 
 		LOG.info("performQueryAux: getting answers ... ");
@@ -117,10 +117,9 @@ public class PLConnectionUtils {
 
 	}
 
-	private static PLGoal evaluateGoal(CiaoPrologQueryInterface query, PlConnectionEnvelope connectionEnvelope)
+	private static PLGoal evaluateGoal(CiaoPrologQueryInterface query, PLConnection plConnection)
 			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
 		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
-		PLConnection plConnection = connectionEnvelope.getPlConnection();
 		PLGoal evaluatedGoal = new PLGoal(plConnection, query.getQuery());
 		String programFileName = null;
 

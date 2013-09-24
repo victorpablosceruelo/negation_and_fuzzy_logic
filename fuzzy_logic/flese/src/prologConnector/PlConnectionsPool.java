@@ -35,15 +35,18 @@ public class PlConnectionsPool {
 		}
 
 		private void reinitilizeConnections() {
+			LOG.info("Reinitializing connections. ");
+			String result = "";
 			for (int i = 0; i < KConstants.PlConnectionsPool.maxNumOfConnections; i++) {
 				if (connections[i] != null) {
 					boolean reserved = connections[i].reservate();
 					if (reserved) {
-						connections[i].reinitializeConnection();
+						result += connections[i].reinitializeConnection();
 						connections[i].free(false);
 					}
 				}
 			}
+			LOG.info("Reinitialized connections: " + result);
 		}
 	}
 
@@ -97,7 +100,7 @@ public class PlConnectionsPool {
 
 		PlConnectionEnvelope connectionEnvelope = getConnection();
 		try {
-			PLConnectionUtils.runPrologQuery(query, connectionEnvelope);
+			PLConnectionUtils.runPrologQuery(query, connectionEnvelope.getPlConnection());
 		} finally {
 			connectionEnvelope.free(true); // Free the connection.
 			LOG.info("connection " + connectionEnvelope.getConnectionId() + " has been freed.");

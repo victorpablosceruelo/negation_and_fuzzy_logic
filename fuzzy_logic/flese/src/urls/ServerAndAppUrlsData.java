@@ -21,6 +21,7 @@ public class ServerAndAppUrlsData {
 	
 
 	public ServerAndAppUrlsData(String url) {
+		LOG.info("url: " + url + " ");
 		if ((url != null) && (!"".equals(url))) {
 			parseUrl(url);
 		}
@@ -67,7 +68,7 @@ public class ServerAndAppUrlsData {
 		}
 		if (url.startsWith(KConstants.Application.httpsPrefix)) {
 			url = url.substring(KConstants.Application.httpsPrefix.length());
-			this.preUrl += KConstants.Application.httpsPrefix;
+			this.preUrl = KConstants.Application.httpsPrefix;
 		}
 		
 		url = removeSlashCharacter(url);
