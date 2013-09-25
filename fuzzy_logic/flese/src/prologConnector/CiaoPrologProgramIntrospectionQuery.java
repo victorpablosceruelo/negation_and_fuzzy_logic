@@ -44,7 +44,8 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		CiaoPrologProgramIntrospectionQuery query = (CiaoPrologProgramIntrospectionQuery) o;
 		if (query == null) {
 			query = new CiaoPrologProgramIntrospectionQuery(programFileInfo);
-			PlConnectionsPool.launchQuery(query);
+			PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
+			plConnectionEnvelope.runPrologQuery(query);
 			CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, query);
 		}
 		return query;
