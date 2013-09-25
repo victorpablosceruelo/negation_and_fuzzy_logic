@@ -9,6 +9,10 @@ import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract {
 
+	public boolean isOfType(String type) {
+		return CiaoPrologQueryAbstract.Constants.ChangeWorkingFolderQuery.equals(type);
+	}
+
 	private CiaoPrologChangeWorkingFolderQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(programFileInfo);
 

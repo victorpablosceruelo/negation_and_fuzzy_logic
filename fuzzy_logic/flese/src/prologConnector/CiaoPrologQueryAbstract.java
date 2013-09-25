@@ -13,6 +13,13 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 
 	final static protected Log LOG = LogFactory.getLog(CiaoPrologQueryAbstract.class);
 
+	public static final class Constants {
+		public static final String ChangeWorkingFolderQuery = "ChangeWorkingFolderQuery";
+		public static final String NormalQuery = "NormalQuery";
+		public static final String ProgramIntrospectionQuery = "ProgramIntrospectionQuery";
+		public static final String TestingQuery = "TestingQuery";
+	}
+	
 	private PLStructure query = null;
 	private ProgramFileInfo programFileInfo = null;
 
@@ -21,7 +28,7 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 	protected String[] variablesNames = null;
 	protected ArrayList<CiaoPrologQueryAnswer> queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
-
+	
 	protected CiaoPrologQueryAbstract(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
 
 		if (programFileInfo == null)

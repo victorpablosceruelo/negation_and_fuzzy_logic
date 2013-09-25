@@ -83,7 +83,12 @@ public class PlConnectionEnvelope {
 			throw new PlConnectionEnvelopeException("ERROR: plConnection is null.");
 		}
 
-		evaluateGoal(query);
+		createGoal(query);
+		if (! query.isOfType(CiaoPrologQueryAbstract.Constants.ChangeWorkingFolderQuery)) {
+			changeProgramFileTo(query);
+		}
+		evaluateGoal();
+		
 		long answersCounter = 0;
 
 		LOG.info("performQueryAux: getting answers ... ");
@@ -161,16 +166,28 @@ public class PlConnectionEnvelope {
 
 	}
 
-	private void evaluateGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
-		LOG.info("runQuery: executing query: " + query.toString() + " .... ");
+	private void createGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+		LOG.info("runQuery: creating goal for query: " + query.toString() + " .... ");
 		evaluatedGoal = new PLGoal(plConnection, query.getQuery());
-		String programFileName = null;
-
-		programFileName = query.getProgramFileInfo().getFileName();
-
-		LOG.info("runQuery: changing programFile to: " + programFileName + ".");
+	}
+	
+	private void changeProgramFileTo(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+		String programFileName = query.getProgramFileInfo().getFileName();
+		LOG.info("runQuery: changing programFile to: " + programFileName + " .... ");
 		try {
 			evaluatedGoal.useModule(programFileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("IOException");
+		} catch (PLException e) {
+			e.printStackTrace();
+			throw new PlConnectionEnvelopeException("PLException");
+		}
+	}
+	
+	private void evaluateGoal() throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+		LOG.info("runQuery: executing query .... ");
+		try {
 			evaluatedGoal.query();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -13,6 +13,10 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 
 	ProgramIntrospection programIntrospection = null;
 
+	public boolean isOfType(String type) {
+		return CiaoPrologQueryAbstract.Constants.ProgramIntrospectionQuery.equals(type);
+	}
+	
 	private CiaoPrologProgramIntrospectionQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(programFileInfo);
 

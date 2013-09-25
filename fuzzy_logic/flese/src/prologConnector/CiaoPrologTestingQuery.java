@@ -9,6 +9,10 @@ import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
+	public boolean isOfType(String type) {
+		return CiaoPrologQueryAbstract.Constants.TestingQuery.equals(type);
+	}
+	
 	private CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException,
 			LocalUserInfoException {
 		super(programFileInfo);

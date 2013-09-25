@@ -12,6 +12,10 @@ import filesAndPaths.ProgramFileInfo;
 
 public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 
+	public boolean isOfType(String type) {
+		return CiaoPrologQueryAbstract.Constants.NormalQuery.equals(type);
+	}
+	
 	private CiaoPrologNormalQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
 		super(programFileInfo);
 	}
