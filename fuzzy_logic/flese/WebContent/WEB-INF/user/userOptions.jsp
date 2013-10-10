@@ -1,3 +1,4 @@
+<%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="storeHouse.SessionStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
@@ -7,32 +8,79 @@
 <%@page import="org.brickred.socialauth.Contact"%>
 <%@page import="org.brickred.socialauth.AuthProvider"%>
 
-<script type="text/javascript">
+
+<div id='userInformationDiv' class='userInformationTable'>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Field Name</div>
+		<div class='userInformationTableCell'>Value</div>
+	</div>
 <%
 	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(request);
 	AuthProvider provider = sessionStoreHouse.getAuthProvider();
 	Profile profile = null;
 	if (provider != null) profile = provider.getUserProfile();
+	if (profile == null) { %>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>DisplayName</div>
+		<div class='userInformationTableCell'><%= sessionStoreHouse.getLocalUserInfo().getLocalUserName() %></div>
+	</div>
 
-	out.println("cleanUpUserInformation();");
-	if (profile == null) {
-		out.println("addToUserInformation(0, 'DisplayName', '"+ request.getAttribute("localUserName") + "');");
-	} else {
-		out.println("addToUserInformation(0, 'DisplayName', '" + profile.getDisplayName() + "');");
-		out.println("addToUserInformation(1, 'Email', '" + profile.getEmail() + "');");
-		out.println("addToUserInformation(2, 'FirstName', '" + profile.getFirstName() + "');");
-		out.println("addToUserInformation(3, 'LastName', '" + profile.getLastName() + "');");
-		out.println("addToUserInformation(4, 'FullName', '" + profile.getFullName() + "');");
-		out.println("addToUserInformation(5, 'Language', '" + profile.getLanguage() + "');");
-		out.println("addToUserInformation(6, 'Country', '" + profile.getCountry() + "');");
-		out.println("addToUserInformation(7, 'Location', '" + profile.getLocation() + "');");
-		out.println("addToUserInformation(8, 'Gender', '" + profile.getGender() + "');");
-		out.println("addToUserInformation(9, 'ProfileImageUrl', '" + profile.getProfileImageURL() + "');");
-		out.println("addToUserInformation(10, 'ProviderId', '" + profile.getProviderId() + "');");
-		out.println("addToUserInformation(11, 'ValidatedId', '" + profile.getValidatedId() + "');");
-		out.println("addToUserInformation(12, 'Date Of BirthDay', '" + profile.getDob() + "');");
-	}
+<%	} else { %>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>DisplayName</div>
+		<div class='userInformationTableCell'><%= profile.getDisplayName() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Email</div>
+		<div class='userInformationTableCell'><%= profile.getEmail() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>FirstName</div>
+		<div class='userInformationTableCell'><%= profile.getFirstName() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>LastName</div>
+		<div class='userInformationTableCell'><%= profile.getLastName() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>FullName</div>
+		<div class='userInformationTableCell'><%= profile.getFullName() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Language</div>
+		<div class='userInformationTableCell'><%= profile.getLanguage() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Country</div>
+		<div class='userInformationTableCell'><%= profile.getCountry() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Location</div>
+		<div class='userInformationTableCell'><%= profile.getLocation() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Gender</div>
+		<div class='userInformationTableCell'><%= profile.getGender() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>ProfileImageUrl</div>
+		<div class='userInformationTableCell'><%= profile.getProfileImageURL() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>ProviderId</div>
+		<div class='userInformationTableCell'><%= profile.getProviderId() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>ValidatedId</div>
+		<div class='userInformationTableCell'><%= profile.getValidatedId() %></div>
+	</div>
+	<div class='userInformationTableRow'>
+		<div class='userInformationTableCell'>Date Of BirthDay</div>
+		<div class='userInformationTableCell'><%= profile.getDob() %></div>
+	</div>
+<% } %>
 
+<%
 	/*
 	if (provider != null) {
 		List<Contact> contactsList = provider.getContactList();
@@ -62,5 +110,7 @@
 	}
 	*/
 %>
-	insertUserOptions('<%= KConstants.JspsDivsIds.mainSecDivId %>');
+</div>
+<script type="text/javascript">
+	insertUserOptions('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.Files.List.getUrl(true) %>', '<%=KUrls.Files.View.getUrl(true) %>', '<%=KUrls.Files.Remove.getUrl(true) %>', '<%=KUrls.Files.Upload.getUrl(true) %>', '<%=KUrls.Files.Download.getUrl(true) %>');
 </script>

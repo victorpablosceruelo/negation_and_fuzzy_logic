@@ -35,60 +35,14 @@ function addToUserInformation(index, fieldName, fieldValue) {
 	userInformation[index] = new userInformationClass(fieldName, fieldValue);
 }
 
-function insertUserOptions(parentDivId) {
-	var parentDiv = document.getElementById(parentDivId);
-	
-	   			parentDiv.innerHTML = "";
-	   			
-	   			var userInformationDiv = document.getElementById("userInformationDiv");
-	   			if (userInformationDiv == null) {
-	   				userInformationDiv = document.createElement('div');
-	   				userInformationDiv.id = "userInformationDiv";
-	   				userInformationDiv.className = "userInformationTable";
-	   				parentDiv.appendChild(userInformationDiv);
-	   			}
-	   			userInformationDiv.innerHTML = "";
-	   			
-	   			var row = null;
-	   			var cell = null;
-	   			
-	   			row = document.createElement('div');
-	   			row.className = "userInformationTableRow";
-	   			userInformationDiv.appendChild(row);
-	   			
-	   			cell = document.createElement('div');
-	   			cell.className = "userInformationTableCell";
-	   			cell.innerHTML = "Field Name";
-	   			row.appendChild(cell);
-
-	   			cell = document.createElement('div');
-	   			cell.className = "userInformationTableCell";
-	   			cell.innerHTML = "Value";
-	   			row.appendChild(cell);
-
-	   			for (var i=0; i<userInformation.length; i++) {
-		   			row = document.createElement('div');
-		   			row.className = "userInformationTableRow";
-		   			userInformationDiv.appendChild(row);
-		   			
-		   			cell = document.createElement('div');
-		   			cell.className = "userInformationTableCell";
-		   			cell.innerHTML = userInformation[i].fieldName;
-		   			row.appendChild(cell);
-
-		   			cell = document.createElement('div');
-		   			cell.className = "userInformationTableCell";
-		   			cell.innerHTML = userInformation[i].fieldValue;;
-		   			row.appendChild(cell);
-	   			}
-	   			
-	   			insertFilesList(parentDivId);
-	   			insertFileUploadFacility(parentDivId);
+function insertUserOptions(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
+	insertFilesList(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
+	insertFileUploadFacility(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
 	
 	return false;
 }
 
-function insertFilesList (parentDivId) {
+function insertFilesList (parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
 	
 	var parentDiv = document.getElementById(parentDivId);
 	var filesListDiv = document.getElementById('filesListDiv'); 
@@ -107,7 +61,7 @@ function insertFilesList (parentDivId) {
 	}
 	fileViewContentsDiv.innerHTML = "";
 		
-	$.getScript(urlMappingFor('FilesListRequest'), 
+	$.getScript(urlList, 
 			function(data, textStatus, jqxhr) {
 				filesListDiv.innerHTML = "";
 	   			filesListDiv.className = "filesListTable"; 			
@@ -182,11 +136,11 @@ function insertFilesListHead(filesListDivId) {
 	row.appendChild(cell);
 }
 
-function fileViewAction(index, fileViewContentsDivId) {
+function fileViewAction(index, fileViewContentsDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
 	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
 	var fileViewContentsDiv = document.getElementById(fileViewContentsDivId);
 	
-	$.get(urlMappingFor('FileViewRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+	$.get(urlView + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
 			function(data, textStatus, jqxhr) {
 				fileViewContentsDiv.innerHTML = data;
 				
@@ -212,12 +166,12 @@ function fileViewAction(index, fileViewContentsDivId) {
 	return false;
 }
 
-function removeFileAction (index, parentDivId) {
-	$.get(urlMappingFor('FileRemoveRequest') + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+function removeFileAction (index, parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
+	$.get(urlRemove + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
 			function(data, textStatus, jqxhr) {
 				// Reload the screen.
 				// alert("parentDivId: " + parentDivId);
-				insertFilesList(parentDivId);
+				insertFilesList(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
 			});
 }
 
@@ -240,7 +194,7 @@ function notNullNorundefined(value) {
 	return ((value != null) && (value != undefined));
 }
 
-function insertFileUploadFacility(parentDivId) {
+function insertFileUploadFacility(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
 	var parentDiv = document.getElementById(parentDivId);
 	var fileUploadDiv = document.getElementById("fileUploadDiv");
 	if (fileUploadDiv == null) {
@@ -255,7 +209,7 @@ function insertFileUploadFacility(parentDivId) {
 	
 	fileUploadDiv.innerHTML = "Upload Program files <br />" + 
 							  "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
-							  "target='" + uploadFormTargetiFrameId+ "' action='" + urlMappingFor('FileUploadRequest') + "' >" +
+							  "target='" + uploadFormTargetiFrameId+ "' action='" + urlUpload + "' >" +
 							  		"<INPUT TYPE='file' NAME='programFileToUpload' size='50' "+
 							  		"onchange='uploadActionOnChange(\""+uploadFormId+"\", \""+uploadStatusDivId+"\");'>" +
 							  "</FORM>" +
@@ -282,7 +236,7 @@ function insertFileUploadFacility(parentDivId) {
 			document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
 
 			// Update the files list.
-			insertFilesList (parentDivId);
+			insertFilesList (parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
 		}
 		  
 	});	
