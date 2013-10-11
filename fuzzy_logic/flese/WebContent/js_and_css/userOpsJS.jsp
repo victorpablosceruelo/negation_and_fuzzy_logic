@@ -19,128 +19,17 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-userInformation = null;
-
-function userInformationClass(fieldName, fieldValue) {
-	this.fieldName = fieldName;
-	this.fieldValue = fieldValue;
-}
-
-function cleanUpUserInformation () {
-	userInformation = null;
-	userInformation = new Array ();
-}
-
-function addToUserInformation(index, fieldName, fieldValue) {
-	userInformation[index] = new userInformationClass(fieldName, fieldValue);
-}
-
-function insertUserOptions(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
-	insertFilesList(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
-	insertFileUploadFacility(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
+function reloadPage (parentDivId, urlReloadPage) {
 	
-	return false;
+	loadAjaxIn(parentDivId, urlReloadPage);
+
 }
 
-function insertFilesList (parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
+
+function fileViewAction(fileViewContentsDivId, urlFileView, fileOwner, fileName) {
+	var fileViewContentsDiv = getContainer(fileViewContentsDivId);
 	
-	var parentDiv = document.getElementById(parentDivId);
-	var filesListDiv = document.getElementById('filesListDiv'); 
-	if (filesListDiv == null) {
-		filesListDiv = document.createElement('div');
-		filesListDiv.id = "filesListDiv";
-		parentDiv.appendChild(filesListDiv);
-	}
-	filesListDiv.innerHTML = loadingImageHtml(true);
-	
-	var fileViewContentsDiv = document.getElementById("fileViewContentsDiv");
-	if (fileViewContentsDiv == null) {
-		fileViewContentsDiv = document.createElement('div');
-		fileViewContentsDiv.id = "fileViewContentsDiv";	 
-		parentDiv.appendChild(fileViewContentsDiv);
-	}
-	fileViewContentsDiv.innerHTML = "";
-		
-	$.getScript(urlList, 
-			function(data, textStatus, jqxhr) {
-				filesListDiv.innerHTML = "";
-	   			filesListDiv.className = "filesListTable"; 			
-	   			var row = null;
-	   			var cell = null;
-	   			
-	   			var showHead = true;
-	   			if ((filesList != null) && (filesList.length > 0)) {
-	   				for (var i=0; i<filesList.length; i++) {
-	   					if (filesList[i].fileOwner == localUserName) {
-	   						if (showHead) {
-	   							insertFilesListHead(filesListDiv.id);
-	   							showHead = false;
-	   						}
-	   						
-	   						row = document.createElement('div');
-	   						row.className = "filesListTableRow";
-	   						filesListDiv.appendChild(row);
-		   			
-	   						cell = document.createElement('div');
-	   						cell.className = "filesListTableCell";
-	   						cell.innerHTML = "<a href='#' title='view program file " + filesList[i].fileName + "' "+
-		   								 	 "onclick='fileViewAction(" + i + ", \"" + fileViewContentsDiv.id + "\");' >" + 
-		   								 	 filesList[i].fileName + "</a>";
-	   						row.appendChild(cell);
-
-	   						cell = document.createElement('div');
-	   						cell.className = "filesListTableCell";
-	   						cell.innerHTML = "<a href='#' title='remove program file " + filesList[i].fileName + "' "+
-	   										 "onclick='removeFileAction(" + i + ", \"" + parentDivId + "\");' >" + 
-	   										 "<img src='images/remove-file.gif' width='20em'>" + "</a>";
-	   						row.appendChild(cell);
-
-	   						cell = document.createElement('div');
-	   						cell.className = "filesListTableCell";
-		   					cell.innerHTML = "<a href='#' title='personalize program file " + filesList[i].fileName + "' "+
-								 			 "onclick='return personalizeProgramFile(\"" + filesList[i].fileName + "\", \"" + filesList[i].fileOwner + "\", \"advanced\");'>" + 
-								 			 "<img src='images/edit.png' width='20em'>" + "</a>";
-		   					row.appendChild(cell);
-	   					}
-	   				}
-	   			}
-	   			
-	   			if (showHead) {
-	   				filesListDiv.innerHTML = "You do not owe any program file. Upload one by using the facility below.";
-	   			}
-			});
-}
-
-function insertFilesListHead(filesListDivId) {
-	var filesListDiv = document.getElementById(filesListDivId);
-	var row = null;
-	var cell = null;
-	
-	row = document.createElement('div');
-	row.className = "filesListTableRow";
-	filesListDiv.appendChild(row);
-		
-	cell = document.createElement('div');
-	cell.className = "filesListTableCell";
-	cell.innerHTML = "Program File Name";
-	row.appendChild(cell);
-
-	cell = document.createElement('div');
-	cell.className = "filesListTableCell";
-	cell.innerHTML = "";
-	row.appendChild(cell);
-
-	cell = document.createElement('div');
-	cell.className = "filesListTableCell";
-	cell.innerHTML = "";
-	row.appendChild(cell);
-}
-
-function fileViewAction(index, fileViewContentsDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
-	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
-	var fileViewContentsDiv = document.getElementById(fileViewContentsDivId);
-	
-	$.get(urlView + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+	$.get(urlView + "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner + "&<%=KConstants.Request.fileNameParam%>=" + fileName, 
 			function(data, textStatus, jqxhr) {
 				fileViewContentsDiv.innerHTML = data;
 				
@@ -156,7 +45,7 @@ function fileViewAction(index, fileViewContentsDivId, urlList, urlView, urlRemov
 		                resizable: true, 
 		                height: "auto", // 800,
 		                width: "auto", // 800,
-		                title: 'Contents of program file ' + filesList[index].fileName
+		                title: 'Contents of program file ' + fileName
 		            });
 			        // $( "#" + fileViewContentsDivId ).dialog();
 			    });
@@ -166,12 +55,12 @@ function fileViewAction(index, fileViewContentsDivId, urlList, urlView, urlRemov
 	return false;
 }
 
-function removeFileAction (index, parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
-	$.get(urlRemove + "&fileName="+filesList[index].fileName+"&fileOwner="+filesList[index].fileOwner, 
+function removeFileAction (parentDivId, urlRemove, urlReloadPage, fileOwner, fileName) {
+	$.get(urlRemove + "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner + "&<%=KConstants.Request.fileNameParam%>=" + fileName, 
 			function(data, textStatus, jqxhr) {
 				// Reload the screen.
 				// alert("parentDivId: " + parentDivId);
-				insertFilesList(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
+				reloadPage (parentDivId, urlReloadPage);
 			});
 }
 
@@ -194,28 +83,8 @@ function notNullNorundefined(value) {
 	return ((value != null) && (value != undefined));
 }
 
-function insertFileUploadFacility(parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload) {
-	var parentDiv = document.getElementById(parentDivId);
-	var fileUploadDiv = document.getElementById("fileUploadDiv");
-	if (fileUploadDiv == null) {
-		fileUploadDiv = document.createElement('div');
-		fileUploadDiv.id = "fileUploadDiv";
-		parentDiv.appendChild(fileUploadDiv);
-	}
+function insertFileUploadFacility(parentDivId, urlUpload, urlReloadPage, uploadFormId, uploadStatusDivId, uploadFormTargetiFrameId) {
 	
-	var uploadFormId = "uploadForm";
-	var uploadStatusDivId = "uploadStatus";
-	var uploadFormTargetiFrameId = "uploadFormTargetiFrame";
-	
-	fileUploadDiv.innerHTML = "Upload Program files <br />" + 
-							  "<FORM ID='"+uploadFormId+"' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' "+
-							  "target='" + uploadFormTargetiFrameId+ "' action='" + urlUpload + "' >" +
-							  		"<INPUT TYPE='file' NAME='programFileToUpload' size='50' "+
-							  		"onchange='uploadActionOnChange(\""+uploadFormId+"\", \""+uploadStatusDivId+"\");'>" +
-							  "</FORM>" +
-							  "<div id='"+uploadStatusDivId+"'></div>" +
-							  "<iframe id='"+uploadFormTargetiFrameId+"' name='"+uploadFormTargetiFrameId+"' "+
-							  "style='display:none;'></iframe>";
 	// This does not work on google chrome: "src='#' " 
     	
 	$('#' + uploadFormTargetiFrameId).load(function() {
@@ -236,7 +105,7 @@ function insertFileUploadFacility(parentDivId, urlList, urlView, urlRemove, urlU
 			document.getElementById(uploadStatusDivId).innerHTML = responseHtmlText;
 
 			// Update the files list.
-			insertFilesList (parentDivId, urlList, urlView, urlRemove, urlUpload, urlDownload);
+			reloadPage (parentDivId, urlReloadPage);
 		}
 		  
 	});	
@@ -251,6 +120,12 @@ function uploadActionOnChange(formId, uploadStatusDivId) {
 	form.submit();
 }
 
+function uploadFileResults(uploadStatusDivId, results) {
+	var uploadStatusDiv = getContainer(uploadStatusDivId);
+	for (var i=0; i<results.length; i++) {
+		document.getElementById(uploadStatusDiv).innerHTML += "<br>" + results[i];
+	}
+}
 
 
 

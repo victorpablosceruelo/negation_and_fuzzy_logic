@@ -19,7 +19,6 @@ import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsMgmt;
-import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsUtils;
 import filesAndPaths.ProgramFileInfo;
 import filters.OnlyCiaoPrologFilesFilterClass;
@@ -32,19 +31,18 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Gets a list with the existing program files.
-	 * 
-	 * @param localUserName
-	 *            is the name of the user that is logged in.
-	 * @return the program files iterator, null if there are no program files to
-	 *         iterate.
-	 * @throws FilesAndPathsException
-	 * @throws LocalUserInfoException
-	 * @throws RequestStoreHouseException
-	 */
+	public static ProgramFileInfo[] listMyFiles(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,
+			RequestStoreHouseException {
+		return listAux(requestStoreHouse, false);
+	}
+
 	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,
 			RequestStoreHouseException {
+		return listAux(requestStoreHouse, false);
+	}
+
+	public static ProgramFileInfo[] listAux(RequestStoreHouse requestStoreHouse, boolean onlyMine) throws FilesAndPathsException,
+			LocalUserInfoException, RequestStoreHouseException {
 
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
@@ -67,14 +65,16 @@ public class FilesManagerAux {
 			}
 		}
 
-		// We list in second (and last) place the other program files.
-		filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserInfo.getLocalUserName());
-		subDirs = dir.list(filter);
+		if (!onlyMine) {
+			// We list in second (and last) place the other program files.
+			filter = (FilenameFilter) new OnlyNotLocalUserNameFolderFilterClass(localUserInfo.getLocalUserName());
+			subDirs = dir.list(filter);
 
-		if (subDirs != null) {
-			for (int i = 0; i < subDirs.length; i++) {
-				// Get filename of file or directory
-				currentList = listProgramFilesInSubDir(subDirs[i], pathsMgmt, currentList);
+			if (subDirs != null) {
+				for (int i = 0; i < subDirs.length; i++) {
+					// Get filename of file or directory
+					currentList = listProgramFilesInSubDir(subDirs[i], pathsMgmt, currentList);
+				}
 			}
 		}
 
@@ -135,21 +135,14 @@ public class FilesManagerAux {
 			throw new Exception("We cannot upload because the content of the request is not multipart.");
 		}
 
-		// Folder checks
-		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
-		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
-
-		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
-			throw new Exception("The user must be the owner of the destiny folder.");
-		}
-
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// maximum size that will be stored in memory
 		factory.setSizeThreshold(KConstants.Communications.maxMemSize);
 		// Location to save data that is larger than maxMemSize.
 		// factory.setRepository(new File("/tmp/uploads"));
 		PathsMgmt pathsMgmt = new PathsMgmt();
-		factory.setRepository(new File(pathsMgmt.getProgramFilesPath()));
+		String repositoryLocation = pathsMgmt.getProgramFilesPath();
+		factory.setRepository(new File(repositoryLocation));
 
 		// Create a new file upload handler
 		ServletFileUpload upload = new ServletFileUpload(factory);
@@ -157,7 +150,8 @@ public class FilesManagerAux {
 		upload.setSizeMax(KConstants.Communications.maxFileSize);
 
 		// Get the path where we are going to upload the file.
-		String filesPath = programFileInfo.getProgramFileFolderFullPath();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+		String filesPath = localUserInfo.getLocalUserName();
 		if ((filesPath == null) || ("".equals(filesPath))) {
 			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
 		}
@@ -170,9 +164,8 @@ public class FilesManagerAux {
 		// Parse the request to get file items.
 		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(requestStoreHouse.getRequest()));
 
-
 		StringBuilder fileNames = new StringBuilder();
-		
+
 		for (int i = 0; i < fileItems.size(); i++) {
 			// FileItem fileItem = (FileItem)i.next();
 			FileItem fileItem = fileItems.get(i);
@@ -187,7 +180,7 @@ public class FilesManagerAux {
 					throw new Exception("The name of the program file to upload is an empty string.");
 				}
 				if (!fileName.endsWith(".pl")) {
-					throw new Exception("The name of the program file to upload must have the extension '.pl'.");
+					throw new Exception("The name of the program file to upload must have the .pl extension.");
 				}
 				// ServletsAuxMethodsClass.addMessageToTheUser(request,
 				// "Please choose a correct program file. Allowed file extension is \'.pl\'",
@@ -205,9 +198,9 @@ public class FilesManagerAux {
 
 				File file = new File(fileName);
 				fileItem.write(file);
-				
-				if (i>0) {
-				fileNames.append(", ");
+
+				if (i > 0) {
+					fileNames.append(", ");
 				}
 				fileNames.append(fileName);
 			}

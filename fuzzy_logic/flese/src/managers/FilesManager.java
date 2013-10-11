@@ -8,13 +8,10 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 
 import storeHouse.CacheStoreHouseCleaner;
-import storeHouse.RequestStoreHouseException;
 import auxiliar.LocalUserInfo;
-import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
-import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
@@ -43,27 +40,22 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void list() throws FilesAndPathsException, LocalUserInfoException, RequestStoreHouseException {
-		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
+	public void list() throws Exception {
+		ProgramFileInfo[] filesList = FilesManagerAux.listMyFiles(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
 
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ListPage, ""));
 	}
 
-	public void uploadFile() throws Exception {
-		String msg = "Program File has been uploaded.";
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
-
+	public void upload() throws Exception {
 		try {
-			String filesNames = FilesManagerAux.uploadFileAux(requestStoreHouse);
-			resultsStoreHouse.addMessage("Name of the uploaded file: " + filesNames);
+			FilesManagerAux.uploadFileAux(requestStoreHouse);
+			resultsStoreHouse.addMessage("Program File has been uploaded.");
 		} catch (Exception e) {
-			msg = "Error: " + e.getMessage();
-			setNextStep(null);
+			resultsStoreHouse.addMessage(e.getMessage());
 		}
-
-		resultsStoreHouse.addMessage(msg);
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
 
 	}
 
@@ -121,8 +113,7 @@ public class FilesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 
-	public void viewFile() throws FilesAndPathsException, FilesManagerException, FilesAndPathsException, LocalUserInfoException,
-			RequestStoreHouseException {
+	public void view() throws Exception {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();

@@ -149,6 +149,11 @@ public class KConstants {
 		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
 		public static final String queryLinesTableId = "queryLinesTable";
 		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
+		
+		public static final String uploadFormId = "uploadForm";
+		public static final String uploadStatusDivId = "uploadStatus";
+		public static final String uploadFormTargetiFrameId = "uploadFormTargetiFrame";
+
 	}
 }
 

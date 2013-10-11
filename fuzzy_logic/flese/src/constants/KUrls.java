@@ -35,7 +35,7 @@ public class KUrls {
 		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap UploadPage = new UrlMap(manager, "uploadPage", null, null, "WEB-INF/files/upload.jsp");
-		public static final UrlMap Upload = new UrlMap(manager, "upload", UploadPage, KUrls.Pages.Exception, "");
+		public static final UrlMap Upload = new UrlMap(manager, "upload", UploadPage, UploadPage, "");
 
 		public static final UrlMap ViewPage = new UrlMap(manager, "viewPage", null, null, "WEB-INF/files/view.jsp");
 		public static final UrlMap View = new UrlMap(manager, "view", ViewPage, KUrls.Pages.Exception, "");
@@ -90,6 +90,9 @@ public class KUrls {
 
 		public static final UrlMap ListPage = new UrlMap(manager, "", null, null, "WEB-INF/listFuzzifications.jsp");
 		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap EditPage = new UrlMap(manager, "", null, null, "WEB-INF/editFuzzification.jsp");
+		public static final UrlMap Edit = new UrlMap(manager, "edit", EditPage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap SavePage = new UrlMap(manager, "", null, null, "WEB-INF/saveFuzzification.jsp");
 		public static final UrlMap Save = new UrlMap(manager, "save", SavePage, KUrls.Pages.Exception, "");
