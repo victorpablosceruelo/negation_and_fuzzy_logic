@@ -4,7 +4,6 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <script type="text/javascript">
-uploadFileResults(<%=KConstants.JspsDivsIds.uploadStatusDivId%>, [
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
@@ -12,12 +11,8 @@ uploadFileResults(<%=KConstants.JspsDivsIds.uploadStatusDivId%>, [
 	String [] msgs = resultsStoreHouse.getMessages();
 	if ((msgs != null) && (msgs.length > 0)) {
 		for (int i=0; i<msgs.length; i++) {
-			%>'<%=msgs[i]%>'<%
-			if (i+1 < msgs.length) {
-				%>,<%
-			}
+			out.println("alert('" + msgs[i] +"');");
 		}
 	}
 %>
-]);
 </script>

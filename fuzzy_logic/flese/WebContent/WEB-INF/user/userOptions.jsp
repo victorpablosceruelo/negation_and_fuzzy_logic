@@ -127,7 +127,7 @@
 	</FORM>
 	
 	<div id='<%=KConstants.JspsDivsIds.uploadStatusDivId%>'></div>
-	<iframe id='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId %>' name='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId%>' ></iframe>
+	<iframe id='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId %>' name='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId%>' style='display:none;' ></iframe>
 	<!-- style='display:none;' -->
 </div>
 

@@ -113,8 +113,8 @@ function insertFileUploadFacility(parentDivId, urlUpload, urlReloadPage, uploadF
 
 function uploadActionOnChange(formId, uploadStatusDivId) {
 	// alert("Upload Submit Action started ...");
-	document.getElementById(uploadStatusDivId).style.visibility = 'visible';
-	document.getElementById(uploadStatusDivId).innerHTML = loadingImageHtml(true);
+	// document.getElementById(uploadStatusDivId).style.visibility = 'visible';
+	// document.getElementById(uploadStatusDivId).innerHTML = loadingImageHtml(true);
 
 	var form = document.getElementById(formId);
 	form.submit();
