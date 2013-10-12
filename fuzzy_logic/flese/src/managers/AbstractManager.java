@@ -13,6 +13,7 @@ import urls.UrlMapException;
 import urls.UrlsMaps;
 import auxiliar.NextStep;
 import constants.KConstants;
+import constants.KUrls;
 
 public abstract class AbstractManager implements InterfaceManager {
 
@@ -21,6 +22,19 @@ public abstract class AbstractManager implements InterfaceManager {
 	protected RequestStoreHouse requestStoreHouse = null;
 	protected ResultsStoreHouse resultsStoreHouse = null;
 	private NextStep nextStep;
+
+	public NextStep getExceptionPage() {
+		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
+		return nextStep;
+	}
+	
+	public boolean createSessionIfNull() {
+		return false;
+	}
+	
+	public boolean exceptionIfSessionIsNull() {
+		return true;
+	}
 
 	public NextStep getNextStep() {
 		return nextStep;

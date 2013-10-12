@@ -13,19 +13,8 @@ public class FuzzificationsManager extends AbstractManager {
 	}
 
 	@Override
-	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
-		return nextStep;
-	}
-
-	@Override
 	public void byDefaultMethod() throws Exception {
 		list();
-	}
-
-	@Override
-	public boolean createSessionIfNull() {
-		return false;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

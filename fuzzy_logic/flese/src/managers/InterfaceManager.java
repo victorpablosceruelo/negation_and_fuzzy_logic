@@ -19,4 +19,6 @@ public interface InterfaceManager {
 
 	public void setSessionStoreHouse(RequestStoreHouse sessionStoreHouse);
 
+	public boolean exceptionIfSessionIsNull();
+
 }

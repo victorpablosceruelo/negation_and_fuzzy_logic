@@ -21,21 +21,10 @@ public class FilesManager extends AbstractManager {
 	}
 
 	@Override
-	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
-		return nextStep;
-	}
-
-	@Override
 	public void byDefaultMethod() throws Exception {
 		list();
 	}
-
-	@Override
-	public boolean createSessionIfNull() {
-		return false;
-	}
-
+	
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +90,7 @@ public class FilesManager extends AbstractManager {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
-		if (!(localUserInfo.equals(programFileInfo.getFileOwner()))) {
+		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
 			throw new Exception("Logged user does not own the program file.");
 		}
 
