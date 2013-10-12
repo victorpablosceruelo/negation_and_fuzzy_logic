@@ -115,22 +115,14 @@
 <div id='filesListDiv' class='filesListTable'>
 </div>
 
-<%
-	String urlUpload = KUrls.Files.Upload.getUrl(true);
-%>
 <div id='fileUploadDiv' class='filesListTable'>
-	Upload Program files <br /> 
-	<FORM ID='<%=KConstants.JspsDivsIds.uploadFormId %>' ENCTYPE='multipart/form-data' method='POST' accept-charset='UTF-8' 
-			target='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId %>' action='<%=urlUpload %>' >
-			<INPUT TYPE='file' NAME='programFileToUpload' size='50' 
-					onchange='uploadActionOnChange("<%=KConstants.JspsDivsIds.uploadFormId %>", "<%=KConstants.JspsDivsIds.uploadStatusDivId%>");'>
-	</FORM>
-	
-	<div id='<%=KConstants.JspsDivsIds.uploadStatusDivId%>'></div>
-	<iframe id='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId %>' name='<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId%>' style='display:none;' ></iframe>
-	<!-- style='display:none;' -->
 </div>
 
 <script type="text/javascript">
 	loadAjaxIn('filesListDiv', '<%=KUrls.Files.List.getUrl(true) %>');
+	loadAjaxIn('fileUploadDiv', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');
 </script>
+
+
+
+<!-- END -->

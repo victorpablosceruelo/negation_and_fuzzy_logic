@@ -68,7 +68,10 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 	// debug.info("loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
 	var container = getContainer(containerId);
 	if (container === null) {
-		debug.info("aborted loadAjaxIn("+containerId + ", " + ajaxPageUrl + ")");
+		debug.info("aborted loadAjaxIn");
+		debug.info("containerId: " + containerId);
+		debug.info("ajaxPageUrl: " + ajaxPageUrl);
+		debug.info("aborted loadAjaxIn (end)");
 		return;
 	}
 
@@ -98,17 +101,50 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 	return false;
 }
 
+function loadAjaxInModal(containerId, ajaxPageUrl) {
+	
+}
+
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function clearScreen() {
-	var mainSection = getContainer('mainSecDiv');
+function getIframeWindow(iframe_object) {
+	  var doc = null;
+
+	  if (iframe_object.contentWindow) return iframe_object.contentWindow;
+	  if (iframe_object.window) return iframe_object.window;
+
+	  if ((doc == null) && iframe_object.contentDocument) doc = iframe_object.contentDocument;
+	  if ((doc == null) && iframe_object.document) doc = iframe_object.document;
+
+	  if ((doc != null) && doc.defaultView) return doc.defaultView;
+	  if ((doc != null) && doc.parentWindow) return doc.parentWindow;
+
+	  debug.info("getIframeWindow returns null");
+	  return null;
+	}
+
+function notNullNorUndefined(value) {
+	return ((value != null) && (value != undefined));
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function clearMainSection() {
+	var mainSection = getContainer('<%=KConstants.JspsDivsIds.mainSecDivId %>');
+	mainSection.innerHTML = "";
+}
+
+function clearMsgsSection() {
+	var mainSection = getContainer('<%=KConstants.JspsDivsIds.msgsSecDivId %>');
 	mainSection.innerHTML = "";
 }
 
 function showMsgs(msgs) {
-	var msgsContainerId = 'msgs';
+	var msgsContainerId = '<%=KConstants.JspsDivsIds.msgsSecDivId %>';
 	var msgsContainer = getContainer(msgsContainerId);
 
 	msgsContainer.innerHTML = "";

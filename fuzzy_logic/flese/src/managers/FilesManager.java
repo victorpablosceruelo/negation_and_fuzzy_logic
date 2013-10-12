@@ -37,6 +37,10 @@ public class FilesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ListPage, ""));
 	}
 
+	public void uploadDiv() throws Exception {
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadDivPage, ""));
+	}
+	
 	public void upload() throws Exception {
 		try {
 			FilesManagerAux.uploadFileAux(requestStoreHouse);

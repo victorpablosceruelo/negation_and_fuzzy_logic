@@ -34,6 +34,9 @@ public class KUrls {
 		public static final UrlMap ListPage = new UrlMap(manager, "listPage", null, null, "WEB-INF/files/list.jsp");
 		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap UploadDivPage = new UrlMap(manager, "uploadDivPage", null, null, "WEB-INF/files/uploadDiv.jsp");
+		public static final UrlMap UploadDiv = new UrlMap(manager, "uploadDiv", UploadDivPage, KUrls.Pages.Exception, "");
+
 		public static final UrlMap UploadPage = new UrlMap(manager, "uploadPage", null, null, "WEB-INF/files/upload.jsp");
 		public static final UrlMap Upload = new UrlMap(manager, "upload", UploadPage, UploadPage, "");
 

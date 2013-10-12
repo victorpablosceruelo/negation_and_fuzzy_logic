@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
 <%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
+	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 
 	String [] msgs = resultsStoreHouse.getMessages();
@@ -14,5 +14,8 @@
 			out.println("alert('" + msgs[i] +"');");
 		}
 	}
-%>
+	else { %>
+		// Update the files list.
+		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', );
+<%	}  %>
 </script>

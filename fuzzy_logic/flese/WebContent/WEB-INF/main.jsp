@@ -36,9 +36,12 @@
 		</div>
 	</header>
 	<br />
-	<section id="msgs" class="bodyToUserMsgs">
+	<section id="<%=KConstants.JspsDivsIds.msgsSecDivId %>" class="bodyToUserMsgs">
 
 	</section>
+	<section id="<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>" style='display:none;' >
+	</section>
+	
 	<br />
 
 	<section id="<%= KConstants.JspsDivsIds.mainSecDivId %>" class="">
