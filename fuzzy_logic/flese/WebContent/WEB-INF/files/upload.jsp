@@ -1,3 +1,4 @@
+<%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="results.ResultsStoreHouse"%>
@@ -26,6 +27,6 @@
 	}
 	else { %>
 		// Update the files list.
-		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', );
+		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.Files.List.getUrl(true) %>');
 <%	}  %>
 </script>
