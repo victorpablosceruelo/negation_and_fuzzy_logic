@@ -10,12 +10,17 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 
 public class ProgramFileInfo {
+
+	final Log LOG = LogFactory.getLog(ProgramFileInfo.class);
 
 	private String fileName = null;
 	private String fileOwner = null;
@@ -73,8 +78,9 @@ public class ProgramFileInfo {
 	public String getProgramFileBackupFullPath() throws FilesAndPathsException {
 		PathsMgmt pathsMgmt = new PathsMgmt();
 		String folderPath = PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(), KConstants.Application.BackupsFolder);
+
 		String tmp1 = PathsUtils.concatPathsStrings(folderPath, Dates.getCurrentDate());
-		String tmp2 = tmp1 + "_" + fileName;
+		String tmp2 = tmp1 + "_" + fileOwner + "_" + fileName;
 		return tmp2;
 	}
 
@@ -109,15 +115,18 @@ public class ProgramFileInfo {
 	}
 
 	public void backup() throws FilesAndPathsException {
-		String backupFullPath = getProgramFileBackupFullPath();
+		PathsMgmt pathsMgmt = new PathsMgmt();
+		pathsMgmt.createFolder(KConstants.Application.BackupsFolder, false);
 
+		String backupFileFullPath = getProgramFileBackupFullPath();
 		Path FROM = Paths.get(fileFullPath);
-		Path TO = Paths.get(backupFullPath);
+		Path TO = Paths.get(backupFileFullPath);
 		// overwrite existing file, if exists
 		CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES };
 		try {
 			java.nio.file.Files.copy(FROM, TO, options);
 		} catch (IOException e) {
+			LOG.info("Error on copy. \n FROM: " + fileFullPath + "\n TO: " + backupFileFullPath + "\n");
 			e.printStackTrace();
 			throw new FilesAndPathsException("Cannot make a backup of program file " + fileName + " owned by " + fileOwner + ".");
 		}

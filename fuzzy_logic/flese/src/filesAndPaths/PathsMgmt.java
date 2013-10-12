@@ -1,6 +1,10 @@
 package filesAndPaths;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import managers.FilesManagerAux;
 
@@ -28,11 +32,11 @@ public class PathsMgmt {
 			setPlServerPath(tmpPlServerPath);
 			LOG.info("plServerPath: " + plServerPath);
 		}
-		
+
 		if (programFilesPath == null) {
 			throw new FilesAndPathsException("programFilesPath cannot be null.");
 		}
-		
+
 		if (plServerPath == null) {
 			throw new FilesAndPathsException("plServerPath cannot be null.");
 		}
@@ -160,5 +164,23 @@ public class PathsMgmt {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public void createFolder(String subPath, boolean exceptionIfExists) throws FilesAndPathsException {
+		String folderPath = programFilesPath + subPath;
+		Path dir = Paths.get(folderPath);
+
+		if (Files.exists(dir)) {
+			if (exceptionIfExists) {
+				throw new FilesAndPathsException("Cannot create folder " + folderPath + " because it exists.");
+			}
+		} else {
+			try {
+				Files.createDirectory(dir);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new FilesAndPathsException("Cannot create folder " + folderPath);
+			}
+		}
+	}
 
 }

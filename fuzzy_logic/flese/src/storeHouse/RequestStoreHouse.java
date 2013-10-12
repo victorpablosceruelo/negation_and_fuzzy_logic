@@ -27,14 +27,23 @@ public class RequestStoreHouse {
 
 	private HashMap<String, String[]> requestParams = null;
 
-	public RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull)
-			throws RequestStoreHouseException, RequestStoreHouseSessionException {
+	public RequestStoreHouse(HttpServletRequest request) throws RequestStoreHouseException, RequestStoreHouseSessionException {
+		RequestStoreHouseConstructor(request, false, false, false);
+	}
+
+	public RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
+			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
+		RequestStoreHouseConstructor(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull);
+	}
+
+	public void RequestStoreHouseConstructor(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
+			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
 
 		if (request == null)
 			throw new RequestStoreHouseException("request is null");
 
 		this.request = request;
-		session = new SessionStoreHouse(request, create);
+		session = new SessionStoreHouse(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull);
 		if ((session == null) && (exceptionIfSessionIsNull)) {
 			throw new RequestStoreHouseException("session is null");
 		}

@@ -14,10 +14,14 @@ public class SessionStoreHouse {
 
 	private HttpSession session = null;
 
-	public SessionStoreHouse(HttpServletRequest request, boolean create) throws RequestStoreHouseException, RequestStoreHouseSessionException {
+	public SessionStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
+			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
 		this.session = request.getSession(create);
-		if (session == null) {
+		if ((session == null) && (exceptionIfSessionIsNull)) {
 			throw new RequestStoreHouseSessionException("session is null. 'Create if null' has the value: " + create);
+		}
+		if ((exceptionIfLocalUserInfoIsNull) && (getLocalUserInfo() == null)) {
+			throw new RequestStoreHouseSessionException("Invalid session. Please Log In again");
 		}
 	}
 
@@ -37,7 +41,8 @@ public class SessionStoreHouse {
 
 	public boolean appIsInTestingMode() {
 		String isInTestingMode = (String) session.getAttribute(KConstants.Session.swAppInTestingMode);
-		if (isInTestingMode == null) return false;
+		if (isInTestingMode == null)
+			return false;
 		return "true".equals(isInTestingMode);
 	}
 

@@ -17,7 +17,7 @@ public class JspsUtils {
 
 		String localUserInfoName = null;
 		try {
-			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
+			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false, true, true);
 			localUserInfoName = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
 		} catch (Exception e) {
 			localUserInfoName = "";
@@ -28,7 +28,7 @@ public class JspsUtils {
 	public static SessionStoreHouse getSessionStoreHouse(HttpServletRequest request) {
 		SessionStoreHouse sessionStoreHouse = null;
 		try {
-			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
+			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 			sessionStoreHouse = requestStoreHouse.getSession();
 		} catch (Exception e) {
 			sessionStoreHouse = null;

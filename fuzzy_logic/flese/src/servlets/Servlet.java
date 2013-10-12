@@ -98,11 +98,13 @@ public class Servlet extends HttpServlet {
 		// Create the session if the manager needs it.
 		boolean createSessionIfNull = managerObject.createSessionIfNull();
 		boolean exceptionIfSessionIsNull = managerObject.exceptionIfSessionIsNull();
+		boolean exceptionIfLocalUserInfoIsNull = managerObject.exceptionIfLocalUserInfoIsNull();
+		
 		ServletContext servletContext = getServletConfig().getServletContext();
 		RequestStoreHouse requestStoreHouse;
 		try {
 			try {
-				requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull);
+				requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull);
 			} catch (RequestStoreHouseSessionException e) {
 				e.printStackTrace();
 				return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.NullSession, "");
