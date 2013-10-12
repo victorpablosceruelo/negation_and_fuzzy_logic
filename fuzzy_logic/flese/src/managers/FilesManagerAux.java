@@ -151,14 +151,9 @@ public class FilesManagerAux {
 
 		// Get the path where we are going to upload the file.
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
-		String filesPath = localUserInfo.getLocalUserName();
-		if ((filesPath == null) || ("".equals(filesPath))) {
-			throw new Exception("ERROR: filesPath cannot be null nor empty string.");
-		}
-
-		// Adequate
-		if (!(filesPath.endsWith("/"))) {
-			filesPath += "/";
+		String fileOwner = localUserInfo.getLocalUserName();
+		if ((fileOwner == null) || ("".equals(fileOwner))) {
+			throw new Exception("ERROR: fileOwner cannot be null nor empty string.");
 		}
 
 		// Parse the request to get file items.
@@ -182,21 +177,24 @@ public class FilesManagerAux {
 				if (!fileName.endsWith(".pl")) {
 					throw new Exception("The name of the program file to upload must have the .pl extension.");
 				}
-				// ServletsAuxMethodsClass.addMessageToTheUser(request,
-				// "Please choose a correct program file. Allowed file extension is \'.pl\'",
-				// LOG);
+				
+				while (fileName.lastIndexOf("\\") >= 0) {
+					fileName = fileName.substring(fileName.lastIndexOf("\\"));
+				}
+				while (fileName.lastIndexOf("/") >= 0) {
+					fileName = fileName.substring(fileName.lastIndexOf("/"));
+				}
 
 				// String fileNameReal = "";
 				// String contentType = fi.getContentType();
 				// boolean isInMemory = fi.isInMemory();
 				// long sizeInBytes = fi.getSize();
 				// Write the file
-				if (fileName.lastIndexOf("\\") >= 0) {
-					fileName = filesPath + fileName.substring(fileName.lastIndexOf("\\"));
-				} else
-					fileName = filesPath + fileName;
-
-				File file = new File(fileName);
+				
+				ProgramFileInfo programFileInfo = new ProgramFileInfo(fileOwner, fileName);
+				
+				String programFileFullPath = programFileInfo.getProgramFileFullPath();
+				File file = new File(programFileFullPath);
 				fileItem.write(file);
 
 				if (i > 0) {

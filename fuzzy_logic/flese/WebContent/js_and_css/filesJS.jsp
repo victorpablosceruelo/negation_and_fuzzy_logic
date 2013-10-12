@@ -67,7 +67,7 @@ function fileViewAction(fileViewContentsDivId, urlFileView, fileOwner, fileName)
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertiFrameWindowEvaluationOfJSWindowToDiv(uploadFormTargetiFrameId) {
+function insertiFrameWindowEvaluationOfJS(uploadFormTargetiFrameId) {
 	
 	// This does not work on google chrome: "src='#' " 
     	
@@ -84,10 +84,14 @@ function insertiFrameWindowEvaluationOfJSWindowToDiv(uploadFormTargetiFrameId) {
 			if (notNullNorUndefined(responseHtmlText)) {
 				iFrameWindow.document.body.innerHTML="";
 				debug.info(responseHtmlText);
-				executeAjaxLoadedPageJS(responseHtmlText);
+				if (typeof(executeAjaxLoadedPageJS) == "function") {
+					executeAjaxLoadedPageJS(responseHtmlText);
+				}
+				if (typeof(window.parent.executeAjaxLoadedPageJS) == "function") {
+					window.parent.executeAjaxLoadedPageJS(responseHtmlText);
+				}
 			}
 			
-			iFrameWindow.
 			// Clear the content of the iframe.
 			// this.contentDocument.location.href = '/images/loading.gif';
 			// alert("responseText: " + responseHtmlText);

@@ -17,7 +17,7 @@
 	<!-- style='display:none;' -->
 
 <script type="text/javascript">
-	insertiFrameWindowEvaluationOfJSWindowToDiv('<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId %>');
+	insertiFrameWindowEvaluationOfJS('<%=KConstants.JspsDivsIds.uploadFormTargetiFrameId %>');
 </script>
 
 

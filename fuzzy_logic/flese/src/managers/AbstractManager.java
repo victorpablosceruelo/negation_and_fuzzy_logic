@@ -134,6 +134,7 @@ public abstract class AbstractManager implements InterfaceManager {
 				NextStep onExceptionNextStep = getExceptionPage();
 				setNextStep(onExceptionNextStep);
 				e.printStackTrace();
+				resultsStoreHouse.addMessage(e.getMessage());
 			}
 		}
 	}

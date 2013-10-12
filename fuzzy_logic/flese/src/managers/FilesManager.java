@@ -24,7 +24,7 @@ public class FilesManager extends AbstractManager {
 	public void byDefaultMethod() throws Exception {
 		list();
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,16 +40,14 @@ public class FilesManager extends AbstractManager {
 	public void uploadDiv() throws Exception {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadDivPage, ""));
 	}
-	
+
 	public void upload() throws Exception {
 		try {
 			FilesManagerAux.uploadFileAux(requestStoreHouse);
-			resultsStoreHouse.addMessage("Program File has been uploaded.");
 		} catch (Exception e) {
 			resultsStoreHouse.addMessage(e.getMessage());
 		}
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
-
 	}
 
 	public void download() throws Exception {
@@ -98,11 +96,14 @@ public class FilesManager extends AbstractManager {
 			throw new Exception("Logged user does not own the program file.");
 		}
 
-		programFileInfo.remove();
-		resultsStoreHouse.addMessage("The program file " + programFileInfo.getFileName() + " has been removed. ");
+		try {
+			programFileInfo.remove();
+		} catch (Exception e) {
+			resultsStoreHouse.addMessage(e.getMessage());
+			throw e;
+		}
 
 		CacheStoreHouseCleaner.clean(requestStoreHouse);
-
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 
