@@ -97,10 +97,15 @@ public class ProgramFileInfo {
 		return retVal;
 	}
 
-	public void remove() throws FilesAndPathsException {
-		existsFile(true);
-		backup();
-		removeFileWithoutBackup();
+	public String remove() throws FilesAndPathsException {
+		if (existsFile(false)) {
+			backup();
+			removeFileWithoutBackup();
+			return "File " + fileName + " does not exist.";
+		}
+		else {
+			return "File " + fileName + " does not exist.";
+		}
 	}
 
 	public void removeFileWithoutBackup() throws FilesAndPathsException {

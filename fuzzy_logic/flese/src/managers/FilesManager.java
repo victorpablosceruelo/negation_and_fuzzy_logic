@@ -93,17 +93,13 @@ public class FilesManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
-			throw new Exception("Logged user does not own the program file.");
+			resultsStoreHouse.addMessage("Logged user does not own the program file.");
+		} else {
+			String result = programFileInfo.remove();
+			resultsStoreHouse.addMessage(result);
+			CacheStoreHouseCleaner.clean(requestStoreHouse);
 		}
 
-		try {
-			programFileInfo.remove();
-		} catch (Exception e) {
-			resultsStoreHouse.addMessage(e.getMessage());
-			throw e;
-		}
-
-		CacheStoreHouseCleaner.clean(requestStoreHouse);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
 

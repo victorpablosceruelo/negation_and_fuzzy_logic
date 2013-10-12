@@ -1,5 +1,7 @@
 package auxiliar;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 
 import results.ResultsStoreHouse;
@@ -42,6 +44,33 @@ public class JspsUtils {
 			resultsStoreHouse = new ResultsStoreHouse();
 		}
 		return resultsStoreHouse;
+	}
+	
+	public static String getMessagesInJS(HttpServletRequest request, ArrayList<String> msgs) {
+		if (msgs == null) {
+			msgs = new ArrayList<String>();
+		}
+		
+		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+		String [] msgsError = resultsStoreHouse.getMessages();
+		if (msgsError != null) {
+			for (int i=0; i<msgsError.length; i++) {
+				msgs.add(msgsError[i]);
+			}
+		}
+
+		StringBuilder msg = new StringBuilder();
+		// msg.append("[");
+		for (int i=0; i<msgs.size(); i++) {
+			msg.append("'");
+			msg.append(msgs.get(i));
+			msg.append("'");
+			if (i+1 < msgs.size()) {
+				msg.append(", ");
+			}
+		}
+		// msg.append("]");
+		return msg.toString();
 	}
 
 	public static String comboBoxDefaultValue() {
