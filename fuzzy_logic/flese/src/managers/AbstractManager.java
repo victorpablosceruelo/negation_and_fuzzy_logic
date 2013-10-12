@@ -35,6 +35,10 @@ public abstract class AbstractManager implements InterfaceManager {
 	public boolean exceptionIfSessionIsNull() {
 		return true;
 	}
+	
+	public boolean exceptionIfLocalUserInfoIsNull() {
+		return true;
+	}
 
 	public NextStep getNextStep() {
 		return nextStep;
