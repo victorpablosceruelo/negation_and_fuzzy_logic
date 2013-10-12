@@ -13,7 +13,7 @@ public class ResultsStoreHouse {
 	private String[] fileContents = null;
 	private String[] fuzzificationsList = null;
 	private ProgramIntrospection programIntrospection = null;
-	private String [] variablesNames = null;
+	private String[] variablesNames = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
 
 	/**
@@ -27,9 +27,9 @@ public class ResultsStoreHouse {
 			messages.add(msg);
 		}
 	}
-	
-	public String [] getMessages() {
-		return messages.toArray(new String [messages.size()]);
+
+	public String[] getMessages() {
+		return messages.toArray(new String[messages.size()]);
 	}
 
 	public void setFilesList(ProgramFileInfo[] filesList) {
@@ -75,18 +75,18 @@ public class ResultsStoreHouse {
 	public CiaoPrologQueryAnswer[] getCiaoPrologQueryAnswers() {
 		return this.queryAnswers;
 	}
-	
-	public void setCiaoPrologQueryVariablesNames(String [] variablesNames) {
+
+	public void setCiaoPrologQueryVariablesNames(String[] variablesNames) {
 		this.variablesNames = null;
 		if (variablesNames != null) {
 			this.variablesNames = variablesNames;
 		}
 	}
-	
-	public String [] getCiaoPrologQueryVariablesNames() {
+
+	public String[] getCiaoPrologQueryVariablesNames() {
 		return this.variablesNames;
 	}
-	
+
 	public void setCiaoPrologProgramIntrospection(ProgramIntrospection programIntrospection) {
 		this.programIntrospection = null;
 		if (programIntrospection != null) {

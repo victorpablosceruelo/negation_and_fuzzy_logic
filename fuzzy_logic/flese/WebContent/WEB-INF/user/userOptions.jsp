@@ -132,5 +132,5 @@
 </div>
 
 <script type="text/javascript">
-	true;
+	loadAjaxIn('filesListDiv', '<%=KUrls.Files.List.getUrl(true) %>');
 </script>

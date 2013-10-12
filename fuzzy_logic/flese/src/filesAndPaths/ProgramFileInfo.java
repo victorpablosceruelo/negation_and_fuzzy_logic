@@ -4,15 +4,24 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
+import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
+import constants.KConstants;
 
 public class ProgramFileInfo {
 
 	private String fileName = null;
 	private String fileOwner = null;
+
+	private String folderFullPath = null;
+	private String fileFullPath = null;
 
 	public ProgramFileInfo(String fileOwner, String fileName) throws FilesAndPathsException, LocalUserInfoException {
 
@@ -34,6 +43,11 @@ public class ProgramFileInfo {
 
 		this.fileName = fileName;
 		this.fileOwner = fileOwner;
+
+		PathsMgmt pathsMgmt = new PathsMgmt();
+		this.folderFullPath = PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(), fileOwner);
+		this.fileFullPath = PathsUtils.concatPathsStrings(this.folderFullPath, fileName);
+
 	}
 
 	public String getFileName() {
@@ -43,35 +57,69 @@ public class ProgramFileInfo {
 	public String getFileOwner() {
 		return fileOwner;
 	}
-	
+
 	public String getInfoForUrls() {
-		return "&fileName="+getFileName()+"&fileOwner="+getFileOwner();
+		return "&fileName=" + getFileName() + "&fileOwner=" + getFileOwner();
+	}
+
+	public String getProgramFileFolderFullPath() {
+		return this.folderFullPath;
 	}
 
 	public String getProgramFileFullPath() throws FilesAndPathsException {
-		return PathsUtils.concatPathsStrings(getProgramFileFolderFullPath(), fileName);
+		return this.fileFullPath;
 	}
 
-	public String getProgramFileFolderFullPath() throws FilesAndPathsException {
+	public String getProgramFileBackupFullPath() throws FilesAndPathsException {
 		PathsMgmt pathsMgmt = new PathsMgmt();
-		return PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(), fileOwner);
+		String folderPath = PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(), KConstants.Application.BackupsFolder);
+		String tmp1 = PathsUtils.concatPathsStrings(folderPath, Dates.getCurrentDate());
+		String tmp2 = tmp1 + "_" + fileName;
+		return tmp2;
 	}
 
-	public Boolean canDeleteFile(String localUserName) {
-		return fileOwner.equals(localUserName);
+	public Boolean canDeleteFile(String localUserName) throws FilesAndPathsException {
+		return existsFile(false) && fileOwner.equals(localUserName);
 	}
 
-	public void remove() throws FilesAndPathsException, FilesAndPathsException {
-		String fullPath = getProgramFileFolderFullPath();
-
-		File file = new File(fullPath);
+	public boolean existsFile(boolean throwExceptionIfNot) throws FilesAndPathsException {
+		File file = new File(fileFullPath);
 		boolean retVal = file.exists();
-		if (!retVal) {
-			throw new FilesAndPathsException("The program file" + fullPath + "does not exist.");
+		if (throwExceptionIfNot && (!retVal)) {
+			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " does not exist.");
 		}
-		retVal = file.delete();
-		if (!retVal) {
-			throw new FilesAndPathsException("The program file" + fullPath + "can not be removed.");
+		return retVal;
+	}
+
+	public void remove() throws FilesAndPathsException {
+		existsFile(true);
+		backup();
+		removeFileWithoutBackup();
+	}
+
+	public void removeFileWithoutBackup() throws FilesAndPathsException {
+		existsFile(true);
+		Path target = Paths.get(fileFullPath);
+		try {
+			java.nio.file.Files.delete(target);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " can not be removed.");
+		}
+	}
+
+	public void backup() throws FilesAndPathsException {
+		String backupFullPath = getProgramFileBackupFullPath();
+
+		Path FROM = Paths.get(fileFullPath);
+		Path TO = Paths.get(backupFullPath);
+		// overwrite existing file, if exists
+		CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES };
+		try {
+			java.nio.file.Files.copy(FROM, TO, options);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new FilesAndPathsException("Cannot make a backup of program file " + fileName + " owned by " + fileOwner + ".");
 		}
 	}
 

@@ -21,8 +21,8 @@
 %>
 	<div class='filesListTableRow'>
 		<div class='filesListTableCell'>Program File Name</div>
-		<div class='filesListTableCell'>Program File Name</div>
-		<div class='filesListTableCell'>Program File Name</div>
+		<div class='filesListTableCell'></div>
+		<div class='filesListTableCell'></div>
 	</div>		
 <%	}
 	else {
@@ -33,16 +33,20 @@ You do not owe any program file. Upload one by using the facility below.
 	for(int i=0; i<filesList.length; i++) { 
 %>
 	<div class='filesListTableRow'>
-		<a href='#' onclick='fileViewAction("fileViewContentsDiv", <%=urlFileView%>, <%= filesList[i].getFileOwner() %>, <%= filesList[i].getFileName() %>);'
+		<div class='filesListTableCell'>
+		<a href='#' onclick='fileViewAction("fileViewContentsDiv", "<%=urlFileView%>", "<%= filesList[i].getFileOwner() %>", "<%= filesList[i].getFileName() %>");'
 					title='view program file <%= filesList[i].getFileName() %>'><%=filesList[i].getFileName() %></a>
-		   					
-		<a href='#' onclick='removeFileAction("parentDivId", <%=urlFileRemove%>, <%=urlReloadPage%><%= filesList[i].getFileOwner() %>, <%= filesList[i].getFileName() %>);' 
+		</div>
+		<div class='filesListTableCell'>   					
+		<a href='#' onclick='removeFileAction("parentDivId", "<%=urlFileRemove%>", "<%=urlReloadPage%>", "<%= filesList[i].getFileOwner() %>", "<%= filesList[i].getFileName() %>");' 
 	   				title='remove program file <%= filesList[i].getFileName() %>' >
 	   				<img src='images/remove-file.gif' width='20em'></a>
-	   										 
-		<a href='#' onclick='return personalizeProgramFile("advanced", <%=urlListFuzzifications%>, <%= filesList[i].getFileOwner() %>, <%= filesList[i].getFileName() %>);' 
+	   	</div>
+	   	<div class='filesListTableCell'>	 
+		<a href='#' onclick='return personalizeProgramFile("advanced", "<%=urlListFuzzifications%>", "<%= filesList[i].getFileOwner() %>", "<%= filesList[i].getFileName() %>");' 
 					title='personalize program file <%= filesList[i].getFileName() %>' >
 					<img src='images/edit.png' width='20em'></a>
+		</div>
 	</div>
 <%  }  %>
 
