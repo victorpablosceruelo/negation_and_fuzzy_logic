@@ -67,6 +67,65 @@ function fileViewAction(fileViewContentsDivId, urlFileView, fileOwner, fileName)
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
+function insertiFrameWindowEvaluationOfJSWindowToDiv(uploadFormTargetiFrameId) {
+	
+	// This does not work on google chrome: "src='#' " 
+    	
+	$('#' + uploadFormTargetiFrameId).load(function() {
+		// document.getElementById('#' + submitiFrameId);
+		var responseHtmlText = null;
+		var iFrameWindow = getIframeWindow(this);
+		if ((notNullNorUndefined(iFrameWindow)) && (notNullNorUndefined(iFrameWindow.document)) && (notNullNorUndefined(iFrameWindow.document.body))) {
+			
+			// Save html received in iFrameWindow
+			responseHtmlText = iFrameWindow.document.body.innerHTML;
+			
+			// Empty iFrameWindow html text.
+			if (notNullNorUndefined(responseHtmlText)) {
+				iFrameWindow.document.body.innerHTML="";
+				debug.info(responseHtmlText);
+				executeAjaxLoadedPageJS(responseHtmlText);
+			}
+			
+			iFrameWindow.
+			// Clear the content of the iframe.
+			// this.contentDocument.location.href = '/images/loading.gif';
+			// alert("responseText: " + responseHtmlText);
+			
+			// var container = getContainer(uploadStatusDivId);
+			// container.style.visibility = 'visible';
+			// container.innerHTML = responseHtmlText;
+		}
+		  
+	});	
+}
+
+function fileUploadAutomaticSendActionOnChange(formId, uploadStatusDivId) {
+	// alert("Upload Submit Action started ...");
+	var uploadStatusDiv = getContainer(uploadStatusDivId);
+	uploadStatusDiv.style.visibility = 'visible';
+	uploadStatusDiv.innerHTML = "";
+	uploadStatusDiv.innerHTML = loadingImageHtml(true);
+
+	var form = document.getElementById(formId);
+	form.submit();
+}
+
+function fileUploadShowResults(uploadStatusDivId, results) {
+	var uploadStatusDiv = getContainer(uploadStatusDivId);
+	uploadStatusDiv.innerHTML = "";
+	
+	for (var i=0; i<results.length; i++) {
+		uploadStatusDiv.innerHTML += "<br>" + results[i];
+	}
+}
+
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+
 <% if (JspsUtils.getStringWithValueS().equals("N")) { %>
 </script>
 <% } %>
