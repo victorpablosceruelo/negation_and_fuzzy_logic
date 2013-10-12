@@ -8,12 +8,26 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+<%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 
 <% if (JspsUtils.getStringWithValueS().equals("N")) { %>
 <script type="text/javascript">
 <% } %>
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+function removeFileAction (fileOwner, fileName) {
+	var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
+	var urlRemove = "<%=KUrls.Files.Remove.getUrl(true)%>";
+	var fileOwnerParam = "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner;
+	var fileNameParam = "&<%=KConstants.Request.fileNameParam%>=" + fileName;
+	
+	loadAjaxIn(divId, urlRemove + fileOwnerParam + fileNameParam);
+}
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */

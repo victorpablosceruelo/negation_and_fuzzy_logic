@@ -49,16 +49,7 @@ You do not owe any program file. Upload one by using the facility below.
 	</div>
 <%  }  %>
 
-<script type="text/javascript">
-	function removeFileAction (fileOwner, fileName) {
-		var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
-		var urlRemove = "<%=KUrls.Files.Remove.getUrl(true)%>";
-		var fileOwnerParam = "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner;
-		var fileNameParam = "&<%=KConstants.Request.fileNameParam%>=" + fileName;
-		
-		loadAjaxIn(divId, urlRemove + fileOwnerParam + fileNameParam);
-	}
-</script>
+
 
 
 

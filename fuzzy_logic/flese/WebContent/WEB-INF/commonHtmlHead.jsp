@@ -27,7 +27,7 @@
 	<script type="text/javascript" src="js_and_css/auxiliarJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 	<script type="text/javascript" src="js_and_css/answersJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 	<script type="text/javascript" src="js_and_css/fuzzificationsJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
-	<script type="text/javascript" src="js_and_css/userOpsJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
+	<script type="text/javascript" src="js_and_css/filesJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 </head>
 <!-- end of commonHtmlHead -->
 
