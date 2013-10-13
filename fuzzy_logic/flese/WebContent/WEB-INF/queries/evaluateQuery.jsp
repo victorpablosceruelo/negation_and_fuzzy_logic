@@ -8,7 +8,7 @@
 cleanUpQueryAnswers();
 
 <% 
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
+	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String [] variablesNames = resultsStoreHouse.getCiaoPrologQueryVariablesNames();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();

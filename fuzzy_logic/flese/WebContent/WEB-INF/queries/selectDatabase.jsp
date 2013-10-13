@@ -13,7 +13,7 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false);
+	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);

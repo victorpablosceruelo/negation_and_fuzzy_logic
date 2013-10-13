@@ -237,6 +237,12 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .filesListTableRow {display:table-row; border:0.1em solid grey; text-align:left; padding:0.1em;}
 .filesListTableCell {display:table-cell; border:0.1em solid grey; text-align:left; padding:0.1em;}
 
+.filesListTable {display:table; border:0.1em solid #000000; margin:1em; text-align:center;}
+.filesListTableRow {display:table-row; border:0.1em solid grey; text-align:left; padding:0.1em;}
+.filesListTableCell {display:table-cell; border:0.1em solid grey; text-align:left; padding:0.1em;}
+
+.fileViewTableCell {display:table-cell; border:0em solid grey; text-align:left; padding:0.1em;}
+
 .userInformationTable {display:table; border:0.1em solid #000000; margin:1em; text-align:center;}
 .userInformationTableRow {display:table-row; border:0.1em solid grey; text-align:left; padding:0.1em;}
 .userInformationTableCell {display:table-cell; border:0.1em solid grey; text-align:left; padding:0.1em;}
