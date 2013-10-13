@@ -12,7 +12,7 @@
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();
 	
 	if (answers.length > 0) {
-		out.print("showAnswers(" + KConstants.JspsDivsIds.runQueryDivId + "[ [ 0, ");
+		out.print("showAnswers('" + KConstants.JspsDivsIds.runQueryDivId + "', [ [ 0, ");
 		for (int j=0; j<variablesNames.length; j++) {
 			out.print("'" + variablesNames[j] + "'");
 			if (j+1 < variablesNames.length) {
@@ -46,7 +46,7 @@
 	if (answers.length <= 0) {
 		String [] msgs = resultsStoreHouse.getMessages();
 		if (msgs.length <= 0) {
-			%>The query has no answers. Maybe the database is empty? <%
+			%>The query has no answers. <%
 		}
 		else {
 			for (int i=0; i<msgs.length; i++) {

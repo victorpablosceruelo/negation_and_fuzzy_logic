@@ -126,7 +126,7 @@ var queryAnswersOver70 = null;
 var queryAnswersOver50 = null;
 var queryAnswersOver0 = null;
 
-function showQueryAnswers(runQueryDivId, answers) {
+function showAnswers(runQueryDivId, answers) {
 
 	var runQueryDiv = getContainer(runQueryDivId);
 	if ((runQueryDiv == null) || (runQueryDiv == undefined)) {
@@ -136,9 +136,11 @@ function showQueryAnswers(runQueryDivId, answers) {
 	}
 		
 	if ((answers == null) || (answers.length <= 1)) {
+		runQueryDiv.innerHTML = "The query has no answers.";
 		return;
 	}
 	
+	alert("answers.length" + answers.length);
 	answers.sort(arraySortFunction);
 
 	var best10answersName = "10 best results";
@@ -158,93 +160,72 @@ function showQueryAnswers(runQueryDivId, answers) {
 	insertInfoForQueryAnswers(allAnswers, null);
 	
 	for (var i=0; i<answers.length; i++) {
-		if ((i <= 10) && (resultOver(0, answers[i]))) insertInfoForQueryAnswers(best10answersName, i);
-		if (resultOver(0.7, answers[i])) insertInfoForQueryAnswers(answersOver70Name, i);
-		if (resultOver(0.5, answers[i])) insertInfoForQueryAnswers(answersOver50Name, i);
-		if (resultOver(0, answers[i])) insertInfoForQueryAnswers(answersOver0Name, i);
-		if (resultOver(0, answers[i])) insertInfoForQueryAnswers(allAnswers, i);
+		var answer = answers[i];
+		if ((i <= 10) && (resultOver(0, answer))) insertInfoForQueryAnswers(best10answersName, i);
+		if (resultOver(0.7, answer)) insertInfoForQueryAnswers(answersOver70Name, i);
+		if (resultOver(0.5, answer)) insertInfoForQueryAnswers(answersOver50Name, i);
+		if (resultOver(0, answer)) insertInfoForQueryAnswers(answersOver0Name, i);
+		insertInfoForQueryAnswers(allAnswers, i);
 	}
 	
-	// Create the real tables (if necessary) and put inside the results.
-	var hasAnswers = false;
-	for (var i=0; i<answersIndexes.length; i++) {
+	runQueryDiv.innerHTML = "";
+
+	var tabsDiv = document.createElement('div');
+	tabsDiv.id = "tabs";
+	runQueryDiv.appendChild(tabsDiv);
+	var tabsDivList = document.createElement('ul');
+	tabsDiv.appendChild(tabsDivList);
+	
+	var html = null;
+	var i = null;
+	var j = null;
+	var k = null;
+	var tabDiv = null;
+	var tabContentDiv = null;
+	var row = null;
+	var cell = null;
+		
+	html = "";
+	j = 1;
+	for (i=0; i<answersIndexes.length; i++) {
 		// The first answer is information about the database fields.
 		if (answersIndexes[i].queryAnswersIndexes.length > 1) {
-			hasAnswers = true;
+			html += "<li><a href='#tabs-"+j+"'>"+answersIndexes[i].tableName+"</a></li>";
+			j++;
 		}
 	}
-	debug.info("hasAnswers: " + hasAnswers);
-	console.log("hasAnswers: " + hasAnswers);
-	
-	// if (! hasAnswers) {
-	// 	runQueryDiv.innerHTML = "The query has no answers. Maybe the database is empty? ";
-	// }
-	// else {
-	if (hasAnswers) {	
-		runQueryDiv.innerHTML = "";
-
-		var tabsDiv = document.createElement('div');
-		tabsDiv.id = "tabs";
-		runQueryDiv.appendChild(tabsDiv);
-		var tabsDivList = document.createElement('ul');
-		tabsDiv.appendChild(tabsDivList);
+	tabsDivList.innerHTML = html;
 		
-		var html = null;
-		var i = null;
-		var j = null;
-		var k = null;
-		var tabDiv = null;
-		var tabContentDiv = null;
-		var row = null;
-		var cell = null;
-		
-		html = "";
-		j = 1;
-		for (i=0; i<answersIndexes.length; i++) {
-			// The first answer is information about the database fields.
-			if (answersIndexes[i].queryAnswersIndexes.length > 1) {
-				html += "<li><a href='#tabs-"+j+"'>"+answersIndexes[i].tableName+"</a></li>";
-				j++;
-			}
-		}
-		tabsDivList.innerHTML = html;
-		
-		html = "";
-		j = 1;
-		for (i=0; i<answersIndexes.length; i++) {
-			// The first answer is information about the database fields.
-			if (answersIndexes[i].queryAnswersIndexes.length > 1) {
-				tabDiv = document.createElement('div');
-				tabDiv.id = "tabs-" + j;
-				j++;
-				tabsDiv.appendChild(tabDiv);
+	html = "";
+	j = 1;
+	for (i=0; i<answersIndexes.length; i++) {
+		// The first answer is information about the database fields.
+		if (answersIndexes[i].queryAnswersIndexes.length > 1) {
+			tabDiv = document.createElement('div');
+			tabDiv.id = "tabs-" + j;
+			j++;
+			tabsDiv.appendChild(tabDiv);
 				
-				tabContentDiv = document.createElement('div');
-				tabContentDiv.className = "queryAnswersTable";
-				tabDiv.appendChild(tabContentDiv);
+			tabContentDiv = document.createElement('div');
+			tabContentDiv.className = "queryAnswersTable";
+			tabDiv.appendChild(tabContentDiv);
 				
-				// Now insert each answer in a row, inside the table
-				for (k=0; k<answersIndexes[i].queryAnswersIndexes.length; k++) {
-					row = document.createElement('div');
-					row.className = "queryAnswersTableRow";
-					tabContentDiv.appendChild(row);
+			// Now insert each answer in a row, inside the table
+			for (k=0; k<answersIndexes[i].queryAnswersIndexes.length; k++) {
+				row = document.createElement('div');
+				row.className = "queryAnswersTableRow";
+				tabContentDiv.appendChild(row);
 					
-					var answer = queryAnswers[answersIndexes[i].queryAnswersIndexes[k]];
-					for (var l=1; l<answer.length; l++) {
-						cell = document.createElement('div');
-						cell.className = "queryAnswersTableCell";
-						row.appendChild(cell);
-						if (l+1 < answer.length) {
-//							if (k==0) {
-								cell.innerHTML = prologNameInColloquialLanguage(answer[l]);
-//							}
-//							else {
-//								cell.innerHTML = answer[l];
-//							}
-						}
-						else {
-							cell.innerHTML = truncate_truth_value(answer[l]);
-						}
+				var answer = answers[answersIndexes[i].queryAnswersIndexes[k]];
+				for (var l=1; l<answer.length; l++) {
+					cell = document.createElement('div');
+					cell.className = "queryAnswersTableCell";
+					row.appendChild(cell);
+					if (l+1 < answer.length) {
+						cell.innerHTML = prologNameInColloquialLanguage(answer[l]);
+					}
+					else {
+						cell.innerHTML = truncate_truth_value(answer[l]);
 					}
 				}
 			}
