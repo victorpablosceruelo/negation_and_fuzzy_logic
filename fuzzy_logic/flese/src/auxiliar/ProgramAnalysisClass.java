@@ -11,12 +11,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import storeHouse.RequestStoreHouse;
-import constants.KConstants;
+import filesAndPaths.ProgramFileInfo;
 
 public class ProgramAnalysisClass {
 	final Log LOG = LogFactory.getLog(ProgramAnalysisClass.class);
 
-	private RequestStoreHouse requestStoreHouse;
+	private ProgramFileInfo programFileInfo;
 	private ArrayList<ProgramPartAnalysisClass> programParts = null;
 	private String[] programFunctionsOrderedInJavaScript = null;
 
@@ -27,16 +27,16 @@ public class ProgramAnalysisClass {
 	 * @throws Exception
 	 *             when any of the previous is null or empty string.
 	 */
-	public ProgramAnalysisClass(RequestStoreHouse requestStoreHouse) throws Exception {
+	public ProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
 
-		this.requestStoreHouse = requestStoreHouse;
+		this.programFileInfo = programFileInfo;
 
-		LOG.info("\n filePath: " + requestStoreHouse.getProgramFileInfo().getProgramFileFullPath());
+		LOG.info("\n filePath: " + programFileInfo.getProgramFileFullPath());
 
 		programParts = new ArrayList<ProgramPartAnalysisClass>();
 		programFunctionsOrderedInJavaScript = null;
 
-		BufferedReader reader = new BufferedReader(new FileReader(requestStoreHouse.getProgramFileInfo().getProgramFileFullPath()));
+		BufferedReader reader = new BufferedReader(new FileReader(programFileInfo.getProgramFileFullPath()));
 
 		String line;
 		ProgramPartAnalysisClass programPart = null;
@@ -57,7 +57,7 @@ public class ProgramAnalysisClass {
 
 	}
 
-	public String[] getProgramFuzzificationsInJS() throws Exception {
+	public String[] getProgramFuzzificationsInJS(LocalUserInfo localUserInfo) throws Exception {
 
 		LOG.info("getProgramFuzzificationsInJS");
 		if (programParts == null)
@@ -75,9 +75,8 @@ public class ProgramAnalysisClass {
 		for (i = 0; i < programParts.size(); i++) {
 			programPart = programParts.get(i);
 			if (programPart.isFunction()) {
-				if ((requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName().equals(requestStoreHouse.getProgramFileInfo()
-						.getFileOwner()))
-						|| (programPart.getPredOwner().equals(requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName()))
+				if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
+						|| (programPart.getPredOwner().equals(localUserInfo.getLocalUserName()))
 						|| (programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
 
 					boolean placed = false;
@@ -137,15 +136,11 @@ public class ProgramAnalysisClass {
 		return programFunctionsOrderedInJavaScript;
 	}
 
-	public void updateProgramFile() throws Exception {
-
-		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
-		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
-		String predOwner = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predOwner);
-		String[][] functionDefinition = getFunctionDefinition();
+	public void updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String predOwner,
+			String[][] functionDefinition) throws Exception {
 
 		LOG.info("saving fuzzification: " + predDefined + " depending on " + predNecessary + " personalized for username: " + predOwner
-				+ " by username: " + requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName() + "\n\n");
+				+ " by username: " + localUserInfo.getLocalUserName() + "\n\n");
 
 		// Security issues ("" strings).
 		if ("".equals(predDefined))
@@ -158,16 +153,16 @@ public class ProgramAnalysisClass {
 		// If I'm not the owner I can change only my fuzzification.
 		// If I'm the owner I can change mine and the default one, but no other
 		// one.
-		if ((!requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName().equals(requestStoreHouse.getProgramFileInfo().getFileOwner()))
+		if ((!localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
 				|| (!predOwner.equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
-			predOwner = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
+			predOwner = localUserInfo.getLocalUserName();
 		}
 
 		ProgramPartAnalysisClass programPart = null;
 
-		File file = new File(requestStoreHouse.getProgramFileInfo().getProgramFileFullPath());
+		File file = new File(programFileInfo.getProgramFileFullPath());
 		if (file.exists()) {
-			String filePathAux = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
+			String filePathAux = programFileInfo.getProgramFileFullPath();
 
 			// Remove the extension.
 			if (filePathAux.endsWith(".pl"))
@@ -177,13 +172,13 @@ public class ProgramAnalysisClass {
 			filePathAux = filePathAux + "_backup_" + Dates.getCurrentDate() + ".txt";
 
 			// Rename the original file.
-			LOG.info("renaming " + requestStoreHouse.getProgramFileInfo().getProgramFileFullPath() + " into " + filePathAux);
+			LOG.info("renaming " + programFileInfo.getProgramFileFullPath() + " into " + filePathAux);
 			File fileAux = new File(filePathAux);
 			file.renameTo(fileAux);
 		}
 
 		// Create a new file.
-		LOG.info("creating the file " + requestStoreHouse.getProgramFileInfo().getProgramFileFullPath());
+		LOG.info("creating the file " + programFileInfo.getProgramFileFullPath());
 		file.createNewFile();
 
 		ArrayList<ProgramPartAnalysisClass> programPartsAffected = new ArrayList<ProgramPartAnalysisClass>();
@@ -257,7 +252,7 @@ public class ProgramAnalysisClass {
 		// that calls us.
 	}
 
-	private String[][] getFunctionDefinition() {
+	public String[][] getFunctionDefinition(RequestStoreHouse requestStoreHouse) {
 		int counter = 0;
 		String[][] functionDefinition = null;
 		StringBuilder paramsDebug = new StringBuilder();

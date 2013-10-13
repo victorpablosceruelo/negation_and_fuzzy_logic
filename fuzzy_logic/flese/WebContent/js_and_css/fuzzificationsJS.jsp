@@ -8,6 +8,7 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+<%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 
@@ -61,21 +62,14 @@ function personalizeProgramFile(chooseProgramFileId, mode) {
 	return false;
 }
 
-function personalizeProgramFile(fileName, fileOwner, mode) {
-	$.get(urlMappingFor('ListProgramFuzzificationsRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner, 
-		function(data, textStatus, jqxhr) {
-			// Evaluate the JS code returned by the server.
-			eval(data);
-
-			if ((mode == 'basic') || (mode == 'advanced')) {
-				// Show the personalization dialog to the user.
-				showPersonalizeProgramFileDialog(fileName, fileOwner, mode);
-			}
-			else {
-				alert("mode selected is not basic nor advanced. Internal error.");
-			}
-			
-		});
+function personalizeProgramFile(fuzzificationsViewMode, url, fileOwner, fileName) {
+	var fileOwnerParam = "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner;
+	var fileNameParam = "&<%=KConstants.Request.fileNameParam%>=" + fileName;
+	var fuzzificationsViewModeParam = "&<%=KConstants.Request.fuzzificationsViewMode%>=" + fuzzificationsViewMode;
+	var ajaxPageUrl = url + fileOwnerParam + fileNameParam + fuzzificationsViewModeParam;
+	var containerId = '<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>';
+	
+	loadAjaxInDialog(containerId, ajaxPageUrl, 'Personalize program file ' + fileName);
 	
 	//prevent the browser to follow the link
 	return false;

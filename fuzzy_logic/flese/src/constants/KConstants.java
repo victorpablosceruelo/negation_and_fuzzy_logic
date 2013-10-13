@@ -52,6 +52,7 @@ public class KConstants {
 		public static final String operatorParam = "operator";
 		public static final String valueParam = "value";
 
+		public static final String fuzzificationsViewMode = "fuzzViewMode";
 	}
 
 	public static class PathsMgmt {

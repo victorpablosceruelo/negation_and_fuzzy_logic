@@ -91,13 +91,13 @@ public class KUrls {
 	public static class Fuzzifications {
 		public static String manager = "FuzzificationsManager";
 
-		public static final UrlMap ListPage = new UrlMap(manager, "", null, null, "WEB-INF/listFuzzifications.jsp");
+		public static final UrlMap ListPage = new UrlMap(manager, "", null, null, "WEB-INF/fuzzifications/list.jsp");
 		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap EditPage = new UrlMap(manager, "", null, null, "WEB-INF/editFuzzification.jsp");
+		public static final UrlMap EditPage = new UrlMap(manager, "", null, null, "WEB-INF/fuzzifications/edit.jsp");
 		public static final UrlMap Edit = new UrlMap(manager, "edit", EditPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap SavePage = new UrlMap(manager, "", null, null, "WEB-INF/saveFuzzification.jsp");
+		public static final UrlMap SavePage = new UrlMap(manager, "", null, null, "WEB-INF/fuzzifications/save.jsp");
 		public static final UrlMap Save = new UrlMap(manager, "save", SavePage, KUrls.Pages.Exception, "");
 	}
 
