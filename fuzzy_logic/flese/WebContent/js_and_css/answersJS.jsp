@@ -140,7 +140,7 @@ function showAnswers(runQueryDivId, answers) {
 		return;
 	}
 	
-	alert("answers.length" + answers.length);
+	// alert("answers.length" + answers.length);
 	answers.sort(arraySortFunction);
 
 	var best10answersName = "10 best results";
@@ -230,10 +230,11 @@ function showAnswers(runQueryDivId, answers) {
 				}
 			}
 		}
-		
-		// Enable tabs
-		$( "#tabs" ).tabs();
 	}
+	
+	// Enable tabs
+	$( "#tabs" ).tabs();
+
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
