@@ -132,7 +132,7 @@ function loadAjaxInDialog(containerId, ajaxPageUrl, title, width, height) {
         success: function(html) {
         	console.log("loading html: " + html);
         	container.innerHTML=html;
-        	openDialogWindow(containerId, title, width, height, html);
+        	openDialogWindow(containerId, title, width, height);
         	executeAjaxLoadedPageJS(html);
 		},
 		fail: function() { 
@@ -141,7 +141,7 @@ function loadAjaxInDialog(containerId, ajaxPageUrl, title, width, height) {
 	});
 }
 
-function openDialogWindow(containerId, title, width, height, html) {
+function openDialogWindow(containerId, title, width, height) {
 	var container = getContainer(containerId);
 	if (container === null) {
 		debug.info("aborted openDialogWindow");
