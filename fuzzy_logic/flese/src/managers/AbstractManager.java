@@ -157,10 +157,11 @@ public abstract class AbstractManager implements InterfaceManager {
 	public void getResultsStoreHouse() {
 		if (reinitializeResultsStoreHouse()) {
 			this.resultsStoreHouse = null;
+			setResultsStoreHouse();
 		}
-		else {
-			this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
-		}
+
+		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
+		
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
 		}
