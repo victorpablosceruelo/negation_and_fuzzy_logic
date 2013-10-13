@@ -75,6 +75,9 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 		return;
 	}
 
+	// Clear the msgs section. 
+	clearMsgsSection();
+	
 	container.innerHTML=loadingImageHtml(true);
     $.ajax({
         method: 'get',

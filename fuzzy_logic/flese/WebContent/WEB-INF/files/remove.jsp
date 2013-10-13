@@ -14,7 +14,7 @@ String msg = JspsUtils.getMessagesInJS(request, msgs);
 	</script>
 <% } else { %>
 	<script type="text/javascript">
-		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId%>', '<%=KUrls.Files.List.getUrl(true) %>');
+		loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
 	</script>
 <% } %>
 

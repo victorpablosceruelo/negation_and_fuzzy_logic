@@ -112,15 +112,15 @@
 %>
 </div>
 
-<div id='filesListDiv' class='filesListTable'>
+<div id='<%=KConstants.JspsDivsIds.filesListDiv %>' class='filesListTable'>
 </div>
 
-<div id='fileUploadDiv' class='filesListTable'>
+<div id='<%=KConstants.JspsDivsIds.fileUploadDiv %>' class='filesListTable'>
 </div>
 
 <script type="text/javascript">
-	loadAjaxIn('filesListDiv', '<%=KUrls.Files.List.getUrl(true) %>');
-	loadAjaxIn('fileUploadDiv', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');
+	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+	loadAjaxIn('<%=KConstants.JspsDivsIds.fileUploadDiv %>', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');
 </script>
 
 
