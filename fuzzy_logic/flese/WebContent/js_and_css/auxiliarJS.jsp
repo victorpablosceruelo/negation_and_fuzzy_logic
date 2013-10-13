@@ -104,8 +104,70 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 	return false;
 }
 
-function loadAjaxInModal(containerId, ajaxPageUrl) {
+function loadAjaxInDialog(containerId, ajaxPageUrl, title, width, height) {
+	var container = getContainer(containerId);
+	if (container === null) {
+		debug.info("aborted loadAjaxInDialog");
+		debug.info("containerId: " + containerId);
+		debug.info("ajaxPageUrl: " + ajaxPageUrl);
+		debug.info("aborted loadAjaxInDialog (end)");
+		return;
+	}
 	
+    $.ajax({
+        method: 'get',
+        url: ajaxPageUrl,
+        data: 'page=' + $(this).attr('rel'),
+        beforeSend: function() {
+            container.innerHTML=loadingImageHtml(true);
+        },
+        complete: function() {
+        	debug.info("load of html is complete.");
+        	// container.innerHTML=loadingImageHtml(true);
+        },
+        success: function(html) {
+        	console.log("loading html: " + html);
+        	container.innerHTML=html;
+        	openDialogWindow(containerId, title, width, height);
+        	executeAjaxLoadedPageJS(html);
+		},
+		fail: function() { 
+			alert("error: Impossible to load page " + ajaxPageUrl); 
+		}
+	});
+}
+
+function openDialogWindow(containerId, title, width, height) {
+	var container = getContainer(containerId);
+	if (container === null) {
+		debug.info("aborted openDialogWindow");
+		debug.info("containerId: " + containerId);
+		debug.info("title: " + title);
+		debug.info("aborted openDialogWindow (end)");
+		return;
+	}
+	
+	if (nullOrUndefined(title))
+		title = "undefined";
+	if (nullOrUndefined(width))
+		width = "auto";
+	if (nullOrUndefined(height))
+		height = "auto";
+	
+	$(fileViewContentsDiv).dialog({
+        // add a close listener to prevent adding multiple divs to the document
+        close: function(event, ui) {
+            // remove div with all data and events
+            // dialog.remove();
+            container.innerHTML = "";
+        },
+        modal: true,
+        resizable: true, 
+        height: height, // 800,
+        width: width, // 800,
+        title: title
+    });
+    // $( "#" + fileViewContentsDivId ).dialog();
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -131,6 +193,11 @@ function getIframeWindow(iframe_object) {
 function notNullNorUndefined(value) {
 	return ((value != null) && (value != undefined));
 }
+
+function nullOrUndefined(value) {
+	return ((value == null) || (value == undefined));
+}
+
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */

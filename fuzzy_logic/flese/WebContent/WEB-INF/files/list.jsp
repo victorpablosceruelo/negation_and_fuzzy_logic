@@ -33,7 +33,7 @@ You do not owe any program file. Upload one by using the facility below.
 %>
 	<div class='filesListTableRow'>
 		<div class='filesListTableCell'>
-		<a href='#' onclick='fileViewAction("fileViewContentsDiv", "<%=urlFileView%>", "<%= filesList[i].getFileOwner() %>", "<%= filesList[i].getFileName() %>");'
+		<a href='#' onclick='fileViewAction("<%=KConstants.JspsDivsIds.fileViewContentsDiv %>", "<%=urlFileView%>", "<%= filesList[i].getFileOwner() %>", "<%= filesList[i].getFileName() %>");'
 					title='view program file <%= filesList[i].getFileName() %>'><%=filesList[i].getFileName() %></a>
 		</div>
 		<div class='filesListTableCell'>   					
@@ -49,6 +49,8 @@ You do not owe any program file. Upload one by using the facility below.
 	</div>
 <%  }  %>
 
+<div id='<%=KConstants.JspsDivsIds.fileViewContentsDiv %>' class='filesListTable' style='display:none;' >
+</div>
 
 
 

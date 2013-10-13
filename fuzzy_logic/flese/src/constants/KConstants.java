@@ -155,6 +155,7 @@ public class KConstants {
 		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
 		
 		public static final String filesListDiv = "filesListDiv";
+		public static final String fileViewContentsDiv = "fileViewContentsDiv";
 		public static final String fileUploadDiv = "fileUploadDiv";
 		public static final String uploadFormId = "uploadForm";
 		public static final String uploadStatusDivId = "uploadStatus";
