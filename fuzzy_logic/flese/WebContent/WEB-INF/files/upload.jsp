@@ -27,6 +27,23 @@
 	}
 	else { %>
 		// Update the files list.
-		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.Files.List.getUrl(true) %>');
+		if (typeof(loadAjaxIn) == "function") {
+			loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+		}
+		if (typeof(window.parent.loadAjaxIn) == "function") {
+			window.parent.loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+		}
+		if (typeof(fileUploadCleanStatusDiv) == "function") {
+			fileUploadCleanStatusDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
+		}
+		if (typeof(window.parent.fileUploadCleanStatusDiv) == "function") {
+			window.parent.fileUploadCleanStatusDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
+		}
 <%	}  %>
 </script>
+
+
+
+
+
+<!-- END -->

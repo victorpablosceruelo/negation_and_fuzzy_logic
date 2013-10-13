@@ -115,13 +115,9 @@ function fileUploadAutomaticSendActionOnChange(formId, uploadStatusDivId) {
 	form.submit();
 }
 
-function fileUploadShowResults(uploadStatusDivId, results) {
+function fileUploadCleanStatusDiv(uploadStatusDivId) {
 	var uploadStatusDiv = getContainer(uploadStatusDivId);
 	uploadStatusDiv.innerHTML = "";
-	
-	for (var i=0; i<results.length; i++) {
-		uploadStatusDiv.innerHTML += "<br>" + results[i];
-	}
 }
 
 
