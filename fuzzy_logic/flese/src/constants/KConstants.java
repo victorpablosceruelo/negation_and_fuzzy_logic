@@ -162,6 +162,7 @@ public class KConstants {
 		public static final String uploadStatusDivId = "uploadStatus";
 		public static final String uploadFormTargetiFrameId = "uploadFormTargetiFrame";
 
+		public static final String personalizationFunctionUnderModificationDivId = "personalizationFunctionUnderModificationDivId";
 	}
 }
 

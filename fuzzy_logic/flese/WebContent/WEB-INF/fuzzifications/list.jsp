@@ -1,3 +1,4 @@
+<%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="results.ResultsStoreHouse"%>
@@ -6,15 +7,11 @@
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ProgramAnalysisClass"%>
 
+<script type="text/javascript">
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String [] fuzzifications = resultsStoreHouse.getFuzzificationsList();
-
-	String localUserName = (String) request.getAttribute("localUserName");
-	String fileName = (String) request.getAttribute("fileName");
-	String fileOwner = (String) request.getAttribute("fileOwner");
-	String filePath = (String) request.getAttribute("filePath");
 	
 	out.println("cleanUpFuzzificationFunctionsDefinitions();");
 	if (fuzzifications != null) {
@@ -31,3 +28,27 @@
 	}
 */
 %>
+</script>
+
+<div class='personalizationDivMainTable'>
+	<div class='personalizationDivMainTableRow'>
+		<div class='personalizationDivMainTableCell'>
+			<div class='personalizationDivSelectFuzzificationTable'>
+				<div class='personalizationDivSelectFuzzificationTableRow'>
+					<div class='personalizationDivSelectFuzzificationTableCell'>
+						I want to personalize how it is determined that a &nbsp;
+					</div>
+					<div class='personalizationDivSelectFuzzificationTableCell'>
+						<select name="personalizationSelectComboBoxId" id="personalizationSelectComboBoxId"
+								onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>',  
+														'advanced', fileName, fileOwner);">
+								<%=JspsUtils.comboBoxDefaultValue() %>
+						</select>
+					</div>
+				</div> 
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- END -->
