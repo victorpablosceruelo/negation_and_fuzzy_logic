@@ -111,7 +111,7 @@ public class FilesManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		String[] fileContents = null;
-		if (localUserInfo.equals(programFileInfo.getFileOwner())) {
+		if (localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner())) {
 			try {
 				fileContents = programFileInfo.getFileContents();
 			} catch (FilesAndPathsException e) {
