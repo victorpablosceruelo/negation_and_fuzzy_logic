@@ -26,7 +26,7 @@ public class JspsUtils {
 		}
 		return localUserInfoName;
 	}
-	
+
 	public static SessionStoreHouse getSessionStoreHouse(HttpServletRequest request) {
 		SessionStoreHouse sessionStoreHouse = null;
 		try {
@@ -45,27 +45,37 @@ public class JspsUtils {
 		}
 		return resultsStoreHouse;
 	}
-	
-	public static String getMessagesInJS(HttpServletRequest request, ArrayList<String> msgs) {
+
+	public static ArrayList<String> getMessagesArrayList(HttpServletRequest request, ArrayList<String> msgs) {
 		if (msgs == null) {
 			msgs = new ArrayList<String>();
 		}
-		
+
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String [] msgsError = resultsStoreHouse.getMessages();
+		String[] msgsError = resultsStoreHouse.getMessages();
 		if (msgsError != null) {
-			for (int i=0; i<msgsError.length; i++) {
+			for (int i = 0; i < msgsError.length; i++) {
 				msgs.add(msgsError[i]);
 			}
 		}
+		return msgs;
+	}
+	
+	public static String [] getMessages(HttpServletRequest request, ArrayList<String> msgs) {
+		msgs = getMessagesArrayList(request, msgs);
+		return msgs.toArray(new String [msgs.size()]);
+	}
+
+	public static String getMessagesInJS(HttpServletRequest request, ArrayList<String> msgs) {
+		String [] msgsAux = getMessages(request, msgs);
 
 		StringBuilder msg = new StringBuilder();
 		// msg.append("[");
-		for (int i=0; i<msgs.size(); i++) {
+		for (int i = 0; i < msgsAux.length; i++) {
 			msg.append("'");
-			msg.append(msgs.get(i));
+			msg.append(msgsAux[i]);
 			msg.append("'");
-			if (i+1 < msgs.size()) {
+			if (i + 1 < msgsAux.length) {
 				msg.append(", ");
 			}
 		}
@@ -97,7 +107,7 @@ public class JspsUtils {
 		}
 		return textIn;
 	}
-	
+
 	public static String getValue(String value) {
 		return value;
 	}
