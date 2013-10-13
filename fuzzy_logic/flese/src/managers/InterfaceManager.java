@@ -22,5 +22,7 @@ public interface InterfaceManager {
 	public boolean exceptionIfSessionIsNull();
 
 	public boolean exceptionIfLocalUserInfoIsNull();
+	
+	public boolean reinitializeResultsStoreHouse();
 
 }

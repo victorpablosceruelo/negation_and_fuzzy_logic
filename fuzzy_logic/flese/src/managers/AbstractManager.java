@@ -39,6 +39,10 @@ public abstract class AbstractManager implements InterfaceManager {
 	public boolean exceptionIfLocalUserInfoIsNull() {
 		return true;
 	}
+	
+	public boolean reinitializeResultsStoreHouse() {
+		return true;
+	}
 
 	public NextStep getNextStep() {
 		return nextStep;
@@ -151,15 +155,22 @@ public abstract class AbstractManager implements InterfaceManager {
 	}
 
 	public void getResultsStoreHouse() {
-		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
-		if (this.resultsStoreHouse == null)
+		if (reinitializeResultsStoreHouse()) {
+			this.resultsStoreHouse = null;
+		}
+		else {
+			this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
+		}
+		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
+		}
 	}
 
 	public void setResultsStoreHouse() {
 		this.requestStoreHouse.getRequest().removeAttribute(KConstants.Request.resultsStoreHouse);
-		if (resultsStoreHouse != null)
+		if (resultsStoreHouse != null) {
 			this.requestStoreHouse.getRequest().setAttribute(KConstants.Request.resultsStoreHouse, this.resultsStoreHouse);
+		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
