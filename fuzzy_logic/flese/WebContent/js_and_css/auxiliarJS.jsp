@@ -37,6 +37,10 @@ function getContainer(containerId) {
 				debug.info("getContainer: container is null");
 				debug.info("getContainer: containerId is " + containerId);
 			}
+			if (container == undefined) {
+				debug.info("getContainer: container is undefined");
+				debug.info("getContainer: containerId is " + containerId);				
+			}
 		}
 	}
 	return container;

@@ -5,8 +5,6 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <script type="text/javascript">
-cleanUpQueryAnswers();
-
 <% 
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
@@ -14,29 +12,35 @@ cleanUpQueryAnswers();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();
 	
 	if (answers.length > 0) {
-		out.print("addToProgramQueryAnsers(0, [");
+		out.print("showAnswers(" + KConstants.JspsDivsIds.runQueryDivId + "[ [ 0, ");
 		for (int j=0; j<variablesNames.length; j++) {
 			out.print("'" + variablesNames[j] + "'");
 			if (j+1 < variablesNames.length) {
 				out.print(", ");
 			}
 		}
-		out.println("]);");
-		for (int i=0; i< answers.length; i++) {
-			out.print("addToProgramQueryAnsers(" + (i + 1) + ", [");
-			for (int j=0; j<variablesNames.length; j++) {
-				out.print("'" + answers[i].getCiaoPrologQueryVariableAnswer(variablesNames[j]) + "'");
-				if (j+1 < variablesNames.length) {
+		out.println("]");
+		if (answers.length > 0) {
+			out.print(", ");
+
+			for (int i=0; i< answers.length; i++) {
+				out.print("[ " + (i + 1) + ", ");
+				for (int j=0; j<variablesNames.length; j++) {
+					out.print("'" + answers[i].getCiaoPrologQueryVariableAnswer(variablesNames[j]) + "'");
+					if (j+1 < variablesNames.length) {
+						out.print(", ");
+					}
+				}
+				out.println("]");
+				if (i+1 < answers.length) {
 					out.print(", ");
 				}
 			}
-			out.println("]);");
+			out.print(" ]); ");
 		}
 	}
 	
 %>
-
-showQueryAnswers('<%=KConstants.JspsDivsIds.runQueryDivId %>');
 </script>
 <%
 	if (answers.length <= 0) {

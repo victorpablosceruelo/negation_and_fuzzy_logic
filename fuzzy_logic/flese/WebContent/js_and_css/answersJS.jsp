@@ -19,20 +19,6 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-var queryAnswers = null;
-
-function cleanUpQueryAnswers() {
-	queryAnswers = new Array();
-}
-
-function addToProgramQueryAnsers(index, realAnswer) {
-	queryAnswers[index] = realAnswer;
-}
-
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-
 
 // Sort the array of answers.
 function arraySortFunction(elt1, elt2) {
@@ -62,9 +48,9 @@ function truncate_truth_value (truth_value) {
 	}
 }
 
-function resultOver(value, index) {
-	if ((queryAnswers[index] == null) || (queryAnswers[index] == undefined)) return false;
-	var realValue = queryAnswers[index][queryAnswers[index].length -1];
+function resultOver(value, answer) {
+	if ((answer == null) || (answer == undefined)) return false;
+	var realValue = answer[answer.length -1];
 	if ((realValue == null) || (realValue == undefined)) return false;
 	if (realValue == "Truth Value") return true;
 	return (parseFloat(realValue) > value);
@@ -101,7 +87,7 @@ function prologNameInColloquialLanguage(textLabelIn) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-var infosForQueryAnswers = null;
+var answersIndexes = null;
 
 function infoForQueryAnswers (tableName, queryAnswerIndex) {
 	this.tableName = tableName;
@@ -112,25 +98,25 @@ function infoForQueryAnswers (tableName, queryAnswerIndex) {
 }
 
 function insertInfoForQueryAnswers (tableName, queryAnswerIndex) {
-	if (infosForQueryAnswers == null) {
-		infosForQueryAnswers = new Array();
+	if (answersIndexes == null) {
+		answersIndexes = new Array();
 	}
 	
 	var i = 0;
 	var found = false;
-	while ((i < infosForQueryAnswers.length) && (! found)) {
-		if (tableName == infosForQueryAnswers[i].tableName) {
+	while ((i < answersIndexes.length) && (! found)) {
+		if (tableName == answersIndexes[i].tableName) {
 			found = true;
 		}
 		else i++;
 	}
 	
 	if (! found) {
-		infosForQueryAnswers[infosForQueryAnswers.length] = new infoForQueryAnswers(tableName, queryAnswerIndex);
+		answersIndexes[answersIndexes.length] = new infoForQueryAnswers(tableName, queryAnswerIndex);
 	}
 	else {
 		if ((queryAnswerIndex != null) && (queryAnswerIndex != undefined)) {
-			infosForQueryAnswers[i].queryAnswersIndexes[infosForQueryAnswers[i].queryAnswersIndexes.length] = queryAnswerIndex;
+			answersIndexes[i].queryAnswersIndexes[answersIndexes[i].queryAnswersIndexes.length] = queryAnswerIndex;
 		}
 	}
 }
@@ -140,24 +126,20 @@ var queryAnswersOver70 = null;
 var queryAnswersOver50 = null;
 var queryAnswersOver0 = null;
 
-function showQueryAnswers(runQueryDivId) {
-	
-	if (! isString(runQueryDivId)) {
-		debug.info("ERROR: runQueryDivId is not a string.");
-		alert("ERROR: runQueryDivId is not a string.");
-		return;
-	}
-	var runQueryDiv = document.getElementById(runQueryDivId);
+function showQueryAnswers(runQueryDivId, answers) {
+
+	var runQueryDiv = getContainer(runQueryDivId);
 	if ((runQueryDiv == null) || (runQueryDiv == undefined)) {
 		debug.info("ERROR: runQueryDiv is null or undefined.");
 		alert("ERROR: runQueryDiv is null or undefined.");
 		return;
 	}
+		
+	if ((answers == null) || (answers.length <= 1)) {
+		return;
+	}
 	
-	// Initialize.
-	infosForQueryAnswers = null;
-	
-	if ((queryAnswers != null) && (queryAnswers.length > 1)) queryAnswers.sort(arraySortFunction);
+	answers.sort(arraySortFunction);
 
 	var best10answersName = "10 best results";
 	var answersOver70Name = "Results over 70%";
@@ -165,6 +147,9 @@ function showQueryAnswers(runQueryDivId) {
 	var answersOver0Name  = "Results over 0%";
 	var allAnswers        = "All results";
 	
+	// Initialize multiDimensional array.
+	answersIndexes = null;
+
 	// Initialize to keep the final order.
 	insertInfoForQueryAnswers(best10answersName, null);
 	insertInfoForQueryAnswers(answersOver70Name, null);
@@ -172,30 +157,30 @@ function showQueryAnswers(runQueryDivId) {
 	insertInfoForQueryAnswers(answersOver0Name, null);
 	insertInfoForQueryAnswers(allAnswers, null);
 	
-	if ((queryAnswers != null) && (queryAnswers.length > 0)) {
-		for (var i=0; i<queryAnswers.length; i++) {
-			if ((i <= 10) && (resultOver(0, i))) insertInfoForQueryAnswers(best10answersName, i);
-			if (resultOver(0.7, i)) insertInfoForQueryAnswers(answersOver70Name, i);
-			if (resultOver(0.5, i)) insertInfoForQueryAnswers(answersOver50Name, i);
-			if (resultOver(0, i)) insertInfoForQueryAnswers(answersOver0Name, i);
-			if (resultOver(0, i)) insertInfoForQueryAnswers(allAnswers, i);
-		}
+	for (var i=0; i<answers.length; i++) {
+		if ((i <= 10) && (resultOver(0, answers[i]))) insertInfoForQueryAnswers(best10answersName, i);
+		if (resultOver(0.7, answers[i])) insertInfoForQueryAnswers(answersOver70Name, i);
+		if (resultOver(0.5, answers[i])) insertInfoForQueryAnswers(answersOver50Name, i);
+		if (resultOver(0, answers[i])) insertInfoForQueryAnswers(answersOver0Name, i);
+		if (resultOver(0, answers[i])) insertInfoForQueryAnswers(allAnswers, i);
 	}
 	
 	// Create the real tables (if necessary) and put inside the results.
-	var noAnswers = true;
-	for (var i=0; i<infosForQueryAnswers.length; i++) {
+	var hasAnswers = false;
+	for (var i=0; i<answersIndexes.length; i++) {
 		// The first answer is information about the database fields.
-		if (infosForQueryAnswers[i].queryAnswersIndexes.length > 1) {
-			noAnswers = false;
+		if (answersIndexes[i].queryAnswersIndexes.length > 1) {
+			hasAnswers = true;
 		}
 	}
+	debug.info("hasAnswers: " + hasAnswers);
+	console.log("hasAnswers: " + hasAnswers);
 	
-	// if (noAnswers) {
+	// if (! hasAnswers) {
 	// 	runQueryDiv.innerHTML = "The query has no answers. Maybe the database is empty? ";
 	// }
 	// else {
-	if (! noAnswers) {	
+	if (hasAnswers) {	
 		runQueryDiv.innerHTML = "";
 
 		var tabsDiv = document.createElement('div');
@@ -215,10 +200,10 @@ function showQueryAnswers(runQueryDivId) {
 		
 		html = "";
 		j = 1;
-		for (i=0; i<infosForQueryAnswers.length; i++) {
+		for (i=0; i<answersIndexes.length; i++) {
 			// The first answer is information about the database fields.
-			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 1) {
-				html += "<li><a href='#tabs-"+j+"'>"+infosForQueryAnswers[i].tableName+"</a></li>";
+			if (answersIndexes[i].queryAnswersIndexes.length > 1) {
+				html += "<li><a href='#tabs-"+j+"'>"+answersIndexes[i].tableName+"</a></li>";
 				j++;
 			}
 		}
@@ -226,9 +211,9 @@ function showQueryAnswers(runQueryDivId) {
 		
 		html = "";
 		j = 1;
-		for (i=0; i<infosForQueryAnswers.length; i++) {
+		for (i=0; i<answersIndexes.length; i++) {
 			// The first answer is information about the database fields.
-			if (infosForQueryAnswers[i].queryAnswersIndexes.length > 1) {
+			if (answersIndexes[i].queryAnswersIndexes.length > 1) {
 				tabDiv = document.createElement('div');
 				tabDiv.id = "tabs-" + j;
 				j++;
@@ -239,12 +224,12 @@ function showQueryAnswers(runQueryDivId) {
 				tabDiv.appendChild(tabContentDiv);
 				
 				// Now insert each answer in a row, inside the table
-				for (k=0; k<infosForQueryAnswers[i].queryAnswersIndexes.length; k++) {
+				for (k=0; k<answersIndexes[i].queryAnswersIndexes.length; k++) {
 					row = document.createElement('div');
 					row.className = "queryAnswersTableRow";
 					tabContentDiv.appendChild(row);
 					
-					var answer = queryAnswers[infosForQueryAnswers[i].queryAnswersIndexes[k]];
+					var answer = queryAnswers[answersIndexes[i].queryAnswersIndexes[k]];
 					for (var l=1; l<answer.length; l++) {
 						cell = document.createElement('div');
 						cell.className = "queryAnswersTableCell";
