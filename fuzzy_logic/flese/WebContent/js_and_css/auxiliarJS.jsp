@@ -132,7 +132,7 @@ function loadAjaxInDialog(containerId, ajaxPageUrl, title, width, height) {
         success: function(html) {
         	console.log("loading html: " + html);
         	container.innerHTML=html;
-        	openDialogWindow(containerId, title, width, height);
+        	openDialogWindow(containerId, title, width, height, html);
         	executeAjaxLoadedPageJS(html);
 		},
 		fail: function() { 
@@ -141,7 +141,7 @@ function loadAjaxInDialog(containerId, ajaxPageUrl, title, width, height) {
 	});
 }
 
-function openDialogWindow(containerId, title, width, height) {
+function openDialogWindow(containerId, title, width, height, html) {
 	var container = getContainer(containerId);
 	if (container === null) {
 		debug.info("aborted openDialogWindow");
@@ -158,7 +158,7 @@ function openDialogWindow(containerId, title, width, height) {
 	if (nullOrUndefined(height))
 		height = "auto";
 	
-	$(fileViewContentsDiv).dialog({
+	$(container).dialog({
         // add a close listener to prevent adding multiple divs to the document
         close: function(event, ui) {
             // remove div with all data and events

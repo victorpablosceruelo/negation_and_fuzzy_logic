@@ -8,7 +8,7 @@
 ArrayList<String> msgsIn = new ArrayList<String>();
 String [] msgs = JspsUtils.getMessages(request, msgsIn);
 %>
-
+	<div class="fileViewTable">
 <% 
 if ((msgs != null) && (msgs.length > 0)) { 
 	for (int i=0; i< msgs.length; i++) {
@@ -20,9 +20,6 @@ if ((msgs != null) && (msgs.length > 0)) {
 	String [] fileContents = resultsStoreHouse.getfileContents();
 	
 	if (fileContents != null) {
-%>
-		<div class="fileViewTable">
-<%
 		for (int i=0; i< fileContents.length; i++) {
 %>
 			<div class="fileViewTableRow">
@@ -32,12 +29,12 @@ if ((msgs != null) && (msgs.length > 0)) {
 			</div>
 <%
 		}
-%>
-		</div>
-<%
 	}
 }
 %>
+
+</div>
+
 
 
 
