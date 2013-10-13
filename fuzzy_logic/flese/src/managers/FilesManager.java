@@ -96,7 +96,9 @@ public class FilesManager extends AbstractManager {
 			resultsStoreHouse.addMessage("Logged user does not own the program file.");
 		} else {
 			String result = programFileInfo.remove();
-			resultsStoreHouse.addMessage(result);
+			if ((result != null) && (result.length() > 0)) {
+				resultsStoreHouse.addMessage(result);
+			}
 			CacheStoreHouseCleaner.clean(requestStoreHouse);
 		}
 

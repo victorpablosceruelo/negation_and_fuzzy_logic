@@ -101,7 +101,8 @@ public class ProgramFileInfo {
 		if (existsFile(false)) {
 			backup();
 			removeFileWithoutBackup();
-			return "File " + fileName + " does not exist.";
+			// "File " + fileName + " has been removed.";
+			return "";
 		}
 		else {
 			return "File " + fileName + " does not exist.";
