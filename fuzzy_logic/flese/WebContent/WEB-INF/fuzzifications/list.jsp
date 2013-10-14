@@ -9,29 +9,12 @@
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ProgramAnalysisClass"%>
 
-<script type="text/javascript">
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo programFileInfo = resultsStoreHouse.getProgramFileInfo();
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
-	
-	out.println("cleanUpFuzzificationFunctionsDefinitions();");
-	if (fuzzifications != null) {
-		for (int i=0; i<fuzzifications.length; i++) {
-			out.println(fuzzifications[i]);
-		}
-		out.println("showPersonalizeProgramFileDialog(fileName, fileOwner, mode);");
-	}
-	else {
-		out.println("addMsgToTheUser('ERROR: fuzzifications is null.');");
-	}
-/*	else {
-		out.println("addMsgToTheUser('ERROR: programAnalized is null.');");
-	}
-*/
 %>
-</script>
 
 <div class='personalizationDivMainTable'>
 	<div class='personalizationDivMainTableRow'>
