@@ -10,15 +10,19 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import prologConnector.CiaoPrologProgramIntrospectionQuery;
+import storeHouse.CacheStoreHouse;
+import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
+import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class ProgramAnalysisClass {
 	final Log LOG = LogFactory.getLog(ProgramAnalysisClass.class);
 
 	private ProgramFileInfo programFileInfo;
-	private ArrayList<ProgramPartAnalysisClass> programParts = null;
-	private String[] programFunctionsOrderedInJavaScript = null;
+	private ArrayList<ProgramPartAnalysis> programParts = null;
+	private ProgramPartAnalysis[][] programFunctionsOrdered = null;
 
 	/**
 	 * Analizes the program file pointed by filePath.
@@ -27,25 +31,24 @@ public class ProgramAnalysisClass {
 	 * @throws Exception
 	 *             when any of the previous is null or empty string.
 	 */
-	public ProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
+	private ProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
 
 		this.programFileInfo = programFileInfo;
 
 		LOG.info("\n filePath: " + programFileInfo.getProgramFileFullPath());
 
-		programParts = new ArrayList<ProgramPartAnalysisClass>();
-		programFunctionsOrderedInJavaScript = null;
+		programParts = new ArrayList<ProgramPartAnalysis>();
 
 		BufferedReader reader = new BufferedReader(new FileReader(programFileInfo.getProgramFileFullPath()));
 
 		String line;
-		ProgramPartAnalysisClass programPart = null;
+		ProgramPartAnalysis programPart = null;
 		boolean continues = false;
 
 		while ((line = reader.readLine()) != null) {
 			while (line != null) {
 				if (!continues) {
-					programPart = new ProgramPartAnalysisClass();
+					programPart = new ProgramPartAnalysis();
 				}
 				line = programPart.parse(line);
 			}
@@ -57,47 +60,62 @@ public class ProgramAnalysisClass {
 
 	}
 
-	public String[] getProgramFuzzificationsInJS(LocalUserInfo localUserInfo) throws Exception {
+	public static ProgramAnalysisClass getProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
+		String fullPath = programFileInfo.getProgramFileFullPath();
+		String key = ProgramAnalysisClass.class.getName();
+
+		Object o = CacheStoreHouse.retrieve(ProgramAnalysisClass.class, fullPath, key, key);
+		ProgramAnalysisClass object = (ProgramAnalysisClass) o;
+		if (object == null) {
+			object = new ProgramAnalysisClass(programFileInfo);
+			object.getProgramFuzzifications();
+			CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, object);
+		}
+		return object;
+	}
+
+	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
+		String fullPath = programFileInfo.getProgramFileFullPath();
+		String key = ProgramAnalysisClass.class.getName();
+		CacheStoreHouse.store(ProgramAnalysisClass.class, fullPath, key, key, null);
+	}
+
+	private ProgramPartAnalysis[][] getProgramFuzzifications() throws Exception {
 
 		LOG.info("getProgramFuzzificationsInJS");
 		if (programParts == null)
 			throw new Exception("programParts is null.");
 
-		// Use the information cached.
-		if (programFunctionsOrderedInJavaScript != null) {
-			return programFunctionsOrderedInJavaScript;
+		// Cache.
+		if (programFunctionsOrdered != null) {
+			return programFunctionsOrdered;
 		}
 
-		ArrayList<ArrayList<ProgramPartAnalysisClass>> programFunctionsOrdered = new ArrayList<ArrayList<ProgramPartAnalysisClass>>();
-		ProgramPartAnalysisClass programPart = null;
+		ArrayList<ArrayList<ProgramPartAnalysis>> progrFunctsOrdered = new ArrayList<ArrayList<ProgramPartAnalysis>>();
+		ProgramPartAnalysis programPart = null;
 		int i = 0, j = 0;
 
 		for (i = 0; i < programParts.size(); i++) {
 			programPart = programParts.get(i);
 			if (programPart.isFunction()) {
-				if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
-						|| (programPart.getPredOwner().equals(localUserInfo.getLocalUserName()))
-						|| (programPart.getPredOwner().equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
+				boolean placed = false;
 
-					boolean placed = false;
-
-					j = 0;
-					while ((j < programFunctionsOrdered.size()) && (!placed)) {
-						if ((programFunctionsOrdered.get(j) != null) && (programFunctionsOrdered.get(j).size() > 0)) {
-							if ((programFunctionsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined()))
-									&& (programFunctionsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
-								programFunctionsOrdered.get(j).add(programPart);
-								placed = true;
-							}
+				j = 0;
+				while ((j < progrFunctsOrdered.size()) && (!placed)) {
+					if ((progrFunctsOrdered.get(j) != null) && (progrFunctsOrdered.get(j).size() > 0)) {
+						if ((progrFunctsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined()))
+								&& (progrFunctsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
+							progrFunctsOrdered.get(j).add(programPart);
+							placed = true;
 						}
-						j++;
 					}
-					if (!placed) {
-						ArrayList<ProgramPartAnalysisClass> current = new ArrayList<ProgramPartAnalysisClass>();
-						current.add(programPart);
-						programFunctionsOrdered.add(current);
-						placed = true;
-					}
+					j++;
+				}
+				if (!placed) {
+					ArrayList<ProgramPartAnalysis> current = new ArrayList<ProgramPartAnalysis>();
+					current.add(programPart);
+					progrFunctsOrdered.add(current);
+					placed = true;
 				}
 			}
 			/*
@@ -108,16 +126,29 @@ public class ProgramAnalysisClass {
 			 */
 		}
 
+		programFunctionsOrdered = new ProgramPartAnalysis[progrFunctsOrdered.size()][];
+
+		for (i = 0; i < progrFunctsOrdered.size(); i++) {
+			ArrayList<ProgramPartAnalysis> tmp = progrFunctsOrdered.get(i);
+			programFunctionsOrdered[i] = tmp.toArray(new ProgramPartAnalysis[tmp.size()]);
+		}
+		return programFunctionsOrdered;
+	}
+
+	public static String[] getProgramFuzzificationsInJS(ProgramPartAnalysis[][] programFunctions) throws Exception {
+
+		// Use the information cached.
+		if (programFunctions == null) {
+			return new String[0];
+		}
+
 		String tmp = null;
-		ProgramPartAnalysisClass function = null;
-		programFunctionsOrderedInJavaScript = new String[programFunctionsOrdered.size()];
-		i = 0;
-		LOG.info("programFunctionsOrdered.size(): " + programFunctionsOrdered.size());
-		while (i < programFunctionsOrdered.size()) {
-			j = 0;
-			LOG.info("programFunctionsOrdered.get(i).size(): " + programFunctionsOrdered.get(i).size());
-			while (j < programFunctionsOrdered.get(i).size()) {
-				function = programFunctionsOrdered.get(i).get(j);
+		ProgramPartAnalysis function = null;
+		String[] programFunctionsInJavaScript = new String[programFunctions.length];
+
+		for (int i = 0; i < programFunctions.length; i++) {
+			for (int j = 0; j < programFunctions[i].length; j++) {
+				function = programFunctions[i][j];
 
 				if (j == 0) {
 					tmp = "addFuzzificationFunctionDefinition('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
@@ -126,14 +157,40 @@ public class ProgramAnalysisClass {
 					tmp += ", ";
 
 				tmp += "new ownerPersonalization('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
-				j++;
 			}
 			tmp += "))"; // End the javascript arrays.
-			programFunctionsOrderedInJavaScript[i] = tmp;
-			i++;
+			programFunctionsInJavaScript[i] = tmp;
 		}
 
-		return programFunctionsOrderedInJavaScript;
+		return programFunctionsInJavaScript;
+	}
+
+	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo) throws Exception {
+
+		if (programFunctionsOrdered == null) {
+			getProgramFuzzifications();
+		}
+
+		ProgramPartAnalysis function = null;
+		ProgramPartAnalysis[][] filteredResult = new ProgramPartAnalysis[programFunctionsOrdered.length][];
+		ArrayList<ProgramPartAnalysis> filteredSingleResult = null;
+
+		for (int i = 0; i < programFunctionsOrdered.length; i++) {
+			filteredSingleResult = new ArrayList<ProgramPartAnalysis>();
+
+			for (int j = 0; j < programFunctionsOrdered[i].length; j++) {
+				function = programFunctionsOrdered[i][j];
+
+				if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
+						|| (function.getPredOwner().equals(localUserInfo.getLocalUserName()))
+						|| (function.getPredOwner().equals(ProgramPartAnalysis.DEFAULT_DEFINITION))) {
+					filteredSingleResult.add(function);
+				}
+			}
+
+			filteredResult[i] = filteredSingleResult.toArray(new ProgramPartAnalysis[filteredSingleResult.size()]);
+		}
+		return filteredResult;
 	}
 
 	public void updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String predOwner,
@@ -154,11 +211,11 @@ public class ProgramAnalysisClass {
 		// If I'm the owner I can change mine and the default one, but no other
 		// one.
 		if ((!localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
-				|| (!predOwner.equals(ProgramPartAnalysisClass.DEFAULT_DEFINITION))) {
+				|| (!predOwner.equals(ProgramPartAnalysis.DEFAULT_DEFINITION))) {
 			predOwner = localUserInfo.getLocalUserName();
 		}
 
-		ProgramPartAnalysisClass programPart = null;
+		ProgramPartAnalysis programPart = null;
 
 		File file = new File(programFileInfo.getProgramFileFullPath());
 		if (file.exists()) {
@@ -181,7 +238,7 @@ public class ProgramAnalysisClass {
 		LOG.info("creating the file " + programFileInfo.getProgramFileFullPath());
 		file.createNewFile();
 
-		ArrayList<ProgramPartAnalysisClass> programPartsAffected = new ArrayList<ProgramPartAnalysisClass>();
+		ArrayList<ProgramPartAnalysis> programPartsAffected = new ArrayList<ProgramPartAnalysis>();
 		boolean foundFuzzifications = false;
 		boolean copiedBackFuzzifications = false;
 
@@ -219,7 +276,7 @@ public class ProgramAnalysisClass {
 						}
 
 						if (!updated) {
-							ProgramPartAnalysisClass newProgramPart = new ProgramPartAnalysisClass();
+							ProgramPartAnalysis newProgramPart = new ProgramPartAnalysis();
 							newProgramPart.setPredDefined(predDefined);
 							newProgramPart.setPredNecessary(predNecessary);
 							newProgramPart.setPredOwner(predOwner);
@@ -244,12 +301,9 @@ public class ProgramAnalysisClass {
 
 		bw.close();
 
-		programFunctionsOrderedInJavaScript = null;
-		// At this point we must clear the CiaoPrologConnection queries cache,
-		// but introducing the parameter session
-		// or the parameter CiaoPrologConnectionClass complicates this
-		// innecessarily. We must do it in the servlet
-		// that calls us.
+		programFunctionsOrdered = null;
+		clearCacheInstancesFor(this.programFileInfo);
+		CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(this.programFileInfo);
 	}
 
 	public String[][] getFunctionDefinition(RequestStoreHouse requestStoreHouse) {

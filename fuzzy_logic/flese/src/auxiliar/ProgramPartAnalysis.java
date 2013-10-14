@@ -6,8 +6,8 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ProgramPartAnalysisClass {
-	final Log LOG = LogFactory.getLog(ProgramPartAnalysisClass.class);
+public class ProgramPartAnalysis {
+	final Log LOG = LogFactory.getLog(ProgramPartAnalysis.class);
 	public final static String DEFAULT_DEFINITION = "default definition";
 	
 	private ArrayList <String> programSubPartLines = null;
@@ -36,7 +36,7 @@ public class ProgramPartAnalysisClass {
 													termNamePattern + whiteSpacesPattern + "[\\)]{1}" + whiteSpacesPattern;
 
 	
-	ProgramPartAnalysisClass() {
+	ProgramPartAnalysis() {
 		this.programSubPartLineAcc = "";
 		this.programSubPartLines = new ArrayList <String>();
 		this.programSubPartComments = new ArrayList <String>();

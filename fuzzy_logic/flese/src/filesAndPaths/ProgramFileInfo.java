@@ -13,9 +13,12 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import prologConnector.CiaoPrologProgramIntrospectionQuery;
+import storeHouse.CacheStoreHouseException;
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
+import auxiliar.ProgramAnalysisClass;
 import constants.KConstants;
 
 public class ProgramFileInfo {
@@ -97,10 +100,14 @@ public class ProgramFileInfo {
 		return retVal;
 	}
 
-	public String remove() throws FilesAndPathsException {
+	public String remove() throws FilesAndPathsException, CacheStoreHouseException {
 		if (existsFile(false)) {
 			backup();
 			removeFileWithoutBackup();
+			
+			ProgramAnalysisClass.clearCacheInstancesFor(this);
+			CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(this);
+
 			// "File " + fileName + " has been removed.";
 			return "";
 		}

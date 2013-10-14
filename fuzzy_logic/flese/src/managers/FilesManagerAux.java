@@ -11,11 +11,13 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.CastingsClass;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
+import auxiliar.ProgramAnalysisClass;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsMgmt;
@@ -201,6 +203,10 @@ public class FilesManagerAux {
 					fileNames.append(", ");
 				}
 				fileNames.append(fileName);
+				
+				ProgramAnalysisClass.clearCacheInstancesFor(programFileInfo);
+				CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(programFileInfo);
+
 			}
 		}
 		return fileNames.toString();

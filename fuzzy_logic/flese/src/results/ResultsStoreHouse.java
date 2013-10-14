@@ -2,6 +2,7 @@ package results;
 
 import java.util.ArrayList;
 
+import auxiliar.ProgramPartAnalysis;
 import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.ProgramIntrospection;
 import filesAndPaths.ProgramFileInfo;
@@ -11,6 +12,8 @@ public class ResultsStoreHouse {
 	private ArrayList<String> messages = new ArrayList<String>();
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
 	private String[] fileContents = null;
+	private ProgramFileInfo programFileInfo = null;
+	private ProgramPartAnalysis [][] programPartAnalysis = null;
 	private String[] fuzzificationsList = null;
 	private ProgramIntrospection programIntrospection = null;
 	private String[] variablesNames = null;
@@ -54,6 +57,28 @@ public class ResultsStoreHouse {
 		return fileContents;
 	}
 
+	public void setProgramFileInfo(ProgramFileInfo programFileInfo) {
+		this.programFileInfo = null;
+		if (programFileInfo != null) {
+			this.programFileInfo = programFileInfo;
+		}
+	}
+
+	public ProgramFileInfo getProgramFileInfo() {
+		return programFileInfo;
+	}
+	
+	public void setProgramPartAnalysis(ProgramPartAnalysis[][] programPartAnalysis) {
+		this.programPartAnalysis = null;
+		if (programPartAnalysis != null) {
+			this.programPartAnalysis = programPartAnalysis;
+		}
+	}
+
+	public ProgramPartAnalysis[][] getProgramPartAnalysis() {
+		return programPartAnalysis;
+	}
+	
 	public void setFuzzificationsList(String[] fuzzificationsList) {
 		this.fuzzificationsList = null;
 		if (fuzzificationsList != null) {
