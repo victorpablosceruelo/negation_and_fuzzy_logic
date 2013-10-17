@@ -7,12 +7,30 @@
 <%@page import="java.io.InputStreamReader"%>
 <%@page import="auxiliar.ProgramAnalysisClass"%>
 
-<script type="text/javascript">
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	String [] fuzzifications = resultsStoreHouse.getFuzzificationsList();
-	
+%>
+
+<div class='personalizationDivFuzzificationFunctionTable'>
+	<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
+	<div class='personalizationDivFuzzificationFunctionTableRow'>
+		<div class='personalizationDivFuzzificationFunctionTableCell1' id='<%=KConstants.JspsDivsIds.fuzzificationGraphicDivId %>'>
+		
+		</div>
+	</div>
+	<% } %>
+	<div class='personalizationDivFuzzificationFunctionTableRow'>
+		<div class='personalizationDivFuzzificationFunctionTableCell2' id='<%=KConstants.JspsDivsIds.fuzzificationValuesAndButtonDivId %>'>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+<%	
 	out.println("cleanUpFuzzificationFunctionsDefinitions();");
 	if (fuzzifications != null) {
 		for (int i=0; i<fuzzifications.length; i++) {
@@ -28,6 +46,11 @@
 	}
 */
 %>
+<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
+	insertFuzzificationGraphicRepresentation('<%=KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');
+<% } %>
 </script>
+
+
 
 <!-- END -->

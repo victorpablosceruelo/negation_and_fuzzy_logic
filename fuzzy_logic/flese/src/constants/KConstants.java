@@ -164,6 +164,9 @@ public class KConstants {
 		public static final String uploadFormTargetiFrameId = "uploadFormTargetiFrame";
 
 		public static final String personalizationFunctionUnderModificationDivId = "personalizationFunctionUnderModificationDivId";
+		
+		public static final String fuzzificationGraphicDivId = "fuzzificationGraphicDiv";
+		public static final String fuzzificationValuesAndButtonDivId = "fuzzificationValuesAndButtonDiv";
 	}
 }
 

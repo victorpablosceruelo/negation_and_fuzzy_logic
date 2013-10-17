@@ -111,53 +111,11 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId) {
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, url) {
 	
-	var comboBoxValue = getComboBoxValue(comboBox);
-
-	var index = comboBoxValue;
-	var PersonalizationFunctionUnderModificationDiv = getContainer(PersonalizationFunctionUnderModificationDivId);
-	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
+	var params = getComboBoxValue(comboBox);
+	loadAjax(PersonalizationFunctionUnderModificationDivId, url + params);
 	
-	var table = null;
-	var row = null;
-	var cell = null;
-	var fuzzificationGraphicDivId = "fuzzificationGraphicDiv";
-	var fuzzificationValuesAndButtonDivId = "fuzzificationValuesAndButtonDiv";
-	
-	// Table that contains everything about the fuzzification function.
-	table = document.createElement('div');
-	table.className = "personalizationDivFuzzificationFunctionTable";
-	PersonalizationFunctionUnderModificationDiv.appendChild(table);		
-	
-	if (mode == 'advanced') {
-		row = document.createElement('div');
-		row.className = "personalizationDivFuzzificationFunctionTableRow";
-		table.appendChild(row);
-		
-		// Cell that contains the graphic representation of the fuzzification function.
-		cell = document.createElement('div');
-		cell.id = fuzzificationGraphicDivId;
-		cell.className = "personalizationDivFuzzificationFunctionTableCell1";
-		cell.innerHTML = "";
-		row.appendChild(cell);
-		
-		insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
-	}
-	
-	row = document.createElement('div');
-	row.className = "personalizationDivFuzzificationFunctionTableRow";
-	table.appendChild(row);
-	
-	// Cell that contains the numerical representation of the function, the save
-	// button and some others.
-	cell = document.createElement('div');
-	cell.id = fuzzificationValuesAndButtonDivId;
-	cell.className = "personalizationDivFuzzificationFunctionTableCell2";
-	cell.innerHTML = "";
-	row.appendChild(cell);
-	
-	insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode, fileName, fileOwner);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

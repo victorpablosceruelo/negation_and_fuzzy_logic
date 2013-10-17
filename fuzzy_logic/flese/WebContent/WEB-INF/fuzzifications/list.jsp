@@ -1,3 +1,4 @@
+<%@page import="constants.KUrls"%>
 <%@page import="filesAndPaths.ProgramFileInfo"%>
 <%@page import="auxiliar.ProgramPartAnalysis"%>
 <%@page import="constants.KConstants"%>
@@ -15,6 +16,7 @@
 	ProgramFileInfo programFileInfo = resultsStoreHouse.getProgramFileInfo();
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
+	String urlEditFuzzification = KUrls.Fuzzifications.Edit.getUrl(true);
 %>
 
 <div class='personalizationDivMainTable'>
@@ -27,7 +29,7 @@
 					</div>
 					<div class='personalizationDivSelectFuzzificationTableCell'>
 						<select name="personalizationSelectComboBoxId" id="personalizationSelectComboBoxId"
-								onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>');">
+								onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>', '<%= urlEditFuzzification %>');">
 								<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 								for (int i=0; i<fuzzifications.length; i++) {
