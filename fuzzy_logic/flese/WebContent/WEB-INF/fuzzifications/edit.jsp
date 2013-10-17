@@ -12,6 +12,10 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	String [] fuzzifications = resultsStoreHouse.getFuzzificationsList();
+	
+	String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
+	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
+	
 %>
 
 <div class='personalizationDivFuzzificationFunctionTable'>
@@ -24,6 +28,39 @@
 	<% } %>
 	<div class='personalizationDivFuzzificationFunctionTableRow'>
 		<div class='personalizationDivFuzzificationFunctionTableCell2' id='<%=KConstants.JspsDivsIds.fuzzificationValuesAndButtonDivId %>'>
+			<div class='personalizationDivFuzzificationFunctionWithButtonTable'>
+				<div class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
+					<div class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
+						<div class='personalizationDivFuzzificationFunctionValuesTable'>
+							<div class='personalizationDivFuzzificationFunctionValuesTableRow'>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									A <%= JspsUtils.getPrologNameAsFuzzificationFunctionName(predDefined, true) %> 
+									whose value for <%= JspsUtils.getPrologNameAsFuzzificationFunctionName(predNecessary, false) %>
+									is
+								</div>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									is <%= JspsUtils.getPrologNameAsFuzzificationFunctionName(predDefined, false) %>
+									with a degree of
+								</div>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									Current Value
+								</div>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
+										Old Value
+									<% } else { %>
+										Default Value
+									<% } %>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
+					<div class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

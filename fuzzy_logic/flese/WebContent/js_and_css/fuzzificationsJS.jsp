@@ -123,71 +123,7 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
 function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode, fileName, fileOwner){
-	
-	var container = document.getElementById(fuzzificationValuesAndButtonDivId);
-	var table = null;
-	var row = null;
-	var cell = null;
-	var saveButtonCell = null;
-	var fuzzificationValuesCell = null;
-	
-	table = document.createElement('div');
-	table.className = "personalizationDivFuzzificationFunctionWithButtonTable";
-	container.appendChild(table);
-	
-	row = document.createElement('div');
-	row.className = "personalizationDivFuzzificationFunctionWithButtonTableRow";
-	table.appendChild(row);
-	
-	fuzzificationValuesCell = document.createElement('div');
-	fuzzificationValuesCell.className = "personalizationDivFuzzificationFunctionWithButtonTableCell";
-	row.appendChild(fuzzificationValuesCell);
-	
-	row = document.createElement('div');
-	row.className = "personalizationDivFuzzificationFunctionWithButtonTableRow";
-	table.appendChild(row);
-	
-	saveButtonCell = document.createElement('div');
-	saveButtonCell.className = "personalizationDivFuzzificationFunctionWithButtonTableCell";
-	row.appendChild(saveButtonCell);
-
-	
-	// Fuzzification function values view and modification.
-	// We present them inside a table.
-	table = document.createElement('div');
-	table.className = "personalizationDivFuzzificationFunctionValuesTable";
-	fuzzificationValuesCell.appendChild(table);	
-	
-	row = document.createElement('div');
-	row.className = "personalizationDivFuzzificationFunctionValuesTableRow";
-	table.appendChild(row);
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-	row.appendChild(cell);
-	cell.innerHTML = "A " + 
-						fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'subject') +
-						" whose value for " + 
-						fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predNecessary, 'adjective') + 
-						" is ";
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-	row.appendChild(cell);
-	cell.innerHTML = "is " + fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'adjective') +
-						" with a degree of ";
-
-	cell = document.createElement('div');
-	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-	row.appendChild(cell);
-	cell.innerHTML = "Current Value";
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-	row.appendChild(cell);
-	if (mode == 'basic') cell.innerHTML = "Default Value";
-	else cell.innerHTML = "Old Value";
-	
+		
 	var i = null;
 	var j = null;
 	var indexOfDefault = null;
