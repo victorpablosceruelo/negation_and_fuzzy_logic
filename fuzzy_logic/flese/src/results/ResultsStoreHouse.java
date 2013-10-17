@@ -32,6 +32,9 @@ public class ResultsStoreHouse {
 	}
 
 	public String[] getMessages() {
+		if (messages == null) {
+			return new String[0];
+		}
 		return messages.toArray(new String[messages.size()]);
 	}
 
@@ -43,6 +46,9 @@ public class ResultsStoreHouse {
 	}
 
 	public ProgramFileInfo[] getFilesList() {
+		if (filesList == null) {
+			return new ProgramFileInfo[0];
+		}
 		return filesList;
 	}
 
@@ -54,6 +60,9 @@ public class ResultsStoreHouse {
 	}
 
 	public String[] getfileContents() {
+		if (fileContents == null) {
+			return new String[0];
+		}
 		return fileContents;
 	}
 
@@ -76,6 +85,9 @@ public class ResultsStoreHouse {
 	}
 
 	public ProgramPartAnalysis[][] getProgramPartAnalysis() {
+		if (programPartAnalysis == null) {
+			return new ProgramPartAnalysis[0][];
+		}
 		return programPartAnalysis;
 	}
 	
@@ -87,6 +99,9 @@ public class ResultsStoreHouse {
 	}
 
 	public String[] getFuzzificationsList() {
+		if (fuzzificationsList == null) {
+			return new String[0];
+		}
 		return fuzzificationsList;
 	}
 
@@ -98,6 +113,9 @@ public class ResultsStoreHouse {
 	}
 
 	public CiaoPrologQueryAnswer[] getCiaoPrologQueryAnswers() {
+		if (queryAnswers == null) {
+			return new CiaoPrologQueryAnswer[0];
+		}
 		return this.queryAnswers;
 	}
 
@@ -109,6 +127,9 @@ public class ResultsStoreHouse {
 	}
 
 	public String[] getCiaoPrologQueryVariablesNames() {
+		if (variablesNames == null) {
+			return new String[0];
+		}
 		return this.variablesNames;
 	}
 

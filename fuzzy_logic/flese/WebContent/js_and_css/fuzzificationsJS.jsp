@@ -114,7 +114,7 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, url) {
 	
 	var params = getComboBoxValue(comboBox);
-	loadAjax(PersonalizationFunctionUnderModificationDivId, url + params);
+	loadAjaxIn(PersonalizationFunctionUnderModificationDivId, url + params);
 	
 }
 

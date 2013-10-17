@@ -33,12 +33,12 @@
 								<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 								for (int i=0; i<fuzzifications.length; i++) {
-									if (fuzzifications[i].length > 0) {
+									if ((fuzzifications[i] != null) && (fuzzifications[i].length > 0)) {
 										ProgramPartAnalysis fuzzification = fuzzifications[i][0];
 										String desc = JspsUtils.getPrologNameAsFuzzificationFunctionName(fuzzification.getPredDefined(), true) + 
 														" from the value it has for " + 
 														JspsUtils.getPrologNameAsFuzzificationFunctionName(fuzzification.getPredNecessary(), false);
-										String id = KConstants.Request.fileOwnerParam + "=" + programFileInfo.getFileOwner() +
+										String id = "&" + KConstants.Request.fileOwnerParam + "=" + programFileInfo.getFileOwner() +
 													"&" + KConstants.Request.fileNameParam + "=" + programFileInfo.getFileName() + 
 													"&" + KConstants.Fuzzifications.predDefined + "=" + fuzzification.getPredDefined() +
 													"&" + KConstants.Fuzzifications.predNecessary + "=" + fuzzification.getPredNecessary() +
@@ -56,7 +56,7 @@
 		</div>
 	</div>
 	<div class='personalizationDivMainTableRow'>
-		<div class='personalizationDivMainTableCell'>
+		<div class='personalizationDivMainTableCell' id='<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>'>
 			Select the fuzzification you want to personalize.
 		</div>
 	</div>
