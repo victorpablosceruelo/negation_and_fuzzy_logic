@@ -14,6 +14,7 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo programFileInfo = resultsStoreHouse.getProgramFileInfo();
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
+	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 %>
 
 <div class='personalizationDivMainTable'>
@@ -26,20 +27,20 @@
 					</div>
 					<div class='personalizationDivSelectFuzzificationTableCell'>
 						<select name="personalizationSelectComboBoxId" id="personalizationSelectComboBoxId"
-								onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>',  
-														'advanced', fileName, fileOwner);">
+								onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>');">
 								<%=JspsUtils.comboBoxDefaultValue() %>
 <%
 								for (int i=0; i<fuzzifications.length; i++) {
 									if (fuzzifications[i].length > 0) {
 										ProgramPartAnalysis fuzzification = fuzzifications[i][0];
-										String desc = JspsUtils.getPrologNameInColloquialLanguage(fuzzification.getPredDefined()) + 
+										String desc = JspsUtils.getPrologNameAsFuzzificationFunctionName(fuzzification.getPredDefined(), true) + 
 														" from the value it has for " + 
-														JspsUtils.getPrologNameInColloquialLanguage(fuzzification.getPredNecessary());
+														JspsUtils.getPrologNameAsFuzzificationFunctionName(fuzzification.getPredNecessary(), false);
 										String id = KConstants.Request.fileOwnerParam + "=" + programFileInfo.getFileOwner() +
 													"&" + KConstants.Request.fileNameParam + "=" + programFileInfo.getFileName() + 
 													"&" + KConstants.Fuzzifications.predDefined + "=" + fuzzification.getPredDefined() +
-													"&" + KConstants.Fuzzifications.predNecessary + "=" + fuzzification.getPredNecessary();
+													"&" + KConstants.Fuzzifications.predNecessary + "=" + fuzzification.getPredNecessary() +
+													"&" + KConstants.Request.mode + "=" + mode;
 %>
 									<option id='<%=desc%>' title='<%=desc%>' value='<%=id%>'><%= desc %></option>
 <%

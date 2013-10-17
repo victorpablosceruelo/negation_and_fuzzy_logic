@@ -107,8 +107,27 @@ public class JspsUtils {
 		}
 		return textIn;
 	}
+	
+	public static String getPrologNameAsFuzzificationFunctionName(String textIn, boolean full) {
+		
+		int indexI = textIn.indexOf("(");
+		int indexJ = textIn.indexOf(")");
+		
+		String predicateName = textIn.substring(indexI + 1, indexJ);
+		String fuzzificationName = textIn.substring(0, indexI);
+		
+		if (full) {
+			return getPrologNameInColloquialLanguage(predicateName) + " is " + getPrologNameInColloquialLanguage(fuzzificationName);
+		}
+		return getPrologNameInColloquialLanguage(fuzzificationName);
+	}
 
 	public static String getValue(String value) {
 		return value;
 	}
 }
+
+
+
+
+// END

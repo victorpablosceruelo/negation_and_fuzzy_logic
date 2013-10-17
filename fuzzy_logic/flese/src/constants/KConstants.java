@@ -37,6 +37,9 @@ public class KConstants {
 		public static final String providerId = "id";
 		public static final String isAjaxParam = "ajax";
 		public static final String programParam = "chooseProgram";
+		public static final String mode = "mode";
+		public static final String modeBasic = "basic";
+		public static final String modeAdvanced = "advanced";
 
 		// Lines Counters
 		public static final String linesCounterParam = "linesCount";
@@ -51,8 +54,6 @@ public class KConstants {
 		public static final String quantifierParam = "quantifier";
 		public static final String operatorParam = "operator";
 		public static final String valueParam = "value";
-
-		public static final String fuzzificationsViewMode = "fuzzViewMode";
 	}
 
 	public static class PathsMgmt {

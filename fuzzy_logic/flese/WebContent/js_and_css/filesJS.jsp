@@ -20,27 +20,21 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function removeFileAction (fileOwner, fileName) {
+function removeFileAction (urlRemove, params) {
 	var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
-	var urlRemove = "<%=KUrls.Files.Remove.getUrl(true)%>";
-	var fileOwnerParam = "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner;
-	var fileNameParam = "&<%=KConstants.Request.fileNameParam%>=" + fileName;
 	
-	loadAjaxIn(divId, urlRemove + fileOwnerParam + fileNameParam);
+	loadAjaxIn(divId, urlRemove + params);
 }
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function fileViewAction(fileViewContentsDivId, urlFileView, fileOwner, fileName) {
+function fileViewAction(fileViewContentsDivId, urlFileView, params, fileName) {
 	
-	var fileOwnerParam = "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner;
-	var fileNameParam = "&<%=KConstants.Request.fileNameParam%>=" + fileName;	
-	var ajaxPageUrl = urlFileView + fileOwnerParam + fileNameParam;
 	var containerId = fileViewContentsDivId;
 	
-	loadAjaxInDialog(containerId, ajaxPageUrl, 'Contents of program file ' + fileName);
+	loadAjaxInDialog(containerId, urlFileView + params, 'Contents of program file ' + fileName);
 	
 	//prevent the browser to follow the link
 	return false;

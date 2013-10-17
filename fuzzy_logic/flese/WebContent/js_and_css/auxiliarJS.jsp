@@ -249,11 +249,35 @@ function isString(o) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function getComboBoxValue(comboBox) {
-	if (comboBox == null) return "";
+	if (comboBox == null) {
+		debug.info("getComboBoxValue: comboBox is null");
+		return "";
+	}
+	if (comboBox == undefined) {
+		debug.info("getComboBoxValue: comboBox is undefined");
+		return "";
+	}
+	
 	var comboBoxSelectedIndex = comboBox.selectedIndex;
-	if (comboBoxSelectedIndex == null) return "";
+	if (comboBoxSelectedIndex == null) {
+		debug.info("getComboBoxValue: comboBoxSelectedIndex is null");
+		return "";
+	}
+	if (comboBoxSelectedIndex == undefined) {
+		debug.info("getComboBoxValue: comboBoxSelectedIndex is undefined");
+		return "";
+	}
+	
 	var comboBoxSelectedField = comboBox.options[comboBoxSelectedIndex];
-	if (comboBoxSelectedField == null) return "";
+	if (comboBoxSelectedField == null) {
+		debug.info("getComboBoxValue: comboBoxSelectedField is null");
+		return "";
+	}
+	if (comboBoxSelectedField == undefined) {
+		debug.info("getComboBoxValue: comboBoxSelectedField is undefined");
+		return "";
+	}
+
 	var comboBoxValue = comboBoxSelectedField.value;
 	var comboBoxText = comboBoxSelectedField.text;
 	var comboBoxName = comboBoxSelectedField.name;

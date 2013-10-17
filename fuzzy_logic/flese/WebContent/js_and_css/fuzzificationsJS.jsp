@@ -62,14 +62,10 @@ function personalizeProgramFile(chooseProgramFileId, mode) {
 	return false;
 }
 
-function personalizeProgramFile(fuzzificationsViewMode, url, fileOwner, fileName) {
-	var fileOwnerParam = "&<%=KConstants.Request.fileOwnerParam%>=" + fileOwner;
-	var fileNameParam = "&<%=KConstants.Request.fileNameParam%>=" + fileName;
-	var fuzzificationsViewModeParam = "&<%=KConstants.Request.fuzzificationsViewMode%>=" + fuzzificationsViewMode;
-	var ajaxPageUrl = url + fileOwnerParam + fileNameParam + fuzzificationsViewModeParam;
+function personalizeProgramFile(url, params, fileName) {
 	var containerId = '<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>';
 	
-	loadAjaxInDialog(containerId, ajaxPageUrl, 'Personalize program file ' + fileName);
+	loadAjaxInDialog(containerId, url + params, 'Personalize program file ' + fileName);
 	
 	//prevent the browser to follow the link
 	return false;
@@ -115,22 +111,12 @@ function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, mode, fileName, fileOwner) {
+function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId) {
 	
-	if ((comboBox == null) || (comboBox == undefined)) {
-		alert("comboBox is invalid in personalizationFunctionChanged.");
-		return;
-	}
-	
-	var comboBoxValue = comboBox.options[comboBox.selectedIndex].value;
-	if (	(comboBoxValue == null) || (comboBoxValue == undefined) || (isNaN(comboBoxValue)) || 
-			(comboBoxValue < 0) || (comboBoxValue >= fuzzificationsFunctions.length)) {
-		alert("comboBoxValue is invalid in personalizationFunctionChanged.");
-		return;
-	}
-	
+	var comboBoxValue = getComboBoxValue(comboBox);
+
 	var index = comboBoxValue;
-	var PersonalizationFunctionUnderModificationDiv = document.getElementById(PersonalizationFunctionUnderModificationDivId);
+	var PersonalizationFunctionUnderModificationDiv = getContainer(PersonalizationFunctionUnderModificationDivId);
 	PersonalizationFunctionUnderModificationDiv.innerHTML = "";
 	
 	var table = null;
