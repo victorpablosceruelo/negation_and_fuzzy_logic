@@ -83,28 +83,5 @@
 	</div>
 </div>
 
-<script type="text/javascript">
-<%	
-	out.println("cleanUpFuzzificationFunctionsDefinitions();");
-	if (fuzzifications != null) {
-		for (int i=0; i<fuzzifications.length; i++) {
-			out.println(fuzzifications[i]);
-		}
-		out.println("showPersonalizeProgramFileDialog(fileName, fileOwner, mode);");
-	}
-	else {
-		out.println("addMsgToTheUser('ERROR: fuzzifications is null.');");
-	}
-/*	else {
-		out.println("addMsgToTheUser('ERROR: programAnalized is null.');");
-	}
-*/
-%>
-<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
-	insertFuzzificationGraphicRepresentation('<%=KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');
-<% } %>
-</script>
-
-
 
 <!-- END -->
