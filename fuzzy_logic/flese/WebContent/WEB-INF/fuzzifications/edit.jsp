@@ -1,3 +1,5 @@
+<%@page import="auxiliar.LocalUserInfo"%>
+<%@page import="auxiliar.FunctionPoint"%>
 <%@page import="auxiliar.ProgramPartAnalysis"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
@@ -11,6 +13,7 @@
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
 
@@ -34,7 +37,56 @@
 		}
 	}
 	
+	FunctionPoint [] defFuzzPoints = defaultFuzzification.getFunctionPoints();
+	FunctionPoint [] myFuzzPoints = myFuzzification.getFunctionPoints(); 
+	String[][] points = new String[defFuzzPoints.length];
+	
+	for (int i=0; i<defFuzzPoints.length; i++) {
+		FunctionPoint defFuzzPoint = defFuzzPoints[i];
+		FunctionPoint myFuzzPoint = null;
+		int j=0;
+		while ((j<myFuzzPoints.length) && (myFuzzPoint == null)) {
+			if (defFuzzPoint.getCoordinate1().equals(myFuzzPoints[j].getCoordinate1())) {
+				myFuzzPoint = myFuzzPoints[j];
+			}
+		}
+		if ((myFuzzPoint == null) || (mode.equals(KConstants.Request.modeAdvanced))) {
+			myFuzzPoint = defFuzzPoint;
+		}
+		String fpx = defFuzzPoint.getCoordinate1();
+		String fpy = defFuzzPoint.getCoordinate2();
+		String fpd = myFuzzPoint.getCoordinate2();
+
+		points[i] = new String[3];
+		points[i][0] = fpx;
+		points[i][1] = fpy;
+		points[i][2] = fpd;
+	}
+	
 %>
+<script type="text/javascript">
+<%
+
+	out.print("addFuzzificationFunction('" + localUserInfo.getLocalUserName() + "', new Array(");
+	for (int i=0; i<points.length; i++) {
+		out.print("new Array(" + points[i][0] + ", " + points[i][1] + ")");
+		if (i+1 < points.length) {
+			out.print(", ");
+		}
+	} 
+	out.print(");");
+	
+	out.print("addFuzzificationFunction('" + defaultFuzzification.getPredOwner() + "', new Array(");
+	for (int i=0; i<points.length; i++) {
+		out.print("new Array(" + points[i][0] + ", " + points[i][2] + ")");
+		if (i+1 < points.length) {
+			out.print(", ");
+		}
+	} 
+	out.print(");");
+	
+%>
+</script>
 
 <div class='personalizationDivFuzzificationFunctionTable'>
 	<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
@@ -71,11 +123,24 @@
 									<% } %>
 								</div>
 							</div>
+
+							<div class='personalizationDivFuzzificationFunctionValuesTableRow'>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									<%= fpx %>
+								</div>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx' value='<%=fpx %>'/>
+						 			<input type='range'  name='fuzzificationBars[<%= i %>].fpy' min='0' max='1' step='0.01' value='"+fpy+"' width='150px' 
+						 					"onchange="barValueChanged(this, '<%= i %>', "+indexOfMine+", "+index+", \""+fuzzificationGraphicDivId+"\")'/>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+
 				<div class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
 					<div class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
+						
 					</div>
 				</div>
 			</div>
