@@ -49,7 +49,7 @@ public class FuzzificationsManager extends AbstractManager {
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setFuzzificationsList(fuzzificationsList);
 
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.ListPage, ""));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.EditPage, ""));
 
 	}
 

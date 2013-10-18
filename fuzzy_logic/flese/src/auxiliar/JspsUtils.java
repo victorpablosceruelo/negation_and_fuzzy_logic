@@ -60,14 +60,14 @@ public class JspsUtils {
 		}
 		return msgs;
 	}
-	
-	public static String [] getMessages(HttpServletRequest request, ArrayList<String> msgs) {
+
+	public static String[] getMessages(HttpServletRequest request, ArrayList<String> msgs) {
 		msgs = getMessagesArrayList(request, msgs);
-		return msgs.toArray(new String [msgs.size()]);
+		return msgs.toArray(new String[msgs.size()]);
 	}
 
 	public static String getMessagesInJS(HttpServletRequest request, ArrayList<String> msgs) {
-		String [] msgsAux = getMessages(request, msgs);
+		String[] msgsAux = getMessages(request, msgs);
 
 		StringBuilder msg = new StringBuilder();
 		// msg.append("[");
@@ -107,27 +107,46 @@ public class JspsUtils {
 		}
 		return textIn;
 	}
-	
-	public static String getPrologNameAsFuzzificationFunctionName(String textIn, boolean full) {
-		
-		int indexI = textIn.indexOf("(");
-		int indexJ = textIn.indexOf(")");
-		
-		String predicateName = textIn.substring(indexI + 1, indexJ);
-		String fuzzificationName = textIn.substring(0, indexI);
-		
-		if (full) {
-			return getPrologNameInColloquialLanguage(predicateName) + " is " + getPrologNameInColloquialLanguage(fuzzificationName);
+
+	public static String humanizeIfTrue(String text, boolean humanize) {
+		if (humanize) {
+			return getPrologNameInColloquialLanguage(text);
 		}
-		return getPrologNameInColloquialLanguage(fuzzificationName);
+		return text;
+	}
+
+	public static String getFromFuzzificationNameOf(ProgramPartAnalysis programPartAnalysis, String element, boolean humanize) {
+		String predDefined = programPartAnalysis.getPredDefined();
+		String predNecessary = programPartAnalysis.getPredNecessary();
+
+		int indexI1 = predNecessary.indexOf("(");
+		int indexJ1 = predNecessary.indexOf(")");
+
+		int indexI2 = predNecessary.indexOf("(");
+		// int indexJ2 = predNecessary.indexOf(")");
+
+		String databaseName1 = predDefined.substring(indexI1 + 1, indexJ1);
+		// String databaseName2 = predDefined.substring(indexI2 + 1, indexJ2);
+
+		predDefined = predDefined.substring(0, indexI1);
+		predNecessary = predNecessary.substring(0, indexI2);
+
+		if (element.equals(KConstants.Fuzzifications.predDefined)) {
+			return humanizeIfTrue(predDefined, humanize);
+		}
+		if (element.equals(KConstants.Fuzzifications.predNecessary)) {
+			return humanizeIfTrue(predNecessary, humanize);
+		}
+		if (element.equals(KConstants.Fuzzifications.database)) {
+			return humanizeIfTrue(databaseName1, humanize);
+		}
+
+		return "";
 	}
 
 	public static String getValue(String value) {
 		return value;
 	}
 }
-
-
-
 
 // END

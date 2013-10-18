@@ -35,9 +35,11 @@
 								for (int i=0; i<fuzzifications.length; i++) {
 									if ((fuzzifications[i] != null) && (fuzzifications[i].length > 0)) {
 										ProgramPartAnalysis fuzzification = fuzzifications[i][0];
-										String desc = JspsUtils.getPrologNameAsFuzzificationFunctionName(fuzzification.getPredDefined(), true) + 
+										String desc = JspsUtils.getFromFuzzificationNameOf(fuzzification, KConstants.Fuzzifications.database, true) +
+														" is " + 
+														JspsUtils.getFromFuzzificationNameOf(fuzzification, KConstants.Fuzzifications.predDefined, true) +
 														" from the value it has for " + 
-														JspsUtils.getPrologNameAsFuzzificationFunctionName(fuzzification.getPredNecessary(), false);
+														JspsUtils.getFromFuzzificationNameOf(fuzzification, KConstants.Fuzzifications.predNecessary, true);
 										String id = "&" + KConstants.Request.fileOwnerParam + "=" + programFileInfo.getFileOwner() +
 													"&" + KConstants.Request.fileNameParam + "=" + programFileInfo.getFileName() + 
 													"&" + KConstants.Fuzzifications.predDefined + "=" + fuzzification.getPredDefined() +

@@ -106,6 +106,7 @@ public class KConstants {
 		public static final String predDefined = "predDefined";
 		public static final String predNecessary = "predNecessary";
 		public static final String predOwner = "predOwner";
+		public static final String database = "database";
 	}
 
 	public static class ProgramIntrospectionFields {
