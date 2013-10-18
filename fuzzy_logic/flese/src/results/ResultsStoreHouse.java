@@ -14,7 +14,6 @@ public class ResultsStoreHouse {
 	private String[] fileContents = null;
 	private ProgramFileInfo programFileInfo = null;
 	private ProgramPartAnalysis [][] programPartAnalysis = null;
-	private String[] fuzzificationsList = null;
 	private ProgramIntrospection programIntrospection = null;
 	private String[] variablesNames = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
@@ -89,20 +88,6 @@ public class ResultsStoreHouse {
 			return new ProgramPartAnalysis[0][];
 		}
 		return programPartAnalysis;
-	}
-	
-	public void setFuzzificationsList(String[] fuzzificationsList) {
-		this.fuzzificationsList = null;
-		if (fuzzificationsList != null) {
-			this.fuzzificationsList = fuzzificationsList;
-		}
-	}
-
-	public String[] getFuzzificationsList() {
-		if (fuzzificationsList == null) {
-			return new String[0];
-		}
-		return fuzzificationsList;
 	}
 
 	public void setCiaoPrologQueryAnswers(CiaoPrologQueryAnswer[] queryAnswers) {

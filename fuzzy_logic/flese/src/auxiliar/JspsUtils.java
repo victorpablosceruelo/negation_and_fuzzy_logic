@@ -116,11 +116,15 @@ public class JspsUtils {
 	}
 
 	public static String getFromFuzzificationNameOf(ProgramPartAnalysis programPartAnalysis, String element, boolean humanize) {
+		if (programPartAnalysis == null) {
+			return "";
+		}
+		
 		String predDefined = programPartAnalysis.getPredDefined();
 		String predNecessary = programPartAnalysis.getPredNecessary();
 
-		int indexI1 = predNecessary.indexOf("(");
-		int indexJ1 = predNecessary.indexOf(")");
+		int indexI1 = predDefined.indexOf("(");
+		int indexJ1 = predDefined.indexOf(")");
 
 		int indexI2 = predNecessary.indexOf("(");
 		// int indexJ2 = predNecessary.indexOf(")");

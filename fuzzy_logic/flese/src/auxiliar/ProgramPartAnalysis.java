@@ -6,9 +6,10 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import constants.KConstants;
+
 public class ProgramPartAnalysis {
 	final Log LOG = LogFactory.getLog(ProgramPartAnalysis.class);
-	public final static String DEFAULT_DEFINITION = "default definition";
 	
 	private ArrayList <String> programSubPartLines = null;
 	private ArrayList <String> programSubPartComments = null;
@@ -599,13 +600,13 @@ public class ProgramPartAnalysis {
 	}
 	
 	public void setPredOwner(String predOwner) {
-		if ((predOwner != null) && (! DEFAULT_DEFINITION.equals(predOwner)) && (! "".equals(predOwner))) {
+		if ((predOwner != null) && (! KConstants.Fuzzifications.DEFAULT_DEFINITION.equals(predOwner)) && (! "".equals(predOwner))) {
 			only_for_user = predOwner;
 		}
 	}
 	
 	public String getPredOwner() {
-		if ((only_for_user == null) || (only_for_user != null) && ("".equals(only_for_user))) return DEFAULT_DEFINITION;
+		if ((only_for_user == null) || (only_for_user != null) && ("".equals(only_for_user))) return KConstants.Fuzzifications.DEFAULT_DEFINITION;
 		else return only_for_user;
 	}
 
@@ -696,7 +697,7 @@ public class ProgramPartAnalysis {
 			if (i+1 < params.length) line += ",";
 		}
 		line += " ])";
-		if ((only_for_user != null) && (! DEFAULT_DEFINITION.equals(only_for_user))) 
+		if ((only_for_user != null) && (! KConstants.Fuzzifications.DEFAULT_DEFINITION.equals(only_for_user))) 
 			line += " only_for_user '" + only_for_user + "'";
 		programSubPartLines.add(line);
 		

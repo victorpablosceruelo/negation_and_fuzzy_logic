@@ -1,3 +1,4 @@
+<%@page import="auxiliar.ProgramPartAnalysis"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
@@ -11,10 +12,27 @@
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
-	String [] fuzzifications = resultsStoreHouse.getFuzzificationsList();
-	
-	String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
-	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
+	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
+
+	ProgramPartAnalysis myFuzzification = null;
+	ProgramPartAnalysis defaultFuzzification = null;
+
+	if ((fuzzifications.length == 1)) {
+		if (fuzzifications[0].length == 1) {
+			defaultFuzzification = fuzzifications[0][0];
+			myFuzzification = fuzzifications[0][0];			
+		}
+		if (fuzzifications[0].length == 2) {
+			if (fuzzifications[0][0].getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION)) {
+				defaultFuzzification = fuzzifications[0][0];
+				myFuzzification = fuzzifications[0][1];
+			}
+			else {
+				defaultFuzzification = fuzzifications[0][1];
+				myFuzzification = fuzzifications[0][0];			
+			}
+		}
+	}
 	
 %>
 
@@ -34,12 +52,12 @@
 						<div class='personalizationDivFuzzificationFunctionValuesTable'>
 							<div class='personalizationDivFuzzificationFunctionValuesTableRow'>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									A <%= JspsUtils.getPrologNameAsFuzzificationFunctionName(predDefined, true) %> 
-									whose value for <%= JspsUtils.getPrologNameAsFuzzificationFunctionName(predNecessary, false) %>
+									A <%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.database, true) %> 
+									whose value for <%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predNecessary, true) %>
 									is
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									is <%= JspsUtils.getPrologNameAsFuzzificationFunctionName(predDefined, false) %>
+									is <%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predDefined, true) %>
 									with a degree of
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
@@ -64,7 +82,6 @@
 		</div>
 	</div>
 </div>
-
 
 <script type="text/javascript">
 <%	

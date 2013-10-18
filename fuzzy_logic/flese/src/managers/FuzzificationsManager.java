@@ -28,7 +28,7 @@ public class FuzzificationsManager extends AbstractManager {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis [][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo);
+		ProgramPartAnalysis [][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, "", "");
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 
@@ -43,11 +43,13 @@ public class FuzzificationsManager extends AbstractManager {
 	public void edit() throws Exception {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
+		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
+		
 		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis [][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo);
-		String[] fuzzificationsList = ProgramAnalysisClass.getProgramFuzzificationsInJS(programPartAnalysis);
+		ProgramPartAnalysis [][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary);
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
-		resultsStoreHouse.setFuzzificationsList(fuzzificationsList);
+		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.EditPage, ""));
 

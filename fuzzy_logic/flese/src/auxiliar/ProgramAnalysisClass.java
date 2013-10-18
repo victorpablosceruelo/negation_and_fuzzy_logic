@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import constants.KConstants;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
@@ -165,32 +166,51 @@ public class ProgramAnalysisClass {
 		return programFunctionsInJavaScript;
 	}
 
-	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo) throws Exception {
+	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo, String predDefined, String predNecessary)
+			throws Exception {
+
+		if (predDefined == null) {
+			predDefined = "";
+		}
+
+		if (predNecessary == null) {
+			predNecessary = "";
+		}
 
 		if (programFunctionsOrdered == null) {
 			getProgramFuzzifications();
 		}
 
 		ProgramPartAnalysis function = null;
-		ProgramPartAnalysis[][] filteredResult = new ProgramPartAnalysis[programFunctionsOrdered.length][];
-		ArrayList<ProgramPartAnalysis> filteredSingleResult = null;
+		ArrayList<ArrayList<ProgramPartAnalysis>> filteredResults = new ArrayList<ArrayList<ProgramPartAnalysis>>();
+		ArrayList<ProgramPartAnalysis> filteredResult = null;
 
 		for (int i = 0; i < programFunctionsOrdered.length; i++) {
-			filteredSingleResult = new ArrayList<ProgramPartAnalysis>();
+			filteredResult = new ArrayList<ProgramPartAnalysis>();
 
 			for (int j = 0; j < programFunctionsOrdered[i].length; j++) {
 				function = programFunctionsOrdered[i][j];
 
-				if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
-						|| (function.getPredOwner().equals(localUserInfo.getLocalUserName()))
-						|| (function.getPredOwner().equals(ProgramPartAnalysis.DEFAULT_DEFINITION))) {
-					filteredSingleResult.add(function);
+				if ((predDefined.equals("") || (predDefined.equals(function.getPredDefined())))) {
+					if ((predNecessary.equals("") || (predNecessary.equals(function.getPredNecessary())))) {
+						if ((function.getPredOwner().equals(localUserInfo.getLocalUserName()))
+								|| (function.getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION))) {
+							filteredResult.add(function);
+						}
+					}
 				}
 			}
 
-			filteredResult[i] = filteredSingleResult.toArray(new ProgramPartAnalysis[filteredSingleResult.size()]);
+			if (filteredResult.size() > 0) {
+				filteredResults.add(filteredResult);
+			}
 		}
-		return filteredResult;
+
+		ProgramPartAnalysis[][] results = new ProgramPartAnalysis[filteredResults.size()][];
+		for (int i = 0; i < filteredResults.size(); i++) {
+			results[i] = filteredResults.get(i).toArray(new ProgramPartAnalysis[filteredResults.get(i).size()]);
+		}
+		return results;
 	}
 
 	public void updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String predOwner,
@@ -211,7 +231,7 @@ public class ProgramAnalysisClass {
 		// If I'm the owner I can change mine and the default one, but no other
 		// one.
 		if ((!localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
-				|| (!predOwner.equals(ProgramPartAnalysis.DEFAULT_DEFINITION))) {
+				|| (!predOwner.equals(KConstants.Fuzzifications.DEFAULT_DEFINITION))) {
 			predOwner = localUserInfo.getLocalUserName();
 		}
 
