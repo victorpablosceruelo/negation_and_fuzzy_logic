@@ -17,6 +17,14 @@ public class FunctionPoint {
 		this.coordinate_2 = coordinate_2.replaceAll(floatPattern, "$1");
 	}
 	
+	public String getCoordinate1() {
+		return coordinate_1;
+	}
+
+	public String getCoordinate2() {
+		return coordinate_2;
+	}
+
 	public String toString () {
 		return " coordinates: 1: " + coordinate_1 + " 2: " + coordinate_2 + " ";
 	}
