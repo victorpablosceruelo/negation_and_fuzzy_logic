@@ -27,36 +27,32 @@ function fuzzificationPoints (predOwner, predOwnerHumanized, functionPoints) {
 	this.predOwner = predOwner;
 	this.name = predOwnerHumanized;
 	this.data = functionPoints;
+	this.modified = false;
 }
 
-function fuzzificationFunctionConstructor(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
+function fuzzificationFunctionConstructor(predDefined, predNecessary, modifiable, msgTop, msgBottom, fuzzificationPoints) {
 	this.predDefined = predDefined;
 	this.predNecessary = predNecessary;
+	this.modifiable = modifiable;
 	this.msgTop = msgTop;
 	this.msgBottom = msgBottom;
 	this.fuzzificationPoints = fuzzificationPoints; // ownersPersonalizations
 }
 
-function setFuzzificationFunction (predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
-	fuzzificationFunction = new fuzzificationFunctionConstructor(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints);
+function setFuzzificationFunction (predDefined, predNecessary, modifiable, msgTop, msgBottom, fuzzificationPoints) {
+	fuzzificationFunction = new fuzzificationFunctionConstructor(predDefined, predNecessary, modifiable, msgTop, msgBottom, fuzzificationPoints);
 }
 
 function indexOfMyPersonalizedFunction() {
-	var i = 0;
-	var found = false;
+	var i = fuzzificationFunction.modifiable;
 	
-	while ((i < fuzzificationFunction.fuzzificationPoints.length) && (! found)) { 
-		found = ! (fuzzificationFunction.fuzzificationPoints[i].name == '<%=KConstants.Fuzzifications.DEFAULT_DEFINITION %>');
-		if (! found) {
-			i++;
-		}
+	if (i < fuzzificationFunction.fuzzificationPoints.length) {
+		return i;
 	}
 	
-	if (! found) {
-		debug.info("IndexOfMyPersonalizedFunction: i < 0");
-		return -1;
-	}
-	return i;
+	debug.info("IndexOfMyPersonalizedFunction: i < 0");
+	return -1;
+	
 }
 
 function changeFuzzificationPointValue(fpx, valueFloat) {
@@ -69,6 +65,7 @@ function changeFuzzificationPointValue(fpx, valueFloat) {
 		while ((j < fuzzificationFunction.fuzzificationPoints[i].data.length) && (! found)) {
 			if (fuzzificationFunction.fuzzificationPoints[i].data[j][0] == fpx) {
 				fuzzificationFunction.fuzzificationPoints[i].data[j][1] = valueFloat;
+				fuzzificationFunction.fuzzificationPoints[i].modified = true;
 				found = true;
 			}
 			else {
@@ -89,6 +86,8 @@ function changeFuzzificationPointValue(fpx, valueFloat) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
 function barValueChanged(barObject, fuzzificationBarDivId, fpx, fuzzificationGraphicDivId) {
+	
+	debug.info("barValueChanged");
 	
 	if ((barObject == null) || (barObject == undefined)) {
 		debug.info("barObject is null or undefined in barValueChanged.");
@@ -157,15 +156,15 @@ function insertFuzzificationGraphicRepresentation(fuzzificationGraphicDivId) {
 // var charts = new Array(); // globally available
 var chart = null;
 
-function drawChart(identifier) {
+function drawChart(divIdentifier) {
 	
 	if ((fuzzificationFunction != null) && (fuzzificationFunction.fuzzificationPoints != null)) {
 
-		$(document).ready(function() {
+//		$(document).ready(function() {
 			  // charts[i] = 
 		      chart = new Highcharts.Chart({
 		         chart: {
-	    	        renderTo: identifier,
+	    	        renderTo: divIdentifier,
 	        	    type: 'line' //,
 /*					style: { margin: '0 auto' } */
 		         },
@@ -186,7 +185,7 @@ function drawChart(identifier) {
 	        	 series: fuzzificationFunction.fuzzificationPoints
 		         		/*	[{ name: 'Jane', data: [1, 0, 4] }, { name: 'John', data: [5, 7, 3] }] */
 		      });
-		   });
+//		   });
 	}
 }
 

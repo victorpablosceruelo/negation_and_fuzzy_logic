@@ -104,6 +104,7 @@ public class KConstants {
 
 	public static class Fuzzifications {
 		public final static String DEFAULT_DEFINITION = "default definition";
+		public final static String PREVIOUS_DEFAULT_DEFINITION = "previous default definition";
 		public static final String predDefined = "predDefined";
 		public static final String predNecessary = "predNecessary";
 		public static final String predOwner = "predOwner";
