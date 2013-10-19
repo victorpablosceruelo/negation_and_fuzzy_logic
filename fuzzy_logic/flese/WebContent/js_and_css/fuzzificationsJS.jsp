@@ -29,7 +29,7 @@ function fuzzificationPoints (predOwner, predOwnerHumanized, functionPoints) {
 	this.data = functionPoints;
 }
 
-function fuzzificationFunction(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
+function fuzzificationFunctionConstructor(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
 	this.predDefined = predDefined;
 	this.predNecessary = predNecessary;
 	this.msgTop = msgTop;
@@ -38,7 +38,7 @@ function fuzzificationFunction(predDefined, predNecessary, msgTop, msgBottom, fu
 }
 
 function setFuzzificationFunction (predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
-	fuzzificationFunction = new fuzzificationFunction(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints);
+	fuzzificationFunction = new fuzzificationFunctionConstructor(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints);
 }
 
 function indexOfMyPersonalizedFunction() {
@@ -64,6 +64,8 @@ function changeFuzzificationPointValue(fpx, valueFloat) {
 
 	if (i >= 0) {
 		var j=0; 
+		var found = false;
+		
 		while ((j < fuzzificationFunction.fuzzificationPoints[i].data.length) && (! found)) {
 			if (fuzzificationFunction.fuzzificationPoints[i].data[j][0] == fpx) {
 				fuzzificationFunction.fuzzificationPoints[i].data[j][1] = valueFloat;
@@ -120,7 +122,7 @@ function barValueChanged(barObject, fuzzificationBarDivId, fpx, fuzzificationGra
 	fuzzificationBarDiv.innerHTML = valueToShow;
 
 	// Display in the graphic the result.
-	insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
+	insertFuzzificationGraphicRepresentation(fuzzificationGraphicDivId);
 }
 
 
@@ -128,7 +130,7 @@ function barValueChanged(barObject, fuzzificationBarDivId, fpx, fuzzificationGra
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId) {
+function insertFuzzificationGraphicRepresentation(fuzzificationGraphicDivId) {
 	
 	var div = document.getElementById(fuzzificationGraphicDivId);
 	if ((div != null) && (div != undefined)) {
@@ -144,7 +146,7 @@ function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDiv
 		div.appendChild(container);
 	
 		// alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
-		drawChart(container.id, index);
+		drawChart(container.id);
 	}
 }
 
@@ -155,7 +157,7 @@ function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDiv
 // var charts = new Array(); // globally available
 var chart = null;
 
-function drawChart(identifier, index) {
+function drawChart(identifier) {
 	
 	if ((fuzzificationFunction != null) && (fuzzificationFunction.fuzzificationPoints != null)) {
 

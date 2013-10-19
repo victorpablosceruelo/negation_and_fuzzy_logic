@@ -63,6 +63,7 @@
 			if (defFuzzPoint.getCoordinate1().equals(myFuzzPoints[j].getCoordinate1())) {
 				myFuzzPoint = myFuzzPoints[j];
 			}
+			else j++;
 		}
 		if ((myFuzzPoint == null) || (mode.equals(KConstants.Request.modeAdvanced))) {
 			myFuzzPoint = defFuzzPoint;
@@ -87,7 +88,8 @@
 
 	out.print("setFuzzificationFunction('" + defaultFuzzification.getPredDefined() + "', '" + defaultFuzzification.getPredNecessary());
 	out.print("', '" + dbPredIsPredDefined + "', '" + PredNecessaryOfADbPred + "', new Array("); 
-	out.print("new fuzzificationPoints('"+ localUserInfo.getLocalUserName() + "', new Array(");
+	out.print("new fuzzificationPoints('"+ localUserInfo.getLocalUserName() + "', '" + localUserInfo.getLocalUserName());
+	out.print("', new Array(");
 	for (int i=0; i<points.length; i++) {
 		out.print("new Array(" + points[i][0] + ", " + points[i][1] + ")");
 		if (i+1 < points.length) {
