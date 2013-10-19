@@ -95,7 +95,7 @@ public class FilesManagerAux {
 	private static ArrayList<ProgramFileInfo> listProgramFilesInSubDir(String subDir, PathsMgmt pathsMgmt,
 			ArrayList<ProgramFileInfo> currentList) throws FilesAndPathsException, LocalUserInfoException {
 
-		if ((subDir == null) || ("".equals(subDir))) {
+		if ((subDir == null) || ("".equals(subDir)) || (KConstants.Application.BackupsFolder.equals(subDir))) {
 			return currentList;
 		}
 
