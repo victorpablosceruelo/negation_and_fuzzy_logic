@@ -8,6 +8,7 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+<%@page import="constants.KConstants.Fuzzifications"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
@@ -223,15 +224,35 @@ function barValueChanged(barObject, i, indexOfMine, index, fuzzificationGraphicD
 function saveFuzzification(fuzzificationSaveStatusDivId, saveUrl) {
 	var fuzzificationSaveStatusDiv = getContainer(fuzzificationSaveStatusDivId);
 	fuzzificationSaveStatusDiv.innerHTML = loadingImageHtml(false);
-		
-	for (var i=0; i < fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data.length; i++) {
-		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][0];
-		fpy = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][1];
-		
-		saveUrl += "&fpy["+fpx+"]=" + fpy;
-	}
 	
-	loadAjaxIn(fuzzificationSaveStatusDivId, saveUrl);
+	var i=0;
+	var found = false;
+	
+	while ((i < fuzzificationFunction.fuzzificationPoints.length) && (! found)) { 
+		found = ! (fuzzificationFunction.fuzzificationPoints[i].name == '<%=KConstants.Fuzzifications.DEFAULT_DEFINITION %>');
+		if (! found) {
+			i++;
+		}
+	}
+	if (found) {
+		if (fuzzificationFunction.fuzzificationPoints[i].modified) {
+			for (var j=0; j < fuzzificationFunction.fuzzificationPoints[i].data.length; j++) {
+				var fpx = fuzzificationFunction.fuzzificationPoints[i].data[j][0];
+				var fpy = fuzzificationFunction.fuzzificationPoints[i].data[j][1];
+		
+				saveUrl += "&fpx["+j+"]=" + fpx;
+				saveUrl += "&fpy["+j+"]=" + fpy;
+			}
+	
+			loadAjaxIn(fuzzificationSaveStatusDivId, saveUrl);
+		}
+		else {
+			fuzzificationSaveStatusDiv.innerHTML = "No changes to save.";
+		}
+	}
+	else {
+		fuzzificationSaveStatusDiv.innerHTML = "Impossible to save fuzzification modifications.";
+	}
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
