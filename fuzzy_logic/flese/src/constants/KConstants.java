@@ -169,7 +169,8 @@ public class KConstants {
 		
 		public static final String fuzzificationGraphicDivId = "fuzzificationGraphicDiv";
 		public static final String fuzzificationValuesAndButtonDivId = "fuzzificationValuesAndButtonDiv";
-		public static final String fuzzificationSaveStatus = "fuzzificationSaveStatus";
+		public static final String fuzzificationSaveStatusDivId = "fuzzificationSaveStatus";
+		public static final String fuzzificationBarValueDivId = "fuzzificationBarValueDivId";
 	}
 }
 

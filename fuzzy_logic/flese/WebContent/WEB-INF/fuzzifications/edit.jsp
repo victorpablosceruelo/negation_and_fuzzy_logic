@@ -80,8 +80,13 @@
 %>
 <script type="text/javascript">
 <%
+	String dbPredIsPredDefined = JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.database, true) + " is " +
+			JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predDefined, true);
+	String PredNecessaryOfADbPred = JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predNecessary, true) +
+			" of a " + JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.database, true);
 
-	out.print("setFuzzificationFunction('" + defaultFuzzification.getPredDefined() + "', '" + defaultFuzzification.getPredNecessary() +	"', new Array("); 
+	out.print("setFuzzificationFunction('" + defaultFuzzification.getPredDefined() + "', '" + defaultFuzzification.getPredNecessary());
+	out.print("', '" + dbPredIsPredDefined + "', '" + PredNecessaryOfADbPred + "', new Array("); 
 	out.print("new fuzzificationPoints('"+ localUserInfo.getLocalUserName() + "', new Array(");
 	for (int i=0; i<points.length; i++) {
 		out.print("new Array(" + points[i][0] + ", " + points[i][1] + ")");
@@ -139,7 +144,9 @@
 								</div>
 							</div>
 
-							<% for (int i=0; i<points.length; i++) { %>
+							<% for (int i=0; i<points.length; i++) { 
+									String fuzzificationBarDivId = KConstants.JspsDivsIds.fuzzificationBarValueDivId + "[" + i + "]";
+							%>
 							<div class='personalizationDivFuzzificationFunctionValuesTableRow'>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
 									<%= points[i][0] %>
@@ -148,10 +155,10 @@
 									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx' value='<%= points[i][0] %>'/>
 						 			<input type='range'  name='fuzzificationBars[<%= i %>].fpy' min='0' max='1' 
 						 					step='0.01' value='<%= points[i][1] %>' width='150px' 
-						 					onchange="barValueChanged(this, '<%= points[i][0] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');"/>
+						 					onchange="barValueChanged(this, '<%=fuzzificationBarDivId %>', '<%= points[i][0] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');"/>
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<span id='fuzzificationBarValue["+i+"]'><%= points[i][1] %></span>
+									<span id='<%=fuzzificationBarDivId %>'><%= points[i][1] %></span>
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
 									<%= points[i][2] %>

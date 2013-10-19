@@ -23,20 +23,178 @@
 
 var fuzzificationFunction = null;
 
-function fuzzificationPoints (predOwner, functionPoints) {
-	this.name = predOwner;
+function fuzzificationPoints (predOwner, predOwnerHumanized, functionPoints) {
+	this.predOwner = predOwner;
+	this.name = predOwnerHumanized;
 	this.data = functionPoints;
 }
 
-function fuzzificationFunction(predDefined, predNecessary, fuzzificationPoints) {
+function fuzzificationFunction(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
 	this.predDefined = predDefined;
 	this.predNecessary = predNecessary;
+	this.msgTop = msgTop;
+	this.msgBottom = msgBottom;
 	this.fuzzificationPoints = fuzzificationPoints; // ownersPersonalizations
 }
 
-function setFuzzificationFunction (predDefined, predNecessary, fuzzificationPoints) {
-	fuzzificationFunction = new fuzzificationFunction(predDefined, predNecessary, fuzzificationPoints);
+function setFuzzificationFunction (predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints) {
+	fuzzificationFunction = new fuzzificationFunction(predDefined, predNecessary, msgTop, msgBottom, fuzzificationPoints);
 }
+
+function indexOfMyPersonalizedFunction() {
+	var i = 0;
+	var found = false;
+	
+	while ((i < fuzzificationFunction.fuzzificationPoints.length) && (! found)) { 
+		found = ! (fuzzificationFunction.fuzzificationPoints[i].name == '<%=KConstants.Fuzzifications.DEFAULT_DEFINITION %>');
+		if (! found) {
+			i++;
+		}
+	}
+	
+	if (! found) {
+		debug.info("IndexOfMyPersonalizedFunction: i < 0");
+		return -1;
+	}
+	return i;
+}
+
+function changeFuzzificationPointValue(fpx, valueFloat) {
+	var i = indexOfMyPersonalizedFunction();
+
+	if (i >= 0) {
+		var j=0; 
+		while ((j < fuzzificationFunction.fuzzificationPoints[i].data.length) && (! found)) {
+			if (fuzzificationFunction.fuzzificationPoints[i].data[j][0] == fpx) {
+				fuzzificationFunction.fuzzificationPoints[i].data[j][1] = valueFloat;
+				found = true;
+			}
+			else {
+				j++;
+			}
+		}
+		if (! found) {
+			debug.info("changeFuzzificationPointValue: not found");
+		}
+	}
+	else {
+		debug.info("changeFuzzificationPointValue: not found");
+	}
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function barValueChanged(barObject, fuzzificationBarDivId, fpx, fuzzificationGraphicDivId) {
+	
+	if ((barObject == null) || (barObject == undefined)) {
+		debug.info("barObject is null or undefined in barValueChanged.");
+		return;
+	}
+	
+	var valueOriginal=barObject.value;
+	if  ((valueOriginal == null) || (valueOriginal == undefined) || (isNaN(valueOriginal))) {
+		alert("Erroneous value. I'll reset to 0.");
+		barObject.value = 0;
+		valueOriginal = 0;
+		return;
+	}
+	
+	var valueFloat = parseFloat(valueOriginal);
+	var valueToShow = 0;
+	
+	if ((valueFloat != null) && (valueFloat != undefined) && (! isNaN(valueFloat))) {
+		valueToShow = valueFloat.toFixed(2);
+	}
+	else {
+		valueFloat = 0;
+		valueToShow = 0;
+	}
+		
+	// Modify the stored value 
+	changeFuzzificationPointValue(fpx, valueFloat);
+
+	// Show the value in the div.
+	var fuzzificationBarDiv = getContainer(fuzzificationBarDivId);
+	fuzzificationBarDiv.innerHTML = valueToShow;
+
+	// Display in the graphic the result.
+	insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
+}
+
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId) {
+	
+	var div = document.getElementById(fuzzificationGraphicDivId);
+	if ((div != null) && (div != undefined)) {
+		div.innerHTML = ""; // Re-initialize
+	
+		var container = document.createElement('div');
+		container.id = fuzzificationGraphicDivId + "Container";
+		container.style.width= "50em"; 
+		container.style.height= "15em";
+		container.style.margin= "2em";
+		container.style['text-align'] = "center";
+		container.style['align'] = "center";
+		div.appendChild(container);
+	
+		// alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
+		drawChart(container.id, index);
+	}
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+// var charts = new Array(); // globally available
+var chart = null;
+
+function drawChart(identifier, index) {
+	
+	if ((fuzzificationFunction != null) && (fuzzificationFunction.fuzzificationPoints != null)) {
+
+		$(document).ready(function() {
+			  // charts[i] = 
+		      chart = new Highcharts.Chart({
+		         chart: {
+	    	        renderTo: identifier,
+	        	    type: 'line' //,
+/*					style: { margin: '0 auto' } */
+		         },
+		         title: { text: fuzzificationFunction.msgTop },
+		         xAxis: {
+					title: { text: fuzzificationFunction.msgBottom },
+					min: 0
+
+		            // categories: ['Apples', 'Bananas', 'Oranges']
+		         },
+		         yAxis: {
+					title: { text: 'Truth value' },
+					min: 0,
+					max: 1
+		         	// categories: [0, 0.25, 0.5, 0.75, 1]
+	    	     },
+/*	    	     navigator: { height: 30, width: 40 }, center: [60, 45], size: 50, */
+	        	 series: fuzzificationFunction.fuzzificationPoints
+		         		/*	[{ name: 'Jane', data: [1, 0, 4] }, { name: 'John', data: [5, 7, 3] }] */
+		      });
+		   });
+	}
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
@@ -95,146 +253,13 @@ function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderMo
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId) {
-	
-	var div = document.getElementById(fuzzificationGraphicDivId);
-	if ((div != null) && (div != undefined)) {
-		div.innerHTML = ""; // Re-initialize
-	
-		var container = document.createElement('div');
-		container.id = fuzzificationGraphicDivId + "Container";
-		container.style.width= "50em"; 
-		container.style.height= "15em";
-		container.style.margin= "2em";
-		container.style['text-align'] = "center";
-		container.style['align'] = "center";
-		div.appendChild(container);
-	
-		// alert("insertFuzzificationGraphicRepresentation not implemented yet !!!");
-		drawChart(container.id, index);
-	}
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
-// var charts = new Array(); // globally available
-var chart = null;
-
-function drawChart(identifier, index) {
-	
-	if ((fuzzificationsFunctions[index] != null) && 
-		(fuzzificationsFunctions[index].ownersPersonalizations != null)) {
-
-		$(document).ready(function() {
-			  // charts[i] = 
-		      chart = new Highcharts.Chart({
-		         chart: {
-	    	        renderTo: identifier,
-	        	    type: 'line' //,
-/*					style: { margin: '0 auto' }
-*/
-		         },
-		         title: {
-	    	        text: fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predDefined, 'all')
-	        	 },
-		         xAxis: {
-					title: {
-						text: fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predNecessary, 'adjective') + 
-								" of a " + fuzzificationFunctionNameInColloquial(fuzzificationsFunctions[index].predNecessary, 'subject')
-					},
-					min: 0
-
-		            // categories: ['Apples', 'Bananas', 'Oranges']
-		         },
-		         yAxis: {
-					title: {
-						text: 'Truth value'
-					},
-					min: 0,
-					max: 1
-		         	// categories: [0, 0.25, 0.5, 0.75, 1]
-	    	     },
-/*	    	     navigator: {
-	    	    	 height: 30,
-	    	    	 width: 40
-	    	     },
-	    	     center: [60, 45],
-	    	     size: 50,
-*/
-	        	 series: fuzzificationsFunctions[index].ownersPersonalizations
-		         		/*	[{
-		            name: 'Jane',
-		            data: [1, 0, 4]
-	    	     }, {
-	        	    name: 'John',
-	            	data: [5, 7, 3]
-		         }] */
-		      });
-		   });
-	}
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
-function barValueChanged(barObject, i, indexOfMine, index, fuzzificationGraphicDivId) {
-	
-	if ((barObject == null) || (barObject == undefined)) {
-		debug.info("barObject is null or undefined in barValueChanged.");
-		return;
-	}
-	
-	var valueOriginal=barObject.value;
-	if  ((valueOriginal == null) || (valueOriginal == undefined) || (isNaN(valueOriginal))) {
-		alert("Erroneous value. I'll reset to 0.");
-		barObject.value = 0;
-		valueOriginal = 0;
-		return;
-	}
-	
-	var valueFloat = parseFloat(valueOriginal);
-	var valueToShow = 0;
-	
-	if ((valueFloat != null) && (valueFloat != undefined) && (! isNaN(valueFloat))) {
-		valueToShow = valueFloat.toFixed(2);
-	}
-	else {
-		valueFloat = 0;
-		valueToShow = 0;
-	}
-	
-	// Show the value in the div.
-	var div = document.getElementById("fuzzificationBarValue["+i+"]");
-	div.innerHTML = valueToShow;
-	
-	// Modify the stored value 
-	fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][1] = valueFloat;
-
-	// Display in the graphic the result.
-	insertFuzzificationGraphicRepresentation(index, fuzzificationGraphicDivId);
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
 function saveFuzzification(fuzzificationSaveStatusDivId, saveUrl) {
 	var fuzzificationSaveStatusDiv = getContainer(fuzzificationSaveStatusDivId);
 	fuzzificationSaveStatusDiv.innerHTML = loadingImageHtml(false);
 	
-	var i=0;
-	var found = false;
-	
-	while ((i < fuzzificationFunction.fuzzificationPoints.length) && (! found)) { 
-		found = ! (fuzzificationFunction.fuzzificationPoints[i].name == '<%=KConstants.Fuzzifications.DEFAULT_DEFINITION %>');
-		if (! found) {
-			i++;
-		}
-	}
-	if (found) {
+	var i = indexOfMyPersonalizedFunction();
+
+	if (i >= 0) {
 		if (fuzzificationFunction.fuzzificationPoints[i].modified) {
 			for (var j=0; j < fuzzificationFunction.fuzzificationPoints[i].data.length; j++) {
 				var fpx = fuzzificationFunction.fuzzificationPoints[i].data[j][0];
