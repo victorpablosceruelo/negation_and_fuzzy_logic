@@ -65,10 +65,10 @@ public class FuzzificationsManager extends AbstractManager {
 
 		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
 		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
-		String predOwner = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predOwner);
+		String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 		String[][] functionDefinition = programAnalized.getFunctionDefinition(requestStoreHouse);
 
-		int result = programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, predOwner, functionDefinition);
+		int result = programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, mode, functionDefinition);
 
 		String msg = "Program file " + programFileInfo.getFileName() + " owned by " + programFileInfo.getFileOwner()
 				+ " has NOT been updated. ";

@@ -214,26 +214,27 @@ public class ProgramAnalysisClass {
 		return results;
 	}
 
-	public int updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String predOwner,
+	public int updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String mode, 
 			String[][] functionDefinition) throws Exception {
 
-		LOG.info("saving fuzzification: " + predDefined + " depending on " + predNecessary + " personalized for username: " + predOwner
-				+ " by username: " + localUserInfo.getLocalUserName() + "\n\n");
+		LOG.info("saving the fuzzification " + predDefined + " depending on " + predNecessary + " in mode " + mode);
 
 		// Security issues ("" strings).
 		if ("".equals(predDefined))
 			throw new Exception("predDefined cannot be empty string.");
 		if ("".equals(predNecessary))
 			throw new Exception("predNecessary cannot be empty string.");
-		if ("".equals(predOwner))
-			throw new Exception("predOwner cannot be empty string.");
+		if ("".equals(mode)) {
+			mode = KConstants.Request.modeBasic;
+		}
 
 		// If I'm not the owner I can change only my fuzzification.
 		// If I'm the owner I can change mine and the default one, but no other
 		// one.
-		if ((!localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
-				|| (!predOwner.equals(KConstants.Fuzzifications.DEFAULT_DEFINITION))) {
-			predOwner = localUserInfo.getLocalUserName();
+		String predOwner = localUserInfo.getLocalUserName();
+		if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
+				&& (KConstants.Request.modeAdvanced.equals(mode))) {
+			predOwner = KConstants.Fuzzifications.DEFAULT_DEFINITION;
 		}
 
 		ProgramPartAnalysis programPart = null;
@@ -311,7 +312,7 @@ public class ProgramAnalysisClass {
 			CacheStoreHouseCleaner.clean(programFileInfo);
 			return 0;
 		}
-		return 1;
+		return -1;
 	}
 
 	public String[][] getFunctionDefinition(RequestStoreHouse requestStoreHouse) {

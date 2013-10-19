@@ -107,7 +107,6 @@ public class KConstants {
 		public final static String PREVIOUS_DEFAULT_DEFINITION = "previous default definition";
 		public static final String predDefined = "predDefined";
 		public static final String predNecessary = "predNecessary";
-		public static final String predOwner = "predOwner";
 		public static final String database = "database";
 	}
 

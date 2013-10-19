@@ -18,17 +18,16 @@
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	String fileName = requestStoreHouse.getRequestParameter(KConstants.Request.fileNameParam);
 	String fileOwner = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	String predDefined = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	String predOwner = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
+	String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
+	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
 	
 	String saveUrl = KUrls.Fuzzifications.Save.getUrl(true) + 
 			"&" + KConstants.Request.fileNameParam + "=" + fileName + 
 			"&" + KConstants.Request.fileOwnerParam + "=" + fileOwner +
 			"&" + KConstants.Request.mode + "=" + mode +
 			"&" + KConstants.Fuzzifications.predDefined + "=" + predDefined +
-			"&" + KConstants.Fuzzifications.predNecessary + "=" + predNecessary +
-			"&" + KConstants.Fuzzifications.predOwner + "=" + predOwner;
+			"&" + KConstants.Fuzzifications.predNecessary + "=" + predNecessary;
+	JspsUtils.getValue(saveUrl);
 	
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
 	ProgramPartAnalysis myFuzzification = null;
