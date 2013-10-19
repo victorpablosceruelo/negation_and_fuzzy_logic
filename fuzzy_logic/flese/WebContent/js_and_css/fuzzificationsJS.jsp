@@ -41,22 +41,6 @@ function setFuzzificationFunction (predDefined, predNecessary, fuzzificationPoin
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function personalizeProgramFile(chooseProgramFileId, mode) {
-	// alert("fileViewContentsDivId: " + fileViewContentsDivId);
-	var comboBox = document.getElementById(chooseProgramFileId);
-	var selectedProgramDatabase = getProgramDatabaseComboBoxValue(comboBox);
-	
-	if (selectedProgramDatabase == null) {
-		alert("Please choose a valid database to continue.");
-	}
-	else {
-		personalizeProgramFile(selectedProgramDatabase.fileName, selectedProgramDatabase.fileOwner, mode);
-	}
-	
-	//prevent the browser to follow the link
-	return false;
-}
-
 function personalizeProgramFile(url, params, fileName) {
 	var containerId = '<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>';
 	
@@ -99,147 +83,11 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function showPersonalizeProgramFileDialog(fileName, fileOwner, mode) {
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
 function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, url) {
 	
 	var params = getComboBoxValue(comboBox);
 	loadAjaxIn(PersonalizationFunctionUnderModificationDivId, url + params);
 	
-}
-
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-/* ----------------------------------------------------------------------------------------------------------------------------*/
-
-function insertFuzzificationValuesAndSaveButton(index, fuzzificationValuesAndButtonDivId, fuzzificationGraphicDivId, mode, fileName, fileOwner){
-		
-	var i = null;
-	var j = null;
-	var indexOfDefault = null;
-	var indexOfMine = null;
-	
-	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations.length; i++) {
-		if (fuzzificationsFunctions[index].ownersPersonalizations[i].name == localUserName) {
-			indexOfMine = i;
-		}
-		if (fuzzificationsFunctions[index].ownersPersonalizations[i].name == 'default definition') {
-			indexOfDefault = i;
-		}
-	}
-	//debug.info("indexOfMine: " + indexOfMine);
-	//debug.info("indexOfDefault: " + indexOfDefault);
-	//debug.info("mode: " + mode);
-	
-	if (mode == 'advanced') indexOfMine = indexOfDefault;
-	else {
-		if (indexOfMine == null) {
-			indexOfMine = fuzzificationsFunctions[index].ownersPersonalizations.length;
-			fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine] =
-				new ownerPersonalization(localUserName, new Array());
-			for (i=0; i < fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data.length; i++) {
-				fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i] = new Array();
-				for (j=0; j < fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i].length; j++) {
-					fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][j] = 
-						fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][j];
-				}
-			}
-		}
-	}
-	//debug.info("indexOfMine (fixed): " + indexOfMine);
-	
-	var fpx = null;
-	var fpy = null;
-	var fpd = null;
-	var found = false;
-	
-	for (i=0; i<fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data.length; i++) {
-		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][0];
-		fpd = fuzzificationsFunctions[index].ownersPersonalizations[indexOfDefault].data[i][1];
-		fpy = null;
-		
-		found = false;
-		if (indexOfMine != null) {
-			j = 0;
-			while ((j<fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data.length) && (! found)) {
-				if (fpx == fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[j][0]) {
-					found = true;
-					fpy = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[j][1];
-				}
-				else j++;
-			}
-		}
-		
-		// Assign default value if personalized one is not found.
-		if ((! found) || (fpy == null) || (fpy == undefined)) fpy = fpd;
-		
-		// Now it is time to build the table with the data.
-		row = document.createElement('div');
-		row.className = "personalizationDivFuzzificationFunctionValuesTableRow";
-		table.appendChild(row);
-		
-		cell = document.createElement('div');
-		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-		row.appendChild(cell);
-		cell.innerHTML = fpx;
-		
-		cell = document.createElement('div');
-		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-		row.appendChild(cell);
-		cell.innerHTML = "<input type='hidden' name='fuzzificationBars["+i+"].fpx' value='"+fpx+"'/>" +
-						 "<input type='range'  name='fuzzificationBars["+i+"].fpy' min='0' max='1' step='0.01' "+
-						 "value='"+fpy+"' width='150px' "+
-						 "onchange='barValueChanged(this, "+i+", "+indexOfMine+", "+index+", \""+fuzzificationGraphicDivId+"\")'/>";
-
-		cell = document.createElement('div');
-		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-		row.appendChild(cell);
-		cell.innerHTML = "<span id='fuzzificationBarValue["+i+"]'>"+fpy+"</span>";
-		
-		cell = document.createElement('div');
-		cell.className = "personalizationDivFuzzificationFunctionValuesTableCell";
-		row.appendChild(cell);
-		cell.innerHTML = fpd;		
-	}
-	
-	// Table for the button in charge of saving the changes.
-	table = document.createElement('div');
-	table.className = "personalizationDivSaveButtonAndMsgTable";
-	saveButtonCell.appendChild(table);
-
-	row = document.createElement('div');
-	row.className = "personalizationDivSaveButtonAndMsgTableRow";
-	table.appendChild(row);
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
-	row.appendChild(cell);
-	cell.innerHTML = 	"<INPUT type='submit' value='Save modifications' "+
-						"onclick='saveFuzzificationPersonalizations(\"saveMyFuzzificationStatus\", \""+ 
-						mode + "\", \"" + fileName + "\", \"" + fileOwner + "\", " + index + ", "+ indexOfMine + ")'>";
-
-	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
-	row.appendChild(cell);
-	cell.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;";
-	
-	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
-	cell.id = "saveMyFuzzificationStatus";
-	row.appendChild(cell);
-	cell.innerHTML = "";
-
-	/*
-	cell = document.createElement('div');
-	cell.className = "personalizationDivSaveButtonAndMsgTableCell";
-	container.appendChild(cell);
-	cell.innerHTML = "";
-	*/	
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
