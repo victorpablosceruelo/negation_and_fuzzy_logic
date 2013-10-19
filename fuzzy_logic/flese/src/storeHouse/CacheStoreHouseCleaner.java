@@ -3,17 +3,15 @@ package storeHouse;
 import prologConnector.CiaoPrologNormalQuery;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import auxiliar.LocalUserInfoException;
-import filesAndPaths.FilesAndPathsException;
+import auxiliar.ProgramAnalysisClass;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
 public class CacheStoreHouseCleaner {
 
-	public static void clean(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, CacheStoreHouseException, FilesAndPathsException,
-			LocalUserInfoException {
-
-		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
-		
+	public static void clean(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException,
+			FilesAndPathsException, LocalUserInfoException {
+		ProgramAnalysisClass.clearCacheInstancesFor(programFileInfo);
 		CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(programFileInfo);
 		CiaoPrologNormalQuery.clearCacheInstancesFor(programFileInfo);
 

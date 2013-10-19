@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import constants.KConstants;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import storeHouse.CacheStoreHouse;
+import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
+import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
@@ -213,7 +214,7 @@ public class ProgramAnalysisClass {
 		return results;
 	}
 
-	public void updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String predOwner,
+	public int updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String predOwner,
 			String[][] functionDefinition) throws Exception {
 
 		LOG.info("saving fuzzification: " + predDefined + " depending on " + predNecessary + " personalized for username: " + predOwner
@@ -305,9 +306,12 @@ public class ProgramAnalysisClass {
 
 		bw.close();
 
-		programFunctionsOrdered = null;
-		clearCacheInstancesFor(this.programFileInfo);
-		CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(this.programFileInfo);
+		if (copiedBackFuzzifications) {
+			programFunctionsOrdered = null;
+			CacheStoreHouseCleaner.clean(programFileInfo);
+			return 0;
+		}
+		return 1;
 	}
 
 	public String[][] getFunctionDefinition(RequestStoreHouse requestStoreHouse) {

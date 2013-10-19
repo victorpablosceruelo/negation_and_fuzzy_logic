@@ -45,7 +45,7 @@ public class FilesManager extends AbstractManager {
 		try {
 			FilesManagerAux.uploadFileAux(requestStoreHouse);
 		} catch (Exception e) {
-			resultsStoreHouse.addMessage(e.getMessage());
+			resultsStoreHouse.addExceptionMessage(e.getMessage());
 		}
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
 	}
@@ -93,13 +93,13 @@ public class FilesManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
-			resultsStoreHouse.addMessage("Logged user does not own the program file.");
+			resultsStoreHouse.addExceptionMessage("Logged user does not own the program file.");
 		} else {
 			String result = programFileInfo.remove();
 			if ((result != null) && (result.length() > 0)) {
-				resultsStoreHouse.addMessage(result);
+				resultsStoreHouse.addExceptionMessage(result);
 			}
-			CacheStoreHouseCleaner.clean(requestStoreHouse);
+			CacheStoreHouseCleaner.clean(programFileInfo);
 		}
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
@@ -123,7 +123,7 @@ public class FilesManager extends AbstractManager {
 			}
 			resultsStoreHouse.setFileContents(fileContents);
 		} else {
-			resultsStoreHouse.addMessage("You are not allowed to see the contents of the file " + programFileInfo.getFileName());
+			resultsStoreHouse.addExceptionMessage("You are not allowed to see the contents of the file " + programFileInfo.getFileName());
 		}
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, ""));

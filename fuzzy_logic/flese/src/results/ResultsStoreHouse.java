@@ -9,7 +9,8 @@ import filesAndPaths.ProgramFileInfo;
 
 public class ResultsStoreHouse {
 
-	private ArrayList<String> messages = new ArrayList<String>();
+	private ArrayList<String> exceptionMessages = new ArrayList<String>();
+	private String resultMessage = "";
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
 	private String[] fileContents = null;
 	private ProgramFileInfo programFileInfo = null;
@@ -24,17 +25,28 @@ public class ResultsStoreHouse {
 	 * @param msg
 	 *            is the message to be added. Cannot be null.
 	 */
-	public void addMessage(String msg) {
+	public void addExceptionMessage(String msg) {
 		if ((msg != null) && (!"".equals(msg))) {
-			messages.add(msg);
+			exceptionMessages.add(msg);
 		}
 	}
 
-	public String[] getMessages() {
-		if (messages == null) {
+	public String[] getExceptionMessages() {
+		if (exceptionMessages == null) {
 			return new String[0];
 		}
-		return messages.toArray(new String[messages.size()]);
+		return exceptionMessages.toArray(new String[exceptionMessages.size()]);
+	}
+	
+	public void setResultMessage(String msg) {
+		resultMessage = msg;
+	}
+
+	public String getResultMessage() {
+		if (resultMessage == null) {
+			return "";
+		}
+		return resultMessage;
 	}
 
 	public void setFilesList(ProgramFileInfo[] filesList) {

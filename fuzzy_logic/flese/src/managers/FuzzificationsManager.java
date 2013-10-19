@@ -1,6 +1,5 @@
 package managers;
 
-import storeHouse.CacheStoreHouseCleaner;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import auxiliar.ProgramAnalysisClass;
@@ -28,7 +27,7 @@ public class FuzzificationsManager extends AbstractManager {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis [][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, "", "");
+		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, "", "");
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 
@@ -45,9 +44,9 @@ public class FuzzificationsManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
 		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
-		
+
 		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis [][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary);
+		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary);
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 
@@ -69,19 +68,19 @@ public class FuzzificationsManager extends AbstractManager {
 		String predOwner = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predOwner);
 		String[][] functionDefinition = programAnalized.getFunctionDefinition(requestStoreHouse);
 
-		programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, predOwner, functionDefinition);
+		int result = programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, predOwner, functionDefinition);
 
-		CacheStoreHouseCleaner.clean(requestStoreHouse);
+		String msg = "Program file " + programFileInfo.getFileName() + " owned by " + programFileInfo.getFileOwner()
+				+ " has NOT been updated. ";
+		if (result == 0) {
+			msg = "Program file " + programFileInfo.getFileName() + " owned by " + programFileInfo.getFileOwner() + " has been updated. ";
+		}
 
-		/*
-		 * This is just to test if the send button produces errors. int j = 0;
-		 * while (true) { j++; }
-		 */
+		resultsStoreHouse.setResultMessage(msg);
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, ""));
 
 	}
-
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

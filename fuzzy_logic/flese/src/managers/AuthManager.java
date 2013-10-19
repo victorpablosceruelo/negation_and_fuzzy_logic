@@ -63,7 +63,7 @@ public class AuthManager extends AbstractManager {
 	public void authenticate() throws Exception {
 
 		if (requestStoreHouse.getSession().appIsInTestingMode()) {
-			resultsStoreHouse.addMessage("INFO: Social Authentication in Testing mode.");
+			resultsStoreHouse.addExceptionMessage("INFO: Social Authentication in Testing mode.");
 		} else {
 			// get the social auth manager from session
 			tryAuthenticationWithSocialAuthManager();
@@ -75,7 +75,7 @@ public class AuthManager extends AbstractManager {
 
 		String providerId = requestStoreHouse.getProviderId();
 
-		resultsStoreHouse.addMessage("Welcome to the FleSe application !!");
+		resultsStoreHouse.addExceptionMessage("Welcome to the FleSe application !!");
 		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
 	}
 

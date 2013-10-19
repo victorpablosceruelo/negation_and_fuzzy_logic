@@ -5,11 +5,10 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <script type="text/javascript">
-<%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+<%RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 
-	String [] msgs = resultsStoreHouse.getMessages();
+	String [] msgs = resultsStoreHouse.getExceptionMessages();
 	if ((msgs != null) && (msgs.length > 0)) { 
 
 		out.print("window.parent.fileUploadShowResults('");
@@ -25,7 +24,7 @@
 		
 		out.print("]);");
 	}
-	else { %>
+	else {%>
 		// Update the files list.
 		if (typeof(loadAjaxIn) == "function") {
 			loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');

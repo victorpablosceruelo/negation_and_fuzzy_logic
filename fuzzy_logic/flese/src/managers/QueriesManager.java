@@ -113,12 +113,12 @@ public class QueriesManager extends AbstractManager {
 			queryAnswers = new CiaoPrologQueryAnswer[0];
 			queryVariablesNames = new String[0];
 			String msg = e.getMessage();
-			resultsStoreHouse.addMessage(msg);
+			resultsStoreHouse.addExceptionMessage(msg);
 		} catch (CiaoPrologConnectorException e) {
 			queryAnswers = new CiaoPrologQueryAnswer[0];
 			queryVariablesNames = new String[0];
 			String msg = e.getMessage();
-			resultsStoreHouse.addMessage(msg);
+			resultsStoreHouse.addExceptionMessage(msg);
 		}
 		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
 		resultsStoreHouse.setCiaoPrologQueryVariablesNames(queryVariablesNames);

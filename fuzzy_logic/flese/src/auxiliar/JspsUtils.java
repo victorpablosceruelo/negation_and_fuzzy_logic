@@ -52,7 +52,7 @@ public class JspsUtils {
 		}
 
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String[] msgsError = resultsStoreHouse.getMessages();
+		String[] msgsError = resultsStoreHouse.getExceptionMessages();
 		if (msgsError != null) {
 			for (int i = 0; i < msgsError.length; i++) {
 				msgs.add(msgsError[i]);

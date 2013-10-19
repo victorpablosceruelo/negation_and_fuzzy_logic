@@ -11,13 +11,12 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import prologConnector.CiaoPrologProgramIntrospectionQuery;
+import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.CastingsClass;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
-import auxiliar.ProgramAnalysisClass;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsMgmt;
@@ -179,7 +178,7 @@ public class FilesManagerAux {
 				if (!fileName.endsWith(".pl")) {
 					throw new Exception("The name of the program file to upload must have the .pl extension.");
 				}
-				
+
 				while (fileName.lastIndexOf("\\") >= 0) {
 					fileName = fileName.substring(fileName.lastIndexOf("\\"));
 				}
@@ -192,9 +191,9 @@ public class FilesManagerAux {
 				// boolean isInMemory = fi.isInMemory();
 				// long sizeInBytes = fi.getSize();
 				// Write the file
-				
+
 				ProgramFileInfo programFileInfo = new ProgramFileInfo(fileOwner, fileName);
-				
+
 				String programFileFullPath = programFileInfo.getProgramFileFullPath();
 				File file = new File(programFileFullPath);
 				fileItem.write(file);
@@ -203,9 +202,8 @@ public class FilesManagerAux {
 					fileNames.append(", ");
 				}
 				fileNames.append(fileName);
-				
-				ProgramAnalysisClass.clearCacheInstancesFor(programFileInfo);
-				CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(programFileInfo);
+
+				CacheStoreHouseCleaner.clean(programFileInfo);
 
 			}
 		}

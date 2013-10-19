@@ -44,9 +44,9 @@
 </script>
 <%
 	if (answers.length <= 0) {
-		String [] msgs = resultsStoreHouse.getMessages();
+		String [] msgs = resultsStoreHouse.getExceptionMessages();
 		if (msgs.length <= 0) {
-			%>The query has no answers. <%
+%>The query has no answers. <%
 		}
 		else {
 			for (int i=0; i<msgs.length; i++) {

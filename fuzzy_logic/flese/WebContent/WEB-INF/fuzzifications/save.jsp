@@ -13,17 +13,9 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
-	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
-	String fileName = requestStoreHouse.getRequestParameter(KConstants.Request.fileNameParam);
-	String fileOwner = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	String predDefined = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	String predOwner = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
-	
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);	
 %>
 
-Updated file <%=fileName %>.
+<%=resultsStoreHouse.getResultMessage() %>
 
 <!-- END -->
