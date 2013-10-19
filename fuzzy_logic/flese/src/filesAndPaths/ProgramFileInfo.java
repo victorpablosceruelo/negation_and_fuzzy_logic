@@ -91,6 +91,12 @@ public class ProgramFileInfo {
 		return existsFile(false) && fileOwner.equals(localUserName);
 	}
 
+	/**
+	 * Tests if the file exists.
+	 * @param throwExceptionIfNot
+	 * @return
+	 * @throws FilesAndPathsException
+	 */
 	public boolean existsFile(boolean throwExceptionIfNot) throws FilesAndPathsException {
 		File file = new File(fileFullPath);
 		boolean retVal = file.exists();
@@ -100,6 +106,27 @@ public class ProgramFileInfo {
 		return retVal;
 	}
 
+	public File createFile(boolean throwExceptionIfExists) throws FilesAndPathsException {
+		if (existsFile(false)) {
+			if (throwExceptionIfExists) {
+				throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " already exists.");
+			}
+		}
+		File file = new File(getProgramFileFullPath());
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			throw new FilesAndPathsException(e.getMessage());
+		}
+		return file;
+	}
+	
+	/**
+	 * Performs a file backup and removes it.
+	 * @return
+	 * @throws FilesAndPathsException
+	 * @throws CacheStoreHouseException
+	 */
 	public String remove() throws FilesAndPathsException, CacheStoreHouseException {
 		if (existsFile(false)) {
 			backup();
@@ -116,7 +143,7 @@ public class ProgramFileInfo {
 		}
 	}
 
-	public void removeFileWithoutBackup() throws FilesAndPathsException {
+	private void removeFileWithoutBackup() throws FilesAndPathsException {
 		existsFile(true);
 		Path target = Paths.get(fileFullPath);
 		try {

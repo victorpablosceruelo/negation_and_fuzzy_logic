@@ -237,26 +237,10 @@ public class ProgramAnalysisClass {
 
 		ProgramPartAnalysis programPart = null;
 
-		File file = new File(programFileInfo.getProgramFileFullPath());
-		if (file.exists()) {
-			String filePathAux = programFileInfo.getProgramFileFullPath();
-
-			// Remove the extension.
-			if (filePathAux.endsWith(".pl"))
-				filePathAux = filePathAux.substring(0, filePathAux.length() - ".pl".length());
-
-			// Add the new suffix.
-			filePathAux = filePathAux + "_backup_" + Dates.getCurrentDate() + ".txt";
-
-			// Rename the original file.
-			LOG.info("renaming " + programFileInfo.getProgramFileFullPath() + " into " + filePathAux);
-			File fileAux = new File(filePathAux);
-			file.renameTo(fileAux);
+		if (programFileInfo.existsFile(false)) {
+			programFileInfo.remove();
 		}
-
-		// Create a new file.
-		LOG.info("creating the file " + programFileInfo.getProgramFileFullPath());
-		file.createNewFile();
+		File file = programFileInfo.createFile(true);
 
 		ArrayList<ProgramPartAnalysis> programPartsAffected = new ArrayList<ProgramPartAnalysis>();
 		boolean foundFuzzifications = false;
