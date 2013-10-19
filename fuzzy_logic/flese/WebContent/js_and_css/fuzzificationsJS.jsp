@@ -20,26 +20,21 @@
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-var fuzzificationsFunctions = null;
+var fuzzificationFunction = null;
 
-function ownerPersonalization (predOwner, functionPoints) {
+function fuzzificationPoints (predOwner, functionPoints) {
 	this.name = predOwner;
 	this.data = functionPoints;
 }
 
-function fuzzificationFunction(predDefined, predNecessary, ownersPersonalizations) {
+function fuzzificationFunction(predDefined, predNecessary, fuzzificationPoints) {
 	this.predDefined = predDefined;
 	this.predNecessary = predNecessary;
-	this.ownersPersonalizations = ownersPersonalizations;
+	this.fuzzificationPoints = fuzzificationPoints; // ownersPersonalizations
 }
 
-function cleanUpFuzzificationFunctionsDefinitions () {
-	fuzzificationsFunctions = null;
-	fuzzificationsFunctions = new Array();
-}
-
-function addFuzzificationFunctionDefinition (predDefined, predNecessary, ownersPersonalizations) {
-	fuzzificationsFunctions[fuzzificationsFunctions.length] = new fuzzificationFunction(predDefined, predNecessary, ownersPersonalizations);
+function setFuzzificationFunction (predDefined, predNecessary, fuzzificationPoints) {
+	fuzzificationFunction = new fuzzificationFunction(predDefined, predNecessary, fuzzificationPoints);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

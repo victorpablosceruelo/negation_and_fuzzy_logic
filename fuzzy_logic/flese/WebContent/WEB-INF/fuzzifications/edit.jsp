@@ -39,7 +39,7 @@
 	
 	FunctionPoint [] defFuzzPoints = defaultFuzzification.getFunctionPoints();
 	FunctionPoint [] myFuzzPoints = myFuzzification.getFunctionPoints(); 
-	String[][] points = new String[defFuzzPoints.length];
+	String[][] points = new String[defFuzzPoints.length][];
 	
 	for (int i=0; i<defFuzzPoints.length; i++) {
 		FunctionPoint defFuzzPoint = defFuzzPoints[i];
@@ -67,23 +67,24 @@
 <script type="text/javascript">
 <%
 
-	out.print("addFuzzificationFunction('" + localUserInfo.getLocalUserName() + "', new Array(");
+	out.print("setFuzzificationFunction('" + defaultFuzzification.getPredDefined() + "', '" + defaultFuzzification.getPredNecessary() +	"', new Array("); 
+	out.print("new fuzzificationPoints('"+ localUserInfo.getLocalUserName() + "', new Array(");
 	for (int i=0; i<points.length; i++) {
 		out.print("new Array(" + points[i][0] + ", " + points[i][1] + ")");
 		if (i+1 < points.length) {
 			out.print(", ");
 		}
 	} 
-	out.print(");");
+	out.print(")), ");
 	
-	out.print("addFuzzificationFunction('" + defaultFuzzification.getPredOwner() + "', new Array(");
+	out.print("new fuzzificationPoints('" + defaultFuzzification.getPredOwner() + "', new Array(");
 	for (int i=0; i<points.length; i++) {
 		out.print("new Array(" + points[i][0] + ", " + points[i][2] + ")");
 		if (i+1 < points.length) {
 			out.print(", ");
 		}
 	} 
-	out.print(");");
+	out.print("))));");
 	
 %>
 </script>
@@ -124,23 +125,45 @@
 								</div>
 							</div>
 
+							<% for (int i=0; i<points.length; i++) { %>
 							<div class='personalizationDivFuzzificationFunctionValuesTableRow'>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<%= fpx %>
+									<%= points[i][0] %>
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx' value='<%=fpx %>'/>
-						 			<input type='range'  name='fuzzificationBars[<%= i %>].fpy' min='0' max='1' step='0.01' value='"+fpy+"' width='150px' 
-						 					"onchange="barValueChanged(this, '<%= i %>', "+indexOfMine+", "+index+", \""+fuzzificationGraphicDivId+"\")'/>
+									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx' value='<%= points[i][0] %>'/>
+						 			<input type='range'  name='fuzzificationBars[<%= i %>].fpy' min='0' max='1' 
+						 					step='0.01' value='<%= points[i][1] %>' width='150px' 
+						 					onchange="barValueChanged(this, '<%= points[i][0] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');"/>
+								</div>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									<span id='fuzzificationBarValue["+i+"]'><%= points[i][1] %></span>
+								</div>
+								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
+									<%= points[i][2] %>
 								</div>
 							</div>
+							<% } %>
 						</div>
 					</div>
 				</div>
 
 				<div class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
 					<div class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
-						
+						<div class='personalizationDivSaveButtonAndMsgTable'>
+							<div class='personalizationDivSaveButtonAndMsgTableRow'>
+								<div class='personalizationDivSaveButtonAndMsgTableCell'>
+									<INPUT type='submit' value='Save modifications' 
+											onclick="saveFuzzificationPersonalizations('saveMyFuzzificationStatus', \""+ 
+						mode + "\", \"" + fileName + "\", \"" + fileOwner + "\", " + index + ", "+ indexOfMine + ")'>
+								</div>
+								<div class='personalizationDivSaveButtonAndMsgTableCell'>
+									&nbsp;&nbsp;&nbsp;&nbsp;
+								</div>
+								<div class='personalizationDivSaveButtonAndMsgTableCell' id='<%=KConstants.JspsDivsIds.fuzzificationSaveStatus %>'>
+								</div> 
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
