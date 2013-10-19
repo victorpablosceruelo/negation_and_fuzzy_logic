@@ -270,6 +270,7 @@ function saveFuzzification(fuzzificationSaveStatusDivId, saveUrl) {
 				saveUrl += "&fpy["+j+"]=" + fpy;
 			}
 	
+			fuzzificationFunction.fuzzificationPoints[i].modified = false;
 			loadAjaxIn(fuzzificationSaveStatusDivId, saveUrl);
 		}
 		else {
