@@ -220,34 +220,18 @@ function barValueChanged(barObject, i, indexOfMine, index, fuzzificationGraphicD
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 
-function saveFuzzificationPersonalizations(saveMyFuzzificationStatusDivId, mode, fileName, fileOwner, index, indexOfMine) {
-	document.getElementById(saveMyFuzzificationStatusDivId).innerHTML = loadingImageHtml(false);
-	
-	// Aqui generamos la query, la ejecutamos y mostramos el resultado.
-	var query = urlMappingFor('SaveProgramFuzzificationRequest');
-	query += "&fileName=" + fileName + "&fileOwner="+ fileOwner + "&predOwner=";
-	
-	if (mode == 'basic') query += localUserName;
-	else query += "default definition";
-	
-	query += "&predDefined=" + fuzzificationsFunctions[index].predDefined;
-	query += "&predNecessary=" + fuzzificationsFunctions[index].predNecessary;
-	
+function saveFuzzification(fuzzificationSaveStatusDivId, saveUrl) {
+	var fuzzificationSaveStatusDiv = getContainer(fuzzificationSaveStatusDivId);
+	fuzzificationSaveStatusDiv.innerHTML = loadingImageHtml(false);
+		
 	for (var i=0; i < fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data.length; i++) {
 		fpx = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][0];
 		fpy = fuzzificationsFunctions[index].ownersPersonalizations[indexOfMine].data[i][1];
 		
-		query += "&fpx["+i+"]=" + fpx;
-		query += "&fpy["+i+"]=" + fpy;
+		saveUrl += "&fpy["+fpx+"]=" + fpy;
 	}
-
 	
-	
-	$.get(query, 
-			function(data, textStatus, jqxhr) {
-				// alert(data);
-				document.getElementById(saveMyFuzzificationStatusDivId).innerHTML = data;		
-	});	
+	loadAjaxIn(fuzzificationSaveStatusDivId, saveUrl);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

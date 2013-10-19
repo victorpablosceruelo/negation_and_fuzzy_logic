@@ -1,3 +1,4 @@
+<%@page import="constants.KUrls"%>
 <%@page import="auxiliar.LocalUserInfo"%>
 <%@page import="auxiliar.FunctionPoint"%>
 <%@page import="auxiliar.ProgramPartAnalysis"%>
@@ -15,8 +16,21 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
+	String fileName = requestStoreHouse.getRequestParameter(KConstants.Request.fileNameParam);
+	String fileOwner = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
+	String predDefined = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
+	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
+	String predOwner = requestStoreHouse.getRequestParameter(KConstants.Request.fileOwnerParam);
+	
+	String saveUrl = KUrls.Fuzzifications.Save.getUrl(true) + 
+			"&" + KConstants.Request.fileNameParam + "=" + fileName + 
+			"&" + KConstants.Request.fileOwnerParam + "=" + fileOwner +
+			"&" + KConstants.Request.mode + "=" + mode +
+			"&" + KConstants.Fuzzifications.predDefined + "=" + predDefined +
+			"&" + KConstants.Fuzzifications.predNecessary + "=" + predNecessary +
+			"&" + KConstants.Fuzzifications.predOwner + "=" + predOwner;
+	
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
-
 	ProgramPartAnalysis myFuzzification = null;
 	ProgramPartAnalysis defaultFuzzification = null;
 
@@ -154,13 +168,12 @@
 							<div class='personalizationDivSaveButtonAndMsgTableRow'>
 								<div class='personalizationDivSaveButtonAndMsgTableCell'>
 									<INPUT type='submit' value='Save modifications' 
-											onclick="saveFuzzificationPersonalizations('saveMyFuzzificationStatus', \""+ 
-						mode + "\", \"" + fileName + "\", \"" + fileOwner + "\", " + index + ", "+ indexOfMine + ")'>
+											onclick="saveFuzzification('<%=KConstants.JspsDivsIds.fuzzificationSaveStatusDivId %>', '<%=saveUrl %>')">
 								</div>
 								<div class='personalizationDivSaveButtonAndMsgTableCell'>
 									&nbsp;&nbsp;&nbsp;&nbsp;
 								</div>
-								<div class='personalizationDivSaveButtonAndMsgTableCell' id='<%=KConstants.JspsDivsIds.fuzzificationSaveStatus %>'>
+								<div class='personalizationDivSaveButtonAndMsgTableCell' id='<%=KConstants.JspsDivsIds.fuzzificationSaveStatusDivId %>'>
 								</div> 
 							</div>
 						</div>
