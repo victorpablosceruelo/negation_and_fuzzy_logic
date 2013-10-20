@@ -693,7 +693,7 @@ public class ProgramPartAnalysis {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void updateFunction(String[][] params) throws Exception {
+	public void updateFunction(String[][] params) throws ProgramAnalysisException {
 		programSubPartLines = new ArrayList<String>();
 		String line = this.predDefined + " :~ function(" + this.predNecessary + ", [";
 

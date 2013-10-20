@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -243,10 +244,6 @@ public class ProgramAnalysis {
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 
-		int j = 0, k = 0;
-		boolean updated = false;
-		String[] lines = null;
-
 		for (int i = 0; i < programParts.size(); i++) {
 			programPart = programParts.get(i);
 			// LOG.info("analyzing the program line: " + programPart.getLine());
@@ -258,53 +255,66 @@ public class ProgramAnalysis {
 					programPartsAffected.add(programPart);
 				} else {
 					if (foundFuzzifications) {
+						programPartsAffected = updateAffectedProgramParts(programPartsAffected, predDefined, predNecessary, predOwner, functionDefinition);
+						writeProgramParts(programPartsAffected, bw);
 						copiedBackFuzzifications = true;
-
-						updated = false;
-						for (j = 0; j < programPartsAffected.size(); j++) {
-							if (programPartsAffected.get(j).getPredOwner().equals(predOwner)) {
-								programPartsAffected.get(j).updateFunction(functionDefinition);
-								updated = true;
-							}
-
-							lines = programPartsAffected.get(j).getLines();
-							for (k = 0; k < lines.length; k++) {
-								bw.write(lines[k] + "\n");
-							}
-						}
-
-						if (!updated) {
-							ProgramPartAnalysis newProgramPart = new ProgramPartAnalysis();
-							newProgramPart.setPredDefined(predDefined);
-							newProgramPart.setPredNecessary(predNecessary);
-							newProgramPart.setPredOwner(predOwner);
-							newProgramPart.updateFunction(functionDefinition);
-
-							lines = newProgramPart.getLines();
-							for (k = 0; k < lines.length; k++) {
-								bw.write(lines[k] + "\n");
-							}
-						}
 					}
 				}
 			}
 
 			if ((!foundFuzzifications) || (foundFuzzifications && copiedBackFuzzifications)) {
-				lines = programPart.getLines();
-				for (k = 0; k < lines.length; k++) {
-					bw.write(lines[k] + "\n");
-				}
+				writeProgramPart(programPart, bw);
 			}
 		}
 
 		bw.close();
 
 		if (copiedBackFuzzifications) {
-			programFunctionsOrdered = null;
+			this.programParts = null;
+			this.programFunctionsOrdered = null;
 			CacheStoreHouseCleaner.clean(programFileInfo);
 			return 0;
 		}
 		return -1;
+	}
+
+	private void writeProgramParts(ArrayList<ProgramPartAnalysis> programParts, BufferedWriter bw) throws IOException {
+		for (int i = 0; i < programParts.size(); i++) {
+			writeProgramPart(programParts.get(i), bw);
+		}
+	}
+
+	private void writeProgramPart(ProgramPartAnalysis programPart, BufferedWriter bw) throws IOException {
+		String[] lines = programPart.getLines();
+		if (lines != null) {
+			for (int i = 0; i < lines.length; i++) {
+				bw.write(lines[i] + "\n");
+			}
+		}
+	}
+
+	private ArrayList<ProgramPartAnalysis> updateAffectedProgramParts(ArrayList<ProgramPartAnalysis> programPartsAffected,
+			String predDefined, String predNecessary, String predOwner, String[][] functionDefinition) throws ProgramAnalysisException {
+		boolean updated = false;
+		int j = 0;
+
+		for (j = 0; j < programPartsAffected.size(); j++) {
+			if (programPartsAffected.get(j).getPredOwner().equals(predOwner)) {
+				programPartsAffected.get(j).updateFunction(functionDefinition);
+				updated = true;
+			}
+		}
+
+		if (!updated) {
+			ProgramPartAnalysis newProgramPart = new ProgramPartAnalysis();
+			newProgramPart.setPredDefined(predDefined);
+			newProgramPart.setPredNecessary(predNecessary);
+			newProgramPart.setPredOwner(predOwner);
+			newProgramPart.updateFunction(functionDefinition);
+
+			programPartsAffected.add(newProgramPart);
+		}
+		return programPartsAffected;
 	}
 
 	public String[][] getFunctionDefinition(RequestStoreHouse requestStoreHouse) {
