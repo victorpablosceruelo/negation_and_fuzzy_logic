@@ -1,4 +1,5 @@
 
+<%@page import="filesAndPaths.ProgramFileInfo"%>
 <%@page import="prologConnector.PredicateInfo"%>
 <%@page import="prologConnector.ProgramIntrospection"%>
 <%@page import="results.ResultsStoreHouse"%>
@@ -17,9 +18,17 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
-	String url1 = KUrls.Queries.SelectQuery.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls() + 
+	ProgramFileInfo programFileInfo = programIntrospection.getProgramFileInfo();
+	
+	String url1 = KUrls.Queries.SelectQuery.getUrl(true) + programFileInfo.getInfoForUrls() + 
 			"&" + KConstants.Request.databaseParam + "=";
-	String url2 = KUrls.Queries.Evaluate.getUrl(true) + programIntrospection.getProgramFileInfo().getInfoForUrls();
+	String url2 = KUrls.Queries.Evaluate.getUrl(true) + programFileInfo.getInfoForUrls();
+	
+	
+	String urlListFuzzifications = KUrls.Fuzzifications.List.getUrl(true);
+	String fuzzificationParams = "&" + KConstants.Request.fileOwnerParam + "=" + programFileInfo.getFileOwner() +
+			"&" + KConstants.Request.fileNameParam + "=" + programFileInfo.getFileName() + 
+			"&" + KConstants.Request.mode + "=" + KConstants.Request.modeBasic;
 %>
 
 
@@ -62,7 +71,8 @@
 			  <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;
 			  </div>
 			  <div class='searchOrPersonalizeTableCell'>
-					<INPUT type='submit' value='Personalize Program File' onclick='return personalizeProgramFile(fileName, fileOwner, basic);'>
+					<INPUT type='submit' value='Personalize Program File' 
+							onclick='return personalizeProgramFile("<%=urlListFuzzifications%>", "<%= fuzzificationParams %>", "<%=programFileInfo.getFileName() %>");'>
 			  </div>
 		</div>
 	</div>
