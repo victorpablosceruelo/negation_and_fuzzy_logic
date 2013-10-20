@@ -67,8 +67,8 @@
 			myFuzzPoint = defFuzzPoint;
 		}
 		String fpx = defFuzzPoint.getCoordinate1();
-		String fpy = defFuzzPoint.getCoordinate2();
-		String fpd = myFuzzPoint.getCoordinate2();
+		String fpy = myFuzzPoint.getCoordinate2();
+		String fpd = defFuzzPoint.getCoordinate2();
 
 		points[i] = new String[3];
 		points[i][0] = fpx;
