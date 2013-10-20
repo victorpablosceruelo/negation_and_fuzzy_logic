@@ -31,6 +31,9 @@ public class KUrls {
 
 	public static class Files {
 		public static String manager = "FilesManager";
+		public static final UrlMap ListMyFilesPage = new UrlMap(manager, "listMyFilesPage", null, null, "WEB-INF/files/list.jsp");
+		public static final UrlMap ListMyFiles = new UrlMap(manager, "listMyFiles", ListMyFilesPage, KUrls.Pages.Exception, "");
+
 		public static final UrlMap ListPage = new UrlMap(manager, "listPage", null, null, "WEB-INF/files/list.jsp");
 		public static final UrlMap List = new UrlMap(manager, "list", ListPage, KUrls.Pages.Exception, "");
 

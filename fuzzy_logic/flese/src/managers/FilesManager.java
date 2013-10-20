@@ -30,6 +30,14 @@ public class FilesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void list() throws Exception {
+		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
+		resultsStoreHouse.setFilesList(filesList);
+
+		// Forward to the jsp page.
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ListPage, ""));
+	}
+	
+	public void listMyFiles() throws Exception {
 		ProgramFileInfo[] filesList = FilesManagerAux.listMyFiles(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
 
@@ -93,7 +101,7 @@ public class FilesManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
-			resultsStoreHouse.addExceptionMessage("Logged user does not own the program file.");
+			resultsStoreHouse.addExceptionMessage("You do not own the program file. So, you cannot remove it.");
 		} else {
 			String result = programFileInfo.remove();
 			if ((result != null) && (result.length() > 0)) {

@@ -34,7 +34,7 @@ public class FilesManagerAux {
 
 	public static ProgramFileInfo[] listMyFiles(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,
 			RequestStoreHouseException {
-		return listAux(requestStoreHouse, false);
+		return listAux(requestStoreHouse, true);
 	}
 
 	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,

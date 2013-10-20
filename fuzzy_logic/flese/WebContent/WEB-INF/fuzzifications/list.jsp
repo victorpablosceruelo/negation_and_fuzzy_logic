@@ -17,6 +17,8 @@
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	String urlEditFuzzification = KUrls.Fuzzifications.Edit.getUrl(true);
+	
+	if (fuzzifications.length == 0) {
 %>
 
 <div class='personalizationDivMainTable'>
@@ -64,10 +66,19 @@
 	</div>
 </div>
 
+<%
+	} else {
+%>
+<div class='personalizationDivMainTable'>
+	<div class='personalizationDivMainTableRow'>
+		<div class='personalizationDivMainTableCell'>
+			You cannot personalize this program file.
+		</div>
+	</div>
+</div>
+
+<% } %>
 <script type="text/javascript">
-	<% if (fuzzifications.length == 0) { %>
-		alert("The program has nothing to personalize.");
-	<% } %>
 </script>
 
 

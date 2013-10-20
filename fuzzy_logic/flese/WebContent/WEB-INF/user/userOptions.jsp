@@ -119,7 +119,7 @@
 </div>
 
 <script type="text/javascript">
-	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.ListMyFiles.getUrl(true) %>');
 	loadAjaxIn('<%=KConstants.JspsDivsIds.fileUploadDiv %>', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');
 </script>
 
