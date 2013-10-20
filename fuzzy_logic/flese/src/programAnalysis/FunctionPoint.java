@@ -1,4 +1,4 @@
-package auxiliar;
+package programAnalysis;
 
 public class FunctionPoint {
 

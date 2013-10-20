@@ -1,4 +1,4 @@
-package auxiliar;
+package programAnalysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
+import auxiliar.LocalUserInfo;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
-public class ProgramAnalysisClass {
-	final Log LOG = LogFactory.getLog(ProgramAnalysisClass.class);
+public class ProgramAnalysis {
+	final Log LOG = LogFactory.getLog(ProgramAnalysis.class);
 
 	private ProgramFileInfo programFileInfo;
 	private ArrayList<ProgramPartAnalysis> programParts = null;
@@ -33,7 +33,7 @@ public class ProgramAnalysisClass {
 	 * @throws Exception
 	 *             when any of the previous is null or empty string.
 	 */
-	private ProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
+	private ProgramAnalysis(ProgramFileInfo programFileInfo) throws Exception {
 
 		this.programFileInfo = programFileInfo;
 
@@ -62,15 +62,15 @@ public class ProgramAnalysisClass {
 
 	}
 
-	public static ProgramAnalysisClass getProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
+	public static ProgramAnalysis getProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
-		Object o = CacheStoreHouse.retrieve(ProgramAnalysisClass.class, fullPath, fullPath, fullPath);
-		ProgramAnalysisClass object = (ProgramAnalysisClass) o;
+		Object o = CacheStoreHouse.retrieve(ProgramAnalysis.class, fullPath, fullPath, fullPath);
+		ProgramAnalysis object = (ProgramAnalysis) o;
 		if (object == null) {
-			object = new ProgramAnalysisClass(programFileInfo);
+			object = new ProgramAnalysis(programFileInfo);
 			object.getProgramFuzzifications();
-			CacheStoreHouse.store(ProgramAnalysisClass.class, fullPath, fullPath, fullPath, object);
+			CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, object);
 		}
 		return object;
 	}
@@ -78,7 +78,7 @@ public class ProgramAnalysisClass {
 	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
-		CacheStoreHouse.store(ProgramAnalysisClass.class, fullPath, fullPath, fullPath, null);
+		CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, null);
 	}
 
 	private ProgramPartAnalysis[][] getProgramFuzzifications() throws Exception {
@@ -166,8 +166,8 @@ public class ProgramAnalysisClass {
 		return programFunctionsInJavaScript;
 	}
 
-	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String mode)
-			throws Exception {
+	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo, String predDefined, String predNecessary,
+			String mode) throws Exception {
 
 		if (predDefined == null) {
 			predDefined = "";
@@ -176,13 +176,14 @@ public class ProgramAnalysisClass {
 		if (predNecessary == null) {
 			predNecessary = "";
 		}
-		
+
 		if ((mode == null) || ("".equals(mode))) {
 			mode = KConstants.Request.modeBasic;
 		}
-		
-		// If logged user is not the file owner then edition mode is always basic. 
-		if (! (programFileInfo.getFileOwner().equals(localUserInfo.getLocalUserName()))) {
+
+		// If logged user is not the file owner then edition mode is always
+		// basic.
+		if (!(programFileInfo.getFileOwner().equals(localUserInfo.getLocalUserName()))) {
 			mode = KConstants.Request.modeBasic;
 		}
 
@@ -205,12 +206,13 @@ public class ProgramAnalysisClass {
 						if (function.getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION)) {
 							// The default definition is always retrieved.
 							filteredResult.add(function);
-						}
-						else {
-							if (! (KConstants.Request.modeAdvanced.equals(mode))) { 
+						} else {
+							if (!(KConstants.Request.modeAdvanced.equals(mode))) {
 								if (function.getPredOwner().equals(localUserInfo.getLocalUserName())) {
-									// If the mode is not advanced and the logged user
-									// is the fuzzification owner, retrieve it too.
+									// If the mode is not advanced and the
+									// logged user
+									// is the fuzzification owner, retrieve it
+									// too.
 									filteredResult.add(function);
 								}
 							}
@@ -231,7 +233,7 @@ public class ProgramAnalysisClass {
 		return results;
 	}
 
-	public int updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String mode, 
+	public int updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String mode,
 			String[][] functionDefinition) throws Exception {
 
 		LOG.info("saving the fuzzification " + predDefined + " depending on " + predNecessary + " in mode " + mode);
@@ -249,8 +251,7 @@ public class ProgramAnalysisClass {
 		// If I'm the owner I can change mine and the default one, but no other
 		// one.
 		String predOwner = localUserInfo.getLocalUserName();
-		if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))
-				&& (KConstants.Request.modeAdvanced.equals(mode))) {
+		if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner())) && (KConstants.Request.modeAdvanced.equals(mode))) {
 			predOwner = KConstants.Fuzzifications.DEFAULT_DEFINITION;
 		}
 

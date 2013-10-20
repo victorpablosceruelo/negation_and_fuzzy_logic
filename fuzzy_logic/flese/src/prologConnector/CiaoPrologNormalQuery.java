@@ -15,7 +15,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 	public boolean isOfType(String type) {
 		return CiaoPrologQueryAbstract.Constants.NormalQuery.equals(type);
 	}
-	
+
 	private CiaoPrologNormalQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
 		super(programFileInfo);
 	}
@@ -46,8 +46,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException,
-			FilesAndPathsException, LocalUserInfoException {
+	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
 		CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, null, null, null);

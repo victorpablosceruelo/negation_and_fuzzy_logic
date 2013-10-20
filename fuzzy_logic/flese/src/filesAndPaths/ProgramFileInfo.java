@@ -13,12 +13,11 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import prologConnector.CiaoPrologProgramIntrospectionQuery;
+import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import auxiliar.LocalUserInfoException;
-import auxiliar.ProgramAnalysisClass;
 import constants.KConstants;
 
 public class ProgramFileInfo {
@@ -93,6 +92,7 @@ public class ProgramFileInfo {
 
 	/**
 	 * Tests if the file exists.
+	 * 
 	 * @param throwExceptionIfNot
 	 * @return
 	 * @throws FilesAndPathsException
@@ -120,9 +120,10 @@ public class ProgramFileInfo {
 		}
 		return file;
 	}
-	
+
 	/**
 	 * Performs a file backup and removes it.
+	 * 
 	 * @return
 	 * @throws FilesAndPathsException
 	 * @throws CacheStoreHouseException
@@ -131,14 +132,12 @@ public class ProgramFileInfo {
 		if (existsFile(false)) {
 			backup();
 			removeFileWithoutBackup();
-			
-			ProgramAnalysisClass.clearCacheInstancesFor(this);
-			CiaoPrologProgramIntrospectionQuery.clearCacheInstancesFor(this);
+
+			CacheStoreHouseCleaner.clean(this);
 
 			// "File " + fileName + " has been removed.";
 			return "";
-		}
-		else {
+		} else {
 			return "File " + fileName + " does not exist.";
 		}
 	}

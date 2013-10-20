@@ -2,7 +2,7 @@ package results;
 
 import java.util.ArrayList;
 
-import auxiliar.ProgramPartAnalysis;
+import programAnalysis.ProgramPartAnalysis;
 import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.ProgramIntrospection;
 import filesAndPaths.ProgramFileInfo;

@@ -1,4 +1,4 @@
-package auxiliar;
+package programAnalysis;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,9 +6,9 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ProgramPartLineClass {
+public class ProgramPartLine {
 	
-	final Log LOG = LogFactory.getLog(ProgramPartLineClass.class);
+	final Log LOG = LogFactory.getLog(ProgramPartLine.class);
 	
 
 	
@@ -22,7 +22,7 @@ public class ProgramPartLineClass {
 	private static String fuzzificationInitialSubstring = "rfuzzy_fuzzification(";
 	private static String functionInitialSubstring = "function([";
 	
-	public ProgramPartLineClass (String line) throws Exception {
+	public ProgramPartLine (String line) throws Exception {
 		if (programLine == null) throw new Exception("line is null");
 		
 		if ("".equals(line)) throw new Exception("line is empty string");

@@ -1,7 +1,7 @@
+<%@page import="programAnalysis.FunctionPoint"%>
+<%@page import="programAnalysis.ProgramPartAnalysis"%>
 <%@page import="constants.KUrls"%>
 <%@page import="auxiliar.LocalUserInfo"%>
-<%@page import="auxiliar.FunctionPoint"%>
-<%@page import="auxiliar.ProgramPartAnalysis"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
@@ -9,7 +9,6 @@
 <%@page import="java.util.*"%>
 <%@page import="java.io.*"%>
 <%@page import="java.io.InputStreamReader"%>
-<%@page import="auxiliar.ProgramAnalysisClass"%>
 
 <%
 	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);

@@ -1,9 +1,9 @@
 package managers;
 
+import programAnalysis.ProgramAnalysis;
+import programAnalysis.ProgramPartAnalysis;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
-import auxiliar.ProgramAnalysisClass;
-import auxiliar.ProgramPartAnalysis;
 import constants.KConstants;
 import constants.KUrls;
 import filesAndPaths.ProgramFileInfo;
@@ -26,8 +26,8 @@ public class FuzzificationsManager extends AbstractManager {
 	public void list() throws Exception {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
-		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		
+		ProgramAnalysis programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
+
 		String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, "", "", mode);
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
@@ -48,8 +48,9 @@ public class FuzzificationsManager extends AbstractManager {
 		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
 		String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 
-		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary, mode);
+		ProgramAnalysis programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
+		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary,
+				mode);
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 
@@ -64,7 +65,7 @@ public class FuzzificationsManager extends AbstractManager {
 	public void save() throws Exception {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
-		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
+		ProgramAnalysis programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
 
 		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
 		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);

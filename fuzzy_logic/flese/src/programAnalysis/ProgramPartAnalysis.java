@@ -1,4 +1,4 @@
-package auxiliar;
+package programAnalysis;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.Dates;
 import constants.KConstants;
 
 public class ProgramPartAnalysis {
