@@ -107,8 +107,12 @@ public class ProgramAnalysis {
 				j = 0;
 				while ((j < progrFunctsOrdered.size()) && (!placed)) {
 					if ((progrFunctsOrdered.get(j) != null) && (progrFunctsOrdered.get(j).size() > 0)) {
-						if ((progrFunctsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined()))
-								&& (progrFunctsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
+						Collection<String> keysTmp = progrFunctsOrdered.get(j).keySet();
+						String [] keys = keysTmp.toArray(new String[keysTmp.size()]);
+						ProgramPartAnalysis representative = progrFunctsOrdered.get(j).get(keys[0]);
+						
+						if ((representative.getPredDefined().equals(programPart.getPredDefined()))
+								&& (representative.getPredNecessary().equals(programPart.getPredNecessary()))) {
 
 							progrFunctsOrdered.get(j).put(programPart.getKeyForHashMap(), programPart);
 							placed = true;
