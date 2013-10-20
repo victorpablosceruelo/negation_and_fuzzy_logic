@@ -39,8 +39,9 @@ public class CacheStoreHouse {
 			throws CacheStoreHouseException {
 
 		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
-
-		return retrieve(key);
+		Object retrieved = retrieve(key);
+		
+		return retrieved;
 	}
 
 	/**
