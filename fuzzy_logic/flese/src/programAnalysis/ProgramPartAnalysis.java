@@ -260,6 +260,21 @@ public class ProgramPartAnalysis {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	private String removeSimpleCommas(String input) {
+		String tmp = null;
+		
+		while (input.contains("'")) {
+			int index = input.indexOf("'");
+			tmp = input.substring(0, index) + input.substring(index + 1, input.length());
+			input = tmp;
+		}
+		return input;
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	/*
 	 * if (programPart.getFunctionAnalized() != null) { if
 	 * ((localUserName.equals(fileOwner)) ||
@@ -505,6 +520,7 @@ public class ProgramPartAnalysis {
 		}
 		if (argumentsIn.startsWith(only_for_user_marker)) {
 			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(only_for_user_marker.length()));
+			argumentsOut = removeSimpleCommas(argumentsOut);
 			for (int i = 0; i < argumentsOut.length(); i++) {
 				if (isDelimiter(argumentsOut.charAt(i))) {
 					throw new Exception("Not a valid user name: " + argumentsOut);

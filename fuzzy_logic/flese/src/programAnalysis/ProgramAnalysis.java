@@ -70,6 +70,7 @@ public class ProgramAnalysis {
 
 		Object o = CacheStoreHouse.retrieve(ProgramAnalysis.class, fullPath, fullPath, fullPath);
 		ProgramAnalysis object = (ProgramAnalysis) o;
+		object = null;
 		if (object == null) {
 			object = new ProgramAnalysis(programFileInfo);
 			object.getProgramFuzzifications();
