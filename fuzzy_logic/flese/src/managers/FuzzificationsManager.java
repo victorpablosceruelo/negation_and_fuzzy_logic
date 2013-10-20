@@ -27,7 +27,9 @@ public class FuzzificationsManager extends AbstractManager {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, "", "");
+		
+		String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
+		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, "", "", mode);
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 
@@ -44,9 +46,10 @@ public class FuzzificationsManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
 		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
+		String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 
 		ProgramAnalysisClass programAnalized = ProgramAnalysisClass.getProgramAnalysisClass(programFileInfo);
-		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary);
+		ProgramPartAnalysis[][] programPartAnalysis = programAnalized.getProgramFuzzifications(localUserInfo, predDefined, predNecessary, mode);
 		resultsStoreHouse.setProgramFileInfo(programFileInfo);
 		resultsStoreHouse.setProgramPartAnalysis(programPartAnalysis);
 

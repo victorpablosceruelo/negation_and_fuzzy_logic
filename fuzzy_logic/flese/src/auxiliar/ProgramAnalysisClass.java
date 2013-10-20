@@ -167,7 +167,7 @@ public class ProgramAnalysisClass {
 		return programFunctionsInJavaScript;
 	}
 
-	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo, String predDefined, String predNecessary)
+	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String mode)
 			throws Exception {
 
 		if (predDefined == null) {
@@ -176,6 +176,15 @@ public class ProgramAnalysisClass {
 
 		if (predNecessary == null) {
 			predNecessary = "";
+		}
+		
+		if ((mode == null) || ("".equals(mode))) {
+			mode = KConstants.Request.modeBasic;
+		}
+		
+		// If logged user is not the file owner then edition mode is always basic. 
+		if (! (programFileInfo.getFileOwner().equals(localUserInfo.getLocalUserName()))) {
+			mode = KConstants.Request.modeBasic;
 		}
 
 		if (programFunctionsOrdered == null) {
@@ -194,9 +203,18 @@ public class ProgramAnalysisClass {
 
 				if ((predDefined.equals("") || (predDefined.equals(function.getPredDefined())))) {
 					if ((predNecessary.equals("") || (predNecessary.equals(function.getPredNecessary())))) {
-						if ((function.getPredOwner().equals(localUserInfo.getLocalUserName()))
-								|| (function.getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION))) {
+						if (function.getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION)) {
+							// The default definition is always retrieved.
 							filteredResult.add(function);
+						}
+						else {
+							if (! (KConstants.Request.modeAdvanced.equals(mode))) { 
+								if (function.getPredOwner().equals(localUserInfo.getLocalUserName())) {
+									// If the mode is not advanced and the logged user
+									// is the fuzzification owner, retrieve it too.
+									filteredResult.add(function);
+								}
+							}
 						}
 					}
 				}

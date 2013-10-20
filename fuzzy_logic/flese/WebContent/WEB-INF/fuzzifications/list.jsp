@@ -18,7 +18,7 @@
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	String urlEditFuzzification = KUrls.Fuzzifications.Edit.getUrl(true);
 	
-	if (fuzzifications.length == 0) {
+	if (fuzzifications.length != 0) {
 %>
 
 <div class='personalizationDivMainTable'>
