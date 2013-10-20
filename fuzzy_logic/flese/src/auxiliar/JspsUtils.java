@@ -88,13 +88,16 @@ public class JspsUtils {
 	}
 
 	public static String getPrologNameInColloquialLanguage(String textIn) {
-		String text = null;
+		
 
 		if ((textIn == null) || ("".equals(textIn))) {
 			return "";
 		}
 
-		// debug.info("textLabel: " + textLabelIn);
+		textIn = fixNamesInSpecialCases(textIn);
+		
+		// debug.info("textIn: " + textIn);
+		String text = null;
 		int i = textIn.indexOf("_");
 		while (i != -1) {
 			text = ""; // Initialize
@@ -108,6 +111,15 @@ public class JspsUtils {
 		return textIn;
 	}
 
+	private static String fixNamesInSpecialCases(String textIn) {
+		if (textIn == null) return null;
+		if ("".equals(textIn)) return "";
+		
+		if ("fnot".equals(textIn)) return "not";
+		
+		return textIn;
+	}
+	
 	public static String humanizeIfTrue(String text, boolean humanize) {
 		if (humanize) {
 			return getPrologNameInColloquialLanguage(text);
