@@ -140,36 +140,6 @@ public class ProgramAnalysis {
 		return programFunctionsOrdered;
 	}
 
-	public static String[] getProgramFuzzificationsInJS(ProgramPartAnalysis[][] programFunctions) throws Exception {
-
-		// Use the information cached.
-		if (programFunctions == null) {
-			return new String[0];
-		}
-
-		String tmp = null;
-		ProgramPartAnalysis function = null;
-		String[] programFunctionsInJavaScript = new String[programFunctions.length];
-
-		for (int i = 0; i < programFunctions.length; i++) {
-			for (int j = 0; j < programFunctions[i].length; j++) {
-				function = programFunctions[i][j];
-
-				if (j == 0) {
-					tmp = "addFuzzificationFunctionDefinition('" + function.getPredDefined() + "', '" + function.getPredNecessary() + "', ";
-					tmp += "new Array(";
-				} else
-					tmp += ", ";
-
-				tmp += "new ownerPersonalization('" + function.getPredOwner() + "', " + function.getFunctionInJavaScript() + ")";
-			}
-			tmp += "))"; // End the javascript arrays.
-			programFunctionsInJavaScript[i] = tmp;
-		}
-
-		return programFunctionsInJavaScript;
-	}
-
 	public ProgramPartAnalysis[][] getProgramFuzzifications(LocalUserInfo localUserInfo, String predDefined, String predNecessary,
 			String mode) throws Exception {
 
