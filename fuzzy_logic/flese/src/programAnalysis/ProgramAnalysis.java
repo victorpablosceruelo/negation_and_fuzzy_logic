@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -92,7 +94,7 @@ public class ProgramAnalysis {
 			return programFunctionsOrdered;
 		}
 
-		ArrayList<ArrayList<ProgramPartAnalysis>> progrFunctsOrdered = new ArrayList<ArrayList<ProgramPartAnalysis>>();
+		ArrayList<HashMap<String, ProgramPartAnalysis>> progrFunctsOrdered = new ArrayList<HashMap<String, ProgramPartAnalysis>>();
 		ProgramPartAnalysis programPart = null;
 		int i = 0, j = 0;
 
@@ -106,15 +108,16 @@ public class ProgramAnalysis {
 					if ((progrFunctsOrdered.get(j) != null) && (progrFunctsOrdered.get(j).size() > 0)) {
 						if ((progrFunctsOrdered.get(j).get(0).getPredDefined().equals(programPart.getPredDefined()))
 								&& (progrFunctsOrdered.get(j).get(0).getPredNecessary().equals(programPart.getPredNecessary()))) {
-							progrFunctsOrdered.get(j).add(programPart);
+
+							progrFunctsOrdered.get(j).put(programPart.getKeyForHashMap(), programPart);
 							placed = true;
 						}
 					}
 					j++;
 				}
 				if (!placed) {
-					ArrayList<ProgramPartAnalysis> current = new ArrayList<ProgramPartAnalysis>();
-					current.add(programPart);
+					HashMap<String, ProgramPartAnalysis> current = new HashMap<String, ProgramPartAnalysis>();
+					current.put(programPart.getKeyForHashMap(), programPart);
 					progrFunctsOrdered.add(current);
 					placed = true;
 				}
@@ -130,8 +133,9 @@ public class ProgramAnalysis {
 		programFunctionsOrdered = new ProgramPartAnalysis[progrFunctsOrdered.size()][];
 
 		for (i = 0; i < progrFunctsOrdered.size(); i++) {
-			ArrayList<ProgramPartAnalysis> tmp = progrFunctsOrdered.get(i);
-			programFunctionsOrdered[i] = tmp.toArray(new ProgramPartAnalysis[tmp.size()]);
+			HashMap<String, ProgramPartAnalysis> tmp1 = progrFunctsOrdered.get(i);
+			Collection<ProgramPartAnalysis> tmp2 = tmp1.values();
+			programFunctionsOrdered[i] = tmp2.toArray(new ProgramPartAnalysis[tmp2.size()]);
 		}
 		return programFunctionsOrdered;
 	}

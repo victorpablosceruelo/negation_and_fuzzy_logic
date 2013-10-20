@@ -584,6 +584,10 @@ public class ProgramPartAnalysis {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	public String getKeyForHashMap() {
+		return this.getPredDefined() + "_" + this.getPredNecessary() + "_" + this.getPredOwner();
+	}
+	
 	public void setPredDefined(String predDefined) {
 		this.predDefined = predDefined;
 	}
@@ -607,7 +611,7 @@ public class ProgramPartAnalysis {
 	}
 	
 	public String getPredOwner() {
-		if ((only_for_user == null) || (only_for_user != null) && ("".equals(only_for_user))) return KConstants.Fuzzifications.DEFAULT_DEFINITION;
+		if ((only_for_user == null) || ("".equals(only_for_user))) return KConstants.Fuzzifications.DEFAULT_DEFINITION;
 		else return only_for_user;
 	}
 
