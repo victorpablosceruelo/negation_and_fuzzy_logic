@@ -2,12 +2,8 @@ package storeHouse;
 
 import java.util.HashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class CacheStoreHouse {
 
-	private static final Log LOG = LogFactory.getLog(CacheStoreHouse.class);
 	private static HashMap<String, HashMap<String, HashMap<String, HashMap<String, Object>>>> storeHouse = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, Object>>>>();
 
 	/**
@@ -20,67 +16,15 @@ public class CacheStoreHouse {
 	 * @param object
 	 * @throws CacheStoreHouseException
 	 */
-	public synchronized static void store(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2, String keyLevel3,
+	public static void store(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2, String keyLevel3,
 			String keyLevel4, Object object) throws CacheStoreHouseException {
 
-		String className = getKeyLevel1(keyLevel1);
-		className = getKey(className);
-		keyLevel2 = getKey(keyLevel2);
-		keyLevel3 = getKey(keyLevel3);
-		keyLevel4 = getKey(keyLevel4);
+		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
 
-		boolean resetLevel2 = false;
-		boolean resetLevel3 = false;
-		boolean resetLevel4 = false;
-
-		if ((keyLevel2 == null) || ("".equals(keyLevel2))) {
-			LOG.info("Level 2 reset.");
-			resetLevel2 = true;
-		}
-
-		if ((keyLevel3 == null) || ("".equals(keyLevel3))) {
-			LOG.info("Level 3 reset.");
-			resetLevel3 = true;
-		}
-
-		if ((keyLevel4 == null) || ("".equals(keyLevel4))) {
-			LOG.info("Level 4 reset.");
-			resetLevel4 = true;
-		}
-
-		// Retrieve or create the level 2 storeHouse.
-		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(className);
-		if ((storeHouseL2 == null) || resetLevel2) {
-			storeHouseL2 = new HashMap<String, HashMap<String, HashMap<String, Object>>>();
-			storeHouse.put(className, storeHouseL2);
-
-			if (resetLevel2)
-				return;
-		}
-
-		// Retrieve or create the level 3 storeHouse.
-		HashMap<String, HashMap<String, Object>> storeHouseL3 = storeHouseL2.get(keyLevel2);
-		if ((storeHouseL3 == null) || (resetLevel3)) {
-			storeHouseL3 = new HashMap<String, HashMap<String, Object>>();
-			storeHouseL2.put(keyLevel2, storeHouseL3);
-
-			if (resetLevel3)
-				return;
-		}
-
-		// Retrieve or create the level 4 storeHouse.
-		HashMap<String, Object> storeHouseL4 = storeHouseL3.get(keyLevel3);
-		if ((storeHouseL4 == null) || (resetLevel4)) {
-			storeHouseL4 = new HashMap<String, Object>();
-			storeHouseL3.put(keyLevel3, storeHouseL4);
-
-			if (resetLevel4)
-				return;
-		}
-		// Save the object in the level 3 storeHouse.
-		storeHouseL4.put(keyLevel4, object);
+		store(key, object);
 	}
 
+	
 	/**
 	 * This method allow to retrieve from the storeHouse an object
 	 * 
@@ -94,27 +38,9 @@ public class CacheStoreHouse {
 	public static Object retrieve(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2, String keyLevel3, String keyLevel4)
 			throws CacheStoreHouseException {
 
-		String className = getKeyLevel1(keyLevel1);
-		className = getKey(className);
-		keyLevel2 = getKey(keyLevel2);
-		keyLevel3 = getKey(keyLevel3);
-		keyLevel4 = getKey(keyLevel4);
+		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
 
-
-		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(className);
-		if (storeHouseL2 == null)
-			return null;
-
-		HashMap<String, HashMap<String, Object>> storeHouseL3 = storeHouseL2.get(keyLevel2);
-		if (storeHouseL3 == null)
-			return null;
-
-		HashMap<String, Object> storeHouseL4 = storeHouseL3.get(keyLevel3);
-		if (storeHouseL4 == null)
-			return null;
-
-		Object object = storeHouseL4.get(keyLevel4);
-		return object;
+		return retrieve(key);
 	}
 
 	/**
@@ -129,35 +55,83 @@ public class CacheStoreHouse {
 	public static void remove(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2, String keyLevel3, String keyLevel4)
 			throws CacheStoreHouseException {
 
-		store(keyLevel1, keyLevel2, keyLevel3, keyLevel4, null);
+		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
+		
+		store(key, null);
+	}
+
+	// --------------
+	// --------------
+	// --------------
+	
+	private synchronized static void store(CacheStoreHouseKey key, Object object) throws CacheStoreHouseException {
+		
+		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = null;
+		HashMap<String, HashMap<String, Object>> storeHouseL3 = null;
+		HashMap<String, Object> storeHouseL4 = null;
+		
+		
+		// Retrieve or create the level 2 storeHouse.
+		storeHouseL2 = storeHouse.get(key.getKeyLevel1(true));
+		if ((storeHouseL2 == null) || (key.resetLevel2())) {
+			storeHouseL2 = new HashMap<String, HashMap<String, HashMap<String, Object>>>();
+			storeHouse.put(key.getKeyLevel1(true), storeHouseL2);
+			
+			if (key.resetLevel2())
+				return;
+		}
+		
+		
+		// Retrieve or create the level 3 storeHouse.
+		storeHouseL3 = storeHouseL2.get(key.getKeyLevel2(true));
+		if ((storeHouseL3 == null) || (key.resetLevel3())) {
+			storeHouseL3 = new HashMap<String, HashMap<String, Object>>();
+			storeHouseL2.put(key.getKeyLevel2(true), storeHouseL3);
+
+			if (key.resetLevel3())
+				return;
+		}
+
+		// Retrieve or create the level 4 storeHouse.
+		storeHouseL4 = storeHouseL3.get(key.getKeyLevel3(true));
+		if ((storeHouseL4 == null) || (key.resetLevel4())) {
+			storeHouseL4 = new HashMap<String, Object>();
+			storeHouseL3.put(key.getKeyLevel3(true), storeHouseL4);
+
+			if (key.resetLevel3())
+				return;
+		}
+		
+		// Save the object in the level 4 storeHouse.
+		storeHouseL4.put(key.getKeyLevel4(true), object);
 	}
 
 	/**
-	 * Gets the key from the class object
-	 * 
-	 * @param keyLevel1
-	 * @return returns the key
+	 * Retrieves the object in the cache (if any).
+	 * @param key
+	 * @return
 	 * @throws CacheStoreHouseException
 	 */
-	private static String getKeyLevel1(@SuppressWarnings("rawtypes") Class keyLevel1) throws CacheStoreHouseException {
-		if (keyLevel1 == null)
-			throw new CacheStoreHouseException("keyLevel1 cannot be null.");
-		String className = keyLevel1.getName();
-		if (className == null)
-			throw new CacheStoreHouseException("keyLevel1.getName cannot be null.");
-		if ("".equals(className))
-			throw new CacheStoreHouseException("keyLevel1.getName cannot be empty string.");
-		return className;
-	}
+	private static Object retrieve(CacheStoreHouseKey key) throws CacheStoreHouseException {
 
+		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(key.getKeyLevel1(true));
+		if (storeHouseL2 == null)
+			return null;
+
+		HashMap<String, HashMap<String, Object>> storeHouseL3 = storeHouseL2.get(key.getKeyLevel2(true));
+		if (storeHouseL3 == null)
+			return null;
+
+		HashMap<String, Object> storeHouseL4 = storeHouseL3.get(key.getKeyLevel3(true));
+		if (storeHouseL4 == null)
+			return null;
+
+		Object object = storeHouseL4.get(key.getKeyLevel4(true));
+		return object;
+	}
 	
-	private static String getKey(String input) {
-		if (input == null) return "";
-		if ("".equals(input)) return "";
-		return input.toUpperCase();
-	}
-
-	// --------------
-	// --------------
-	// --------------
 }
+
+
+
+// END OF FILE

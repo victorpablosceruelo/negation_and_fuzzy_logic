@@ -64,27 +64,26 @@ public class ProgramAnalysisClass {
 
 	public static ProgramAnalysisClass getProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
 		String fullPath = programFileInfo.getProgramFileFullPath();
-		String key = ProgramAnalysisClass.class.getName();
 
-		Object o = CacheStoreHouse.retrieve(ProgramAnalysisClass.class, fullPath, key, key);
+		Object o = CacheStoreHouse.retrieve(ProgramAnalysisClass.class, fullPath, fullPath, fullPath);
 		ProgramAnalysisClass object = (ProgramAnalysisClass) o;
 		if (object == null) {
 			object = new ProgramAnalysisClass(programFileInfo);
 			object.getProgramFuzzifications();
-			CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, key, key, object);
+			CacheStoreHouse.store(ProgramAnalysisClass.class, fullPath, fullPath, fullPath, object);
 		}
 		return object;
 	}
 
 	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
-		String key = ProgramAnalysisClass.class.getName();
-		CacheStoreHouse.store(ProgramAnalysisClass.class, fullPath, key, key, null);
+
+		CacheStoreHouse.store(ProgramAnalysisClass.class, fullPath, fullPath, fullPath, null);
 	}
 
 	private ProgramPartAnalysis[][] getProgramFuzzifications() throws Exception {
 
-		LOG.info("getProgramFuzzificationsInJS");
+		LOG.info("getProgramFuzzifications");
 		if (programParts == null)
 			throw new Exception("programParts is null.");
 
