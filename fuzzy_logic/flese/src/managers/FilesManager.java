@@ -53,7 +53,11 @@ public class FilesManager extends AbstractManager {
 		try {
 			FilesManagerAux.uploadFileAux(requestStoreHouse);
 		} catch (Exception e) {
+			e.printStackTrace();
 			resultsStoreHouse.addExceptionMessage(e.getMessage());
+			if ((e.getMessage() == null) || ("".equals(e.getMessage()))){
+				resultsStoreHouse.addExceptionMessage("An exception occurred during file upload.");
+			}
 		}
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
 	}

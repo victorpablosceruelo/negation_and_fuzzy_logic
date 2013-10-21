@@ -7,6 +7,9 @@ public class KConstants {
 		public static boolean inTestMode = true;
 		public static final String httpsPrefix = "https://";
 		public static final String httpPrefix = "http://";
+		public static final String doGetMethod = "doGet";
+		public static final String doPostMethod = "doPost";
+		
 		public static final String BackupsFolder = "FleSeProgramsBackups";
 	}
 

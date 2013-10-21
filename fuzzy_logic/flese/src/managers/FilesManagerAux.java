@@ -126,7 +126,7 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static String uploadFileAux(RequestStoreHouse requestStoreHouse) throws Exception {
-		if ((requestStoreHouse.getDoMethod() == null) || ("doGet".equals(requestStoreHouse.getDoMethod()))) {
+		if ((requestStoreHouse.getDoMethod() == null) || (! (KConstants.Application.doPostMethod.equals(requestStoreHouse.getDoMethod())))) {
 			throw new ServletException("Uploads are only allowed using http post method.");
 		}
 
