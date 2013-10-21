@@ -246,7 +246,13 @@ function fuzzificationFunctionNameInColloquial(currentName, grade) {
 function personalizationFunctionChanged(comboBox, PersonalizationFunctionUnderModificationDivId, url) {
 	
 	var params = getComboBoxValue(comboBox);
-	loadAjaxIn(PersonalizationFunctionUnderModificationDivId, url + params);
+	if (params != "") {
+		loadAjaxIn(PersonalizationFunctionUnderModificationDivId, url + params);
+	}
+	else {
+		var container = getContainer(PersonalizationFunctionUnderModificationDivId);
+		container.innerHTML = "Please choose a valid fuzzification function.";
+	}
 	
 }
 

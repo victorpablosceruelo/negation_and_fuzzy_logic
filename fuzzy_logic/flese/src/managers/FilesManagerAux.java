@@ -193,9 +193,8 @@ public class FilesManagerAux {
 				// Write the file
 
 				ProgramFileInfo programFileInfo = new ProgramFileInfo(fileOwner, fileName);
-
-				String programFileFullPath = programFileInfo.getProgramFileFullPath();
-				File file = new File(programFileFullPath);
+				File file = programFileInfo.createFile(false);
+				
 				fileItem.write(file);
 
 				if (i > 0) {
@@ -215,3 +214,9 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
+
+
+
+
+
+//// EOF

@@ -166,7 +166,19 @@ public class PathsMgmt {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void createFolder(String subPath, boolean exceptionIfExists) throws FilesAndPathsException {
-		String folderPath = programFilesPath + subPath;
+		
+		if (subPath == null) {
+			throw new FilesAndPathsException("subPath cannot be null.");
+		}
+		
+		String folderPath = null;
+		
+		if (! subPath.startsWith(programFilesPath)) {
+			folderPath = programFilesPath + subPath;
+		}
+		else {
+			folderPath = subPath;
+		}
 		Path dir = Paths.get(folderPath);
 
 		if (Files.exists(dir)) {

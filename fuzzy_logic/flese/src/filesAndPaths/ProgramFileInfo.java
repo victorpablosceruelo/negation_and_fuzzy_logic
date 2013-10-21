@@ -112,11 +112,20 @@ public class ProgramFileInfo {
 				throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " already exists.");
 			}
 		}
+		
+		PathsMgmt pathsMgmt = new PathsMgmt();
+		pathsMgmt.createFolder(getProgramFileFolderFullPath(), false);
+		
 		File file = new File(getProgramFileFullPath());
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			throw new FilesAndPathsException(e.getMessage());
+			if ((e.getMessage() != null) && (!"".equals(e.getMessage()))) {
+				throw new FilesAndPathsException(e.getMessage());
+			}
+			else {
+				throw new FilesAndPathsException("Error when trying to create the new file.");
+			}
 		}
 		return file;
 	}
