@@ -4,6 +4,10 @@
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 
+<%
+	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
+%>
+
 <script type="text/javascript">
 <%RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
@@ -27,10 +31,10 @@
 	else {%>
 		// Update the files list.
 		if (typeof(loadAjaxIn) == "function") {
-			loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+			loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
 		}
 		if (typeof(window.parent.loadAjaxIn) == "function") {
-			window.parent.loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+			window.parent.loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
 		}
 		if (typeof(fileUploadCleanStatusDiv) == "function") {
 			fileUploadCleanStatusDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
