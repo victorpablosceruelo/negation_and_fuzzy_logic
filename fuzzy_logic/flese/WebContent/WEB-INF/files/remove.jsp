@@ -4,6 +4,8 @@
 <%@page import="constants.KConstants"%>
 
 <%
+String urlList = KUrls.Files.ListMyFiles.getUrl(true);
+
 ArrayList<String> msgs = new ArrayList<String>();
 String msg = JspsUtils.getMessagesInJS(request, msgs);
 %>
@@ -14,7 +16,7 @@ String msg = JspsUtils.getMessagesInJS(request, msgs);
 	</script>
 <% } else { %>
 	<script type="text/javascript">
-		loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.List.getUrl(true) %>');
+		loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
 	</script>
 <% } %>
 
