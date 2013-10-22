@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
+import programAnalysis.ProgramPartAnalysis;
 import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
 import storeHouse.SessionStoreHouse;
 import constants.KConstants;
-import programAnalysis.ProgramPartAnalysis;
 
 public class JspsUtils {
 
@@ -50,9 +50,21 @@ public class JspsUtils {
 	public static String getPreviousExceptionMessages(HttpServletRequest request) {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 		String[] msgs = resultsStoreHouse.getPreviousExceptionMessages();
-		return getMessagesInJS(msgs);
+
+		String exception = request.getParameter(KConstants.Request.exceptionParam);
+		String[] msgsAux;
+		if ((exception != null) && (!"".equals(exception))) {
+			msgsAux = new String[msgs.length + 1];
+			for (int i = 0; i < msgs.length; i++) {
+				msgsAux[i] = msgs[i];
+			}
+			msgsAux[msgs.length] = exception;
+		} else {
+			msgsAux = msgs;
+		}
+		return getMessagesInJS(msgsAux);
 	}
-	
+
 	public static ArrayList<String> getMessagesArrayList(HttpServletRequest request, ArrayList<String> msgs) {
 		if (msgs == null) {
 			msgs = new ArrayList<String>();
@@ -78,14 +90,18 @@ public class JspsUtils {
 
 		return getMessagesInJS(msgsAux);
 	}
-	
-	public static String getMessagesInJS(String [] msgs) {
+
+	public static String getMessagesInJS(String[] msgs) {
 
 		StringBuilder msg = new StringBuilder();
 		// msg.append("[");
 		for (int i = 0; i < msgs.length; i++) {
 			msg.append("'");
-			msg.append(msgs[i]);
+			if ((msgs[i] != null) && (!"".equals(msgs[i]))) {
+				msg.append(msgs[i]);
+			} else {
+				msg.append(" ");
+			}
 			msg.append("'");
 			if (i + 1 < msgs.length) {
 				msg.append(", ");
@@ -93,21 +109,20 @@ public class JspsUtils {
 		}
 		// msg.append("]");
 		return msg.toString();
-	}	
+	}
 
 	public static String comboBoxDefaultValue() {
 		return "<option id='----' title='----' value='----'>----</option>";
 	}
 
 	public static String getPrologNameInColloquialLanguage(String textIn) {
-		
 
 		if ((textIn == null) || ("".equals(textIn))) {
 			return "";
 		}
 
 		textIn = fixNamesInSpecialCases(textIn);
-		
+
 		// debug.info("textIn: " + textIn);
 		String text = null;
 		int i = textIn.indexOf("_");
@@ -124,14 +139,17 @@ public class JspsUtils {
 	}
 
 	private static String fixNamesInSpecialCases(String textIn) {
-		if (textIn == null) return null;
-		if ("".equals(textIn)) return "";
-		
-		if ("fnot".equals(textIn)) return "not";
-		
+		if (textIn == null)
+			return null;
+		if ("".equals(textIn))
+			return "";
+
+		if ("fnot".equals(textIn))
+			return "not";
+
 		return textIn;
 	}
-	
+
 	public static String humanizeIfTrue(String text, boolean humanize) {
 		if (humanize) {
 			return getPrologNameInColloquialLanguage(text);
@@ -143,7 +161,7 @@ public class JspsUtils {
 		if (programPartAnalysis == null) {
 			return "";
 		}
-		
+
 		String predDefined = programPartAnalysis.getPredDefined();
 		String predNecessary = programPartAnalysis.getPredNecessary();
 

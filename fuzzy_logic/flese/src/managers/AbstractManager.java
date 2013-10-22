@@ -164,6 +164,9 @@ public abstract class AbstractManager implements InterfaceManager {
 		resultsStoreHouse.addExceptionMessage(e.getMessage());
 
 		NextStep onExceptionNextStep = getExceptionPage();
+		if ((e.getMessage() != null) && (!"".equals(e.getMessage()))) {
+			onExceptionNextStep.addToAppend(KConstants.Request.exceptionParam + "='" + e.getMessage() + "'");
+		}
 		setNextStep(onExceptionNextStep);
 	}
 

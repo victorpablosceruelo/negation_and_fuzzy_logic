@@ -31,6 +31,7 @@ public class KConstants {
 	public static class Request {
 		// Objects stored in the request.
 		public static final String resultsStoreHouse = "resultsStoreHouse";
+		public static final String exceptionParam = "exception";
 
 		// General parameters
 		public static final String managerParam = "manager";

@@ -37,6 +37,15 @@ public class NextStep {
 			this.appended = append;
 	}
 
+	public void addToAppend(String msg) {
+		if ((msg != null) && (!"".equals(msg))) {
+			StringBuilder appendedTmp = new StringBuilder();
+			appendedTmp.append(this.appended);
+			appendedTmp.append(msg);
+			this.appended = appendedTmp.toString();
+		}
+	}
+
 	public void takeAction(HttpServletRequest request, HttpServletResponse response) throws NextStepException, IOException,
 			ServletException {
 
