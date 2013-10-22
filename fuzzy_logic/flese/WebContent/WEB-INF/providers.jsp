@@ -1,6 +1,5 @@
 <%@page import="constants.KUrls"%>
-   	
-			
+
 <h3>
 	To access to FleSe you need an account in a Social Authentication Provider.
 	<br />

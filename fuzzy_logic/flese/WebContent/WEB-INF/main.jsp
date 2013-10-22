@@ -2,6 +2,13 @@
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KConstants"%>
 <%@page import="constants.KUrls"%>
+<%@page import="java.util.ArrayList"%>
+
+<%
+	ArrayList<String> msgs = new ArrayList<String>();
+	String msg = JspsUtils.getMessagesInJS(request, msgs);
+%>
+
 
 
 <body>
@@ -56,10 +63,14 @@
 	</div>
 	<br /><br /><br /><br /><br />
 
-	<% if (! "".equals(localUserInfoName)) { %>
 	<script type="text/javascript">
-		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");		
+		<% if (! "".equals(localUserInfoName)) { %>
+			loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");
+		<% } %>		
+		<% if ((msg != null) && (msg.length() > 0)) { %>
+			showMsgs(new Array(<%= msg %>));
+		<% } %>
 	</script>
-	<% } %>
+
 </body>
 </html>
