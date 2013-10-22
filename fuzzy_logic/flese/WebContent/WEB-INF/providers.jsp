@@ -1,4 +1,16 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
+
+<%
+	String msg = JspsUtils.getPreviousExceptionMessages(request);
+%>
+
+<script type="text/javascript">
+	<% if ((msg != null) && (msg.length() > 0)) { %>
+		showMsgs(new Array(<%= msg %>));
+	<% } %>
+</script>
 
 <h3>
 	To access to FleSe you need an account in a Social Authentication Provider.

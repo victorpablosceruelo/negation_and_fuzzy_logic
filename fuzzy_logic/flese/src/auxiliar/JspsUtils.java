@@ -47,6 +47,12 @@ public class JspsUtils {
 		return resultsStoreHouse;
 	}
 
+	public static String getPreviousExceptionMessages(HttpServletRequest request) {
+		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+		String[] msgs = resultsStoreHouse.getPreviousExceptionMessages();
+		return getMessagesInJS(msgs);
+	}
+	
 	public static ArrayList<String> getMessagesArrayList(HttpServletRequest request, ArrayList<String> msgs) {
 		if (msgs == null) {
 			msgs = new ArrayList<String>();
@@ -70,19 +76,24 @@ public class JspsUtils {
 	public static String getMessagesInJS(HttpServletRequest request, ArrayList<String> msgs) {
 		String[] msgsAux = getMessages(request, msgs);
 
+		return getMessagesInJS(msgsAux);
+	}
+	
+	public static String getMessagesInJS(String [] msgs) {
+
 		StringBuilder msg = new StringBuilder();
 		// msg.append("[");
-		for (int i = 0; i < msgsAux.length; i++) {
+		for (int i = 0; i < msgs.length; i++) {
 			msg.append("'");
-			msg.append(msgsAux[i]);
+			msg.append(msgs[i]);
 			msg.append("'");
-			if (i + 1 < msgsAux.length) {
+			if (i + 1 < msgs.length) {
 				msg.append(", ");
 			}
 		}
 		// msg.append("]");
 		return msg.toString();
-	}
+	}	
 
 	public static String comboBoxDefaultValue() {
 		return "<option id='----' title='----' value='----'>----</option>";

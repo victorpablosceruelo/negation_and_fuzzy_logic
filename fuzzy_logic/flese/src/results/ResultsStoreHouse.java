@@ -10,6 +10,8 @@ import filesAndPaths.ProgramFileInfo;
 public class ResultsStoreHouse {
 
 	private ArrayList<String> exceptionMessages = new ArrayList<String>();
+	private String [] previousExceptionMessages = null;
+	
 	private String resultMessage = "";
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
 	private String[] fileContents = null;
@@ -36,6 +38,17 @@ public class ResultsStoreHouse {
 			return new String[0];
 		}
 		return exceptionMessages.toArray(new String[exceptionMessages.size()]);
+	}
+	
+	public void setPreviousExceptionMessages(String[] previousExceptionMessages) {
+		this.previousExceptionMessages = previousExceptionMessages;
+	}
+	
+	public String[] getPreviousExceptionMessages() {
+		if (previousExceptionMessages == null) {
+			return new String[0];
+		}
+		return previousExceptionMessages;
 	}
 	
 	public void setResultMessage(String msg) {

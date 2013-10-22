@@ -161,15 +161,21 @@ public abstract class AbstractManager implements InterfaceManager {
 	}
 
 	public void getResultsStoreHouse() {
+		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
+		
+		String [] previousExceptionMessages = null;
+		if (this.resultsStoreHouse != null) {
+			previousExceptionMessages = this.resultsStoreHouse.getExceptionMessages();
+		}
+		
 		if (reinitializeResultsStoreHouse()) {
 			this.resultsStoreHouse = null;
 			setResultsStoreHouse();
 		}
-
-		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
 		
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
+			this.resultsStoreHouse.setPreviousExceptionMessages(previousExceptionMessages);
 		}
 	}
 
