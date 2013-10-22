@@ -36,6 +36,14 @@ public class ServerAndAppUrls {
 		return serverAndAppUrlsData.toString();
 	}
 
+	public static boolean isAppInTestingMode(HttpServletRequest request) {
+		if (! serverAndAppUrlsData.isValid()) {
+			computeAppAndServerUrls(request);
+		}
+		
+		return serverAndAppUrlsData.isAppInTestingMode();
+	}
+	
 	private static void computeAppAndServerUrls(HttpServletRequest request) {
 
 		if (serverAndAppUrlsData.isValid()) {

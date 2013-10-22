@@ -11,6 +11,7 @@ import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
 import storeHouse.RequestStoreHouseException;
+import urls.ServerAndAppUrls;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import constants.KConstants;
@@ -51,7 +52,7 @@ public class AuthManager extends AbstractManager {
 	public boolean createSessionIfNull() {
 		return true;
 	}
-	
+
 	public boolean exceptionIfLocalUserInfoIsNull() {
 		return false;
 	}
@@ -137,8 +138,8 @@ public class AuthManager extends AbstractManager {
 		String providerId = requestStoreHouse.getProviderId();
 
 		// Returns the host name of the server to which the request was sent.
-		String serverName = requestStoreHouse.getRequest().getServerName();
-		if ((serverName != null) && (("localhost".equals(serverName)) || KConstants.Application.inTestMode)) {
+
+		if (ServerAndAppUrls.isAppInTestingMode(requestStoreHouse.getRequest())) {
 			requestStoreHouse.getSession().setAppInTestingMode(true);
 			@SuppressWarnings("unused")
 			LocalUserInfo localUserName = LocalUserInfo.getLocalUserInfo(requestStoreHouse);

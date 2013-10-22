@@ -4,7 +4,7 @@ public class KConstants {
 
 	public static final class Application {
 		public static final String servletName = "/Servlet";
-		public static boolean inTestMode = true;
+		public static final String testModeSubUrl = "fleseTest";
 		public static final String httpsPrefix = "https://";
 		public static final String httpPrefix = "http://";
 		public static final String doGetMethod = "doGet";

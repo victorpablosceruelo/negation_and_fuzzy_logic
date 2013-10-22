@@ -59,6 +59,12 @@ public class ServerAndAppUrlsData {
 		return "";
 	}
 	
+	public boolean isAppInTestingMode() {
+		String subPart = KConstants.Application.testModeSubUrl.toLowerCase();
+		String url = toString().toLowerCase();
+		return url.contains(subPart);
+	}
+	
 	
 	private void parseUrl(String url) {
 		this.preUrl = null;
