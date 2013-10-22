@@ -16,10 +16,6 @@ import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
-// import org.apache.commons.lang.StringUtils;
-// import org.brickred.socialauth.Profile;
-// import org.brickred.socialauth.Contact;
-// import org.brickred.socialauth.Profile;
 
 /**
  * 
@@ -29,12 +25,11 @@ import constants.KUrls;
  * calls the getLoginRedirectURL() method to find the URL which the user should
  * be redirect to.
  * 
- * @author tarunn@brickred.com
- * 
  */
 // public class SocialAuthenticationAction extends Action {
 
 public class AuthManager extends AbstractManager {
+	// final Log LOG = LogFactory.getLog(AuthManager.class);
 
 	public AuthManager() {
 		super();

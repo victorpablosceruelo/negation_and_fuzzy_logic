@@ -127,18 +127,24 @@ public abstract class AbstractManager implements InterfaceManager {
 				method.invoke((Object) this, new Object[0]);
 			} catch (IllegalAccessException e) {
 				LogAbstractManager.error("ERROR invoking method " + method.getName() + " in class " + this.getClass().getName());
-				setNextStep(null);
 				e.printStackTrace();
+				setNextStep(null);
 			} catch (IllegalArgumentException e) {
 				LogAbstractManager.error("ERROR invoking method " + method.getName() + " in class " + this.getClass().getName());
-				setNextStep(null);
 				e.printStackTrace();
+				setNextStep(null);
 			} catch (InvocationTargetException e) {
 				LogAbstractManager.error("Exception executing method " + method.getName() + " in class " + this.getClass().getName());
+				if ((e.getMessage() != null) && (! "".equals(e.getMessage()))) {
+					LogAbstractManager.error(e.getMessage());
+				}
+				LogAbstractManager.error("------------------------------");
+				e.printStackTrace();
+				LogAbstractManager.error("------------------------------");
+				resultsStoreHouse.addExceptionMessage(e.getMessage());
+
 				NextStep onExceptionNextStep = getExceptionPage();
 				setNextStep(onExceptionNextStep);
-				e.printStackTrace();
-				resultsStoreHouse.addExceptionMessage(e.getMessage());
 			}
 		}
 	}
