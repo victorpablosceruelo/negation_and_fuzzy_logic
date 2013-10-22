@@ -27,19 +27,19 @@ public abstract class AbstractManager implements InterfaceManager {
 		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		return nextStep;
 	}
-	
+
 	public boolean createSessionIfNull() {
 		return false;
 	}
-	
+
 	public boolean exceptionIfSessionIsNull() {
 		return true;
 	}
-	
+
 	public boolean exceptionIfLocalUserInfoIsNull() {
 		return true;
 	}
-	
+
 	public boolean reinitializeResultsStoreHouse() {
 		return true;
 	}
@@ -89,7 +89,7 @@ public abstract class AbstractManager implements InterfaceManager {
 
 		// Save results in the request, to access them from jsps.
 		setResultsStoreHouse();
-		
+
 		return nextStep;
 	}
 
@@ -134,17 +134,7 @@ public abstract class AbstractManager implements InterfaceManager {
 				e.printStackTrace();
 				setNextStep(null);
 			} catch (InvocationTargetException e) {
-				LogAbstractManager.error("Exception executing method " + method.getName() + " in class " + this.getClass().getName());
-				if ((e.getMessage() != null) && (! "".equals(e.getMessage()))) {
-					LogAbstractManager.error(e.getMessage());
-				}
-				LogAbstractManager.error("------------------------------");
-				e.printStackTrace();
-				LogAbstractManager.error("------------------------------");
-				resultsStoreHouse.addExceptionMessage(e.getMessage());
-
-				NextStep onExceptionNextStep = getExceptionPage();
-				setNextStep(onExceptionNextStep);
+				actionWhenExceptionInTargetMethodInvocation(e, method.getName(), this.getClass().getName());
 			}
 		}
 	}
@@ -154,25 +144,42 @@ public abstract class AbstractManager implements InterfaceManager {
 			LogAbstractManager.info("Invoke byDefaultMethod ");
 			byDefaultMethod();
 		} catch (Exception e) {
-			NextStep onExceptionNextStep = getExceptionPage();
-			setNextStep(onExceptionNextStep);
-			e.printStackTrace();
+			actionWhenExceptionInTargetMethodInvocation(e, "byDefaultMethod", this.getClass().getName());
 		}
+	}
+
+	private void actionWhenExceptionInTargetMethodInvocation(Exception e, String methodName, String className) {
+		if (methodName == null)
+			methodName = "unknown";
+		if (className == null)
+			className = "unknown";
+
+		LogAbstractManager.error("Exception executing method " + methodName + " in class " + className);
+		if ((e.getMessage() != null) && (!"".equals(e.getMessage()))) {
+			LogAbstractManager.error(e.getMessage());
+		}
+		LogAbstractManager.error("------------------------------");
+		e.printStackTrace();
+		LogAbstractManager.error("------------------------------");
+		resultsStoreHouse.addExceptionMessage(e.getMessage());
+
+		NextStep onExceptionNextStep = getExceptionPage();
+		setNextStep(onExceptionNextStep);
 	}
 
 	public void getResultsStoreHouse() {
 		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
-		
-		String [] previousExceptionMessages = null;
+
+		String[] previousExceptionMessages = null;
 		if (this.resultsStoreHouse != null) {
 			previousExceptionMessages = this.resultsStoreHouse.getExceptionMessages();
 		}
-		
+
 		if (reinitializeResultsStoreHouse()) {
 			this.resultsStoreHouse = null;
 			setResultsStoreHouse();
 		}
-		
+
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
 			this.resultsStoreHouse.setPreviousExceptionMessages(previousExceptionMessages);
