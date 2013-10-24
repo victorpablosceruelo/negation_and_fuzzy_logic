@@ -5,15 +5,12 @@
 <%@page import="constants.KConstants"%>
 
 <%
-ArrayList<String> msgsIn = new ArrayList<String>();
-String [] msgs = JspsUtils.getMessages(request, msgsIn);
+	String msg = JspsUtils.getResultMessage(request);
 %>
 	<div class="fileViewTable">
 <% 
-if ((msgs != null) && (msgs.length > 0)) { 
-	for (int i=0; i< msgs.length; i++) {
-		out.println(msgs[i]);
-	}		
+if ((msg != null) && (msg.length() > 0)) { 
+	out.println(msg);
 } else { 
 	
 	ResultsStoreHouse resultsStoreHouse =  JspsUtils.getResultsStoreHouse(request);	

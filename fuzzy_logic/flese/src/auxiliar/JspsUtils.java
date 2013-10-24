@@ -47,54 +47,40 @@ public class JspsUtils {
 		return resultsStoreHouse;
 	}
 
-	public static String getPreviousExceptionMessages(HttpServletRequest request) {
+	public static String getExceptionMsg(HttpServletRequest request) {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String[] msgs = resultsStoreHouse.getPreviousExceptionMessages();
+		String msg = resultsStoreHouse.getExceptionMsg();
+		return msg;
+	}
 
-		String exception = request.getParameter(KConstants.Request.exceptionParam);
-		String[] msgsAux;
-		if ((exception != null) && (!"".equals(exception))) {
-			msgsAux = new String[msgs.length + 1];
-			for (int i = 0; i < msgs.length; i++) {
-				msgsAux[i] = msgs[i];
-			}
-			msgsAux[msgs.length] = exception;
-		} else {
-			msgsAux = msgs;
-		}
+	public static String getExceptionMsgInJS(HttpServletRequest request) {
+		String msg = getExceptionMsg(request);
+		String[] msgsAux = { msg };
 		return getMessagesInJS(msgsAux);
 	}
 
-	public static ArrayList<String> getMessagesArrayList(HttpServletRequest request, ArrayList<String> msgs) {
-		if (msgs == null) {
-			msgs = new ArrayList<String>();
-		}
-
+	public static String getResultMessage(HttpServletRequest request) {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String[] msgsError = resultsStoreHouse.getExceptionMessages();
-		if (msgsError != null) {
-			for (int i = 0; i < msgsError.length; i++) {
-				msgs.add(msgsError[i]);
-			}
-		}
-		return msgs;
+		String msg = resultsStoreHouse.getResultMessage();
+		return msg;
 	}
 
-	public static String[] getMessages(HttpServletRequest request, ArrayList<String> msgs) {
-		msgs = getMessagesArrayList(request, msgs);
-		return msgs.toArray(new String[msgs.size()]);
-	}
-
-	public static String getMessagesInJS(HttpServletRequest request, ArrayList<String> msgs) {
-		String[] msgsAux = getMessages(request, msgs);
-
+	public static String getResultMessageInJS(HttpServletRequest request) {
+		String msg = getResultMessage(request);
+		String[] msgsAux = { msg };
 		return getMessagesInJS(msgsAux);
 	}
 
+	public static String getMessagesInJS(ArrayList<String> msgs) {
+		String [] msgsAux = msgs.toArray(new String [msgs.size()]);
+		String msg = getMessagesInJS(msgsAux);
+		return msg;
+	}
+	
 	public static String getMessagesInJS(String[] msgs) {
 
 		StringBuilder msg = new StringBuilder();
-		// msg.append("[");
+		msg.append("new Array(");
 		for (int i = 0; i < msgs.length; i++) {
 			msg.append("'");
 			if ((msgs[i] != null) && (!"".equals(msgs[i]))) {
@@ -107,7 +93,7 @@ public class JspsUtils {
 				msg.append(", ");
 			}
 		}
-		// msg.append("]");
+		msg.append(")");
 		return msg.toString();
 	}
 

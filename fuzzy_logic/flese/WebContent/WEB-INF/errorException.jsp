@@ -7,8 +7,9 @@ ArrayList<String> msgs = new ArrayList<String>();
 msgs.add("Ups! An exception occurred.");
 msgs.add("You can press the key F5 and try again or send a bug report to vpablos@babel.ls.fi.upm.es");
 msgs.add("");
+msgs.add(JspsUtils.getExceptionMsg(request));
 
-String msg = JspsUtils.getMessagesInJS(request, msgs);
+String msgsArray = JspsUtils.getMessagesInJS(msgs);
 %>
 
 
@@ -26,10 +27,10 @@ if (typeof(window.parent.clearMsgsSection) == "function") {
 	window.parent.clearMsgsSection();
 }
 if (typeof(showMsgs) == "function") {
-	showMsgs(new Array(<%= msg %>));
+	showMsgs(<%= msgsArray %>);
 }
 if (typeof(window.parent.showMsgs) == "function") {
-	window.parent.showMsgs(new Array(<%= msg %>));
+	window.parent.showMsgs(<%= msgsArray %>);
 }
 </script>
 

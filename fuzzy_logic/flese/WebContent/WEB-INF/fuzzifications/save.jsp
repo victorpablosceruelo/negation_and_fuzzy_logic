@@ -3,10 +3,9 @@
 <%@page import="results.ResultsStoreHouse"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);	
+	String msg = JspsUtils.getResultMessage(request);
 %>
 
-<%=resultsStoreHouse.getResultMessage() %>
+<%=msg %>
 
 <!-- END -->

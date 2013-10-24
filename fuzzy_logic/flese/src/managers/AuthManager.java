@@ -11,6 +11,7 @@ import org.brickred.socialauth.SocialAuthManager;
 import org.brickred.socialauth.util.SocialAuthUtil;
 
 import storeHouse.RequestStoreHouseException;
+import storeHouse.SessionStoreHouse;
 import urls.ServerAndAppUrls;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
@@ -35,11 +36,10 @@ public class AuthManager extends AbstractManager {
 		super();
 	}
 
-	public NextStep getExceptionPage() {
-		NextStep nextStep = new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignOut, "");
-		return nextStep;
+	public void actionWhenExceptionInTargetMethodInvocation() {
+		signOut();
 	}
-
+	
 	public void byDefaultMethod() throws Exception {
 		authenticate();
 	}
@@ -58,10 +58,8 @@ public class AuthManager extends AbstractManager {
 
 	public void authenticate() throws Exception {
 
-		if (requestStoreHouse.getSession().appIsInTestingMode()) {
-			resultsStoreHouse.addExceptionMessage("INFO: Social Authentication in Testing mode.");
-		} else {
-			// get the social auth manager from session
+		if (! requestStoreHouse.getSession().appIsInTestingMode()) {
+			// get the social auth manager from the session
 			tryAuthenticationWithSocialAuthManager();
 		}
 
@@ -71,7 +69,7 @@ public class AuthManager extends AbstractManager {
 
 		String providerId = requestStoreHouse.getProviderId();
 
-		resultsStoreHouse.addExceptionMessage("Welcome to the FleSe application !!");
+		resultsStoreHouse.setResultMessage("Welcome to the FleSe application !!");
 		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
 	}
 
@@ -181,16 +179,23 @@ public class AuthManager extends AbstractManager {
 
 	}
 
-	public void signOut() throws Exception {
+	public void signOut() {
 
 		invalidateSession();
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignOutPage, ""));
 	}
 
-	private void invalidateSession() throws RequestStoreHouseException {
+	private void invalidateSession() {
 
-		if (!requestStoreHouse.getSession().isNull()) {
-			SocialAuthManager authManager = requestStoreHouse.getSession().getSocialAuthManager();
+		SessionStoreHouse sessionStoreHouse;
+		try {
+			sessionStoreHouse = requestStoreHouse.getSession();
+		} catch (RequestStoreHouseException e) {
+			sessionStoreHouse = null;
+		}
+		
+		if ((sessionStoreHouse != null) && (! sessionStoreHouse.isNull())) {
+			SocialAuthManager authManager = sessionStoreHouse.getSocialAuthManager();
 			if (authManager != null) {
 				List<String> connectedProvidersIds = authManager.getConnectedProvidersIds();
 				if (connectedProvidersIds != null) {
@@ -206,7 +211,7 @@ public class AuthManager extends AbstractManager {
 				}
 			}
 			// Invalidate the session.
-			requestStoreHouse.getSession().invalidateSession();
+			sessionStoreHouse.invalidateSession();
 		}
 
 	}

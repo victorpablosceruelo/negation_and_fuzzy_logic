@@ -4,15 +4,13 @@
 <%@page import="constants.KConstants"%>
 
 <%
-String urlList = KUrls.Files.ListMyFiles.getUrl(true);
-
-ArrayList<String> msgs = new ArrayList<String>();
-String msg = JspsUtils.getMessagesInJS(request, msgs);
+	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
+	String msgsArray = JspsUtils.getResultMessageInJS(request);
 %>
 
-<% if ((msg != null) && (msg.length() > 0)) { %>
+<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
 	<script type="text/javascript">
-		showMsgs(new Array(<%= msg %>));
+		showMsgs(<%= msgsArray %>);
 	</script>
 <% } else { %>
 	<script type="text/javascript">

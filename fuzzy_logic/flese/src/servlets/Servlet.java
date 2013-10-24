@@ -51,25 +51,15 @@ public class Servlet extends HttpServlet {
 	private void doGetAndDoPostProtected(String doMethod, HttpServletRequest request, HttpServletResponse response) {
 		String requestUrl = request.getRequestURL().toString();
 		LOG.info(formatMsg("url: " + requestUrl));
-		try {
-			doGetAndDoPost("doPost", request, response);
-		} catch (ServletException e) {
-			LOG.error("doGetAndDoPostProtected: ServletException EXCEPTION");
-			e.printStackTrace();
-			
-		} catch (IOException e) {
-			LOG.error("doGetAndDoPostProtected: IOException EXCEPTION");
-			e.printStackTrace();
-		}
+		doGetAndDoPost("doPost", request, response);
 	}
-	
+
 	private String formatMsg(String msg) {
 		String line = "------------------------------------------------------------\n";
 		return "\n" + line + msg + "\n" + line;
 	}
-	
-	private void doGetAndDoPost(String doMethod, HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+
+	private void doGetAndDoPost(String doMethod, HttpServletRequest request, HttpServletResponse response) {
 
 		String managerName = request.getParameter(KConstants.Request.managerParam);
 		LOG.info(formatMsg("STARTS Servlet. doAction: " + doMethod + " manager: " + (managerName != null ? managerName : "")));
@@ -92,6 +82,7 @@ public class Servlet extends HttpServlet {
 			HttpServletResponse response) {
 
 		if (managerObject == null) {
+			LOG.error("managerObject is NULL.");
 			return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		}
 
@@ -99,13 +90,15 @@ public class Servlet extends HttpServlet {
 		boolean createSessionIfNull = managerObject.createSessionIfNull();
 		boolean exceptionIfSessionIsNull = managerObject.exceptionIfSessionIsNull();
 		boolean exceptionIfLocalUserInfoIsNull = managerObject.exceptionIfLocalUserInfoIsNull();
-		
+
 		ServletContext servletContext = getServletConfig().getServletContext();
 		RequestStoreHouse requestStoreHouse;
 		try {
 			try {
-				requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull);
+				requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull,
+						exceptionIfLocalUserInfoIsNull);
 			} catch (RequestStoreHouseSessionException e) {
+				LOG.error("Exception creating object requestStoreHouse.");
 				e.printStackTrace();
 				return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.NullSession, "");
 			}
@@ -113,13 +106,14 @@ public class Servlet extends HttpServlet {
 			requestStoreHouse.setServletContext(servletContext);
 			requestStoreHouse.setDoMethod(doMethod);
 		} catch (RequestStoreHouseException e) {
+			LOG.error("Exception setting attributes in object requestStoreHouse.");
 			e.printStackTrace();
-			return managerObject.getExceptionPage();
+			return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
 		}
 
 		// By-pass parameters to the manager.
-		managerObject.setSessionStoreHouse(requestStoreHouse);
-		
+		managerObject.setRequestStoreHouse(requestStoreHouse);
+
 		// Dispatch the query.
 		return managerObject.processRequest();
 	}
@@ -148,21 +142,27 @@ public class Servlet extends HttpServlet {
 			managerObject = (InterfaceManager) (managerClass.getConstructor(new Class[0])).newInstance(new Object[0]);
 		} catch (InstantiationException e) {
 			managerObject = null;
+			LOG.error("Exception InstantiationException");
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			managerObject = null;
+			LOG.error("Exception IllegalAccessException");
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			managerObject = null;
+			LOG.error("Exception IllegalArgumentException");
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			managerObject = null;
+			LOG.error("Exception InvocationTargetException");
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
 			managerObject = null;
+			LOG.error("Exception NoSuchMethodException");
 			e.printStackTrace();
 		} catch (SecurityException e) {
 			managerObject = null;
+			LOG.error("Exception SecurityException");
 			e.printStackTrace();
 		}
 		return managerObject;

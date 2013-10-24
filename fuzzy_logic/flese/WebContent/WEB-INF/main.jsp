@@ -5,8 +5,7 @@
 <%@page import="java.util.ArrayList"%>
 
 <%
-	ArrayList<String> msgs = new ArrayList<String>();
-	String msg = JspsUtils.getMessagesInJS(request, msgs);
+	String msgsArray = JspsUtils.getResultMessageInJS(request);
 %>
 
 
@@ -67,8 +66,8 @@
 		<% if (! "".equals(localUserInfoName)) { %>
 			loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");
 		<% } %>		
-		<% if ((msg != null) && (msg.length() > 0)) { %>
-			showMsgs(new Array(<%= msg %>));
+		<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
+			showMsgs(<%= msgsArray %>);
 		<% } %>
 	</script>
 

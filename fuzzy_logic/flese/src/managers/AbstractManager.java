@@ -22,10 +22,12 @@ public abstract class AbstractManager implements InterfaceManager {
 	protected RequestStoreHouse requestStoreHouse = null;
 	protected ResultsStoreHouse resultsStoreHouse = null;
 	private NextStep nextStep;
+	private Method method;
+	private String op;
 
-	public NextStep getExceptionPage() {
+	public void actionWhenExceptionInTargetMethodInvocation(String methodName) {
 		NextStep nextStep = new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.Exception, "");
-		return nextStep;
+		setNextStep(nextStep);
 	}
 
 	public boolean createSessionIfNull() {
@@ -52,8 +54,8 @@ public abstract class AbstractManager implements InterfaceManager {
 		this.nextStep = nextStep;
 	}
 
-	public void setSessionStoreHouse(RequestStoreHouse sessionStoreHouse) {
-		this.requestStoreHouse = sessionStoreHouse;
+	public void setRequestStoreHouse(RequestStoreHouse requestStoreHouse) {
+		this.requestStoreHouse = requestStoreHouse;
 	}
 
 	protected String getRequestManager() {
@@ -66,8 +68,8 @@ public abstract class AbstractManager implements InterfaceManager {
 
 	public NextStep processRequest() {
 
-		String op = null;
-		Method method = null;
+		op = null;
+		method = null;
 		setNextStep(null);
 		UrlMap urlMap = getValidUrlMap();
 
@@ -77,8 +79,8 @@ public abstract class AbstractManager implements InterfaceManager {
 		if (urlMap != null) {
 			op = urlMap.getOp(false);
 			if ((op != null) && (!"".equals(op))) {
-				method = getMethod(op);
-				invokeMethod(method);
+				getMethod();
+				invokeMethod();
 			}
 		}
 		// This allows a failsafe when the method is not found or there is no
@@ -104,23 +106,23 @@ public abstract class AbstractManager implements InterfaceManager {
 		return urlMap;
 	}
 
-	private Method getMethod(String op) {
-		Method method = null;
+	private void getMethod() {
 		try {
 			method = this.getClass().getMethod(op, new Class[] {});
 		} catch (NoSuchMethodException e) {
+			method = null;
 			LogAbstractManager.error("ERROR looking for method " + op + " in class " + this.getClass().getName());
 			setNextStep(null);
 			e.printStackTrace();
 		} catch (SecurityException e) {
+			method = null;
 			LogAbstractManager.error("ERROR looking for method " + op + " in class " + this.getClass().getName());
 			setNextStep(null);
 			e.printStackTrace();
 		}
-		return method;
 	}
 
-	private void invokeMethod(Method method) {
+	private void invokeMethod() {
 		if (method != null) {
 			try {
 				LogAbstractManager.info("Calling method " + method.getName() + " in class " + this.getClass().getName());
@@ -134,7 +136,7 @@ public abstract class AbstractManager implements InterfaceManager {
 				e.printStackTrace();
 				setNextStep(null);
 			} catch (InvocationTargetException e) {
-				actionWhenExceptionInTargetMethodInvocation(e, method.getName(), this.getClass().getName());
+				actionWhenExceptionInTargetMethodInvocationEnvelope(e, method.getName(), this.getClass().getName());
 			}
 		}
 	}
@@ -144,11 +146,11 @@ public abstract class AbstractManager implements InterfaceManager {
 			LogAbstractManager.info("Invoke byDefaultMethod ");
 			byDefaultMethod();
 		} catch (Exception e) {
-			actionWhenExceptionInTargetMethodInvocation(e, "byDefaultMethod", this.getClass().getName());
+			actionWhenExceptionInTargetMethodInvocationEnvelope(e, "byDefaultMethod", this.getClass().getName());
 		}
 	}
 
-	private void actionWhenExceptionInTargetMethodInvocation(Exception e, String methodName, String className) {
+	private void actionWhenExceptionInTargetMethodInvocationEnvelope(Exception e, String methodName, String className) {
 		if (methodName == null)
 			methodName = "unknown";
 		if (className == null)
@@ -161,31 +163,47 @@ public abstract class AbstractManager implements InterfaceManager {
 		LogAbstractManager.error("------------------------------");
 		e.printStackTrace();
 		LogAbstractManager.error("------------------------------");
-		resultsStoreHouse.addExceptionMessage(e.getMessage());
 
-		NextStep onExceptionNextStep = getExceptionPage();
-		if ((e.getMessage() != null) && (!"".equals(e.getMessage()))) {
-			onExceptionNextStep.addToAppend("&" + KConstants.Request.exceptionParam + "='" + e.getMessage() + "'");
-		}
-		setNextStep(onExceptionNextStep);
+		saveExceptionInformation(e, className, methodName);
+		actionWhenExceptionInTargetMethodInvocation(methodName);
 	}
 
-	public void getResultsStoreHouse() {
-		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
-
-		String[] previousExceptionMessages = null;
-		if (this.resultsStoreHouse != null) {
-			previousExceptionMessages = this.resultsStoreHouse.getExceptionMessages();
+	private void saveExceptionInformation(Exception e, String className, String methodName) {
+		if (className == null) {
+			className = "unknown";
 		}
+		if (methodName == null) {
+			methodName = "unknown";
+		}
+
+		StringBuilder msg = new StringBuilder();
+		msg.append("Exception in method ");
+		msg.append(methodName);
+		msg.append(" of class ");
+		msg.append(className);
+
+		if ((e != null) && (e.getMessage() != null) && (!"".equals(e.getMessage()))) {
+			msg.append(": ");
+			msg.append(e.getMessage());
+		}
+		resultsStoreHouse.setExceptionMsg(msg.toString());
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public void getResultsStoreHouse() {
 
 		if (reinitializeResultsStoreHouse()) {
 			this.resultsStoreHouse = null;
 			setResultsStoreHouse();
 		}
 
+		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
+		
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
-			this.resultsStoreHouse.setPreviousExceptionMessages(previousExceptionMessages);
 		}
 	}
 

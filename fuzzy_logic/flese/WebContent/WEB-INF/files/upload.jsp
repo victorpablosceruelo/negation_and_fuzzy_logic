@@ -6,29 +6,19 @@
 
 <%
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
+	String msgsArray = JspsUtils.getResultMessageInJS(request);
 %>
 
 <script type="text/javascript">
-<%RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-
-	String [] msgs = resultsStoreHouse.getExceptionMessages();
-	if ((msgs != null) && (msgs.length > 0)) { 
-
+<%
+	
+	if ((msgsArray != null) && (msgsArray.length() > 0)) { 
 		out.print("window.parent.fileUploadShowResults('");
 		out.print(KConstants.JspsDivsIds.uploadStatusDivId);
-		out.print("', [");
-
-		for (int i=0; i<msgs.length; i++) {
-			out.print("'" + msgs[i] +"'");
-			if (i+1 < msgs.length) {
-				out.print(", ");
-			}
-		}
-		
-		out.print("]);");
+		out.print("', " + msgsArray + ");");
 	}
-	else {%>
+	else {
+%>
 		// Update the files list.
 		if (typeof(loadAjaxIn) == "function") {
 			loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
