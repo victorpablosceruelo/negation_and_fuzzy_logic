@@ -3,12 +3,12 @@
 <%@page import="constants.KUrls"%>
 
 <%
-	String msg = JspsUtils.getPreviousExceptionMessages(request);
+	String msgs = JspsUtils.getExceptionMsgInJS(request);
 %>
 
 <script type="text/javascript">
-	<% if ((msg != null) && (msg.length() > 0)) { %>
-		showMsgs(new Array(<%= msg %>));
+	<% if ((msgs != null) && (msgs.length() > 0)) { %>
+		showMsgs(new Array(<%= msgs %>));
 	<% } %>
 </script>
 

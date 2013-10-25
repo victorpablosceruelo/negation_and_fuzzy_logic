@@ -41,7 +41,8 @@ public class ServerAndAppUrls {
 			computeAppAndServerUrls(request);
 		}
 		
-		return serverAndAppUrlsData.isAppInTestingMode();
+		boolean isAppInTestingMode = serverAndAppUrlsData.isAppInTestingMode(); 
+		return isAppInTestingMode;
 	}
 	
 	private static void computeAppAndServerUrls(HttpServletRequest request) {
