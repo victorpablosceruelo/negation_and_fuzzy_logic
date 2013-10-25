@@ -16,34 +16,62 @@ public class JspsUtils {
 		return "S";
 	}
 
+	public static String includeMainBodyWhenNotAjax(HttpServletRequest request) {
+		if (!isAjax(request)) {
+			return "<jsp:include page='commonHtmlBody.jsp' />";
+		}
+		return "";
+	}
+
+	private static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
+		RequestStoreHouse requestStoreHouse = null;
+		try {
+			requestStoreHouse = new RequestStoreHouse(request);
+		} catch (Exception e) {
+			requestStoreHouse = null;
+		}
+		return requestStoreHouse;
+	}
+
+	public static boolean isAjax(HttpServletRequest request) {
+		boolean isAjax = false;
+		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
+		if (requestStoreHouse != null) {
+			String isAjaxString = requestStoreHouse.getRequestParameter(KConstants.Request.isAjaxParam);
+			isAjax = (isAjaxString != null) && (KConstants.Values.True.equals(isAjaxString));
+		}
+		return isAjax;
+	}
+
 	public static String getLocalUserInfoName(HttpServletRequest request) {
 
-		String localUserInfoName = null;
-		try {
-			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request, false, true, true);
-			localUserInfoName = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
-		} catch (Exception e) {
-			localUserInfoName = "";
+		String localUserInfoName = "";
+		SessionStoreHouse sessionStoreHouse = getSessionStoreHouse(request);
+
+		if (sessionStoreHouse != null) {
+			LocalUserInfo localUserInfo = sessionStoreHouse.getLocalUserInfo();
+			if (localUserInfo != null) {
+				localUserInfoName = localUserInfo.getLocalUserName();
+			}
 		}
 		return localUserInfoName;
 	}
 
 	public static SessionStoreHouse getSessionStoreHouse(HttpServletRequest request) {
+		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
 		SessionStoreHouse sessionStoreHouse = null;
-		try {
-			RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
-			sessionStoreHouse = requestStoreHouse.getSession();
-		} catch (Exception e) {
-			sessionStoreHouse = null;
-		}
+		if (requestStoreHouse != null)
+			try {
+				sessionStoreHouse = requestStoreHouse.getSession();
+			} catch (Exception e) {
+				sessionStoreHouse = null;
+			}
 		return sessionStoreHouse;
 	}
 
 	public static ResultsStoreHouse getResultsStoreHouse(HttpServletRequest request) {
-		ResultsStoreHouse resultsStoreHouse = (ResultsStoreHouse) request.getAttribute(KConstants.Request.resultsStoreHouse);
-		if (resultsStoreHouse == null) {
-			resultsStoreHouse = new ResultsStoreHouse();
-		}
+		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
+		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse(false, true);
 		return resultsStoreHouse;
 	}
 
@@ -72,11 +100,11 @@ public class JspsUtils {
 	}
 
 	public static String getMessagesInJS(ArrayList<String> msgs) {
-		String [] msgsAux = msgs.toArray(new String [msgs.size()]);
+		String[] msgsAux = msgs.toArray(new String[msgs.size()]);
 		String msg = getMessagesInJS(msgsAux);
 		return msg;
 	}
-	
+
 	public static String getMessagesInJS(String[] msgs) {
 
 		StringBuilder msg = new StringBuilder();

@@ -4,12 +4,6 @@
 <%@page import="constants.KUrls"%>
 <%@page import="java.util.ArrayList"%>
 
-<%
-	String msgsArray = JspsUtils.getResultMessageInJS(request);
-%>
-
-
-
 <body>
    	<header>
 		<div id="bodyHeadTable" class="bodyHeadTable">
@@ -51,25 +45,13 @@
 	<br />
 
 	<section id="<%= KConstants.JspsDivsIds.mainSecDivId %>" class="">
-	<% if ("".equals(localUserInfoName)) { %>
-		<jsp:include page="providers.jsp" />
-	<% } %>
 	</section>
 	<br />
 	
 	<div id="footer">
-	
 	</div>
+	
 	<br /><br /><br /><br /><br />
-
-	<script type="text/javascript">
-		<% if (! "".equals(localUserInfoName)) { %>
-			loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");
-		<% } %>		
-		<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-			showMsgs(<%= msgsArray %>);
-		<% } %>
-	</script>
 
 </body>
 </html>

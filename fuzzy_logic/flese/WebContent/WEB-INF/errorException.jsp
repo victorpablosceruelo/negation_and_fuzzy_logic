@@ -2,6 +2,11 @@
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="java.util.ArrayList"%>
+
+<%	if (! JspsUtils.isAjax(request)) { %>
+	<jsp:include page='commonHtmlBody.jsp' />
+<% } %>
+
 <%
 ArrayList<String> msgs = new ArrayList<String>();
 msgs.add("Ups! An exception occurred.");
@@ -11,6 +16,7 @@ msgs.add(JspsUtils.getExceptionMsg(request));
 
 String msgsArray = JspsUtils.getMessagesInJS(msgs);
 %>
+
 
 
 <script type="text/javascript">

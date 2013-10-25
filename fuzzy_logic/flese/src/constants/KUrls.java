@@ -14,11 +14,14 @@ public class KUrls {
 	public static class Auth {
 		public static String manager = "AuthManager";
 		public static final UrlMap SocialAuthCallback = new UrlMap("", "", null, null, ""); // No manager nor op.
+		
+		public static final UrlMap ProvidersPage = new UrlMap(manager, "providersPage", null, null, "WEB-INF/authentication/providers.jsp");
+		public static final UrlMap Providers = new UrlMap(manager, "providers", ProvidersPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap SignInPage = new UrlMap(manager, "signInPage", null, null, "WEB-INF/main.jsp");
+		public static final UrlMap SignInPage = new UrlMap(manager, "signInPage", null, null, "WEB-INF/authentication/signedIn.jsp");
 		public static final UrlMap SignIn = new UrlMap(manager, "signIn", SignInPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/main.jsp");
+		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/authentication/signedOut.jsp");
 		public static final UrlMap SignOut = new UrlMap(manager, "signOut", SignOutPage, KUrls.Pages.Exception, "");
 	}
 

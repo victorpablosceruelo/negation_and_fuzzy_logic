@@ -11,6 +11,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import results.ResultsStoreHouse;
 import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
@@ -24,20 +25,22 @@ public class RequestStoreHouse {
 	private ServletContext servletContext = null;
 	private String doMethod = null;
 	private SessionStoreHouse session = null;
+	private ResultsStoreHouse resultsStoreHouse = null;
 
 	private HashMap<String, String[]> requestParams = null;
 
 	public RequestStoreHouse(HttpServletRequest request) throws RequestStoreHouseException, RequestStoreHouseSessionException {
-		RequestStoreHouseConstructor(request, false, false, false);
+		RequestStoreHouseConstructor(request, false, false, false, true);
 	}
 
 	public RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
 			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
-		RequestStoreHouseConstructor(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull);
+		RequestStoreHouseConstructor(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull, false);
 	}
 
 	public void RequestStoreHouseConstructor(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
-			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
+			boolean exceptionIfLocalUserInfoIsNull, boolean restoreRequestParams) throws RequestStoreHouseException,
+			RequestStoreHouseSessionException {
 
 		if (request == null)
 			throw new RequestStoreHouseException("request is null");
@@ -48,6 +51,9 @@ public class RequestStoreHouse {
 			throw new RequestStoreHouseException("session is null");
 		}
 		copyRequestParameters();
+		if (restoreRequestParams) {
+			restoreRequestParameters();
+		}
 	}
 
 	public HttpServletRequest getRequest() {
@@ -199,4 +205,62 @@ public class RequestStoreHouse {
 		return new ProgramFileInfo(fileOwner, fileName);
 	}
 
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public ResultsStoreHouse getResultsStoreHouse(boolean reinitializeResultsStoreHouse, boolean restoreRequestParameters) {
+
+		if (reinitializeResultsStoreHouse) {
+			this.resultsStoreHouse = null;
+			storeResultsStoreHouse();
+		}
+
+		this.resultsStoreHouse = (ResultsStoreHouse) this.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
+
+		if (this.resultsStoreHouse == null) {
+			this.resultsStoreHouse = new ResultsStoreHouse();
+		}
+
+		if (! reinitializeResultsStoreHouse) {
+			if (restoreRequestParameters) {
+				restoreRequestParameters();
+			}
+		}
+
+		return resultsStoreHouse;
+	}
+
+	public void storeResultsStoreHouse() {
+		this.getRequest().removeAttribute(KConstants.Request.resultsStoreHouse);
+		if (resultsStoreHouse != null) {
+			this.saveRequestParameters();
+			this.getRequest().setAttribute(KConstants.Request.resultsStoreHouse, this.resultsStoreHouse);
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private void saveRequestParameters() {
+		if (this.resultsStoreHouse != null) {
+			this.resultsStoreHouse.setRequestParamsHashMap(requestParams);
+		}
+	}
+
+	private void restoreRequestParameters() {
+		if (this.resultsStoreHouse != null) {
+			if (this.resultsStoreHouse.getRequestParamsHashMap() != null) {
+				this.requestParams = this.resultsStoreHouse.getRequestParamsHashMap();
+			}
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
+
+// EOF

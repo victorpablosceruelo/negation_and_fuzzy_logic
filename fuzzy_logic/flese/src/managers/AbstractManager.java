@@ -74,7 +74,7 @@ public abstract class AbstractManager implements InterfaceManager {
 		UrlMap urlMap = getValidUrlMap();
 
 		// Get the results storage facility.
-		this.getResultsStoreHouse();
+		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse(true, false);
 
 		if (urlMap != null) {
 			op = urlMap.getOp(false);
@@ -90,7 +90,7 @@ public abstract class AbstractManager implements InterfaceManager {
 		}
 
 		// Save results in the request, to access them from jsps.
-		setResultsStoreHouse();
+		this.requestStoreHouse.storeResultsStoreHouse();
 
 		return nextStep;
 	}
@@ -193,29 +193,8 @@ public abstract class AbstractManager implements InterfaceManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void getResultsStoreHouse() {
-
-		if (reinitializeResultsStoreHouse()) {
-			this.resultsStoreHouse = null;
-			setResultsStoreHouse();
-		}
-
-		this.resultsStoreHouse = (ResultsStoreHouse) this.requestStoreHouse.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
-		
-		if (this.resultsStoreHouse == null) {
-			this.resultsStoreHouse = new ResultsStoreHouse();
-		}
-	}
-
-	public void setResultsStoreHouse() {
-		this.requestStoreHouse.getRequest().removeAttribute(KConstants.Request.resultsStoreHouse);
-		if (resultsStoreHouse != null) {
-			this.requestStoreHouse.getRequest().setAttribute(KConstants.Request.resultsStoreHouse, this.resultsStoreHouse);
-		}
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 }
+
+
+
+// EOF

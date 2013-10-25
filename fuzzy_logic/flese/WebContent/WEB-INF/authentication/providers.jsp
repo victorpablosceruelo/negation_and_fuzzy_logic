@@ -2,6 +2,10 @@
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
 
+<%	if (! JspsUtils.isAjax(request)) { %>
+	<jsp:include page='../commonHtmlBody.jsp' />
+<% } %>
+
 <%
 	String msgs = JspsUtils.getExceptionMsgInJS(request);
 %>
