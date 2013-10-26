@@ -15,16 +15,11 @@ public interface InterfaceManager {
 
 	public boolean createSessionIfNull();
 	
-	public boolean reinitializeResultsStoreHouse(String op);
-
-	public void setRequestStoreHouse(RequestStoreHouse requestStoreHouse);
-
 	public boolean exceptionIfSessionIsNull();
 
 	public boolean exceptionIfLocalUserInfoIsNull();
 
 	public void actionWhenExceptionInTargetMethodInvocation(String methodName);
-	
-	public boolean reinitializeResultsStoreHouse();
 
+	public void setRequestStoreHouse(RequestStoreHouse requestStoreHouse);
 }

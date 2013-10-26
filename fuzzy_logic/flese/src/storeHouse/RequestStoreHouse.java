@@ -203,12 +203,7 @@ public class RequestStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public ResultsStoreHouse getResultsStoreHouse(boolean reinitializeResultsStoreHouse) {
-
-		if (reinitializeResultsStoreHouse) {
-			this.resultsStoreHouse = null;
-			storeResultsStoreHouse();
-		}
+	public ResultsStoreHouse getResultsStoreHouse() {
 
 		this.resultsStoreHouse = (ResultsStoreHouse) this.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
 

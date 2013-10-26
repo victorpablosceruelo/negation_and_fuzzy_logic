@@ -178,6 +178,7 @@ public class KConstants {
 	}
 	
 	public static class AppMsgs {
+		public static final String welcomeToFleSe = "Welcome to the FleSe application. Enjoy !!!";
 		public static final String errorTryingToAuthenticateUser = "The social authentication provider choosen says you are not authenticated. Sorry.";
 		public static final String exception1 = "Ups! An exception occurred.";
 		public static final String exception2 = "You can press the key F5 and try again or send a bug report to ";

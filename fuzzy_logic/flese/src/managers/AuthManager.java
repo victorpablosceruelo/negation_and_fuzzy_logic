@@ -35,7 +35,8 @@ public class AuthManager extends AbstractManager {
 		super();
 	}
 
-	public void actionWhenExceptionInTargetMethodInvocation() {
+	@Override
+	public void actionWhenExceptionInTargetMethodInvocation(String methodName) {
 		signOut();
 	}
 
@@ -45,14 +46,11 @@ public class AuthManager extends AbstractManager {
 	}
 	
 	@Override
-	public boolean reinitializeResultsStoreHouse(String op) {
-		return false;
-	}
-
 	public boolean createSessionIfNull() {
 		return true;
 	}
 
+	@Override
 	public boolean exceptionIfLocalUserInfoIsNull() {
 		return false;
 	}
@@ -152,6 +150,7 @@ public class AuthManager extends AbstractManager {
 		// In that case we by-pass signIn and go directly to authentication.
 		LocalUserInfo localUserInfo = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
 		if (localUserInfo != null) {
+			resultsStoreHouse.addResultMessage(KConstants.AppMsgs.welcomeToFleSe);
 			setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignInPage, ""));
 			return;
 		}

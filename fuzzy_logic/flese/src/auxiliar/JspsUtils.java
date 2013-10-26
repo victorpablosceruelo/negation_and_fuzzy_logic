@@ -65,7 +65,7 @@ public class JspsUtils {
 
 	public static ResultsStoreHouse getResultsStoreHouse(HttpServletRequest request) {
 		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
-		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse(false);
+		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse();
 		return resultsStoreHouse;
 	}
 

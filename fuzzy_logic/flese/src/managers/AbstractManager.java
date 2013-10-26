@@ -88,8 +88,7 @@ public abstract class AbstractManager implements InterfaceManager {
 		}
 
 		// Get the results storage facility.
-		boolean reinitializeResultsStoreHouse = reinitializeResultsStoreHouse(op);
-		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse(reinitializeResultsStoreHouse);
+		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse();
 
 		// Invoke the method.
 		invokeMethod();
