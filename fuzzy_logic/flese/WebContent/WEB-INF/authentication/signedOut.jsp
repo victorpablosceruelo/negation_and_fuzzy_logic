@@ -9,7 +9,7 @@
 %>
 
 <script type="text/javascript">	
-	<%= JspsUtils.loadMessagesAjaxInItsDiv() %>
+	<%= JspsUtils.loadMessagesInItsDiv() %>
 	<% if ("".equals(localUserInfoName)) { %>
 		loadAjaxIn('mainSecDiv', "<%=KUrls.Auth.Providers.getUrl(true)%>");
 	<% } %>	

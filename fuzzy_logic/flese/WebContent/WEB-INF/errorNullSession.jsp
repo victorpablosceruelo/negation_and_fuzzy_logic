@@ -23,10 +23,10 @@ if (typeof(clearMsgsSection) == "function") {
 if (typeof(window.parent.clearMsgsSection) == "function") {
 	window.parent.clearMsgsSection();
 }
-if (typeof(showMsgs) == "function") {
-	showMsgs(<%= msgsArray %>);
+if (typeof(showMsgsArray) == "function") {
+	showMsgsArray(<%= msgsArray %>);
 }
-if (typeof(window.parent.showMsgs) == "function") {
-	window.parent.showMsgs(<%= msgsArray %>);
+if (typeof(window.parent.showMsgsArray) == "function") {
+	window.parent.showMsgsArray(<%= msgsArray %>);
 }
 </script>

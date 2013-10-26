@@ -217,23 +217,37 @@ function clearMsgsSection() {
 	mainSection.innerHTML = "";
 }
 
-function showMsgs(msgs) {
-	var msgsContainerId = '<%=KConstants.JspsDivsIds.msgsSecDivId %>';
+function showMsgsArray(msgs) {
+	var divId = '<%=KConstants.JspsDivsIds.msgsSecDivId %>';
+	showMsgsArrayInDiv(divId, msgs)
+}
+
+function showMsgsArrayInDiv(divId, msgs) {
 	var msgsContainer = getContainer(msgsContainerId);
 
-	msgsContainer.innerHTML = "";
-	if (Array.isArray(msgs)) {
-		for (var i=0; i<msgs.length; i++) {
-			var subDiv = document.createElement('div');
-			// row.className = "";
-			// row.id = destinyAddLine;
-			// document.getElementById(msgsContainerId)
-			subDiv.innerHTML = msgs[i];
-			msgsContainer.appendChild(subDiv);
+	if (msgsContainer != null) {
+		msgsContainer.innerHTML = "";
+		if (Array.isArray(msgs)) {
+			if (msgs.length > 0) {
+				for (var i=0; i<msgs.length; i++) {
+					var subDiv = document.createElement('div');
+					// row.className = "";
+					// row.id = destinyAddLine;
+					// document.getElementById(msgsContainerId)
+					subDiv.innerHTML = msgs[i];
+					msgsContainer.appendChild(subDiv);
+				}
+			}
+			else {
+				debug.info("showMsgs: msgs length is 0.");
+			}
+		}
+		else {
+			debug.info("showMsgs: msgs is not an array.");
 		}
 	}
 	else {
-		debug.info("showMsgs: msgs is not an array.");
+		debug.info("showMsgs: msgs container is null.");
 	}
 }
 

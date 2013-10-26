@@ -24,8 +24,12 @@ public class JspsUtils {
 		return "";
 	}
 	
-	public static String loadMessagesAjaxInItsDiv() {
-		return "loadAjaxIn('" + KConstants.JspsDivsIds.msgsSecDivId + "', '" + KUrls.Auth.Msgs.getUrl(true) + "');";
+	public static String loadMessagesInItsDiv(HttpServletRequest request) {
+		String [] msgs = getResultMessages(request);
+		String msgJS = getMessagesInJS(msgs);
+		
+		StringBuilder result = new StringBuilder();
+		result.append("");
 	}
 		
 
@@ -87,7 +91,7 @@ public class JspsUtils {
 		return getMessagesInJS(msgsAux);
 	}
 
-	public static String[] getResultMessages(HttpServletRequest request) {
+	private static String[] getResultMessages(HttpServletRequest request) {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 		String[] msgs = resultsStoreHouse.getResultMessages();
 		return msgs;
