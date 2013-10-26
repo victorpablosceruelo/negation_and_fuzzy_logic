@@ -11,8 +11,13 @@ public class UserManager extends AbstractManager {
 	}
 
 	@Override
-	public void byDefaultMethod() throws Exception {
-		options();
+	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
+		return "options";
+	}
+	
+	@Override
+	public boolean reinitializeResultsStoreHouse(String op) {
+		return true;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

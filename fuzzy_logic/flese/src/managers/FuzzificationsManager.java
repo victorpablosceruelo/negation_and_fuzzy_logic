@@ -15,8 +15,13 @@ public class FuzzificationsManager extends AbstractManager {
 	}
 
 	@Override
-	public void byDefaultMethod() throws Exception {
-		list();
+	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
+		return "list";
+	}
+	
+	@Override
+	public boolean reinitializeResultsStoreHouse(String op) {
+		return true;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

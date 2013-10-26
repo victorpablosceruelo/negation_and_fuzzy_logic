@@ -21,8 +21,13 @@ public class QueriesManager extends AbstractManager {
 	}
 
 	@Override
-	public void byDefaultMethod() throws Exception {
-		selectProgramFile();
+	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
+		return "selectProgramFile";
+	}
+	
+	@Override
+	public boolean reinitializeResultsStoreHouse(String op) {
+		return true;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -39,8 +39,14 @@ public class AuthManager extends AbstractManager {
 		signOut();
 	}
 
-	public void byDefaultMethod() throws Exception {
-		authenticate();
+	@Override
+	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
+		return "authenticate";
+	}
+	
+	@Override
+	public boolean reinitializeResultsStoreHouse(String op) {
+		return false;
 	}
 
 	public boolean createSessionIfNull() {
@@ -209,12 +215,13 @@ public class AuthManager extends AbstractManager {
 			} catch (Exception e) {
 				e.printStackTrace();
 				nextURL = null;
+				resultsStoreHouse.addResultMessage(e.getMessage());
 			}
 
-			// Store in session.
-			requestStoreHouse.getSession().setSocialAuthManager(socialAuthManager);
-
 			if ((nextURL != null) && (!"".equals(nextURL))) {
+				// Store social authentication manager in session.
+				requestStoreHouse.getSession().setSocialAuthManager(socialAuthManager);
+
 				setNextStep(new NextStep(KConstants.NextStep.redirect_to, null, nextURL));
 				return;
 			}
@@ -254,6 +261,13 @@ public class AuthManager extends AbstractManager {
 					}
 				}
 			}
+			
+			sessionStoreHouse.setSocialAuthManager(null);
+			sessionStoreHouse.setAuthProvider(null);
+			sessionStoreHouse.setProviderId(null);
+			sessionStoreHouse.setUserProfile(null);
+
+			
 			// Invalidate the session.
 			sessionStoreHouse.invalidateSession();
 		}

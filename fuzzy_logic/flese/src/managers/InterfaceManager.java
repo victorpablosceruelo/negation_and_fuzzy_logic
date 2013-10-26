@@ -11,9 +11,11 @@ public interface InterfaceManager {
 
 	public void setNextStep(NextStep nextStep);
 
-	public void byDefaultMethod() throws Exception;
+	public String methodToInvokeIfMethodRequestedIsNotAvailable();
 
 	public boolean createSessionIfNull();
+	
+	public boolean reinitializeResultsStoreHouse(String op);
 
 	public void setRequestStoreHouse(RequestStoreHouse requestStoreHouse);
 

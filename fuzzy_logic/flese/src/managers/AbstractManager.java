@@ -73,22 +73,27 @@ public abstract class AbstractManager implements InterfaceManager {
 		setNextStep(null);
 		UrlMap urlMap = getValidUrlMap();
 
-		// Get the results storage facility.
-		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse(true);
-
 		if (urlMap != null) {
 			op = urlMap.getOp(false);
 			if ((op != null) && (!"".equals(op))) {
 				getMethod();
-				invokeMethod();
 			}
 		}
 		// This allows a failsafe when the method is not found or there is no
 		// method.
 		if ((urlMap == null) || (method == null) || (op == null) || ("".equals(op))) {
-			invokeDefaultMethod();
+			LogAbstractManager.info("Impossible to reach url method. Getting default method.");
+			op = methodToInvokeIfMethodRequestedIsNotAvailable();
+			getMethod();
 		}
 
+		// Get the results storage facility.
+		boolean reinitializeResultsStoreHouse = reinitializeResultsStoreHouse(op);
+		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse(reinitializeResultsStoreHouse);
+
+		// Invoke the method.
+		invokeMethod();
+		
 		// Save results in the request, to access them from jsps.
 		this.requestStoreHouse.storeResultsStoreHouse();
 
@@ -138,15 +143,6 @@ public abstract class AbstractManager implements InterfaceManager {
 			} catch (InvocationTargetException e) {
 				actionWhenExceptionInTargetMethodInvocationEnvelope(e, method.getName(), this.getClass().getName());
 			}
-		}
-	}
-
-	private void invokeDefaultMethod() {
-		try {
-			LogAbstractManager.info("Invoke byDefaultMethod ");
-			byDefaultMethod();
-		} catch (Exception e) {
-			actionWhenExceptionInTargetMethodInvocationEnvelope(e, "byDefaultMethod", this.getClass().getName());
 		}
 	}
 

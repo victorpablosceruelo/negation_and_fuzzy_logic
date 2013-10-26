@@ -6,7 +6,6 @@
 <% } %>
 <%
 	String localUserInfoName = JspsUtils.getLocalUserInfoName(request);
-	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <script type="text/javascript">	

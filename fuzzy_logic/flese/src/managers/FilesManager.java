@@ -20,9 +20,12 @@ public class FilesManager extends AbstractManager {
 	public FilesManager() {
 	}
 
-	@Override
-	public void byDefaultMethod() throws Exception {
-		list();
+	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
+		return "list";
+	}
+	
+	public boolean reinitializeResultsStoreHouse(String op) {
+		return true;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
