@@ -6,16 +6,6 @@
 	<jsp:include page='../commonHtmlBody.jsp' />
 <% } %>
 
-<%
-	String msgs = JspsUtils.getExceptionMsgInJS(request);
-%>
-
-<script type="text/javascript">
-	<% if ((msgs != null) && (msgs.length() > 0)) { %>
-		showMsgs(new Array(<%= msgs %>));
-	<% } %>
-</script>
-
 <h3>
 	To access to FleSe you need an account in a Social Authentication Provider.
 	<br />

@@ -87,6 +87,7 @@ public class AuthManager extends AbstractManager {
 				}
 			}
 		}
+		resultsStoreHouse.addResultMessage(KConstants.AppMsgs.errorTryingToAuthenticateUser);
 		signOut();
 	}
 
@@ -218,7 +219,7 @@ public class AuthManager extends AbstractManager {
 			// response.encodeRedirectURL( athenticationUrl );
 		}
 		
-		resultsStoreHouse.addResultMessage("The provider choosen says you are not authenticated. Sorry.");
+		resultsStoreHouse.addResultMessage(KConstants.AppMsgs.errorTryingToAuthenticateUser);
 		signOut();
 
 	}

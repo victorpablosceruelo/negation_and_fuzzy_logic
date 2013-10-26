@@ -1,5 +1,8 @@
 package auxiliar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.brickred.socialauth.Profile;
 
 import storeHouse.RequestStoreHouse;
@@ -8,6 +11,7 @@ import storeHouse.SessionStoreHouse;
 
 public class LocalUserInfo {
 
+	final Log LOG = LogFactory.getLog(LocalUserInfo.class);
 	private String localUserName = null;
 
 	/**
@@ -44,7 +48,9 @@ public class LocalUserInfo {
 		// List<Contact> contactsList = provider.getContactList();
 
 		if (localUserName == null) {
-			throw new Exception("localUserName is null");
+			String msg = "Impossible to create object LocalUserInfo because Variable localUserName is null";
+			LOG.info(msg);
+			throw new Exception(msg);
 		}
 	}
 
@@ -62,7 +68,7 @@ public class LocalUserInfo {
 			try {
 				localUserInfo = new LocalUserInfo(requestStoreHouse);
 			} catch (Exception e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 				localUserInfo = null;
 			}
 			requestStoreHouse.getSession().setLocalUserInfo(localUserInfo);

@@ -176,6 +176,10 @@ public class KConstants {
 		public static final String fuzzificationSaveStatusDivId = "fuzzificationSaveStatus";
 		public static final String fuzzificationBarValueDivId = "fuzzificationBarValueDivId";
 	}
+	
+	public static class AppMsgs {
+		public static final String errorTryingToAuthenticateUser = "The social authentication provider choosen says you are not authenticated. Sorry.";
+	}
 }
 
 // **********************************
