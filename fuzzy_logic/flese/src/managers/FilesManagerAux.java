@@ -5,13 +5,13 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import storeHouse.CacheStoreHouseCleaner;
+import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.CastingsClass;
@@ -125,15 +125,18 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static String uploadFileAux(RequestStoreHouse requestStoreHouse) throws Exception {
-		if ((requestStoreHouse.getDoMethod() == null) || (! (KConstants.Application.doPostMethod.equals(requestStoreHouse.getDoMethod())))) {
-			throw new ServletException("Uploads are only allowed using http post method.");
+	public static String[] uploadFileAux(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, RequestStoreHouseException, FileUploadException, CacheStoreHouseException, LocalUserInfoException {
+		ArrayList<String> ret = new ArrayList<String>();
+		String doMethod = requestStoreHouse.getDoMethod();
+
+		if ((doMethod == null) || (!(KConstants.Application.doPostMethod.equals(doMethod)))) {
+			return uploadFileAuxReturn(ret, "Uploads are only allowed using http post method.");
 		}
 
 		// Check that we have a file upload request
 		boolean isMultipart = requestStoreHouse.requestIsMultipartContent();
 		if (!isMultipart) {
-			throw new Exception("We cannot upload because the content of the request is not multipart.");
+			return uploadFileAuxReturn(ret, "We cannot upload because the content of the request is not multipart.");
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -154,13 +157,11 @@ public class FilesManagerAux {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		String fileOwner = localUserInfo.getLocalUserName();
 		if ((fileOwner == null) || ("".equals(fileOwner))) {
-			throw new Exception("ERROR: fileOwner cannot be null nor empty string.");
+			return uploadFileAuxReturn(ret, "ERROR: fileOwner cannot be null nor empty string.");
 		}
 
 		// Parse the request to get file items.
 		List<FileItem> fileItems = CastingsClass.castList(FileItem.class, upload.parseRequest(requestStoreHouse.getRequest()));
-
-		StringBuilder fileNames = new StringBuilder();
 
 		for (int i = 0; i < fileItems.size(); i++) {
 			// FileItem fileItem = (FileItem)i.next();
@@ -170,43 +171,73 @@ public class FilesManagerAux {
 				// String fieldName = fi.getFieldName();
 				String fileName = fileItem.getName();
 				if (fileName == null) {
-					throw new Exception("The name of the program file to upload is null.");
-				}
-				if ("".equals(fileName)) {
-					throw new Exception("The name of the program file to upload is an empty string.");
-				}
-				if (!fileName.endsWith(".pl")) {
-					throw new Exception("The name of the program file to upload must have the .pl extension.");
-				}
+					ret.add("The name of the program file to upload is null.");
+				} else {
+					if ("".equals(fileName)) {
+						ret.add("The name of the program file to upload is an empty string.");
+					} else {
+						if (!fileName.endsWith(".pl")) {
+							ret.add("The name of the program file to upload must have the .pl extension.");
+						} else {
 
-				while (fileName.lastIndexOf("\\") >= 0) {
-					fileName = fileName.substring(fileName.lastIndexOf("\\"));
+							while (fileName.lastIndexOf("\\") >= 0) {
+								fileName = fileName.substring(fileName.lastIndexOf("\\"));
+							}
+							while (fileName.lastIndexOf("/") >= 0) {
+								fileName = fileName.substring(fileName.lastIndexOf("/"));
+							}
+
+							// String fileNameReal = "";
+							// String contentType = fi.getContentType();
+							// boolean isInMemory = fi.isInMemory();
+							// long sizeInBytes = fi.getSize();
+							// Write the file
+
+							ProgramFileInfo programFileInfo = new ProgramFileInfo(fileOwner, fileName);
+							if (programFileInfo.existsFile(false)) {
+								ret.add("You cannot upload two files with the same name. Use a different name for the new one.");
+							} else {
+								File file = programFileInfo.createFile(false);
+
+								boolean writeWasOk = false;
+								try {
+									fileItem.write(file);
+									writeWasOk = true;
+								} catch (Exception e) {
+									e.printStackTrace();
+									ret.add(e.getMessage());
+									writeWasOk = false;
+								}
+
+								if (writeWasOk) {
+									CacheStoreHouseCleaner.clean(programFileInfo);
+									ret.add("Successfully uploaded file " + fileName);
+								}
+							}
+						}
+					}
 				}
-				while (fileName.lastIndexOf("/") >= 0) {
-					fileName = fileName.substring(fileName.lastIndexOf("/"));
-				}
-
-				// String fileNameReal = "";
-				// String contentType = fi.getContentType();
-				// boolean isInMemory = fi.isInMemory();
-				// long sizeInBytes = fi.getSize();
-				// Write the file
-
-				ProgramFileInfo programFileInfo = new ProgramFileInfo(fileOwner, fileName);
-				File file = programFileInfo.createFile(false);
-				
-				fileItem.write(file);
-
-				if (i > 0) {
-					fileNames.append(", ");
-				}
-				fileNames.append(fileName);
-
-				CacheStoreHouseCleaner.clean(programFileInfo);
-
 			}
 		}
-		return fileNames.toString();
+		return uploadFileAuxReturn(ret, null);
+	}
+
+	private static String[] uploadFileAuxReturn(ArrayList<String> accumulator, String newMsg) {
+		String[] result = null;
+		if (accumulator == null) {
+			if ((newMsg != null) && (!("".equals(newMsg)))) {
+				result = new String[1];
+				result[0] = newMsg;
+			} else {
+				result = new String[0];
+			}
+		} else {
+			if ((newMsg != null) && (!("".equals(newMsg)))) {
+				accumulator.add(newMsg);
+			}
+			result = accumulator.toArray(new String[accumulator.size()]);
+		}
+		return result;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,8 +246,4 @@ public class FilesManagerAux {
 
 }
 
-
-
-
-
-//// EOF
+// // EOF

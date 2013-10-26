@@ -80,7 +80,7 @@ public class FuzzificationsManager extends AbstractManager {
 			msg = "Program file " + programFileInfo.getFileName() + " owned by " + programFileInfo.getFileOwner() + " has been updated. ";
 		}
 
-		resultsStoreHouse.setResultMessage(msg);
+		resultsStoreHouse.addResultMessage(msg);
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, ""));
 

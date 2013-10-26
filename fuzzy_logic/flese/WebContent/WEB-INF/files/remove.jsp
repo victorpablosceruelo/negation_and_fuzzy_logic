@@ -5,7 +5,7 @@
 
 <%
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
-	String msgsArray = JspsUtils.getResultMessageInJS(request);
+	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>

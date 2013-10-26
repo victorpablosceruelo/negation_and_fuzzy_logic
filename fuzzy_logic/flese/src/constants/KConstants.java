@@ -11,6 +11,7 @@ public class KConstants {
 		public static final String doPostMethod = "doPost";
 		
 		public static final String BackupsFolder = "FleSeProgramsBackups";
+		public static final String AppBugsEmail = "vpablos@babel.ls.fi.upm.es";
 	}
 
 	public static final class Titles {

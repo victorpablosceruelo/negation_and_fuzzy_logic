@@ -98,6 +98,15 @@ function fileUploadCleanStatusDiv(uploadStatusDivId) {
 	uploadStatusDiv.innerHTML = "";
 }
 
+function fileUploadShowResults(divId, msgsArray) {
+	fileUploadCleanStatusDiv(divId);
+	var container = getContainer(divId);
+	for (var i=0; i<msgsArray.length; i++) {
+		container.innerHTML += "<BR />" + msgsArray[i];
+	}
+	debug.info("fileUploadShowResults: msgsArray");
+	debug.info(msgsArray);
+}
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/

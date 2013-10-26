@@ -3,9 +3,10 @@
 <%@page import="results.ResultsStoreHouse"%>
 
 <%
-	String msg = JspsUtils.getResultMessage(request);
+	String [] msgs = JspsUtils.getResultMessages(request);
+	for (int i=0; i<msgs.length; i++) {
+		out.println(msgs[i]);
+	}
 %>
-
-<%=msg %>
 
 <!-- END -->

@@ -50,14 +50,10 @@ public class FilesManager extends AbstractManager {
 	}
 
 	public void upload() throws Exception {
-		try {
-			FilesManagerAux.uploadFileAux(requestStoreHouse);
-		} catch (Exception e) {
-			e.printStackTrace();
-			resultsStoreHouse.setResultMessage(e.getMessage());
-			if ((e.getMessage() == null) || ("".equals(e.getMessage()))){
-				resultsStoreHouse.setResultMessage("An exception occurred during file upload.");
-			}
+
+		String [] msgs = FilesManagerAux.uploadFileAux(requestStoreHouse);
+		for (int i=0; i<msgs.length; i++) {
+			resultsStoreHouse.addResultMessage(msgs[i]);
 		}
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
 	}
@@ -105,11 +101,11 @@ public class FilesManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
-			resultsStoreHouse.setResultMessage("You do not own the program file. So, you cannot remove it.");
+			resultsStoreHouse.addResultMessage("You do not own the program file. So, you cannot remove it.");
 		} else {
 			String result = programFileInfo.remove();
 			if ((result != null) && (result.length() > 0)) {
-				resultsStoreHouse.setResultMessage(result);
+				resultsStoreHouse.addResultMessage(result);
 			}
 			CacheStoreHouseCleaner.clean(programFileInfo);
 		}
@@ -135,7 +131,7 @@ public class FilesManager extends AbstractManager {
 			}
 			resultsStoreHouse.setFileContents(fileContents);
 		} else {
-			resultsStoreHouse.setResultMessage("You are not allowed to see the contents of the file " + programFileInfo.getFileName());
+			resultsStoreHouse.addResultMessage("You are not allowed to see the contents of the file " + programFileInfo.getFileName());
 		}
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, ""));

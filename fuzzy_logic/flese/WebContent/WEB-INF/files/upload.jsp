@@ -6,33 +6,24 @@
 
 <%
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
-	String msgsArray = JspsUtils.getResultMessageInJS(request);
+	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <script type="text/javascript">
-<%
-	
-	if ((msgsArray != null) && (msgsArray.length() > 0)) { 
-		out.print("window.parent.fileUploadShowResults('");
-		out.print(KConstants.JspsDivsIds.uploadStatusDivId);
-		out.print("', " + msgsArray + ");");
+	// Update the files list.
+	if (typeof(loadAjaxIn) == "function") {
+		loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
 	}
-	else {
-%>
-		// Update the files list.
-		if (typeof(loadAjaxIn) == "function") {
-			loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
-		}
-		if (typeof(window.parent.loadAjaxIn) == "function") {
-			window.parent.loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
-		}
-		if (typeof(fileUploadCleanStatusDiv) == "function") {
-			fileUploadCleanStatusDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
-		}
-		if (typeof(window.parent.fileUploadCleanStatusDiv) == "function") {
-			window.parent.fileUploadCleanStatusDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
-		}
-<%	}  %>
+	if (typeof(window.parent.loadAjaxIn) == "function") {
+		window.parent.loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
+	}
+	// Clean the status div.
+	if (typeof(fileUploadShowResults) == "function") {
+		fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%= msgsArray %>);
+	}
+	if (typeof(window.parent.fileUploadShowResults) == "function") {
+		window.parent.fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%= msgsArray %>);
+	}
 </script>
 
 

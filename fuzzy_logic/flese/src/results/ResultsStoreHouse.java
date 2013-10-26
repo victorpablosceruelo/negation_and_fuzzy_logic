@@ -1,7 +1,9 @@
 package results;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import auxiliar.Dates;
 import programAnalysis.ProgramPartAnalysis;
 import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.ProgramIntrospection;
@@ -11,7 +13,7 @@ public class ResultsStoreHouse {
 
 	private HashMap<String, String[]> requestParams = null;
 	private String exceptionMsg = null;
-	private String resultMessage = "";
+	private ArrayList<String> resultMessages = null;
 	private ProgramFileInfo[] filesList = new ProgramFileInfo[0];
 	private String[] fileContents = null;
 	private ProgramFileInfo programFileInfo = null;
@@ -32,7 +34,7 @@ public class ResultsStoreHouse {
 	 */
 	public void setExceptionMsg(String exceptionMsg) {
 		if ((exceptionMsg != null) && (!"".equals(exceptionMsg))) {
-			this.exceptionMsg = exceptionMsg;
+			this.exceptionMsg = Dates.getCurrentDate() + " " + exceptionMsg;
 		}
 	}
 
@@ -44,15 +46,20 @@ public class ResultsStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void setResultMessage(String msg) {
-		resultMessage = msg;
+	public void addResultMessage(String msg) {
+		if (msg != null) {
+			if (resultMessages == null) {
+				resultMessages = new ArrayList<String>();
+			}
+			resultMessages.add(msg);
+		}
 	}
 
-	public String getResultMessage() {
-		if (resultMessage == null) {
-			return "";
+	public String [] getResultMessages() {
+		if (resultMessages == null) {
+			return new String[0];
 		}
-		return resultMessage;
+		return resultMessages.toArray(new String[resultMessages.size()]);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

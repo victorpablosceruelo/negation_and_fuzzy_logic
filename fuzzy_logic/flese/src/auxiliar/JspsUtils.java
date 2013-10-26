@@ -87,16 +87,15 @@ public class JspsUtils {
 		return getMessagesInJS(msgsAux);
 	}
 
-	public static String getResultMessage(HttpServletRequest request) {
+	public static String [] getResultMessages(HttpServletRequest request) {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String msg = resultsStoreHouse.getResultMessage();
-		return msg;
+		String [] msgs = resultsStoreHouse.getResultMessages();
+		return msgs;
 	}
 
-	public static String getResultMessageInJS(HttpServletRequest request) {
-		String msg = getResultMessage(request);
-		String[] msgsAux = { msg };
-		return getMessagesInJS(msgsAux);
+	public static String getResultMessagesInJS(HttpServletRequest request) {
+		String [] msgs = getResultMessages(request);
+		return getMessagesInJS(msgs);
 	}
 
 	public static String getMessagesInJS(ArrayList<String> msgs) {

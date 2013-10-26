@@ -73,7 +73,7 @@ public class AuthManager extends AbstractManager {
 
 		String providerId = requestStoreHouse.getProviderId();
 
-		resultsStoreHouse.setResultMessage("Welcome to the FleSe application !!");
+		resultsStoreHouse.addResultMessage("Welcome to the FleSe application !!");
 		setNextStep(new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SignIn, "&id=" + providerId));
 	}
 

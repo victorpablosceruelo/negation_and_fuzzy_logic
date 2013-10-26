@@ -44,11 +44,13 @@
 </script>
 <%
 	if (answers.length <= 0) {
-		String msg = JspsUtils.getResultMessage(request);
-		if ((msg == null) || (msg.length() <= 0)) {
+		String [] msgs = JspsUtils.getResultMessages(request);
+		if ((msgs == null) || (msgs.length <= 0)) {
 %>The query has no answers. <%
 		} else {
-			%>msg<%
+			for (int i=0; i<msgs.length; i++) {
+				out.print(msgs[i]);
+			}
 		}
 	}
 %>
