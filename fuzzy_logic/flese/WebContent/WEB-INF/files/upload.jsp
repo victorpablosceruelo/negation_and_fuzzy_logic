@@ -6,7 +6,6 @@
 
 <%
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
-	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <script type="text/javascript">
@@ -19,10 +18,10 @@
 	}
 	// Clean the status div.
 	if (typeof(fileUploadShowResults) == "function") {
-		fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%= msgsArray %>);
+		fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
 	}
 	if (typeof(window.parent.fileUploadShowResults) == "function") {
-		window.parent.fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%= msgsArray %>);
+		window.parent.fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
 	}
 </script>
 

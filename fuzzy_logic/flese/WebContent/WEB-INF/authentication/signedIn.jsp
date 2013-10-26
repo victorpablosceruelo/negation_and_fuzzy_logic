@@ -7,14 +7,11 @@
 
 <%
 	String localUserInfoName = JspsUtils.getLocalUserInfoName(request);
-	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <script type="text/javascript">
+	<%= JspsUtils.loadMessagesAjaxInItsDiv() %>
 	<% if (! "".equals(localUserInfoName)) { %>
 		loadAjaxIn('mainSecDiv', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");
 	<% } %>		
-	<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-		showMsgs(<%= msgsArray %>);
-	<% } %>
 </script>

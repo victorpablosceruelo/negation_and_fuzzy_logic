@@ -179,6 +179,11 @@ public class KConstants {
 	
 	public static class AppMsgs {
 		public static final String errorTryingToAuthenticateUser = "The social authentication provider choosen says you are not authenticated. Sorry.";
+		public static final String exception1 = "Ups! An exception occurred.";
+		public static final String exception2 = "You can press the key F5 and try again or send a bug report to ";
+		public static final String exception3 = " with the following info: ";
+		public static final String errorSessionNull1 = "Your session has expired. You need to sign in again.";
+		public static final String errorSessionNull2 = "To sign in again you can press the key F5 or sign out and sign in again.";
 	}
 }
 

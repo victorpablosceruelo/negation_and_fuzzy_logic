@@ -9,6 +9,7 @@ import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
 import storeHouse.SessionStoreHouse;
 import constants.KConstants;
+import constants.KUrls;
 
 public class JspsUtils {
 
@@ -22,6 +23,11 @@ public class JspsUtils {
 		}
 		return "";
 	}
+	
+	public static String loadMessagesAjaxInItsDiv() {
+		return "loadAjaxIn('" + KConstants.JspsDivsIds.msgsSecDivId + "', '" + KUrls.Auth.Msgs.getUrl(true) + "');";
+	}
+		
 
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
 		return RequestStoreHouse.getRequestStoreHouse(request);
@@ -65,7 +71,7 @@ public class JspsUtils {
 
 	public static ResultsStoreHouse getResultsStoreHouse(HttpServletRequest request) {
 		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
-		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse(false, true);
+		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse(false);
 		return resultsStoreHouse;
 	}
 
@@ -85,11 +91,6 @@ public class JspsUtils {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 		String[] msgs = resultsStoreHouse.getResultMessages();
 		return msgs;
-	}
-
-	public static String getResultMessagesInJS(HttpServletRequest request) {
-		String[] msgs = getResultMessages(request);
-		return getMessagesInJS(msgs);
 	}
 
 	public static String getMessagesInJS(ArrayList<String> msgs) {

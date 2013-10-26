@@ -203,7 +203,7 @@ public class RequestStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public ResultsStoreHouse getResultsStoreHouse(boolean reinitializeResultsStoreHouse, boolean restoreRequestParameters) {
+	public ResultsStoreHouse getResultsStoreHouse(boolean reinitializeResultsStoreHouse) {
 
 		if (reinitializeResultsStoreHouse) {
 			this.resultsStoreHouse = null;
@@ -214,12 +214,6 @@ public class RequestStoreHouse {
 
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
-		}
-
-		if (!reinitializeResultsStoreHouse) {
-			if (restoreRequestParameters) {
-				restoreRequestParameters();
-			}
 		}
 
 		return resultsStoreHouse;

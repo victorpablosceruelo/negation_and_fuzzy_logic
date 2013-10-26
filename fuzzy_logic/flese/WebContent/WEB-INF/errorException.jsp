@@ -10,8 +10,8 @@
 
 <%
 ArrayList<String> msgs = new ArrayList<String>();
-msgs.add("Ups! An exception occurred.");
-msgs.add("You can press the key F5 and try again or send a bug report to " + KConstants.Application.AppBugsEmail + " with the following info: ");
+msgs.add(KConstants.AppMsgs.exception1);
+msgs.add(KConstants.AppMsgs.exception2 + KConstants.Application.AppBugsEmail + KConstants.AppMsgs.exception3);
 msgs.add("");
 msgs.add(JspsUtils.getExceptionMsg(request));
 

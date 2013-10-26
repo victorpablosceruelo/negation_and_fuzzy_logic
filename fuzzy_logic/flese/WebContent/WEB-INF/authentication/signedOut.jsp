@@ -10,9 +10,7 @@
 %>
 
 <script type="text/javascript">	
-	<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-		showMsgs(<%= msgsArray %>);
-	<% } %>
+	<%= JspsUtils.loadMessagesAjaxInItsDiv() %>
 	<% if ("".equals(localUserInfoName)) { %>
 		loadAjaxIn('mainSecDiv', "<%=KUrls.Auth.Providers.getUrl(true)%>");
 	<% } %>	

@@ -74,7 +74,7 @@ public abstract class AbstractManager implements InterfaceManager {
 		UrlMap urlMap = getValidUrlMap();
 
 		// Get the results storage facility.
-		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse(true, false);
+		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse(true);
 
 		if (urlMap != null) {
 			op = urlMap.getOp(false);

@@ -1,3 +1,15 @@
+
+<%@page import="auxiliar.JspsUtils"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="constants.KConstants"%>
+
+<%
+ArrayList<String> msgs = new ArrayList<String>();
+msgs.add(KConstants.AppMsgs.errorSessionNull1);
+msgs.add(KConstants.AppMsgs.errorSessionNull2);
+String msgsArray = JspsUtils.getMessagesInJS(msgs);
+%>
+
 <script type="text/javascript">
 if (typeof(clearMainSection) == "function") {
 	clearMainSection();
@@ -12,9 +24,9 @@ if (typeof(window.parent.clearMsgsSection) == "function") {
 	window.parent.clearMsgsSection();
 }
 if (typeof(showMsgs) == "function") {
-	showMsgs(new Array("Your session has expired. You need to sign in again.", "To sign in again you can press the key F5 or sign out and sign in again."));
+	showMsgs(<%= msgsArray %>);
 }
 if (typeof(window.parent.showMsgs) == "function") {
-	window.parent.showMsgs(new Array("Your session has expired. You need to sign in again.", "To sign in again you can press the key F5 or sign out and sign in again."));
+	window.parent.showMsgs(<%= msgsArray %>);
 }
 </script>
