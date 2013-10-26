@@ -23,14 +23,8 @@ public class JspsUtils {
 		return "";
 	}
 
-	private static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
-		RequestStoreHouse requestStoreHouse = null;
-		try {
-			requestStoreHouse = getRequestStoreHouse(request);
-		} catch (Exception e) {
-			requestStoreHouse = null;
-		}
-		return requestStoreHouse;
+	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
+		return RequestStoreHouse.getRequestStoreHouse(request);
 	}
 
 	public static boolean isAjax(HttpServletRequest request) {
@@ -87,14 +81,14 @@ public class JspsUtils {
 		return getMessagesInJS(msgsAux);
 	}
 
-	public static String [] getResultMessages(HttpServletRequest request) {
+	public static String[] getResultMessages(HttpServletRequest request) {
 		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String [] msgs = resultsStoreHouse.getResultMessages();
+		String[] msgs = resultsStoreHouse.getResultMessages();
 		return msgs;
 	}
 
 	public static String getResultMessagesInJS(HttpServletRequest request) {
-		String [] msgs = getResultMessages(request);
+		String[] msgs = getResultMessages(request);
 		return getMessagesInJS(msgs);
 	}
 

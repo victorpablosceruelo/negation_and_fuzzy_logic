@@ -46,9 +46,18 @@ public class RequestStoreHouse {
 		}
 	}
 
-	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) throws RequestStoreHouseException,
-			RequestStoreHouseSessionException {
-		return new RequestStoreHouse(request, false, false, false, true);
+	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
+		RequestStoreHouse requestStoreHouse = null;
+		try {
+			requestStoreHouse = new RequestStoreHouse(request, false, false, false, true);
+		} catch (RequestStoreHouseException e) {
+			e.printStackTrace();
+			requestStoreHouse = null;
+		} catch (RequestStoreHouseSessionException e) {
+			e.printStackTrace();
+			requestStoreHouse = null;
+		}
+		return requestStoreHouse;
 	}
 
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,

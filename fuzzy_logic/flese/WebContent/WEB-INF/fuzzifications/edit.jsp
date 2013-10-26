@@ -11,7 +11,7 @@
 <%@page import="java.io.InputStreamReader"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);

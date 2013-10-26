@@ -5,7 +5,7 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <script type="text/javascript">
-<%RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
+<%RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String [] variablesNames = resultsStoreHouse.getCiaoPrologQueryVariablesNames();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();

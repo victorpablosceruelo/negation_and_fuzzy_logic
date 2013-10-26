@@ -10,7 +10,7 @@
 <%@page import="java.io.InputStreamReader"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo programFileInfo = resultsStoreHouse.getProgramFileInfo();
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();

@@ -8,7 +8,7 @@
 <%@page import="java.io.*"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 

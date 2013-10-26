@@ -12,7 +12,7 @@
 <%@page import="prologConnector.ProgramIntrospection"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
