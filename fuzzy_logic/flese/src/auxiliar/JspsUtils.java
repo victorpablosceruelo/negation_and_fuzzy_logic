@@ -23,20 +23,6 @@ public class JspsUtils {
 		return "";
 	}
 
-	public static String loadMessagesInDiv(HttpServletRequest request, String divId) {
-		String[] msgs = getResultMessages(request);
-		String msgJS = getMessagesInJS(msgs);
-
-		StringBuilder result = new StringBuilder();
-		result.append("showMsgsArrayInDiv('");
-		result.append(divId);
-		result.append("', ");
-		result.append(msgJS);
-		result.append(");");
-
-		return result.toString();
-	}
-
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
 		return RequestStoreHouse.getRequestStoreHouse(request);
 	}
