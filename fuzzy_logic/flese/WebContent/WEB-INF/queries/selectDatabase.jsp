@@ -14,21 +14,21 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
 	ProgramFileInfo programFileInfo = programIntrospection.getProgramFileInfo();
 	
 	String url1 = KUrls.Queries.SelectQuery.getUrl(true) + programFileInfo.getInfoForUrls() + 
-			"&" + KConstants.Request.databaseParam + "=";
+	"&" + KConstants.Request.databaseParam + "=";
 	String url2 = KUrls.Queries.Evaluate.getUrl(true) + programFileInfo.getInfoForUrls();
 	
 	
 	String urlListFuzzifications = KUrls.Fuzzifications.List.getUrl(true);
 	String fuzzificationParams = "&" + KConstants.Request.fileOwnerParam + "=" + programFileInfo.getFileOwner() +
-			"&" + KConstants.Request.fileNameParam + "=" + programFileInfo.getFileName() + 
-			"&" + KConstants.Request.mode + "=" + KConstants.Request.modeBasic;
+	"&" + KConstants.Request.fileNameParam + "=" + programFileInfo.getFileName() + 
+	"&" + KConstants.Request.mode + "=" + KConstants.Request.modeBasic;
 %>
 
 

@@ -3,7 +3,6 @@ package prologConnector;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
-import auxiliar.LocalUserInfoException;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
@@ -12,9 +11,8 @@ public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 	public boolean isOfType(String type) {
 		return CiaoPrologQueryAbstract.Constants.TestingQuery.equals(type);
 	}
-	
-	private CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException,
-			LocalUserInfoException {
+
+	private CiaoPrologTestingQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(programFileInfo);
 
 		String testFileName = "restaurant.pl";
@@ -58,8 +56,8 @@ public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
 	}
 
-	public static CiaoPrologTestingQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException,
-			LocalUserInfoException {
+	public static CiaoPrologTestingQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException,
+			FilesAndPathsException {
 		return new CiaoPrologTestingQuery(programFileInfo);
 	}
 }

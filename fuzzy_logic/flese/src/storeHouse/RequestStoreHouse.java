@@ -12,7 +12,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import results.ResultsStoreHouse;
-import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
@@ -29,16 +28,7 @@ public class RequestStoreHouse {
 
 	private HashMap<String, String[]> requestParams = null;
 
-	public RequestStoreHouse(HttpServletRequest request) throws RequestStoreHouseException, RequestStoreHouseSessionException {
-		RequestStoreHouseConstructor(request, false, false, false, true);
-	}
-
-	public RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
-			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
-		RequestStoreHouseConstructor(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull, false);
-	}
-
-	public void RequestStoreHouseConstructor(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
+	private RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
 			boolean exceptionIfLocalUserInfoIsNull, boolean restoreRequestParams) throws RequestStoreHouseException,
 			RequestStoreHouseSessionException {
 
@@ -56,6 +46,16 @@ public class RequestStoreHouse {
 		}
 	}
 
+	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) throws RequestStoreHouseException,
+			RequestStoreHouseSessionException {
+		return new RequestStoreHouse(request, false, false, false, true);
+	}
+
+	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
+			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
+		return new RequestStoreHouse(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull, false);
+	}
+
 	public HttpServletRequest getRequest() {
 		return request;
 	}
@@ -66,15 +66,11 @@ public class RequestStoreHouse {
 		this.response = response;
 	}
 
-	public HttpServletResponse getResponse() throws RequestStoreHouseException {
-		if (this.response == null)
-			throw new RequestStoreHouseException("response is null");
+	public HttpServletResponse getResponse() {
 		return this.response;
 	}
 
-	public SessionStoreHouse getSession() throws RequestStoreHouseException {
-		if (this.session == null)
-			throw new RequestStoreHouseException("session is null");
+	public SessionStoreHouse getSession() {
 		return this.session;
 	}
 
@@ -85,9 +81,7 @@ public class RequestStoreHouse {
 		this.servletContext = servletContext;
 	}
 
-	public ServletContext getServletContext() throws RequestStoreHouseException {
-		if (this.servletContext == null)
-			throw new RequestStoreHouseException("servletContext is null");
+	public ServletContext getServletContext() {
 		return servletContext;
 	}
 
@@ -100,13 +94,8 @@ public class RequestStoreHouse {
 		this.doMethod = doMethod;
 	}
 
-	public String getDoMethod() throws RequestStoreHouseException {
-		if (this.doMethod == null)
-			throw new RequestStoreHouseException("doMethod is null");
-		if ((!"doGet".equals(this.doMethod)) && (!"doPost".equals(this.doMethod)))
-			throw new RequestStoreHouseException("doMethod is not doGet nor doPost.");
-
-		return this.doMethod;
+	public String getDoMethod() {
+		return this.doMethod != null ? this.doMethod : "";
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +170,7 @@ public class RequestStoreHouse {
 		return this.request.getServerName();
 	}
 
-	public String getProviderId() throws RequestStoreHouseException {
+	public String getProviderId() {
 		String providerId = "";
 		if (session != null)
 			providerId = session.getProviderId();
@@ -191,14 +180,10 @@ public class RequestStoreHouse {
 			if (session != null)
 				session.setProviderId(providerId);
 		}
-
-		if ((providerId == null) || ("".equals(providerId)))
-			throw new RequestStoreHouseException("providerId is null in session and in request.");
-
 		return providerId;
 	}
 
-	public ProgramFileInfo getProgramFileInfo() throws FilesAndPathsException, LocalUserInfoException {
+	public ProgramFileInfo getProgramFileInfo() throws FilesAndPathsException {
 		String fileName = getRequestParameter(KConstants.Request.fileNameParam);
 		String fileOwner = getRequestParameter(KConstants.Request.fileOwnerParam);
 
@@ -222,7 +207,7 @@ public class RequestStoreHouse {
 			this.resultsStoreHouse = new ResultsStoreHouse();
 		}
 
-		if (! reinitializeResultsStoreHouse) {
+		if (!reinitializeResultsStoreHouse) {
 			if (restoreRequestParameters) {
 				restoreRequestParameters();
 			}

@@ -11,7 +11,7 @@
 <%@page import="java.io.InputStreamReader"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
@@ -21,11 +21,11 @@
 	String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
 	
 	String saveUrl = KUrls.Fuzzifications.Save.getUrl(true) + 
-			"&" + KConstants.Request.fileNameParam + "=" + fileName + 
-			"&" + KConstants.Request.fileOwnerParam + "=" + fileOwner +
-			"&" + KConstants.Request.mode + "=" + mode +
-			"&" + KConstants.Fuzzifications.predDefined + "=" + predDefined +
-			"&" + KConstants.Fuzzifications.predNecessary + "=" + predNecessary;
+	"&" + KConstants.Request.fileNameParam + "=" + fileName + 
+	"&" + KConstants.Request.fileOwnerParam + "=" + fileOwner +
+	"&" + KConstants.Request.mode + "=" + mode +
+	"&" + KConstants.Fuzzifications.predDefined + "=" + predDefined +
+	"&" + KConstants.Fuzzifications.predNecessary + "=" + predNecessary;
 	JspsUtils.getValue(saveUrl);
 	
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
@@ -34,18 +34,18 @@
 
 	if ((fuzzifications.length == 1)) {
 		if (fuzzifications[0].length == 1) {
-			defaultFuzzification = fuzzifications[0][0];
-			myFuzzification = fuzzifications[0][0];			
+	defaultFuzzification = fuzzifications[0][0];
+	myFuzzification = fuzzifications[0][0];			
 		}
 		if (fuzzifications[0].length == 2) {
-			if (fuzzifications[0][0].getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION)) {
-				defaultFuzzification = fuzzifications[0][0];
-				myFuzzification = fuzzifications[0][1];
-			}
-			else {
-				defaultFuzzification = fuzzifications[0][1];
-				myFuzzification = fuzzifications[0][0];			
-			}
+	if (fuzzifications[0][0].getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION)) {
+		defaultFuzzification = fuzzifications[0][0];
+		myFuzzification = fuzzifications[0][1];
+	}
+	else {
+		defaultFuzzification = fuzzifications[0][1];
+		myFuzzification = fuzzifications[0][0];			
+	}
 		}
 	}
 	
@@ -58,13 +58,13 @@
 		FunctionPoint myFuzzPoint = null;
 		int j=0;
 		while ((j<myFuzzPoints.length) && (myFuzzPoint == null)) {
-			if (defFuzzPoint.getCoordinate1().equals(myFuzzPoints[j].getCoordinate1())) {
-				myFuzzPoint = myFuzzPoints[j];
-			}
-			else j++;
+	if (defFuzzPoint.getCoordinate1().equals(myFuzzPoints[j].getCoordinate1())) {
+		myFuzzPoint = myFuzzPoints[j];
+	}
+	else j++;
 		}
 		if ((myFuzzPoint == null) || (mode.equals(KConstants.Request.modeAdvanced))) {
-			myFuzzPoint = defFuzzPoint;
+	myFuzzPoint = defFuzzPoint;
 		}
 		String fpx = defFuzzPoint.getCoordinate1();
 		String fpy = myFuzzPoint.getCoordinate2();
@@ -75,7 +75,6 @@
 		points[i][1] = fpy;
 		points[i][2] = fpd;
 	}
-	
 %>
 
 <div class='personalizationDivFuzzificationFunctionTable'>

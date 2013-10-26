@@ -16,7 +16,6 @@ import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.CastingsClass;
 import auxiliar.LocalUserInfo;
-import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsMgmt;
@@ -32,18 +31,17 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static ProgramFileInfo[] listMyFiles(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,
+	public static ProgramFileInfo[] listMyFiles(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException,
 			RequestStoreHouseException {
 		return listAux(requestStoreHouse, true);
 	}
 
-	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, LocalUserInfoException,
-			RequestStoreHouseException {
+	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, RequestStoreHouseException {
 		return listAux(requestStoreHouse, false);
 	}
 
 	public static ProgramFileInfo[] listAux(RequestStoreHouse requestStoreHouse, boolean onlyMine) throws FilesAndPathsException,
-			LocalUserInfoException, RequestStoreHouseException {
+			RequestStoreHouseException {
 
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
@@ -92,7 +90,7 @@ public class FilesManagerAux {
 	 * @throws LocalUserInfoException
 	 */
 	private static ArrayList<ProgramFileInfo> listProgramFilesInSubDir(String subDir, PathsMgmt pathsMgmt,
-			ArrayList<ProgramFileInfo> currentList) throws FilesAndPathsException, LocalUserInfoException {
+			ArrayList<ProgramFileInfo> currentList) throws FilesAndPathsException {
 
 		if ((subDir == null) || ("".equals(subDir)) || (KConstants.Application.BackupsFolder.equals(subDir))) {
 			return currentList;
@@ -125,7 +123,8 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static String[] uploadFileAux(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, RequestStoreHouseException, FileUploadException, CacheStoreHouseException, LocalUserInfoException {
+	public static String[] uploadFileAux(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, RequestStoreHouseException,
+			FileUploadException, CacheStoreHouseException {
 		ArrayList<String> ret = new ArrayList<String>();
 		String doMethod = requestStoreHouse.getDoMethod();
 

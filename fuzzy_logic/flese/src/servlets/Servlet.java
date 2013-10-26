@@ -95,7 +95,7 @@ public class Servlet extends HttpServlet {
 		RequestStoreHouse requestStoreHouse;
 		try {
 			try {
-				requestStoreHouse = new RequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull,
+				requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull,
 						exceptionIfLocalUserInfoIsNull);
 			} catch (RequestStoreHouseSessionException e) {
 				LOG.error("Exception creating object requestStoreHouse.");

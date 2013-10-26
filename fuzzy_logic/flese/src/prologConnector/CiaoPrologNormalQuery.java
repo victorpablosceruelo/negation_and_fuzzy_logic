@@ -4,7 +4,6 @@ import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
-import auxiliar.LocalUserInfoException;
 import conversors.ConversorToPrologQuery;
 import conversors.QueryConversorException;
 import filesAndPaths.FilesAndPathsException;
@@ -22,7 +21,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 
 	public static CiaoPrologNormalQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException,
 			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException, FilesAndPathsException,
-			QueryConversorException, LocalUserInfoException, RequestStoreHouseException {
+			QueryConversorException, RequestStoreHouseException {
 
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
 		String key1 = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();

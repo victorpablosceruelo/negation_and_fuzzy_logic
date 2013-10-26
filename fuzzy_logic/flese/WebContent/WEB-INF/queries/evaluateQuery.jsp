@@ -5,8 +5,7 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <script type="text/javascript">
-<% 
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+<%RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String [] variablesNames = resultsStoreHouse.getCiaoPrologQueryVariablesNames();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();
@@ -38,9 +37,7 @@
 			}
 			out.print(" ]); ");
 		}
-	}
-	
-%>
+	}%>
 </script>
 <%
 	if (answers.length <= 0) {

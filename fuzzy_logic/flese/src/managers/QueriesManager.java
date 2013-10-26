@@ -7,7 +7,6 @@ import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.CiaoPrologTestingQuery;
 import prologConnector.ProgramIntrospection;
 import storeHouse.RequestStoreHouseException;
-import auxiliar.LocalUserInfoException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
@@ -30,7 +29,7 @@ public class QueriesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void selectProgramFile() throws FilesAndPathsException, LocalUserInfoException, RequestStoreHouseException {
+	public void selectProgramFile() throws FilesAndPathsException, RequestStoreHouseException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
 
@@ -53,7 +52,7 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryPage, ""));
 	}
-	
+
 	public void selectQueryAddLine() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
@@ -61,7 +60,7 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddLinePage, ""));
 	}
-	
+
 	public void selectQueryAddAggr() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
@@ -69,7 +68,7 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddAggrPage, ""));
 	}
-	
+
 	public void selectNegation() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
@@ -77,7 +76,7 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectNegationPage, ""));
 	}
-	
+
 	public void selectQuantifier() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
@@ -85,7 +84,7 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQuantifierPage, ""));
 	}
-	
+
 	public void selectOperator() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
@@ -93,7 +92,7 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectOperatorPage, ""));
 	}
-	
+
 	public void selectValue() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
@@ -104,7 +103,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void evaluate() throws Exception {
 		CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
-		String [] queryVariablesNames = new String[0];
+		String[] queryVariablesNames = new String[0];
 		try {
 			CiaoPrologNormalQuery query = CiaoPrologNormalQuery.getInstance(requestStoreHouse);
 			queryAnswers = query.getQueryAnswers();
@@ -131,6 +130,5 @@ public class QueriesManager extends AbstractManager {
 		resultsStoreHouse.setCiaoPrologQueryAnswers(queryAnswers);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.EvaluatePage, ""));
 	}
-
 
 }

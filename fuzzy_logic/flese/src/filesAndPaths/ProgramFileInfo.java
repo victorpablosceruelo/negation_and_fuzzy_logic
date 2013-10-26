@@ -17,7 +17,6 @@ import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
-import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 
 public class ProgramFileInfo {
@@ -30,7 +29,7 @@ public class ProgramFileInfo {
 	private String folderFullPath = null;
 	private String fileFullPath = null;
 
-	public ProgramFileInfo(String fileOwner, String fileName) throws FilesAndPathsException, LocalUserInfoException {
+	public ProgramFileInfo(String fileOwner, String fileName) throws FilesAndPathsException {
 
 		if (fileOwner == null) {
 			throw new FilesAndPathsException("FileInfoClass constructor: fileOwner can not be null.");
@@ -46,7 +45,7 @@ public class ProgramFileInfo {
 			throw new FilesAndPathsException("FileInfoClass constructor: fileName can not be empty string.");
 		}
 
-		LocalUserInfo.checkUserNameIsValid(fileOwner);
+		LocalUserInfo.nullOnlyIfUserNameIsValid(fileOwner);
 
 		this.fileName = fileName;
 		this.fileOwner = fileOwner;
@@ -112,18 +111,17 @@ public class ProgramFileInfo {
 				throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " already exists.");
 			}
 		}
-		
+
 		PathsMgmt pathsMgmt = new PathsMgmt();
 		pathsMgmt.createFolder(getProgramFileFolderFullPath(), false);
-		
+
 		File file = new File(getProgramFileFullPath());
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
 			if ((e.getMessage() != null) && (!"".equals(e.getMessage()))) {
 				throw new FilesAndPathsException(e.getMessage());
-			}
-			else {
+			} else {
 				throw new FilesAndPathsException("Error when trying to create the new file.");
 			}
 		}

@@ -4,6 +4,7 @@ import org.brickred.socialauth.Profile;
 
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
+import storeHouse.SessionStoreHouse;
 
 public class LocalUserInfo {
 
@@ -22,7 +23,7 @@ public class LocalUserInfo {
 	 *             if request is null, response is null, session is null or
 	 *             localUserName can not be set.
 	 */
-	private LocalUserInfo(RequestStoreHouse requestStoreHouse) throws LocalUserInfoException, RequestStoreHouseException {
+	private LocalUserInfo(RequestStoreHouse requestStoreHouse) throws Exception {
 
 		Profile profile = requestStoreHouse.getSession().getUserProfile();
 		if (profile == null) {
@@ -42,19 +43,32 @@ public class LocalUserInfo {
 		// OR also obtain list of contacts
 		// List<Contact> contactsList = provider.getContactList();
 
-		if (localUserName == null)
-			throw new LocalUserInfoException("localUserName is null");
-
+		if (localUserName == null) {
+			throw new Exception("localUserName is null");
+		}
 	}
-	
-	public static LocalUserInfo getLocalUserInfo(RequestStoreHouse requestStoreHouse) throws RequestStoreHouseException, LocalUserInfoException {
-		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+
+	public static LocalUserInfo getLocalUserInfo(RequestStoreHouse requestStoreHouse) {
+		LocalUserInfo localUserInfo = null;
+		SessionStoreHouse sessionStoreHouse = null;
+		if (requestStoreHouse != null) {
+			sessionStoreHouse = requestStoreHouse.getSession();
+			if (sessionStoreHouse != null) {
+				localUserInfo = sessionStoreHouse.getLocalUserInfo();
+			}
+		}
+
 		if (localUserInfo == null) {
-			localUserInfo = new LocalUserInfo(requestStoreHouse);
+			try {
+				localUserInfo = new LocalUserInfo(requestStoreHouse);
+			} catch (Exception e) {
+				e.printStackTrace();
+				localUserInfo = null;
+			}
 			requestStoreHouse.getSession().setLocalUserInfo(localUserInfo);
 		}
 		return localUserInfo;
-		
+
 	}
 
 	public String getLocalUserName() {
@@ -74,8 +88,7 @@ public class LocalUserInfo {
 	 * @throws LocalUserInfoException
 	 * 
 	 */
-	private void ifNullThenSetUserNameFrom(String beforeAt, String afterAt, String msgForBeforeAt, String msgForAfterAt)
-			throws LocalUserInfoException {
+	private void ifNullThenSetUserNameFrom(String beforeAt, String afterAt, String msgForBeforeAt, String msgForAfterAt) {
 		if (localUserName == null) {
 			if ((beforeAt != null) && (afterAt != null)) {
 				if (beforeAt.contains(afterAt)) {
@@ -94,13 +107,10 @@ public class LocalUserInfo {
 	 * 
 	 * @param localUserName
 	 *            is the name of the user.
-	 * @return the fixed localUserName.
-	 * @throws Exception
-	 * @exception LocalUserNameFixesClassException
-	 *                if localUserName is empty, null or can not be fixed.
+	 * @return the fixed localUserName or null if we cannot fix it.
 	 * 
 	 */
-	private String fixLocalUserName(String newLocalUserName) throws LocalUserInfoException {
+	private String fixLocalUserName(String newLocalUserName) {
 		// String msg = "fixLocalUserName: ";
 		if ((newLocalUserName != null) && (!"".equals(newLocalUserName))) {
 			// msg += newLocalUserName + " -> ";
@@ -112,10 +122,10 @@ public class LocalUserInfo {
 			// msg += newLocalUserName + " ";
 			// LOG.info(msg);
 		}
-		if ("".equals(newLocalUserName))
+
+		if (null != nullOnlyIfUserNameIsValid(newLocalUserName)) {
 			newLocalUserName = null;
-		if (!checkUserNameIsValid(newLocalUserName))
-			newLocalUserName = null;
+		}
 		return newLocalUserName;
 	}
 
@@ -124,25 +134,30 @@ public class LocalUserInfo {
 	 * 
 	 * @param localUserName
 	 *            is the name of the user that we are checking.
-	 * @exception LocalUserNameFixesClassException
-	 *                if localUserName is empty, null or invalid.
+	 * @return null if the localUserName parameter serves as a valid user name.
 	 */
-	public static boolean checkUserNameIsValid(String userName) throws LocalUserInfoException {
+	public static String nullOnlyIfUserNameIsValid(String userName) {
 
-		if (userName == null)
-			throw new LocalUserInfoException("userName is null");
-		if ("".equals(userName))
-			throw new LocalUserInfoException("userName is empty");
-		if (userName.contains("\\s"))
-			throw new LocalUserInfoException("userName contains \\s");
-		if (userName.contains("\\@"))
-			throw new LocalUserInfoException("userName contains \\@");
-		if (userName.contains("\\."))
-			throw new LocalUserInfoException("userName contains \\.");
-		if (userName.contains("/"))
-			throw new LocalUserInfoException("userName contains /.");
+		if (userName == null) {
+			return "userName is null";
+		}
+		if ("".equals(userName)) {
+			return "userName is empty";
+		}
+		if (userName.contains("\\s")) {
+			return "userName contains \\s";
+		}
+		if (userName.contains("\\@")) {
+			return "userName contains \\@";
+		}
+		if (userName.contains("\\.")) {
+			return "userName contains \\.";
+		}
+		if (userName.contains("/")) {
+			return "userName contains /.";
+		}
 
-		return true;
+		return null;
 	}
 }
 

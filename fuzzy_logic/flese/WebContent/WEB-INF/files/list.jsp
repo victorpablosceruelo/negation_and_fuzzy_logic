@@ -8,7 +8,7 @@
 <%@page import="java.io.*"%>
 
 <%
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 
@@ -17,7 +17,7 @@
 	String urlReloadPage = KUrls.User.Options.getUrl(true);
 	String urlFileRemoval = KUrls.Files.Remove.getUrl(true);
 	
-	if (filesList.length > 0) { 
+	if (filesList.length > 0) {
 %>
 	<div class='filesListTableRow'>
 		<div class='filesListTableCell'>Program File Name</div>

@@ -11,8 +11,7 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <%
-	
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String linesCounter = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 	// int lineIndex = Conversors.toInt(lineIndexString);

@@ -26,7 +26,7 @@ public class JspsUtils {
 	private static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
 		RequestStoreHouse requestStoreHouse = null;
 		try {
-			requestStoreHouse = new RequestStoreHouse(request);
+			requestStoreHouse = getRequestStoreHouse(request);
 		} catch (Exception e) {
 			requestStoreHouse = null;
 		}

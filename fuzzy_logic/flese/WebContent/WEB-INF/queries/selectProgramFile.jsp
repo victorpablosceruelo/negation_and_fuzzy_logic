@@ -9,8 +9,7 @@
 
 <div id="selectDatabaseContainerDiv" class="selectDatabaseTable">
 <%
-	
-	RequestStoreHouse requestStoreHouse = new RequestStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 

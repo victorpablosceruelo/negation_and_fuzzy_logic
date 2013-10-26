@@ -21,7 +21,6 @@ import CiaoJava.PLInteger;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
-import auxiliar.LocalUserInfoException;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 
@@ -69,7 +68,7 @@ public class ConversorToPrologQuery {
 
 	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
 			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException, FilesAndPathsException,
-			LocalUserInfoException, RequestStoreHouseException {
+			RequestStoreHouseException {
 
 		this.requestStoreHouse = sessionStoreHouse;
 		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
@@ -86,7 +85,7 @@ public class ConversorToPrologQuery {
 
 		PrologSubQuery prologSubQuery = new PrologSubQuery();
 		ConversionInput input = prologSubQuery.input;
-		input.lineIndex = 0; 
+		input.lineIndex = 0;
 		input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 		input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
 		testConversionInput(prologSubQuery);
@@ -99,7 +98,7 @@ public class ConversorToPrologQuery {
 			input.lineIndex = i + 1;
 			input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
 			input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
-			
+
 			input.quantifier0 = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.negationParam);
 			input.quantifier1 = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.quantifierParam);
 			input.predicate = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.predicateParam);
@@ -119,24 +118,26 @@ public class ConversorToPrologQuery {
 	public void testConversionInput(PrologSubQuery prologSubQuery) throws QueryConversorException, RequestStoreHouseException,
 			CiaoPrologConnectorException {
 		ConversionInput input = prologSubQuery.input;
-		if ("".equals(input.database)) throw new QueryConversorException("You must say what you are looking for.");
-		
+		if ("".equals(input.database))
+			throw new QueryConversorException("You must say what you are looking for.");
+
 		String msg = "";
 		msg += ("\n  fp: " + input.quantifier0 + "(" + input.quantifier1 + "(" + input.predicate + "))");
 		msg += ("\n  cp: " + input.predicate + " " + input.operator + " " + input.value);
 		msg += ("\n  aggregator: " + input.aggregator);
 		msg += ("\n  database: " + input.database);
 		LOG.info(msg);
-		
+
 		if (0 == input.lineIndex) {
 			subQueryInitialEndTestAndSave(prologSubQuery);
-		}
-		else {
-			if ("".equals(input.predicate)) throw new QueryConversorException("You must refine your search.");
+		} else {
+			if ("".equals(input.predicate))
+				throw new QueryConversorException("You must refine your search.");
 			if (1 < input.lineIndex) {
-				if ("".equals(input.aggregator)) throw new QueryConversorException("You must choose an aggregator.");
+				if ("".equals(input.aggregator))
+					throw new QueryConversorException("You must choose an aggregator.");
 			}
-		
+
 			if (((!"".equals(input.operator)) || (!"".equals(input.value)))
 					&& ((!"".equals(input.quantifier0)) || (!"".equals(input.quantifier1)))) {
 				throw new QueryConversorException("We cannot process a so complex query.");
@@ -251,8 +252,8 @@ public class ConversorToPrologQuery {
 		 */
 
 		prologSubQuery.subQuery = new PLStructure("rfuzzy_compute", new PLTerm[] { operator, origin, value, database, resultVar });
-		prologSubQuery.SubQuerySimpleInfoString = " " + input.predicate + "(" + input.database + ")" + " "
-				+ input.operator + " " + input.value;
+		prologSubQuery.SubQuerySimpleInfoString = " " + input.predicate + "(" + input.database + ")" + " " + input.operator + " "
+				+ input.value;
 		CiaoPrologTermInJava tmpQuery = new CiaoPrologTermInJava(prologSubQuery.subQuery, null);
 		prologSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
 		prologSubQuery.resultVariable = resultVar;
@@ -275,7 +276,7 @@ public class ConversorToPrologQuery {
 		PLStructure subGoal2 = null;
 		PLStructure subGoal3 = null;
 
-		if (! "".equals(input.quantifier1)) {
+		if (!"".equals(input.quantifier1)) {
 			tmpVar2 = new PLVariable();
 			subGoal2 = new PLStructure(input.quantifier1, new PLTerm[] { subGoal1, tmpVar2 });
 		} else {
@@ -283,7 +284,7 @@ public class ConversorToPrologQuery {
 			tmpVar2 = tmpVar1;
 		}
 
-		if (! "".equals(input.quantifier0)) {
+		if (!"".equals(input.quantifier0)) {
 			tmpVar3 = new PLVariable();
 			subGoal3 = new PLStructure(input.quantifier0, new PLTerm[] { subGoal2, tmpVar3 });
 		} else {
