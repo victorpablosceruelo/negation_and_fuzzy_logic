@@ -65,8 +65,7 @@ public class AuthManager extends AbstractManager {
 
 	public void authenticate() {
 
-		SessionStoreHouse sessionStoreHouse;
-		sessionStoreHouse = requestStoreHouse.getSession();
+		SessionStoreHouse sessionStoreHouse = requestStoreHouse.getSession();
 
 		if (sessionStoreHouse != null) {
 			if (!sessionStoreHouse.appIsInTestingMode()) {
