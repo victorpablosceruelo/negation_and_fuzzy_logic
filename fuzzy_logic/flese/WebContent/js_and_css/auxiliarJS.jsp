@@ -232,6 +232,9 @@ function showMsgs(msgs) {
 			msgsContainer.appendChild(subDiv);
 		}
 	}
+	else {
+		debug.info("showMsgs: msgs is not an array.");
+	}
 }
 
 
