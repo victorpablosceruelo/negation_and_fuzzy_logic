@@ -8,15 +8,13 @@
 	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
-<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-	<script type="text/javascript">
+
+<script type="text/javascript">
+	<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
 		showMsgs(<%= msgsArray %>);
-	</script>
-<% } else { %>
-	<script type="text/javascript">
-		loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
-	</script>
-<% } %>
+	<% } %>
+	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');	
+</script>
 
 
 
