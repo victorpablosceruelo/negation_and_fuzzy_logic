@@ -9,7 +9,7 @@
 
 
 <script type="text/javascript">
-	<%= JspsUtils.loadMessagesAjaxInItsDiv() %>
+	<%= JspsUtils.loadMessagesInItsDiv(request) %>
 	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');	
 </script>
 
