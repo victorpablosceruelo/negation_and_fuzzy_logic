@@ -9,7 +9,6 @@ import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
 import storeHouse.SessionStoreHouse;
 import constants.KConstants;
-import constants.KUrls;
 
 public class JspsUtils {
 
@@ -23,15 +22,18 @@ public class JspsUtils {
 		}
 		return "";
 	}
-	
+
 	public static String loadMessagesInItsDiv(HttpServletRequest request) {
-		String [] msgs = getResultMessages(request);
+		String[] msgs = getResultMessages(request);
 		String msgJS = getMessagesInJS(msgs);
-		
+
 		StringBuilder result = new StringBuilder();
-		result.append("");
+		result.append("showMsgsArray(");
+		result.append(msgJS);
+		result.append(");");
+
+		return result.toString();
 	}
-		
 
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
 		return RequestStoreHouse.getRequestStoreHouse(request);

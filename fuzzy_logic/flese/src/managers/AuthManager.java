@@ -61,10 +61,6 @@ public class AuthManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void msgs() throws Exception {
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.MsgsPage, ""));
-	}
-
 	public void providers() throws Exception {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.ProvidersPage, ""));
 	}
