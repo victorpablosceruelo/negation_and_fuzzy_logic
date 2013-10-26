@@ -79,8 +79,8 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
 		return;
 	}
 
-	// Clear the msgs section. 
-	clearMsgsSection();
+	// Clear the msgs section. WHY ?????? 
+	// clearMsgsSection();
 	
 	container.innerHTML=loadingImageHtml(true);
     $.ajax({
@@ -223,7 +223,7 @@ function showMsgsArray(msgs) {
 }
 
 function showMsgsArrayInDiv(divId, msgs) {
-	var msgsContainer = getContainer(msgsContainerId);
+	var msgsContainer = getContainer(divId);
 
 	if (msgsContainer != null) {
 		msgsContainer.innerHTML = "";
@@ -239,14 +239,17 @@ function showMsgsArrayInDiv(divId, msgs) {
 				}
 			}
 			else {
+				// alert("showMsgs: msgs length is 0.");
 				debug.info("showMsgs: msgs length is 0.");
 			}
 		}
 		else {
+			// alert("showMsgs: msgs is not an array.");
 			debug.info("showMsgs: msgs is not an array.");
 		}
 	}
 	else {
+		// alert("showMsgs: msgs container is null.");
 		debug.info("showMsgs: msgs container is null.");
 	}
 }

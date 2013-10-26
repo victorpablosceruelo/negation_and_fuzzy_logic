@@ -1,3 +1,4 @@
+<%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
 
@@ -15,7 +16,7 @@
 		showMsgsArray(<%= msgsArray %>);
 	<% } %>
 	<% if ("".equals(localUserInfoName)) { %>
-		loadAjaxIn('mainSecDiv', "<%=KUrls.Auth.Providers.getUrl(true)%>");
+		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', "<%=KUrls.Auth.Providers.getUrl(true)%>");
 	<% } %>	
 </script>
 
