@@ -220,7 +220,7 @@ function clearMsgsSection() {
 
 function showMsgsArray(msgs) {
 	var divId = '<%=KConstants.JspsDivsIds.msgsSecDivId %>';
-	showMsgsArrayInDiv(divId, msgs)
+	showMsgsArrayInDiv(divId, msgs);
 }
 
 function showMsgsArrayInDiv(divId, msgs) {
