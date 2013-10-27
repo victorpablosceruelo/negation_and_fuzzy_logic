@@ -49,17 +49,19 @@ public class Servlet extends HttpServlet {
 	}
 
 	private void doGetAndDoPostProtected(String doMethod, HttpServletRequest request, HttpServletResponse response) {
-		String requestUrl = null;
-		requestUrl = request.getRequestURL().toString();
-		LOG.info(formatMsg("url: " + requestUrl));
-		requestUrl = request.getQueryString();
-		LOG.info(formatMsg("url: " + requestUrl));
-		requestUrl = request.getRemoteAddr();
-		LOG.info(formatMsg("url: " + requestUrl));
-		requestUrl = request.getRequestURI();
-		LOG.info(formatMsg("url: " + requestUrl));
-		requestUrl = request.toString();
-		LOG.info(formatMsg("url: " + requestUrl));
+		String requestUrl = request.getRequestURL().toString();
+		String requestUrlParams = requestUrl = request.getQueryString();		
+		LOG.info(formatMsg("url: " + requestUrl + "?" + requestUrlParams));
+		
+		// requestUrl = request.getQueryString();
+		// LOG.info(formatMsg("urlParams: " + requestUrl));
+		// requestUrl = request.getRemoteAddr();
+		// LOG.info(formatMsg("url: " + requestUrl));
+		// requestUrl = request.getRequestURI();
+		// LOG.info(formatMsg("url: " + requestUrl));
+		// requestUrl = request.toString();
+		// LOG.info(formatMsg("url: " + requestUrl));
+		
 		doGetAndDoPost("doPost", request, response);
 	}
 
