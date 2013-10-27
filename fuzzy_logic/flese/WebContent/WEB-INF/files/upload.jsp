@@ -6,6 +6,8 @@
 
 <%
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
+	String [] msgs = JspsUtils.getResultMessages(request);
+	String msgsArray = JspsUtils.getMessagesInJS(msgs);
 %>
 
 <script type="text/javascript">
@@ -17,11 +19,11 @@
 		window.parent.loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');
 	}
 	// Clean the status div.
-	if (typeof(fileUploadShowResults) == "function") {
-		fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
+	if (typeof(showMsgsArrayInDiv) == "function") {
+		showMsgsArrayInDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%=msgsArray%>);
 	}
-	if (typeof(window.parent.fileUploadShowResults) == "function") {
-		window.parent.fileUploadShowResults("<%=KConstants.JspsDivsIds.uploadStatusDivId%>");
+	if (typeof(window.parent.showMsgsArrayInDiv) == "function") {
+		window.parent.showMsgsArrayInDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%=msgsArray%>);
 	}
 </script>
 
