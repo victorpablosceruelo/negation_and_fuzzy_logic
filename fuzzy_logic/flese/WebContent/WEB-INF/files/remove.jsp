@@ -5,15 +5,12 @@
 
 <%
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
-	String [] msgs = JspsUtils.getResultMessages(request);
-	String msgsArray = JspsUtils.getMessagesInJS(msgs);
+	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 
 <script type="text/javascript">
-	<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-		showMsgsArray(<%= msgsArray %>);
-	<% } %>
+	showMsgsArray(<%= msgsArray %>);
 	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=urlList %>');	
 </script>
 

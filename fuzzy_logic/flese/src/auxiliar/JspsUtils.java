@@ -93,6 +93,10 @@ public class JspsUtils {
 		String msg = getMessagesInJS(msgs);
 		return msg;
 	}
+	
+	public static String getEmptyArrayMessagesInJs() {
+		return "new Array()";
+	}
 
 	public static String getMessagesInJS(ArrayList<String> msgs) {
 		String[] msgsAux = msgs.toArray(new String[msgs.size()]);

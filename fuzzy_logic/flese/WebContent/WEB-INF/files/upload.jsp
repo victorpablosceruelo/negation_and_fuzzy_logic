@@ -25,6 +25,13 @@
 	if (typeof(window.parent.showMsgsArrayInDiv) == "function") {
 		window.parent.showMsgsArrayInDiv("<%=KConstants.JspsDivsIds.uploadStatusDivId%>", <%=msgsArray%>);
 	}
+	// Clean the messages div.
+	if (typeof(showMsgsArray) == "function") {
+		showMsgsArray(<%=JspsUtils.getEmptyArrayMessagesInJs()%>);
+	}
+	if (typeof(window.parent.showMsgsArray) == "function") {
+		window.parent.showMsgsArray(<%=JspsUtils.getEmptyArrayMessagesInJs()%>);
+	}	
 </script>
 
 
