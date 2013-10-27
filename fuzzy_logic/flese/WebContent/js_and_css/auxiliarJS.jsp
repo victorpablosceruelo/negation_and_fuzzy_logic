@@ -9,6 +9,7 @@
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 <%@page import="constants.KConstants"%>
+<%@page import="constants.KUrls"%>
 <%@page import="auxiliar.JspsUtils"%>
 
 <% if (JspsUtils.getStringWithValueS().equals("N")) { %>
@@ -381,13 +382,13 @@ function splitString(inputString, separation) {
 
 function loadUserOptions() {
 	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
-	loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.User.Options.getUrl(true) %>');
+	loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%= KUrls.User.Options.getUrl(true) %>');
 	return false;
 }
 
 function loadNewQuery() {
 	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
-	loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.Queries.SelectProgramFile.getUrl(true) %>');
+	loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%= KUrls.Queries.SelectProgramFile.getUrl(true) %>');
 	return false;
 }
 
