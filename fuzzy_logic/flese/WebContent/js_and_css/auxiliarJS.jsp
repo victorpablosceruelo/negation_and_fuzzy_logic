@@ -397,6 +397,7 @@ function loadNewQuery() {
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function selectedProgramDatabaseChanged(comboBox) {
+	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
 	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
 	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';
 	

@@ -4,12 +4,19 @@
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 
-<script type="text/javascript">
-<%RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+<%
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	String [] variablesNames = resultsStoreHouse.getCiaoPrologQueryVariablesNames();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();
+%>
+
+<script type="text/javascript">
+	// Clean up the msgs div
+	showMsgsArray(<%=JspsUtils.getEmptyArrayMessagesInJs()%>);
 	
+	// Show the results.
+<%	
 	if (answers.length > 0) {
 		out.print("showAnswers('" + KConstants.JspsDivsIds.runQueryDivId + "', [ [ 0, ");
 		for (int j=0; j<variablesNames.length; j++) {
