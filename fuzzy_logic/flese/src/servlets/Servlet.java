@@ -50,7 +50,7 @@ public class Servlet extends HttpServlet {
 
 	private void doGetAndDoPostProtected(String doMethod, HttpServletRequest request, HttpServletResponse response) {
 		String requestUrl = request.getRequestURL().toString();
-		String requestUrlParams = requestUrl = request.getQueryString();		
+		String requestUrlParams = request.getQueryString();		
 		LOG.info(formatMsg("url: " + requestUrl + "?" + requestUrlParams));
 		
 		// requestUrl = request.getQueryString();
