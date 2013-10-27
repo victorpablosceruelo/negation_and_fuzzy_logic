@@ -23,11 +23,9 @@
 					<%= localUserInfoName %>
 					<br />
 					<a id='userOptions' title='user options' href='#' 
-						onclick="return loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', 
-								'<%=KUrls.User.Options.getUrl(true) %>');">user options</a> | 
+						onclick="return loadUserOptions();">user options</a> | 
 					<a id='newQuery' title='new query' href='#' 
-						onclick="return loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', 
-								'<%=KUrls.Queries.SelectProgramFile.getUrl(true) %>');">new query</a>
+						onclick="return loadNewQuery();">new query</a>
 			<%  } %>
 			</div>
 			<div id="bodyHeadLogout" class="bodyHeadTable">

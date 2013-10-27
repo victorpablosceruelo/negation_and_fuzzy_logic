@@ -7,21 +7,15 @@
 <% } %>
 
 <%
-	String localUserInfoName = JspsUtils.getLocalUserInfoName(request);
-	String [] msgs = JspsUtils.getResultMessages(request);
-	String msgsArray = JspsUtils.getMessagesInJS(msgs);
+	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <script type="text/javascript">
-// $(window).load(function(){
-	// alert("Pffff");
-	<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-		showMsgsArray(<%= msgsArray %>);
-	<% } %>
-	// alert("Do you see the message? It is loadAjaxIn the function that kills it !!!");
-	<% if (! "".equals(localUserInfoName)) { %>
-		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");
-	<% } %>
-	/*code goes here*/ 
-// });
+	showMsgsArray(<%= msgsArray %>);
+	loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', "<%=KUrls.Queries.SelectProgramFile.getUrl(true)%>");
+
+	// Window onload trigger to load contents after page load.
+	// $(window).load(function(){
+		/*code goes here*/ 
+	// });
 </script>

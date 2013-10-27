@@ -379,6 +379,22 @@ function splitString(inputString, separation) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+function loadUserOptions() {
+	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
+	loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.User.Options.getUrl(true) %>');
+	return false;
+}
+
+function loadNewQuery() {
+	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
+	loadAjaxIn('<%= KConstants.JspsDivsIds.mainSecDivId %>', '<%=KUrls.Queries.SelectProgramFile.getUrl(true) %>');
+	return false;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
 function selectedProgramDatabaseChanged(comboBox) {
 	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
 	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';

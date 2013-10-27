@@ -6,17 +6,11 @@
 	<jsp:include page='../commonHtmlBody.jsp' />
 <% } %>
 <%
-	String localUserInfoName = JspsUtils.getLocalUserInfoName(request);
-	String [] msgs = JspsUtils.getResultMessages(request);
-	String msgsArray = JspsUtils.getMessagesInJS(msgs);
+	String msgsArray = JspsUtils.getResultMessagesInJS(request);
 %>
 
 <script type="text/javascript">	
-	<% if ((msgsArray != null) && (msgsArray.length() > 0)) { %>
-		showMsgsArray(<%= msgsArray %>);
-	<% } %>
-	<% if ("".equals(localUserInfoName)) { %>
-		loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', "<%=KUrls.Auth.Providers.getUrl(true)%>");
-	<% } %>	
+	showMsgsArray(<%= msgsArray %>);
+	loadAjaxIn('<%=KConstants.JspsDivsIds.mainSecDivId %>', "<%=KUrls.Auth.Providers.getUrl(true)%>");
 </script>
 
