@@ -87,6 +87,13 @@ public class JspsUtils {
 		return msgs;
 	}
 
+	public static String getResultMessagesInJS(HttpServletRequest request) {
+		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+		String[] msgs = resultsStoreHouse.getResultMessages();
+		String msg = getMessagesInJS(msgs);
+		return msg;
+	}
+
 	public static String getMessagesInJS(ArrayList<String> msgs) {
 		String[] msgsAux = msgs.toArray(new String[msgs.size()]);
 		String msg = getMessagesInJS(msgsAux);
