@@ -379,26 +379,6 @@ function splitString(inputString, separation) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function fileInfo(fileName, fileOwner) {
-	this.fileName = fileName;
-	this.fileOwner = fileOwner;
-}
-
-// Declare as global the variable containing the files list.
-var filesList = null;
-
-function cleanUpFilesList() {
-	filesList = new Array();
-}
-
-function addToFilesList(index, fileName, fileOwner) {
-	filesList[index] = new fileInfo(fileName, fileOwner);
-}
-
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------------------------------------- */
-
 function selectedProgramDatabaseChanged(comboBox) {
 	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
 	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';
