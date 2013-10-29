@@ -23,6 +23,10 @@ public class KUrls {
 
 		public static final UrlMap SignOutPage = new UrlMap(manager, "signOutPage", null, null, "WEB-INF/authentication/signedOut.jsp");
 		public static final UrlMap SignOut = new UrlMap(manager, "signOut", SignOutPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap AboutPage = new UrlMap(manager, "aboutPage", null, null, "WEB-INF/authentication/about.jsp");
+		public static final UrlMap About = new UrlMap(manager, "about", AboutPage, KUrls.Pages.Exception, "");
+
 	}
 
 	public static class User {

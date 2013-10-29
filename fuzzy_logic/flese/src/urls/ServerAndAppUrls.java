@@ -5,13 +5,19 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.Dates;
 import constants.KConstants;
 
 public class ServerAndAppUrls {
 	static final Log LOG = LogFactory.getLog(ServerAndAppUrls.class);
 	
 	private static ServerAndAppUrlsData serverAndAppUrlsData = new ServerAndAppUrlsData(null);
+	private static String loadDate = Dates.getCurrentDate();
 
+	public static String getRunningSince() {
+		return loadDate;
+	}
+	
 	public static String getAppUrl() {
 		return getAppUrl(null);
 	}

@@ -8,6 +8,7 @@ import programAnalysis.ProgramPartAnalysis;
 import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
 import storeHouse.SessionStoreHouse;
+import urls.ServerAndAppUrls;
 import constants.KConstants;
 
 public class JspsUtils {
@@ -93,7 +94,7 @@ public class JspsUtils {
 		String msg = getMessagesInJS(msgs);
 		return msg;
 	}
-	
+
 	public static String getEmptyArrayMessagesInJs() {
 		return "new Array()";
 	}
@@ -205,6 +206,10 @@ public class JspsUtils {
 
 	public static String getValue(String value) {
 		return value;
+	}
+
+	public static String getRunningSince() {
+		return ServerAndAppUrls.getRunningSince();
 	}
 }
 
