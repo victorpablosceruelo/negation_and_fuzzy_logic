@@ -1,8 +1,9 @@
 package auxiliar;
 
+import logs.LogsManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.brickred.socialauth.Profile;
 
 import storeHouse.RequestStoreHouse;
@@ -51,6 +52,9 @@ public class LocalUserInfo {
 			String msg = "Impossible to create object LocalUserInfo because Variable localUserName is null";
 			LOG.info(msg);
 			throw new Exception(msg);
+		}
+		else {
+			LogsManager.logSignedUser(this.localUserName);
 		}
 	}
 

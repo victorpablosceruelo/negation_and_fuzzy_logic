@@ -2,6 +2,8 @@ package prologConnector;
 
 import java.io.IOException;
 
+import logs.LogsManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -168,6 +170,7 @@ public class PlConnectionEnvelope {
 
 	private void createGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info("runQuery: creating goal for query: " + query.toString() + " .... ");
+		LogsManager.logQuery(query.toString());
 		evaluatedGoal = new PLGoal(plConnection, query.getQuery());
 	}
 	

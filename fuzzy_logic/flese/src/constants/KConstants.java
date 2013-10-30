@@ -11,6 +11,11 @@ public class KConstants {
 		public static final String doPostMethod = "doPost";
 		
 		public static final String BackupsFolder = "FleSeProgramsBackups";
+		public static final String LogsFolder = "FleSeLogs";
+		public static final String LogsDefaultName = "FleSeUnknownLogs_";
+		public static final String LogsFileForQueries = "FleSeQueriesLog_";
+		public static final String LogsFileForSignedUsers = "FleSeSignedUsersLog_";
+		
 		public static final String AppBugsEmail = "vpablos@babel.ls.fi.upm.es";
 	}
 
