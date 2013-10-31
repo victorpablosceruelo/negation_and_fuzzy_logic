@@ -170,7 +170,7 @@ public class PlConnectionEnvelope {
 
 	private void createGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info("runQuery: creating goal for query: " + query.toString() + " .... ");
-		LogsManager.logQuery(query.toString());
+		LogsManager.logQuery(query);
 		evaluatedGoal = new PLGoal(plConnection, query.getQuery());
 	}
 	
