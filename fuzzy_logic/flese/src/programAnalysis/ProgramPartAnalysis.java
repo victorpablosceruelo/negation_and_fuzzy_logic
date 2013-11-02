@@ -354,7 +354,7 @@ public class ProgramPartAnalysis {
 		LOG.info("\n" + "functionality: " + functionality + "\n" + "arguments: " + arguments);
 
 		// For values.
-		if ("value".equals(functionality)) {
+		if (KConstants.ProgramAnalysis.markerForValue.equals(functionality)) {
 			parsed = parseUntilExtraPar(arguments, '(');
 			try {
 				value = Float.parseFloat(parsed[1]);
@@ -365,7 +365,7 @@ public class ProgramPartAnalysis {
 		}
 
 		// For functions.
-		if ("function".equals(functionality)) {
+		if (KConstants.ProgramAnalysis.markerForFunction.equals(functionality)) {
 			parsed = parseUntilExtraPar(arguments, '(');
 			arguments = parsed[0];
 
@@ -387,7 +387,7 @@ public class ProgramPartAnalysis {
 		}
 
 		// For rules.
-		if ("rule".equals(functionality)) {
+		if (KConstants.ProgramAnalysis.markerForRule.equals(functionality)) {
 			parsed = parseUntilExtraPar(arguments, '(');
 			arguments = parsed[0];
 			ruleAggregator = null;
@@ -403,7 +403,7 @@ public class ProgramPartAnalysis {
 		}
 
 		// For defaults.
-		if ("defaults_to".equals(functionality)) {
+		if (KConstants.ProgramAnalysis.markerForDefaultsTo.equals(functionality)) {
 			parsed = parseUntilExtraPar(arguments, '(');
 			try {
 				defaults_to = Float.parseFloat(parsed[1]);
@@ -494,14 +494,12 @@ public class ProgramPartAnalysis {
 			return argumentsIn;
 
 		LOG.info("arguments: " + argumentsIn);
-
-		final String if_marker = "if";
-		final String with_credibility_marker = "with_credibility";
-		final String only_for_user_marker = "only_for_user";
 		String argumentsOut = null;
-
-		if (argumentsIn.startsWith(if_marker)) {
-			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(if_marker.length()));
+		String marker = null;
+		
+		marker = KConstants.ProgramAnalysis.markerForIf;
+		if (argumentsIn.startsWith(marker)) {
+			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(marker.length()));
 			if (argumentsOut.indexOf("(") == 0)
 				argumentsOut = argumentsOut.substring(1);
 			String[] parsed = parseUntilExtraPar(argumentsOut, '(');
@@ -509,8 +507,10 @@ public class ProgramPartAnalysis {
 			LOG.info("if_condition: " + if_condition);
 			argumentsOut = parsed[0];
 		}
-		if (argumentsIn.startsWith(with_credibility_marker)) {
-			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(with_credibility_marker.length()));
+		
+		marker = KConstants.ProgramAnalysis.markerForWithCredibility;
+		if (argumentsIn.startsWith(marker)) {
+			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(marker.length()));
 			if (argumentsOut.indexOf("(") == 0)
 				argumentsOut = argumentsOut.substring(1);
 			String[] parsed = parseUntilExtraPar(argumentsOut, '(');
@@ -518,8 +518,10 @@ public class ProgramPartAnalysis {
 			LOG.info("with_credibility: " + with_credibility);
 			argumentsOut = parsed[0];
 		}
-		if (argumentsIn.startsWith(only_for_user_marker)) {
-			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(only_for_user_marker.length()));
+		
+		marker = KConstants.ProgramAnalysis.markerForOnlyForUser;
+		if (argumentsIn.startsWith(marker)) {
+			argumentsOut = removeSpacesBeforeAndAfter(argumentsIn.substring(marker.length()));
 			argumentsOut = removeSimpleCommas(argumentsOut);
 			for (int i = 0; i < argumentsOut.length(); i++) {
 				if (isDelimiter(argumentsOut.charAt(i))) {

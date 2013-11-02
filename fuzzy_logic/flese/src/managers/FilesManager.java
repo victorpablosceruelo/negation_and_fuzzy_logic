@@ -24,7 +24,7 @@ public class FilesManager extends AbstractManager {
 	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
 		return "list";
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ public class FilesManager extends AbstractManager {
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ListPage, ""));
 	}
-	
+
 	public void listMyFiles() throws Exception {
 		ProgramFileInfo[] filesList = FilesManagerAux.listMyFiles(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
@@ -51,8 +51,8 @@ public class FilesManager extends AbstractManager {
 
 	public void upload() throws Exception {
 
-		String [] msgs = FilesManagerAux.uploadFileAux(requestStoreHouse);
-		for (int i=0; i<msgs.length; i++) {
+		String[] msgs = FilesManagerAux.uploadFileAux(requestStoreHouse);
+		for (int i = 0; i < msgs.length; i++) {
 			resultsStoreHouse.addResultMessage(msgs[i]);
 		}
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.UploadPage, ""));
@@ -119,20 +119,16 @@ public class FilesManager extends AbstractManager {
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
 		String[] fileContents = null;
-		if (localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner())) {
-			try {
-				fileContents = programFileInfo.getFileContents();
-			} catch (FilesAndPathsException e) {
-				e.printStackTrace();
-				throw e;
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new FilesManagerException(e.getMessage());
-			}
-			resultsStoreHouse.setFileContents(fileContents);
-		} else {
-			resultsStoreHouse.addResultMessage("You are not allowed to see the contents of the file " + programFileInfo.getFileName());
+		try {
+			fileContents = programFileInfo.getFileContents(localUserInfo);
+		} catch (FilesAndPathsException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new FilesManagerException(e.getMessage());
 		}
+		resultsStoreHouse.setFileContents(fileContents);
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ViewPage, ""));
 	}

@@ -178,12 +178,25 @@ public class ProgramFileInfo {
 		}
 	}
 
-	public String[] getFileContents() throws FilesAndPathsException, IOException {
+	public String[] getFileContents(LocalUserInfo localUserInfo) throws FilesAndPathsException, IOException {
 		ArrayList<String> contents = new ArrayList<String>();
 		BufferedReader reader = new BufferedReader(new FileReader(getProgramFileFullPath()));
 		String line;
+		String subLine;
+		boolean addLine = true;
 		while ((line = reader.readLine()) != null) {
-			contents.add(line);
+			addLine = true;
+			if (!this.fileOwner.equals(localUserInfo.getLocalUserName())) {
+				if (line.contains(KConstants.ProgramAnalysis.markerForOnlyForUser)) {
+					subLine = line.substring(line.indexOf(KConstants.ProgramAnalysis.markerForOnlyForUser));
+					if (!subLine.contains(localUserInfo.getLocalUserName())) {
+						addLine = false;
+					}
+				}
+			}
+			if (addLine) {
+				contents.add(line);
+			}
 		}
 		reader.close();
 		return contents.toArray(new String[contents.size()]);

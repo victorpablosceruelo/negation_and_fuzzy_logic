@@ -9,13 +9,13 @@ public class KConstants {
 		public static final String httpPrefix = "http://";
 		public static final String doGetMethod = "doGet";
 		public static final String doPostMethod = "doPost";
-		
+
 		public static final String BackupsFolder = "FleSeProgramsBackups";
 		public static final String LogsFolder = "FleSeLogs";
 		public static final String LogsDefaultName = "FleSeUnknownLogs_";
 		public static final String LogsFileForQueries = "FleSeQueriesLog_";
 		public static final String LogsFileForSignedUsers = "FleSeSignedUsersLog_";
-		
+
 		public static final String AppBugsEmail = "vpablos@babel.ls.fi.upm.es";
 	}
 
@@ -148,6 +148,16 @@ public class KConstants {
 		public static final String similarityClause = "rfuzzy_similarity_clause";
 	}
 
+	public static class ProgramAnalysis {
+		public static final String markerForIf = "if";
+		public static final String markerForWithCredibility = "with_credibility";
+		public static final String markerForOnlyForUser = "only_for_user";
+		public static final String markerForDefaultsTo = "defaults_to";
+		public static final String markerForRule = "rule";
+		public static final String markerForFunction = "function";
+		public static final String markerForValue = "value";
+	}
+
 	public static class JavaScriptScripts {
 		public static final String jsRegex = "<script[^>]*>[^<]*</script>";
 		public static final String jsStart = "<script type=\"text/javascript\">";
@@ -158,7 +168,7 @@ public class KConstants {
 		public static final String auxAndInvisibleSection = "auxAndInvisibleSection";
 		public static final String mainSecDivId = "mainSecDiv";
 		public static final String msgsSecDivId = "msgsSecDiv";
-		
+
 		public static final String queryStartContainerId = "queryStartContainer";
 		public static final String selectQueryDivId = "selectQueryDiv";
 		public static final String runQueryDivId = "runQueryDiv";
@@ -166,7 +176,7 @@ public class KConstants {
 		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
 		public static final String queryLinesTableId = "queryLinesTable";
 		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
-		
+
 		public static final String filesListDiv = "filesListDiv";
 		public static final String fileViewContentsDiv = "fileViewContentsDiv";
 		public static final String fileUploadDiv = "fileUploadDiv";
@@ -175,13 +185,13 @@ public class KConstants {
 		public static final String uploadFormTargetiFrameId = "uploadFormTargetiFrame";
 
 		public static final String personalizationFunctionUnderModificationDivId = "personalizationFunctionUnderModificationDivId";
-		
+
 		public static final String fuzzificationGraphicDivId = "fuzzificationGraphicDiv";
 		public static final String fuzzificationValuesAndButtonDivId = "fuzzificationValuesAndButtonDiv";
 		public static final String fuzzificationSaveStatusDivId = "fuzzificationSaveStatus";
 		public static final String fuzzificationBarValueDivId = "fuzzificationBarValueDivId";
 	}
-	
+
 	public static class AppMsgs {
 		public static final String welcomeToFleSe = "Welcome to the FleSe application. Enjoy !!!";
 		public static final String errorTryingToAuthenticateUser = "The social authentication provider chosen says you are not authenticated. Sorry.";
