@@ -66,6 +66,9 @@ public class KUrls {
 		public static final UrlMap SelectProgramFilePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectProgramFile.jsp");
 		public static final UrlMap SelectProgramFile = new UrlMap(manager, "selectProgramFile", SelectProgramFilePage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap ProgramFileActionsPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/programFileActions.jsp");
+		public static final UrlMap ProgramFileActions = new UrlMap(manager, "programFileActions", ProgramFileActionsPage, KUrls.Pages.Exception, "");
+
 		public static final UrlMap SelectDatabasePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectDatabase.jsp");
 		public static final UrlMap SelectDatabase = new UrlMap(manager, "selectDatabase", SelectDatabasePage, KUrls.Pages.Exception, "");
 

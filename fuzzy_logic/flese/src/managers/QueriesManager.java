@@ -37,6 +37,14 @@ public class QueriesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectProgramFilePage, ""));
 	}
 
+	public void programFileActions() throws FilesAndPathsException, RequestStoreHouseException {
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
+		resultsStoreHouse.setProgramFileInfo(programFileInfo);
+
+		// Forward to the jsp page.
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.ProgramFileActionsPage, ""));
+	}
+
 	public void selectDatabase() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());

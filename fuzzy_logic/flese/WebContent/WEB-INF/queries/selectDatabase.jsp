@@ -23,6 +23,7 @@
 	String url1 = KUrls.Queries.SelectQuery.getUrl(true) + programFileInfo.getInfoForUrls() + 
 	"&" + KConstants.Request.databaseParam + "=";
 	String url2 = KUrls.Queries.Evaluate.getUrl(true) + programFileInfo.getInfoForUrls();
+	String url3 = KUrls.Queries.ProgramFileActions.getUrl(true) + programFileInfo.getInfoForUrls();
 	
 	
 	String urlListFuzzifications = KUrls.Fuzzifications.List.getUrl(true);
@@ -40,10 +41,10 @@
 	<div id='<%=KConstants.JspsDivsIds.queryStartContainerId%>' class='queryStartContainerTable'>
 	     <div class='queryStartContainerTableRow'>
 	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
-	          <div class='queryStartContainerTableCell2' id='chooseQueryStartTypeContainerId'>
+	          <div class='queryStartContainerTableCell2' id='<%=KConstants.JspsDivsIds.chooseQueryStartTypeContainerId%>'>
 					<select name="<%=KConstants.Request.databaseParam %>" 
 							id="<%=KConstants.Request.databaseParam %>" 
-					        onchange="selectedQueryStartTypeChanged(this, '<%=url1 %>');" >
+					        onchange="selectedQueryStartTypeChanged(this, '<%=url1 %>', '<%=url3 %>');" >
 						<%=JspsUtils.comboBoxDefaultValue()%>
 <%
 	for (int i=0; i<predicatesInfos.length; i++) {
@@ -53,6 +54,8 @@
 <%
 	}
 %>					</select>
+	          </div>
+	          <div class='queryStartContainerTableCell3' id='<%=KConstants.JspsDivsIds.databaseActionsContainerId%>'>
 	          </div>
 		 </div>
 	</div>

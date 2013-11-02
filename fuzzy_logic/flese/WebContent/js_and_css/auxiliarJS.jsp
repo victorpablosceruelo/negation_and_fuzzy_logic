@@ -424,9 +424,10 @@ function selectedProgramDatabaseChanged(comboBox) {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectedQueryStartTypeChanged(comboBox, url1) {
+function selectedQueryStartTypeChanged(comboBox, url1, url2) {
 	var queryLinesContainerId = "<%=KConstants.JspsDivsIds.queryLinesContainerId %>";
 	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId %>";
+	var databaseActionsContainerId = "<%=KConstants.JspsDivsIds.databaseActionsContainerId %>";
 	
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
@@ -435,16 +436,20 @@ function selectedQueryStartTypeChanged(comboBox, url1) {
 	var queryLinesContainerDiv = getContainer(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
-	var searchOrPersonalizeTable = document.getElementById(searchOrPersonalizeTableId);
+	var databaseActionsContainer = getContainer(databaseActionsContainerId);
+	var searchOrPersonalizeTable = getContainer(searchOrPersonalizeTableId);
 	
 	if ((startupType == "") || (startupType == '')) {
 		queryLinesContainerDiv.innerHTML="Please select what are you looking for.";
 		queryLinesContainerDiv.style.display='none';
+		databaseActionsContainer.style.visibility = 'hidden'; 
 		searchOrPersonalizeTable.style.visibility = 'hidden'; 
 	}
 	else {
-		searchOrPersonalizeTable.style.visibility = 'visible'; 
+		databaseActionsContainer.style.visibility = 'visible';
+		searchOrPersonalizeTable.style.visibility = 'visible';
 		queryLinesContainerDiv.style.display='block';
+		loadAjaxIn(databaseActionsContainerId, url2 + startupType);
 		loadAjaxIn(queryLinesContainerId, url1 + startupType);
 	}
 }
