@@ -396,10 +396,11 @@ function loadNewQuery() {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectedProgramDatabaseChanged(comboBox) {
+function selectedProgramDatabaseChanged(comboBox, urlDatabaseActions) {
 	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
 	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
 	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';
+	var databaseActionsContainerId = "<%=KConstants.JspsDivsIds.databaseActionsContainerId %>";
 	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	debugInfoIfVarIsNull(selectQueryDiv, "selectQueryDiv", "selectedProgramDatabaseChanged");
@@ -409,13 +410,18 @@ function selectedProgramDatabaseChanged(comboBox) {
 	debugInfoIfVarIsNull(runQueryDiv, "runQueryDiv", "selectedProgramDatabaseChanged");
 	runQueryDiv.innerHTML = "";
 	
+	var databaseActionsContainer = getContainer(databaseActionsContainerId);
+	
 	var selectedProgramDatabaseUrl = getComboBoxValue(comboBox);
 	
 	if (selectedProgramDatabaseUrl == "") {
+		databaseActionsContainer.style.visibility = 'hidden'; 
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
 		loadAjaxIn(selectQueryDivId, selectedProgramDatabaseUrl);
+		databaseActionsContainer.style.visibility = 'visible';
+		loadAjaxIn(databaseActionsContainerId, urlDatabaseActions);
 	}
 	
 }
@@ -427,7 +433,6 @@ function selectedProgramDatabaseChanged(comboBox) {
 function selectedQueryStartTypeChanged(comboBox, url1, url2) {
 	var queryLinesContainerId = "<%=KConstants.JspsDivsIds.queryLinesContainerId %>";
 	var searchOrPersonalizeTableId = "<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId %>";
-	var databaseActionsContainerId = "<%=KConstants.JspsDivsIds.databaseActionsContainerId %>";
 	
 	var startupType = getComboBoxValue(comboBox);
 	debug.info("startupType changed to " + startupType);
@@ -436,20 +441,16 @@ function selectedQueryStartTypeChanged(comboBox, url1, url2) {
 	var queryLinesContainerDiv = getContainer(queryLinesContainerId); 
 	queryLinesContainerDiv.innerHTML="";
 	
-	var databaseActionsContainer = getContainer(databaseActionsContainerId);
 	var searchOrPersonalizeTable = getContainer(searchOrPersonalizeTableId);
 	
 	if ((startupType == "") || (startupType == '')) {
 		queryLinesContainerDiv.innerHTML="Please select what are you looking for.";
 		queryLinesContainerDiv.style.display='none';
-		databaseActionsContainer.style.visibility = 'hidden'; 
 		searchOrPersonalizeTable.style.visibility = 'hidden'; 
 	}
 	else {
-		databaseActionsContainer.style.visibility = 'visible';
 		searchOrPersonalizeTable.style.visibility = 'visible';
 		queryLinesContainerDiv.style.display='block';
-		loadAjaxIn(databaseActionsContainerId, url2 + startupType);
 		loadAjaxIn(queryLinesContainerId, url1 + startupType);
 	}
 }

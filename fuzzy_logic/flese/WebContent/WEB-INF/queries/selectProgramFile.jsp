@@ -42,6 +42,8 @@
 	}
 %>			</select>
 		</div>
+		<div class='selectDatabaseTableCell3' id='<%=KConstants.JspsDivsIds.databaseActionsContainerId%>'>
+		</div>
 	</div>
 <%
 	}

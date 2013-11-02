@@ -55,8 +55,6 @@
 	}
 %>					</select>
 	          </div>
-	          <div class='queryStartContainerTableCell3' id='<%=KConstants.JspsDivsIds.databaseActionsContainerId%>'>
-	          </div>
 		 </div>
 	</div>
 
