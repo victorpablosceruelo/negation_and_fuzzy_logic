@@ -69,8 +69,8 @@ public class KUrls {
 		public static final UrlMap ProgramFileActionsPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/programFileActions.jsp");
 		public static final UrlMap ProgramFileActions = new UrlMap(manager, "programFileActions", ProgramFileActionsPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap SelectDatabasePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectDatabase.jsp");
-		public static final UrlMap SelectDatabase = new UrlMap(manager, "selectDatabase", SelectDatabasePage, KUrls.Pages.Exception, "");
+		public static final UrlMap SelectQueryStartTypePage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQueryStartType.jsp");
+		public static final UrlMap SelectQueryStartType = new UrlMap(manager, "selectQueryStartType", SelectQueryStartTypePage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap SelectQueryPage = new UrlMap(manager, "", null, null, "WEB-INF/queries/selectQuery.jsp");
 		public static final UrlMap SelectQuery = new UrlMap(manager, "selectQuery", SelectQueryPage, KUrls.Pages.Exception, "");

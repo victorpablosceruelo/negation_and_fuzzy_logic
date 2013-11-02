@@ -45,12 +45,12 @@ public class QueriesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.ProgramFileActionsPage, ""));
 	}
 
-	public void selectDatabase() throws Exception {
+	public void selectQueryStartType() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse.getProgramFileInfo());
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectDatabasePage, ""));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryStartTypePage, ""));
 	}
 
 	public void selectQuery() throws Exception {

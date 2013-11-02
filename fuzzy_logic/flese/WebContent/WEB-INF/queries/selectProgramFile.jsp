@@ -34,7 +34,7 @@
 			<%=JspsUtils.comboBoxDefaultValue()%>
 <%
 	for (int i=0; i<filesList.length; i++) { 
-		String value = KUrls.Queries.SelectDatabase.getUrl(true) + filesList[i].getInfoForUrls();
+		String value = KUrls.Queries.SelectQueryStartType.getUrl(true) + filesList[i].getInfoForUrls();
 		String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
 %>	
 				<option id='<%=value%>' title='<%=value%>' value='<%=value%>'><%=desc%></option>
