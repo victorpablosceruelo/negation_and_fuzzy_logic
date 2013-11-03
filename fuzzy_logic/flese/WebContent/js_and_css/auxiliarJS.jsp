@@ -63,10 +63,21 @@ function executeAjaxLoadedPageJS(loadedContent) {
 
     var script = content.match("<%=KConstants.JavaScriptScripts.jsRegex %>");
     if (script != null) {
-		script = script.toString().replace(scriptStart, '');
-		script = script.replace(scriptEnd, '');
-		eval(script);
+    	var scriptString = script.toString();
+    	scriptString = scriptString.replace(scriptStart, '');
+    	scriptString = scriptString.replace(scriptEnd, '');
+    	var notExecutable = scriptHasProblematicParts(scriptString);
+    	if (notExecutable) {
+    		debug.warn(scriptString);
+    	}
+    	else {
+			eval(script);
+    	}
 	}
+}
+
+function scriptHasProblematicParts(scriptString) {
+	return scriptString.contains("script type=");
 }
 
 function loadAjaxIn(containerId, ajaxPageUrl) {
