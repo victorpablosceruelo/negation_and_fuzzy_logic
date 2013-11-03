@@ -18,7 +18,7 @@
 
 
 filename_prefix("debug_file_of_file_").
-filename_suffix(".pl").
+filename_suffix(".txt").
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                Consulting a file                   %
