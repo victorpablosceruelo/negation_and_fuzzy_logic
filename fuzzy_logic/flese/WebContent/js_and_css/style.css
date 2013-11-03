@@ -247,10 +247,18 @@ a.indexPageImportantLink:visited, a.indexPageImportantLink:hover {
 .userInformationTableRow {display:table-row; border:0.1em solid grey; text-align:left; padding:0.1em;}
 .userInformationTableCell {display:table-cell; border:0.1em solid grey; text-align:left; padding:0.1em;}
 
-.selectDatabaseTable {display:table; border:none; width:90%; margin:1em; text-align:center;}
-.selectDatabaseTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
-.selectDatabaseTableCell1 {display:table-cell; border:none; width:25%; text-align:left; }
-.selectDatabaseTableCell2 {display:table-cell; border:none; width:75%; text-align:left; }
+.defaultTable {display:table; border:none; margin:1em; width:90%; text-align:center;}
+.defaultTableRow {display:table-row; border:none; width:100%; text-align:left; padding:0.1em;}
+.defaultTableCell1 {display:table-cell; border:none; width:25%; text-align:left; }
+.defaultTableCell2 {display:table-cell; border:none; width:70%; text-align:left; }
+.defaultTableCell3 {display:table-cell; border:none; width:5%; text-align:left; }
+
+
+.selectDatabaseTable {display:table; border:none; margin:1em; text-align:center;}
+.selectDatabaseTableRow {display:table-row; border:none; text-align:left; padding:0.1em;}
+.selectDatabaseTableCell1 {display:table-cell; border:none; padding-right:3em; text-align:left; }
+.selectDatabaseTableCell2 {display:table-cell; border:none; padding-right:3em; text-align:left; }
+.selectDatabaseTableCell3 {display:table-cell; border:none; padding-right:3em; text-align:left; }
 
 .searchOrPersonalizeTable {display:table; border:none; margin:1em; text-align:center;}
 .searchOrPersonalizeTableRow {display:table-row; border:none; text-align:left; padding:0.1em;}
