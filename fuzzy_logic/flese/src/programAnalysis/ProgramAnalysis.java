@@ -109,9 +109,9 @@ public class ProgramAnalysis {
 				while ((j < progrFunctsOrdered.size()) && (!placed)) {
 					if ((progrFunctsOrdered.get(j) != null) && (progrFunctsOrdered.get(j).size() > 0)) {
 						Collection<String> keysTmp = progrFunctsOrdered.get(j).keySet();
-						String [] keys = keysTmp.toArray(new String[keysTmp.size()]);
+						String[] keys = keysTmp.toArray(new String[keysTmp.size()]);
 						ProgramPartAnalysis representative = progrFunctsOrdered.get(j).get(keys[0]);
-						
+
 						if ((representative.getPredDefined().equals(programPart.getPredDefined()))
 								&& (representative.getPredNecessary().equals(programPart.getPredNecessary()))) {
 
@@ -187,14 +187,12 @@ public class ProgramAnalysis {
 							// The default definition is always retrieved.
 							filteredResult.add(function);
 						} else {
-							if (!(KConstants.Request.modeAdvanced.equals(mode))) {
-								if (function.getPredOwner().equals(localUserInfo.getLocalUserName())) {
-									// If the mode is not advanced and the
-									// logged user
-									// is the fuzzification owner, retrieve it
-									// too.
-									filteredResult.add(function);
-								}
+							if ((KConstants.Request.modeAdvanced.equals(mode))
+									|| (function.getPredOwner().equals(localUserInfo.getLocalUserName()))) {
+								// If the mode is not advanced and the logged
+								// user is the fuzzification owner,
+								// retrieve it too.
+								filteredResult.add(function);
 							}
 						}
 					}
@@ -260,7 +258,8 @@ public class ProgramAnalysis {
 					programPartsAffected.add(programPart);
 				} else {
 					if (foundFuzzifications) {
-						programPartsAffected = updateAffectedProgramParts(programPartsAffected, predDefined, predNecessary, predOwner, functionDefinition);
+						programPartsAffected = updateAffectedProgramParts(programPartsAffected, predDefined, predNecessary, predOwner,
+								functionDefinition);
 						writeProgramParts(programPartsAffected, bw);
 						copiedBackFuzzifications = true;
 					}

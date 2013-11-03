@@ -29,52 +29,32 @@
 	JspsUtils.getValue(saveUrl);
 	
 	ProgramPartAnalysis [][] fuzzifications = resultsStoreHouse.getProgramPartAnalysis();
+	ProgramPartAnalysis [] thisFuzzification = null;
 	ProgramPartAnalysis myFuzzification = null;
 	ProgramPartAnalysis defaultFuzzification = null;
+	ProgramPartAnalysis [] othersFuzzifications = null;
+	String [] keyValues = null;
 
-	if ((fuzzifications.length == 1)) {
-		if (fuzzifications[0].length == 1) {
-	defaultFuzzification = fuzzifications[0][0];
-	myFuzzification = fuzzifications[0][0];			
+	if (fuzzifications.length >= 1) {
+		thisFuzzification = fuzzifications[0];
+		keyValues = JspsUtils.getKeyValues(thisFuzzification);
+		
+		if (thisFuzzification.length == 1) {
+			defaultFuzzification = thisFuzzification[0];
+			myFuzzification = thisFuzzification[0];
+			othersFuzzifications = new ProgramPartAnalysis[0];
 		}
-		if (fuzzifications[0].length == 2) {
-	if (fuzzifications[0][0].getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION)) {
-		defaultFuzzification = fuzzifications[0][0];
-		myFuzzification = fuzzifications[0][1];
-	}
-	else {
-		defaultFuzzification = fuzzifications[0][1];
-		myFuzzification = fuzzifications[0][0];			
-	}
+		else {
+			defaultFuzzification = JspsUtils.getDefaultFuzzification(thisFuzzification);
+			myFuzzification = JspsUtils.getMyFuzzification(thisFuzzification, localUserInfo, mode);
+			othersFuzzifications = JspsUtils.getOthersFuzzifications(thisFuzzification, localUserInfo, mode);
 		}
 	}
 	
-	FunctionPoint [] defFuzzPoints = defaultFuzzification.getFunctionPoints();
-	FunctionPoint [] myFuzzPoints = myFuzzification.getFunctionPoints(); 
-	String[][] points = new String[defFuzzPoints.length][];
 	
-	for (int i=0; i<defFuzzPoints.length; i++) {
-		FunctionPoint defFuzzPoint = defFuzzPoints[i];
-		FunctionPoint myFuzzPoint = null;
-		int j=0;
-		while ((j<myFuzzPoints.length) && (myFuzzPoint == null)) {
-	if (defFuzzPoint.getCoordinate1().equals(myFuzzPoints[j].getCoordinate1())) {
-		myFuzzPoint = myFuzzPoints[j];
-	}
-	else j++;
-		}
-		if ((myFuzzPoint == null) || (mode.equals(KConstants.Request.modeAdvanced))) {
-	myFuzzPoint = defFuzzPoint;
-		}
-		String fpx = defFuzzPoint.getCoordinate1();
-		String fpy = myFuzzPoint.getCoordinate2();
-		String fpd = defFuzzPoint.getCoordinate2();
+	HashMap<String, String> defaultFuzzPoints = defaultFuzzification.getFunctionPoints();
+	HashMap<String, String> myFuzzPoints = myFuzzification.getFunctionPoints(); 
 
-		points[i] = new String[3];
-		points[i][0] = fpx;
-		points[i][1] = fpy;
-		points[i][2] = fpd;
-	}
 %>
 
 <div class='personalizationDivFuzzificationFunctionTable'>
@@ -113,24 +93,26 @@
 								</div>
 							</div>
 
-							<% for (int i=0; i<points.length; i++) { 
+							<% for (int i=0; i<keyValues.length; i++) { 
 									String fuzzificationBarDivId = KConstants.JspsDivsIds.fuzzificationBarValueDivId + "[" + i + "]";
+									String defaultValue = JspsUtils.getValueFor(keyValues[i], defaultFuzzPoints, defaultFuzzPoints);
+									String myValue = JspsUtils.getValueFor(keyValues[i], myFuzzPoints, defaultFuzzPoints);
 							%>
 							<div class='personalizationDivFuzzificationFunctionValuesTableRow'>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<%= points[i][0] %>
+									<%= keyValues[i] %>
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx' value='<%= points[i][0] %>'/>
+									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx' value='<%= keyValues[i] %>'/>
 						 			<input type='range'  name='fuzzificationBars[<%= i %>].fpy' min='0' max='1' 
-						 					step='0.01' value='<%= points[i][1] %>' width='150px' 
-						 					onchange="barValueChanged(this, '<%=fuzzificationBarDivId %>', '<%= points[i][0] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');"/>
+						 					step='0.01' value='<%= myValue %>' width='150px' 
+						 					onchange="barValueChanged(this, '<%=fuzzificationBarDivId %>', '<%= keyValues[i] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');"/>
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<span id='<%=fuzzificationBarDivId %>'><%= points[i][1] %></span>
+									<span id='<%=fuzzificationBarDivId %>'><%= myValue %></span>
 								</div>
 								<div class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<%= points[i][2] %>
+									<%= defaultValue %>
 								</div>
 							</div>
 							<% } %>
@@ -167,34 +149,30 @@
 	String PredNecessaryOfADbPred = JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predNecessary, true) +
 			" of a " + JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.database, true);
 	
-	String defaultDefinitionName = defaultFuzzification.getPredOwner();
-	String myName = localUserInfo.getLocalUserName();
+	String name;
 	
-	if (mode.equals(KConstants.Request.modeAdvanced)) {
-		defaultDefinitionName = KConstants.Fuzzifications.PREVIOUS_DEFAULT_DEFINITION;
-		myName = KConstants.Fuzzifications.DEFAULT_DEFINITION;
-	}
-
 	out.print("setFuzzificationFunction('" + defaultFuzzification.getPredDefined() + "', '" + defaultFuzzification.getPredNecessary());
 	out.print("', 0, '" + dbPredIsPredDefined + "', '" + PredNecessaryOfADbPred + "', new Array("); 
-	out.print("new fuzzificationPoints('"+ myName + "', '" + myName + "', new Array(");
 	
-	for (int i=0; i<points.length; i++) {
-		out.print("new Array(" + points[i][0] + ", " + points[i][1] + ")");
-		if (i+1 < points.length) {
-			out.print(", ");
-		}
-	} 
-	out.print(")), ");
+	name = defaultFuzzification.getPredOwner();
+	if (mode.equals(KConstants.Request.modeAdvanced)) {
+		name = KConstants.Fuzzifications.PREVIOUS_DEFAULT_DEFINITION;
+	}
+
+	out.print(JspsUtils.convertFunctionPointsToJS(name, keyValues, defaultFuzzPoints));
+	out.print(", ");
 	
-	out.print("new fuzzificationPoints('" + defaultDefinitionName + "', '" + defaultDefinitionName + "', new Array(");
-	for (int i=0; i<points.length; i++) {
-		out.print("new Array(" + points[i][0] + ", " + points[i][2] + ")");
-		if (i+1 < points.length) {
+	name = myFuzzification.getPredOwner();
+	out.print(JspsUtils.convertFunctionPointsToJS(name, keyValues, myFuzzPoints));
+
+	if (othersFuzzifications.length > 0) {
+		for (int i=0; i<othersFuzzifications.length; i++) {
+			name = othersFuzzifications[i].getPredOwner();
 			out.print(", ");
+			out.print(JspsUtils.convertFunctionPointsToJS(name, keyValues, othersFuzzifications[i].getFunctionPoints()));			
 		}
-	} 
-	out.print("))));");
+	}
+	out.print(");");
 %>
 	insertFuzzificationGraphicRepresentation('<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');
 </script>

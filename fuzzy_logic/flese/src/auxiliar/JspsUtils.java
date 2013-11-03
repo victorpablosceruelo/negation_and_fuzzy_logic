@@ -1,6 +1,8 @@
 package auxiliar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -211,6 +213,100 @@ public class JspsUtils {
 	public static String getRunningSince() {
 		return ServerAndAppUrls.getRunningSince();
 	}
+
+	public static String[] getKeyValues(ProgramPartAnalysis[] fuzzifications) {
+		HashMap<String, String> keyValues = new HashMap<String, String>();
+
+		for (int i = 0; i < fuzzifications.length; i++) {
+			HashMap<String, String> functionPoints = fuzzifications[i].getFunctionPoints();
+			Set<String> functionKeyValuesSet = functionPoints.keySet();
+			String[] functionKeyValues = functionKeyValuesSet.toArray(new String[functionKeyValuesSet.size()]);
+			for (int j = 0; j < functionKeyValues.length; j++) {
+				keyValues.put(functionKeyValues[j], functionKeyValues[j]);
+			}
+		}
+
+		Set<String> keyValuesSet = keyValues.keySet();
+		return keyValuesSet.toArray(new String[keyValuesSet.size()]);
+	}
+
+	public static ProgramPartAnalysis getMyFuzzification(ProgramPartAnalysis[] fuzzifications, LocalUserInfo localUserInfo, String mode) {
+		if (KConstants.Request.modeAdvanced.equals(mode)) {
+			return getDefaultFuzzification(fuzzifications);
+		}
+		int i = 0;
+		boolean found = false;
+		while ((i < fuzzifications.length) && (!found)) {
+			found = fuzzifications[i].getPredOwner().equals(localUserInfo.getLocalUserName());
+
+			if (!found) {
+				i++;
+			}
+		}
+		return fuzzifications[i];
+	}
+
+	public static ProgramPartAnalysis getDefaultFuzzification(ProgramPartAnalysis[] fuzzifications) {
+		int i = 0;
+		boolean found = false;
+		while ((i < fuzzifications.length) && (!found)) {
+			found = fuzzifications[i].getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION);
+
+			if (!found) {
+				i++;
+			}
+		}
+		return fuzzifications[i];
+	}
+
+	public static ProgramPartAnalysis[] getOthersFuzzifications(ProgramPartAnalysis[] fuzzifications, LocalUserInfo localUserInfo,
+			String mode) {
+		ArrayList<ProgramPartAnalysis> result = new ArrayList<ProgramPartAnalysis>();
+		int i = 0;
+		while (i < fuzzifications.length) {
+			if (!(fuzzifications[i].getPredOwner().equals(KConstants.Fuzzifications.DEFAULT_DEFINITION))) {
+
+				if ((KConstants.Request.modeAdvanced.equals(mode))
+						|| (!(fuzzifications[i].getPredOwner().equals(localUserInfo.getLocalUserName())))) {
+					result.add(fuzzifications[i]);
+				}
+			}
+
+			i++;
+		}
+		return result.toArray(new ProgramPartAnalysis[result.size()]);
+	}
+
+	public static String getValueFor(String keyValue, HashMap<String, String> functionPoints, HashMap<String, String> defaultPoints) {
+		String value = functionPoints.get(keyValue);
+		if (value == null) {
+			value = defaultPoints.get(keyValue);
+			if (value == null) {
+				return "0";
+			}
+		}
+		return value;
+	}
+
+	public static String convertFunctionPointsToJS(String name, String[] keyValues, HashMap<String, String> functionPoints) {
+		boolean isTheFirstPoint = true;
+		StringBuilder result = new StringBuilder();
+		result.append("new fuzzificationPoints('" + name + "', '" + name + "', new Array(");
+
+		for (int i = 0; i < keyValues.length; i++) {
+			String value = functionPoints.get(keyValues[i]);
+			if ((value != null) && (!"".equals(value))) {
+				if (!isTheFirstPoint) {
+					result.append(", ");
+				}
+				result.append("new Array(" + keyValues[i] + ", " + value + ")");
+				isTheFirstPoint = false;
+			}
+		}
+		result.append("))");
+		return result.toString();
+	}
+
 }
 
 // END

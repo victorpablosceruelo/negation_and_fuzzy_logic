@@ -1,6 +1,7 @@
 package programAnalysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +22,7 @@ public class ProgramPartAnalysis {
 	private String body = null;
 	private String fuzzyBody = null;
 	private float value = -1;
-	private ArrayList<FunctionPoint> functionPoints = null;
+	private HashMap<String, String> functionPoints = null;
 	private String ruleBody = null;
 	private String ruleAggregator = null;
 	private float defaults_to = -1;
@@ -455,12 +456,12 @@ public class ProgramPartAnalysis {
 						String pointY = pointsPairString.substring(indexMiddle + 1);
 
 						if (functionPoints == null) {
-							functionPoints = new ArrayList<FunctionPoint>();
+							functionPoints = new HashMap<String, String>();
 						}
 						FunctionPoint functionPoint = new FunctionPoint(pointX, pointY);
 						// LOG.info("functionPoint " +
 						// functionPoint.toString());
-						functionPoints.add(functionPoint);
+						functionPoints.put(functionPoint.getCoordinate1(), functionPoint.getCoordinate2());
 					} else
 						throw new Exception("no comma between point coordinates.");
 				} else
@@ -700,11 +701,11 @@ public class ProgramPartAnalysis {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public FunctionPoint[] getFunctionPoints() {
+	public HashMap<String, String> getFunctionPoints() {
 		if (functionPoints == null) {
-			return new FunctionPoint[0];
+			return new HashMap<String, String>();
 		}
-		return functionPoints.toArray(new FunctionPoint[functionPoints.size()]);
+		return functionPoints;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -715,10 +716,12 @@ public class ProgramPartAnalysis {
 		programSubPartLines = new ArrayList<String>();
 		String line = this.predDefined + " :~ function(" + this.predNecessary + ", [";
 
-		functionPoints = new ArrayList<FunctionPoint>();
+		functionPoints = new HashMap<String, String>();
+		FunctionPoint functionPoint = null;
 
 		for (int i = 0; i < params.length; i++) {
-			functionPoints.add(new FunctionPoint(params[i][0], params[i][1]));
+			functionPoint = new FunctionPoint(params[i][0], params[i][1]);
+			functionPoints.put(functionPoint.getCoordinate1(), functionPoint.getCoordinate2());
 			line += " (" + params[i][0] + ", " + params[i][1] + ")";
 			if (i + 1 < params.length)
 				line += ",";
