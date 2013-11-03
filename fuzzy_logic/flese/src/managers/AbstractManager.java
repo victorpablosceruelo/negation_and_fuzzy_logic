@@ -100,7 +100,7 @@ public abstract class AbstractManager implements InterfaceManager {
 	}
 
 	private UrlMap getValidUrlMap() {
-		UrlMap urlMap = new UrlMap(requestStoreHouse);
+		UrlMap urlMap = UrlMap.getUrlMap(requestStoreHouse);
 		try {
 			urlMap = UrlsMaps.getUrlMap(urlMap);
 		} catch (UrlMapException e1) {

@@ -18,21 +18,7 @@ public class UrlMap {
 		public static final String defaultOp = "defaultOp";
 	}
 
-	protected UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage) {
-		initializeUrlMap(manager, op, nextPage, exceptionPage, "");
-	}
-
-	public UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) {
-		initializeUrlMap(manager, op, nextPage, exceptionPage, currentUrl);
-	}
-
-	public UrlMap(RequestStoreHouse sessionStoreHouse) {
-		String manager = sessionStoreHouse.getRequestParameter(KConstants.Request.managerParam);
-		String op = sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam);
-		initializeUrlMap(manager, op, null, null, null);
-	}
-
-	private void initializeUrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) {
+	private UrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) {
 		if (manager == null)
 			manager = "";
 		if (op == null)
@@ -45,6 +31,20 @@ public class UrlMap {
 		this.nextPage = nextPage;
 		this.exceptionPage = exceptionPage;
 		this.currentUrl = currentUrl;
+	}
+
+	protected static UrlMap getUrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage) {
+		return new UrlMap(manager, op, nextPage, exceptionPage, "");
+	}
+
+	public static UrlMap getUrlMap(String manager, String op, UrlMap nextPage, UrlMap exceptionPage, String currentUrl) {
+		return new UrlMap(manager, op, nextPage, exceptionPage, currentUrl);
+	}
+
+	public static UrlMap getUrlMap(RequestStoreHouse sessionStoreHouse) {
+		String manager = sessionStoreHouse.getRequestParameter(KConstants.Request.managerParam);
+		String op = sessionStoreHouse.getRequestParameter(KConstants.Request.operationParam);
+		return new UrlMap(manager, op, null, null, null);
 	}
 
 	private String adequateManagerName(String managerName) {
