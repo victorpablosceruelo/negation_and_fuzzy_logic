@@ -66,12 +66,13 @@ function executeAjaxLoadedPageJS(loadedContent) {
     	var scriptString = script.toString();
     	scriptString = scriptString.replace(scriptStart, '');
     	scriptString = scriptString.replace(scriptEnd, '');
+    	// scriptString = scriptString.replace('\n', '');
     	var notExecutable = scriptHasProblematicParts(scriptString);
     	if (notExecutable) {
     		debug.warn(scriptString);
     	}
     	else {
-			eval(script);
+			eval(scriptString);
     	}
 	}
 }
