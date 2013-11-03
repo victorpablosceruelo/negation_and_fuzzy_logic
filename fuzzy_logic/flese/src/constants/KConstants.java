@@ -169,8 +169,8 @@ public class KConstants {
 		public static final String mainSecDivId = "mainSecDiv";
 		public static final String msgsSecDivId = "msgsSecDiv";
 
+		public static final String programFileActionsContainerId = "programFileActionsContainer";
 		public static final String chooseQueryStartTypeContainerId = "chooseQueryStartTypeContainerId";
-		public static final String databaseActionsContainerId = "databaseActionsContainer";
 		public static final String queryStartContainerId = "queryStartContainer";
 		public static final String selectQueryDivId = "selectQueryDiv";
 		public static final String runQueryDivId = "runQueryDiv";

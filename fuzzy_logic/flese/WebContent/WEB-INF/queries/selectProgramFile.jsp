@@ -13,6 +13,9 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 
+	String urlSelectQueryStartType = KUrls.Queries.SelectQueryStartType.getUrl(true);
+	String urlProgramFileActions = KUrls.Queries.ProgramFileActions.getUrl(true);
+	
 	if (filesList.length == 0) {
 %>
 	<div class="selectDatabaseTableRow">
@@ -30,11 +33,11 @@
 		<div class="selectDatabaseTableCell2">
 			<select name="<%=KConstants.Request.programParam %>" 
 					id="<%=KConstants.Request.programParam %>" 
-					onchange='selectedProgramDatabaseChanged(this)' >
+					onchange="selectedProgramDatabaseChanged(this, '<%=urlSelectQueryStartType %>', '<%=urlProgramFileActions %>')" >
 			<%=JspsUtils.comboBoxDefaultValue()%>
 <%
 	for (int i=0; i<filesList.length; i++) { 
-		String value = KUrls.Queries.SelectQueryStartType.getUrl(true) + filesList[i].getInfoForUrls();
+		String value = filesList[i].getInfoForUrls();
 		String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
 %>	
 				<option id='<%=value%>' title='<%=value%>' value='<%=value%>'><%=desc%></option>
@@ -42,7 +45,7 @@
 	}
 %>			</select>
 		</div>
-		<div class='selectDatabaseTableCell3' id='<%=KConstants.JspsDivsIds.databaseActionsContainerId%>'>
+		<div class='selectDatabaseTableCell3' id='<%=KConstants.JspsDivsIds.programFileActionsContainerId%>'>
 		</div>
 	</div>
 <%

@@ -407,11 +407,11 @@ function loadNewQuery() {
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-function selectedProgramDatabaseChanged(comboBox, urlDatabaseActions) {
+function selectedProgramDatabaseChanged(comboBox, urlSelectQueryStartType, urlProgramFileActions) {
 	showMsgsArray(<%= JspsUtils.getEmptyArrayMessagesInJs() %>);
 	var selectQueryDivId = '<%= KConstants.JspsDivsIds.selectQueryDivId %>'; 
 	var runQueryDivId = '<%= KConstants.JspsDivsIds.runQueryDivId %>';
-	var databaseActionsContainerId = "<%=KConstants.JspsDivsIds.databaseActionsContainerId %>";
+	var programFileActionsContainerId = "<%=KConstants.JspsDivsIds.programFileActionsContainerId %>";
 	
 	var selectQueryDiv = document.getElementById(selectQueryDivId);
 	debugInfoIfVarIsNull(selectQueryDiv, "selectQueryDiv", "selectedProgramDatabaseChanged");
@@ -421,18 +421,18 @@ function selectedProgramDatabaseChanged(comboBox, urlDatabaseActions) {
 	debugInfoIfVarIsNull(runQueryDiv, "runQueryDiv", "selectedProgramDatabaseChanged");
 	runQueryDiv.innerHTML = "";
 	
-	var databaseActionsContainer = getContainer(databaseActionsContainerId);
+	var programFileActionsContainer = getContainer(programFileActionsContainerId);
 	
-	var selectedProgramDatabaseUrl = getComboBoxValue(comboBox);
+	var selectedProgramFileUrlParams = getComboBoxValue(comboBox);
 	
-	if (selectedProgramDatabaseUrl == "") {
-		databaseActionsContainer.style.visibility = 'hidden'; 
+	if (selectedProgramFileUrlParams == "") {
+		programFileActionsContainer.style.visibility = 'hidden'; 
 		selectQueryDiv.innerHTML="Please choose a valid database to continue.";
 	}
 	else {
-		loadAjaxIn(selectQueryDivId, selectedProgramDatabaseUrl);
-		databaseActionsContainer.style.visibility = 'visible';
-		loadAjaxIn(databaseActionsContainerId, urlDatabaseActions);
+		loadAjaxIn(selectQueryDivId, urlSelectQueryStartType + selectedProgramFileUrlParams);
+		programFileActionsContainer.style.visibility = 'visible';
+		loadAjaxIn(programFileActionsContainerId, urlProgramFileActions + selectedProgramFileUrlParams);
 	}
 	
 }
