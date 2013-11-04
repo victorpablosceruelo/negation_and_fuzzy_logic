@@ -160,6 +160,27 @@ function drawChart(divIdentifier) {
 	
 	if ((fuzzificationFunction != null) && (fuzzificationFunction.fuzzificationPoints != null)) {
 
+		var minValue = null;
+		var maxValue = null;
+		var currentValue = 0;
+		for (var i=0; i<fuzzificationFunction.fuzzificationPoints.length; i++) {
+			for (var j=0; j<fuzzificationFunction.fuzzificationPoints[i].data.length; j++) {
+				currentValue = fuzzificationFunction.fuzzificationPoints[i].data[j][0];
+				if ((minValue == null) || (minValue > currentValue)) {
+					minValue = currentValue;
+				}
+				if ((maxValue == null) || (maxValue < currentValue)) {
+					maxValue = currentValue;
+				}
+			}
+		}
+		
+		var extension = (maxValue - minValue) * (10 / 100);
+		if (! (minValue == 0)) {
+			minValue = minValue - extension;
+		}
+		maxValue = maxValue + extension;
+		
 //		$(document).ready(function() {
 			  // charts[i] = 
 		      chart = new Highcharts.Chart({
@@ -171,8 +192,8 @@ function drawChart(divIdentifier) {
 		         title: { text: fuzzificationFunction.msgTop },
 		         xAxis: {
 					title: { text: fuzzificationFunction.msgBottom },
-					min: 0
-
+					min: minValue,
+					max: maxValue
 		            // categories: ['Apples', 'Bananas', 'Oranges']
 		         },
 		         yAxis: {
