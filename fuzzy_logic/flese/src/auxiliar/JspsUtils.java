@@ -1,6 +1,7 @@
 package auxiliar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -227,7 +228,9 @@ public class JspsUtils {
 		}
 
 		Set<String> keyValuesSet = keyValues.keySet();
-		return keyValuesSet.toArray(new String[keyValuesSet.size()]);
+		String[] keyValuesArray = keyValuesSet.toArray(new String[keyValuesSet.size()]);
+		Arrays.sort(keyValuesArray, StringsComparator.PERSONALIZED);
+		return keyValuesArray;
 	}
 
 	public static ProgramPartAnalysis getMyFuzzification(ProgramPartAnalysis[] fuzzifications, LocalUserInfo localUserInfo, String mode) {

@@ -172,7 +172,7 @@
 			out.print(JspsUtils.convertFunctionPointsToJS(name, keyValues, othersFuzzifications[i].getFunctionPoints()));			
 		}
 	}
-	out.print(");");
+	out.print("));");
 %>
 	insertFuzzificationGraphicRepresentation('<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');
 </script>

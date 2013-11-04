@@ -26,7 +26,7 @@ public class FunctionPoint {
 	}
 
 	public String toString () {
-		return " coordinates: 1: " + coordinate_1 + " 2: " + coordinate_2 + " ";
+		return "funct(" + coordinate_1 + ")=" + coordinate_2 + "  ";
 	}
 	
 	public String toJavaScript () {

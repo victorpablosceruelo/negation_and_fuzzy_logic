@@ -434,6 +434,7 @@ public class ProgramPartAnalysis {
 		boolean morePoints = true;
 		int indexStart, indexMiddle, indexEnd;
 		String pointsPairString = "";
+		StringBuilder logMsg = new StringBuilder();
 
 		while (morePoints) {
 			indexEnd = input.indexOf(")");
@@ -462,6 +463,7 @@ public class ProgramPartAnalysis {
 						// LOG.info("functionPoint " +
 						// functionPoint.toString());
 						functionPoints.put(functionPoint.getCoordinate1(), functionPoint.getCoordinate2());
+						logMsg.append(functionPoint.toString());
 					} else
 						throw new Exception("no comma between point coordinates.");
 				} else
@@ -472,14 +474,7 @@ public class ProgramPartAnalysis {
 			}
 		}
 
-		// LOG result.
-		String msg = "";
-		if (functionPoints != null) {
-			for (int i = 0; i < functionPoints.size(); i++) {
-				msg += functionPoints.get(i).toString() + " ";
-			}
-		}
-		LOG.info(msg);
+		LOG.info(logMsg.toString());
 
 		if (!"".equals(removeSpacesBeforeAndAfter(input))) {
 			throw new Exception("Not parsed text: " + input);
