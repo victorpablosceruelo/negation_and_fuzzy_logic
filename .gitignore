@@ -16,6 +16,7 @@
 packed/*
 debug_file*.pl
 debug_pkg_*.pl
+debug_file_of_file_*.txt
 debug_pkg_cneg_statistics.pl
 *.\$\$\$
 */.svn/*
