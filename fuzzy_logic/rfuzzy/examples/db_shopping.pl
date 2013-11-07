@@ -7,8 +7,8 @@ rfuzzy_define_database(car/11,
 	   (class,  rfuzzy_enum_type),
 	    (year_of_production_start, rfuzzy_integer_type),
 	     (year_of_production_end, rfuzzy_integer_type), 
-	      (length, rfuzzy_integer_type),
-	       (width, rfuzzy_integer_type),
+	      (car_length, rfuzzy_integer_type),
+	       (car_width, rfuzzy_integer_type),
 		(height, rfuzzy_integer_type),
 		 (horsepower_in_kw, rfuzzy_integer_type),
 		  (max_speed_in_mph, rfuzzy_integer_type),
@@ -26,6 +26,6 @@ car('Ford Fiesta', 'Ford Motor Company', 'City Car',                      1976, 
 
 expensive(car) :~ function(price_in_euros(car), [ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
 fast(car) :~ function(max_speed_in_mph(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
-large(car) :~ function(length(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
-wide(car) :~ function(width(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
+large(car) :~ function(car_length(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
+wide(car) :~ function(car_width(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
 big(car) :~ rule(min, (large(car), wide(car))).
