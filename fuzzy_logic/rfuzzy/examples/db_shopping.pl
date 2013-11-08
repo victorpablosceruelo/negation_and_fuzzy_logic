@@ -9,7 +9,7 @@ rfuzzy_define_database(car/11,
 	     (year_of_production_end, rfuzzy_integer_type), 
 	      (car_length, rfuzzy_integer_type),
 	       (car_width, rfuzzy_integer_type),
-		(height, rfuzzy_integer_type),
+		(car_height, rfuzzy_integer_type),
 		 (horsepower_in_kw, rfuzzy_integer_type),
 		  (max_speed_in_mph, rfuzzy_integer_type),
 		   (price_in_euros, rfuzzy_integer_type)]).
@@ -17,9 +17,14 @@ rfuzzy_define_database(car/11,
 % We define the individuals in our database.
 car('Fiat Cinquecento', 'Fiat Auto Poland', 'City Car',                     1991, 1998, 3230, 1490, 1435, 31, 93, null).
 car('VW Caddy', 'Volkswagen Commercial Vehicles', 'Work Van', 1980, null,   4405, 1794, 1833, 80, 110, 45000).
-car('Alfa Romeo GT', 'Alfa Romeo', 'Sport Car',                            2003, 2010, 4489, 1763, 1362, 237, 130, 30000).
-car('Aston Martin Bulldog', 'Aston Martin', 'Sport Car',                  1980, null,    4376, 1698, 1100, 522, 191, 150000).
+car('Alfa Romeo GT', 'Alfa Romeo', 'Sports Car',                            2003, 2010, 4489, 1763, 1362, 237, 130, 30000).
+car('Aston Martin Bulldog', 'Aston Martin', 'Sports Car',                  1980, null,    4376, 1698, 1100, 522, 191, 150000).
 car('Ford Fiesta', 'Ford Motor Company', 'City Car',                      1976, null,    3924, 1685, 1468, 73, 114, 12000).
+car('Ford Probe', 'Ford Motor Company', 'Sports Coupe',               1989, 1997,  4496, 1735, 1316, 73, 204, 20000).
+car('Peugeot 207CC', 'Peugeot', 'Supermini',                                2006, 2012,  4045, 1748, 1472, 90, 199, 21000).
+car('Audi TT', 'Audi AG', 'Sports Car',                                             1998, null,  4178, 1735, 1352, 178, 204, 40000).
+car('Audi TT Coupe', 'Audi AG', 'Sports Coupe',                            1998, 2006,  4041, 1764, 1346, 222, 226, 45000).
+car('Audi TT Quattro Sport', 'Audi AG', 'Sports Car',                      1998, null,  4141, 1842, 1346, 237, 250, 48000).
 
 %  vw_phaeton.
 % ferrari
