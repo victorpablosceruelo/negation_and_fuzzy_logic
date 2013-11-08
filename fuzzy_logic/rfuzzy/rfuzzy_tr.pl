@@ -503,7 +503,12 @@ translate_fuzzy(Pred_Info, Cls) :-
 	generate_ifcondition_subCl(If_Cond, P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition),
 	generate_username_subCl(UN, SubCl_UserName),
 	generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, SubCl_IfCondition, SubCl_UserName, SubCl_Prio),
-	Cls = [(NP_F :- SubCl_TypeTest, Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio)],
+	generate_on_error_subCl(NP_Arg_TV, NP_Arg_Prio, Cl_Body_On_Error),
+	Cls = [(NP_F :- SubCl_TypeTest, (
+					    (Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio) 
+					; 
+					    (Cl_Body_On_Error)
+					))],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
 	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], ('fuzzy_rule', [(NP_N, NP_A)])),
@@ -512,6 +517,9 @@ translate_fuzzy(Pred_Info, Cls) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
+
+generate_on_error_subCl(Cl_Body_TV, Cl_Body_Prio, Cl_Body_On_Error) :-
+	Cl_Body_On_Error = (Cl_Body_TV .=. 0, Cl_Body_Prio .=. 0).
 
 generate_type_test_subCl(NP_Arg_Input, P_TN, P_TA, SubCl_TypeTest) :-
 	functor(Type_F, P_TN, P_TA),
