@@ -26,6 +26,7 @@ car('Ford Fiesta', 'Ford Motor Company', 'City Car',                      1976, 
 
 expensive(car) :~ function(price_in_euros(car), [ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
 fast(car) :~ function(max_speed_in_mph(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
-large(car) :~ function(car_length(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
-wide(car) :~ function(car_width(car), [ (0, 0), (100, 0.5), (150, 1), (1000, 1) ]).
+large(car) :~ function(car_length(car), [ (0, 0), (3000, 0.2), (4000, 0.5), (5000, 1), (10000, 1) ]).
+wide(car) :~ function(car_width(car), [ (0, 0), (1400, 0.2), (1500, 0.5), (1700, 1), (3000, 1) ]).
 big(car) :~ rule(min, (large(car), wide(car))).
+
