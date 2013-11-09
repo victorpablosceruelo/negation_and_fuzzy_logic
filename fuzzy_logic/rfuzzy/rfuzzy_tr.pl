@@ -798,6 +798,20 @@ translate_db_description([(Field_Name, Field_Type) | Description], Index, DB_P_N
 	New_Index is Index + 1,
 	translate_db_description(Description, New_Index, DB_P_N, DB_P_A, Types, Field_Names).
 
+translate_db_description(_List_In, Index, _DB_P_N, DB_P_A, _Types, _Field_Names) :-
+	nonvar(Index), nonvar(DB_P_A), Index >= DB_P_A, !,
+	print_msg('error', 'There are more database fields than the number of fields you specify in the program file', DB_P_A),
+	!, fail. % If this is a variable the tranlate rules loop forever !!!
+
+translate_db_description(_List_In, Index, _DB_P_N, DB_P_A, _Types, _Field_Names) :-
+	(
+	    var(Index)
+	;
+	    var(DB_P_A)
+	), !,
+	print_msg('error', 'translate_db_description: Index or DB_P_A are variables when they should not. (Index, DB_P_A) ', (Index, DB_P_A)),
+	!, fail. % If this is a variable the tranlate rules loop forever !!!
+
 save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
 	nonvar(Field_Name), nonvar(Field_Type), nonvar(DB_P_N), nonvar(DB_P_A), nonvar(Index),
 
