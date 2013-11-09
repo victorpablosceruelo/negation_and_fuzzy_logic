@@ -30,8 +30,7 @@ car('Ford Probe', 'Ford Motor Company', 'Sports Coupe',               1989, 1997
 car('Peugeot 207CC', 'Peugeot', 'Supermini',                                2006, 2012,    4045, 1748, 1472,  156,  8.5, 220, 4,   16,     50, 7.4,    21000).
 
 car('Audi TT', 'Audi AG', 'Sports Car',                                             1998, null,     4178, 1735, 1352,  200,  6.6, 240, 4,   16,     55, 7.7,    40000).
-car('Audi TT Coupe', 'Audi AG', 'Sports Coupe',                            1998, 2006,    4041, 1764, 1346,  222, 226, 45000).
-car('Audi TT Quattro Sport', 'Audi AG', 'Sports Car',                      1998, null,     4141, 1842, 1346,   237, 250, 48000).
+car('Audi TT Quattro Sport', 'Audi AG', 'Sports Car',                      2006, null,     4178, 1842, 1352,  250,  5.7, 250, 6,   24,     60, 9.4,    48000).
 
 %  vw_phaeton.
 % ferrari
