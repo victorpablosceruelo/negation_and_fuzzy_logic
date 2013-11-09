@@ -98,13 +98,13 @@ public class PlConnectionEnvelope {
 		long timesCounter;
 		boolean queryIsStillRunning = true;
 
-		String msgsAccumulator = "";
+		StringBuilder msgsAccumulator = new StringBuilder();
 		do { // Get all the answers you can.
 			prologQueryAnswer = null;
 			timesCounter = 0;
 			// Save the current answer.
 			answersCounter++;
-			msgsAccumulator += "getting answer number: " + answersCounter + "\n";
+			msgsAccumulator.append("getting answer number: " + answersCounter + "\n");
 			// LOG.info(msgsAccumulator);
 			// msgsAccumulator = "";
 
@@ -121,24 +121,26 @@ public class PlConnectionEnvelope {
 						+ KConstants.CiaoPrologQuery.maximumNumberOfRetries);
 			}
 
-			msgsAccumulator += "goal: " + evaluatedGoal.toString() + "\n";
+			msgsAccumulator.append("goal: " + evaluatedGoal.toString() + "\n");
 			if (prologQueryAnswer != null) {
 				CiaoPrologQueryAnswer ciaoPrologQueryAnswer = new CiaoPrologQueryAnswer();
 				int variablesLength = query.getVariablesLength();
 				for (int i = 0; i < variablesLength; i++) {
-					msgsAccumulator += "      var[" + i + "]: ";
+					msgsAccumulator.append("      var[" + i + "]: ");
 
 					PLVariable variable = query.getVariables()[i];
 					String variableName = query.getVariablesNames()[i];
 					CiaoPrologTermInJava ciaoPrologTermInJava = null;
 
 					if (variable != null) {
-						msgsAccumulator += (variable.toString() + " bind: " + variable.getBinding());
+						msgsAccumulator.append(variable.toString());
+						msgsAccumulator.append(" bind: "); 
+						msgsAccumulator.append(variable.getBinding());
 						ciaoPrologTermInJava = new CiaoPrologTermInJava(variable, prologQueryAnswer);
-						msgsAccumulator += " -> " + ciaoPrologTermInJava.toString() + " \n";
+						msgsAccumulator.append(" -> " + ciaoPrologTermInJava.toString() + " \n");
 					} else {
 						ciaoPrologTermInJava = null;
-						msgsAccumulator += "null -> null \n";
+						msgsAccumulator.append("null -> null \n");
 					}
 
 					ciaoPrologQueryAnswer.addCiaoPrologVariableAnswer(variableName, ciaoPrologTermInJava);
@@ -147,12 +149,12 @@ public class PlConnectionEnvelope {
 				// LOG.info(msgsAccumulator);
 			} else {
 				// LOG.info("performQueryAux: answer obtained: null ");
-				msgsAccumulator += "answer obtained: null \n";
+				msgsAccumulator.append("answer obtained: null \n");
 			}
 
 		} while ((prologQueryAnswer != null) && (answersCounter < KConstants.CiaoPrologQuery.maximumNumberOfAnswers));
 
-		LOG.info(msgsAccumulator);
+		LOG.info(msgsAccumulator.toString());
 		// LOG.info("performQueryAux: terminating goal execution ...");
 		if (evaluatedGoal != null) {
 			try {
