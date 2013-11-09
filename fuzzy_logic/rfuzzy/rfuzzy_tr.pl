@@ -1313,6 +1313,7 @@ code_for_assert_local_user_name(Code, [Cl_1, Cl_2 | Code]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
+code_for_getting_attribute_values(In, In) :- !. % Without use.
 code_for_getting_attribute_values(In, [Code_1, Code_2, Code_3|In]) :-
 	Code_1 = (rfuzzy_var_truth_value(Var, Condition, Value) :-
 		 print_msg('debug', 'rfuzzy_var_truth_value :: Var', Var),

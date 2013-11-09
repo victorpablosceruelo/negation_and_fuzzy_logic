@@ -15,7 +15,8 @@
 	one_by_one_first_head/2, one_by_one_first_tail/2,
 	rfuzzy_process_attribute_dump/4,
 	append_local/3, memberchk_local/2, remove_list_dupplicates/3,
-	sets_union/3, lists_substraction/3
+	sets_union/3, lists_substraction/3,
+	rfuzzy_var_truth_value/3
 		     ],[hiord]).
 
 :- use_module(library(write),[write/1]).
@@ -433,6 +434,25 @@ remove_list_dupplicates([Element|List_In], List_Aux, List_Out) :-
 	remove_list_dupplicates(List_In, List_Aux, List_Out).
 remove_list_dupplicates([Element|List_In], List_Aux, List_Out) :-
 	remove_list_dupplicates(List_In, [Element|List_Aux], List_Out).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+rfuzzy_var_truth_value(Var, Condition, Value) :-
+	var(Var),					 
+	print_msg('debug', 'rfuzzy_var_truth_value :: Var', Var),
+	dump_constraints(Var, Var, Dump), !,
+	print_msg('debug', 'rfuzzy_var_truth_value :: dump_constraints :: Dump', Dump),
+	rfuzzy_process_attribute_dump(Dump, Var, Condition, Value),
+	!.
+rfuzzy_var_truth_value(Var, 'constant', Var) :- 
+	nonvar(Var), 
+	print_msg('debug', 'rfuzzy_var_truth_value :: Constant', Var),
+	!.
+rfuzzy_var_truth_value(Var, 'error', 0) :-
+	print_msg('error', 'rfuzzy_var_truth_value :: ERROR :: unknown', Var),
+	!.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
