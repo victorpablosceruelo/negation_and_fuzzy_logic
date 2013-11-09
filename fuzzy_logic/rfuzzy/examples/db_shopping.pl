@@ -27,12 +27,16 @@ car('Alfa Romeo GT', 'Alfa Romeo', 'Sports Car',                            2003
 car('Aston Martin Bulldog', 'Aston Martin', 'Sports Car',                  1980, null,    4376, 1698, 1100,  522, 12,    191, 8,   null, 113, g, 30,    150000).
 
 car('Ford Fiesta', 'Ford Motor Company', 'City Car',                      2008, null,      3950, 1722, 1481,   96, 13.9, 166, 4,   16,     45, d, 6.5,    12000).
-car('Ford Probe', 'Ford Motor Company', 'Sports Coupe',               1989, 1997,  4496, 1735, 1316,  165,   8,   220, 6,   24,     60, g, 9.6,   20000).
+car('Ford Probe', 'Ford Motor Company', 'Sports Coupe',               1989, 1997,  4496, 1735, 1316,  165,   8,   220, 6,   24,     60, g, 9.6,    20000).
+car('Ford S Max 1.8 TDCi', 'Ford Motor Company', 'Large MPV',  2006, 2010,   4768, 1884, 1658,  125, 11.6, 190, 4,   8,     70, d, 6.2,     30000).
+
 car('Peugeot 207CC', 'Peugeot', 'Supermini',                                2006, 2012,    4045, 1748, 1472,  156,  8.5, 220, 4,   16,     50, g, 7.4,    21000).
+car('Peugeot 306', 'Peugeot', 'Family Car',                                    1993, 2002,    4030, 1680, 1380,   90,   13, 182, 4,    8,     60, d, 6.2,      15000).
 
 car('Audi TT', 'Audi AG', 'Sports Car',                                             1998, null,     4178, 1735, 1352,  200,  6.6, 240, 4,   16,     55, g, 7.7,    40000).
 car('Audi TT Quattro Sport', 'Audi AG', 'Sports Car',                      2006, null,     4178, 1842, 1352,  250,  5.7, 250, 6,   24,     60, g, 9.4,    48000).
 
+car('Mini Cooper', 'British Motor Corporation', 'Economy Car',       2009, null,    3699, 1683, 1414,  120,  9.8, 198, 4,   16,     40, g, 5.7,    24000).
 
 
 %  vw_phaeton.
