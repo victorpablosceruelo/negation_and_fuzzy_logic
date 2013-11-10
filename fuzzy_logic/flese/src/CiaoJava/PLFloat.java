@@ -104,10 +104,13 @@ public class PLFloat extends PLTerm {
 	 */
 	public boolean equals(PLTerm t) {
 
-		if ((Type == t.Type) && (Value == ((PLFloat) t).Value))
-			return true;
-		else
-			return false;
+		if (Type == t.Type) {
+			Double floatValue = ((PLFloat) t).Value; 
+			if (Value.equals(floatValue)) {
+				return true;
+			}
+		}
+		return false;
 
 	}
 
