@@ -1,5 +1,6 @@
 package prologConnector;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import CiaoJava.PLAtom;
@@ -71,7 +72,9 @@ public class CiaoPrologTermInJava {
 		if (term.isFloat()) {
 			creationMsgs += " is a float. ";
 			PLFloat prologFloat = (PLFloat) term;
-			singleAnswerTerm = prologFloat.toString();
+			double doubleValue = prologFloat.getValue();
+			DecimalFormat df = new DecimalFormat("#.##");
+			singleAnswerTerm = df.format(doubleValue);
 		}
 		// For atom ???
 		if (term.isAtom()) {
