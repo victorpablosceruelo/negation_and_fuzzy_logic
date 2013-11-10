@@ -48,5 +48,8 @@ large(car) :~ function(car_length_in_mm(car), [ (0, 0), (3000, 0.2), (4000, 0.5)
 wide(car) :~ function(car_width_in_mm(car), [ (0, 0), (1400, 0.2), (1500, 0.5), (1700, 1), (3000, 1) ]).
 big(car) :~ rule(min, (large(car), wide(car))).
 
-preQuery :- activate_rfuzzy_debug.
-problematicQuery :- (((((((((((((((((((((assertLocalUserName('victorpablosceruelo_at_gmail_com_at_google'),(car(_244, _245, _246, _247, _248, _249, _250, _251, _252, _253, _254, _255, _256, _257, _258, _259, _260), =(_261, car(_244, _245, _246, _247, _248, _249, _250, _251, _252, _253, _254, _255, _256, _257, _258, _259, _260)))), rfuzzy_compute(<, consumption_in_litres_each_100_km(_261), 6, car, Z1)), rfuzzy_var_truth_value(_261, Y19, X19)), rfuzzy_var_truth_value(_244, Y18, X18)), rfuzzy_var_truth_value(_245, Y17, X17)), rfuzzy_var_truth_value(_246, Y16, X16)), rfuzzy_var_truth_value(_247, Y15, X15)), rfuzzy_var_truth_value(_248, Y14, X14)), rfuzzy_var_truth_value(_249, Y13, X13)), rfuzzy_var_truth_value(_250, Y12, X12)), rfuzzy_var_truth_value(_251, Y11, X11)), rfuzzy_var_truth_value(_252, Y10, X10)), rfuzzy_var_truth_value(_253, Y9, X9)), rfuzzy_var_truth_value(_254, Y8, X8)), rfuzzy_var_truth_value(_255, Y7, X7)), rfuzzy_var_truth_value(_256, Y6, X6)), rfuzzy_var_truth_value(_257, Y5, X5)), rfuzzy_var_truth_value(_258, Y4, X4)), rfuzzy_var_truth_value(_259, Y3, X3)), rfuzzy_var_truth_value(_260, Y2, X2)), rfuzzy_var_truth_value(Z1, Y1, X1)).
+small(car) :~ antonym_of(big(car), prod, 1).
+cheap(car) :~ antonym_of(expensive(car), prod, 1).
+
+unexpensive(car) :~ synonym_of(cheap(car), prod, 1).
+familiar(car) :~ synonym_of(big(car), prod, 1).
