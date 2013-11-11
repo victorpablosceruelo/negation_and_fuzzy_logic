@@ -121,6 +121,7 @@ reorder_by_truth_value_aux(Head_1, [ Head_2 | Tail_In ], [ Head_1, Head_2 | Tail
 
 has_less_truth_value(Head_1, Head_2) :-
 	print_msg('debug', 'has_less_truth_value(Head_1, Head_2)', (Head_1, Head_2)),
+	
 	functor(Head_1, _Name_1, Arity_1), 
 	functor(Head_2, _Name_2, Arity_2), 
 	arg(Arity_1, Head_1, TV_1),
@@ -509,7 +510,20 @@ print_msg_real(Pre_Msg1, Msg1,  Msg1_Info, Msg2) :-
 	write(Msg1), 
 	print_msg1_info(Msg1_Info),
 	write(':  '),  write(Msg2),
-	write('    ').
+	write('    '), 
+	print_msg_attributes(Msg2).
+
+print_msg_attributes(Msg2) :-
+	rfuzzy_rt:varsbag(Msg2, [], [], Vars),
+	print_vars_attributes(Vars).
+
+print_vars_attributes([]) :- !.
+print_vars_attributes([Var|Vars]) :-
+	dump_constraints(Var, Var, Dump), !,
+	write(Dump), !, 
+	print_vars_attributes(Vars).
+print_vars_attributes([_Var|Vars]) :-
+	print_vars_attributes(Vars).
 
 % Print msg1 Info (in reverse order to show the structure).
 print_msg1_info([]) :- !.
@@ -521,3 +535,101 @@ print_msg1_info([Head | Tail]) :- !,
 print_msg_nl(Level) :- print_msg_level(Level), !, nl.
 print_msg_nl(_Level) :- !.
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+varsbag(X, OtherBag, Bag_In, Bag_Out) :- 
+        var(X), !,
+	% print_msg('debug', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out),
+	% print_msg('debug', 'varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)', varsbag_local_variable(X, OtherBag, Bag_In, Bag_Out)),
+	!.
+
+varsbag(Term, OtherBag, Bag_In, Bag_Out) :-
+	functor(Term, _Name, Arity),
+        varsbag_go_inside(Arity, Term, OtherBag, Bag_In, Bag_Out).
+
+varsbag_go_inside(0, _Term, _OtherBag, Bag, Bag) :- !.
+varsbag_go_inside(Arity, Term, OtherBag, Bag_In, Bag_Out) :-
+        NewArity is Arity-1,
+        arg(Arity, Term, Argument),
+        rfuzzy_rt:varsbag(Argument, OtherBag, Bag_In, Bag_Tmp), !,
+        varsbag_go_inside(NewArity, Term, OtherBag, Bag_Tmp, Bag_Out).
+
+varsbag_local_variable(X, OtherBag, Bag, Bag) :-
+	var(X),
+	rfuzzy_rt:memberchk(X, OtherBag), % Var is in the other bag.
+	!.
+varsbag_local_variable(X, _OtherBag, Bag, Bag) :- 
+	var(X),
+	rfuzzy_rt:memberchk(X, Bag), % Var is alredy in the bag.
+	!.
+varsbag_local_variable(X, _OtherBag, Bag, [X|Bag]) :- 
+	var(X),
+	!.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% From Ciao Prolog (idlists library).
+% memberchk(X, [Y|_]) :- X == Y, !.
+% memberchk(X, [_|L]) :- memberchk(X, L).
+
+memberchk(_T1, []) :- !, fail.
+memberchk(T1, [T2]) :-
+	terms_are_equal(T1,T2).
+memberchk(T1, [T2|_L]) :- 
+	terms_are_equal(T1,T2).
+memberchk(T1, [_T2|L]) :- 
+        memberchk(T1, L).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+terms_are_equal(T1, T2) :- % Same var
+        var(T1),
+        var(T2),
+        T1==T2,!.
+terms_are_equal(T1, T2) :- % Different vars.
+        (   var(T1) ;
+            var(T2)),
+        !, fail. % Fail
+
+terms_are_equal(T1, T2) :- % For functors.
+        functor_local(T1, Name1, Arity1, Args1),
+        functor_local(T2, Name2, Arity2, Args2),
+	Name1 == Name2,
+	Arity1 == Arity2,
+        !,
+        terms_are_equal_list(Args1, Args2).
+
+terms_are_equal(_T1, _T2) :- % Other things
+%       write(terms_are_equal(T1, T2)), write(' ERROR '), nl,
+        !, fail. % Fail
+
+terms_are_equal_list([],[]) :- !. % Empty lists.
+terms_are_equal_list([T1|L1],[T2|L2]) :- !, % Lists.
+        terms_are_equal(T1, T2),
+        terms_are_equal_list(L1,L2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+functor_local(Head, Name, Arity, Args) :-
+        functor(Head, Name, Arity),
+        Arity > 0, !,
+        Head=..[Name|Args].
+
+functor_local(Head, Name, Arity, []) :-
+        functor(Head, Name, Arity),
+        Arity == 0.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
