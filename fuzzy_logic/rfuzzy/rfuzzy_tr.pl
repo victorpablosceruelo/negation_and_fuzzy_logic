@@ -588,25 +588,25 @@ generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, SubCl_IfCondition, SubCl_User
 	    (
 		SubCl_IfCondition = 'true', 
 		SubCl_UserName = 'true',
-		SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.15)
+		SubCl_Prio = (NP_Arg_Prio .=. Cl_Body_Prio - 0.15)
 	    )
 	;
 	    (
 		SubCl_IfCondition = 'true', 
 		SubCl_UserName \== 'true',
-		SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.1)		
+		SubCl_Prio = (NP_Arg_Prio .=. Cl_Body_Prio - 0.1)		
 	    )
 	;
 	    (
 		SubCl_IfCondition \== 'true', 
 		SubCl_UserName = 'true',
-		SubCl_Prio = (NP_Arg_Prio is Cl_Body_Prio - 0.05)		
+		SubCl_Prio = (NP_Arg_Prio .=. Cl_Body_Prio - 0.05)		
 	    )
 	;
 	    (
 		SubCl_IfCondition \== 'true', 
 		SubCl_UserName \== 'true',
-		SubCl_Prio = (NP_Arg_Prio = Cl_Body_Prio)		
+		SubCl_Prio = (NP_Arg_Prio .=. Cl_Body_Prio)		
 	    )
 	), !.
 

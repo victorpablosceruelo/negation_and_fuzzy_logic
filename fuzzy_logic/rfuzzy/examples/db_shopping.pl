@@ -53,3 +53,4 @@ cheap(car) :~ antonym_of(expensive(car), prod, 1).
 
 unexpensive(car) :~ synonym_of(cheap(car), prod, 1).
 familiar(car) :~ synonym_of(big(car), prod, 1).
+
