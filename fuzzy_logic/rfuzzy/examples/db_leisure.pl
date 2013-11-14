@@ -125,11 +125,9 @@ rfuzzy_similarity_between(film, original_language(italian), original_language(sp
 % rfuzzy_similarity_between(film, original_language(italian), original_language(italian), 1).
 
 % funny is an example of a discrete attribute
-funny(film) :~ value(0) if (genre(film) equals drama).
-funny(film) :~ value(0.2) if (genre(film) equals western).
+funny(film) :~ value(0) if (genre(film) is_not comedy).
+% funny(film) :~ value(0.2) if (genre(film) equals western).
 funny(film) :~ value(0.4) if (genre(film) equals romance).
 funny(film) :~ value(0.4) if (genre(film) equals adventure).
 funny(film) :~ value(1) if (genre(film) equals comedy).
 
-
-puta(_25613, _25614, _25615) :- ((=(film(_25626, _25627, _25628, _25629, _25630, _25631, _25632), _25613), film(_25626, _25627, _25628, _25629, _25630, _25631, _25632)), ((.=.(_25615, 1), (true, ((genre(_25613, _25661), =(_25661, drama)), (true, (.=.(_25672, -(1, 0.05)), ((.>.(_25672, 0), .=.(_25614, _25672)) ; (.=<.(_25672, 0), .=.(_25614, 0)))))))))).
