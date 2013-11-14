@@ -40,9 +40,6 @@ near_the_city_center(restaurant):~ function(distance_to_the_city_center(restaura
 traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]).
 traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (5, 0.2), (10, 0.8), (15, 1), (100, 1) ]) only_for_user bartolo.
 
-rfuzzy_type_for(is_zalacain/1, [restaurant]).
-is_zalacain(Restaurant) :- id(Restaurant, Restaurant_Id), Restaurant_Id = zalacain.
-
 cheap(restaurant) :~ defaults_to(0.5).
 cheap(restaurant) :~ defaults_to(0.2) if (near_the_city_center(restaurant) is_over 0.7).
 cheap(restaurant) :~ value(0.1) if (id(restaurant) equals zalacain).
@@ -51,14 +48,14 @@ cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15,
 unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
 expensive(restaurant) :~ antonym_of(cheap(restaurant), prod, 1).
 
-rfuzzy_quantifier(special_very/2, TV_In, TV_Out) :-
+rfuzzy_quantifier(too_much/2, TV_In, TV_Out) :-
  	Thershold .=. 0.7,
 	Min_In .=. TV_In - Thershold, 
 	min(0, Min_In, Dividend), 
 	TV_Out .=. ((Dividend)/(0 - Thershold)).
 
 tempting_restaurant(restaurant) :~ defaults_to( 0.1).
-tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(special_very(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
+tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(too_much(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
 tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_credibility (min, 0.5) .
 
 % More tests (maybe not needed in this DB).
@@ -67,13 +64,6 @@ not_very_expensive(restaurant) :~ rule(fnot(very(expensive(restaurant)))).
 rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
 	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).
 
-
-test1(A, B) :- A .=. B.
-test2(A, B) :- A .>. B.
-test3(A, B, C) :- C .=. A + B.
-test4(A, B) :- A .>=. B.
-test5(A, B) :- A .=<. B.
-test6(A, B) :- A .<>. B.
 
 % Define the films database format.
 rfuzzy_define_database(film/7, 
@@ -135,9 +125,9 @@ rfuzzy_similarity_between(film, original_language(italian), original_language(sp
 % rfuzzy_similarity_between(film, original_language(italian), original_language(italian), 1).
 
 % funny is an example of a discrete attribute
-%rfuzzy_type_for(funny/1, [film]).
-%funny(genre('drama')) value 0 .
-%funny('romance') value 0.4 .
-%funny('western') value 0.2 .
-%funny('adventure') value 0.2 .
-%funny('comedy') value 1 .
+funny(film) :~ value(0) if (genre(film) equals drama).
+funny(film) :~ value(0.2) if (genre(film) equals western).
+funny(film) :~ value(0.4) if (genre(film) equals romance).
+funny(film) :~ value(0.4) if (genre(film) equals adventure).
+funny(film) :~ value(1) if (genre(film) equals comedy).
+
