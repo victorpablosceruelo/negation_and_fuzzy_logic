@@ -9,6 +9,7 @@
 :- op(1195,xfx,'with_credibility').    % 
 
 :- op(1190,xfx,'equals').    % 
+:- op(1190,xfx,'is_not').    % 
 :- op(1190,xfx,'is_over').    % 
 :- op(1190,xfx,'is_under').    % 
 

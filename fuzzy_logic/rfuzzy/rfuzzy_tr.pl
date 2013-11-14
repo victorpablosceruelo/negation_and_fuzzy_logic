@@ -568,6 +568,22 @@ generate_ifcondition_subCl((Functor equals Value), P_TN, P_TA, NP_Arg_Input, Sub
 	nonvar(Value), !,
 	SubCl_IfCondition = (Get_Value, (Obtained_Value = Value)).
 
+generate_ifcondition_subCl((Functor is_not Value), P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition) :-
+	extract_from_PF_values_PN_PA_PTN_PTA(Functor, FP_N, _FP_A, P_TN, P_TA),
+	functor(Get_Value, FP_N, 2),
+	arg(1, Get_Value, NP_Arg_Input),
+	arg(2, Get_Value, Obtained_Value),
+	nonvar(Value), number(Value), !,
+	SubCl_IfCondition = (Get_Value, (Obtained_Value .<>. Value)).
+
+generate_ifcondition_subCl((Functor is_not Value), P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition) :-
+	extract_from_PF_values_PN_PA_PTN_PTA(Functor, FP_N, _FP_A, P_TN, P_TA),
+	functor(Get_Value, FP_N, 2),
+	arg(1, Get_Value, NP_Arg_Input),
+	arg(2, Get_Value, Obtained_Value),
+	nonvar(Value), !,
+	SubCl_IfCondition = (Get_Value, (Obtained_Value \== Value)).
+
 generate_ifcondition_subCl((Functor is_over Value), P_TN, P_TA, NP_Arg_Input, SubCl_IfCondition) :-
 	extract_from_PF_values_PN_PA_PTN_PTA(Functor, FP_N, _FP_A, P_TN, P_TA),	
 	functor(Get_Value, FP_N, 2),
