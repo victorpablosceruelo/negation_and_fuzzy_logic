@@ -1,4 +1,4 @@
-:- module(db_leisure,_,[rfuzzy, clpr]).
+:- module(db_leisure,_,[rfuzzy, clpr, pkgs_output_debug]).
 % Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
 % Running time debug can be activated removing the comment marker % at the beginning of the following line.
 % :- activate_rfuzzy_debug.
@@ -131,3 +131,5 @@ funny(film) :~ value(0.4) if (genre(film) equals romance).
 funny(film) :~ value(0.4) if (genre(film) equals adventure).
 funny(film) :~ value(1) if (genre(film) equals comedy).
 
+
+puta(_25613, _25614, _25615) :- ((=(film(_25626, _25627, _25628, _25629, _25630, _25631, _25632), _25613), film(_25626, _25627, _25628, _25629, _25630, _25631, _25632)), ((.=.(_25615, 1), (true, ((genre(_25613, _25661), =(_25661, drama)), (true, (.=.(_25672, -(1, 0.05)), ((.>.(_25672, 0), .=.(_25614, _25672)) ; (.=<.(_25672, 0), .=.(_25614, 0)))))))))).
