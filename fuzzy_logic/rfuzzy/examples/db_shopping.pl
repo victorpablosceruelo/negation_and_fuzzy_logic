@@ -42,10 +42,19 @@ car('Mini Cooper', 'British Motor Corporation', 'Economy Car',       2009, null,
 %  vw_phaeton.
 % ferrari
 
+expensive(car) :~ defaults_to(0).
 expensive(car) :~ function(price_in_euros(car), [ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
+fast(car) :~ defaults_to(0).
 fast(car) :~ function(max_speed_in_kph(car), [ (0, 0), (60, 0), (100, 0.4), (150, 0.75), (200, 1), (1000, 1) ]).
+large(car) :~ defaults_to(0).
 large(car) :~ function(car_length_in_mm(car), [ (0, 0), (3000, 0.2), (4000, 0.5), (5000, 1), (10000, 1) ]).
+wide(car) :~ defaults_to(0).
 wide(car) :~ function(car_width_in_mm(car), [ (0, 0), (1400, 0.2), (1500, 0.5), (1700, 1), (3000, 1) ]).
+old(car) :~ defaults_to(0).
+old(car) :~ function(year_of_production_end(car), [ (1900, 1), (2000, 1), (2005, 0.5), (2010, 0.1), (2015, 0) ]).
+
+
+big(car) :~ defaults_to(0).
 big(car) :~ rule(min, (large(car), wide(car))).
 
 small(car) :~ antonym_of(big(car), prod, 1).
