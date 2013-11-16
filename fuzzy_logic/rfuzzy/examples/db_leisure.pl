@@ -1,7 +1,4 @@
 :- module(db_leisure,_,[rfuzzy, clpr, pkgs_output_debug]).
-% Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
-% Running time debug can be activated removing the comment marker % at the beginning of the following line.
-% :- activate_rfuzzy_debug.
 
 % Define the restaurants database format.
 rfuzzy_define_database(restaurant/7, 
@@ -58,13 +55,6 @@ tempting_restaurant(restaurant) :~ defaults_to( 0.1).
 tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(too_much(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
 tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_credibility (min, 0.5) .
 
-% More tests (maybe not needed in this DB).
-not_very_expensive(restaurant) :~ rule(fnot(very(expensive(restaurant)))).
-
-rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
-	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).
-
-
 % Define the films database format.
 rfuzzy_define_database(film/7, 
 	[(id, rfuzzy_string_type), 
@@ -83,29 +73,34 @@ film('Il buono, il brutto, il cattivo', 1967, 141, adventure, italian, 'Sergio L
 film('Finding Nemo', 2003, 112, comedy, english, 'Andrew Stanton and Lee Unkrich', 'Disney - PIXAR').
 
 
-modern(film) :~ function(release_year(film), [ (1970, 0), (2000, 1), (2010, 1)]).
+modern(film) :~ defaults_to( 1 ).
+modern(film) :~ function(release_year(film), [ (1800, 0), (1970, 0), (2000, 0.1), (2010, 0.8)]).
+long_duration(film) :~ defaults_to( 0 ).
 long_duration(film) :~ function(duration_in_minutes(film), [ (120, 0), (180, 1), (600, 1)]) .
 
 % similarity over genres
-% rfuzzy_similarity_between(film, genre(drama), genre(drama), 1).
+rfuzzy_similarity_between(film, genre(drama), genre(drama), 1).
 rfuzzy_similarity_between(film, genre(drama), genre(romance), 0.6).
 rfuzzy_similarity_between(film, genre(drama), genre(western), 0.1).
 rfuzzy_similarity_between(film, genre(drama), genre(adventure), 0.1).
 rfuzzy_similarity_between(film, genre(drama), genre(comedy), 0).
 rfuzzy_similarity_between(film, genre(romance), genre(drama), 0.6).
-%rfuzzy_similarity_between(film, genre(romance), genre(romance), 1).
+
+fuzzy_similarity_between(film, genre(romance), genre(romance), 1).
 rfuzzy_similarity_between(film, genre(romance), genre(western), 0.4).
 rfuzzy_similarity_between(film, genre(romance), genre(adventure), 0.3).
 rfuzzy_similarity_between(film, genre(romance), genre(comedy), 0.3).
 rfuzzy_similarity_between(film, genre(western), genre(drama), 0.1).
 rfuzzy_similarity_between(film, genre(western), genre(romance), 0.4).
-%rfuzzy_similarity_between(film, genre(western), genre(western), 1).
+
+fuzzy_similarity_between(film, genre(western), genre(western), 1).
 rfuzzy_similarity_between(film, genre(western), genre(adventure), 0.8).
 rfuzzy_similarity_between(film, genre(western), genre(comedy), 0.1).
 rfuzzy_similarity_between(film, genre(adventure), genre(drama), 0.1).
 rfuzzy_similarity_between(film, genre(adventure), genre(romance), 0.3).
 rfuzzy_similarity_between(film, genre(adventure), genre(western), 0.8).
-%rfuzzy_similarity_between(film, genre(adventure), genre(adventure), 1).
+
+fuzzy_similarity_between(film, genre(adventure), genre(adventure), 1).
 rfuzzy_similarity_between(film, genre(adventure), genre(comedy), 0.2).
 rfuzzy_similarity_between(film, genre(comedy), genre(drama), 0).
 rfuzzy_similarity_between(film, genre(comedy), genre(romance), 0.3).
