@@ -56,7 +56,7 @@ tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), 
 tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_credibility (min, 0.5) .
 
 % Define the films database format.
-rfuzzy_define_database(film/7, 
+rfuzzy_define_database(film/8, 
 	[(id, rfuzzy_string_type), 
 	  (release_year, rfuzzy_integer_type), 
 	   (duration_in_minutes, rfuzzy_integer_type),
@@ -64,7 +64,7 @@ rfuzzy_define_database(film/7,
 	     (original_language, rfuzzy_enum_type), 
 	      (directed_by, rfuzzy_enum_type), 
 	       (distributed_by, rfuzzy_enum_type),
-		(not_for_children_under)]).
+		(not_for_children_under, rfuzzy_integer_type)]).
 
 film('The Godfather', 1972, 207, drama, english, 'Francis Ford Coppola', 'Paramount Pictures', 12).
 film('Casablanca', 1946, 172, romance, english, 'Michael Curtiz', 'Warner Bros', null).
@@ -78,9 +78,19 @@ film('The Collection', 2013, 82, thriller, english, 'Marcus Dunstan', 'Alimpro F
 film('Before Sunrise', 1995, 101, romantic_drama, english, 'Richard Linklater', 'Columbia Pictures', null).
 film('Before Midnight', 2013, 109, romantic_drama, english, 'Richard Linklater', 'Sony Pictures Classics', null).
 film('Quien mato a Bambi?', 2013, 89, comedy, spanish, 'Santi Amodeo', 'Sony Pictures', 12).
-film('Not Suitable for Children', 2012, 96, romantic_comedy, 'Peter Templeman', 'Icon Film Distribution', null).
-film('Alien vs Predator', 2004, 115, science fiction, english, 'Paul W.S. Anderson', '20th Century Fox', 12).
-
+film('Not Suitable for Children', 2012, 96, romantic_comedy, english, 'Peter Templeman', 'Icon Film Distribution', null).
+film('Alien vs Predator', 2004, 115, science_fiction, english, 'Paul W.S. Anderson', '20th Century Fox', 12).
+film('Despicable Me', 2010, 95, comedy, english, 'Pierre Coffin and Chris Renaud', 'Universal Pictures', 0).
+film('Despicable Me 2', 2013, 98, comedy, english, 'Pierre Coffin and Chris Renaud', 'Universal Pictures', 0).
+film('Wall-E', 2008, 98, romantic_comedy, english, 'Andrew Stanton', 'Walt Disney Studios Motion Pictures', 0).
+film('Ice Age', 2002, 81, computer-animated_comedy-drama_adventure, english, 'Carlos Saldanha and Chris Wedge', '20th Century Fox', 0).
+film('Ice Age: The Meltdown', 2006, 91, computer-animated_comedy_adventure, english, 'Carlos Saldanha', '20th Century Fox', 0).
+film('Ice Age: Dawn of the Dinosaurs', 2009, 94, computer-animated_comedy_adventure, english, 'Carlos Saldanha', '20th Century Fox', 0).
+film('Ice Age: Continental Drift', 2012, 88, computer-animated_comedy_adventure, english, 'Steve Martino and Mike Thurmeier', '20th Century Fox', 0).
+film('Shrek', 2001, 90, computer-animated_fantasy-comedy, english, 'Andrew Adamson and Vicky Jenson', 'DreamWorks Pictures', 0).
+film('Shrek 2', 2004, 92, computer-animated_fantasy-comedy, english, 'Andrew Adamson, Kelly Asbury and Conrad Vernon', 'DreamWorks Pictures', 0).
+film('Shrek 3', 2007, 93, computer-animated_fantasy-comedy, english, 'Chris Miller and Raman Hui', 'Paramount Pictures', 0).
+film('Shrek Forever After', 2010, 93, computer-animated_fantasy-comedy, english, 'Mike Mitchell', 'Paramount Pictures', 0).
 
 modern(film) :~ defaults_to( 1 ).
 modern(film) :~ function(release_year(film), [ (1800, 0), (1970, 0), (2000, 0.1), (2010, 0.8)]).
