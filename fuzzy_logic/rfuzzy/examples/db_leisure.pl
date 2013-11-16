@@ -63,14 +63,23 @@ rfuzzy_define_database(film/7,
 	    (genre, rfuzzy_enum_type), 
 	     (original_language, rfuzzy_enum_type), 
 	      (directed_by, rfuzzy_enum_type), 
-	       (distributed_by, rfuzzy_enum_type)]).
+	       (distributed_by, rfuzzy_enum_type),
+		(not_for_children_under)]).
 
-film('The Godfather', 1972, 207, drama, english, 'Francis Ford Coppola', 'Paramount Pictures').
-film('Casablanca', 1946, 172, romance, english, 'Michael Curtiz', 'Warner Bros').
-film('Cera una volta il West', 1968, 165, western, italian, 'Sergio Leone', 'MYMONETRO').
-film('El laberinto del fauno', 2006, 107, drama, spanish, 'Guillermo del Toro', 'Esperanto Films').
-film('Il buono, il brutto, il cattivo', 1967, 141, adventure, italian, 'Sergio Leone', 'United Artists').
-film('Finding Nemo', 2003, 112, comedy, english, 'Andrew Stanton and Lee Unkrich', 'Disney - PIXAR').
+film('The Godfather', 1972, 207, drama, english, 'Francis Ford Coppola', 'Paramount Pictures', 12).
+film('Casablanca', 1946, 172, romance, english, 'Michael Curtiz', 'Warner Bros', null).
+film('Cera una volta il West', 1968, 165, western, italian, 'Sergio Leone', 'MYMONETRO', null).
+film('El laberinto del fauno', 2006, 107, drama, spanish, 'Guillermo del Toro', 'Esperanto Films', 12).
+film('Il buono, il brutto, il cattivo', 1967, 141, adventure, italian, 'Sergio Leone', 'United Artists', null).
+film('Finding Nemo', 2003, 112, comedy, english, 'Andrew Stanton and Lee Unkrich', 'Disney - PIXAR', null).
+film('Thor - The dark world', 2013, 90, action, english, 'Alan Taylor', 'Walt Disney Studios Motion Pictures', null).
+film('Blue Jasmine', 2013, 98, action, english, 'Woody Allen', 'Warner Bros', null).
+film('The Collection', 2013, 82, thriller, english, 'Marcus Dunstan', 'Alimpro Films', null).
+film('Before Sunrise', 1995, 101, romantic_drama, english, 'Richard Linklater', 'Columbia Pictures', null).
+film('Before Midnight', 2013, 109, romantic_drama, english, 'Richard Linklater', 'Sony Pictures Classics', null).
+film('Quien mato a Bambi?', 2013, 89, comedy, spanish, 'Santi Amodeo', 'Sony Pictures', 12).
+film('Not Suitable for Children', 2012, 96, romantic_comedy, 'Peter Templeman', 'Icon Film Distribution', null).
+film('Alien vs Predator', 2004, 115, science fiction, english, 'Paul W.S. Anderson', '20th Century Fox', 12).
 
 
 modern(film) :~ defaults_to( 1 ).
