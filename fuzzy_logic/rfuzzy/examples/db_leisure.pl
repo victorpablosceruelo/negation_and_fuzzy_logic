@@ -1,4 +1,7 @@
 :- module(db_leisure,_,[rfuzzy, clpr, pkgs_output_debug]).
+% Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
+% Running time debug can be activated removing the comment marker % at the beginning of the following line.
+% :- activate_rfuzzy_debug.
 
 % Define the restaurants database format.
 rfuzzy_define_database(restaurant/7, 
