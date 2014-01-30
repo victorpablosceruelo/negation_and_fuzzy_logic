@@ -2,7 +2,7 @@
 
 % Define the restaurants database format.
 rfuzzy_define_database(restaurant/7, 
-	[(id, rfuzzy_string_type), 
+	[(name, rfuzzy_string_type), 
 	  (restaurant_type, rfuzzy_enum_type), 
 	   (food_type, rfuzzy_enum_type),
 	    (years_since_opening, rfuzzy_integer_type), 
@@ -10,7 +10,7 @@ rfuzzy_define_database(restaurant/7,
 	      (price_average, rfuzzy_integer_type), 
 	       (menu_price, rfuzzy_integer_type)]).
 
-% restaurant(restaurant_id,                        2,        3,      4,          5,         6,        7, ).
+% restaurant(restaurant_name,                        2,        3,      4,          5,         6,        7, ).
 %restaurant(rfuzzy_default_values, 1,        0,       null,      null,     null,       800).  <- nonsense ??
 restaurant(kenzo,                           fast_casual,     japanese,           5,    null,       50,     null).
 restaurant(burguer_king,               fast_food,        american,         10,    null,       10,     5).
@@ -39,7 +39,7 @@ traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (
 
 cheap(restaurant) :~ defaults_to(0.5).
 cheap(restaurant) :~ defaults_to(0.2) if (near_the_city_center(restaurant) is_over 0.7).
-cheap(restaurant) :~ value(0.1) if (id(restaurant) equals zalacain).
+cheap(restaurant) :~ value(0.1) if (name(restaurant) equals zalacain).
 cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ]).
 
 unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
@@ -57,7 +57,7 @@ tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_c
 
 % Define the films database format.
 rfuzzy_define_database(film/8, 
-	[(id, rfuzzy_string_type), 
+	[(name, rfuzzy_string_type), 
 	  (release_year, rfuzzy_integer_type), 
 	   (duration_in_minutes, rfuzzy_integer_type),
 	    (genre, rfuzzy_enum_type), 
