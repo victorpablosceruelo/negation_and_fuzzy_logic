@@ -13,3 +13,5 @@
 Main developer: Victor Pablos Ceruelo (vpablos@babel.ls.fi.upm.es)
 <br />
 Running since: <%= JspsUtils.getRunningSince() %>
+
+<%= JspsUtils.getLogs() %>

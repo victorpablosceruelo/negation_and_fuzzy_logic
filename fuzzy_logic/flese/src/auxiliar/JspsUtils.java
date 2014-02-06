@@ -310,6 +310,9 @@ public class JspsUtils {
 		return result.toString();
 	}
 
+	public static String getLogs() {
+		return "";
+	}
 }
 
 // END
