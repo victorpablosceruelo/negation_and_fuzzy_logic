@@ -211,6 +211,7 @@ function showAnswers(runQueryDivId, answers) {
 			tabDiv.appendChild(tabContentDiv);
 				
 			// Now insert each answer in a row, inside the table
+			var answersTitles = answers[0];
 			for (k=0; k<answersIndexes[i].queryAnswersIndexes.length; k++) {
 				row = document.createElement('div');
 				row.className = "queryAnswersTableRow";
@@ -221,12 +222,9 @@ function showAnswers(runQueryDivId, answers) {
 					cell = document.createElement('div');
 					cell.className = "queryAnswersTableCell";
 					row.appendChild(cell);
-					if (l+1 < answer.length) {
-						cell.innerHTML = prologNameInColloquialLanguage(answer[l]);
-					}
-					else {
-						cell.innerHTML = truncate_truth_value(answer[l]);
-					}
+					
+					cell.innerHTML = showCellAnswer(k, l, answer.length, answersTitles, answer[l]);
+					
 				}
 			}
 		}
@@ -236,6 +234,40 @@ function showAnswers(runQueryDivId, answers) {
 	$( "#tabs" ).tabs();
 
 }
+
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------*/
+
+function showCellAnswer(currentRow, currentColumn, columnsLength, answersTitles, answer) {
+	if ((currentRow != 0) && (currentColumn == 1)) {
+		return buildIndexAnswer(currentRow, answer);
+	}
+	else {
+		if (currentColumn+1 > columnsLength) {
+			return truncate_truth_value(answer);
+		}
+		else {
+			if (answersTitles[currentColumn] == 'url') {
+				return buildUrlAnswer(answer);	
+			}
+			else {
+				return prologNameInColloquialLanguage(answer);
+			}
+		}
+	}
+}
+
+function buildIndexAnswer(currentRow, answer) {
+	// title='" + answer + "'
+	// alt='Database entry: " + answer + "'
+	return "<a href='#' onclick='return false;' title='Database entry: " + answer + "'> nº." + currentRow + "</a>";
+}
+
+function buildUrlAnswer(answer) {
+	return "<a href='#' onclick='openUrlInNewTab(" + answer + ")' title='view " + answer + "'>view</a>";
+}
+
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
