@@ -47,6 +47,14 @@ function getContainer(containerId) {
 	return container;
 }
 
+function writeHtmlInContainer(containerId, html, reset) {
+	var container = getContainer(containerId);
+	if (reset) {
+		container.innerHTML = "";
+	}
+	container.innerHTML += html;
+}
+
 function debugInfoIfVarIsNull(varValue, varName, preMsg) {
 	if (varValue === null) {
 		debug.info(preMsg + ": " + varName + " is null.");

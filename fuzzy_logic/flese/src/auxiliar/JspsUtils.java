@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import logs.LogsManager;
 import programAnalysis.ProgramPartAnalysis;
 import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
@@ -311,11 +312,11 @@ public class JspsUtils {
 	}
 
 	public static String getLogsQueries() {
-		return "";
+		return LogsManager.getLogsQueries();
 	}
 	
 	public static String getLogsSignedUsers() {
-		return "";
+		return LogsManager.getLogsSignedUsers();
 	}
 
 }

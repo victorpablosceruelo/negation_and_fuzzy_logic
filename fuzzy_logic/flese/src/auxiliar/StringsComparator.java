@@ -6,7 +6,7 @@ public class StringsComparator {
 
 	public static final Comparator<String> PERSONALIZED = new PersonalizedComparator();
 
-	private static class PersonalizedComparator implements Comparator<String>, java.io.Serializable {
+	public static class PersonalizedComparator implements Comparator<String>, java.io.Serializable {
 
 		// use serialVersionUID from JDK 1.2.2 for interoperability
 		private static final long serialVersionUID = 1L;
@@ -65,27 +65,29 @@ public class StringsComparator {
 			while ((i < maxLength) && (car1 == car2)) {
 				car1 = o1.charAt(i);
 				car2 = o2.charAt(i);
-			}
-			if (car1 == car2) {
-				if (o1.length() < o2.length()) {
-					return -1;
-				}
-				if (o1.length() > o2.length()) {
-					return +1;
-				}
-				if (o1.length() == o2.length()) {
-					return 0;
-				}
-			} else {
-				if (car1 < car2) {
-					return -1;
-				}
-				if (car1 > car2) {
-					return +1;
-				}
+				
 				if (car1 == car2) {
-					return 0;
+					if (o1.length() < o2.length()) {
+						return -1;
+					}
+					if (o1.length() > o2.length()) {
+						return +1;
+					}
+					if (o1.length() == o2.length()) {
+						return 0;
+					}
+				} else {
+					if (car1 < car2) {
+						return -1;
+					}
+					if (car1 > car2) {
+						return +1;
+					}
+					if (car1 == car2) {
+						return 0;
+					}
 				}
+				i++;
 			}
 			return 0;
 		}
