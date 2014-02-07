@@ -310,9 +310,14 @@ public class JspsUtils {
 		return result.toString();
 	}
 
-	public static String getLogs() {
+	public static String getLogsQueries() {
 		return "";
 	}
+	
+	public static String getLogsSignedUsers() {
+		return "";
+	}
+
 }
 
 // END

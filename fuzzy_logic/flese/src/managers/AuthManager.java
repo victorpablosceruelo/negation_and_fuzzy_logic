@@ -67,6 +67,16 @@ public class AuthManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.AboutPage, ""));
 	}
 
+	public void logs() throws Exception {
+		LocalUserInfo localUserInfo = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
+		if (localUserInfo != null) {
+			setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.LogsPage, ""));
+		}
+		else {
+			signOut();
+		}
+	}
+
 	public void authenticate() {
 
 		SessionStoreHouse sessionStoreHouse = requestStoreHouse.getSession();

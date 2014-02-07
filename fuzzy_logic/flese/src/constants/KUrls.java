@@ -27,6 +27,9 @@ public class KUrls {
 		public static final UrlMap AboutPage = getUrlMap(manager, "aboutPage", null, null, "WEB-INF/authentication/about.jsp");
 		public static final UrlMap About = getUrlMap(manager, "about", AboutPage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap LogsPage = getUrlMap(manager, "logsPage", null, null, "WEB-INF/authentication/logs.jsp");
+		public static final UrlMap Logs = getUrlMap(manager, "logs", LogsPage, KUrls.Pages.Exception, "");
+
 	}
 
 	public static class User {

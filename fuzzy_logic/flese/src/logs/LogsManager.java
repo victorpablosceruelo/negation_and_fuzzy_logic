@@ -9,8 +9,8 @@ public class LogsManager {
 	private static final String puntoYComa = ";";
 	private static final String extension = ".csv";
 	
-	static LogsFiles logFileForQueries = null;
-	static LogsFiles logFileForSignedUsers = null;
+	private static LogsFiles logFileForQueries = null;
+	private static LogsFiles logFileForSignedUsers = null;
 
 	public static void logSignedUser(String userName) {
 		try {
@@ -71,5 +71,24 @@ public class LogsManager {
 			String fileName = KConstants.Application.LogsFileForQueries + date + extension;
 			logFileForQueries = new LogsFiles(fileName);
 		}
+	}
+	
+	public static String getLogsSignedUsers() {
+		LogsFilesPaths logsFilesPaths = new LogsFilesPaths();
+		String folderName = logsFilesPaths.getLogsFolderPath();
+		String prefix = KConstants.Application.LogsFileForSignedUsers;
+		
+		LogsFilesAux logsFilesAux = new LogsFilesAux();
+		return logsFilesAux.getContentsOfAllFilesInFolderStartingBy(folderName, prefix);
+	}
+	
+	public static String getLogsQueries() {
+		LogsFilesPaths logsFilesPaths = new LogsFilesPaths();
+		String folderName = logsFilesPaths.getLogsFolderPath();
+		String prefix = KConstants.Application.LogsFileForQueries;
+		
+		LogsFilesAux logsFilesAux = new LogsFilesAux();
+		return logsFilesAux.getContentsOfAllFilesInFolderStartingBy(folderName, prefix);
+		
 	}
 }
