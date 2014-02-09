@@ -7,3 +7,6 @@
 [submodule "fuzzy_logic/flese-utils/form.git"]
 	path = fuzzy_logic/flese-utils/form.git
 	url = https://github.com/malsup/form.git
+[submodule "fuzzy_logic/flese-utils/socialauth"]
+	path = fuzzy_logic/flese-utils/socialauth
+	url = https://github.com/3pillarlabs/socialauth.git
