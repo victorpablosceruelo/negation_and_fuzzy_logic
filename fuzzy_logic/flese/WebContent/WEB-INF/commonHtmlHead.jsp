@@ -20,10 +20,10 @@
 	<script type="text/javascript" src="js_and_css/ba-debug.js"></script>
 	<script type="text/javascript" src="js_and_css/ba-debug-init.js"></script>
 	<script type="text/javascript" src="js_and_css/jquery-1.11.0.js"></script>
-	<script type="text/javascript" src="js_and_css/jquery-ui.js"></script>
+	<script type="text/javascript" src="js_and_css/jquery-ui-1.10.4.js"></script>
 	
 	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
-	<script type="text/javascript" src="js_and_css/highcharts-2.3.3.js" ></script>
+	<script type="text/javascript" src="js_and_css/highcharts-all-3.0.9.js" ></script>
 	<script type="text/javascript" src="js_and_css/auxiliarJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 	<script type="text/javascript" src="js_and_css/answersJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 	<script type="text/javascript" src="js_and_css/fuzzificationsJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
