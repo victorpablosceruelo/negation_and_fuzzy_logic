@@ -22,3 +22,5 @@ debug_pkg_cneg_statistics.pl
 */.svn/*
 .svn/
 build/
+
+fuzzy_logic/flese-utils/Highcharts-3.0.9/*
