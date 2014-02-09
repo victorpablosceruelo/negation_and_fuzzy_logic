@@ -10,3 +10,9 @@
 [submodule "fuzzy_logic/flese-utils/socialauth"]
 	path = fuzzy_logic/flese-utils/socialauth
 	url = https://github.com/3pillarlabs/socialauth.git
+[submodule "fuzzy_logic/flese-utils/highcharts.com.git"]
+	path = fuzzy_logic/flese-utils/highcharts.com.git
+	url = https://github.com/highslide-software/highcharts.com.git
+[submodule "fuzzy_logic/flese-utils/jquery-ui.git"]
+	path = fuzzy_logic/flese-utils/jquery-ui.git
+	url = https://github.com/jquery/jquery-ui.git
