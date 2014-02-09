@@ -46,8 +46,26 @@ the engine that processes fuzzy queries and the web interface that presents resu
 	</li>
 </ul>
 </div>
-<br />
-<br />
+
+<br /><br />
+<div class='indexPageSubTitle'>Technologies used</div>
+<div class='indexPageText'>
+FleSe core is developed as a <a href="http://ciao-lang.org/">Ciao Prolog</a> package, 
+while the web interface is managed by a <a href="https://www.java.com/">Java</a> application 
+running on an <a href="http://tomcat.apache.org/">Apache Tomcat</a> <a href="http://www.debian.org/">Debian</a> (Linux) server.
+The client part of the web interface is developed in 
+<a href="http://en.wikipedia.org/wiki/HTML">HTML</a> and 
+<a href="http://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
+and uses <a href="http://en.wikipedia.org/wiki/Ajax_%28programming%29">Ajax</a> to improve the usability.
+Besides, we use some libraries developed by others. Mainly: 
+<a href="http://code.google.com/p/socialauth/">SocialAuth</a>, 
+<a href="https://code.google.com/p/openid4java/">OpenId4Java</a>,
+<a href="http://jquery.com/">jQuery</a>,
+<a href="https://jqueryui.com/">jQuery UI</a> and
+<a href="http://www.highcharts.com/">Highcharts JS</a>.
+</div>
+
+<br /><br />
 <div class='indexPageSubTitle'>Developers</div>
 <div class='indexPageText'>
 This application is being developed by
@@ -59,7 +77,6 @@ as part of his research in the
 </div>
 
 <br /><br />
-
 <div class='indexPageSubTitle'>Support</div>
 <div class='indexPageText'>
 This work is partially supported by research projects 
