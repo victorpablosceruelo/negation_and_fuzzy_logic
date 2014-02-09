@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="js_and_css/jquery-ui.js"></script>
 	
 	<script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
-	<script type="text/javascript" src="js_and_css/highcharts.js" ></script>
+	<script type="text/javascript" src="js_and_css/highcharts-2.3.3.js" ></script>
 	<script type="text/javascript" src="js_and_css/auxiliarJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 	<script type="text/javascript" src="js_and_css/answersJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
 	<script type="text/javascript" src="js_and_css/fuzzificationsJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
