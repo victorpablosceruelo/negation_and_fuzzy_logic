@@ -1,6 +1,6 @@
 /*
  ===========================================================================
- Copyright (c) 2010 BrickRed Technologies Limited
+ Copyright (c) 2013 3PillarGlobal
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@
 package org.brickred.socialauth.provider;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,11 +35,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.AbstractProvider;
-import org.brickred.socialauth.AuthProvider;
 import org.brickred.socialauth.Contact;
 import org.brickred.socialauth.Permission;
 import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.exception.AccessTokenExpireException;
+import org.brickred.socialauth.exception.ServerDataException;
 import org.brickred.socialauth.exception.SocialAuthException;
 import org.brickred.socialauth.exception.UserDeniedPermissionException;
 import org.brickred.socialauth.oauthstrategy.OAuth2;
@@ -50,38 +49,34 @@ import org.brickred.socialauth.util.Constants;
 import org.brickred.socialauth.util.MethodType;
 import org.brickred.socialauth.util.OAuthConfig;
 import org.brickred.socialauth.util.Response;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Provider implementation for SalesForce
+ * Provider implementation for Nimble
  * 
+ * @author tarun.nagpal
  * 
  */
+public class NimbleImpl extends AbstractProvider {
 
-public class SalesForceImpl extends AbstractProvider implements AuthProvider,
-		Serializable {
+	private static final long serialVersionUID = 8942981661253696430L;
 
-	private static final long serialVersionUID = 6929330230703360670L;
+	private static final String CONTACTS_URL = "https://api.nimble.com/api/v1/contacts?per_page=200";
 	private static final Map<String, String> ENDPOINTS;
-	private final Log LOG = LogFactory.getLog(SalesForceImpl.class);
+	private final Log LOG = LogFactory.getLog(NimbleImpl.class);
 
-	private OAuthConfig config;
 	private Permission scope;
+	private OAuthConfig config;
 	private AccessGrant accessGrant;
-	private Profile userProfile;
-	private String profileURL;
 	private OAuthStrategyBase authenticationStrategy;
-
-	// set this to the list of extended permissions you want
-	private static final String AllPerms = new String("full");
-	private static final String AuthPerms = new String("api");
 
 	static {
 		ENDPOINTS = new HashMap<String, String>();
 		ENDPOINTS.put(Constants.OAUTH_AUTHORIZATION_URL,
-				"https://login.salesforce.com/services/oauth2/authorize");
+				"https://api.nimble.com/oauth/authorize");
 		ENDPOINTS.put(Constants.OAUTH_ACCESS_TOKEN_URL,
-				"https://login.salesforce.com/services/oauth2/token");
+				"https://api.nimble.com/oauth/token");
 	}
 
 	/**
@@ -92,7 +87,7 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	 *            and consumer secret
 	 * @throws Exception
 	 */
-	public SalesForceImpl(final OAuthConfig providerConfig) throws Exception {
+	public NimbleImpl(final OAuthConfig providerConfig) throws Exception {
 		config = providerConfig;
 		if (config.getCustomPermissions() != null) {
 			scope = Permission.CUSTOM;
@@ -123,11 +118,11 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	 * 
 	 * @param accessGrant
 	 *            It contains the access token and other information
-	 * @throws AccessTokenExpireException
+	 * @throws Exception
 	 */
 	@Override
 	public void setAccessGrant(final AccessGrant accessGrant)
-			throws AccessTokenExpireException {
+			throws AccessTokenExpireException, SocialAuthException {
 		this.accessGrant = accessGrant;
 		authenticationStrategy.setAccessGrant(accessGrant);
 	}
@@ -137,16 +132,9 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	 * appropriate URL which will be used for authentication with the provider
 	 * that has been set using setId()
 	 * 
-	 * @throws Exception
 	 */
-
 	@Override
 	public String getLoginRedirectURL(final String successUrl) throws Exception {
-		LOG.info("Determining URL for redirection");
-		if (!successUrl.startsWith("https")) {
-			throw new SocialAuthException(
-					"To implement SalesForce provider your web application should run on a secure port. Please use an https URL instead of http.");
-		}
 		return authenticationStrategy.getLoginRedirectURL(successUrl);
 	}
 
@@ -167,11 +155,6 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 		return doVerifyResponse(requestParams);
 	}
 
-	/**
-	 * @param requestParams
-	 * @return
-	 * @throws Exception
-	 */
 	private Profile doVerifyResponse(final Map<String, String> requestParams)
 			throws Exception {
 		LOG.info("Retrieving Access Token in verify response function");
@@ -184,11 +167,17 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 
 		if (accessGrant != null) {
 			LOG.debug("Obtaining user profile");
-			return getProfile();
+			return null;
 		} else {
 			throw new SocialAuthException("Access token not found");
 		}
+	}
 
+	@Override
+	public Response updateStatus(final String msg) throws Exception {
+		LOG.warn("WARNING: Not implemented for Nimble");
+		throw new SocialAuthException(
+				"Update Status is not implemented for Nimble");
 	}
 
 	/**
@@ -201,27 +190,95 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 
 	@Override
 	public List<Contact> getContactList() throws Exception {
-		LOG.warn("WARNING: Not implemented for SalesForce");
-		throw new SocialAuthException(
-				"Retrieving contacts is not implemented for SalesForce");
-
-	}
-
-	/**
-	 * Updates the status on the chosen provider if available. This may not be
-	 * implemented for all providers.
-	 * 
-	 * @param msg
-	 *            Message to be shown as user's status
-	 * @throws Exception
-	 */
-
-	@Override
-	public Response updateStatus(final String msg) throws Exception {
-		LOG.warn("WARNING: Not implemented for SalesForce");
-		throw new SocialAuthException(
-				"Update Status is not implemented for SalesForce");
-
+		List<Contact> plist = new ArrayList<Contact>();
+		LOG.info("Fetching contacts from " + CONTACTS_URL);
+		String respStr;
+		try {
+			Response response = authenticationStrategy
+					.executeFeed(CONTACTS_URL);
+			respStr = response.getResponseBodyAsString(Constants.ENCODING);
+		} catch (Exception e) {
+			throw new SocialAuthException("Error while getting contacts from "
+					+ CONTACTS_URL, e);
+		}
+		try {
+			LOG.debug("User Contacts list in json : " + respStr);
+			JSONObject resp = new JSONObject(respStr);
+			JSONArray responses = resp.getJSONArray("resources");
+			LOG.debug("Found contacts : " + responses.length());
+			for (int i = 0; i < responses.length(); i++) {
+				JSONObject obj = responses.getJSONObject(i);
+				JSONObject fields = obj.getJSONObject("fields");
+				Contact p = new Contact();
+				if (obj.has("record_type")) {
+					if ("company".equals(obj.getString("record_type"))) {
+						if (fields.has("company name")) {
+							JSONArray arr = fields.getJSONArray("company name");
+							JSONObject jobj = arr.getJSONObject(0);
+							if (jobj.has("value")) {
+								p.setFirstName(jobj.getString("value"));
+							}
+						}
+						if (obj.has("avatar_url")) {
+							p.setProfileImageURL(obj.getString("avatar_url"));
+						}
+						if (fields.has("URL")) {
+							JSONArray arr = fields.getJSONArray("URL");
+							JSONObject jobj = arr.getJSONObject(0);
+							if (jobj.has("value")) {
+								p.setProfileUrl(jobj.getString("value"));
+							}
+						}
+						plist.add(p);
+					} else if ("person".equals(obj.getString("record_type"))) {
+						if (fields.has("last name")) {
+							JSONArray arr = fields.getJSONArray("last name");
+							JSONObject jobj = arr.getJSONObject(0);
+							if (jobj.has("value")) {
+								p.setLastName(jobj.getString("value"));
+							}
+						}
+						if (fields.has("first name")) {
+							JSONArray arr = fields.getJSONArray("first name");
+							JSONObject jobj = arr.getJSONObject(0);
+							if (jobj.has("value")) {
+								p.setFirstName(jobj.getString("value"));
+							}
+						}
+						if (obj.has("avatar_url")) {
+							p.setProfileImageURL(obj.getString("avatar_url"));
+						}
+						if (fields.has("URL")) {
+							JSONArray arr = fields.getJSONArray("URL");
+							if (arr.length() == 1) {
+								JSONObject jobj = arr.getJSONObject(0);
+								if (jobj.has("value")) {
+									p.setProfileUrl(jobj.getString("value"));
+								}
+							} else {
+								String url = null;
+								for (int k = 0; k < arr.length(); k++) {
+									JSONObject jobj = arr.getJSONObject(k);
+									url = jobj.optString("value");
+									if ("personal".equals(jobj
+											.optString("modifier"))) {
+										break;
+									}
+								}
+								if (url != null) {
+									p.setProfileUrl(url);
+								}
+							}
+						}
+						plist.add(p);
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new ServerDataException(
+					"Failed to parse the contacts json : " + respStr, e);
+		}
+		return plist;
 	}
 
 	/**
@@ -234,79 +291,6 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	}
 
 	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Profile getProfile() throws Exception {
-		if (accessGrant.getAttribute("id") != null) {
-			profileURL = (String) accessGrant.getAttribute("id");
-		}
-		LOG.debug("Profile URL : " + profileURL);
-		Profile p = new Profile();
-		Map<String, String> headerParam = new HashMap<String, String>();
-		headerParam.put("Authorization", "OAuth " + accessGrant.getKey());
-		headerParam.put("Content-Type", "application/json");
-		headerParam.put("Accept", "application/json");
-		Response serviceResponse;
-		try {
-			serviceResponse = authenticationStrategy.executeFeed(profileURL,
-					MethodType.GET.toString(), null, headerParam, null);
-			// HttpUtil.doHttpRequest(profileURL, "GET", null, headerParam);
-		} catch (Exception e) {
-			throw new SocialAuthException(
-					"Failed to retrieve the user profile from  " + profileURL,
-					e);
-		}
-
-		String result;
-		try {
-			result = serviceResponse
-					.getResponseBodyAsString(Constants.ENCODING);
-			LOG.debug("User Profile :" + result);
-		} catch (Exception e) {
-			throw new SocialAuthException("Failed to read response from  "
-					+ profileURL, e);
-		}
-		try {
-			JSONObject resp = new JSONObject(result);
-			if (resp.has("user_id")) {
-				p.setValidatedId(resp.getString("user_id"));
-			}
-			if (resp.has("first_name")) {
-				p.setFirstName(resp.getString("first_name"));
-			}
-			if (resp.has("last_name")) {
-				p.setLastName(resp.getString("last_name"));
-			}
-			p.setDisplayName(resp.getString("display_name"));
-
-			p.setEmail(resp.getString("email"));
-			String locale = resp.getString("locale");
-			if (locale != null) {
-				String a[] = locale.split("_");
-				p.setLanguage(a[0]);
-				p.setCountry(a[1]);
-			}
-			if (resp.has("photos")) {
-				JSONObject photosResp = resp.getJSONObject("photos");
-
-				if (p.getProfileImageURL() == null
-						|| p.getProfileImageURL().length() <= 0) {
-					p.setProfileImageURL(photosResp.getString("thumbnail"));
-				}
-			}
-			serviceResponse.close();
-			p.setProviderId(getProviderId());
-			userProfile = p;
-			return p;
-		} catch (Exception e) {
-			throw new SocialAuthException(
-					"Failed to parse the user profile json : " + result, e);
-
-		}
-	}
-
-	/**
 	 * 
 	 * @param p
 	 *            Permission object which can be Permission.AUHTHENTICATE_ONLY,
@@ -316,7 +300,7 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	public void setPermission(final Permission p) {
 		LOG.debug("Permission requested : " + p.toString());
 		this.scope = p;
-		authenticationStrategy.setPermission(scope);
+		authenticationStrategy.setPermission(this.scope);
 		authenticationStrategy.setScope(getScope());
 	}
 
@@ -328,6 +312,7 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	 * @param methodType
 	 *            Method type can be GET, POST or PUT
 	 * @param params
+	 *            Not using this parameter in Google API function
 	 * @param headerParams
 	 *            Parameters need to pass as Header Parameters
 	 * @param body
@@ -359,11 +344,8 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	 */
 	@Override
 	public Profile getUserProfile() throws Exception {
-		if (userProfile == null && accessGrant != null) {
-			getProfile();
-		}
-		return userProfile;
-
+		LOG.warn("WARNING: Get Profile function not implemented for Nimble");
+		return null;
 	}
 
 	@Override
@@ -379,21 +361,13 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	@Override
 	public Response uploadImage(final String message, final String fileName,
 			final InputStream inputStream) throws Exception {
-		LOG.warn("WARNING: Not implemented for SalesForce");
+		LOG.warn("WARNING: Not implemented for Nimble");
 		throw new SocialAuthException(
-				"Upload Image is not implemented for SalesForce");
+				"Upload Image is not implemented for Nimble");
 	}
 
 	private String getScope() {
-		String scopeStr = null;
-		if (Permission.AUTHENTICATE_ONLY.equals(scope)) {
-			scopeStr = AuthPerms;
-		} else if (Permission.CUSTOM.equals(scope)) {
-			scopeStr = config.getCustomPermissions();
-		} else {
-			scopeStr = AllPerms;
-		}
-		return scopeStr;
+		return null;
 	}
 
 	@Override
@@ -410,4 +384,5 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	protected OAuthStrategyBase getOauthStrategy() {
 		return authenticationStrategy;
 	}
+
 }
