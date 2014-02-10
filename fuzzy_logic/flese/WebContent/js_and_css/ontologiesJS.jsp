@@ -23,7 +23,7 @@
 function sendOntologyMainQuery (fieldId, url, divId) {
 	var fieldValue = getFieldValue(fieldId);
 	var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
-	var params = "<%=KConstants.Request.ontologyUrl %>=" + fieldValue;
+	var params = "&<%=KConstants.Request.ontologyUrl %>=" + fieldValue;
 	
 	loadAjaxIn(divId, url + params);
 }
