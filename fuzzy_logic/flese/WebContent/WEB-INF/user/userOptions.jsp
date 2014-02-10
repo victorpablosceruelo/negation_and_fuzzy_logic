@@ -118,9 +118,13 @@
 <div id='<%=KConstants.JspsDivsIds.fileUploadDiv %>' class='filesListTable'>
 </div>
 
+<div id='<%=KConstants.JspsDivsIds.ontologyStartDivId %>' class='filesListTable'>
+</div>
+
 <script type="text/javascript">
 	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.ListMyFiles.getUrl(true) %>');
 	loadAjaxIn('<%=KConstants.JspsDivsIds.fileUploadDiv %>', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');
+	loadAjaxIn('<%=KConstants.JspsDivsIds.ontologyStartDivId %>', '<%=KUrls.Ontologies.Start.getUrl(true) %>');
 </script>
 
 

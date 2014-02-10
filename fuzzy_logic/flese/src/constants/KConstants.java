@@ -63,6 +63,9 @@ public class KConstants {
 		public static final String quantifierParam = "quantifier";
 		public static final String operatorParam = "operator";
 		public static final String valueParam = "value";
+		
+		//Ontologies parameters.
+		public static final String ontologyUrl = "ontologyUrl";
 	}
 
 	public static class PathsMgmt {
@@ -192,6 +195,10 @@ public class KConstants {
 		public static final String fuzzificationValuesAndButtonDivId = "fuzzificationValuesAndButtonDiv";
 		public static final String fuzzificationSaveStatusDivId = "fuzzificationSaveStatus";
 		public static final String fuzzificationBarValueDivId = "fuzzificationBarValueDivId";
+		
+		public static final String ontologyStartDivId = "ontologyStartDivId";
+		public static final String ontologyUrlFieldId = "ontologyUrlFieldId";
+		public static final String ontologyQueryResultsDivId = "ontologyQueryResultsDivId";
 	}
 
 	public static class AppMsgs {

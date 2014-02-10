@@ -63,6 +63,20 @@ public class KUrls {
 		public static final UrlMap Remove = getUrlMap(manager, "remove", RemovePage, KUrls.Pages.Exception, "");
 	}
 
+	public static class Ontologies{
+		public static String manager = "OntologiesManager";
+		
+		public static final UrlMap StartPage = getUrlMap(manager, "startPage", null, null, "WEB-INF/ontologies/start.jsp");
+		public static final UrlMap Start = getUrlMap(manager, "start", StartPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap MainPage = getUrlMap(manager, "mainPage", null, null, "WEB-INF/ontologies/main.jsp");
+		public static final UrlMap Main = getUrlMap(manager, "main", MainPage, KUrls.Pages.Exception, "");
+
+		public static final UrlMap MainQueryPage = getUrlMap(manager, "mainQueryPage", null, null, "WEB-INF/ontologies/mainQuery.jsp");
+		public static final UrlMap MainQuery = getUrlMap(manager, "mainQuery", MainQueryPage, KUrls.Pages.Exception, "");
+
+	}
+	
 	public static class Queries {
 		public static String manager = "QueriesManager";
 
