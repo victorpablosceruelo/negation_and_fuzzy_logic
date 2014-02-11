@@ -22,10 +22,13 @@
 
 function sendOntologyMainQuery (fieldId, url, divId) {
 	var fieldValue = getFieldValue(fieldId);
-	var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
-	var params = "&<%=KConstants.Request.ontologyUrl %>=" + fieldValue;
-	
-	loadAjaxIn(divId, url + params);
+	if (fieldValue != "") {
+		var params = "&<%=KConstants.Request.ontologyUrl %>=" + fieldValue;
+		loadAjaxIn(divId, url + params);
+	}
+	else {
+		alert("Please introduce a valid ontology url");
+	}
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

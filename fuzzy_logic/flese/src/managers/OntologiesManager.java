@@ -1,5 +1,6 @@
 package managers;
 
+import ontologies.OntologyRootQuery;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
@@ -29,6 +30,8 @@ public class OntologiesManager extends AbstractManager {
 	}
 
 	public void mainQuery() throws Exception {
+		OntologyRootQuery query = new OntologyRootQuery();
+		query.query();
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
 	}

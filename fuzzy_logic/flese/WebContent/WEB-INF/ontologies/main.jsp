@@ -7,7 +7,7 @@
 <%
 	String ontologyUrlFieldId = KConstants.JspsDivsIds.ontologyUrlFieldId;
 	String ontologyQueryResultsDivId = KConstants.JspsDivsIds.ontologyQueryResultsDivId;
-	String queryUrl = KUrls.Ontologies.Main.getUrl(true);
+	String queryUrl = KUrls.Ontologies.MainQuery.getUrl(true);
 %>
 
 <form action="#">
