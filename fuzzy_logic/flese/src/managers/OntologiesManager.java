@@ -31,7 +31,7 @@ public class OntologiesManager extends AbstractManager {
 
 	public void mainQuery() throws Exception {
 		OntologyRootQuery query = new OntologyRootQuery();
-		query.query();
+		query.query(null);
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
 	}

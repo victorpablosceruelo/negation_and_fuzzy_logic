@@ -6,4 +6,5 @@ public abstract class AbstractOntologyQuery {
 		// TODO Auto-generated constructor stub
 	}
 
+	public abstract void query(String serviceEndPoint);
 }
