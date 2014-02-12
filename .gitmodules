@@ -16,3 +16,6 @@
 [submodule "fuzzy_logic/flese-utils/jquery-ui.git"]
 	path = fuzzy_logic/flese-utils/jquery-ui.git
 	url = https://github.com/jquery/jquery-ui.git
+[submodule "fuzzy_logic/flese-utils/jena.git"]
+	path = fuzzy_logic/flese-utils/jena.git
+	url = https://github.com/apache/jena.git
