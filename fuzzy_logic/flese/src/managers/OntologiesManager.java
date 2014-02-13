@@ -1,5 +1,7 @@
 package managers;
 
+import ontologies.InterfaceOntologyQuery;
+import ontologies.OntologyInstancesQuery;
 import ontologies.OntologyRootQuery;
 import auxiliar.NextStep;
 import constants.KConstants;
@@ -30,8 +32,20 @@ public class OntologiesManager extends AbstractManager {
 	}
 
 	public void mainQuery() throws Exception {
-		OntologyRootQuery query = new OntologyRootQuery();
-		query.query(null);
+		InterfaceOntologyQuery classesQuery = new OntologyRootQuery();
+		classesQuery.query(null);
+		
+		String [] results = classesQuery.getResults();
+		
+		for (String result : results) {
+			String [][] args = new String[1][2];
+			args[0][0] = OntologyInstancesQuery.nameArg1;
+			args[0][1] = result.toString();
+			
+			InterfaceOntologyQuery instancesQuery = new OntologyInstancesQuery();
+			instancesQuery.query(null);
+		}
+		
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
 	}
