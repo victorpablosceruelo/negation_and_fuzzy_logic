@@ -85,21 +85,23 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 
 		String realQuery = queryString.toString();
 		System.out.println(realQuery);
-		Query query = QueryFactory.create(realQuery);
-		QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
+		if ((realQuery != null) && (!"".equals(realQuery))) {
+			Query query = QueryFactory.create(realQuery);
+			QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
 
-		try {
-			ResultSet rs = qe.execSelect();
-			if (rs.hasNext()) {
-				QuerySolution qs = rs.next();
-				RDFNode node = qs.get(nameVar1);
-				results.add(node.toString());
-				System.out.println(ResultSetFormatter.asText(rs));
+			try {
+				ResultSet rs = qe.execSelect();
+				if (rs.hasNext()) {
+					QuerySolution qs = rs.next();
+					RDFNode node = qs.get(nameVar1);
+					results.add(node.toString());
+					System.out.println(ResultSetFormatter.asText(rs));
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			} finally {
+				qe.close();
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		} finally {
-			qe.close();
 		}
 	}
 

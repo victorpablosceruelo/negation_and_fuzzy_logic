@@ -43,6 +43,7 @@ public class OntologiesManager extends AbstractManager {
 			args[0][1] = result.toString();
 			
 			InterfaceOntologyQuery instancesQuery = new OntologyInstancesQuery();
+			instancesQuery.setArguments(args);
 			instancesQuery.query(null);
 		}
 		
