@@ -1,0 +1,215 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.xerces.impl.xs.models;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.xerces.impl.xs.SubstitutionGroupHandler;
+import org.apache.xerces.impl.xs.XMLSchemaException;
+import org.apache.xerces.impl.xs.XSConstraints;
+import org.apache.xerces.impl.xs.XSElementDecl;
+import org.apache.xerces.impl.xs.XSElementDeclHelper;
+import org.apache.xerces.impl.xs.XSOpenContentDecl;
+import org.apache.xerces.impl.xs.XSWildcardDecl;
+import org.apache.xerces.xni.QName;
+
+/**
+ * XSEmptyCM is a derivative of the abstract content model base class that
+ * handles a content model with no children (elements).
+ *
+ * This model validated on the way in.
+ *
+ * @xerces.internal 
+ *
+ * @author Elena Litani, IBM
+ * @author Lisa Martin, IBM
+ * @version $Id: XSEmptyCM.java 1155073 2011-08-08 20:02:50Z knoaman $
+ */
+public class XSEmptyCM implements XSCMValidator, XS11CMRestriction.XS11CM {
+
+    //
+    // Constants
+    //
+
+    // start the content model: did not see any children
+    private static final short STATE_START = 0;
+    
+    private static final Vector EMPTY = new Vector(0);
+
+    //
+    // Data
+    //
+    private final XSOpenContentDecl fOpenContent;
+
+    //
+    // Constructors
+    //
+  
+    // Only one instance of an XSEmptyCM with no openContent will be created.
+    public XSEmptyCM() {
+        fOpenContent = null;
+    }
+
+    // This constructor will be called when the complexType is empty but
+    // contains openContent wildcard
+    public XSEmptyCM(XSOpenContentDecl openContent) {
+        fOpenContent = openContent;
+    }
+
+    //
+    // XSCMValidator methods
+    //
+
+    /**
+     * This methods to be called on entering a first element whose type
+     * has this content model. It will return the initial state of the content model
+     *
+     * @return Start state of the content model
+     */
+    public int[] startContentModel(){
+        return (new int[] {STATE_START});
+    }
+
+
+    /**
+     * The method corresponds to one transaction in the content model.
+     *
+     * @param elementName the qualified name of the element
+     * @param currentState Current state
+     * @param subGroupHandler the substitution group handler
+     * @return element index corresponding to the element from the Schema grammar
+     */
+    public Object oneTransition (QName elementName, int[] currentState, SubstitutionGroupHandler subGroupHandler, XSElementDeclHelper eDeclHelper){
+
+        // error state
+        if (currentState[0] < 0) {
+            currentState[0] = XSCMValidator.SUBSEQUENT_ERROR;
+            return null;
+        }
+
+        if (fOpenContent != null) {
+            if (allowExpandedName(fOpenContent.fWildcard, elementName, subGroupHandler, eDeclHelper)) {
+                return fOpenContent;
+            }
+        }
+
+        currentState[0] = XSCMValidator.FIRST_ERROR;
+        return null;
+    }
+
+
+    /**
+     * The method indicates the end of list of children
+     *
+     * @param currentState Current state of the content model
+     * @return true if the last state was a valid final state
+     */
+    public boolean endContentModel (int[] currentState){
+        int state = currentState[0];
+
+        // restore content model state:
+
+        // error
+        if (state < 0) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+    /**
+     * check whether this content violates UPA constraint.
+     *
+     * @param subGroupHandler the substitution group handler
+     * @param xsConstraints the XML Schema Constraint checker
+     * @return true if this content model contains other or list wildcard
+     */
+    public boolean checkUniqueParticleAttribution(SubstitutionGroupHandler subGroupHandler, XSConstraints xsConstraints) throws XMLSchemaException {
+        return false;
+    }
+
+    /**
+     * Check which elements are valid to appear at this point. This method also
+     * works if the state is in error, in which case it returns what should
+     * have been seen.
+     * 
+     * @param state  the current state
+     * @return       a Vector whose entries are instances of
+     *               either XSWildcardDecl or XSElementDecl.
+     */
+    public Vector whatCanGoHere(int[] state) {
+        return EMPTY;
+    }
+    
+    public int [] occurenceInfo(int[] state) {
+        return null;
+    }
+    
+    public String getTermName(int termId) {
+        return null;
+    }
+    
+    public boolean isCompactedForUPA() {
+        return false;
+    }
+    
+    public XSElementDecl nextElementTransition(int[] s, int[] sn, int[] index) {
+        return null;
+    }
+    public XSWildcardDecl nextWildcardTransition(int[] s, int[] sn, int[] index) {
+        sn[0] = s[0];
+        if (fOpenContent == null) {
+            return null;
+        }
+        if (index[0] == -1) {
+            index[0] = 0;
+            return fOpenContent.fWildcard;
+        }
+        index[0] = -1;
+        return null;
+    }
+    public boolean isOpenContent(XSWildcardDecl w) {
+        return fOpenContent != null && fOpenContent.fWildcard == w;
+    }
+    public boolean allowExpandedName(XSWildcardDecl wildcard,
+            QName curElem, SubstitutionGroupHandler subGroupHandler,
+            XSElementDeclHelper eDeclHelper) {
+        if (wildcard.allowQName(curElem)) {
+            if (wildcard.fDisallowedDefined && eDeclHelper.getGlobalElementDecl(curElem) != null) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    public List getDefinedNames(SubstitutionGroupHandler subGroupHandler) {
+        return Collections.EMPTY_LIST;
+    }
+    public void optimizeStates(XS11CMRestriction.XS11CM base, int[] b, int[] d, int indexb) {
+    }
+    public XSOpenContentDecl getOpenContent() {
+        return fOpenContent;
+    }
+    
+    public XSElementDecl findMatchingElemDecl(QName elementName, SubstitutionGroupHandler subGroupHandler) {
+        return null;
+    }
+} // class XSEmptyCM

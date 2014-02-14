@@ -1,0 +1,39 @@
+/*
+ * Copyright 2001, 2002,2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.xerces.impl.dv;
+
+/**
+ * Datatype exception for invalid values.
+ *
+ * @author Sandy Gao, IBM
+ *
+ * @version $Id: InvalidDatatypeValueException.java 319803 2004-02-24 22:48:17Z mrglavas $
+ */
+public class InvalidDatatypeValueException extends DatatypeException {
+
+    /**
+     * Create a new datatype exception by providing an error code and a list
+     * of error message substitution arguments.
+     *
+     * @param key  error code
+     * @param args error arguments
+     */
+    public InvalidDatatypeValueException(String key, Object[] args) {
+        super(key, args);
+    }
+
+}
