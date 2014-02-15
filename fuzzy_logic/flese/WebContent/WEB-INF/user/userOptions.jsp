@@ -14,7 +14,7 @@
 		<div class='userInformationTableCell'>Field Name</div>
 		<div class='userInformationTableCell'>Value</div>
 	</div>
-<%
+	<%
 	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(request);
 	AuthProvider provider = sessionStoreHouse.getAuthProvider();
 	Profile profile = null;
@@ -25,7 +25,7 @@
 		<div class='userInformationTableCell'><%= sessionStoreHouse.getLocalUserInfo().getLocalUserName() %></div>
 	</div>
 
-<%	} else { %>
+	<%	} else { %>
 	<div class='userInformationTableRow'>
 		<div class='userInformationTableCell'>DisplayName</div>
 		<div class='userInformationTableCell'><%= profile.getDisplayName() %></div>
@@ -78,9 +78,9 @@
 		<div class='userInformationTableCell'>Date Of BirthDay</div>
 		<div class='userInformationTableCell'><%= profile.getDob() %></div>
 	</div>
-<% } %>
+	<% } %>
 
-<%
+	<%
 	/*
 	if (provider != null) {
 		List<Contact> contactsList = provider.getContactList();
@@ -112,14 +112,14 @@
 %>
 </div>
 
-<div id='<%=KConstants.JspsDivsIds.filesListDiv %>' class='filesListTable'>
-</div>
+<div id='<%=KConstants.JspsDivsIds.filesListDiv %>'
+	class='filesListTable'></div>
 
-<div id='<%=KConstants.JspsDivsIds.fileUploadDiv %>' class='filesListTable'>
-</div>
+<div id='<%=KConstants.JspsDivsIds.fileUploadDiv %>'
+	class='filesListTable'></div>
 
-<div id='<%=KConstants.JspsDivsIds.ontologyStartDivId %>' class='filesListTable'>
-</div>
+<div id='<%=KConstants.JspsDivsIds.ontologyStartDivId %>'
+	class='filesListTable'></div>
 
 <script type="text/javascript">
 	loadAjaxIn('<%=KConstants.JspsDivsIds.filesListDiv %>', '<%=KUrls.Files.ListMyFiles.getUrl(true) %>');

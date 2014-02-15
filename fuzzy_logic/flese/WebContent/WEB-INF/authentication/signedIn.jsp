@@ -3,7 +3,7 @@
 <%@page import="constants.KUrls"%>
 
 <%	if (! JspsUtils.isAjax(request)) { %>
-	<jsp:include page='../commonHtmlBody.jsp' />
+<jsp:include page='../commonHtmlBody.jsp' />
 <% } %>
 
 <%

@@ -29,23 +29,25 @@
 <%
 	if (predicatePredicateInfo.hasType(neededType, false)) {
 %>
-	<select name="<%=lineId%>.<%=KConstants.Request.quantifierParam%>quantifier" 
-			id="<%=lineId%>.<%=KConstants.Request.quantifierParam%>">
-		<%=JspsUtils.comboBoxDefaultValue() %>
+<select
+	name="<%=lineId%>.<%=KConstants.Request.quantifierParam%>quantifier"
+	id="<%=lineId%>.<%=KConstants.Request.quantifierParam%>">
+	<%=JspsUtils.comboBoxDefaultValue() %>
 
-		<% for (int i=0; i<predicatesInfos.length; i++) { %>
-			<% if (! predicatesInfos[i].getPredicateName().equals("fnot")) { %>
-				<option title='<%=i %>' value='<%=predicatesInfos[i].getPredicateName() %>'>
-					<%=JspsUtils.getPrologNameInColloquialLanguage(predicatesInfos[i].getPredicateName()) %>
-				</option>
-			<% } %>	
-		<% } %>
-	</select>
-	<script type="text/javascript">
+	<% for (int i=0; i<predicatesInfos.length; i++) { %>
+	<% if (! predicatesInfos[i].getPredicateName().equals("fnot")) { %>
+	<option title='<%=i %>'
+		value='<%=predicatesInfos[i].getPredicateName() %>'>
+		<%=JspsUtils.getPrologNameInColloquialLanguage(predicatesInfos[i].getPredicateName()) %>
+	</option>
+	<% } %>
+	<% } %>
+</select>
+<script type="text/javascript">
 		document.getElementById('<%= lineId %>.quantifierDiv').style.display='inline';
 	</script>
 <% } else { %>
-	<script type="text/javascript">
+<script type="text/javascript">
 		document.getElementById('<%= lineId %>.quantifierDiv').style.display='none';
-	</script>	
+	</script>
 <% } %>

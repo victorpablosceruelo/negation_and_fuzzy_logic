@@ -38,8 +38,7 @@
 <div id="<%=lineId %>.row" class="queryLinesTableRow">
 
 	<!-- Negation -->
-	<div id="<%=lineId %>.negationDiv" class="queryLinesTableCell">
-	</div>
+	<div id="<%=lineId %>.negationDiv" class="queryLinesTableCell"></div>
 
 	<!-- Quantifier -->
 	<div id="<%=lineId %>.quantifierDiv" class="queryLinesTableCell">
@@ -47,30 +46,30 @@
 
 	<!-- Predicate -->
 	<div id="<%=lineId %>.predicateDiv" class="queryLinesTableCell">
-	
-		<select name="<%=lineId %>.<%=KConstants.Request.predicateParam %>" id="<%=lineId %>.<%=KConstants.Request.predicateParam %>" 
-				onchange="selectPredicateChanged(this, '<%=lineId %>', '<%=negUrl %>', '<%=quantUrl %>', '<%=opUrl %>', '<%=valueUrl %>');">
-				<%=JspsUtils.comboBoxDefaultValue() %>
 
-				<% for (int i=0; i<predicatesInfos.length; i++) { %>
-					<option title='<%=i %>' value='<%=predicatesInfos[i].getPredicateName() %>'>
-						<%=JspsUtils.getPrologNameInColloquialLanguage(predicatesInfos[i].getPredicateName()) %>
-					</option>
-				<% } %>
+		<select name="<%=lineId %>.<%=KConstants.Request.predicateParam %>"
+			id="<%=lineId %>.<%=KConstants.Request.predicateParam %>"
+			onchange="selectPredicateChanged(this, '<%=lineId %>', '<%=negUrl %>', '<%=quantUrl %>', '<%=opUrl %>', '<%=valueUrl %>');">
+			<%=JspsUtils.comboBoxDefaultValue() %>
+
+			<% for (int i=0; i<predicatesInfos.length; i++) { %>
+			<option title='<%=i %>'
+				value='<%=predicatesInfos[i].getPredicateName() %>'>
+				<%=JspsUtils.getPrologNameInColloquialLanguage(predicatesInfos[i].getPredicateName()) %>
+			</option>
+			<% } %>
 		</select>
 	</div>
-	
+
 	<!-- Operator -->
-	<div id="<%=lineId %>.operatorDiv" class="queryLinesTableCell">
-	</div>
+	<div id="<%=lineId %>.operatorDiv" class="queryLinesTableCell"></div>
 
 	<!-- Value -->
-	<div id="<%=lineId %>.valueDiv" class="queryLinesTableCell">
-	</div>
-	
+	<div id="<%=lineId %>.valueDiv" class="queryLinesTableCell"></div>
+
 </div>
 
-	<script type="text/javascript">
+<script type="text/javascript">
 		document.getElementById('<%= lineId %>.negationDiv').style.display='none';
 		document.getElementById('<%= lineId %>.quantifierDiv').style.display='none';
 		document.getElementById('<%= lineId %>.operatorDiv').style.display='none';

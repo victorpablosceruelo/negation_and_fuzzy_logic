@@ -12,16 +12,14 @@
 
 <form action="#">
 
-Enter the ontology url <br>
-<input type="text" name="<%=ontologyUrlFieldId%>" id="<%=ontologyUrlFieldId%>">
-
-<input type="button" value="Process Ontology"
-	onclick="sendOntologyMainQuery('<%=ontologyUrlFieldId%>', '<%=queryUrl%>', '<%=ontologyQueryResultsDivId%>');">
+	Enter the ontology url <br> <input type="text"
+		name="<%=ontologyUrlFieldId%>" id="<%=ontologyUrlFieldId%>"> <input
+		type="button" value="Process Ontology"
+		onclick="sendOntologyMainQuery('<%=ontologyUrlFieldId%>', '<%=queryUrl%>', '<%=ontologyQueryResultsDivId%>');">
 
 </form>
 
-<div id="<%=ontologyQueryResultsDivId%>">
-</div>
+<div id="<%=ontologyQueryResultsDivId%>"></div>
 
 <script type="text/javascript">
 	// loadAjaxIn('<%=KConstants.JspsDivsIds.ontologyStartDivId %>', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');

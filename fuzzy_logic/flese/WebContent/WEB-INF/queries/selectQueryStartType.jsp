@@ -38,47 +38,53 @@
 // action='"+ urlMappingFor('RunQueryRequest') + "&fileName="+fileName+"&fileOwner="+fileOwner + "' ";
 // target='" + runQueryTargetiFrameId+ "'>";
  -->
-	<div id='<%=KConstants.JspsDivsIds.queryStartContainerId%>' class='queryStartContainerTable'>
-	     <div class='queryStartContainerTableRow'>
-	          <div class='queryStartContainerTableCell1'>Your query: I'm looking for a </div>
-	          <div class='queryStartContainerTableCell2' id='<%=KConstants.JspsDivsIds.chooseQueryStartTypeContainerId%>'>
-					<select name="<%=KConstants.Request.databaseParam %>" 
-							id="<%=KConstants.Request.databaseParam %>" 
-					        onchange="selectedQueryStartTypeChanged(this, '<%=url1 %>', '<%=url3 %>');" >
-						<%=JspsUtils.comboBoxDefaultValue()%>
-<%
+<div id='<%=KConstants.JspsDivsIds.queryStartContainerId%>'
+	class='queryStartContainerTable'>
+	<div class='queryStartContainerTableRow'>
+		<div class='queryStartContainerTableCell1'>Your query: I'm
+			looking for a</div>
+		<div class='queryStartContainerTableCell2'
+			id='<%=KConstants.JspsDivsIds.chooseQueryStartTypeContainerId%>'>
+			<select name="<%=KConstants.Request.databaseParam %>"
+				id="<%=KConstants.Request.databaseParam %>"
+				onchange="selectedQueryStartTypeChanged(this, '<%=url1 %>', '<%=url3 %>');">
+				<%=JspsUtils.comboBoxDefaultValue()%>
+				<%
 	for (int i=0; i<predicatesInfos.length; i++) {
 		String desc = predicatesInfos[i].getPredicateName();
-%>	
-						<option id='<%=desc%>' title='<%=desc%>' value='<%=desc%>'><%=JspsUtils.getPrologNameInColloquialLanguage(desc)%></option>
-<%
+%>
+				<option id='<%=desc%>' title='<%=desc%>' value='<%=desc%>'><%=JspsUtils.getPrologNameInColloquialLanguage(desc)%></option>
+				<%
 	}
-%>					</select>
-	          </div>
-		 </div>
-	</div>
-
-	<!-- Initialize the query lines counter -->	          
-	<input type="hidden" name='<%=KConstants.Request.linesCounterParam %>' value="0" id='<%=KConstants.Request.linesCounterParam %>'>
-              
-	<div id='<%=KConstants.JspsDivsIds.queryLinesContainerId%>' class='queryLinesContainerTable'>
-	</div>
-    
-	<div id='<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId%>' class='searchOrPersonalizeTable'>
-		 <div class='searchOrPersonalizeTableRow'>
-			  <div class='searchOrPersonalizeTableCell'>
-					<input type='submit' value='Search' onclick="return evaluateQuery('<%=url2 %>');" >
-			  </div>
-			  <div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;
-			  </div>
-			  <div class='searchOrPersonalizeTableCell'>
-					<INPUT type='submit' value='Personalize Program File' 
-							onclick='return personalizeProgramFile("<%=urlListFuzzifications%>", "<%= fuzzificationParams %>", "<%=programFileInfo.getFileName() %>");'>
-			  </div>
+%>
+			</select>
 		</div>
 	</div>
-	<!--  </form><br />  -->
+</div>
 
-	<script type="text/javascript">
+<!-- Initialize the query lines counter -->
+<input type="hidden" name='<%=KConstants.Request.linesCounterParam %>'
+	value="0" id='<%=KConstants.Request.linesCounterParam %>'>
+
+<div id='<%=KConstants.JspsDivsIds.queryLinesContainerId%>'
+	class='queryLinesContainerTable'></div>
+
+<div id='<%=KConstants.JspsDivsIds.searchOrPersonalizeTableId%>'
+	class='searchOrPersonalizeTable'>
+	<div class='searchOrPersonalizeTableRow'>
+		<div class='searchOrPersonalizeTableCell'>
+			<input type='submit' value='Search'
+				onclick="return evaluateQuery('<%=url2 %>');">
+		</div>
+		<div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;</div>
+		<div class='searchOrPersonalizeTableCell'>
+			<INPUT type='submit' value='Personalize Program File'
+				onclick='return personalizeProgramFile("<%=urlListFuzzifications%>", "<%= fuzzificationParams %>", "<%=programFileInfo.getFileName() %>");'>
+		</div>
+	</div>
+</div>
+<!--  </form><br />  -->
+
+<script type="text/javascript">
 		selectedQueryStartTypeChanged("");		
 	</script>

@@ -19,7 +19,9 @@
 				"&" + KConstants.Request.mode + "=" + KConstants.Request.modeBasic;
 	
 %>
-	<a href='#' onclick='fileViewAction("<%=KConstants.JspsDivsIds.fileViewContentsDiv %>", "<%=urlFileView%>", "<%=params %>", "<%=programFileInfo.getFileName() %>");'
-				title='view program file <%= programFileInfo.getFileName() %>'>View </a>
+<a href='#'
+	onclick='fileViewAction("<%=KConstants.JspsDivsIds.fileViewContentsDiv %>", "<%=urlFileView%>", "<%=params %>", "<%=programFileInfo.getFileName() %>");'
+	title='view program file <%= programFileInfo.getFileName() %>'>View
+</a>
 
 <% } %>

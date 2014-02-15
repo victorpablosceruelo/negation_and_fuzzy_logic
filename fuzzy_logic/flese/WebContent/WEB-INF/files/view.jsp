@@ -5,8 +5,8 @@
 <%@page import="constants.KConstants"%>
 
 
-	<div class="fileViewTable">
-<% 
+<div class="fileViewTable">
+	<% 
 	String [] msgs = JspsUtils.getResultMessages(request);
 	if ((msgs != null) && (msgs.length > 0)) { 
 		for (int i=0; i<msgs.length; i++) {
@@ -20,12 +20,12 @@
 		if ((fileContents != null) && (fileContents.length > 0)) {
 			for (int i=0; i< fileContents.length; i++) {
 %>
-				<div class="fileViewTableRow">
-					<div class="fileViewTableCell">
-						<%= fileContents[i] %>
-					</div>
-				</div>
-<%
+	<div class="fileViewTableRow">
+		<div class="fileViewTableCell">
+			<%= fileContents[i] %>
+		</div>
+	</div>
+	<%
 			}
 		}
 	}

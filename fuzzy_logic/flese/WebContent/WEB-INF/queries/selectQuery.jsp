@@ -27,18 +27,21 @@
 	// JspsUtils.getValue(selectQueryAddAggrUrl);
 %>
 
-	<div id="queryLinesContainerTableRow" class="queryLinesContainerTableRow">
-		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
-			<div id="<%=KConstants.JspsDivsIds.queryLinesTableId%>" class="queryLinesTable">
-			</div>
-		</div>
-		<div id="queryLinesContainerTableCell" class="queryLinesContainerTableCell">
-			<div id="<%=KConstants.JspsDivsIds.queryLinesAggregatorTableId%>" class="queryLinesAggregatorTable">
-			</div>
-		</div>
-		
+<div id="queryLinesContainerTableRow"
+	class="queryLinesContainerTableRow">
+	<div id="queryLinesContainerTableCell"
+		class="queryLinesContainerTableCell">
+		<div id="<%=KConstants.JspsDivsIds.queryLinesTableId%>"
+			class="queryLinesTable"></div>
+	</div>
+	<div id="queryLinesContainerTableCell"
+		class="queryLinesContainerTableCell">
+		<div id="<%=KConstants.JspsDivsIds.queryLinesAggregatorTableId%>"
+			class="queryLinesAggregatorTable"></div>
 	</div>
 
-	<script type="text/javascript">
+</div>
+
+<script type="text/javascript">
 		selectQueryAddLine("<%=selectQueryAddLineUrl %>", "<%=selectQueryAddAggrUrl %>");
 	</script>

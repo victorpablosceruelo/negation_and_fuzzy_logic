@@ -26,13 +26,13 @@
 			<div class='personalizationDivSelectFuzzificationTable'>
 				<div class='personalizationDivSelectFuzzificationTableRow'>
 					<div class='personalizationDivSelectFuzzificationTableCell'>
-						I want to personalize how it is determined that a &nbsp;
-					</div>
+						I want to personalize how it is determined that a &nbsp;</div>
 					<div class='personalizationDivSelectFuzzificationTableCell'>
-						<select name="personalizationSelectComboBoxId" id="personalizationSelectComboBoxId"
-								onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>', '<%= urlEditFuzzification %>');">
-								<%=JspsUtils.comboBoxDefaultValue() %>
-<%
+						<select name="personalizationSelectComboBoxId"
+							id="personalizationSelectComboBoxId"
+							onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>', '<%= urlEditFuzzification %>');">
+							<%=JspsUtils.comboBoxDefaultValue() %>
+							<%
 								for (int i=0; i<fuzzifications.length; i++) {
 									if ((fuzzifications[i] != null) && (fuzzifications[i].length > 0)) {
 										ProgramPartAnalysis fuzzification = fuzzifications[i][0];
@@ -47,21 +47,21 @@
 													"&" + KConstants.Fuzzifications.predNecessary + "=" + fuzzification.getPredNecessary() +
 													"&" + KConstants.Request.mode + "=" + mode;
 %>
-									<option id='<%=desc%>' title='<%=desc%>' value='<%=id%>'><%= desc %></option>
-<%
+							<option id='<%=desc%>' title='<%=desc%>' value='<%=id%>'><%= desc %></option>
+							<%
 									}
 								}
 %>
 						</select>
 					</div>
-				</div> 
+				</div>
 			</div>
 		</div>
 	</div>
 	<div class='personalizationDivMainTableRow'>
-		<div class='personalizationDivMainTableCell' id='<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>'>
-			Select the fuzzification you want to personalize.
-		</div>
+		<div class='personalizationDivMainTableCell'
+			id='<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>'>
+			Select the fuzzification you want to personalize.</div>
 	</div>
 </div>
 
@@ -70,9 +70,8 @@
 %>
 <div class='personalizationDivMainTable'>
 	<div class='personalizationDivMainTableRow'>
-		<div class='personalizationDivMainTableCell'>
-			You cannot personalize this program file.
-		</div>
+		<div class='personalizationDivMainTableCell'>You cannot
+			personalize this program file.</div>
 	</div>
 </div>
 

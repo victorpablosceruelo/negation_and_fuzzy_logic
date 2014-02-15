@@ -19,11 +19,11 @@
 	
 	if (filesList.length > 0) {
 %>
-	<div class='filesListTableRow'>
-		<div class='filesListTableCell'>Program File Name</div>
-		<div class='filesListTableCell'></div>
-		<div class='filesListTableCell'></div>
-	</div>		
+<div class='filesListTableRow'>
+	<div class='filesListTableCell'>Program File Name</div>
+	<div class='filesListTableCell'></div>
+	<div class='filesListTableCell'></div>
+</div>
 <%	}
 	else {
 %>
@@ -35,26 +35,30 @@ You do not owe any program file. Upload one by using the facility below.
 								"&" + KConstants.Request.fileNameParam + "=" + filesList[i].getFileName() + 
 								"&" + KConstants.Request.mode + "=" + KConstants.Request.modeAdvanced;
 %>
-	<div class='filesListTableRow'>
-		<div class='filesListTableCell'>
-		<a href='#' onclick='fileViewAction("<%=KConstants.JspsDivsIds.fileViewContentsDiv %>", "<%=urlFileView%>", "<%=params %>", "<%=filesList[i].getFileName() %>");'
-					title='view program file <%= filesList[i].getFileName() %>'><%=filesList[i].getFileName() %></a>
-		</div>
-		<div class='filesListTableCell'>   					
-		<a href='#' onclick='removeFileAction("<%= urlFileRemoval %>", "<%= params %>");' 
-	   				title='remove program file <%= filesList[i].getFileName() %>' >
-	   				<img src='images/remove-file.gif' width='20em'></a>
-	   	</div>
-	   	<div class='filesListTableCell'>	 
-		<a href='#' onclick='return personalizeProgramFile("<%=urlListFuzzifications%>", "<%= params %>", "<%=filesList[i].getFileName() %>");' 
-					title='personalize program file <%= filesList[i].getFileName() %>' >
-					<img src='images/edit.png' width='20em'></a>
-		</div>
+<div class='filesListTableRow'>
+	<div class='filesListTableCell'>
+		<a href='#'
+			onclick='fileViewAction("<%=KConstants.JspsDivsIds.fileViewContentsDiv %>", "<%=urlFileView%>", "<%=params %>", "<%=filesList[i].getFileName() %>");'
+			title='view program file <%= filesList[i].getFileName() %>'><%=filesList[i].getFileName() %></a>
 	</div>
+	<div class='filesListTableCell'>
+		<a href='#'
+			onclick='removeFileAction("<%= urlFileRemoval %>", "<%= params %>");'
+			title='remove program file <%= filesList[i].getFileName() %>'> <img
+			src='images/remove-file.gif' width='20em'></a>
+	</div>
+	<div class='filesListTableCell'>
+		<a href='#'
+			onclick='return personalizeProgramFile("<%=urlListFuzzifications%>", "<%= params %>", "<%=filesList[i].getFileName() %>");'
+			title='personalize program file <%= filesList[i].getFileName() %>'>
+			<img src='images/edit.png' width='20em'>
+		</a>
+	</div>
+</div>
 <%  }  %>
 
-<div id='<%=KConstants.JspsDivsIds.fileViewContentsDiv %>' class='filesListTable' style='display:none;' >
-</div>
+<div id='<%=KConstants.JspsDivsIds.fileViewContentsDiv %>'
+	class='filesListTable' style='display: none;'></div>
 
 
 

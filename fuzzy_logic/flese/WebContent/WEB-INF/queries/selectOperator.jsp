@@ -40,21 +40,21 @@
 <%
 	if ((predicateInfo.hasType(neededType1, false)) || (predicateInfo.hasType(neededType2, false)) || (predicateInfo.hasType(neededType3, false))) {
 %>
-	<select name="<%=lineId%>.<%=KConstants.Request.operatorParam %>" 
-			id="<%=lineId%>.<%=KConstants.Request.operatorParam %>">
-		<%=JspsUtils.comboBoxDefaultValue() %>
+<select name="<%=lineId%>.<%=KConstants.Request.operatorParam %>"
+	id="<%=lineId%>.<%=KConstants.Request.operatorParam %>">
+	<%=JspsUtils.comboBoxDefaultValue() %>
 
-		<% for (int i=0; i<operators.length; i++) {	%>
-				<option value='<%=operators[i][0] %>'>
-					<%= JspsUtils.getPrologNameInColloquialLanguage(operators[i][0])  %>
-				</option>
-		<% } %>
-	</select>
-	<script type="text/javascript">
+	<% for (int i=0; i<operators.length; i++) {	%>
+	<option value='<%=operators[i][0] %>'>
+		<%= JspsUtils.getPrologNameInColloquialLanguage(operators[i][0])  %>
+	</option>
+	<% } %>
+</select>
+<script type="text/javascript">
 		document.getElementById('<%= lineId %>.operatorDiv').style.display='inline';
 	</script>
 <% } else { %>
-	<script type="text/javascript">
+<script type="text/javascript">
 		document.getElementById('<%= lineId %>.operatorDiv').style.display='none';
-	</script>	
+	</script>
 <% } %>

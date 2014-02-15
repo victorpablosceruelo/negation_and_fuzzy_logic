@@ -29,44 +29,45 @@
 %>
 
 <% if (predicatePredicateInfo.hasType(neededType1, false)) { %>
-	<% 
+<% 
 		PredMoreInfoInterface pmi = predicatePredicateInfo.getPredicateMoreInfoAs(KConstants.MoreInfoTypes.enumTypeValues);
 		if (pmi != null) {
 	%>
-		<select name="<%=lineId %>.<%=KConstants.Request.valueParam %>" id="<%=lineId %>.<%=KConstants.Request.valueParam %>">
-			<%=JspsUtils.comboBoxDefaultValue() %>
+<select name="<%=lineId %>.<%=KConstants.Request.valueParam %>"
+	id="<%=lineId %>.<%=KConstants.Request.valueParam %>">
+	<%=JspsUtils.comboBoxDefaultValue() %>
 
-			<% 
+	<% 
 				String [] values = pmi.getValuesFor(database); 
 				for (int i=0; i<values.length; i++) {
 					if (null != values[i]) { 
 			%>
-						<option title='<%=values[i] %>' value='<%=values[i] %>'>
-							<%=JspsUtils.getPrologNameInColloquialLanguage(values[i]) %>
-						</option>
-			<%
+	<option title='<%=values[i] %>' value='<%=values[i] %>'>
+		<%=JspsUtils.getPrologNameInColloquialLanguage(values[i]) %>
+	</option>
+	<%
 					}
 				}
 			%>
-		</select>
-		<script type="text/javascript">
+</select>
+<script type="text/javascript">
 			document.getElementById('<%= lineId %>.valueDiv').style.display='inline';
 		</script>
-		
-	<% } %>
+
+<% } %>
 <% } else { %>
-	<% if ((predicatePredicateInfo.hasType(neededType2, false)) || (predicatePredicateInfo.hasType(neededType3, false))) { %>
-		<input type='text' value='' 
-				name="<%=lineId %>.<%=KConstants.Request.valueParam %>" 
-				id="<%=lineId %>.<%=KConstants.Request.valueParam %>" />
-		<script type="text/javascript">
+<% if ((predicatePredicateInfo.hasType(neededType2, false)) || (predicatePredicateInfo.hasType(neededType3, false))) { %>
+<input type='text' value=''
+	name="<%=lineId %>.<%=KConstants.Request.valueParam %>"
+	id="<%=lineId %>.<%=KConstants.Request.valueParam %>" />
+<script type="text/javascript">
 			document.getElementById('<%= lineId %>.valueDiv').style.display='inline';
 		</script>
-	<% } else { %>
-		<script type="text/javascript">
+<% } else { %>
+<script type="text/javascript">
 			document.getElementById('<%= lineId %>.valueDiv').style.display='none';
-		</script>	
-	<% } %>
+		</script>
+<% } %>
 <% } %>
 
 

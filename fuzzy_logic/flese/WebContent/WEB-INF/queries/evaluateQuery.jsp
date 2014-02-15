@@ -50,7 +50,8 @@
 	if (answers.length <= 0) {
 		String [] msgs = JspsUtils.getResultMessages(request);
 		if ((msgs == null) || (msgs.length <= 0)) {
-%>The query has no answers. <%
+%>The query has no answers.
+<%
 		} else {
 			for (int i=0; i<msgs.length; i++) {
 				out.print(msgs[i]);

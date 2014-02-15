@@ -5,7 +5,7 @@
 <%@page import="java.util.ArrayList"%>
 
 <%	if (! JspsUtils.isAjax(request)) { %>
-	<jsp:include page='commonHtmlBody.jsp' />
+<jsp:include page='commonHtmlBody.jsp' />
 <% } %>
 
 <%

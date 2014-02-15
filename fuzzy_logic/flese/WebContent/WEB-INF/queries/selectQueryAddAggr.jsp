@@ -35,65 +35,71 @@
 %>
 
 <% if ((linesCounter == null) || ("".equals(linesCounter)) || ("0".equals(linesCounter))) { %>
-	<div class='queryLinesAggregatorTableRow'>
-		<div class='queryLinesAggregatorTableCell'>
-			<a href="#" onClick="selectQueryAddLine('<%=selectQueryAddLineUrl %>', '<%=selectQueryAddAggrUrl %>');" >
-				<img src="images/add.png" width="20" alt="Add more conditions to the query" 
-						title="Add more conditions to the query" />
-			</a>
-		</div>
+<div class='queryLinesAggregatorTableRow'>
+	<div class='queryLinesAggregatorTableCell'>
+		<a href="#"
+			onClick="selectQueryAddLine('<%=selectQueryAddLineUrl %>', '<%=selectQueryAddAggrUrl %>');">
+			<img src="images/add.png" width="20"
+			alt="Add more conditions to the query"
+			title="Add more conditions to the query" />
+		</a>
 	</div>
+</div>
 <% } else { %>
-	<div class='queryLinesAggregatorTableRow'>
-		<div class='queryLinesAggregatorTableCell'>
-			<a href="#" onClick="selectQueryAddLine('<%=selectQueryAddLineUrl %>', '<%=selectQueryAddAggrUrl %>');" >
-				<img src="images/add.png" width="20" alt="Add more conditions to the query" 
-						title="Add more conditions to the query" />
-			</a>
-		</div>
+<div class='queryLinesAggregatorTableRow'>
+	<div class='queryLinesAggregatorTableCell'>
+		<a href="#"
+			onClick="selectQueryAddLine('<%=selectQueryAddLineUrl %>', '<%=selectQueryAddAggrUrl %>');">
+			<img src="images/add.png" width="20"
+			alt="Add more conditions to the query"
+			title="Add more conditions to the query" />
+		</a>
 	</div>
+</div>
 
-	<div class='queryLinesAggregatorTableRow'>
-		<div class='queryLinesAggregatorTableCell'>
-			<a id='<%=queryLinesSelectAggregatorShowOptionsId %>' href='' 
-				onclick="return aggregatorDetailsShow('<%= queryLinesSelectAggregatorShowOptionsId %>', 
+<div class='queryLinesAggregatorTableRow'>
+	<div class='queryLinesAggregatorTableCell'>
+		<a id='<%=queryLinesSelectAggregatorShowOptionsId %>' href=''
+			onclick="return aggregatorDetailsShow('<%= queryLinesSelectAggregatorShowOptionsId %>', 
 						'<%= queryLinesSelectAggregatorHideOptionsId %>', 
-						'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');"> show options</a>
-			<a id='<%=queryLinesSelectAggregatorHideOptionsId %>' href='' 
-				onclick="return aggregatorDetailsHide('<%=	queryLinesSelectAggregatorShowOptionsId %>', 
+						'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');">
+			show options</a> <a id='<%=queryLinesSelectAggregatorHideOptionsId %>'
+			href=''
+			onclick="return aggregatorDetailsHide('<%=	queryLinesSelectAggregatorShowOptionsId %>', 
 						'<%= queryLinesSelectAggregatorHideOptionsId %>', 
-						'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');"> hide options</a>
-		</div>
+						'<%= chooseAgregatorInfoCellId %>', '<%=chooseAgregatorCellId %>');">
+			hide options</a>
 	</div>
+</div>
 
-	<div class='queryLinesAggregatorTableRow'>
-		<div class='queryLinesAggregatorTableCell' id=<%= chooseAgregatorInfoCellId %>>
-			The aggregator used to combine <br />the subqueries' truth values is:
-		</div>
+<div class='queryLinesAggregatorTableRow'>
+	<div class='queryLinesAggregatorTableCell'
+		id=<%= chooseAgregatorInfoCellId %>>
+		The aggregator used to combine <br />the subqueries' truth values is:
 	</div>
+</div>
 
-	<div class='queryLinesAggregatorTableRow'>
-		<div class='queryLinesAggregatorTableCell' id=<%= chooseAgregatorCellId %>>
-			<select name='<%= KConstants.Request.aggregatorParam %>' id='<%= KConstants.Request.aggregatorParam %>'>
-				<% 
+<div class='queryLinesAggregatorTableRow'>
+	<div class='queryLinesAggregatorTableCell'
+		id=<%= chooseAgregatorCellId %>>
+		<select name='<%= KConstants.Request.aggregatorParam %>'
+			id='<%= KConstants.Request.aggregatorParam %>'>
+			<% 
 					for (int i=0; i<aggregators.length; i++) {
 						String name = aggregators[i].getPredicateName(); 
 						if ((name != null) && (! "".equals(name))) {
 				%>
-							<option 
-								<% if ("min".equals(name)) { %>
-									selected
-								<% } %>
-									id='<%=name %>' value='<%=name %>'>
-								<%= JspsUtils.getPrologNameInColloquialLanguage(name) %> 
-							</option>
-					<%	} %>			
-				<%	} %>
-			</select>
-		</div>
+			<option <% if ("min".equals(name)) { %> selected <% } %>
+				id='<%=name %>' value='<%=name %>'>
+				<%= JspsUtils.getPrologNameInColloquialLanguage(name) %>
+			</option>
+			<%	} %>
+			<%	} %>
+		</select>
 	</div>
-	
-	<script type="text/javascript">
+</div>
+
+<script type="text/javascript">
 		document.getElementById('<%= queryLinesSelectAggregatorHideOptionsId %>').style.display='none';
 		document.getElementById('<%= chooseAgregatorInfoCellId  %>').style.display='none';
 		document.getElementById('<%= chooseAgregatorCellId  %>').style.display='none';
