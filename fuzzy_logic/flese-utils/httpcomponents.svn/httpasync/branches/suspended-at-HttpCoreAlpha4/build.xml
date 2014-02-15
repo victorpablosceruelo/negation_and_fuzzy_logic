@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   $HeadURL: https://svn.apache.org/repos/asf/httpcomponents/httpasync/branches/suspended-at-HttpCoreAlpha4/build.xml $
+   $Revision: 489367 $
+   $Date: 2006-12-21 15:22:51 +0100 (Thu, 21 Dec 2006) $
+
+   ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+   ====================================================================
+
+   This software consists of voluntary contributions made by many
+   individuals on behalf of the Apache Software Foundation.  For more
+   information on the Apache Software Foundation, please see
+   <http://www.apache.org/>.
+ -->
+
+<project name="HttpAsync" basedir="." default="package-src">
+<description>
+HttpAsync: Jakarta HttpComponents Asynchronous
+</description>
+
+
+<!-- Definition of the local environment.
+        The default location of the build.properties assumes that you are
+        building from the full tree of all HTTP components, and have a
+        single build.properties file located in ${root}/project/. If this is
+        not the case, override property local.properties when calling Ant.
+
+        Use this file to specify the location of external dependencies,
+        and to override other properties defined below if you have to.
+
+        External dependencies for which there is a default location:
+          httpcore.jar        - always
+          javadoc.j2sdk.link  - for javadoc
+          dist.core.api       - for javadoc
+
+        External dependencies for which there is no default location:
+          commons-logging.jar - (to be added to default dependencies)
+          junit.jar           - for test and clover targets
+          clover.jar          - for clover target
+  -->
+<property name="local.properties" location="../project/build.properties" />
+<property file="${local.properties}" />
+
+
+<!-- component and version information -->
+<property name="comp.async.name"
+         value="httpasync"/>
+<property name="comp.async.title"
+         value="Jakarta HttpComponents Asynchronous"/>
+<property name="comp.async.version"
+         value="SNAPSHOT"/>
+
+<!-- external dependencies
+        These are prime candidates for overriding in local.properties.
+        The defaults assume again that you are building from the full tree
+        of HTTP components, and that other components use the default
+        build settings.
+        The '.jar properties must be set to either to a JAR file in which
+        the classes are packaged, or to a directory tree holding them.
+  -->
+
+<property name="httpcore.home" location="../httpcore" />
+<property name="httpcore.jar"
+      location="${httpcore.home}/module-main/target/classes" />
+<property name="dist.core.api"
+      location="${httpcore.home}/dist/docs/api/" />
+
+<path id="classpath.async.compile">
+  <pathelement location="${httpcore.jar}"/>
+<!--     <pathelement location="${commons-logging.jar}"/> -->
+</path>
+
+<path id="classpath.async.javadoc">
+  <path refid="classpath.async.compile" />
+  <!-- add dependencies for contrib classes for which to JavaDoc -->
+</path>
+
+
+<!-- directory structure of the source tree -->
+<property name="comp.async.home"  value="${basedir}"/>
+<property name="comp.async.src"   value="${comp.async.home}/src/java"/>
+<property name="comp.async.tests" value="${comp.async.home}/src/test/java"/>
+<property name="comp.async.xmpls" value="${comp.async.home}/src/examples"/>
+<property name="comp.async.contr" value="${comp.async.home}/src/contrib"/>
+
+
+<!-- locations for intermediate and final build results
+        For consistency with other builds, the temporary files are
+        located by default below "target/", final results below "dist/".
+  -->
+<property name="build.async.home"    value="${comp.async.home}/target"/>
+<property name="build.async.classes" value="${build.async.home}/classes"/>
+<property name="build.async.tests"   value="${build.async.home}/tests"/>
+<property name="build.async.xmpls"   value="${build.async.home}/examples"/>
+<property name="build.async.contr"   value="${build.async.home}/contrib"/>
+<property name="build.async.clover"  value="${build.async.home}/clover"/>
+
+<property name="dist.async.home"     value="${comp.async.home}/dist"/>
+<property name="dist.async.docs"     value="${dist.async.home}/docs"/>
+<property name="dist.async.api"      value="${dist.async.docs}/api"/>
+
+<property name="jar.async.src.name"
+         value="jakarta-${comp.async.name}-${comp.async.version}.jar" />
+<property name="jar.async.addon.name"
+         value="jakarta-${comp.async.name}-addon-${comp.async.version}.jar" />
+
+
+<!-- compiler and javadoc setup -->
+<property name="compile.debug"       value="true"/>
+<property name="compile.deprecation" value="true"/>
+<property name="compile.optimize"    value="true"/>
+<property name="compile.source"      value="1.4"/>
+<property name="compile.target"      value="1.4"/>
+<property name="javadoc.access"      value="protected"/>
+
+<property name="javadoc.j2sdk.link"
+         value="http://java.sun.com/j2se/1.4.2/docs/api/" />
+
+
+<!-- build targets ======================================================== -->
+
+<target name="echo-properties"
+        description="echo properties to verify the build setup"
+>
+<echo>
+General
+  component         ${comp.async.name}
+  component title   ${comp.async.title}
+  component version ${comp.async.version}
+  base directory    ${basedir}
+  local properties  ${local.properties}
+
+Dependencies
+  HttpCore        ${httpcore.jar}
+  Commons Logging ${commons-logging.jar}
+  JUnit           ${junit.jar}
+  Clover          ${clover.jar}
+
+Source Tree
+  base     ${comp.async.home}
+  main     ${comp.async.src}
+  tests    ${comp.async.tests}
+  examples ${comp.async.xmpls}
+  contrib  ${comp.async.contr}
+
+Output
+  temp    ${build.async.home}
+  final   ${dist.async.home}
+  javadoc ${dist.async.api}
+</echo>
+</target>
+
+
+<!-- traditional targets ======================================================
+        These targets match the ones before the build restructuring, except:
+        - "javadoc" does not depend on "compile"
+        - "clover" will always recompile the source and tests
+  -->
+
+<target name="compile" depends="compile-src" />
+<target name="package" depends="package-src" />
+<target name="javadoc" depends="javadoc-src" />
+<target name="test"    depends="compile-src,run-tests" />
+<target name="clover"  depends="run-clover" />
+<target name="clean"   depends="clean-build,clean-dist" />
+
+
+<!-- combined compilation targets =============================================
+        For external invocation.
+        See also the packaging and test/verification targets below
+  -->
+
+<target name="compile-all"
+        depends="compile-src,compile-tests,
+                 compile-examples,compile-contrib"
+        description="compiles everything, not from scratch"
+/>
+<target name="clean-compile"
+        depends="clean-src,clean-tests,
+                 clean-examples,clean-contrib"
+        description="cleans intermediate files from compilation"
+/>
+<target name="compile-all-fs"
+        depends="clean-compile,compile-all"
+        description="compiles everything from scratch"
+/>
+
+
+<!-- compile and clean targets ================================================
+        For compiling and recompiling specific parts of HttpAsync code.
+        These targets do NOT define dependencies between eachother.
+        Direct invocation of these targets is for those who know what they do!
+  -->
+
+<target name="compile-src" depends="build-init">
+
+	<mkdir dir="${build.async.classes}" />
+        <javac destdir     ="${build.async.classes}"
+               debug       ="${compile.debug}"
+               deprecation ="${compile.deprecation}"
+               optimize    ="${compile.optimize}"
+               encoding    ="UTF-8"
+               source      ="${compile.source}"
+               target      ="${compile.target}"
+        >
+          <src>
+            <pathelement location="${comp.async.src}"/>
+          </src>
+          <classpath>
+            <path refid="classpath.async.compile"/>
+          </classpath>
+        </javac>
+</target>
+<target name="clean-src">
+	<delete dir="${build.async.classes}" quiet="true" />
+</target>
+
+
+<target name="compile-tests" depends="build-init">
+	<mkdir dir="${build.async.tests}" />
+        <javac destdir     ="${build.async.tests}"
+               debug       ="${compile.debug}"
+               deprecation ="${compile.deprecation}"
+               optimize    ="${compile.optimize}"
+               encoding    ="UTF-8"
+               source      ="${compile.source}"
+               target      ="${compile.target}"
+        >
+          <src>
+            <pathelement path="${comp.async.tests}"/>
+          </src>
+          <classpath>
+            <path refid="classpath.async.compile"/>
+            <pathelement location="${build.async.classes}"/>
+            <pathelement location="${junit.jar}"/>
+          </classpath>
+        </javac>
+</target>
+<target name="clean-tests">
+	<delete dir="${build.async.tests}" quiet="true" />
+</target>
+
+
+<target name="compile-examples" depends="build-init">
+	<mkdir dir="${build.async.xmpls}" />
+        <javac destdir     ="${build.async.xmpls}"
+               debug       ="${compile.debug}"
+               deprecation ="${compile.deprecation}"
+               optimize    ="${compile.optimize}"
+               encoding    ="UTF-8"
+               source      ="${compile.source}"
+               target      ="${compile.target}"
+        >
+          <src>
+            <pathelement path="${comp.async.xmpls}"/>
+          </src>
+          <classpath>
+            <path refid="classpath.async.compile"/>
+            <pathelement location="${build.async.classes}"/>
+          </classpath>
+        </javac>
+</target>
+<target name="clean-examples">
+	<delete dir="${build.async.xmpls}" quiet="true" />
+</target>
+
+
+<target name="compile-contrib" depends="build-init">
+	<mkdir dir="${build.async.contr}" />
+        <javac destdir     ="${build.async.contr}"
+               debug       ="${compile.debug}"
+               deprecation ="${compile.deprecation}"
+               optimize    ="${compile.optimize}"
+               encoding    ="UTF-8"
+               source      ="${compile.source}"
+               target      ="${compile.target}"
+        >
+          <src>
+            <pathelement path="${comp.async.contr}"/>
+          </src>
+          <classpath>
+            <path refid="classpath.async.compile"/>
+            <pathelement location="${build.async.classes}"/>
+          </classpath>
+        </javac>
+</target>
+<target name="clean-contrib">
+	<delete dir="${build.async.contr}" quiet="true" />
+</target>
+
+
+<!-- packaging and verification targets =======================================
+        For building JARs and running tests.
+
+        Targets for building JARs define dependencies on compilation targets.
+        Unlike with Maven, running tests is not a dependency for packaging.
+
+        The plain test target defines dependencies on the test classes, but
+        not on the classes to be tested. It should be possible to run a test
+        target without affecting the subject of the test. The "from scratch"
+        test target defines transitive dependencies on the subject classes.
+  -->
+
+<target name="package-src"
+     depends="dist-init,compile-src"
+ description="builds the JAR with HttpAsync classes"
+>
+        <jar destfile="${dist.async.home}/${jar.async.src.name}">
+          <!-- manifest? -->
+          <!-- timestamp in meta-inf? -->
+          <fileset dir="${build.async.classes}" includes="**" />
+        </jar>    
+</target>
+<target name="package-src-fs"
+     depends="clean-src,package-src"
+ description="builds the JAR with HttpAsync classes, compiling from scratch"
+/>
+
+
+<target name="package-addon"
+     depends="dist-init,compile-src,
+              compile-examples,compile-contrib"
+ description="builds the JAR with HttpAsync examples and contributions"
+>
+        <jar destfile="${dist.async.home}/${jar.async.addon.name}">
+          <!-- manifest? -->
+          <!-- timestamp in meta-inf? -->
+          <fileset dir="${build.async.xmpls}" includes="**" />
+          <fileset dir="${build.async.contr}" includes="**" />
+        </jar>    
+</target>
+<target name="package-addon-fs"
+     depends="clean-examples,clean-contrib,package-addon"
+ description="builds the JAR with HttpAsync examples and contributions, compiling them from scratch"
+/>
+
+
+<target name="run-tests"
+     depends="build-init,compile-tests"
+ description="runs unit tests on HttpAsync classes"
+>
+        <copy todir="${build.async.tests}" filtering="on">
+          <fileset dir="${comp.async.tests}" excludes="**/*.java" />
+        </copy>
+        <!-- don't use Ant optional JUnit tasks here -->
+        <java classname="junit.textui.TestRunner"
+              fork="yes" failonerror="yes"
+        >
+          <arg value="org.apache.http.async.TestAll"/>
+          <classpath>
+            <path refid="classpath.async.compile"/>
+            <pathelement location="${junit.jar}"/>
+            <pathelement location="${clover.jar}"/>
+            <pathelement location="${build.async.classes}"/>
+            <pathelement location="${build.async.tests}"/>
+          </classpath>
+      </java>
+</target>
+<target name="run-tests-fs"
+     depends="clean-build,compile-src,run-tests"
+/>
+
+
+<!-- Clover always needs a recompile to instrument the source code.
+     clean-build enforces the recompilation, clover-init prepares
+     the Ant environment for Clover instrumentation.
+  -->
+<target name="run-clover"
+     depends="clean-build,clover-init,compile-src,run-tests"
+ description="runs Clover on HttpAsync, recompiling everything from scratch"
+>
+    <echoproperties prefix="clover"/>
+    <mkdir dir="${build.async.clover}"/>
+    <clover-report>
+       <current outfile="${build.async.clover}/coverage-report">
+          <format type="html"/>
+       </current>
+    </clover-report>
+</target>
+
+
+<target name="javadoc-src"
+        description="generates JavaDoc for the HttpAsync classes"
+>
+        <mkdir dir="${dist.async.api}" />
+        <javadoc destdir="${dist.async.api}"
+                  access="${javadoc.access}"
+                 version="true"
+                  author="true"
+             windowtitle="${comp.async.title} (Version ${comp.async.version})"
+        >
+          <packageset dir="${comp.async.src}">
+            <include name="org/apache/http/**" />
+          </packageset>
+
+          <group title="API">
+            <package name="org.apache.http.async" />
+          </group>
+          <group title="Implementation">
+            <package name="*.impl.*" />
+          </group>
+    
+          <classpath refid="classpath.async.javadoc"/>
+          <link href="${javadoc.j2sdk.link}"/>
+          <link href="${dist.core.api}"/>
+
+          <doctitle>${comp.async.title}</doctitle>
+          <bottom>Copyright (c) 2005-2006 - Apache Software Foundation</bottom>
+        </javadoc>
+</target>
+
+
+<target name="javadoc-addon"
+        description="generates JavaDoc including examples and contributions"
+>
+        <mkdir dir="${dist.async.api}" />
+        <javadoc destdir="${dist.async.api}"
+                  access="${javadoc.access}"
+                 version="true"
+                  author="true"
+             windowtitle="${comp.async.title} (Version ${comp.async.version})"
+        >
+          <packageset dir="${comp.async.src}">
+            <include name="org/apache/http/**" />
+          </packageset>
+          <packageset dir="${comp.async.xmpls}">
+            <include name="org/apache/http/**" />
+          </packageset>
+          <packageset dir="${comp.async.contr}">
+            <include name="org/apache/http/**" />
+          </packageset>
+
+          <group title="API">
+            <package name="org.apache.http.async" />
+          </group>
+          <group title="Implementation">
+            <package name="org.apache.http.async.impl*" />
+          </group>
+          <group title="Examples">
+            <package name="org.apache.http.examples*" />
+          </group>
+          <group title="Contributions (unsupported)">
+            <package name="org.apache.http.async.contrib*" />
+          </group>
+    
+          <classpath refid="classpath.async.javadoc"/>
+          <link href="${javadoc.j2sdk.link}"/>
+          <link href="${dist.core.api}"/>
+
+          <doctitle>${comp.async.title}</doctitle>
+          <bottom>Copyright (c) 2005-2006 - Apache Software Foundation</bottom>
+        </javadoc>
+</target>
+
+
+<!-- generic and helper targets =========================================== -->
+
+<target name="build-init">
+        <mkdir dir="${build.async.home}" />
+</target>
+<target name="clean-build"
+        description="cleans all intermediate files, including test reports"
+>
+        <delete dir="${build.async.home}" quiet="true" />
+</target>
+
+<target name="dist-init">
+        <mkdir dir="${dist.async.home}" />
+        <!-- timestamp? (in build directory!) -->
+        <!-- manifest? (in build directory!) -->
+</target>
+<target name="clean-dist"
+        description="cleans all final build results"
+>
+        <!-- By default, dist.async.docs and dist.async.api are located
+             below dist.async.home and will be cleaned here. If their
+             location is redefined to be somewhere else, they will not
+             be cleaned here. Use the targets dist-docs-clean or
+             dist-api-clean to achieve that.
+          -->
+        <delete dir="${dist.async.home}" quiet="true" />
+        <!-- delete timestamps and manifests from build.async.home? -->
+</target>
+<target name="dist-docs-clean">
+        <delete dir="${dist.async.docs}" quiet="true" />
+</target>
+<target name="dist-api-clean">
+        <delete dir="${dist.async.api}" quiet="true" />
+</target>
+
+
+<target name="clover-init">
+        <taskdef resource="clovertasks" />
+        <property name="build.async.clover.db"
+              location="${build.async.clover}/database" />
+        <mkdir dir="${build.async.clover.db}"/>
+        <!-- This task prepares the Ant environment for Clover instrumentation.
+             Everything compiled afterwards will be instrumented if it matches
+             the fileset(s) defined here.
+          -->
+        <clover-setup initString="${build.async.clover.db}/coverage.db" >
+           <fileset dir="${comp.async.src}" includes="**" />
+        </clover-setup>
+</target>
+
+
+</project><!-- HttpAsync -->

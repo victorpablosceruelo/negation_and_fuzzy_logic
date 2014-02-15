@@ -1,0 +1,47 @@
+$Id: BUILDING.txt 134229 2003-06-04 06:16:04Z oglueck $
+================================================================
+Building HttpClient
+================================================================
+
+To compile httpclient, you'll want the excellent Ant utility
+(version 1.2 or later). It can obtained from:
+
+  http://jakarta.apache.org/ant/
+ 
+Your Ant installation is ready when you can run Ant from the httpclient
+project directory:
+
+ $ ant
+
+To build the project you'll also need:
+
+ * an implementation of the Java Secure Socket Extension,
+   a standard Java extension available from:
+     http://java.sun.com/products/jsse
+
+ * the Jakarta-Commons logging component, available from:
+     http://jakarta.apache.org/commons/logging/
+
+To help the build and test targets find these classes,
+you must make a copy of the build.properties.sample file,
+rename to build.properties, and modify it to reflect the
+location of jsse.jar, jnet.jar, jcert.jar and commons-logging.jar
+on your computer.
+
+Once you have Ant, JSSE and Commons-Logging properly installed, and
+your build.properties file properly configured, you are ready
+to build the component:
+
+To build a jar:
+
+ $ ant dist
+
+To build the API documentation:
+
+ $ ant javadoc
+
+To build the jar and API doc at once:
+
+ $ ant dist
+
+Run ant -projecthelp to see a list of all available targets.

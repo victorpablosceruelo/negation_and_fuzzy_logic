@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <title>Status</title>
+    <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+    <author email="remy@apache.org">Remy Maucherat</author>
+    <author email="rwaldhoff@apache.org">Rodney Waldhoff</author>
+    <author email="jsdever@apache.org">Jeff Dever</author>
+    <revision>$Id: status.xml 468688 2006-10-28 12:59:24Z olegk $</revision>
+  </properties>
+
+  <body>
+
+    <section name="Current Status">
+        <p>HttpClient 3.1 adds support for the RFC 2965 cookie management (also known as
+           Cookie2 or port sensitive cookies) and a number of improvements to the 
+           HTTP connection management. HttpClient 3.1 is backward compatible with 
+           HttpClient 3.0</p>
+
+        <p>Bug reports targeted for the next release can be found
+         <a href="http://issues.apache.org/jira/secure/IssueNavigator.jspa?requestId=12311032">here</a>.
+       </p>
+    </section>
+
+    <section name="Release Info">
+      <p>Current Stable Release (<b>recommended</b>): <a href="http://jakarta.apache.org/site/downloads/downloads_commons-httpclient.cgi">
+          Release 3.0.1</a></p>
+      <p>HttpClient 2.0 is no longer being actively developed and supported.</p>
+    </section>
+
+  </body>
+
+</document>

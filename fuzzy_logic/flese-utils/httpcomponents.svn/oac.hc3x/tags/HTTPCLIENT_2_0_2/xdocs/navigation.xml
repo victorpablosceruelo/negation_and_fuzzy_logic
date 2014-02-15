@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE org.apache.commons.menus SYSTEM '../../commons-build/menus/menus.dtd'>
+
+<project name="HttpClient">
+
+  <properties>
+    <title>HttpClient</title>
+    <author email="jsdever@apache.org">Jeff Dever</author>
+    <author email="adrian@ephox.com">Adrian Sutton</author>
+    <revision>$Id: navigation.xml 134710 2004-09-20 02:33:23Z mbecke $</revision>
+  </properties>
+
+  <body>
+    <menu name="Overview">
+      <item name="HttpClient 3.0" href="/3.0/index.html"/>
+      <item name="Features" href="/features.html"/>
+      <item name="News" href="/news.html"/>
+      <item name="Status" href="/status.html"/>
+      <item name="Download" href="/downloads.html"/>
+      <item name="Applications" href="/applications.html"/>
+      <item name="User Guide" href="/userguide.html">
+        <item name="Authentication Guide" href="/authentication.html"/>
+        <item name="Character Encodings" href="/charencodings.html"/>
+        <item name="Cookies" href="/cookies.html"/>
+        <item name="Cross Host Redirects" href="/redirects.html"/>
+        <item name="Logging Guide" href="/logging.html"/>
+        <item name="Methods" href="/methods.html"/>
+        <item name="Sample Code" href="http://cvs.apache.org/viewcvs.cgi/jakarta-commons/httpclient/src/examples/?only_with_tag=HTTPCLIENT_2_0_BRANCH"/>
+        <item name="SSL Guide" href="/sslguide.html"/>
+        <item name="Threading" href="/threading.html"/>
+        <item name="Trouble Shooting" href="/troubleshooting.html"/>
+        <item name="Tutorial" href="/tutorial.html"/>
+      </item>
+      <item name="Developer Guide" href="/developerguide.html">
+        <item name="Release Process" href="/releases.html"/>
+        <item name="Webapp Test Guide" href="/testwebapp.html"/>
+      </item>
+    </menu>
+
+    &common-menus;
+  
+  </body>
+</project>

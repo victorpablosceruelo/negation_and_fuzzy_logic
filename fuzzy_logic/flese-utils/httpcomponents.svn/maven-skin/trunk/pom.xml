@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>8</version>
+    </parent>
+
+  <groupId>org.apache.httpcomponents</groupId>
+  <artifactId>maven-site-skin</artifactId>
+  <name>maven-site-skin</name>
+  <version>1.2-SNAPSHOT</version>
+
+  <inceptionYear>2011</inceptionYear>
+  <packaging>jar</packaging>
+  <url>http://hc.apache.org</url>
+
+  <description>Maven custom skin allowing specification of footer elements</description>
+<!--
+   To use the skin, add the following to the src/site/site.xml file:
+
+<project ...
+  <skin>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>maven-site-skin</artifactId>
+    <version>1.1</version>
+  </skin>
+...
+</project>
+
+   The skin contains an updated version of the default Maven template, as well as the
+   default css and image files.
+
+   The template checks the site.xml file for the presence of the following custom tag:
+
+   <custom>
+      <footer>
+      Optional HTML-formatted text goes here
+      </footer>
+   </custom>
+
+   If the tag is found, its contents are added to the footer just before the copyright statement.
+   Example usage:
+   
+ <custom>
+    <footer>
+      <div class="xleft">Apache HttpComponents, Commons HttpClient, Apache, the Apache feather logo, 
+      and the Apache HttpComponents project logo are trademarks of The Apache Software Foundation.</div>
+      <br/>
+      <div class="xleft">All other marks mentioned may be trademarks or registered trademarks of their respective owners.</div>
+    </footer>
+  </custom>
+
+-->
+
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Apache License</name>
+      <url>LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+              <connection>scm:svn:http://svn.apache.org/repos/asf/httpcomponents/httpcomponents-maven-skin/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/httpcomponents/httpcomponents-maven-skin/trunk</developerConnection>
+                             <url>http://svn.apache.org/repos/asf/httpcomponents/httpcomponents-maven-skin/trunk</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <profiles>
+   <profile>
+     <!-- The apache-release profile also creates a zip archive which we don't need -->
+     <id>release</id>
+     <build>
+       <plugins>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+         </plugin>
+       </plugins>
+     </build>
+   </profile>
+  </profiles>
+</project>

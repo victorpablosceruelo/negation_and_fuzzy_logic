@@ -1,0 +1,12 @@
+    ----------
+    HttpComponents HttpAsync Overview
+    ----------
+    ----------
+    ----------
+
+HttpAsync Overview
+
+    The HttpAsync component provides an asynchronous interface for client side 
+    HTTP communication, which separates the sending of a request from the 
+    receiving of the response. This simplifies development of multithreaded HTTP
+    applications and allows for new features such as pipelining.

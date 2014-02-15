@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="HttpCore">
+  <bannerLeft>
+    <name>Jakarta</name>
+    <src>http://jakarta.apache.org/images/logos/jakarta-logo.png</src>
+    <href>http://jakarta.apache.org/</href>
+  </bannerLeft>
+
+  <bannerRight>
+    <name>HttpComponents HttpCore</name>
+    <src>http://jakarta.apache.org/httpcomponents/images/logos/httpcomponents.png</src>
+    <href>http://jakarta.apache.org/httpcomponents/http-core/</href>
+  </bannerRight>
+
+  <body>
+    <links>
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Jakarta" href="http://jakarta.apache.org/"/>
+      <item name="HttpComponents" href=".."/>
+    </links>
+
+    <menu name="HttpComponents">
+      <item name="Home" href=".."/>
+    </menu>
+    <menu name="HttpCore Overview">
+      <item name="Description" href="index.html"/>
+      <item name="Download" href="download.html"/>
+      <item name="Examples" href="examples.html"/>
+    </menu>
+    <menu name="Modules">
+      <item name="Base" href="jakarta-httpcore/index.html"/>
+      <item name="NIO extensions" href="jakarta-httpcore-nio/index.html"/>
+    </menu>
+
+  </body>
+</project>

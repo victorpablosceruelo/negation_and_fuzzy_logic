@@ -1,0 +1,47 @@
+Release 2.0 Alpha 2
+------------------
+Changes since Release 2.0 Alpha 1:
+
+ * Mavenized builds.
+ 
+ * Digest authentication.  NTLM authentication.
+ 
+ * Multipart post.
+ 
+ * Added a StatusLine class to manage the status line of a
+   http response.
+
+ * Added ability to cusomize SocketFactory for http and https. 
+   New Protocol class to allow for more protocols than just http/s.
+
+ * Removed the HttpMultiClient, added multi-thread support to 
+   HttpClient.
+ 
+ * Revamp the streaming policy.  Added AutoCloseInputStream,
+   ChunkedInputStream, ChunkedOutputStream, ContentLengthInputStream,
+   ResponseConsumedWatcher
+ 
+ * Commons Logging.  Dependancy on the commons-logging.jar
+ 
+ * Added httpclient.util package.  Move Base64 and URIUtil classs 
+   into util.
+
+ * Added a HttpURLConnection wrapper.  Allows for wrapping 
+   HttpClient into the java standard library.  Partial support only.
+
+ * Added httpclient.cookie package.  Complete overhaul of cookie
+   handling.  Allows for user specified CookiePolicy and 
+   various cookie specification classes.
+  
+ * Removed previously deprecated Cookie.createCookieHeader(String,
+   String,boolean,Cookie[]) method (port number is required for
+   future compatibility).
+
+ * Also removed Cookie.createCookieHeader(String,String,Cookie[])
+   method, which should have been deprecated (port number is
+   required for future compatibility)
+
+ * Renamed HttpMethod.followRedirects to getFollowRedirects,
+   for consistency (and made the corresponding change to
+   HttpMethodBase)
+

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <title>Status</title>
+    <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+    <author email="remy@apache.org">Remy Maucherat</author>
+    <author email="rwaldhoff@apache.org">Rodney Waldhoff</author>
+    <author email="jsdever@apache.org">Jeff Dever</author>
+    <revision>$Id: status.xml 357627 2005-12-19 04:29:32Z mbecke $</revision>
+  </properties>
+
+  <body>
+
+    <section name="Current Status">
+        <p>HttpClient 3.0 has arrived! We strongly encourage all current HttpClient 
+	users to migrate.</p>
+
+        <p>HttpClient 2.0 is no longer being actively developed, with the exception of 
+        bug fixes and minor enhancements.  2.0.2 is the latest stable release.</p>
+        
+        <p>It is important to note that HttpClient 3.0 is no longer fully compatible 
+        with the 2.0.x APIs. API incompatibilities with HttpClient 2.0.x are described 
+        <a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/httpclient/trunk/API_CHANGES_3_0.txt?view=markup">here</a>.
+        </p>
+
+        <p>Bug reports targeted for the next release can be found
+         <a href="http://issues.apache.org/bugzilla/buglist.cgi?query_format=advanced&amp;short_desc_type=allwordssubstr&amp;short_desc=&amp;product=HttpClient&amp;component=Commons+HttpClient&amp;target_milestone=3.0.1&amp;long_desc_type=allwordssubstr&amp;long_desc=&amp;bug_file_loc_type=allwordssubstr&amp;bug_file_loc=&amp;keywords_type=anywords&amp;keywords=&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;emailassigned_to1=1&amp;emailtype1=substring&amp;email1=&amp;emailreporter2=1&amp;emailtype2=substring&amp;email2=&amp;bugidtype=include&amp;bug_id=&amp;votes=&amp;chfieldfrom=&amp;chfieldto=Now&amp;chfieldvalue=&amp;cmdtype=doit&amp;order=Reuse+same+sort+as+last+time&amp;field0-0-0=noop&amp;type0-0-0=noop&amp;value0-0-0=">here</a>.
+       </p>
+    </section>
+
+    <section name="Release Info">
+      <p>Current Stable Release (<b>recommended</b>): <a href="http://jakarta.apache.org/site/downloads/downloads_commons-httpclient.cgi">
+          Release 3.0</a></p>
+      <p>Previous Stable Release: <a href="http://jakarta.apache.org/site/downloads/downloads_commons-httpclient.cgi">
+          Release 2.0.2</a></p>
+    </section>
+
+  </body>
+
+</document>

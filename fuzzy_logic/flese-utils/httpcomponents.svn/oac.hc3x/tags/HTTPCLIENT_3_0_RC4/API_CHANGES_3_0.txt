@@ -1,0 +1,41 @@
+This document outlines API incompatibilities between 2.0 and 3.0 releases
+
+* HttpUrlMethod interface, UrlDeleteMethod, UrlHeadMethod, UrlOptionsMethod, 
+  UrlPostMethod, UrlPutMethod classes removed. Use their non-Url counterparts instead.
+
+* Disk buffering code in GetMethod removed. Use custom buffering logic where
+  appropriate.
+
+* ExpectContinueMethod class (and its sub-classes: EntityEnclosingMethod, 
+  PostMethod, PutMethod, MultipartPostMethod) no longer extends GetMethod class.
+  It is now directly derived from HttpMethodBase class. 
+
+* Connection manager can no longer be set via HttpState methods. It can now only be 
+  set via HttpClient methods.
+
+* Deprecated classe Authenticator removed. Use HttpAuthenticator class instead.
+
+* Deprecated RequestOutputStream, ResponseInputStream classes removed.
+
+* Deprecated methods in classes Cookie, HttpClient, HttpConnection, HttpState, URI,
+  URIUtil removed.
+
+* NTLM classes moved to org.apache.commons.httpclient.auth package amd made private
+
+* DigestSheme:
+    the following public methods were removed, as they were only public for testing
+    - authenticate(UsernamePasswordCredentials, Map)
+    - createDigest(String, String, Map)
+    - createDigestHeader(String, Map, String)
+    the following public methods were made private, as they now depend on or mutate the
+    state of DigestScheme:
+    - createDigest(String, String)
+    - createDigestHeader(String, String)
+    
+* Deprecated extra Protocol constructor
+
+* Made dependent on Commons Codec 1.2.0 or above
+
+* HttpMethod#getResponseBody & HttpMethod#getResponseBodyAsString changed to
+  propagate IOException to the caller instead of logging and discarding it. 
+

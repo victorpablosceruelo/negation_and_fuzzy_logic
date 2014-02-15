@@ -1,0 +1,36 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+version = '0.1-SNAPSHOT'
+
+sourceCompatibility = '1.6'
+
+dependencies {
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '8.1.7.v20120910'
+    compile group: 'org.eclipse.jetty', name: 'jetty-client', version: '8.1.7.v20120910'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.2'
+    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.2.5'
+    compile group: 'com.ning', name: 'async-http-client', version: '1.7.12'
+}
+
+task benchmark(dependsOn: 'classes') << {
+    def agents = [
+            'HttpJRE',
+            'ApacheHttpClient',
+//            'JettyHttpClient',
+            'NingHttpClient']
+    agents.each { agent ->
+        javaexec {
+            main = "org.apache.http.client.benchmark.${agent}"
+            classpath = sourceSets.main.runtimeClasspath
+        }
+        sleep(2000)
+    }
+}
+
+defaultTasks 'clean', 'benchmark'

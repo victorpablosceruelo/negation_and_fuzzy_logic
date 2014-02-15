@@ -1,0 +1,8 @@
+org.apache.http.impl.nio.client
+org.apache.http.impl.nio.conn
+org.apache.http.nio.client
+org.apache.http.nio.client.methods
+org.apache.http.nio.client.util
+org.apache.http.nio.conn
+org.apache.http.nio.conn.scheme
+org.apache.http.nio.conn.ssl

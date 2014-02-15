@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <title>Status</title>
+    <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+    <author email="remy@apache.org">Remy Maucherat</author>
+    <author email="rwaldhoff@apache.org">Rodney Waldhoff</author>
+    <author email="jsdever@apache.org">Jeff Dever</author>
+    <revision>$Id: status.xml 134078 2003-02-02 05:11:18Z jsdever $</revision>
+  </properties>
+
+  <body>
+
+    <section name="Current Status">
+        <p>For all current contributors and anyone wishing to contribute to or use 
+            <em>HttpClient</em>, we are now in the Beta 1 development stage.</p>
+
+      <p>There is currently a rather complete list of bugs in 
+        <a href="http://nagoya.apache.org/bugzilla/">bugzilla</a> now.  To find 
+        them, do a query for the *Commons* project, *HttpClient* component, and 
+        target milestone *2.0 Beta 1*.</p>
+
+      <p>There are some 
+        <a href="http://nagoya.apache.org/bugzilla/show_bug.cgi?id=16416">strightforward</a> tasks, some 
+        <a href="http://nagoya.apache.org/bugzilla/show_bug.cgi?id=10807">complex</a> tasks, and some 
+        <a href="http://nagoya.apache.org/bugzilla/show_bug.cgi?id=16429">long and tedious</a> tasks
+        somthing for everyone.  All of the bugs that are marked for milestone Beta 1 will have to be
+        closed before a Beta 1 drop can be released.</p>
+
+      <p>If you are interested in working on any task, please reassign the bug to yourself and add the 
+        list address to the cc field (commons-httpclient-dev@jakarta-apache.org).  When you have a 
+        patch, it can be attached directly to the bug.  Any discussion can take place on the mailing list.</p>
+
+      <p>While the Alpha 2 release was finished only recently, it was 14 months from the previous Alpha 1 release.
+        While there were many reasons for the previous delay, none of those obstacles are in our way for the
+        Beta 1 drop, which we would like to see within the month of February.</p>
+    </section>
+
+    <section name="Release Info">
+      <p>Current Release: <a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-httpclient/v2.0/">
+          Release 2.0 Alpha 2</a></p>
+      <p>Planned Next Release: 2.0 Beta 1</p>
+    </section>
+
+    <section name="Action Items">
+      <p>Like to help?  There are a number of action items to work on.
+        We make extensive use of <a href="http://issues.apache.org/bugzilla/"> Bugzilla</a>
+        where <em>HttpClient</em> can be found as a *component* of the <b>Commons</b> *program*.
+        We also mark <tt>//TODO</tt> and <tt>//FIXME</tt> comments in the source files, so they can be 
+        easily found by grep or by the <a href="checkstyle-report.html">Checkstyle report</a></p>
+      <p>To volunteer for a task, send an email to
+        <a href="mailto:commons-httpclient-dev@jakarta.apache.org">
+          commons-httpclient-dev@jakarta.apache.org</a>.
+      </p>
+    </section>
+
+  </body>
+
+</document>

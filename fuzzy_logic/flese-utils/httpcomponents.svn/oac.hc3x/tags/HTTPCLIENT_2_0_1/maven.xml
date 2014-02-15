@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!-- Author: Jeff Dever -->
+
+<project>
+
+  <!-- 
+    Builds the HttpClient distribution.  Ensures that the site docs are included 
+    in the dist. 
+  -->
+  <goal name="httpclient:dist" prereqs="site:generate, dist"/>
+
+  <postGoal name="dist:prepare-bin-filesystem">
+
+    <echo>[HttpClient] dist:prepare-bin-filesystem postGoal</echo>
+
+    <copy todir="${maven.dist.bin.assembly.dir}/docs">
+      <fileset dir="./docs">
+        <include name="*.txt"/>
+        <include name="*.html"/>
+      </fileset>
+      <fileset dir="target/docs">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+
+   <copy file="release_notes.txt" tofile="${maven.dist.bin.assembly.dir}/RELEASE_NOTES.txt" />
+    
+   <fixcrlf srcdir="${maven.dist.bin.assembly.dir}" eol="lf" encoding="ISO-8859-1"
+       includes="**/*.xml **/*.properties **/*.html **/*.css" />
+
+   <fixcrlf srcdir="${maven.dist.bin.assembly.dir}" eol="crlf" encoding="ISO-8859-1"
+       includes="**/*.txt" />
+
+   <copy file="LICENSE.txt" tofile="${maven.dist.bin.assembly.dir}/LICENSE" />
+   <copy file="README.txt" tofile="${maven.dist.bin.assembly.dir}/README" />
+   <copy file="release_notes.txt" tofile="${maven.dist.bin.assembly.dir}/RELEASE_NOTES" />
+
+   <fixcrlf srcdir="${maven.dist.bin.assembly.dir}" eol="lf" encoding="ISO-8859-1"
+       includes="LICENSE README RELEASE_NOTES" />
+
+  </postGoal>
+
+  <postGoal name="dist:prepare-src-filesystem">
+
+    <echo>[HttpClient] dist:prepare-src-filesystem postGoal</echo>
+
+    <copy todir="${maven.dist.src.assembly.dir}">
+      <fileset dir=".">
+        <include name="build.properties.sample"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${maven.dist.src.assembly.dir}/docs">
+      <fileset dir="./docs">
+        <include name="*.txt"/>
+        <include name="*.html"/>
+      </fileset>
+      <fileset dir="target/docs">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+
+   <copy file="release_notes.txt" tofile="${maven.dist.src.assembly.dir}/RELEASE_NOTES.txt" />
+
+   <fixcrlf srcdir="${maven.dist.src.assembly.dir}" javafiles="true" 
+       eol="lf" tab="remove" tablength="4" encoding="ISO-8859-1"
+       includes="**/*.java" />
+  
+   <fixcrlf srcdir="${maven.dist.src.assembly.dir}" eol="lf" encoding="ISO-8859-1"
+       includes="**/*.xml **/*.properties **/*.html **/*.css" />
+
+   <fixcrlf srcdir="${maven.dist.src.assembly.dir}" eol="crlf" encoding="ISO-8859-1"
+       includes="**/*.txt" />
+
+   <copy file="LICENSE.txt" tofile="${maven.dist.src.assembly.dir}/LICENSE" />
+   <copy file="README.txt" tofile="${maven.dist.src.assembly.dir}/README" />
+   <copy file="release_notes.txt" tofile="${maven.dist.src.assembly.dir}/RELEASE_NOTES" />
+
+   <fixcrlf srcdir="${maven.dist.src.assembly.dir}" eol="lf" encoding="ISO-8859-1"
+       includes="LICENSE README RELEASE_NOTES" />
+
+  </postGoal>
+
+</project>

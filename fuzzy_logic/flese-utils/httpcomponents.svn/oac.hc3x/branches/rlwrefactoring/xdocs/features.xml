@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<document>
+   <properties>
+      <title>Features</title>
+      <author email="jakarta-commons@jakarta.apache.org">Commons Documentation Team</author>
+      <author email="rwaldhoff@apache.org">Rodney Waldhoff</author>
+      <revision>$Id: features.xml 133569 2001-08-27 15:33:02Z rwaldhoff $</revision>
+   </properties>
+
+   <body>
+      <section name="Features">
+         <p>
+            HTTP Client provides...
+         </p>
+         <ul>
+            <li>
+               an extensible framework for implementing HTTP-based methods,
+               including built-in support for the GET, POST, PUT, DELETE, HEAD,
+               and OPTIONS methods.
+            </li>
+            <br/>&#xA0;
+            <li>
+               unconditional suppport for the client side of the HTTP/1.0 protocol, as defined in
+               <a href="http://www.w3.org/Protocols/rfc1945/rfc1945.txt">RFC 1945
+               (<i>Hypertext Transfer Protocol - HTTP/1.0</i>)</a>.
+            </li>
+            <br/>&#xA0;
+            <li>
+               unconditional suppport for the client side of the HTTP/1.1 protocol, as defined in
+               <a href="http://www.w3.org/Protocols/rfc2616/rfc2616.txt">RFC 2616
+               (<i>Hypertext Transfer Protocol - HTTP/1.1</i>)</a>.
+            </li>
+            <br/>&#xA0;
+            <li>
+               support for HTTP Cookies, as defined in
+               <a href="http://www.w3.org/Protocols/rfc2109/rfc2109.txt">RFC 2109
+               (<i>HTTP State Management System</i>)</a>.
+            </li>
+            <br/>&#xA0;
+            <li>
+               support for Basic authentication, as defined in
+               <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617
+               (<i>HTTP Authentication: Basic and Digest Access Authentication</i>)</a>.
+            </li>
+            <br/>&#xA0;
+            <li>
+               support for HTTPS (HTTP over SSL).
+            </li>
+            <br/>&#xA0;
+            <li>
+               support for HTTP proxies.
+            </li>
+         </ul>
+      </section>
+   </body>
+</document>

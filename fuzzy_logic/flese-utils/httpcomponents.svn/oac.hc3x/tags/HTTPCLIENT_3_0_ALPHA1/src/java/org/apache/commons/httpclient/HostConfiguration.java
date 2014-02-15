@@ -1,0 +1,565 @@
+/*
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//httpclient/src/java/org/apache/commons/httpclient/HostConfiguration.java,v 1.17 2004/05/13 04:03:25 mbecke Exp $
+ * $Revision: 1.17 $
+ * $Date: 2004-05-13 06:03:25 +0200 (Thu, 13 May 2004) $
+ *
+ * ====================================================================
+ *
+ *  Copyright 2002-2004 The Apache Software Foundation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ */
+
+package org.apache.commons.httpclient;
+
+import org.apache.commons.httpclient.params.HostParams;
+import org.apache.commons.httpclient.protocol.Protocol;
+
+import java.net.InetAddress;
+
+/**
+ * Holds all of the variables needed to describe an HTTP connection to a host.  This includes 
+ * remote host, port and protocol, proxy host and port, local address, and virtual host.
+ * 
+ * @author <a href="mailto:becke@u.washington.edu">Michael Becke</a>
+ * @author <a href="mailto:mbowler@GargoyleSoftware.com">Mike Bowler</a>
+ * @author <a href="mailto:oleg@ural.ru">Oleg Kalnichevski</a>
+ * @author Laura Werner
+ * 
+ * @since 2.0 
+ */
+public class HostConfiguration implements Cloneable {
+
+    /** The host to use. */
+    private String host;
+
+    /** The virtual host to use. */
+    private String virtualHost;
+
+    /** The port to use. */
+    private int port;
+
+    /** The protocol */
+    private Protocol protocol;
+
+    /** True if a host has been set */
+    private boolean hostSet;
+
+    /** The host name of the proxy server */
+    private String proxyHost;
+
+    /** The port number of the proxy server */
+    private int proxyPort;
+
+    /** True if a proxy server has been set */
+    private boolean proxySet;
+    
+    /** The local address to use when creating the socket, or null to use the default */
+    private InetAddress localAddress;
+
+    /** Parameters specific to this host */
+    private HostParams params;
+
+    /**
+     * Constructor for HostConfiguration.
+     */
+    public HostConfiguration() {
+        
+        this.host = null;
+        this.virtualHost = null;
+        this.port = -1;
+        this.protocol = null;
+        this.hostSet = false;
+        
+        this.proxyHost = null;
+        this.proxyPort = -1;
+        this.proxySet = false;
+        this.localAddress = null;
+        this.params = new HostParams();
+    }
+    
+    /**
+     * Copy constructor for HostConfiguration
+     * 
+     * @param hostConfiguration the hostConfiguration to copy
+     */
+    public HostConfiguration (HostConfiguration hostConfiguration) {
+        
+        // wrap all of the assignments in a synchronized block to avoid
+        // having to negotiate the monitor for each method call
+        synchronized (hostConfiguration) {            
+            this.host = hostConfiguration.getHost();
+            this.virtualHost = hostConfiguration.getVirtualHost();
+            this.port = hostConfiguration.getPort();
+            this.protocol = hostConfiguration.getProtocol();
+            this.hostSet = hostConfiguration.isHostSet();
+            
+            this.proxyHost = hostConfiguration.getProxyHost();
+            this.proxyPort = hostConfiguration.getProxyPort();
+            this.proxySet = hostConfiguration.isProxySet();
+            this.localAddress = hostConfiguration.getLocalAddress();
+            try {
+                this.params = (HostParams)hostConfiguration.getParams().clone();
+            } catch (CloneNotSupportedException e) {
+                this.params = new HostParams();
+            }
+        }
+        
+    }
+
+    /**
+     * @see java.lang.Object#clone()
+     */
+    public Object clone() {
+        return new HostConfiguration(this);
+    }    
+    
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public synchronized String toString() {
+        
+        boolean appendComma = false;
+        
+        StringBuffer b = new StringBuffer(50);        
+        b.append("HostConfiguration[");
+        
+        if (isHostSet()) {
+            appendComma = true;
+            b.append("host=").append(host);
+            b.append(", protocol=").append(protocol);
+            b.append(", port=").append(port);
+            if (virtualHost != null) {
+                b.append(", virtualHost=").append(virtualHost);
+            }
+        }
+        if (isProxySet()) {
+            if (appendComma) {
+                b.append(", ");
+            } else {
+                appendComma = true;
+            }
+            b.append("proxyHost=").append(proxyHost);
+            b.append(", proxyPort=").append(proxyPort);
+        }
+        if (localAddress != null) {
+            if (appendComma) {
+                b.append(", ");
+            } else {
+                appendComma = true;
+            }
+            b.append("localAddress=").append(localAddress);
+        }
+        
+        b.append("]");
+        return b.toString();
+    }    
+    
+    /**
+     * Tests if the host configuration equals the configuration set on the
+     * connection. True only if the host, port, protocol, local address and virtual address
+     * are equal.  If no host configuration has been set false will be returned.
+     * 
+     * @param connection the connection to test against
+     * @return <code>true</code> if the connection's host information equals that of this
+     * configuration
+     * 
+     * @see #proxyEquals(HttpConnection)
+     * @see #isHostSet()
+     */
+    public synchronized boolean hostEquals(HttpConnection connection) {
+        
+        if (hostSet) {
+            if (!this.host.equalsIgnoreCase(connection.getHost())) {
+                return false;
+            }
+            if (this.virtualHost != null) {
+                if (!this.virtualHost.equalsIgnoreCase(connection.getVirtualHost())) {
+                    return false;
+                }
+            } else {
+                if (connection.getVirtualHost() != null) {
+                    return false; 
+                }
+            }
+            if (this.port != connection.getPort()) {
+                return false;
+            }
+            if (!this.protocol.equals(connection.getProtocol())) {
+                return false;
+            }
+            if (this.localAddress != null) {
+                if (!this.localAddress.equals(connection.getLocalAddress())) {
+                    return false;
+                }
+            } else {
+                if (connection.getLocalAddress() != null) {
+                    return false; 
+                }
+            }
+            return true;
+        } else {
+            return false;   
+        }
+        
+    }
+
+    /**
+     * Tests if the proxy configuration equals the configuration set on the
+     * connection. True only if the proxyHost and proxyPort are equal.
+     *
+     * @param connection the connection to test against
+     * @return <code>true</code> if the connection's proxy information equals that of this
+     * configuration
+     *
+     * @see #hostEquals(HttpConnection)
+     */
+    public synchronized boolean proxyEquals(HttpConnection connection) {
+        
+        if (proxyHost == null) {
+            return connection.getProxyHost() == null;   
+        } else {
+            return (
+                proxyHost.equalsIgnoreCase(connection.getProxyHost())
+                && proxyPort == connection.getProxyPort()
+            );
+        }
+    }    
+    
+    /**
+     * Returns true if the host is set.
+     * @return <code>true</code> if the host is set.
+     */
+    public synchronized boolean isHostSet() {
+        return hostSet;
+    }
+
+    /**
+     * Sets the given host, port and protocol
+     * 
+     * @param host the host(IP or DNS name)
+     * @param port The port
+     * @param protocol The protocol.
+     */
+    public synchronized void setHost(String host, int port, String protocol) {
+        setHost(host, null, port, Protocol.getProtocol(protocol));
+    }
+    
+    /**
+     * Sets the given host, virtual host, port and protocol.
+     * 
+     * @param host the host(IP or DNS name)
+     * @param virtualHost the virtual host name or <code>null</code>
+     * @param port the host port or -1 to use protocol default
+     * @param protocol the protocol
+     */
+    public synchronized void setHost(String host, String virtualHost, int port, 
+        Protocol protocol) {
+            
+        if (host == null) {
+            throw new IllegalArgumentException("host must not be null");   
+        }
+        if (protocol == null) {
+            throw new IllegalArgumentException("protocol must not be null");   
+        }
+        
+        this.host = host;
+        this.virtualHost = virtualHost;
+        this.port = port == -1 ? protocol.getDefaultPort() : port;
+        this.protocol = protocol;
+        
+        this.hostSet = true;
+    }
+
+    /**
+     * Sets the given host, port and protocol.
+     *   
+     * @param host the host(IP or DNS name)
+     * @param port The port
+     * @param protocol the protocol
+     */
+    public synchronized void setHost(String host, int port, Protocol protocol) {
+        setHost(host, null, port, protocol);
+    }
+
+    /**
+     * Sets the given host and port.  Uses the default protocol "http".
+     * 
+     * @param host the host(IP or DNS name)
+     * @param port The port
+     */
+    public synchronized void setHost(String host, int port) {
+        setHost(host, null, port, Protocol.getProtocol("http"));
+    }
+    
+    /**
+     * Set the given host. Uses the default protocol("http") and its port.
+     * 
+     * @param host The host(IP or DNS name).
+     */
+    public synchronized void setHost(String host) {
+        Protocol defaultProtocol = Protocol.getProtocol("http"); 
+        setHost(host, null, defaultProtocol.getDefaultPort(), defaultProtocol);
+    }
+    
+    /**
+     * Sets the protocol, host and port from the given URI.
+     * @param uri the URI.
+     */
+    public synchronized void setHost(URI uri) {
+        try {
+            setHost(uri.getHost(), uri.getPort(), uri.getScheme());
+        } catch (URIException e) {
+            throw new IllegalArgumentException(e.toString());
+        }
+    }
+
+    /**
+     * Return the host url.
+     * 
+     * @return The host url.
+     */
+    public synchronized String getHostURL() {
+        
+        if (!hostSet) {
+            throw new IllegalStateException("a default host must be set to "
+                + "create a host URL" 
+            );   
+        }
+        
+        String url = protocol.getScheme() + "://" + host;
+        
+        if (port != -1 && port != protocol.getDefaultPort()) {
+            url += ":" + port;
+        }
+        
+        return url;
+    }
+
+    /**
+     * Returns the host.
+     * 
+     * @return the host(IP or DNS name), or <code>null</code> if not set
+     * 
+     * @see #isHostSet()
+     */
+    public synchronized String getHost() {
+        return host;
+    }
+
+    /**
+     * Returns the virtual host.
+     * 
+     * @return the virtual host name, or <code>null</code> if not set
+     */
+    public synchronized String getVirtualHost() {
+        return virtualHost;
+    }
+
+    /**
+     * Returns the port.
+     * 
+     * @return the host port, or <code>-1</code> if not set
+     * 
+     * @see #isHostSet()
+     */
+    public synchronized int getPort() {
+        return port;
+    }
+
+    /**
+     * Returns the protocol.
+     * @return The protocol.
+     */
+    public synchronized Protocol getProtocol() {
+        return protocol;
+    }
+
+    /**
+     * Tests if the proxy host/port have been set.
+     * 
+     * @return <code>true</code> if a proxy server has been set.
+     * 
+     * @see #setProxy(String, int)
+     */    
+    public synchronized boolean isProxySet() {
+        return proxySet;   
+    }
+
+    /**
+     * Set the proxy settings.
+     * @param proxyHost The proxy host
+     * @param proxyPort The proxy port
+     */
+    public synchronized void setProxy(String proxyHost, int proxyPort) {
+        
+        this.proxyHost = proxyHost;
+        this.proxyPort = proxyPort;
+        
+        this.proxySet = true;
+    }
+
+    /**
+     * Returns the proxyHost.
+     * 
+     * @return the proxy host, or <code>null</code> if not set
+     * 
+     * @see #isProxySet()
+     */
+    public synchronized String getProxyHost() {
+        return proxyHost;
+    }
+
+    /**
+     * Returns the proxyPort.
+     * 
+     * @return the proxy port, or <code>-1</code> if not set
+     * 
+     * @see #isProxySet()
+     */
+    public synchronized int getProxyPort() {
+        return proxyPort;
+    }
+
+    /**
+     * Set the local address to be used when creating connections.
+     * If this is unset, the default address will be used.
+     * This is useful for specifying the interface to use on multi-homed or clustered systems.
+     * 
+     * @param localAddress the local address to use
+     */
+    public synchronized void setLocalAddress(InetAddress localAddress) {
+        this.localAddress = localAddress;
+    }
+
+    /**
+     * Return the local address to be used when creating connections.
+     * If this is unset, the default address should be used.
+     * 
+     * @return the local address to be used when creating Sockets, or <code>null</code>
+     */
+    public synchronized InetAddress getLocalAddress() {
+        return this.localAddress;
+    }
+    
+    /**
+     * Returns {@link HostParams HTTP protocol parameters} associated with this host.
+     *
+     * @return HTTP parameters.
+     *
+     * @since 3.0
+     */
+    public HostParams getParams() {
+        return this.params;
+    }
+
+    /**
+     * Assigns {@link HostParams HTTP protocol parameters} specific to this host.
+     * 
+     * @since 3.0
+     * 
+     * @see HttpMethodParams
+     */
+    public void setParams(final HostParams params) {
+        if (params == null) {
+            throw new IllegalArgumentException("Parameters may not be null");
+        }
+        this.params = params;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public synchronized boolean equals(Object o) {
+        
+        if (o instanceof HostConfiguration) {
+            
+            // shortcut if we're comparing with ourselves
+            if (o == this) { 
+                return true;
+            }
+            
+            HostConfiguration config = (HostConfiguration) o;
+            
+            if (hostSet) {
+                if (!host.equalsIgnoreCase(config.getHost())) {
+                    return false;
+                }
+                if (virtualHost != null) {
+                    if (!virtualHost.equalsIgnoreCase(config.getVirtualHost())) {
+                        return false;
+                    }
+                } else {
+                    if (config.getVirtualHost() != null) {
+                        return false;
+                    }
+                }
+                if (port != config.getPort()) {
+                    return false;
+                }
+                if (!protocol.equals(config.getProtocol())) {
+                    return false;
+                }
+            } else if (config.isHostSet()) {
+                return false;
+            }
+            if (proxyHost != null) {
+                if (!proxyHost.equalsIgnoreCase (config.getProxyHost())
+                    || proxyPort != config.getProxyPort()) {
+                    // either proxyHost or proxyPort don't match
+                    return false;
+                }
+            } else if (config.getProxyHost() != null) {
+                return false;
+            }            
+            if (localAddress != null) {
+                if (!localAddress.equals(config.getLocalAddress())) {
+                    return false;
+                }
+            } else {
+                if (config.getLocalAddress() != null) {
+                    return false; 
+                }
+            }
+
+            // everything matches
+            return true;
+
+        } else {
+            return false;
+        }
+        
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        
+        if (host != null) {
+            return host.hashCode();
+        } else if (proxyHost != null) {
+            return proxyHost.hashCode();   
+        } else {
+            return super.hashCode();
+        }
+    }
+
+}

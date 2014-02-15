@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+   <properties>
+      <title>HttpClient Logging Practices</title>
+      <author email="jsdever@apache.org">Jeff Dever</author>
+      <revision>$Id: logging.xml 134040 2003-01-26 16:36:24Z jsdever $</revision>
+   </properties>
+
+   <body>
+
+      <section name="Logging Practices">
+         <p>
+            <em>HttpClient</em> utilizes the logging interface provided by the
+            <a href="http://jakarta.apache.org/commons/logging.html">
+            Jakarta Commons Logging</a> package.  Commons Logging provides
+            a simple and generalized 
+            <a href="http://jakarta.apache.org/commons/logging/api/index.html">
+            log interface</a> to various logging packages.  By using the
+            Commons Logging configuration, HttpClient can be configured
+            for a variety of logging behaviours.
+         </p><p>
+         </p><p>
+            There are two specific types of loggers used within
+            <em>HttpClient</em>: the standard <code>log</code> used for each 
+            class and the <code>wireLog</code> used for wire messages.  
+            Commons Logging allows for various logging systems to do the
+            actual output.  The most basic is SimpleLog which uses stdout
+            to write log messages.  All the following examples are shown with
+            SimpleLog to highlight the utility within <em>HttpClient</em>
+         </p><p>
+            <u>log</u><br />
+            The logging output can be configured on a class by class basis if
+            desired.  This is accomplished by setting a system property for
+            each class.  For example, if you wanted to see extremely detailed 
+            information on authentication routines, you could turn up the 
+            logging level for the Authenticator by setting the following 
+            property:<br />
+            <code>org.apache.commons.logging.simplelog.log.org.apache.commons.httpclient.Authenticator=trace</code><br />
+            The default log level for all classes can be set to a default by
+            using the following:<br />
+            <code>org.apache.commons.logging.simplelog.defaultlog=info</code><br />
+         </p><p>
+            <u>wireLog</u><br />
+            There is one log that cuts across several classes that is used for
+            logging wire messages.  <i>Careful when turning this on as 
+            potentially a huge volume of data may be written, some of it in 
+            binary format.</i><br />
+            org.apache.commons.logging.simplelog.log.httpclient.wire=debug
+         </p><p>
+            When troubleshooting a problem, it is good to turn on the log to find out
+            what is going on, both over the wire and in httpclient.  The following
+            statements can be used to configure the logger from within your java
+            application:
+            <blockquote>
+             System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");<br />
+             System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");<br />
+             System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire ", "debug");<br />
+             System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.commons.httpclient", "trace");<br />
+            </blockquote>
+         </p>
+      </section>
+
+   </body>
+
+</document>

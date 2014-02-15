@@ -1,0 +1,62 @@
+/*
+ * $HeadURL: https://svn.apache.org/repos/asf/httpcomponents/httpcore/tags/4.0-alpha3/src/contrib/org/apache/http/contrib/compress/RequestAcceptEncoding.java $
+ * $Revision: 431170 $
+ * $Date: 2006-08-13 15:00:29 +0200 (Sun, 13 Aug 2006) $
+ *
+ * ====================================================================
+ *
+ *  Copyright 1999-2006 The Apache Software Foundation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ */
+
+package org.apache.http.contrib.compress;
+
+import java.io.IOException;
+
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.protocol.HttpContext;
+
+/**
+ * Client-side interceptor to indicate support for Gzip content compression.
+ *
+ * @author <a href="mailto:oleg at ural.ru">Oleg Kalnichevski</a>
+ *
+ *
+ * <!-- empty lines above to avoid 'svn diff' context problems -->
+ * @version $Revision: 431170 $
+ * 
+ * @since 4.0
+ */
+public class RequestAcceptEncoding implements HttpRequestInterceptor {
+
+    private static final String ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String GZIP_CODEC = "gzip";
+    
+    public void process(final HttpRequest request, final HttpContext context) 
+            throws HttpException, IOException {
+        if (!request.containsHeader(ACCEPT_ENCODING)) {
+            request.addHeader(ACCEPT_ENCODING, GZIP_CODEC);
+        }
+    }
+    
+}

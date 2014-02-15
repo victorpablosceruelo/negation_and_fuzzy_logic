@@ -1,0 +1,60 @@
+Release 4.0 Alpha 3
+-------------------
+
+The 4.0 ALPHA3 release largely completes the application programming interface and feature set 
+of HttpAsyncClient. While the API may still change in the course of the ALPHA development phase, 
+this is expected to be the last round of major API changes and the API is expected to be reasonably
+stable as of this release.
+
+We are kindly asking actual and prospective users of HttpAsyncClient to review its API, evaluate
+its functionality and give us feedback while the 4.0 API is still not final. If no major flaws 
+are discovered the 4.0 API is expected to be frozen with the next BETA release. 
+
+Changelog:
+
+* [HTTPASYNC-6]: Fixed NPE in the DefaultAsyncRequestDirector#responseCompleted method.
+  Contributed by Oleg Kalnichevski <olegk at apache.org>
+
+
+Release 4.0 Alpha 2
+-------------------
+
+The second ALPHA release of HttpAsyncClient 4.0 comes with a number of important improvements and
+enhancements. As of this version HttpAsyncClient fully supports HTTP state management (cookies) 
+and HTTP authentication (basic, digest, NTLM, spnego/kerberos). Connection management classes have 
+been thoroughly reworked and improved. This version also improves support for zero copy file 
+upload / download operations.
+
+The HttpAsyncClient 4.0 API is still considered experimental and is expected to change 
+in the course of the ALPHA development phase.
+
+Please note that currently HttpAsyncClient DOES NOT support
+
+* Stateful HTTP connections
+
+
+Changelog:
+
+* [HTTPASYNC-3]: Fixed incorrect handling of expired I/O sessions by SessionPool.
+  Contributed by Oleg Kalnichevski <olegk at apache.org>
+
+
+Release 4.0 Alpha 1
+-------------------
+
+HttpAsyncClient is a library for asynchronous client-side HTTP communication built on HttpCore NIO
+and HttpClient components.
+
+HttpAsyncClient is NOT meant to replace or supersede Apache HttpClient. It is a complementary
+library to Apache HttpClient intended for special cases where ability to handle a great number of
+concurrent connections is more important than performance in terms of a raw data throughput or
+for those users who prefer event-driven APIs.
+
+The HttpAsyncClient 4.0 API is still very experimental and is expected to change in the course
+of the ALPHA development phase.
+
+Please note that currently HttpAsyncClient DOES NOT support
+
+* HTTP state management (cookies)
+* HTTP authentication
+* Stateful HTTP connections

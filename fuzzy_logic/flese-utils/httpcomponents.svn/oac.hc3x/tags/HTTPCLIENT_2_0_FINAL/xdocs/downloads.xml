@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+
+   <properties>
+      <title>HttpClient Downloads</title>
+      <author email="commons-httpclient-dev@jakarta.apache.org">Commons HttpClient Team</author>
+      <revision>$Id: downloads.xml 134526 2004-02-15 15:48:43Z  $</revision>
+   </properties>
+
+   <body>
+
+     <section name="Downloads">
+       <p>
+         The following releases are available for download:
+       </p>
+       <ul>
+         <li>2.0 Final - 15 February 2004 - 
+            <a href="http://jakarta.apache.org/site/binindex.cgi">Binary</a> and 
+            <a href="http://jakarta.apache.org/site/sourceindex.cgi">Source</a></li>
+       </ul>
+       <p>
+         Nightly source drops and binary builds can be obtained 
+         <a href="http://cvs.apache.org/builds/jakarta-commons/nightly/commons-httpclient/">here</a>.
+         <b>Please note that nightly drops are no longer 2.0 API compatible.</b>
+       </p>
+       <p>
+         The latest <a href="http://jakarta.apache.org/gump/">Gump</a> generated binary
+         can be obtained <a href="http://gump.covalent.net/jars/latest/jakarta-commons/">here</a>.
+         <b>Please note that nightly drops are no longer 2.0 API compatible.</b>
+       </p>
+       <p>
+         The CVS repository for <em>HttpClient</em> can be
+         <a href="http://cvs.apache.org/viewcvs.cgi/jakarta-commons/httpclient/">browsed online</a>.
+       </p>
+       <p>
+         The best way to get <em>HttpClient</em>, is to checkout the souce from our public 
+         <a href="http://jakarta.apache.org/site/cvsindex.html">CVS server</a>.
+       </p>
+       <p>
+         If you are using Maven for your project, you can create a dependency in your
+         project.xml with the following block:</p>
+         <source><![CDATA[
+<dependency>
+    <id>commons-httpclient</id>
+    <version>2.0-final</version>
+    <url>http://jakarta.apache.org/commons/httpclient/</url>
+</dependency>
+         ]]></source>
+           <p>There are also other jar versions available.  You can check
+           <a href="http://www.ibiblio.org/maven/commons-httpclient/">HttpClient on ibiblio</a>
+           for exactly what is available.
+       </p>
+     </section>
+
+   </body>
+
+ </document>

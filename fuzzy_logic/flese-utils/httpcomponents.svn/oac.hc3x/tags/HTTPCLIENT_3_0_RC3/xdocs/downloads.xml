@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+
+   <properties>
+      <title>HttpClient Downloads</title>
+      <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+      <revision>$Id: downloads.xml 201790 2005-06-25 21:46:23Z mbecke $</revision>
+   </properties>
+
+   <body>
+
+     <section name="Downloads">
+       <p>
+         The following releases are avilable for download:
+       </p>
+       <ul>
+         <li>3.0-RC3 - 26 June 2005 - 
+            <a href="http://jakarta.apache.org/site/downloads/downloads_commons-httpclient.cgi">Download</a> - <a 
+             href="http://www.apache.org/dist/jakarta/commons/httpclient/RELEASE-NOTES.txt"
+             >Release notes</a></li>
+       </ul>
+       <ul>
+         <li>2.0.2 - 11 October 2004 - 
+            <a href="http://jakarta.apache.org/site/downloads/downloads_commons-httpclient.cgi">Download</a> - <a 
+             href="http://www.apache.org/dist/jakarta/commons/httpclient/RELEASE-NOTES-2.0.txt"
+             >Release notes</a></li>
+       </ul>
+       <p>
+         Nightly source drops and binary builds can be obtained at the following URLs:
+       </p>
+       <ul>
+           <li>STABLE - <a href="http://svn.apache.org/builds/jakarta-commons/nightly/commons-httpclient2/">latest from the 2.0 branch</a></li>
+           <li>DEVELOPMENT - <a href="http://svn.apache.org/builds/jakarta-commons/nightly/commons-httpclient/">latest from HEAD(3.0)</a> - <b>Please note that this code is no longer 2.0 API compatible.</b></li>
+       </ul>
+       <p>
+         The latest <a href="http://jakarta.apache.org/gump/">Gump</a> generated binary
+         can be obtained <a href="http://gump.covalent.net/jars/latest/jakarta-commons/">here</a>.
+         <b>Please note that nightly drops are no longer 2.0 API compatible.</b>
+       </p>
+       <p>
+         The Subversion repository for <em>HttpClient</em> can be
+         <a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/httpclient/trunk/">browsed online</a>.
+       </p>
+       <p>
+         The best way to get <em>HttpClient</em>, is to checkout the souce from our public 
+         <a href="http://jakarta.apache.org/site/cvsindex.html#Subversion">Subversion server</a>.
+       </p>
+       <p>
+         If you are using Maven for your project, you can create a dependency in your
+         project.xml with one of the following blocks:</p>
+         <source><![CDATA[
+<dependency>
+    <id>commons-httpclient</id>
+    <version>3.0-rc3</version>
+    <url>http://jakarta.apache.org/commons/httpclient/3.0/</url>
+</dependency>
+         ]]></source>
+         <source><![CDATA[
+<dependency>
+    <id>commons-httpclient</id>
+    <version>2.0.2</version>
+    <url>http://jakarta.apache.org/commons/httpclient/</url>
+</dependency>
+         ]]></source>
+           <p>There are also other jar versions available.  You can check
+           <a href="http://www.ibiblio.org/maven/commons-httpclient/">HttpClient on ibiblio</a>
+           for exactly what is available.
+       </p>
+     </section>
+
+   </body>
+
+ </document>

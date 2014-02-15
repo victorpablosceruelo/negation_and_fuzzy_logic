@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  
+  <properties>
+    <title>Cross Host Redirects</title>
+    <author email="adrian@ephox.com">Adrian Sutton</author>
+    <revision>$Id: redirects.xml 134139 2003-03-11 08:03:12Z jsdever $</revision>
+  </properties>
+
+  <body>
+
+    <section name="Introduction">
+      <p>This document provides a brief guide to handling cross host redirects
+        with <em>HttpClient</em>.  In future versions, it is anticipated that
+        this will be handled by the <code>HttpClient</code> class automatically.  
+        However due to technical constraints and the desire to stabilise the API for a 2.0
+        release sooner rather than later, this ability is yet to be implemented.
+        Redirects to a different URL on the same host, port and protocol is supported.</p>
+    </section>
+
+    <section name="Handling Redirects">
+      <p>When a server returns a redirect instruction to HttpClient that
+      requires connecting to a different host, HttpClient will simply return
+      the redirect status code as the response status.  This will be one of:</p>
+
+      <ul>
+        <li>301 Moved Permanently.
+        <code>HttpStatus.SC_MOVED_PERMANENTLY</code></li>
+
+        <li>302 Moved Temporarily.
+        <code>HttpStatus.SC_MOVED_TEMPORARILY</code></li>
+
+        <li>303 See Other. <code>HttpStatus.SC_SEE_OTHER</code></li>
+
+        <li>307 Temporary Redirect.
+        <code>HttpStatus.SC_TEMPORARY_REDIRECT</code></li>
+      </ul>
+
+      <p>When your application receives one of these codes, it should extract
+        the new URL from the HttpMethod object and retry downloading from that URL.  
+        Additionally, it is usually a good idea to limit the number of redirects that will be
+        followed in the redirects point to each other.</p>
+
+      <p>The URL to connect to can be extracted from the <tt>Location</tt>
+      header.</p>
+
+      <source><![CDATA[
+        String redirectLocation;
+        Header locationHeader = method.getResponseHeader("location");
+        if (locationHeader != null) {
+            redirectLocation = locationHeader.getValue();
+        } else {
+            // The response is invalid and did not provide the new location for
+            // the resource.  Report an error or possibly handle the response
+            // like a 404 Not Found error.
+        }
+      ]]></source>
+
+      <p>Once you have determined the new location, you can reattempt the
+      connection as normal.  See the <a href="tutorial.html">Tutorial</a> for
+      more information on this.</p>
+    </section>
+  </body>
+</document>

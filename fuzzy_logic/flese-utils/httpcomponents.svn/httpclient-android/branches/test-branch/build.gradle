@@ -1,0 +1,226 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.7.3+'
+    }
+}
+
+apply plugin: 'android-library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+repositories {
+    mavenCentral()
+}
+
+group = 'org.apache.httpcomponents'
+version = HC_VER
+
+ext.isRelease = !version.endsWith('-SNAPSHOT')
+
+android {
+
+    compileSdkVersion 18
+    buildToolsVersion "19.0.1"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 8
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_5
+        targetCompatibility JavaVersion.VERSION_1_5
+    }
+}
+
+configurations {
+    dist
+}
+
+signing {
+    required { isRelease }
+}
+
+ext.sharedManifest = manifest {
+    attributes (
+            'Specification-Title': "HttpComponents HttpClient for Android",
+            'Specification-Version': "$version",
+            'Specification-Vendor': "The Apache Software Foundation",
+            'Implementation-Title': "HttpComponents HttpClient for Android",
+            'Implementation-Version': "$version",
+            'Implementation-Vendor': "The Apache Software Foundation",
+            'Implementation-Vendor-Id': "org.apache",
+            'url': 'http://hc.apache.org/httpcomponents-client'
+    )
+}
+
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    if (name == 'release') {
+
+        task createAndroidJar(type: Jar) {
+            dependsOn variant.javaCompile
+            from variant.javaCompile.destinationDir
+            from 'NOTICE.txt'
+            from 'LICENSE.txt'
+            rename '(NOTICE|LICENSE).txt', '$1'
+
+            manifest {
+                from sharedManifest
+            }
+        }
+
+        task createAndroidSrcJar(type: Jar) {
+            dependsOn variant.javaCompile
+            from variant.javaCompile.source
+            from 'NOTICE.txt'
+            from 'LICENSE.txt'
+            rename '(NOTICE|LICENSE).txt', '$1'
+            classifier = 'source'
+
+            manifest {
+                from sharedManifest
+            }
+        }
+
+        task createAndroidJavadoc(type: Javadoc) {
+            dependsOn variant.javaCompile
+            source = variant.javaCompile.source
+            classpath = files(android.plugin.runtimeJarList, variant.javaCompile.classpath.files)
+        }
+
+        task createAndroidJavadocJar(type: Jar) {
+            dependsOn createAndroidJavadoc
+            from createAndroidJavadoc.destinationDir
+            from 'NOTICE.txt'
+            from 'LICENSE.txt'
+            rename '(NOTICE|LICENSE).txt', '$1'
+            classifier = 'javadoc'
+
+            manifest {
+                from sharedManifest
+            }
+        }
+
+        artifacts {
+            dist createAndroidJar
+            dist createAndroidSrcJar
+            dist createAndroidJavadocJar
+        }
+
+        signing {
+            sign createAndroidJar
+            sign createAndroidSrcJar
+            sign createAndroidJavadocJar
+        }
+
+        artifacts {
+            tasks.withType(Sign) { Sign task ->
+                task.signatures.each { PublishArtifact artifact ->
+                    dist artifact
+                }
+            }
+        }
+    }
+}
+
+// Deployment tasks
+
+def askPassphrase = {
+    Console console = System.console()
+    if (console) {
+        String password = project.ext.has('signing.password') ? project.ext.'signing.password' : null
+        String keyId = project.ext.has('signing.keyId') ? project.ext.'signing.keyId' : null
+        if (keyId && !password) {
+            char[] raw = console.readPassword("\n> Please provide password for PGP key ${keyId}: ")
+            project.ext.'signing.password' = new String(raw)
+        }
+    }
+}
+
+def askCredentials(MavenDeployer mavenDeployer) {
+    Console console = System.console()
+    if (console) {
+        URL url = new URL(mavenDeployer.repository.url)
+        def auth = mavenDeployer.repository.authentication
+        if (auth) {
+            if (!auth.userName || auth.userName == '') {
+                String username = console.readLine("\n> Please enter user name for repository '${url}': ")
+                auth.userName = username
+            }
+            if (!auth.password || auth.password == '') {
+                char[] raw = console.readPassword("\n> Please enter password for repository '${url}': ")
+                auth.password = new String(raw)
+            }
+        }
+    }
+}
+
+task uploadDist(type: Upload) {
+    configuration = configurations.dist
+    repositories {
+        mavenDeployer {
+            def creds = [
+                userName: project.ext.has('asf.username') ? project.ext.'asf.username' : null,
+                password: project.ext.has('asf.password') ? project.ext.'asf.password' : null ]
+
+            if (System.properties['localRepo']) {
+                repository(url: "file:${buildDir.absolutePath}/repo")
+            } else {
+                if (version.endsWith('-SNAPSHOT')) {
+                    repository(url: ASF_SNAPSHOT_REPO) {
+                        authentication(creds)
+                    }
+                } else {
+                    repository(url: ASF_NEXUS_STAGE) {
+                        authentication(creds)
+                    }
+                }
+            }
+            pom.project {
+                name 'HttpComponents Client for Android'
+                url 'http://hc.apache.org/httpcomponents-client/'
+                organization {
+                    name 'The Apache Software Foundation'
+                    url 'http://www.apache.org/'
+                }
+                licenses {
+                    license {
+                        name 'Apache License, Version 2.0'
+                        url 'LICENSE.txt'
+                        distribution 'repo'
+                    }
+                }
+                issueManagement {
+                    system 'Jira'
+                    url 'http://issues.apache.org/jira/browse/HTTPCLIENT'
+                }
+            }
+            if (isRelease) {
+                beforeDeployment { MavenDeployment deployment ->
+                    askPassphrase()
+                    signing.signPom(deployment)
+                }
+            }
+        }
+    }
+}
+
+gradle.taskGraph.whenReady { TaskExecutionGraph taskGraph ->
+    taskGraph.allTasks.findAll { Task task ->
+        task instanceof Upload }.each { Upload task ->
+            task.doFirst {
+                task.repositories.each { MavenDeployer mavenDeployer ->
+                    askCredentials(mavenDeployer)
+                }
+            }
+    }
+
+    taskGraph.allTasks.findAll { Task task ->
+        task instanceof Sign }.each { Sign task ->
+            task.doFirst { askPassphrase() }
+    }
+}

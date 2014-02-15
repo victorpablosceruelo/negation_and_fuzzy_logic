@@ -1,0 +1,8 @@
+.classpath
+.project
+.settings
+.clover
+.externalToolBuilders
+target
+maven-eclipse.xml
+

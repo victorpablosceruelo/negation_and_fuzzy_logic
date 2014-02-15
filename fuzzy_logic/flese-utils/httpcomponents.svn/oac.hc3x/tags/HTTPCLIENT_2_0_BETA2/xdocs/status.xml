@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <title>Status</title>
+    <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+    <author email="remy@apache.org">Remy Maucherat</author>
+    <author email="rwaldhoff@apache.org">Rodney Waldhoff</author>
+    <author email="jsdever@apache.org">Jeff Dever</author>
+    <revision>$Id: status.xml 134259 2003-07-02 01:28:50Z mbecke $</revision>
+  </properties>
+
+  <body>
+
+    <section name="Current Status">    	
+        <p>For all current committers and anyone wishing to contribute to or use 
+        <em>HttpClient</em>, we are now in the final stages of 2.0 development.</p>
+
+	<p>Only bug fixes and documentation enhancements will be made to the 2.0 
+        code base in the next few weeks.  We hope to have a final 2.0 release shortly.</p>
+
+	<p>Now that 2.0 beta 2 has been released initial development for post 2.0 releases 
+        can begin.  A CVS branch of the 2.0 code will be made shortly so that 2.1 development
+        can begin on the HEAD.</p>
+    </section>
+
+    <section name="Release Info">
+      <p>Current Release: <a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-httpclient/v2.0/">
+          Release 2.0 Beta 2</a></p>
+      <p>Planned Next Release: 2.0 Release Candidate 1</p>
+    </section>
+
+  </body>
+
+</document>

@@ -1,0 +1,77 @@
+# ===================================================================
+# Sample build.properties file
+#
+# Make a copy this file named "build.properties",
+# and customize it to your environment and preferences.
+#
+# $Id: build.properties.sample 133582 2001-10-04 17:49:15Z rwaldhoff $
+# ===================================================================
+
+# ===================================================================
+# Classpath Settings
+# ===================================================================
+
+# A JSSE implementation (see http://java.sun.com/products/jsse):
+# Required to compile, only needed at runtime if you're using HTTPS.
+
+jsse.jar=/java/jsse/lib/jsse.jar
+jcert.jar=/java/jsse/lib/jcert.jar
+jnet.jar=/java/jsse/lib/jnet.jar
+
+# JUnit Version 3.2(+?) (See http://junit.org)
+# Required to compile and run the unit tests.
+
+junit.jar=/java/junit/junit.jar
+
+# The Servlet API (See http://java.sun.com/products/servlet)
+# Required to compile the test webapp.
+
+servlet.jar=/java/jakarta-tomcat/lib/servlet.jar
+
+# Log4J (See http://jakarta.apache.org/log4j)
+# Required to compile, optional at runtime.
+
+log4j.jar=/java/log4j/log4j.jar
+
+
+# ===================================================================
+# Test Properties - used to configure the test cases
+# ===================================================================
+
+# httpclient.log
+#  - indicates which log writer to use (optional)
+
+httpclient.log=org.apache.commons.httpclient.log.SimpleLog
+#httpclient.log=org.apache.commons.httpclient.log.Log4JCategoryLog
+#httpclient.log=org.apache.commons.httpclient.log.NoOpLog
+
+# httpclient.test.*
+#  - various properties used to override defaults within
+#    the JUnit tests
+
+# the host name for the "local" webserver
+#httpclient.test.localHost=127.0.0.1
+
+# the port for the "local" webserver
+#httpclient.test.localPort=8080
+
+# the context to which the test webapp is deployed
+#httpclient.test.webappContext=httpclienttest
+
+# ===================================================================
+# Build Properties
+# ===================================================================
+
+# where to build the test-webapp to
+#test-webapp.dest=${dist.home}
+#test-webapp.dest=/java/jakarta-tomcat-4.0-b7/webapps
+
+
+# ===================================================================
+# Anakia Properties (used by the xdoc target)
+# ===================================================================
+velocity.jar=/cvs/jakarta/jakarta-site2/lib/velocity-1.0.1.jar
+jdom.jar=/cvs/jakarta/jakarta-site2/lib/jdom-b6.jar
+xerces.jar=/cvs/jakarta/jakarta-site2/lib/xerces-1.3.0.jar
+# set this property to keep xdoc from fetching .vsl file from cvs
+#localstylesheet=true

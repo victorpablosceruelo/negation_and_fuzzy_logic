@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<document>
+   <properties>
+      <title>HttpClient News</title>
+      <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+      <author email="rwaldhoff@apache.org">Rodney Waldhoff</author>
+      <author email="jsdever@apache.org">Jeff Dever</author>
+      <revision>$Id: news.xml 134028 2003-01-25 16:24:04Z jsdever $</revision>
+   </properties>
+
+   <body>
+
+       <section name="25 January 2003 - HttpClient 2.0 Alpha 2 released">
+          <p>After many months and a great resurgence of developers, the new build
+              of <em>HttpClient</em> is finally here.  The new group of developers has done
+             extensive refactoring to move the project along the new vision.
+             The code base has reached a significant level of maturity and we
+             expect that the beta builds will come quickly and that the 
+             final release of 2.0 is not far away!</p>
+            
+          <p>The <em>HttpClient</em> revision 2.0 Alpha 2 is available for 
+              <a href="downloads.html">download</a>.
+          </p>
+          <p>Also check out the new <em>HttpClient</em> logo on the maven generated
+              <a href="http://jakarta.apache.org/commons/httpclient/">website</a>!
+          </p>
+      </section>
+
+      <section name="21 December, 2002 - Welcome new committer Oleg (Olegolas) Kalnichevski">
+           <p>Oleg is the first committer to be voted in on the dedicated httpclient 
+              mailing list.  Welcome to the fellowship Oleg!
+           </p>
+      </section>
+
+       <section name="3 December, 2002 - HttpClient/HttpMultiClient merger">
+           <p>The initial merger of the top level classes HttpClient and HttpMultiClient
+              is complete.  Thanks for the patches and hard work from everyone 
+              particularly to Michale Becke for supplying the primary patch.
+         </p>
+      </section>
+
+      <section name="3 October, 2002 - commons-httpclient-dev mailing list">
+         <p>The mailing list was renamed to be <b>commons-httpclient-dev</b>.
+            Sorry for the confusion.
+         </p>
+         <p>
+            If you wish to subscribe to this new mailing list, you can send mail to
+            <a href="mailto:commons-httpclient-dev-subscribe@jakarta.apache.org">
+            commons-httpclient-dev-subscribe@jakarta.apache.org</a>
+         </p>
+      </section>
+
+       <section name="2 October, 2002 - httpclient-dev mailing list created">
+         <p>There has been so much traffic on the commons-dev mailing list
+            specific to HttpClient, that a new mailing list was created
+            to partition the traffic.  
+         </p>
+      </section>
+ 
+      <section name="12 July, 2002 - HttpClient 2.0 Release Planning">
+         <p>The <em>HttpClient</em> project has go through some very active
+            development leading up to Alpha 1 last year, but unfortunately 
+            lost momentum shortly after that.  There is now renewed interest
+            and greatly increased activity on the dev-commons mailing list.
+            The committers and contributors are working on a new release plan
+            for 2.0.
+         </p>
+         <p>The 2.0 release plan is expected to be posted to the mailing list for 
+            review by July 22, 2002.
+         </p>
+      </section>
+ 
+      <section name="5 October, 2001 - HttpClient 2.0 Alpha 1 Released">
+         <p>
+            The <em>HttpClient</em> revision 2.0 alpha 1 is
+            available at
+            <a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-httpclient/v2.0/">
+                http://jakarta.apache.org/builds/jakarta-commons/release/commons-httpclient/v2.0/</a>.
+         </p>
+      </section>
+
+      <section name="25 April, 2001 - HttpClient Proposal Accepted">
+         <p>
+            The <em>HttpClient</em> <a href="proposal.html">proposal</a>
+            has been accepted by the
+            <a href="http://jakarta.apache.org/commons">Jakarta Commons</a>
+            team and the source has been moved into the
+            <a href="http://cvs.apache.org/viewcvs/jakarta-commons/httpclient/">CVS repository</a>.
+         </p>
+      </section>
+
+      <section name="18 April, 2001 - HttpClient Proposed">
+         <p>
+            <em>HttpClient</em>, originally developed by the
+            <a href="http://jakarta.apache.org/slide">Jakarta Slide</a>
+            team, has been
+            <a href="http://www.mail-archive.com/jakarta-commons@jakarta.apache.org/msg01153.html">proposed</a>
+            as a <a href="http://jakarta.apache.org/commons">Jakarta Commons</a>
+            component.
+         </p>
+      </section>
+   </body>
+</document>

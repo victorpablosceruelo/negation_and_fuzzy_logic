@@ -1,0 +1,12 @@
+MAVEN_HOME=/opt/maven
+
+HC_DEV = https://svn.apache.org/repos/asf/httpcomponents/httpclient/trunk
+HC_DIST_STAGING=https://dist.apache.org/repos/dist/dev/httpcomponents/
+HC_SITE_STAGING=https://svn.apache.org/repos/asf/httpcomponents/site/
+HC_PROJECT_SITE=https://svn.apache.org/repos/asf/httpcomponents/project-website/trunk/
+
+HC_PUBLISHED_RELEASES=
+
+signing.keyId=
+signing.password=
+signing.secretKeyRingFile=$HOME/.gnupg/secring.gpg

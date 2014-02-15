@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+
+  <properties>
+    <title>Trouble Shooting HttpClient</title>
+    <author email="adrian@ephox.com">Adrian Sutton</author>
+    <revision>$Id: troubleshooting.xml 134808 2004-12-31 10:31:04Z oglueck $</revision>
+  </properties>
+
+  <body>
+
+    <section name="Introduction">
+      <p>This document outlines some of the techniques that often help when
+        trying to track down a problem in <em>HttpClient</em>.  Please try the suggestions
+        on this page before emailing the user or dev lists with questions.  If
+        none of these things help, please provide the information they provide to
+        help the developers track down the problem.</p>
+    </section>
+
+    <section name="Things To Try">
+      <ol>
+        <li>Try connecting with a normal browser and make sure the server gives
+        the right response.</li>
+        
+        <li>If you're using a proxy server try without it if possible.</li>
+
+        <li>Try the same code on a different server (preferably running
+        different server software).</li>
+
+        <li>Check that your code matches the general pattern for using
+          <em>HttpClient</em> as described in the <a
+        href="tutorial.html">tutorial</a>.</li>
+
+        <li>Set the <a href="logging.html">logging level</a> to debug and check
+        the output for the cause of the problem.</li>
+
+        <li>Enable the <a href="logging.html">wire trace</a> and follow the
+        communication between the client and server to determine where the
+        problem is occurring.</li>
+
+        <li>Use telnet or netcat to manually send the request to the server.
+        This is particularly useful once you think you know what the problem is
+        and you want to easily test that changing what <em>HttpClient</em> sends will
+        fix it.</li>
+
+        <li>Use netcat in listen mode to act as the server and check how
+          <em>HttpClient</em> handles various responses.</li>
+
+        <li>Try updating to the latest nightly build of <em>HttpClient</em>.  Bugs
+        happen and they are generally fixed pretty quickly so testing against
+        the latest build is often worthwhile.</li>
+      </ol>
+    </section>
+
+    <section name="Asking For Help">
+      <p>If you've tried the things above and still can't work out how to fix
+      the problem, it might be time to contact the <a
+      href="mail-lists.html">mailing list</a> for support.  All questions, bug
+      reports etc should be directed to the HttpClient development list as all
+      the really knowledgeable people for HttpClient are there and most are not
+      also on the commons-user list.</p>
+
+      <p>When you do send off the email, please include as much detail as you
+      can, particularly including attaching wire trace logs as there is almost
+      nothing we can do to help without them.
+      If you are seeing exceptions being thrown the full stack
+      trace is essential to tracking down the problem.  Any of the information
+      you gained from the "things to try" section above are probably worth
+      mentioning.</p>
+    </section>
+
+    <section name="Reporting Bugs">
+      <p>If you're fairly certain that the problem is a bug in <em>HttpClient</em> or
+        something that <em>HttpClient</em> doesn't currently support but probably should,
+      log it in <a href="http://issues.apache.org/bugzilla/">Bugzilla</a>.
+      Make sure you spend some time searching the existing bugs to make sure it
+      hasn't already been logged.  If you're unsure about whether or not to log
+      something in Bugzilla, it's probably worth bringing it up on the
+      developer mailing list to clarify the situation.</p>
+    </section>
+  </body>
+</document>
