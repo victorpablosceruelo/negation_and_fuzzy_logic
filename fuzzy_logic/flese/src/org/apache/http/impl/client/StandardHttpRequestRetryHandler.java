@@ -1,1 +1,0 @@
-../../../../../../../flese-utils/httpcomponents.svn/httpclient/tags/4.3/httpclient/src/main/java/org/apache/http/impl/client/StandardHttpRequestRetryHandler.java
