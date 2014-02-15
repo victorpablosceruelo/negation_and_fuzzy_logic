@@ -1,3 +1,0 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="tns">
-    <xs:include schemaLocation="ag1.xsd"/>
-</xs:schema>

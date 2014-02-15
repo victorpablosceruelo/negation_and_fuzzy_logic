@@ -1,7 +1,0 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-   
-   <xs:element name="ISBN" type="xs:string" />
-   
-   <xs:element name="NoPages" type="xs:positiveInteger" />
-
-</xs:schema>

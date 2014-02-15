@@ -1,4 +1,0 @@
-<!-- to be validated with, test6.xsd -->
-<message mustUnderstand="YES" attr1="test value..">
-  <body>test message..</body>
-</message>

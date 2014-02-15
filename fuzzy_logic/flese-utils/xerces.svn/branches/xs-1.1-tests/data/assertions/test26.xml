@@ -1,9 +1,0 @@
-<test>
-  <a aCount="2">
-    <a1>aaa</a1>
-	<a1>aaa..</a1>
-  </a>
-  <b>world</b>
-  <!--<c>hello..</c>-->
-  <d>world..</d>
-</test>

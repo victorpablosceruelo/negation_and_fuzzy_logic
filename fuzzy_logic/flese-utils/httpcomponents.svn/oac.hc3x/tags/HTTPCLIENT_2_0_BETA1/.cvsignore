@@ -1,8 +1,0 @@
-dist
-build.properties
-target
-.classpath
-.project
-maven.log
-velocity.log
-bin
