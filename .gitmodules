@@ -19,9 +19,3 @@
 [submodule "fuzzy_logic/flese-utils/jena.git"]
 	path = fuzzy_logic/flese-utils/jena.git
 	url = https://github.com/apache/jena.git
-[submodule "fuzzy_logic/flese-utils/slf4j.git"]
-	path = fuzzy_logic/flese-utils/slf4j.git
-	url = https://github.com/qos-ch/slf4j.git
-[submodule "fuzzy_logic/flese-utils/jsonld-java.git"]
-	path = fuzzy_logic/flese-utils/jsonld-java.git
-	url = https://github.com/jsonld-java/jsonld-java.git
