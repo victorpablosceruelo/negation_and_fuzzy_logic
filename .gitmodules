@@ -25,3 +25,6 @@
 [submodule "fuzzy_logic/flese-utils/httpcore.git"]
 	path = fuzzy_logic/flese-utils/httpcore.git
 	url = https://github.com/apache/httpcore.git
+[submodule "fuzzy_logic/flese-utils/jsonld-java.git"]
+	path = fuzzy_logic/flese-utils/jsonld-java.git
+	url = https://github.com/jsonld-java/jsonld-java.git
