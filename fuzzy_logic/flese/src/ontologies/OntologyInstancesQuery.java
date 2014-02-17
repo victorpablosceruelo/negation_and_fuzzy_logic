@@ -60,44 +60,4 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 		return argsNames;
 	}
 
-	
-	public void query(String serviceEndPoint) {
-
-		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
-			serviceEndPoint = defaultServiceEndpoint;
-		}
-
-		// queryString.Namespaces.AddNamespace("ex", new
-		// Uri("http://example.org/ns#"));
-		// queryString.CommandText = "SELECT * WHERE { ?s ex:property @value }";
-		// Inject a Value for the parameter
-		// queryString.SetUri("value", new Uri("http://example.org/value"));
-
-		// When we call ToString() we get the full command text with namespaces
-		// appended as PREFIX
-		// declarations and any parameters replaced with their declared values
-		// Console.WriteLine(queryString.ToString());
-
-		String realQuery = queryString.toString();
-		System.out.println(realQuery);
-		if ((realQuery != null) && (!"".equals(realQuery))) {
-			Query query = QueryFactory.create(realQuery);
-			QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
-
-			try {
-				ResultSet rs = qe.execSelect();
-				if (rs.hasNext()) {
-					QuerySolution qs = rs.next();
-					RDFNode node = qs.get(nameVar1);
-					results.add(node.toString());
-					System.out.println(ResultSetFormatter.asText(rs));
-				}
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			} finally {
-				qe.close();
-			}
-		}
-	}
-
 }

@@ -14,40 +14,39 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
-	
 	private ArrayList<ArrayList<String>> results;
 	private String queryString;
 	private String substitutedQueryString;
 	private String serviceEndPoint;
-	
+
 	final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
-	
+
 	protected AbstractOntologyQuery() {
 		queryString = null;
 		substitutedQueryString = null;
 		results = new ArrayList<ArrayList<String>>();
 		serviceEndPoint = null;
 	}
-	
+
 	public final void setServiceEndPoint(String serviceEndPoint) {
 		this.serviceEndPoint = serviceEndPoint;
 	}
-	
+
 	public final void setQueryString(String queryString) {
 		this.queryString = queryString;
 	}
-	
+
 	public final String getQueryString(boolean argumentsSubstituted) {
 		if (argumentsSubstituted) {
 			return this.substitutedQueryString;
 		}
 		return this.queryString;
 	}
-	
+
 	public final void setQueryArguments(String[][] args) {
 		String tmpQuery = getQueryString(false);
 		ParameterizedSparqlString parametrizedQuery = new ParameterizedSparqlString();
-		
+
 		// Create the Parameterized String
 		// ParameterizedSparqlString queryString = new
 		// ParameterizedSparqlString();
@@ -62,35 +61,40 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
 		this.substitutedQueryString = parametrizedQuery.toString();
 	}
-	
+
 	public void query() {
 
 		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
 			serviceEndPoint = defaultServiceEndpoint;
 		}
-		
-		Query query = QueryFactory.create(getQueryString(true));
-		QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
 
-		try {
-			ResultSet rs = qe.execSelect();
-			if (rs.hasNext()) {
-				QuerySolution qs = rs.next();
-				ArrayList<String> tmpResults = new ArrayList<String>();
-				results.add(tmpResults);
-				
-				String [] varsNames = getVariablesNames();
-				for (String varName : varsNames) {
-					RDFNode node = qs.get(varName);
-					tmpResults.add(node.toString());	
+		String queryToBeSend = getQueryString(true);
+		System.out.println(queryToBeSend);
+		if ((queryToBeSend != null) && (!"".equals(queryToBeSend))) {
+
+			Query query = QueryFactory.create(queryToBeSend);
+			QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
+
+			try {
+				ResultSet rs = qe.execSelect();
+				if (rs.hasNext()) {
+					QuerySolution qs = rs.next();
+					ArrayList<String> tmpResults = new ArrayList<String>();
+					results.add(tmpResults);
+
+					String[] varsNames = getVariablesNames();
+					for (String varName : varsNames) {
+						RDFNode node = qs.get(varName);
+						tmpResults.add(node.toString());
+					}
+
+					System.out.println(ResultSetFormatter.asText(rs));
 				}
-				
-				System.out.println(ResultSetFormatter.asText(rs));
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			} finally {
+				qe.close();
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		} finally {
-			qe.close();
 		}
 
 		// //Create the Parameterized String
@@ -108,14 +112,14 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		// //declarations and any parameters replaced with their declared values
 		// Console.WriteLine(queryString.ToString());
 	}
-	
-	public final String [] [] getResults() {
-		String [] [] arrayResults = new String[this.results.size()][];
-		for (int i=0; i<this.results.size(); i++) {
+
+	public final String[][] getResults() {
+		String[][] arrayResults = new String[this.results.size()][];
+		for (int i = 0; i < this.results.size(); i++) {
 			ArrayList<String> tmpResult = this.results.get(i);
 			arrayResults[i] = tmpResult.toArray(new String[tmpResult.size()]);
 		}
 		return arrayResults;
 	}
-	
+
 }
