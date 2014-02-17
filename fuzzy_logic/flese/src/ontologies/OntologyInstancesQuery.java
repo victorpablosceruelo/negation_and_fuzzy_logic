@@ -1,17 +1,5 @@
 package ontologies;
 
-import java.util.ArrayList;
-
-import com.hp.hpl.jena.query.ParameterizedSparqlString;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-
 public class OntologyInstancesQuery extends AbstractOntologyQuery {
 
 	private final String queryPrefixLine01 = "PREFIX owl: <http://www.w3.org/2002/07/owl#>";
@@ -34,18 +22,16 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 
 	public static final String nameArg1 = "url";
 
-	
-
 	private OntologyInstancesQuery() {
-		setQueryString(queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05 + queryPrefixLine06
-				+ queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01 + queryEndLine02
-				+ queryEndLine03);
+		setQueryString(queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05
+				+ queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01
+				+ queryEndLine02 + queryEndLine03);
 	}
 
 	public static AbstractOntologyQuery getInstance() {
 		return new OntologyInstancesQuery();
 	}
-	
+
 	@Override
 	public String[] getVariablesNames() {
 		String[] varsNames = new String[1];

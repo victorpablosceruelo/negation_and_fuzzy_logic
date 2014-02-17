@@ -38,9 +38,9 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
 	public final String getQueryString(boolean argumentsSubstituted) {
 		if (argumentsSubstituted) {
-			return this.substitutedQueryString;
+			return this.substitutedQueryString == null ? "" : this.substitutedQueryString;
 		}
-		return this.queryString;
+		return this.queryString == null ? "" : this.queryString;
 	}
 
 	public final void setQueryArguments(String[][] args) {
@@ -69,7 +69,7 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		}
 
 		String queryToBeSend = getQueryString(true);
-		System.out.println(queryToBeSend);
+		System.out.println("Sending query: " + queryToBeSend);
 		if ((queryToBeSend != null) && (!"".equals(queryToBeSend))) {
 
 			Query query = QueryFactory.create(queryToBeSend);

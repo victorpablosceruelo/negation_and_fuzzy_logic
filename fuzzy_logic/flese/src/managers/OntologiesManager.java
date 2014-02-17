@@ -33,8 +33,9 @@ public class OntologiesManager extends AbstractManager {
 
 	public void mainQuery() throws Exception {
 		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance();
-		classesQuery.query();
 		
+		classesQuery.setQueryArguments(new String[0][]);
+		classesQuery.query();
 		String [][] results = classesQuery.getResults();
 		
 		for (String [] result : results) {
