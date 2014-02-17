@@ -32,19 +32,19 @@ public class OntologiesManager extends AbstractManager {
 	}
 
 	public void mainQuery() throws Exception {
-		InterfaceOntologyQuery classesQuery = new OntologyRootQuery();
-		classesQuery.query(null);
+		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance();
+		classesQuery.query();
 		
-		String [] results = classesQuery.getResults();
+		String [][] results = classesQuery.getResults();
 		
-		for (String result : results) {
+		for (String [] result : results) {
 			String [][] args = new String[1][2];
 			args[0][0] = OntologyInstancesQuery.nameArg1;
-			args[0][1] = result.toString();
+			args[0][1] = result[0].toString();
 			
-			InterfaceOntologyQuery instancesQuery = new OntologyInstancesQuery();
-			instancesQuery.setArguments(args);
-			instancesQuery.query(null);
+			InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance();
+			instancesQuery.setQueryArguments(args);
+			instancesQuery.query();
 		}
 		
 		// Forward to the jsp page.

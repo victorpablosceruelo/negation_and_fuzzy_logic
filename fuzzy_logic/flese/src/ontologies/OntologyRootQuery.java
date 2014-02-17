@@ -1,16 +1,5 @@
 package ontologies;
 
-import java.util.ArrayList;
-
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-
 public class OntologyRootQuery extends AbstractOntologyQuery {
 
 	private final String queryPrefixLine01 = "PREFIX owl: <http://www.w3.org/2002/07/owl#>";
@@ -32,68 +21,27 @@ public class OntologyRootQuery extends AbstractOntologyQuery {
 	private final String queryEndLine06 = "        FILTER ( !bound(?super) ) } ";
 
 	private final String nameVar1 = "class";
-	
-	ArrayList<String> results;
-	
-	public OntologyRootQuery() {
-		results = new ArrayList<String>();
+
+	private OntologyRootQuery() {
+		setQueryString(queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05
+				+ queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01
+				+ queryEndLine02 + queryEndLine03 + queryEndLine04 + queryEndLine05 + queryEndLine06);
 	}
 
-	final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
-
-	private final String getQuery() {
-		return queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05 + queryPrefixLine06
-				+ queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01 + queryEndLine02
-				+ queryEndLine03 + queryEndLine04 + queryEndLine05 + queryEndLine06;
-	}
-
-	public void query(String serviceEndPoint) {
-
-		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
-			serviceEndPoint = defaultServiceEndpoint;
-		}
-		
-		Query query = QueryFactory.create(getQuery());
-		QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
-
-		try {
-			ResultSet rs = qe.execSelect();
-			if (rs.hasNext()) {
-				QuerySolution qs = rs.next();
-				RDFNode node = qs.get(nameVar1);
-				results.add(node.toString());
-				System.out.println(ResultSetFormatter.asText(rs));
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		} finally {
-			qe.close();
-		}
-
-		// //Create the Parameterized String
-		// ParameterizedSparqlString queryString = new
-		// ParameterizedSparqlString();
-		// queryString.Namespaces.AddNamespace("ex", new
-		// Uri("http://example.org/ns#"));
-		// queryString.CommandText = "SELECT * WHERE { ?s ex:property @value }";
-		//
-		// //Inject a Value for the parameter
-		// queryString.SetUri("value", new Uri("http://example.org/value"));
-		//
-		// //When we call ToString() we get the full command text with
-		// namespaces appended as PREFIX
-		// //declarations and any parameters replaced with their declared values
-		// Console.WriteLine(queryString.ToString());
+	public static AbstractOntologyQuery getInstance() {
+		return new OntologyRootQuery();
 	}
 
 	@Override
-	public String[] getResults() {
-		return this.results.toArray(new String[this.results.size()]);
+	public String[] getVariablesNames() {
+		String[] varsNames = new String[1];
+		varsNames[0] = nameVar1;
+		return varsNames;
 	}
 
 	@Override
-	public void setArguments(String[][] args) {
-		
+	public String[] getArgumentsNames() {
+		return new String[0];
 	}
-	
+
 }

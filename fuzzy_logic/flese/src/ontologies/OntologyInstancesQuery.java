@@ -34,38 +34,33 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 
 	public static final String nameArg1 = "url";
 
-	ArrayList<String> results;
-	ParameterizedSparqlString queryString;
+	
 
-	public OntologyInstancesQuery() {
-		results = new ArrayList<String>();
-		queryString = new ParameterizedSparqlString();
+	private OntologyInstancesQuery() {
+		setQueryString(queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05 + queryPrefixLine06
+				+ queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01 + queryEndLine02
+				+ queryEndLine03);
 	}
 
-	final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
-
-	private final String getQuery() {
-		return queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05 + queryPrefixLine06
-				+ queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01 + queryEndLine02
-				+ queryEndLine03;
+	public static AbstractOntologyQuery getInstance() {
+		return new OntologyInstancesQuery();
+	}
+	
+	@Override
+	public String[] getVariablesNames() {
+		String[] varsNames = new String[1];
+		varsNames[0] = nameVar1;
+		return varsNames;
 	}
 
 	@Override
-	public void setArguments(String[][] args) {
-		// Create the Parameterized String
-		// ParameterizedSparqlString queryString = new
-		// ParameterizedSparqlString();
-		queryString.setCommandText(getQuery());
-
-		for (String[] arg : args) {
-			System.out.println("Setting args: arg0: " + arg[0] + " arg1: " + arg[1]);
-			queryString.setLiteral(arg[0], arg[1]);
-		}
-		// queryString.setLiteral("url", serviceEndPoint);
-		// queryString.toString();
-
+	public String[] getArgumentsNames() {
+		String[] argsNames = new String[1];
+		argsNames[0] = nameArg1;
+		return argsNames;
 	}
 
+	
 	public void query(String serviceEndPoint) {
 
 		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
@@ -105,8 +100,4 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 		}
 	}
 
-	@Override
-	public String[] getResults() {
-		return this.results.toArray(new String[this.results.size()]);
-	}
 }
