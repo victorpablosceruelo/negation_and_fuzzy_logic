@@ -14,7 +14,7 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 	private final String queryPrefixLine10 = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>";
 
 	private final String queryEndLine01 = "SELECT ?instance ";
-	private final String queryEndLine02 = "WHERE { ?instance a @url } ";
+	private final String queryEndLine02 = "WHERE { ?instance a ?url } ";
 	private final String queryEndLine03 = "        ORDER BY ?instance ";
 	// @url = <http://dbpedia.org/ontology/Disease>
 

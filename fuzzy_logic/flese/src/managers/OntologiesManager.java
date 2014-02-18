@@ -1,5 +1,7 @@
 package managers;
 
+import java.util.ArrayList;
+
 import ontologies.InterfaceOntologyQuery;
 import ontologies.OntologyInstancesQuery;
 import ontologies.OntologyRootQuery;
@@ -36,17 +38,24 @@ public class OntologiesManager extends AbstractManager {
 		
 		classesQuery.setQueryArguments(new String[0][]);
 		classesQuery.query();
-		String [][] results = classesQuery.getResults();
+		String [][] classesQueryResults = classesQuery.getResults();
 		
-		for (String [] result : results) {
+		ArrayList<String [][]> allResults = new ArrayList<String [][]>();
+		allResults.add(classesQueryResults);
+		
+		for (String [] classesQueryResult : classesQueryResults) {
 			String [][] args = new String[1][2];
 			args[0][0] = OntologyInstancesQuery.nameArg1;
-			args[0][1] = result[0].toString();
+			args[0][1] = classesQueryResult[0].toString();
 			
 			InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance();
 			instancesQuery.setQueryArguments(args);
 			instancesQuery.query();
+			String [][] instancesQueryResults = instancesQuery.getResults();
+			allResults.add(instancesQueryResults);
 		}
+		
+		resultsStoreHouse.setOntologyQueryResults(allResults);
 		
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
