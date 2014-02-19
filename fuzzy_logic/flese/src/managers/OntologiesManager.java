@@ -1,6 +1,9 @@
 package managers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import ontologies.InterfaceOntologyQuery;
 import ontologies.OntologyInstancesQuery;
@@ -36,23 +39,28 @@ public class OntologiesManager extends AbstractManager {
 	public void mainQuery() throws Exception {
 		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance();
 		
-		classesQuery.setQueryArguments(new String[0][]);
+		classesQuery.setQueryArguments(null);
 		classesQuery.query();
-		String [][] classesQueryResults = classesQuery.getResults();
+		ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
 		
-		ArrayList<String [][]> allResults = new ArrayList<String [][]>();
-		allResults.add(classesQueryResults);
+		ArrayList<String [][][]> allResults = new ArrayList<String [][][]>();
+		allResults.add(classesQuery.getResultsAsStrings());
 		
-		for (String [] classesQueryResult : classesQueryResults) {
-			String [][] args = new String[1][2];
-			args[0][0] = OntologyInstancesQuery.nameArg1;
-			args[0][1] = classesQueryResult[0].toString();
+		int i = 0;
+		for (HashMap<String, RDFNode> classesQueryResult : classesQueryResults) {
+			if (i < 1) {
+			HashMap<String, RDFNode> args = new HashMap<String, RDFNode>();
+			RDFNode value = classesQueryResult.get(OntologyRootQuery.nameVar1);
+					
+			args.put(OntologyInstancesQuery.nameArg1, value);
 			
 			InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance();
 			instancesQuery.setQueryArguments(args);
 			instancesQuery.query();
-			String [][] instancesQueryResults = instancesQuery.getResults();
+			String [][][] instancesQueryResults = instancesQuery.getResultsAsStrings();
 			allResults.add(instancesQueryResults);
+			}
+			i++;
 		}
 		
 		resultsStoreHouse.setOntologyQueryResults(allResults);

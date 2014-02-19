@@ -6,20 +6,29 @@
 
 <%
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	String [][][] ontologyQueryResults = resultsStoreHouse.getOntologyQueryResults();
+	String [][][][] ontologyQueryResults = resultsStoreHouse.getOntologyQueryResults();
 %>
 
 Results:
 
 <% 
 	for (int i=0; i<ontologyQueryResults.length; i++) {
-		String [][] result = ontologyQueryResults[i];
+		String [][][] result = ontologyQueryResults[i];
+		result = (result == null) ? new String [0][][] : result;
 		for (int j=0; j<result.length; j++) {
-			String [] resultDetails = result[j];
+			String [][] resultDetails = result[j];
+			resultDetails = (resultDetails == null) ? new String [0][] : resultDetails;
 			for (int k=0; k<resultDetails.length; k++) {
+				String [] varAndValue = resultDetails[k];
+				varAndValue = (varAndValue == null) ? new String [0] : varAndValue;
 %>
-				<%= resultDetails[k] %>
+				<BR>
 <%
+				for (int l=0; l<varAndValue.length; l++) {
+%>
+					<%= varAndValue[l] %>
+<%
+				}
 			}
 		}
 	}

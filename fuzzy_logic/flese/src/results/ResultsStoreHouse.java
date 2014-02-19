@@ -21,7 +21,7 @@ public class ResultsStoreHouse {
 	private ProgramIntrospection programIntrospection = null;
 	private String[] variablesNames = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
-	private String [][][] ontologyQueryResults = null;
+	private String [][][][] ontologyQueryResults = null;
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,16 +199,16 @@ public class ResultsStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void setOntologyQueryResults(ArrayList<String [][]> ontologyQueryResults) {
+	public void setOntologyQueryResults(ArrayList<String [][][]> ontologyQueryResults) {
 		this.ontologyQueryResults = null;
 		if (ontologyQueryResults != null) {
-			this.ontologyQueryResults = ontologyQueryResults.toArray(new String[ontologyQueryResults.size()][][]);
+			this.ontologyQueryResults = ontologyQueryResults.toArray(new String[ontologyQueryResults.size()][][][]);
 		}
 	}
 	
-	public String [][][] getOntologyQueryResults() {
+	public String [][][][] getOntologyQueryResults() {
 		if (this.ontologyQueryResults == null) {
-			return new String[0][][];
+			return new String[0][][][];
 		}
 		return this.ontologyQueryResults;
 	}

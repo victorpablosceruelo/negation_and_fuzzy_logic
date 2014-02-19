@@ -1,6 +1,8 @@
 package ontologies;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.Query;
@@ -14,18 +16,18 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
-	private ArrayList<ArrayList<String>> results;
+	private String serviceEndPoint;
 	private String queryString;
 	private String substitutedQueryString;
-	private String serviceEndPoint;
+	private ArrayList<HashMap<String, RDFNode>> results;
 
 	final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
 
 	protected AbstractOntologyQuery() {
+		serviceEndPoint = null;
 		queryString = null;
 		substitutedQueryString = null;
-		results = new ArrayList<ArrayList<String>>();
-		serviceEndPoint = null;
+		results = new ArrayList<HashMap<String, RDFNode>>();
 	}
 
 	public final void setServiceEndPoint(String serviceEndPoint) {
@@ -43,7 +45,11 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		return this.queryString == null ? "" : this.queryString;
 	}
 
-	public final void setQueryArguments(String[][] args) {
+	public final void setQueryArguments(HashMap<String, RDFNode> args) {
+		if (args == null) {
+			args = new HashMap<String, RDFNode>();
+		}
+
 		String tmpQuery = getQueryString(false);
 		ParameterizedSparqlString parametrizedQuery = new ParameterizedSparqlString();
 
@@ -52,9 +58,12 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		// ParameterizedSparqlString();
 		parametrizedQuery.setCommandText(tmpQuery);
 
-		for (String[] arg : args) {
-			System.out.println("Setting args: arg0: " + arg[0] + " arg1: " + arg[1]);
-			parametrizedQuery.setLiteral(arg[0], arg[1]);
+		Set<String> keys = args.keySet();
+
+		for (String key : keys) {
+			RDFNode value = args.get(key);
+			System.out.println("Setting args: arg0: " + key + " arg1: " + value.toString());
+			parametrizedQuery.setParam(key, value);
 		}
 		// queryString.setLiteral("url", serviceEndPoint);
 		// queryString.toString();
@@ -75,25 +84,30 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 			Query query = QueryFactory.create(queryToBeSend);
 			QueryExecution qe = QueryExecutionFactory.sparqlService(serviceEndPoint, query);
 
+			ResultSet rs = null;
 			try {
-				ResultSet rs = qe.execSelect();
-				if (rs.hasNext()) {
+				rs = qe.execSelect();
+				while (rs.hasNext()) {
 					QuerySolution qs = rs.next();
-					ArrayList<String> tmpResults = new ArrayList<String>();
-					results.add(tmpResults);
+					HashMap<String, RDFNode> result = new HashMap<String, RDFNode>();
 
 					String[] varsNames = getVariablesNames();
 					for (String varName : varsNames) {
-						RDFNode node = qs.get(varName);
-						tmpResults.add(node.toString());
+						RDFNode value = qs.get(varName);
+						result.put(varName, value);
 					}
 
-					System.out.println(ResultSetFormatter.asText(rs));
+					results.add(result);
 				}
 			} catch (Exception e) {
+				rs = null;
 				System.out.println(e.getMessage());
 			} finally {
 				qe.close();
+			}
+			
+			if (rs != null) {
+			System.out.println(ResultSetFormatter.asText(rs));
 			}
 		}
 
@@ -113,13 +127,37 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		// Console.WriteLine(queryString.ToString());
 	}
 
-	public final String[][] getResults() {
-		String[][] arrayResults = new String[this.results.size()][];
-		for (int i = 0; i < this.results.size(); i++) {
-			ArrayList<String> tmpResult = this.results.get(i);
-			arrayResults[i] = tmpResult.toArray(new String[tmpResult.size()]);
+	public final ArrayList<HashMap<String, RDFNode>> getResults() {
+		return results;
+	}
+
+	public final String[][][] getResultsAsStrings() {
+		String[][][] arrayResults = new String[this.results.size()][][];
+
+		int size = this.results.size();
+		for (int i=0; i<size; i++) {
+			HashMap<String, RDFNode> result = this.results.get(i); 
+			Set<String> keys = result.keySet();
+			String[][] stringsResult = new String[keys.size()][];
+			int j = 0;
+
+			for (String key : keys) {
+				RDFNode node = result.get(key);
+				String value = node.toString();
+				stringsResult[j] = new String[2];
+				stringsResult[j][0] = key;
+				stringsResult[j][1] = value;
+				j++;
+			}
+			
+			arrayResults[i] = stringsResult;
 		}
+
 		return arrayResults;
 	}
 
+	// .
+	// .
+	// .
+	// .
 }
