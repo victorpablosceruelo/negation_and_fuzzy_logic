@@ -85,7 +85,14 @@ function executeAjaxLoadedPageJS(loadedContent) {
 }
 
 function scriptHasProblematicParts(scriptString) {
-	return scriptString.contains("script type=");
+	var problematic = false;
+	if ((scriptString != null) && (scriptString != null) && (typeof(scriptString) == "string")) {
+		problematic = (scriptString.indexOf("script type=") != -1);
+		// Not working in google chrome.
+		// problematic = (scriptString.contains(""));
+	}
+	
+	return problematic; 
 }
 
 function loadAjaxIn(containerId, ajaxPageUrl) {
