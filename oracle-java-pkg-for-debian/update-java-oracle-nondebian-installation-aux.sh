@@ -103,6 +103,9 @@ function real_install_aux () {
 real_install_aux ${JAVA_INSTALLATION} java_installation ${INSTALLATION_PATH} 
 real_install_aux /usr/lib/jvm/java-6-sun java-6-sun-fake ${JAVA_INSTALLATION}
 real_install_aux /usr/lib/jvm/java-7-sun java-7-sun-fake ${JAVA_INSTALLATION}
+real_install_aux /usr/lib/jvm/default-java default-java ${JAVA_INSTALLATION}
+real_install_aux /usr/local/jdk-1.6 java-6-sun-local-fake ${JAVA_INSTALLATION}
+real_install_aux /usr/local/jdk-1.7 java-7-sun-local-fake ${JAVA_INSTALLATION}
 real_install_aux /usr/lib/jvm/java_jdk java_jdk ${INSTALLATION_PATH} 
 real_install_aux /usr/lib/jvm/java_jre java_jre ${INSTALLATION_PATH}/jre
 
