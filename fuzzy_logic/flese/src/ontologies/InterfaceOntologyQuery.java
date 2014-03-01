@@ -17,7 +17,7 @@ public interface InterfaceOntologyQuery {
 	
 	public abstract String [] getArgumentsNames();
 	
-	public abstract void setQueryArguments(HashMap<String, RDFNode> args);
+	public abstract void setQueryArguments(HashMap<String, OntologyQueryArgument> args);
 	
 	public abstract void query();
 	

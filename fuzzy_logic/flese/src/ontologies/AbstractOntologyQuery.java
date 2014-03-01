@@ -45,9 +45,9 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		return this.queryString == null ? "" : this.queryString;
 	}
 
-	public final void setQueryArguments(HashMap<String, RDFNode> args) {
+	public final void setQueryArguments(HashMap<String, OntologyQueryArgument> args) {
 		if (args == null) {
-			args = new HashMap<String, RDFNode>();
+			args = new HashMap<String, OntologyQueryArgument>();
 		}
 
 		String tmpQuery = getQueryString(false);
@@ -61,14 +61,25 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		Set<String> keys = args.keySet();
 
 		for (String key : keys) {
-			RDFNode value = args.get(key);
-			System.out.println("Setting args: arg0: " + key + " arg1: " + value.toString());
-			parametrizedQuery.setParam(key, value);
+			OntologyQueryArgument argValue = args.get(key);
+			setQueryArgument(key, argValue, parametrizedQuery);
 		}
 		// queryString.setLiteral("url", serviceEndPoint);
 		// queryString.toString();
 
 		this.substitutedQueryString = parametrizedQuery.toString();
+	}
+		
+	private void setQueryArgument(String key, OntologyQueryArgument argValue, ParameterizedSparqlString parametrizedQuery) {
+		System.out.println("Setting args: arg0: " + key + " arg1: " + argValue.toString());
+		
+		if (argValue.isNode()) {
+			RDFNode value = argValue.getRDFNode();			
+			parametrizedQuery.setParam(key, value);
+		}
+		else {
+			parametrizedQuery.setLiteral(key, argValue.toString());
+		}
 	}
 
 	public void query() {

@@ -8,13 +8,14 @@
 	String ontologyUrlFieldId = KConstants.JspsDivsIds.ontologyUrlFieldId;
 	String ontologyQueryResultsDivId = KConstants.JspsDivsIds.ontologyQueryResultsDivId;
 	String queryUrl = KUrls.Ontologies.MainQuery.getUrl(true);
+	String defaultServiceEndpoint = KConstants.Ontologies.defaultServiceEndpoint;
 %>
 
 <form action="#">
 
-	Enter the ontology url <br> <input type="text"
-		name="<%=ontologyUrlFieldId%>" id="<%=ontologyUrlFieldId%>"> <input
-		type="button" value="Process Ontology"
+	Enter the ontology url <br> 
+		<input type="text" name="<%=ontologyUrlFieldId%>" id="<%=ontologyUrlFieldId%>" value="<%=defaultServiceEndpoint%>"> 
+		<input type="button" value="Process Ontology"
 		onclick="sendOntologyMainQuery('<%=ontologyUrlFieldId%>', '<%=queryUrl%>', '<%=ontologyQueryResultsDivId%>');">
 
 </form>

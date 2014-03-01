@@ -160,6 +160,10 @@ public class KConstants {
 		public static final String markerForFunction = "function";
 		public static final String markerForValue = "value";
 	}
+	
+	public static class Ontologies {
+		public static final String defaultServiceEndpoint = "http://dbpedia.org/sparql";
+	}
 
 	public static class JavaScriptScripts {
 		public static final String jsRegex = "<script[^>]*>[^<]*</script>";
