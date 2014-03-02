@@ -13,7 +13,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
 
 public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
@@ -70,15 +69,14 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
 		this.substitutedQueryString = parametrizedQuery.toString();
 	}
-		
+
 	private void setQueryArgument(String key, OntologyQueryArgument argValue, ParameterizedSparqlString parametrizedQuery) {
 		System.out.println("Setting args: arg0: " + key + " arg1: " + argValue.toString());
-		
+
 		if (argValue.isNode()) {
-			RDFNode value = argValue.getRDFNode();			
+			RDFNode value = argValue.getRDFNode();
 			parametrizedQuery.setParam(key, value);
-		}
-		else {
+		} else {
 			parametrizedQuery.setLiteral(key, argValue.toString());
 		}
 	}
@@ -117,9 +115,9 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 			} finally {
 				qe.close();
 			}
-			
+
 			if (rs != null) {
-			System.out.println(ResultSetFormatter.asText(rs));
+				System.out.println(ResultSetFormatter.asText(rs));
 			}
 		}
 
@@ -143,40 +141,27 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		return results;
 	}
 
-	public final OntologyQueryResult[][][] getResultsWithInfo() {
-		OntologyQueryResult[][][] arrayResults = new OntologyQueryResult[this.results.size()][][];
+	public final OntologyQueryVarResult[][] getResultsWithInfo() throws OntologiesException {
+		OntologyQueryVarResult[][] arrayResults = new OntologyQueryVarResult[this.results.size()][];
 
 		int size = this.results.size();
-		for (int i=0; i<size; i++) {
-			HashMap<String, RDFNode> result = this.results.get(i); 
-			Set<String> keys = result.keySet();
-			String[][] stringsResult = new String[keys.size()][];
+		for (int i = 0; i < size; i++) {
+			HashMap<String, RDFNode> resultIn = this.results.get(i);
+			Set<String> keys = resultIn.keySet();
+			OntologyQueryVarResult[] result = new OntologyQueryVarResult[keys.size()];
 			int j = 0;
 
-			OntologyQueryResult ontologyQueryResult = null;
 			for (String key : keys) {
-				RDFNode node = result.get(key);
-				ontologyQueryResult = new OntologyQueryResult(key, node);
+				RDFNode node = resultIn.get(key);
+				OntologyQueryVarResult ontologyQueryVarResult = new OntologyQueryVarResult(key, node);
+				result[j] = ontologyQueryVarResult;
 				j++;
 			}
-			
-			arrayResults[i] = ontologyQueryResult;
+
+			arrayResults[i] = result;
 		}
 
 		return arrayResults;
-	}
-
-	private String getRDFNodeAsString(RDFNode node) {
-		String nodeDescr = null;
-		String nodeUri = null;
-		
-		if (node.isResource()) {
-			Resource rNode = node.asResource();
-			nodeUri = rNode.getURI();
-			nodeDescr = rNode.toString();
-		}
-		
-		return nodeDescr + " " + nodeUri;
 	}
 
 	// .

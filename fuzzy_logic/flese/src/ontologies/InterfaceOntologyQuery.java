@@ -23,6 +23,6 @@ public interface InterfaceOntologyQuery {
 	
 	public abstract ArrayList<HashMap<String, RDFNode>> getResults();
 	
-	public abstract String[][][] getResultsAsStrings();
+	public abstract OntologyQueryVarResult[][] getResultsWithInfo() throws OntologiesException;
 	
 }

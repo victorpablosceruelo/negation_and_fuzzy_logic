@@ -1,3 +1,4 @@
+<%@page import="ontologies.OntologyQueryVarResult"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
@@ -6,27 +7,23 @@
 
 <%
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-	String [][][][] ontologyQueryResults = resultsStoreHouse.getOntologyQueryResults();
+	OntologyQueryVarResult[][][] ontologyQueryResults = resultsStoreHouse.getOntologyQueryResults();
 %>
 
 Results:
 
 <% 
 	for (int i=0; i<ontologyQueryResults.length; i++) {
-		String [][][] result = ontologyQueryResults[i];
-		result = (result == null) ? new String [0][][] : result;
+		OntologyQueryVarResult [][] result = ontologyQueryResults[i];
+		result = (result == null) ? new OntologyQueryVarResult [0][] : result;
 		for (int j=0; j<result.length; j++) {
-			String [][] resultDetails = result[j];
-			resultDetails = (resultDetails == null) ? new String [0][] : resultDetails;
+			OntologyQueryVarResult [] resultDetails = result[j];
+			resultDetails = (resultDetails == null) ? new OntologyQueryVarResult [0] : resultDetails;
 			for (int k=0; k<resultDetails.length; k++) {
-				String [] varAndValue = resultDetails[k];
-				varAndValue = (varAndValue == null) ? new String [0] : varAndValue;
+				OntologyQueryVarResult varAndValue = resultDetails[k];
+				if (varAndValue != null) {
 %>
-				<BR>
-<%
-				for (int l=0; l<varAndValue.length; l++) {
-%>
-					<%= varAndValue[l] %>
+				<BR><%= varAndValue.getRDFNodeDescription() %>
 <%
 				}
 			}

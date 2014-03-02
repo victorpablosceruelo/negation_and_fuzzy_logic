@@ -6,6 +6,7 @@ import java.util.HashMap;
 import ontologies.InterfaceOntologyQuery;
 import ontologies.OntologyInstancesQuery;
 import ontologies.OntologyQueryArgument;
+import ontologies.OntologyQueryVarResult;
 import ontologies.OntologyRootQuery;
 import auxiliar.NextStep;
 
@@ -47,10 +48,10 @@ public class OntologiesManager extends AbstractManager {
 
 		classesQuery.setQueryArguments(null);
 		classesQuery.query();
-		ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
+		// ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
 
-		ArrayList<String[][][]> allResults = new ArrayList<String[][][]>();
-		allResults.add(classesQuery.getResultsAsStrings());
+		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
+		allResults.add(classesQuery.getResultsWithInfo());
 
 		resultsStoreHouse.setOntologyQueryResults(allResults);
 
@@ -63,7 +64,7 @@ public class OntologiesManager extends AbstractManager {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
 		String argumentValue = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
 
-		ArrayList<String[][][]> allResults = new ArrayList<String[][][]>();
+		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
 
 		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
 		OntologyQueryArgument value = new OntologyQueryArgument(argumentValue);
@@ -74,7 +75,7 @@ public class OntologiesManager extends AbstractManager {
 		instancesQuery.setServiceEndPoint(serviceEndPoint);
 		instancesQuery.setQueryArguments(args);
 		instancesQuery.query();
-		String[][][] instancesQueryResults = instancesQuery.getResultsAsStrings();
+		OntologyQueryVarResult[][] instancesQueryResults = instancesQuery.getResultsWithInfo();
 		allResults.add(instancesQueryResults);
 
 		resultsStoreHouse.setOntologyQueryResults(allResults);
@@ -93,8 +94,8 @@ public class OntologiesManager extends AbstractManager {
 		classesQuery.query();
 		ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
 
-		ArrayList<String[][][]> allResults = new ArrayList<String[][][]>();
-		allResults.add(classesQuery.getResultsAsStrings());
+		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
+		allResults.add(classesQuery.getResultsWithInfo());
 
 		int i = 0;
 		for (HashMap<String, RDFNode> classesQueryResult : classesQueryResults) {
@@ -107,7 +108,7 @@ public class OntologiesManager extends AbstractManager {
 				InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance();
 				instancesQuery.setQueryArguments(args);
 				instancesQuery.query();
-				String[][][] instancesQueryResults = instancesQuery.getResultsAsStrings();
+				OntologyQueryVarResult[][] instancesQueryResults = instancesQuery.getResultsWithInfo();
 				allResults.add(instancesQueryResults);
 			}
 			i++;

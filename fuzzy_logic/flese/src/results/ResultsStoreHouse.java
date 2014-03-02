@@ -3,6 +3,7 @@ package results;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ontologies.OntologyQueryVarResult;
 import auxiliar.Dates;
 import programAnalysis.ProgramPartAnalysis;
 import prologConnector.CiaoPrologQueryAnswer;
@@ -21,7 +22,7 @@ public class ResultsStoreHouse {
 	private ProgramIntrospection programIntrospection = null;
 	private String[] variablesNames = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
-	private String [][][][] ontologyQueryResults = null;
+	private OntologyQueryVarResult[][][] ontologyQueryResults = null;
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,16 +200,16 @@ public class ResultsStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void setOntologyQueryResults(ArrayList<String [][][]> ontologyQueryResults) {
+	public void setOntologyQueryResults(ArrayList<OntologyQueryVarResult[][]> ontologyQueryResults) {
 		this.ontologyQueryResults = null;
 		if (ontologyQueryResults != null) {
-			this.ontologyQueryResults = ontologyQueryResults.toArray(new String[ontologyQueryResults.size()][][][]);
+			this.ontologyQueryResults = ontologyQueryResults.toArray(new OntologyQueryVarResult[ontologyQueryResults.size()][][]);
 		}
 	}
 	
-	public String [][][][] getOntologyQueryResults() {
+	public OntologyQueryVarResult[][][] getOntologyQueryResults() {
 		if (this.ontologyQueryResults == null) {
-			return new String[0][][][];
+			return new OntologyQueryVarResult[0][][];
 		}
 		return this.ontologyQueryResults;
 	}
