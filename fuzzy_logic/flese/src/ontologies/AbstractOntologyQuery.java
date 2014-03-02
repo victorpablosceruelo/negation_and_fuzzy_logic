@@ -12,7 +12,10 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
@@ -31,7 +34,9 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 	}
 
 	public final void setServiceEndPoint(String serviceEndPoint) {
-		this.serviceEndPoint = serviceEndPoint;
+		if ((serviceEndPoint != null) && (! "".equals(serviceEndPoint))) {
+			this.serviceEndPoint = serviceEndPoint;
+		}
 	}
 
 	public final void setQueryString(String queryString) {
@@ -77,7 +82,9 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 			RDFNode value = argValue.getRDFNode();
 			parametrizedQuery.setParam(key, value);
 		} else {
-			parametrizedQuery.setLiteral(key, argValue.toString());
+			Resource resource = ResourceFactory.createResource(argValue.toString());
+			parametrizedQuery.setParam(key, resource);
+			// NO: parametrizedQuery.setLiteral(key, argValue.toString());
 		}
 	}
 

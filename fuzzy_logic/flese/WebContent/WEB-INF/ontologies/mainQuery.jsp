@@ -5,12 +5,19 @@
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 
+
 <%
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	OntologyQueryVarResult[][][] ontologyQueryResults = resultsStoreHouse.getOntologyQueryResults();
+	String destinyUrl = KUrls.Ontologies.InstancesQuery.getUrl(true);
+	String prefix = destinyUrl + "&" + KConstants.Request.url + "=";
+	String divId = KConstants.JspsDivsIds.ontologyQueryResultsDivId;
 %>
 
-Results:
+<table>
+  <tr>
+    <th>Result</th>
+  </tr>
 
 <% 
 	for (int i=0; i<ontologyQueryResults.length; i++) {
@@ -22,17 +29,23 @@ Results:
 			for (int k=0; k<resultDetails.length; k++) {
 				OntologyQueryVarResult varAndValue = resultDetails[k];
 				if (varAndValue != null) {
+					String url = varAndValue.getUrlToRDFNode(prefix);
 %>
-				<BR><%= varAndValue.getRDFNodeDescription() %>
+				<tr><td>
+				<a href="#" onclick="return loadAjaxIn('<%=divId %>', '<%= url %>');">
+				<%=varAndValue.getRDFNodeDescription() %></a>
+				</td></tr>
 <%
 				}
 			}
 		}
 	}
 %>
+</table>
 
 <script type="text/javascript">
 	// loadAjaxIn('<%=KConstants.JspsDivsIds.ontologyStartDivId %>', '<%=KUrls.Files.UploadDiv.getUrl(true) %>');
 </script>
+
 
 <!-- END -->

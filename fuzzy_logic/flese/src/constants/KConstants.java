@@ -65,7 +65,8 @@ public class KConstants {
 		public static final String valueParam = "value";
 		
 		//Ontologies parameters.
-		public static final String ontologyUrl = "ontologyUrl";
+		public static final String url = "url";
+		
 	}
 
 	public static class PathsMgmt {

@@ -33,7 +33,7 @@ public class OntologyQueryVarResult {
 	}
 	
 	public String getRDFNodeDescription() {
-		String nodeDescr = null;
+		String nodeDescr = "";
 		// String nodeUri = null;
 
 		if (this.node.isResource()) {
@@ -45,7 +45,7 @@ public class OntologyQueryVarResult {
 		return nodeDescr; // + " " + nodeUri;
 	}
 
-	public String getRDFNodeHtmlRef(String prefix) {
+	public String getUrlToRDFNode(String prefix) {
 		if (this.node.isResource()) {
 			Resource rNode = node.asResource();
 			String nodeUri = rNode.getURI();

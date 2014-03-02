@@ -59,15 +59,15 @@ public class OntologiesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
 	}
 
-	public void subQuery() throws Exception {
+	public void instancesQuery() throws Exception {
 
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
-		String argumentValue = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
+		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
 
 		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
 
 		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
-		OntologyQueryArgument value = new OntologyQueryArgument(argumentValue);
+		OntologyQueryArgument value = new OntologyQueryArgument(urlValue);
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
