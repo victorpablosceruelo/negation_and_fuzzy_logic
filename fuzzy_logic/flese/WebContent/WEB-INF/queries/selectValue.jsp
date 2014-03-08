@@ -57,7 +57,7 @@
 <% } %>
 <% } else { %>
 <% if ((predicatePredicateInfo.hasType(neededType2, false)) || (predicatePredicateInfo.hasType(neededType3, false))) { %>
-<input type='text' value=''
+<input type='text' size='5' value=''
 	name="<%=lineId %>.<%=KConstants.Request.valueParam %>"
 	id="<%=lineId %>.<%=KConstants.Request.valueParam %>" />
 <script type="text/javascript">

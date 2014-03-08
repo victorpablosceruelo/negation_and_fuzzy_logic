@@ -11,6 +11,10 @@
 	String defaultServiceEndpoint = KConstants.Ontologies.defaultServiceEndpoint;
 %>
 
+<p style="font-family:arial;color:red;font-size:20px;align:center">
+This is still under development !!!
+</p>
+
 <form action="#">
 
 	Enter the ontology url <br> 
@@ -19,6 +23,8 @@
 		onclick="sendOntologyMainQuery('<%=ontologyUrlFieldId%>', '<%=queryUrl%>', '<%=ontologyQueryResultsDivId%>');">
 
 </form>
+
+<br>
 
 <div id="<%=ontologyQueryResultsDivId%>"></div>
 
