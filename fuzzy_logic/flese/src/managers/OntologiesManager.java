@@ -43,13 +43,8 @@ public class OntologiesManager extends AbstractManager {
 
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
 
-		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance();
-		classesQuery.setServiceEndPoint(serviceEndPoint);
-
-		classesQuery.setQueryArguments(null);
-		classesQuery.query();
+		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance(serviceEndPoint, null);
 		// ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
-
 		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
 		allResults.add(classesQuery.getResultsWithInfo());
 
@@ -71,10 +66,7 @@ public class OntologiesManager extends AbstractManager {
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
-		InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance();
-		instancesQuery.setServiceEndPoint(serviceEndPoint);
-		instancesQuery.setQueryArguments(args);
-		instancesQuery.query();
+		InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
 		OntologyQueryVarResult[][] instancesQueryResults = instancesQuery.getResultsWithInfo();
 		allResults.add(instancesQueryResults);
 
@@ -87,11 +79,7 @@ public class OntologiesManager extends AbstractManager {
 	public void test() throws Exception {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
 
-		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance();
-		classesQuery.setServiceEndPoint(serviceEndPoint);
-
-		classesQuery.setQueryArguments(null);
-		classesQuery.query();
+		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance(serviceEndPoint, null);
 		ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
 
 		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
@@ -105,9 +93,7 @@ public class OntologiesManager extends AbstractManager {
 
 				args.put(OntologyInstancesQuery.nameArg1, new OntologyQueryArgument(value));
 
-				InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance();
-				instancesQuery.setQueryArguments(args);
-				instancesQuery.query();
+				InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
 				OntologyQueryVarResult[][] instancesQueryResults = instancesQuery.getResultsWithInfo();
 				allResults.add(instancesQueryResults);
 			}

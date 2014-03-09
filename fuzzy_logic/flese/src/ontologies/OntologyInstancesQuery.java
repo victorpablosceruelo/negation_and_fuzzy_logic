@@ -1,5 +1,10 @@
 package ontologies;
 
+import java.util.HashMap;
+
+import storeHouse.CacheStoreHouse;
+import storeHouse.CacheStoreHouseException;
+
 public class OntologyInstancesQuery extends AbstractOntologyQuery {
 
 	private static final String queryPrefixLine01 = "PREFIX owl: <http://www.w3.org/2002/07/owl#>";
@@ -18,18 +23,29 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 	private static final String queryEndLine03 = "        ORDER BY ?instance ";
 	// @url = <http://dbpedia.org/ontology/Disease>
 
+	private static final String queryString = queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04
+			+ queryPrefixLine05 + queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10
+			+ queryEndLine01 + queryEndLine02 + queryEndLine03;
+
 	private static final String nameVar1 = "instance";
 
 	public static final String nameArg1 = "url";
 
-	private OntologyInstancesQuery() {
-		setQueryString(queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05
-				+ queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01
-				+ queryEndLine02 + queryEndLine03);
+	private OntologyInstancesQuery(String serviceEndPoint, HashMap<String, OntologyQueryArgument> args) {
+		super(serviceEndPoint, queryString, args);
 	}
 
-	public static AbstractOntologyQuery getInstance() {
-		return new OntologyInstancesQuery();
+	public static AbstractOntologyQuery getInstance(String serviceEndPoint, HashMap<String, OntologyQueryArgument> args)
+			throws CacheStoreHouseException {
+		String queryStringKey = getQueryStringKey(queryString);
+		String argumentsKey = getArgumentsKey(args);
+		Object o = CacheStoreHouse.retrieve(OntologyInstancesQuery.class, serviceEndPoint, queryStringKey, argumentsKey);
+		OntologyInstancesQuery query = (OntologyInstancesQuery) o;
+		if (query == null) {
+			query = new OntologyInstancesQuery(serviceEndPoint, args);
+			CacheStoreHouse.store(OntologyInstancesQuery.class, serviceEndPoint, queryStringKey, argumentsKey, query);
+		}
+		return query;
 	}
 
 	@Override

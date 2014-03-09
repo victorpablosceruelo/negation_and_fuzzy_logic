@@ -1,5 +1,10 @@
 package ontologies;
 
+import java.util.HashMap;
+
+import storeHouse.CacheStoreHouse;
+import storeHouse.CacheStoreHouseException;
+
 public class OntologyRootQuery extends AbstractOntologyQuery {
 
 	private static final String queryPrefixLine01 = "PREFIX owl: <http://www.w3.org/2002/07/owl#>";
@@ -20,16 +25,27 @@ public class OntologyRootQuery extends AbstractOntologyQuery {
 	private static final String queryEndLine05 = "                   FILTER ( ?super != owl:Thing && ?super != ?class ) } . ";
 	private static final String queryEndLine06 = "        FILTER ( !bound(?super) ) } ";
 
+	private static final String queryString = queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04
+			+ queryPrefixLine05 + queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10
+			+ queryEndLine01 + queryEndLine02 + queryEndLine03 + queryEndLine04 + queryEndLine05 + queryEndLine06;
+
 	public static final String nameVar1 = "class";
 
-	private OntologyRootQuery() {
-		setQueryString(queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04 + queryPrefixLine05
-				+ queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10 + queryEndLine01
-				+ queryEndLine02 + queryEndLine03 + queryEndLine04 + queryEndLine05 + queryEndLine06);
+	private OntologyRootQuery(String serviceEndPoint, HashMap<String, OntologyQueryArgument> args) {
+		super(serviceEndPoint, queryString, args);
 	}
 
-	public static AbstractOntologyQuery getInstance() {
-		return new OntologyRootQuery();
+	public static AbstractOntologyQuery getInstance(String serviceEndPoint, HashMap<String, OntologyQueryArgument> args)
+			throws CacheStoreHouseException {
+		String queryStringKey = getQueryStringKey(queryString);
+		String argumentsKey = getArgumentsKey(args);
+		Object o = CacheStoreHouse.retrieve(OntologyRootQuery.class, serviceEndPoint, queryStringKey, argumentsKey);
+		OntologyRootQuery query = (OntologyRootQuery) o;
+		if (query == null) {
+			query = new OntologyRootQuery(serviceEndPoint, args);
+			CacheStoreHouse.store(OntologyRootQuery.class, serviceEndPoint, queryStringKey, argumentsKey, query);
+		}
+		return query;
 	}
 
 	@Override

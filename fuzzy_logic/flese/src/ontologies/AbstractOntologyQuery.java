@@ -12,7 +12,6 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -26,21 +25,21 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
 	final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
 
-	protected AbstractOntologyQuery() {
-		serviceEndPoint = null;
-		queryString = null;
-		substitutedQueryString = null;
-		results = new ArrayList<HashMap<String, RDFNode>>();
+	protected AbstractOntologyQuery(String serviceEndPoint, String queryString, HashMap<String, OntologyQueryArgument> args) {
+		this.serviceEndPoint = null;
+		this.queryString = queryString;
+		this.substitutedQueryString = null;
+		this.results = new ArrayList<HashMap<String, RDFNode>>();
+
+		setServiceEndPoint(serviceEndPoint);
+		setQueryArguments(args);
+		query();
 	}
 
-	public final void setServiceEndPoint(String serviceEndPoint) {
-		if ((serviceEndPoint != null) && (! "".equals(serviceEndPoint))) {
+	private final void setServiceEndPoint(String serviceEndPoint) {
+		if ((serviceEndPoint != null) && (!"".equals(serviceEndPoint))) {
 			this.serviceEndPoint = serviceEndPoint;
 		}
-	}
-
-	public final void setQueryString(String queryString) {
-		this.queryString = queryString;
 	}
 
 	public final String getQueryString(boolean argumentsSubstituted) {
@@ -50,7 +49,7 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		return this.queryString == null ? "" : this.queryString;
 	}
 
-	public final void setQueryArguments(HashMap<String, OntologyQueryArgument> args) {
+	private final void setQueryArguments(HashMap<String, OntologyQueryArgument> args) {
 		if (args == null) {
 			args = new HashMap<String, OntologyQueryArgument>();
 		}
@@ -88,7 +87,7 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		}
 	}
 
-	public void query() {
+	private void query() {
 
 		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
 			serviceEndPoint = defaultServiceEndpoint;
@@ -169,6 +168,20 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		}
 
 		return arrayResults;
+	}
+
+	protected static String getQueryStringKey(String querystring) {
+		return querystring == null ? "" : querystring;
+	}
+
+	protected static String getArgumentsKey(HashMap<String, OntologyQueryArgument> args) {
+		if (args == null) {
+			return "";
+		}
+		if (args.size() == 0) {
+			return "";
+		}
+		return "";
 	}
 
 	// .
