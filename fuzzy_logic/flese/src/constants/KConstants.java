@@ -66,6 +66,7 @@ public class KConstants {
 		
 		//Ontologies parameters.
 		public static final String url = "url";
+		public static final String serviceEndPoint = "serviceEndPoint";
 		
 	}
 

@@ -10,7 +10,9 @@
 	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
 	OntologyQueryVarResult[][][] ontologyQueryResults = resultsStoreHouse.getOntologyQueryResults();
 	String destinyUrl = KUrls.Ontologies.InstancesQuery.getUrl(true);
-	String prefix = destinyUrl + "&" + KConstants.Request.url + "=";
+	String [] serviceEndPoints = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.serviceEndPoint); 
+	String serviceEndPoint = ((serviceEndPoints != null) && (serviceEndPoints.length > 0)) ? serviceEndPoints[0] : "";
+	String prefix = destinyUrl + "&" + KConstants.Request.serviceEndPoint + "=" + serviceEndPoint + "&" + KConstants.Request.url + "=";
 	String divId = KConstants.JspsDivsIds.ontologyQueryResultsDivId;
 %>
 
@@ -30,6 +32,7 @@
 				OntologyQueryVarResult varAndValue = resultDetails[k];
 				if (varAndValue != null) {
 					String url = varAndValue.getUrlToRDFNode(prefix);
+					out.println();
 %>
 				<tr><td>
 				<a href="#" onclick="return loadAjaxIn('<%=divId %>', '<%= url %>');">

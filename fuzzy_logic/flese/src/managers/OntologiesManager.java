@@ -41,7 +41,7 @@ public class OntologiesManager extends AbstractManager {
 
 	public void mainQuery() throws Exception {
 
-		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
+		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
 
 		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance(serviceEndPoint, null);
 		// ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
@@ -56,7 +56,7 @@ public class OntologiesManager extends AbstractManager {
 
 	public void instancesQuery() throws Exception {
 
-		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
+		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
 		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
 
 		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();

@@ -22,12 +22,13 @@ Pablos Ceruelo */ /*
 function sendOntologyMainQuery (fieldId, url, divId) {
 	var fieldValue = getFieldValue(fieldId);
 	if (fieldValue != "") {
-		var params = "&<%=KConstants.Request.ontologyUrl %>=" + fieldValue;
+		var params = "&<%=KConstants.Request.serviceEndPoint %>=" + fieldValue;
 		loadAjaxIn(divId, url + params);
 	}
 	else {
 		alert("Please introduce a valid ontology url");
 	}
+	return false;
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
