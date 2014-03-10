@@ -1,6 +1,7 @@
 package ontologies;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -18,28 +19,19 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
-	private String serviceEndPoint;
 	private String queryString;
 	private String substitutedQueryString;
 	private ArrayList<HashMap<String, RDFNode>> results;
 
-	final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
+	private final static String defaultServiceEndpoint = "http://dbpedia.org/sparql";
 
 	protected AbstractOntologyQuery(String serviceEndPoint, String queryString, HashMap<String, OntologyQueryArgument> args) {
-		this.serviceEndPoint = null;
 		this.queryString = queryString;
 		this.substitutedQueryString = null;
 		this.results = new ArrayList<HashMap<String, RDFNode>>();
 
-		setServiceEndPoint(serviceEndPoint);
 		setQueryArguments(args);
-		query();
-	}
-
-	private final void setServiceEndPoint(String serviceEndPoint) {
-		if ((serviceEndPoint != null) && (!"".equals(serviceEndPoint))) {
-			this.serviceEndPoint = serviceEndPoint;
-		}
+		query(serviceEndPoint);
 	}
 
 	public final String getQueryString(boolean argumentsSubstituted) {
@@ -87,7 +79,7 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		}
 	}
 
-	private void query() {
+	private void query(String serviceEndPoint) {
 
 		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
 			serviceEndPoint = defaultServiceEndpoint;
@@ -170,18 +162,45 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		return arrayResults;
 	}
 
+	protected static String getServiceEndPointKey(String serviceEndPoint) {
+		if ((serviceEndPoint == null) || ("".equals(serviceEndPoint))) {
+			return defaultServiceEndpoint;
+		}
+		return serviceEndPoint;
+	}
+
 	protected static String getQueryStringKey(String querystring) {
-		return querystring == null ? "" : querystring;
+		if ((querystring == null) || ("".equals(querystring))) {
+			return "null";
+		}
+		return querystring;
 	}
 
 	protected static String getArgumentsKey(HashMap<String, OntologyQueryArgument> args) {
 		if (args == null) {
-			return "";
+			return "null";
 		}
 		if (args.size() == 0) {
-			return "";
+			return "null";
 		}
-		return "";
+
+		Set<String> keysSet = args.keySet();
+		String[] keys = keysSet.toArray(new String[keysSet.size()]);
+		Arrays.sort(keys);
+
+		StringBuilder sbKey = new StringBuilder();
+		for (int i = 0; i < keys.length; i++) {
+			sbKey.append(keys[i]);
+			sbKey.append("=");
+			OntologyQueryArgument arg = args.get(keys[i]);
+			String argString = arg.toString();
+			sbKey.append(argString);
+			if (i + 1 < keys.length) {
+				sbKey.append(":");
+			}
+		}
+		String keyString = sbKey.toString();
+		return keyString;
 	}
 
 	// .

@@ -37,13 +37,14 @@ public class OntologyRootQuery extends AbstractOntologyQuery {
 
 	public static AbstractOntologyQuery getInstance(String serviceEndPoint, HashMap<String, OntologyQueryArgument> args)
 			throws CacheStoreHouseException {
+		String serviceEndPointKey = getServiceEndPointKey(serviceEndPoint);
 		String queryStringKey = getQueryStringKey(queryString);
 		String argumentsKey = getArgumentsKey(args);
-		Object o = CacheStoreHouse.retrieve(OntologyRootQuery.class, serviceEndPoint, queryStringKey, argumentsKey);
+		Object o = CacheStoreHouse.retrieve(OntologyRootQuery.class, serviceEndPointKey, queryStringKey, argumentsKey);
 		OntologyRootQuery query = (OntologyRootQuery) o;
 		if (query == null) {
 			query = new OntologyRootQuery(serviceEndPoint, args);
-			CacheStoreHouse.store(OntologyRootQuery.class, serviceEndPoint, queryStringKey, argumentsKey, query);
+			CacheStoreHouse.store(OntologyRootQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query);
 		}
 		return query;
 	}
