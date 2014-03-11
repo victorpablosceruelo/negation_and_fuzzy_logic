@@ -4,22 +4,23 @@
 
 echo "running $0 $* ... "
 
-if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ]; then
+if [ -z "$1" ] || [ "$1" == "" ] || [ -z "$2" ] || [ "$2" == "" ] || [ -z "$3" ] || [ "$3" == "" ]; then
 	echo " "
 	echo "This is an utility to build Java debian packages."
-	echo "usage: $0 ORIG_FOLDER DEST_FOLDER  "
+	echo "usage: $0 ORIG_FOLDER DEST_FOLDER SOURCE_FILE "
 	echo "example: $0 . ~/tmp "
 	echo " "
 	exit 0
 else
 	ORIG_FOLDER="$1"
 	DEST_FOLDER="$2"
+	SOURCE_FILE="$3"
 fi;
 
 DATE=`date +%Y%m%d`
-PKG_VERSION="2.0.0+r$DATE"
-FOLDER_NAME="oracle-java-pkg-for-debian-${PKG_VERSION}"
-FILE_NAME=oracle-java-pkg-for-debian_${PKG_VERSION}
+PKG_VERSION="1.0.0+r$DATE"
+FOLDER_NAME="adobe-reader-pkg-for-debian-${PKG_VERSION}"
+FILE_NAME=adobe-reader-pkg-for-debian_${PKG_VERSION}
 BUILD_TGZ=${FILE_NAME}.orig.tar.gz
 BUILD_DSC=${FILE_NAME}.dsc
 BUILD_DIFF=${FILE_NAME}.diff
@@ -30,6 +31,7 @@ mkdir -p ${DEST_FOLDER}
 mkdir -p ${DEST_FOLDER}/${FOLDER_NAME}
 mkdir -p ${DEST_FOLDER}/${FOLDER_NAME}/debian
 cp ${ORIG_FOLDER}/* ${DEST_FOLDER}/${FOLDER_NAME}/debian
+cp ${SOURCE_FILE} ${DEST_FOLDER}/${FOLDER_NAME}
 
 # Ensure we work locally.
 pushd ${DEST_FOLDER}
@@ -64,12 +66,7 @@ echo " "
 echo " "
 
 set -x
-sudo cowbuilder --build ${DEST_FOLDER}/${BUILD_DSC}
+# sudo cowbuilder --build ${DEST_FOLDER}/${BUILD_DSC}
 set +x
 popd
-
-echo "-> Now run "
-echo " sudo ${SCRIPT_DIR}/ciao-prolog-autoinstall.sh "
-echo " "
-
 
