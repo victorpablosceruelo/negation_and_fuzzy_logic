@@ -40,6 +40,11 @@ build-and-install:
 	dh_testroot
 	dh_installdirs
 
+	tar jxvf AdbeRdr9.5.5-1_i486linux_enu.tar.bz2
+	cd AdbeRdr9.5.5-1_i486linux_enu
+	make 
+	make install
+
 	# Fake installation.
 	mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
 	cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
