@@ -27,7 +27,7 @@ FILES_NAMES_PREFIX=adobe-reader
 PKG_NAME=adobe-reader-pkg-for-debian
 PKG_FAKE_PATH=$(CURDIR)/debian/tmp
 PKG_FINAL_PATH=$(CURDIR)/debian/$(PKG_NAME)
-PKG_FINAL_SUBPATH=/usr/sbin
+PKG_FINAL_SUBPATH=/usr/local/acroread
 
 clean:
 	@echo "Makefile :: clean (it does nothing)"
@@ -40,19 +40,23 @@ build-and-install:
 	dh_testroot
 	dh_installdirs
 
+	mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
+	mkdir -p $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
+
 	tar jxvf AdbeRdr9.5.5-1_i486linux_enu.tar.bz2
-	AdobeReader/INSTALL
+	AdobeReader/INSTALL --install_path=$(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)/
 
 	# Fake installation.
-	mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
-	cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
+	# mkdir -p $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
+	# cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FAKE_PATH)/$(PKG_FINAL_SUBPATH)
 
 	# Real installation.
-	mkdir -p $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
-	cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
+	# mkdir -p $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
+	# cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
 
 	# See what it is really doing ... (debug)
-	find / | grep -iv 'proc' | grep -i 'adobe-reader'
+	# find / | grep -iv 'proc' | grep -i 'adobe-reader'
+	ls -la $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
 
 	@echo " "
 	dh_install --list-missing
@@ -123,7 +127,7 @@ binary: build-and-install binary-arch binary-indep
 	@echo " "
 	@echo " "
 	# See what it is really doing ... (debug)
-	find / | grep -iv 'proc' | grep -i 'adobe-reader'
+	find / | grep -iv 'proc' | grep -i 'acroread'
 	@echo " "
 	@echo " "
 
