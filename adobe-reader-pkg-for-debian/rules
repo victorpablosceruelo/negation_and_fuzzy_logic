@@ -23,8 +23,8 @@ export SHELL=/bin/sh
 # Example of destiny folder.
 # /tmp/buildd/oracle-java-pkg-for-debian-1.0/debian/oracle-java-pkg-for-debian/usr/share/doc/oracle-java-pkg-for-debian/changelog.gz
 
-FILES_NAMES_PREFIX=update-java-oracle
-PKG_NAME=oracle-java-pkg-for-debian
+FILES_NAMES_PREFIX=adobe-reader
+PKG_NAME=adobe-reader-pkg-for-debian
 PKG_FAKE_PATH=$(CURDIR)/debian/tmp
 PKG_FINAL_PATH=$(CURDIR)/debian/$(PKG_NAME)
 PKG_FINAL_SUBPATH=/usr/sbin
@@ -54,7 +54,7 @@ build-and-install:
 	cp debian/$(FILES_NAMES_PREFIX)*.sh $(PKG_FINAL_PATH)/$(PKG_FINAL_SUBPATH)
 
 	# See what it is really doing ... (debug)
-	find / | grep -iv 'proc' | grep -i 'oracle-java'
+	find / | grep -iv 'proc' | grep -i 'adobe-reader'
 
 	@echo " "
 	dh_install --list-missing
@@ -125,7 +125,7 @@ binary: build-and-install binary-arch binary-indep
 	@echo " "
 	@echo " "
 	# See what it is really doing ... (debug)
-	find / | grep -iv 'proc' | grep -i 'oracle-java'
+	find / | grep -iv 'proc' | grep -i 'adobe-reader'
 	@echo " "
 	@echo " "
 
