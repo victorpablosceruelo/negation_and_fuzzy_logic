@@ -25,3 +25,4 @@ build/
 
 fuzzy_logic/flese-utils/Highcharts-3.0.9/*
 fuzzy_logic/flese-utils/Jena-2.6.4/*
+fuzzy_logic/flese-utils/jena.git/*/target
