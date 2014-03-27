@@ -40,9 +40,11 @@
 					out.println();
 %>
 				<tr><td><%=varAndValue.getRDFNodeDescription() %>&nbsp;
+				<!-- 
 				<a href="#" onclick="return loadAjaxIn('<%=divId %>', '<%= instancesUrl %>');">
 					instances
 				</a>&nbsp;
+				 -->
 				<a href="#" onclick="return loadAjaxIn('<%=divId %>', '<%= propertiesUrl %>');">
 					properties
 				</a>
