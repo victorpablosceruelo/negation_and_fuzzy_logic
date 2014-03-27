@@ -78,6 +78,9 @@ public class KUrls {
 		public static final UrlMap InstancesQueryPage = getUrlMap(manager, "instancesQueryPage", null, null, "WEB-INF/ontologies/instancesQuery.jsp");
 		public static final UrlMap InstancesQuery = getUrlMap(manager, "instancesQuery", InstancesQueryPage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap PropertiesQueryPage = getUrlMap(manager, "propertiesQueryPage", null, null, "WEB-INF/ontologies/propertiesQuery.jsp");
+		public static final UrlMap PropertiesQuery = getUrlMap(manager, "propertiesQuery", PropertiesQueryPage, KUrls.Pages.Exception, "");
+
 	}
 	
 	public static class Queries {

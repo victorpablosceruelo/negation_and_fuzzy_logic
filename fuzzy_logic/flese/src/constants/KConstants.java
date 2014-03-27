@@ -205,6 +205,7 @@ public class KConstants {
 		public static final String ontologyStartDivId = "ontologyStartDivId";
 		public static final String ontologyUrlFieldId = "ontologyUrlFieldId";
 		public static final String ontologyQueryResultsDivId = "ontologyQueryResultsDivId";
+		public static final String ontologySubQueryResultsDivId = "ontologySubQueryResultsDivId";
 	}
 
 	public static class AppMsgs {

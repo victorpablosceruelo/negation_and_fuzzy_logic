@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import ontologies.InterfaceOntologyQuery;
 import ontologies.OntologyInstancesQuery;
+import ontologies.OntologyPropertiesQuery;
 import ontologies.OntologyQueryArgument;
 import ontologies.OntologyQueryVarResult;
 import ontologies.OntologyRootQuery;
@@ -66,9 +67,9 @@ public class OntologiesManager extends AbstractManager {
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
-		InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
-		OntologyQueryVarResult[][] instancesQueryResults = instancesQuery.getResultsWithInfo();
-		allResults.add(instancesQueryResults);
+		InterfaceOntologyQuery query = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
+		OntologyQueryVarResult[][] queryResults = query.getResultsWithInfo();
+		allResults.add(queryResults);
 
 		resultsStoreHouse.setOntologyQueryResults(allResults);
 
@@ -76,6 +77,28 @@ public class OntologiesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
 	}
 
+	public void propertiesQuery() throws Exception {
+
+		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
+		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
+
+		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
+
+		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
+		OntologyQueryArgument value = new OntologyQueryArgument(urlValue);
+
+		args.put(OntologyInstancesQuery.nameArg1, value);
+
+		InterfaceOntologyQuery query = OntologyPropertiesQuery.getInstance(serviceEndPoint, args);
+		OntologyQueryVarResult[][] queryResults = query.getResultsWithInfo();
+		allResults.add(queryResults);
+
+		resultsStoreHouse.setOntologyQueryResults(allResults);
+
+		// Forward to the jsp page.
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
+	}
+	
 	public void test() throws Exception {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
 

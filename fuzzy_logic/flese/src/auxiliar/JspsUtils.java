@@ -314,11 +314,20 @@ public class JspsUtils {
 	public static String getLogsQueries() {
 		return LogsManager.getLogsQueries();
 	}
-	
+
 	public static String getLogsSignedUsers() {
 		return LogsManager.getLogsSignedUsers();
 	}
 
+	public static String getOntologyQueryUrl(String queryUrl, String serviceEndPoint) {
+		return queryUrl + "&" + KConstants.Request.serviceEndPoint + "=" + serviceEndPoint + "&" + KConstants.Request.url + "=";
+	}
+	
+	public static String getServiceEndPointParam(ResultsStoreHouse resultsStoreHouse) {
+		String [] serviceEndPoints = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.serviceEndPoint); 
+		String serviceEndPoint = ((serviceEndPoints != null) && (serviceEndPoints.length > 0)) ? serviceEndPoints[0] : "";
+		return serviceEndPoint;
+	}
 }
 
 // END
