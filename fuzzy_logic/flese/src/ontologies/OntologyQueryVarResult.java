@@ -16,9 +16,6 @@ public class OntologyQueryVarResult {
 		if ("".equals(key)) {
 			throw new OntologiesException("key cannot be empty string");
 		}
-		if (node == null) {
-			throw new OntologiesException("node cannot be null");
-		}
 		
 		this.key = key;
 		this.node = node;
@@ -36,7 +33,7 @@ public class OntologyQueryVarResult {
 		String nodeDescr = "";
 		// String nodeUri = null;
 
-		if (this.node.isResource()) {
+		if ((this.node != null ) && (this.node.isResource())) {
 			Resource rNode = node.asResource();
 			// nodeUri = rNode.getURI();
 			nodeDescr = rNode.toString();
@@ -46,7 +43,7 @@ public class OntologyQueryVarResult {
 	}
 
 	public String getUrlToRDFNode(String prefix) {
-		if (this.node.isResource()) {
+		if ((this.node != null ) && (this.node.isResource())) {
 			Resource rNode = node.asResource();
 			String nodeUri = rNode.getURI();
 			return prefix + nodeUri;

@@ -18,16 +18,22 @@ public class OntologyPropertiesQuery extends AbstractOntologyQuery {
 	private static final String queryPrefixLine09 = "PREFIX dbpedia: <http://dbpedia.org/>";
 	private static final String queryPrefixLine10 = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>";
 
-	private static final String queryEndLine01 = "SELECT ?instance ";
-	private static final String queryEndLine02 = "WHERE { ?instance a ?url } ";
-	private static final String queryEndLine03 = "        ORDER BY ?instance ";
+	private static final String queryEndLine01 = "SELECT ?property ?hasValue ?isValueOf";
+	private static final String queryEndLine02 = "WHERE { ";
+	private static final String queryEndLine03 = "         { ?url ?property ?hasValue }";
+	private static final String queryEndLine04 = "      UNION ";
+	private static final String queryEndLine05 = "         { ?isValueOf ?property ?url }";
+	private static final String queryEndLine06 = "      }";
 	// @url = <http://dbpedia.org/ontology/Disease>
+	// @url = <http://dbpedia.org/resource/Air_Force_blue>
 
 	private static final String queryString = queryPrefixLine01 + queryPrefixLine02 + queryPrefixLine03 + queryPrefixLine04
 			+ queryPrefixLine05 + queryPrefixLine06 + queryPrefixLine07 + queryPrefixLine08 + queryPrefixLine09 + queryPrefixLine10
-			+ queryEndLine01 + queryEndLine02 + queryEndLine03;
+			+ queryEndLine01 + queryEndLine02 + queryEndLine03 + queryEndLine04 + queryEndLine05 + queryEndLine06;
 
-	private static final String nameVar1 = "instance";
+	private static final String nameVar1 = "property";
+	private static final String nameVar2 = "hasValue";
+	private static final String nameVar3 = "isValueOf";
 
 	public static final String nameArg1 = "url";
 
@@ -51,8 +57,10 @@ public class OntologyPropertiesQuery extends AbstractOntologyQuery {
 
 	@Override
 	public String[] getVariablesNames() {
-		String[] varsNames = new String[1];
+		String[] varsNames = new String[3];
 		varsNames[0] = nameVar1;
+		varsNames[1] = nameVar2;
+		varsNames[2] = nameVar3;
 		return varsNames;
 	}
 
