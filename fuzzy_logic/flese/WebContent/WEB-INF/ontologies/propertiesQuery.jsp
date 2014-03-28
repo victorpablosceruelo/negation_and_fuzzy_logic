@@ -21,7 +21,9 @@
 
 <table>
   <tr>
-    <th>Ontology contents</th>
+    <th></th>
+    <th></th>
+    <th></th>
   </tr>
 
 <% 
@@ -31,26 +33,32 @@
 		for (int j=0; j<result.length; j++) {
 			OntologyQueryVarResult [] resultDetails = result[j];
 			resultDetails = (resultDetails == null) ? new OntologyQueryVarResult [0] : resultDetails;
+			String divId = divIdPrefix + i + "_" + j;
+%>
+	<tr>
+<%
 			for (int k=0; k<resultDetails.length; k++) {
 				OntologyQueryVarResult varAndValue = resultDetails[k];
 				if (varAndValue != null) {
 					String instancesUrl = varAndValue.getUrlToRDFNode(instancesPrefix);
 					String propertiesUrl = varAndValue.getUrlToRDFNode(propertiesPrefix);
-					String divId = divIdPrefix + i + "_" + j + "_" + k;
 					out.println();
 %>
-				<tr><td><%=varAndValue.getRDFNodeDescription() %>&nbsp;
+				<td><%=varAndValue.getRDFNodeDescription() %>&nbsp;
 				<a href="#" onclick="return loadAjaxIn('<%=divId %>', '<%= instancesUrl %>');">
 					instances
 				</a>&nbsp;
 				<a href="#" onclick="return loadAjaxIn('<%=divId %>', '<%= propertiesUrl %>');">
 					properties
 				</a>
-				</td></tr>
-				<tr><td><div id='<%=divId %>'></div></td></tr>
+				</td>
 <%
 				}
 			}
+%>
+	</tr>
+	<tr><td><div id='<%=divId %>'></div></td></tr>
+<%
 		}
 	}
 %>
