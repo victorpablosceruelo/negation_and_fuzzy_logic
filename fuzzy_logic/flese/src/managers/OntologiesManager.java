@@ -7,7 +7,6 @@ import ontologies.InterfaceOntologyQuery;
 import ontologies.OntologyInstancesQuery;
 import ontologies.OntologyPropertiesQuery;
 import ontologies.OntologyQueryArgument;
-import ontologies.OntologyQueryVarResult;
 import ontologies.OntologyRootQuery;
 import auxiliar.NextStep;
 
@@ -43,7 +42,7 @@ public class OntologiesManager extends AbstractManager {
 	public void mainQuery() throws Exception {
 
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
-		
+
 		InterfaceOntologyQuery query = OntologyRootQuery.getInstance(serviceEndPoint, null);
 
 		this.resultsStoreHouse.resetOntologyQueryResults();
@@ -59,7 +58,7 @@ public class OntologiesManager extends AbstractManager {
 		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
 
 		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
-		OntologyQueryArgument value = new OntologyQueryArgument(urlValue);
+		OntologyQueryArgument value = OntologyQueryArgument.getInstance(urlValue);
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
@@ -78,7 +77,7 @@ public class OntologiesManager extends AbstractManager {
 		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
 
 		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
-		OntologyQueryArgument value = new OntologyQueryArgument(urlValue);
+		OntologyQueryArgument value = OntologyQueryArgument.getInstance(urlValue);
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
@@ -90,15 +89,15 @@ public class OntologiesManager extends AbstractManager {
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.PropertiesQueryPage, ""));
 	}
-	
+
 	public void test() throws Exception {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
-		
+
 		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance(serviceEndPoint, null);
-		
+
 		this.resultsStoreHouse.resetOntologyQueryResults();
 		this.resultsStoreHouse.addOntologyQueryResults(classesQuery);
-		
+
 		ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
 		int i = 0;
 		for (HashMap<String, RDFNode> classesQueryResult : classesQueryResults) {
@@ -106,7 +105,7 @@ public class OntologiesManager extends AbstractManager {
 				HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
 				RDFNode value = classesQueryResult.get(OntologyRootQuery.nameVar1);
 
-				args.put(OntologyInstancesQuery.nameArg1, new OntologyQueryArgument(value));
+				args.put(OntologyInstancesQuery.nameArg1, OntologyQueryArgument.getInstance(value));
 
 				InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
 				this.resultsStoreHouse.addOntologyQueryResults(instancesQuery);

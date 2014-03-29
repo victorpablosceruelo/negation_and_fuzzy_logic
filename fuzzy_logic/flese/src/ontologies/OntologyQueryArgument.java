@@ -7,7 +7,7 @@ public class OntologyQueryArgument {
 	private RDFNode rdfNodeArg;
 	private String stringArg;
 
-	public OntologyQueryArgument(RDFNode rdfNodeArg) throws OntologiesException {
+	private OntologyQueryArgument(RDFNode rdfNodeArg) throws OntologiesException {
 		if (rdfNodeArg == null) {
 			throw new OntologiesException("Node to create argument is null.");
 		}
@@ -16,7 +16,7 @@ public class OntologyQueryArgument {
 		this.stringArg = null;
 	}
 
-	public OntologyQueryArgument(String stringArg) throws OntologiesException {
+	private OntologyQueryArgument(String stringArg) throws OntologiesException {
 		if (stringArg == null) {
 			throw new OntologiesException("String to create argument is null.");
 		}
@@ -27,6 +27,34 @@ public class OntologyQueryArgument {
 
 		this.rdfNodeArg = null;
 		this.stringArg = stringArg;
+	}
+	
+	public static OntologyQueryArgument getInstance(RDFNode rdfNodeArg) {
+		if (rdfNodeArg == null) {
+			return null;
+		}
+		OntologyQueryArgument argument;
+		try {
+			argument = new OntologyQueryArgument(rdfNodeArg);
+		} catch (OntologiesException e) {
+			argument = null;
+			e.printStackTrace();
+		}
+		return argument;
+	}
+	
+	public static OntologyQueryArgument getInstance(String stringArg) {
+		if (stringArg == null) {
+			return null;
+		}
+		OntologyQueryArgument argument;
+		try {
+			argument = new OntologyQueryArgument(stringArg);
+		} catch (OntologiesException e) {
+			argument = null;
+			e.printStackTrace();
+		}
+		return argument;
 	}
 
 	public boolean isNode() {

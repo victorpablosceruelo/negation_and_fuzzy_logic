@@ -69,13 +69,15 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 	private void setQueryArgument(String key, OntologyQueryArgument argValue, ParameterizedSparqlString parametrizedQuery) {
 		System.out.println("Setting args: arg0: " + key + " arg1: " + argValue.toString());
 
-		if (argValue.isNode()) {
-			RDFNode value = argValue.getRDFNode();
-			parametrizedQuery.setParam(key, value);
-		} else {
-			Resource resource = ResourceFactory.createResource(argValue.toString());
-			parametrizedQuery.setParam(key, resource);
-			// NO: parametrizedQuery.setLiteral(key, argValue.toString());
+		if (argValue != null) {
+			if (argValue.isNode()) {
+				RDFNode value = argValue.getRDFNode();
+				parametrizedQuery.setParam(key, value);
+			} else {
+				Resource resource = ResourceFactory.createResource(argValue.toString());
+				parametrizedQuery.setParam(key, resource);
+				// NO: parametrizedQuery.setLiteral(key, argValue.toString());
+			}
 		}
 	}
 
@@ -193,7 +195,7 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 			sbKey.append(keys[i]);
 			sbKey.append("=");
 			OntologyQueryArgument arg = args.get(keys[i]);
-			String argString = arg.toString();
+			String argString = (arg == null) ? "null" : arg.toString();
 			sbKey.append(argString);
 			if (i + 1 < keys.length) {
 				sbKey.append(":");
