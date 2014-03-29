@@ -43,11 +43,11 @@
 <%
 			for (int k=0; k<resultDetails.length; k++) {
 				OntologyQueryVarResult varAndValue = resultDetails[k];
-				if (varAndValue != null) {
+				if ((varAndValue != null) && (varAndValue.nodeIsNotNull())) {
 					String rdfNodeUri = varAndValue.getRDFNodeURI();
 					out.println();
 %>
-				<td><%=varAndValue.getRDFNodeDescription() %>&nbsp;
+				<td><%=varAndValue.getRDFNodeFancyHtml() %>&nbsp;
 				<a href="#" 
 				onclick="return ontologyQuery('<%=instancesQueryUrl %>', '<%= serviceEndPoint %>', '<%= rdfNodeUri %>', '<%= divId %>');">
 					instances
