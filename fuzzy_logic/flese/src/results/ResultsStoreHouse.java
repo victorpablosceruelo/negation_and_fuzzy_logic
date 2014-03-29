@@ -3,6 +3,7 @@ package results;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ontologies.InterfaceOntologyQuery;
 import ontologies.OntologyQueryVarResult;
 import auxiliar.Dates;
 import programAnalysis.ProgramPartAnalysis;
@@ -22,7 +23,7 @@ public class ResultsStoreHouse {
 	private ProgramIntrospection programIntrospection = null;
 	private String[] variablesNames = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
-	private OntologyQueryVarResult[][][] ontologyQueryResults = null;
+	private ArrayList<InterfaceOntologyQuery> ontologiesQueries = null;
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,18 +201,22 @@ public class ResultsStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void setOntologyQueryResults(ArrayList<OntologyQueryVarResult[][]> ontologyQueryResults) {
-		this.ontologyQueryResults = null;
-		if (ontologyQueryResults != null) {
-			this.ontologyQueryResults = ontologyQueryResults.toArray(new OntologyQueryVarResult[ontologyQueryResults.size()][][]);
-		}
+	public void resetOntologyQueryResults() {
+		this.ontologiesQueries = null;
 	}
 	
-	public OntologyQueryVarResult[][][] getOntologyQueryResults() {
-		if (this.ontologyQueryResults == null) {
-			return new OntologyQueryVarResult[0][][];
+	public void addOntologyQueryResults(InterfaceOntologyQuery ontologyQuery) {
+		if (this.ontologiesQueries == null) {
+			this.ontologiesQueries = new ArrayList<InterfaceOntologyQuery>();
 		}
-		return this.ontologyQueryResults;
+		this.ontologiesQueries.add(ontologyQuery);
+	}
+	
+	public InterfaceOntologyQuery[] getOntologyQueryResults() {
+		if (this.ontologiesQueries == null) {
+			return new InterfaceOntologyQuery[0];
+		}
+		return this.ontologiesQueries.toArray(new InterfaceOntologyQuery[this.ontologiesQueries.size()]);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

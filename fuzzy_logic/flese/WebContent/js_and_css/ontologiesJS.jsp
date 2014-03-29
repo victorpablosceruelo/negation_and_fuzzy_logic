@@ -31,6 +31,18 @@ function sendOntologyMainQuery (fieldId, url, divId) {
 	return false;
 }
 
+function ontologyQuery(url, serviceEndPoint, rdfNodeUri, divId) {
+	var fullUrl = url;
+	
+	if ((rdfNodeUri != null) && (rdfNodeUri != "")) {
+		fullUrl += "&<%=KConstants.Request.serviceEndPoint %>=" + serviceEndPoint;
+		fullUrl += "&<%=KConstants.Request.url %>=" + rdfNodeUri;
+		fullUrl += "&<%=KConstants.Request.divIdPrefix %>=" + divId;
+	}
+		
+	return loadAjaxIn(divId, fullUrl);
+}
+
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/

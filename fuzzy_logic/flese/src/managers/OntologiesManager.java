@@ -43,13 +43,11 @@ public class OntologiesManager extends AbstractManager {
 	public void mainQuery() throws Exception {
 
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
+		
+		InterfaceOntologyQuery query = OntologyRootQuery.getInstance(serviceEndPoint, null);
 
-		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance(serviceEndPoint, null);
-		// ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
-		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
-		allResults.add(classesQuery.getResultsWithInfo());
-
-		resultsStoreHouse.setOntologyQueryResults(allResults);
+		this.resultsStoreHouse.resetOntologyQueryResults();
+		this.resultsStoreHouse.addOntologyQueryResults(query);
 
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
@@ -60,21 +58,18 @@ public class OntologiesManager extends AbstractManager {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
 		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
 
-		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
-
 		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
 		OntologyQueryArgument value = new OntologyQueryArgument(urlValue);
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
 		InterfaceOntologyQuery query = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
-		OntologyQueryVarResult[][] queryResults = query.getResultsWithInfo();
-		allResults.add(queryResults);
 
-		resultsStoreHouse.setOntologyQueryResults(allResults);
+		this.resultsStoreHouse.resetOntologyQueryResults();
+		this.resultsStoreHouse.addOntologyQueryResults(query);
 
 		// Forward to the jsp page.
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.InstancesQueryPage, ""));
 	}
 
 	public void propertiesQuery() throws Exception {
@@ -82,32 +77,29 @@ public class OntologiesManager extends AbstractManager {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.Request.serviceEndPoint);
 		String urlValue = requestStoreHouse.getRequestParameter(KConstants.Request.url);
 
-		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
-
 		HashMap<String, OntologyQueryArgument> args = new HashMap<String, OntologyQueryArgument>();
 		OntologyQueryArgument value = new OntologyQueryArgument(urlValue);
 
 		args.put(OntologyInstancesQuery.nameArg1, value);
 
 		InterfaceOntologyQuery query = OntologyPropertiesQuery.getInstance(serviceEndPoint, args);
-		OntologyQueryVarResult[][] queryResults = query.getResultsWithInfo();
-		allResults.add(queryResults);
 
-		resultsStoreHouse.setOntologyQueryResults(allResults);
+		this.resultsStoreHouse.resetOntologyQueryResults();
+		this.resultsStoreHouse.addOntologyQueryResults(query);
 
 		// Forward to the jsp page.
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.PropertiesQueryPage, ""));
 	}
 	
 	public void test() throws Exception {
 		String serviceEndPoint = requestStoreHouse.getRequestParameter(KConstants.JspsDivsIds.ontologyUrlFieldId);
-
+		
 		InterfaceOntologyQuery classesQuery = OntologyRootQuery.getInstance(serviceEndPoint, null);
+		
+		this.resultsStoreHouse.resetOntologyQueryResults();
+		this.resultsStoreHouse.addOntologyQueryResults(classesQuery);
+		
 		ArrayList<HashMap<String, RDFNode>> classesQueryResults = classesQuery.getResults();
-
-		ArrayList<OntologyQueryVarResult[][]> allResults = new ArrayList<OntologyQueryVarResult[][]>();
-		allResults.add(classesQuery.getResultsWithInfo());
-
 		int i = 0;
 		for (HashMap<String, RDFNode> classesQueryResult : classesQueryResults) {
 			if (i < 1) {
@@ -117,13 +109,10 @@ public class OntologiesManager extends AbstractManager {
 				args.put(OntologyInstancesQuery.nameArg1, new OntologyQueryArgument(value));
 
 				InterfaceOntologyQuery instancesQuery = OntologyInstancesQuery.getInstance(serviceEndPoint, args);
-				OntologyQueryVarResult[][] instancesQueryResults = instancesQuery.getResultsWithInfo();
-				allResults.add(instancesQueryResults);
+				this.resultsStoreHouse.addOntologyQueryResults(instancesQuery);
 			}
 			i++;
 		}
-
-		resultsStoreHouse.setOntologyQueryResults(allResults);
 
 		// Forward to the jsp page.
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Ontologies.MainQueryPage, ""));

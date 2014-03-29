@@ -127,19 +127,33 @@ public abstract class AbstractManager implements InterfaceManager {
 	}
 
 	private void invokeMethod() {
+		StringBuilder msg = new StringBuilder();
+		msg.append(" method "); 
+		msg.append(method == null ? "unknown" : method.getName());
+		msg.append(" in class ");
+		if ((this.getClass() != null) && (this.getClass().getName() != null)) {
+			msg.append(this.getClass().getName());
+		}
+		else {
+			msg.append(" unknown ");
+		}
+				
 		if (method != null) {
 			try {
-				LogAbstractManager.info("Calling method " + method.getName() + " in class " + this.getClass().getName());
+				LogAbstractManager.info("Calling method " + msg.toString());
 				method.invoke((Object) this, new Object[0]);
 			} catch (IllegalAccessException e) {
-				LogAbstractManager.error("ERROR invoking method " + method.getName() + " in class " + this.getClass().getName());
+				LogAbstractManager.error("ERROR invoking" + msg.toString());
 				e.printStackTrace();
 				setNextStep(null);
 			} catch (IllegalArgumentException e) {
-				LogAbstractManager.error("ERROR invoking method " + method.getName() + " in class " + this.getClass().getName());
+				LogAbstractManager.error("ERROR invoking" + msg.toString());
 				e.printStackTrace();
 				setNextStep(null);
 			} catch (InvocationTargetException e) {
+				actionWhenExceptionInTargetMethodInvocationEnvelope(e, method.getName(), this.getClass().getName());
+			// } catch (Throwable e) {
+			} catch (RuntimeException e) {
 				actionWhenExceptionInTargetMethodInvocationEnvelope(e, method.getName(), this.getClass().getName());
 			}
 		}

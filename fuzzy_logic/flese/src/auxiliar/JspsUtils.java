@@ -319,12 +319,51 @@ public class JspsUtils {
 		return LogsManager.getLogsSignedUsers();
 	}
 
-	public static String getOntologyQueryUrl(String queryUrl, String serviceEndPoint) {
-		return queryUrl + "&" + KConstants.Request.serviceEndPoint + "=" + serviceEndPoint + "&" + KConstants.Request.url + "=";
+	public static String setUrlParamServiceEndPoint(String queryUrl, String serviceEndPoint) {
+		StringBuilder urlSB = new StringBuilder();
+		urlSB.append(queryUrl);
+		urlSB.append("&");
+		urlSB.append(KConstants.Request.serviceEndPoint);
+		urlSB.append("=");
+		urlSB.append(serviceEndPoint);
+		String urlAux = urlSB.toString();
+		return urlAux;
+	}
+
+	public static String setUrlParamDivIdPrefix(String queryUrl, String divIdPrefix) {
+		StringBuilder urlSB = new StringBuilder();
+		urlSB.append(queryUrl);
+		urlSB.append("&");
+		urlSB.append(KConstants.Request.divIdPrefix);
+		urlSB.append("=");
+		urlSB.append(divIdPrefix);
+		String urlAux = urlSB.toString();
+		return urlAux;
+	}
+
+	public static String setUrlParamUrl(String queryUrl, String url) {
+		StringBuilder urlSB = new StringBuilder();
+		urlSB.append(queryUrl);
+		urlSB.append("&");
+		urlSB.append(KConstants.Request.url);
+		urlSB.append("=");
+		urlSB.append(url);
+		String urlAux = urlSB.toString();
+		return urlAux;
+	}
+
+	
+	public static String getDivIdPrefix(ResultsStoreHouse resultsStoreHouse, String defaultDivIdPrefix) {
+		String[] divIdPrefixes = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.divIdPrefix);
+		String divIdPrefix = ((divIdPrefixes != null) && (divIdPrefixes.length > 0)) ? divIdPrefixes[0] : "";
+		if ((divIdPrefix == null) || (divIdPrefix.isEmpty())) {
+			divIdPrefix = defaultDivIdPrefix;
+		}
+		return divIdPrefix;
 	}
 	
 	public static String getServiceEndPointParam(ResultsStoreHouse resultsStoreHouse) {
-		String [] serviceEndPoints = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.serviceEndPoint); 
+		String[] serviceEndPoints = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.serviceEndPoint);
 		String serviceEndPoint = ((serviceEndPoints != null) && (serviceEndPoints.length > 0)) ? serviceEndPoints[0] : "";
 		return serviceEndPoint;
 	}

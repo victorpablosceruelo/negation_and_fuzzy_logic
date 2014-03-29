@@ -42,11 +42,11 @@ public class OntologyQueryVarResult {
 		return nodeDescr; // + " " + nodeUri;
 	}
 
-	public String getUrlToRDFNode(String prefix) {
+	public String getRDFNodeURI() {
 		if ((this.node != null ) && (this.node.isResource())) {
 			Resource rNode = node.asResource();
 			String nodeUri = rNode.getURI();
-			return prefix + nodeUri;
+			return nodeUri;
 		}
 		return "";
 	}
