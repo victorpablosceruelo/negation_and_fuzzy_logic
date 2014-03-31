@@ -2,6 +2,7 @@ package ontologies;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
 	private String queryString;
+	private HashMap<String, OntologyQueryArgument> queryArguments;
 	private String substitutedQueryString;
 	private ArrayList<HashMap<String, RDFNode>> results;
 
@@ -27,6 +29,7 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 
 	protected AbstractOntologyQuery(String serviceEndPoint, String queryString, HashMap<String, OntologyQueryArgument> args) {
 		this.queryString = queryString;
+		this.queryArguments = args;
 		this.substitutedQueryString = null;
 		this.results = new ArrayList<HashMap<String, RDFNode>>();
 
@@ -204,6 +207,50 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 		String keyString = sbKey.toString();
 		return keyString;
 	}
+
+	protected HashMap<String, OntologyQueryArgument> getQueryArguments() {
+		return this.queryArguments;
+	}
+
+	@Override
+	public String getQueryLogo() {
+		HashMap<String, OntologyQueryArgument> args = getQueryArguments();
+		StringBuilder logoSB = new StringBuilder();
+
+		String subLogo = getQuerySubLogo();
+		if (subLogo != null) {
+			logoSB.append(subLogo);
+			logoSB.append(" ");
+		}
+
+		Collection<OntologyQueryArgument> valuesCol = args.values();
+		for (OntologyQueryArgument ontologyQueryArgument : valuesCol) {
+			if (ontologyQueryArgument != null) {
+				String argStr = ontologyQueryArgument.getStringArg();
+				if (argStr != null) {
+					argStr = adequateUrlString(argStr);
+					logoSB.append(argStr);
+					logoSB.append(" ");
+				}
+			}
+		}
+
+		return logoSB.toString();
+	}
+
+	private String adequateUrlString(String argStr) {
+		if ((argStr == null) || ("".equals(argStr))) {
+			return "";
+		}
+
+		int index = argStr.lastIndexOf("/");
+		if ((index > -1) && (index + 1 < argStr.length())) {
+			argStr = argStr.substring(index + 1);
+		}
+		return argStr;
+	}
+
+	abstract protected String getQuerySubLogo();
 
 	// .
 	// .

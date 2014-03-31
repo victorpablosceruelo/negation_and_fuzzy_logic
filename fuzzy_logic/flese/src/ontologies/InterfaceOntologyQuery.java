@@ -17,4 +17,5 @@ public interface InterfaceOntologyQuery {
 	
 	public abstract OntologyQueryVarResult[][] getResultsWithInfo() throws OntologiesException;
 	
+	public abstract String getQueryLogo();
 }

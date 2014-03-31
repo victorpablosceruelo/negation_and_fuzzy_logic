@@ -23,6 +23,7 @@
 		InterfaceOntologyQuery ontologyQuery = ontologyQueries[i];
 		String [] varsNames = ontologyQuery.getVariablesNames();
 %> 
+Results for the query <%=ontologyQuery.getQueryLogo() %> 
 <table>
   <tr>
   <%
@@ -43,18 +44,18 @@
 <%
 			for (int k=0; k<resultDetails.length; k++) {
 				OntologyQueryVarResult varAndValue = resultDetails[k];
-				if ((varAndValue != null) && (varAndValue.nodeIsNotNull())) {
+				if ((varAndValue != null) && (varAndValue.nodeIsNotNull()) && (! "".equals(varAndValue.getRDFNodeURI()))) {
 					String rdfNodeUri = varAndValue.getRDFNodeURI();
 					out.println();
 %>
 				<td><%=varAndValue.getRDFNodeFancyHtml() %>&nbsp;
-				<a href="#" 
+				<a href="#" title="instances" 
 				onclick="return ontologyQuery('<%=instancesQueryUrl %>', '<%= serviceEndPoint %>', '<%= rdfNodeUri %>', '<%= divId %>');">
-					instances
+					i
 				</a>&nbsp;
-				<a href="#" 
+				<a href="#" title="properties"
 				onclick="return ontologyQuery('<%=propertiesQueryUrl %>', '<%= serviceEndPoint %>', '<%= rdfNodeUri %>', '<%= divId %>');">
-					properties
+					p
 				</a>
 				</td>
 <%
@@ -62,7 +63,7 @@
 			}
 %>
 	</tr>
-	<tr><td><div id='<%=divId %>'></div></td></tr>
+	<tr><td colspan="<%=resultDetails.length%>"><div id='<%=divId %>'></div></td></tr>
 <%
 		}
 %>

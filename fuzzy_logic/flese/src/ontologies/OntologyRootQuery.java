@@ -61,4 +61,7 @@ public class OntologyRootQuery extends AbstractOntologyQuery {
 		return new String[0];
 	}
 
+	protected String getQuerySubLogo() {
+		return "classes of ";
+	}
 }

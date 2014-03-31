@@ -63,4 +63,7 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 		return argsNames;
 	}
 
+	protected String getQuerySubLogo() {
+		return "instances of ";
+	}
 }

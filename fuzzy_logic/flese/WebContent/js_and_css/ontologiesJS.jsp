@@ -38,9 +38,14 @@ function ontologyQuery(url, serviceEndPoint, rdfNodeUri, divId) {
 		fullUrl += "&<%=KConstants.Request.serviceEndPoint %>=" + serviceEndPoint;
 		fullUrl += "&<%=KConstants.Request.url %>=" + rdfNodeUri;
 		fullUrl += "&<%=KConstants.Request.divIdPrefix %>=" + divId;
-	}
 		
-	return loadAjaxIn(divId, fullUrl);
+		return loadAjaxIn(divId, fullUrl);
+	}
+	else {
+		var container = getContainer(divId);
+		container.innerHTML="Operation not available";
+	}
+	return false;
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

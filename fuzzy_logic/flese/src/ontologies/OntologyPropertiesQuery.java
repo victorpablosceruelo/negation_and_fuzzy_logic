@@ -71,4 +71,7 @@ public class OntologyPropertiesQuery extends AbstractOntologyQuery {
 		return argsNames;
 	}
 
+	protected String getQuerySubLogo() {
+		return "properties of ";
+	}
 }
