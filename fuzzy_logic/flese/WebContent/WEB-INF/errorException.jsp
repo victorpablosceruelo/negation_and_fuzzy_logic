@@ -1,19 +1,23 @@
 
+<%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="java.util.ArrayList"%>
 
-<%	if (! JspsUtils.isAjax(request)) { %>
+<% RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request); %>
+
+<%	if (! JspsUtils.isAjax(requestStoreHouse)) { %>
 <jsp:include page='commonHtmlBody.jsp' />
 <% } %>
 
 <%
+ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 ArrayList<String> msgs = new ArrayList<String>();
 msgs.add(KConstants.AppMsgs.exception1);
 msgs.add(KConstants.AppMsgs.exception2 + KConstants.Application.AppBugsEmail + KConstants.AppMsgs.exception3);
 msgs.add("");
-msgs.add(JspsUtils.getExceptionMsg(request));
+msgs.add(resultsStoreHouse.getExceptionMsg());
 
 String msgsArray = JspsUtils.getMessagesInJS(msgs);
 %>
