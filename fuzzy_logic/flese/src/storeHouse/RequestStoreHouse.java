@@ -2,6 +2,7 @@ package storeHouse;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +30,8 @@ public class RequestStoreHouse {
 	private HashMap<String, String[]> requestParams = null;
 
 	private RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
-			boolean exceptionIfLocalUserInfoIsNull, boolean restoreRequestParams) throws RequestStoreHouseException,
-			RequestStoreHouseSessionException {
+			boolean exceptionIfLocalUserInfoIsNull, boolean getRequestParams, boolean restoreRequestParams)
+			throws RequestStoreHouseException, RequestStoreHouseSessionException {
 
 		if (request == null)
 			throw new RequestStoreHouseException("request is null");
@@ -40,7 +41,11 @@ public class RequestStoreHouse {
 		if ((session == null) && (exceptionIfSessionIsNull)) {
 			throw new RequestStoreHouseException("session is null");
 		}
-		copyRequestParameters();
+		getResultsStoreHouse();
+
+		if (getRequestParams) {
+			copyRequestParameters();
+		}
 		if (restoreRequestParams) {
 			restoreRequestParameters();
 		}
@@ -49,7 +54,7 @@ public class RequestStoreHouse {
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
 		RequestStoreHouse requestStoreHouse = null;
 		try {
-			requestStoreHouse = new RequestStoreHouse(request, false, false, false, true);
+			requestStoreHouse = new RequestStoreHouse(request, false, false, false, false, true);
 		} catch (RequestStoreHouseException e) {
 			e.printStackTrace();
 			requestStoreHouse = null;
@@ -62,7 +67,7 @@ public class RequestStoreHouse {
 
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
 			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
-		return new RequestStoreHouse(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull, false);
+		return new RequestStoreHouse(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull, true, false);
 	}
 
 	public HttpServletRequest getRequest() {
@@ -113,7 +118,9 @@ public class RequestStoreHouse {
 
 	private void copyRequestParameters() {
 
-		this.requestParams = new HashMap<String, String[]>();
+		if (this.requestParams == null) {
+			this.requestParams = new HashMap<String, String[]>();
+		}
 
 		String parameterName = null;
 		String[] valuesArrayIn = null;
@@ -233,11 +240,76 @@ public class RequestStoreHouse {
 	}
 
 	private void restoreRequestParameters() {
-		if (this.resultsStoreHouse != null) {
-			if (this.resultsStoreHouse.getRequestParamsHashMap() != null) {
-				this.requestParams = this.resultsStoreHouse.getRequestParamsHashMap();
+		if (this.requestParams == null) {
+			this.requestParams = new HashMap<String, String[]>();
+		}
+		if ((this.resultsStoreHouse != null) && (this.resultsStoreHouse.getRequestParamsHashMap() != null)) {
+			StringBuilder logMsg = new StringBuilder();
+			HashMap<String, String[]> oldValuesHashMap = this.resultsStoreHouse.getRequestParamsHashMap();
+			Set<String> keys = getFullKeysSet(oldValuesHashMap.keySet(), this.requestParams.keySet());
+
+			for (String key : keys) {
+				logMsg.append("\n");
+				logMsg.append(key);
+				logMsg.append(" = ");
+
+				String[] oldValues = oldValuesHashMap.get(key);
+				String[] newValues = this.requestParams.get(key);
+
+				HashMap<String, String> valuesAL = new HashMap<String, String>();
+
+				if (newValues != null) {
+					for (int i = (newValues.length - 1); i >= 0; i--) {
+						String value = newValues[i];
+						if ((value != null) && (!"".equals(value))) {
+							valuesAL.put(value, value);
+						}
+					}
+				}
+
+				if (oldValues != null) {
+					for (int i = (oldValues.length - 1); i >= 0; i--) {
+						String value = oldValues[i];
+						if ((value != null) && (!"".equals(value))) {
+							valuesAL.put(value, value);
+						}
+					}
+				}
+
+				Set<String> valuesSet = valuesAL.keySet();
+				String[] values = valuesSet.toArray(new String[valuesSet.size()]);
+				for (String value : values) {
+					logMsg.append(value);
+					logMsg.append(", ");
+				}
+				this.requestParams.put(key, values);
+
+			}
+
+			LOG.info("restoreRequestParameters: " + logMsg.toString());
+		}
+	}
+
+	private Set<String> getFullKeysSet(Set<String> keySetIn1, Set<String> keySetIn2) {
+
+		HashMap<String, String> keys = new HashMap<String, String>();
+
+		if (keySetIn1 != null) {
+			for (String key : keySetIn1) {
+				if ((key != null) && (!"".equals(key))) {
+					keys.put(key, key);
+				}
 			}
 		}
+
+		if (keySetIn2 != null) {
+			for (String key : keySetIn2) {
+				if ((key != null) && (!"".equals(key))) {
+					keys.put(key, key);
+				}
+			}
+		}
+		return keys.keySet();
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

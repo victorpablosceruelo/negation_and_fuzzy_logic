@@ -22,7 +22,8 @@ public class JspsUtils {
 	}
 
 	public static String includeMainBodyWhenNotAjax(HttpServletRequest request) {
-		if (!isAjax(request)) {
+		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
+		if (!isAjax(requestStoreHouse)) {
 			return "<jsp:include page='commonHtmlBody.jsp' />";
 		}
 		return "";
@@ -32,9 +33,8 @@ public class JspsUtils {
 		return RequestStoreHouse.getRequestStoreHouse(request);
 	}
 
-	public static boolean isAjax(HttpServletRequest request) {
+	public static boolean isAjax(RequestStoreHouse requestStoreHouse) {
 		boolean isAjax = false;
-		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
 		if (requestStoreHouse != null) {
 			String isAjaxString = requestStoreHouse.getRequestParameter(KConstants.Request.isAjaxParam);
 			isAjax = (isAjaxString != null) && (KConstants.Values.True.equals(isAjaxString));
@@ -42,11 +42,9 @@ public class JspsUtils {
 		return isAjax;
 	}
 
-	public static String getLocalUserInfoName(HttpServletRequest request) {
+	public static String getLocalUserInfoName(SessionStoreHouse sessionStoreHouse) {
 
 		String localUserInfoName = "";
-		SessionStoreHouse sessionStoreHouse = getSessionStoreHouse(request);
-
 		if (sessionStoreHouse != null) {
 			LocalUserInfo localUserInfo = sessionStoreHouse.getLocalUserInfo();
 			if (localUserInfo != null) {
@@ -56,8 +54,7 @@ public class JspsUtils {
 		return localUserInfoName;
 	}
 
-	public static SessionStoreHouse getSessionStoreHouse(HttpServletRequest request) {
-		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
+	public static SessionStoreHouse getSessionStoreHouse(RequestStoreHouse requestStoreHouse) {
 		SessionStoreHouse sessionStoreHouse = null;
 		if (requestStoreHouse != null)
 			try {
@@ -68,32 +65,21 @@ public class JspsUtils {
 		return sessionStoreHouse;
 	}
 
-	public static ResultsStoreHouse getResultsStoreHouse(HttpServletRequest request) {
-		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
-		ResultsStoreHouse resultsStoreHouse = requestStoreHouse.getResultsStoreHouse();
+	public static ResultsStoreHouse getResultsStoreHouse(RequestStoreHouse requestStoreHouse) {
+		ResultsStoreHouse resultsStoreHouse = null;
+		if (requestStoreHouse != null) {
+			requestStoreHouse.getResultsStoreHouse();
+		}
 		return resultsStoreHouse;
 	}
 
-	public static String getExceptionMsg(HttpServletRequest request) {
-		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	public static String getExceptionMsgInJS(ResultsStoreHouse resultsStoreHouse) {
 		String msg = resultsStoreHouse.getExceptionMsg();
-		return msg;
-	}
-
-	public static String getExceptionMsgInJS(HttpServletRequest request) {
-		String msg = getExceptionMsg(request);
 		String[] msgsAux = { msg };
 		return getMessagesInJS(msgsAux);
 	}
 
-	public static String[] getResultMessages(HttpServletRequest request) {
-		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
-		String[] msgs = resultsStoreHouse.getResultMessages();
-		return msgs;
-	}
-
-	public static String getResultMessagesInJS(HttpServletRequest request) {
-		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	public static String getResultMessagesInJS(ResultsStoreHouse resultsStoreHouse) {
 		String[] msgs = resultsStoreHouse.getResultMessages();
 		String msg = getMessagesInJS(msgs);
 		return msg;
@@ -352,7 +338,6 @@ public class JspsUtils {
 		return urlAux;
 	}
 
-	
 	public static String getDivIdPrefix(ResultsStoreHouse resultsStoreHouse, String defaultDivIdPrefix) {
 		String[] divIdPrefixes = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.divIdPrefix);
 		String divIdPrefix = ((divIdPrefixes != null) && (divIdPrefixes.length > 0)) ? divIdPrefixes[0] : "";
@@ -361,7 +346,7 @@ public class JspsUtils {
 		}
 		return divIdPrefix;
 	}
-	
+
 	public static String getServiceEndPointParam(ResultsStoreHouse resultsStoreHouse) {
 		String[] serviceEndPoints = resultsStoreHouse.getRequestParamsHashMap().get(KConstants.Request.serviceEndPoint);
 		String serviceEndPoint = ((serviceEndPoints != null) && (serviceEndPoints.length > 0)) ? serviceEndPoints[0] : "";
