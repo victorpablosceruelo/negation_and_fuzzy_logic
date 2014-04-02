@@ -119,8 +119,7 @@ th.withoutBorder,td.withoutBorder,tr.withoutBorder {
 	/* border-color:transparent; */
 	border-width: 0px;
 	/* color:white; */
-	align: center;
-	vertical-align: center;
+	vertical-align: middle;
 	text-align: center;
 }
 
@@ -135,7 +134,6 @@ div {
 }
 
 .center {
-	align: center;
 	text-align: center;
 }
 
@@ -152,7 +150,7 @@ div {
 .indexPageImportantLink,a.indexPageImportantLink,a.indexPageImportantLink:link,a.indexPageImportantLink:visited,a.indexPageImportantLink:hover
 	{
 	color: red;
-	text-color: red;
+	/* text-color: red; */
 	font-size: 125%;
 	text-align: center;
 }
@@ -293,7 +291,6 @@ div {
 	border: 0.1em solid #000000;
 	width: 20%;
 	text-align: center;
-	align: center;
 }
 
 .fuzzificationDefsTableCell1 {
@@ -570,7 +567,6 @@ div {
 	display: table;
 	border: none;
 	text-align: center;
-	align: center;
 	margin: 0em;
 	padding: 0em;
 }
@@ -579,7 +575,6 @@ div {
 	display: table-row;
 	border: none;
 	text-align: center;
-	align: center;
 	margin: 0em;
 	padding: 0em;
 }
@@ -588,7 +583,6 @@ div {
 	display: table-cell;
 	border: none;
 	text-align: center;
-	align: center;
 	margin: 0em;
 	padding: 0em;
 }
@@ -847,7 +841,6 @@ table.programFilesTable,td.programFilesTable {
 	border-color: black;
 	padding: 0.4em;
 	margin: 0.2em;
-	align: center;
 	text-align: center;
 }
 
@@ -856,7 +849,6 @@ th.programFileChosen,td.programFileChosen {
 }
 
 th.queryLineAggregatorTable,td.queryLineAggregatorTable {
-	align: center;
 	text-align: center;
 }
 
@@ -869,7 +861,6 @@ tr.queryResults,th.queryResults,td.queryResults {
 	border-color: black;
 	padding: 0.6em;
 	margin: 0.2em;
-	align: center;
 	text-align: center;
 }
 
