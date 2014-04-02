@@ -21,8 +21,7 @@ public class JspsUtils {
 		return "S";
 	}
 
-	public static String includeMainBodyWhenNotAjax(HttpServletRequest request) {
-		RequestStoreHouse requestStoreHouse = getRequestStoreHouse(request);
+	public static String includeMainBodyWhenNotAjax(RequestStoreHouse requestStoreHouse) {
 		if (!isAjax(requestStoreHouse)) {
 			return "<jsp:include page='commonHtmlBody.jsp' />";
 		}
@@ -68,7 +67,7 @@ public class JspsUtils {
 	public static ResultsStoreHouse getResultsStoreHouse(RequestStoreHouse requestStoreHouse) {
 		ResultsStoreHouse resultsStoreHouse = null;
 		if (requestStoreHouse != null) {
-			requestStoreHouse.getResultsStoreHouse();
+			resultsStoreHouse = requestStoreHouse.getResultsStoreHouse();
 		}
 		return resultsStoreHouse;
 	}
@@ -80,8 +79,13 @@ public class JspsUtils {
 	}
 
 	public static String getResultMessagesInJS(ResultsStoreHouse resultsStoreHouse) {
-		String[] msgs = resultsStoreHouse.getResultMessages();
-		String msg = getMessagesInJS(msgs);
+		String msg = "";
+	
+		if (resultsStoreHouse != null) {
+			String[] msgs = resultsStoreHouse.getResultMessages();
+			msg = getMessagesInJS(msgs);
+		}
+		
 		return msg;
 	}
 

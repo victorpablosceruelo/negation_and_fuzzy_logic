@@ -212,8 +212,10 @@ public class RequestStoreHouse {
 
 	public ResultsStoreHouse getResultsStoreHouse() {
 
-		this.resultsStoreHouse = (ResultsStoreHouse) this.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
-
+		if (this.resultsStoreHouse == null) {
+			this.resultsStoreHouse = (ResultsStoreHouse) this.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
+		}
+		
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
 		}
