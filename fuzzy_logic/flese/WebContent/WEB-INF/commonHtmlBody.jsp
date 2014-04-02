@@ -7,6 +7,27 @@
 <%@page import="java.util.ArrayList"%>
 
 <body>
+<script type="text/javascript">
+    $("body").keypress(function(evt){
+        var keyCode = (evt.which?evt.which:(evt.keyCode?evt.keyCode:0));
+        if (keyCode == 113) {
+			alert(keyCode);
+			launchCallsRegistry();
+        }
+    });
+
+	// $("body").attachEvent('keydown', function (e) { alert(e.keyCode); }, false);
+	/*$("body").onkeypress=function(evt){
+		var keyCode = (evt.which?evt.which:(evt.keyCode?evt.keyCode:0))
+		alert(keyCode);
+	}*/
+	
+	$("body").onkeydown=function(evt){
+		var keyCode = (evt.which?evt.which:(evt.keyCode?evt.keyCode:0));
+		alert(keyCode);
+	}
+</script>
+
 	<header>
 		<div id="bodyHeadTable" class="bodyHeadTable">
 			<div id="bodyHeadTitle" class="bodyHeadTable">

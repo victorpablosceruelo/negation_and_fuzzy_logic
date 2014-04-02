@@ -30,6 +30,8 @@ public class KUrls {
 		public static final UrlMap LogsPage = getUrlMap(manager, "logsPage", null, null, "WEB-INF/authentication/logs.jsp");
 		public static final UrlMap Logs = getUrlMap(manager, "logs", LogsPage, KUrls.Pages.Exception, "");
 
+		public static final UrlMap CallsRegistryPage = getUrlMap(manager, "callsRegistryPage", null, null, "WEB-INF/authentication/callsRegistry.jsp");
+		public static final UrlMap CallsRegistry = getUrlMap(manager, "callsRegistry", CallsRegistryPage, KUrls.Pages.Exception, "");
 	}
 
 	public static class User {

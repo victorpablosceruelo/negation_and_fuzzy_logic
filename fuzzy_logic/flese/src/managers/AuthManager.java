@@ -281,6 +281,10 @@ public class AuthManager extends AbstractManager {
 		}
 
 	}
+	
+	public void callsRegistry() {
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.CallsRegistryPage, ""));
+	}
 }
 
 // // EOF
