@@ -15,7 +15,7 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();	
 	PredicateInfo [] predicatesInfos = programIntrospection.getPredicatesInfosByMoreInfoKey(KConstants.MoreInfoTypes.database);
 	ProgramFileInfo programFileInfo = programIntrospection.getProgramFileInfo();

@@ -12,7 +12,7 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 	String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
 	String fileName = requestStoreHouse.getRequestParameter(KConstants.Request.fileNameParam);

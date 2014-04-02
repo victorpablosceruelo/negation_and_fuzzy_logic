@@ -12,7 +12,7 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	ProgramIntrospection programIntrospection = resultsStoreHouse.getCiaoPrologProgramIntrospection();
 	
 	String database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);

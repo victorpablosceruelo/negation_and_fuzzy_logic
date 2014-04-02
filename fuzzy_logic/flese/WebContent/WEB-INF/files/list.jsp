@@ -9,7 +9,7 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 
 	String urlFileView = KUrls.Files.View.getUrl(true);

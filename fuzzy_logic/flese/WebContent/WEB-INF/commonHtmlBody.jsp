@@ -1,3 +1,5 @@
+<%@page import="storeHouse.SessionStoreHouse"%>
+<%@page import="storeHouse.RequestStoreHouse"%>
 <jsp:include page="commonHtmlHead.jsp" />
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KConstants"%>
@@ -13,7 +15,9 @@
 			</div>
 			<div id="bodyHeadLogged" class="bodyHeadTable">
 				<%  
-				String localUserInfoName = JspsUtils.getLocalUserInfoName(request);
+				RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+				SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(requestStoreHouse);
+				String localUserInfoName = JspsUtils.getLocalUserInfoName(sessionStoreHouse);
 				if ("".equals(localUserInfoName)) {
 					%>Not logged in<%
 				}

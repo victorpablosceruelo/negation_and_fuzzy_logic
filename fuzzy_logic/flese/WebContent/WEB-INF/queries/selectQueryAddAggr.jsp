@@ -12,7 +12,7 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	String linesCounter = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 	// int lineIndex = Conversors.toInt(lineIndexString);
 	

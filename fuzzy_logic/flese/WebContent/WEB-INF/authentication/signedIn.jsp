@@ -1,13 +1,20 @@
+<%@page import="storeHouse.RequestStoreHouse"%>
+<%@page import="results.ResultsStoreHouse"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
 
-<%	if (! JspsUtils.isAjax(request)) { %>
+<% 
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
+%>
+
+<%	if (! JspsUtils.isAjax(requestStoreHouse)) { %>
 <jsp:include page='../commonHtmlBody.jsp' />
 <% } %>
 
 <%
-	String msgsArray = JspsUtils.getResultMessagesInJS(request);
+	String msgsArray = JspsUtils.getResultMessagesInJS(resultsStoreHouse);
 %>
 
 <script type="text/javascript">

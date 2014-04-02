@@ -1,8 +1,13 @@
+<%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
 
-<%	if (! JspsUtils.isAjax(request)) { %>
+<%
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+%>
+
+<%	if (! JspsUtils.isAjax(requestStoreHouse)) { %>
 <jsp:include page='../commonHtmlBody.jsp' />
 <% } %>
 

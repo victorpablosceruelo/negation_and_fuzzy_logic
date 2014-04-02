@@ -3,7 +3,9 @@
 <%@page import="results.ResultsStoreHouse"%>
 
 <%
-	String [] msgs = JspsUtils.getResultMessages(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
+	String [] msgs = resultsStoreHouse.getResultMessages();
 	for (int i=0; i<msgs.length; i++) {
 		out.println(msgs[i]);
 	}

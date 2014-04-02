@@ -1,3 +1,4 @@
+<%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="storeHouse.SessionStoreHouse"%>
@@ -15,7 +16,8 @@
 		<div class='userInformationTableCell'>Value</div>
 	</div>
 	<%
-	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(requestStoreHouse);
 	AuthProvider provider = sessionStoreHouse.getAuthProvider();
 	Profile profile = null;
 	if (provider != null) profile = provider.getUserProfile();

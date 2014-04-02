@@ -11,7 +11,7 @@
 	<div id="selectDatabaseContainerDiv" class="selectDatabaseTable">
 		<%
 		RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+		ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 		ProgramFileInfo[] filesList = resultsStoreHouse.getFilesList();
 
 		String urlSelectQueryStartType = KUrls.Queries.SelectQueryStartType.getUrl(true);

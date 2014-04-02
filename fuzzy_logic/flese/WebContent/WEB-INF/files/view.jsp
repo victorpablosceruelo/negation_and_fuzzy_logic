@@ -1,3 +1,4 @@
+<%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="results.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="java.util.ArrayList"%>
@@ -7,14 +8,15 @@
 
 <div class="fileViewTable">
 	<% 
-	String [] msgs = JspsUtils.getResultMessages(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
+
+	String [] msgs = resultsStoreHouse.getResultMessages();
 	if ((msgs != null) && (msgs.length > 0)) { 
 		for (int i=0; i<msgs.length; i++) {
 			out.println(msgs[i]);
 		}
 	} else { 
-	
-		ResultsStoreHouse resultsStoreHouse =  JspsUtils.getResultsStoreHouse(request);	
 		String [] fileContents = resultsStoreHouse.getfileContents();
 	
 		if ((fileContents != null) && (fileContents.length > 0)) {

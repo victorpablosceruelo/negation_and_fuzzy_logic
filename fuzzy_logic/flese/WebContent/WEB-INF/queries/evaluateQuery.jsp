@@ -6,7 +6,7 @@
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	String [] variablesNames = resultsStoreHouse.getCiaoPrologQueryVariablesNames();
 	CiaoPrologQueryAnswer [] answers = resultsStoreHouse.getCiaoPrologQueryAnswers();
 %>
@@ -48,7 +48,7 @@
 </script>
 <%
 	if (answers.length <= 0) {
-		String [] msgs = JspsUtils.getResultMessages(request);
+		String [] msgs = resultsStoreHouse.getResultMessages();
 		if ((msgs == null) || (msgs.length <= 0)) {
 %>The query has no answers.
 <%

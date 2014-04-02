@@ -8,7 +8,8 @@
 
 
 <%
-	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(request);
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 	InterfaceOntologyQuery[] ontologyQueries = resultsStoreHouse.getOntologyQueryResults();
 	String serviceEndPoint = JspsUtils.getServiceEndPointParam(resultsStoreHouse);
 	String divIdPrefix = JspsUtils.getDivIdPrefix(resultsStoreHouse, KConstants.JspsDivsIds.ontologyQueryResultsDivId);

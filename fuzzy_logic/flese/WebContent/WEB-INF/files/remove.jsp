@@ -1,11 +1,16 @@
+<%@page import="storeHouse.RequestStoreHouse"%>
+<%@page import="results.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 
 <%
+	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
+	ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
+
 	String urlList = KUrls.Files.ListMyFiles.getUrl(true);
-	String msgsArray = JspsUtils.getResultMessagesInJS(request);
+	String msgsArray = JspsUtils.getResultMessagesInJS(resultsStoreHouse);
 %>
 
 
