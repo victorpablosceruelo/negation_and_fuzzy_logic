@@ -648,8 +648,9 @@ function openUrlInNewTab(url)
 }
 
 function launchCallsRegistry() {
-	var url = '<% KUrls.Auth.CallsRegistry.getUrl(true); %>';
-	openUrlInNewTab(url);
+	var url = '<%= KUrls.Auth.CallsRegistry.getUrl(false) %>';
+	debug.info("Opening url: " + url);
+	return openUrlInNewTab(url);
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/

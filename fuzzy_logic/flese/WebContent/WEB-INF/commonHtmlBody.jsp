@@ -11,7 +11,8 @@
     $("body").keypress(function(evt){
         var keyCode = (evt.which?evt.which:(evt.keyCode?evt.keyCode:0));
         if (keyCode == 113) {
-			alert(keyCode);
+        	debug.info("Pressed key: " + keyCode);
+			// alert(keyCode);
 			launchCallsRegistry();
         }
     });

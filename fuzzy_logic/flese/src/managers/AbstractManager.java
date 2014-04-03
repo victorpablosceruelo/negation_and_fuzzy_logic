@@ -12,6 +12,7 @@ import urls.UrlMap;
 import urls.UrlMapException;
 import urls.UrlsMaps;
 import auxiliar.NextStep;
+import auxiliar.RegistryEntry;
 import constants.KConstants;
 import constants.KUrls;
 
@@ -90,8 +91,17 @@ public abstract class AbstractManager implements InterfaceManager {
 		// Get the results storage facility.
 		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse();
 
+		// Register input.
+		String className = this.getClass().getName();
+		RegistryEntry registryEntry = new RegistryEntry(className, op, "in");
+		this.resultsStoreHouse.addRegistryEntry(registryEntry);
+		
 		// Invoke the method.
 		invokeMethod();
+		
+		// Register output.
+		registryEntry = new RegistryEntry(className, op, "out");
+		this.resultsStoreHouse.addRegistryEntry(registryEntry);
 		
 		// Save results in the request, to access them from jsps.
 		this.requestStoreHouse.storeResultsStoreHouse();
