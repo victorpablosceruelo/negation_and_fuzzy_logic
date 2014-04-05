@@ -6,8 +6,9 @@ import java.lang.reflect.Method;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import results.ResultsStoreHouse;
+import storeHouse.RegistryStoreHouse;
 import storeHouse.RequestStoreHouse;
+import storeHouse.ResultsStoreHouse;
 import urls.UrlMap;
 import urls.UrlMapException;
 import urls.UrlsMaps;
@@ -22,6 +23,7 @@ public abstract class AbstractManager implements InterfaceManager {
 
 	protected RequestStoreHouse requestStoreHouse = null;
 	protected ResultsStoreHouse resultsStoreHouse = null;
+	protected RegistryStoreHouse registryStoreHouse = null;
 	private NextStep nextStep;
 	private Method method;
 	private String op;
@@ -67,6 +69,13 @@ public abstract class AbstractManager implements InterfaceManager {
 		return requestStoreHouse.getRequestParameter(KConstants.Request.operationParam);
 	}
 
+	public String getCalledMethodName() {
+		if (this.method != null) {
+			return this.method.getName();
+		}
+		return "unknown";
+	}
+
 	public NextStep processRequest() {
 
 		op = null;
@@ -91,18 +100,32 @@ public abstract class AbstractManager implements InterfaceManager {
 		// Get the results storage facility.
 		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse();
 
-		// Register input.
+		// Get the registry storage facility.
+		if (this.requestStoreHouse.getSession() != null) {
+			this.registryStoreHouse = this.requestStoreHouse.getSession().getRegistryStoreHouse();
+		}
+
+		if (this.registryStoreHouse == null) {
+			this.registryStoreHouse = new RegistryStoreHouse();
+		}
+
 		String className = this.getClass().getName();
-		RegistryEntry registryEntry = new RegistryEntry(className, op, "in");
-		this.resultsStoreHouse.addRegistryEntry(registryEntry);
-		
+		RegistryEntry registryEntry = new RegistryEntry(className, op, "");
+		this.registryStoreHouse.addRegistryEntry(registryEntry);
+
 		// Invoke the method.
 		invokeMethod();
-		
-		// Register output.
-		registryEntry = new RegistryEntry(className, op, "out");
-		this.resultsStoreHouse.addRegistryEntry(registryEntry);
-		
+
+		// Register output. Include exception msg if any.
+		registryEntry = new RegistryEntry(registryEntry, nextStep, requestStoreHouse.isAjax());
+		registryEntry.setMsg(this.resultsStoreHouse.getExceptionMsg());
+		this.registryStoreHouse.addRegistryEntry(registryEntry);
+
+		// Save registry in the session (if session available).
+		if (this.requestStoreHouse.getSession() != null) {
+			this.requestStoreHouse.getSession().setRegistryStoreHouse(this.registryStoreHouse);
+		}
+
 		// Save results in the request, to access them from jsps.
 		this.requestStoreHouse.storeResultsStoreHouse();
 
@@ -137,45 +160,43 @@ public abstract class AbstractManager implements InterfaceManager {
 	}
 
 	private void invokeMethod() {
-		StringBuilder msg = new StringBuilder();
-		msg.append(" method "); 
-		msg.append(method == null ? "unknown" : method.getName());
-		msg.append(" in class ");
-		if ((this.getClass() != null) && (this.getClass().getName() != null)) {
-			msg.append(this.getClass().getName());
-		}
-		else {
-			msg.append(" unknown ");
-		}
-				
 		if (method != null) {
 			try {
-				LogAbstractManager.info("Calling method " + msg.toString());
+				LogAbstractManager.info(getInfoMsg("Calling"));
 				method.invoke((Object) this, new Object[0]);
 			} catch (IllegalAccessException e) {
-				LogAbstractManager.error("ERROR invoking" + msg.toString());
+				LogAbstractManager.error(getInfoMsg("ERROR invoking"));
 				e.printStackTrace();
 				setNextStep(null);
 			} catch (IllegalArgumentException e) {
-				LogAbstractManager.error("ERROR invoking" + msg.toString());
+				LogAbstractManager.error(getInfoMsg("ERROR invoking"));
 				e.printStackTrace();
 				setNextStep(null);
 			} catch (InvocationTargetException e) {
-				actionWhenExceptionInTargetMethodInvocationEnvelope(e, method.getName(), this.getClass().getName());
-			// } catch (Throwable e) {
+				actionWhenExceptionInTargetMethodInvocationEnvelope(e);
+				// } catch (Throwable e) {
 			} catch (RuntimeException e) {
-				actionWhenExceptionInTargetMethodInvocationEnvelope(e, method.getName(), this.getClass().getName());
+				actionWhenExceptionInTargetMethodInvocationEnvelope(e);
 			}
 		}
 	}
 
-	private void actionWhenExceptionInTargetMethodInvocationEnvelope(Exception e, String methodName, String className) {
-		if (methodName == null)
-			methodName = "unknown";
-		if (className == null)
-			className = "unknown";
+	private String getInfoMsg(String prefix) {
+		StringBuilder msg = new StringBuilder();
+		msg.append(prefix == null ? "Playing with" : prefix);
+		msg.append(" method ");
+		msg.append(getCalledMethodName());
+		msg.append(" in class ");
+		if ((this.getClass() != null) && (this.getClass().getName() != null)) {
+			msg.append(this.getClass().getName());
+		} else {
+			msg.append(" unknown ");
+		}
+		return msg.toString();
+	}
 
-		LogAbstractManager.error("Exception executing method " + methodName + " in class " + className);
+	private void actionWhenExceptionInTargetMethodInvocationEnvelope(Exception e) {
+		LogAbstractManager.error(getInfoMsg("Exception executing"));
 		if ((e.getMessage() != null) && (!"".equals(e.getMessage()))) {
 			LogAbstractManager.error(e.getMessage());
 		}
@@ -183,23 +204,13 @@ public abstract class AbstractManager implements InterfaceManager {
 		e.printStackTrace();
 		LogAbstractManager.error("------------------------------");
 
-		saveExceptionInformation(e, className, methodName);
-		actionWhenExceptionInTargetMethodInvocation(methodName);
+		saveExceptionInformation(e);
+		actionWhenExceptionInTargetMethodInvocation(getCalledMethodName());
 	}
 
-	private void saveExceptionInformation(Exception e, String className, String methodName) {
-		if (className == null) {
-			className = "unknown";
-		}
-		if (methodName == null) {
-			methodName = "unknown";
-		}
-
+	private void saveExceptionInformation(Exception e) {
 		StringBuilder msg = new StringBuilder();
-		msg.append("Exception in method ");
-		msg.append(methodName);
-		msg.append(" of class ");
-		msg.append(className);
+		msg.append(getInfoMsg("Exception executing "));
 
 		if ((e != null) && (e.getMessage() != null) && (!"".equals(e.getMessage()))) {
 			msg.append(": ");
@@ -213,7 +224,5 @@ public abstract class AbstractManager implements InterfaceManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
-
-
 
 // EOF

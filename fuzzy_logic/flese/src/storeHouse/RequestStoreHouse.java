@@ -12,7 +12,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import results.ResultsStoreHouse;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
@@ -206,6 +205,12 @@ public class RequestStoreHouse {
 		return new ProgramFileInfo(fileOwner, fileName);
 	}
 
+	public boolean isAjax() {
+		String isAjaxString = getRequestParameter(KConstants.Request.isAjaxParam);
+		boolean isAjax = (isAjaxString != null) && (KConstants.Values.True.equals(isAjaxString));
+		return isAjax;
+	}
+	
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

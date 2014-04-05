@@ -1,6 +1,6 @@
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 
 <%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);

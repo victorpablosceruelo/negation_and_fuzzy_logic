@@ -106,7 +106,7 @@ public class KConstants {
 		public static final String socialAuthProviderId = "socialAuthProviderId";
 		public static final String socialAuthProfile = "socialAuthProfile";
 		public static final String localUserInfo = "localUserInfo";
-
+		public static final String registryStoreHouse = "registryStoreHouse";
 	}
 
 	public static class NextStep {

@@ -22,4 +22,6 @@ public interface InterfaceManager {
 	public void actionWhenExceptionInTargetMethodInvocation(String methodName);
 
 	public void setRequestStoreHouse(RequestStoreHouse requestStoreHouse);
+	
+	public String getCalledMethodName();
 }

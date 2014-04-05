@@ -1,7 +1,7 @@
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="prologConnector.CiaoPrologQueryAnswer"%>
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 
 <%

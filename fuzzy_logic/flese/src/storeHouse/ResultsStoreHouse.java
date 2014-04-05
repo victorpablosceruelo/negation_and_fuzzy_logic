@@ -1,4 +1,4 @@
-package results;
+package storeHouse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,6 @@ public class ResultsStoreHouse {
 	private String[] variablesNames = null;
 	private CiaoPrologQueryAnswer[] queryAnswers = new CiaoPrologQueryAnswer[0];
 	private ArrayList<InterfaceOntologyQuery> ontologiesQueries = null;
-	private HashMap<String, RegistryEntry> registryEntries = null;
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +46,9 @@ public class ResultsStoreHouse {
 	}
 
 	public String getExceptionMsg() {
+		if (this.exceptionMsg == null) {
+			return "";
+		}
 		return exceptionMsg;
 	}
 
@@ -222,66 +224,6 @@ public class ResultsStoreHouse {
 			return new InterfaceOntologyQuery[0];
 		}
 		return this.ontologiesQueries.toArray(new InterfaceOntologyQuery[this.ontologiesQueries.size()]);
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public void resetRegistryEntries() {
-		this.registryEntries = null;
-	}
-	
-	public void addRegistryEntry(RegistryEntry registryEntry) {
-		if (this.registryEntries == null) {
-			this.registryEntries = new HashMap<String, RegistryEntry>();
-		}
-		this.registryEntries.put(registryEntry.getDate(), registryEntry);
-	}
-	
-	public String getRegistryEntries() {
-		if (this.registryEntries == null) {
-			return "";
-		}
-		
-		Set<String> keysSet = this.registryEntries.keySet();
-		String [] keys = keysSet.toArray(new String[keysSet.size()]);
-		Arrays.sort(keys, Collections.reverseOrder());
-		
-		StringBuilder registryEntriesSB = new StringBuilder(); 
-		registryEntriesSB.append("<tr>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Time");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Manager");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Operation");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Info");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("</tr>");
-		
-		for (int i=0; i<keys.length; i++) {
-			RegistryEntry registryEntry = this.registryEntries.get(keys[i]);
-			registryEntriesSB.append("<tr>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getDate());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getManager());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getOp());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getMsg());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("</tr>");
-		}
-		return registryEntriesSB.toString();
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

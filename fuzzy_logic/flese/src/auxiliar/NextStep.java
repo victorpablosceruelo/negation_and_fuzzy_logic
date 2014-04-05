@@ -84,4 +84,8 @@ public class NextStep {
 
 		return urlMap.getUrl(withServerPath, withAppPath, isAjax, request) + appended;
 	}
+	
+	public String getLoggingInformation(boolean isAjax) {
+		return getUrl(false, false, isAjax, null);
+	}
 }

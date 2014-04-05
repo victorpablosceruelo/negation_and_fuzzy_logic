@@ -1,4 +1,4 @@
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>

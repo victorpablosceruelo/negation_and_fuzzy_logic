@@ -1,5 +1,10 @@
 package storeHouse;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -8,6 +13,7 @@ import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.SocialAuthManager;
 
 import auxiliar.LocalUserInfo;
+import auxiliar.RegistryEntry;
 import constants.KConstants;
 
 public class SessionStoreHouse {
@@ -101,4 +107,15 @@ public class SessionStoreHouse {
 		return (providerId == null) ? "" : providerId;
 	}
 
+	public void setRegistryStoreHouse(RegistryStoreHouse registryStoreHouse) {
+		session.removeAttribute(KConstants.Session.registryStoreHouse);
+		if (registryStoreHouse != null)
+			session.setAttribute(KConstants.Session.registryStoreHouse, registryStoreHouse);
+	}
+
+	public RegistryStoreHouse getRegistryStoreHouse() {
+		RegistryStoreHouse registryStoreHouse = (RegistryStoreHouse) session.getAttribute(KConstants.Session.registryStoreHouse);
+		return (registryStoreHouse == null) ? null : registryStoreHouse;
+	}
+	
 }

@@ -2,7 +2,7 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="java.util.ArrayList"%>
 
 <% RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request); %>

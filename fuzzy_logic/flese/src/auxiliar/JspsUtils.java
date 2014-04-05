@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import logs.LogsManager;
 import programAnalysis.ProgramPartAnalysis;
-import results.ResultsStoreHouse;
 import storeHouse.RequestStoreHouse;
+import storeHouse.ResultsStoreHouse;
 import storeHouse.SessionStoreHouse;
 import urls.ServerAndAppUrls;
 import constants.KConstants;
@@ -33,12 +33,10 @@ public class JspsUtils {
 	}
 
 	public static boolean isAjax(RequestStoreHouse requestStoreHouse) {
-		boolean isAjax = false;
 		if (requestStoreHouse != null) {
-			String isAjaxString = requestStoreHouse.getRequestParameter(KConstants.Request.isAjaxParam);
-			isAjax = (isAjaxString != null) && (KConstants.Values.True.equals(isAjaxString));
+			return requestStoreHouse.isAjax();
 		}
-		return isAjax;
+		return false;
 	}
 
 	public static String getLocalUserInfoName(SessionStoreHouse sessionStoreHouse) {

@@ -1,5 +1,5 @@
 <%@page import="constants.KConstants"%>
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="constants.KUrls"%>
 <%@page import="storeHouse.RequestStoreHouse"%>

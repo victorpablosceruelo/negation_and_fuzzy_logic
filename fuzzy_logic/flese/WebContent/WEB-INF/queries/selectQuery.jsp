@@ -1,7 +1,7 @@
 
 <%@page import="prologConnector.PredicateInfo"%>
 <%@page import="prologConnector.ProgramIntrospection"%>
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="prologConnector.CiaoPrologTermInJava"%>

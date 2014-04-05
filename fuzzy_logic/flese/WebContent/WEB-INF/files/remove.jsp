@@ -1,5 +1,5 @@
 <%@page import="storeHouse.RequestStoreHouse"%>
-<%@page import="results.ResultsStoreHouse"%>
+<%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="constants.KUrls"%>
