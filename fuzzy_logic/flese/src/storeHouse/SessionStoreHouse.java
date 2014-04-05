@@ -107,15 +107,26 @@ public class SessionStoreHouse {
 		return (providerId == null) ? "" : providerId;
 	}
 
-	public void setRegistryStoreHouse(RegistryStoreHouse registryStoreHouse) {
+	public synchronized void addToRegistryStoreHouse(RegistryEntry registryEntry) {
+		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
 		session.removeAttribute(KConstants.Session.registryStoreHouse);
-		if (registryStoreHouse != null)
+		if (registryStoreHouse == null) {
+			registryStoreHouse = new RegistryStoreHouse();
+		}
+		registryStoreHouse.addRegistryEntry(registryEntry);
+		if (registryStoreHouse != null) {
 			session.setAttribute(KConstants.Session.registryStoreHouse, registryStoreHouse);
+		}
 	}
 
-	public RegistryStoreHouse getRegistryStoreHouse() {
+	private RegistryStoreHouse privateGetRegistryStoreHouse() {
 		RegistryStoreHouse registryStoreHouse = (RegistryStoreHouse) session.getAttribute(KConstants.Session.registryStoreHouse);
 		return (registryStoreHouse == null) ? null : registryStoreHouse;
 	}
 	
+	public String getRegistryStoreHouse() {
+		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
+		String registryEntries = registryStoreHouse.getRegistryEntries();
+		return registryEntries;
+	}
 }

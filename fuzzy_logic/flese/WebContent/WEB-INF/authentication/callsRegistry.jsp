@@ -10,13 +10,9 @@
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(requestStoreHouse);
 	// ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
-	RegistryStoreHouse registryStoreHouse = null;
-	if (sessionStoreHouse != null) {
-		registryStoreHouse = sessionStoreHouse.getRegistryStoreHouse();
-	}
 	String registry = "";
-	if (registryStoreHouse != null) {
-		registry = registryStoreHouse.getRegistryEntries();
+	if (sessionStoreHouse != null) {
+		registry = sessionStoreHouse.getRegistryStoreHouse();
 	}
 %>
 

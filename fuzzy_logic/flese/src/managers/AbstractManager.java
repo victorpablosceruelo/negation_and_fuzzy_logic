@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import storeHouse.RegistryStoreHouse;
 import storeHouse.RequestStoreHouse;
 import storeHouse.ResultsStoreHouse;
 import urls.UrlMap;
@@ -23,7 +22,7 @@ public abstract class AbstractManager implements InterfaceManager {
 
 	protected RequestStoreHouse requestStoreHouse = null;
 	protected ResultsStoreHouse resultsStoreHouse = null;
-	protected RegistryStoreHouse registryStoreHouse = null;
+
 	private NextStep nextStep;
 	private Method method;
 	private String op;
@@ -100,30 +99,22 @@ public abstract class AbstractManager implements InterfaceManager {
 		// Get the results storage facility.
 		this.resultsStoreHouse = this.requestStoreHouse.getResultsStoreHouse();
 
-		// Get the registry storage facility.
-		if (this.requestStoreHouse.getSession() != null) {
-			this.registryStoreHouse = this.requestStoreHouse.getSession().getRegistryStoreHouse();
-		}
-
-		if (this.registryStoreHouse == null) {
-			this.registryStoreHouse = new RegistryStoreHouse();
-		}
-
+		// Use the registry storage facility to register input.
 		String className = this.getClass().getName();
 		RegistryEntry registryEntry = new RegistryEntry(className, op, "");
-		this.registryStoreHouse.addRegistryEntry(registryEntry);
+		if (this.requestStoreHouse.getSession() != null) {
+			this.requestStoreHouse.getSession().addToRegistryStoreHouse(registryEntry);
+		}
 
 		// Invoke the method.
 		invokeMethod();
 
-		// Register output. Include exception msg if any.
+		// Use the registry storage facility to register output. Include
+		// exception msg if any.
 		registryEntry = new RegistryEntry(registryEntry, nextStep, requestStoreHouse.isAjax());
 		registryEntry.setMsg(this.resultsStoreHouse.getExceptionMsg());
-		this.registryStoreHouse.addRegistryEntry(registryEntry);
-
-		// Save registry in the session (if session available).
 		if (this.requestStoreHouse.getSession() != null) {
-			this.requestStoreHouse.getSession().setRegistryStoreHouse(this.registryStoreHouse);
+			this.requestStoreHouse.getSession().addToRegistryStoreHouse(registryEntry);
 		}
 
 		// Save results in the request, to access them from jsps.
