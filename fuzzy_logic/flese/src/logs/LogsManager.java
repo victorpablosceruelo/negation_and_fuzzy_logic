@@ -21,7 +21,7 @@ public class LogsManager {
 	}
 	
 	private static void logSignedUserAux(String userName) throws Exception {
-		String date = Dates.getCurrentDate();
+		String date = Dates.getStringOfCurrentDate();
 		if (logFileForSignedUsers == null) {
 			newLogsFileForSignedUsers(date);
 		}
@@ -49,7 +49,7 @@ public class LogsManager {
 	}
 	
 	private static void logQueryAux(CiaoPrologQueryInterface query) throws Exception {
-		String date = Dates.getCurrentDate();
+		String date = Dates.getStringOfCurrentDate();
 		if (logFileForQueries == null) {
 			newLogsFileForQueries(date);
 		}

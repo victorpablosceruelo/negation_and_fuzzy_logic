@@ -27,14 +27,14 @@
 <script type="text/javascript" src="js_and_css/clientSoftware.js"></script>
 <script type="text/javascript" src="js_and_css/highcharts-all-3.0.9.js"></script>
 <script type="text/javascript"
-	src="js_and_css/auxiliarJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
+	src="js_and_css/auxiliarJS.jsp?date=<%=Dates.getStringOfCurrentDate()%>"></script>
 <script type="text/javascript"
-	src="js_and_css/answersJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
+	src="js_and_css/answersJS.jsp?date=<%=Dates.getStringOfCurrentDate()%>"></script>
 <script type="text/javascript"
-	src="js_and_css/fuzzificationsJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
+	src="js_and_css/fuzzificationsJS.jsp?date=<%=Dates.getStringOfCurrentDate()%>"></script>
 <script type="text/javascript"
-	src="js_and_css/filesJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
+	src="js_and_css/filesJS.jsp?date=<%=Dates.getStringOfCurrentDate()%>"></script>
 <script type="text/javascript"
-	src="js_and_css/ontologiesJS.jsp?date=<%=Dates.getCurrentDate()%>"></script>
+	src="js_and_css/ontologiesJS.jsp?date=<%=Dates.getStringOfCurrentDate()%>"></script>
 </head>
 <!-- end of commonHtmlHead -->

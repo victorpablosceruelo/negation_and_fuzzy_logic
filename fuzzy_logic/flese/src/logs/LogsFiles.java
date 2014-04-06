@@ -18,7 +18,7 @@ public class LogsFiles {
 
 	LogsFiles(String fileName) {
 		if ((fileName == null) || ("".equals(fileName))) {
-			fileName = KConstants.Application.LogsDefaultName + Dates.getCurrentDate();
+			fileName = KConstants.Application.LogsDefaultName + Dates.getStringOfCurrentDate();
 		}
 
 		String fileFullPath = null;

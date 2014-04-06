@@ -20,8 +20,8 @@ public class RegistryEntry {
 			msg = "";
 		}
 
-		this.dateIn = Dates.getCurrentDate(Dates.longFormat);
-		this.dateOut = Dates.getCurrentDate(Dates.longFormat);
+		this.dateIn = Dates.getStringOfCurrentDate(Dates.longFormat);
+		this.dateOut = Dates.getStringOfCurrentDate(Dates.longFormat);
 		this.manager = manager;
 		this.op = op;
 		this.msg = msg;
@@ -30,7 +30,7 @@ public class RegistryEntry {
 
 	public RegistryEntry(RegistryEntry registryEntry, NextStep nextStep, boolean isAjax) {
 		this.dateIn = (registryEntry == null) ? "" : registryEntry.getDateIn();
-		this.dateOut = Dates.getCurrentDate(Dates.longFormat);
+		this.dateOut = Dates.getStringOfCurrentDate(Dates.longFormat);
 		this.manager = (registryEntry == null) ? "" : registryEntry.getManager();
 		this.op = (registryEntry == null) ? "" : registryEntry.getOp();
 		this.msg = (registryEntry == null) ? "" : registryEntry.getMsg();

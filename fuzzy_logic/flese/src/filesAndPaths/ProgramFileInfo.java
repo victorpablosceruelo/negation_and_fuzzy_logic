@@ -80,7 +80,7 @@ public class ProgramFileInfo {
 		PathsMgmt pathsMgmt = new PathsMgmt();
 		String folderPath = PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(), KConstants.Application.BackupsFolder);
 
-		String tmp1 = PathsUtils.concatPathsStrings(folderPath, Dates.getCurrentDate());
+		String tmp1 = PathsUtils.concatPathsStrings(folderPath, Dates.getStringOfCurrentDate());
 		String tmp2 = tmp1 + "_" + fileOwner + "_" + fileName;
 		return tmp2;
 	}

@@ -12,7 +12,7 @@ public class ServerAndAppUrls {
 	static final Log LOG = LogFactory.getLog(ServerAndAppUrls.class);
 	
 	private static ServerAndAppUrlsData serverAndAppUrlsData = new ServerAndAppUrlsData(null);
-	private static String loadDate = Dates.getCurrentDate();
+	private static String loadDate = Dates.getStringOfCurrentDate();
 
 	public static String getRunningSince() {
 		return loadDate;

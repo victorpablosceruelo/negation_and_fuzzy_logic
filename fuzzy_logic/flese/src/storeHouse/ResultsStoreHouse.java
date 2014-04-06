@@ -41,7 +41,7 @@ public class ResultsStoreHouse {
 	 */
 	public void setExceptionMsg(String exceptionMsg) {
 		if ((exceptionMsg != null) && (!"".equals(exceptionMsg))) {
-			this.exceptionMsg = Dates.getCurrentDate() + " " + exceptionMsg;
+			this.exceptionMsg = Dates.getStringOfCurrentDate() + " " + exceptionMsg;
 		}
 	}
 
