@@ -223,14 +223,16 @@ public abstract class AbstractOntologyQuery implements InterfaceOntologyQuery {
 			logoSB.append(" ");
 		}
 
-		Collection<OntologyQueryArgument> valuesCol = args.values();
-		for (OntologyQueryArgument ontologyQueryArgument : valuesCol) {
-			if (ontologyQueryArgument != null) {
-				String argStr = ontologyQueryArgument.getStringArg();
-				if (argStr != null) {
-					argStr = adequateUrlString(argStr);
-					logoSB.append(argStr);
-					logoSB.append(" ");
+		if (args != null) {
+			Collection<OntologyQueryArgument> valuesCol = args.values();
+			for (OntologyQueryArgument ontologyQueryArgument : valuesCol) {
+				if (ontologyQueryArgument != null) {
+					String argStr = ontologyQueryArgument.getStringArg();
+					if (argStr != null) {
+						argStr = adequateUrlString(argStr);
+						logoSB.append(argStr);
+						logoSB.append(" ");
+					}
 				}
 			}
 		}
