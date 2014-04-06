@@ -124,9 +124,9 @@ public class SessionStoreHouse {
 		return (registryStoreHouse == null) ? null : registryStoreHouse;
 	}
 	
-	public String getRegistryStoreHouse() {
+	public String [] getRegistryStoreHouse() {
 		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
-		String registryEntries = registryStoreHouse.getRegistryEntries();
+		String [] registryEntries = registryStoreHouse.getRegistryEntries();
 		return registryEntries;
 	}
 }

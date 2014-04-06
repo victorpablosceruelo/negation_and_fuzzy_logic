@@ -101,7 +101,7 @@ public abstract class AbstractManager implements InterfaceManager {
 
 		// Use the registry storage facility to register input.
 		String className = this.getClass().getName();
-		RegistryEntry registryEntry = new RegistryEntry(className, op, "");
+		RegistryEntry registryEntry = new RegistryEntry(className, op, "", this.requestStoreHouse);
 		if (this.requestStoreHouse.getSession() != null) {
 			this.requestStoreHouse.getSession().addToRegistryStoreHouse(registryEntry);
 		}

@@ -1,15 +1,22 @@
 package auxiliar;
 
+import java.util.Date;
+
+import constants.KConstants;
+import storeHouse.RequestStoreHouse;
+
 public class RegistryEntry {
 
-	private String dateIn;
-	private String dateOut;
+	private Date dateIn;
+	private Date dateOut;
 	private String manager;
 	private String op;
 	private String msg;
-	private String nextStep;
+	private String requestParams;
+	private NextStep nextStep;
+	private boolean isAjax;
 
-	public RegistryEntry(String manager, String op, String msg) {
+	public RegistryEntry(String manager, String op, String msg, RequestStoreHouse requestStoreHouse) {
 		if (manager == null) {
 			manager = "";
 		}
@@ -19,25 +26,53 @@ public class RegistryEntry {
 		if (msg == null) {
 			msg = "";
 		}
+		if (requestParams == null) {
+			requestParams = "";
+		}
 
-		this.dateIn = Dates.getStringOfCurrentDate(Dates.longFormat);
-		this.dateOut = Dates.getStringOfCurrentDate(Dates.longFormat);
+		StringBuilder requestSB = new StringBuilder();
+		if (requestStoreHouse != null) {
+			String [] keys = requestStoreHouse.getRequestParametersNames();
+			for (int i=0; i<keys.length; i++) {
+				String paramName = keys[i];
+				if ((paramName != null) && (!"".equals(paramName))) {
+					if ((!KConstants.Request.operationParam.equals(paramName)) && (!KConstants.Request.managerParam.equals(paramName))) {
+						if (i != 0) {
+							requestSB.append("&");
+						}
+						requestSB.append(keys[i]);
+						requestSB.append("=");
+						String paramValue = requestStoreHouse.getRequestParameter(paramName);
+						paramValue = (paramValue == null) ? "" : paramValue;
+						requestSB.append(paramValue);
+					}
+				}
+				
+			}
+		}
+		
+		this.dateIn = Dates.getCurrentDate();
+		this.dateOut = Dates.getCurrentDate();
 		this.manager = manager;
 		this.op = op;
 		this.msg = msg;
-		this.nextStep = "";
+		this.requestParams = requestSB.toString();
+		this.isAjax = false;
+		this.nextStep = null;
 	}
 
 	public RegistryEntry(RegistryEntry registryEntry, NextStep nextStep, boolean isAjax) {
-		this.dateIn = (registryEntry == null) ? "" : registryEntry.getDateIn();
-		this.dateOut = Dates.getStringOfCurrentDate(Dates.longFormat);
+		this.dateIn = (registryEntry == null) ? Dates.getCurrentDate() : registryEntry.getDateIn();
+		this.dateOut = Dates.getCurrentDate();
 		this.manager = (registryEntry == null) ? "" : registryEntry.getManager();
 		this.op = (registryEntry == null) ? "" : registryEntry.getOp();
 		this.msg = (registryEntry == null) ? "" : registryEntry.getMsg();
-		this.nextStep = "";
+		this.nextStep = null;
+		this.isAjax = isAjax;
+		this.requestParams = registryEntry.getRequestParams();
 
 		if (nextStep != null) {
-			this.nextStep = nextStep.getLoggingInformation(isAjax);
+			this.nextStep = nextStep;
 		}
 	}
 
@@ -46,13 +81,21 @@ public class RegistryEntry {
 			this.msg = msg;
 		}
 	}
-	
-	public String getDateIn() {
+
+	public Date getDateIn() {
 		return this.dateIn;
 	}
 
-	public String getDateOut() {
+	public String getStringOfDateIn() {
+		return Dates.getStringOfDate(this.dateIn, Dates.longFormat);
+	}
+
+	public Date getDateOut() {
 		return this.dateOut;
+	}
+
+	public String getStringOfDateOut() {
+		return Dates.getStringOfDate(this.dateOut, Dates.longFormat);
 	}
 
 	public String getManager() {
@@ -67,8 +110,120 @@ public class RegistryEntry {
 		return this.msg;
 	}
 
-	public String getNextStep() {
+	public String getRequestParams() {
+		return this.requestParams;
+	}
+	
+	public NextStep getNextStep() {
 		return this.nextStep;
 	}
+	
+	public boolean getIsAjax() {
+		return this.isAjax;
+	}
 
+	public String getHtmlTableHead() {
+		StringBuilder htmlTableHeadSB = new StringBuilder();
+		htmlTableHeadSB.append("<tr>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Time In");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Time Out");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Manager");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Operation");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Info");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Request Params");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("<th>");
+		htmlTableHeadSB.append("Next Step");
+		htmlTableHeadSB.append("</th>");
+		htmlTableHeadSB.append("</tr>");
+		return htmlTableHeadSB.toString();
+	}
+
+	public String getHtmlTableRow() {
+		StringBuilder htmlTableRowSB = new StringBuilder();
+		htmlTableRowSB.append("<tr>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getHtmlFormatOfDate(getDateIn()));
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getHtmlFormatOfDate(getDateOut()));
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getManagerInHtmlFormat());
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getOp());
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getMsg());
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getRequestParamsInHtmlFormat());
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("<td>");
+		htmlTableRowSB.append(getNextStepInHtmlFormat());
+		htmlTableRowSB.append("</td>");
+		htmlTableRowSB.append("</tr>");
+		return htmlTableRowSB.toString();
+	}
+
+	private String getHtmlFormatOfDate(Date dateIn) {
+		String longFormat = Dates.getStringOfDate(dateIn, Dates.longFormat);
+		String shortFormat = Dates.getStringOfDate(dateIn, Dates.timeFormat);
+		return "<a href=\'\' onclick=\'return false;\' title=\'" + longFormat + "\'>" + shortFormat + "</a>";
+	}
+
+	private String getHtmlFormatOfUrl(String url) {
+		if (url == null) {
+			return "";
+		}
+		String longFormat = url;
+		String shortFormat = longFormat;
+
+		if (shortFormat.lastIndexOf("/") > 0) {
+			if ((shortFormat.lastIndexOf("/") + 1 < shortFormat.length())) {
+				shortFormat = shortFormat.substring(shortFormat.lastIndexOf("/") + 1);
+				if (shortFormat.lastIndexOf("?") > 0) {
+					if ((shortFormat.lastIndexOf("?") < shortFormat.length())) {
+						shortFormat = shortFormat.substring(0, shortFormat.lastIndexOf("?"));
+					}
+				}
+			}
+		}
+		return "<a href=\'\' onclick=\'return false;\' title=\'" + longFormat + "\'>" + shortFormat + "</a>";
+	}
+	
+	private String getManagerInHtmlFormat() {
+		String longFormat = getManager();
+		String shortFormat = getManager();
+
+		if (shortFormat.lastIndexOf(".") > 0) {
+			if ((shortFormat.lastIndexOf(".") + 1 < shortFormat.length())) {
+				shortFormat = shortFormat.substring(shortFormat.lastIndexOf(".") + 1);
+			}
+		}
+		return "<a href=\'\' onclick=\'return false;\' title=\'" + longFormat + "\'>" + shortFormat + "</a>";
+	}
+	
+	private String getNextStepInHtmlFormat() {
+		String longFormat = getNextStep() == null ? "" : getNextStep().getLoggingInformation(getIsAjax());
+		return getHtmlFormatOfUrl(longFormat);
+	}
+	
+	private String getRequestParamsInHtmlFormat() {
+		String longFormat = getRequestParams() == null ? "" : getRequestParams();
+		String shortFormat = "params";
+		return "<a href=\'\' onclick=\'return false;\' title=\'" + longFormat + "\'>" + shortFormat + "</a>";
+	}
 }

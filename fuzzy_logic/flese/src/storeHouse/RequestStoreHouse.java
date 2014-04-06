@@ -1,5 +1,6 @@
 package storeHouse;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Set;
@@ -166,8 +167,18 @@ public class RequestStoreHouse {
 		return isMultipart;
 	}
 
+	public String [] getRequestParametersNames() {
+		if (this.requestParams == null) {
+			return new String[0];
+		}
+		Set<String> keysSet = this.requestParams.keySet();
+		String[] keys = keysSet.toArray(new String[keysSet.size()]);
+		Arrays.sort(keys);
+		return keys;
+	}
+	
 	public String getRequestParameter(String paramName) {
-		String[] values = requestParams.get(paramName);
+		String[] values = this.requestParams.get(paramName);
 		if (values != null) {
 			if (values.length > 0)
 				return values[0];

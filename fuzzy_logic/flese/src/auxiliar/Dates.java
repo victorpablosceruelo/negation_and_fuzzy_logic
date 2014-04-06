@@ -8,13 +8,18 @@ public class Dates {
 
 	public static String shortFormat = "yyyyMMdd_HHmmss";
 	public static String longFormat = "yyyyMMdd_HHmmss_S";
+	public static String timeFormat = "HHmmss";
+	
+	public static Date getCurrentDate() {
+		return new Date();
+	}
 	
 	public static String getStringOfCurrentDate() {
 		return getStringOfCurrentDate(null);
 	}
 
 	public static String getStringOfCurrentDate(String format) {
-		Date date = new Date();
+		Date date = getCurrentDate();
 		return getStringOfDate(date, format);
 	}
 

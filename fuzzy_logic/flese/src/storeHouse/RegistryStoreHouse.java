@@ -1,10 +1,13 @@
 package storeHouse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 
+import auxiliar.Dates;
 import auxiliar.RegistryEntry;
 
 public class RegistryStoreHouse {
@@ -27,64 +30,28 @@ public class RegistryStoreHouse {
 		if (this.registryEntries == null) {
 			this.registryEntries = new HashMap<String, RegistryEntry>();
 		}
-		this.registryEntries.put(registryEntry.getDateOut(), registryEntry);
+		this.registryEntries.put(registryEntry.getStringOfDateOut(), registryEntry);
 	}
 	
-	public String getRegistryEntries() {
+	public String [] getRegistryEntries() {
 		if (this.registryEntries == null) {
-			return "";
+			return new String[0];
 		}
 		
 		Set<String> keysSet = this.registryEntries.keySet();
 		String [] keys = keysSet.toArray(new String[keysSet.size()]);
 		Arrays.sort(keys, Collections.reverseOrder());
-		
-		StringBuilder registryEntriesSB = new StringBuilder(); 
-		registryEntriesSB.append("<tr>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Time In");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Time Out");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Manager");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Operation");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Info");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("<th>");
-		registryEntriesSB.append("Next Step");
-		registryEntriesSB.append("</th>");
-		registryEntriesSB.append("</tr>");
-		
+		ArrayList<String> results = new ArrayList<String>();
+				
 		for (int i=0; i<keys.length; i++) {
 			RegistryEntry registryEntry = this.registryEntries.get(keys[i]);
-			registryEntriesSB.append("<tr>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getDateIn());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getDateOut());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getManager());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getOp());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getMsg());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("<td>");
-			registryEntriesSB.append(registryEntry.getNextStep());
-			registryEntriesSB.append("</td>");
-			registryEntriesSB.append("</tr>");
+			if (i==0) {
+				results.add(registryEntry.getHtmlTableHead());
+			}
+			results.add(registryEntry.getHtmlTableRow());
 		}
-		return registryEntriesSB.toString();
+		return results.toArray(new String[results.size()]);
 	}
-	
+
+
 }
