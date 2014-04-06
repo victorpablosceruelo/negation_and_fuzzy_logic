@@ -2,7 +2,6 @@ package auxiliar;
 
 import java.util.Date;
 
-import constants.KConstants;
 import storeHouse.RequestStoreHouse;
 
 public class RegistryEntry {
@@ -26,37 +25,21 @@ public class RegistryEntry {
 		if (msg == null) {
 			msg = "";
 		}
-		if (requestParams == null) {
-			requestParams = "";
+
+		String requestParamsAux = "";
+		if (requestStoreHouse != null) {
+			requestParamsAux = requestStoreHouse.getRequestParametersString();
+		}
+		if (requestParamsAux == null) {
+			requestParamsAux = "";
 		}
 
-		StringBuilder requestSB = new StringBuilder();
-		if (requestStoreHouse != null) {
-			String [] keys = requestStoreHouse.getRequestParametersNames();
-			for (int i=0; i<keys.length; i++) {
-				String paramName = keys[i];
-				if ((paramName != null) && (!"".equals(paramName))) {
-					if ((!KConstants.Request.operationParam.equals(paramName)) && (!KConstants.Request.managerParam.equals(paramName))) {
-						if (i != 0) {
-							requestSB.append("&");
-						}
-						requestSB.append(keys[i]);
-						requestSB.append("=");
-						String paramValue = requestStoreHouse.getRequestParameter(paramName);
-						paramValue = (paramValue == null) ? "" : paramValue;
-						requestSB.append(paramValue);
-					}
-				}
-				
-			}
-		}
-		
 		this.dateIn = Dates.getCurrentDate();
 		this.dateOut = Dates.getCurrentDate();
 		this.manager = manager;
 		this.op = op;
 		this.msg = msg;
-		this.requestParams = requestSB.toString();
+		this.requestParams = requestParamsAux;
 		this.isAjax = false;
 		this.nextStep = null;
 	}
@@ -113,11 +96,11 @@ public class RegistryEntry {
 	public String getRequestParams() {
 		return this.requestParams;
 	}
-	
+
 	public NextStep getNextStep() {
 		return this.nextStep;
 	}
-	
+
 	public boolean getIsAjax() {
 		return this.isAjax;
 	}
@@ -203,7 +186,7 @@ public class RegistryEntry {
 		}
 		return "<a href=\'\' onclick=\'return false;\' title=\'" + longFormat + "\'>" + shortFormat + "</a>";
 	}
-	
+
 	private String getManagerInHtmlFormat() {
 		String longFormat = getManager();
 		String shortFormat = getManager();
@@ -215,12 +198,12 @@ public class RegistryEntry {
 		}
 		return "<a href=\'\' onclick=\'return false;\' title=\'" + longFormat + "\'>" + shortFormat + "</a>";
 	}
-	
+
 	private String getNextStepInHtmlFormat() {
 		String longFormat = getNextStep() == null ? "" : getNextStep().getLoggingInformation(getIsAjax());
 		return getHtmlFormatOfUrl(longFormat);
 	}
-	
+
 	private String getRequestParamsInHtmlFormat() {
 		String longFormat = getRequestParams() == null ? "" : getRequestParams();
 		String shortFormat = "params";

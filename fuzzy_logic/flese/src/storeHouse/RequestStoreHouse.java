@@ -49,6 +49,8 @@ public class RequestStoreHouse {
 		if (restoreRequestParams) {
 			restoreRequestParameters();
 		}
+		String requestParametersToLog = getRequestParametersString();
+		LOG.info("requestParameters: " + requestParametersToLog);
 	}
 
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request) {
@@ -125,7 +127,6 @@ public class RequestStoreHouse {
 		String parameterName = null;
 		String[] valuesArrayIn = null;
 		String[] valuesArrayTmp = null;
-		StringBuilder logMsg = new StringBuilder();
 
 		if (this.request != null) {
 			// Get the values of all request parameters
@@ -136,16 +137,10 @@ public class RequestStoreHouse {
 					// Get the name of the request parameter
 					parameterName = (parametersEnum.nextElement()).toString();
 					valuesArrayIn = this.request.getParameterValues(parameterName);
-					logMsg.append("\n");
-					logMsg.append(parameterName);
-					logMsg.append(" = ");
 					if (valuesArrayIn != null) {
 						valuesArrayTmp = new String[valuesArrayIn.length];
 						int j = 0;
 						for (int i = 0; i < valuesArrayIn.length; i++) {
-							if (i != 0)
-								logMsg.append(", ");
-							logMsg.append(valuesArrayIn[i]);
 							if ((valuesArrayIn[i] != null) && (!"".equals(valuesArrayIn[i]))) {
 								valuesArrayTmp[j] = valuesArrayIn[i];
 								j++;
@@ -159,15 +154,82 @@ public class RequestStoreHouse {
 				}
 			}
 		}
-		LOG.info("copyRequestParameters: " + logMsg.toString());
 	}
+
+	private void saveRequestParameters() {
+		if (this.resultsStoreHouse != null) {
+			this.resultsStoreHouse.setRequestParamsHashMap(requestParams);
+		}
+	}
+
+	private void restoreRequestParameters() {
+		if (this.requestParams == null) {
+			this.requestParams = new HashMap<String, String[]>();
+		}
+		if ((this.resultsStoreHouse != null) && (this.resultsStoreHouse.getRequestParamsHashMap() != null)) {
+			HashMap<String, String[]> oldValuesHashMap = this.resultsStoreHouse.getRequestParamsHashMap();
+			Set<String> keys = getFullKeysSet(oldValuesHashMap.keySet(), this.requestParams.keySet());
+
+			for (String key : keys) {
+				String[] oldValues = oldValuesHashMap.get(key);
+				String[] newValues = this.requestParams.get(key);
+
+				HashMap<String, String> valuesAL = new HashMap<String, String>();
+
+				if (newValues != null) {
+					for (int i = (newValues.length - 1); i >= 0; i--) {
+						String value = newValues[i];
+						if ((value != null) && (!"".equals(value))) {
+							valuesAL.put(value, value);
+						}
+					}
+				}
+
+				if (oldValues != null) {
+					for (int i = (oldValues.length - 1); i >= 0; i--) {
+						String value = oldValues[i];
+						if ((value != null) && (!"".equals(value))) {
+							valuesAL.put(value, value);
+						}
+					}
+				}
+				Set<String> valuesSet = valuesAL.keySet();
+				String[] values = valuesSet.toArray(new String[valuesSet.size()]);
+				this.requestParams.put(key, values);
+
+			}
+		}
+	}
+
+	public String getRequestParametersString() {
+		StringBuilder requestSB = new StringBuilder();
+		String[] keys = getRequestParametersNames();
+		for (int i = 0; i < keys.length; i++) {
+			String paramName = keys[i];
+			if ((paramName != null) && (!"".equals(paramName))) {
+				if (i != 0) {
+					requestSB.append("&");
+				}
+				requestSB.append(keys[i]);
+				requestSB.append("=");
+				String paramValue = getRequestParameter(paramName);
+				paramValue = (paramValue == null) ? "" : paramValue;
+				requestSB.append(paramValue);
+			}
+		}
+		return requestSB.toString();
+	}
+
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public boolean requestIsMultipartContent() {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		return isMultipart;
 	}
 
-	public String [] getRequestParametersNames() {
+	private String[] getRequestParametersNames() {
 		if (this.requestParams == null) {
 			return new String[0];
 		}
@@ -176,7 +238,7 @@ public class RequestStoreHouse {
 		Arrays.sort(keys);
 		return keys;
 	}
-	
+
 	public String getRequestParameter(String paramName) {
 		String[] values = this.requestParams.get(paramName);
 		if (values != null) {
@@ -221,7 +283,7 @@ public class RequestStoreHouse {
 		boolean isAjax = (isAjaxString != null) && (KConstants.Values.True.equals(isAjaxString));
 		return isAjax;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,7 +293,7 @@ public class RequestStoreHouse {
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = (ResultsStoreHouse) this.getRequest().getAttribute(KConstants.Request.resultsStoreHouse);
 		}
-		
+
 		if (this.resultsStoreHouse == null) {
 			this.resultsStoreHouse = new ResultsStoreHouse();
 		}
@@ -250,63 +312,6 @@ public class RequestStoreHouse {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private void saveRequestParameters() {
-		if (this.resultsStoreHouse != null) {
-			this.resultsStoreHouse.setRequestParamsHashMap(requestParams);
-		}
-	}
-
-	private void restoreRequestParameters() {
-		if (this.requestParams == null) {
-			this.requestParams = new HashMap<String, String[]>();
-		}
-		if ((this.resultsStoreHouse != null) && (this.resultsStoreHouse.getRequestParamsHashMap() != null)) {
-			StringBuilder logMsg = new StringBuilder();
-			HashMap<String, String[]> oldValuesHashMap = this.resultsStoreHouse.getRequestParamsHashMap();
-			Set<String> keys = getFullKeysSet(oldValuesHashMap.keySet(), this.requestParams.keySet());
-
-			for (String key : keys) {
-				logMsg.append("\n");
-				logMsg.append(key);
-				logMsg.append(" = ");
-
-				String[] oldValues = oldValuesHashMap.get(key);
-				String[] newValues = this.requestParams.get(key);
-
-				HashMap<String, String> valuesAL = new HashMap<String, String>();
-
-				if (newValues != null) {
-					for (int i = (newValues.length - 1); i >= 0; i--) {
-						String value = newValues[i];
-						if ((value != null) && (!"".equals(value))) {
-							valuesAL.put(value, value);
-						}
-					}
-				}
-
-				if (oldValues != null) {
-					for (int i = (oldValues.length - 1); i >= 0; i--) {
-						String value = oldValues[i];
-						if ((value != null) && (!"".equals(value))) {
-							valuesAL.put(value, value);
-						}
-					}
-				}
-
-				Set<String> valuesSet = valuesAL.keySet();
-				String[] values = valuesSet.toArray(new String[valuesSet.size()]);
-				for (String value : values) {
-					logMsg.append(value);
-					logMsg.append(", ");
-				}
-				this.requestParams.put(key, values);
-
-			}
-
-			LOG.info("restoreRequestParameters: " + logMsg.toString());
-		}
-	}
 
 	private Set<String> getFullKeysSet(Set<String> keySetIn1, Set<String> keySetIn2) {
 

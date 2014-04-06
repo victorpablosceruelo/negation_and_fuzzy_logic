@@ -1,18 +1,13 @@
 package storeHouse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
 
 import ontologies.InterfaceOntologyQuery;
-import ontologies.OntologyQueryVarResult;
-import auxiliar.Dates;
-import auxiliar.RegistryEntry;
 import programAnalysis.ProgramPartAnalysis;
 import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.ProgramIntrospection;
+import auxiliar.Dates;
 import filesAndPaths.ProgramFileInfo;
 
 public class ResultsStoreHouse {
@@ -65,7 +60,7 @@ public class ResultsStoreHouse {
 		}
 	}
 
-	public String [] getResultMessages() {
+	public String[] getResultMessages() {
 		if (resultMessages == null) {
 			return new String[0];
 		}
@@ -203,7 +198,7 @@ public class ResultsStoreHouse {
 	public HashMap<String, String[]> getRequestParamsHashMap() {
 		return this.requestParams;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,14 +206,14 @@ public class ResultsStoreHouse {
 	public void resetOntologyQueryResults() {
 		this.ontologiesQueries = null;
 	}
-	
+
 	public void addOntologyQueryResults(InterfaceOntologyQuery ontologyQuery) {
 		if (this.ontologiesQueries == null) {
 			this.ontologiesQueries = new ArrayList<InterfaceOntologyQuery>();
 		}
 		this.ontologiesQueries.add(ontologyQuery);
 	}
-	
+
 	public InterfaceOntologyQuery[] getOntologyQueryResults() {
 		if (this.ontologiesQueries == null) {
 			return new InterfaceOntologyQuery[0];
@@ -232,5 +227,4 @@ public class ResultsStoreHouse {
 
 }
 
-
-//EOF
+// EOF
