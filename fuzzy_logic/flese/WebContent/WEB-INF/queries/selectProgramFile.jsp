@@ -20,15 +20,14 @@
 		if (filesList.length == 0) {
 	%>
 		<div class="selectDatabaseTableRow">
-			<div class="selectDatabaseTableCell">No databases. Please
+			<div class="selectDatabaseTableCell">No configuration files available. Please
 				upload one via your user options.</div>
 		</div>
 		<%
 		} else {
 	%>
 		<div class="selectDatabaseTableRow">
-			<div class="selectDatabaseTableCell1">Please, select a database
-				to load:</div>
+			<div class="selectDatabaseTableCell1">Please, select a configuration file:</div>
 			<div class="selectDatabaseTableCell2">
 				<select name="<%=KConstants.Request.programParam %>"
 					id="<%=KConstants.Request.programParam %>"
