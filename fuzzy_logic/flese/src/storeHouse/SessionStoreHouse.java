@@ -132,7 +132,7 @@ public class SessionStoreHouse {
 		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
 		String [] registryEntries = new String[0];
 		if (registryStoreHouse != null) {
-			registryStoreHouse.getRegistryEntries();
+			registryEntries = registryStoreHouse.getRegistryEntries();
 		}
 		return registryEntries;
 	}
