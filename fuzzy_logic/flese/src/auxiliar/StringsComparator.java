@@ -57,41 +57,51 @@ public class StringsComparator {
 
 			char car1 = 'a';
 			char car2 = 'a';
-			int maxLength = o1.length();
-			if (maxLength > o2.length()) {
-				maxLength = o2.length();
-			}
+			int minLength = getMinLength(o1.length(), o2.length());
+			// int maxLength = getMaxLength(o1.length(), o2.length());
+
 			int i = 0;
-			while ((i < maxLength) && (car1 == car2)) {
+			int retVal = 0;
+			while ((i < minLength) && (retVal == 0)) {
 				car1 = o1.charAt(i);
 				car2 = o2.charAt(i);
-				
-				if (car1 == car2) {
-					if (o1.length() < o2.length()) {
-						return -1;
-					}
-					if (o1.length() > o2.length()) {
-						return +1;
-					}
-					if (o1.length() == o2.length()) {
-						return 0;
-					}
-				} else {
+
+				if (car1 != car2) {
 					if (car1 < car2) {
-						return -1;
+						retVal = -1;
 					}
 					if (car1 > car2) {
-						return +1;
-					}
-					if (car1 == car2) {
-						return 0;
+						retVal = +1;
 					}
 				}
 				i++;
 			}
-			return 0;
+
+			if (retVal == 0) {
+				if (o1.length() < o2.length()) {
+					retVal = -1;
+				}
+				if (o1.length() > o2.length()) {
+					retVal = +1;
+				}
+			}
+
+			return retVal;
 		}
 
+		private int getMinLength(int i, int j) {
+			if (i > j) {
+				return j;
+			}
+			return i;
+		}
+
+		private int getMaxLength(int i, int j) {
+			if (i > j) {
+				return i;
+			}
+			return j;
+		}
 	}
 
 }
