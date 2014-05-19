@@ -1,6 +1,5 @@
 package logs;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,8 +12,7 @@ import filesAndPaths.PathsUtils;
 
 public class LogsFiles {
 
-	private boolean error = false;
-	private BufferedWriter bw = null;
+	private File file;
 
 	LogsFiles(String fileName) {
 		if ((fileName == null) || ("".equals(fileName))) {
@@ -29,7 +27,6 @@ public class LogsFiles {
 			fileFullPath = PathsUtils.concatPathsStrings(logsFolderPath, fileName);
 		} else {
 			fileFullPath = null;
-			this.error = true;
 		}
 
 		if (fileFullPath != null) {
@@ -38,14 +35,14 @@ public class LogsFiles {
 			}
 		}
 	}
-	
+
 	protected void finalize() throws Throwable {
-		  // Invoke the finalizer of our superclass
-		  // We haven't discussed superclasses or this syntax yet
-		  super.finalize();
-		  
-		  // Now get rid of the resources you do not need any more.
-		  closeFile();
+		// Invoke the finalizer of our superclass
+		// We haven't discussed superclasses or this syntax yet
+		super.finalize();
+
+		// Now get rid of the resources you do not need any more.
+		// closeFile();
 	}
 
 	private boolean existsFile(String fileFullPath) {
@@ -58,98 +55,87 @@ public class LogsFiles {
 	}
 
 	private void createFile(String fileFullPath, String folderFullPath) {
-		if (this.error) {
-			return;
-		}
-
+		boolean error = false;
 		try {
 			PathsMgmt pathsMgmt = new PathsMgmt();
 			pathsMgmt.createFolder(folderFullPath, false);
 		} catch (FilesAndPathsException e) {
 			e.printStackTrace();
-			this.error = true;
+			error = true;
 		}
 
-		createFileAux(fileFullPath);
-
+		if (!error) {
+			createFileAux(fileFullPath);
+		}
 	}
 
-	private void createFileAux(String fileFullPath) {
-		if (this.error) {
-			return;
-		}
-
-		File file = new File(fileFullPath);
+	synchronized private void createFileAux(String fileFullPath) {
+		this.file = new File(fileFullPath);
 		try {
-			file.createNewFile();
+			this.file.createNewFile();
 		} catch (IOException e) {
-			this.error = true;
+			this.file = null;
 		}
 
-		openFile(file);
-		writeLogos(file.getName());
+		if (this.file != null) {
+			FileWriter fw = openFileWriter();
+			writeLogos(fw);
+			closeFileWriter(fw);
+		}
 	}
 
-	private void openFile(File file) {
+	private FileWriter openFileWriter() {
 		FileWriter fw = null;
-		try {
-			fw = new FileWriter(file.getAbsoluteFile(), true);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fw = null;
-			this.error = true;
+		if (this.file != null) {
+			try {
+				fw = new FileWriter(this.file.getAbsoluteFile(), true);
+			} catch (IOException e) {
+				e.printStackTrace();
+				fw = null;
+			}
 		}
+		return fw;
+	}
+
+	private void closeFileWriter(FileWriter fw) {
 		if (fw != null) {
-			this.bw = new BufferedWriter(fw);
-		}
-	}
-
-	private void closeFile() {
-		if (bw != null) {
 			try {
-				bw.close();
+				fw.close();
 			} catch (IOException e) {
-				this.error = true;
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private boolean basicTest() {
-		return ((!this.error) && (this.bw != null));
-	}
-
-	private void writeLogos(String fileName) {
-		if (basicTest()) {
+	private void writeLogos(FileWriter fw) {
+		if (this.file != null) {
+			String fileName = this.file.getName();
 			try {
-				bw.write("\n");
-				bw.write("### - FleSe Application Logs -- " + fileName + " - ###");
-				bw.write("\n");
-				bw.write("\n");
+				fw.write("\n");
+				fw.write("### - FleSe Application Logs -- " + fileName + " - ###");
+				fw.write("\n");
+				fw.write("\n");
 			} catch (IOException e) {
-				this.error = true;
 				e.printStackTrace();
 			}
 		}
 	}
 
-	synchronized public boolean append(String msg) {
-		if (! basicTest()) {
-			return true;
-		}
-
-		if ((msg == null) || ("".equals(msg))) {
-			return false;
-		}
-
+	synchronized private void appendAux(FileWriter fw, String msg) {
 		try {
-			bw.write(msg);
-			bw.write("\n");
+			fw.write(msg);
+			fw.write("\n");
 		} catch (IOException e) {
-			this.error = true;
 			e.printStackTrace();
 		}
-		return this.error;
+	}
+
+	public void append(String msg) {
+		if ((msg != null) && (!"".equals(msg))) {
+			FileWriter fw = openFileWriter();
+			appendAux(fw, msg);
+			closeFileWriter(fw);
+		}
 	}
 
 }
