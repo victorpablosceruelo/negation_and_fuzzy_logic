@@ -1,7 +1,10 @@
 package prologConnector;
 
+import logs.LogsManager;
+import auxiliar.LocalUserInfo;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
+import storeHouse.RequestStoreHouse;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
@@ -39,18 +42,22 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		isProgramIntrospectionQuery = true;
 	}
 
-	public static synchronized CiaoPrologProgramIntrospectionQuery getInstance(ProgramFileInfo programFileInfo) throws CacheStoreHouseException,
+	public static synchronized CiaoPrologProgramIntrospectionQuery getInstance(RequestStoreHouse requestStoreHouse) throws CacheStoreHouseException,
 			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException {
-		String fullPath = programFileInfo.getProgramFileFullPath();
-
+		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+		
 		Object o = CacheStoreHouse.retrieve(CiaoPrologProgramIntrospectionQuery.class, fullPath, fullPath, fullPath);
 		CiaoPrologProgramIntrospectionQuery query = (CiaoPrologProgramIntrospectionQuery) o;
 		if (query == null) {
-			query = new CiaoPrologProgramIntrospectionQuery(programFileInfo);
+			query = new CiaoPrologProgramIntrospectionQuery(requestStoreHouse.getProgramFileInfo());
 			PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
-			plConnectionEnvelope.runPrologQuery(query);
+			plConnectionEnvelope.runPrologQuery(query, localUserInfo);
 			CacheStoreHouse.store(CiaoPrologProgramIntrospectionQuery.class, fullPath, fullPath, fullPath, query);
+		} else {
+			LogsManager.logQuery(query, localUserInfo);
 		}
+
 		return query;
 	}
 

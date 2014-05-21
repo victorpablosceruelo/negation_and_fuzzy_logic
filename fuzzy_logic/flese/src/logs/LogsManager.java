@@ -2,6 +2,7 @@ package logs;
 
 import prologConnector.CiaoPrologQueryInterface;
 import auxiliar.Dates;
+import auxiliar.LocalUserInfo;
 import constants.KConstants;
 
 public class LogsManager {
@@ -40,21 +41,23 @@ public class LogsManager {
 		}
 	}
 	
-	public static void logQuery(CiaoPrologQueryInterface query) {
+	public static void logQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) {
 		try {
-			logQueryAux(query);
+			logQueryAux(query, localUserInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private static void logQueryAux(CiaoPrologQueryInterface query) throws Exception {
+	private static void logQueryAux(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws Exception {
 		String date = Dates.getStringOfCurrentDate();
 		if (logFileForQueries == null) {
 			newLogsFileForQueries(date);
 		}
 		StringBuilder toLog = new StringBuilder();
 		toLog.append(date);
+		toLog.append(puntoYComa);
+		toLog.append(localUserInfo == null ? "unknown" : localUserInfo.getLocalUserName());
 		toLog.append(puntoYComa);
 		toLog.append(query.getProgramFileInfo().getFileOwner());
 		toLog.append(puntoYComa);

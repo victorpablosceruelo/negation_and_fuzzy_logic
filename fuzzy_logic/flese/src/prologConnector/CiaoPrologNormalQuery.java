@@ -1,5 +1,7 @@
 package prologConnector;
 
+import logs.LogsManager;
+import auxiliar.LocalUserInfo;
 import storeHouse.CacheStoreHouse;
 import storeHouse.CacheStoreHouseException;
 import storeHouse.RequestStoreHouse;
@@ -24,7 +26,8 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 			QueryConversorException, RequestStoreHouseException {
 
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
-		String key1 = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+		String key1 = localUserInfo.getLocalUserName();
 
 		ConversorToPrologQuery conversor = new ConversorToPrologQuery(requestStoreHouse);
 		String key2 = conversor.getQueryComplexInfoString();
@@ -35,8 +38,11 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 			query = new CiaoPrologNormalQuery(requestStoreHouse.getProgramFileInfo());
 			query.setRealQuery(conversor.getConvertedQuery(), conversor.getListOfVariables(), conversor.getListOfNamesForVariables());
 			PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
-			plConnectionEnvelope.runPrologQuery(query);
+			plConnectionEnvelope.runPrologQuery(query, localUserInfo);
 			CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, key2, query);
+		}
+		else {
+			LogsManager.logQuery(query, localUserInfo);
 		}
 		return query;
 	}

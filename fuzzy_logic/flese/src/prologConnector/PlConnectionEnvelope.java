@@ -7,6 +7,7 @@ import logs.LogsManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.LocalUserInfo;
 import CiaoJava.PLConnection;
 import CiaoJava.PLException;
 import CiaoJava.PLGoal;
@@ -61,31 +62,31 @@ public class PlConnectionEnvelope {
 		}
 	}
 
-	public void runPrologQuery(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
+	public void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
 			FilesAndPathsException {
 		try {
 			createPlConnection();
-			changeCiaoPrologWorkingFolder(query);
-			runPrologQueryAux(query);
+			changeCiaoPrologWorkingFolder(query, localUserInfo);
+			runPrologQueryAux(query, localUserInfo);
 		} finally {
 			destroyPlConnection();
 		}
 	}
 
-	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery) throws CiaoPrologConnectorException,
+	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery, LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
 			FilesAndPathsException, PlConnectionEnvelopeException {
 
 		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
-		runPrologQueryAux(folderChangeQuery);
+		runPrologQueryAux(folderChangeQuery, localUserInfo);
 	}
 
-	private void runPrologQueryAux(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+	private void runPrologQueryAux(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info(query.getQuery().toString());
 		if (plConnection == null) {
 			throw new PlConnectionEnvelopeException("ERROR: plConnection is null.");
 		}
 
-		createGoal(query);
+		createGoal(query, localUserInfo);
 		if (! query.isOfType(CiaoPrologQueryAbstract.Constants.ChangeWorkingFolderQuery)) {
 			changeProgramFileTo(query);
 		}
@@ -170,9 +171,9 @@ public class PlConnectionEnvelope {
 
 	}
 
-	private void createGoal(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+	private void createGoal(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info("runQuery: creating goal for query: " + query.toString() + " .... ");
-		LogsManager.logQuery(query);
+		LogsManager.logQuery(query, localUserInfo);
 		evaluatedGoal = new PLGoal(plConnection, query.getQuery());
 	}
 	

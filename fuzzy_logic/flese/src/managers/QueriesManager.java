@@ -47,7 +47,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectQueryStartType() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryStartTypePage, ""));
@@ -55,7 +55,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectQuery() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryPage, ""));
@@ -63,7 +63,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectQueryAddLine() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddLinePage, ""));
@@ -71,7 +71,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectQueryAddAggr() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQueryAddAggrPage, ""));
@@ -79,7 +79,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectNegation() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectNegationPage, ""));
@@ -87,7 +87,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectQuantifier() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQuantifierPage, ""));
@@ -95,7 +95,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectOperator() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectOperatorPage, ""));
@@ -103,7 +103,7 @@ public class QueriesManager extends AbstractManager {
 
 	public void selectValue() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
-				.getInstance(requestStoreHouse.getProgramFileInfo());
+				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectValuePage, ""));

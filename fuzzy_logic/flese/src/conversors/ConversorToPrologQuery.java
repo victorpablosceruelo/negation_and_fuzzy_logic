@@ -66,14 +66,14 @@ public class ConversorToPrologQuery {
 	private CiaoPrologProgramIntrospectionQuery ciaoPrologIntrospectionQuery = null;
 	private RequestStoreHouse requestStoreHouse = null;
 
-	public ConversorToPrologQuery(RequestStoreHouse sessionStoreHouse) throws QueryConversorException, CacheStoreHouseException,
+	public ConversorToPrologQuery(RequestStoreHouse requestStoreHouse) throws QueryConversorException, CacheStoreHouseException,
 			FilesAndPathsException, CiaoPrologConnectorException, PlConnectionEnvelopeException, FilesAndPathsException,
 			RequestStoreHouseException {
 
-		this.requestStoreHouse = sessionStoreHouse;
-		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(sessionStoreHouse.getProgramFileInfo());
+		this.requestStoreHouse = requestStoreHouse;
+		ciaoPrologIntrospectionQuery = CiaoPrologProgramIntrospectionQuery.getInstance(requestStoreHouse);
 
-		String queryLinesCounterString = sessionStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
+		String queryLinesCounterString = requestStoreHouse.getRequestParameter(KConstants.Request.linesCounterParam);
 
 		int queryLinesCounter = Integer.parseInt(queryLinesCounterString);
 
@@ -86,8 +86,8 @@ public class ConversorToPrologQuery {
 		PrologSubQuery prologSubQuery = new PrologSubQuery();
 		ConversionInput input = prologSubQuery.input;
 		input.lineIndex = 0;
-		input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
-		input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
+		input.database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
+		input.aggregator = requestStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
 		testConversionInput(prologSubQuery);
 
 		for (int i = 0; i < queryLinesCounter; i++) {
@@ -96,14 +96,14 @@ public class ConversorToPrologQuery {
 			String lineHead = "queryLine[" + i + "].";
 
 			input.lineIndex = i + 1;
-			input.database = sessionStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
-			input.aggregator = sessionStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
+			input.database = requestStoreHouse.getRequestParameter(KConstants.Request.databaseParam);
+			input.aggregator = requestStoreHouse.getRequestParameter(KConstants.Request.aggregatorParam);
 
-			input.quantifier0 = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.negationParam);
-			input.quantifier1 = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.quantifierParam);
-			input.predicate = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.predicateParam);
-			input.operator = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.operatorParam);
-			input.value = sessionStoreHouse.getRequestParameter(lineHead + KConstants.Request.valueParam);
+			input.quantifier0 = requestStoreHouse.getRequestParameter(lineHead + KConstants.Request.negationParam);
+			input.quantifier1 = requestStoreHouse.getRequestParameter(lineHead + KConstants.Request.quantifierParam);
+			input.predicate = requestStoreHouse.getRequestParameter(lineHead + KConstants.Request.predicateParam);
+			input.operator = requestStoreHouse.getRequestParameter(lineHead + KConstants.Request.operatorParam);
+			input.value = requestStoreHouse.getRequestParameter(lineHead + KConstants.Request.valueParam);
 
 			testConversionInput(prologSubQuery);
 			// We only initialize the list if we really need it.
