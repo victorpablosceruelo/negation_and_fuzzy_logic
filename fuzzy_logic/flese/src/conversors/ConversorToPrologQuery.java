@@ -216,7 +216,7 @@ public class ConversorToPrologQuery {
 
 		PLTerm database = new PLAtom(input.database);
 		PLVariable resultVar = new PLVariable();
-		PLStructure origin = new PLStructure(input.predicate, new PLTerm[] { showVariables[0] });
+		PLStructure dbValue = new PLStructure(input.predicate, new PLTerm[] { showVariables[0] });
 		PLAtom operator = new PLAtom(input.operator);
 
 		boolean isInteger = true;
@@ -235,14 +235,14 @@ public class ConversorToPrologQuery {
 			isDouble = false;
 		}
 
-		PLTerm value = null;
+		PLTerm enteredValue = null;
 		if ((!isInteger) && (!isDouble)) {
-			value = new PLAtom(input.value);
+			enteredValue = new PLAtom(input.value);
 		} else {
 			if (isInteger) {
-				value = new PLInteger(valueInt);
+				enteredValue = new PLInteger(valueInt);
 			} else {
-				value = new PLFloat(valueDouble);
+				enteredValue = new PLFloat(valueDouble);
 			}
 		}
 
@@ -251,7 +251,7 @@ public class ConversorToPrologQuery {
 		 * PLStructure(tmpPredicate, new PLTerm[]{value}); }
 		 */
 
-		prologSubQuery.subQuery = new PLStructure("rfuzzy_compute", new PLTerm[] { operator, origin, value, database, resultVar });
+		prologSubQuery.subQuery = new PLStructure("rfuzzy_compute", new PLTerm[] { operator, enteredValue, dbValue, database, resultVar });
 		prologSubQuery.SubQuerySimpleInfoString = " " + input.predicate + "(" + input.database + ")" + " " + input.operator + " "
 				+ input.value;
 		CiaoPrologTermInJava tmpQuery = new CiaoPrologTermInJava(prologSubQuery.subQuery, null);
