@@ -30,11 +30,11 @@ restaurant(zalacain,                         fine_dining,    basque,            
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(tapas), 0.6).
-rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(spanish), 0.6) cred (prod, 0.8).
-rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(italian), 0.6) cred (prod, 0.8).
-rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(mediterranean), 0.8) cred (prod, 0.8).
-rfuzzy_similarity_between(restaurant, food_type(italian), food_type(mediterranean), 0.8) cred (prod, 0.8).
+rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(tapas), 0.7).
+rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(spanish), 0.8) cred (prod, 0.9).
+rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(italian), 0.8) cred (prod, 0.9).
+rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(mediterranean), 0.6) cred (prod, 0.9).
+rfuzzy_similarity_between(restaurant, food_type(italian), food_type(mediterranean), 0.6) cred (prod, 0.9).
 
 near_the_city_center(restaurant) :~ defaults_to(0).
 near_the_city_center(restaurant):~ function(distance_to_the_city_center(restaurant), [ (0, 1), (100, 1), (1000, 0.1) ]).
