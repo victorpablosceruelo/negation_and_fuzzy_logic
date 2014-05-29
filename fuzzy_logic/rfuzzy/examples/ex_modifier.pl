@@ -8,5 +8,5 @@ equal(X,X).
 greater(X,Y):- X.>.Y.
 
 % QUANTIFIERS
-rfuzzy_quantifier(a_little/2, TV_In, TV_Out) :-
+rfuzzy_modifier(a_little/2, TV_In, TV_Out) :-
 	TV_Out .=. TV_In / TV_In.
