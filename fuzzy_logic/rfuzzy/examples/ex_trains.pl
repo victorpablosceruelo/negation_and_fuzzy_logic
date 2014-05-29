@@ -15,9 +15,9 @@ speed(X) :- current_input(S), get_code(S, X).
 
 fast(speed) :~ function(speed_value(speed), [(0, 0), (100, 0.5), (200, 1), (250, 0.5), (300, 0)]).
 
-rfuzzy_quantifier(not_so/1, under, 0.4).
-rfuzzy_quantifier(very/1, over, 0.5).
-rfuzzy_quantifier(too_much/1, over, 0.7).
+rfuzzy_modifier(not_so/1, under, 0.4).
+rfuzzy_modifier(very/1, over, 0.5).
+rfuzzy_modifier(too_much/1, over, 0.7).
 
 %distance(0). % Units are kilometres.
 %distance(X) :-

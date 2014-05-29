@@ -50,7 +50,7 @@ cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15,
 unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
 expensive(restaurant) :~ antonym_of(cheap(restaurant), prod, 1).
 
-rfuzzy_quantifier(too_much/2, TV_In, TV_Out) :-
+rfuzzy_modifier(too_much/2, TV_In, TV_Out) :-
  	Thershold .=. 0.7,
 	Min_In .=. TV_In - Thershold, 
 	min(0, Min_In, Dividend), 
