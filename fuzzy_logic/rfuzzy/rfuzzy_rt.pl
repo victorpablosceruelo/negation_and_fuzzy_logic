@@ -7,7 +7,7 @@
 	inject/3, merge/4, prod/3, iprod/3, mean/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	% Quantifiers.
-	rfuzzy_defined_quantifiers/1,
+	rfuzzy_defined_modifiers/1,
 	% Auxiliar predicates.
 	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
 	rfuzzy_conversion_in/2, rfuzzy_conversion_out/2,
@@ -370,14 +370,14 @@ rfuzzy_compute_aux(Operator, Args_Type, _Elt1, _Elt2, _Computed_Similarities, Tr
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% rfuzzy_defined_quantifiers([]).
-rfuzzy_defined_quantifiers([(very, 2, TV_In, TV_Out, (TV_Out .=. (TV_In * TV_In)))]).
+% rfuzzy_defined_modifiers([]).
+rfuzzy_defined_modifiers([(very, 2, TV_In, TV_Out, (TV_Out .=. (TV_In * TV_In)))]).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-% This could be useful if we could execute the subbody of quantifiers as if they were
+% This could be useful if we could execute the subbody of modifiers as if they were
 % clauses' bodies, but they are not. If we have a composed subbody there is no simple 
 % way to detect if we are running a condition or another subbody. We cannot accept that.
 %

@@ -10,7 +10,7 @@
 :- data predicate_definition/4.
 :- data aggregators/1.
 :- data sentences/2.
-:- data defined_quantifiers_code/1.
+:- data defined_modifiers_code/1.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -20,7 +20,7 @@ clean_up_asserted_facts :-
 	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14)), _Removed_1),
 	findall('done', retract_fact(aggregators(_21)), _Removed_2),
 	findall('done', retract_fact(sentences(_31, _32)), _Removed_3),
-	findall('done', retract_fact(defined_quantifiers_code(_41)), _Removed_4),
+	findall('done', retract_fact(defined_modifiers_code(_41)), _Removed_4),
 	!.
 
 % ------------------------------------------------------
@@ -249,9 +249,9 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
 	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], ('defined_operators', Compute_Defined_Operators)),
 
-	rfuzzy_defined_quantifiers(Defined_Quantifiers_List),
-	save_rfuzzy_quantifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
-	assertz_fact(defined_quantifiers_code(Defined_Quantifiers_Code)).
+	rfuzzy_defined_modifiers(Defined_Quantifiers_List),
+	save_rfuzzy_modifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
+	assertz_fact(defined_modifiers_code(Defined_Quantifiers_Code)).
 
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
@@ -367,10 +367,10 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, []),
 	!.
 
-translate((rfuzzy_quantifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
-	print_msg('debug', 'translate: rfuzzy_quantifier(P_N/P_A)', rfuzzy_quantifier(P_N/P_A)),
-	save_rfuzzy_quantifiers_list([(P_N, P_A, Var_In, Var_Out, Code)], Translation),
-	print_msg('debug', 'translate: rfuzzy_quantifier(P_N/P_A)', rfuzzy_quantifier(P_N/P_A)).
+translate((rfuzzy_modifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
+	print_msg('debug', 'translate: rfuzzy_modifier(P_N/P_A)', rfuzzy_modifier(P_N/P_A)),
+	save_rfuzzy_modifiers_list([(P_N, P_A, Var_In, Var_Out, Code)], Translation),
+	print_msg('debug', 'translate: rfuzzy_modifier(P_N/P_A)', rfuzzy_modifier(P_N/P_A)).
 
 % Predicate type(s) definition (Class = database).
 translate(rfuzzy_define_database(P_N/P_A, Description), Cls):- !,
@@ -880,8 +880,8 @@ translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, C
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_rfuzzy_quantifiers_list([], []) :- !.
-save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | More], [Translation | Translations]) :-
+save_rfuzzy_modifiers_list([], []) :- !.
+save_rfuzzy_modifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | More], [Translation | Translations]) :-
 	nonvar(P_N), nonvar(P_A), number(P_A), P_A = 2,
 
 	functor(Quantifier, P_N, P_A),
@@ -901,7 +901,7 @@ save_rfuzzy_quantifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) 
 	% save_predicate_definition(P_N, P_A, P_T, P_MI)
 	save_predicate_definition(P_N, P_A, P_T, []), !,
 
-	save_rfuzzy_quantifiers_list(More, Translations).
+	save_rfuzzy_modifiers_list(More, Translations).
 
 
 % ------------------------------------------------------
@@ -941,13 +941,13 @@ translate_rfuzzy_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, NP_Arg_Input
 
 % Rule Body Conjunct with Quantifier.
 translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, Translation) :-
-	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - with quantifier',(Body_F, Truth_Value)),
+	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - with modifier',(Body_F, Truth_Value)),
 	nonvar(Body_F),
 	functor(Body_F, QP_N, QP_Arity),
-	QP_Arity = 1, % If not then it is not a quantifier.
+	QP_Arity = 1, % If not then it is not a modifier.
 	arg(1, Body_F, SubBody),
 	functor(SubBody, _BodyP_N, BodyP_Arity),
-	BodyP_Arity > 0, % If not then it is not a quantifier.
+	BodyP_Arity > 0, % If not then it is not a modifier.
 	!,
 
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error) 
@@ -964,11 +964,11 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Val
 	arg(1, QP_F, SubCall),
 	arg(2, QP_F, Truth_Value),
 	Translation = QP_F, % Note this can be a sub-body: it must be a functor, but not a conjunction of them.
-	print_msg('debug', 'translate_rfuzzy_rule_body(Translation) - with quantifier',(Translation)).
+	print_msg('debug', 'translate_rfuzzy_rule_body(Translation) - with modifier',(Translation)).
 
 % Rule Body Conjunct without Quantifier.
 translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, Translation) :-
-	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - without quantifier',(Body_F, Truth_Value)),
+	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - without modifier',(Body_F, Truth_Value)),
 	extract_from_PF_values_PN_PA_PTN_PTA(Body_F, P_N, _Fake_P_A, P_TN, _Type_1_Arity),
 
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error) 
@@ -1310,10 +1310,10 @@ generate_pl_body_when_enum_type(Field_Type, DB_P_N, DB_P_A, P_N, PI_Body_List_In
 
 add_auxiliar_code(Cls_In, Cls_Out) :-
 	print_msg('debug', 'add_auxiliar_code :: Cls_In', Cls_In),
-	code_for_quantifier_fnot(Cls_In, Cls_Aux_1), 
+	code_for_modifier_fnot(Cls_In, Cls_Aux_1), 
 	code_for_getting_attribute_values(Cls_Aux_1, Cls_Aux_2), 
 	code_for_predefined_types(Cls_Aux_2, Cls_Aux_3),
-	code_for_defined_quantifiers(Cls_Aux_3, Cls_Aux_4),
+	code_for_defined_modifiers(Cls_Aux_3, Cls_Aux_4),
 	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_4', Cls_Aux_4),
 %	code_for_rfuzzy_compute_1(Cls_Aux_4, Cls_Aux_5),
 %	print_msg('debug', 'add_auxiliar_code :: Cls_Aux_5', Cls_Aux_5),
@@ -1366,7 +1366,7 @@ code_for_getting_attribute_values(In, [Code_1, Code_2, Code_3|In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_quantifier_fnot(In, [Code | In]) :-
+code_for_modifier_fnot(In, [Code | In]) :-
 	Code = (
 		   fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
 	       
@@ -1393,8 +1393,8 @@ code_for_quantifier_fnot(In, [Code | In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_defined_quantifiers(Code_In, Code_Out) :-
-	retract_fact(defined_quantifiers_code(Defined_Quantifiers_Code)),
+code_for_defined_modifiers(Code_In, Code_Out) :-
+	retract_fact(defined_modifiers_code(Defined_Quantifiers_Code)),
 	append_local(Defined_Quantifiers_Code, Code_In, Code_Out), !.
 
 % ------------------------------------------------------
