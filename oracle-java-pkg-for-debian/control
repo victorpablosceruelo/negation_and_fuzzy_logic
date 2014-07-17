@@ -10,26 +10,12 @@ Section: devel
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: bash
-Replaces: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk
-Conflicts: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jdk
-Provides: java1-runtime, java2-runtime, java3-runtime, java4-runtime, java5-runtime, java6-runtime, java7-runtime, java1-runtime-headless, java2-runtime-headless, java3-runtime-headless, java4-runtime-headless, java5-runtime-headless, java6-runtime-headless, java7-runtime-headless, java1-sdk, java2-sdk, java3-sdk, java4-sdk, java5-sdk, java6-sdk, java7-jdk, default-jre, default-jre-headless, default-jdk, default-jdk-headless, sun-java6-jre
-Description: This package does not contain the sun-java-jdk nor the java-jdk from Oracle: 
+Replaces: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jre-headless, default-jdk, default-jdk-headless, sun-java6-jre
+Conflicts: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jre-headless, default-jdk, default-jdk-headless, sun-java6-jre
+Provides: sun-java6-jre, sun-java6-jdk, openjdk-6-jre, openjdk-7-jre, openjdk-6-jdk, openjdk-7-jdk, default-jre, default-jre-headless, default-jdk, default-jdk-headless, sun-java6-jre, java1-runtime, java2-runtime, java3-runtime, java4-runtime, java5-runtime, java6-runtime, java7-runtime, java1-runtime-headless, java2-runtime-headless, java3-runtime-headless, java4-runtime-headless, java5-runtime-headless, java6-runtime-headless, java7-runtime-headless, java1-sdk, java2-sdk, java3-sdk, java4-sdk, java5-sdk, java6-sdk, java7-jdk
+Description: This package is a fake package whose aim is removing oracle java and openjdk OS packages.
  .
- It is just a fake package. 
- .
- Since dependencies do not let us to remove the old java packages 
- and there are no new ones (so we could upgrade) we have decided to 
- tell the system that this package contains the new java version, 
- so by installing it what you are doing is removing any previous 
- java installation (and not upgrading, as the system thinks). 
- .
- After that we can download any version and install it by hand 
- without any dependency problem, which is just what we wanted. 
- Since installing java by hand is a tedious task, we have included 
- some scripts that automatize the installation of the java sdk 
- (that you must download from oracle, because you have to accept the copyright). 
- .
- The scripts are installed in /usr/share/oracle-java-pkg-for-debian/ 
+ The script to link in the correct way the binaries you need to download (if you want to have java in your system) is /usr/sbin/update-java-oracle-nondebian-installation.sh. It takes the tar.gz distribution file and installs it under /opt.
  .
  Enjoy !!
  .
