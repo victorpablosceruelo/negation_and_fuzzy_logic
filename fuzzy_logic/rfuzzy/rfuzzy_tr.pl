@@ -108,7 +108,7 @@ retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
 % ------------------------------------------------------
 	
 check_save_predicate_definition_input(P_N, P_A, P_T, P_O, P_MI) :-
-	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T)', (P_N, P_A, P_T, P_O)),
+	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T, P_O)', (P_N, P_A, P_T, P_O)),
 	( 
 	    (	nonvar(P_N), !    )
 	;
@@ -142,6 +142,12 @@ check_save_predicate_definition_input(P_N, P_A, P_T, P_O, P_MI) :-
 	    (	var(P_O),
 		print_msg('error', 'save_predicate_definition: P_O cannot be a variable. Value', P_O), !, fail
 	    )
+	;
+	    (	list(P_O),
+		print_msg('error', 'save_predicate_definition: P_O cannot be a list. Value', P_O), !, fail
+	    )
+	;   
+	    (	nonvar(P_O), !     )
 	),
 	(
 	    print_msg('debug', 'check_pred_type_aux(P_A, P_T)', (P_A, P_T)),
@@ -230,7 +236,7 @@ rfuzzy_trans_sent_aux(end_of_file, Code_Before_EOF_with_EOF):-
 	clean_up_asserted_facts.
 
 rfuzzy_trans_sent_aux(0, []) :- !, 
-%	activate_rfuzzy_debug,
+	% activate_rfuzzy_debug,
 	clean_up_asserted_facts,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
@@ -1149,9 +1155,9 @@ generate_code_from_saved_info([], Cls_1_In, Cls_1_In, Cls_2_In, Cls_2_In) :- !,
 	print_msg('debug', 'generate_code_from_saved_info', 'END').
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
 	print_msg('debug', 'generate_code_from_saved_info :: Predicate_Def', Predicate_Def),
-	Predicate_Def = predicate_definition(P_N, P_A, P_T, P_MI), !,
+	Predicate_Def = predicate_definition(P_N, P_A, P_T, P_O, P_MI), !,
 	print_msg('debug', 'generate_code_from_saved_info :: P_MI', P_MI),
-	generate_code_main(P_N, P_A, P_T, P_MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
+	generate_code_main(P_N, P_A, P_T, P_O, P_MI, Cls_1_In, Cls_1_Aux, Cls_2_In, Cls_2_Aux),
 %	print_msg('debug', 'generate_code_from_saved_info :: Cls_1_Aux', Cls_1_Aux),
 %	print_msg('debug', 'generate_code_from_saved_info :: Cls_2_Aux', Cls_2_Aux),
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_Aux, Cls_1_Out, Cls_2_Aux, Cls_2_Out).
@@ -1160,25 +1166,25 @@ generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Ou
 	print_msg('error', 'generate_code_from_saved_info :: cannot parse', Predicate_Def),
 	generate_code_from_saved_info(Predicate_Defs, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out).
 
-generate_code_main(P_N, P_A, P_T, P_MI, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
+generate_code_main(P_N, P_A, P_T, P_O, P_MI, Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
 	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)),
 	generate_code_from_P_MIs(P_MI, P_N, P_A, P_T, [], Cls_1_In, Cls_1_Out, PI_Body_List),
 	print_msg('debug', 'generate_code_main :: (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)),
 	print_msg('debug', 'generate_code_main :: PI_Body_List', PI_Body_List),
-	build_introspection_clause(P_N, P_A, P_T, P_MI, PI_Body_List, Cls_2_In, Cls_2_Out).
+	build_introspection_clause(P_N, P_A, P_T, P_O, P_MI, PI_Body_List, Cls_2_In, Cls_2_Out).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-build_introspection_clause(P_N, P_A, P_T, P_MI, [], Cls_In, [Cl | Cls_In]) :- !,
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, P_MI)).
-build_introspection_clause(P_N, P_A, P_T, P_MI, PI_Body_List, Cls_In, [Cl | Cls_In]) :-
+build_introspection_clause(P_N, P_A, P_T, P_O, P_MI, [], Cls_In, [Cl | Cls_In]) :- !,
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, P_O, P_MI)).
+build_introspection_clause(P_N, P_A, P_T, P_O, P_MI, PI_Body_List, Cls_In, [Cl | Cls_In]) :-
 	list_to_disjunction(PI_Body_List, PI_Body, Type_Var, Enum_Value_Var),
 
 	Generator = (findall((Type_Var, Enum_Value_Var), PI_Body, Enum_Values_List), 
 	remove_list_dupplicates(Enum_Values_List, [], New_Enum_Values_List)),
-	Cl = (rfuzzy_introspection(P_N, P_A, P_T, [('rfuzzy_enum_type_values', New_Enum_Values_List) | P_MI]) :- Generator).
+	Cl = (rfuzzy_introspection(P_N, P_A, P_T, P_O, [('rfuzzy_enum_type_values', New_Enum_Values_List) | P_MI]) :- Generator).
 	
 list_to_disjunction([], 'false', _Type_Var, _Enum_Value_Var) :- !.
 list_to_disjunction([(Type_Var, Enum_Value_Var, Body) | PI_Body_List], (Body ; PI_Body), Type_Var, Enum_Value_Var) :-
@@ -1336,10 +1342,10 @@ add_auxiliar_code(Cls_In, Cls_Out) :-
 % ------------------------------------------------------
 
 code_for_testing_program_introspection(Cls_In, [Cl_1, Cl_2, Cl_3, Cl_4, Cl_5, Cl_6 | Cls_In]) :-
-	Cl_1 = (test_program_introspection :- findall(rfuzzy_introspection(PN, PA, PT, P_MI), rfuzzy_introspection(PN, PA, PT, P_MI), L), test_program_introspection_aux_1(L)),
+	Cl_1 = (test_program_introspection :- findall(rfuzzy_introspection(PN, PA, PT, P_O, P_MI), rfuzzy_introspection(PN, PA, PT, P_O, P_MI), L), test_program_introspection_aux_1(L)),
 	Cl_2 = (test_program_introspection_aux_1([])), 
 	Cl_3 = (test_program_introspection_aux_1([H|T]) :- test_program_introspection_aux_2(H), test_program_introspection_aux_1(T)),
-	Cl_4 = (test_program_introspection_aux_2(rfuzzy_introspection(_PN, _PA, _PT, P_MI)) :- test_program_introspection_aux_3(P_MI)),
+	Cl_4 = (test_program_introspection_aux_2(rfuzzy_introspection(_PN, _PA, _PT, _P_O, P_MI)) :- test_program_introspection_aux_3(P_MI)),
 	Cl_5 = (test_program_introspection_aux_3([])),
 	Cl_6 = (test_program_introspection_aux_3([(Selector, Info) | P_MI]) :- list(Info), print_msg('debug', '(Selector, Info)', (Selector, Info)), test_program_introspection_aux_3(P_MI)).
 
@@ -1415,7 +1421,7 @@ code_for_rfuzzy_compute_2(In, [Code | In]) :-
 	       functor(Elt2_In, Name, 1),
 	       functor(Aux_Elt2, Name, 2),
 	       print_msg('debug', 'rfuzzy_compute_aux :: rfuzzy_introspection(Name, 2)', (Name, 2)),
-	       rfuzzy_introspection(Name, 2, P_T, _Pred_MI_1_List), !,
+	       rfuzzy_introspection(Name, 2, P_T, _P_O, _Pred_MI_1_List), !,
 	       print_msg('debug', 'rfuzzy_compute_aux :: rfuzzy_introspection(Name, 2, P_T)', (Name, 2, P_T)),
 	       memberchk_local([Database, Arg_Type], P_T),
 	       print_msg('debug', 'rfuzzy_compute_aux :: Arg_Type', (Arg_Type)),
