@@ -1,7 +1,7 @@
 :- module(ex_trains, _, [rfuzzy, clpr]).
 
 % Activate/Deactivate debug.
-% :- activate_rfuzzy_debug.
+:- activate_rfuzzy_debug.
 
 % Do not use this to define valid natural numbers.
 %speed(0). % Units are kilometres per hour

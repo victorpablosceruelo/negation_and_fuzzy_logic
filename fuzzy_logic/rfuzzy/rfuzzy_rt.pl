@@ -1,12 +1,12 @@
 :- module(rfuzzy_rt, [
-	% Rfuzzy Computations.
-	rfuzzy_compute_defined_operators/1,
+	% Rfuzzy Comparisons.
+	rfuzzy_compute_defined_comparators/1,
 	rfuzzy_compute_aux/6,	
 	% Aggregators.
 	rfuzzy_defined_aggregators/1, 
 	inject/3, merge/4, prod/3, iprod/3, mean/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
-	% Quantifiers.
+	% Modifiers.
 	rfuzzy_defined_modifiers/1,
 	% Auxiliar predicates.
 	print_msg/3, print_msg_nl/1, activate_rfuzzy_debug/0,
@@ -263,7 +263,7 @@ rfuzzy_process_attribute_dump(Dump, _Var, _Condition, _Value) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-rfuzzy_compute_defined_operators([('=~=', 'rfuzzy_enum_type'), ('=', 'rfuzzy_any_type'), ('=/=', 'rfuzzy_any_type'), ('>', 'rfuzzy_number_type'), ('<', 'rfuzzy_number_type'), ('>=', 'rfuzzy_number_type'), ('=<', 'rfuzzy_number_type')]).
+rfuzzy_compute_defined_comparators([('=~=', 'rfuzzy_enum_type'), ('=', 'rfuzzy_any_type'), ('=/=', 'rfuzzy_any_type'), ('>', 'rfuzzy_number_type'), ('<', 'rfuzzy_number_type'), ('>=', 'rfuzzy_number_type'), ('=<', 'rfuzzy_number_type')]).
 
 rfuzzy_compute_aux_args_are_numbers(Args_Type) :-
 	(

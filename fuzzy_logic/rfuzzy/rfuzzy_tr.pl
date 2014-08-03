@@ -7,7 +7,7 @@
 :- include(library('rfuzzy/rfuzzy_ops')).
 
 % Important info to be saved.
-:- data predicate_definition/4.
+:- data predicate_definition/5.
 :- data aggregators/1.
 :- data sentences/2.
 :- data defined_modifiers_code/1.
@@ -17,7 +17,7 @@
 % ------------------------------------------------------
 
 clean_up_asserted_facts :-
-	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14)), _Removed_1),
+	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14, _15)), _Removed_1),
 	findall('done', retract_fact(aggregators(_21)), _Removed_2),
 	findall('done', retract_fact(sentences(_31, _32)), _Removed_3),
 	findall('done', retract_fact(defined_modifiers_code(_41)), _Removed_4),
@@ -33,30 +33,33 @@ get_auxiliar_suffix('rfuzzy_aux').
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-save_predicates_definition_list([], _P_A, _P_T, _P_MI) :- !.
-save_predicates_definition_list([P_N | Pred_List], P_A, P_T, P_MI) :-
-	save_predicate_definition(P_N, P_A, P_T, P_MI), !,
-	save_predicates_definition_list(Pred_List, P_A, P_T, P_MI).
+save_predicates_definition_list([], _P_A, _P_T, _P_O, _P_MI) :- !.
+save_predicates_definition_list([P_N | Pred_List], P_A, P_T, P_O, P_MI) :-
+	save_predicate_definition(P_N, P_A, P_T, P_O, P_MI), !,
+	save_predicates_definition_list(Pred_List, P_A, P_T, P_O, P_MI).
 
-save_predicate_definition(P_N, P_A, P_T, P_MI) :-
-	print_msg('debug', 'save_predicate_definition(P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)),
-	check_save_predicate_definition_input(P_N, P_A, P_T, P_MI),
+save_predicate_definition(P_N, P_A, P_T, P_O, P_MI) :-
+	print_msg('debug', 'save_predicate_definition(P_N, P_A, P_T, P_O, P_MI)', (P_N, P_A, P_T, P_O, P_MI)),
+	check_save_predicate_definition_input(P_N, P_A, P_T, P_O, P_MI),
 	print_msg('debug', 'check_save_predicate_definition_input', 'ok'),
+	!,
 	(
 	    (	 
-		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_P_MI)), !, % Retract last
-		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_P_MI)),
+		retract_fact(predicate_definition(P_N, P_A, Old_P_T, Old_P_O, Old_P_MI)), !, % Retract last
+		print_msg('debug', 'save_predicate_definition :: current', (P_N, P_A, Old_P_T, Old_P_O, Old_P_MI)),
 		add_element_to_set_if_any(P_T, Old_P_T, New_P_T),
+		add_element_to_set_if_any(P_O, Old_P_O, New_P_O),
 		add_element_to_set_if_any(P_MI, Old_P_MI, New_P_MI)
 	    )
 	;
 	    (
 		add_element_to_set_if_any(P_T, [], New_P_T),
+		add_element_to_set_if_any(P_O, [], New_P_O),
 		add_element_to_set_if_any(P_MI, [], New_P_MI)
 	    )
 	), 
-	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_P_MI)),
-	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_P_MI)),
+	assertz_fact(predicate_definition(P_N, P_A, New_P_T, New_P_O, New_P_MI)),
+	print_msg('debug', 'saved', save_predicate_definition(P_N, P_A, New_P_T, New_P_O, New_P_MI)),
 	!.
 
 % sets_union_if_non_empty(New_SubSet, Set, New_Set).
@@ -81,8 +84,8 @@ add_element_to_set_if_any(Element, Set, New_Set) :-
 retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	print_msg('debug', 'retrieve_predicate_info(P_N, P_A, P_T, Show_Error)', retrieve_predicate_info(P_N, P_A, P_T, Show_Error)),
 	(
-	    (   predicate_definition(P_N, P_A, P_T, P_MI), !,
-		print_msg('debug', 'retrieved', retrieve_predicate_info(P_N, P_A, P_T, P_MI))   
+	    (   predicate_definition(P_N, P_A, P_T, P_O, P_MI), !,
+		print_msg('debug', 'retrieved', retrieve_predicate_info(P_N, P_A, P_T, P_O, P_MI))   
 	    )
 	;
 	    (   Show_Error = 'no', !, 
@@ -95,8 +98,8 @@ retrieve_predicate_info(P_N, P_A, P_T, Show_Error) :-
 	).
 
 retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
-	findall((predicate_definition(P_N, P_A, P_T, P_MI)), 
-	predicate_definition(P_N, P_A, P_T, P_MI), Retrieved), !.
+	findall((predicate_definition(P_N, P_A, P_T, P_O, P_MI)), 
+	predicate_definition(P_N, P_A, P_T, P_O, P_MI), Retrieved), !.
 %	(retract_fact(predicate_definition(P_N, P_A, P_T, P_MI))), Retrieved),
 %	 !.
 
@@ -104,8 +107,8 @@ retrieve_all_predicate_infos(P_N, P_A, Retrieved) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 	
-check_save_predicate_definition_input(P_N, P_A, P_T, P_MI) :-
-	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T)', (P_N, P_A, P_T)),
+check_save_predicate_definition_input(P_N, P_A, P_T, P_O, P_MI) :-
+	print_msg('debug', 'check_save_predicate_definition_input(P_N, P_A, P_T)', (P_N, P_A, P_T, P_O)),
 	( 
 	    (	nonvar(P_N), !    )
 	;
@@ -136,6 +139,11 @@ check_save_predicate_definition_input(P_N, P_A, P_T, P_MI) :-
 	    )
 	), 
 	(
+	    (	var(P_O),
+		print_msg('error', 'save_predicate_definition: P_O cannot be a variable. Value', P_O), !, fail
+	    )
+	),
+	(
 	    print_msg('debug', 'check_pred_type_aux(P_A, P_T)', (P_A, P_T)),
 	    check_pred_type_aux(P_A, P_T), !
 	;
@@ -160,8 +168,8 @@ check_save_predicate_definition_input(P_N, P_A, P_T, P_MI) :-
 	),
 	!.
 
-check_save_predicate_definition_input(P_N, P_A, P_T, P_MI) :-
-	print_msg('debug', 'check_save_predicate_definition_input :: (P_N, P_A, P_T, P_MI)', (P_N, P_A, P_T, P_MI)), !, fail.
+check_save_predicate_definition_input(P_N, P_A, P_T, P_O, P_MI) :-
+	print_msg('debug', 'check_save_predicate_definition_input :: (P_N, P_A, P_T, P_O, P_MI)', (P_N, P_A, P_T, P_O, P_MI)), !, fail.
 
 check_pred_type_aux(0, []) :- !.
 check_pred_type_aux(1, [_P_T]) :- !.
@@ -227,31 +235,31 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	print_msg_nl('info'), print_msg_nl('info'), 
 	print_msg('info', 'Rfuzzy (Ciao Prolog package to compile Rfuzzy programs into a pure Prolog programs)', 'compiling ...'),
 	print_msg_nl('info'),
-	% save_predicate_definition(P_N, P_A, P_T, P_MI)
-	save_predicate_definition('rfuzzy_any_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_truth_value_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_credibility_value_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_predicate_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_number_type', 1, ['null'], []),
-	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], []),
+	% save_predicate_definition(P_N, P_A, P_T, P_O, P_MI)
+	save_predicate_definition('rfuzzy_any_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_truth_value_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_credibility_value_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_predicate_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_number_type', 1, ['null'], 'type', []),
+	save_predicate_definition('fnot', 2, ['rfuzzy_predicate_type', 'rfuzzy_truth_value_type'], 'negation', []),
 
-	save_predicate_definition('rfuzzy_string_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_integer_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_float_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_enum_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_boolean_type', 1, ['null'], []),
-	save_predicate_definition('rfuzzy_datetime_type', 1, ['null'], []),
+	save_predicate_definition('rfuzzy_string_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_integer_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_float_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_enum_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_boolean_type', 1, ['null'], 'type', []),
+	save_predicate_definition('rfuzzy_datetime_type', 1, ['null'], 'type', []),
 
 	rfuzzy_defined_aggregators(Defined_Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, []),
+	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, 'aggregator', []),
 	
-	rfuzzy_compute_defined_operators(Compute_Defined_Operators),
-	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], ('defined_operators', Compute_Defined_Operators)),
+	rfuzzy_compute_defined_comparators(Compute_Defined_Comparators),
+	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], 'framework', ('defined_operators', Compute_Defined_Comparators)),
 
-	rfuzzy_defined_modifiers(Defined_Quantifiers_List),
-	save_rfuzzy_modifiers_list(Defined_Quantifiers_List, Defined_Quantifiers_Code),
-	assertz_fact(defined_modifiers_code(Defined_Quantifiers_Code)).
+	rfuzzy_defined_modifiers(Defined_Modifiers_List),
+	save_rfuzzy_modifiers_list(Defined_Modifiers_List, Defined_Modifiers_Code),
+	assertz_fact(defined_modifiers_code(Defined_Modifiers_Code)).
 
 rfuzzy_trans_sent_aux((:-activate_rfuzzy_debug), []) :- !,
 	activate_rfuzzy_debug.
@@ -364,7 +372,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
 	% save_predicate_definition(P_N, P_A, P_T, P_MI)
-	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, []),
+	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, 'aggregator', []),
 	!.
 
 translate((rfuzzy_modifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
@@ -414,7 +422,7 @@ translate(Other, Other) :-
 	),
 	generate_fake_type(P_A, P_T),
 	% save_predicate_definition(P_N, P_A, P_T, P_MI)
-	save_predicate_definition(P_N, P_A, P_T, []).
+	save_predicate_definition(P_N, P_A, P_T, 'type', []).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -511,7 +519,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 					))],
 	print_msg('debug', 'translate_fuzzy', Cls),
 
-	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], ('fuzzy_rule', [(NP_N, NP_A)])),
+	save_predicate_definition(P_N, 2, [P_TN, 'rfuzzy_truth_value_type'], P_B_Name, ('fuzzy_rule', [(NP_N, NP_A)])),
 	print_msg('debug', 'translate_fuzzy ', ' ').
 
 % ------------------------------------------------------
@@ -805,7 +813,7 @@ translate_rfuzzy_type_for_crisp_rule(P_N, P_A, P_T, P_MI, [Cl]) :-
 	;
 	    (   % Define it or redefine it (Include the new type definition)
 		% save_predicate_definition(P_N, P_A, P_T, P_MI)
-		save_predicate_definition(P_N, P_A, P_T, P_MI)
+		save_predicate_definition(P_N, P_A, P_T, 'type', P_MI)
 	    )
 	), !.
 
@@ -853,7 +861,7 @@ save_field_description(Field_Name, Field_Type, DB_P_N, DB_P_A, Index) :-
 	retrieve_predicate_info(Field_Type, 1, _P_T, 'true'), !,
 
 	P_MI = ('rfuzzy_db_field', [(Field_Name, Field_Type, DB_P_N, DB_P_A, Index)]),
-	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], P_MI).
+	save_predicate_definition(Field_Name, 2, [DB_P_N, Field_Type], 'db_field', P_MI).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -874,7 +882,7 @@ translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, C
 	arg(6, Translation, Credibility),
 	
 	Real_P_T = ['rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_predicate_type', 'rfuzzy_truth_value_type', 'rfuzzy_predicate_type', 'rfuzzy_credibility_value_type'],
-	save_predicate_definition(Real_P_N, 6, Real_P_T, ('rfuzzy_similarity_clause', [Translation])).
+	save_predicate_definition(Real_P_N, 6, Real_P_T, 'similarity', ('rfuzzy_similarity_clause', [Translation])).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -884,11 +892,11 @@ save_rfuzzy_modifiers_list([], []) :- !.
 save_rfuzzy_modifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | More], [Translation | Translations]) :-
 	nonvar(P_N), nonvar(P_A), number(P_A), P_A = 2,
 
-	functor(Quantifier, P_N, P_A),
-	arg(1, Quantifier, Fuzzy_Predicate_Functor_In),
-	arg(2, Quantifier, Truth_Value_Out),
+	functor(Modifier, P_N, P_A),
+	arg(1, Modifier, Fuzzy_Predicate_Functor_In),
+	arg(2, Modifier, Truth_Value_Out),
 
-	Translation = ( Quantifier :-	
+	Translation = ( Modifier :-	
 		      functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
 		      arg(FP_Arity, Fuzzy_Predicate_Functor_In, Truth_Value_In),
 		      Fuzzy_Predicate_Functor_In,
@@ -899,7 +907,7 @@ save_rfuzzy_modifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | 
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
 	% save_predicate_definition(P_N, P_A, P_T, P_MI)
-	save_predicate_definition(P_N, P_A, P_T, []), !,
+	save_predicate_definition(P_N, P_A, P_T, 'modifier', []), !,
 
 	save_rfuzzy_modifiers_list(More, Translations).
 
@@ -939,7 +947,7 @@ translate_rfuzzy_rule_body((Tmp_Body_1, Tmp_Body_2), TV_Aggregator, NP_Arg_Input
 	arg(2, Aggr_F, TV_2), 
 	arg(3, Aggr_F, Truth_Value), !.
 
-% Rule Body Conjunct with Quantifier.
+% Rule Body Conjunct with Modifier.
 translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, Translation) :-
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - with modifier',(Body_F, Truth_Value)),
 	nonvar(Body_F),
@@ -966,7 +974,7 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Val
 	Translation = QP_F, % Note this can be a sub-body: it must be a functor, but not a conjunction of them.
 	print_msg('debug', 'translate_rfuzzy_rule_body(Translation) - with modifier',(Translation)).
 
-% Rule Body Conjunct without Quantifier.
+% Rule Body Conjunct without Modifier.
 translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, NP_Arg_Input, P_TN, Truth_Value, Translation) :-
 	print_msg('debug', 'translate_rfuzzy_rule_body(Body, Truth_Value) - without modifier',(Body_F, Truth_Value)),
 	extract_from_PF_values_PN_PA_PTN_PTA(Body_F, P_N, _Fake_P_A, P_TN, _Type_1_Arity),
@@ -1394,8 +1402,8 @@ code_for_modifier_fnot(In, [Code | In]) :-
 % ------------------------------------------------------
 
 code_for_defined_modifiers(Code_In, Code_Out) :-
-	retract_fact(defined_modifiers_code(Defined_Quantifiers_Code)),
-	append_local(Defined_Quantifiers_Code, Code_In, Code_Out), !.
+	retract_fact(defined_modifiers_code(Defined_Modifiers_Code)),
+	append_local(Defined_Modifiers_Code, Code_In, Code_Out), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
