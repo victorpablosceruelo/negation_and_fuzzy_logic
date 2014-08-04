@@ -11,6 +11,7 @@
 :- data aggregators/1.
 :- data sentences/2.
 :- data defined_modifiers_code/1.
+:- data defined_negation_ops_code/1.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
@@ -263,9 +264,9 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	rfuzzy_compute_defined_comparators(Compute_Defined_Comparators),
 	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], 'framework', ('defined_operators', Compute_Defined_Comparators)),
 
-	rfuzzy_defined_negators(Defined_Negators_List),
-	save_rfuzzy_negators_list(Defined_Negators_List, Defined_Negators_Code),
-	assertz_fact(defined_negators_code(Defined_Negators_Code)),
+	rfuzzy_defined_negation_ops(Defined_Negators_List),
+	save_rfuzzy_negation_ops_list(Defined_Negators_List, Defined_Negators_Code),
+	assertz_fact(defined_negation_ops_code(Defined_Negators_Code)),
 
 	rfuzzy_defined_modifiers(Defined_Modifiers_List),
 	save_rfuzzy_modifiers_list(Defined_Modifiers_List, Defined_Modifiers_Code),
@@ -934,17 +935,28 @@ save_rfuzzy_negation_ops_list([], []) :- !.
 save_rfuzzy_negation_ops_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | More], [Translation | Translations]) :-
 	nonvar(P_N), nonvar(P_A), number(P_A), P_A = 2,
 
-	functor(Modifier, P_N, P_A),
-	arg(1, Modifier, Fuzzy_Predicate_Functor_In),
-	arg(2, Modifier, Truth_Value_Out),
+	functor(Negator, P_N, P_A),
+	arg(1, Negator, Fuzzy_Predicate_Functor),
+	arg(2, Negator, Truth_Value_Out),
 
-	Translation = ( Modifier :-	
-		      functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
-		      arg(FP_Arity, Fuzzy_Predicate_Functor_In, Truth_Value_In),
-		      Fuzzy_Predicate_Functor_In,
+	Translation = ( Negator :-	
+		      print_msg('debug', P_N, 'Computing results list.'),
+		      findall(Fuzzy_Predicate_Functor, Fuzzy_Predicate_Functor, Results_List), !,
+		      print_msg('debug', P_N, Results_List),
+		      reorder_by_truth_value(Results_List, [], Results_List_Aux),
+		      print_msg('debug', 'reorder_by_truth_value', Results_List_Aux),
+		      one_by_one_first_tail(Results_List_Aux, Result_Functor),
+		      print_msg('debug', 'take_an_element', Result_Functor),
+	       
+		      functor(Fuzzy_Predicate_Functor, _FP_Name, FP_Arity), 
+		      FP_Arity_Aux is FP_Arity - 1,
+		      copy_args(FP_Arity_Aux, Result_Functor, Fuzzy_Predicate_Functor),
+		      arg(FP_Arity, Result_Functor, Truth_Value_In),
+	       
+		      print_msg('debug', 'fnot :: adjusting Truth_Value', Truth_Value_Out),
 		      Code,
-		      Truth_Value_Out .>=. 0, 
-		      Truth_Value_Out .=<. 1
+		      Truth_Value_Out .>=. 0, Truth_Value_Out .=<. 1,
+		      print_msg('debug', 'negation :: result', Fuzzy_Predicate_Functor)
 		      ),
 
 	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
@@ -1360,7 +1372,7 @@ generate_pl_body_when_enum_type(Field_Type, DB_P_N, DB_P_A, P_N, PI_Body_List_In
 
 add_auxiliar_code(Cls_In, Cls_Out) :-
 	print_msg('debug', 'add_auxiliar_code :: Cls_In', Cls_In),
-	code_for_modifier_fnot(Cls_In, Cls_Aux_1), 
+	code_for_defined_negation_ops(Cls_In, Cls_Aux_1), 
 	code_for_getting_attribute_values(Cls_Aux_1, Cls_Aux_2), 
 	code_for_predefined_types(Cls_Aux_2, Cls_Aux_3),
 	code_for_defined_modifiers(Cls_Aux_3, Cls_Aux_4),
@@ -1416,28 +1428,9 @@ code_for_getting_attribute_values(In, [Code_1, Code_2, Code_3|In]) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-code_for_modifier_fnot(In, [Code | In]) :-
-	Code = (
-		   fnot(Fuzzy_Predicate_Functor, Truth_Value) :-
-	       
-	       print_msg('debug', 'fnot', 'Computing results list.'),
-	       findall(Fuzzy_Predicate_Functor, Fuzzy_Predicate_Functor, Results_List), !,
-	       print_msg('debug', 'fnot', Results_List),
-	       reorder_by_truth_value(Results_List, [], Results_List_Aux),
-	       print_msg('debug', 'reorder_by_truth_value', Results_List_Aux),
-	       one_by_one_first_tail(Results_List_Aux, Result_Functor),
-	       print_msg('debug', 'take_an_element', Result_Functor),
-	       
-	       functor(Fuzzy_Predicate_Functor, _FP_Name, FP_Arity), 
-	       FP_Arity_Aux is FP_Arity - 1,
-	       copy_args(FP_Arity_Aux, Result_Functor, Fuzzy_Predicate_Functor),
-	       arg(FP_Arity, Result_Functor, SubCall_Truth_Value),
-	       
-	       print_msg('debug', 'fnot :: adjusting Truth_Value', Truth_Value),
-	       Truth_Value .=. 1 - SubCall_Truth_Value,
-	       Truth_Value .>=. 0, Truth_Value .=<. 1,
-	       print_msg('debug', 'fnot :: result', Fuzzy_Predicate_Functor)
-	       ).
+code_for_defined_negation_ops(Code_In, Code_Out) :-
+	retract_fact(defined_negation_ops_code(Defined_Neg_Ops_Code)),
+	append_local(Defined_Neg_Ops_Code, Code_In, Code_Out), !.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
