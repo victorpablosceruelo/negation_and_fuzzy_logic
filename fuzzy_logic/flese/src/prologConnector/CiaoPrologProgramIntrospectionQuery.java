@@ -25,17 +25,18 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 
 		// Prepare the query structure.
 		// rfuzzy_introspection(PClass, PName, PArity, PType).
-		PLVariable[] variables = new PLVariable[4];
+		PLVariable[] variables = new PLVariable[5];
 		variables[0] = new PLVariable(); // predicateType
 		variables[1] = new PLVariable(); // predicateName
 		variables[2] = new PLVariable(); // predicateArity
-		variables[3] = new PLVariable(); // predicateType
-		PLTerm[] args = { variables[0], variables[1], variables[2], variables[3] };
+		variables[3] = new PLVariable(); // predicateOrigin
+		variables[4] = new PLVariable(); // predicateType
+		PLTerm[] args = { variables[0], variables[1], variables[2], variables[3], variables[4] };
 		PLStructure query = new PLStructure("rfuzzy_introspection", args);
 
 		String[] variablesNames = { KConstants.ProgramIntrospectionFields.predicateName,
 				KConstants.ProgramIntrospectionFields.predicateArity, KConstants.ProgramIntrospectionFields.predicateTypes,
-				KConstants.ProgramIntrospectionFields.predicateMoreInfo };
+				KConstants.ProgramIntrospectionFields.predicateOrigins, KConstants.ProgramIntrospectionFields.predicateMoreInfo };
 
 		setRealQuery(query, variables, variablesNames);
 

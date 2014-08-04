@@ -129,6 +129,7 @@ public class KConstants {
 		public static final String predicateName = "predicateName";
 		public static final String predicateArity = "predicateArity";
 		public static final String predicateTypes = "predicateTypes";
+		public static final String predicateOrigins = "predicateOrigins";
 		public static final String predicateMoreInfo = "predicateMoreInfo";
 	}
 

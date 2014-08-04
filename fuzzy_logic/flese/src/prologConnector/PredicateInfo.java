@@ -13,6 +13,7 @@ public class PredicateInfo {
 	private String predicateName = null;
 	private String[][] predicateTypes = null;
 	private int predicateArity = 0;
+	private String [] predicateOrigins = null;
 	private HashMap<String, PredMoreInfoInterface> predicateMoreInfo = new HashMap<String, PredMoreInfoInterface>();
 
 	public PredicateInfo(CiaoPrologQueryAnswer answer) throws PredicateInfoException {
@@ -24,6 +25,7 @@ public class PredicateInfo {
 			setPredicateName(answer);
 			setPredicateTypes(answer);
 			setPredicateArity(answer);
+			setPredicateOrigins(answer);
 			setPredicateMoreInfo(answer);
 
 		} catch (CiaoPrologConnectorException e) {
@@ -74,7 +76,7 @@ public class PredicateInfo {
 		}
 
 	}
-
+	
 	private void setPredicateArity(CiaoPrologQueryAnswer answer) throws PredicateInfoException, CiaoPrologConnectorException {
 		String predicateArityString = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateArity)
 				.toString();
@@ -88,6 +90,31 @@ public class PredicateInfo {
 		predicateArity = Integer.parseInt(predicateArityString);
 	}
 
+	private void setPredicateOrigins(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException, PredicateInfoException {
+		predicateOrigins = null;
+		CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateOrigins);
+		if (term == null) {
+			throw new PredicateInfoException("predicateOrigins cannot be null");
+		}
+		if (!term.isList()) {
+			throw new PredicateInfoException("predicateOrigins is not a list.");
+		}
+		int originsListLength = term.length();
+		predicateOrigins = new String[originsListLength];
+
+		for (int i = 0; i < originsListLength; i++) {
+			CiaoPrologTermInJava origin = term.atPosition(i);
+			if (origin == null) {
+				throw new PredicateInfoException("predicateOrigins individual origin cannot be null");
+			}
+			if (origin.isList()) {
+				throw new PredicateInfoException("predicateOrigins individual origin is a list.");
+			}
+			predicateOrigins[i] = origin.toString();
+		}
+
+	}
+	
 	private void setPredicateMoreInfo(CiaoPrologQueryAnswer answer) throws PredicateInfoException, CiaoPrologConnectorException {
 		
 		CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateMoreInfo);
@@ -109,15 +136,19 @@ public class PredicateInfo {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public String getPredicateName() {
-		return predicateName;
+		return this.predicateName;
 	}
 
 	public String[][] getPredicateTypes() {
-		return predicateTypes;
+		return this.predicateTypes;
 	}
 
 	public int getPredicateArity() {
-		return predicateArity;
+		return this.predicateArity;
+	}
+	
+	public String [] getPredicateOrigins() {
+		return this.predicateOrigins;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
