@@ -263,6 +263,10 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	rfuzzy_compute_defined_comparators(Compute_Defined_Comparators),
 	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], 'framework', ('defined_operators', Compute_Defined_Comparators)),
 
+	rfuzzy_defined_negators(Defined_Negators_List),
+	save_rfuzzy_negators_list(Defined_Negators_List, Defined_Negators_Code),
+	assertz_fact(defined_negators_code(Defined_Negators_Code)),
+
 	rfuzzy_defined_modifiers(Defined_Modifiers_List),
 	save_rfuzzy_modifiers_list(Defined_Modifiers_List, Defined_Modifiers_Code),
 	assertz_fact(defined_modifiers_code(Defined_Modifiers_Code)).
@@ -385,6 +389,11 @@ translate((rfuzzy_modifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !
 	print_msg('debug', 'translate: rfuzzy_modifier(P_N/P_A)', rfuzzy_modifier(P_N/P_A)),
 	save_rfuzzy_modifiers_list([(P_N, P_A, Var_In, Var_Out, Code)], Translation),
 	print_msg('debug', 'translate: rfuzzy_modifier(P_N/P_A)', rfuzzy_modifier(P_N/P_A)).
+
+translate((define_negation_op(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
+	print_msg('debug', 'translate: define_negation_op(P_N/P_A)', define_negation_op(P_N/P_A)),
+	save_rfuzzy_negation_ops_list([(P_N, P_A, Var_In, Var_Out, Code)], Translation),
+	print_msg('debug', 'translate: define_negation_op(P_N/P_A)', define_negation_op(P_N/P_A)).
 
 % Predicate type(s) definition (Class = database).
 translate(rfuzzy_define_database(P_N/P_A, Description), Cls):- !,
@@ -916,6 +925,33 @@ save_rfuzzy_modifiers_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | 
 	save_predicate_definition(P_N, P_A, P_T, 'modifier', []), !,
 
 	save_rfuzzy_modifiers_list(More, Translations).
+
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+save_rfuzzy_negation_ops_list([], []) :- !.
+save_rfuzzy_negation_ops_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code) | More], [Translation | Translations]) :-
+	nonvar(P_N), nonvar(P_A), number(P_A), P_A = 2,
+
+	functor(Modifier, P_N, P_A),
+	arg(1, Modifier, Fuzzy_Predicate_Functor_In),
+	arg(2, Modifier, Truth_Value_Out),
+
+	Translation = ( Modifier :-	
+		      functor(Fuzzy_Predicate_Functor_In, _FP_Name, FP_Arity), 
+		      arg(FP_Arity, Fuzzy_Predicate_Functor_In, Truth_Value_In),
+		      Fuzzy_Predicate_Functor_In,
+		      Code,
+		      Truth_Value_Out .>=. 0, 
+		      Truth_Value_Out .=<. 1
+		      ),
+
+	P_T = [rfuzzy_predicate_type, rfuzzy_truth_value_type],
+	% save_predicate_definition(P_N, P_A, P_T, P_MI)
+	save_predicate_definition(P_N, P_A, P_T, 'negation', []), !,
+
+	save_rfuzzy_negation_ops_list(More, Translations).
 
 
 % ------------------------------------------------------
