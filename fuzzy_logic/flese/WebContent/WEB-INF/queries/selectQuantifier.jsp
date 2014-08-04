@@ -35,7 +35,7 @@
 	<%=JspsUtils.comboBoxDefaultValue() %>
 
 	<% for (int i=0; i<predicatesInfos.length; i++) { %>
-	<% if (! predicatesInfos[i].getPredicateName().equals("fnot")) { %>
+	<% if (predicatesInfos[i].hasPredicateOrigin(KConstants.PredicateOrigins.modifier)) { %>
 	<option title='<%=i %>'
 		value='<%=predicatesInfos[i].getPredicateName() %>'>
 		<%=JspsUtils.getPrologNameInColloquialLanguage(predicatesInfos[i].getPredicateName()) %>

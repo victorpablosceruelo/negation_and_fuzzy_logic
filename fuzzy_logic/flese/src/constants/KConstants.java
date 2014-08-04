@@ -146,6 +146,22 @@ public class KConstants {
 
 	}
 
+	public static class PredicateOrigins {
+		public static final String framework = "framework";
+		public static final String db_field = "db_field";
+		public static final String type = "type";
+		public static final String negation = "negation";
+		public static final String modifier = "modifier";
+		public static final String aggregator = "aggregator";
+		public static final String similarity = "similarity";
+		public static final String value = "value";
+		public static final String function = "function";
+		public static final String rule = "rule";
+		public static final String defaults_to = "defaults_to";
+		public static final String synonym_of = "synonym_of";
+		public static final String antonym_of = "antonym_of";
+	}
+	
 	public static class MoreInfoTypes {
 		public static final String fuzzyRule = "fuzzy_rule";
 		public static final String database = "database";

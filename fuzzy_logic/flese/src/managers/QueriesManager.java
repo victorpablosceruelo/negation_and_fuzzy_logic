@@ -90,7 +90,7 @@ public class QueriesManager extends AbstractManager {
 				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
 		resultsStoreHouse.setCiaoPrologProgramIntrospection(programIntrospection);
-		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectQuantifierPage, ""));
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectModifierPage, ""));
 	}
 
 	public void selectOperator() throws Exception {
