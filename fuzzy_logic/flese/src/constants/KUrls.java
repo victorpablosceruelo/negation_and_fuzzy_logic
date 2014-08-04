@@ -109,8 +109,8 @@ public class KUrls {
 		public static final UrlMap SelectNegationPage = getUrlMap(manager, "", null, null, "WEB-INF/queries/selectNegation.jsp");
 		public static final UrlMap SelectNegation = getUrlMap(manager, "selectNegation", SelectNegationPage, KUrls.Pages.Exception, "");
 
-		public static final UrlMap SelectModifierPage = getUrlMap(manager, "", null, null, "WEB-INF/queries/selectQuantifier.jsp");
-		public static final UrlMap SelectModifier = getUrlMap(manager, "selectQuantifier", SelectModifierPage, KUrls.Pages.Exception, "");
+		public static final UrlMap SelectModifierPage = getUrlMap(manager, "", null, null, "WEB-INF/queries/selectModifier.jsp");
+		public static final UrlMap SelectModifier = getUrlMap(manager, "selectModifier", SelectModifierPage, KUrls.Pages.Exception, "");
 
 		public static final UrlMap SelectOperatorPage = getUrlMap(manager, "", null, null, "WEB-INF/queries/selectOperator.jsp");
 		public static final UrlMap SelectOperator = getUrlMap(manager, "selectOperator", SelectOperatorPage, KUrls.Pages.Exception, "");
