@@ -246,6 +246,7 @@ public class PredicateInfo {
 		
 		while ((!found) && (i<this.predicateOrigins.length)) {
 			found = predOrigin.equals(predicateOrigins[i].trim().toUpperCase());
+			i++;
 		}
 		return found;
 	}

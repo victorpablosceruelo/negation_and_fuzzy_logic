@@ -85,7 +85,7 @@ public class QueriesManager extends AbstractManager {
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Queries.SelectNegationPage, ""));
 	}
 
-	public void selectQuantifier() throws Exception {
+	public void selectModifier() throws Exception {
 		CiaoPrologProgramIntrospectionQuery ciaoPrologProgramIntrospectionQuery = CiaoPrologProgramIntrospectionQuery
 				.getInstance(requestStoreHouse);
 		ProgramIntrospection programIntrospection = ciaoPrologProgramIntrospectionQuery.getProgramIntrospection();
