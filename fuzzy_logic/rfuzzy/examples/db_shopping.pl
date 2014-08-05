@@ -1,7 +1,7 @@
 :- module(db_shopping, _, [rfuzzy, clpr, pkgs_output_debug]).
 
 % Database declaration
-rfuzzy_define_database(car/17, 
+define_database(car/17, 
 	[(id, rfuzzy_enum_type), 
 	  (manufacturer, rfuzzy_enum_type),
 	   (class,  rfuzzy_enum_type),
@@ -63,8 +63,11 @@ cheap(car) :~ antonym_of(expensive(car), prod, 1).
 unexpensive(car) :~ synonym_of(cheap(car), prod, 1).
 familiar(car) :~ synonym_of(big(car), prod, 1).
 
-rfuzzy_negation(godel_neg/2, TV_In, TV_Out) :-
+define_negation_op(godel_neg/2, TV_In, TV_Out) :-
 	((TV_In .=. 0, TV_Out .=. 1) ; (\+(TV_In .=. 0), TV_Out .=. 0)).
 
-rfuzzy_modifier(too_much/2, TV_In, TV_Out) :-
+define_modifier(too_much/2, TV_In, TV_Out) :-
 	TV_Out .=. TV_In * TV_In * TV_In.
+
+define_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
+	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).

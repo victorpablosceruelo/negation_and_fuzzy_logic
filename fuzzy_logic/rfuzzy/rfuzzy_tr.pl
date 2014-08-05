@@ -371,7 +371,7 @@ translate((P_F :~ PB_In), Cls) :- !,
 % Although aggregators are just crisp predicates of arity 3, 
 % we use the following to ensure programmers do not use as aggregators
 % fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
-translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
+translate((define_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
 
@@ -386,7 +386,7 @@ translate((rfuzzy_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, 'aggregator', []),
 	!.
 
-translate((rfuzzy_modifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
+translate((define_modifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
 	print_msg('debug', 'translate: rfuzzy_modifier(P_N/P_A)', rfuzzy_modifier(P_N/P_A)),
 	save_rfuzzy_modifiers_list([(P_N, P_A, Var_In, Var_Out, Code)], Translation),
 	print_msg('debug', 'translate: rfuzzy_modifier(P_N/P_A)', rfuzzy_modifier(P_N/P_A)).
@@ -397,11 +397,11 @@ translate((define_negation_op(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :
 	print_msg('debug', 'translate: define_negation_op(P_N/P_A)', define_negation_op(P_N/P_A)).
 
 % Predicate type(s) definition (Class = database).
-translate(rfuzzy_define_database(P_N/P_A, Description), Cls):- !,
+translate(define_database(P_N/P_A, Description), Cls):- !,
 	translate_rfuzzy_define_database(P_N, P_A, Description, Cls).
 
 % Predicate type(s) definition (Class \== database).
-translate(rfuzzy_type_for(P_N/P_A, P_T), Cls):-
+translate(define_type_for(P_N/P_A, P_T), Cls):-
 	!, % If patter matching, backtracking forbiden.
 	print_msg('debug', 'translate_rfuzzy_type_for(P_N, P_A, P_T)', (P_N, P_A, P_T)),
 	nonvar(P_N), nonvar(P_A), number(P_A), nonvar(P_T), 
@@ -410,9 +410,9 @@ translate(rfuzzy_type_for(P_N/P_A, P_T), Cls):-
 	print_msg('debug', 'translate_rfuzzy_type_for(Cls)', Cls).
 
 % Similarity between elements.
-translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value)), []) :-
+translate((define_similarity_between(Database, Element1, Element2, Truth_Value)), []) :-
 	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, 'prod', 1).
-translate((rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), []) :-
+translate((define_similarity_between(Database, Element1, Element2, Truth_Value) cred (Credibility_Operator, Credibility)), []) :-
 	translate_rfuzzy_similarity_between(Database, Element1, Element2, Truth_Value, Credibility_Operator, Credibility).
 
 % crisp predicates (non-facts) and crisp facts.
