@@ -107,7 +107,16 @@ public class SessionStoreHouse {
 		return (providerId == null) ? "" : providerId;
 	}
 
-	public synchronized void addToRegistryStoreHouse(RegistryEntry registryEntry) {
+	public void addToRegistryStoreHouse(RegistryEntry registryEntry) {
+		try {
+			addToRegistryStoreHouseAux(registryEntry);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private synchronized void addToRegistryStoreHouseAux(RegistryEntry registryEntry) {
 		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
 		if (session != null) {
 			session.removeAttribute(KConstants.Session.registryStoreHouse);
