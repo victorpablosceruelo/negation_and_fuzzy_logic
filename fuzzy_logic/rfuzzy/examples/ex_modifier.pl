@@ -9,4 +9,7 @@ greater(X,Y):- X.>.Y.
 
 % QUANTIFIERS
 rfuzzy_modifier(a_little/2, TV_In, TV_Out) :-
-	TV_Out .=. TV_In / TV_In.
+	TV_Out * TV_Out .=. TV_In.
+
+rfuzzy_modifier(too_much/2, TV_In, TV_Out) :-
+	TV_Out .=. TV_In * TV_In * TV_In.

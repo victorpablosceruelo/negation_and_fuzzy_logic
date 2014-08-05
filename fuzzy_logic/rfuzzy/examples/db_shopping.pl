@@ -63,3 +63,8 @@ cheap(car) :~ antonym_of(expensive(car), prod, 1).
 unexpensive(car) :~ synonym_of(cheap(car), prod, 1).
 familiar(car) :~ synonym_of(big(car), prod, 1).
 
+rfuzzy_negation(godel_neg/2, TV_In, TV_Out) :-
+	((TV_In .=. 0, TV_Out .=. 1) ; (\+(TV_In .=. 0), TV_Out .=. 0)).
+
+rfuzzy_modifier(too_much/2, TV_In, TV_Out) :-
+	TV_Out .=. TV_In * TV_In * TV_In.
