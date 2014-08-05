@@ -1071,15 +1071,26 @@ test_type_definition(_P_A, _Actual, Types) :-
 	print_msg('error', 'test_type_definition :: Types', Types),
 	!, fail.
 
-test_type_definition_aux(Type) :-
+test_type_definition_aux1(Type/1) :-
+	test_type_definition_aux2(Type), !.
+
+test_type_definition_aux1(Type) :-
+	test_type_definition_aux2(Type), !.
+
+test_type_definition_aux2(Type) :-
 	print_msg('debug', 'test_type_definition_aux :: Type', Type),
 	functor(Type, P_N, Fake_P_A),
 	print_msg('debug', 'test_type_definition_aux :: (P_N, Fake_P_A)', (P_N, Fake_P_A)),
+	nonvar(P_N), nonvar(Fake_P_A),
+	P_N \== '/',
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(P_N, _P_A, _P_T, 'true'),
 	!.
-test_type_definition_aux(Type) :-
+test_type_definition_aux(Type/1) :-
 	print_msg('error', 'Not an adequate type name', Type), !, fail.
+
+test_type_definition_aux(Type) :-
+	print_msg('error', 'Type must have the format Name/Arity, where arity must be 1', Type), !, fail.
 
 % ------------------------------------------------------
 % ------------------------------------------------------
