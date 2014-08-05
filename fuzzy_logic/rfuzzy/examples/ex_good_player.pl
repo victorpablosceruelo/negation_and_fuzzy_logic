@@ -1,7 +1,7 @@
 :- module(ex_good_player,_,[rfuzzy, clpr]).
 
 % Define the database.
-rfuzzy_define_database(player/4, 
+define_database(player/4, 
 	[(id, rfuzzy_enum_type), 
 	  (swift, rfuzzy_truth_value_type),
 	   (height, rfuzzy_integer_type), % Height of players in mm.

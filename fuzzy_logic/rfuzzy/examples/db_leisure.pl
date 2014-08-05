@@ -4,8 +4,8 @@
 % :- activate_rfuzzy_debug.
 
 % Define the restaurants database format.
-rfuzzy_define_database(restaurant/7, 
-	[(name, rfuzzy_string_type), 
+define_database(restaurant/7, 
+	[(rest_name, rfuzzy_string_type), 
 	  (restaurant_type, rfuzzy_enum_type), 
 	   (food_type, rfuzzy_enum_type),
 	    (years_since_opening, rfuzzy_integer_type), 
@@ -30,11 +30,11 @@ restaurant(zalacain,                         fine_dining,    basque,            
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(tapas), 0.7).
-rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(spanish), 0.8) cred (prod, 0.9).
-rfuzzy_similarity_between(restaurant, food_type(mediterranean), food_type(italian), 0.8) cred (prod, 0.9).
-rfuzzy_similarity_between(restaurant, food_type(spanish), food_type(mediterranean), 0.6) cred (prod, 0.9).
-rfuzzy_similarity_between(restaurant, food_type(italian), food_type(mediterranean), 0.6) cred (prod, 0.9).
+define_similarity_between(restaurant, food_type(spanish), food_type(tapas), 0.7).
+define_similarity_between(restaurant, food_type(mediterranean), food_type(spanish), 0.8) cred (prod, 0.9).
+define_similarity_between(restaurant, food_type(mediterranean), food_type(italian), 0.8) cred (prod, 0.9).
+define_similarity_between(restaurant, food_type(spanish), food_type(mediterranean), 0.6) cred (prod, 0.9).
+define_similarity_between(restaurant, food_type(italian), food_type(mediterranean), 0.6) cred (prod, 0.9).
 
 near_the_city_center(restaurant) :~ defaults_to(0).
 near_the_city_center(restaurant):~ function(distance_to_the_city_center(restaurant), [ (0, 1), (100, 1), (1000, 0.1) ]).
@@ -44,13 +44,13 @@ traditional(restaurant) :~ function(years_since_opening(restaurant), [ (0, 1), (
 
 cheap(restaurant) :~ defaults_to(0.5).
 cheap(restaurant) :~ defaults_to(0.2) if (near_the_city_center(restaurant) is_over 0.7).
-cheap(restaurant) :~ value(0.1) if (name(restaurant) equals zalacain).
+cheap(restaurant) :~ value(0.1) if (rest_name(restaurant) equals zalacain).
 cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15, 0.9), (20, 0.8), (30, 0.5), (50, 0.1), (100, 0) ]).
 
 unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
 expensive(restaurant) :~ antonym_of(cheap(restaurant), prod, 1).
 
-rfuzzy_modifier(too_much/2, TV_In, TV_Out) :-
+define_modifier(too_much/2, TV_In, TV_Out) :-
  	Thershold .=. 0.7,
 	Min_In .=. TV_In - Thershold, 
 	min(0, Min_In, Dividend), 
@@ -61,8 +61,8 @@ tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), 
 tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_credibility (min, 0.5) .
 
 % Define the films database format.
-rfuzzy_define_database(film/8, 
-	[(name, rfuzzy_string_type), 
+define_database(film/8, 
+	[(film_name, rfuzzy_string_type), 
 	  (release_year, rfuzzy_integer_type), 
 	   (duration_in_minutes, rfuzzy_integer_type),
 	    (genre, rfuzzy_enum_type), 
@@ -103,45 +103,45 @@ long_duration(film) :~ defaults_to( 0 ).
 long_duration(film) :~ function(duration_in_minutes(film), [ (120, 0), (180, 1), (600, 1)]) .
 
 % similarity over genres
-rfuzzy_similarity_between(film, genre(drama), genre(drama), 1).
-rfuzzy_similarity_between(film, genre(drama), genre(romance), 0.6).
-rfuzzy_similarity_between(film, genre(drama), genre(western), 0.1).
-rfuzzy_similarity_between(film, genre(drama), genre(adventure), 0.1).
-rfuzzy_similarity_between(film, genre(drama), genre(comedy), 0).
-rfuzzy_similarity_between(film, genre(romance), genre(drama), 0.6).
+define_similarity_between(film, genre(drama), genre(drama), 1).
+define_similarity_between(film, genre(drama), genre(romance), 0.6).
+define_similarity_between(film, genre(drama), genre(western), 0.1).
+define_similarity_between(film, genre(drama), genre(adventure), 0.1).
+define_similarity_between(film, genre(drama), genre(comedy), 0).
+define_similarity_between(film, genre(romance), genre(drama), 0.6).
 
-fuzzy_similarity_between(film, genre(romance), genre(romance), 1).
-rfuzzy_similarity_between(film, genre(romance), genre(western), 0.4).
-rfuzzy_similarity_between(film, genre(romance), genre(adventure), 0.3).
-rfuzzy_similarity_between(film, genre(romance), genre(comedy), 0.3).
-rfuzzy_similarity_between(film, genre(western), genre(drama), 0.1).
-rfuzzy_similarity_between(film, genre(western), genre(romance), 0.4).
+define_similarity_between(film, genre(romance), genre(romance), 1).
+define_similarity_between(film, genre(romance), genre(western), 0.4).
+define_similarity_between(film, genre(romance), genre(adventure), 0.3).
+define_similarity_between(film, genre(romance), genre(comedy), 0.3).
+define_similarity_between(film, genre(western), genre(drama), 0.1).
+define_similarity_between(film, genre(western), genre(romance), 0.4).
 
-fuzzy_similarity_between(film, genre(western), genre(western), 1).
-rfuzzy_similarity_between(film, genre(western), genre(adventure), 0.8).
-rfuzzy_similarity_between(film, genre(western), genre(comedy), 0.1).
-rfuzzy_similarity_between(film, genre(adventure), genre(drama), 0.1).
-rfuzzy_similarity_between(film, genre(adventure), genre(romance), 0.3).
-rfuzzy_similarity_between(film, genre(adventure), genre(western), 0.8).
+define_similarity_between(film, genre(western), genre(western), 1).
+define_similarity_between(film, genre(western), genre(adventure), 0.8).
+define_similarity_between(film, genre(western), genre(comedy), 0.1).
+define_similarity_between(film, genre(adventure), genre(drama), 0.1).
+define_similarity_between(film, genre(adventure), genre(romance), 0.3).
+define_similarity_between(film, genre(adventure), genre(western), 0.8).
 
-fuzzy_similarity_between(film, genre(adventure), genre(adventure), 1).
-rfuzzy_similarity_between(film, genre(adventure), genre(comedy), 0.2).
-rfuzzy_similarity_between(film, genre(comedy), genre(drama), 0).
-rfuzzy_similarity_between(film, genre(comedy), genre(romance), 0.3).
-rfuzzy_similarity_between(film, genre(comedy), genre(western), 0.1).
-rfuzzy_similarity_between(film, genre(comedy), genre(adventure), 0.2).
-%rfuzzy_similarity_between(film, genre(comedy), genre(comedy), 1.
+define_similarity_between(film, genre(adventure), genre(adventure), 1).
+define_similarity_between(film, genre(adventure), genre(comedy), 0.2).
+define_similarity_between(film, genre(comedy), genre(drama), 0).
+define_similarity_between(film, genre(comedy), genre(romance), 0.3).
+define_similarity_between(film, genre(comedy), genre(western), 0.1).
+define_similarity_between(film, genre(comedy), genre(adventure), 0.2).
+%define_similarity_between(film, genre(comedy), genre(comedy), 1.
 
 % similarity over languages
-% rfuzzy_similarity_between(film, original_language(english), original_language(english), 1).
-rfuzzy_similarity_between(film, original_language(english), original_language(spanish), 0.2).
-rfuzzy_similarity_between(film, original_language(english), original_language(italian), 0.2).
-rfuzzy_similarity_between(film, original_language(spanish), original_language(english), 0.2).
-% rfuzzy_similarity_between(film, original_language(spanish), original_language(spanish), 1).
-rfuzzy_similarity_between(film, original_language(spanish), original_language(italian), 0.7).
-rfuzzy_similarity_between(film, original_language(italian), original_language(english), 0.2).
-rfuzzy_similarity_between(film, original_language(italian), original_language(spanish), 0.7).
-% rfuzzy_similarity_between(film, original_language(italian), original_language(italian), 1).
+% define_similarity_between(film, original_language(english), original_language(english), 1).
+define_similarity_between(film, original_language(english), original_language(spanish), 0.2).
+define_similarity_between(film, original_language(english), original_language(italian), 0.2).
+define_similarity_between(film, original_language(spanish), original_language(english), 0.2).
+% define_similarity_between(film, original_language(spanish), original_language(spanish), 1).
+define_similarity_between(film, original_language(spanish), original_language(italian), 0.7).
+define_similarity_between(film, original_language(italian), original_language(english), 0.2).
+define_similarity_between(film, original_language(italian), original_language(spanish), 0.7).
+% define_similarity_between(film, original_language(italian), original_language(italian), 1).
 
 % funny is an example of a discrete attribute
 funny(film) :~ value(0) if (genre(film) is_not comedy).

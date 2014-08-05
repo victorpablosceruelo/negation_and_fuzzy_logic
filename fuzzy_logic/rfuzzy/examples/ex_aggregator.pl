@@ -8,8 +8,8 @@ equal(X,X).
 greater(X,Y):- X.>.Y.
 
 % AGGREGATORS
-rfuzzy_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
+define_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
 	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).
 
-rfuzzy_aggregator(special_prod/3, TV_In_1, TV_In_2, TV_Out) :-
+define_aggregator(special_prod/3, TV_In_1, TV_In_2, TV_Out) :-
 	TV_Out .=. TV_In_1 * TV_In_2.

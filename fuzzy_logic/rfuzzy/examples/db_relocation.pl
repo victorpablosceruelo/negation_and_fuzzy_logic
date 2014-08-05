@@ -4,7 +4,7 @@
 % :- activate_rfuzzy_debug.
 
 % TYPE DECLARATION
-rfuzzy_define_database(house/13, 
+define_database(house/13, 
 	[(code, rfuzzy_enum_type), 
 	  (house_type, rfuzzy_enum_type), 
 	   (size_in_m2, rfuzzy_integer_type),

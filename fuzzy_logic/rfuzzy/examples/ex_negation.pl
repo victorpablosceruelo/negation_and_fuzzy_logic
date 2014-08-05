@@ -8,5 +8,5 @@ equal(X,X).
 greater(X,Y):- X.>.Y.
 
 % QUANTIFIERS
-rfuzzy_negation(godel_neg/2, TV_In, TV_Out) :-
+define_negation_op(godel_neg/2, TV_In, TV_Out) :-
 	((TV_In .=. 0, TV_Out .=. 1) ; (\+(TV_In .=. 0), TV_Out .=. 0)).

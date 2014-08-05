@@ -1,6 +1,6 @@
 :- module(ex_job_selection,_,[rfuzzy, clpr]).
 
-rfuzzy_define_database(position/5, 
+define_database(position/5, 
 	[(id, rfuzzy_string_type), 
 	  (interest, rfuzzy_truth_value_type), 
 	   (distance, rfuzzy_truth_value_type),

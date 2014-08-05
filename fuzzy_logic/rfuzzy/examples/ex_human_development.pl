@@ -1,6 +1,6 @@
 :- module(ex_human_development,_,[rfuzzy, clpr]).
 
-rfuzzy_define_database(country/4, 
+define_database(country/4, 
 	[(id, rfuzzy_string_type), 
 	  (living_standard, rfuzzy_truth_value_type), 
 	   (literacy_rate, rfuzzy_truth_value_type),

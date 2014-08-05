@@ -1,7 +1,7 @@
 :- module(db_travels,_,[rfuzzy, clpr]).
 
 % Define the database.
-rfuzzy_define_database(city/3, 
+define_database(city/3, 
 	[(id, rfuzzy_enum_type), 
 	  (nice_weather, rfuzzy_truth_value_type),
 	   (many_sights,  rfuzzy_truth_value_type)]).
