@@ -1055,13 +1055,13 @@ translate_rfuzzy_rule_body(Body_F, _TV_Aggregator, _NP_Arg_Input, _P_TN, _Truth_
 test_type_definition(P_A, Actual, [Type]) :-
 	print_msg('debug', 'test_type_definition(P_A, Actual, Type)', (P_A, Actual, [Type]) ),
 	Actual = P_A, !, % Security conditions.
-	test_type_definition_aux(Type),
+	test_type_definition_aux_1(Type),
 	!. % Backtracking not allowed.
 
 test_type_definition(P_A, Actual, [Type | More]) :-
 	print_msg('debug', 'test_type_definition(P_A, Actual, Type)', (P_A, Actual, [Type|More]) ),
 	Actual < P_A, !,  % Security conditions.
-	test_type_definition_aux(Type),
+	test_type_definition_aux_1(Type),
 	NewActual is Actual + 1, % Next values.
 	!,
 	test_type_definition(P_A, NewActual, More),
@@ -1071,13 +1071,13 @@ test_type_definition(_P_A, _Actual, Types) :-
 	print_msg('error', 'test_type_definition :: Types', Types),
 	!, fail.
 
-test_type_definition_aux1(Type/1) :-
-	test_type_definition_aux2(Type), !.
+test_type_definition_aux_1(Type/1) :-
+	test_type_definition_aux_2(Type), !.
 
-test_type_definition_aux1(Type) :-
-	test_type_definition_aux2(Type), !.
+test_type_definition_aux_1(Type) :-
+	test_type_definition_aux_2(Type), !.
 
-test_type_definition_aux2(Type) :-
+test_type_definition_aux_2(Type) :-
 	print_msg('debug', 'test_type_definition_aux :: Type', Type),
 	functor(Type, P_N, Fake_P_A),
 	print_msg('debug', 'test_type_definition_aux :: (P_N, Fake_P_A)', (P_N, Fake_P_A)),
@@ -1086,10 +1086,10 @@ test_type_definition_aux2(Type) :-
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),
 	retrieve_predicate_info(P_N, _P_A, _P_T, 'true'),
 	!.
-test_type_definition_aux(Type/1) :-
+test_type_definition_aux_2(Type/1) :-
 	print_msg('error', 'Not an adequate type name', Type), !, fail.
 
-test_type_definition_aux(Type) :-
+test_type_definition_aux_2(Type) :-
 	print_msg('error', 'Type must have the format Name/Arity, where arity must be 1', Type), !, fail.
 
 % ------------------------------------------------------
