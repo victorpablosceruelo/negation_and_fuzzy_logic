@@ -60,4 +60,8 @@ public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 			FilesAndPathsException {
 		return new CiaoPrologTestingQuery(programFileInfo);
 	}
+
+	@Override
+	public void adequationOfQueryAnswers() {
+	}
 }

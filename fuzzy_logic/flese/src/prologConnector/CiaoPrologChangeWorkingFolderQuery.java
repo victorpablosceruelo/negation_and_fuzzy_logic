@@ -38,4 +38,8 @@ public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract 
 		return new CiaoPrologChangeWorkingFolderQuery(programFileInfo);
 	}
 
+	@Override
+	public void adequationOfQueryAnswers() {
+	}
+
 }

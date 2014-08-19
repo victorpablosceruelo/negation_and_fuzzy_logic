@@ -1,6 +1,7 @@
 package prologConnector;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import logs.LogsManager;
 
@@ -99,6 +100,8 @@ public class PlConnectionEnvelope {
 		long timesCounter;
 		boolean queryIsStillRunning = true;
 
+		ArrayList<CiaoPrologQueryAnswer> ciaoPrologQueryAnswers = new ArrayList<CiaoPrologQueryAnswer>();
+		
 		StringBuilder msgsAccumulator = new StringBuilder();
 		do { // Get all the answers you can.
 			prologQueryAnswer = null;
@@ -146,7 +149,7 @@ public class PlConnectionEnvelope {
 
 					ciaoPrologQueryAnswer.addCiaoPrologVariableAnswer(variableName, ciaoPrologTermInJava);
 				}
-				query.addQueryAnswer(ciaoPrologQueryAnswer);
+				ciaoPrologQueryAnswers.add(ciaoPrologQueryAnswer);
 				// LOG.info(msgsAccumulator);
 			} else {
 				// LOG.info("performQueryAux: answer obtained: null ");
@@ -155,6 +158,9 @@ public class PlConnectionEnvelope {
 
 		} while ((prologQueryAnswer != null) && (answersCounter < KConstants.CiaoPrologQuery.maximumNumberOfAnswers));
 
+		CiaoPrologQueryAnswer [] ciaoPrologQueryAnswersArray = ciaoPrologQueryAnswers.toArray(new CiaoPrologQueryAnswer[ciaoPrologQueryAnswers.size()]);
+		query.setQueryAnswers(ciaoPrologQueryAnswersArray);
+		
 		LOG.info(msgsAccumulator.toString());
 		// LOG.info("performQueryAux: terminating goal execution ...");
 		if (evaluatedGoal != null) {

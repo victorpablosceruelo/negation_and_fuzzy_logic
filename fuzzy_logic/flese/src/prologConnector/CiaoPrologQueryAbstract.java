@@ -26,7 +26,7 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 	private PLVariable[] variables = null;
 
 	protected String[] variablesNames = null;
-	protected ArrayList<CiaoPrologQueryAnswer> queryAnswers = null;
+	private CiaoPrologQueryAnswer [] queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
 	
 	protected CiaoPrologQueryAbstract(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
@@ -36,7 +36,7 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 
 		this.programFileInfo = programFileInfo;
 
-		this.queryAnswers = new ArrayList<CiaoPrologQueryAnswer>();
+		this.queryAnswers = new CiaoPrologQueryAnswer[0];
 	}
 
 	protected void setRealQuery(PLStructure query, PLVariable[] variables, String[] variablesNames) throws CiaoPrologConnectorException {
@@ -92,12 +92,13 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 		return variablesNames.length;
 	}
 
-	public void addQueryAnswer(CiaoPrologQueryAnswer ciaoPrologQueryAnswer) {
-		this.queryAnswers.add(ciaoPrologQueryAnswer);
+	public void setQueryAnswers(CiaoPrologQueryAnswer [] ciaoPrologQueryAnswers) {
+		this.queryAnswers = ciaoPrologQueryAnswers;
+		adequationOfQueryAnswers();
 	}
 
 	public CiaoPrologQueryAnswer[] getQueryAnswers() {
-		return this.queryAnswers.toArray(new CiaoPrologQueryAnswer[this.queryAnswers.size()]);
+		return this.queryAnswers;
 	}
 
 	public String toString() {

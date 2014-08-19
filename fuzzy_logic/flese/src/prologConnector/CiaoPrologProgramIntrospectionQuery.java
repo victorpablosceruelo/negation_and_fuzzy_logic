@@ -73,14 +73,18 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 
 	public ProgramIntrospection getProgramIntrospection() {
 		// if (programIntrospection != null) return programIntrospection;
+		return this.programIntrospection;
+	}
 
+	@Override
+	public void adequationOfQueryAnswers() {
 		programIntrospection = new ProgramIntrospection(getProgramFileInfo());
 		CiaoPrologQueryAnswer answer = null;
-		for (int i = 0; i < queryAnswers.size(); i++) {
-			answer = queryAnswers.get(i);
+		CiaoPrologQueryAnswer [] queryAnswers = getQueryAnswers();
+		for (int i = 0; i < queryAnswers.length; i++) {
+			answer = queryAnswers[i];
 			programIntrospection.addAnswerInfo(answer);
 		}
-		return programIntrospection;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
