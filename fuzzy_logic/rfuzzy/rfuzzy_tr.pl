@@ -8,7 +8,7 @@
 
 % Important info to be saved.
 :- data predicate_definition/5.
-:- data aggregators/1.
+:- data connectives/1.
 :- data sentences/2.
 :- data defined_modifiers_code/1.
 :- data defined_negation_ops_code/1.
@@ -19,7 +19,7 @@
 
 clean_up_asserted_facts :-
 	findall('done', retract_fact(predicate_definition(_11, _12, _13, _14, _15)), _Removed_1),
-	findall('done', retract_fact(aggregators(_21)), _Removed_2),
+	findall('done', retract_fact(connectives(_21)), _Removed_2),
 	findall('done', retract_fact(sentences(_31, _32)), _Removed_3),
 	findall('done', retract_fact(defined_modifiers_code(_41)), _Removed_4),
 	!.
@@ -257,9 +257,9 @@ rfuzzy_trans_sent_aux(0, []) :- !,
 	save_predicate_definition('rfuzzy_boolean_type', 1, ['null'], 'type', []),
 	save_predicate_definition('rfuzzy_datetime_type', 1, ['null'], 'type', []),
 
-	rfuzzy_defined_aggregators(Defined_Aggregators_List),
+	rfuzzy_defined_connectives(Defined_Aggregators_List),
 	Aggregators_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
-	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, 'aggregator', []),
+	save_predicates_definition_list(Defined_Aggregators_List, 3, Aggregators_Type, 'connective', []),
 	
 	rfuzzy_compute_defined_comparators(Compute_Defined_Comparators),
 	save_predicate_definition('rfuzzy_compute_defined_operators', 0, [], 'framework', ('defined_operators', Compute_Defined_Comparators)),
@@ -368,10 +368,10 @@ translate((P_F :~ PB_In), Cls) :- !,
 
 	translate_fuzzy(Pred_Info, Cls).
 
-% Although aggregators are just crisp predicates of arity 3, 
-% we use the following to ensure programmers do not use as aggregators
+% Although connectives are just crisp predicates of arity 3, 
+% we use the following to ensure programmers do not use as connectives
 % fuzzy predicates (of arity 3 too). An error like that is very difficult to find.
-translate((define_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
+translate((define_connective(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2, TV_Out) :- Code), [Translation]) :-
 	!, % If patter matching, backtracking forbiden.
 	nonvar(Aggregator_Name), number(Aggregator_Arity), Aggregator_Arity = 3,
 
@@ -383,7 +383,7 @@ translate((define_aggregator(Aggregator_Name/Aggregator_Arity, TV_In_1, TV_In_2,
 
 	Aggregator_Type = ['rfuzzy_truth_value_type', 'rfuzzy_truth_value_type', 'rfuzzy_truth_value_type'],
 	% save_predicate_definition(P_N, P_A, P_T, P_MI)
-	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, 'aggregator', []),
+	save_predicate_definition(Aggregator_Name, Aggregator_Arity, Aggregator_Type, 'connective', []),
 	!.
 
 translate((define_modifier(P_N/P_A, Var_In, Var_Out) :- Code), Translation) :- !,
@@ -480,16 +480,16 @@ translate_fuzzy(Pred_Info, Cls) :-
 		P_B_Name = 'rule', P_B_Arity = 2,
 		arg(1, P_B, Rule_Op),
 		arg(2, P_B, Rule_Body),
-		test_aggregator_is_defined(Rule_Op, 'yes'),
+		test_connective_is_defined(Rule_Op, 'yes'),
 		translate_rfuzzy_rule_body(Rule_Body, Rule_Op, NP_Arg_Input, P_TN, Cl_Body_TV, Cl_Body),
 		Cl_Body_Prio = 0.4
 	    )	
 	;
-	    (   % Fuzzy Rule (without truth values aggregator) 
+	    (   % Fuzzy Rule (without truth values connective) 
 		P_B_Name = 'rule', P_B_Arity = 1,
 		Rule_Op = 'prod',
 		arg(1, P_B, Rule_Body),
-		test_aggregator_is_defined(Rule_Op, 'yes'),
+		test_connective_is_defined(Rule_Op, 'yes'),
 		translate_rfuzzy_rule_body(Rule_Body, Rule_Op, NP_Arg_Input, P_TN, Cl_Body_TV, Cl_Body),
 		Cl_Body_Prio = 0.4
 	    )	
@@ -506,7 +506,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 		P_B_Name = 'synonym_of', P_B_Arity = 3,
 		arg(1, P_B, Defined_Pred),
 		arg(2, P_B, TV_Op),
-		test_aggregator_is_defined(TV_Op, 'true'),
+		test_connective_is_defined(TV_Op, 'true'),
 		arg(3, P_B, TV_Val),
 		translate_rfuzzy_rule_synonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio)
 	    )
@@ -515,7 +515,7 @@ translate_fuzzy(Pred_Info, Cls) :-
 		P_B_Name = 'antonym_of', P_B_Arity = 3,
 		arg(1, P_B, Defined_Pred),
 		arg(2, P_B, TV_Op),
-		test_aggregator_is_defined(TV_Op, 'true'),
+		test_connective_is_defined(TV_Op, 'true'),
 		arg(3, P_B, TV_Val),
 		translate_rfuzzy_rule_antonym(Pred_Info, Defined_Pred, TV_Op, TV_Val, Cl_Body, Cl_Body_TV, Cl_Body_Prio)
 	    )
@@ -970,7 +970,7 @@ save_rfuzzy_negation_ops_list([(P_N, P_A, Truth_Value_In, Truth_Value_Out, Code)
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-test_aggregator_is_defined(P_N, Show_Error) :-
+test_connective_is_defined(P_N, Show_Error) :-
 	nonvar(P_N),
 	P_A = 3,
 	% retrieve_predicate_info(P_N, P_A, P_T, Show_Error),

@@ -69,5 +69,5 @@ define_negation_op(godel_neg/2, TV_In, TV_Out) :-
 define_modifier(too_much/2, TV_In, TV_Out) :-
 	TV_Out .=. TV_In * TV_In * TV_In.
 
-define_aggregator(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
+define_connective(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
 	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).

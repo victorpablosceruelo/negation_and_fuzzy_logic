@@ -3,7 +3,7 @@
 	rfuzzy_compute_defined_comparators/1,
 	rfuzzy_compute_aux/6,	
 	% Aggregators.
-	rfuzzy_defined_aggregators/1, 
+	rfuzzy_defined_connectives/1, 
 	inject/3, merge/4, prod/3, iprod/3, mean/3, 
 	min/3, luka/3, dprod/3, max/3, dluka/3, complement/3,
 	% Modifiers.
@@ -28,9 +28,9 @@
 % ---------------------------------------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
 
-% REMOVED: preinject/3,postinject/4, id/2, id/3, id (in defined_aggregators), 
+% REMOVED: preinject/3,postinject/4, id/2, id/3, id (in defined_connectives), 
 
-rfuzzy_defined_aggregators([min, max, prod, iprod, dprod, luka, dluka, complement, mean]).
+rfuzzy_defined_connectives([min, max, prod, iprod, dprod, luka, dluka, complement, mean]).
 
 min(X,Y,Z):- X .=<. Y, X .=. Z .
 min(X,Y,Z):- X .>. Y, Y .=. Z .

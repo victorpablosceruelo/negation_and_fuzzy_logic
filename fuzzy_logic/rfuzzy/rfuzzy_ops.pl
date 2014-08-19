@@ -26,10 +26,10 @@
 :- op(1175,xfx,'if').      % implicacion fuzzy.
 :- op(1150,fx,'fnot').     % fuzzy negation
 
-%:- op(1150, fx,aggr).      % declared associative aggregator
-%:- op(1120,xfy,'##').      % associative aggregator
-%:- op(1120,xfy,'<#').      % before apply aggregator
-%:- op(1120,xfy,'#>').      % after apply aggregator
+%:- op(1150, fx,aggr).      % declared associative connective
+%:- op(1120,xfy,'##').      % associative connective
+%:- op(1120,xfy,'<#').      % before apply connective
+%:- op(1120,xfy,'#>').      % after apply connective
 
 %:- op(1150,fx,'fuzzy'). % fuzzied
 %:- op(1190,fx,'fuzzy_predicate'). 
