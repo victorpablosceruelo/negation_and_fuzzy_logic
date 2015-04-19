@@ -101,10 +101,8 @@ public class KConstants {
 
 	public static class Session {
 		public static final String swAppInTestingMode = "swAppInTestingMode";
-		public static final String socialAuthManager = "socialAuthManager";
-		public static final String socialAuthProvider = "socialAuthProvider";
-		public static final String socialAuthProviderId = "socialAuthProviderId";
-		public static final String socialAuthProfile = "socialAuthProfile";
+		public static final String authProvider = "authProvider";
+		public static final String authProviderId = "authProviderId";
 		public static final String localUserInfo = "localUserInfo";
 		public static final String registryStoreHouse = "registryStoreHouse";
 	}

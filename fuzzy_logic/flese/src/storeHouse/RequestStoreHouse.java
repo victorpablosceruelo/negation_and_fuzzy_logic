@@ -258,15 +258,15 @@ public class RequestStoreHouse {
 		return this.request.getServerName();
 	}
 
-	public String getProviderId() {
+	public String getAuthProviderId() {
 		String providerId = "";
 		if (session != null)
-			providerId = session.getProviderId();
+			providerId = session.getAuthProviderId();
 
 		if ((providerId == null) || ("".equals(providerId))) {
 			providerId = (String) request.getParameter(KConstants.Request.providerId);
 			if (session != null)
-				session.setProviderId(providerId);
+				session.setAuthProviderId(providerId);
 		}
 		return providerId;
 	}

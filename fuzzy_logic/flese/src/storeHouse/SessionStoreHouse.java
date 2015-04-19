@@ -1,17 +1,11 @@
 package storeHouse;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.brickred.socialauth.AuthProvider;
-import org.brickred.socialauth.Profile;
-import org.brickred.socialauth.SocialAuthManager;
 
+import authProviders.AuthProviderInterface;
 import auxiliar.LocalUserInfo;
 import auxiliar.RegistryEntry;
 import constants.KConstants;
@@ -52,28 +46,6 @@ public class SessionStoreHouse {
 		return "true".equals(isInTestingMode);
 	}
 
-	public void setSocialAuthManager(SocialAuthManager socialAuthManager) {
-		session.removeAttribute(KConstants.Session.socialAuthManager);
-		if (socialAuthManager != null)
-			session.setAttribute(KConstants.Session.socialAuthManager, socialAuthManager);
-	}
-
-	public SocialAuthManager getSocialAuthManager() {
-		SocialAuthManager socialAuthManager = (SocialAuthManager) session.getAttribute(KConstants.Session.socialAuthManager);
-		return socialAuthManager;
-	}
-
-	public void setUserProfile(Profile profile) {
-		session.removeAttribute(KConstants.Session.socialAuthProfile);
-		if (profile != null)
-			session.setAttribute(KConstants.Session.socialAuthProfile, profile);
-	}
-
-	public Profile getUserProfile() {
-		Profile profile = (Profile) session.getAttribute(KConstants.Session.socialAuthProfile);
-		return profile;
-	}
-
 	public void setLocalUserInfo(LocalUserInfo localUserInfo) {
 		session.removeAttribute(KConstants.Session.localUserInfo);
 		if (localUserInfo != null)
@@ -85,37 +57,36 @@ public class SessionStoreHouse {
 		return localUserInfo;
 	}
 
-	public void setAuthProvider(AuthProvider authProvider) {
-		session.removeAttribute(KConstants.Session.socialAuthProvider);
+	public void setAuthProvider(AuthProviderInterface authProvider) {
+		session.removeAttribute(KConstants.Session.authProvider);
 		if (authProvider != null)
-			session.setAttribute(KConstants.Session.socialAuthProvider, authProvider);
+			session.setAttribute(KConstants.Session.authProvider, authProvider);
 	}
 
-	public AuthProvider getAuthProvider() {
-		AuthProvider authProvider = (AuthProvider) session.getAttribute(KConstants.Session.socialAuthProvider);
+	public AuthProviderInterface getAuthProvider() {
+		AuthProviderInterface authProvider = (AuthProviderInterface) session.getAttribute(KConstants.Session.authProvider);
 		return authProvider;
 	}
 
-	public void setProviderId(String providerId) {
-		session.removeAttribute(KConstants.Session.socialAuthProviderId);
+	public void setAuthProviderId(String providerId) {
+		session.removeAttribute(KConstants.Session.authProviderId);
 		if (providerId != null)
-			session.setAttribute(KConstants.Session.socialAuthProviderId, providerId);
+			session.setAttribute(KConstants.Session.authProviderId, providerId);
 	}
 
-	public String getProviderId() {
-		String providerId = (String) session.getAttribute(KConstants.Session.socialAuthProviderId);
+	public String getAuthProviderId() {
+		String providerId = (String) session.getAttribute(KConstants.Session.authProviderId);
 		return (providerId == null) ? "" : providerId;
 	}
 
 	public void addToRegistryStoreHouse(RegistryEntry registryEntry) {
 		try {
 			addToRegistryStoreHouseAux(registryEntry);
-		}
-		catch (Throwable e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private synchronized void addToRegistryStoreHouseAux(RegistryEntry registryEntry) {
 		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
 		if (session != null) {
@@ -136,10 +107,10 @@ public class SessionStoreHouse {
 			registryStoreHouse = (RegistryStoreHouse) session.getAttribute(KConstants.Session.registryStoreHouse);
 		return (registryStoreHouse == null) ? null : registryStoreHouse;
 	}
-	
-	public String [] getRegistryStoreHouse() {
+
+	public String[] getRegistryStoreHouse() {
 		RegistryStoreHouse registryStoreHouse = privateGetRegistryStoreHouse();
-		String [] registryEntries = new String[0];
+		String[] registryEntries = new String[0];
 		if (registryStoreHouse != null) {
 			registryEntries = registryStoreHouse.getRegistryEntries();
 		}

@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
+import authProviders.Utils;
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import constants.KConstants;
@@ -45,7 +46,10 @@ public class ProgramFileInfo {
 			throw new FilesAndPathsException("FileInfoClass constructor: fileName can not be empty string.");
 		}
 
-		LocalUserInfo.nullOnlyIfUserNameIsValid(fileOwner);
+		String invalidUserNameReason = Utils.nullOnlyIfUserNameIsValid(fileOwner);
+		if (invalidUserNameReason != null) {
+			throw new FilesAndPathsException(invalidUserNameReason);
+		}
 
 		this.fileName = fileName;
 		this.fileOwner = fileOwner;
