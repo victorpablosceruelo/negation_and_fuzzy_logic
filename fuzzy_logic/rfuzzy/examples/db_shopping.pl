@@ -1,5 +1,7 @@
 :- module(db_shopping, _, [rfuzzy, clpr, pkgs_output_debug]).
 
+:- activate_rfuzzy_debug.
+
 % Database declaration
 define_database(car/17, 
 	[(id, rfuzzy_enum_type), 
