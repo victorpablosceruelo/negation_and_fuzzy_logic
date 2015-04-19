@@ -1,6 +1,7 @@
 package managers;
 
 import storeHouse.SessionStoreHouse;
+import storeHouse.SessionStoreHouseException;
 import urls.ServerAndAppUrls;
 import authProviders.AbstractAuthProvider;
 import authProviders.AuthProviderInterface;
@@ -130,15 +131,25 @@ public class AuthManager extends AbstractManager {
 		}
 
 		// Get the provider id.
-		String providerId = requestStoreHouse.getAuthProviderId();
+		String authProviderId = requestStoreHouse.getAuthProviderId();
 
 		// Returns the host name of the server to which the request was sent.
 
 		if (ServerAndAppUrls.isAppInTestingMode(requestStoreHouse.getRequest())) {
-			requestStoreHouse.getSession().setAppInTestingMode(true);
+			try {
+				requestStoreHouse.getSession().setAppInTestingMode(true);
+			} catch (SessionStoreHouseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			localUserInfo = LocalUserInfo.getLocalUserInfo(requestStoreHouse);
 			if (localUserInfo != null) {
-				requestStoreHouse.getSession().setAuthProviderId("localhost");
+				try {
+					requestStoreHouse.getSession().setAuthProviderId("localhost");
+				} catch (SessionStoreHouseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				setNextStep(nextStep);
 				return;
 			}
@@ -148,10 +159,12 @@ public class AuthManager extends AbstractManager {
 		AuthProviderInterface authProvider = sessionStoreHouse.getAuthProvider();
 		AuthenticationResult authResult = null;
 		if (authProvider == null) {
-			signOut();
-		} else {
+			authProvider = AbstractAuthProvider.getInstance(authProviderId);
+		}
+
+		if (authProvider != null) {
 			try {
-				authResult = authProvider.authenticationFirstStep();
+				authResult = authProvider.authenticationFirstStep(nextURL);
 			} catch (Exception e) {
 				authResult = null;
 			}
@@ -167,7 +180,12 @@ public class AuthManager extends AbstractManager {
 
 			if (authResult.getNextStep() != null) {
 				// Store authentication provider in session.
-				requestStoreHouse.getSession().setAuthProvider(authProvider);
+				try {
+					requestStoreHouse.getSession().setAuthProvider(authProvider);
+				} catch (SessionStoreHouseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				setNextStep(authResult.getNextStep());
 				return;
@@ -192,11 +210,20 @@ public class AuthManager extends AbstractManager {
 			}
 		}
 
-		sessionStoreHouse.setAuthProvider(null);
-		sessionStoreHouse.setAuthProviderId(null);
+		try {
+			sessionStoreHouse.setAuthProvider(null);
+		} catch (SessionStoreHouseException e) {
+		}
+		try {
+			sessionStoreHouse.setAuthProviderId(null);
+		} catch (SessionStoreHouseException e) {
+		}
 
 		// Invalidate the session.
-		sessionStoreHouse.invalidateSession();
+		try {
+			sessionStoreHouse.invalidateSession();
+		} catch (SessionStoreHouseException e) {
+		}
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Auth.SignOutPage, ""));
 	}

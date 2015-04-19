@@ -4,7 +4,7 @@ import storeHouse.RequestStoreHouse;
 
 public interface AuthProviderInterface {
 
-	public AuthenticationResult authenticationFirstStep() throws Exception;
+	public AuthenticationResult authenticationFirstStep() throws AuthProviderException;
 	
 	public AuthenticationResult authenticationCallback(RequestStoreHouse requestStoreHouse) throws Exception;
 	

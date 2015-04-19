@@ -17,13 +17,20 @@ import constants.KConstants;
 public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProviderInterface {
 
 	private SocialAuthManager socialAuthManager;
-	private AuthProvider authProvider;
-	private String providerId;
+	private AuthProvider socialAuthProvider;
 	private Profile profile;
 
-	public AuthenticationResult authenticationFirstStep() {
+	public OpenIdAuthProvider(String authProviderId) {
+		super(authProviderId);
+	}
+
+	public AuthenticationResult authenticationFirstStep() throws AuthProviderException {
 
 		AuthenticationResult authResult = new AuthenticationResult();
+
+		if (getAuthProviderId() == null) {
+			throw new AuthProviderException("Provider id is not valid");
+		}
 
 		if (socialAuthManager == null) {
 			// Create an instance of SocialAuthConfgi object
@@ -56,10 +63,10 @@ public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProv
 			// get Provider URL to which you should redirect for authentication.
 			// id can have values "facebook", "twitter", "yahoo" etc. or the
 			// OpenID URL
-			socialAuthManager.setPermission(providerId, Permission.AUTHENTICATE_ONLY);
+			socialAuthManager.setPermission(getAuthProviderId(), Permission.AUTHENTICATE_ONLY);
 			String nextURL = null;
 			try {
-				nextURL = socialAuthManager.getAuthenticationUrl(providerId, nextURL);
+				nextURL = socialAuthManager.getAuthenticationUrl(getAuthProviderId(), nextURL);
 			} catch (Exception e) {
 				e.printStackTrace();
 				nextURL = null;
@@ -70,17 +77,15 @@ public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProv
 				authResult.setNextStep(new NextStep(KConstants.NextStep.redirect_to, null, nextURL));
 			}
 		}
-		
+
 		return authResult;
 	}
 
 	public AuthenticationResult authenticationCallback(RequestStoreHouse requestStoreHouse) throws Exception {
 
-		// Re-Initialize in session. If an exception occurs this avoids
-		// problems.
-		// socialAuthManager = null;
-		authProvider = null;
-		providerId = null;
+		// Re-Initialize in session.
+		// If an exception occurs this avoids problems.
+		socialAuthProvider = null;
 		profile = null;
 
 		if (socialAuthManager == null) {
@@ -90,25 +95,25 @@ public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProv
 		// call connect method of manager which returns the provider object.
 		// Pass request parameter map while calling connect method.
 		try {
-			authProvider = socialAuthManager.connect(SocialAuthUtil.getRequestParametersMap(requestStoreHouse.getRequest()));
+			socialAuthProvider = socialAuthManager.connect(SocialAuthUtil.getRequestParametersMap(requestStoreHouse.getRequest()));
 		} catch (Exception e) {
-			authProvider = null;
+			socialAuthProvider = null;
 			e.printStackTrace();
 			throw new Exception("Error connecting social authentication provider.");
 		}
 
-		if (authProvider == null)
-			throw new Exception("provider is null");
+		if (socialAuthProvider == null)
+			throw new Exception("social auth provider is null");
 
 		// Retrieve the provider id to rebuild the initial query.
 		// NO: authManager.getCurrentAuthProvider().getProviderId();
-		providerId = authProvider.getProviderId();
+		String providerId = socialAuthProvider.getProviderId();
 		if (providerId == null)
-			throw new Exception("providerId is null");
+			throw new Exception("providerId is null in social auth provider");
 
-		profile = authProvider.getUserProfile();
+		profile = socialAuthProvider.getUserProfile();
 		if (profile == null)
-			throw new Exception("profile is null");
+			throw new Exception("profile is null in social auth provider");
 
 		// Save new computed results in session.
 		requestStoreHouse.getSession().setAuthProvider(this);

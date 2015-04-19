@@ -62,7 +62,11 @@ public class LocalUserInfo {
 				// e.printStackTrace();
 				localUserInfo = null;
 			}
-			requestStoreHouse.getSession().setLocalUserInfo(localUserInfo);
+			try {
+				requestStoreHouse.getSession().setLocalUserInfo(localUserInfo);
+			} catch (FleSeException e) {
+				e.printStackTrace();
+			}
 		}
 		return localUserInfo;
 

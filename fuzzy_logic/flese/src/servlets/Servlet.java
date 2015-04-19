@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import storeHouse.RequestStoreHouseSessionException;
+import auxiliar.FleSeException;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
@@ -108,7 +109,7 @@ public class Servlet extends HttpServlet {
 			try {
 				requestStoreHouse = RequestStoreHouse.getRequestStoreHouse(request, createSessionIfNull, exceptionIfSessionIsNull,
 						exceptionIfLocalUserInfoIsNull);
-			} catch (RequestStoreHouseSessionException e) {
+			} catch (FleSeException e) {
 				LOG.error("Exception creating object requestStoreHouse.");
 				e.printStackTrace();
 				return new NextStep(KConstants.NextStep.forward_to, KUrls.Pages.NullSession, "");

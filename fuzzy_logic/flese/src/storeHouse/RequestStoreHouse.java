@@ -13,6 +13,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.FleSeException;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
@@ -30,8 +31,7 @@ public class RequestStoreHouse {
 	private HashMap<String, String[]> requestParams = null;
 
 	private RequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
-			boolean exceptionIfLocalUserInfoIsNull, boolean getRequestParams, boolean restoreRequestParams)
-			throws RequestStoreHouseException, RequestStoreHouseSessionException {
+			boolean exceptionIfLocalUserInfoIsNull, boolean getRequestParams, boolean restoreRequestParams) throws FleSeException {
 
 		if (request == null)
 			throw new RequestStoreHouseException("request is null");
@@ -57,10 +57,7 @@ public class RequestStoreHouse {
 		RequestStoreHouse requestStoreHouse = null;
 		try {
 			requestStoreHouse = new RequestStoreHouse(request, false, false, false, false, true);
-		} catch (RequestStoreHouseException e) {
-			e.printStackTrace();
-			requestStoreHouse = null;
-		} catch (RequestStoreHouseSessionException e) {
+		} catch (FleSeException e) {
 			e.printStackTrace();
 			requestStoreHouse = null;
 		}
@@ -68,7 +65,7 @@ public class RequestStoreHouse {
 	}
 
 	public static RequestStoreHouse getRequestStoreHouse(HttpServletRequest request, boolean create, boolean exceptionIfSessionIsNull,
-			boolean exceptionIfLocalUserInfoIsNull) throws RequestStoreHouseException, RequestStoreHouseSessionException {
+			boolean exceptionIfLocalUserInfoIsNull) throws FleSeException {
 		return new RequestStoreHouse(request, create, exceptionIfSessionIsNull, exceptionIfLocalUserInfoIsNull, true, false);
 	}
 
@@ -265,8 +262,13 @@ public class RequestStoreHouse {
 
 		if ((providerId == null) || ("".equals(providerId))) {
 			providerId = (String) request.getParameter(KConstants.Request.providerId);
-			if (session != null)
-				session.setAuthProviderId(providerId);
+			if (session != null){
+				try {
+					session.setAuthProviderId(providerId);
+				} catch (SessionStoreHouseException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return providerId;
 	}
