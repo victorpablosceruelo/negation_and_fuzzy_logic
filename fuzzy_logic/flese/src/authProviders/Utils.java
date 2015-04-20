@@ -17,13 +17,17 @@ public class Utils {
 	 */
 	public static String ifNullThenSetUserNameFrom(String localUserName, String beforeAt, String afterAt, String msgForBeforeAt,
 			String msgForAfterAt) {
+		final String replaceForAt1 = "_from_";
+		final String replaceForAt2 = "_at_";
+
 		if (localUserName == null) {
 			if ((beforeAt != null) && (afterAt != null)) {
 				if (beforeAt.contains(afterAt)) {
-					localUserName = fixLocalUserName(beforeAt);
+					localUserName = fixLocalUserName(beforeAt, replaceForAt1);
 					// LOG.info(msgForBeforeAt);
 				} else {
-					localUserName = fixLocalUserName(beforeAt + "_at_" + afterAt);
+					String auxLocalUserName = beforeAt + "_from_" + afterAt;
+					localUserName = fixLocalUserName(auxLocalUserName, replaceForAt2);
 					// LOG.info(msgForBeforeAt+ "+ _at_ + "+ msgForAfterAt);
 				}
 			}
@@ -39,13 +43,16 @@ public class Utils {
 	 * @return the fixed localUserName or null if we cannot fix it.
 	 * 
 	 */
-	private static String fixLocalUserName(String newLocalUserName) {
+	private static String fixLocalUserName(String newLocalUserName, String replaceForAt) {
+		if ((replaceForAt == null) || (replaceForAt.isEmpty()))
+			replaceForAt = "_at_";
+
 		// String msg = "fixLocalUserName: ";
 		if ((newLocalUserName != null) && (!"".equals(newLocalUserName))) {
 			// msg += newLocalUserName + " -> ";
 			newLocalUserName = newLocalUserName.replaceAll("\\s", "_");
 			// msg += newLocalUserName + " -> ";
-			newLocalUserName = newLocalUserName.replaceAll("\\@", "_at_");
+			newLocalUserName = newLocalUserName.replaceAll("\\@", replaceForAt);
 			// msg += newLocalUserName + " -> ";
 			newLocalUserName = newLocalUserName.replaceAll("\\.", "_");
 			// msg += newLocalUserName + " ";

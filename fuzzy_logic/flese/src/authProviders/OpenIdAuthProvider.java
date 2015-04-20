@@ -24,7 +24,7 @@ public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProv
 		super(authProviderId);
 	}
 
-	public AuthenticationResult authenticationFirstStep() throws AuthProviderException {
+	public AuthenticationResult authenticationFirstStep(String callbackURL) throws AuthProviderException {
 
 		AuthenticationResult authResult = new AuthenticationResult();
 
@@ -66,7 +66,7 @@ public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProv
 			socialAuthManager.setPermission(getAuthProviderId(), Permission.AUTHENTICATE_ONLY);
 			String nextURL = null;
 			try {
-				nextURL = socialAuthManager.getAuthenticationUrl(getAuthProviderId(), nextURL);
+				nextURL = socialAuthManager.getAuthenticationUrl(getAuthProviderId(), callbackURL);
 			} catch (Exception e) {
 				e.printStackTrace();
 				nextURL = null;
@@ -156,11 +156,11 @@ public class OpenIdAuthProvider extends AbstractAuthProvider implements AuthProv
 				Utils.ifNullThenSetUserNameFrom(localUserName, "Testing User", "localhost.localnet", "testing", "testing");
 			}
 		} else {
-			Utils.ifNullThenSetUserNameFrom(localUserName, profile.getEmail(), profile.getProviderId(), "email", "providerId");
-			Utils.ifNullThenSetUserNameFrom(localUserName, profile.getDisplayName(), profile.getProviderId(), "displayName", "providerId");
-			Utils.ifNullThenSetUserNameFrom(localUserName, profile.getFullName(), profile.getProviderId(), "fullName", "providerId");
-			Utils.ifNullThenSetUserNameFrom(localUserName, profile.getFirstName(), profile.getProviderId(), "firstName", "providerId");
-			Utils.ifNullThenSetUserNameFrom(localUserName, profile.getLastName(), profile.getProviderId(), "lastName", "providerId");
+			localUserName = Utils.ifNullThenSetUserNameFrom(localUserName, profile.getEmail(), profile.getProviderId(), "email", "providerId");
+			localUserName = Utils.ifNullThenSetUserNameFrom(localUserName, profile.getDisplayName(), profile.getProviderId(), "displayName", "providerId");
+			localUserName = Utils.ifNullThenSetUserNameFrom(localUserName, profile.getFullName(), profile.getProviderId(), "fullName", "providerId");
+			localUserName = Utils.ifNullThenSetUserNameFrom(localUserName, profile.getFirstName(), profile.getProviderId(), "firstName", "providerId");
+			localUserName = Utils.ifNullThenSetUserNameFrom(localUserName, profile.getLastName(), profile.getProviderId(), "lastName", "providerId");
 		}
 
 		// you can obtain profile information
