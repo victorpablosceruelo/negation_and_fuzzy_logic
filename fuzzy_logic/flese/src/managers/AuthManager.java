@@ -36,7 +36,7 @@ public class AuthManager extends AbstractManager {
 
 	@Override
 	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
-		return "authenticate";
+		return "authenticationCallback";
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class AuthManager extends AbstractManager {
 		}
 	}
 
-	public void authenticate() {
+	public void authenticationCallback() {
 
 		SessionStoreHouse sessionStoreHouse = requestStoreHouse.getSession();
 

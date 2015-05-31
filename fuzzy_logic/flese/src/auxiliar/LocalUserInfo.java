@@ -5,10 +5,10 @@ import logs.LogsManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import authProviders.AuthProviderInterface;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import storeHouse.SessionStoreHouse;
+import authProviders.AuthProviderInterface;
 
 public class LocalUserInfo {
 
@@ -31,9 +31,14 @@ public class LocalUserInfo {
 	private LocalUserInfo(RequestStoreHouse requestStoreHouse) throws Exception {
 
 		localUserName = null;
-		
+
 		boolean appIsInTestingMode = requestStoreHouse.getSession().appIsInTestingMode();
-		AuthProviderInterface authProvider = requestStoreHouse.getSession().getAuthProvider(); 
+		AuthProviderInterface authProvider = requestStoreHouse.getSession().getAuthProvider();
+		if (authProvider == null) {
+			String msg = "Impossible to create object LocalUserInfo because authProvider is null";
+			LOG.info(msg);
+			throw new Exception(msg);
+		}
 		localUserName = authProvider.getLocalUserName(appIsInTestingMode);
 
 		if (localUserName == null) {

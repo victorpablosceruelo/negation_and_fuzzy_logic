@@ -1,3 +1,5 @@
+<%@page import="authProviders.AuthProviderInterface"%>
+<%@page import="authProviders.OpenIdAuthProvider"%>
 <%@page import="storeHouse.RequestStoreHouse"%>
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
@@ -18,9 +20,12 @@
 	<%
 	RequestStoreHouse requestStoreHouse = JspsUtils.getRequestStoreHouse(request);
 	SessionStoreHouse sessionStoreHouse = JspsUtils.getSessionStoreHouse(requestStoreHouse);
-	AuthProvider provider = sessionStoreHouse.getAuthProvider();
+	AuthProviderInterface provider = sessionStoreHouse.getAuthProvider();
 	Profile profile = null;
-	if (provider != null) profile = provider.getUserProfile();
+	if ((provider != null) && (provider instanceof OpenIdAuthProvider)) {
+		profile = ((OpenIdAuthProvider) provider).getUserProfile();
+	}
+	
 	if (profile == null) { %>
 	<div class='userInformationTableRow'>
 		<div class='userInformationTableCell'>DisplayName</div>

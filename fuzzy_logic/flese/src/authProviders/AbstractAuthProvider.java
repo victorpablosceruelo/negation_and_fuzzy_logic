@@ -1,6 +1,7 @@
 package authProviders;
 
 import storeHouse.RequestStoreHouse;
+import auxiliar.StringsUtil;
 
 public abstract class AbstractAuthProvider implements AuthProviderInterface {
 
@@ -11,9 +12,29 @@ public abstract class AbstractAuthProvider implements AuthProviderInterface {
 	}
 
 	public static AuthProviderInterface getInstance(String authProviderId) {
-		if (KCtes.Providers.google.equals(authProviderId)) {
+		if (StringsUtil.isEmptyString(authProviderId))
+			return null;
+		if (KCtes.Providers.fakeAuthProvider.equals(authProviderId))
+			return new FakeAuthProvider(authProviderId);
+		if (KCtes.Providers.google.equals(authProviderId))
 			return new OpenIdAuthProvider(authProviderId);
-		}
+		if (KCtes.Providers.facebook.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.twitter.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.yahoo.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.hotmail.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.linkedin.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.foursquare.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.myspace.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+		if (KCtes.Providers.mendeley.equals(authProviderId))
+			return new OpenIdAuthProvider(authProviderId);
+
 		return null;
 	}
 
