@@ -94,6 +94,11 @@ public class AuthManager extends AbstractManager {
 					}
 					authProvider.authenticationCallback(requestStoreHouse);
 				} catch (Exception e) {
+					try {
+						sessionStoreHouse.setAuthProvider(null);
+					} catch (SessionStoreHouseException e1) {
+						e1.printStackTrace();
+					}
 					e.printStackTrace();
 				}
 			}
