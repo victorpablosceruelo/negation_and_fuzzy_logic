@@ -15,6 +15,7 @@ import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import storeHouse.RequestStoreHouse;
 import auxiliar.NextStep;
 import constants.KConstants;
+import constants.KUrls;
 
 public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthProviderInterface {
 
@@ -50,12 +51,16 @@ public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthP
 
 	@Override
 	public AuthenticationResult authenticationCallback(RequestStoreHouse requestStoreHouse) throws Exception {
+		// URL of YOUR application which will be called after authentication
+		NextStep nextStep = new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SocialAuthCallback, "");
+		String nextURL = nextStep.getUrl(true, true, false, requestStoreHouse.getRequest());
+		
 		OAuthAuthzResponse oar = OAuthAuthzResponse.oauthCodeAuthzResponse(requestStoreHouse.getRequest());
 		String code = oar.getCode();
 
-		OAuthClientRequest request = OAuthClientRequest.tokenProvider(OAuthProviderType.FACEBOOK)
+		OAuthClientRequest request = OAuthClientRequest.tokenProvider(getOAuthProviderType())
 				.setGrantType(GrantType.AUTHORIZATION_CODE).setClientId(getClientId()).setClientSecret(getClientSecret())
-				.setRedirectURI("http://www.example.com/redirect").setCode(code).buildQueryMessage();
+				.setCode(code).buildQueryMessage();
 
 		// create OAuth client that uses custom http client under the hood
 		OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
