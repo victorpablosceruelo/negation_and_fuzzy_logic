@@ -17,7 +17,7 @@ public abstract class AbstractAuthProvider implements AuthProviderInterface {
 		if (KCtes.Providers.fakeAuthProvider.equals(authProviderId))
 			return new FakeAuthProvider(authProviderId);
 		if (KCtes.Providers.google.equals(authProviderId))
-			return new OpenAuth_2_0_Provider(authProviderId);
+			return new OpenAuth_2_0_Provider_google(authProviderId);
 		if (KCtes.Providers.facebook.equals(authProviderId))
 			return new OpenIdAuthProvider(authProviderId);
 		if (KCtes.Providers.twitter.equals(authProviderId))

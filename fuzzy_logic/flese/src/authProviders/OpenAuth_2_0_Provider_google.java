@@ -3,30 +3,27 @@ package authProviders;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
-import org.apache.oltu.oauth2.client.response.GitHubTokenResponse;
 import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
+import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.oltu.oauth2.common.OAuthProviderType;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
-import org.apache.oltu.oauth2.common.parameters.OAuthParametersApplier;
-import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 
 import storeHouse.RequestStoreHouse;
 import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
 
-public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthProviderInterface {
+public class OpenAuth_2_0_Provider_google extends AbstractAuthProvider implements AuthProviderInterface {
 
 	// The contents of this auth provider came from
 	// https://cwiki.apache.org/confluence/display/OLTU/OAuth+2.0+Client+Quickstart
 
 	String localUserName;
 
-	protected OpenAuth_2_0_Provider(String authProviderId) {
+	protected OpenAuth_2_0_Provider_google(String authProviderId) {
 		super(authProviderId);
-		localUserName = "unknown@nowhere.org";
 	}
 
 	@Override
@@ -34,9 +31,7 @@ public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthP
 		OAuthClientRequest oauthRequest;
 		try {
 			oauthRequest = OAuthClientRequest.authorizationProvider(getOAuthProviderType()).setClientId(getClientId())
-					.setRedirectURI(callbackURL).setResponseType(ResponseType.CODE.toString())
-					.setScope("https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email")
-					.buildQueryMessage();
+					.setRedirectURI(callbackURL).setResponseType(ResponseType.CODE.toString()).setScope(getScope()).buildQueryMessage();
 		} catch (OAuthSystemException e) {
 			e.printStackTrace();
 			oauthRequest = null;
@@ -53,32 +48,24 @@ public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthP
 	public AuthenticationResult authenticationCallback(RequestStoreHouse requestStoreHouse) throws Exception {
 		// URL of YOUR application which will be called after authentication
 		NextStep nextStep = new NextStep(KConstants.NextStep.redirect_to, KUrls.Auth.SocialAuthCallback, "");
-		String nextURL = nextStep.getUrl(true, true, false, requestStoreHouse.getRequest());
-		
+		String callbackURL = nextStep.getUrl(true, true, false, requestStoreHouse.getRequest());
+
 		OAuthAuthzResponse oar = OAuthAuthzResponse.oauthCodeAuthzResponse(requestStoreHouse.getRequest());
 		String code = oar.getCode();
 
-		OAuthClientRequest request = OAuthClientRequest.tokenProvider(getOAuthProviderType())
-				.setGrantType(GrantType.AUTHORIZATION_CODE).setClientId(getClientId()).setClientSecret(getClientSecret())
-				.setCode(code).buildQueryMessage();
+		OAuthClientRequest request = OAuthClientRequest.tokenProvider(getOAuthProviderType()).setGrantType(GrantType.AUTHORIZATION_CODE)
+				.setClientId(getClientId()).setClientSecret(getClientSecret()).setScope(getScope()).setCode(code)
+				.setRedirectURI(callbackURL).buildQueryMessage();
 
 		// create OAuth client that uses custom http client under the hood
 		OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
 
-		// Facebook is not fully compatible with OAuth 2.0 draft 10, access
-		// token response is
-		// application/x-www-form-urlencoded, not json encoded so we use
-		// dedicated response class for that
-		// Custom response classes are an easy way to deal with oauth providers
-		// that introduce modifications to
-		// OAuth 2.0 specification
-		GitHubTokenResponse oAuthResponse = oAuthClient.accessToken(request, GitHubTokenResponse.class);
+		OAuthJSONAccessTokenResponse tokenResponse = oAuthClient.accessToken(request, OAuthJSONAccessTokenResponse.class);
 
-		String accessToken = oAuthResponse.getAccessToken();
-		Long expiresIn = oAuthResponse.getExpiresIn();
-		// oAuthResponse.getParam(param)
+		// logger.log(Level.WARNING, "token: " + tokenResponse.getAccessToken()
+		// + " valid to: " + tokenResponse.getExpiresIn());
 
-		localUserName = oAuthResponse.getBody();
+		localUserName = tokenResponse.getBody();
 
 		return null;
 	}
@@ -110,7 +97,7 @@ public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthP
 
 	private String getClientId() {
 		String authProviderId = getAuthProviderId();
-		String clientId = "your-facebook-application-client-id";
+		String clientId = "your-provider-application-client-id";
 
 		switch (authProviderId) {
 		case KCtes.Providers.google:
@@ -122,7 +109,7 @@ public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthP
 
 	private String getClientSecret() {
 		String authProviderId = getAuthProviderId();
-		String clientSecret = "your-facebook-application-client-secret";
+		String clientSecret = "your-provider-application-client-secret";
 
 		switch (authProviderId) {
 		case KCtes.Providers.google:
@@ -132,4 +119,15 @@ public class OpenAuth_2_0_Provider extends AbstractAuthProvider implements AuthP
 		return clientSecret;
 	}
 
+	private String getScope() {
+		String authProviderId = getAuthProviderId();
+		String providerScope = "your-provider-scope";
+
+		switch (authProviderId) {
+		case KCtes.Providers.google:
+			providerScope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
+			break;
+		}
+		return providerScope;
+	}
 }
