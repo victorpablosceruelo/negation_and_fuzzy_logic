@@ -2,13 +2,17 @@ package authProviders;
 
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
+import org.apache.oltu.oauth2.client.request.OAuthBearerClientRequest;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.apache.oltu.oauth2.client.response.OAuthAccessTokenResponse;
 import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
-import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
+import org.apache.oltu.oauth2.client.response.OAuthResourceResponse;
+import org.apache.oltu.oauth2.common.OAuth;
 import org.apache.oltu.oauth2.common.OAuthProviderType;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
+import org.json.JSONObject;
 
 import storeHouse.RequestStoreHouse;
 import auxiliar.NextStep;
@@ -30,8 +34,9 @@ public class OpenAuth_2_0_Provider_google extends AbstractAuthProvider implement
 	public AuthenticationResult authenticationFirstStep(String callbackURL) throws AuthProviderException {
 		OAuthClientRequest oauthRequest;
 		try {
-			oauthRequest = OAuthClientRequest.authorizationProvider(getOAuthProviderType()).setClientId(getClientId())
-					.setRedirectURI(callbackURL).setResponseType(ResponseType.CODE.toString()).setScope(getScope()).buildQueryMessage();
+			oauthRequest = OAuthClientRequest.authorizationProvider(getOAuthProviderType())
+					.setClientId(getClientId()).setRedirectURI(callbackURL)
+					.setResponseType(ResponseType.CODE.toString()).setScope(getScope()).buildQueryMessage();
 		} catch (OAuthSystemException e) {
 			e.printStackTrace();
 			oauthRequest = null;
@@ -53,19 +58,34 @@ public class OpenAuth_2_0_Provider_google extends AbstractAuthProvider implement
 		OAuthAuthzResponse oar = OAuthAuthzResponse.oauthCodeAuthzResponse(requestStoreHouse.getRequest());
 		String code = oar.getCode();
 
-		OAuthClientRequest request = OAuthClientRequest.tokenProvider(getOAuthProviderType()).setGrantType(GrantType.AUTHORIZATION_CODE)
-				.setClientId(getClientId()).setClientSecret(getClientSecret()).setScope(getScope()).setCode(code)
-				.setRedirectURI(callbackURL).buildQueryMessage();
+		OAuthClientRequest oAuthClientRequest = OAuthClientRequest.tokenProvider(getOAuthProviderType())
+				.setGrantType(GrantType.AUTHORIZATION_CODE).setClientId(getClientId())
+				.setClientSecret(getClientSecret()).setScope(getScope()).setCode(code)
+				.setRedirectURI(callbackURL).buildBodyMessage();
 
 		// create OAuth client that uses custom http client under the hood
 		OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
 
-		OAuthJSONAccessTokenResponse tokenResponse = oAuthClient.accessToken(request, OAuthJSONAccessTokenResponse.class);
+		OAuthAccessTokenResponse accessTokenResponse = oAuthClient.accessToken(oAuthClientRequest);
+		String accessToken = accessTokenResponse.getAccessToken();
+
+		final OAuthClientRequest bearerClientRequest = new OAuthBearerClientRequest(getUserInfoUrl())
+				.setAccessToken(accessToken).buildHeaderMessage();
+
+		OAuthResourceResponse resourceResponse = oAuthClient.resource(bearerClientRequest,
+				OAuth.HttpMethod.GET, OAuthResourceResponse.class);
+		String responseBody = resourceResponse.getBody();
+		
+		JSONObject jsonObject = new JSONObject(responseBody);
+		localUserName = jsonObject.getString("email");
+		
+		// OAuthJSONAccessTokenResponse tokenResponse = oAuthClient.accessToken(request,
+		// OAuthJSONAccessTokenResponse.class);
 
 		// logger.log(Level.WARNING, "token: " + tokenResponse.getAccessToken()
 		// + " valid to: " + tokenResponse.getExpiresIn());
 
-		localUserName = tokenResponse.getBody();
+		// localUserName = tokenResponse.getBody();
 
 		return null;
 	}
@@ -129,5 +149,17 @@ public class OpenAuth_2_0_Provider_google extends AbstractAuthProvider implement
 			break;
 		}
 		return providerScope;
+	}
+
+	private String getUserInfoUrl() {
+		String authProviderId = getAuthProviderId();
+		String userInfoUrl = "your-provider-scope";
+
+		switch (authProviderId) {
+		case KCtes.Providers.google:
+			userInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
+			break;
+		}
+		return userInfoUrl;
 	}
 }

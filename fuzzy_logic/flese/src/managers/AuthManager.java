@@ -6,6 +6,7 @@ import urls.ServerAndAppUrls;
 import authProviders.AbstractAuthProvider;
 import authProviders.AuthProviderInterface;
 import authProviders.AuthenticationResult;
+import auxiliar.FleSeException;
 import auxiliar.LocalUserInfo;
 import auxiliar.NextStep;
 import constants.KConstants;
@@ -224,6 +225,11 @@ public class AuthManager extends AbstractManager {
 		} catch (SessionStoreHouseException e) {
 		}
 
+		try {
+			sessionStoreHouse.setLocalUserInfo(null);
+		} catch (FleSeException e) {
+		}
+		
 		// Invalidate the session.
 		try {
 			sessionStoreHouse.invalidateSession();
