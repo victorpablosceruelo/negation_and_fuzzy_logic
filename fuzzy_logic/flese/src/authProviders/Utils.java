@@ -3,20 +3,18 @@ package authProviders;
 public class Utils {
 
 	/**
-	 * Returns newLocalUserName if localUserName is null; localUserName
-	 * otherwise.
+	 * Returns newLocalUserName if localUserName is null; localUserName otherwise.
 	 * 
 	 * @param localUserName
 	 *            is the name of the user.
 	 * @param newLocalUserName
 	 *            is the new value proposed for localUserName.
-	 * @return newLocalUserName if localUserName is null; localUserName
-	 *         otherwise
+	 * @return newLocalUserName if localUserName is null; localUserName otherwise
 	 * @throws LocalUserInfoException
 	 * 
 	 */
-	public static String ifNullThenSetUserNameFrom(String localUserName, String beforeAt, String afterAt, String msgForBeforeAt,
-			String msgForAfterAt) {
+	public static String ifNullThenSetUserNameFrom(String localUserName, String beforeAt, String afterAt,
+			String msgForBeforeAt, String msgForAfterAt) {
 		final String replaceForAt1 = "_from_";
 		final String replaceForAt2 = "_at_";
 
@@ -29,6 +27,13 @@ public class Utils {
 					String auxLocalUserName = beforeAt + "_from_" + afterAt;
 					localUserName = fixLocalUserName(auxLocalUserName, replaceForAt2);
 					// LOG.info(msgForBeforeAt+ "+ _at_ + "+ msgForAfterAt);
+				}
+			} else {
+				if (beforeAt != null) {
+					localUserName = fixLocalUserName(beforeAt, replaceForAt2);
+				}
+				if (afterAt != null) {
+					localUserName = fixLocalUserName(beforeAt, replaceForAt2);
 				}
 			}
 		}

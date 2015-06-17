@@ -9,6 +9,7 @@ import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import storeHouse.SessionStoreHouse;
 import authProviders.AuthProviderInterface;
+import authProviders.Utils;
 
 public class LocalUserInfo {
 
@@ -16,8 +17,7 @@ public class LocalUserInfo {
 	private String localUserName = null;
 
 	/**
-	 * Tests if the client session has been authenticated, which is why it needs
-	 * request and response.
+	 * Tests if the client session has been authenticated, which is why it needs request and response.
 	 * 
 	 * @param request
 	 *            is the HttpServletRequest
@@ -25,8 +25,7 @@ public class LocalUserInfo {
 	 *            is the HttpServletResponse
 	 * @throws RequestStoreHouseException
 	 * @throws Exception
-	 *             if request is null, response is null, session is null or
-	 *             localUserName can not be set.
+	 *             if request is null, response is null, session is null or localUserName can not be set.
 	 */
 	private LocalUserInfo(RequestStoreHouse requestStoreHouse) throws Exception {
 
@@ -40,13 +39,27 @@ public class LocalUserInfo {
 			throw new Exception(msg);
 		}
 		localUserName = authProvider.getLocalUserName(appIsInTestingMode);
+		check();
 
-		if (localUserName == null) {
-			String msg = "Impossible to create object LocalUserInfo because Variable localUserName is null";
+		// If auth manager is not able to return a correct username, fix it.
+		if (localUserName.contains("@")) {
+			localUserName = Utils.ifNullThenSetUserNameFrom(null, localUserName, null, "", "");
+			check();
+		}
+
+		// Ensure no spaces around.
+		localUserName = localUserName.trim();
+		check();
+
+		LogsManager.logSignedUser(this.localUserName);
+
+	}
+
+	private void check() throws Exception {
+		if (StringsUtil.isEmptyString(localUserName)) {
+			String msg = "Impossible to create object LocalUserInfo because Variable localUserName is empty or null.";
 			LOG.info(msg);
 			throw new Exception(msg);
-		} else {
-			LogsManager.logSignedUser(this.localUserName);
 		}
 	}
 

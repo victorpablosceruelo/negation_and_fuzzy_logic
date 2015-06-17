@@ -75,10 +75,10 @@ public class OpenAuth_2_0_Provider_google extends AbstractAuthProvider implement
 		OAuthResourceResponse resourceResponse = oAuthClient.resource(bearerClientRequest,
 				OAuth.HttpMethod.GET, OAuthResourceResponse.class);
 		String responseBody = resourceResponse.getBody();
-		
+
 		JSONObject jsonObject = new JSONObject(responseBody);
 		localUserName = jsonObject.getString("email");
-		
+
 		// OAuthJSONAccessTokenResponse tokenResponse = oAuthClient.accessToken(request,
 		// OAuthJSONAccessTokenResponse.class);
 
