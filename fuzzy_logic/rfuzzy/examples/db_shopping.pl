@@ -46,6 +46,7 @@ car('Mini Cooper', 'British Motor Corporation', 'Economy Car',       2009, null,
 
 expensive(car) :~ defaults_to(0).
 expensive(car) :~ function(price_in_euros(car), [ (0, 0), (10000, 0.5), (30000, 1), (1000000, 1) ]).
+expensive(car) :~ function(price_in_euros(car), [ (0, 1), (10000, 0.78), (30000, 0.38), (1000000, 0) ]) only_for_user 'victorpablosceruelo_at_gmail_com'.
 fast(car) :~ defaults_to(0).
 fast(car) :~ function(max_speed_in_kph(car), [ (0, 0), (60, 0), (100, 0.4), (150, 0.75), (200, 1), (1000, 1) ]).
 large(car) :~ defaults_to(0).
