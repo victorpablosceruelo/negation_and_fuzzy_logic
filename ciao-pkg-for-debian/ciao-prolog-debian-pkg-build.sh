@@ -27,6 +27,9 @@ BUILD_DIFF=${FILE_NAME}.diff
 BUILD_DIFF_GZ=${FILE_NAME}.diff.gz
 SCRIPT_DIR=`dirname $0`
 
+# PBUILDER_KEYRING_OPTS=--keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg
+PBUILDER_KEYRING_OPTS=--keyring=/etc/apt/trusted.gpg
+
 # Apply patches.
 # ${SCRIPT_DIR}/ciao-prolog-debian-pkg-build-apply-patches.sh ${BASE_FOLDER}/${SOURCE_FOLDER} do_not_apply
 
@@ -75,7 +78,7 @@ echo " "
 echo " "
 
 set -x
-sudo cowbuilder --build ${BASE_FOLDER}/${BUILD_DSC}
+sudo cowbuilder --build ${BASE_FOLDER}/${BUILD_DSC} ${KEYRING_OPTS}
 set +x
 popd
 

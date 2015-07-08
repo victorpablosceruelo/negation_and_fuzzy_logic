@@ -36,3 +36,5 @@ rm -frv ciao/contrib/pkgs_output_debug
 popd
 # EOF
 
+# apt-get -y --force-yes install 
+

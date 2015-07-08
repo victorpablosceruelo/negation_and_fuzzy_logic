@@ -8,7 +8,8 @@ BASETGZ=/var/cache/pbuilder/base.tgz
 BUILDPLACE=/var/cache/pbuilder/build/
 #export DEBIAN_BUILDARCH=athlon
 #EXTRAPACKAGES=gcc3.0-athlon-builder
-EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog fakeroot mysql-client-5.5 mysql-server-5.5 mysql-common libmysql++-dev libmysqlclient18 libmysqlclient-dev libmysqld-dev libmysql-java libmysql++-dev libmysqld-dev libmysql-cil-dev bash bash-static build-essential debhelper texlive-latex-base texlive-latex-extra texinfo texi2html dvi2ps dvi2dvi subversion locate libgsl0-dev libppl-c-dev libppl-c-dev gcc-multilib emacs imagemagick ant g++-multilib tar bzip2 whiptail dialog multiarch-support oracle-java8-installer"
+EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog fakeroot mysql-client-5.5 mysql-server-5.5 mysql-common libmysql++-dev libmysqlclient18 libmysqlclient-dev libmysqld-dev libmysql-java libmysql++-dev libmysqld-dev libmysql-cil-dev bash bash-static build-essential debhelper texlive-latex-base texlive-latex-extra texinfo texi2html dvi2ps dvi2dvi subversion locate libgsl0-dev libppl-c-dev libppl-c-dev gcc-multilib emacs imagemagick ant g++-multilib tar bzip2 whiptail dialog multiarch-support"
+# NO: oracle-java8-installer
 # NO: ia32-libs libc6-dev-i386 <- only for 64 bits arch !!!
 # NO: gcc-multilib [amd64] <- we'll keep the dependency because the pkg exists in i386 arch too.
 
@@ -25,7 +26,7 @@ OTHERMIRROR="deb http://ftp.de.debian.org/debian/ jessie main contrib non-free |
 DISTRIBUTION=jessie
 
 # APT configuration files directory
-# APTCONFDIR="/etc/pbuilder/pbuilder-apt/"
+APTCONFDIR="/etc/apt/"
 # APTCONFDIR=/etc/apt
 APTCACHE="/var/cache/pbuilder/aptcache/"
 APTCACHEHARDLINK="yes"
