@@ -79,6 +79,9 @@ public class PlConnectionEnvelope {
 
 		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
 		runPrologQueryAux(folderChangeQuery, localUserInfo);
+		
+		CiaoPrologQueryInterface folderCheckQuery = CiaoPrologCheckWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
+		runPrologQueryAux(folderCheckQuery, localUserInfo);
 	}
 
 	private void runPrologQueryAux(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
@@ -188,6 +191,7 @@ public class PlConnectionEnvelope {
 		LOG.info("runQuery: changing programFile to: " + programFileName + " .... ");
 		try {
 			evaluatedGoal.useModule(programFileName);
+			LOG.info("runQuery: changed programFile to: " + programFileName + " .... ");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new PlConnectionEnvelopeException("IOException");
