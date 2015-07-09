@@ -528,8 +528,9 @@ translate_fuzzy(Pred_Info, Cls) :-
 	generate_username_subCl(UN, SubCl_UserName),
 	generate_priority_subCl(Cl_Body_Prio, NP_Arg_Prio, SubCl_IfCondition, SubCl_UserName, SubCl_Prio),
 	generate_on_error_subCl(NP_Arg_TV, NP_Arg_Prio, Cl_Body_On_Error),
+	generate_debug_helper(P_B_Name, NP_F, SubCl_Debug),
 	Cls = [(NP_F :- SubCl_TypeTest, (
-					    (Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio) 
+					    (Cl_Body, SubCl_Credibility, SubCl_IfCondition, SubCl_UserName, SubCl_Prio, SubCl_Debug) 
 					; 
 					    (Cl_Body_On_Error)
 					))],
@@ -541,6 +542,9 @@ translate_fuzzy(Pred_Info, Cls) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 % ------------------------------------------------------
+
+generate_debug_helper(P_B_Name, NP_F, SubCl_Debug) :-
+	SubCl_Debug = print_msg('debug', P_B_Name, NP_F).
 
 generate_on_error_subCl(Cl_Body_TV, Cl_Body_Prio, Cl_Body_On_Error) :-
 	Cl_Body_On_Error = (Cl_Body_TV .=. 0, Cl_Body_Prio .=. 0).
