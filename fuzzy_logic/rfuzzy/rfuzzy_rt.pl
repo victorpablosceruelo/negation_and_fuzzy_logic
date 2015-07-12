@@ -69,11 +69,11 @@ supreme(List_In, Answer) :-
 	Arguments_Arity is Arity -1,
 	Truth_Value_Arity is Arity +1,
 	
-	print_msg('debug', 'supreme :: List_In', List_In),
+	print_msg('ultradebug', 'supreme :: List_In', List_In),
 	supreme_aux_1(List_In, List_Aux_1), !,
-	print_msg('debug', 'supreme :: List_Aux_1', List_Aux_1),
+	print_msg('ultradebug', 'supreme :: List_Aux_1', List_Aux_1),
 	reorder_by_truth_value(List_Aux_1, [], List_Aux_2),
-	print_msg('debug', 'supreme :: List_Aux_2', List_Aux_2),
+	print_msg('ultradebug', 'supreme :: List_Aux_2', List_Aux_2),
 	one_by_one_first_head(List_Aux_2, Element),
 	print_msg('debug', 'supreme :: element_taken', Element),
 
@@ -452,7 +452,7 @@ rfuzzy_var_truth_value(Var, Condition, Value) :-
 	!.
 rfuzzy_var_truth_value(Var, 'constant', Var) :- 
 	nonvar(Var), 
-	print_msg('debug', 'rfuzzy_var_truth_value :: Constant', Var),
+	print_msg('ultradebug', 'rfuzzy_var_truth_value :: Constant', Var),
 	!.
 rfuzzy_var_truth_value(Var, 'error', 0) :-
 	print_msg('error', 'rfuzzy_var_truth_value :: ERROR :: unknown', Var),
