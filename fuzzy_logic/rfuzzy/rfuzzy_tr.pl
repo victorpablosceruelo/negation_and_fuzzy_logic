@@ -1169,11 +1169,13 @@ build_straight_lines_aux(X, V, [(X1,V1),(X2,V2)|List], (Point ; Line ; More)) :-
 	build_line(X, V, X1, V1, X2, V2, Line),
 	build_straight_lines_aux(X, V, [(X2,V2)|List], More).
 
-build_point(X, V, X1, V1, (X .=. X1, V .=. V1)) :-
+build_point(X, V, X1, V1, (Point, Debug)) :-
 	print_msg('debug', 'build_point', build_point(X, V, X, V, (H :- (H :- X1 .=. X, V1 .=. V)))),
-	nonvar(X1), nonvar(V1), !.
+	nonvar(X1), nonvar(V1), !,
+	Point = (X .=. X1, V .=. V1),
+	Debug = (print_msg('debug', 'function point', Point)).
 
-build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)) :-
+build_line(X, V, X1, V1, X2, V2, (Line, Debug)) :-
 	print_msg('debug', 'build_line', (build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)))),
 
 	nonvar(X1), nonvar(X2), nonvar(V1), nonvar(V2), 
@@ -1181,7 +1183,9 @@ build_line(X, V, X1, V1, X2, V2, (X .>. X1, X .<. X2, Calculate_V)) :-
 	%	X1 .<. X2, 
 
 	!, % Backtracking is not allowed here.
-	Calculate_V = (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X1)).
+	Calculate_V = (Pend .=. ((V2-V1)/(X2-X1)), V .=. V1+Pend*(X-X1)),
+	Line = (X .>. X1, X .<. X2, Calculate_V),
+	Debug = (print_msg('debug', 'function line', Line)).
 
 % ------------------------------------------------------
 % ------------------------------------------------------
