@@ -2,12 +2,15 @@ package prologConnector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Timer;
 
 import logs.LogsManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import auxiliar.InterruptTimerTask;
 import auxiliar.LocalUserInfo;
 import CiaoJava.PLConnection;
 import CiaoJava.PLException;
@@ -65,6 +68,23 @@ public class PlConnectionEnvelope {
 
 	public void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
 			FilesAndPathsException {
+		
+		long delay = 60000; // 1 minute.
+		Timer timer = new Timer(true);
+		InterruptTimerTask interruptTimerTask = 
+		    new InterruptTimerTask(Thread.currentThread());
+		timer.schedule(interruptTimerTask, delay);
+		try {
+			runPrologQueryWithTimer(query, localUserInfo);
+		} catch (InterruptedException e) {
+			throw new PlConnectionEnvelopeException("PLConnectionException: timeout exeeded");
+		} finally {
+		    timer.cancel();
+		}
+	}
+	
+	public void runPrologQueryWithTimer(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
+	FilesAndPathsException, InterruptedException {
 		try {
 			createPlConnection();
 			changeCiaoPrologWorkingFolder(query, localUserInfo);
