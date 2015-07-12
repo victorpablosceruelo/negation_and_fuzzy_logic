@@ -58,7 +58,8 @@ PBUILDERROOTCMD="sudo"
 # implementation, "pbuilder-satisfydepends-experimental", which might be useful
 # to pull packages from experimental or from repositories with a low APT Pin
 # Priority
-PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimental"
+# PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimental"
+PBUILDERSATISFYDEPENDSCMD="/etc/pbuilder-satisfydepends-experimental"
 
 #default is to build everything. Passed on to dpkg-buildpackage
 # DEBBUILDOPTS="-b"
