@@ -1,5 +1,6 @@
 package auxiliar;
 
+import java.util.Timer;
 import java.util.TimerTask;
 
 public class InterruptTimerTask extends TimerTask {
@@ -10,14 +11,51 @@ public class InterruptTimerTask extends TimerTask {
 	 */
 
 	private Thread theTread;
+	boolean active;
+	boolean delayAgain;
 
-	public InterruptTimerTask(Thread theTread) {
+	public static InterruptTimerTask getInstance(Thread theTread) {
+		return new InterruptTimerTask(theTread);
+	}
+
+	private InterruptTimerTask(Thread theTread) {
 		this.theTread = theTread;
+		this.active = true;
+		reschedule(true);
+	}
+
+	public void reschedule() {
+		reschedule(false);
+	}
+
+	public void deactivate() {
+		active = false;
+		this.cancel();
+	}
+
+	private void reschedule(boolean fullReschedule) {
+		if (fullReschedule) {
+			long delay = 120000; // 2 minutes.
+			Timer timer = new Timer(true);
+			timer.schedule(this, delay);
+		}
+		updateDelayAgain(true);
 	}
 
 	@Override
 	public void run() {
-		theTread.interrupt();
+		if (active) {
+			if (delayAgain) {
+				reschedule(true);
+				updateDelayAgain(false);
+			} else {
+				theTread.interrupt();
+			}
+		}
+	}
+
+	private synchronized void updateDelayAgain(boolean value) {
+		this.delayAgain = value;
 	}
 
 }

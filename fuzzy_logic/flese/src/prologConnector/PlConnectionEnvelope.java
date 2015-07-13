@@ -2,21 +2,19 @@ package prologConnector;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Timer;
 
 import logs.LogsManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.InterruptTimerTask;
-import auxiliar.LocalUserInfo;
 import CiaoJava.PLConnection;
 import CiaoJava.PLException;
 import CiaoJava.PLGoal;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
+import auxiliar.InterruptTimerTask;
+import auxiliar.LocalUserInfo;
 import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.PathsMgmt;
@@ -29,7 +27,8 @@ public class PlConnectionEnvelope {
 	private PLConnection plConnection = null;
 	private PathsMgmt pathsMgmt = null;
 
-	public PlConnectionEnvelope() throws PlConnectionEnvelopeException, FilesAndPathsException, CiaoPrologConnectorException {
+	public PlConnectionEnvelope() throws PlConnectionEnvelopeException, FilesAndPathsException,
+			CiaoPrologConnectorException {
 		this.pathsMgmt = new PathsMgmt();
 		this.plConnection = null;
 	}
@@ -66,56 +65,60 @@ public class PlConnectionEnvelope {
 		}
 	}
 
-	public void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
-			FilesAndPathsException {
-		
-		long delay = 60000; // 1 minute.
-		Timer timer = new Timer(true);
-		InterruptTimerTask interruptTimerTask = 
-		    new InterruptTimerTask(Thread.currentThread());
-		timer.schedule(interruptTimerTask, delay);
+	public void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo)
+			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
+
+		InterruptTimerTask interruptTimerTask = InterruptTimerTask.getInstance(Thread.currentThread());
 		try {
-			runPrologQueryWithTimer(query, localUserInfo);
+			runPrologQueryWithTimer(query, localUserInfo, interruptTimerTask);
 		} catch (InterruptedException e) {
 			throw new PlConnectionEnvelopeException("PLConnectionException: timeout exeeded");
 		} finally {
-		    timer.cancel();
+			interruptTimerTask.deactivate();
 		}
 	}
-	
-	public void runPrologQueryWithTimer(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException,
-	FilesAndPathsException, InterruptedException {
+
+	public void runPrologQueryWithTimer(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo,
+			InterruptTimerTask interruptTimerTask) throws PlConnectionEnvelopeException,
+			CiaoPrologConnectorException, FilesAndPathsException, InterruptedException {
 		try {
 			createPlConnection();
-			changeCiaoPrologWorkingFolder(query, localUserInfo);
-			runPrologQueryAux(query, localUserInfo);
+			interruptTimerTask.reschedule();
+			changeCiaoPrologWorkingFolder(query, localUserInfo, interruptTimerTask);
+			interruptTimerTask.reschedule();
+			runPrologQueryAux(query, localUserInfo, interruptTimerTask);
 		} finally {
 			destroyPlConnection();
 		}
 	}
 
-	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery, LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
-			FilesAndPathsException, PlConnectionEnvelopeException {
+	private void changeCiaoPrologWorkingFolder(CiaoPrologQueryInterface realQuery,
+			LocalUserInfo localUserInfo, InterruptTimerTask interruptTimerTask)
+			throws CiaoPrologConnectorException, FilesAndPathsException, PlConnectionEnvelopeException {
 
-		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
-		runPrologQueryAux(folderChangeQuery, localUserInfo);
-		
-		CiaoPrologQueryInterface folderCheckQuery = CiaoPrologCheckWorkingFolderQuery.getInstance(realQuery.getProgramFileInfo());
-		runPrologQueryAux(folderCheckQuery, localUserInfo);
+		CiaoPrologQueryInterface folderChangeQuery = CiaoPrologChangeWorkingFolderQuery.getInstance(realQuery
+				.getProgramFileInfo());
+		runPrologQueryAux(folderChangeQuery, localUserInfo, interruptTimerTask);
+
+		CiaoPrologQueryInterface folderCheckQuery = CiaoPrologCheckWorkingFolderQuery.getInstance(realQuery
+				.getProgramFileInfo());
+		runPrologQueryAux(folderCheckQuery, localUserInfo, interruptTimerTask);
 	}
 
-	private void runPrologQueryAux(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+	private void runPrologQueryAux(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo,
+			InterruptTimerTask interruptTimerTask) throws PlConnectionEnvelopeException,
+			CiaoPrologConnectorException {
 		LOG.info(query.getQuery().toString());
 		if (plConnection == null) {
 			throw new PlConnectionEnvelopeException("ERROR: plConnection is null.");
 		}
 
 		createGoal(query, localUserInfo);
-		if (! query.isOfType(CiaoPrologQueryAbstract.Constants.ChangeWorkingFolderQuery)) {
+		if (!query.isOfType(CiaoPrologQueryAbstract.Constants.ChangeWorkingFolderQuery)) {
 			changeProgramFileTo(query);
 		}
 		evaluateGoal();
-		
+
 		long answersCounter = 0;
 
 		LOG.info("performQueryAux: getting answers ... ");
@@ -124,7 +127,7 @@ public class PlConnectionEnvelope {
 		boolean queryIsStillRunning = true;
 
 		ArrayList<CiaoPrologQueryAnswer> ciaoPrologQueryAnswers = new ArrayList<CiaoPrologQueryAnswer>();
-		
+
 		StringBuilder msgsAccumulator = new StringBuilder();
 		do { // Get all the answers you can.
 			prologQueryAnswer = null;
@@ -139,6 +142,7 @@ public class PlConnectionEnvelope {
 				prologQueryAnswer = getNextSolution();
 				queryIsStillRunning = getQueryIsStillRunning();
 				timesCounter++;
+				interruptTimerTask.reschedule();
 
 			} while ((prologQueryAnswer == null) && queryIsStillRunning
 					&& (timesCounter < KConstants.CiaoPrologQuery.maximumNumberOfRetries));
@@ -161,7 +165,7 @@ public class PlConnectionEnvelope {
 
 					if (variable != null) {
 						msgsAccumulator.append(variable.toString());
-						msgsAccumulator.append(" bind: "); 
+						msgsAccumulator.append(" bind: ");
 						msgsAccumulator.append(variable.getBinding());
 						ciaoPrologTermInJava = new CiaoPrologTermInJava(variable, prologQueryAnswer);
 						msgsAccumulator.append(" -> " + ciaoPrologTermInJava.toString() + " \n");
@@ -171,6 +175,7 @@ public class PlConnectionEnvelope {
 					}
 
 					ciaoPrologQueryAnswer.addCiaoPrologVariableAnswer(variableName, ciaoPrologTermInJava);
+					interruptTimerTask.reschedule();
 				}
 				ciaoPrologQueryAnswers.add(ciaoPrologQueryAnswer);
 				// LOG.info(msgsAccumulator);
@@ -179,11 +184,17 @@ public class PlConnectionEnvelope {
 				msgsAccumulator.append("answer obtained: null \n");
 			}
 
-		} while ((prologQueryAnswer != null) && (answersCounter < KConstants.CiaoPrologQuery.maximumNumberOfAnswers));
+			interruptTimerTask.reschedule();
 
-		CiaoPrologQueryAnswer [] ciaoPrologQueryAnswersArray = ciaoPrologQueryAnswers.toArray(new CiaoPrologQueryAnswer[ciaoPrologQueryAnswers.size()]);
+		} while ((prologQueryAnswer != null)
+				&& (answersCounter < KConstants.CiaoPrologQuery.maximumNumberOfAnswers));
+
+		interruptTimerTask.deactivate();
+
+		CiaoPrologQueryAnswer[] ciaoPrologQueryAnswersArray = ciaoPrologQueryAnswers
+				.toArray(new CiaoPrologQueryAnswer[ciaoPrologQueryAnswers.size()]);
 		query.setQueryAnswers(ciaoPrologQueryAnswersArray);
-		
+
 		LOG.info(msgsAccumulator.toString());
 		// LOG.info("performQueryAux: terminating goal execution ...");
 		if (evaluatedGoal != null) {
@@ -200,13 +211,15 @@ public class PlConnectionEnvelope {
 
 	}
 
-	private void createGoal(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+	private void createGoal(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo)
+			throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info("runQuery: creating goal for query: " + query.toString() + " .... ");
 		LogsManager.logQuery(query, localUserInfo);
 		evaluatedGoal = new PLGoal(plConnection, query.getQuery());
 	}
-	
-	private void changeProgramFileTo(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
+
+	private void changeProgramFileTo(CiaoPrologQueryInterface query) throws PlConnectionEnvelopeException,
+			CiaoPrologConnectorException {
 		String programFileName = query.getProgramFileInfo().getFileName();
 		LOG.info("runQuery: changing programFile to: " + programFileName + " .... ");
 		try {
@@ -220,7 +233,7 @@ public class PlConnectionEnvelope {
 			throw new PlConnectionEnvelopeException("PLException");
 		}
 	}
-	
+
 	private void evaluateGoal() throws PlConnectionEnvelopeException, CiaoPrologConnectorException {
 		LOG.info("runQuery: executing query .... ");
 		try {
