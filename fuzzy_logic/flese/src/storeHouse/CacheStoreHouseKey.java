@@ -1,5 +1,8 @@
 package storeHouse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class CacheStoreHouseKey {
 
 	private String keyLevel1 = null;
@@ -7,27 +10,40 @@ public class CacheStoreHouseKey {
 	private String keyLevel3 = null;
 	private String keyLevel4 = null;
 
-	protected CacheStoreHouseKey(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2, String keyLevel3, String keyLevel4)
-			throws CacheStoreHouseException {
+	final static protected Log LOG = LogFactory.getLog(CacheStoreHouseKey.class);
+
+	protected CacheStoreHouseKey(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2,
+			String keyLevel3, String keyLevel4) throws CacheStoreHouseException {
 
 		boolean reset = false;
-		
+
 		this.keyLevel1 = getKeyFromClassName(keyLevel1);
-		if ("".equals(this.keyLevel1)) 
-			reset = true;
-		
-		this.keyLevel2 = reset ? "" : getKey(keyLevel2);
-		if ("".equals(this.keyLevel2)) 
-			reset = true;
-		
-		this.keyLevel3 = reset ? "" : getKey(keyLevel3);
-		if ("".equals(this.keyLevel3)) 
-			reset = true;
-		
-		this.keyLevel4 = reset ? "" : getKey(keyLevel4);
-		if ("".equals(this.keyLevel4)) 
+		if ("".equals(this.keyLevel1))
 			reset = true;
 
+		this.keyLevel2 = reset ? "" : getKey(keyLevel2);
+		if ("".equals(this.keyLevel2))
+			reset = true;
+
+		this.keyLevel3 = reset ? "" : getKey(keyLevel3);
+		if ("".equals(this.keyLevel3))
+			reset = true;
+
+		this.keyLevel4 = reset ? "" : getKey(keyLevel4);
+		if ("".equals(this.keyLevel4))
+			reset = true;
+
+		StringBuilder debugMsg = new StringBuilder();
+		debugMsg.append("CacheStoreHouseKey: -");
+		debugMsg.append(getKeyLevel1(false));
+		debugMsg.append("- -");
+		debugMsg.append(getKeyLevel2(false));
+		debugMsg.append("- -");
+		debugMsg.append(getKeyLevel3(false));
+		debugMsg.append("- -");
+		debugMsg.append(getKeyLevel4(false));
+		debugMsg.append("-");
+		LOG.info(debugMsg.toString());
 	}
 
 	/**
@@ -37,7 +53,8 @@ public class CacheStoreHouseKey {
 	 * @return returns the key
 	 * @throws CacheStoreHouseException
 	 */
-	private String getKeyFromClassName(@SuppressWarnings("rawtypes") Class keyLevel1) throws CacheStoreHouseException {
+	private String getKeyFromClassName(@SuppressWarnings("rawtypes") Class keyLevel1)
+			throws CacheStoreHouseException {
 		if (keyLevel1 == null)
 			throw new CacheStoreHouseException("keyLevel1 cannot be null.");
 		String className = keyLevel1.getName();
