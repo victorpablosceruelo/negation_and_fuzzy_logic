@@ -48,7 +48,7 @@ public class CiaoPrologProgramIntrospectionQuery extends CiaoPrologQueryAbstract
 		String fullPath = requestStoreHouse.getProgramFileInfo().getProgramFileFullPath();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		
-		Object o = CacheStoreHouse.retrieve(CiaoPrologProgramIntrospectionQuery.class, fullPath, fullPath, fullPath);
+		Object o = CacheStoreHouse.retrieve(CiaoPrologProgramIntrospectionQuery.class, fullPath, fullPath, fullPath, true);
 		CiaoPrologProgramIntrospectionQuery query = (CiaoPrologProgramIntrospectionQuery) o;
 		if (query == null) {
 			query = new CiaoPrologProgramIntrospectionQuery(requestStoreHouse.getProgramFileInfo());

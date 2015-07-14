@@ -30,7 +30,7 @@ public class UrlsMaps {
 		}
 
 		try {
-			urlMap = (UrlMap) CacheStoreHouse.retrieve(UrlsMaps.class, manager, manager, op);
+			urlMap = (UrlMap) CacheStoreHouse.retrieve(UrlsMaps.class, manager, manager, op, false);
 		} catch (CacheStoreHouseException e) {
 			e.printStackTrace();
 			urlMap = null;

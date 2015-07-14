@@ -32,7 +32,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 		ConversorToPrologQuery conversor = new ConversorToPrologQuery(requestStoreHouse);
 		String key2 = conversor.getQueryComplexInfoString();
 
-		Object o = CacheStoreHouse.retrieve(CiaoPrologNormalQuery.class, fullPath, key1, key2);
+		Object o = CacheStoreHouse.retrieve(CiaoPrologNormalQuery.class, fullPath, key1, key2, true);
 		CiaoPrologNormalQuery query = (CiaoPrologNormalQuery) o;
 		if (query == null) {
 			query = new CiaoPrologNormalQuery(requestStoreHouse.getProgramFileInfo());
@@ -42,6 +42,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 			CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, key2, query);
 		}
 		else {
+			LOG.info("Answers retrieved from cache ");
 			LogsManager.logQuery(query, localUserInfo);
 		}
 		return query;

@@ -1,16 +1,11 @@
 package storeHouse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class CacheStoreHouseKey {
 
 	private String keyLevel1 = null;
 	private String keyLevel2 = null;
 	private String keyLevel3 = null;
 	private String keyLevel4 = null;
-
-	final static protected Log LOG = LogFactory.getLog(CacheStoreHouseKey.class);
 
 	protected CacheStoreHouseKey(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2,
 			String keyLevel3, String keyLevel4) throws CacheStoreHouseException {
@@ -32,18 +27,6 @@ public class CacheStoreHouseKey {
 		this.keyLevel4 = reset ? "" : getKey(keyLevel4);
 		if ("".equals(this.keyLevel4))
 			reset = true;
-
-		StringBuilder debugMsg = new StringBuilder();
-		debugMsg.append("CacheStoreHouseKey: -");
-		debugMsg.append(getKeyLevel1(false));
-		debugMsg.append("- -");
-		debugMsg.append(getKeyLevel2(false));
-		debugMsg.append("- -");
-		debugMsg.append(getKeyLevel3(false));
-		debugMsg.append("- -");
-		debugMsg.append(getKeyLevel4(false));
-		debugMsg.append("-");
-		LOG.info(debugMsg.toString());
 	}
 
 	/**
@@ -124,6 +107,22 @@ public class CacheStoreHouseKey {
 	public boolean resetLevel4() throws CacheStoreHouseException {
 		return ("".equals(getKeyLevel4(false)));
 	}
+
+	public String getDebugMsg() throws CacheStoreHouseException {
+		StringBuilder debugMsg = new StringBuilder();
+
+		debugMsg.append("CacheStoreHouseKey: -");
+		debugMsg.append(getKeyLevel1(false));
+		debugMsg.append("- -");
+		debugMsg.append(getKeyLevel2(false));
+		debugMsg.append("- -");
+		debugMsg.append(getKeyLevel3(false));
+		debugMsg.append("- -");
+		debugMsg.append(getKeyLevel4(false));
+		debugMsg.append("-");
+		return debugMsg.toString();
+	}
+
 }
 
 // EOF

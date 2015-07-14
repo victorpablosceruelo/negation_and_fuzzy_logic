@@ -40,7 +40,7 @@ public class OntologyRootQuery extends AbstractOntologyQuery {
 		String serviceEndPointKey = getServiceEndPointKey(serviceEndPoint);
 		String queryStringKey = getQueryStringKey(queryString);
 		String argumentsKey = getArgumentsKey(args);
-		Object o = CacheStoreHouse.retrieve(OntologyRootQuery.class, serviceEndPointKey, queryStringKey, argumentsKey);
+		Object o = CacheStoreHouse.retrieve(OntologyRootQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, true);
 		OntologyRootQuery query = (OntologyRootQuery) o;
 		if (query == null) {
 			query = new OntologyRootQuery(serviceEndPoint, args);

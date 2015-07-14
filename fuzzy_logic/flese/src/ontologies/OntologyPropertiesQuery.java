@@ -46,7 +46,7 @@ public class OntologyPropertiesQuery extends AbstractOntologyQuery {
 		String serviceEndPointKey = getServiceEndPointKey(serviceEndPoint);
 		String queryStringKey = getQueryStringKey(queryString);
 		String argumentsKey = getArgumentsKey(args);
-		Object o = CacheStoreHouse.retrieve(OntologyPropertiesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey);
+		Object o = CacheStoreHouse.retrieve(OntologyPropertiesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, true);
 		OntologyPropertiesQuery query = (OntologyPropertiesQuery) o;
 		if (query == null) {
 			query = new OntologyPropertiesQuery(serviceEndPoint, args);

@@ -2,7 +2,12 @@ package storeHouse;
 
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class CacheStoreHouse {
+
+	final static protected Log LOG = LogFactory.getLog(CacheStoreHouse.class);
 
 	private static HashMap<String, HashMap<String, HashMap<String, HashMap<String, Object>>>> storeHouse = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, Object>>>>();
 
@@ -35,10 +40,10 @@ public class CacheStoreHouse {
 	 * @throws CacheStoreHouseException
 	 */
 	public static Object retrieve(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2,
-			String keyLevel3, String keyLevel4) throws CacheStoreHouseException {
+			String keyLevel3, String keyLevel4, boolean debug) throws CacheStoreHouseException {
 
 		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
-		Object retrieved = retrieve(key);
+		Object retrieved = retrieve(key, debug);
 
 		return retrieved;
 	}
@@ -118,7 +123,7 @@ public class CacheStoreHouse {
 	 * @return
 	 * @throws CacheStoreHouseException
 	 */
-	private static Object retrieve(CacheStoreHouseKey key) throws CacheStoreHouseException {
+	private static Object retrieve(CacheStoreHouseKey key, boolean debug) throws CacheStoreHouseException {
 
 		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = storeHouse.get(key
 				.getKeyLevel1(true));
@@ -134,6 +139,11 @@ public class CacheStoreHouse {
 			return null;
 
 		Object object = storeHouseL4.get(key.getKeyLevel4(true));
+		if (object == null)
+			return null;
+
+		if (debug)
+			LOG.info("Object retrieved from cache using key: " + key.getDebugMsg());
 		return object;
 	}
 

@@ -68,7 +68,7 @@ public class ProgramAnalysis {
 	public static ProgramAnalysis getProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
-		Object o = CacheStoreHouse.retrieve(ProgramAnalysis.class, fullPath, fullPath, fullPath);
+		Object o = CacheStoreHouse.retrieve(ProgramAnalysis.class, fullPath, fullPath, fullPath, true);
 		ProgramAnalysis object = (ProgramAnalysis) o;
 		// object = null;
 		if (object == null) {

@@ -40,7 +40,7 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 		String serviceEndPointKey = getServiceEndPointKey(serviceEndPoint);
 		String queryStringKey = getQueryStringKey(queryString);
 		String argumentsKey = getArgumentsKey(args);
-		Object o = CacheStoreHouse.retrieve(OntologyInstancesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey);
+		Object o = CacheStoreHouse.retrieve(OntologyInstancesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, true);
 		OntologyInstancesQuery query = (OntologyInstancesQuery) o;
 		if (query == null) {
 			query = new OntologyInstancesQuery(serviceEndPoint, args);
