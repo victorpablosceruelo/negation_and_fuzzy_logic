@@ -1,7 +1,5 @@
 package prologConnector;
 
-import java.util.ArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,16 +17,16 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 		public static final String ProgramIntrospectionQuery = "ProgramIntrospectionQuery";
 		public static final String TestingQuery = "TestingQuery";
 	}
-	
+
 	private PLStructure query = null;
 	private ProgramFileInfo programFileInfo = null;
 
 	private PLVariable[] variables = null;
 
 	protected String[] variablesNames = null;
-	private CiaoPrologQueryAnswer [] queryAnswers = null;
+	private CiaoPrologQueryAnswer[] queryAnswers = null;
 	protected boolean isProgramIntrospectionQuery = false;
-	
+
 	protected CiaoPrologQueryAbstract(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException {
 
 		if (programFileInfo == null)
@@ -39,7 +37,8 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 		this.queryAnswers = new CiaoPrologQueryAnswer[0];
 	}
 
-	protected void setRealQuery(PLStructure query, PLVariable[] variables, String[] variablesNames) throws CiaoPrologConnectorException {
+	protected void setRealQuery(PLStructure query, PLVariable[] variables, String[] variablesNames)
+			throws CiaoPrologConnectorException {
 		if (query == null)
 			throw new CiaoPrologConnectorException("query cannot be null.");
 		if (variables == null)
@@ -92,7 +91,7 @@ public abstract class CiaoPrologQueryAbstract implements CiaoPrologQueryInterfac
 		return variablesNames.length;
 	}
 
-	public void setQueryAnswers(CiaoPrologQueryAnswer [] ciaoPrologQueryAnswers) {
+	public void setQueryAnswers(CiaoPrologQueryAnswer[] ciaoPrologQueryAnswers) {
 		this.queryAnswers = ciaoPrologQueryAnswers;
 		adequationOfQueryAnswers();
 	}

@@ -1,4 +1,4 @@
-:- module(db_shopping, _, [rfuzzy, clpr, pkgs_output_debug]).
+:- module(db_shopping, _, [rfuzzy, clpr]).
 
 :- activate_rfuzzy_debug.
 

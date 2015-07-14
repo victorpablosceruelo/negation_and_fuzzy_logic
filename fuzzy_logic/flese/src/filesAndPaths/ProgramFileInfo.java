@@ -82,7 +82,8 @@ public class ProgramFileInfo {
 
 	public String getProgramFileBackupFullPath() throws FilesAndPathsException {
 		PathsMgmt pathsMgmt = new PathsMgmt();
-		String folderPath = PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(), KConstants.Application.BackupsFolder);
+		String folderPath = PathsUtils.concatPathsStrings(pathsMgmt.getProgramFilesPath(),
+				KConstants.Application.BackupsFolder);
 
 		String tmp1 = PathsUtils.concatPathsStrings(folderPath, Dates.getStringOfCurrentDate());
 		String tmp2 = tmp1 + "_" + fileOwner + "_" + fileName;
@@ -104,7 +105,8 @@ public class ProgramFileInfo {
 		File file = new File(fileFullPath);
 		boolean retVal = file.exists();
 		if (throwExceptionIfNot && (!retVal)) {
-			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " does not exist.");
+			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner
+					+ " does not exist.");
 		}
 		return retVal;
 	}
@@ -112,7 +114,8 @@ public class ProgramFileInfo {
 	public File createFile(boolean throwExceptionIfExists) throws FilesAndPathsException {
 		if (existsFile(false)) {
 			if (throwExceptionIfExists) {
-				throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " already exists.");
+				throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner
+						+ " already exists.");
 			}
 		}
 
@@ -160,7 +163,8 @@ public class ProgramFileInfo {
 			java.nio.file.Files.delete(target);
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner + " can not be removed.");
+			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner
+					+ " can not be removed.");
 		}
 	}
 
@@ -172,13 +176,15 @@ public class ProgramFileInfo {
 		Path FROM = Paths.get(fileFullPath);
 		Path TO = Paths.get(backupFileFullPath);
 		// overwrite existing file, if exists
-		CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES };
+		CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING,
+				StandardCopyOption.COPY_ATTRIBUTES };
 		try {
 			java.nio.file.Files.copy(FROM, TO, options);
 		} catch (IOException e) {
 			LOG.info("Error on copy. \n FROM: " + fileFullPath + "\n TO: " + backupFileFullPath + "\n");
 			e.printStackTrace();
-			throw new FilesAndPathsException("Cannot make a backup of program file " + fileName + " owned by " + fileOwner + ".");
+			throw new FilesAndPathsException("Cannot make a backup of program file " + fileName
+					+ " owned by " + fileOwner + ".");
 		}
 	}
 
@@ -204,6 +210,22 @@ public class ProgramFileInfo {
 		}
 		reader.close();
 		return contents.toArray(new String[contents.size()]);
+	}
+
+	public void cleanCiaoPrologTmpFiles() throws FilesAndPathsException {
+		if (existsFile(true)) {
+			String fullPath = getProgramFileFullPath();
+			removeCiaoPrologTmpFile(getFileOwner(), fullPath.replace(".pl", ".po"));
+			removeCiaoPrologTmpFile(getFileOwner(), fullPath.replace(".pl", ".itf"));
+		}
+	}
+
+	private static void removeCiaoPrologTmpFile(String fileOwner, String replace)
+			throws FilesAndPathsException {
+		ProgramFileInfo pAux = new ProgramFileInfo(fileOwner, replace);
+		if (pAux.existsFile(false)) {
+			pAux.removeFileWithoutBackup();
+		}
 	}
 }
 
