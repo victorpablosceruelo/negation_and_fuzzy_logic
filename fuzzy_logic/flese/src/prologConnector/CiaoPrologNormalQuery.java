@@ -39,7 +39,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 			query.setRealQuery(conversor.getConvertedQuery(), conversor.getListOfVariables(), conversor.getListOfNamesForVariables());
 			PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
 			plConnectionEnvelope.runPrologQuery(query, localUserInfo);
-			CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, key2, query);
+			CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, key2, query, true);
 		}
 		else {
 			LOG.info("Answers retrieved from cache ");
@@ -55,7 +55,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
-		CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, null, null, null);
+		CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, null, null, null, true);
 	}
 
 	@Override

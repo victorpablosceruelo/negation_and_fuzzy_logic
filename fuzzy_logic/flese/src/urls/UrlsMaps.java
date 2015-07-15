@@ -100,7 +100,7 @@ public class UrlsMaps {
 		String manager = getManager(urlMap);
 		String op = getOp(urlMap);
 
-		CacheStoreHouse.store(UrlsMaps.class, manager, manager, op, urlMap);
+		CacheStoreHouse.store(UrlsMaps.class, manager, manager, op, urlMap, true);
 	}
 }
 

@@ -44,7 +44,7 @@ public class OntologyRootQuery extends AbstractOntologyQuery {
 		OntologyRootQuery query = (OntologyRootQuery) o;
 		if (query == null) {
 			query = new OntologyRootQuery(serviceEndPoint, args);
-			CacheStoreHouse.store(OntologyRootQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query);
+			CacheStoreHouse.store(OntologyRootQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query, true);
 		}
 		return query;
 	}

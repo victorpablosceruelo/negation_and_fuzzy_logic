@@ -22,11 +22,11 @@ public class CacheStoreHouse {
 	 * @throws CacheStoreHouseException
 	 */
 	public static void store(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2,
-			String keyLevel3, String keyLevel4, Object object) throws CacheStoreHouseException {
+			String keyLevel3, String keyLevel4, Object object, boolean debug) throws CacheStoreHouseException {
 
 		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
 
-		store(key, object);
+		store(key, object, debug);
 	}
 
 	/**
@@ -58,18 +58,18 @@ public class CacheStoreHouse {
 	 * @throws CacheStoreHouseException
 	 */
 	public static void remove(@SuppressWarnings("rawtypes") Class keyLevel1, String keyLevel2,
-			String keyLevel3, String keyLevel4) throws CacheStoreHouseException {
+			String keyLevel3, String keyLevel4, boolean debug) throws CacheStoreHouseException {
 
 		CacheStoreHouseKey key = new CacheStoreHouseKey(keyLevel1, keyLevel2, keyLevel3, keyLevel4);
 
-		store(key, null);
+		store(key, null, debug);
 	}
 
 	// --------------
 	// --------------
 	// --------------
 
-	private synchronized static void store(CacheStoreHouseKey key, Object object)
+	private synchronized static void store(CacheStoreHouseKey key, Object object, boolean debug)
 			throws CacheStoreHouseException {
 
 		HashMap<String, HashMap<String, HashMap<String, Object>>> storeHouseL2 = null;
@@ -84,8 +84,11 @@ public class CacheStoreHouse {
 				storeHouseL2 = new HashMap<String, HashMap<String, HashMap<String, Object>>>();
 			storeHouse.put(key.getKeyLevel1(true), storeHouseL2);
 
-			if (key.resetLevel2())
+			if (key.resetLevel2()) {
+				if (debug)
+					LOG.info("Removed L2 cache. Key: " + key.getDebugMsg());
 				return;
+			}
 		}
 
 		// Retrieve or create the level 3 storeHouse.
@@ -96,8 +99,11 @@ public class CacheStoreHouse {
 				storeHouseL3 = new HashMap<String, HashMap<String, Object>>();
 			storeHouseL2.put(key.getKeyLevel2(true), storeHouseL3);
 
-			if (key.resetLevel3())
+			if (key.resetLevel3()){
+				if (debug)
+					LOG.info("Removed L3 cache. Key: " + key.getDebugMsg());
 				return;
+			}
 		}
 
 		// Retrieve or create the level 4 storeHouse.
@@ -108,12 +114,24 @@ public class CacheStoreHouse {
 				storeHouseL4 = new HashMap<String, Object>();
 			storeHouseL3.put(key.getKeyLevel3(true), storeHouseL4);
 
-			if (key.resetLevel4())
+			if (key.resetLevel4()){
+				if (debug)
+					LOG.info("Removed L4 cache. Key: " + key.getDebugMsg());
 				return;
+			}
 		}
 
 		// Save the object in the level 4 storeHouse.
 		storeHouseL4.put(key.getKeyLevel4(true), object);
+		
+		if (object == null) {
+			if (debug)
+				LOG.info("Removed object from cache. Key: " + key.getDebugMsg());
+		}
+		else {
+			if (debug)
+				LOG.info("Stored object in cache with Key: " + key.getDebugMsg());
+		}
 	}
 
 	/**
@@ -143,7 +161,7 @@ public class CacheStoreHouse {
 			return null;
 
 		if (debug)
-			LOG.info("Object retrieved from cache using key: " + key.getDebugMsg());
+			LOG.info("Object retrieved from cache using Key: " + key.getDebugMsg());
 		return object;
 	}
 

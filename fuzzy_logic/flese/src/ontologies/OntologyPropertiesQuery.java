@@ -50,7 +50,7 @@ public class OntologyPropertiesQuery extends AbstractOntologyQuery {
 		OntologyPropertiesQuery query = (OntologyPropertiesQuery) o;
 		if (query == null) {
 			query = new OntologyPropertiesQuery(serviceEndPoint, args);
-			CacheStoreHouse.store(OntologyPropertiesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query);
+			CacheStoreHouse.store(OntologyPropertiesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query, true);
 		}
 		return query;
 	}

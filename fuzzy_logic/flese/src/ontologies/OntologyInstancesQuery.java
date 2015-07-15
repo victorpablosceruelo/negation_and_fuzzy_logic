@@ -44,7 +44,7 @@ public class OntologyInstancesQuery extends AbstractOntologyQuery {
 		OntologyInstancesQuery query = (OntologyInstancesQuery) o;
 		if (query == null) {
 			query = new OntologyInstancesQuery(serviceEndPoint, args);
-			CacheStoreHouse.store(OntologyInstancesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query);
+			CacheStoreHouse.store(OntologyInstancesQuery.class, serviceEndPointKey, queryStringKey, argumentsKey, query, true);
 		}
 		return query;
 	}

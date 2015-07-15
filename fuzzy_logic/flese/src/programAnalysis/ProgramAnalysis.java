@@ -74,7 +74,7 @@ public class ProgramAnalysis {
 		if (object == null) {
 			object = new ProgramAnalysis(programFileInfo);
 			object.getProgramFuzzifications();
-			CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, object);
+			CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, object, true);
 		}
 		return object;
 	}
@@ -82,7 +82,7 @@ public class ProgramAnalysis {
 	public static void clearCacheInstancesFor(ProgramFileInfo programFileInfo) throws FilesAndPathsException, CacheStoreHouseException {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
-		CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, null);
+		CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, null, true);
 	}
 
 	private ProgramPartAnalysis[][] getProgramFuzzifications() throws Exception {
