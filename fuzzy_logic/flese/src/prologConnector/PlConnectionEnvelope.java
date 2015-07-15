@@ -69,7 +69,7 @@ public class PlConnectionEnvelope {
 	public void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo)
 			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
 
-		RunCommand.run("killall ciaoengine.LINUXi86_64");
+		RunCommand.run("killall -q ciaoengine.LINUXi86_64 ciaoengine", LOG);
 		InterruptTimerTask interruptTimerTask = InterruptTimerTask.getInstance(Thread.currentThread());
 		try {
 			runPrologQueryWithTimer(query, localUserInfo, interruptTimerTask);
