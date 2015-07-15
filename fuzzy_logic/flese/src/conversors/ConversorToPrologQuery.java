@@ -198,8 +198,8 @@ public class ConversorToPrologQuery {
 		PLStructure subGoal3 = new PLStructure("assertLocalUserName", new PLTerm[] { new PLAtom("'" + localUserName + "'") });
 
 		initialSubQuery = new PrologSubQuery();
-		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[] { subGoal3, subGoal1, subGoal2 });
-		// initialSubQuery.subQuery = new PLStructure(",", new PLTerm[] { subGoal3, initialSubQuery.subQuery });
+		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[] { subGoal3, subGoal1 });
+		initialSubQuery.subQuery = new PLStructure(",", new PLTerm[] { initialSubQuery.subQuery, subGoal2 });
 		initialSubQuery.SubQuerySimpleInfoString = "";
 		CiaoPrologTermInJava tmpQuery = new CiaoPrologTermInJava(initialSubQuery.subQuery, null);
 		initialSubQuery.SubQueryComplexInfoString = tmpQuery.toString();
