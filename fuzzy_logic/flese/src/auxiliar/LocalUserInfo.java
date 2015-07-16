@@ -1,15 +1,14 @@
 package auxiliar;
 
-import logs.LogsManager;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import authProviders.AuthProviderInterface;
+import authProviders.Utils;
+import logs.LogsManager;
 import storeHouse.RequestStoreHouse;
 import storeHouse.RequestStoreHouseException;
 import storeHouse.SessionStoreHouse;
-import authProviders.AuthProviderInterface;
-import authProviders.Utils;
 
 public class LocalUserInfo {
 
@@ -17,7 +16,8 @@ public class LocalUserInfo {
 	private String localUserName = null;
 
 	/**
-	 * Tests if the client session has been authenticated, which is why it needs request and response.
+	 * Tests if the client session has been authenticated, which is why it needs
+	 * request and response.
 	 * 
 	 * @param request
 	 *            is the HttpServletRequest
@@ -25,7 +25,8 @@ public class LocalUserInfo {
 	 *            is the HttpServletResponse
 	 * @throws RequestStoreHouseException
 	 * @throws Exception
-	 *             if request is null, response is null, session is null or localUserName can not be set.
+	 *             if request is null, response is null, session is null or
+	 *             localUserName can not be set.
 	 */
 	private LocalUserInfo(RequestStoreHouse requestStoreHouse) throws Exception {
 
@@ -52,7 +53,14 @@ public class LocalUserInfo {
 		check();
 
 		LogsManager.logSignedUser(this.localUserName);
+	}
 
+	private LocalUserInfo(String localUserNameIn) throws Exception {
+		// Ensure no spaces around.
+		localUserName = localUserNameIn.trim();
+		check();
+
+		LogsManager.logSignedUser(this.localUserName);
 	}
 
 	private void check() throws Exception {
@@ -87,7 +95,10 @@ public class LocalUserInfo {
 			}
 		}
 		return localUserInfo;
+	}
 
+	public static LocalUserInfo getFakeLocalUserInfo(String localUserName) throws Exception {
+		return new LocalUserInfo(localUserName);
 	}
 
 	public String getLocalUserName() {

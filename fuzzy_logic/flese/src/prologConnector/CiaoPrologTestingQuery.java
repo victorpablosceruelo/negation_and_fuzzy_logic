@@ -51,9 +51,14 @@ public class CiaoPrologTestingQuery extends CiaoPrologQueryAbstract {
 
 			setRealQuery(query, variables, variablesNames);
 		} else {
-			throw new CiaoPrologConnectorException("fileName is not " + testFileName);
+			LOG.info("Please use method overrideRealQuery to set your testing query.");
+			// throw new CiaoPrologConnectorException("fileName is not " + testFileName);
 		}
 
+	}
+	
+	public void overrideRealQuery(PLStructure query, PLVariable[] variables, String [] variablesNames) throws CiaoPrologConnectorException {
+		setRealQuery(query, variables, variablesNames);
 	}
 
 	public static CiaoPrologTestingQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException,
