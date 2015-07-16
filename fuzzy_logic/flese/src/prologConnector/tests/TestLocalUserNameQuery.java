@@ -61,7 +61,7 @@ public class TestLocalUserNameQuery {
 		PLTerm[] args_conjunction3 = { conjunction1, conjunction2 };
 		PLStructure conjunction3 = new PLStructure(",", args_conjunction3);
 
-		query = conjunction3;
+		query = conjunction1;
 
 		// Now the real stuff.
 		CiaoPrologTestingQuery ciaoQuery = CiaoPrologTestingQuery.getInstance(pfi);
