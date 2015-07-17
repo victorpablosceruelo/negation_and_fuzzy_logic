@@ -65,7 +65,7 @@ public class InterruptTimerTask extends TimerTask {
 		this.timer = null;
 		this.inBadState = false;
 
-		LOG.info("New InterruptTimerTask for thread with id " + threadId);
+		LOG.debug("New InterruptTimerTask for thread with id " + threadId);
 	}
 
 	public void deactivate() {
@@ -77,7 +77,7 @@ public class InterruptTimerTask extends TimerTask {
 		this.inBadState = true;
 
 		putInHash(threadId, null);
-		LOG.info("Cancelled interruption of thread " + threadId);
+		LOG.debug("Cancelled interruption of thread " + threadId);
 	}
 
 	public void reschedule(long nextExecInMs) {
@@ -89,9 +89,9 @@ public class InterruptTimerTask extends TimerTask {
 			this.timer = new Timer(false);
 			this.timer.schedule(this, nextExecInMs);
 			this.inBadState = true;
-			LOG.info("Interrupting thread " + threadId + " execution in " + nextExecInMs + "ms.");
+			LOG.debug("Interrupting thread " + threadId + " execution in " + nextExecInMs + "ms.");
 		} else {
-			LOG.info("Reschedule of interrupting thread " + threadId + " needs recreation ... ");
+			LOG.debug("Reschedule of interrupting thread " + threadId + " needs recreation ... ");
 			this.deactivate();
 			InterruptTimerTask.getInstance(this.theThread).reschedule(nextExecInMs);
 		}
@@ -99,7 +99,7 @@ public class InterruptTimerTask extends TimerTask {
 
 	@Override
 	public void run() {
-		LOG.info("Interrupting execution of thread " + threadId);
+		LOG.debug("Interrupting execution of thread " + threadId);
 		this.theThread.interrupt();
 	}
 
