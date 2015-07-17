@@ -8,13 +8,13 @@ is_ascii_list([X|Xs]) :-
 
 sameUserNameAtom(X, Y) :- var(X), var(Y), !.
 sameUserNameAtom(X, Y) :- (var(X) ; var(Y)), !, fail.
-sameuserNameAtom(X, Y) :-
+sameUserNameAtom(X, Y) :-
 	functor(X, Name, Arity),
 	functor(Y, Name, Arity), !.
 
 test('Ok') :- localUserName('victorpablosceruelo_at_gmail_com').
-test('Ok atom') :- localUserName(Atom), sameAtom(Atom, 'victorpablosceruelo_at_gmail_com').
-text('Ascii in Prolog') :- X is 'victorpablosceruelo_at_gmail_com', is_ascii_list(X).
+test('Ok atom') :- localUserName(Atom), sameUserNameAtom(Atom, 'victorpablosceruelo_at_gmail_com').
+test('Ascii in Prolog') :- X = 'victorpablosceruelo_at_gmail_com', is_ascii_list(X).
 test('Ascii from outside') :- localUserName(X), is_ascii_list(X).
 test('Fail').
 
