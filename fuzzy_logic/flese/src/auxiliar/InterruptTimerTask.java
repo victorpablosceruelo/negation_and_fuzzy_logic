@@ -1,5 +1,6 @@
 package auxiliar;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -8,67 +9,98 @@ import org.apache.commons.logging.LogFactory;
 
 public class InterruptTimerTask extends TimerTask {
 
+	public static final class KCtes {
+		public static final long normalWaitingTime = 120000l;
+	}
+
 	final static private Log LOG = LogFactory.getLog(InterruptTimerTask.class);
-	
+
 	/*
 	 * A TimerTask that interrupts the specified thread when run.
-	 * http://stackoverflow.com/questions/5243233/set-running-time-limit-on-a-method-in-java
+	 * http://stackoverflow.com/questions/5243233/set-running-time-limit-on-a-
+	 * method-in-java
 	 */
 
-	private Thread theTread;
-	boolean active;
-	boolean delayAgain;
+	private static HashMap<Long, InterruptTimerTask> interruptedTimerTasksByThread;
 
-	public static InterruptTimerTask getInstance(Thread theTread) {
-		return new InterruptTimerTask(theTread);
+	private Thread theThread;
+	long threadId;
+	Timer timer;
+	boolean inBadState;
+
+	private static synchronized void createHashMap() {
+		interruptedTimerTasksByThread = new HashMap<Long, InterruptTimerTask>();
 	}
 
-	private InterruptTimerTask(Thread theTread) {
-		LOG.info("New InterruptTimerTask");
-		this.theTread = theTread;
-		this.active = true;
-		reschedule(true);
+	private static InterruptTimerTask getFromHash(long id) {
+		if (interruptedTimerTasksByThread == null) {
+			createHashMap();
+		}
+		return interruptedTimerTasksByThread.get(id);
 	}
 
-	public void reschedule() {
-		reschedule(false);
+	private static void putInHash(long id, InterruptTimerTask interruptTimerTask) {
+		if (interruptedTimerTasksByThread == null) {
+			createHashMap();
+		}
+		synchronized (interruptedTimerTasksByThread) {
+			interruptedTimerTasksByThread.put(id, interruptTimerTask);
+		}
+	}
+
+	public static InterruptTimerTask getInstance(Thread theThread) {
+		long id = theThread.getId();
+		InterruptTimerTask interruptTimerTask = getFromHash(id);
+
+		if (interruptTimerTask == null) {
+			interruptTimerTask = new InterruptTimerTask(theThread);
+			putInHash(id, interruptTimerTask);
+		}
+		return interruptTimerTask;
+	}
+
+	private InterruptTimerTask(Thread theThread) {
+		this.theThread = theThread;
+		this.threadId = theThread.getId();
+		this.timer = null;
+		this.inBadState = false;
+
+		LOG.info("New InterruptTimerTask for thread with id " + threadId);
 	}
 
 	public void deactivate() {
-		active = false;
+		// Reset current timer.
+		if (timer != null)
+			this.timer.cancel();
+
 		this.cancel();
-		LOG.info("Deactivated InterruptTimerTask");
+		this.inBadState = true;
+
+		putInHash(threadId, null);
+		LOG.info("Cancelled interruption of thread " + threadId);
 	}
 
-	private void reschedule(boolean fullReschedule) {
-		if (fullReschedule) {
-			long delay = 120000; // 2 minutes.
-			Timer timer = new Timer(true);
-			timer.schedule(this, delay);
-			LOG.info("Full reschedule");
+	public void reschedule(long nextExecInMs) {
+		if (nextExecInMs <= 0) {
+			nextExecInMs = KCtes.normalWaitingTime;
 		}
-		else {
-			LOG.info("Partial reschedule");
+
+		if (!inBadState) {
+			this.timer = new Timer(false);
+			this.timer.schedule(this, nextExecInMs);
+			this.inBadState = true;
+			LOG.info("Interrupting thread " + threadId + " execution in " + nextExecInMs + "ms.");
+		} else {
+			LOG.info("Reschedule of interrupting thread " + threadId + " needs recreation ... ");
+			this.deactivate();
+			InterruptTimerTask.getInstance(this.theThread).reschedule(nextExecInMs);
 		}
-		updateDelayAgain(true);
 	}
 
 	@Override
 	public void run() {
-		if (active) {
-			if (delayAgain) {
-				LOG.info("Not interrupting due to delayAgain");
-				reschedule(true);
-				updateDelayAgain(false);
-			} else {
-				LOG.info("Interrupting");
-				theTread.interrupt();
-			}
-		}
-	}
-
-	private synchronized void updateDelayAgain(boolean value) {
-		this.delayAgain = value;
+		LOG.info("Interrupting execution of thread " + threadId);
+		this.theThread.interrupt();
 	}
 
 }

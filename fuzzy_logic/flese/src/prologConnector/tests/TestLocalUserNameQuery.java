@@ -69,5 +69,6 @@ public class TestLocalUserNameQuery {
 		PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
 		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 
+		System.exit(0);
 	}
 }
