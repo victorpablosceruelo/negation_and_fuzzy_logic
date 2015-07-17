@@ -6,8 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import managers.FilesManagerAux;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,7 +13,7 @@ import constants.KConstants;
 
 public class PathsMgmt {
 
-	private static final Log LOG = LogFactory.getLog(FilesManagerAux.class);
+	private static final Log LOG = LogFactory.getLog(PathsMgmt.class);
 
 	private static String programFilesPath = null;
 	private static String plServerPath = null;
@@ -77,21 +75,28 @@ public class PathsMgmt {
 		String programFilesValidPath = null;
 		int index = 0;
 
-		while (((programFilesValidPath == null) || ("".equals(programFilesValidPath))) && (index < programFilesValidPaths.length)) {
-			LOG.info(programFilesValidPaths[index]);
+		while (((programFilesValidPath == null) || ("".equals(programFilesValidPath)))
+				&& (index < programFilesValidPaths.length)) {
 			try {
+				LOG.info("determineProgramFilesValidPath: checking " + programFilesValidPaths[index]);
 				if (PathsUtils.testIfFolderExists(programFilesValidPaths[index], true)) {
 					programFilesValidPath = programFilesValidPaths[index];
 				}
 			} catch (Exception e) {
 				programFilesValidPath = null;
 			}
-			if (programFilesValidPath == null)
+			if (programFilesValidPath == null) {
+				if ((programFilesValidPaths != null) && (index < programFilesValidPaths.length)
+						&& (programFilesValidPaths[index] != null))
+					LOG.info("determineProgramFilesValidPath: invalid: " + programFilesValidPaths[index]);
 				index++;
+			}
 		}
 
 		if ((programFilesValidPath == null) || ("".equals(programFilesValidPath)))
 			throw new FilesAndPathsException("programFilesValidPath cannot be null.");
+
+		LOG.info("determineProgramFilesValidPath: ok: " + programFilesValidPath);
 		return programFilesValidPath;
 	}
 
@@ -166,17 +171,16 @@ public class PathsMgmt {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void createFolder(String subPath, boolean exceptionIfExists) throws FilesAndPathsException {
-		
+
 		if (subPath == null) {
 			throw new FilesAndPathsException("subPath cannot be null.");
 		}
-		
+
 		String folderPath = null;
-		
-		if (! subPath.startsWith(programFilesPath)) {
+
+		if (!subPath.startsWith(programFilesPath)) {
 			folderPath = programFilesPath + subPath;
-		}
-		else {
+		} else {
 			folderPath = subPath;
 		}
 		Path dir = Paths.get(folderPath);
