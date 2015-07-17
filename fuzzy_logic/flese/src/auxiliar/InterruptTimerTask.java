@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 public class InterruptTimerTask extends TimerTask {
 
 	public static final class KCtes {
-		public static final long normalWaitingTime = 120000l;
+		public static final long normalWaitingTime = 180000l; // 3 mins.
 	}
 
 	final static private Log LOG = LogFactory.getLog(InterruptTimerTask.class);
