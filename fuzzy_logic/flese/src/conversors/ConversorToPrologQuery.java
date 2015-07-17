@@ -204,7 +204,7 @@ public class ConversorToPrologQuery {
 		PLStructure subGoal2 = new PLStructure("=", plArgsSubGoal2);
 
 		String localUserName = requestStoreHouse.getSession().getLocalUserInfo().getLocalUserName();
-		PLTerm[] argsAssert = new PLTerm[] { new PLString("'" + localUserName + "'") };
+		PLTerm[] argsAssert = new PLTerm[] { new PLAtom(localUserName) };
 		PLStructure subGoal3 = new PLStructure("assertLocalUserName", argsAssert);
 
 		initialSubQuery = new PrologSubQuery();

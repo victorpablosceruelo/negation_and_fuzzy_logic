@@ -1,17 +1,16 @@
 package prologConnector.tests;
 
+import prologConnector.CiaoPrologConnectorException;
+import prologConnector.CiaoPrologTestingQuery;
+import prologConnector.PlConnectionEnvelope;
+import prologConnector.PlConnectionEnvelopeException;
 import CiaoJava.PLAtom;
-import CiaoJava.PLString;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfo;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
-import prologConnector.CiaoPrologConnectorException;
-import prologConnector.CiaoPrologTestingQuery;
-import prologConnector.PlConnectionEnvelope;
-import prologConnector.PlConnectionEnvelopeException;
 
 public class TestLocalUserNameQuery {
 
@@ -29,15 +28,15 @@ public class TestLocalUserNameQuery {
 	public static void main(String[] args) throws Exception {
 		LocalUserInfo localUserInfo = LocalUserInfo.getFakeLocalUserInfo("victorpablosceruelo_at_gmail_com");
 
-		// test1(localUserInfo);
-		test2(localUserInfo);
+		test1(localUserInfo);
+		// test2(localUserInfo);
 
 		System.exit(0);
 
 	}
 
-	private static void test1(LocalUserInfo localUserInfo)
-			throws CiaoPrologConnectorException, FilesAndPathsException, PlConnectionEnvelopeException {
+	protected static void test1(LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
+			FilesAndPathsException, PlConnectionEnvelopeException {
 		ProgramFileInfo pfi = new ProgramFileInfo(KCtes.programOwner, KCtes.programFileName1);
 		// To fill in with values.
 		PLStructure query = null;
@@ -45,29 +44,31 @@ public class TestLocalUserNameQuery {
 		String[] variablesNames = null;
 
 		variables = new PLVariable[6];
-		variables[0] = new PLVariable(); // UserName
-		variables[1] = new PLVariable(); // Kind
+		variables[0] = new PLVariable(); // Kind
+		variables[1] = new PLVariable(); // Reason
 		variables[2] = new PLVariable(); // Xtmp
 		variables[3] = new PLVariable(); // Vtmp
 		variables[4] = new PLVariable(); // Cond
 		variables[5] = new PLVariable(); // V
 
-		variablesNames = new String[] { "UserName", "Kind", "Xtmp", "Vtmp", "Cond", "V" };
+		variablesNames = new String[] { "Kind", "Reason", "Xtmp", "Vtmp", "Cond", "V" };
 
 		String localUserName = localUserInfo.getLocalUserName();
-		PLTerm[] argsAssert = new PLTerm[] { new PLAtom("'" + localUserName + "'") };
+		PLTerm argAssert = new PLAtom(localUserName);
+		PLTerm[] argsAssert = new PLTerm[] { argAssert };
 		PLStructure queryAssert = new PLStructure(KCtes.assertLocalUserNamePredicate, argsAssert);
 
-		PLTerm[] argsRetrieve = new PLTerm[] { variables[0], variables[1] };
-		PLStructure queryRetrieve = new PLStructure(KCtes.isLocalUserNamePredicate, argsRetrieve);
+		PLTerm[] argsCheckUserName = new PLTerm[] { argAssert, variables[0], variables[1] };
+		PLStructure queryCheckUserName = new PLStructure(KCtes.isLocalUserNamePredicate, argsCheckUserName);
 
 		PLTerm[] args_expensive = { variables[2], variables[3] };
 		PLStructure query_expensive = new PLStructure("expensive", args_expensive);
 
 		PLTerm[] args_rfuzzy_var_truth_value = { variables[3], variables[4], variables[5] };
-		PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
+		PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value",
+				args_rfuzzy_var_truth_value);
 
-		PLTerm[] args_conjunction1 = { queryAssert, queryRetrieve };
+		PLTerm[] args_conjunction1 = { queryAssert, queryCheckUserName };
 		PLStructure conjunction1 = new PLStructure(",", args_conjunction1);
 
 		PLTerm[] args_conjunction2 = { query_expensive, query_dump_constraints };
@@ -85,8 +86,8 @@ public class TestLocalUserNameQuery {
 		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 	}
 
-	private static void test2(LocalUserInfo localUserInfo)
-			throws CiaoPrologConnectorException, FilesAndPathsException, PlConnectionEnvelopeException {
+	protected static void test2(LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
+			FilesAndPathsException, PlConnectionEnvelopeException {
 		ProgramFileInfo pfi = new ProgramFileInfo(KCtes.programOwner, KCtes.programFileName2);
 		// To fill in with values.
 		PLStructure query = null;
@@ -99,25 +100,25 @@ public class TestLocalUserNameQuery {
 		variables[2] = new PLVariable(); //
 		variables[3] = new PLVariable(); //
 		variables[4] = new PLVariable(); //
-		
+
 		variablesNames = new String[] { "Kind", "Reason", "Type2", "Kind2", "Reason2" };
 
 		String localUserName = localUserInfo.getLocalUserName();
+		// PLTerm argAssert = new PLStructure("'" + localUserName + "'", new
+		// PLTerm[0]);
 		// PLTerm argAssert = new PLString("'" + localUserName + "'");
 		// PLTerm argAssert = new PLAtom("'" + localUserName + "'");
 		PLTerm argAssert = new PLAtom(localUserName);
-		// PLTerm argAssert = new PLStructure("'" + localUserName + "'", new
-		// PLTerm[0]);
 		PLTerm[] argsAssert = new PLTerm[] { argAssert };
 		PLStructure queryAssert = new PLStructure(KCtes.assertLocalUserNamePredicate, argsAssert);
 
-		PLTerm[] argsRetrieve = new PLTerm[] { argAssert, variables[0], variables[1] };
-		PLStructure queryRetrieve = new PLStructure(KCtes.isLocalUserNamePredicate, argsRetrieve);
+		PLTerm[] argsCheckUserName = new PLTerm[] { argAssert, variables[0], variables[1] };
+		PLStructure queryCheckUserName = new PLStructure(KCtes.isLocalUserNamePredicate, argsCheckUserName);
 
 		PLTerm[] args_test = { variables[2], variables[3], variables[4] };
 		PLStructure query_test = new PLStructure("test", args_test);
 
-		PLTerm[] args_conjunction1 = { queryAssert, queryRetrieve };
+		PLTerm[] args_conjunction1 = { queryAssert, queryCheckUserName };
 		PLStructure conjunction1 = new PLStructure(",", args_conjunction1);
 
 		PLTerm[] args_conjunction2 = { conjunction1, query_test };
