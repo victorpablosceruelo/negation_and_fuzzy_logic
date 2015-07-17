@@ -633,7 +633,7 @@ generate_username_subCl(UN, 'true') :-
 	nonvar(UN), UN = 'null', !.
 generate_username_subCl(UN, SubCl_UserName) :-
 	nonvar(UN), UN \== 'null', !, 
-	functor(Obtain_UserName, 'localUserName', 1),
+	functor(Obtain_UserName, 'isUserNameLocalUserName', 1),
 	arg(1, Obtain_UserName, Obtined_UserName),
 	SubCl_UserName = (Obtain_UserName, (Obtined_UserName = UN)).
 
@@ -1191,33 +1191,6 @@ build_line(X, V, X1, V1, X2, V2, (Line, Debug)) :-
 % ------------------------------------------------------
 % ------------------------------------------------------
 
-add_preffix_to_name(Input, Preffix, Output) :-
-	(
-	    (	nonvar(Input), nonvar(Preffix), atom(Input), atom(Preffix), !    )
-	;
-	    (	print_msg('error', 'add_preffix_to_name :: not atoms :: (Input, Preffix)', (Input, Preffix)), !, fail    )
-	),
-	atom_codes(Input, Input_Chars),
-	atom_codes(Preffix, Preffix_Chars),
-	string(Input_Chars),
-	string(Preffix_Chars),
-	(
-	    (	Preffix_Chars = "", !, New_Input_Chars = Input_Chars    )
-	;
-	    (   append_local("_", Input_Chars, New_Input_Chars)    )
-	),  
-%	print_msg('debug', 'add_preffix_to_name :: Preffix_Chars', Preffix_Chars),
-%	print_msg('debug', 'add_preffix_to_name :: New_Input_Chars', New_Input_Chars),
-	append_local(Preffix_Chars, New_Input_Chars, Output_Chars),
-%	print_msg('debug', 'add_preffix_to_name :: Output_Chars', Output_Chars),
-	atom_codes(Output, Output_Chars), 
-	atom(Output), !,
-	print_msg('debug', 'add_preffix_to_name :: Output', Output).
-
-% ------------------------------------------------------
-% ------------------------------------------------------
-% ------------------------------------------------------
-
 generate_code_from_saved_info([], Cls_1_In, Cls_1_In, Cls_2_In, Cls_2_In) :- !,
 	print_msg('debug', 'generate_code_from_saved_info', 'END').
 generate_code_from_saved_info([Predicate_Def|Predicate_Defs], Cls_1_In, Cls_1_Out, Cls_2_In, Cls_2_Out) :-
@@ -1421,8 +1394,8 @@ code_for_testing_program_introspection(Cls_In, [Cl_1, Cl_2, Cl_3, Cl_4, Cl_5, Cl
 % ------------------------------------------------------
 
 code_for_assert_local_user_name(Code, [Cl_1, Cl_2 | Code]) :-
-	Cl_1 = (:- data localUserName/1),
-	Cl_2 = (assertLocalUserName(UserName) :- assertz_fact(localUserName(UserName))).
+	Cl_1 = (assertLocalUserName(UserName) :- assertLocalUserNameAux(UserName)),
+	Cl_2 = (isUserNameLocalUserName(UserName) :- isUserNameLocalUserNameAux(UserName, _Kind, 'ok')).
 
 % ------------------------------------------------------
 % ------------------------------------------------------

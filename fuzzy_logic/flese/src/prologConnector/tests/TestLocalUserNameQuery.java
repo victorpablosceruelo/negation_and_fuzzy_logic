@@ -1,6 +1,7 @@
 package prologConnector.tests;
 
 import CiaoJava.PLAtom;
+import CiaoJava.PLString;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
@@ -21,12 +22,12 @@ public class TestLocalUserNameQuery {
 		public static String programFileName2 = "test_username.pl";
 
 		public static String assertLocalUserNamePredicate = "assertLocalUserName";
-		public static String retrieveLocalUserNamePredicate = "localUserName";
+		public static String isLocalUserNamePredicate = "isUserNameLocalUserNameAux";
 
 	}
 
 	public static void main(String[] args) throws Exception {
-		LocalUserInfo localUserInfo = LocalUserInfo.getFakeLocalUserInfo("victorpablosceruelo_at_gmail.com");
+		LocalUserInfo localUserInfo = LocalUserInfo.getFakeLocalUserInfo("victorpablosceruelo_at_gmail_com");
 
 		// test1(localUserInfo);
 		test2(localUserInfo);
@@ -43,26 +44,27 @@ public class TestLocalUserNameQuery {
 		PLVariable[] variables = null;
 		String[] variablesNames = null;
 
-		variables = new PLVariable[5];
+		variables = new PLVariable[6];
 		variables[0] = new PLVariable(); // UserName
-		variables[1] = new PLVariable(); // Xtmp
-		variables[2] = new PLVariable(); // Vtmp
-		variables[3] = new PLVariable(); // Cond
-		variables[4] = new PLVariable(); // V
+		variables[1] = new PLVariable(); // Kind
+		variables[2] = new PLVariable(); // Xtmp
+		variables[3] = new PLVariable(); // Vtmp
+		variables[4] = new PLVariable(); // Cond
+		variables[5] = new PLVariable(); // V
 
-		variablesNames = new String[] { "UserName", "Xtmp", "Vtmp", "Cond", "V" };
+		variablesNames = new String[] { "UserName", "Kind", "Xtmp", "Vtmp", "Cond", "V" };
 
 		String localUserName = localUserInfo.getLocalUserName();
 		PLTerm[] argsAssert = new PLTerm[] { new PLAtom("'" + localUserName + "'") };
 		PLStructure queryAssert = new PLStructure(KCtes.assertLocalUserNamePredicate, argsAssert);
 
-		PLTerm[] argsRetrieve = new PLTerm[] { variables[0] };
-		PLStructure queryRetrieve = new PLStructure(KCtes.retrieveLocalUserNamePredicate, argsRetrieve);
+		PLTerm[] argsRetrieve = new PLTerm[] { variables[0], variables[1] };
+		PLStructure queryRetrieve = new PLStructure(KCtes.isLocalUserNamePredicate, argsRetrieve);
 
-		PLTerm[] args_expensive = { variables[1], variables[2] };
+		PLTerm[] args_expensive = { variables[2], variables[3] };
 		PLStructure query_expensive = new PLStructure("expensive", args_expensive);
 
-		PLTerm[] args_rfuzzy_var_truth_value = { variables[2], variables[3], variables[4] };
+		PLTerm[] args_rfuzzy_var_truth_value = { variables[3], variables[4], variables[5] };
 		PLStructure query_dump_constraints = new PLStructure("rfuzzy_var_truth_value", args_rfuzzy_var_truth_value);
 
 		PLTerm[] args_conjunction1 = { queryAssert, queryRetrieve };
@@ -91,25 +93,28 @@ public class TestLocalUserNameQuery {
 		PLVariable[] variables = null;
 		String[] variablesNames = null;
 
-		variables = new PLVariable[2];
+		variables = new PLVariable[5];
 		variables[0] = new PLVariable(); //
 		variables[1] = new PLVariable(); //
-
-		variablesNames = new String[] { "UserName", "Result" };
+		variables[2] = new PLVariable(); //
+		variables[3] = new PLVariable(); //
+		variables[4] = new PLVariable(); //
+		
+		variablesNames = new String[] { "Kind", "Reason", "Type2", "Kind2", "Reason2" };
 
 		String localUserName = localUserInfo.getLocalUserName();
 		// PLTerm argAssert = new PLString("'" + localUserName + "'");
-		PLTerm argAssert = new PLAtom("'" + localUserName + "'");
-		// PLTerm argAssert = new PLAtom(localUserName);
+		// PLTerm argAssert = new PLAtom("'" + localUserName + "'");
+		PLTerm argAssert = new PLAtom(localUserName);
 		// PLTerm argAssert = new PLStructure("'" + localUserName + "'", new
 		// PLTerm[0]);
 		PLTerm[] argsAssert = new PLTerm[] { argAssert };
 		PLStructure queryAssert = new PLStructure(KCtes.assertLocalUserNamePredicate, argsAssert);
 
-		PLTerm[] argsRetrieve = new PLTerm[] { variables[0] };
-		PLStructure queryRetrieve = new PLStructure(KCtes.retrieveLocalUserNamePredicate, argsRetrieve);
+		PLTerm[] argsRetrieve = new PLTerm[] { argAssert, variables[0], variables[1] };
+		PLStructure queryRetrieve = new PLStructure(KCtes.isLocalUserNamePredicate, argsRetrieve);
 
-		PLTerm[] args_test = { variables[1] };
+		PLTerm[] args_test = { variables[2], variables[3], variables[4] };
 		PLStructure query_test = new PLStructure("test", args_test);
 
 		PLTerm[] args_conjunction1 = { queryAssert, queryRetrieve };

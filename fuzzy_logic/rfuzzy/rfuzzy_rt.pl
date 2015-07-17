@@ -17,6 +17,9 @@
 	rfuzzy_process_attribute_dump/4,
 	append_local/3, memberchk_local/2, remove_list_dupplicates/3,
 	sets_union/3, lists_substraction/3,
+	isUserNameLocalUserNameAux/3,
+	assertLocalUserNameAux/1,
+	add_preffix_to_name/3,
 	rfuzzy_var_truth_value/3
 		     ],[hiord]).
 
@@ -24,6 +27,8 @@
 :- use_package(clpr).
 :- use_module(library(terms),[copy_args/3]).
 
+:- data localUserName/1.
+	
 % ---------------------------------------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
@@ -633,6 +638,110 @@ functor_local(Head, Name, Arity, []) :-
         functor(Head, Name, Arity),
         Arity == 0.
 
+% ------------------------------------------------------
+% ------------------------------------------------------
+% ------------------------------------------------------
+
+add_preffix_to_name(Input, Preffix, Output) :-
+	(
+	    (	nonvar(Input), nonvar(Preffix), atom(Input), atom(Preffix), !    )
+	;
+	    (	print_msg('error', 'add_preffix_to_name :: not atoms :: (Input, Preffix)', (Input, Preffix)), !, fail    )
+	),
+	atom_codes(Input, Input_Chars),
+	atom_codes(Preffix, Preffix_Chars),
+	string(Input_Chars),
+	string(Preffix_Chars),
+	(
+	    (	Preffix_Chars = "", !, New_Input_Chars = Input_Chars    )
+	;
+	    (   append_local("_", Input_Chars, New_Input_Chars)    )
+	),  
+%	print_msg('debug', 'add_preffix_to_name :: Preffix_Chars', Preffix_Chars),
+%	print_msg('debug', 'add_preffix_to_name :: New_Input_Chars', New_Input_Chars),
+	append_local(Preffix_Chars, New_Input_Chars, Output_Chars),
+%	print_msg('debug', 'add_preffix_to_name :: Output_Chars', Output_Chars),
+	atom_codes(Output, Output_Chars), 
+	atom(Output), !,
+	print_msg('debug', 'add_preffix_to_name :: Output', Output).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+assertLocalUserNameAux(UserName) :-
+	assertz_fact(localUserName(UserName)).
+isUserNameLocalUserNameAux(UserName, Kind, Result) :-
+	localUserName(CurrentUserName),
+	compareUserNames(UserName, CurrentUserName, Kind, Result).
+
+%compareUserNames(UserName, CurrentUserName, Kind) :-
+
+compareUserNames(X, Y, 'variables', 'ok') :- var(X), var(Y), !.
+compareUserNames(X, _Y, 'var_vs_nonvar', 'error') :-
+	var(X), !.
+compareUserNames(_X, Y, 'nonvar_vs_var', 'error') :-
+	var(Y), !.
+
+compareUserNames(X, X, 'raw_comparison', 'ok') :- !.
+compareUserNames(X, Y, 'functors', 'ok') :-
+	functor(X, Name1, Arity1),
+	functor(Y, Name2, Arity2),
+	Name1 == Name2,
+	Arity1 == Arity2, !.
+
+compareUserNames(X, Y, 'distinct_functors_arity', 'error') :-
+	functor(X, Name, _Arity1),
+	functor(Y, Name, _Arity2), !.
+
+compareUserNames(X, Y, Out, 'error') :-
+	functor(X, Name1, Arity),
+	functor(Y, Name2, Arity), !,
+	add_preffix_to_name(Name1, Name2, Tmp),
+	add_preffix_to_name(Tmp, 'distinct_functors_name', Out),
+	!.
+
+compareUserNames(X, Y, 'distinct_functors', 'error') :-
+	functor(X, _Name1, _Arity1),
+	functor(Y, _Name2, _Arity2), !.
+
+compareUserNames(X, Y, 'functor_vs_ascii_list', 'error') :-
+	functor(X, _Name, _Arity),
+	isAsciiList(Y), !.
+
+compareUserNames(X, _Y, 'functor_vs_unknown', 'error') :-
+	functor(X, _Name, _Arity), !.
+
+compareUserNames(X, Y, 'ascii_list_vs_functor', 'error') :-
+	functor(Y, _Name, _Arity),
+	isAsciiList(X), !.
+
+compareUserNames(_X, Y, 'unknown_vs_functor', 'error') :-
+	functor(Y, _Name, _Arity), !.
+
+compareUserNames(X, Y, 'ascii_lists', 'ok') :-
+	isAsciiList(X),
+	isAsciiList(Y),
+	compareAsciiLists(X, Y), !.
+
+compareUserNames(X, _Y, 'ascii_list_vs_non_ascii_list', 'error') :-
+	isAsciiList(X), !.
+
+compareUserNames(_X, Y, 'non_ascii_list_vs_ascii_list', 'error') :-
+	isAsciiList(Y), !.
+
+compareUserNames(X, X, 'comparison_error', 'error') :- !.
+	
+isAsciiList(X) :- var(X), !, fail.
+isAsciiList([]).
+isAsciiList([X|Xs]) :-
+	integer(X),
+	isAsciiList(Xs).
+
+compareAsciiLists([], []) :- !.
+compareAsciiLists([X|Xs], [X|Ys]) :-
+	compareAsciiLists(Xs, Ys).
+	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
