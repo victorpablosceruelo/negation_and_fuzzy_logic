@@ -1,6 +1,7 @@
 package prologConnector.tests;
 
 import CiaoJava.PLAtom;
+import CiaoJava.PLString;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
@@ -98,7 +99,7 @@ public class TestLocalUserNameQuery {
 		variablesNames = new String[] { "UserName", "Result" };
 
 		String localUserName = localUserInfo.getLocalUserName();
-		PLTerm[] argsAssert = new PLTerm[] { new PLAtom("'" + localUserName + "'") };
+		PLTerm[] argsAssert = new PLTerm[] { new PLString("'" + localUserName + "'") };
 		PLStructure queryAssert = new PLStructure(KCtes.assertLocalUserNamePredicate, argsAssert);
 
 		PLTerm[] argsRetrieve = new PLTerm[] { variables[0] };
