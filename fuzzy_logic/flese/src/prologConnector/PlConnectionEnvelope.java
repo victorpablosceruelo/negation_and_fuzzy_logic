@@ -222,7 +222,7 @@ public class PlConnectionEnvelope {
 
 	private void changeProgramFileTo(CiaoPrologQueryInterface query)
 			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
-		query.getProgramFileInfo().cleanCiaoPrologTmpFiles();
+		query.getProgramFileInfo().ensureFolderIsAccessibleAndCleanCiaoPrologTmpFiles();
 
 		String programFileName = query.getProgramFileInfo().getFileName();
 		LOG.info("runQuery: changing programFile to: " + programFileName + " .... ");

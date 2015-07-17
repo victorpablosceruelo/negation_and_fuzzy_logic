@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import storeHouse.CacheStoreHouseCleaner;
-import storeHouse.CacheStoreHouseException;
 import authProviders.Utils;
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import constants.KConstants;
+import storeHouse.CacheStoreHouseCleaner;
+import storeHouse.CacheStoreHouseException;
 
 public class ProgramFileInfo {
 
@@ -105,8 +105,8 @@ public class ProgramFileInfo {
 		File file = new File(fileFullPath);
 		boolean retVal = file.exists();
 		if (throwExceptionIfNot && (!retVal)) {
-			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner
-					+ " does not exist.");
+			throw new FilesAndPathsException(
+					"The program file " + fileName + " owned by " + fileOwner + " does not exist.");
 		}
 		return retVal;
 	}
@@ -114,8 +114,8 @@ public class ProgramFileInfo {
 	public File createFile(boolean throwExceptionIfExists) throws FilesAndPathsException {
 		if (existsFile(false)) {
 			if (throwExceptionIfExists) {
-				throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner
-						+ " already exists.");
+				throw new FilesAndPathsException(
+						"The program file " + fileName + " owned by " + fileOwner + " already exists.");
 			}
 		}
 
@@ -163,8 +163,8 @@ public class ProgramFileInfo {
 			java.nio.file.Files.delete(target);
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new FilesAndPathsException("The program file " + fileName + " owned by " + fileOwner
-					+ " can not be removed.");
+			throw new FilesAndPathsException(
+					"The program file " + fileName + " owned by " + fileOwner + " can not be removed.");
 		}
 	}
 
@@ -183,8 +183,8 @@ public class ProgramFileInfo {
 		} catch (IOException e) {
 			LOG.info("Error on copy. \n FROM: " + fileFullPath + "\n TO: " + backupFileFullPath + "\n");
 			e.printStackTrace();
-			throw new FilesAndPathsException("Cannot make a backup of program file " + fileName
-					+ " owned by " + fileOwner + ".");
+			throw new FilesAndPathsException(
+					"Cannot make a backup of program file " + fileName + " owned by " + fileOwner + ".");
 		}
 	}
 
@@ -212,7 +212,10 @@ public class ProgramFileInfo {
 		return contents.toArray(new String[contents.size()]);
 	}
 
-	public void cleanCiaoPrologTmpFiles() throws FilesAndPathsException {
+	public void ensureFolderIsAccessibleAndCleanCiaoPrologTmpFiles() throws FilesAndPathsException {
+
+		PathsUtils.testIfFolderExists(this.folderFullPath, true);
+
 		if (existsFile(true)) {
 			String fullPath = getProgramFileFullPath();
 			removeCiaoPrologTmpFile(getFileOwner(), fullPath.replace(".pl", ".po"));
@@ -220,8 +223,7 @@ public class ProgramFileInfo {
 		}
 	}
 
-	private static void removeCiaoPrologTmpFile(String fileOwner, String replace)
-			throws FilesAndPathsException {
+	private static void removeCiaoPrologTmpFile(String fileOwner, String replace) throws FilesAndPathsException {
 		ProgramFileInfo pAux = new ProgramFileInfo(fileOwner, replace);
 		if (pAux.existsFile(false)) {
 			pAux.removeFileWithoutBackup();
@@ -235,4 +237,3 @@ public class ProgramFileInfo {
 /* ---- */
 /* ---- */
 /* ---- */
-

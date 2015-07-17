@@ -13,8 +13,11 @@ public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract 
 		return CiaoPrologQueryAbstract.Constants.ChangeWorkingFolderQuery.equals(type);
 	}
 
-	private CiaoPrologChangeWorkingFolderQuery(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException, FilesAndPathsException {
+	private CiaoPrologChangeWorkingFolderQuery(ProgramFileInfo programFileInfo)
+			throws CiaoPrologConnectorException, FilesAndPathsException {
 		super(programFileInfo);
+
+		programFileInfo.ensureFolderIsAccessibleAndCleanCiaoPrologTmpFiles();
 
 		String programFileFolderName = programFileInfo.getProgramFileFolderFullPath();
 
@@ -27,14 +30,15 @@ public class CiaoPrologChangeWorkingFolderQuery extends CiaoPrologQueryAbstract 
 		variablesNames[0] = "result";
 
 		// Prepare the "change working folder" query.
-		PLStructure query = new PLStructure("working_directory", new PLTerm[] { variables[0], new PLAtom(programFileFolderName) });
+		PLStructure query = new PLStructure("working_directory",
+				new PLTerm[] { variables[0], new PLAtom(programFileFolderName) });
 
 		setRealQuery(query, variables, variablesNames);
 
 	}
 
-	public static CiaoPrologChangeWorkingFolderQuery getInstance(ProgramFileInfo programFileInfo) throws CiaoPrologConnectorException,
-			FilesAndPathsException {
+	public static CiaoPrologChangeWorkingFolderQuery getInstance(ProgramFileInfo programFileInfo)
+			throws CiaoPrologConnectorException, FilesAndPathsException {
 		return new CiaoPrologChangeWorkingFolderQuery(programFileInfo);
 	}
 
