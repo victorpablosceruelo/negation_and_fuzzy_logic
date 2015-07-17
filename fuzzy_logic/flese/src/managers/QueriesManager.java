@@ -5,6 +5,7 @@ import prologConnector.CiaoPrologNormalQuery;
 import prologConnector.CiaoPrologProgramIntrospectionQuery;
 import prologConnector.CiaoPrologQueryAnswer;
 import prologConnector.CiaoPrologTestingQuery;
+import prologConnector.PlConnectionEnvelopeException;
 import prologConnector.ProgramIntrospection;
 import storeHouse.RequestStoreHouseException;
 import auxiliar.NextStep;
@@ -122,6 +123,11 @@ public class QueriesManager extends AbstractManager {
 			String msg = e.getMessage();
 			resultsStoreHouse.addResultMessage(msg);
 		} catch (CiaoPrologConnectorException e) {
+			queryAnswers = new CiaoPrologQueryAnswer[0];
+			queryVariablesNames = new String[0];
+			String msg = e.getMessage();
+			resultsStoreHouse.addResultMessage(msg);
+		} catch (PlConnectionEnvelopeException e) {
 			queryAnswers = new CiaoPrologQueryAnswer[0];
 			queryVariablesNames = new String[0];
 			String msg = e.getMessage();
