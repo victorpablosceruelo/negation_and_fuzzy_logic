@@ -26,3 +26,6 @@ build/
 fuzzy_logic/flese-utils/Highcharts-3.0.9/*
 fuzzy_logic/flese-utils/Jena-2.6.4/*
 fuzzy_logic/flese-utils/jena.git/*/target
+fuzzy_logic/flese/core
+fuzzy_logic/flese/hs_err_pid*.log
+
