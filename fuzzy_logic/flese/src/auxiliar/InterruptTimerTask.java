@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 public class InterruptTimerTask extends TimerTask {
 
 	public static final class KCtes {
-		public static final long normalWaitingTime = 180000l; // 3 mins.
+		public static final long normalWaitingTimeInMs = 5 * 60 * 1000l; // 5 mins.
 	}
 
 	final static private Log LOG = LogFactory.getLog(InterruptTimerTask.class);
@@ -82,7 +82,7 @@ public class InterruptTimerTask extends TimerTask {
 
 	public void reschedule(long nextExecInMs) {
 		if (nextExecInMs <= 0) {
-			nextExecInMs = KCtes.normalWaitingTime;
+			nextExecInMs = KCtes.normalWaitingTimeInMs;
 		}
 
 		if (!inBadState) {

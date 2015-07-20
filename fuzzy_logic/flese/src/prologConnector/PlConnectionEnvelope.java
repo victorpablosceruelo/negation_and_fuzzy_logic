@@ -65,7 +65,7 @@ public class PlConnectionEnvelope {
 		}
 	}
 
-	public void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo)
+	public synchronized void runPrologQuery(CiaoPrologQueryInterface query, LocalUserInfo localUserInfo)
 			throws PlConnectionEnvelopeException, CiaoPrologConnectorException, FilesAndPathsException {
 
 		RunCommand.run("killall -q ciaoengine.LINUXi86_64 ciaoengine.LINUXi86 ciaoengine", LOG);
