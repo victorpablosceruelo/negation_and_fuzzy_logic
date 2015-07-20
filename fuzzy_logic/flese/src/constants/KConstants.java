@@ -80,7 +80,7 @@ public class KConstants {
 		public static final String[] plServerValidSubPaths = { "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
 				"/usr/share/CiaoDE/ciao/library/javall/plserver", "/usr/lib/ciao", "/usr/share/CiaoDE", "/usr", "/opt", "/home", "/" };
 
-		public static final String plServerProgramFileName = "plserver";
+		public static final String[] plServerValidProgramFileNames = {"plserver", "plserver.bat"};
 	}
 
 	public static class Communications {
