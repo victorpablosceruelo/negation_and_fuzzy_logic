@@ -82,8 +82,7 @@ public class TestLocalUserNameQuery {
 		// Now the real stuff.
 		CiaoPrologTestingQuery ciaoQuery = CiaoPrologTestingQuery.getInstance(pfi);
 		ciaoQuery.overrideRealQuery(query, variables, variablesNames);
-		PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
-		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
+		PlConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 	}
 
 	protected static void test2(LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
@@ -129,8 +128,7 @@ public class TestLocalUserNameQuery {
 		// Now the real stuff.
 		CiaoPrologTestingQuery ciaoQuery = CiaoPrologTestingQuery.getInstance(pfi);
 		ciaoQuery.overrideRealQuery(query, variables, variablesNames);
-		PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
-		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
+		PlConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 	}
 
 }
