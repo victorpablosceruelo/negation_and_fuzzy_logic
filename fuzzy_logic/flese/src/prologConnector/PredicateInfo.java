@@ -6,14 +6,15 @@ import java.util.Set;
 
 import prologConnector.moreInfo.PredMoreInfoAbstract;
 import prologConnector.moreInfo.PredMoreInfoInterface;
+import auxiliar.StringsUtil;
 import constants.KConstants;
 
-public class PredicateInfo {
+public class PredicateInfo implements Comparable<PredicateInfo> {
 
 	private String predicateName = null;
 	private String[][] predicateTypes = null;
 	private int predicateArity = 0;
-	private String [] predicateOrigins = null;
+	private String[] predicateOrigins = null;
 	private HashMap<String, PredMoreInfoInterface> predicateMoreInfo = new HashMap<String, PredMoreInfoInterface>();
 
 	public PredicateInfo(CiaoPrologQueryAnswer answer) throws PredicateInfoException {
@@ -38,8 +39,10 @@ public class PredicateInfo {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void setPredicateName(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException, PredicateInfoException {
-		predicateName = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateName).toString();
+	private void setPredicateName(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException,
+			PredicateInfoException {
+		predicateName = answer.getCiaoPrologQueryVariableAnswer(
+				KConstants.ProgramIntrospectionFields.predicateName).toString();
 		if (predicateName == null) {
 			throw new PredicateInfoException("predicateName cannot be null");
 		}
@@ -48,9 +51,11 @@ public class PredicateInfo {
 		}
 	}
 
-	private void setPredicateTypes(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException, PredicateInfoException {
+	private void setPredicateTypes(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException,
+			PredicateInfoException {
 		predicateTypes = null;
-		CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateTypes);
+		CiaoPrologTermInJava term = answer
+				.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateTypes);
 		if (term == null) {
 			throw new PredicateInfoException("predicateTypes cannot be null");
 		}
@@ -76,10 +81,11 @@ public class PredicateInfo {
 		}
 
 	}
-	
-	private void setPredicateArity(CiaoPrologQueryAnswer answer) throws PredicateInfoException, CiaoPrologConnectorException {
-		String predicateArityString = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateArity)
-				.toString();
+
+	private void setPredicateArity(CiaoPrologQueryAnswer answer) throws PredicateInfoException,
+			CiaoPrologConnectorException {
+		String predicateArityString = answer.getCiaoPrologQueryVariableAnswer(
+				KConstants.ProgramIntrospectionFields.predicateArity).toString();
 		if (predicateArityString == null) {
 			throw new PredicateInfoException("predicateArity cannot be null");
 		}
@@ -90,9 +96,11 @@ public class PredicateInfo {
 		predicateArity = Integer.parseInt(predicateArityString);
 	}
 
-	private void setPredicateOrigins(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException, PredicateInfoException {
+	private void setPredicateOrigins(CiaoPrologQueryAnswer answer) throws CiaoPrologConnectorException,
+			PredicateInfoException {
 		predicateOrigins = null;
-		CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateOrigins);
+		CiaoPrologTermInJava term = answer
+				.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateOrigins);
 		if (term == null) {
 			throw new PredicateInfoException("predicateOrigins cannot be null");
 		}
@@ -114,23 +122,25 @@ public class PredicateInfo {
 		}
 
 	}
-	
-	private void setPredicateMoreInfo(CiaoPrologQueryAnswer answer) throws PredicateInfoException, CiaoPrologConnectorException {
-		
-		CiaoPrologTermInJava term = answer.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateMoreInfo);
+
+	private void setPredicateMoreInfo(CiaoPrologQueryAnswer answer) throws PredicateInfoException,
+			CiaoPrologConnectorException {
+
+		CiaoPrologTermInJava term = answer
+				.getCiaoPrologQueryVariableAnswer(KConstants.ProgramIntrospectionFields.predicateMoreInfo);
 		predicateMoreInfo = PredMoreInfoAbstract.getHashMapWithMoreInfoObjects(term);
-		
+
 	}
 
 	public PredMoreInfoInterface getPredicateMoreInfoAs(String type) {
 		return predicateMoreInfo.get(type);
 	}
-	
+
 	public Set<String> getPredicateMoreInfoKeys() {
 		Set<String> keysSet = predicateMoreInfo.keySet();
 		return keysSet;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,8 +156,8 @@ public class PredicateInfo {
 	public int getPredicateArity() {
 		return this.predicateArity;
 	}
-	
-	public String [] getPredicateOrigins() {
+
+	public String[] getPredicateOrigins() {
 		return this.predicateOrigins;
 	}
 
@@ -175,28 +185,36 @@ public class PredicateInfo {
 		}
 		return found;
 	}
-	
+
 	private boolean typeComparison(String type1, String type2, boolean exactMatch) {
-		if ((type1 == null) || ("".equals(type1))) return false;
-		if ((type2 == null) || ("".equals(type2))) return false;
-		
+		if ((type1 == null) || ("".equals(type1)))
+			return false;
+		if ((type2 == null) || ("".equals(type2)))
+			return false;
+
 		if (exactMatch) {
 			return type1.equals(type2);
 		}
 
-		if (KConstants.PrologTypes.rfuzzy_any_type.equals(type1)) return true;
-		if (KConstants.PrologTypes.rfuzzy_any_type.equals(type2)) return true;
-		
+		if (KConstants.PrologTypes.rfuzzy_any_type.equals(type1))
+			return true;
+		if (KConstants.PrologTypes.rfuzzy_any_type.equals(type2))
+			return true;
+
 		if (KConstants.PrologTypes.rfuzzy_number_type.equals(type1)) {
-			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(type2)) return true;
-			if (KConstants.PrologTypes.rfuzzy_float_type.equals(type2)) return true;
+			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(type2))
+				return true;
+			if (KConstants.PrologTypes.rfuzzy_float_type.equals(type2))
+				return true;
 		}
-		
+
 		if (KConstants.PrologTypes.rfuzzy_number_type.equals(type2)) {
-			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(type1)) return true;
-			if (KConstants.PrologTypes.rfuzzy_float_type.equals(type1)) return true;
+			if (KConstants.PrologTypes.rfuzzy_integer_type.equals(type1))
+				return true;
+			if (KConstants.PrologTypes.rfuzzy_float_type.equals(type1))
+				return true;
 		}
-		
+
 		return type1.equals(type2);
 	}
 
@@ -204,8 +222,8 @@ public class PredicateInfo {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public String [][] getFullyDefinedTypes(String [] type) {
-		ArrayList<String []> results = new ArrayList<String []>();
+	public String[][] getFullyDefinedTypes(String[] type) {
+		ArrayList<String[]> results = new ArrayList<String[]>();
 
 		for (int j = 0; j < predicateTypes.length; j++) {
 			boolean valid = false;
@@ -226,9 +244,9 @@ public class PredicateInfo {
 			}
 		}
 
-		return results.toArray(new String [results.size()][]);
+		return results.toArray(new String[results.size()][]);
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,17 +258,31 @@ public class PredicateInfo {
 		if (predOrigin.isEmpty())
 			return false;
 		predOrigin = predOrigin.toUpperCase();
-		
+
 		boolean found = false;
-		int i=0;
-		
-		while ((!found) && (i<this.predicateOrigins.length)) {
+		int i = 0;
+
+		while ((!found) && (i < this.predicateOrigins.length)) {
 			found = predOrigin.equals(predicateOrigins[i].trim().toUpperCase());
 			i++;
 		}
 		return found;
 	}
-	
+
+	@Override
+	public int compareTo(PredicateInfo other) {
+		String currentStrName = "";
+		String otherStrName = "";
+
+		if (!StringsUtil.isEmptyString(this.predicateName))
+			currentStrName = this.predicateName;
+		if (!StringsUtil.isEmptyString(other.predicateName))
+			otherStrName = other.predicateName;
+
+		int retVal = currentStrName.compareTo(otherStrName);
+		return retVal;
+	}
+
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

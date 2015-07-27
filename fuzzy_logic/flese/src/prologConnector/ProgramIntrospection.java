@@ -1,6 +1,7 @@
 package prologConnector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -102,7 +103,10 @@ public class ProgramIntrospection {
 			i++;
 		}
 
-		return predicatesArrayList.toArray(new PredicateInfo[predicatesArrayList.size()]);
+		PredicateInfo[] predicatesArray = predicatesArrayList.toArray(new PredicateInfo[predicatesArrayList.size()]);
+		Arrays.sort(predicatesArray);
+		
+		return predicatesArray;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +136,7 @@ public class ProgramIntrospection {
 		}
 
 		PredicateInfo [] predicatesArray = predicatesList.values().toArray(new PredicateInfo[predicatesList.size()]); 
+		Arrays.sort(predicatesArray);
 		return predicatesArray;
 	}
 
