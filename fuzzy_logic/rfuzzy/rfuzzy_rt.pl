@@ -325,28 +325,28 @@ rfuzzy_compute_aux('=/=', Args_Type, Elt1, Elt2, _Computed_Similarities, Truth_V
 rfuzzy_compute_aux('>', Args_Type, Elt1, Elt2, _Computed_Similarities, Truth_Value) :- !,
 	rfuzzy_compute_aux_args_are_numbers(Args_Type), 
 	(
-	    (	Elt1 .>. Elt2, !,	Truth_Value .=. 1    )
+	    (	Elt2 .>. Elt1, !,	Truth_Value .=. 1    )
 	;
 	    (	Truth_Value .=. 0, !    )
 	).
 rfuzzy_compute_aux('<', Args_Type, Elt1, Elt2, _Computed_Similarities, Truth_Value) :- !,
 	rfuzzy_compute_aux_args_are_numbers(Args_Type), 
 	(
-	    (	Elt1 .<. Elt2, !,	Truth_Value .=. 1    )
+	    (	Elt2 .<. Elt1, !,	Truth_Value .=. 1    )
 	;
 	    (	Truth_Value .=. 0    )
 	).
 rfuzzy_compute_aux('>=', Args_Type, Elt1, Elt2, _Computed_Similarities, Truth_Value) :- !,
 	rfuzzy_compute_aux_args_are_numbers(Args_Type), 
 	(
-	    (	Elt1 .>=. Elt2, !,	Truth_Value .=. 1    )
+	    (	Elt2 .>=. Elt1, !,	Truth_Value .=. 1    )
 	;
 	    (	Truth_Value .=. 0, !    )
 	).
 rfuzzy_compute_aux('=<', Args_Type, Elt1, Elt2, _Computed_Similarities, Truth_Value) :- !,
 	rfuzzy_compute_aux_args_are_numbers(Args_Type), 
 	(
-	    (	Elt1 .=<. Elt2, !,	Truth_Value .=. 1    )
+	    (	Elt2 .=<. Elt1, !,	Truth_Value .=. 1    )
 	;
 	    (	Truth_Value .=. 0, !    )
 	).
