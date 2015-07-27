@@ -377,7 +377,7 @@ rfuzzy_compute_aux(Operator, Args_Type, _Elt1, _Elt2, _Computed_Similarities, Tr
 % ------------------------------------------------------
 
 % rfuzzy_defined_modifiers([]).
-rfuzzy_defined_modifiers([(very, 2, TV_In, TV_Out, (TV_Out .=. (TV_In * TV_In)))]).
+rfuzzy_defined_modifiers([(fairly, 2, TV_In, TV_Out, (TV_Out .=. TV_In))]).
 
 rfuzzy_defined_negation_ops([(fnot, 2, TV_In, TV_Out, (TV_Out .=. 1 - TV_In))]).
 

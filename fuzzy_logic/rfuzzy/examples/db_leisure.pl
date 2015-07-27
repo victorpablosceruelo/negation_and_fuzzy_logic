@@ -1,4 +1,5 @@
-:- module(db_leisure,_,[rfuzzy, clpr, pkgs_output_debug]).
+:- module(db_leisure,_,[rfuzzy, clpr]).
+% :- module(db_leisure,_,[rfuzzy, clpr, pkgs_output_debug]).
 % Compilation time debug can be activated  by adding to the packages list [rfuzzy, clpr] the package pkgs_output_debug.
 % Running time debug can be activated removing the comment marker % at the beginning of the following line.
 % :- activate_rfuzzy_debug.
@@ -50,14 +51,17 @@ cheap(restaurant) :~ function(price_average(restaurant), [ (0, 1), (10, 1), (15,
 unexpensive(restaurant) :~ synonym_of(cheap(restaurant), prod, 1).
 expensive(restaurant) :~ antonym_of(cheap(restaurant), prod, 1).
 
-define_modifier(too_much/2, TV_In, TV_Out) :-
- 	Thershold .=. 0.7,
-	Min_In .=. TV_In - Thershold, 
-	min(0, Min_In, Dividend), 
-	TV_Out .=. ((Dividend)/(0 - Thershold)).
+define_modifier(rather/2, TV_In, TV_Out) :-
+	TV_Out .=. TV_In * TV_In.
+define_modifier(very/2, TV_In, TV_Out) :-
+	TV_Out .=. TV_In * TV_In * TV_In.
+define_modifier(little/2, TV_In, TV_Out) :-
+	TV_Out * TV_Out .=. TV_In.
+define_modifier(very_little/2, TV_In, TV_Out) :-
+	TV_Out * TV_Out * TV_Out .=. TV_In.
 
 tempting_restaurant(restaurant) :~ defaults_to( 0.1).
-tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(too_much(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
+tempting_restaurant(restaurant) :~ rule(min, (near_the_city_center(restaurant), fnot(very(expensive(restaurant))), very(traditional(restaurant)))) with_credibility (min, 0.7).
 tempting_restaurant(restaurant) :~ rule(near_the_city_center(restaurant)) with_credibility (min, 0.5) .
 
 % Define the films database format.

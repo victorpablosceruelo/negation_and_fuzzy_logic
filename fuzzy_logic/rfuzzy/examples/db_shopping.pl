@@ -66,11 +66,17 @@ cheap(car) :~ antonym_of(expensive(car), prod, 1).
 unexpensive(car) :~ synonym_of(cheap(car), prod, 1).
 familiar(car) :~ synonym_of(big(car), prod, 1).
 
+define_modifier(rather/2, TV_In, TV_Out) :-
+	TV_Out .=. TV_In * TV_In.
+define_modifier(very/2, TV_In, TV_Out) :-
+	TV_Out .=. TV_In * TV_In * TV_In.
+define_modifier(little/2, TV_In, TV_Out) :-
+	TV_Out * TV_Out .=. TV_In.
+define_modifier(very_little/2, TV_In, TV_Out) :-
+	TV_Out * TV_Out * TV_Out .=. TV_In.
+
 define_negation_op(godel_neg/2, TV_In, TV_Out) :-
 	((TV_In .=. 0, TV_Out .=. 1) ; (\+(TV_In .=. 0), TV_Out .=. 0)).
-
-define_modifier(too_much/2, TV_In, TV_Out) :-
-	TV_Out .=. TV_In * TV_In * TV_In.
 
 define_connective(max_with_min_a_half/3, TV_In_1, TV_In_2, TV_Out) :-
 	max(TV_In_1, TV_In_2, TV_Aux), min(TV_Aux, 0.5, TV_Out).
