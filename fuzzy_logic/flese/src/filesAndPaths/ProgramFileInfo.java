@@ -20,7 +20,7 @@ import constants.KConstants;
 import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
 
-public class ProgramFileInfo {
+public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 
 	final Log LOG = LogFactory.getLog(ProgramFileInfo.class);
 
@@ -228,6 +228,17 @@ public class ProgramFileInfo {
 		if (pAux.existsFile(false)) {
 			pAux.removeFileWithoutBackup();
 		}
+	}
+
+	@Override
+	public int compareTo(ProgramFileInfo other) {
+		int retVal = this.fileName.compareTo(other.fileName);
+		
+		if (retVal == 0) {
+			retVal = this.fileOwner.compareTo(other.fileOwner);
+		}
+		
+		return retVal;
 	}
 }
 

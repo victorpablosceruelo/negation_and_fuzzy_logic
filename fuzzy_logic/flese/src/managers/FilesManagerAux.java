@@ -3,6 +3,7 @@ package managers;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -77,7 +78,10 @@ public class FilesManagerAux {
 			}
 		}
 
-		return currentList.toArray(new ProgramFileInfo[currentList.size()]);
+		ProgramFileInfo [] array = currentList.toArray(new ProgramFileInfo[currentList.size()]);
+		Arrays.sort(array);
+		
+		return array;
 	}
 
 	/**
