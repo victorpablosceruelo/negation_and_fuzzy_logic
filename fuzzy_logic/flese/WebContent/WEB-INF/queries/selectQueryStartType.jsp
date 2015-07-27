@@ -76,11 +76,13 @@
 			<input type='submit' value='Search'
 				onclick="return evaluateQuery('<%=url2 %>');">
 		</div>
+		<!-- 
 		<div class='searchOrPersonalizeTableCell'>&nbsp; or &nbsp;</div>
 		<div class='searchOrPersonalizeTableCell'>
 			<INPUT type='submit' value='Personalize Program File'
 				onclick='return personalizeProgramFile("<%=urlListFuzzifications%>", "<%= fuzzificationParams %>", "<%=programFileInfo.getFileName() %>");'>
 		</div>
+		-->
 	</div>
 </div>
 <!--  </form><br />  -->
