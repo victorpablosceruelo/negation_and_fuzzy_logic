@@ -79,20 +79,22 @@ public class UrlsMaps {
 	}
 
 	/**
-	 * This predicate loads all the defined pages in KUrls so that we ca access
-	 * dynamically to them.
+	 * This predicate loads all the defined pages in KUrls so that we ca access dynamically to them.
 	 */
-	private static void load() {
+	private static synchronized void load() {
 
-		UrlMap[] pagesList = retrieveDefinedUrls();
+		if (!loaded) {
+			UrlMap[] pagesList = retrieveDefinedUrls();
 
-		for (int i = 0; i < pagesList.length; i++) {
-			UrlMap page = pagesList[i];
-			try {
-				storeMapping(page);
-			} catch (CacheStoreHouseException e) {
-				e.printStackTrace();
+			for (int i = 0; i < pagesList.length; i++) {
+				UrlMap page = pagesList[i];
+				try {
+					storeMapping(page);
+				} catch (CacheStoreHouseException e) {
+					e.printStackTrace();
+				}
 			}
+			loaded = true;
 		}
 	}
 

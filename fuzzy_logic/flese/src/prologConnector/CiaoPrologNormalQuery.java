@@ -37,8 +37,7 @@ public class CiaoPrologNormalQuery extends CiaoPrologQueryAbstract {
 		if (query == null) {
 			query = new CiaoPrologNormalQuery(requestStoreHouse.getProgramFileInfo());
 			query.setRealQuery(conversor.getConvertedQuery(), conversor.getListOfVariables(), conversor.getListOfNamesForVariables());
-			PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
-			plConnectionEnvelope.runPrologQuery(query, localUserInfo);
+			PlConnectionEnvelope.runPrologQuery(query, localUserInfo);
 			CacheStoreHouse.store(CiaoPrologNormalQuery.class, fullPath, key1, key2, query, true);
 		}
 		else {
