@@ -1,4 +1,10 @@
 package constants;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import org.brickred.socialauth.SocialAuthConfig;
 
 public class KConstants {
 
@@ -72,15 +78,42 @@ public class KConstants {
 	}
 
 	public static class PathsMgmt {
-		public static final String[] programFilesValidPaths = { "/home/java-apps/fuzzy-search/",
-				System.getProperty("java.io.tmpdir") + "/java-apps/fuzzy-search/",
-				// servlet.getServletContext().getInitParameter("working-folder-fuzzy-search"),
-				"/tmp/java-apps/fuzzy-search/" };
-
-		public static final String[] plServerValidSubPaths = { "/home/tomcat/ciao-prolog-1.15.0+r14854/ciao/library/javall/plserver",
-				"/usr/share/CiaoDE/ciao/library/javall/plserver", "/usr/lib/ciao", "/usr/share/CiaoDE", "/usr", "/opt", "/home", "/" };
-
-		public static final String[] plServerValidProgramFileNames = {"plserver", "plserver.bat"};
+		public static String[] programFilesValidPaths = new String[5];
+		public static String[] plServerValidSubPaths = new String[2];
+		public static String plServerProgramFileName = "";
+		
+		public static void loadConfig() {
+		ClassLoader loader = KConstants.class.getClassLoader();
+		Properties prop = new Properties();
+		InputStream input = null;
+	 
+		try {
+			input = loader.getResourceAsStream("config.properties");
+			prop.load(input);
+	 
+			// get the property values and load it into the constants
+			programFilesValidPaths[0] = System.getProperty("java.io.tmpdir") + (prop.getProperty("programFilesValidPathsFromTemp"));
+			programFilesValidPaths[1] = (prop.getProperty("programFilesValidPaths"));
+			programFilesValidPaths[2] = (prop.getProperty("programFilesValidPaths2"));
+			programFilesValidPaths[3] = (prop.getProperty("programFilesValidPaths3"));
+			programFilesValidPaths[4] = (prop.getProperty("programFilesValidPaths4"));
+			
+			plServerValidSubPaths[0] = prop.getProperty("plServerValidSubPaths");
+			plServerValidSubPaths[1] = prop.getProperty("plServerValidSubPaths2");
+			plServerProgramFileName = prop.getProperty("plServerProgramFileName");
+	 
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		}
 	}
 
 	public static class Communications {

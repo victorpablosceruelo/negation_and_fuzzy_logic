@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import auxiliar.StringsUtil;
 import constants.KConstants;
 
 public class PathsMgmt {
@@ -75,6 +74,7 @@ public class PathsMgmt {
 	private String determineProgramFilesValidPath(String[] programFilesValidPaths) throws FilesAndPathsException {
 		String programFilesValidPath = null;
 		int index = 0;
+		KConstants.PathsMgmt.loadConfig();
 
 		while (((programFilesValidPath == null) || ("".equals(programFilesValidPath)))
 				&& (index < programFilesValidPaths.length)) {
@@ -146,7 +146,7 @@ public class PathsMgmt {
 
 			if ((file.exists()) && (file.canRead()) || (file.canExecute())) {
 				if (file.isFile()) {
-					if (isValidProgramFileName(file.getName())) {
+					if (KConstants.PathsMgmt.plServerProgramFileName.equals(file.getName())) {
 						result = subPath;
 					}
 				} else {
@@ -155,7 +155,7 @@ public class PathsMgmt {
 						int index = 0;
 						while ((result == null) && (index < subFiles.length)) {
 							result = lookForPlServerFileInSubDir(subFiles[index].getAbsolutePath());
-							index++;
+							
 						}
 					} else {
 						LOG.info("Impossible to process path (not a file nor a directory): " + subPath);
@@ -166,23 +166,6 @@ public class PathsMgmt {
 			}
 		}
 		return result;
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private boolean isValidProgramFileName(String currentName) {
-		if (StringsUtil.isEmptyString(currentName)) {
-			return false;
-		}
-
-		for (String validName : KConstants.PathsMgmt.plServerValidProgramFileNames) {
-			if (validName.equals(currentName)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

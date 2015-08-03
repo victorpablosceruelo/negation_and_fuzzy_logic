@@ -9,6 +9,7 @@ import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;
 import auxiliar.LocalUserInfo;
+import constants.KConstants;
 import filesAndPaths.FilesAndPathsException;
 import filesAndPaths.ProgramFileInfo;
 
@@ -26,8 +27,9 @@ public class TestLocalUserNameQuery {
 	}
 
 	public static void main(String[] args) throws Exception {
+		KConstants.PathsMgmt.loadConfig();
 		LocalUserInfo localUserInfo = LocalUserInfo.getFakeLocalUserInfo("victorpablosceruelo_at_gmail_com");
-
+		
 		test1(localUserInfo);
 		// test2(localUserInfo);
 
@@ -82,7 +84,8 @@ public class TestLocalUserNameQuery {
 		// Now the real stuff.
 		CiaoPrologTestingQuery ciaoQuery = CiaoPrologTestingQuery.getInstance(pfi);
 		ciaoQuery.overrideRealQuery(query, variables, variablesNames);
-		PlConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
+		PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
+		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 	}
 
 	protected static void test2(LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
@@ -128,7 +131,8 @@ public class TestLocalUserNameQuery {
 		// Now the real stuff.
 		CiaoPrologTestingQuery ciaoQuery = CiaoPrologTestingQuery.getInstance(pfi);
 		ciaoQuery.overrideRealQuery(query, variables, variablesNames);
-		PlConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
+		PlConnectionEnvelope plConnectionEnvelope = new PlConnectionEnvelope();
+		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 	}
 
 }
