@@ -55,6 +55,7 @@ public class KConstants {
 		public static final String mode = "mode";
 		public static final String modeBasic = "basic";
 		public static final String modeAdvanced = "advanced";
+		public static final String modeEditingDefault = "editing default";
 
 		// Lines Counters
 		public static final String linesCounterParam = "linesCount";

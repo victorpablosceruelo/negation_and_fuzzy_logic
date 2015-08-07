@@ -656,6 +656,10 @@ public class ProgramPartAnalysis {
 		return head;
 	}
 
+	public String getOnly_for_user(){
+		return only_for_user;
+	}
+	
 	public String getBody() {
 		return body;
 	}

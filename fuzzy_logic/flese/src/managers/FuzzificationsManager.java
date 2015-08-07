@@ -7,13 +7,19 @@ import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
 import filesAndPaths.ProgramFileInfo;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 public class FuzzificationsManager extends AbstractManager {
+
 
 	public FuzzificationsManager() {
 		super();
 	}
+	
 
+	   
 	@Override
 	public String methodToInvokeIfMethodRequestedIsNotAvailable() {
 		return "list";
@@ -66,12 +72,16 @@ public class FuzzificationsManager extends AbstractManager {
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 		ProgramAnalysis programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
-
+        //preDefined = expensive(house) - predNecessary price(house) mode advanced - functionDefinition table
+		
+		
 		String predDefined = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predDefined);
 		String predNecessary = requestStoreHouse.getRequestParameter(KConstants.Fuzzifications.predNecessary);
 		String mode = requestStoreHouse.getRequestParameter(KConstants.Request.mode);
+		
 		String[][] functionDefinition = programAnalized.getFunctionDefinition(requestStoreHouse);
-
+		
+		
 		int result = programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, mode, functionDefinition);
 
 		String msg = "Program file " + programFileInfo.getFileName() + " owned by " + programFileInfo.getFileOwner()
@@ -81,9 +91,17 @@ public class FuzzificationsManager extends AbstractManager {
 		}
 
 		resultsStoreHouse.addResultMessage(msg);
-
+		
+		//getting the data
+		programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
+		
+		//analyzing the data
+		String[][] resul = programAnalized.algo(programAnalized.getAllDefinedFunctionDefinition(predDefined));
+		//setting the data
+		mode = KConstants.Request.modeEditingDefault;
+		programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, mode, resul);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, ""));
-
+		//Default problem
 	}
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////

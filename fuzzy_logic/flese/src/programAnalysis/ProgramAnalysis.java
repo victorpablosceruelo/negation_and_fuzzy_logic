@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,6 +67,20 @@ public class ProgramAnalysis {
 	}
 
 	public static ProgramAnalysis getProgramAnalysisClass(ProgramFileInfo programFileInfo) throws Exception {
+		String fullPath = programFileInfo.getProgramFileFullPath();
+
+		Object o = CacheStoreHouse.retrieve(ProgramAnalysis.class, fullPath, fullPath, fullPath, true);
+		ProgramAnalysis object = (ProgramAnalysis) o;
+		// object = null;
+		if (object == null) {
+			object = new ProgramAnalysis(programFileInfo);
+			object.getProgramFuzzifications();
+			CacheStoreHouse.store(ProgramAnalysis.class, fullPath, fullPath, fullPath, object, true);
+		}
+		return object;
+	}
+	
+	public static ProgramAnalysis getProgramAnalysisClass2(ProgramFileInfo programFileInfo) throws Exception {
 		String fullPath = programFileInfo.getProgramFileFullPath();
 
 		Object o = CacheStoreHouse.retrieve(ProgramAnalysis.class, fullPath, fullPath, fullPath, true);
@@ -210,6 +225,7 @@ public class ProgramAnalysis {
 		}
 		return results;
 	}
+	
 
 	public int updateProgramFile(LocalUserInfo localUserInfo, String predDefined, String predNecessary, String mode,
 			String[][] functionDefinition) throws Exception {
@@ -230,6 +246,10 @@ public class ProgramAnalysis {
 		// one.
 		String predOwner = localUserInfo.getLocalUserName();
 		if ((localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner())) && (KConstants.Request.modeAdvanced.equals(mode))) {
+			predOwner = KConstants.Fuzzifications.DEFAULT_DEFINITION;
+		}
+		
+		if ((KConstants.Request.modeEditingDefault.equals(mode))) {
 			predOwner = KConstants.Fuzzifications.DEFAULT_DEFINITION;
 		}
 
@@ -345,6 +365,67 @@ public class ProgramAnalysis {
 		LOG.info(paramsDebug.toString());
 		return functionDefinition;
 	}
+	
+	public ArrayList<HashMap<String,String>> getAllDefinedFunctionDefinition(String predDefined)
+	{
+		int i = 0;
+		ArrayList<HashMap<String,String>> fuzz = new ArrayList<HashMap<String,String>>();
+		boolean found = false;
+		System.out.println("" + programFunctionsOrdered.length);
+		while((i < programFunctionsOrdered.length)&&(!found))
+		{
+			if ((programFunctionsOrdered[i][0].getHead()).equals(predDefined))
+			{
+				for (int j = 0 ; j < programFunctionsOrdered[i].length ; j++)
+				{
+					//Taking out the default rule
+					if (programFunctionsOrdered[i][j].getOnly_for_user() != null)
+					{
+						HashMap<String,String> h = programFunctionsOrdered[i][j].getFunctionPoints();
+						fuzz.add(h);
+					}
+				}
+				found = true;
+				} 
+			i++;
+			return fuzz;
+		}
+		return new ArrayList<HashMap<String,String>>();
+	}
+	
+	public String[][] algo(ArrayList<HashMap<String,String>> a)
+    {
+        //problem cases
+        if ((a == null)||(a.size() == 0))
+        {
+            return new String[0][0];
+        }
+       
+        Set<String> strSet = a.get(0).keySet();
+        String[][] resul = new String[strSet.size()][2];
+         double avg = 0;
+         int i = 0;
+        for (String key: strSet)
+        {
+             avg = 0;
+             double v;
+            for (HashMap<String, String> entry: a) {
+                v = Double.parseDouble(entry.get(key));
+                avg += v;
+            }
+            resul[i][0] = key;
+            Double value = new Double(Math.round(avg*1000/a.size())/1000.);
+              if (((value*10) % 10) == 0)
+              {
+              	resul[i][1] = String.valueOf(value.intValue());
+              	} else {
+              	resul[i][1] = String.valueOf(value);
+              	}
+            i++;
+        }
+		LOG.info("Default rule updated with: " + resul);
+            return resul;
+        }
 }
 
 /*
