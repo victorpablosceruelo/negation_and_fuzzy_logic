@@ -91,7 +91,7 @@ public class FuzzificationsManager extends AbstractManager {
 		}
 
 		resultsStoreHouse.addResultMessage(msg);
-		
+		/*
 		//getting the data
 		programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
 		
@@ -101,7 +101,7 @@ public class FuzzificationsManager extends AbstractManager {
 		mode = KConstants.Request.modeEditingDefault;
 		programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, mode, resul);
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Fuzzifications.SavePage, ""));
-		//Default problem
+		*/
 	}
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
