@@ -21,11 +21,11 @@
 	if (mode.equals(KConstants.Request.modeAdvanced))
 	{
 		textMode = "Default";
-		textMode2 = "If any user modify a fuzzification, it is not possible to modify the default fuzzification anymore.";
+		textMode2 = "If any user modifies a fuzzification, it is not possible to modify the default fuzzification anymore.";
 	}
 	if (fuzzifications.length != 0) {
 %>
-<center> Select the <strong> <%=textMode %> </strong> fuzzification you want to personalize: </center>
+<center><br> Select the <strong> <%=textMode %> </strong> fuzzification you want to personalize: </center>
 <div class='personalizationDivMainTable'>
 	<div class='personalizationDivMainTableRow'>
 		<div class='personalizationDivMainTableCell'>
