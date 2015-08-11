@@ -6,11 +6,17 @@
 <%
 ArrayList<String> msgs = new ArrayList<String>();
 msgs.add(KConstants.AppMsgs.errorSessionNull1);
-msgs.add(KConstants.AppMsgs.errorSessionNull2);
 String msgsArray = JspsUtils.getMessagesInJS(msgs);
+//tring ss = KConstants.Request.modeAdvanced;
+String mes1 = KConstants.AppMsgs.errorSessionNull1;
 %>
 
 <script type="text/javascript">
+popupExpire();
+function popupExpire() {
+    alert("<%=mes1%>");
+    history.go(-1);
+}
 if (typeof(clearMainSection) == "function") {
 	clearMainSection();
 }

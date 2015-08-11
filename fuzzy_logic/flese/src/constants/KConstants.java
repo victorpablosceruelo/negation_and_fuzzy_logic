@@ -263,8 +263,9 @@ public class KConstants {
 		public static final String exception1 = "Ups! An exception occurred.";
 		public static final String exception2 = "You can press the key F5 and try again or send a bug report to ";
 		public static final String exception3 = " with the following info: ";
+		public static final String exception4 = "Can't find the configuration file (resource folder)";
+		public static final String exception5 = "Error in the configuration file";
 		public static final String errorSessionNull1 = "Your session has expired. You need to sign in again.";
-		public static final String errorSessionNull2 = "To sign in again you can press the key F5 or sign out and sign in again.";
 	}
 }
 
