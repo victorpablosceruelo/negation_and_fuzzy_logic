@@ -29,3 +29,7 @@ fuzzy_logic/flese-utils/jena.git/*/target
 fuzzy_logic/flese/core
 fuzzy_logic/flese/hs_err_pid*.log
 
+fuzzy_logic/.metadata/
+fuzzy_logic/.recommenders/
+fuzzy_logic/RemoteSystemsTempFiles/
+fuzzy_logic/Servers/
