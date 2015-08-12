@@ -14,10 +14,28 @@
 <%
 ResultsStoreHouse resultsStoreHouse = JspsUtils.getResultsStoreHouse(requestStoreHouse);
 ArrayList<String> msgs = new ArrayList<String>();
-msgs.add(KConstants.AppMsgs.exception1);
-msgs.add(KConstants.AppMsgs.exception2 + KConstants.Application.AppBugsEmail + KConstants.AppMsgs.exception3);
-msgs.add("");
-msgs.add(resultsStoreHouse.getExceptionMsg());
+if (KConstants.PathsMgmt.stateErrorConfigFile)
+{
+	msgs.add(KConstants.AppMsgs.exception1);
+	msgs.add(KConstants.AppMsgs.exception4);
+	msgs.add(KConstants.AppMsgs.exception5);
+	KConstants.PathsMgmt.stateErrorConfigFile = false;
+} else {
+	if (KConstants.PathsMgmt.stateErrorConfigFile2)
+	{
+		msgs.add(KConstants.AppMsgs.exception1);
+		msgs.add(KConstants.AppMsgs.exception6 + " " + KConstants.PathsMgmt.reasonError2);
+		msgs.add(KConstants.AppMsgs.exception7);
+		KConstants.PathsMgmt.stateErrorConfigFile2 = false;
+		KConstants.PathsMgmt.reasonError2 = "";
+	} else {
+		msgs.add(KConstants.AppMsgs.exception1);
+		msgs.add(KConstants.AppMsgs.exception2 + KConstants.Application.AppBugsEmail + KConstants.AppMsgs.exception3);
+		msgs.add("");
+		msgs.add(resultsStoreHouse.getExceptionMsg());
+	}
+}
+
 
 String msgsArray = JspsUtils.getMessagesInJS(msgs);
 %>

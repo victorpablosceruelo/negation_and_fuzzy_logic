@@ -82,8 +82,13 @@ public class KConstants {
 		public static String[] programFilesValidPaths = new String[5];
 		public static String[] plServerValidSubPaths = new String[2];
 		public static String plServerProgramFileName = "";
+		public static boolean stateErrorConfigFile = false;
+		public static boolean stateErrorConfigFile2 = false;
+		public static String reasonError2 = "";
+		
 		
 		public static void loadConfig() {
+
 		ClassLoader loader = KConstants.class.getClassLoader();
 		Properties prop = new Properties();
 		InputStream input = null;
@@ -91,10 +96,12 @@ public class KConstants {
 		try {
 			input = loader.getResourceAsStream("config.properties");
 			prop.load(input);
-	 
 			// get the property values and load it into the constants
-			programFilesValidPaths[0] = System.getProperty("java.io.tmpdir") + (prop.getProperty("programFilesValidPathsFromTemp"));
-			programFilesValidPaths[1] = (prop.getProperty("programFilesValidPaths"));
+			if (!prop.getProperty("programFilesValidPathsFromTemp").equals(""))
+			{
+				programFilesValidPaths[0] = System.getProperty("java.io.tmpdir") + (prop.getProperty("programFilesValidPathsFromTemp"));
+			}
+				programFilesValidPaths[1] = (prop.getProperty("programFilesValidPaths"));
 			programFilesValidPaths[2] = (prop.getProperty("programFilesValidPaths2"));
 			programFilesValidPaths[3] = (prop.getProperty("programFilesValidPaths3"));
 			programFilesValidPaths[4] = (prop.getProperty("programFilesValidPaths4"));
@@ -105,7 +112,12 @@ public class KConstants {
 	 
 		} catch (IOException ex) {
 			ex.printStackTrace();
-		} finally {
+		} catch (NullPointerException ex) {
+			stateErrorConfigFile = true;
+			ex.printStackTrace();
+		}
+		
+		finally {
 			if (input != null) {
 				try {
 					input.close();
@@ -263,8 +275,10 @@ public class KConstants {
 		public static final String exception1 = "Ups! An exception occurred.";
 		public static final String exception2 = "You can press the key F5 and try again or send a bug report to ";
 		public static final String exception3 = " with the following info: ";
-		public static final String exception4 = "Can't find the configuration file (resource folder)";
-		public static final String exception5 = "Error in the configuration file";
+		public static final String exception4 = "Cannot find the configuration file.";
+		public static final String exception5 = "Move the file to the resource folder and you can press the key F5 and try again.";
+		public static final String exception6 = "Cannot load the configuration file: ";
+		public static final String exception7 = "Check and correct the configuration file and you can press the key F5 and try again.";
 		public static final String errorSessionNull1 = "Your session has expired. You need to sign in again.";
 	}
 }
