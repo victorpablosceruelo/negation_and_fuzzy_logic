@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -392,40 +391,6 @@ public class ProgramAnalysis {
 		}
 		return new ArrayList<HashMap<String,String>>();
 	}
-	
-	public String[][] algo(ArrayList<HashMap<String,String>> a)
-    {
-        //problem cases
-        if ((a == null)||(a.size() == 0))
-        {
-            return new String[0][0];
-        }
-       
-        Set<String> strSet = a.get(0).keySet();
-        String[][] resul = new String[strSet.size()][2];
-         double avg = 0;
-         int i = 0;
-        for (String key: strSet)
-        {
-             avg = 0;
-             double v;
-            for (HashMap<String, String> entry: a) {
-                v = Double.parseDouble(entry.get(key));
-                avg += v;
-            }
-            resul[i][0] = key;
-            Double value = new Double(Math.round(avg*1000/a.size())/1000.);
-              if (((value*10) % 10) == 0)
-              {
-              	resul[i][1] = String.valueOf(value.intValue());
-              	} else {
-              	resul[i][1] = String.valueOf(value);
-              	}
-            i++;
-        }
-		LOG.info("Default rule updated with: " + resul);
-            return resul;
-        }
 }
 
 /*

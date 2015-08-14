@@ -96,7 +96,7 @@ public class FuzzificationsManager extends AbstractManager {
 		programAnalized = ProgramAnalysis.getProgramAnalysisClass(programFileInfo);
 		
 		//analyzing the data
-		String[][] resul = programAnalized.algo(programAnalized.getAllDefinedFunctionDefinition(predDefined));
+		String[][] resul = FuzzificationsAlgorithms.algo(programAnalized.getAllDefinedFunctionDefinition(predDefined));
 		//setting the data
 		mode = KConstants.Request.modeEditingDefault;
 		programAnalized.updateProgramFile(localUserInfo, predDefined, predNecessary, mode, resul);
