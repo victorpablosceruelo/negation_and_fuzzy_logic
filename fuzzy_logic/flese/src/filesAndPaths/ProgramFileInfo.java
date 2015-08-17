@@ -29,6 +29,8 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 
 	private String folderFullPath = null;
 	private String fileFullPath = null;
+	private boolean share = true;
+	public static int numberOfFileForShare = -1;
 
 	public ProgramFileInfo(String fileOwner, String fileName) throws FilesAndPathsException {
 
@@ -60,6 +62,19 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 
 	}
 
+	public boolean getShare()
+	{
+		return share;
+	}
+	
+	public void changeShare()
+	{
+		if (numberOfFileForShare != -1){
+			share = !share;
+			numberOfFileForShare = -1;
+		}
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}

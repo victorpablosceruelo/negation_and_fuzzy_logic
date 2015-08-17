@@ -66,6 +66,7 @@ public class FourSquareImpl extends AbstractProvider {
 	private static final Map<String, String> ENDPOINTS;
 	private final Log LOG = LogFactory.getLog(FourSquareImpl.class);
 
+	@SuppressWarnings("unused")
 	private Permission scope;
 	private String accessToken;
 	private OAuthConfig config;

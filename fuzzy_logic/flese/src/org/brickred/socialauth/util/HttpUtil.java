@@ -371,6 +371,7 @@ public class HttpUtil {
 		return s.toString();
 	}
 
+	@SuppressWarnings("unused")
 	private static final String ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";
 
 	public static String encodeURIComponent(final String value)
@@ -402,7 +403,7 @@ public class HttpUtil {
 	 * input; }
 	 */
 
-	private static String getHex(final byte buf[]) {
+	@SuppressWarnings("unused") private static String getHex(final byte buf[]) {
 		StringBuilder o = new StringBuilder(buf.length * 3);
 		for (int i = 0; i < buf.length; i++) {
 			int n = buf[i] & 0xff;

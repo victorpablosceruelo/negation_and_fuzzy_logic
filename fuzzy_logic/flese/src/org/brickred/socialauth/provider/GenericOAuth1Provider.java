@@ -69,6 +69,7 @@ public class GenericOAuth1Provider extends AbstractProvider {
 
 	private final Log LOG = LogFactory.getLog(GenericOAuth1Provider.class);
 
+	@SuppressWarnings("unused")
 	private Permission scope;
 	private boolean isVerify;
 	private AccessGrant accessToken;

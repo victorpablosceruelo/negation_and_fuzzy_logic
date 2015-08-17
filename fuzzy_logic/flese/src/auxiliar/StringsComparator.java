@@ -96,7 +96,7 @@ public class StringsComparator {
 			return i;
 		}
 
-		private int getMaxLength(int i, int j) {
+		@SuppressWarnings("unused") private int getMaxLength(int i, int j) {
 			if (i > j) {
 				return i;
 			}

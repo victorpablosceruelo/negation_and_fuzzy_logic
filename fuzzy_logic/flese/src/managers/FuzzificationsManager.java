@@ -7,9 +7,6 @@ import auxiliar.NextStep;
 import constants.KConstants;
 import constants.KUrls;
 import filesAndPaths.ProgramFileInfo;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 public class FuzzificationsManager extends AbstractManager {
 

@@ -18,7 +18,6 @@ import storeHouse.RequestStoreHouseException;
 import CiaoJava.PLAtom;
 import CiaoJava.PLFloat;
 import CiaoJava.PLInteger;
-import CiaoJava.PLString;
 import CiaoJava.PLStructure;
 import CiaoJava.PLTerm;
 import CiaoJava.PLVariable;

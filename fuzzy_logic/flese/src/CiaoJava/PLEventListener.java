@@ -22,12 +22,13 @@ class PLEventListener implements AWTEventListener {
   /**
    * System queue
    */
-  private EventQueue queue;
+  @SuppressWarnings("unused")
+private EventQueue queue;
 
   /**
    * Object/event Hashtable.
    */
-  private Hashtable objTable;
+  private Hashtable<Object, PLEvents> objTable;
 
   /**
    * Interpreter to evaluate goal arguments.
@@ -52,7 +53,7 @@ class PLEventListener implements AWTEventListener {
 
     Toolkit.getDefaultToolkit().addAWTEventListener(this, Long.MAX_VALUE);
 
-    objTable = new Hashtable(STARTING_CAPACITY, FACTOR);
+    objTable = new Hashtable<Object, PLEvents>(STARTING_CAPACITY, FACTOR);
     this.pl = pl;
     this.interpreter = interpreter;
 
@@ -71,7 +72,7 @@ class PLEventListener implements AWTEventListener {
    * @param goal Prolog goal that will be evaluated when the
    *             event raises.
    */
-  void addListener(Object obj, Class ec, PLTerm goal) {
+  void addListener(Object obj, Class<?> ec, PLTerm goal) {
 
     PLEvents events = null;
     if ((events = (PLEvents)objTable.get(obj)) == null) {
@@ -93,7 +94,7 @@ class PLEventListener implements AWTEventListener {
    * @param goal Prolog goal that will be evaluated when the
    *             event raises.
    */
-  void removeListener(Object obj, Class ec, PLTerm goal) {
+  void removeListener(Object obj, Class<?> ec, PLTerm goal) {
     PLEvents events = null;
     if ((events = (PLEvents)objTable.get(obj)) != null) {
       events.removeEvent(ec, goal);
@@ -135,7 +136,7 @@ class PLEvents {
   /*
    * Events table.
    */
-  private Hashtable events;
+  private Hashtable<Class<?>, PLGoals> events;
 
   /**
    * Creates a new event class to be listened for an object,
@@ -144,8 +145,8 @@ class PLEvents {
    * @param ec   Event class that will be listened.
    * @param goal Prolog goal to be launched when the event raises.
    */
-  PLEvents(Class ec, PLTerm goal) {
-    events = new Hashtable(STARTING_CAPACITY, FACTOR);
+  PLEvents(Class<?> ec, PLTerm goal) {
+    events = new Hashtable<Class<?>, PLGoals>(STARTING_CAPACITY, FACTOR);
     addEvent(ec, goal);
   }
 
@@ -155,7 +156,7 @@ class PLEvents {
    * @param ec   Event class that will be listened.
    * @param goal Prolog goal to be launched when the event raises.
    */
-  void addEvent(Class ec, PLTerm goal) {
+  void addEvent(Class<?> ec, PLTerm goal) {
     PLGoals pl = null;
     if ((pl = (PLGoals)events.get(ec)) == null) {
       pl = new PLGoals(goal);
@@ -171,7 +172,7 @@ class PLEvents {
    * @param ec   Event class that is being listened.
    * @param goal Prolog goal to be launched when the event raises.
    */
-  void removeEvent(Class ec, PLTerm goal) {
+  void removeEvent(Class<?> ec, PLTerm goal) {
     PLGoals pl = null;
     if ((pl = (PLGoals)events.get(ec)) != null) {
       pl.removeGoal(goal);
@@ -196,7 +197,7 @@ class PLEvents {
    * @param pl          Prolog process on which evaluate the
    *                    Prolog event handlers.
    */
-  void eventDispatched(Class ec,
+  void eventDispatched(Class<? extends AWTEvent> ec,
                           PLInterpreter interpreter,
                           PLConnection pl) {
 
@@ -217,13 +218,13 @@ class PLGoals {
   private static final int STARTING_CAPACITY = 10;
   private static final int INCREMENT = 10;
 
-  private Vector goals;
+  private Vector<PLTerm> goals;
 
   /**
    * Creates a new empty goal set.
    */
   PLGoals() {
-    goals = new Vector(STARTING_CAPACITY, INCREMENT);
+    goals = new Vector<PLTerm>(STARTING_CAPACITY, INCREMENT);
   }
 
   /**
@@ -232,7 +233,7 @@ class PLGoals {
    * @param goal Prolog goal to be evaluated.
    */
   PLGoals(PLTerm goal) {
-    goals = new Vector(STARTING_CAPACITY, INCREMENT);
+    goals = new Vector<PLTerm>(STARTING_CAPACITY, INCREMENT);
     goals.addElement(goal);
   }
 
@@ -272,7 +273,7 @@ class PLGoals {
 			  PLConnection pl) {
 
     PLStructure el;
-    for (Enumeration c = goals.elements(); c.hasMoreElements();) {
+    for (Enumeration<PLTerm> c = goals.elements(); c.hasMoreElements();) {
       el = (PLStructure)c.nextElement();
       el.launchGoal(interpreter, pl);
     }

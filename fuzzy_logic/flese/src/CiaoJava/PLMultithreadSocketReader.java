@@ -45,7 +45,7 @@ class PLMultithreadSocketReader extends Thread {
      * messages. An element is removed from the hashtable when all
      * of its messages are read.
      */
-    private Hashtable msgTable;
+    private Hashtable<Object, Object> msgTable;
 
     /**
      * List of request objects waiting for messages. It is a TreeMap
@@ -55,7 +55,7 @@ class PLMultithreadSocketReader extends Thread {
      * when a message is received with that identifier, the socket
      * reader will notify the thread waiting for it.
      */
-    private Hashtable rqsTable;
+    private Hashtable<Object, Object> rqsTable;
 
     /**
      * Handler constructor. Starts a new handler thread reading at the
@@ -68,8 +68,8 @@ class PLMultithreadSocketReader extends Thread {
 	//	super("PLMultithreadSocketReader");
 	this.in = in;
 	this.writer = writer;
-	msgTable = new Hashtable(STARTING_CAPACITY, FACTOR);
-	rqsTable = new Hashtable(STARTING_CAPACITY, FACTOR);
+	msgTable = new Hashtable<Object,Object>(STARTING_CAPACITY, FACTOR);
+	rqsTable = new Hashtable<>(STARTING_CAPACITY, FACTOR);
 	this.start();
     }
 
@@ -157,9 +157,10 @@ class PLMultithreadSocketReader extends Thread {
      * of this stream (and it will be unique).
      */
     private void addMsg(Object id,PLTerm t) {
-	Vector msgList = (Vector)msgTable.get(id);
+	@SuppressWarnings("unchecked")
+	Vector<PLTerm> msgList = (Vector<PLTerm>) msgTable.get(id);
 	if (msgList == null) {
-	    msgList = new Vector(STARTING_CAPACITY,INCREMENT);
+	    msgList = new Vector<PLTerm>(STARTING_CAPACITY,INCREMENT);
 	    msgList.add(t);
 	    msgTable.put(id,msgList);
 	} else
@@ -192,7 +193,7 @@ class PLMultithreadSocketReader extends Thread {
     /**
      * Clears the internal data structures.
      */
-    private synchronized void clear() {
+    @SuppressWarnings("unused") private synchronized void clear() {
 	msgTable.clear();
 	rqsTable.clear();
     }

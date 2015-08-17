@@ -9,8 +9,6 @@ import org.apache.oltu.oauth2.common.OAuthProviderType;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
-import org.apache.oltu.oauth2.common.parameters.OAuthParametersApplier;
-import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 
 import storeHouse.RequestStoreHouse;
 import auxiliar.NextStep;
@@ -73,7 +71,9 @@ public class OpenAuth_2_0_Provider_facebook extends AbstractAuthProvider impleme
 		// OAuth 2.0 specification
 		GitHubTokenResponse oAuthResponse = oAuthClient.accessToken(request, GitHubTokenResponse.class);
 
+		@SuppressWarnings("unused")
 		String accessToken = oAuthResponse.getAccessToken();
+		@SuppressWarnings("unused")
 		Long expiresIn = oAuthResponse.getExpiresIn();
 		// oAuthResponse.getParam(param)
 

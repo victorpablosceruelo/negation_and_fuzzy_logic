@@ -74,6 +74,7 @@ public class YahooImpl extends AbstractProvider implements AuthProvider,
 	private final Log LOG = LogFactory.getLog(YahooImpl.class);
 	private static final Map<String, String> ENDPOINTS;
 
+	@SuppressWarnings("unused")
 	private Permission scope;
 	private AccessGrant accessToken;
 	private OAuthConfig config;

@@ -80,6 +80,7 @@ public class TwitterImpl extends AbstractProvider implements AuthProvider,
 
 	private final Log LOG = LogFactory.getLog(TwitterImpl.class);
 
+	@SuppressWarnings("unused")
 	private Permission scope;
 	private boolean isVerify;
 	private AccessGrant accessToken;

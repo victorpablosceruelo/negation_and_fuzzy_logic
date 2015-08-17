@@ -65,6 +65,7 @@ public class MendeleyImpl extends AbstractProvider {
 	private static final Map<String, String> ENDPOINTS;
 	private final Log LOG = LogFactory.getLog(MendeleyImpl.class);
 
+	@SuppressWarnings("unused")
 	private Permission scope;
 	private boolean isVerify;
 	private AccessGrant accessToken;

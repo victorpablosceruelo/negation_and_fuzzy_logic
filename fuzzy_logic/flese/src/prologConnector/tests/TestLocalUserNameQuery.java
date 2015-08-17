@@ -37,6 +37,7 @@ public class TestLocalUserNameQuery {
 
 	}
 
+	@SuppressWarnings("static-access")
 	protected static void test1(LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
 			FilesAndPathsException, PlConnectionEnvelopeException {
 		ProgramFileInfo pfi = new ProgramFileInfo(KCtes.programOwner, KCtes.programFileName1);
@@ -88,6 +89,7 @@ public class TestLocalUserNameQuery {
 		plConnectionEnvelope.runPrologQuery(ciaoQuery, localUserInfo);
 	}
 
+	@SuppressWarnings("static-access")
 	protected static void test2(LocalUserInfo localUserInfo) throws CiaoPrologConnectorException,
 			FilesAndPathsException, PlConnectionEnvelopeException {
 		ProgramFileInfo pfi = new ProgramFileInfo(KCtes.programOwner, KCtes.programFileName2);

@@ -214,9 +214,9 @@ public class OAuth2 implements OAuthStrategyBase {
 					}
 				}
 				if (accessToken != null) {
-					Iterator<String> keyItr = jObj.keys();
+					Iterator<?> keyItr = jObj.keys();
 					while (keyItr.hasNext()) {
-						String key = keyItr.next();
+						String key = (String) keyItr.next();
 						if (!"access_token".equals(key)
 								&& !"expires_in".equals(key)) {
 							attributes.put(key, jObj.optString(key));

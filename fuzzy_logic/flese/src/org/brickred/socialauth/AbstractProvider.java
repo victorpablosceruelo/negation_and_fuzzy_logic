@@ -57,6 +57,7 @@ public abstract class AbstractProvider implements AuthProvider, Serializable {
 		pluginsMap = new HashMap<Class<? extends Plugin>, Class<? extends Plugin>>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getPlugin(final Class<T> clazz) throws Exception {
 		Class<? extends Plugin> plugin = pluginsMap.get(clazz);
@@ -86,6 +87,7 @@ public abstract class AbstractProvider implements AuthProvider, Serializable {
 				Class<? extends Plugin> clazz = Class.forName(s).asSubclass(
 						Plugin.class);
 				// getting constructor only for checking
+				@SuppressWarnings("unused")
 				Constructor<? extends Plugin> cons = clazz
 						.getConstructor(ProviderSupport.class);
 				Class<?> interfaces[] = clazz.getInterfaces();

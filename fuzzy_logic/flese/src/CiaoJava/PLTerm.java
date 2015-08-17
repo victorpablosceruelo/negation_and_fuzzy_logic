@@ -74,11 +74,14 @@ public abstract class PLTerm extends Object {
    * fastRead/fastWrite fields constants.
    */
   private static String AtomTable[] = {};
-  private static int VarNumber = 0;
-  private static int VarCounter = 0;
+  @SuppressWarnings("unused")
+private static int VarNumber = 0;
+  @SuppressWarnings("unused")
+private static int VarCounter = 0;
 
   private static final int STRING_BUFFER_SIZE = 20;
-  private static final int MAX_READ_BUFFER = 512;
+  @SuppressWarnings("unused")
+private static final int MAX_READ_BUFFER = 512;
 
   /*
    * Constants for fast_read/fast_write version 'a'.
@@ -120,7 +123,7 @@ public abstract class PLTerm extends Object {
    * and as value the sequential variable number. This variable is
    * absolutely private, and is cleanst every time this term is 'fastWritten.'
    */
-  private Hashtable varTable = null;
+  private Hashtable<Object, Integer> varTable = null;
 
   /****************************************************/
   /* Abstract or overlapped methods                   */
@@ -496,8 +499,10 @@ public abstract class PLTerm extends Object {
    * @param in Reader from which the term will be read.
    */
   private static void getPrefix(BufferedReader in) throws PLException {
-    int NumberOfAtoms;
-    int NumberOfCells;
+    @SuppressWarnings("unused")
+	int NumberOfAtoms;
+    @SuppressWarnings("unused")
+	int NumberOfCells;
 
     switch (currentVersion) {
     case VERSION_A:
@@ -763,9 +768,10 @@ public abstract class PLTerm extends Object {
     /*
      * Private variable Hashtable is initialized.
      */
-    varTable = new Hashtable();
+    varTable = new Hashtable<Object, Integer>();
 
-    int NumberOfAtoms;
+    @SuppressWarnings("unused")
+	int NumberOfAtoms;
 
     // Prefix.
     s.append(genPrefix(this));
