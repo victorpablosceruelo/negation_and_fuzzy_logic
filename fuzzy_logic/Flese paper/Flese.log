@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.10.12)  20 AUG 2015 19:44
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.10.12)  21 AUG 2015 01:43
 entering extended mode
 **C:/Users/Dan/Desktop/Flese*paper/Flese.tex
 ("C:/Users/Dan/Desktop/Flese paper/Flese.tex"
@@ -285,6 +285,14 @@ Package grfext Info: Graphics extension search list:
 G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 452.
 ))
+("C:\Program Files\MiKTeX 2.9\tex\latex\float\float.sty"
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count116
+\float@exts=\toks27
+\float@box=\box55
+\@float@everytoks=\toks28
+\@floatcapt=\box56
+)
 ("C:\Users\Dan\Desktop\Flese paper\SCITEPRESS.sty"
 Conference Style for SCITEPRESS for LaTeX 2e -- version of April 2015
 \titlebox=\skip61
@@ -302,13 +310,14 @@ Package caption3 Info: TeX engine: e-TeX on input line 57.
 \caption@parindent=\dimen133
 \caption@hangindent=\dimen134
 )
-\c@ContinuedFloat=\count116
+\c@ContinuedFloat=\count117
+Package caption Info: float package is loaded.
 Package caption Info: subfigure package is loaded.
 )
 ("C:\Program Files\MiKTeX 2.9\tex\latex\base\inputenc.sty"
 Package: inputenc 2008/03/30 v1.1d Input encoding file
-\inpenc@prehook=\toks27
-\inpenc@posthook=\toks28
+\inpenc@prehook=\toks29
+\inpenc@posthook=\toks30
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\base\utf8.def"
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
@@ -523,79 +532,84 @@ Now handling font encoding U ...
    defining Unicode char U+2423 (decimal 9251)
 ))
 ("C:\Users\Dan\Desktop\Flese paper\Flese.aux")
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
 
 ("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count117
+\scratchcounter=\count118
 \scratchdimen=\dimen135
-\scratchbox=\box55
-\nofMPsegments=\count118
-\nofMParguments=\count119
-\everyMPshowfont=\toks29
-\MPscratchCnt=\count120
+\scratchbox=\box57
+\nofMPsegments=\count119
+\nofMParguments=\count120
+\everyMPshowfont=\toks31
+\MPscratchCnt=\count121
 \MPscratchDim=\dimen136
-\MPnumerator=\count121
-\makeMPintoPDFobject=\count122
-\everyMPtoPDFconversion=\toks30
+\MPnumerator=\count122
+\makeMPintoPDFobject=\count123
+\everyMPtoPDFconversion=\toks32
 )
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <13> not available
-(Font)              size <12> substituted on input line 37.
+(Font)              size <12> substituted on input line 38.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/bx/it' in size <13> not available
-(Font)              size <12> substituted on input line 37.
+(Font)              size <12> substituted on input line 38.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <13> not available
-(Font)              size <12> substituted on input line 37.
+(Font)              size <12> substituted on input line 38.
 
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 37.
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 38.
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <5.5> not available
-(Font)              size <5> substituted on input line 37.
+(Font)              size <5> substituted on input line 38.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <5.5> not available
-(Font)              size <5> substituted on input line 37.
+(Font)              size <5> substituted on input line 38.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <5.5> not available
-(Font)              size <5> substituted on input line 37.
+(Font)              size <5> substituted on input line 38.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 37.
+LaTeX Font Info:    Try loading font information for U+msa on input line 38.
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 37.
+LaTeX Font Info:    Try loading font information for U+msb on input line 38.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 37.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 38.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\base\omscmr.fd"
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <9> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 37.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 38.
 
-Underfull \hbox (badness 10000) in paragraph at lines 37--37
+Underfull \hbox (badness 10000) in paragraph at lines 38--38
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--57
 
  []
 
@@ -603,141 +617,272 @@ Underfull \hbox (badness 10000) in paragraph at lines 37--37
 Underfull \vbox (badness 6708) has occurred while \output is active []
 
 
-Underfull \vbox (badness 1067) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 62--63
 
- [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 64--65
+
+ []
+
+[1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
 
 
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 66--67
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 68--69
+
+ []
+
+<archi.png, id=12, 212.29312pt x 345.54094pt>
+File: archi.png Graphic file (type png)
+ <use archi.png>
+Package pdftex.def Info: archi.png used on input line 75.
+(pdftex.def)             Requested size: 156.49014pt x 254.72614pt.
+
+Underfull \hbox (badness 1237) in paragraph at lines 80--82
+\OT1/cmr/m/n/10 server lis-tens to http(s) re-quests and, when
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 80--82
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 85--86
+
+ []
+
+
+Overfull \hbox (18.10788pt too wide) in paragraph at lines 100--100
+[]\OT1/cmtt/m/n/9 function(distance_to_the_city_center(restaurant),[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 115--116
+
+ []
+
+[2 <C:/Users/Dan/Desktop/Flese paper/archi.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 117--118
+
+ []
+
+
+Underfull \hbox (badness 1052) in paragraph at lines 119--120
+\OT1/cmr/m/n/10 more data to in-sert than oth-ers, it will be
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 119--120
+
+ []
+
+<predicate.png, id=17, 329.73187pt x 343.2825pt>
+File: predicate.png Graphic file (type png)
+ <use predicate.png>
+Package pdftex.def Info: predicate.png used on input line 124.
+(pdftex.def)             Requested size: 156.49014pt x 162.92468pt.
+
+Underfull \hbox (badness 1721) in paragraph at lines 129--130
+\OT1/cmr/m/it/10 Not\OT1/cmr/m/n/10 , min-i-mum \OT1/cmr/m/it/10 Min\OT1/cmr/m/
+n/10 , and quan-tity mod-i-fiers
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 129--130
+
+ []
+
+<min.png, id=18, 224.33812pt x 383.18156pt>
+File: min.png Graphic file (type png)
+ <use min.png>
+Package pdftex.def Info: min.png used on input line 134.
+(pdftex.def)             Requested size: 156.49014pt x 267.30145pt.
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 88--89
+<op.png, id=20, 398.23781pt x 170.88844pt>
+File: op.png Graphic file (type png)
+ <use op.png>
+Package pdftex.def Info: op.png used on input line 142.
+(pdftex.def)             Requested size: 156.49014pt x 67.15208pt.
+
+<query.png, id=21, 398.23781pt x 170.88844pt>
+File: query.png Graphic file (type png)
+ <use query.png>
+Package pdftex.def Info: query.png used on input line 150.
+(pdftex.def)             Requested size: 156.49014pt x 67.15208pt.
+
+<results.png, id=22, 599.99156pt x 210.03468pt>
+File: results.png Graphic file (type png)
+ <use results.png>
+Package pdftex.def Info: results.png used on input line 161.
+(pdftex.def)             Requested size: 227.62204pt x 79.6826pt.
+
+Overfull \hbox (14.20761pt too wide) in paragraph at lines 161--162
+ [][] 
+ []
+
+[3 <C:/Users/Dan/Desktop/Flese paper/predicate.png> <C:/Users/Dan/Desktop/Flese
+ paper/min.png> <C:/Users/Dan/Desktop/Flese paper/op.png> <C:/Users/Dan/Desktop
+/Flese paper/query.png> <C:/Users/Dan/Desktop/Flese paper/results.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 173--174
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 90--91
+Underfull \hbox (badness 10000) in paragraph at lines 175--176
 
  []
 
 
-Underfull \hbox (badness 1454) in paragraph at lines 92--93
+Underfull \hbox (badness 1454) in paragraph at lines 177--178
 []\OT1/cmr/m/n/10 To per-son-al-ize a pred-i-cate, the pred-i-cate is
  []
 
 
-Underfull \hbox (badness 1097) in paragraph at lines 92--93
+Underfull \hbox (badness 1097) in paragraph at lines 177--178
 \OT1/cmr/m/n/10 fuzzy and it is im-pos-si-ble to per-son-al-ize it.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 92--93
+Underfull \hbox (badness 10000) in paragraph at lines 177--178
 
  []
 
-[2]
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 97.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 182.
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--104
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--106
+Underfull \hbox (badness 10000) in paragraph at lines 188--189
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 120--122
+Underfull \hbox (badness 10000) in paragraph at lines 190--191
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 144--145
+Underfull \hbox (badness 10000) in paragraph at lines 205--207
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 146--147
+Underfull \hbox (badness 10000) in paragraph at lines 229--230
 
  []
 
-<pers.png, id=15, 328.97906pt x 202.50656pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 231--232
+
+ []
+
+<pers.png, id=29, 328.97906pt x 202.50656pt>
 File: pers.png Graphic file (type png)
  <use pers.png>
-Package pdftex.def Info: pers.png used on input line 151.
+Package pdftex.def Info: pers.png used on input line 236.
 (pdftex.def)             Requested size: 227.62204pt x 140.119pt.
 
-Overfull \hbox (14.20761pt too wide) in paragraph at lines 151--152
+Overfull \hbox (14.20761pt too wide) in paragraph at lines 236--237
  [][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 156--157
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 241--242
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 183--184
+LaTeX Warning: `h' float specifier changed to `ht'.
 
- []
-
-[3 <C:/Users/Dan/Desktop/Flese paper/pers.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 187--188
-
- []
-
-
-Underfull \hbox (badness 2409) in paragraph at lines 189--190
-[]\OT1/cmr/m/n/10 Knowing that the pred-i-cate are di-vided in
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 189--190
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 268--269
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 191--192
+Underfull \hbox (badness 10000) in paragraph at lines 272--273
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 193--194
+Underfull \hbox (badness 2409) in paragraph at lines 274--275
+\OT1/cmr/m/n/10 Know-ing that the pred-i-cate are di-vided in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 274--275
 
  []
 
 
-Underfull \hbox (badness 2368) in paragraph at lines 195--196
+Underfull \hbox (badness 10000) in paragraph at lines 276--277
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 278--279
+
+ []
+
+
+Underfull \hbox (badness 2368) in paragraph at lines 280--281
 []\OT1/cmr/m/n/10 Theses changes will have no ef-fect on the
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 195--196
+Underfull \hbox (badness 10000) in paragraph at lines 280--281
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 197--198
+Underfull \hbox (badness 10000) in paragraph at lines 282--283
 
  []
 
-<chart.pdf, id=24, 602.25pt x 401.5pt>
+<chart.pdf, id=35, 602.25pt x 401.5pt>
 File: chart.pdf Graphic file (type pdf)
  <use chart.pdf>
-Package pdftex.def Info: chart.pdf used on input line 205.
+Package pdftex.def Info: chart.pdf used on input line 290.
 (pdftex.def)             Requested size: 227.62204pt x 151.75064pt.
 
-Overfull \hbox (14.20761pt too wide) in paragraph at lines 205--206
+Overfull \hbox (14.20761pt too wide) in paragraph at lines 290--291
  [][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 210--211
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [5 <C:/Users/Dan/Desktop/Flese paper/pers.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 295--296
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 304--305
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 306--307
 
  []
 
@@ -747,8 +892,8 @@ LaTeX Warning: Empty `thebibliography' environment on input line 3.
 
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 230.
- [4 <C:/Users/Dan/Desktop/Flese paper/chart.pdf>]
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 322.
+ [6 <C:/Users/Dan/Desktop/Flese paper/chart.pdf>]
 ("C:\Users\Dan\Desktop\Flese paper\Flese.aux")
 
 LaTeX Font Warning: Size substitutions with differences
@@ -756,13 +901,13 @@ LaTeX Font Warning: Size substitutions with differences
 
  ) 
 Here is how much of TeX's memory you used:
- 4207 strings out of 493921
- 59995 string characters out of 3147287
- 129246 words of memory out of 3000000
- 7408 multiletter control sequences out of 15000+200000
+ 4292 strings out of 493921
+ 61113 string characters out of 3147287
+ 130875 words of memory out of 3000000
+ 7484 multiletter control sequences out of 15000+200000
  14732 words of font info for 58 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 42i,7n,40p,686b,282s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 42i,7n,40p,562b,286s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Fil
 es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX 
@@ -773,9 +918,9 @@ nts/cm/cmsy9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
 ti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti9.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt9.pfb><C:/Progr
 am Files/MiKTeX 2.9/fonts/type1/public/eurosym/feymr10.pfb>
-Output written on Flese.pdf (4 pages, 207808 bytes).
+Output written on Flese.pdf (6 pages, 610605 bytes).
 PDF statistics:
- 72 PDF objects out of 1000 (max. 8388607)
+ 86 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 41 words of extra memory for PDF output out of 10000 (max. 10000000)
 
