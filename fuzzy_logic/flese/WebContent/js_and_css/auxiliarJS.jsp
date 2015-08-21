@@ -125,6 +125,7 @@ function loadAjaxIn(containerId, ajaxPageUrl) {
         	console.log("loading html: " + html);
         	container.innerHTML=html;
         	executeAjaxLoadedPageJS(html);
+        	//alert("success" + html);
 		},
 		fail: function() { 
 			alert("error: Impossible to load page " + ajaxPageUrl); 

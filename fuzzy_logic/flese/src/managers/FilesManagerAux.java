@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -27,7 +28,7 @@ import filters.OnlyLocalUserNameFolderFilterClass;
 import filters.OnlyNotLocalUserNameFolderFilterClass;
 
 public class FilesManagerAux {
-
+	private static HashMap<String,HashMap<String,Boolean>>sharingState = new HashMap<String,HashMap<String,Boolean>>();
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,8 +81,53 @@ public class FilesManagerAux {
 
 		ProgramFileInfo [] array = currentList.toArray(new ProgramFileInfo[currentList.size()]);
 		Arrays.sort(array);
-		
+		for (ProgramFileInfo p: array)
+		{
+			if (sharingState.containsKey(p.getFileOwner()))
+			{
+				if ((!sharingState.get(p.getFileOwner()).containsKey(p.getFileName())))
+				{
+					sharingState.get(p.getFileOwner()).put(p.getFileName(), true);
+				}
+			} else {
+				HashMap<String,Boolean> h = new HashMap<String,Boolean>();
+				h.put(p.getFileName(),true);
+				sharingState.put(p.getFileOwner(), h);
+			}
+		}
 		return array;
+	}
+	
+	public static void changeSharingState(ProgramFileInfo p)
+	{
+		sharingState.get(p.getFileOwner()).put(p.getFileName(), !p.getSharingState());
+	}
+	
+	public static boolean getSharingState(ProgramFileInfo p)
+	{
+		return (sharingState.get(p.getFileOwner()).get(p.getFileName()));
+	}
+	
+	public static void removeSharingFile(ProgramFileInfo p)
+	{
+		sharingState.get(p.getFileOwner()).remove(p.getFileName());
+	}
+	
+	public static boolean sharedfiles(String s)
+	{
+		if (sharingState.containsKey(s))
+		{
+			return true;
+		}
+		
+		for (HashMap<String,Boolean> h : sharingState.values())
+		{
+			if (h.containsValue(true))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

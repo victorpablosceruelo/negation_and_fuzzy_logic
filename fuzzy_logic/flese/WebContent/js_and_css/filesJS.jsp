@@ -10,16 +10,26 @@ Pablos Ceruelo */ /*
 <%@page import="constants.KUrls"%>
 <%@page import="constants.KConstants"%>
 <%@page import="auxiliar.JspsUtils"%>
-
-<% if (JspsUtils.getStringWithValueS().equals("N")) { %>
+<%@page import="storeHouse.ResultsStoreHouse"%>
+<%@page import="filesAndPaths.ProgramFileInfo"%>
+<%@page import="storeHouse.RequestStoreHouse"%>
+<%
+	
+ if (JspsUtils.getStringWithValueS().equals("N")) { %>
 <script type="text/javascript">
-<% } %>
-
+<% } 
+%>
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 function removeFileAction (urlRemove, params) {
+	var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
+	
+	loadAjaxIn(divId, urlRemove + params);
+}
+
+function changeSharingState (urlRemove, params) {
 	var divId = "<%=KConstants.JspsDivsIds.auxAndInvisibleSection %>";
 	
 	loadAjaxIn(divId, urlRemove + params);
@@ -39,6 +49,9 @@ function fileViewAction(fileViewContentsDivId, urlFileView, params, fileName) {
 	return false;
 }
 
+function myFunction(val) {
+    document.getElementById("demo").innerHTML = val + "Hello World";
+}
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------------------*/

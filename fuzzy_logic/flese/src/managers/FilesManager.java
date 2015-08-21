@@ -95,6 +95,7 @@ public class FilesManager extends AbstractManager {
 		setNextStep(null);
 	}
 
+	
 	public void remove() throws Exception {
 
 		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
@@ -112,6 +113,21 @@ public class FilesManager extends AbstractManager {
 
 		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.RemovePage, ""));
 	}
+	
+	public void changeState() throws Exception {
+
+		ProgramFileInfo programFileInfo = requestStoreHouse.getProgramFileInfo();
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
+
+		if (!(localUserInfo.getLocalUserName().equals(programFileInfo.getFileOwner()))) {
+			resultsStoreHouse.addResultMessage("You do not own the program file. So, you cannot change its sharing state.");
+		} else {
+			FilesManagerAux.changeSharingState(programFileInfo);
+		}
+
+		setNextStep(new NextStep(KConstants.NextStep.forward_to, KUrls.Files.ChangeStatePage, ""));
+	}
+	
 
 	public void view() throws Exception {
 

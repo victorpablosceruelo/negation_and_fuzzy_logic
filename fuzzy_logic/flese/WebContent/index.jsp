@@ -81,7 +81,7 @@
 			href="http://babel.ls.fi.upm.es/~vpablos/">Ph.D. student Victor
 			Pablos Ceruelo</a> under the supervision of <a
 			href="http://babel.ls.fi.upm.es/~susana/">Dr. Susana Muñoz
-			Hernandez</a>, as part of his research in the <a
+			Hernandez</a>, as part of her research in the <a
 			href="http://babel.ls.fi.upm.es/">Babel Research Group</a>.
 	</div>
 

@@ -17,6 +17,7 @@ import authProviders.Utils;
 import auxiliar.Dates;
 import auxiliar.LocalUserInfo;
 import constants.KConstants;
+import managers.FilesManagerAux;
 import storeHouse.CacheStoreHouseCleaner;
 import storeHouse.CacheStoreHouseException;
 
@@ -29,8 +30,6 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 
 	private String folderFullPath = null;
 	private String fileFullPath = null;
-	private boolean share = true;
-	public static int numberOfFileForShare = -1;
 
 	public ProgramFileInfo(String fileOwner, String fileName) throws FilesAndPathsException {
 
@@ -61,18 +60,9 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 		this.fileFullPath = PathsUtils.concatPathsStrings(this.folderFullPath, fileName);
 
 	}
-
-	public boolean getShare()
-	{
-		return share;
-	}
 	
-	public void changeShare()
-	{
-		if (numberOfFileForShare != -1){
-			share = !share;
-			numberOfFileForShare = -1;
-		}
+	public boolean getSharingState(){
+		return FilesManagerAux.getSharingState(this);
 	}
 	
 	public String getFileName() {
@@ -161,6 +151,7 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 		if (existsFile(false)) {
 			backup();
 			removeFileWithoutBackup();
+			FilesManagerAux.removeSharingFile(this);
 
 			CacheStoreHouseCleaner.clean(this);
 
@@ -176,7 +167,7 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 		Path target = Paths.get(fileFullPath);
 		try {
 			java.nio.file.Files.delete(target);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FilesAndPathsException(
 					"The program file " + fileName + " owned by " + fileOwner + " can not be removed.");

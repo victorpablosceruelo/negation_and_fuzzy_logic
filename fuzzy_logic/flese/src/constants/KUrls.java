@@ -63,7 +63,10 @@ public class KUrls {
 
 		public static final UrlMap RemovePage = getUrlMap(manager, "removePage", null, null, "WEB-INF/files/remove.jsp");
 		public static final UrlMap Remove = getUrlMap(manager, "remove", RemovePage, KUrls.Pages.Exception, "");
-	}
+
+		public static final UrlMap ChangeStatePage = getUrlMap(manager, "ChangeStatePage", null, null, "WEB-INF/files/changeState.jsp");
+		public static final UrlMap ChangeState = getUrlMap(manager, "changeState", ChangeStatePage, KUrls.Pages.Exception, "");
+		}
 
 	public static class Ontologies{
 		public static String manager = "OntologiesManager";

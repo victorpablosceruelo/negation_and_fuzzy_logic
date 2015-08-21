@@ -1,3 +1,4 @@
+<%@page import="auxiliar.LocalUserInfo"%>
 <%@page import="constants.KConstants"%>
 <%@page import="storeHouse.ResultsStoreHouse"%>
 <%@page import="auxiliar.JspsUtils"%>
@@ -6,6 +7,7 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="managers.FilesManagerAux"%>
 <%@page import="filesAndPaths.ProgramFileInfo"%>
+<%@page import="java.util.*"%>
 
 <div class="defaultTable">
 	<div id="selectDatabaseContainerDiv" class="selectDatabaseTable">
@@ -16,6 +18,8 @@
 
 		String urlSelectQueryStartType = KUrls.Queries.SelectQueryStartType.getUrl(true);
 		String urlProgramFileActions = KUrls.Queries.ProgramFileActions.getUrl(true);
+
+		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 	
 		if (filesList.length == 0) {
 	%>
@@ -34,11 +38,22 @@
 					onchange="selectedProgramDatabaseChanged(this, '<%=urlSelectQueryStartType %>', '<%=urlProgramFileActions %>')">
 					<%=JspsUtils.comboBoxDefaultValue()%>
 					<%
+					ArrayList<String> descList = new ArrayList<String>();
+					ArrayList<String> valueList = new ArrayList<String>();
 		for (int i=0; i<filesList.length; i++) { 
-			String value = filesList[i].getInfoForUrls();
-			String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
+			if ((filesList[i].getSharingState())||(filesList[i].getFileOwner()).equals(localUserInfo.getLocalUserName()))
+			{
+				String value = filesList[i].getInfoForUrls();
+				String desc = filesList[i].getFileName() + " ( owned by " + filesList[i].getFileOwner() + " ) ";
+				descList.add(desc);
+				valueList.add(value);
+			}
+		}
+		for (int j = 0 ; j < descList.size() ; j++)
+		{
+			
 	%>
-					<option id='<%=value%>' title='<%=value%>' value='<%=value%>'><%=desc%></option>
+					<option id='<%=valueList.get(j)%>' title='<%=valueList.get(j)%>' value='<%=valueList.get(j)%>'><%=descList.get(j)%></option>
 					<%
 		}
 	%>
