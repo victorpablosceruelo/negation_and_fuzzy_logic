@@ -26,6 +26,7 @@ import filesAndPaths.ProgramFileInfo;
 import filters.OnlyCiaoPrologFilesFilterClass;
 import filters.OnlyLocalUserNameFolderFilterClass;
 import filters.OnlyNotLocalUserNameFolderFilterClass;
+import managers.FileSharingException;
 
 public class FilesManagerAux {
 	private static HashMap<String,HashMap<String,Boolean>>sharingState = new HashMap<String,HashMap<String,Boolean>>();
@@ -34,16 +35,16 @@ public class FilesManagerAux {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static ProgramFileInfo[] listMyFiles(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException,
-			RequestStoreHouseException {
+			RequestStoreHouseException, FileSharingException {
 		return listAux(requestStoreHouse, true);
 	}
 
-	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, RequestStoreHouseException {
+	public static ProgramFileInfo[] list(RequestStoreHouse requestStoreHouse) throws FilesAndPathsException, RequestStoreHouseException, FileSharingException {
 		return listAux(requestStoreHouse, false);
 	}
 
 	public static ProgramFileInfo[] listAux(RequestStoreHouse requestStoreHouse, boolean onlyMine) throws FilesAndPathsException,
-			RequestStoreHouseException {
+			RequestStoreHouseException, FileSharingException {
 
 		LocalUserInfo localUserInfo = requestStoreHouse.getSession().getLocalUserInfo();
 
@@ -81,53 +82,84 @@ public class FilesManagerAux {
 
 		ProgramFileInfo [] array = currentList.toArray(new ProgramFileInfo[currentList.size()]);
 		Arrays.sort(array);
-		for (ProgramFileInfo p: array)
-		{
-			if (sharingState.containsKey(p.getFileOwner()))
+		try{
+			for (ProgramFileInfo p: array)
 			{
-				if ((!sharingState.get(p.getFileOwner()).containsKey(p.getFileName())))
+				if (sharingState.containsKey(p.getFileOwner()))
 				{
-					sharingState.get(p.getFileOwner()).put(p.getFileName(), true);
+					if ((!sharingState.get(p.getFileOwner()).containsKey(p.getFileName())))
+					{
+						sharingState.get(p.getFileOwner()).put(p.getFileName(), true);
+					}
+				} else {
+					HashMap<String,Boolean> h = new HashMap<String,Boolean>();
+					h.put(p.getFileName(),true);
+					sharingState.put(p.getFileOwner(), h);
 				}
-			} else {
-				HashMap<String,Boolean> h = new HashMap<String,Boolean>();
-				h.put(p.getFileName(),true);
-				sharingState.put(p.getFileOwner(), h);
 			}
+		}
+		catch (Exception e)
+		{
+			throw new FileSharingException(e.getMessage());
 		}
 		return array;
 	}
 	
-	public static void changeSharingState(ProgramFileInfo p)
+	public static void changeSharingState(ProgramFileInfo p) throws Exception
 	{
-		sharingState.get(p.getFileOwner()).put(p.getFileName(), !p.getSharingState());
-	}
-	
-	public static boolean getSharingState(ProgramFileInfo p)
-	{
-		return (sharingState.get(p.getFileOwner()).get(p.getFileName()));
-	}
-	
-	public static void removeSharingFile(ProgramFileInfo p)
-	{
-		sharingState.get(p.getFileOwner()).remove(p.getFileName());
-	}
-	
-	public static boolean sharedfiles(String s)
-	{
-		if (sharingState.containsKey(s))
+		try{
+			sharingState.get(p.getFileOwner()).put(p.getFileName(), !p.getSharingState());
+		}
+		catch (Exception e)
 		{
-			return true;
+			throw new FileSharingException(e.getMessage());
 		}
 		
-		for (HashMap<String,Boolean> h : sharingState.values())
+	}
+	
+	public static boolean getSharingState(ProgramFileInfo p) throws Exception
+	{
+		try{
+			return (sharingState.get(p.getFileOwner()).get(p.getFileName()));
+		}
+		catch (Exception e)
 		{
-			if (h.containsValue(true))
+			throw new FileSharingException(e.getMessage());
+		}
+	}
+	
+	public static void removeSharingFile(ProgramFileInfo p) throws Exception
+	{
+		try{
+			sharingState.get(p.getFileOwner()).remove(p.getFileName());
+		}
+		catch (Exception e)
+		{
+			throw new FileSharingException(e.getMessage());
+		}
+	}
+	
+	public static boolean sharedfiles(String s) throws Exception
+	{
+		try{
+			if (sharingState.containsKey(s))
 			{
 				return true;
 			}
+			
+			for (HashMap<String,Boolean> h : sharingState.values())
+			{
+				if (h.containsValue(true))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
-		return false;
+		catch (Exception e)
+		{
+			throw new FileSharingException(e.getMessage());
+		}
 	}
 
 	/**

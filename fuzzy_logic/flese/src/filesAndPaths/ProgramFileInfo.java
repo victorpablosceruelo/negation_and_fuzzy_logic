@@ -19,7 +19,6 @@ import auxiliar.LocalUserInfo;
 import constants.KConstants;
 import managers.FilesManagerAux;
 import storeHouse.CacheStoreHouseCleaner;
-import storeHouse.CacheStoreHouseException;
 
 public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 
@@ -61,7 +60,7 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 
 	}
 	
-	public boolean getSharingState(){
+	public boolean getSharingState() throws Exception{
 		return FilesManagerAux.getSharingState(this);
 	}
 	
@@ -144,10 +143,9 @@ public class ProgramFileInfo implements Comparable<ProgramFileInfo>{
 	 * Performs a file backup and removes it.
 	 * 
 	 * @return
-	 * @throws FilesAndPathsException
-	 * @throws CacheStoreHouseException
+	 * @throws Exception 
 	 */
-	public String remove() throws FilesAndPathsException, CacheStoreHouseException {
+	public String remove() throws Exception {
 		if (existsFile(false)) {
 			backup();
 			removeFileWithoutBackup();

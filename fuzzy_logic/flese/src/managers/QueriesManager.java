@@ -30,7 +30,7 @@ public class QueriesManager extends AbstractManager {
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void selectProgramFile() throws FilesAndPathsException, RequestStoreHouseException {
+	public void selectProgramFile() throws FilesAndPathsException, RequestStoreHouseException, FileSharingException {
 		ProgramFileInfo[] filesList = FilesManagerAux.list(requestStoreHouse);
 		resultsStoreHouse.setFilesList(filesList);
 
