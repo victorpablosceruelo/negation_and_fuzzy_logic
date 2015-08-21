@@ -56,7 +56,6 @@
 	HashMap<String, String> myFuzzPoints = myFuzzification.getFunctionPoints(); 
 
 %>
-
 <div class='personalizationDivFuzzificationFunctionTable'>
 	<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
 	<div class='personalizationDivFuzzificationFunctionTableRow'>
@@ -64,91 +63,93 @@
 			id='<%=KConstants.JspsDivsIds.fuzzificationGraphicDivId %>'></div>
 	</div>
 	<% } %>
-	<div class='personalizationDivFuzzificationFunctionTableRow'>
-		<div class='personalizationDivFuzzificationFunctionTableCell2'
-			id='<%=KConstants.JspsDivsIds.fuzzificationValuesAndButtonDivId %>'>
-			<div class='personalizationDivFuzzificationFunctionWithButtonTable'>
-				<div
-					class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
+	<div id='FuzzificationTable'>
+		<div class='personalizationDivFuzzificationFunctionTableRow'>
+			<div class='personalizationDivFuzzificationFunctionTableCell2'
+				id='<%=KConstants.JspsDivsIds.fuzzificationValuesAndButtonDivId %>'>
+				<div class='personalizationDivFuzzificationFunctionWithButtonTable'>
 					<div
-						class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
-						<div class='personalizationDivFuzzificationFunctionValuesTable'>
-							<div
-								class='personalizationDivFuzzificationFunctionValuesTableRow'>
+						class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
+						<div
+							class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
+							<div class='personalizationDivFuzzificationFunctionValuesTable'>
 								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									A
-									<%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.database, true) %>
-									whose value for
-									<%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predNecessary, true) %>
-									is
+									class='personalizationDivFuzzificationFunctionValuesTableRow'>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										A
+										<%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.database, true) %>
+										whose value for
+										<%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predNecessary, true) %>
+										is
+									</div>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										is
+										<%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predDefined, true) %>
+										with a degree of
+									</div>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										Current Value</div>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
+										Old Value
+										<% } else { %>
+										Default Value
+										<% } %>
+									</div>
 								</div>
+	
+								<% for (int i=0; i<keyValues.length; i++) { 
+										String fuzzificationBarDivId = KConstants.JspsDivsIds.fuzzificationBarValueDivId + "[" + i + "]";
+										String defaultValue = JspsUtils.getValueFor(keyValues[i], defaultFuzzPoints, defaultFuzzPoints);
+										String myValue = JspsUtils.getValueFor(keyValues[i], myFuzzPoints, defaultFuzzPoints);
+								%>
 								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									is
-									<%= JspsUtils.getFromFuzzificationNameOf(defaultFuzzification, KConstants.Fuzzifications.predDefined, true) %>
-									with a degree of
+									class='personalizationDivFuzzificationFunctionValuesTableRow'>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										<%= keyValues[i] %>
+									</div>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										<input type='hidden' name='fuzzificationBars[<%= i %>].fpx'
+											value='<%= keyValues[i] %>' /> <input type='range'
+											name='fuzzificationBars[<%= i %>].fpy' min='0' max='1'
+											step='0.01' value='<%= myValue %>' width='150px'
+											onchange="barValueChanged(this, '<%=fuzzificationBarDivId %>', '<%= keyValues[i] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');" />
+									</div>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										<span id='<%=fuzzificationBarDivId %>'><%= myValue %></span>
+									</div>
+									<div
+										class='personalizationDivFuzzificationFunctionValuesTableCell'>
+										<%= defaultValue %>
+									</div>
 								</div>
-								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									Current Value</div>
-								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<% if (mode.equals(KConstants.Request.modeAdvanced)) { %>
-									Old Value
-									<% } else { %>
-									Default Value
-									<% } %>
-								</div>
+								<% } %>
 							</div>
-
-							<% for (int i=0; i<keyValues.length; i++) { 
-									String fuzzificationBarDivId = KConstants.JspsDivsIds.fuzzificationBarValueDivId + "[" + i + "]";
-									String defaultValue = JspsUtils.getValueFor(keyValues[i], defaultFuzzPoints, defaultFuzzPoints);
-									String myValue = JspsUtils.getValueFor(keyValues[i], myFuzzPoints, defaultFuzzPoints);
-							%>
-							<div
-								class='personalizationDivFuzzificationFunctionValuesTableRow'>
-								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<%= keyValues[i] %>
-								</div>
-								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<input type='hidden' name='fuzzificationBars[<%= i %>].fpx'
-										value='<%= keyValues[i] %>' /> <input type='range'
-										name='fuzzificationBars[<%= i %>].fpy' min='0' max='1'
-										step='0.01' value='<%= myValue %>' width='150px'
-										onchange="barValueChanged(this, '<%=fuzzificationBarDivId %>', '<%= keyValues[i] %>', '<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');" />
-								</div>
-								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<span id='<%=fuzzificationBarDivId %>'><%= myValue %></span>
-								</div>
-								<div
-									class='personalizationDivFuzzificationFunctionValuesTableCell'>
-									<%= defaultValue %>
-								</div>
-							</div>
-							<% } %>
 						</div>
 					</div>
-				</div>
-
-				<div
-					class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
+	
 					<div
-						class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
-						<div class='personalizationDivSaveButtonAndMsgTable'>
-							<div class='personalizationDivSaveButtonAndMsgTableRow'>
-								<div class='personalizationDivSaveButtonAndMsgTableCell'>
-									<INPUT type='submit' value='Save modifications'
-										onclick="saveFuzzification('<%=KConstants.JspsDivsIds.fuzzificationSaveStatusDivId %>', '<%=saveUrl %>')">
-								</div>
-								<div class='personalizationDivSaveButtonAndMsgTableCell'>
-									&nbsp;&nbsp;&nbsp;&nbsp;</div>
-								<div class='personalizationDivSaveButtonAndMsgTableCell'
-									id='<%=KConstants.JspsDivsIds.fuzzificationSaveStatusDivId %>'>
+						class='personalizationDivFuzzificationFunctionWithButtonTableRow'>
+						<div
+							class='personalizationDivFuzzificationFunctionWithButtonTableCell'>
+							<div class='personalizationDivSaveButtonAndMsgTable'>
+								<div class='personalizationDivSaveButtonAndMsgTableRow'>
+									<div class='personalizationDivSaveButtonAndMsgTableCell'>
+										<INPUT type='submit' value='Save modifications'
+											onclick="saveFuzzification('<%=KConstants.JspsDivsIds.fuzzificationSaveStatusDivId %>', '<%=saveUrl %>')">
+									</div>
+									<div class='personalizationDivSaveButtonAndMsgTableCell'>
+										&nbsp;&nbsp;&nbsp;&nbsp;</div>
+									<div class='personalizationDivSaveButtonAndMsgTableCell'
+										id='<%=KConstants.JspsDivsIds.fuzzificationSaveStatusDivId %>'>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -158,6 +159,9 @@
 		</div>
 	</div>
 </div>
+
+<div id="MyDiv">You can't modify this fuzzification, Flese is taking care of it for you.
+ <br> An user already modified it.</div>
 
 <script type="text/javascript">
 <%
@@ -190,7 +194,19 @@
 		}
 	}
 	out.print("));");
+	if ((mode.equals(KConstants.Request.modeAdvanced))&&(thisFuzzification.length != 1))
+	{
+		%> 
+		document.getElementById('FuzzificationTable').style.display = "block";
+	    document.getElementById('FuzzificationTable').style.display = "none";<%
+	} else {
+		%> 
+		document.getElementById('MyDiv').style.display = "block";
+	    document.getElementById('MyDiv').style.display = "none";<%
+	}
 %>
+	
+	
 	insertFuzzificationGraphicRepresentation('<%= KConstants.JspsDivsIds.fuzzificationGraphicDivId %>');
 </script>
 

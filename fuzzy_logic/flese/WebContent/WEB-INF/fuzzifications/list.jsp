@@ -34,14 +34,13 @@
 					<div class='personalizationDivSelectFuzzificationTableCell'>
 						I want to personalize how it is determined that a &nbsp;</div>
 					<div class='personalizationDivSelectFuzzificationTableCell'>
-						
+								<select name="personalizationSelectComboBoxId"
+							id="personalizationSelectComboBoxId"
+							onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>', '<%= urlEditFuzzification %>');">
+							<%=JspsUtils.comboBoxDefaultValue() %>
 							<%
-							ArrayList<String> descList = new ArrayList<String>();
-							ArrayList<String> idList = new ArrayList<String>();
 								for (int i=0; i<fuzzifications.length; i++) {
 									if ((fuzzifications[i] != null) && (fuzzifications[i].length > 0)) {
-										if ((mode.equals(KConstants.Request.modeBasic))||((mode.equals(KConstants.Request.modeAdvanced))&(fuzzifications[i].length == 1)))
-										{
 										ProgramPartAnalysis fuzzification = fuzzifications[i][0];
 										String desc = JspsUtils.getFromFuzzificationNameOf(fuzzification, KConstants.Fuzzifications.database, true) +
 														" is " + 
@@ -53,32 +52,13 @@
 													"&" + KConstants.Fuzzifications.predDefined + "=" + fuzzification.getPredDefined() +
 													"&" + KConstants.Fuzzifications.predNecessary + "=" + fuzzification.getPredNecessary() +
 													"&" + KConstants.Request.mode + "=" + mode;
-																descList.add(desc);
-																idList.add(id);
-										} else {
-											ProgramPartAnalysis fuzzification = fuzzifications[i][0];
-											String desc = "Not available: " + JspsUtils.getFromFuzzificationNameOf(fuzzification, KConstants.Fuzzifications.database, true) +
-															" is " + 
-															JspsUtils.getFromFuzzificationNameOf(fuzzification, KConstants.Fuzzifications.predDefined, true);
-											String id = "";
-																	descList.add(desc);
-																	idList.add(id);
+										%>
+										<option id='<%=desc%>' title='<%=desc%>' value='<%=id%>'><%= desc %></option>
+										<%
 										}
 									}
-								}
-								%>
-								<select name="personalizationSelectComboBoxId"
-							id="personalizationSelectComboBoxId"
-							onchange="personalizationFunctionChanged(this, '<%=KConstants.JspsDivsIds.personalizationFunctionUnderModificationDivId %>', '<%= urlEditFuzzification %>');">
-							<%=JspsUtils.comboBoxDefaultValue() %>
-							<%
-								for (int index = 0 ; index < descList.size() ; index++)
-								{
 									
-									%>
-									<option id='<%=descList.get(index)%>' title='<%=descList.get(index)%>' value='<%=idList.get(index)%>'><%= descList.get(index) %></option>
-									<%
-								}
+									
 							
 %>
 						</select>

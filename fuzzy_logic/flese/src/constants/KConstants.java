@@ -246,7 +246,6 @@ public class KConstants {
 		public static final String searchOrPersonalizeTableId = "searchOrPersonalizeTable";
 		public static final String queryLinesTableId = "queryLinesTable";
 		public static final String queryLinesAggregatorTableId = "queryLinesAggregatorTable";
-		public static final String changeSharingStateId = "changeSharingStateId";
 
 		public static final String filesListDiv = "filesListDiv";
 		public static final String fileViewContentsDiv = "fileViewContentsDiv";
