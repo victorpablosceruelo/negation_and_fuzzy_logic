@@ -1,0 +1,9 @@
+ig(X,X).
+
+p(X) <- q(X,Y).
+p(2).
+
+a(a).
+a(X) <- not ig(X,a).
+a(N) <- a(N).
+

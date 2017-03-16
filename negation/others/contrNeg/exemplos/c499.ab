@@ -1,0 +1,952 @@
+abds([ab/1]).
+
+
+obs(out(inpt0, cid0), 0).
+obs(out(inpt0, cid1), 0).
+obs(out(inpt0, cid2), 0).
+obs(out(inpt0, cid3), 0).
+obs(out(inpt0, cid4), 0).
+obs(out(inpt0, cid5), 0).
+obs(out(inpt0, cid6), 0).
+obs(out(inpt0, cid7), 0).
+obs(out(inpt0, cid8), 0).
+obs(out(inpt0, cid9), 0).
+obs(out(inpt0, cid10), 0).
+obs(out(inpt0, cid11), 0).
+obs(out(inpt0, cid12), 0).
+obs(out(inpt0, cid13), 0).
+obs(out(inpt0, cid14), 0).
+obs(out(inpt0, cid15), 0).
+obs(out(inpt0, cid16), 0).
+obs(out(inpt0, cid17), 0).
+obs(out(inpt0, cid18), 0).
+obs(out(inpt0, cid19), 0).
+obs(out(inpt0, cid20), 0).
+obs(out(inpt0, cid21), 0).
+obs(out(inpt0, cid22), 0).
+obs(out(inpt0, cid23), 0).
+obs(out(inpt0, cid24), 0).
+obs(out(inpt0, cid25), 0).
+obs(out(inpt0, cid26), 0).
+obs(out(inpt0, cid27), 0).
+obs(out(inpt0, cid28), 0).
+obs(out(inpt0, cid29), 0).
+obs(out(inpt0, cid30), 0).
+obs(out(inpt0, cid31), 0).
+obs(out(inpt0, cic0), 0).
+obs(out(inpt0, cic1), 0).
+obs(out(inpt0, cic2), 0).
+obs(out(inpt0, cic3), 0).
+obs(out(inpt0, cic4), 0).
+obs(out(inpt0, cic5), 0).
+obs(out(inpt0, cic6), 0).
+obs(out(inpt0, cic7), 0).
+obs(out(inpt0, cr), 0).
+
+observed <- 
+val(out(xor2, cod0), 0), 
+val(out(xor2, cod1), 0), 
+val(out(xor2, cod2), 0), 
+val(out(xor2, cod3), 0), 
+val(out(xor2, cod4), 0), 
+val(out(xor2, cod5), 0), 
+val(out(xor2, cod6), 0), 
+val(out(xor2, cod7), 0), 
+val(out(xor2, cod8), 0), 
+val(out(xor2, cod9), 0), 
+val(out(xor2, cod10), 0), 
+val(out(xor2, cod11), 0), 
+val(out(xor2, cod12), 0), 
+val(out(xor2, cod13), 0), 
+val(out(xor2, cod14), 0), 
+val(out(xor2, cod15), 0), 
+val(out(xor2, cod16), 0), 
+val(out(xor2, cod17), 0), 
+val(out(xor2, cod18), 0), 
+val(out(xor2, cod19), 0), 
+val(out(xor2, cod20), 0), 
+val(out(xor2, cod21), 0), 
+val(out(xor2, cod22), 0), 
+val(out(xor2, cod23), 0), 
+val(out(xor2, cod24), 0), 
+val(out(xor2, cod25), 0), 
+val(out(xor2, cod26), 0), 
+val(out(xor2, cod27), 0), 
+val(out(xor2, cod28), 0), 
+val(out(xor2, cod29), 0), 
+val(out(xor2, cod30), 0), 
+val(out(xor2, cod31), 1). 
+
+
+
+
+
+
+%
+% Propagation of values thru connections
+%
+val( in(Type,Name,Nr), V ) <-
+  conn( in(Type,Name,Nr), out(Type2,Name2) ),
+  val( out(Type2,Name2), V ).
+
+%
+% input observations
+%
+val( out(inpt0, Name), V ) <- obs( out(inpt0, Name), V ).
+
+
+%
+% computation of a component's output value
+%
+val( out(not1,Name), V ) <-
+  not ab(Name),
+  val( in(not1,Name,1), W),
+  not1_table(W,V).
+val( out(not1,Name), V ) <-
+  ab(Name),
+  val( in(not1,Name,1), W),
+  id1_table(W,V).
+
+val( out(xor2,Name), V ) <-
+  not ab(Name),
+  val( in(xor2,Name,1), W1),
+  val( in(xor2,Name,2), W2),
+  xor2_table(W1,W2,V).
+val( out(xor2,Name), V ) <-
+  ab(Name),
+  val( in(xor2,Name,1), W1),
+  val( in(xor2,Name,2), W2),
+  eq2_table(W1,W2,V).
+
+val( out(or4,Name), V ) <-
+  not ab(Name),
+  val( in(or4,Name,1), W1),
+  val( in(or4,Name,2), W2),
+  val( in(or4,Name,3), W3),
+  val( in(or4,Name,4), W4),
+  or4_table(W1,W2,W3,W4,V).
+val( out(or4,Name), V ) <-
+  ab(Name),
+  val( in(or4,Name,1), W1),
+  val( in(or4,Name,2), W2),
+  val( in(or4,Name,3), W3),
+  val( in(or4,Name,4), W4),
+  nor4_table(W1,W2,W3,W4,V).
+
+val( out(and2,Name), V ) <-
+  not ab(Name),
+  val( in(and2,Name,1), W1),
+  val( in(and2,Name,2), W2),
+  and2_table(W1,W2,V).
+val( out(and2,Name), V ) <-
+  ab(Name),
+  val( in(and2,Name,1), W1),
+  val( in(and2,Name,2), W2),
+  nand2_table(W1,W2,V).
+
+val( out(and4,Name), V ) <-
+  not ab(Name),
+  val( in(and4,Name,1), W1),
+  val( in(and4,Name,2), W2),
+  val( in(and4,Name,3), W3),
+  val( in(and4,Name,4), W4),
+  and4_table(W1,W2,W3,W4,V).
+val( out(and4,Name), V ) <-
+  ab(Name),
+  val( in(and4,Name,1), W1),
+  val( in(and4,Name,2), W2),
+  val( in(and4,Name,3), W3),
+  val( in(and4,Name,4), W4),
+  nand4_table(W1,W2,W3,W4,V).
+
+val( out(and5,Name), V ) <-
+  not ab(Name),
+  val( in(and5,Name,1), W1),
+  val( in(and5,Name,2), W2),
+  val( in(and5,Name,3), W3),
+  val( in(and5,Name,4), W4),
+  val( in(and5,Name,5), W5),
+  and5_table(W1,W2,W3,W4,W5,V).
+val( out(and5,Name), V ) <-
+  ab(Name),
+  val( in(and5,Name,1), W1),
+  val( in(and5,Name,2), W2),
+  val( in(and5,Name,3), W3),
+  val( in(and5,Name,4), W4),
+  val( in(and5,Name,4), W5),
+  nand5_table(W1,W2,W3,W4,W5,V).
+
+
+not1_table(0,1).
+not1_table(1,0).
+
+id1_table(0,0).
+id1_table(1,1).
+
+xor2_table(0,0,0).
+xor2_table(0,1,1).
+xor2_table(1,0,1).
+xor2_table(1,1,0).
+
+eq2_table(0,0,1).
+eq2_table(0,1,0).
+eq2_table(1,0,0).
+eq2_table(1,1,1).
+
+nor4_table(0,0,0,0,1).
+nor4_table(0,0,0,1,0).
+nor4_table(0,0,1,0,0).
+nor4_table(0,0,1,1,0).
+nor4_table(0,1,0,0,0).
+nor4_table(0,1,0,1,0).
+nor4_table(0,1,1,0,0).
+nor4_table(0,1,1,1,0).
+nor4_table(1,0,0,0,0).
+nor4_table(1,0,0,1,0).
+nor4_table(1,0,1,0,0).
+nor4_table(1,0,1,1,0).
+nor4_table(1,1,0,0,0).
+nor4_table(1,1,0,1,0).
+nor4_table(1,1,1,0,0).
+nor4_table(1,1,1,1,0).
+
+or4_table(0,0,0,0,0).
+or4_table(0,0,0,1,1).
+or4_table(0,0,1,0,1).
+or4_table(0,0,1,1,1).
+or4_table(0,1,0,0,1).
+or4_table(0,1,0,1,1).
+or4_table(0,1,1,0,1).
+or4_table(0,1,1,1,1).
+or4_table(1,0,0,0,1).
+or4_table(1,0,0,1,1).
+or4_table(1,0,1,0,1).
+or4_table(1,0,1,1,1).
+or4_table(1,1,0,0,1).
+or4_table(1,1,0,1,1).
+or4_table(1,1,1,0,1).
+or4_table(1,1,1,1,1).
+
+nand2_table(0,0,1).
+nand2_table(0,1,1).
+nand2_table(1,0,1).
+nand2_table(1,1,0).
+
+and2_table(0,0,0).
+and2_table(0,1,0).
+and2_table(1,0,0).
+and2_table(1,1,1).
+
+nand4_table(0,0,0,0,1).
+nand4_table(0,0,0,1,1).
+nand4_table(0,0,1,0,1).
+nand4_table(0,0,1,1,1).
+nand4_table(0,1,0,0,1).
+nand4_table(0,1,0,1,1).
+nand4_table(0,1,1,0,1).
+nand4_table(0,1,1,1,1).
+nand4_table(1,0,0,0,1).
+nand4_table(1,0,0,1,1).
+nand4_table(1,0,1,0,1).
+nand4_table(1,0,1,1,1).
+nand4_table(1,1,0,0,1).
+nand4_table(1,1,0,1,1).
+nand4_table(1,1,1,0,1).
+nand4_table(1,1,1,1,0).
+
+and4_table(0,0,0,0,0).
+and4_table(0,0,0,1,0).
+and4_table(0,0,1,0,0).
+and4_table(0,0,1,1,0).
+and4_table(0,1,0,0,0).
+and4_table(0,1,0,1,0).
+and4_table(0,1,1,0,0).
+and4_table(0,1,1,1,0).
+and4_table(1,0,0,0,0).
+and4_table(1,0,0,1,0).
+and4_table(1,0,1,0,0).
+and4_table(1,0,1,1,0).
+and4_table(1,1,0,0,0).
+and4_table(1,1,0,1,0).
+and4_table(1,1,1,0,0).
+and4_table(1,1,1,1,1).
+
+nand5_table(0,0,0,0,0,1).
+nand5_table(0,0,0,0,1,1).
+nand5_table(0,0,0,1,0,1).
+nand5_table(0,0,0,1,1,1).
+nand5_table(0,0,1,0,0,1).
+nand5_table(0,0,1,0,1,1).
+nand5_table(0,0,1,1,0,1).
+nand5_table(0,0,1,1,1,1).
+nand5_table(0,1,0,0,0,1).
+nand5_table(0,1,0,0,1,1).
+nand5_table(0,1,0,1,0,1).
+nand5_table(0,1,0,1,1,1).
+nand5_table(0,1,1,0,0,1).
+nand5_table(0,1,1,0,1,1).
+nand5_table(0,1,1,1,0,1).
+nand5_table(0,1,1,1,1,1).
+nand5_table(1,0,0,0,0,1).
+nand5_table(1,0,0,0,1,1).
+nand5_table(1,0,0,1,0,1).
+nand5_table(1,0,0,1,1,1).
+nand5_table(1,0,1,0,0,1).
+nand5_table(1,0,1,0,1,1).
+nand5_table(1,0,1,1,0,1).
+nand5_table(1,0,1,1,1,1).
+nand5_table(1,1,0,0,0,1).
+nand5_table(1,1,0,0,1,1).
+nand5_table(1,1,0,1,0,1).
+nand5_table(1,1,0,1,1,1).
+nand5_table(1,1,1,0,0,1).
+nand5_table(1,1,1,0,1,1).
+nand5_table(1,1,1,1,0,1).
+nand5_table(1,1,1,1,1,0).
+
+and5_table(0,0,0,0,0,0).
+and5_table(0,0,0,0,1,0).
+and5_table(0,0,0,1,0,0).
+and5_table(0,0,0,1,1,0).
+and5_table(0,0,1,0,0,0).
+and5_table(0,0,1,0,1,0).
+and5_table(0,0,1,1,0,0).
+and5_table(0,0,1,1,1,0).
+and5_table(0,1,0,0,0,0).
+and5_table(0,1,0,0,1,0).
+and5_table(0,1,0,1,0,0).
+and5_table(0,1,0,1,1,0).
+and5_table(0,1,1,0,0,0).
+and5_table(0,1,1,0,1,0).
+and5_table(0,1,1,1,0,0).
+and5_table(0,1,1,1,1,0).
+and5_table(1,0,0,0,0,0).
+and5_table(1,0,0,0,1,0).
+and5_table(1,0,0,1,0,0).
+and5_table(1,0,0,1,1,0).
+and5_table(1,0,1,0,0,0).
+and5_table(1,0,1,0,1,0).
+and5_table(1,0,1,1,0,0).
+and5_table(1,0,1,1,1,0).
+and5_table(1,1,0,0,0,0).
+and5_table(1,1,0,0,1,0).
+and5_table(1,1,0,1,0,0).
+and5_table(1,1,0,1,1,0).
+and5_table(1,1,1,0,0,0).
+and5_table(1,1,1,0,1,0).
+and5_table(1,1,1,1,0,0).
+and5_table(1,1,1,1,1,1).
+
+
+
+
+
+conn(in(xor2, cxa0, 1), out(inpt0, cid0)).
+conn(in(xor2, cxa0, 2), out(inpt0, cid1)).
+
+conn(in(xor2, cxa1, 1), out(inpt0, cid2)).
+conn(in(xor2, cxa1, 2), out(inpt0, cid3)).
+
+conn(in(xor2, cxa2, 1), out(inpt0, cid4)).
+conn(in(xor2, cxa2, 2), out(inpt0, cid5)).
+
+conn(in(xor2, cxa3, 1), out(inpt0, cid6)).
+conn(in(xor2, cxa3, 2), out(inpt0, cid7)).
+
+conn(in(xor2, cxa4, 1), out(inpt0, cid8)).
+conn(in(xor2, cxa4, 2), out(inpt0, cid9)).
+
+conn(in(xor2, cxa5, 1), out(inpt0, cid10)).
+conn(in(xor2, cxa5, 2), out(inpt0, cid11)).
+
+conn(in(xor2, cxa6, 1), out(inpt0, cid12)).
+conn(in(xor2, cxa6, 2), out(inpt0, cid13)).
+
+conn(in(xor2, cxa7, 1), out(inpt0, cid14)).
+conn(in(xor2, cxa7, 2), out(inpt0, cid15)).
+
+conn(in(xor2, cxa8, 1), out(inpt0, cid16)).
+conn(in(xor2, cxa8, 2), out(inpt0, cid17)).
+
+conn(in(xor2, cxa9, 1), out(inpt0, cid18)).
+conn(in(xor2, cxa9, 2), out(inpt0, cid19)).
+
+conn(in(xor2, cxa10, 1), out(inpt0, cid20)).
+conn(in(xor2, cxa10, 2), out(inpt0, cid21)).
+
+conn(in(xor2, cxa11, 1), out(inpt0, cid22)).
+conn(in(xor2, cxa11, 2), out(inpt0, cid23)).
+
+conn(in(xor2, cxa12, 1), out(inpt0, cid24)).
+conn(in(xor2, cxa12, 2), out(inpt0, cid25)).
+
+conn(in(xor2, cxa13, 1), out(inpt0, cid26)).
+conn(in(xor2, cxa13, 2), out(inpt0, cid27)).
+
+conn(in(xor2, cxa14, 1), out(inpt0, cid28)).
+conn(in(xor2, cxa14, 2), out(inpt0, cid29)).
+
+conn(in(xor2, cxa15, 1), out(inpt0, cid30)).
+conn(in(xor2, cxa15, 2), out(inpt0, cid31)).
+
+conn(in(and2, ch0, 1), out(inpt0, cic0)).
+conn(in(and2, ch0, 2), out(inpt0, cr)).
+
+conn(in(and2, ch1, 1), out(inpt0, cic1)).
+conn(in(and2, ch1, 2), out(inpt0, cr)).
+
+conn(in(and2, ch2, 1), out(inpt0, cic2)).
+conn(in(and2, ch2, 2), out(inpt0, cr)).
+
+conn(in(and2, ch3, 1), out(inpt0, cic3)).
+conn(in(and2, ch3, 2), out(inpt0, cr)).
+
+conn(in(and2, ch4, 1), out(inpt0, cic4)).
+conn(in(and2, ch4, 2), out(inpt0, cr)).
+
+conn(in(and2, ch5, 1), out(inpt0, cic5)).
+conn(in(and2, ch5, 2), out(inpt0, cr)).
+
+conn(in(and2, ch6, 1), out(inpt0, cic6)).
+conn(in(and2, ch6, 2), out(inpt0, cr)).
+
+conn(in(and2, ch7, 1), out(inpt0, cic7)).
+conn(in(and2, ch7, 2), out(inpt0, cr)).
+
+conn(in(xor2, cxb0, 1), out(inpt0, cid0)).
+conn(in(xor2, cxb0, 2), out(inpt0, cid4)).
+
+conn(in(xor2, cxc0, 1), out(inpt0, cid8)).
+conn(in(xor2, cxc0, 2), out(inpt0, cid12)).
+
+conn(in(xor2, cxb1, 1), out(inpt0, cid1)).
+conn(in(xor2, cxb1, 2), out(inpt0, cid5)).
+
+conn(in(xor2, cxc1, 1), out(inpt0, cid9)).
+conn(in(xor2, cxc1, 2), out(inpt0, cid13)).
+
+conn(in(xor2, cxb2, 1), out(inpt0, cid2)).
+conn(in(xor2, cxb2, 2), out(inpt0, cid6)).
+
+conn(in(xor2, cxc2, 1), out(inpt0, cid10)).
+conn(in(xor2, cxc2, 2), out(inpt0, cid14)).
+
+conn(in(xor2, cxb3, 1), out(inpt0, cid3)).
+conn(in(xor2, cxb3, 2), out(inpt0, cid7)).
+
+conn(in(xor2, cxc3, 1), out(inpt0, cid11)).
+conn(in(xor2, cxc3, 2), out(inpt0, cid15)).
+
+conn(in(xor2, cxb4, 1), out(inpt0, cid16)).
+conn(in(xor2, cxb4, 2), out(inpt0, cid20)).
+
+conn(in(xor2, cxc4, 1), out(inpt0, cid24)).
+conn(in(xor2, cxc4, 2), out(inpt0, cid28)).
+
+conn(in(xor2, cxb5, 1), out(inpt0, cid17)).
+conn(in(xor2, cxb5, 2), out(inpt0, cid21)).
+
+conn(in(xor2, cxc5, 1), out(inpt0, cid25)).
+conn(in(xor2, cxc5, 2), out(inpt0, cid29)).
+
+conn(in(xor2, cxb6, 1), out(inpt0, cid18)).
+conn(in(xor2, cxb6, 2), out(inpt0, cid22)).
+
+conn(in(xor2, cxc6, 1), out(inpt0, cid26)).
+conn(in(xor2, cxc6, 2), out(inpt0, cid30)).
+
+conn(in(xor2, cxb7, 1), out(inpt0, cid19)).
+conn(in(xor2, cxb7, 2), out(inpt0, cid23)).
+
+conn(in(xor2, cxc7, 1), out(inpt0, cid27)).
+conn(in(xor2, cxc7, 2), out(inpt0, cid31)).
+
+conn(in(xor2, cf0, 1), out(xor2, cxa0)).
+conn(in(xor2, cf0, 2), out(xor2, cxa1)).
+
+conn(in(xor2, cf1, 1), out(xor2, cxa2)).
+conn(in(xor2, cf1, 2), out(xor2, cxa3)).
+
+conn(in(xor2, cf2, 1), out(xor2, cxa4)).
+conn(in(xor2, cf2, 2), out(xor2, cxa5)).
+
+conn(in(xor2, cf3, 1), out(xor2, cxa6)).
+conn(in(xor2, cf3, 2), out(xor2, cxa7)).
+
+conn(in(xor2, cf4, 1), out(xor2, cxa8)).
+conn(in(xor2, cf4, 2), out(xor2, cxa9)).
+
+conn(in(xor2, cf5, 1), out(xor2, cxa10)).
+conn(in(xor2, cf5, 2), out(xor2, cxa11)).
+
+conn(in(xor2, cf6, 1), out(xor2, cxa12)).
+conn(in(xor2, cf6, 2), out(xor2, cxa13)).
+
+conn(in(xor2, cf7, 1), out(xor2, cxa14)).
+conn(in(xor2, cf7, 2), out(xor2, cxa15)).
+
+conn(in(xor2, cxe0, 1), out(xor2, cxb0)).
+conn(in(xor2, cxe0, 2), out(xor2, cxc0)).
+
+conn(in(xor2, cxe1, 1), out(xor2, cxb1)).
+conn(in(xor2, cxe1, 2), out(xor2, cxc1)).
+
+conn(in(xor2, cxe2, 1), out(xor2, cxb2)).
+conn(in(xor2, cxe2, 2), out(xor2, cxc2)).
+
+conn(in(xor2, cxe3, 1), out(xor2, cxb3)).
+conn(in(xor2, cxe3, 2), out(xor2, cxc3)).
+
+conn(in(xor2, cxe4, 1), out(xor2, cxb4)).
+conn(in(xor2, cxe4, 2), out(xor2, cxc4)).
+
+conn(in(xor2, cxe5, 1), out(xor2, cxb5)).
+conn(in(xor2, cxe5, 2), out(xor2, cxc5)).
+
+conn(in(xor2, cxe6, 1), out(xor2, cxb6)).
+conn(in(xor2, cxe6, 2), out(xor2, cxc6)).
+
+conn(in(xor2, cxe7, 1), out(xor2, cxb7)).
+conn(in(xor2, cxe7, 2), out(xor2, cxc7)).
+
+conn(in(xor2, cg0, 1), out(xor2, cf0)).
+conn(in(xor2, cg0, 2), out(xor2, cf1)).
+
+conn(in(xor2, cg1, 1), out(xor2, cf2)).
+conn(in(xor2, cg1, 2), out(xor2, cf3)).
+
+conn(in(xor2, cg2, 1), out(xor2, cf0)).
+conn(in(xor2, cg2, 2), out(xor2, cf2)).
+
+conn(in(xor2, cg3, 1), out(xor2, cf1)).
+conn(in(xor2, cg3, 2), out(xor2, cf3)).
+
+conn(in(xor2, cg4, 1), out(xor2, cf4)).
+conn(in(xor2, cg4, 2), out(xor2, cf5)).
+
+conn(in(xor2, cg5, 1), out(xor2, cf6)).
+conn(in(xor2, cg5, 2), out(xor2, cf7)).
+
+conn(in(xor2, cg6, 1), out(xor2, cf4)).
+conn(in(xor2, cg6, 2), out(xor2, cf6)).
+
+conn(in(xor2, cg7, 1), out(xor2, cf5)).
+conn(in(xor2, cg7, 2), out(xor2, cf7)).
+
+conn(in(xor2, cxd0, 1), out(and2, ch0)).
+conn(in(xor2, cxd0, 2), out(xor2, cg4)).
+
+conn(in(xor2, cxd1, 1), out(and2, ch1)).
+conn(in(xor2, cxd1, 2), out(xor2, cg5)).
+
+conn(in(xor2, cxd2, 1), out(and2, ch2)).
+conn(in(xor2, cxd2, 2), out(xor2, cg6)).
+
+conn(in(xor2, cxd3, 1), out(and2, ch3)).
+conn(in(xor2, cxd3, 2), out(xor2, cg7)).
+
+conn(in(xor2, cxd4, 1), out(and2, ch4)).
+conn(in(xor2, cxd4, 2), out(xor2, cg0)).
+
+conn(in(xor2, cxd5, 1), out(and2, ch5)).
+conn(in(xor2, cxd5, 2), out(xor2, cg1)).
+
+conn(in(xor2, cxd6, 1), out(and2, ch6)).
+conn(in(xor2, cxd6, 2), out(xor2, cg2)).
+
+conn(in(xor2, cxd7, 1), out(and2, ch7)).
+conn(in(xor2, cxd7, 2), out(xor2, cg3)).
+
+conn(in(xor2, cs0, 1), out(xor2, cxe0)).
+conn(in(xor2, cs0, 2), out(xor2, cxd0)).
+
+conn(in(xor2, cs1, 1), out(xor2, cxe1)).
+conn(in(xor2, cs1, 2), out(xor2, cxd1)).
+
+conn(in(xor2, cs2, 1), out(xor2, cxe2)).
+conn(in(xor2, cs2, 2), out(xor2, cxd2)).
+
+conn(in(xor2, cs3, 1), out(xor2, cxe3)).
+conn(in(xor2, cs3, 2), out(xor2, cxd3)).
+
+conn(in(xor2, cs4, 1), out(xor2, cxe4)).
+conn(in(xor2, cs4, 2), out(xor2, cxd4)).
+
+conn(in(xor2, cs5, 1), out(xor2, cxe5)).
+conn(in(xor2, cs5, 2), out(xor2, cxd5)).
+
+conn(in(xor2, cs6, 1), out(xor2, cxe6)).
+conn(in(xor2, cs6, 2), out(xor2, cxd6)).
+
+conn(in(xor2, cs7, 1), out(xor2, cxe7)).
+conn(in(xor2, cs7, 2), out(xor2, cxd7)).
+
+conn(in(not1, cy0a, 1), out(xor2, cs0)).
+
+conn(in(not1, cy1a, 1), out(xor2, cs1)).
+
+conn(in(not1, cy2a, 1), out(xor2, cs2)).
+
+conn(in(not1, cy0b, 1), out(xor2, cs0)).
+
+conn(in(not1, cy1b, 1), out(xor2, cs1)).
+
+conn(in(not1, cy3b, 1), out(xor2, cs3)).
+
+conn(in(not1, cy0c, 1), out(xor2, cs0)).
+
+conn(in(not1, cy2c, 1), out(xor2, cs2)).
+
+conn(in(not1, cy3c, 1), out(xor2, cs3)).
+
+conn(in(not1, cy1d, 1), out(xor2, cs1)).
+
+conn(in(not1, cy2d, 1), out(xor2, cs2)).
+
+conn(in(not1, cy3d, 1), out(xor2, cs3)).
+
+conn(in(not1, cy5i, 1), out(xor2, cs5)).
+
+conn(in(not1, cy7i, 1), out(xor2, cs7)).
+
+conn(in(not1, cy5j, 1), out(xor2, cs5)).
+
+conn(in(not1, cy6j, 1), out(xor2, cs6)).
+
+conn(in(not1, cy4k, 1), out(xor2, cs4)).
+
+conn(in(not1, cy7k, 1), out(xor2, cs7)).
+
+conn(in(not1, cy4l, 1), out(xor2, cs4)).
+
+conn(in(not1, cy6l, 1), out(xor2, cs6)).
+
+conn(in(not1, cy4a, 1), out(xor2, cs4)).
+
+conn(in(not1, cy5a, 1), out(xor2, cs5)).
+
+conn(in(not1, cy6a, 1), out(xor2, cs6)).
+
+conn(in(not1, cy4b, 1), out(xor2, cs4)).
+
+conn(in(not1, cy5b, 1), out(xor2, cs5)).
+
+conn(in(not1, cy7b, 1), out(xor2, cs7)).
+
+conn(in(not1, cy4c, 1), out(xor2, cs4)).
+
+conn(in(not1, cy6c, 1), out(xor2, cs6)).
+
+conn(in(not1, cy7c, 1), out(xor2, cs7)).
+
+conn(in(not1, cy5d, 1), out(xor2, cs5)).
+
+conn(in(not1, cy6d, 1), out(xor2, cs6)).
+
+conn(in(not1, cy7d, 1), out(xor2, cs7)).
+
+conn(in(not1, cy1i, 1), out(xor2, cs1)).
+
+conn(in(not1, cy3i, 1), out(xor2, cs3)).
+
+conn(in(not1, cy1j, 1), out(xor2, cs1)).
+
+conn(in(not1, cy2j, 1), out(xor2, cs2)).
+
+conn(in(not1, cy0k, 1), out(xor2, cs0)).
+
+conn(in(not1, cy3k, 1), out(xor2, cs3)).
+
+conn(in(not1, cy0l, 1), out(xor2, cs0)).
+
+conn(in(not1, cy2l, 1), out(xor2, cs2)).
+
+conn(in(and4, ct0, 1), out(not1, cy0a)).
+conn(in(and4, ct0, 2), out(not1, cy1a)).
+conn(in(and4, ct0, 3), out(not1, cy2a)).
+conn(in(and4, ct0, 4), out(xor2, cs3)).
+
+conn(in(and4, ct1, 1), out(not1, cy0b)).
+conn(in(and4, ct1, 2), out(not1, cy1b)).
+conn(in(and4, ct1, 3), out(xor2, cs2)).
+conn(in(and4, ct1, 4), out(not1, cy3b)).
+
+conn(in(and4, ct2, 1), out(not1, cy0c)).
+conn(in(and4, ct2, 2), out(xor2, cs1)).
+conn(in(and4, ct2, 3), out(not1, cy2c)).
+conn(in(and4, ct2, 4), out(not1, cy3c)).
+
+conn(in(and4, ct3, 1), out(xor2, cs0)).
+conn(in(and4, ct3, 2), out(not1, cy1d)).
+conn(in(and4, ct3, 3), out(not1, cy2d)).
+conn(in(and4, ct3, 4), out(not1, cy3d)).
+
+conn(in(and4, ct4, 1), out(not1, cy4a)).
+conn(in(and4, ct4, 2), out(not1, cy5a)).
+conn(in(and4, ct4, 3), out(not1, cy6a)).
+conn(in(and4, ct4, 4), out(xor2, cs7)).
+
+conn(in(and4, ct5, 1), out(not1, cy4b)).
+conn(in(and4, ct5, 2), out(not1, cy5b)).
+conn(in(and4, ct5, 3), out(xor2, cs6)).
+conn(in(and4, ct5, 4), out(not1, cy7b)).
+
+conn(in(and4, ct6, 1), out(not1, cy4c)).
+conn(in(and4, ct6, 2), out(xor2, cs5)).
+conn(in(and4, ct6, 3), out(not1, cy6c)).
+conn(in(and4, ct6, 4), out(not1, cy7c)).
+
+conn(in(and4, ct7, 1), out(xor2, cs4)).
+conn(in(and4, ct7, 2), out(not1, cy5d)).
+conn(in(and4, ct7, 3), out(not1, cy6d)).
+conn(in(and4, ct7, 4), out(not1, cy7d)).
+
+conn(in(or4, cu0, 1), out(and4, ct0)).
+conn(in(or4, cu0, 2), out(and4, ct1)).
+conn(in(or4, cu0, 3), out(and4, ct2)).
+conn(in(or4, cu0, 4), out(and4, ct3)).
+
+conn(in(or4, cu1, 1), out(and4, ct4)).
+conn(in(or4, cu1, 2), out(and4, ct5)).
+conn(in(or4, cu1, 3), out(and4, ct6)).
+conn(in(or4, cu1, 4), out(and4, ct7)).
+
+conn(in(and5, cwa, 1), out(xor2, cs4)).
+conn(in(and5, cwa, 2), out(not1, cy5i)).
+conn(in(and5, cwa, 3), out(xor2, cs6)).
+conn(in(and5, cwa, 4), out(not1, cy7i)).
+conn(in(and5, cwa, 5), out(or4, cu0)).
+
+conn(in(and5, cwb, 1), out(xor2, cs4)).
+conn(in(and5, cwb, 2), out(not1, cy5j)).
+conn(in(and5, cwb, 3), out(not1, cy6j)).
+conn(in(and5, cwb, 4), out(xor2, cs7)).
+conn(in(and5, cwb, 5), out(or4, cu0)).
+
+conn(in(and5, cwc, 1), out(not1, cy4k)).
+conn(in(and5, cwc, 2), out(xor2, cs5)).
+conn(in(and5, cwc, 3), out(xor2, cs6)).
+conn(in(and5, cwc, 4), out(not1, cy7k)).
+conn(in(and5, cwc, 5), out(or4, cu0)).
+
+conn(in(and5, cwd, 1), out(not1, cy4l)).
+conn(in(and5, cwd, 2), out(xor2, cs5)).
+conn(in(and5, cwd, 3), out(not1, cy6l)).
+conn(in(and5, cwd, 4), out(xor2, cs7)).
+conn(in(and5, cwd, 5), out(or4, cu0)).
+
+conn(in(and5, cwe, 1), out(xor2, cs0)).
+conn(in(and5, cwe, 2), out(not1, cy1i)).
+conn(in(and5, cwe, 3), out(xor2, cs2)).
+conn(in(and5, cwe, 4), out(not1, cy3i)).
+conn(in(and5, cwe, 5), out(or4, cu1)).
+
+conn(in(and5, cwf, 1), out(xor2, cs0)).
+conn(in(and5, cwf, 2), out(not1, cy1j)).
+conn(in(and5, cwf, 3), out(not1, cy2j)).
+conn(in(and5, cwf, 4), out(xor2, cs3)).
+conn(in(and5, cwf, 5), out(or4, cu1)).
+
+conn(in(and5, cwg, 1), out(not1, cy0k)).
+conn(in(and5, cwg, 2), out(xor2, cs1)).
+conn(in(and5, cwg, 3), out(xor2, cs2)).
+conn(in(and5, cwg, 4), out(not1, cy3k)).
+conn(in(and5, cwg, 5), out(or4, cu1)).
+
+conn(in(and5, cwh, 1), out(not1, cy0l)).
+conn(in(and5, cwh, 2), out(xor2, cs1)).
+conn(in(and5, cwh, 3), out(not1, cy2l)).
+conn(in(and5, cwh, 4), out(xor2, cs3)).
+conn(in(and5, cwh, 5), out(or4, cu1)).
+
+conn(in(and2, ce0, 1), out(xor2, cs0)).
+conn(in(and2, ce0, 2), out(and5, cwa)).
+
+conn(in(and2, ce1, 1), out(xor2, cs1)).
+conn(in(and2, ce1, 2), out(and5, cwa)).
+
+conn(in(and2, ce2, 1), out(xor2, cs2)).
+conn(in(and2, ce2, 2), out(and5, cwa)).
+
+conn(in(and2, ce3, 1), out(xor2, cs3)).
+conn(in(and2, ce3, 2), out(and5, cwa)).
+
+conn(in(and2, ce4, 1), out(xor2, cs0)).
+conn(in(and2, ce4, 2), out(and5, cwb)).
+
+conn(in(and2, ce5, 1), out(xor2, cs1)).
+conn(in(and2, ce5, 2), out(and5, cwb)).
+
+conn(in(and2, ce6, 1), out(xor2, cs2)).
+conn(in(and2, ce6, 2), out(and5, cwb)).
+
+conn(in(and2, ce7, 1), out(xor2, cs3)).
+conn(in(and2, ce7, 2), out(and5, cwb)).
+
+conn(in(and2, ce8, 1), out(xor2, cs0)).
+conn(in(and2, ce8, 2), out(and5, cwc)).
+
+conn(in(and2, ce9, 1), out(xor2, cs1)).
+conn(in(and2, ce9, 2), out(and5, cwc)).
+
+conn(in(and2, ce10, 1), out(xor2, cs2)).
+conn(in(and2, ce10, 2), out(and5, cwc)).
+
+conn(in(and2, ce11, 1), out(xor2, cs3)).
+conn(in(and2, ce11, 2), out(and5, cwc)).
+
+conn(in(and2, ce12, 1), out(xor2, cs0)).
+conn(in(and2, ce12, 2), out(and5, cwd)).
+
+conn(in(and2, ce13, 1), out(xor2, cs1)).
+conn(in(and2, ce13, 2), out(and5, cwd)).
+
+conn(in(and2, ce14, 1), out(xor2, cs2)).
+conn(in(and2, ce14, 2), out(and5, cwd)).
+
+conn(in(and2, ce15, 1), out(xor2, cs3)).
+conn(in(and2, ce15, 2), out(and5, cwd)).
+
+conn(in(and2, ce16, 1), out(xor2, cs4)).
+conn(in(and2, ce16, 2), out(and5, cwe)).
+
+conn(in(and2, ce17, 1), out(xor2, cs5)).
+conn(in(and2, ce17, 2), out(and5, cwe)).
+
+conn(in(and2, ce18, 1), out(xor2, cs6)).
+conn(in(and2, ce18, 2), out(and5, cwe)).
+
+conn(in(and2, ce19, 1), out(xor2, cs7)).
+conn(in(and2, ce19, 2), out(and5, cwe)).
+
+conn(in(and2, ce20, 1), out(xor2, cs4)).
+conn(in(and2, ce20, 2), out(and5, cwf)).
+
+conn(in(and2, ce21, 1), out(xor2, cs5)).
+conn(in(and2, ce21, 2), out(and5, cwf)).
+
+conn(in(and2, ce22, 1), out(xor2, cs6)).
+conn(in(and2, ce22, 2), out(and5, cwf)).
+
+conn(in(and2, ce23, 1), out(xor2, cs7)).
+conn(in(and2, ce23, 2), out(and5, cwf)).
+
+conn(in(and2, ce24, 1), out(xor2, cs4)).
+conn(in(and2, ce24, 2), out(and5, cwg)).
+
+conn(in(and2, ce25, 1), out(xor2, cs5)).
+conn(in(and2, ce25, 2), out(and5, cwg)).
+
+conn(in(and2, ce26, 1), out(xor2, cs6)).
+conn(in(and2, ce26, 2), out(and5, cwg)).
+
+conn(in(and2, ce27, 1), out(xor2, cs7)).
+conn(in(and2, ce27, 2), out(and5, cwg)).
+
+conn(in(and2, ce28, 1), out(xor2, cs4)).
+conn(in(and2, ce28, 2), out(and5, cwh)).
+
+conn(in(and2, ce29, 1), out(xor2, cs5)).
+conn(in(and2, ce29, 2), out(and5, cwh)).
+
+conn(in(and2, ce30, 1), out(xor2, cs6)).
+conn(in(and2, ce30, 2), out(and5, cwh)).
+
+conn(in(and2, ce31, 1), out(xor2, cs7)).
+conn(in(and2, ce31, 2), out(and5, cwh)).
+
+conn(in(xor2, cod0, 1), out(inpt0, cid0)).
+conn(in(xor2, cod0, 2), out(and2, ce0)).
+
+conn(in(xor2, cod1, 1), out(inpt0, cid1)).
+conn(in(xor2, cod1, 2), out(and2, ce1)).
+
+conn(in(xor2, cod2, 1), out(inpt0, cid2)).
+conn(in(xor2, cod2, 2), out(and2, ce2)).
+
+conn(in(xor2, cod3, 1), out(inpt0, cid3)).
+conn(in(xor2, cod3, 2), out(and2, ce3)).
+
+conn(in(xor2, cod4, 1), out(inpt0, cid4)).
+conn(in(xor2, cod4, 2), out(and2, ce4)).
+
+conn(in(xor2, cod5, 1), out(inpt0, cid5)).
+conn(in(xor2, cod5, 2), out(and2, ce5)).
+
+conn(in(xor2, cod6, 1), out(inpt0, cid6)).
+conn(in(xor2, cod6, 2), out(and2, ce6)).
+
+conn(in(xor2, cod7, 1), out(inpt0, cid7)).
+conn(in(xor2, cod7, 2), out(and2, ce7)).
+
+conn(in(xor2, cod8, 1), out(inpt0, cid8)).
+conn(in(xor2, cod8, 2), out(and2, ce8)).
+
+conn(in(xor2, cod9, 1), out(inpt0, cid9)).
+conn(in(xor2, cod9, 2), out(and2, ce9)).
+
+conn(in(xor2, cod10, 1), out(inpt0, cid10)).
+conn(in(xor2, cod10, 2), out(and2, ce10)).
+
+conn(in(xor2, cod11, 1), out(inpt0, cid11)).
+conn(in(xor2, cod11, 2), out(and2, ce11)).
+
+conn(in(xor2, cod12, 1), out(inpt0, cid12)).
+conn(in(xor2, cod12, 2), out(and2, ce12)).
+
+conn(in(xor2, cod13, 1), out(inpt0, cid13)).
+conn(in(xor2, cod13, 2), out(and2, ce13)).
+
+conn(in(xor2, cod14, 1), out(inpt0, cid14)).
+conn(in(xor2, cod14, 2), out(and2, ce14)).
+
+conn(in(xor2, cod15, 1), out(inpt0, cid15)).
+conn(in(xor2, cod15, 2), out(and2, ce15)).
+
+conn(in(xor2, cod16, 1), out(inpt0, cid16)).
+conn(in(xor2, cod16, 2), out(and2, ce16)).
+
+conn(in(xor2, cod17, 1), out(inpt0, cid17)).
+conn(in(xor2, cod17, 2), out(and2, ce17)).
+
+conn(in(xor2, cod18, 1), out(inpt0, cid18)).
+conn(in(xor2, cod18, 2), out(and2, ce18)).
+
+conn(in(xor2, cod19, 1), out(inpt0, cid19)).
+conn(in(xor2, cod19, 2), out(and2, ce19)).
+
+conn(in(xor2, cod20, 1), out(inpt0, cid20)).
+conn(in(xor2, cod20, 2), out(and2, ce20)).
+
+conn(in(xor2, cod21, 1), out(inpt0, cid21)).
+conn(in(xor2, cod21, 2), out(and2, ce21)).
+
+conn(in(xor2, cod22, 1), out(inpt0, cid22)).
+conn(in(xor2, cod22, 2), out(and2, ce22)).
+
+conn(in(xor2, cod23, 1), out(inpt0, cid23)).
+conn(in(xor2, cod23, 2), out(and2, ce23)).
+
+conn(in(xor2, cod24, 1), out(inpt0, cid24)).
+conn(in(xor2, cod24, 2), out(and2, ce24)).
+
+conn(in(xor2, cod25, 1), out(inpt0, cid25)).
+conn(in(xor2, cod25, 2), out(and2, ce25)).
+
+conn(in(xor2, cod26, 1), out(inpt0, cid26)).
+conn(in(xor2, cod26, 2), out(and2, ce26)).
+
+conn(in(xor2, cod27, 1), out(inpt0, cid27)).
+conn(in(xor2, cod27, 2), out(and2, ce27)).
+
+conn(in(xor2, cod28, 1), out(inpt0, cid28)).
+conn(in(xor2, cod28, 2), out(and2, ce28)).
+
+conn(in(xor2, cod29, 1), out(inpt0, cid29)).
+conn(in(xor2, cod29, 2), out(and2, ce29)).
+
+conn(in(xor2, cod30, 1), out(inpt0, cid30)).
+conn(in(xor2, cod30, 2), out(and2, ce30)).
+
+conn(in(xor2, cod31, 1), out(inpt0, cid31)).
+conn(in(xor2, cod31, 2), out(and2, ce31)).

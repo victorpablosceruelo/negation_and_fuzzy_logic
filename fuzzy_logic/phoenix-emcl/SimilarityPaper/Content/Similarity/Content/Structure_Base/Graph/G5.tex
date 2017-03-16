@@ -1,0 +1,49 @@
+\begin{center}
+\begin{tikzpicture}[yscale=-1,
+place/.style={circle,draw=black, fill=black, inner sep=0pt, 
+              minimum size=1mm}]
+
+  \node[place] (1st) at (3, 0) [label=above: $N_{p_c}$,
+                                label=left: 
+             \begin{tabular}{l}
+               $\tau$\\
+               credit value: $c$\\
+               $OP$\\
+             \end{tabular}
+] {};
+	\node[place] (2nd) at (0, 1.5) [label=below: $N_{p_1}$,
+							label=right: 
+             \begin{tabular}{l}
+            $\tau_{p_1}$\\
+             \end{tabular}
+	] {};
+	\node[place] (3rd) at (2, 1.5) [label=below: $N_{p_n}$,
+							  label=right: 
+             \begin{tabular}{l}
+            $\tau_{p_n}$\\
+             \end{tabular}
+	] {}; 
+        \node[place] (4rd) at (4, 1.5) [label=below: $N_{\alpha}$,
+        						  label=right: 
+             \begin{tabular}{l}
+            $\alpha$\\
+            $id$\\
+             \end{tabular}
+        ] {}; 
+        \node[place] (5rd) at (6, 1.5) [label=below: $N_{\alpha}$,
+        						  label=right: 
+             \begin{tabular}{l}
+            $\alpha$\\
+            $id$
+             \end{tabular}
+	] {}; 
+
+	\node (dots) at (1,1.5) {$\cdots$};
+        \node (dots) at (5,1.5) {$\cdots$};
+	
+	\draw[->, thick] (1st) -- (2nd);
+	\draw[->, thick] (1st) -- (3rd);
+        \draw[->, thick] (1st) -- (4rd);
+        \draw[->, thick] (1st) -- (5rd);
+\end{tikzpicture}
+\end{center}   

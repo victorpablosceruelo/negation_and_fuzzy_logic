@@ -1,0 +1,5 @@
+
+:-module(ex_intneg_02, [p / 1]).
+
+p(s(X)) :- a(X,Y), b(Y,X).
+p(f(X)) :- a(X,f(Y)), p(Y).

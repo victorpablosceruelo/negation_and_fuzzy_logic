@@ -1,0 +1,22 @@
+The files in this directory breakdown as follows.
+
+These contain Amadeo's Prolog implementation of the higher order pattern described in (paper reference):
+	hnorm.pl
+	lambda_terms.pl
+	pattern_unify.pl
+
+These make up the lprolog packages:
+	lprolog.pl
+	lprolog_ops.pl
+	lprolog_rt.pl
+	lprolog_tr.pl
+	lprolog_tr_aux.pl
+	lprolog_tr_goal.pl
+"lprolog.pl" defines the module and declares the translations predicates. It imports the other files.
+"lprolog_tr.pl" contains the "higher level" framework code for the translation
+"lprolog_tr_goal.pl" contains of the code for translation of goals for the new HO features
+"lprolog_tr_aux.pl" has some additional translation code used by the above two
+(specifically for creation of HO terms).
+"lprolog_rt.pl" defines the runtime predicates used by the translated code.
+"lprolog_ops.pl" just contains the operator declarations.
+

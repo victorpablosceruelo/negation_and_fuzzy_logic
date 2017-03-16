@@ -1,0 +1,13 @@
+/home/clip/Systems/ciaopp-0.8/bin/ciaopp
+dump_ai(pred)! ppregtypes, 
+
+1.- Size inference (+ types, modes)
+    - revf.pl
+
+2.- Validation / debugging
+    - revf_assrt.pl
+
+3.- Granularity control
+    - qsort_func.pl
+
+shfr, eterms, user, com_child, off, off, user, 

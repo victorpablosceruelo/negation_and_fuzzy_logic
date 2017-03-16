@@ -1,0 +1,84 @@
+\begin{thebibliography}{10}
+
+\bibitem{Barbuti1}
+R.~Barbuti, D.~Mancarella, D.~Pedreschi, and F.~Turini.
+\newblock Intensional negation of logic programs.
+\newblock {\em LNCS}, 250:96--110, 1987.
+
+\bibitem{Barbuti2}
+R.~Barbuti, D.~Mancarella, D.~Pedreschi, and F.~Turini.
+\newblock A transformational approach to negation in logic programming.
+\newblock {\em JLP}, 8(3):201--228, 1990.
+
+\bibitem{Bruscoli}
+P.~Bruscoli, F.~Levi, G.~Levi, and M.~C. Meo.
+\newblock {C}ompilative {C}onstructive {N}egation in {C}onstraint {L}ogic
+  {P}rograms.
+\newblock In Sophie Tyson, editor, {\em Proc. of the Nineteenth International
+  Colloquium on Trees in Algebra and Programming, CAAP '94}, volume 787 of {\em
+  LNCS}, pages 52--67, Berlin, 1994. Springer-Verlag.
+
+\bibitem{CIAO}
+F.~Bueno.
+\newblock {\em The CIAO Multiparadigm Compiler: A User's Manual}, 1995.
+
+\bibitem{Carlsson}
+M.~Carlsson.
+\newblock Freeze, indexing, and other implementation issues in the wam.
+\newblock In {\em ICLP}, pages 40--58. The MIT Press, 1987.
+
+\bibitem{Chan1}
+D.~Chan.
+\newblock Constructive negation based on the complete database.
+\newblock In {\em Proc. Int. Conference on LP'88}, pages 111--125. The MIT
+  Press, 1988.
+
+\bibitem{Chan2}
+D.~Chan.
+\newblock An extension of constructive negation and its application in
+  coroutining.
+\newblock In {\em Proc. NACLP'89}, pages 477--493. The MIT Press, 1989.
+
+\bibitem{Goedel}
+P.~M. Hill and J.~W. Lloyd.
+\newblock {\em The G{\"o}del Programming Language}.
+\newblock The MIT Press, 1994.
+
+\bibitem{Moreno1}
+J.~J. Moreno-Navarro.
+\newblock Default rules: An extension of constructive negation for
+  narrowing-based languages.
+\newblock In {\em Proc. ICLP'94}, pages 535--549. The MIT Press, 1994.
+
+\bibitem{SusanaPADL2000}
+S.~Mu{\~n}oz and J.~J. Moreno-Navarro.
+\newblock How to incorporate negation in a prolog compiler.
+\newblock In E.~Pontelli and V.~Santos Costa, editors, {\em 2nd International
+  Workshop PADL'2000}, volume 1753 of {\em LNCS}, pages 124--140, Boston, MA
+  (USA), 2000. Springer-Verlag.
+
+\bibitem{SusanaLPAR01}
+S.~Mu{\~n}oz, J.~J. Moreno-Navarro, and M.~Hermenegildo.
+\newblock Efficient negation using abstract interpretation.
+\newblock In R.~Nieuwenhuis and A.~Voronkov, editors, {\em Logic for
+  Programming, Artificial Intelligence and Reasoning}, number 2250 in LNAI,
+  pages 485--494, La Habana (Cuba), 2001. LPAR 2001.
+
+\bibitem{Naish}
+L.~Naish.
+\newblock Negation and quantifiers in {NU-Prolog}.
+\newblock In E.~Shapiro, editor, {\em Proceedings 3rd ICLP}, London, UK, July
+  1986. Springer-Verlag.
+
+\bibitem{nai}
+A.~Di Pierro, M.~Martelli, and C.~Palamidessi.
+\newblock Negation as instantiation.
+\newblock {\em Information and Computation}, 120(2):263--278, 1995.
+
+\bibitem{Stuckey95}
+P.~Stuckey.
+\newblock Negation and constraint logic programming.
+\newblock In {\em Information and Computation}, volume 118(1), pages 12--33,
+  1995.
+
+\end{thebibliography}

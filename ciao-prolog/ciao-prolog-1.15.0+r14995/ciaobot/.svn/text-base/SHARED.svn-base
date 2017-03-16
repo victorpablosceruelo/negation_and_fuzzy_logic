@@ -1,0 +1,1158 @@
+## -*- mode: Makefile; -*-
+##
+## SHARED
+##
+## Made by Edison Mera
+## Modified by Jose F. Morales
+##
+## Started on  Wed Oct  4 16:49:45 2006 Edison Mera
+## Last update Wed Oct 13 15:14:26 2010 Edison Mera
+##
+
+## ----------------------------------------------------------------------------
+## Note: This file is part of the Ciao Bot. Its source is in the
+## Ciao repository, only change it in a working copy, otherwise the
+## changes made by you will be lost.
+## ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Options shared with all `installed' Makefiles
+# ----------------------------------------------------------------------------
+
+include SETTINGS
+include hosts/$(HOSTNAME).cfg
+include COMMON
+
+.SUFFIX: .install .slavesrclog .slavenoalib .slavebinlog .slavesrccmd .slavenoacmd .slavebincmd
+
+# Directory used to test installation
+ROOTPREFIX=/tmp/pack_ciaode_${USER}
+
+RUN_AT_SVN_REPO_USERHOST:=$(SSH) $(SVN_REPO_USERHOST)
+
+TARGETNAME:=CiaoDE
+TARGET:=$(TARGETNAME)
+BUILDSOURCEDIR:=$(BUILDBASE)$(TARGET)
+DESTDIR:=$(BUILDSOURCEDIR)
+CIAOARCH:=$(shell ./ciao_get_arch)
+REPOSITORYROOT:=svn+ssh://$(SVN_REPO_USERHOST)$(SVN_REPO_ROOT)
+
+REMOTETMPDIR:=~/tmp/
+
+HOOK_CONDITION_MAIL[src]=( ./sshcmd.sh "$(RUN_AT_LOG_REPO_HOST)" "cat $(LOGSRCVERSION)$(MASTER_HOST)/regr/$(MAILFLAG)" > /dev/null ) ||
+HOOK_CONDITION_MAIL[noa]=$(HOOK_CONDITION_MAIL[src])
+HOOK_CONDITION_MAIL[bin]=$(HOOK_CONDITION_MAIL[src])
+HOOK_CONDITION_MAIL[svn]=
+
+HOOK_AFTER_MAIL[src]=$(RM) /tmp/$(MAILFLAG)
+HOOK_AFTER_MAIL[noa]=$(HOOK_AFTER_MAIL[src])
+HOOK_AFTER_MAIL[bin]=$(HOOK_AFTER_MAIL[noa])
+HOOK_AFTER_MAIL[svn]=
+
+CIAOVERSION?=$(shell   svn cat -r $(NEWVERSION) $(REPOSITORY)/ciao/version/GlobalVersion).$(shell   svn cat -r $(NEWVERSION) $(REPOSITORY)/ciao/version/GlobalPatch)
+CIAOVERSION:=$(CIAOVERSION)
+CIAOPPVERSION?=$(shell svn cat -r $(NEWVERSION) $(REPOSITORY)/ciaopp/version/GlobalVersion).$(shell svn cat -r $(NEWVERSION) $(REPOSITORY)/ciaopp/version/GlobalPatch)
+CIAOPPVERSION:=$(CIAOPPVERSION)
+LPDOCVERSION?=$(shell  svn cat -r $(NEWVERSION) $(REPOSITORY)/lpdoc/version/GlobalVersion).$(shell  svn cat -r $(NEWVERSION) $(REPOSITORY)/lpdoc/version/GlobalPatch)
+LPDOCVERSION:=$(LPDOCVERSION)
+
+PBUNDLE_BASE=$(TARGETNAME)-$(CIAOVERSION)-$(NEWVERSION)
+
+TARBASE[src]:=$(PBUNDLE_BASE).tar.gz
+TARBASE[noa]:=$(PBUNDLE_BASE)-noarch.tar.gz
+TARBASE[bin]:=$(PBUNDLE_BASE)-bin-$(CIAOARCH).tar.gz
+
+TARBASE:=$(TARBASE[$(SOURCETYPE)])
+TARFILE:=$(BUILDBASE)$(TARBASE)
+
+CIAODEVER:=$(PBUNDLE_BASE)
+
+PBUNDLE_BUILD_DIR=$(BUILDSOURCEDIR)/build/pbundle/
+
+VERSIONFILE:=$(HOSTNAME)_version
+ABSVERSIONFILE:=$(VERSIONDIR)$(VERSIONFILE)
+
+# This is only for information
+ACTVERFILE:=$(HOSTNAME)_new_version
+ABSACTVERFILE:=$(VERSIONDIR)$(ACTVERFILE)
+ACTVERSION=`cat $(ABSACTVERFILE)`
+
+# Note that CURVERSION is defined using ``.  That is due to the file
+# ABSVERSIONFILE would not exist yet
+CURVERSION=`cat $(ABSVERSIONFILE)`
+
+LOCKFILE:=$(HOSTNAME).lck
+ABSLOCKFILE:=$(LOCKDIR)$(LOCKFILE)
+LOCKPID:=`if [ -f $(ABSLOCKFILE) ] ; then cat $(ABSLOCKFILE) ; fi`
+
+LOGSRCVERSION=$(LOGSRC)$(NEWVERSION)/
+
+LOGSRCPATH=$(LOGSRCVERSION)$(HOSTNAME)/
+
+DOINGFILE=$(LOGSRCPATH)regr/doing
+STATUSFILE=$(LOGSRCPATH)regr/status
+
+# If the file ABSMAILFLAG is created, a mail with differences were
+# sent to the list, so don't disturb sending other mail with similar
+# errors.
+
+MAILFLAG=mail.log
+ABSMAILFLAG=$(LOGSRCPATH)regr/$(MAILFLAG)
+
+DIFFLABEL=$(CURVERSION):$(NEWVERSION)
+DIFFFILENAME=$(CURVERSION)_$(NEWVERSION).diff
+ABSDIFFFILENAME=$(LOGSRCPATH)regr/$(DIFFFILENAME)
+
+FILTER_AUTHOR=filter_author_$(HOSTNAME)
+
+REVISIONAUTHORS=$(shell \
+	if [ -f $(ABSVERSIONFILE) ] && [ ! x$(NEWVERSION) = x ] ; then \
+	  svn log $(REPOSITORY) -r $(DIFFLABEL) --xml ; \
+	fi | ./$(FILTER_AUTHOR))
+
+MAKECMD= \
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) \
+	SOURCETYPE=$(SOURCETYPE) \
+	BRANCH=$(BRANCH) \
+	HOSTNAME=$(HOSTNAME) \
+	SSH='$(SSH)' \
+	TIMESTAMP=$(TIMESTAMP) \
+	NEWVERSION=$(NEWVERSION) \
+	CIAOVERSION=$(CIAOVERSION) \
+	CIAOPPVERSION=$(CIAOPPVERSION) \
+	LPDOCVERSION=$(LPDOCVERSION)
+
+MAKECMDSLAVE= \
+	$(MAKE) $(MFLAGS) -f SHARED \
+	BRANCH=$(BRANCH) \
+	SSH='$(SSH)' \
+	TIMESTAMP=$(TIMESTAMP) \
+	NEWVERSION=$(NEWVERSION) \
+	CIAOVERSION=$(CIAOVERSION) \
+	CIAOPPVERSION=$(CIAOPPVERSION) \
+	LPDOCVERSION=$(LPDOCVERSION)
+
+.PHONY: justtest test cleantest gen_pbundle__host_$(HOSTNAME) gen_pbundle__noa_tgz \
+	gen_pbundle__bin_tgz gen_pbundle__osarch_cross_debian gen_pbundle__rpm \
+	gen_pbundle__rpm_version gen_pbundle__rpm_separated \
+	justcmdslaves_srclog justcmdslaves_noalog justcmdslaves_binlog
+
+# Shared options:
+
+$(FILTER_AUTHOR): filter_author.c
+	$(CC) -o $(FILTER_AUTHOR) filter_author.c
+
+problems_getting_source_msg:
+	@echo "ERROR ($(HOSTNAME)): Unable to get the source code of $(NEWVERSION)."
+	@echo "	     Please verify the internet connection."
+
+runningbuild_busy_msg:
+	@echo "NOTE ($(HOSTNAME)): Compilation of $(ACTVERSION) in progress.  PID $(LOCKPID)."
+
+init_compilation_system_msg:
+	@echo "NOTE ($(HOSTNAME)): Initializing compilation at version $(NEWVERSION)."
+
+reqdirs:
+	mkdir -p $(LOGSRCPATH)regr
+	mkdir -p $(LOGSRCPATH)diff
+	mkdir -p $(BUILDBASE)
+
+justcleantest:
+	$(RM) -r $(BUILDROOTDIR)$(BRANCH)
+
+justkill:
+	if ( test -f $(ABSLOCKFILE) && ./procexists.sh $(LOCKPID) ) ; then \
+	  /bin/kill -9 $(shell $(BUILDROOTDIR)childpids.sh $(LOCKPID)) ; \
+	  if [ -f $(ABSACTVERFILE) ] ; then \
+	    echo killed > $(LOGSRC)$(ACTVERSION)/$(HOSTNAME)/regr/status ; \
+	  fi ; \
+	  echo "NOTE ($(HOSTNAME)): Killed build" ; \
+	else \
+	  echo "NOTE ($(HOSTNAME)): No build running" ; \
+	fi
+
+justtestnet:
+	@echo `./sshcmd.sh "$(RUN_AT_LOG_REPO_HOST)"     "echo NOTE" || echo ERROR`" ($(HOSTNAME)): Testing RUN_AT_LOG_REPO_HOST, $(RUN_AT_LOG_REPO_HOST)"
+	@echo `./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)"   "echo NOTE" || echo ERROR`" ($(HOSTNAME)): Testing SVN_REPO_USERHOST, $(RUN_AT_SVN_REPO_USERHOST)"
+	@echo `./sshcmd.sh "$(RUN_AT_PBUNDLE_REPO_HOST)" "echo NOTE" || echo ERROR`" ($(HOSTNAME)): Testing RUN_AT_PBUNDLE_REPO_HOST, $(RUN_AT_PBUNDLE_REPO_HOST)"
+# Add hoc case:
+	@if [ x$(HOSTNAME) = xvmfedora ] ; then \
+	  echo `./sshcmd.sh "$(HOST_CROSSDEB)" "echo NOTE" || echo ERROR`" ($(HOSTNAME)): Testing HOST_CROSSDEB, $(HOST_CROSSDEB)" ; \
+	  fi
+
+juststatus:
+	if ( test -f $(ABSLOCKFILE) && ./procexists.sh $(LOCKPID) ) ; then \
+	  if [ -f $(ABSACTVERFILE) ] ; then \
+	    $(MAKECMD) NEWVERSION=$(ACTVERSION) statusyes ; \
+	  else \
+	    $(MAKECMD) statusyes ; \
+	  fi ; \
+	elif [ -f $(ABSVERSIONFILE) ] ; then \
+	  $(MAKECMD) NEWVERSION=$(CURVERSION) statusno ; \
+	else \
+	  echo "   Host '$(HOSTNAME)': No running process (no previous information available)" ; \
+	fi
+
+statusyes:
+	@echo "   Host '$(HOSTNAME)': Process running (revision=$(NEWVERSION), doing=$(shell \
+	  if [ -f $(DOINGFILE) ]; then cat $(DOINGFILE); fi), pid="$(LOCKPID)")"
+
+statusno:
+	@if [ -f $(STATUSFILE) ] ; then \
+	  echo "   Host '$(HOSTNAME)': No running process (revision=$(NEWVERSION), status=`cat $(STATUSFILE)`)" ; \
+	else \
+	  echo "   Host '$(HOSTNAME)': No running process (revision=$(NEWVERSION))" ; \
+	fi
+
+justlist:
+	@echo $(HOSTNAME)
+
+buildall: test
+
+BUILDSLAVESLOG_SRC=$(addsuffix .slavesrclog, $(BUILDSLAVES_SRC))
+BUILDSLAVESCMD_SRC=$(addsuffix .slavesrccmd, $(BUILDSLAVES_SRC))
+
+BUILDSLAVESLOG_NOA=$(addsuffix .slavenoalog, $(BUILDSLAVES_NOA))
+BUILDSLAVESCMD_NOA=$(addsuffix .slavenoacmd, $(BUILDSLAVES_NOA))
+
+BUILDSLAVESLOG_BIN=$(addsuffix .slavebinlog, $(BUILDSLAVES_BIN))
+BUILDSLAVESCMD_BIN=$(addsuffix .slavebincmd, $(BUILDSLAVES_BIN))
+
+BUILDSLAVES_LOG=$(BUILDSLAVESLOG_SRC) $(BUILDSLAVESLOG_NOA) $(BUILDSLAVES_BINLOG)
+BUILDSLAVES_CMD=$(BUILDSLAVESCMD_SRC) $(BUILDSLAVESCMD_NOA) $(BUILDSLAVESCMD_BIN)
+
+commandslaves: just$(COMMANDSLAVES) $(BUILDSLAVES_CMD)
+
+cmdslaveslog: $(BUILDSLAVES_LOG)
+
+cmdslaveslog_src: $(BUILDSLAVESLOG_SRC)
+
+cmdslaveslog_noa: $(BUILDSLAVESLOG_NOA)
+
+cmdslaveslog_bin: $(BUILDSLAVESLOG_BIN)
+
+justcmdslaves_srclog: pre_src_pbundle_$(SOURCETYPE)
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) PPID=$(PPID) cmdslaveslog_src
+
+justcmdslaves_noalog: pre_noa_pbundle_$(SOURCETYPE)
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) PPID=$(PPID) just$(COMMANDSLAVES) cmdslaveslog_noa
+
+justcmdslaves_binlog: pre_bin_pbundle_$(SOURCETYPE)
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) PPID=$(PPID) cmdslaveslog_bin
+
+justcmdslaves: justcmdslaves_srclog justcmdslaves_noalog justcmdslaves_binlog
+
+pre_noa_pbundle_$(SOURCETYPE): pre_src_pbundle_$(SOURCETYPE)
+
+pre_bin_pbundle_$(SOURCETYPE): pre_noa_pbundle_$(SOURCETYPE)
+
+justtest:
+	if [ x$(NEWVERSION) = x ] ; then \
+	  $(MAKECMD) problems_getting_source_msg ; \
+	elif [ ! -f $(ABSVERSIONFILE) ] ; then \
+	  $(MAKECMD) PPID=$(PPID) init_compilation_system_msg compile_src ; \
+	elif [ x$(CURVERSION) = x$(NEWVERSION) ] ; then \
+	  $(MAKECMD) no_version_changed_msg ; \
+	else \
+	  $(MAKECMD) PPID=$(PPID) version_changed_msg recompile_src ; \
+	fi
+
+slave_test:
+	@echo ":: Test started at `date` in $(HOSTNAME)"
+	if [ -f $(STATUSFILE) ] \
+	  && [ x`cat $(STATUSFILE)` = xerror ] ; then \
+	  BACKUP_LOG_OPT_CMD=0 ; \
+	  echo "NOTE ($(HOSTNAME)): Previous test was aborted." ; \
+	  echo "     Skipping recompilation of $(NEWVERSION)." ; \
+	elif [ -f $(ABSLOCKFILE) ] && ./procexists.sh $(LOCKPID) ; then \
+	  BACKUP_LOG_OPT_CMD=0 ; \
+	  $(MAKECMD) runningbuild_busy_msg ; \
+	else \
+	  BACKUP_LOG_OPT_CMD=1 ; \
+	  ( $(MAKECMD) PPID=$${PPID} justtest ) || \
+	    ( $(MAKECMD) DOINGCMD=`cat $(DOINGFILE)` error_msg ; $(HOOK_AFTER_FAILURE) ) ; \
+	fi ; \
+	if [ x$${BACKUP_LOG_OPT_CMD} = x1 ] ; then \
+	  $(MAKECMD) backup_log_$(BACKUP_LOG) ; \
+	fi
+	@echo ":: Test finished at `date` in $(HOSTNAME)"
+
+test:
+	@echo ":: Test started at `date` in $(HOSTNAME)"
+	if [ -f $(STATUSFILE) ] \
+	  && [ x`cat $(STATUSFILE)` = xerror ] ; then \
+	  BACKUP_LOG_OPT_CMD=0 ; \
+	  echo "NOTE ($(HOSTNAME)): Previous test was aborted." ; \
+	  echo "     Skipping recompilation of $(NEWVERSION)." ; \
+	elif [ -f $(ABSLOCKFILE) ] && ./procexists.sh $(LOCKPID) ; then \
+	  BACKUP_LOG_OPT_CMD=0 ; \
+	  $(MAKECMD) runningbuild_busy_msg ; \
+	else \
+	  BACKUP_LOG_OPT_CMD=1 ; \
+	  ( $(MAKECMD) PPID=$${PPID} justcmdslaves COMMANDSLAVES=test ) || \
+	    ( $(MAKECMD) DOINGCMD=`cat $(DOINGFILE)` error_msg ; $(HOOK_AFTER_FAILURE) ) ; \
+	fi ; \
+	if [ x$${BACKUP_LOG_OPT_CMD} = x1 ] ; then \
+	  $(MAKECMD) backup_log_$(BACKUP_LOG) ; \
+	fi
+	@echo ":: Test finished at `date` in $(HOSTNAME)"
+
+justreset:
+	if [ -f $(STATUSFILE) ] \
+	  && [ x`cat $(STATUSFILE)` = xerror ] ; then \
+	  echo reset > $(STATUSFILE) ; \
+	fi
+
+pre_src_pbundle_src pre_src_pbundle_noa pre_src_pbundle_bin:
+
+pre_src_pbundle_svn:
+	echo $@ > $(DOINGFILE)
+	if [ -f $(ABSVERSIONFILE) ] && [ x$(CURVERSION) = x$(NEWVERSION) ] ; then \
+	  $(MAKECMD) no_version_changed_msg ; \
+	else \
+	  $(MAKECMD) prepare_src && \
+	  $(MAKECMD) prepare_bootstrap && \
+	  $(MAKECMD) gen_bundle_revision && \
+	  $(MAKECMD) gen_pbundle__src && \
+	  $(MAKECMD) gen_pbundle__macport && \
+	  $(MAKECMD) gen_pbundle__descfile && \
+	  $(MAKECMD) copy_pbundle PBUNDLE_SET=1 ; \
+	fi
+
+pre_noa_pbundle_src pre_noa_pbundle_noa pre_noa_pbundle_bin:
+
+pre_noa_pbundle_svn:
+	echo $@ > $(DOINGFILE)
+	if [ -f $(ABSVERSIONFILE) ] && [ x$(CURVERSION) = x$(NEWVERSION) ] ; then \
+	  $(MAKECMD) no_version_changed_msg ; \
+	else \
+	  $(MAKECMD) configure && \
+	  $(MAKECMD) build && \
+	  $(MAKECMD) docs && \
+	  $(MAKECMD) install && \
+	  $(MAKECMD) gen_pbundle__noa_tgz && \
+	  $(MAKECMD) copy_pbundle PBUNDLE_SET=2 ; \
+	fi
+
+pre_bin_pbundle_src pre_bin_pbundle_noa pre_bin_pbundle_bin:
+
+pre_bin_pbundle_svn:
+	echo $@ > $(DOINGFILE)
+	if [ -f $(ABSVERSIONFILE) ] && [ x$(CURVERSION) = x$(NEWVERSION) ] ; then \
+	  $(MAKECMD) no_version_changed_msg ; \
+	else \
+	  $(MAKECMD) gen_pbundle__bin_tgz && \
+	  $(MAKECMD) copy_pbundle PBUNDLE_SET=3 ; \
+	fi
+
+package_svn:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) copy_pbundle PBUNDLE_SET=4
+
+package_install_svn:
+
+package_uninstall_svn:
+
+package_bin package_noa package_src:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) gen_pbundle__host_$(HOSTNAME)
+	$(MAKECMD) copy_pbundle
+	$(MAKECMD) remove_tar
+
+package_install_bin package_install_noa package_install_src:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) install_pbundle__host_$(HOSTNAME)
+
+package_uninstall_bin package_uninstall_noa package_uninstall_src:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) uninstall_pbundle__host_$(HOSTNAME)
+
+remove_tar:
+	echo $@ > $(DOINGFILE)
+	$(RM) $(PBUNDLE_BUILD_DIR)/$(TARBASE)
+
+status:
+	$(MAKECMD) commandslaves COMMANDSLAVES=status
+
+cleantest:
+	$(MAKECMD) commandslaves COMMANDSLAVES=cleantest
+
+kill:
+	$(MAKECMD) commandslaves COMMANDSLAVES=kill
+
+reset:
+	$(MAKECMD) commandslaves COMMANDSLAVES=reset
+
+list:
+	$(MAKECMD) commandslaves COMMANDSLAVES=list
+
+showinfo:
+	$(MAKECMD) commandslaves COMMANDSLAVES=showinfo
+
+testnet:
+	$(MAKECMD) commandslaves COMMANDSLAVES=testnet
+
+
+# Those are not files, but commands than can be run in parallel
+
+%.slavesrccmd:
+	./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(MAKECMDSLAVE) -C $(BUILDROOTDIR) just$(COMMANDSLAVES) SOURCETYPE=src HOSTNAME=$*" || \
+	  echo "WARNING ($(HOSTNAME)): Unable to run $(COMMANDSLAVES) in $*"
+
+%.slavenoacmd:
+	./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(MAKECMDSLAVE) -C $(BUILDROOTDIR) just$(COMMANDSLAVES) SOURCETYPE=noa HOSTNAME=$*" || \
+	  echo "WARNING ($(HOSTNAME)): Unable to run $(COMMANDSLAVES) in $*"
+
+%.slavebincmd:
+	./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(MAKECMDSLAVE) -C $(BUILDROOTDIR) just$(COMMANDSLAVES) SOURCETYPE=bin HOSTNAME=$*" || \
+	  echo "WARNING ($(HOSTNAME)): Unable to run $(COMMANDSLAVES) in $*"
+
+%.slavesrclog:
+	mkdir -p $(LOGSRCVERSION)$*/regr/$(COMMANDSLAVES)
+	./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(MAKECMDSLAVE) -C $(BUILDROOTDIR) slave_$(COMMANDSLAVES) SOURCETYPE=src HOSTNAME=$*" $(SAVELOGSLAVE) || \
+	  echo "WARNING ($(HOSTNAME)): Unable to run $(COMMANDSLAVES) in $*"
+
+%.slavenoalog:
+	mkdir -p $(LOGSRCVERSION)$*/regr/$(COMMANDSLAVES)
+	./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(MAKECMDSLAVE) -C $(BUILDROOTDIR) slave_$(COMMANDSLAVES) SOURCETYPE=noa HOSTNAME=$*" $(SAVELOGSLAVE) || \
+	  echo "WARNING ($(HOSTNAME)): Unable to run $(COMMANDSLAVES) in $*"
+
+%.slavebinlog:
+	mkdir -p $(LOGSRCVERSION)$*/regr/$(COMMANDSLAVES)
+	./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(MAKECMDSLAVE) -C $(BUILDROOTDIR) slave_$(COMMANDSLAVES) SOURCETYPE=bin HOSTNAME=$*" $(SAVELOGSLAVE) || \
+	  echo "WARNING ($(HOSTNAME)): Unable to run $(COMMANDSLAVES) in $*"
+
+compile_src:
+	$(MAKECMD) pre_compile_$(SOURCETYPE) PPID=$(PPID)
+	$(MAKECMD) just_compile_src
+	$(MAKECMD) send_startup_mail
+	$(MAKECMD) just_compile_end
+
+recompile_src:
+	$(MAKECMD) pre_compile_$(SOURCETYPE) PPID=$(PPID)
+	$(MAKECMD) just_compile_src
+	$(MAKECMD) send_changes_mail
+	$(MAKECMD) just_compile_end
+
+pre_compile_src pre_compile_noa pre_compile_bin: prepare_src
+
+pre_compile_svn:
+
+prepare_src: reqdirs
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) lockfile PPID=$(PPID)
+	$(MAKECMD) update_$(SOURCETYPE)
+
+update_svn: checkout_ciao
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) properclean
+
+update_bin update_src update_noa: unpack
+
+# We copy the files instead of move to work around a bug in Windows:
+# sometimes is not possible to move the directory correctly, because
+# $(TARGETNAME) can not be deleted completely.
+unpack:
+	echo $@ > $(DOINGFILE)
+	./sshcmd.sh "$(RUN_AT_PBUNDLE_REPO_HOST)" \
+	  "cat $(PBUNDLE_REPO_DIR)$(NEWVERSION)/$(TARBASE)" > $(TARFILE)
+	$(MAKECMD) clean
+	$(MAKECMD) unpack_$(CIAOARCH)
+	$(MAKECMD) restore_pbundle
+
+clean:
+	echo $@ > $(DOINGFILE)
+	-$(RM) -r $(BUILDBASE)$(TARGETNAME)
+#	-$(RM) -r $(BUILDBASE)$(CIAODEVER)
+
+ifeq ($(CIAOARCH),Win32i86)
+unpack_Win32i86:
+	echo $@ > $(DOINGFILE)
+	cd $(BUILDBASE) && \
+	  gzip -d -c $(TARFILE) | $(TAR) -xf - $(SAVELOGUNPACK) && \
+	  cp -rT $(CIAODEVER) $(TARGETNAME) && \
+	  $(RM) -r $(CIAODEVER)
+else
+unpack_$(CIAOARCH):
+	echo $@ > $(DOINGFILE)
+	cd $(BUILDBASE) && \
+	  gzip -d -c $(TARFILE) | $(TAR) -xf - $(SAVELOGUNPACK) && \
+	  $(RM) -r $(TARGETNAME) && \
+	  mv $(CIAODEVER) $(TARGETNAME)
+endif
+
+# Restore the directory for storing pbundles
+restore_pbundle:
+	echo $@ > $(DOINGFILE)
+	mkdir -p $(PBUNDLE_BUILD_DIR) && \
+	touch $(PBUNDLE_BUILD_DIR)/NODISTRIBUTE && \
+	mv -f $(TARFILE) $(PBUNDLE_BUILD_DIR)/$(TARBASE)
+
+just_compile_src: just_compile_src_$(TESTTYPE)
+
+just_compile_src_full:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) configure_$(SOURCETYPE)
+	$(MAKECMD) build_$(SOURCETYPE)
+	$(MAKECMD) build_engine_profile
+	$(MAKECMD) build_engine_profile_debug
+	$(MAKECMD) build_engine_nodebug
+	$(MAKECMD) docs_$(SOURCETYPE)
+	$(MAKECMD) install_$(SOURCETYPE)
+	$(MAKECMD) package_$(SOURCETYPE)
+	$(MAKECMD) package_install_$(SOURCETYPE)
+	$(MAKECMD) package_uninstall_$(SOURCETYPE)
+	$(MAKECMD) alltests
+	$(MAKECMD) uninstall
+	$(MAKECMD) savelog
+	$(MAKECMD) properclean
+
+just_compile_src_norm:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) configure_$(SOURCETYPE)
+	$(MAKECMD) build_$(SOURCETYPE)
+	$(MAKECMD) build_engine_profile
+	$(MAKECMD) build_engine_profile_debug
+	$(MAKECMD) build_engine_nodebug
+	$(MAKECMD) docs_$(SOURCETYPE)
+	$(MAKECMD) install_$(SOURCETYPE)
+	$(MAKECMD) package_$(SOURCETYPE)
+	$(MAKECMD) package_install_$(SOURCETYPE)
+	$(MAKECMD) package_uninstall_$(SOURCETYPE)
+	$(MAKECMD) savelog
+	$(MAKECMD) properclean
+
+just_compile_src_fast:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) configure_$(SOURCETYPE)
+	$(MAKECMD) build_$(SOURCETYPE)
+	$(MAKECMD) build_engine_profile
+	$(MAKECMD) build_engine_profile_debug
+	$(MAKECMD) build_engine_nodebug
+	$(MAKECMD) docs_$(SOURCETYPE)
+	$(MAKECMD) install_$(SOURCETYPE)
+	$(MAKECMD) package_$(SOURCETYPE)
+	$(MAKECMD) savelog
+	$(MAKECMD) properclean
+
+just_compile_end:
+	echo $@ > $(DOINGFILE)
+	$(MAKECMD) versionfile
+	$(MAKECMD) unlockfile
+	$(HOOK_AFTER_COMPILE)
+
+checkout_ciao:
+	echo $@ > $(DOINGFILE)
+	-cd $(BUILDBASE) && svn co -r $(NEWVERSION) $(REPOSITORY) \
+	  $(TARGET)/ $(SAVELOGFILECMD) || \
+	  ( \
+	    echo "NOTE: Update Failed, trying to checkout a new copy:" && \
+	    $(RM) -r $(BUILDSOURCEDIR)/ && \
+	    cd $(BUILDBASE) && \
+	    svn co -r $(NEWVERSION) $(REPOSITORY) $(TARGET)/ \
+	     $(SAVELOGFILECMD) \
+	  )
+
+versionfile: backup_versionfile_$(BACKUP_LOG)
+	echo $@ > $(DOINGFILE)
+	echo $(NEWVERSION) > $(ABSVERSIONFILE)
+
+backup_versionfile_yes: backup_versionfile
+
+backup_versionfile_:
+
+backup_versionfile_no:
+
+backup_versionfile:
+	echo $@ > $(DOINGFILE)
+	./sshcmd.sh "$(RUN_AT_LOG_REPO_HOST)" "echo $(NEWVERSION) > $(ABSVERSIONFILE)"
+
+lockfile:
+	echo $@ > $(DOINGFILE)
+	echo $(PPID) > $(ABSLOCKFILE)
+	echo $(NEWVERSION) > $(ABSACTVERFILE)
+	echo working > $(STATUSFILE)
+
+unlockfile:
+	echo $@ > $(DOINGFILE)
+	$(RM) $(ABSLOCKFILE)
+	$(RM) $(ABSACTVERFILE)
+	echo done > $(DOINGFILE)
+	echo done > $(STATUSFILE)
+
+no_version_changed_msg:
+	@echo "NOTE ($(HOSTNAME)): No version changed."
+	@echo "     Skipping recompilation of $(CURVERSION)."
+
+version_changed_msg:
+	@echo "NOTE ($(HOSTNAME)): Version has changed, $(DIFFLABEL)."
+	@echo "     Recompiling."
+
+# The empty echo | is to disable tty
+
+clean_bin:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  $(CONFIGURE_VARS) $(CIAOSETUP) clean_bin > \
+	  $(LOGSRCPATH)diff/clean_bin.log 2>&1
+
+configure_noa configure_bin configure_src: configure
+
+configure_svn:
+
+configure:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  $(CONFIGURE_VARS) $(CIAOSETUP) configure $(CONFIGURE_OPTS) $(SAVELOGFILECMD)
+
+build_src: build
+
+build_noa: build_nolibs
+
+build_svn build_bin:
+
+build:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) build $(SAVELOGFILECMD)
+
+# TODO: there should be a simpler command in CIAOSETUP to do this
+build_engine_profile:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | ( \
+	  $(CIAOSETUP) configure $(CONFIGURE_OPTS) --debug-level=profile && \
+	  $(CIAOSETUP) clean_engine && \
+	  $(CIAOSETUP) clean_profiler && \
+	  $(CIAOSETUP) build engine && \
+	  $(CIAOSETUP) build static_engine && \
+	  $(CIAOSETUP) build profiler \
+	) $(SAVELOGFILECMD)
+
+build_engine_profile_debug:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | ( \
+	  $(CIAOSETUP) configure $(CONFIGURE_OPTS) --debug-level=profile-debug && \
+	  $(CIAOSETUP) clean_engine && \
+	  $(CIAOSETUP) clean_profiler && \
+	  $(CIAOSETUP) build engine && \
+	  $(CIAOSETUP) build static_engine && \
+	  $(CIAOSETUP) build profiler \
+	) $(SAVELOGFILECMD)
+
+# TODO: there should be a simpler command in CIAOSETUP to do this
+build_engine_nodebug:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | ( \
+	  $(CIAOSETUP) configure $(CONFIGURE_OPTS) --debug-level=nodebug && \
+	  $(CIAOSETUP) clean_engine && \
+	  $(CIAOSETUP) clean_profiler && \
+	  $(CIAOSETUP) build engine && \
+	  $(CIAOSETUP) build static_engine && \
+	  $(CIAOSETUP) build profiler \
+	) $(SAVELOGFILECMD)
+
+build_nolibs:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) build nolibs $(SAVELOGFILECMD)
+
+build_platdep:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) build platdep $(SAVELOGFILECMD)
+
+install_noa install_bin install_src: install
+
+install_svn:
+
+install:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(INSTALL_VARS) $(CIAOSETUP) install $(SAVELOGFILECMD)
+
+uninstall:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(UNINSTALL_VARS) $(CIAOSETUP) uninstall $(SAVELOGFILECMD)
+
+docs_src: docs
+
+docs_svn docs_noa docs_bin:
+
+docs:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(INSTALL_VARS) $(CIAOSETUP) docs $(SAVELOGFILECMD)
+
+## This option have a time-out defined, but it do not stop the compile
+## farm if something bad happens:
+
+# docs:
+# 	echo $@ > $(DOINGFILE)
+# 	-cd $(DESTDIR)/ && \
+# 	  echo | $(INSTALL_VARS) $(TIMEOUT) $(TIMEOUT_DOCS) $(CIAOSETUP) docs \
+# 	    $(SAVELOGFILECMD)
+
+savelog:
+	echo $@ > $(DOINGFILE)
+	-cd $(DESTDIR)/ && \
+	  cp $(BUILDSOURCEDIR)/build/install.log $(LOGSRCPATH)regr/ciaode.log 2>&1
+
+properclean: realclean_$(SOURCETYPE)
+	echo $@ > $(DOINGFILE)
+	$(RM) -r $(ROOTPREFIX)
+
+realclean_svn:
+	echo $@ > $(DOINGFILE)
+	( cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) realclean && \
+	  rm -rf `svn st|grep '^?       '|sed -e s:'\?       '::g` && \
+	  ( for i in `svn st|grep '^M       '|sed -e s:'M       '::g` ; \
+	    do svn revert $${i} ; done ) ) $(SAVELOGFILECMD)
+
+realclean_src realclean_noa realclean_bin:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) realclean $(SAVELOGFILECMD)
+
+distclean:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) distclean $(SAVELOGFILECMD)
+
+build_timingmodel:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) build_timingmodel $(SAVELOGFILECMD)
+
+calibrateciaopp: calibrateciaopp_$(SOURCETYPE)
+
+calibrateciaopp_svn:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) calibrateciaopp $(SAVELOGFILECMD)
+
+calibrateciaopp_src calibrateciaopp_noa calibrateciaopp_bin:
+
+alltests:
+	$(MAKECMD) build_timingmodel
+	$(MAKECMD) runtests
+	$(MAKECMD) runbenchmarks
+	$(MAKECMD) calibrateciaopp
+
+runtests:
+	echo $@ > $(DOINGFILE)
+	-cd $(DESTDIR)/ && \
+	  echo | $(TIMEOUT) $(TIMEOUT_RUNTEST) $(CIAOSETUP) runtests \
+	    $(SAVELOGFILECMD) 2> $(LOGSRCPATH)diff/runtests.err
+
+runbenchmarks:
+	echo $@ > $(DOINGFILE)
+	-cd $(DESTDIR)/ && \
+	  echo | $(TIMEOUT) $(TIMEOUT_RUNBENCHMARKS) $(CIAOSETUP) runbenchmarks \
+	    $(SAVELOGFILECMD) 2> $(LOGSRCPATH)diff/runbenchmarks.err
+
+copy_pbundle:
+	echo $@_$(PBUNDLE_SET) > $(DOINGFILE)
+	./sshcmd.sh "$(RUN_AT_PBUNDLE_REPO_HOST)" "mkdir -p $(PBUNDLE_REPO_DIR)$(NEWVERSION)"
+	$(foreach ITEM_ID,$(PRODUCED_PBUNDLE_ITEMS), \
+	  ./scpcmd.sh $(PBUNDLE_BUILD_DIR)$(PRODUCED_PBUNDLE_ITEM[$(ITEM_ID)]) "$(TAR)" \
+	  "$(RUN_AT_PBUNDLE_REPO_HOST)" $(PBUNDLE_REPO_DIR)$(NEWVERSION)/$(STORED_PBUNDLE_ITEM[$(ITEM_ID)]) \
+	  "$(TAR[$(PBUNDLE_REPO_HOST)])" ; )
+
+commoninfo: $(FILTER_AUTHOR) juststatus
+	@echo PATH=$(PATH)
+	@echo SSH=$(SSH)
+	@echo TAR=$(TAR)
+	@echo MAKE=$(MAKE)
+	@echo make=`which $(MAKE)`
+	@echo MFLAGS=$(MFLAGS)
+	@echo DIFF=$(DIFF)
+	@echo LOGSRC=$(LOGSRC)
+	@echo BUILDSOURCEDIR=$(BUILDSOURCEDIR)
+	@echo CIAOARCH=$(CIAOARCH)
+	@echo ABSVERSIONFILE=$(ABSVERSIONFILE)
+	@echo CIAODEVER=$(CIAODEVER)
+	@echo REVISIONAUTHORS=$(REVISIONAUTHORS)
+	@echo NEWVERSION=$(NEWVERSION)
+	@if [ -f $(ABSVERSIONFILE) ] ; then \
+	    echo CURVERSION=$(CURVERSION) ; \
+	  else \
+	    echo "NOTE: $(ABSVERSIONFILE) undefined yet" ; \
+	  fi
+	@echo ABSMAILFLAG=$(ABSMAILFLAG)
+	@echo ABSLOCKFILE=$(ABSLOCKFILE)
+	@echo LOCKPID=$(LOCKPID)
+	@echo CIAOVERSION=$(CIAOVERSION)
+	@echo CIAOPPVERSION=$(CIAOPPVERSION)
+	@echo LPDOCVERSION=$(LPDOCVERSION)
+	@echo SOURCETYPE=$(SOURCETYPE)
+	@echo BUILDSLAVES_SRC=$(BUILDSLAVES_SRC)
+	@echo BUILDSLAVES_NOA=$(BUILDSLAVES_NOA)
+	@echo BUILDSLAVES_BIN=$(BUILDSLAVES_BIN)
+	@echo MAKECMD=$(MAKECMD)
+	@echo MAKECMDSLAVE=$(MAKECMDSLAVE)
+	@$(foreach ITEM_ID,$(PRODUCED_PBUNDLE_ITEMS), \
+	  echo PRODUCED_PBUNDLE_ITEM[$(ITEM_ID)]=$(PRODUCED_PBUNDLE_ITEM[$(ITEM_ID)]) ; )
+
+send_changes_mail: $(FILTER_AUTHOR)
+	echo $@ > $(DOINGFILE)
+	$(DIFF) -ruN $(LOGSRC)$(CURVERSION)/$(HOSTNAME)/diff \
+	  $(LOGSRCPATH)diff > $(ABSDIFFFILENAME) || \
+	  $(HOOK_CONDITION_MAIL) \
+	  ( \
+	    echo "Sending differences to $(REPORTCHANGESTO)" && \
+	    ( cat $(ABSDIFFFILENAME) | \
+	      ./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)" \
+		"( \
+		echo \"================================================================================\" && \
+		echo \"Commit Authors:\" && \
+	        echo \"--------------------------------------------------------------------------------\" && \
+		echo \"$(REVISIONAUTHORS)\" && \
+	        echo \"--------------------------------------------------------------------------------\" && \
+		echo \"CiaoBot has detected changes in the build and test output.\" && \
+		echo \"Please check that no errors have been introduced.\" && \
+		echo && \
+		echo \"In the host $(HOSTNAME)\" && \
+		echo && \
+		echo \"`uname -a`\" && \
+		echo && \
+		echo \"The log files are available at $(LOG_REPO_URLBASE)tests/$(BRANCH)/log/$(NEWVERSION)/$(HOSTNAME)/\" && \
+		echo \"The pbundles are available at $(PBUNDLE_REPO_URLBASE)ciaopacks/$(BRANCH)/$(NEWVERSION)/\" && \
+		echo && \
+		echo \"The file with changes causing differences in the output is attached to this mail\" && \
+	        echo \"--------------------------------------------------------------------------------\" && \
+		uuencode $(DIFFFILENAME) ) \
+	      | mail -s \"[CiaoBot] Review '$(BRANCH)' $(DIFFLABEL) @ $(HOSTNAME)\" \
+	        $(REPORTCHANGESTO)" ) && \
+	    ./sshcmd.sh "$(RUN_AT_LOG_REPO_HOST)" \
+	      "mkdir -p $(LOGSRCVERSION)$(MASTER_HOST)/regr && \
+	      touch $(LOGSRCVERSION)$(MASTER_HOST)/regr/$(MAILFLAG)" \
+	  )
+	$(HOOK_AFTER_MAIL)
+
+send_startup_mail:
+	echo $@ > $(DOINGFILE)
+	echo "Sending startup message to $(REPORTCHANGESTO)" && \
+	  ( cat $(ABSDIFFFILENAME) | \
+	    ./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)" \
+		"( \
+		echo \"================================================================================\" && \
+		echo \"Starting CiaoBot at version $(NEWVERSION).\" && \
+		echo \"Please check that no critical errors are present.\" && \
+		echo && \
+		echo \"In the host $(HOSTNAME)\" && \
+		echo && \
+		echo \"`uname -a`\" && \
+		echo && \
+		echo \"The log files are available at $(LOG_REPO_URLBASE)tests/$(BRANCH)/log/$(NEWVERSION)/$(HOSTNAME)/\" && \
+		echo \"The pbundles are available at $(PBUNDLE_REPO_URLBASE)ciaopacks/$(BRANCH)/$(NEWVERSION)/\" && \
+	        echo \"--------------------------------------------------------------------------------\" ) \
+	      | mail -s \"[CiaoBot] Starting '$(BRANCH)' $(NEWVERSION) @ $(HOSTNAME)\" \
+	        $(MAINTAINERS)" )
+
+error_msg: $(FILTER_AUTHOR)
+	if [ ! x$(NEWVERSION) = x ] ; then \
+	  echo error > $(STATUSFILE) ; \
+	fi
+	if [ -f $(ABSVERSIONFILE) ] ; then \
+	  FAILEDLABEL=$(DIFFLABEL) ; \
+	else \
+	  FAILEDLABEL=$(NEWVERSION) ; \
+	fi && \
+	( cat $(LOGSRCPATH)$(TARGETDIR[$(DOINGCMD)])/$(DOINGCMD).log \
+	  | ./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)" \
+	    "cat > $(REMOTETMPDIR)$(DOINGCMD).log" ) && \
+	  ( $(MAKECMD) -s justshowinfo | ./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)" \
+	    "( \
+	    echo && \
+	    echo \"================================================================================\" && \
+	    echo \"Commit Authors:\" && \
+	    echo \"--------------------------------------------------------------------------------\" && \
+	    echo \"$(REVISIONAUTHORS)\" && \
+	    echo \"--------------------------------------------------------------------------------\" && \
+	    echo && \
+	    echo \"Error in $(HOSTNAME) requires urgent attention\" && \
+	    echo \"Test was aborted when doing <<$(DOINGCMD)>> \" && \
+	    echo && \
+	    echo \"The log files are available at $(LOG_REPO_URLBASE)tests/$(BRANCH)/log/$(NEWVERSION)/$(HOSTNAME)/\" && \
+	    echo \"The pbundles are available at $(PBUNDLE_REPO_URLBASE)ciaopacks/$(BRANCH)/$(NEWVERSION)/\" && \
+	    echo && \
+	    echo \"`uname -a`\" && \
+	    echo && \
+	    echo \"Variable values:\" && \
+	    cat && \
+	    echo && \
+	    echo \"The file $(DOINGCMD).log is attached to this mail\" && \
+	    echo \"--------------------------------------------------------------------------------\" && \
+	    uuencode $(REMOTETMPDIR)$(DOINGCMD).log $(DOINGCMD).log ) \
+	  | mail -s \"[CiaoBot] Failed '$(BRANCH)' $${FAILEDLABEL} @ $(HOSTNAME)\" \
+	    $(REPORTCHANGESTO)" )
+
+justshowinfo: commoninfo info_$(SOURCETYPE)
+	@echo
+
+info_svn:
+
+info_bin info_noa info_src:
+	@echo TARBASE=$(TARBASE)
+	@echo CONFIGURE_OPTS=$(CONFIGURE_OPTS)
+	@echo CONFIGURE_VARS=$(CONFIGURE_VARS)
+	@echo INSTALL_VARS=$(INSTALL_VARS)
+	@echo UNINSTALL_VARS=$(INSTALL_VARS)
+	@echo NEWVERSION=$(NEWVERSION)
+
+backup_log_yes: backup_log
+
+backup_log_:
+
+backup_log_no:
+
+backup_log:
+	echo $@ > $(DOINGFILE)
+	./sshcmd.sh "$(RUN_AT_LOG_REPO_HOST)" "mkdir -p '$(LOGSRCVERSION)'"
+	if [ x$(LOG_REPO_HOST) != x$(HOSTNAME) ] ; then \
+	  ./scpcmd.sh $(LOGSRCVERSION) "$(TAR)" \
+	    "$(RUN_AT_LOG_REPO_HOST)" '$(LOGSRCVERSION)' "$(TAR[$(LOG_REPO_HOST)])" ; \
+	fi
+
+# 	rsync -a $(LOGSRCPATH) $(RUN_AT_LOG_REPO_HOST):$(LOGSRCPATH)
+
+testmailssh:
+	./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)" "( \
+	     echo \
+	  && echo \"Test mail in the system \"$(HOSTNAME) \
+	  && echo \"`uname -a`\" \
+	  && echo ) \
+	  | mail -s \"[CiaoBot] Test mail at $(HOSTNAME)\" $(MAINTAINERS)"
+
+testmail:
+	echo ./sshcmd.sh "$(RUN_AT_SVN_REPO_USERHOST)" "( \
+	     echo \
+	  && echo \"Test mail in the system \"$(HOSTNAME) \
+	  && echo \"`uname -a`\" \
+	  && echo ) \
+	  | mail -s \"[CiaoBot] Test mail at $(HOSTNAME)\" $(MAINTAINERS)"
+
+# ----------------------------------------------------------------------------
+# Options to install the slaves
+# ----------------------------------------------------------------------------
+
+BUILDSLAVES_INSTALL=$(addsuffix .install, $(BUILDSLAVES_SRC) $(BUILDSLAVES_NOA) $(BUILDSLAVES_BIN))
+
+%.install:
+	echo "NOTE: Installing scripts in $*" && \
+	  ./sshcmd.sh "$(RUN_AT_HOST[$*])" "mkdir -p $(BUILDBASE) $(LOGSRC) $(LOCKDIR) $(VERSIONDIR)"
+	  ( $(TAR) -c \
+	    SETTINGS \
+	    SETTINGS_$(PROFILE) \
+	    ciao_get_arch \
+	    SHARED \
+	    COMMON \
+	    childpids.sh \
+	    sshcmd.sh \
+	    scpcmd.sh \
+	    timeout.sh \
+	    procexists.sh \
+	    filter_author.c hosts/*.cfg \
+	  | ( ./sshcmd.sh "$(RUN_AT_HOST[$*])" \
+	  "$(TAR[$*]) -C $(BUILDROOTDIR) -x \
+	    && cd $(BUILDROOTDIR) \
+	    && $(MAKECMDSLAVE) HOSTNAME=$* install_slaves" ) ) \
+	  || echo "WARNING: Unable to install scripts in $*"
+
+install_slaves: $(BUILDSLAVES_INSTALL)
+
+# This option shows the last version that have all its most important
+# pbundle generated (currently tar.gz, win, rpm, deb and dmg).
+
+showlastpackedversion showlpv:
+	-./sshcmd.sh "$(RUN_AT_PBUNDLE_REPO_HOST)" 'cd $(PBUNDLE_REPO_DIR) ; \
+	LPV=0 ; for ((i = $(NEWVERSION); i > $${LPV}; i--)); do \
+	  if [ -d $${i} ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.ps      ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.ps    ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.ps     ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.pdf     ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.pdf   ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.pdf    ] \
+	    && [ -d $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.html/   ] \
+	    && [ -d $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.html/ ] \
+	    && [ -d $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.html/  ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}.tar.gz       ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}.exe          ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}.i386.rpm     ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}.i386.deb     ] \
+	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}.dmg          ] \
+	  ; then \
+	  echo $${i} ; \
+	  LPV=$${i} ; \
+	  fi ; \
+	  done'
+
+# The following are not mandatory:
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.manl    ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.manl  ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.manl   ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.info    ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.info  ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.info   ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.texi    ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.texi  ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.texi   ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciao.dvi     ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_ciaopp.dvi   ] \
+# 	    && [ -f $${i}/$(TARGETNAME)-$(CIAOVERSION)-$${i}_lpdoc.dvi    ]
+
+# Some generic packaging methods:
+
+## TODO: Unused?
+# package_sys_tgz:
+# 	echo $@ > $(DOINGFILE)
+# 	cd $(ROOTPREFIX) && \
+# 	  $(TAR) -cf - --owner=0 --group=0 * | gzip --best -c > \
+# 	  $(PBUNDLE_BUILD_DIR)$(PBUNDLE_BASE)-$(CIAOARCH)-sys.tar.gz
+
+gen_pbundle__bin_tgz:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle bin_tgz $(SAVELOGFILECMD)
+
+gen_pbundle__raw_tgz:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle raw_tgz $(SAVELOGFILECMD)
+
+gen_pbundle__rpm: gen_pbundle__bin_tgz
+	echo $@ > $(DOINGFILE)
+	$(RM) -r $(HOME)/tmp/RpmBuild
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle rpm --subpackages=no \
+	  $(SAVELOGFILECMD)
+
+gen_pbundle__rpm_version: gen_pbundle__bin_tgz
+	echo $@ > $(DOINGFILE)
+	$(RM) -r $(HOME)/tmp/RpmBuild
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle rpm --subpackages=yes --versionp=yes \
+	  $(SAVELOGFILECMD)
+
+gen_pbundle__rpm_separated: gen_pbundle__bin_tgz
+	echo $@ > $(DOINGFILE)
+	$(RM) -r $(HOME)/tmp/RpmBuild
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle rpm --subpackages=yes --versionp=no \
+	  $(SAVELOGFILECMD)
+
+# Note: - Currently Debian package (.deb) is generated from .rpm.
+#       - In debian you need to install: apt-get install fakeroot alien
+# Kludge: Renamed Debian package (.deb) to be consistent with other package names
+
+gen_pbundle__osarch_cross_debian:
+	echo $@ > $(DOINGFILE)
+	cat $(PBUNDLE_BUILD_DIR)$(PRODUCED_PBUNDLE_ITEM[1]) \
+	  | ( ./sshcmd.sh "$(HOST_CROSSDEB)" \
+	  "$(RM) -r /tmp/ciao_deb \
+	    && mkdir -p /tmp/ciao_deb \
+	    && cat > /tmp/ciao_deb/$(PRODUCED_PBUNDLE_ITEM[1]) \
+	    && cd /tmp/ciao_deb \
+	    && fakeroot alien -d -c -k $(PRODUCED_PBUNDLE_ITEM[1]) > /tmp/$@.log 2>&1 \
+	    && cat $(PRODUCED_PBUNDLE_ITEM[2]) \
+	    && cd /tmp && $(RM) -r /tmp/ciao_deb \
+	  " > $(PBUNDLE_BUILD_DIR)$(PRODUCED_PBUNDLE_ITEM[2]) \
+	) || echo "WARNING: Unable to generate .deb package for Debian"
+	./sshcmd.sh "$(HOST_CROSSDEB)" "cat /tmp/$@.log" $(SAVELOGFILECMD)
+
+# package_$(CURRENTMACHINE) should be defined in the CONFIG file
+
+gen_pbundle__osarch_DARWINppc: gen_pbundle__bin_tgz
+
+gen_pbundle__osarch_DARWINi386:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle pkg $(SAVELOGFILECMD)
+
+gen_pbundle__osarch_Snow_Leopard:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | ( \
+	  $(CIAOSETUP) configure $(CONFIGURE_OPTS) \
+		--cflags=-mmacosx-version-min=10.5 \
+		--ldflags=-mmacosx-version-min=10.5 && \
+	  $(CIAOSETUP) clean_platdep && \
+	  $(CIAOSETUP) build platdep && \
+	  $(CIAOSETUP) docs && \
+	  $(CIAOSETUP) gen_pbundle pkg \
+	) $(SAVELOGFILECMD)
+
+gen_pbundle__osarch_SolarisSparc64: gen_pbundle__raw_tgz
+
+gen_pbundle__osarch_Win32i86:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle win32 $(SAVELOGFILECMD)
+
+install_pbundle__osarch_Win32i86:
+	echo $@ > $(DOINGFILE)
+	-$(TIMEOUT) $(TIMEOUT_INSTALL) $(PBUNDLE_BUILD_DIR)$(PRODUCED_PBUNDLE_ITEM[1]) \
+	  /VERYSILENT /NOCANCEL /NORESTART /LOG="`cygpath $(SAVELOGFILE)`"
+
+uninstall_pbundle__osarch_Win32i86:
+	echo $@ > $(DOINGFILE)
+	-$(TIMEOUT) $(TIMEOUT_INSTALL) "/cygdrive/c/Program Files/CiaoDE/unins000.exe" \
+	  /VERYSILENT /NOCANCEL /NORESTART /LOG="`cygpath $(SAVELOGFILE)`"
+
+prepare_bootstrap:
+	echo $@ > $(DOINGFILE)
+	-cd $(BUILDSOURCEDIR)/ && \
+	  echo | $(CIAOSETUP) prepare_bootstrap $(SAVELOGFILECMD)
+
+gen_bundle_revision:
+	echo $@ > $(DOINGFILE)
+	-cd $(BUILDSOURCEDIR)/ && \
+	  echo | $(CIAOSETUP) gen_bundle_revision $(SAVELOGFILECMD)
+
+gen_pbundle__noa_tgz:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle noa_tgz $(SAVELOGFILECMD)
+
+gen_pbundle__src:
+	echo $@ > $(DOINGFILE)
+	-cd $(BUILDSOURCEDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle tgz $(SAVELOGFILECMD)
+
+gen_pbundle__macport:
+	echo $@ > $(DOINGFILE)
+	-cd $(BUILDSOURCEDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle macport $(SAVELOGFILECMD)
+
+# Note: descfile is not a pbundle
+gen_pbundle__descfile:
+	echo $@ > $(DOINGFILE)
+	cd $(DESTDIR)/ && \
+	  echo | $(CIAOSETUP) gen_pbundle__descfile $(SAVELOGFILECMD)
+
+get_newversion:
+	svn info $(REPOSITORY) | grep "Last Changed Rev: " | \
+	   sed -e s/'Last Changed Rev\: \(.*\)'/'\1'/g
+# svn log -r HEAD:HEAD --xml $(REPOSITORYROOT) | grep revision= | \
+#   sed -e s/'   revision=\"\(.*\)\">'/'\1'/g
+
+get_logsrcpath:
+	@echo $(LOGSRCPATH)
+
+get_repositoryroot:
+	@echo $(REPOSITORYROOT)

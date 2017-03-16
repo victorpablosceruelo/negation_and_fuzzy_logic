@@ -1,0 +1,115 @@
+%Top level predicates
+
+ab(G,AbS) :-
+	getVars(G,V),
+	ab(G,[]*[]+[],Ab),
+	( \+ neg_const -> Ab=AbS ; simplifyIneq(Ab,V,AbS)).
+
+revise(Rev) :-
+	meta_table(not(false([]*[]+[],Rev+[]))).
+
+ab(not(G),I,Ab) :- !,
+	meta_table(not(false(I,Rev+[]))),
+	lastVars(G,[Rev+[],Ab+[]],NG), meta_table(not(NG)).
+ab(G,I,Ab) :-
+	meta_table(not(false(I,Rev+[]))),
+	lastVars(G,[Rev+[],Ab+[]],NG), meta_table(NG).
+
+
+% The meta-interpreter
+
+:- table meta_table/1.
+
+meta_table(A) :- (A <- B), meta(B,A).
+
+
+meta(true,_) :- !.
+meta((A,B),Root) :- !, meta(A,Root), meta(B,Root).
+meta((A;B),Root) :- !, (meta(A,Root); meta(B,Root)).
+meta(not(A),not(R)) :-
+        lastVars(N,[Iab+Icwa,Oab+Ocwa],A),
+        lastVars(N,[Iab+Icwa,Oab+OOcwa],AA),
+        meta_table(not(AA)),
+        lastVars(NR,[_,_],R),
+	  delete_if_there(not(NR),OOcwa,Ocwa).
+meta(not(A),not(_)) :- !,
+	lastVars(N,[I,O],A), \+ abducible(N),
+	insertCWA(not(N),I,O).
+meta(not(A),_) :- !,
+        lastVars(_,[_,_+[]],A),
+        meta_table(not(A)).
+meta(A,_) :- 
+	meta_table(A).
+
+
+% Ordered insertion of abducibles and CWAs
+
+insert(not(A),P*_+_,_) :-
+	memberOrd(A,P), !, fail.
+insert(not(A),P*N+C,P*NewN+C) :- !, insertElem(not(A),N,NewN).
+insert(A,_*N+_,_) :- memberOrd(not(A),N), !, fail.
+insert(A,P*N+C,NewP*N+C) :- insertElem(A,P,NewP).
+
+insertCWA(not(A),Ab+C,Ab+NewC) :-
+	insertElem(not(A),C,NewC).
+
+memberOrd(X,L) :- insertElem(X,_,L).
+
+delete_if_there(not(E),C,NewC) :- insertElem(not(E),NewC,C), !.
+delete_if_there(_,L,L).
+
+insertElem(E,[],[E]).
+insertElem(E,[X|T],[E,X|T]) :- E @< X, !.
+insertElem(E,[E|T],[E|T]) :- !.
+insertElem(E,[X|T],[X|NT]) :- insertElem(E,T,NT).
+
+
+% Constructive Negation Constraints
+
+
+dif(H,T,_,_) :- H == T, !, fail.
+dif(H,T,I,I) :- H \= T, !.
+dif(H,T,I,O) :- neg_const, insert((T \= H),I,O).
+
+simplifyIneq(P*N,V,SP*N) :-
+	simpIneq(P,V,SP), !.
+
+simpIneq([],_,[]).
+simpIneq([(X \= Y)|_],_,_) :- X == Y, !, fail.
+simpIneq([(X \= Y)|Ineq],V,S) :- X \= Y, !, simpIneq(Ineq,V,S).
+simpIneq([(X \= Y)|_],V,_) :- allVarsNew(V,(X \= Y)), !, fail.
+simpIneq([Ab|Ineq],V,[Ab|S]) :- simpIneq(Ineq,V,S).
+
+
+:- import numbervars/3 from numbervars.
+
+getVars(G,G).
+
+allVarsNew(Vars,Term) :- \+ \+ varsNew(Vars,Term).
+
+varsNew(Vars,Term) :-
+	countVars(Vars,N),
+	numbervars(Term,0,TN), TN > 0,
+	countVars(Vars,N).
+
+countVars(Vars,N) :-
+	copy_term(Vars,V),
+	numbervars(V,0,N).
+ 
+
+sys_free(_,I,I) :- \+ neg_const, !.
+
+sys_free(Vars,I,O) :-
+	simpIneq(I,O), \+ oneNonVar(Vars),
+	allVarsNew(O,Vars).
+
+oneNonVar([V|_]) :- nonvar(V).
+oneNonVar([_|T]) :- oneNonVar(T).
+
+
+simpIneq([],[]).
+simpIneq([(X \= Y)|_],_) :- X == Y, !, fail.
+simpIneq([(X \= Y)|Ineq],S) :- X \= Y, !, simpIneq(Ineq,S).
+simpIneq([Ab|Ineq],[Ab|S]) :- simpIneq(Ineq,S).
+
+

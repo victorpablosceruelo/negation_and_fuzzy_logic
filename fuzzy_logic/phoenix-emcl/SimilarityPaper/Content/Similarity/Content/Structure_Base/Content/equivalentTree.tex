@@ -1,0 +1,76 @@
+\subsubsection{Equivalence between predicate trees}
+\label{sec:EquivalentTree}
+In order to compare two predicate trees with different number of children, we reconstruct them with the same number of children, preserving the original semantic meaning. For this, the concept ``equivalent tree" is introduced in this section.
+
+For each rule in $P_{new}$ that $A \stackrel{c,F_c}{\longleftarrow}F(B_1,...,B_n)$, under its interpretations, it is viewed as a function in the following form,
+\[A^{\mathcal{I}} = OP (c,B_1^{\mathcal{I}},...,B_n^{\mathcal{I}})\]
+where $OP=(\hat{F_c},\hat{F})$ is a pair, representing the operations over \textit{credit value} $c$, and other interpretation over atoms $B_i$ in the body of the rule. 
+
+\begin{defin}\textbf{(Identity for complex predicate).}
+\label{def:IdentityComplex}
+ There exists a formula $\alpha$ under the operations of RFuzzy Program, which makes
+ \begin{equation}\label{eq:equivalentFormula}
+ OP(c,B_1^{\mathcal{I}},...,B_n^{\mathcal{I}},\alpha^{\mathcal{I}})=OP(c,B_1^{\mathcal{I}},...,B_n^{\mathcal{I}})
+ \end{equation}
+for each interpretation $\mathcal{I}$. Therefore, the formula $\alpha$ is called \textit{identity} for $OP$. The existence of $\alpha$ depends on the operation $OP$.
+\end{defin}
+
+If \textit{identity} $\alpha$ exists for some $OP$, then the rule
+\begin{center}
+\begin{equation}\label{eq:orginalRule}
+A \stackrel{c,F_c}{\longleftarrow}F(B_1,...,B_n)
+\end{equation}
+\end{center}
+could be rewritten as
+\begin{center}
+\begin{equation}\label{eq:equivalentRule}
+A \stackrel{c,F_c}{\longleftarrow}F(B_1,...,B_n,\alpha,...,\alpha)
+\end{equation}
+\end{center}
+
+Since the procedure of rewriting preserves the semantic equivalence, the corresponding trees of rules \ref{eq:orginalRule} and \ref{eq:equivalentRule} represent the same semantic meaning.
+
+\begin{defin} \textbf{(Identity for atomic predicate).}
+\label{def:IdentityAtomic}
+For some certain $OP=(\hat{F_c},\hat{F})$, there exists a formula $\beta$ under the operations of RFuzzy Program, which makes,
+\[A^{\mathcal{I}} = OP(c,A^{\mathcal{I}},\beta^{\mathcal{I}})\]
+for any interpretation $\mathcal{I}$, where $c$ is a real number in the range of $[0,1]$. Therefore, $\beta$ is called identity for $OP$.
+\end{defin}
+
+We are going to show the existence of identity for any $OP=(\hat{F_c},\hat{F})$ here. In mathematical logic, there are several formal systems of \textit{Fuzzy Logic}, and most of them belong to so-called \textit{t-norm fuzzy logics} \cite{HP98}.
+A t-norm abbreviated of \textit{triangular norm} is a binary algebraic operation on the interval [0, 1], which is use to generalize conjunction in t-norm fuzzy logic. A t-norm \cite{KPMRPE00} is defined as a function $\top: [0, 1]\times[0, 1]\rightarrow[0, 1]$, which satisfies the following properties:
+\begin{itemize}
+\item Commutativity: $\top(a, b) = \top(b, a)$
+\item Monotonicity: $\top(a, b) \leq \top(c, d)$ if $a \leq c$ and $b \leq d$
+\item Associativity: $\top(a, \top(b, c)) = \top(\top(a, b), c)$
+\item Identity element: $\top(a, 1) = a$
+\end{itemize}
+
+T-conorm (S-norm) is dual to t-norm under the order-reversing operation which assigns 1-x to x on [0, 1]. Given a t-norm, the complementary t-conorm is defined by
+\[\bot(a,b) = 1- \top(1-a,1-b)\]
+A t-conorm is used to represent logical disjunction in t-norm fuzzy logic. It satisfies the following conditions, which can be used for an equivalent axiomatic definition of t-conorm independently of t-norm:
+\begin{itemize}
+\item Commutativity: $\bot(a, b) = \bot(b, a)$
+\item Monotonicity: $\bot(a, b) \leq \bot(c, d)$ if $a \leq c$ and $b \leq d$
+\item Associativity: $\bot(a, \bot(b, c)) = \bot(\bot(a, b), c)$
+\item Identity element: $\bot(a, 0) = a$
+\end{itemize}
+
+$\hat{F_c}$ and $\hat{F}$  are the truth functions of many-valued connectives $F_c$ and $F$ respectively. They are defined by t-norm or t-conorm. It implies that for any $\hat{F_c}$ or $\hat{F}$, there exists an identity, since a t-norm and a t-conorm has $1$ and $0$ as their identities respectively. Taking Lukasiewicz logic \cite{L20} as an instance, which is one of t-norm fuzzy logics originally defined in the early 20th-century by Jan Lukasiewicz. The connectives and their functions are shown below.
+\begin{itemize}
+\item Implication: $F_{\rightarrow}(x,y) = min\{1,1-x+y\}$
+\item Equivalence: $F_{\leftrightarrow}(x,y) = 1-\lvert x-y \rvert$
+\item Negation:  $F_{\neg}(x) = 1-x$
+\item Weak Conjunction: $F_{\wedge}(x,y)=min\{x,y\}$
+\item Weak Disjunction:  $F_{\vee}(x,y)=max\{x,y\}$
+\item Strong Conjunction: $F_{\otimes}(x,y)=max\{0,x+y-1\}$
+\item Strong Disjunction:   $F_{\oplus}(x,y)=min\{1,x+y\}$
+\end{itemize}
+The connectives defined by t-norm are Equivalence, Weak Conjunction, Strong Disjunction, which have $1$ as their identities. Implication, Weak Disjunction, Strong Conjunction are defined by t-conorm and $0$ is the identity.
+
+For example, $F_{\rightarrow}(x,y) = F_{\rightarrow}(F_{\rightarrow}(x,y),1)$, if we use $F_{\rightarrow}$ to represent implication with arbitrary arguments, then $F_{\rightarrow}(x,y) = F_{\rightarrow}(x,y,1)$, which satisfies formula \ref{eq:equivalentFormula} in definition \ref{def:IdentityComplex}.
+
+
+
+
+

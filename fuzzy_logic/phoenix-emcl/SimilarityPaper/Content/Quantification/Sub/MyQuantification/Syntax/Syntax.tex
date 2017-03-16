@@ -1,0 +1,15 @@
+\subsection{Syntax}
+\label{sec:QuantificationSyntax}
+\begin{defin} \textbf{Quantification}
+\label{def:Quantification}
+Let $Q$ be a quantifier, the query with quantifier $Q$ is written as,
+\[Q(p(t_1,...,t_n)) \leftarrow v\]
+where $p/n \in \Pi$, is a predicate with arity $n$, $p(\vec{t_i})$ is \textit{well\_typed} and $v \in \mathbb{T}$ has range from $0$ to $1$.
+\end{defin}
+
+\begin{ex}
+\label{ex:Quantification}
+The sentence ``Is Moscow very cold?'' could be translated into $Very(cold(moscow)) \leftarrow 1.0 ?$, where `Very' is a quantifier here, and $cold/1$ is a unary predicate.
+\end{ex}
+
+

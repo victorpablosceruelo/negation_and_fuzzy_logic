@@ -1,0 +1,22 @@
+Implementation Results in Classical Constructive Negation
+
+Susana Munoz-Hernandez 
+Juan Jose Moreno-Navarro
+
+
+  Logic Programming has been advocated as a language for system
+  specification, especially for those involving logical behaviours,
+  rules and knowledge. However, modeling problems involving negation,
+  which is quite natural in many cases, is somewhat limited if Prolog
+  is used as the specification / implementation language. These
+  restrictions are not related to theory viewpoint, where users can
+  find many different models with their respective semantics; they
+  concern practical implementation issues.  The negation capabilities
+  supported by current Prolog systems are rather constrained, and
+  there is no a correct and complete implementation.  In this paper,
+  we refine and propose some extensions to the classical method of
+  constructive negation, providing the complete theoretical
+  algorithm. Furthermore, we also discuss implementation issues
+  providing a preliminary implementation and an optimized
+  implementation to negate predicates with a finite number of
+  solutions.

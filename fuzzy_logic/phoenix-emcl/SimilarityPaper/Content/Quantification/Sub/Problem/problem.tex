@@ -1,0 +1,55 @@
+
+%Quantifier words `some' and `all' in English can be formalized as mathematical symbols $\exists$ and $\forall$ respectively in first order logic. However, there are other quantifiers such as `very', `little', `few', `most', which are used to describe the degree of adjectives or nouns after them. For instance, `very tall' or 'little cat'. The description is no more specific or precise by using quantifiers, and can not be expressed in FOL(First-Order Logic). Linguistic research shows that FOL doesn't have the full expressivity of natural language. In order to incorporate the expressivity of natural language in RFuzzy, characteristic quantification is introduced and formalized into fuzzy logic, representing the meaning of fuzzy predicate-modifiers exemplified by `very', `more or less' `extremely', `slightly', `much' `a little' and so on. This, in turn, leads to a system for computing with linguistic variables, that is, variables whose values are words or sentences in a natural or synthetic language. For example, `Age' is a linguistic variable when its values are assumed to be `young', `old', `very young', `not very old' and so forth. 
+
+%For instance, suppose that we have the following information: $cold(Moscow) = 1.0$, $cold(Roma) = 0.1$, $cold(Madrid) = 0.3$, and the quantifier `very' is defined by the following function $F_{very} : [0,1] \rightarrow [0,1]$, 
+%\[
+%  F_{very}(x) = \left\{ 
+%  \begin{array}{l l}
+%    0 & \quad \text{if 0 $0 \leq x < 0.4$}\\
+%    3/8*x & \quad \text{if $0.4 \leq x < 0.8$}\\
+%    x & \quad \text{if $0.8 \leq x \leq 1.0$}\\
+%  \end{array} \right.
+%\]
+%Then we have $very(cold(Moscow))= 1.0$, $very(cold(Roma))=0$, 
+%$very(cold(Madrid))=0$. In this case, the coldness is depicted by using the `very' qualifier as a filter.
+
+%In order to introduce quantifiers into fuzzy logic, we dedicate for its formal definition in the next section.
+
+It is almost impossible to form a statement of natural language without quantifiers. Moreover, the meaning of natural language depends heavily on its quantifying phrases. Quantifier words `some' and `all' in English can be formalized as mathematical symbols $\exists$ and $\forall$ respectively in \textit{First Order Logic} (FOL). Linguistic research shows that FOL doesn't have the full expressivity of natural language. FOL has its limitation to represent some quantifiers, most of which are vague or fuzzy in nature, such as,
+\begin{itemize}
+\item often, rarely, recently, mostly, almost always (vague temporal specification)
+\item almost everywhere, hardly anywhere, partly (vague local specification)
+\item extremely, slightly, very, more or less, badly (vague extent specification)
+\item many, few, a few; about ten, (approximate specification of the cardinality of a set)
+\item far more than, some more than, (approximate comparison of cardinalities)
+\end{itemize}
+
+Zadeh discerns two ``views" of fuzzy quantifiers \cite{Z83},
+\begin{enumerate}
+\item a fuzzy quantifier is a \textit{Second-Order Fuzzy} (SOF) predicate.
+\item a fuzzy quantifier is a \textit{First-Order Fuzzy} (FOF) predicate.
+\end{enumerate}
+
+Referring to first ``view" , fuzzy quantifiers are viewed as second order fuzzy relations. They are also called \textit{fuzzy determiners}, which are directly applicable to tuples of fuzzy subsets, yielding $[0,1]$ valued results. However, fuzzy determiners are often too complex to be easily understood. The representation of fuzzy quantifiers in the sense of second ``view" lends itself better to human understanding, it is simply a fuzzy subset of the unit interval $[0,1]$.
+
+In our work, we focus to express the statements and queries with the quantifiers which are vague temporal specification, vague local specification and vague extent specification. For example, ``not very beautiful", ``almost in the center". We start by presenting some related work on well-known quantifiers, such as ``some", ``all" using SOF predicate in section \ref{sec:QRW},  and then generate the syntax and semantic of quantifiers in SOF. Those quantifiers according to our demand could be simplified in FOF.  It is introduced in section \ref{sec:QSFQ}. The comparison of two views are presented in the last section.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,75 @@
+% DBG PKG :: (:-(use_module(engine(hiord_rt)))).
+% DBG PKG :: (:-(use_module(library(aggregates)))).
+% DBG PKG :: (:-(use_module(library(write)))).
+% DBG PKG :: (:-(use_module(library(terms_vars)))).
+% DBG PKG :: (:-(use_module(library(pretty_print)))).
+% DBG PKG :: (:-(multifile(portray_attribute/2))).
+% DBG PKG :: (query(not_very_expensive(_13653, _13657), _13653, [_13657])).
+% DBG PKG :: (show([])).
+% DBG PKG :: (local_write_vars([])).
+% DBG PKG :: (house(lfs2155, villa, 2300, 9, 3000000, 13, 800)).
+% DBG PKG :: (house(lfs1938, town_house, 520, 11, 1990000, 19, 80)).
+% DBG PKG :: (house(lfs1939, town_house, 860, 9, 1800000, 14, 2400)).
+% DBG PKG :: (house(es13340, town_house, 1025, 8, 2800000, 25, 7000)).
+% DBG PKG :: (house(5607/152, town_house, 161, 7, 815000, 6, 1200)).
+% DBG PKG :: (house(lfb143, villa, 1200, 9, 2750000, 7, 4000)).
+% DBG PKG :: (house(lfs1917, villa, 210, 5, 590000, 13, 5000)).
+% DBG PKG :: (house(lfs1942, villa, 900, 10, 3100000, 3, 3400)).
+% DBG PKG :: (house(es13462, villa, 600, 6, 4000000, 6, 1500)).
+% DBG PKG :: (house(lfs2041, villa, 4000, 13, 2500000, 4, 1800)).
+% DBG PKG :: (house(lfs2047, villa, 1750, 11, 1650000, 15, 1000)).
+% DBG PKG :: (house(lfs2111, villa, 700, 10, 1100000, 9, 4500)).
+% DBG PKG :: (house(lfs2123, apartment, 62, 3, 285000, 6, 1000)).
+% DBG PKG :: (house(lfs2124, apartment, 63, 2, 275000, 15, 450)).
+% DBG PKG :: (house(lfs2110, apartment, 415, 9, 2500000, 8, 2400)).
+% DBG PKG :: (house(c358, apartment, 74, 3, 340000, 5, 3100)).
+% DBG PKG :: (house(lfs2145, apartment, 224, 8, 790000, 20, 100)).
+% DBG PKG :: (house(lfs2147, apartment, 80, 2, 675000, 12, 200)).
+% DBG PKG :: (house(lfs2144, apartment, 77, 3, 420000, 7, 3500)).
+% DBG PKG :: (house(lfs2168, apartment, 114, 5, 630000, 2, 5700)).
+% DBG PKG :: ((rfuzzy_aux_main :- main)).
+% DBG PKG :: ((rfuzzy_aux_main :- fail)).
+% DBG PKG :: ((rfuzzy_aux_q2 :- q2)).
+% DBG PKG :: ((rfuzzy_aux_q2 :- fail)).
+% DBG PKG :: ((rfuzzy_aux_q1 :- q1)).
+% DBG PKG :: ((rfuzzy_aux_q1 :- fail)).
+% DBG PKG :: ((rfuzzy_aux_show(_13289) :- show(_13289))).
+% DBG PKG :: ((rfuzzy_aux_show(_13278) :- fail)).
+% DBG PKG :: ((rfuzzy_aux_portray_attribute(_13265) :- portray_attribute(_13265))).
+% DBG PKG :: ((rfuzzy_aux_portray_attribute(_13254) :- fail)).
+% DBG PKG :: ((rfuzzy_aux_local_write_answers(_13239, _13240) :- local_write_answers(_13239, _13240))).
+% DBG PKG :: ((rfuzzy_aux_local_write_answers(_13227, _13228) :- fail)).
+% DBG PKG :: ((rfuzzy_aux_local_write_vars(_13214) :- local_write_vars(_13214))).
+% DBG PKG :: ((rfuzzy_aux_local_write_vars(_13203) :- fail)).
+% DBG PKG :: ((rfuzzy_aux_not_very_expensive(_13188, _13189) :- not_very_expensive(_13188, _13189))).
+% DBG PKG :: ((rfuzzy_aux_not_very_expensive(_13176, _13177) :- fail)).
+% DBG PKG :: ((rfuzzy_aux_very_func(_13161, _13162) :- very_func(_13161, _13162))).
+% DBG PKG :: ((rfuzzy_aux_very_func(_13149, _13150) :- fail)).
+% DBG PKG :: ((rfuzzy_aux_not_func(_13134, _13135) :- not_func(_13134, _13135))).
+% DBG PKG :: ((rfuzzy_aux_not_func(_13122, _13123) :- fail)).
+% DBG PKG :: ((expensive_func(_13101, _13102) :- (.=<.(_13102, _13108), rfuzzy_aux_expensive_func(_13101, _13108)))).
+% DBG PKG :: ((rfuzzy_aux_expensive_func(_13048, _13049) :- (true, (fail ; (\+(fail), (rfuzzy_function_expensive_func(_13048, _13049) ; (\+(rfuzzy_function_expensive_func(_13048, _13074)), (fail ; (\+(fail), (fail ; (\+(fail), fail))))))))))).
+% DBG PKG :: ((rfuzzy_aux_expensive(_13033, _13034) :- expensive(_13033, _13034))).
+% DBG PKG :: ((rfuzzy_aux_expensive(_13021, _13022) :- fail)).
+% DBG PKG :: ((main :- (q1, (nl, (q2, nl))))).
+% DBG PKG :: ((q2 :- (findall((_12984, [_12986]), not_very_expensive(_12984, _12986), _12982), show(_12982)))).
+% DBG PKG :: ((q1 :- (findall((_12958, [_12960]), not_very_expensive(_12958, _12960), _12956), show(_12956)))).
+% DBG PKG :: ((show([(_12921, _12922)|_12919]) :- (write(_12921), (nl, (local_write_answers(_12922, [X]), show(_12919)))))).
+% DBG PKG :: ((portray_attribute(_12889) :- (=(_12889, eqn_var(_12897, _12898, _12899, _12900, _12901)), (!, print(_12889))))).
+% DBG PKG :: ((local_write_answers(_12865, _12866) :- (dump_constraints(_12865, _12866, _12873), (write(_12873), nl)))).
+% DBG PKG :: ((local_write_vars([_12841|_12842]) :- (write_attribute(_12841), (display( , ), local_write_vars(_12842))))).
+% DBG PKG :: ((not_very_expensive(_12813, _12814) :- (expensive(_12813, _12820), (very_func(_12820, _12826), not_func(_12826, _12814))))).
+% DBG PKG :: ((very_func(_12779, _12780) :- (.>.(_12779, 0.5), (.=<.(_12779, 1), .=.(_12780, -(1, _12779)))))).
+% DBG PKG :: ((very_func(_12748, _12749) :- (.>=.(_12748, 0), (.=<.(_12748, 0.5), .=.(_12749, _12748))))).
+% DBG PKG :: ((not_func(_12718, _12719) :- (.>=.(_12718, 0), (.=<.(_12718, 1), .=.(_12719, -(1, _12718)))))).
+% DBG PKG :: ((rfuzzy_function_expensive_func(_12083, _12084) :- ((.=.(_12083, 50000), .=.(_12084, 0)) ; ((.>.(_12083, 50000), (.<.(_12083, 100000), (.=.(_12116, -(0.1, 0)/-(100000, 50000)), .=.(_12084, +(0, *(_12116, -(_12083, 50000))))))) ; ((.=.(_12083, 100000), .=.(_12084, 0.1)) ; ((.>.(_12083, 100000), (.<.(_12083, 250000), (.=.(_12178, -(0.2, 0.1)/-(250000, 100000)), .=.(_12084, +(0.1, *(_12178, -(_12083, 100000))))))) ; ((.=.(_12083, 250000), .=.(_12084, 0.2)) ; ((.>.(_12083, 250000), (.<.(_12083, 350000), (.=.(_12248, -(0.3, 0.2)/-(350000, 250000)), .=.(_12084, +(0.2, *(_12248, -(_12083, 250000))))))) ; ((.=.(_12083, 350000), .=.(_12084, 0.3)) ; ((.>.(_12083, 350000), (.<.(_12083, 450000), (.=.(_12318, -(0.5, 0.3)/-(450000, 350000)), .=.(_12084, +(0.3, *(_12318, -(_12083, 350000))))))) ; ((.=.(_12083, 450000), .=.(_12084, 0.5)) ; ((.>.(_12083, 450000), (.<.(_12083, 550000), (.=.(_12388, -(0.6, 0.5)/-(550000, 450000)), .=.(_12084, +(0.5, *(_12388, -(_12083, 450000))))))) ; ((.=.(_12083, 550000), .=.(_12084, 0.6)) ; ((.>.(_12083, 550000), (.<.(_12083, 800000), (.=.(_12458, -(0.7, 0.6)/-(800000, 550000)), .=.(_12084, +(0.6, *(_12458, -(_12083, 550000))))))) ; ((.=.(_12083, 800000), .=.(_12084, 0.7)) ; ((.>.(_12083, 800000), (.<.(_12083, 1000000), (.=.(_12528, -(0.8, 0.7)/-(1000000, 800000)), .=.(_12084, +(0.7, *(_12528, -(_12083, 800000))))))) ; ((.=.(_12083, 1000000), .=.(_12084, 0.8)) ; ((.>.(_12083, 1000000), (.<.(_12083, 1500000), (.=.(_12598, -(0.9, 0.8)/-(1500000, 1000000)), .=.(_12084, +(0.8, *(_12598, -(_12083, 1000000))))))) ; ((.=.(_12083, 1500000), .=.(_12084, 0.9)) ; ((.>.(_12083, 1500000), (.<.(_12083, 2500000), (.=.(_12668, -(1, 0.9)/-(2500000, 1500000)), .=.(_12084, +(0.9, *(_12668, -(_12083, 1500000))))))) ; (.=.(_12083, 2500000), .=.(_12084, 1)))))))))))))))))))))).
+% DBG PKG :: ((expensive(_12057, _12058) :- (house(_12057, _12064, _12065, _12066, _12067, _12068, _12069), expensive_func(_12067, _12058)))).
+% DBG PKG :: (:-(op(1190, fx, complement))).
+% DBG PKG :: (:-(op(1190, fx, iprod))).
+% DBG PKG :: (:-(op(1190, fx, dprod))).
+% DBG PKG :: (:-(op(1190, fx, dluka))).
+% DBG PKG :: (:-(op(1190, fx, max))).
+% DBG PKG :: (:-(op(1190, fx, prod))).
+% DBG PKG :: (:-(op(1190, fx, luka))).
+% DBG PKG :: (:-(op(1190, fx, min))).
+% DBG PKG :: (end_of_file).

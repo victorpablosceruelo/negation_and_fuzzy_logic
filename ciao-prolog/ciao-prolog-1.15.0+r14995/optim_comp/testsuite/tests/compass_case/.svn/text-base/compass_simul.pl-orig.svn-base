@@ -1,0 +1,370 @@
+/* This program is preprocessed using CPP */
+/* All parameters are passed as PARAM_* or USE_* */
+
+:- module(_, [main/1], [functions,assertions]).
+:- function(arith(false)).
+
+:- use_module(..(sound_access)).
+
+#if !defined(PARAM_FREQUENCY)
+#error "No PARAM_FREQUENCY. E.g. use -DPARAM_FREQUENCY=44100"
+#endif
+
+#if (PARAM_OPTIMIZE == 0)
+/* bytecode */
+#elif (PARAM_OPTIMIZE == 1)
+/* plain ptoc + cheap analysis */ 
+#  define USE_PTOC 1
+#  define PARAM_SEMIDET nondet
+#elif (PARAM_OPTIMIZE == 2)
+/* plain ptoc + semidet predicates */ 
+#  define USE_PTOC 1
+#  define PARAM_SEMIDET semidet
+#elif (PARAM_OPTIMIZE == 3)
+/* plain ptoc + semidet predicates + ciaopp annotations */ 
+#  define USE_PTOC 1
+#  define USE_TRUSTS 1
+#  define PARAM_SEMIDET semidet
+#elif (PARAM_OPTIMIZE == 4)
+/* plain ptoc + semidet predicates + ciaopp annotations + specialized arithmetic */ 
+#  define USE_PTOC 1
+#  define USE_TRUSTS 1
+#  define PARAM_SEMIDET semidet
+#  define USE_SPECBLT 1
+#else
+#  error "Unknown PARAM_OPTIMIZE"
+#endif
+
+#if (PARAM_UNFOLD == 0)
+/* no unfolding */
+#elif (PARAM_UNFOLD == 1)
+#  define USE_CIAOPPSPEC 1
+#else
+#  error "Unknown PARAM_UNFOLD"
+#endif
+
+#if defined(USE_SPECBLT)
+/* todo: do not use that version if we are compiling bytecode; do not work because properties are not correctly merged */
+% :- '$forceprops'(term_typing:var/1, [
+%	specialize = [on([any], rename('compass_simul:$is_var'/1))]
+%]).
+:- '$props'('$is_var'/1, [
+	imp = semidet,
+	argmodes = [in],
+	argderefs = [true],
+	argmems = [cvar],
+	sht_usermemo = sht([any], [var]),
+	saveregs = all, noderefmod = true,
+	heap_usage = max(0), trail_usage = max(0), should_trim_frame = false,
+	impnat = ptoc_macro(macro_def([X], Fail,
+	  if(logical_not(call('IsVar', [X])), Fail)
+	))]).
+
+:- '$props'('$=smallint'/2, [
+	imp = semidet,
+	argmodes = [in, in],
+	argderefs = [true, true],
+	argmems = [cvar, cvar],
+	sht_usermemo = sht([smallint, smallint], [smallint, smallint]),
+	argunboxs = [true, true],
+	saveregs = all, noderefmod = true,
+	heap_usage = max(0), trail_usage = max(0), should_trim_frame = false,
+	impnat = ptoc_macro(macro_def([X, Y], Fail,
+	  if(logical_not(X == Y), Fail)
+	))]).
+:- '$props'('$=smallintbox'/2, [
+	imp = semidet,
+	argmodes = [in, in],
+	argderefs = [true, true],
+	argmems = [cvar, cvar],
+	sht_usermemo = sht([smallint, smallint], [smallint, smallint]),
+	argunboxs = [false, false],
+	saveregs = all, noderefmod = true,
+	heap_usage = max(0), trail_usage = max(0), should_trim_frame = false,
+	impnat = ptoc_macro(macro_def([X, Y], Fail,
+	  if(logical_not(X == Y), Fail)
+	))]).
+#endif
+
+#if defined(USE_PTOC)
+% bytecode version
+:- '$pragma'(analyze_all).
+:- include(..(..(nativearith))).
+#endif
+
+#if defined(USE_CIAOPP)
+:- entry main(FileList) : list(FileList, atm).
+#endif
+
+#if 0
+:- '$props'(trace/1, [
+	imp = det,
+	argmodes = [param],
+	argderefs = [false],
+	argmems = [cvar],
+	sht_usermemo = sht([any], [any]),
+	saveregs = all, noderefmod = true,
+	heap_usage = max(0), trail_usage = max(0), should_trim_frame = false,
+	impnat = ptoc_macro(macro_def([String],
+	  call(fprintf, [stderr, "%s\n", String])
+        ))]).
+#endif
+
+#if defined(USE_PTOC)
+:- '$props'(audio_sps/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+audio_sps(PARAM_FREQUENCY). %% This _has_ to match the actual sampling frequency
+
+main([AudioFile]) :-
+%% Instead, we receive a file / device name.
+	catch(main__2(AudioFile), _E, true).
+%	main__2(AudioFile).
+#if defined(USE_PTOC)
+:- '$trust_entry'(main__2/1, sht, [any]). % todo: fix!
+#endif
+
+main__2(AudioFile) :-
+        open(AudioFile, read, InStream),
+	open_read_mono(InStream, InId),
+	OutStream = user_output,
+	open_write_stereo(OutStream),
+        Skip = 0, % Just for documentation: looking North
+        %% N.B.: we should calibrate to determine the initial position
+        %% of the sound source!
+        play_stereo(0, InId, Sample, Sample, Skip).
+
+
+%% 
+%% MCL: add a bogus fact?  To make analyzers happy, giving the program
+%% a possibility to scape cleanly.
+%% play_stereo(0, _, _, _, _).
+#if defined(USE_PTOC)
+:- '$props'(play_stereo/5, [impnat = ptoc, imp = nondet]).
+#endif
+play_stereo(Samples_Remaining, InId, SampleL, SampleR, CurrSkip) :-
+%	Samples_Remaining > -1,
+        %% Skip the necessary number of samples according to the
+        %% orientation of the compass.
+#if defined(USE_TRUSTS)
+ 	'$trust_type'(Samples_Remaining, smallint),
+ 	'$trust_type'(NewCycle, var),
+ 	'$trust_type'(NewSampleL, var),
+ 	'$trust_type'(NewSampleR, var),
+#endif
+        new_sample_cycle(Samples_Remaining, NewCycle, InId,
+                         CurrSkip, NewSkip,
+                         SampleL, SampleR, NewSampleL, NewSampleR),
+        %% Get two new samples for the right and left channels
+#if defined(USE_CIAOPPSPEC)
+	NewSampleR = [R|RestSampleRight],
+	read_it(R, InId),
+	NewSampleL = [L|RestSampleLeft],
+	read_it(L, InId),
+#else
+ 	'$trust_type'(R, var),
+ 	'$trust_type'(RestSampleRight, var),
+        new_sample(InId, NewSampleR, R, RestSampleRight),
+ 	'$trust_type'(L, var),
+ 	'$trust_type'(RestSampleLeft, var),
+        new_sample(InId, NewSampleL, L, RestSampleLeft),
+#endif
+        %% Play this sample and continue.
+        write_stereo(R, L),
+        play_stereo(NewCycle, InId,
+                    RestSampleLeft, RestSampleRight, 
+                    NewSkip).
+
+#if defined(USE_PTOC)
+:- '$props'(compass_sps/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+compass_sps(10).
+%compass_sps(50).
+%compass_sps(441).
+%compass_sps(4410).
+%compass_sps(44100).
+
+#if defined(USE_PTOC)
+:- '$props'(audio_per_compass/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+audio_per_compass(X) :-
+	X is integer(~audio_sps / ~compass_sps).
+
+%% Mainfile: open the input stream (nothing to do if it is the
+%% standard input, but this should not matter for the analysis &
+%% optmizations).
+
+%% This decides how many samples we have to skip for every angle.
+%% We can give a negative amount of samples to skip.  I hope I got the
+%% formulae right.  The results match my experimental feeling with the
+%% earphone. 
+
+#if defined(USE_PTOC)
+:- '$props'(sound_speed/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+sound_speed(340).   % In meters per second
+#if defined(USE_PTOC)
+:- '$props'(head_radius/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+head_radius(0.1).   % In meters
+#if defined(USE_PTOC)
+:- '$props'(pi/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+pi(3.141592).
+
+
+%% How many samples left and right ear differ, according to the angle
+%% the head has turned w.r.t. the North.
+#if defined(USE_PTOC)
+:- '$props'(find_skip/2, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+find_skip(Angle, SamplesDif) :-
+        SamplesDif is round(~samples_per_meter * 2 * ~ear_dif(Angle)).
+
+
+%% How many meters is some ear displaced North with respect to the
+%% center of the head.
+#if defined(USE_PTOC)
+:- '$props'(ear_dif/2, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+ear_dif(Angle, Diff) :-
+	Diff is ~head_radius * sin((Angle * ~pi) / 180).
+
+
+%% How many samples are needed to fill in a meter of air.
+#if defined(USE_PTOC)
+:- '$props'(samples_per_meter/1, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+samples_per_meter(S) :-
+	S is ~audio_sps / ~sound_speed.
+
+% todo: DOES NOT WORK WITH SEMIDET!! WHY?? LOCAL STACK SEEMS TO GROW FOREVER!
+#if defined(USE_PTOC)
+:- '$props'(new_sample_cycle/9, [impnat = ptoc, imp = nondet]).
+#endif
+%% When we have read enough audio samples, read the compass and find
+%% out whether we have to skip or not samples from some channel.
+new_sample_cycle(Cycle, APC, InId,
+                 CurrSkip, NewSkip, SL, SR, NSL, NSR) :-
+#if defined(USE_SPECBLT)
+        '$=smallintbox'(Cycle, 0),
+#else
+        Cycle = 0,
+#endif
+	!,
+        audio_per_compass(APC),
+	read_compass(Angle),
+	find_skip(Angle, NewSkip),
+	Diff is NewSkip - CurrSkip,
+#if defined(USE_TRUSTS)
+ 	'$trust_type'(Diff, smallint),
+ 	'$trust_type'(NSL, var),
+ 	'$trust_type'(NSR, var),
+#endif
+        skip(Diff, InId, SL, SR, NSL, NSR).
+new_sample_cycle(Cycle, NewCycle, _InId, Sk, Sk, SL, SR, NSL, NSR) :-
+ 	'$trust_type'(NSL, var),
+ 	'$trust_type'(NSR, var),
+	SL = NSL,
+	SR = NSR,
+%        Cycle > 0,
+#if defined(USE_TRUSTS)
+ 	'$trust_type'(NewCycle, var),
+#endif
+#if defined(USE_SPECBLT)
+        NewCycle = ~smallint_dec(Cycle),
+#else	
+        NewCycle is Cycle - 1,
+#endif
+#if defined(USE_TRUSTS)
+ 	'$trust_type'(NewCycle, smallint).
+#else
+	true.
+#endif
+
+#if defined(USE_PTOC)
+:- '$props'(new_sample/4, [impnat = ptoc, imp = PARAM_SEMIDET
+	% todo: does not work yet!
+%	,argmems = [x(0), x(1), x(0), x(1)], argmodes = [in,in,out,out]
+]).
+#endif
+new_sample(InId, [Sample|Rest], Sample, Rest) :-
+	read_it(Sample, InId).
+
+#if defined(USE_PTOC)
+:- '$props'(read_it/2, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+%% Advance (and instantiate, if needed) the input list.
+read_it(RealSample, InId) :-
+#if defined(USE_SPECBLT)
+	'$is_var'(RealSample),
+#else
+	var(RealSample),
+#endif
+	!,
+        RealSample = ~read_mono(InId).
+read_it(_, _).
+% :- nonvar(RealSample).
+
+#if defined(USE_PTOC)
+:- '$props'(skip/6, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+%% This predicate is only called from time to time (e.g., only when
+%% we need read from the compass).  But we might want to read from the
+%% compass very often.
+skip(0, _InId, L, R, NL, NR) :- !,
+#if defined(USE_TRUSTS)	
+	'$trust_type'(NL, var),
+#endif
+	NL = L,
+#if defined(USE_TRUSTS)	
+	'$trust_type'(NR, var),
+#endif
+	NR = R.
+skip(Disp, InId, L, R, NL, NR) :-
+%        Disp =\= 0,
+        ( Disp > 0 ->
+#if defined(USE_TRUSTS)	
+	    '$trust_type'(NL, var),
+#endif
+            L = NL,
+#if defined(USE_TRUSTS)	
+	    '$trust_type'(NR, var),
+#endif
+            skip_nth(Disp, InId, R, NR)
+        ; D is -Disp,
+#if defined(USE_TRUSTS)	
+	  '$trust_type'(NR, var),
+#endif
+	  R = NR,
+#if defined(USE_TRUSTS)	
+	  '$trust_type'(NL, var),
+#endif
+	  skip_nth(D, InId, L, NL)
+        ).
+
+#if defined(USE_PTOC)
+:- '$props'(skip_nth/4, [impnat = ptoc, imp = PARAM_SEMIDET]).
+#endif
+skip_nth(1, InId, Samples, Rest) :- !,
+#if defined(USE_CIAOPPSPEC)
+	Samples = [_Elem|Rest],
+	read_it(_Elem, InId).
+#else
+        new_sample(InId, Samples, _Elem, Rest).
+#endif
+skip_nth(N, InId, Samples, Rest) :-
+%        N > 1,
+#if defined(USE_SPECBLT)
+        N1 = ~smallint_dec(N),
+#else
+        N1 is N-1,
+#endif
+#if defined(USE_CIAOPPSPEC)
+	Samples = [_Elem|List],
+	read_it(_Elem, InId),
+#else
+        new_sample(InId, Samples, _, List),
+#endif
+        skip_nth(N1, InId, List, Rest).
+
+

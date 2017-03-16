@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>Fuzzy Query Answering</title>
+    <link media="screen" type="text/css" href="{{MEDIA_URL}}stylesheets/base.css" rel="stylesheet">
+    <link media="screen" type="text/css" href="{{MEDIA_URL}}stylesheets/style.css" id="current-theme" rel="stylesheet">
+
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-1.4.4.js"> </script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/main.js"> </script>
+
+
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1><a href="/">Fuzzy Query Answering</a></h1>
+        <div id="main-navigation">
+          <ul class="wat-cf">
+            <li class="first"><a href="/">Main Page</a></li>
+            <li><a href="/loadingfile/">Load DB</a></li>
+            <li><a href="/concept/list/">Configuration</a></li>
+            <li><a href="/query/">Query</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="wat-cf" id="wrapper">
+        <div id="main">
+
+          {% block content %}
+
+
+          {% endblock %}
+
+        </div>
+
+        <div id="sidebar">
+          {% block sidebar %}
+
+          {% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

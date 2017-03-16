@@ -1,0 +1,13 @@
+\section{Introduction}
+Logic programming \cite{Llo87} has been successfully used in knowledge representation and reasoning for decades. Indeed, world data in not always perceived in a crisp way. Information that we gather might be imperfect, uncertain, or fuzzy in some other way. Hence the management of uncertainty and fuzziness is very important in knowledge representation.
+
+Introducing Fuzzy Logic into Logic Programming has provided the development of several fuzzy systems over Prolog. These systems replace its inference mechanism, SLD-resolution, with a fuzzy variant that is able to handle partial truth. Most of these systems implement the fuzzy resolution introduced by Lee in \cite{Lee72}, as the Prolog-Elf system, the FRIL Prolog system \cite{IK85} and the F-Prolog language \cite{LL90}. However, there is no common method for fuzzifying Prolog, as noted in \cite{SDM89}.
+
+One of the most promising fuzzy tools for Prolog is RFuzzy Framework. The most important advantages against the other approaches are:
+\begin{enumerate}
+\item A truth value is represented as a real number in unit interval $[0,1]$, satisfying certain constrains. 
+\item A truth value is propagated through the rules by means of an aggregation operator. The definition of this aggregation operator is general and is subsumes conjunctive operators (triangular norms \cite{KPMRPE00} like min, prod, etc.), disjunctive operators \cite{TCC95} (triangular co-norms, like max, sum, etc.),
+average operators (average as arithmetic average, quasi-linear average, etc.) and hybrid operators (combinations of the above operators \cite{PTC02}). 
+\item Crisp and fuzzy reasoning are consistently combined
+\item It provides some interesting improvements with respect to FLOPER \cite{MM08a,Mor06}: default values, partial default values, typed predicates and useful syntactic sugar (for presenting facts, rules and functions).
+\end{enumerate}

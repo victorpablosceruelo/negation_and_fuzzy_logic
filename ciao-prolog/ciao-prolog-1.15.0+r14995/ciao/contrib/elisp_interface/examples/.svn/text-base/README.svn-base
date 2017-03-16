@@ -1,0 +1,10 @@
+To run the tests and examples in this directory, please follow the
+following steps:
+
+ - Load ciao_elisp_mode.el from Emacs.
+
+ - Compile the test program as an executable (ciaoc) or (M-x
+   ciao-make-exec).
+
+ - Do `M-x ciao-elisp-run' and select the executable file.
+

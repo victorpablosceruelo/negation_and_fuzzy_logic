@@ -1,0 +1,140 @@
+%%%%%%%%%%%%%%%%%%%%%%%
+%% CONTENIDO_MEMORIA %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+% Ejemplos de comentarios.
+\excludecomment{versionfull}
+% \includecomment{versionwhitepaper}
+% \excludecomment{versionquestionnaire}
+% \excludecomment{versionjavarules}
+
+\newcommand{\baseuri}[0]{https://babel.ls.fi.upm.es/~vpablos/others/packages}
+\newcommand{\ciaoversion}[0]{1.13+r11293}
+
+\section{About Rfuzzy}
+
+Rfuzzy is a preprocessor package hosted at
+\url{http://babel.ls.fi.upm.es/software/rfuzzy/}
+that has been tested for Ciao Prolog \ciaoversion.
+
+More information can be found there, although for semantics we recommend
+you the following papers:
+%
+\cite{MunozHernandez2010}
+\cite{jisbd:2010:vpcafdsmh}
+\cite{hardandsoft:2010:afdvpcsmh}
+\cite{DBLP:conf/eusflat/StrassMC09}
+\cite{DBLP:conf/iwann/Munoz-HernandezCS09}
+\cite{5156427}
+\cite{victor:susana:2008:wlpe}
+
+\section{Install Ciao Prolog}
+\subsection{Easy Installation (Debian and Ubuntu)}
+
+Take a look at 
+\url{\baseuri /readme.html}. 
+Since this version of Rfuzzy has been tested for Ciao Prolog \ciaoversion,
+we recommend you to install this and only this version of Ciao Prolog.
+
+\subsection{Not so easy installation}
+
+\subsubsection{Install cowbuilder}
+Use apt-get, aptitude or synaptic to install cowbuilder.
+\subsubsection{Add to pbuilderrc the mirrors you have in sources.list}
+Simple edit '/etc/pbuilderrc' and add the mirrors
+you have enabled at your '/etc/apt/sources.list' file in the 'OTHERMIRROR' option. 
+We have used the following lines to build ubuntu gutsy i386 precompiled packages:
+
+\textbox{/etc/pbuilderrc OTHERMIRROR option for ubuntu Gutsy}{
+  OTHERMIRROR="deb http://archive.ubuntu.com/ubuntu/ gutsy restricted universe multiverse $ \mid $ deb-src http://archive.ubuntu.com/ubuntu/ gutsy restricted universe multiverse $ \mid $ deb http://archive.canonical.com/ubuntu gutsy partner $ \mid $ deb-src http://archive.canonical.com/ubuntu gutsy partner $ \mid $ deb http://security.ubuntu.com/ubuntu/ gutsy-security main restricted universe multiverse $ \mid $ deb-src http://security.ubuntu.com/ubuntu/ gutsy-security main restricted universe multiverse $ \mid $ deb http://archive.ubuntu.com/ubuntu/ gutsy-updates main restricted universe multiverse $ \mid $ deb-src http://archive.ubuntu.com/ubuntu/ gutsy-updates main restricted universe multiverse" 
+}
+
+\subsubsection{Download ciao-prolog sources}
+Download ciao-prolog sources from 
+\url{\baseuri/sources/}. 
+The files you need are listed below:
+\textbox{Ciao prolog sources' files}{
+ciao-prolog\_1.13+svn20080125-1.diff.gz   ... 10.4K \\
+ciao-prolog\_1.13+svn20080125-1.dsc       ...  0.6K \\
+ciao-prolog\_1.13+svn20080125.orig.tar.gz ... 30.9M \\
+}
+
+\subsubsection{Initialize cowbuilder environment, update it and build}
+Initialize cowbuilder environment and update it to the last version. 
+After that you can do your precompiled packages with the option --build:
+
+\textbox{Cowbuilder commands to make precompiled files}{
+  cowbuilder --create \\
+  cowbuilder --update \\
+  cowbuilder --build ciao-prolog\_1.13+svn20080125-1.dsc \\
+}
+
+\subsubsection{Results from compilation}
+Finally you'll obtain at /var/cache/pbuilder/result/ all the files you need to 
+install ciao prolog. Use dpkg or other tool to install them and you're done.
+
+\section{Installing the rfuzzy library}
+
+Uncompress the \textbf{.tgz} file and copy the {\it rfuzzy} subfolder 
+into the ciao library installation folder.
+It is usually {\it /usr/lib/ciao/ciao-1.13/library/} or
+{\it /usr/local/lib/ciao/ciao-1.13/library/}. 
+
+Simply drag and drop the rfuzzy subfolder there. That's all. 
+Be sure all users can read those files and folder 
+(use {\it chmod 644 filename} for the files 
+and {\it chmod 755 filename} for the folder). 
+
+For debugging purposes we recommend you to install too the 
+debugging package, which is included in the \textbf{.tgz} file.
+For that simply copy the {\it debugger\_pkg} subfolder 
+into the ciao library installation folder.
+
+\section{Examples}
+
+At subfolder examples you have some examples that show you how to use the library.
+They are:
+
+\textbox{Examples included}{
+  good\_player.pl \\
+  human\_development.pl \\
+  jobs.pl \\
+  restaurant.pl \\
+  teams.pl \\
+  which\_row.pl \\
+}
+
+\section{Rfuzzy beginning}
+
+To start using the rfuzzy package you need to include the following line
+in your program source file: 
+
+\textbox{Rfuzzy package beginning}{
+:- module(file\_name,\_,[rfuzzy, clpr]).
+}
+
+If you want to see what is being executed by the Ciao compiler, 
+the easiest way is to install the {\it debugger\_pkg} and 
+include the following line (instead of the previous one).
+
+\textbox{Rfuzzy package beginning}{
+:- module(file\_name,\_,[rfuzzy, clpr, debugger\_pkg]).
+}
+
+The following example shows how this is done:
+
+\line(1,0){300}
+\verbatiminput{../examples/good_player.pl}
+\line(1,0){300}
+
+Enjoy !!!
+
+% Estos comentarios que hay debajo permiten que herramientas como el
+% emacs usen meta-x flyspell-mode para corregir ortografia y para que
+% además compilen los archivos desde cualquiera de los incluidos.
+% NO borrar este comentario.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "manual"
+%%% End: 

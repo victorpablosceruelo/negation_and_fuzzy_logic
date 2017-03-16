@@ -1,0 +1,112 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}     % Nuestro idioma
+%\selectlanguage{spanish} 
+
+\usepackage{charter}
+\usepackage{comment}
+% \usepackage{xmpincl}
+\usepackage{moreverb}
+\usepackage{url}
+\usepackage[pdftex]{graphicx}
+\usepackage{verbatim}
+
+
+% START From http://ringlord.com/publications/latex-pdf-howto/
+\usepackage{thumbpdf}
+\usepackage[pdftex,
+        colorlinks=true,
+        urlcolor=rltblue,       % \href{...}{...} external (URL)
+        filecolor=rltgreen,     % \href{...} local file
+        linkcolor=rltred,       % \ref{...} and \pageref{...}
+        pdftitle={Rfuzzy manual},
+        pdfauthor={Victor Pablos-Ceruelo},
+        pdfsubject={Rfuzzy manual},
+        pdfkeywords={Rfuzzy manual},
+        pdfproducer={pdfLaTeX},
+        % pdfadjustspacing=1,
+        pagebackref,
+        pdfpagemode=None,
+        bookmarksopen=true]{hyperref}
+\usepackage{color}
+\definecolor{rltred}{rgb}{0.75,0,0}
+\definecolor{rltgreen}{rgb}{0,0.5,0}
+\definecolor{rltblue}{rgb}{0,0,0.75}
+\definecolor{white}{rgb}{1,1,1}
+% END From http://ringlord.com/publications/latex-pdf-howto/
+
+\usepackage{amsmath}
+\usepackage{footmisc}
+\usepackage{listings}
+\usepackage{picinpar}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphics}    % Para los gráficos
+% \usepackage{lgrind}
+
+\usepackage{comment}
+\setcounter{secnumdepth}{5} 
+% Permitimos que aparezca numeracion hasta 5 niveles de profundidad
+% (lo normal son 4 niveles de profundidad).
+
+\newcommand{\cuadrotexto}[1]{%
+\medskip
+\noindent
+\fcolorbox{black}{white}{%
+  \begin{minipage}{0.98\textwidth}
+    #1
+  \end{minipage}%
+    }%
+}
+
+
+\def\sourcetabsize{4}
+\newenvironment{sourcestyle}{\begin{scriptsize}}{\end{scriptsize}}
+\def\sourceinput#1{\par\begin{sourcestyle}\verbatimtabinput[\sourcetabsize]{#1}\end{sourcestyle}\par}
+
+\setcounter{secnumdepth}{5} 
+% Permitimos que aparezca numeracion hasta 5 niveles de profundidad
+% (lo normal son 4 niveles de profundidad).
+
+\newcommand{\textbox}[2]{%
+\medskip
+\noindent
+\begin{center}
+  #1
+  \fcolorbox{black}{white}{%
+    \begin{minipage}{0.98\textwidth}
+      #2
+    \end{minipage}%
+  }%
+\end{center}
+}
+
+
+% Configs varios
+\urlstyle{small}
+
+% Title Page
+\title { Rfuzzy (and Ciao Prolog) installation manual}
+
+\author {
+		Víctor Pablos Ceruelo \\
+		\small e-mail: victorpablosceruelo at gmail.com \\
+                \small web page: \url{http://babel.ls.fi.upm.es/~vpablos} \\
+	}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\input{manual_contents}
+
+% Bibliography
+\bibliography{bibliography}
+\bibliographystyle{alpha}
+
+\end{document}

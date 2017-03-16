@@ -1,0 +1,1024 @@
+% \documentclass[a4paper,10pt]{book}
+
+\documentclass[12pt,twoside,a4paper,english]{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BASIC CONFIG PARAMETERS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\eachPageMsg}{EMCL Thesis: WTF.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% - July 26, 2009} % Example.
+
+%% Macros, Packages and so on.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Paquetes relaciones con el lenguaje y codificación general.
+
+%% Codificación en UTF-8
+% \usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+% \usepackage[utf8]{inputenc}
+% \selectlanguage{spanish} 
+
+%% En Tetex 3, hay que usar otro formato como:
+% \usepackage{ucs}
+% \usepackage[utf8x]{inputenc}
+
+%% Babel va sin opciones porque las especificamos globalmente en el
+%% documento. Esto tiene la ventaja de que los demás paquetes soportan
+%% español automáticamente.
+\usepackage{babel}
+
+%% Para propósitos de documentación, éste es el código antiguo para
+%% seleccionar el idioma. Ya no es necesario.
+
+%% selección del idioma
+%% (ver summary.tex para activar otro idioma, ej. inglés)
+%%\selectlanguage{spanish}
+%%\selectlanguage{spanish} 
+%% AHN: que nadie pregunte por qué
+%% egallego: No, no está curado, parece ser que el problema es que hay
+%% que ponerlo en sitios específicos, se ha arreglado especificando
+%% las opciones correctas al paquete babel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Paquetes de utilidad.
+%% (añadir otros paquetes necesarios para el tfc)
+
+%% Gráficos.
+%% \usepackage[final]{graphicx}
+\usepackage[pdftex]{graphicx}
+
+%% OJO!, debemos seleccionar la fuente antes del encoding, si no al
+%% usar fontenc cargará las fuente EC.
+
+%% FIXME: Aunque debería estar ya, debo elegir todavía la fuente con
+%% la cual voy a imprimir el proyecto.
+% \usepackage{times} % Esta no me gusta
+\usepackage{palatino} % Cuidado con los < y > q no van.
+% \usepackage{fourier} % Con esta no van los parenthesis grandes
+
+%% En teoría este paquete nos proporciona una hypenation mejor.
+%\usepackage[T1]{fontenc}
+
+%% Mathematical packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{amsthm}
+\usepackage{mathpazo}
+\usepackage{stmaryrd}
+\usepackage{mathbbol}
+\usepackage[mathcal]{euscript}
+% \usepackage{eufrak}
+
+% If activated \usepackage{latexsym} 
+% ERROR: LaTeX Error: Too many math alphabets used in version normal.
+
+%% Símbolos de gramáticas. NO ACTIVAR
+% \usepackage{txfonts} 
+% \usepackage{yfonts}
+
+%% Preventing figures from appearing on a page by themselves.
+%% http://dcwww.camd.dtu.dk/~schiotz/comp/LatexTips/LatexTips.html
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+
+
+%% Mítico.
+\usepackage{url}
+
+%% Añade fixme support.
+%% \usepackage{fixme}
+
+%% Índices de contenido.
+\usepackage{makeidx}
+\makeindex
+
+%% Para la bibliografía
+\usepackage{natbib}
+\renewcommand{\cite}[1]{\citep{#1}}
+
+%% Arbolitos lindos
+%\usepackage{pstricks,pst-node,pst-tree}
+%\psset{nodesep=2pt,levelsep=40pt}
+
+%% Formato de las cabeceras de los capítulos.
+%% No instalado: 
+%% \usepackage[Lenny]{fncychap}
+%% Casi seguro que hay que hacerlo con titlesec.
+
+%% Formato de la tabla de contenidos.
+%% Se necesita mucho trabajo aquí todavía, entre otras cosas poner un
+%% \let\chaptername\appendixname, es decir, redefinir \appendix, por
+%% lo que yo creo que esto es para el final. Premature optimization is
+%% the root of all evil:)
+\makeatletter
+\usepackage{titletoc}
+\titlecontents{chapter} [6pc]
+   {\addvspace{1pc}\bfseries
+     \titlerule[2pt]\filright}
+   {\contentslabel
+      [\textsc{\chaptertitlename}\
+       \thecontentslabel]{6pc}%
+       \scshape}
+   {\contentsmargin{0pt}}
+   {\hfill\contentspage}
+   [\addvspace{2pt}]
+\makeatother
+
+\usepackage{titlesec}
+%% FIXME part
+% \titleformat{\part}[display]
+%   {\center\bfseries\Huge}
+%   {\partname~\thepart}
+%   {4ex}
+%   {}
+%   [\vspace{2ex}\titlerule]
+
+\titleformat{\chapter}[display]
+{\bfseries\scshape\LARGE}
+  {\filleft\Huge\chaptertitlename~\thechapter}
+  {4ex}
+  {}
+  [\vspace{2ex}\titlerule]
+
+%% Hay que modificar apéndice, creo que no es demansiado difícil
+% \newcommand\appendix{\par
+%   \setcounter{chapter}{0}%
+%   \setcounter{section}{0}%
+%   \gdef\@chapapp{\appendixname}%
+%   \gdef\thechapter{\@Alph\c@chapter}}
+
+% \usepackage{appendix}
+% \usepackage{soul}
+
+%% Para q los frames se puedan dividir en páginas.
+\usepackage{framed}
+
+%% Listings.
+%% Esto habrá que retocarlo un montón.
+
+%% La opción final se sobrepone a la global de draft.
+\usepackage{verbatim}
+\usepackage{multicol} % Para listings con 2 cols.
+% \usepackage[final]{listings}
+\usepackage{listings}
+
+%% Cuidado con la linea de literate, que contiene un hack para poder
+%% poner caracteres acentuados en utf-8. Vaya chapuza de las gordas :)
+% \lstset{
+%   basewidth=0.5em,% OJO!! 
+%   basicstyle=\fontfamily{txtt}\fontseries{m}\selectfont\small,%
+%   commentstyle=\fontshape{it}\selectfont,%
+%   mathescape=true,%
+%   literate={->}{{$\to$}}3 {=>}{{$\Rightarrow$}}3% 
+%   {-->}{{$\qquad \leadsto$}}2%
+%   {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1, %
+%   lineskip=-0.3ex,%
+%   breaklines=true,%
+%   frame=single,%
+%   framexleftmargin=3mm,% FIXME
+%   language=haskell,%
+%   breakatwhitespace=true,%
+%   extendedchars=true,%
+%   prebreak={\mbox{\hfill$\hookleftarrow$}},%
+%   morecomment=[s][\underbar]{!+}{-!} % This is for eval repr.
+% }
+
+
+\usepackage{charter}
+\usepackage{comment}
+% \usepackage{xmpincl}
+\usepackage{moreverb}
+\usepackage{url}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{appendix}
+\usepackage{enumerate}
+
+% START From http://ringlord.com/publications/latex-pdf-howto/
+\usepackage{color}
+% \definecolor{rltred}{rgb}{0.75,0,0}
+% \definecolor{rltgreen}{rgb}{0,0.5,0}
+% \definecolor{rltblue}{rgb}{0,0,0.75}
+% \definecolor{gris50}{rgb}{0.5,0.5,0.5}
+% \definecolor{YellowOrange}{cmyk}{0,0.42,1,0}
+% \definecolor{Black}{rgb}{0,0,0}
+% \definecolor{White}{rgb}{1,1,1}
+
+%\usepackage{thumbpdf}
+\usepackage[pdftex,
+        colorlinks=true,
+        urlcolor=black,       % \href{...}{...} external (URL)
+        filecolor=black,     % \href{...} local file
+        linkcolor=black,       % \ref{...} and \pageref{...}
+        citecolor=black,
+        pdftitle={EMCL Thesis: Negative non-ground queries in Well Founded Semantics},
+        pdfauthor={Victor Pablos Ceruelo},
+        pdfsubject={EMCL Thesis - \today},
+        pdfproducer={pdfLaTeX - \today},
+        % pdfkeywords={test, testing, testable stuff},
+        % pdfadjustspacing=1,
+        % pagebackref,
+        % pagebackref=true,
+        pagebackref=false,
+        pdfpagemode=UseNone,
+        bookmarksopen=true]{hyperref}
+
+% END From http://ringlord.com/publications/latex-pdf-howto/
+
+\usepackage{footmisc}
+\usepackage{longtable}
+\usepackage{picinpar}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphics}    % Para los gráficos
+\usepackage{tikz}
+% \usepackage{lgrind}
+
+% \floatstyle{ruled}
+% \newfloat{source-code}{thp}{lop}
+% \floatname{source-code}{Source Code}
+
+%\newcounter{SourceCodeCount}
+%\setcounter{SourceCodeCount}{0}
+%    \stepcounter{SourceCodeCount} {\bf\small Source Code} 
+%    \arabic{SourceCodeCount}: #2 \\
+%    \scriptsize 
+
+%    \line(1,0){410}
+%    \line(1,0){410} \\
+%    \vspace{5pt}
+
+\newcommand{\horizontalLine}[0]{
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0,0) -- (15,0);
+    \end{tikzpicture}
+  \end{center}
+}
+\newcommand{\horizontalLineText}[2]{
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0,0) -- (15,0);
+      \tikzstyle{every node}=[draw] 
+      \node[fill=white, text centered] at (7.5, 0) {#1};
+    \end{tikzpicture}
+  \end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sección de macros.
+%% (añadir otras macros específicas para el tfc)
+
+\def\sourcetabsize{4}
+\newenvironment{sourcestyle}{\begin{scriptsize}}{\end{scriptsize}}
+\def\sourceinput#1{\par\begin{sourcestyle}\verbatimtabinput[\sourcetabsize]{#1}\end{sourcestyle}\par}
+
+% Configs varios
+\urlstyle{small}
+
+% Marcas registradas.
+\def\TReg{\textsuperscript{\textregistered}}
+\def\TCop{\textsuperscript{\textcopyright}}
+\def\TTra{\textsuperscript{\texttrademark}}
+
+% \TReg für ®
+% \TCop für ©
+% \TTra für ™
+
+%\newcommand*\topfigrule{\hrule\kern-0.4pt\relax}
+%\newcommand*\botfigrule{\hrule\kern-0.4pt\relax}
+
+\newcommand{\labelAndCaption}[2]{
+   \caption{#2}
+  \label{#1}
+}
+
+\newcommand{\fixme}[1]{
+  { \textbf{FIXME}~\footnote{#1} }
+%  \bigskip
+%  \begin{figure}[ht!]  
+%    \frame{
+%      \begin{minipage}[]{0.98\textwidth}
+%        \smallskip
+% \centering \huge
+%    \newline
+%        \smallskip
+%      \end{minipage}
+%    }
+%  \end{figure}
+%  \bigskip
+}
+
+\newcommand{\BoxedFormat}[1]{
+%  \hfill
+  \medskip
+%  \vspace{0.5pt}
+  \noindent
+  \framebox[15.5cm]{
+%  \framebox[14.7cm]{
+%    \mbox
+%    \hspace{0.1pt}
+    \begin{minipage}[b]{0.90\textwidth} 
+      % {0.98\textwidth}
+      \smallskip
+      #1
+      \smallskip
+    \end{minipage}
+    \hspace{5pt}
+  }
+  \medskip
+}
+
+
+\newcommand{\InFigureBoxedFormat}[3]{
+  \label{#1}
+  \caption{#2}
+  \BoxedFormat{#3}
+  \bigskip
+}
+
+\newcommand{\ImageFormat}[4]{
+  \begin{figure}
+    \caption{#2}
+    \label{#1}
+    \includegraphics[scale=#3]{#4} 
+  \end{figure}
+}
+
+\newcommand{\FileInPrologFormat}[1]{
+  \lstset{language={Prolog}}
+  \lstinputlisting{#1}
+%    frame=lines,
+%    basicstyle=\small, 
+%    keywordstyle=\color{black}\bfseries\underbar,
+%    stringstyle=\ttfamily, 
+%    morecomment=[il]{\*}%,
+%    commentstyle=\color{white}
+%    deletekeywordcomment={\%\%}
+%  \lstinputlisting[label=#2, caption=#3]{#1}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Esto es un folclore :)
+%%\usepackage{setspace}
+%%\doublespacing{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% New commands from ngc-2009 paper.
+%% Let's see if they work ...
+
+
+%\lstdefinestyle{listing}{
+%  basicstyle=\ttfamily\small, 
+%  commentstyle=\fontshape{it}\selectfont,%
+%  breaklines=true,%
+%  breakatwhitespace=true,%
+%  prebreak={\mbox{\hfill$\hookleftarrow$}},%
+%  numbers=none,
+%  extendedchars=true,%
+%  literate={->}{{$\to$}}2 {=>}{{$\Rightarrow$}}2%
+%  {||}{{$\where$}}1%
+%  {:-}{{$\neck~$}}2%
+%  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1,%
+%  resetmargins=true,
+%  xrightmargin=0cm,
+%  mathescape=true %
+%  resetmargins=true, %
+%  xleftmargin=50pt
+%  lineskip=-0.3ex,%
+%}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\neck}{\leftarrow}
+\newcommand{\intneg}{\mathit{intneg}}
+\newcommand{\compneg}{\mathit{compneg}}
+\newcommand{\CompNeg}{\mathit{CompNeg}}
+\newcommand{\suc}{\mathit{succ}}
+\newcommand{\eq}{\mathit{eq}}
+\newcommand{\where}{[\!]} %% OJO!!
+\newcommand{\df}{\mathit{def}}
+\newcommand{\cdf}{\mathit{cdef}}
+\newcommand{\FS}{\mathit{FS}}
+\newcommand{\PS}{\mathit{PS}}
+\newcommand{\n}{\mathit{neg}}
+\newcommand{\Term}{\mathit{Term}}
+\newcommand{\comp}{\mathit{Comp}}
+\newcommand{\entails}{\models}
+\newcommand{\vect}{\overline{t}}
+\newcommand{\vecX}{\overline{X}}
+\newcommand{\vecY}{\overline{Y}}
+\newcommand{\vecx}{\overline{x}}
+\newcommand{\vecy}{\overline{y}}
+\newcommand{\vecz}{\overline{z}}
+\newcommand{\vecb}{\overline{b}}
+\newcommand{\vecB}{\overline{B}}
+\newcommand{\existclos}{\boldsymbol{\exists}}
+\newcommand{\CET}{\mathit{CET}}
+\newcommand{\even}{\mathit{even}}
+\newcommand{\then}{\rightarrow}
+\newcommand{\els}{;}
+\newcommand{\onlythen}{\wedge}
+\newcommand{\parels}{\parallel}
+\newcommand{\CD}{\mathit{CD}}
+\newcommand{\NNF}{\mathit{NNF}}
+\newcommand{\negp}{\mathit{neg\_p}}
+\newcommand{\negrhs}{\mathit{negate\_rhs}}
+\newcommand{\paratodo}{\mathit{forall}}
+\newcommand{\sk}{\mathit{sk}}
+% \newcommand{\next}{\mathit{next}}
+\newcommand{\eval}{\mathit{eval}}
+\newcommand{\Vars}{\mathit{Vars}}
+\newcommand{\skolem}{\mathit{skolem}}
+\newcommand{\semb}[1]{[\![{#1}]\!]}
+\newcommand{\Negate}{\mathit{Negate}}
+\newcommand{\depth}{\mathit{s\_depth}}
+\newcommand{\vardepth}{\mathit{vardepth}}
+\newcommand{\nat}{\mathit{nat}}
+\newcommand{\add}{\mathit{add}}
+\newcommand{\looop}{\mathit{loop}}
+\newcommand{\stuck}{\Phi^{\cal H}_P}
+\newcommand{\silly}{\mathit{silly}}
+\newcommand{\etal}{\emph{et al}}
+
+% VPC NO -> mathbf
+\newcommand{\true}{\textbf{t}}
+\newcommand{\false}{\textbf{f}}
+%\newcommand{\undef}{\textbf{u}}
+\newcommand{\setTrue}{\mathit{T}}
+\newcommand{\setFalse}{\mathit{F}}
+\newcommand{\setUndef}{\mathit{U}}
+\newcommand{\interpretationI}{\mathit{I}}
+\newcommand{\interpretationSetI}{\hat{\mathit{I}}}
+\newcommand{\modelM}{\mathit{M}}
+\newcommand{\progP}{\Pi}
+% \mathit{P}}
+\newcommand{\alphabetA}{\mathcal{A}}
+\newcommand{\HB}{\mathcal{H}}
+\newcommand{\HU}{\mathcal{U}}
+
+%\mathbb
+\newcommand{\setI}{\mathcal{I}}
+\newcommand{\setJ}{\mathcal{J}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% From http://for.mat.bham.ac.uk/R.W.Kaye/latex/theorem/theorem.htm
+% and http://www.stat.umn.edu/~charlie/amslatex.html
+
+% Here is where all the new theorem environments are defined.
+% Their use is described in the text.
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}%[section]
+%\newtheorem*{Zorn}{Zorn's Lemma}
+
+%\newtheoremstyle{definition}{\topsep}{\topsep}%
+%{}%         Body font
+%{}%         Indent amount (empty = no indent, \parindent = para indent)
+%{\bfseries}% Thm head font
+%{}%        Punctuation after thm head
+%{0pt}%     Space after thm head (\newline = linebreak)
+%{\thmname{#1}\thmnumber{ #2}\hspace{10pt}\thmnote{ #3}}%         Thm head spec
+
+%\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+%\newtheoremstyle{corollary}{\topsep}{\topsep}%
+%{}%         Body font
+%{}%         Indent amount (empty = no indent, \parindent = para indent)
+%{\bfseries}% Thm head font
+%{}%        Punctuation after thm head
+%{0pt}%     Space after thm head (\newline = linebreak)
+%{\thmname{#1}\thmnumber{ #2}\hspace{10pt}\thmnote{ #3}}%         Thm head spec
+
+%\theoremstyle{corollary}
+\newtheorem{corollary}{Corollary}[section]
+
+\newtheoremstyle{example}{\topsep}{\topsep}%
+{}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{}%        Punctuation after thm head
+{10pt}%     Space after thm head (\newline = linebreak)
+{\thmname{#1}\thmnumber{ #2}\hspace{10pt}\thmnote{ #3}}%         Thm head spec
+
+\theoremstyle{example}
+\newtheorem{example}{Example}[section]
+
+\newtheoremstyle{example*}{\topsep}{\topsep}%
+{}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{}%        Punctuation after thm head
+{10pt}%     Space after thm head (\newline = linebreak)
+{\thmname{#1}\thmnote{ #3}\hspace{10pt}}%         Thm head spec
+
+\theoremstyle{example*}
+\newtheorem*{example*}{Example}
+
+\newtheoremstyle{program}
+{\topsep} %
+{\topsep} %
+{}%  Body font
+{}%  Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{}%        Punctuation after thm head
+{\newline}%     Space after thm head (\newline = linebreak)
+{\thmname{#1}\thmnumber{ #2}\hspace{10pt}\thmnote{ #3}}%         Thm head spec
+
+\theoremstyle{program}
+\newtheorem{program}{Program}[section]
+% Do not use multicols=2. It does not work well.
+
+\newtheoremstyle{th-head}
+{\topsep} % \topsep
+{} % \topsep
+{\bfseries}%  Body font
+{}%  Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{}%        Punctuation after thm head
+{0pt}%     Space after thm head (\newline = linebreak) 
+{\noindent}%         Thm head spec
+%\thmname{#1}  \thmnumber{ #2}\hspace{10pt}\thmnote{ #3}
+
+\theoremstyle{th-head}
+\newtheorem*{th-head}{} % [section]
+% Do not use multicols=2. It does not work well.
+
+\newtheoremstyle{remark}{\topsep}{\topsep}%
+{}%         Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{}%        Punctuation after thm head
+{10pt}%     Space after thm head (\newline = linebreak)
+{Remark.}% {\thmname{#1}\thmnumber{ #2}\hspace{10pt}\thmnote{ #3}}%         Thm head spec
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+% \newtheorem{remark}{Remark}[section]
+
+\newtheoremstyle{algorithm}
+{\topsep} %
+{\topsep} %
+{}%  Body font
+{}%  Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{}%        Punctuation after thm head
+{\newline}%     Space after thm head (\newline = linebreak)
+{\thmname{#1}\thmnumber{ #2}\hspace{10pt}\thmnote{ #3}}%         Thm head spec
+
+\theoremstyle{algorithm}
+\newtheorem{algorithm}{Algorithm}[section]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% How to rotate text in latex.
+% From http://dmine.blogspot.com/2008/11/latex-vertical-text.html
+\usepackage{rotating}
+
+% How to justify text in latex
+\usepackage{ragged2e}
+% \justifying
+
+
+%% Page format (beautiful headers and footers).
+%% \usepackage{fancyheadings}
+\usepackage{fancyhdr}
+
+%% márgenes, tamaño del texto, etc.
+\usepackage{a4wide}
+%% nota: 1 inch = 2.54 centimeters
+\setlength{\headheight}{15pt}
+% \setlength{\topmargin}{0.99cm} % 3.5cm = 1in + 0.99cm
+\setlength{\topmargin}{-0.4cm} % ~ 2 cm
+% \addtolength{\topmargin}{-\headsep}
+% \addtolength{\topmargin}{-\headheight}
+% \setlength{\textheight}{22.5cm}
+\setlength{\textheight}{23.2cm}
+% \setlength{\oddsidemargin}{1.49cm} % 4cm = 1in + 1.49cm
+\setlength{\oddsidemargin}{0.7cm} % ~ 3cm
+% \setlength{\evensidemargin}{-0.51cm} % 2cm = 1in - 0.51cm
+\setlength{\evensidemargin}{-0.5cm} % ~ 2 cm
+% \setlength{\textwidth}{15cm}
+\setlength{\textwidth}{15.7cm}
+
+% Para q deje de quejarse de los saltos de linea.
+% From http://newsgroups.derkeiler.com/Archive/Comp/comp.text.tex/2005-12/msg01210.html
+%\setlength\parskip{.5\baselineskip
+%	plus .1\baselineskip
+%	minus .4\baselineskip
+%}
+
+\usepackage{etoolbox}
+
+\fancypagestyle{plain}{%
+  \fancyhead{} % get rid of the headers on plain pages
+  \renewcommand{\headrulewidth}{0pt} % and the line
+  \fancyfoot{} % get rid of the footers on plain pages
+  \fancyfoot[C]{page \thepage} % Only the page
+  % \fancyfoot[C]{\eachPageMsg{} - page \thepage} % Only the page
+  \renewcommand{\footrulewidth}{0.5pt}
+} 
+
+% First you need to clear the default layout:
+%\fancypagestyle{plain}{%
+%  \fancyhead{}
+  %\lhead{}
+  %\chead{}
+  %\rhead{}
+%  \lfoot{}
+%  \cfoot{EMCL Thesis - page \thepage}
+%  \rfoot{}
+
+  % \renewcommand{\footrulewidth}{0.5pt}
+
+  % Do not use in this environment...
+  % \fancyfoot{}  
+  % \fancyfoot[C]{EMCL Thesis - page \thepage}
+%}
+
+
+%\pagestyle{fancy}
+%\fancyhead{}
+%\renewcommand\headrulewidth{.1pt}
+%\fancyhead[LO,RE]{\footnotesize\sffamily\lite\leftmark}
+%\fancyhead[LE,RO]{\footnotesize\sffamily\lite\itshape\rightmark}
+%\fancyfoot[c]{}
+%\fancyfoot[LE,RO]{\setlength{\fboxsep}{2pt}\ovalbox{\footnotesize\sffamily\thepage}}
+%\fancyfoot[LO,RE]{\footnotesize\sffamily\lite\title}
+%\fancypagestyle{plain}{%
+%\fancyhf{}
+%\fancyfoot[R]{\setlength{\fboxsep}{2pt}{\ovalbox{\footnotesize\sffamily\thepage}}}
+%\fancyfoot[L]{\footnotesize\sffamily\lite\title}
+%\renewcommand{\headrulewidth}{0pt} 
+%}
+% \pagestyle{fancy}
+% This is not the way to change the format:
+% \fancypagestyle{fancy}{ ... }
+
+% There are seven letters you need to know before you can define your own header/footer:
+% E: Even page
+% O: Odd page
+% L: Left field
+% C: Center field
+% R: Right field
+% H: Header
+% F: Footer
+
+\setcounter{secnumdepth}{4}
+
+% Each time we select fancy format we need 
+% to establish again all the parameters.
+% this auxiliary macro is for that.
+% This does not affect plain style pages ...
+\newcommand{\resetFancyFormat}{
+% First you need to clear the default layout:
+\fancyhead{}
+% \fancyfoot{}
+
+% Odd (impar)
+\fancyhead[OL]{\slshape \leftmark}
+\fancyhead[OR]{}
+% Even (par)
+\fancyhead[EL]{}
+\fancyhead[ER]{\slshape \rightmark}
+% \fancyfoot[C]{EMCL Thesis - page \thepage} 
+
+% 
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+}
+
+%\newif\ifbiblio
+%\renewcommand{\backmatter}{%
+%  \fancyhead[C]{\ifbiblio \bibname\else\appendixname\ \thechapter\fi}%
+%  \bibliotrue
+%}
+%\appto\appendix{\clearpage\bibliofalse}
+%\preptocmd{\bibliography}{\cleardoublepage \fancyhead[C]{\bibname}}{}{}
+%\preptocmd{\appendix}{\cleardoublepage \fancyhead[C]{\appendixname\ \thechapter}}{}{}
+%\renewcommand{\backmatter}{
+%    \fancyhdr[C]{\ifstrequal{\leftmark}{\MakeUppercase{\bibname}}
+%        {\bibname}{\appendixname\ \thechapter}}
+%}
+
+
+% \renewcommand{\chaptermark}[1]{\markleft{#1}{}}
+% \renewcommand{\sectionmark}[1]{\markright{#1}{}}
+% \renewcommand{\leftmark}[0]{\chaptertitlename}
+% \renewcommand{\rightmark}[0]{\sectiontitlename}
+% \nouppercase (\nouppercase{\leftmark})
+% \lhead{\leftmark}
+% \chead{\thepage}
+% \rhead{\rightmark}
+% \lfoot{\today}
+% \cfoot{}
+% \rfoot{\thepage}
+% \renewcommand{\headrulewidth}{0.4pt}
+% \renewcommand{\footrulewidth}{0.4pt}
+
+% \preptocmd{\thebibliography}{\cleardoublepage \fancyhead[C]{\bibname}}{}{}
+% \preptocmd{\appendix}{\cleardoublepage \fancyhead[C]{\appendixname\ \thechapter}}{}{}
+
+% \renewcommand{\chaptermark}[1]{%
+%  \markboth{#1}{}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% White pages between chapters configuration.
+%% Going to odd numbered page generating a completely blankpage.
+\newcommand{\clearemptydoublepage}
+{\newpage{\pagestyle{empty}\cleardoublepage}}
+%{\newpage{\pagestyle{empty}\clearpage}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \fussy
+% http://www.tac.dk/cgi-bin/info2www?(latex)\fussy
+% This declaration (which is the default) makes TeX more fussy about
+% line breaking. This can avoids too much space between words, but may
+% produce overfull boxes.
+
+\sloppy
+% http://www.tac.dk/cgi-bin/info2www?(latex)\sloppy
+% This declaration makes TeX less fussy about line breaking. This can
+% prevent overfull boxes, but may leave too much space between words.
+% Lasts until a `\fussy' command is issued.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\abductiveSolTestAbds}[0]
+{for every term $A$, $A~\in~\Delta$, there are
+  a term $B$, $~B~\in~Abdcs~$, and
+  a (possible empty) substitution $~\sigma~$ 
+  such that
+  $~A~=~B\sigma~$ or $~A~=~(\neg B)\sigma~$}
+\newcommand{\abductiveSolTestQueryInWfs}[0]
+{$Q~\in~WFM~(\progP~\cup~IR~\cup~\Delta)$}
+\newcommand{\abductiveSolTestBottomNotInWfs}[0]
+{$\bot~\notin~WFM~(\progP~\cup~IR~\cup~\Delta)$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\documentclass{book}
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{subfiles}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{listings}
+
+\usetikzlibrary{trees,positioning,arrows}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{arrows,automata,backgrounds,fit,shapes,scopes}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defin}[thm]{Definition}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{ex}[thm]{Example}
+
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Thesis initial pages:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{empty}
+
+\input{title.tex}
+
+% \clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearemptydoublepage
+\pagenumbering{arabic}
+\pagestyle{plain}
+
+%\chapter*{Abstract}
+
+% \begin{abstract}
+\input{Abstract.tex}
+% \end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearemptydoublepage
+
+%% cabeceras, pies de página y numeración hasta el primer capítulo
+%% (no tocar)
+% \pagenumbering{roman}
+% \pagenumbering{arabic}
+% \pagestyle{plain}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Dedicatorias y agradecimientos.
+%% FIXME: Debería ser un include, para poder eliminarla.
+
+%% página con la dedicatoria
+\pagestyle{empty}
+\input{newContent/Acknowledgements}
+\clearemptydoublepage
+
+%% agradecimientos
+% \input{agradecimientos}
+% \clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Contents tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Main contents table
+\pagestyle{plain}
+\addcontentsline{toc}{section}{Contents}
+\printindex
+\setcounter{tocdepth}{3}
+\tableofcontents
+\clearemptydoublepage{}
+
+%% Figures index
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+%\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+%\setcounter{figure}{3}
+\listoffigures
+\addcontentsline{toc}{section}{Figures}
+\printindex
+\clearemptydoublepage{}
+
+%% Tables index
+%\addcontentsline{toc}{section}{Tables}
+%\printindex
+%\listoftables
+%\clearemptydoublepage
+
+% examples index (Does not work)
+% \listofexamples
+% \clearemptydoublepage
+
+%% Listings index
+%\addcontentsline{toc}{section}{Listings}
+%\printindex
+%\numberwithin{lstlisting}{section}
+%\lstlistoflistings
+%\clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Fancy pagestyle, arabic pagenumbering.
+%% Do not touch.
+% \pagestyle{empty}
+% \pagenumbering{arabic}
+\pagestyle{fancy}
+\resetFancyFormat{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Thesis core: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% To include source code in thesis.
+%
+%\begin{figure}[h!]
+%  \formatoRuby{app:fase1:migracion-respuestas}{Fase 1: Migración 1, las respuestas.}
+%  \lstinputlisting{app-source-code/fase1-migracion1.rb}
+%\end{figure}
+%
+%\\
+
+
+
+
+
+%\newcommand{\clearemptydoublepage}
+%{\newpage{\pagestyle{empty}\cleardoublepage}}
+
+%\input{title}
+
+%\newpage \thispagestyle{plain} \mbox{}
+%\subfile{Abstract}
+
+%\newpage \thispagestyle{plain} \mbox{}
+
+
+%\newpage \thispagestyle{plain} \mbox{}
+%\subfile{newContent/Acknowledgements}
+
+%\newpage \thispagestyle{plain} \mbox{}
+%\clearemptydoublepage
+%\tableofcontents
+
+
+%\newpage
+\subfile{Introduction}
+%\chapter{Introduction}
+%\label{chap:Introduction}
+
+\clearemptydoublepage
+\subfile{Preliminaries}
+ 
+\clearemptydoublepage
+\subfile{Justification}
+%\chapter{Justification}
+%\label{chap:Justification}
+
+\clearemptydoublepage
+% \newpage \thispagestyle{plain} \mbox{}
+\subfile{MyApproach}
+
+\clearemptydoublepage
+\subfile{Error}
+
+\clearemptydoublepage
+\subfile{Example}
+
+\clearemptydoublepage
+\subfile{Conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Bibliography and references.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \pagestyle{empty}
+% \pagestyle{fancy}
+% \resetFancyFormat{}
+
+%% \chapter{References}
+\bibliographystyle{alpha}
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\printindex
+%%\bibliography{thesis-bib}
+
+%\bibliography{externals/babylon/publications,externals/intneg-papers/tags/ngc/bibliography.bib}
+% \input{bibliografia}
+% \clearemptydoublepage{}
+% \input{apendices}
+
+
+%\nocite{*}
+%\bibliographystyle{alpha}
+\bibliography{medium-string,Thesis}
+
+\clearemptydoublepage{}
+% \clearpage 
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendix}
+\printindex
+\chaptermark{Appendix}
+
+% Odd (impar)
+\fancyhead[OL]{\slshape APPENDIX}
+\fancyhead[OR]{}
+% Even (par)
+\fancyhead[EL]{}
+\fancyhead[ER]{\slshape APPENDIX}
+
+
+\appendix
+%\chapter*{Appendix}
+\subfile{Appendix}
+
+
+%%%%%%%%%
+
+
+%\end{document}
+
+
+
+%\begin{comment}
+%\label{Bibliography}
+%\lhead{\emph{Bibliography}}  % Change the left side page header to "Bibliography"
+%\bibliographystyle{unsrtnat}  % Use the "unsrtnat" BibTeX style for formatting the Bibliography
+%\bibliography{Bibliography}  % The references (bibliography) information are stored in the file named "Bibliography.bib"
+%\end{comment}
+
+\end{document}

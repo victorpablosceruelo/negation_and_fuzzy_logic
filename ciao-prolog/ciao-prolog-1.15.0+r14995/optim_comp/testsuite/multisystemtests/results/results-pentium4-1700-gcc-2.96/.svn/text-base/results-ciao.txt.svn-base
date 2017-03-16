@@ -1,0 +1,20 @@
+t(ciao,queens11,1,780).
+object_size(queens11, 8192)
+t(ciao,crypt,1000,1770).
+object_size(crypt, 12288)
+t(ciao,primes,10000,1240).
+object_size(primes, 8192)
+t(ciao,tak,100,1120).
+object_size(tak, 8192)
+t(ciao,deriv,10000,140).
+object_size(deriv, 12288)
+t(ciao,poly,100,510).
+object_size(poly, 16384)
+t(ciao,qsort,10000,610).
+object_size(qsort, 8192)
+t(ciao,exp,10,561).
+object_size(exp, 8192)
+t(ciao,fib,1000,350).
+object_size(fib, 8192)
+t(ciao,knights,1,720).
+object_size(knights, 8192)

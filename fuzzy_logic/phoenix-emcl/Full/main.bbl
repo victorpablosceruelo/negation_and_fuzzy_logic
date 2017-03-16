@@ -1,0 +1,62 @@
+\begin{thebibliography}{MHPCS10}
+
+\bibitem[APC02]{PTC02}
+Enric~Trillas Ana~Pradera and Tomasa Calvo.
+\newblock A general class of triangular norm-based aggregation operators:
+  quasi-linear t-s operators.
+\newblock {\em International Journal of Approximate Reasoning}, 30(1):57--72,
+  2002.
+
+\bibitem[ETC95]{TCC95}
+Susana~Cubillo Enric~Trillas and Juan~Luis Castro.
+\newblock Conjunction and disjunction on ([0,1],$\leq$).
+\newblock {\em Fuzzy set and systems}, 72(2):155--165, 1995.
+
+\bibitem[IK85]{IK85}
+Mitsuru Ishizuka and Naoki Kanai.
+\newblock {\em Prolog-elf incorporating fuzzy logic}.
+\newblock Morgan Kaufmann Publishers Inc, 1985.
+
+\bibitem[JM08]{MM08a}
+Pedro J.Morcillo and Gines Moreno.
+\newblock Programming with fuzzy logic rules by using the floper tool.
+\newblock {\em In RuleML '08: Proceedings of the International Symposium on
+  Rule Representation, Interchange and Reasoning on the Web}, pages 119--126,
+  2008.
+
+\bibitem[KP00]{KPMRPE00}
+Radko; Klement, Erich Peter;~Mesiar and Endre Pap.
+\newblock {\em Triangular Norms}.
+\newblock Dordrecht: Kluwer, 2000.
+
+\bibitem[Lee72]{Lee72}
+R.~C.~T. Lee.
+\newblock Fuzzy logic and the resolution principle.
+\newblock {\em the Association for Computing Machinery}, 19(1):119–129, 1972.
+
+\bibitem[LL90]{LL90}
+Deyi Li and Dongbo Liu.
+\newblock A fuzzy prolog database system.
+\newblock 1990.
+
+\bibitem[Llo87]{Llo87}
+John~Wylie Lloyd, editor.
+\newblock Springer, 1987.
+
+\bibitem[MHPCS10]{MPS10}
+Susana Munoz-Hernandez, Victor Pablos-Ceruelo, and Hannas Strass.
+\newblock Rfuzzy: Syntax, semantics and implementation details of a simple and
+  expressive fuzzy tool over prolog.
+\newblock 2010.
+
+\bibitem[Mor06]{Mor06}
+Gines Moreno.
+\newblock Building a fuzzy transformation system.
+\newblock {\em Lecture Notes in Computer Science}, 3831:409--418, 2006.
+
+\bibitem[ZM89]{SDM89}
+L.Ding Z.Shen and M.Mukaidono.
+\newblock Fuzzy resolution principle.
+\newblock {\em 18th International Symposium on Multiple-valued Logic}, 5, 1989.
+
+\end{thebibliography}

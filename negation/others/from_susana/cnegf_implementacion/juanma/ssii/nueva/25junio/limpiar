@@ -1,0 +1,6 @@
+rm *.po
+rm *.itf
+rm *.err
+rm *_typesfd_*co*.*
+rm finite_facts.pl
+

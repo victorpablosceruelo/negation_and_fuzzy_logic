@@ -1,0 +1,3 @@
+
+no_number(X):- cneg(number(X)).
+

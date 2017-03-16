@@ -1,0 +1,11 @@
+
+This package only installs some scripts in 
+
+/usr/share/oracle-java-pkg-for-debian
+
+It's up to you to examine this script and determine if it might damage your system.
+
+I'm not responsible of any damage you can do by installing this package.
+
+Enjoy !!
+

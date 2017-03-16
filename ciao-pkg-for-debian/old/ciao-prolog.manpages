@@ -1,0 +1,11 @@
+# Falla para lpdoc
+# debian/tmp/usr/share/man/* /usr/share/man/man1
+# Error:
+# dh_installman: Could not determine section for debian/tmp/usr/share/man/lpdoc-3.0.0.manl
+# make: *** [binary-arch] Error 255
+# dpkg-buildpackage: error: fakeroot debian/rules binary gave error exit status 2
+
+# Solucion (cutre):
+debian/tmp/usr/share/man/ciao-*
+debian/tmp/usr/share/man/ciaopp-*
+

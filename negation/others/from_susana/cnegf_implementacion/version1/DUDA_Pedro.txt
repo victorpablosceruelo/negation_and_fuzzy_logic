@@ -1,0 +1,22 @@
+He hecho una prueba sencilla de análisis de no fallo (typesfd,shfr,nf)
+con el fichero:
+
+
+:- module(_proof2,_,[assertions]).
+
+:- entry no_falla(A) : (ground(A)).
+:- entry no_sabemos(A,L) : (ground(A)).
+
+% falla(_X):- fail.
+no_falla(_X).
+no_sabemos(X,L):- mi_member(X,L).
+
+mi_member(X,[X|_L]):- !.
+mi_member(X,[_Y|L]):- 
+ 	mi_member(X,L).
+
+Y va bien para el que no falla y para el que no se sabe.
+Pero el análisis devuelve "no" si incluyo el predicado falla/1 y no devuelve
+fichero de salida.
+
+	Susana

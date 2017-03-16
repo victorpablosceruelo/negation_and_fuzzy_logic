@@ -1,0 +1,439 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%                                                  %%%%%%%%%%%% 
+%%%%  SOLUCIONES A LOS PREDICADOS DE PROOF_CNEGF.PL   %%%%%%%%%%%%
+%%%%                                                  %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%BASICOS%%%%%%%%%%%%%%%%%%%%%%%%
+?- basico1.
+
+yes
+?- no_basico1.
+
+no
+?- basico2.
+
+no
+?- no_basico2.
+
+yes
+?- basico3(X).
+
+X = 1 ? ;
+
+no
+?- no_basico3(X).
+
+attach_attribute(X,formula(X,[[X/1]])) ? ;
+
+no
+?- basico4(X).
+
+attach_attribute(X,formula(X,[[X/_A]])),
+attach_attribute(_A,formula(_A,[[X/_A]])) ? ;
+
+no
+?- no_basico4(X).
+
+X = fA(_) ? ;
+
+no
+?- basico5(X,Y).
+
+Y = X ? ;
+
+no
+?- no_basico5(X,Y).
+
+attach_attribute(X,formula(X,[[X/Y]])),
+attach_attribute(Y,formula(Y,[[X/Y]])) ? ;
+
+no
+?- basico6(X,Y).
+
+attach_attribute(X,formula(X,[[X/Y]])),
+attach_attribute(Y,formula(Y,[[X/Y]])) ? ;
+
+no
+?- no_basico6(X,Y).
+
+Y = X ? ;
+
+Y = X ? ;
+
+no
+?- basico7(X,Y,Z).
+
+Y = X ? ;
+
+Z = X ? ;
+
+no
+?- no_basico7(X,Y,Z).
+
+attach_attribute(Z,formula(Z,[[X/Z]])),
+attach_attribute(Y,formula(Y,[[X/Y]])),
+attach_attribute(X,formula(X,[[X/Y,X/Z]])) ? ;
+
+no
+?- basico8(X,Y,Z).
+
+Y = X ? ;
+
+attach_attribute(X,formula(X,[[X/Z]])),
+attach_attribute(Z,formula(Z,[[X/Z]])) ? ;
+
+no
+?- no_basico8(X,Y,Z).
+
+Z = X,
+attach_attribute(X,formula(X,[[X/Y]])),
+attach_attribute(Y,formula(Y,[[X/Y]])) ? ;
+
+Z = X,
+attach_attribute(X,formula(X,[[X/Y]])),
+attach_attribute(Y,formula(Y,[[X/Y]])) ? ;
+
+no
+
+%%%%%%%%%%%%%%%%%%%%%%%%LISTAS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+?- lista1(X).
+
+X = [1,2,3] ? ;
+
+no
+?- no_lista1(X).
+
+attach_attribute(X,formula(X,[[X/[1,2,3]]])) ? ;
+
+no
+?- lista2(X,Y).
+
+X = [1,Y,3] ? ;
+
+no
+?- no_lista2(X,Y).
+
+attach_attribute(X,formula(X,[[X/[1,Y,3]]])),
+attach_attribute(Y,formula(Y,[[X/[1,Y,3]]])) ? ;
+
+no
+?- lista3(X,Y,Z).
+
+X = [1,Y,[3,Z,7]] ? ;
+
+no
+?- no_lista3(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/[1,Y,[3,Z,7]]]])),
+attach_attribute(Y,formula(Y,[[X/[1,Y,[3,Z,7]]]])),
+attach_attribute(Z,formula(Z,[[X/[1,Y,[3,Z,7]]]])) ? ;
+
+no
+
+%%%%%%%%%%%%%%%%%%%%%%%CUNATIFICACION UNIVERSAL%%%%%%%%%%%%%%%%
+?- universal1(X).
+
+X = s(_) ? ;
+
+no
+?- no_universal1(X).
+
+attach_attribute(X,formula(X,[[X/s(fA(_A))]])),
+attach_attribute(_A,formula(_A,[[X/s(fA(_A))]])) ? ;
+
+no
+?- universal2(X).
+
+X = s(fA(_)) ? ;
+
+no
+?- no_universal2(X).
+
+attach_attribute(X,formula(X,[[X/s(_A)]])),
+attach_attribute(_A,formula(_A,[[X/s(_A)]])) ? ;
+
+no
+?- universal3(X).
+
+attach_attribute(X,formula(X,[[X/s(_A)]])),
+attach_attribute(_A,formula(_A,[[X/s(_A)]])) ? ;
+
+no
+?- no_universal3(X).
+
+X = s(fA(_)) ? ;
+
+no
+?- universal4(X).
+
+attach_attribute(X,formula(X,[[X/s(fA(_A))]])),
+attach_attribute(_A,formula(_A,[[X/s(fA(_A))]])) ? ;
+
+no
+?- no_universal4(X).
+
+X = s(_) ? ;
+
+no
+?- universal5(X,Y,Z).
+
+X = p(1,Z,_),
+attach_attribute(Y,formula(Y,[[Y/q(Z,s(_A),4)]])),
+attach_attribute(Z,formula(Z,[[Y/q(Z,s(_A),4)]])),
+attach_attribute(_A,formula(_A,[[Y/q(Z,s(_A),4)]])) ? ;
+
+no
+?- no_universal5(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/p(1,Z,fA(_A))]])),
+attach_attribute(Z,formula(Z,[[X/p(1,Z,fA(_A))]])),
+attach_attribute(_A,formula(_A,[[X/p(1,Z,fA(_A))]])) ? ;
+
+Y = q(Z,s(fA(_)),4) ? ;
+
+Y = q(Z,s(fA(_)),4) ? ;
+
+no
+
+%%%%%%%%%%%%%%%%%%%%%%%%MEZCLAS%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+?- mezcla1(X,Y).
+
+X = [1,_,p(2,s(_),[2,_,s(fA(_))])],
+Y = 2 ? ;
+
+no
+?- no_mezcla1(X,Y).
+
+attach_attribute(X,formula(X,[[X/[1,fA(_A),p(2,s(fA(_D)),[2,fA(_B),s(_C)])]]])),
+attach_attribute(_C,formula(_C,[[X/[1,fA(_A),p(2,s(fA(_D)),[2,fA(_B),s(_C)])]]])),
+attach_attribute(_A,formula(_A,[[X/[1,fA(_A),p(2,s(fA(_D)),[2,fA(_B),s(_C)])]]])),
+attach_attribute(_D,formula(_D,[[X/[1,fA(_A),p(2,s(fA(_D)),[2,fA(_B),s(_C)])]]])),
+attach_attribute(_B,formula(_B,[[X/[1,fA(_A),p(2,s(fA(_D)),[2,fA(_B),s(_C)])]]])) ? ;
+
+attach_attribute(Y,formula(Y,[[Y/2]])) ? ;
+
+no
+?- mezcla2(X,Y,Z,W,F).
+
+W = [_,0] ? ;
+
+X = p(W,s(Y),F,_) ? ;
+
+F = s(_A),
+attach_attribute(Z,formula(Z,[[Z/s(_A)]])),
+attach_attribute(_A,formula(_A,[[Z/s(_A)]])) ? ;
+
+no
+?- no_mezcla2(X,Y,Z,W,F).
+
+Z = s(fA(_)),
+attach_attribute(W,formula(W,[[W/[fA(_A),0],X/p(W,s(Y),F,fA(_B))]])),
+attach_attribute(_A,formula(_A,[[W/[fA(_A),0],X/p(W,s(Y),F,fA(_B))]])),
+attach_attribute(X,formula(X,[[W/[fA(_A),0],X/p(W,s(Y),F,fA(_B))]])),
+attach_attribute(F,formula(F,[[W/[fA(_A),0],X/p(W,s(Y),F,fA(_B))]])),
+attach_attribute(Y,formula(Y,[[W/[fA(_A),0],X/p(W,s(Y),F,fA(_B))]])),
+attach_attribute(_B,formula(_B,[[W/[fA(_A),0],X/p(W,s(Y),F,fA(_B))]])) ? ;
+
+attach_attribute(F,formula(F,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])),
+attach_attribute(_A,formula(_A,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])),
+attach_attribute(W,formula(W,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])),
+attach_attribute(_C,formula(_C,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])),
+attach_attribute(X,formula(X,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])),
+attach_attribute(Y,formula(Y,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])),
+attach_attribute(_B,formula(_B,[[F/s(fA(_A)),X/p(W,s(Y),F,fA(_B)),W/[fA(_C),0]]])) ? ;
+
+no
+?- mezcla3(X,Y,Z,W).
+
+X = 1,
+Y = 2,
+attach_attribute(Z,formula(Z,[[Z/3]])),
+attach_attribute(W,formula(W,[[W/4]])) ? ;
+
+no
+?- no_mezcla3(X,Y,Z,W).
+
+attach_attribute(X,formula(X,[[X/1]])) ? ;
+
+attach_attribute(Y,formula(Y,[[Y/2]])) ? ;
+
+Z = 3 ? ;
+
+W = 4 ? ;
+
+no
+?- mezcla4(X).
+
+attach_attribute(X,formula(X,[[X/3,X/4]])) ? ;
+
+no
+?- no_mezcla4(X).
+
+X = 3 ? ;
+
+X = 4 ? ;
+
+no
+?- mezcla5(X,Y).
+
+attach_attribute(Y,formula(Y,[[X/Y],[Y/2]])),
+attach_attribute(X,formula(X,[[X/3,X/Y],[X/3,Y/2]])) ? ;
+
+no
+?- no_mezcla5(X,Y).
+
+X = 3 ? ;
+
+X = 3,
+Y = 2 ? ;
+
+X = 3,
+Y = 3 ? ;
+
+X = 2,
+Y = 2 ? ;
+
+X = 2,
+Y = 2 ? ;
+
+no
+?- mezcla6(X,Y).
+
+attach_attribute(_A,formula(_A,[[X/p(3,_A)]])),
+attach_attribute(Y,formula(Y,[[X/1],[Y/2]])),
+attach_attribute(X,formula(X,[[X/1,X/p(3,_A)],[Y/2,X/p(3,_A)]])) ? ;
+
+no
+?- no_mezcla6(X,Y).
+
+X = 1,
+Y = 2 ? ;
+
+X = p(3,fA(_)),
+Y = 2 ? ;
+
+X = p(3,fA(_)) ? ;
+
+X = 1,
+Y = 2 ? ;
+
+no
+?- mezcla7(X,Y,Z,W).
+
+X = negacion,
+Y = 0,
+attach_attribute(Z,formula(Z,[[W/s(s(fA(Z)))]])),
+attach_attribute(W,formula(W,[[W/s(s(fA(Z)))]])) ? ;
+
+X = negacion,
+Y = s(0),
+attach_attribute(Z,formula(Z,[[W/s(s(fA(Z)))]])),
+attach_attribute(W,formula(W,[[W/s(s(fA(Z)))]])) ? ;
+
+no
+?- no_mezcla7(X,Y,Z,W).
+
+attach_attribute(X,formula(X,[[X/negacion]])) ? ;
+
+attach_attribute(X,formula(X,[[X/negacion]])),
+attach_attribute(Y,formula(Y,[[Y/s(0)]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(X,formula(X,[[X/negacion]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(X,formula(X,[[X/negacion]])) ? ;
+
+attach_attribute(Y,formula(Y,[[Y/0]])),
+attach_attribute(X,formula(X,[[X/negacion]])) ? ;
+
+attach_attribute(Y,formula(Y,[[Y/s(0),Y/0]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(Y,formula(Y,[[Y/0]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(Y,formula(Y,[[Y/0]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(X,formula(X,[[X/negacion]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(Y,formula(Y,[[Y/s(0)]])) ? ;
+
+W = s(s(Z)) ? ;
+
+W = s(s(Z)) ? ;
+
+W = s(s(Z)),
+attach_attribute(X,formula(X,[[X/negacion]])) ? ;
+
+W = s(s(Z)),
+attach_attribute(Y,formula(Y,[[Y/s(0)]])) ? ;
+
+W = s(s(Z)) ? ;
+
+W = s(s(Z)) ? ;
+
+no
+?- mezcla8(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/Z],[Y/5]])),
+attach_attribute(Y,formula(Y,[[X/Z],[Y/5]])),
+attach_attribute(Z,formula(Z,[[X/Z,Z/6],[Y/5,Z/6]])) ? ;
+
+no
+?- no_mezcla8(X,Y,Z).
+
+Y = 5,
+Z = X ? ;
+
+Y = 5,
+Z = X ? ;
+
+Y = 5,
+Z = X ? ;
+
+X = 6,
+Z = 6 ? ;
+
+Y = 5,
+Z = 6 ? ;
+
+Z = 6 ? ;
+
+no
+?- mezcla9(X,Y,Z,W,F,G).
+
+F = s(fA(_A)),
+G = s(_B),
+X = [[W,W],2],
+Y = [W,W],
+Z = 2,
+attach_attribute(_B,formula(_B,[[W/[s(fA(_A)),s(_B)]]])),
+attach_attribute(_A,formula(_A,[[W/[s(fA(_A)),s(_B)]]])),
+attach_attribute(W,formula(W,[[W/[s(fA(_A)),s(_B)]]])) ? ;
+
+no
+?- no_mezcla9(X,Y,Z,W,F,G).
+
+attach_attribute(X,formula(X,[[X/[[W,W],2]]])),
+attach_attribute(W,formula(W,[[X/[[W,W],2]]])) ? ;
+
+attach_attribute(Y,formula(Y,[[Y/[W,W]]])),
+attach_attribute(W,formula(W,[[Y/[W,W]]])) ? ;
+
+attach_attribute(Z,formula(Z,[[Z/2]])) ? ;
+
+W = [s(_),s(fA(_))] ? ;
+
+attach_attribute(F,formula(F,[[F/s(_A)]])),
+attach_attribute(_A,formula(_A,[[F/s(_A)]])) ? ;
+
+attach_attribute(G,formula(G,[[G/s(fA(_A))]])),
+attach_attribute(_A,formula(_A,[[G/s(fA(_A))]])) ? ;
+
+no
+

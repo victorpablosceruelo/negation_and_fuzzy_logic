@@ -1,0 +1,15 @@
+This program shows a bug in the Ciao recompilation conditions when
+compilation modules are involved.
+
+The reason has been identified (c_itf_internal:change_dependences/2)
+and a solution is in the works, but the problem is complex. 
+
+Ask me for more details.
+
+(Jose F. Morales)
+
+---------------------------------------------------------------------------
+
+Use the 'do.sh' shell script to reproduce it.
+
+

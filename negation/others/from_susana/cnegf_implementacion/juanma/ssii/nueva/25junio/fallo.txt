@@ -1,0 +1,137 @@
+Ciao-Prolog 1.8 #2: Wed Nov 27 02:07:00 EST 2002
+?- use_module('/home/juanma/SSII/10junio/opt_cnegf.pl').
+
+yes
+?- main([qsort1]).
+{Precompiling /home/juanma/SSII/10junio/qsort1.pl
+{preprocessed in 19 msec.}
+{mode analysis in 23 msec.}
+{analysis prepared in 15 msec.}
+{type analysis in 339 msec.}
+{types simplified in 56 msec.}
+{information stored in 1 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 1263 msec.}
+{predicates: total=5 non-failing=3 covered=5}
+ln: `/home/juanma/SSII/10junio/qsort1_opt.pl': File exists
+{completed in 1760 msec.}
+{predicates=5, clauses=9, literals=13, max_variables=7, mean_variables=4.33333333333333313}
+{written file /home/juanma/SSII/10junio/qsort1_typesfd_shfr_nf_co.pl}
+}
+{Precompiling /home/juanma/SSII/10junio/qsort1.pl
+{preprocessed in 17 msec.}
+{mode analysis in 25 msec.}
+{analysis prepared in 13 msec.}
+{type analysis in 351 msec.}
+{types simplified in 58 msec.}
+{information stored in 0 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 1265 msec.}
+{predicates: total=5 non-failing=3 covered=5}
+{cost analysis in 101 msec.}
+{cost information stored in 0 msec.}
+{completed in 1872 msec.}
+{predicates=5, clauses=9, literals=13, max_variables=7, mean_variables=4.33333333333333313}
+{written file /home/juanma/SSII/10junio/qsort1_typesfd_shfr_upper_nf_co.pl}
+}
+{ERROR: read/1 - syntax error (lns 153-154) 
+operator expected after expression:
+:- regtype 
+** here **
+t253 / 1 . 
+}
+{Precompiling /home/juanma/SSII/10junio/qsort1.pl
+{preprocessed in 17 msec.}
+{mode analysis in 23 msec.}
+{analysis prepared in 15 msec.}
+{type analysis in 374 msec.}
+{types simplified in 58 msec.}
+{information stored in 1 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 1267 msec.}
+{predicates: total=5 non-failing=3 covered=5}
+{cost analysis in 97 msec.}
+{cost information stored in 0 msec.}
+{completed in 1898 msec.}
+{predicates=5, clauses=9, literals=13, max_variables=7, mean_variables=4.33333333333333313}
+{written file /home/juanma/SSII/10junio/qsort1_typesfd_shfr_upper_nf_co.pl}
+}
+{ERROR: read/1 - syntax error (lns 153-154) 
+operator expected after expression:
+:- regtype 
+** here **
+t293 / 1 . 
+}
+{Precompiling /home/juanma/SSII/10junio/qsort1.pl
+{preprocessed in 15 msec.}
+{mode analysis in 27 msec.}
+{analysis prepared in 19 msec.}
+{type analysis in 400 msec.}
+{types simplified in 60 msec.}
+{information stored in 0 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 1273 msec.}
+{predicates: total=5 non-failing=3 covered=5}
+{completed in 1833 msec.}
+{predicates=5, clauses=9, literals=13, max_variables=7, mean_variables=4.33333333333333313}
+{written file /home/juanma/SSII/10junio/qsort1_typesfd_shfr_nf_co.pl}
+}
+{Precompiling /home/juanma/SSII/10junio/qsort1.pl
+{preprocessed in 15 msec.}
+{mode analysis in 23 msec.}
+{analysis prepared in 15 msec.}
+{type analysis in 414 msec.}
+{types simplified in 58 msec.}
+{information stored in 0 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 1275 msec.}
+{predicates: total=5 non-failing=3 covered=5}
+{cost analysis in 97 msec.}
+{cost information stored in 0 msec.}
+{completed in 1936 msec.}
+{predicates=5, clauses=9, literals=13, max_variables=7, mean_variables=4.33333333333333313}
+{written file /home/juanma/SSII/10junio/qsort1_typesfd_shfr_upper_nf_co.pl}
+}
+{ERROR: read/1 - syntax error (lns 153-154) 
+operator expected after expression:
+:- regtype 
+** here **
+t373 / 1 . 
+}
+{Precompiling /home/juanma/SSII/10junio/qsort1.pl
+{preprocessed in 15 msec.}
+{mode analysis in 23 msec.}
+{analysis prepared in 17 msec.}
+{type analysis in 433 msec.}
+{types simplified in 58 msec.}
+{information stored in 0 msec.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{WARNING (infernf): User predicate neg/1 not defined. Assumed that any call to it fails.}
+{non-failure analysis in 1291 msec.}
+{predicates: total=5 non-failing=3 covered=5}
+{cost analysis in 97 msec.}
+{cost information stored in 0 msec.}
+{completed in 1978 msec.}
+{predicates=5, clauses=9, literals=13, max_variables=7, mean_variables=4.33333333333333313}
+{written file /home/juanma/SSII/10junio/qsort1_typesfd_shfr_upper_nf_co.pl}
+}
+{ERROR: read/1 - syntax error (lns 153-154) 
+operator expected after expression:
+:- regtype 
+** here **
+t413 / 1 . 
+}
+
+no
+?- 

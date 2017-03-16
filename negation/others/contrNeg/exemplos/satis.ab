@@ -1,0 +1,23 @@
+sat(1).
+sat(e(X,Y)) <- sat(X), sat(Y).
+sat(ou(X,_)) <- sat(X).
+sat(ou(_,Y)) <- sat(Y).
+sat(n(X)) <- not sat(X).
+
+/*
+
+No Art of Prolog está assim:
+
+sat(1).
+sat(e(X,Y)) <- sat(X), sat(Y).
+sat(ou(X,_)) <- sat(X).
+sat(ou(_,Y)) <- sat(Y).
+sat(n(X)) <- inv(X).
+
+inv(0).
+inv(ou(X,Y)) <- inv(X), inv(Y).
+inv(e(X,_)) <- inv(X).
+inv(e(_,Y)) <- inv(Y).
+inv(n(X)) <- sat(X).
+
+*/

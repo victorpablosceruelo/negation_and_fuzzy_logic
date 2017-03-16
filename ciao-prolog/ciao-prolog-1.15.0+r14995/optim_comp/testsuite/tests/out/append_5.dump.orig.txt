@@ -1,0 +1,88 @@
+Analysis info for domain sht
+Predicate: /(multifile:$initialization,1)
+  calltypes: [~t0]
+  exittypes: $bottom
+Types: 
+  t0 := ~mode(any) && #any
+Predicate: /(multifile:$on_abort,1)
+  calltypes: [~t1]
+  exittypes: $bottom
+Types: 
+  t1 := ~mode(any) && #any
+Predicate: /(append_5:extract_paths,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(append_5:extract_path#12,2)
+  calltypes: [~t2, ~t3]
+  exittypes: [~t4, ~t5]
+Types: 
+  t2 := ~mode(nva) && #reclist(~t6)
+  t6 := ~mode(nva) && #smallint(~t7)
+  t7 := ~mode(nva) && 1
+  t3 := ~mode(var) && #any
+  t4 := ~mode(nva) && #reclist(~t8)
+  t8 := ~mode(nva) && #smallint(~t9)
+  t9 := ~mode(nva) && 1
+  t5 := ~mode(nva) && #atom(~t10)
+  t10 := ~mode(nva) && a
+Predicate: /(append_5:extract_path#13,2)
+  calltypes: [~t11, ~t12]
+  exittypes: [~t13, ~t14]
+Types: 
+  t11 := ~mode(nva) && #atom(~t15)
+  t15 := ~mode(nva) && []
+  t12 := ~mode(var) && #any
+  t13 := ~mode(nva) && #atom(~t16)
+  t16 := ~mode(nva) && []
+  t14 := ~mode(nva) && #atom(~t17)
+  t17 := ~mode(nva) && a
+Predicate: /(append_5:extract_path#14,2)
+  calltypes: [~t18, ~t19]
+  exittypes: [~t20, ~t21]
+Types: 
+  t18 := ~mode(nva) && #list(~t22)
+  t22 := ~mode(nva) && .(~t23, ~t24)
+  t23 := ~mode(nva) && #smallint(~t25)
+  t25 := ~mode(nva) && 1
+  t24 := ~mode(nva) && #reclist(~t26)
+  t26 := ~mode(nva) && #smallint(~t27)
+  t27 := ~mode(nva) && 1
+  t19 := ~mode(var) && #any
+  t20 := ~mode(nva) && #list(~t28)
+  t28 := ~mode(nva) && .(~t29, ~t30)
+  t29 := ~mode(nva) && #smallint(~t31)
+  t31 := ~mode(nva) && 1
+  t30 := ~mode(nva) && #reclist(~t32)
+  t32 := ~mode(nva) && #smallint(~t33)
+  t33 := ~mode(nva) && 1
+  t21 := ~mode(nva) && #atom(~t34)
+  t34 := ~mode(nva) && a
+Predicate: /(append_5:extract_path#15,2)
+  calltypes: [~t35, ~t36]
+  exittypes: [~t37, ~t38]
+Types: 
+  t35 := ~mode(nva) && #reclist(~t39)
+  t39 := ~mode(nva) && #smallint(~t40)
+  t40 := ~mode(nva) && 1
+  t36 := ~mode(var) && #any
+  t37 := ~mode(nva) && #reclist(~t41)
+  t41 := ~mode(nva) && #smallint(~t42)
+  t42 := ~mode(nva) && 1
+  t38 := ~mode(nva) && #atom(~t43)
+  t43 := ~mode(nva) && a
+Analysis info for domain idet
+Predicate: /(multifile:$initialization,1)
+  imp: nondet
+Predicate: /(multifile:$on_abort,1)
+  imp: nondet
+Predicate: /(append_5:extract_paths,0)
+  imp: nondet
+Predicate: /(append_5:extract_path#12,2)
+  imp: nondet
+Predicate: /(append_5:extract_path#13,2)
+  imp: nondet
+Predicate: /(append_5:extract_path#14,2)
+  imp: nondet
+Predicate: /(append_5:extract_path#15,2)
+  imp: nondet

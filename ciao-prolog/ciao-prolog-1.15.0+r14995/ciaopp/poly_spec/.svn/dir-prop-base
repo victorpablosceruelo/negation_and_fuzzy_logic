@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 23
+*.po
+*.itf
+*.asr
+*.ast
+
+END

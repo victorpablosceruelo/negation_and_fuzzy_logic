@@ -1,0 +1,50 @@
+@title{Testsuite Invokation}
+@author{Jose F. Morales}
+
+The @apl{ciaotool tests} command allows the invokation of the @em{test
+suite} and check its results.
+
+@section{Usage}
+
+@tt{ciaotool tests ACTION}
+  
+@section{Available actions}
+
+@item Compiler and full tests:
+
+@begin{itemize}
+@item @tt{full}: Full tests (comp + inccomp + (@tt{update-all}) + runexec + check)
+@item @tt{comp}: Compiler check
+@item @tt{inccomp}: Incremental compiler check
+@end{itemize}
+
+@item The following are only possible after performing @tt{update-all}:
+
+@begin{itemize}
+@item @tt{runexecs}: Test case execution (run the tests cases)
+@item @tt{check}: Test case compilation (compare the compilation output)
+@end{itemize}
+
+@item Performance tests:
+
+@begin{itemize}
+@item @tt{eval}: Test case evaluation (performance and bytecode size)
+@end{itemize}
+
+@item Compare test output:
+
+@begin{itemize}
+@item @tt{briefcompare}: Show a summary of compilation results that differs
+@item @tt{compare}: Compare saved results (invoking @app{meld} for each pair of files)
+@item @tt{save}: Save results
+@end{itemize}
+
+@item Absmach generation actions:
+
+@begin{itemize}
+@item @tt{sabsmach-min}: Absmach machine minimization benchmarks
+@item @tt{sabsmach-vers}: Absmach machine versions benchmarks
+@end{itemize}
+
+
+

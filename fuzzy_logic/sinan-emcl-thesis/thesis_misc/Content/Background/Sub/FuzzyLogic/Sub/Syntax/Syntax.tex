@@ -1,0 +1,25 @@
+\subsubsection{Syntax}
+\label{sec:FLSyntax}
+Let $\Sigma$ be a set of function symbols, $V$ be a set of variables and $\Pi$ be a set of predicate symbols. Terminology such as terms, atoms are formally defined.
+
+\begin{defin} \textbf{Term}
+\label{def:Term}
+\begin{itemize}
+
+\item $t$ is a term, if $t \in V$
+
+\item $f(t_1,...,t_n)$ is a term, if $f \in \Sigma$ and $t_i$ are terms, where $i \in [1,n]$.
+
+\item nothing else is term.
+
+\end{itemize}
+\end{defin}
+A special case is that $f$'s arity is 0, then the term is called \textit{constant}. The set of all the terms is called \textbf{term universe}, notated as $TU_{\Sigma,V}$.
+
+\begin{defin} \textbf{Atom}
+\label{def:Atom}
+$p(t_1,...,t_n)$ is an atom if $p \in \Pi$ and $t_i$ are terms.
+\end{defin}
+A special case is that $p$'s arity is 0, then the atom is called \textit{proposition}. The set of all the atoms built under $V$, $\Sigma$, $\Pi$ is called \textbf{term base}, notated as $TB_{\Pi,\Sigma,V}$.
+
+Terms and atoms are called \textit{ground} if they do not contain variables. The \textbf{Herbrand universe} $\mathbb{HU}$ is a set of all ground terms, and the \textbf{Herbrand base} $\mathbb{HB}$ is a set of all ground atoms.

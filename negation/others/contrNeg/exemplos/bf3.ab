@@ -1,0 +1,25 @@
+abds([flies_ab/1,bird_ab/1,penguin_ab/1,flying_p_ab/1]).
+
+flies(N,X) <- bird(N,X), not -flies(N,X), not ab1(N,X).
+-flies(N,X) <- penguin(N,X), not flies(N,X), not ab2(N,X).
+flies(N,X) <- flying_p(N,X), not -flies(N,X), not ab3(N,X).
+
+ab1(N,X) <- penguin(N,X), not ab2(N,X).
+ab2(N,X) <- flying_p(N,X), not ab3(N,X).
+
+flies(N,X) <- flies_ab(X).
+bird(N,X) <- bird_ab(X).
+penguin(N,X) <- penguin_ab(X).
+flying_p(N,X) <- flying_p_ab(X).
+
+bird(N,X) <- penguin(N,X).
+penguin(N,X) <- flying_p(N,X).
+
+bird(_,a).
+penguin(_,b).
+flying_p(_,c).
+
+bird(_,d).
+-flies(_,d).
+
+

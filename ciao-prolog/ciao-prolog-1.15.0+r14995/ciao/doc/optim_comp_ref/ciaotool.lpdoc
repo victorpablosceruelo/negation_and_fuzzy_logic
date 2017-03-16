@@ -1,0 +1,134 @@
+@title{Ciaotool}
+@author{Jose F. Morales}
+
+The @apl{ciaotool} command is the main entry for @em{optim-comp}:
+
+@section{Usage}
+
+@tt{ciaotool [OPTIONS] COMMAND}
+
+Where the available options are:
+
+@begin{itemize}
+@item Environment Setup
+  @begin{itemize}
+  @item @tt{--cache-dir D}: Set cache directory to @tt{D}
+  @end{itemize}
+
+@item Compiler
+  @begin{itemize}
+  @item @tt{--verbose}: Turn on verbose compilation
+  @item @tt{--stats}: Show a brief memory and time consumption info
+  @end{itemize}
+
+@item Code Generation
+  @begin{itemize}
+  @item @tt{--profile}: Enable profiler
+  @item @tt{--rtchecks}: Enable (low level) runtime checks
+  @end{itemize}
+@end{itemize}
+
+The available commands are:
+@begin{itemize}
+
+  @item @tt{version}: Show version
+
+  @item Compile the Compiler
+
+    The compiler compiles itself in up to three steps. Those are the
+    commands to start the compilation:
+
+    @begin{itemize}
+    @item @tt{update-comp}: Update the compiler.
+    @item @tt{update-comp-rt}: Update the compiler with (engine) runtime checks enabled.
+    @item @tt{status}: Show the compilation status.
+    @item @tt{promote}: Backup the old compiler and promote the new compiler (only if step 3 succeeded).
+    @end{itemize}
+
+    Other compilation commands:
+
+    @begin{itemize}
+    @item @tt{fast-update-comp}: Compile the compiler in one step (it is
+    	faster, but may apply all the changes in the abstract machine
+    	or compiler)
+    @end{itemize}
+
+  @item Incremental Compilation Tests
+
+    @begin{itemize}
+    @item @tt{inc}: Incremental compilation test
+    @end{itemize}
+
+  @item Call the Candidate Compiler (generated in step 2)
+
+    @begin{itemize}
+    @item @tt{comp [...]}: Call the @index{candidate compiler}
+    @item @tt{debug-comp [...]}: Call the @index{candidate compiler} in debug mode (@apl{gdb})
+    @item @tt{comp-ana [...]}: Call the result of step 3
+    @end{itemize}
+
+  @item Other backends:
+
+    @begin{itemize}
+    @item @tt{update-comp-js [...]}: Update compiler with JS backend
+    @item @tt{comp-js [...]}: Call the compiler with JS backend
+    @end{itemize}
+
+  @item Set Up the Environment
+
+    @begin{itemize}
+    @item @tt{bash-env}: Get bash environment settings (use shell @tt{eval})
+    @item @tt{csh-env}: Get csh environment settings (use shell @tt{eval})
+    @end{itemize}
+
+  @item Compile the System
+
+    @begin{itemize}
+    @item @tt{build} :: Build the complete system (update-comp and update-all)
+               (without performing any test)
+    @item @tt{update-loader}: Update the dynamic executable loader
+    @item @tt{update-apps}: Update misc applications (ciaosh, ...)
+    @item @tt{update-all}: Update loader and apps
+    @end{itemize}
+
+  @item Maintenance 
+
+    @begin{itemize}
+    @item @tt{clean-cache}: Clean the compiler cache
+    @item @tt{clean-bootstrap}: Clean the bootstrap compiler copy
+    @end{itemize}
+
+  @item Tests
+
+    @begin{itemize}
+    @item @tt{tests [...]}: Run the @index{tests}
+    @item @tt{run-testing [...]}: Run an executable (@index{testing version})
+    @item @tt{comp-testing [...]}: Call the @index{candidate compiler} (@index{testing version})
+    @item @tt{update-comp-testing}: Update the @index{testing} @index{compiler}
+    @item @tt{update-loader-testing}: Update the @index{testing} @index{dynamic executable loader}
+    @item @tt{update-apps-testing}: Update miscellaneous @index{applications} (for @index{testing})
+    @item @tt{bench [...]}: Run the @index{benchmarks}
+    @end{itemize}
+
+  @item Multisystem tests
+
+    @begin{itemize}
+    @item @tt{multisystemtests [...]}: Run the @index{multi-system tests}
+    @end{itemize}
+
+  @item Experimental
+
+    @begin{itemize}
+    @item @tt{ana}: Compile the compiler using analysis
+    @end{itemize}
+
+  @item SVN Repository
+
+    @begin{itemize}
+    @item @tt{svn-update-rev}: Update @tt{SVN} revision (to include in the engine)
+    @item @tt{svn-update-source}: Update @tt{SVN} source (@tt{svn up})
+    @end{itemize}
+
+@end{itemize}
+
+

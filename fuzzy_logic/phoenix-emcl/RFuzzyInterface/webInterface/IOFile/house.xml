@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<House>
+	<PrimaryKey>house_code</PrimaryKey>
+	<AttrDom>
+		<Attribute>type</Attribute>
+		<Domain>
+			<Type>D</Type>
+			<Range>["apartment","villa","town_house"]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>size</Attribute>
+		<Domain>
+			<Type>C</Type>
+			<Range>[(0,2500]]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>number_of_rooms</Attribute>
+		<Domain>
+			<Type>D</Type>
+			<Range>[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>price</Attribute>
+		<Domain>
+			<Type>C</Type>
+			<Range>[(0,5000000]]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>distance_from_center</Attribute>
+		<Domain>
+			<Type>C</Type>
+			<Range>[(0,30]]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>close_to_beach</Attribute>
+		<Domain>
+			<Type>C</Type>
+			<Range>[(0,2000]]</Range>
+		</Domain>
+	</AttrDom>
+
+</House>

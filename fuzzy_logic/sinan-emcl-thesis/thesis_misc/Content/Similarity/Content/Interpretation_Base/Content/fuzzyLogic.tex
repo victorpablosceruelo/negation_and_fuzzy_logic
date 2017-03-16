@@ -1,0 +1,24 @@
+\subsection{Similarity Between Two Predicates}
+\label{sec:predicateSim}
+In chapter \ref{chap:CorrespondingRelation}, we demonstrated the relation between \textit{fuzzy set} and \textit{fuzzy logic}. The main idea is briefly presented first. $D_i = \mathbb{HU}^{i} \in \mathfrak{D}$, and $\Pi_i$ represents the set of \textit{i-arity} predicates, then \textit{i-arity} atom domain is $\mathcal{AD}_i = \mathcal{D}_i \times \Pi_i$, and $\mathcal{F}(\mathcal{AD}_i)$ is the set of all fuzzy sets over $\mathcal{AD}_i$, which are considered as all the interpretations over \textit{i-arity} ground atoms, denoted as $\mathfrak{I}_i$.
+In other words, $\mathfrak{I}_i=\mathcal{F}(\mathcal{AD}_i)$. Since $\mathfrak{I}_i=\mathcal{F}(\mathcal{AD}_i)$, each fuzzy set $f$ in $\mathcal{F}(\mathcal{AD}_i)$ corresponds to an interpretation $I$ in $\mathfrak{I}_i$. 
+
+A set of all the interpretations over ground atoms regardless of their arities is Cartesian product over $\mathfrak{I}_i$, written as $\mathfrak{I}=\prod{\substack{i \in [1,n]}}\mathfrak{I}_i$. Each element in $\mathfrak{I}$ is an interpretation $\mathcal{I} : \mathbb{HB} \rightarrow [0,1]$, where $\mathbb{HB}=\bigcup{\substack{i \in [1,n]}}\mathcal{AD}_i$. 
+
+According to the relation between \textit{fuzzy logic} and \textit{fuzzy set}, we extend the similarity between fuzzy set into similarity between predicates.
+
+\begin{defin}\textbf{Similarity between two predicates}
+Let \textbf{P} be a RFuzzy program. $\mathbb{HB}$ is the Herbrand Base for \textbf{P}. $p_i/n$ and $p_j/n$ are arbitrary predicates in $\mathbb{HB}$ with the same type $\tau$. $\mathcal{I}_{lm}=lm(\textbf{P})=\sqcap_{\mathcal{I}\models\textbf{P}}\mathcal{I}$. 
+
+When $\mathcal{I}_{lm}$ works as a discrete function, similarity between predicates is defined as,
+\begin{equation}
+sim(p_i,p_j)=1-\frac{\sum_{k=1}^{n} \rvert p_i(\vec{t_k})^{\mathcal{I}_{lm}}-p_j(\vec{t_k})^{\mathcal{I}_{lm}} \lvert}{n}
+\end{equation}
+$p_i(\vec{t_k})$ and $p_j(\vec{t_k})$ are ground atoms in $\mathbb{HB}$, since they are of the same type, the number of ground atoms with $p_i$ as predicate is the same as that with $p_j$, and is represented as $n$.
+When $\mathcal{I}_{lm}$ works as a continuous function, similarity between predicates is defined as,
+\begin{equation}
+Sim(p_i,p_j) =1- \frac{\int_{x_{low}}^{x_{up}} \rvert p_i(x)^{\mathcal{I}_{lm}}-p_j(x)^{\mathcal{I}_{lm}} \lvert\, \mathrm{d}x}{\int_{x_{low}}^{x_{up}}\mathrm{d}x}
+\end{equation}
+
+\end{defin} 
+

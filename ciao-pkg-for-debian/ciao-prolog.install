@@ -1,0 +1,4 @@
+# Take everything and put it in the correct place.
+debian/tmp/*                        /
+
+

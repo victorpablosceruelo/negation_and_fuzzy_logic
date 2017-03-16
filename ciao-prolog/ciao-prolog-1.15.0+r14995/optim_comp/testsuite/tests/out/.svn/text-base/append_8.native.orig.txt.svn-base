@@ -1,0 +1,144 @@
+#include <engine/basiccontrol.native.h>
+definition_t *append__8__0;
+bcp_t append__8__1;
+try_node_t *append__8__2;
+bcp_t append__8__3;
+void append__8_3amain__n0(worker_t *);
+void append__8_3ak_233__n0(worker_t *);
+/* append_8:main/0 */
+void append__8_3amain__n0(worker_t *w) {
+  frame_t *var0;
+  choice_t *var1;
+  int32_t var2;
+  uint32_t var3;
+  choice_t *var4;
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 0);
+  goto lab1;
+lab1:
+  /* append_8:a#3/0 */
+  if (ValidLocalTop()) goto lab2; else goto lab3;
+lab2:
+  var0 = G->local_top;
+  goto lab5;
+lab3:
+  var0 = w->choice->local_top;
+  if (StackYounger(var0, G->frame)) goto lab5; else goto lab4;
+lab4:
+  var0 = StackCharOffset(G->frame, FrameSize(G->next_insn));
+  goto lab5;
+lab5:
+  var0->next_insn = G->next_insn;
+  var0->frame = G->frame;
+  G->frame = var0;
+  G->next_insn = append__8__1;
+  G->local_top = StackCharOffset(var0, FrameSize(G->next_insn));
+  if (OffStacktop(var0, Stack_Warn)) goto lab6; else goto lab7;
+lab6:
+  SetEvent();
+  goto lab7;
+lab7:
+  /* append_8:##0#3/0 */
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab8; else goto lab9;
+lab8:
+  v__handle_event(w, 0);
+  goto lab9;
+lab9:
+  w->previous_choice = w->choice;
+  if (ValidLocalTop()) goto lab10; else goto lab11;
+lab10:
+  G->local_top = G->local_top;
+  goto lab13;
+lab11:
+  G->local_top = w->choice->local_top;
+  if (StackYounger(G->local_top, G->frame)) goto lab13; else goto lab12;
+lab12:
+  G->local_top = StackCharOffset(G->frame, FrameSize(G->next_insn));
+  goto lab13;
+lab13:
+  G->next_alt = append__8__2;
+  w->choice = ChoiceNext0(w->choice, append__8__2->arity);
+  w->choice->flags = 0;
+  w->choice->trail_top = G->trail_top;
+  w->choice->local_top = G->local_top;
+  w->choice->heap_top = G->heap_top;
+  SetShallowTry();
+  w->global_uncond = Tagp(0, w->choice->heap_top);
+  w->local_uncond = Tagp(2, w->choice->local_top);
+  w->choice = w->choice;
+  TEST_CHOICE_OVERFLOW(w->choice, CHOICEPAD);
+  var1 = w->choice;
+  var1->frame = G->frame;
+  var1->next_insn = G->next_insn;
+  var1->next_alt = G->next_alt;
+  var2 = 0;
+  SetDeep();
+  if (ValidLocalTop()) goto lab14; else goto lab15;
+lab14:
+  var0 = G->local_top;
+  goto lab17;
+lab15:
+  var0 = w->choice->local_top;
+  if (StackYounger(var0, G->frame)) goto lab17; else goto lab16;
+lab16:
+  var0 = StackCharOffset(G->frame, FrameSize(G->next_insn));
+  goto lab17;
+lab17:
+  var0->x[0] = ChoiceToTagged(w->previous_choice);
+  var0->next_insn = G->next_insn;
+  var0->frame = G->frame;
+  G->frame = var0;
+  G->next_insn = append__8__3;
+  G->local_top = StackCharOffset(var0, FrameSize(G->next_insn));
+  if (OffStacktop(var0, Stack_Warn)) goto lab18; else goto lab19;
+lab18:
+  SetEvent();
+  goto lab19;
+lab19:
+  append__8_3ak_233__n0(w);
+  var0 = G->frame;
+  var3 = var0->x[0];
+  G->local_top = var0;
+  w->previous_choice = ChoiceFromTagged(var3);
+  var4 = w->previous_choice;
+  G->next_alt = var4->next_alt;
+  w->global_uncond = Tagp(0, var4->heap_top);
+  w->local_uncond = Tagp(2, var4->local_top);
+  w->choice = var4;
+  DEBUG_CUT(var4);
+  ConcChptCleanUp(TopConcChptFun(), var4);
+  SetDeep();
+  G->next_insn = var0->next_insn;
+  G->frame = var0->frame;
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab20; else goto lab21;
+lab20:
+  v__handle_event(w, 0);
+  goto lab21;
+lab21:
+  G->local_top = NULL;
+  var0 = G->frame;
+  G->next_insn = var0->next_insn;
+  G->frame = var0->frame;
+  append__8_3ak_233__n0(w);
+  return;
+}
+/* append_8:k#3/0 */
+void append__8_3ak_233__n0(worker_t *w) {
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 0);
+  goto lab1;
+lab1:
+  G->local_top = NULL;
+  return;
+}
+void append__8__init(worker_t *w) {
+  append__8__0 = register_cvoid("append_8:main", 0, append__8_3amain__n0);
+  append__8__1 = def_success_cinsnp(w, NULL, 0);
+  append__8__2 = def_retry_cinsnp(w, NULL, 0);
+  append__8__3 = def_success_cinsnp(w, NULL, 1);
+}
+void append__8__end(worker_t *w) {
+  unregister_cvoid("append_8:main", 0);
+}

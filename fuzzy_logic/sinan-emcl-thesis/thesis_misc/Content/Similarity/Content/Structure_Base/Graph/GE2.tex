@@ -1,0 +1,23 @@
+\begin{center}
+\begin{tikzpicture}[yscale=-1,
+place/.style={circle,draw=black, fill=black, inner sep=0pt, 
+              minimum size=1mm}]
+
+ \node[place] (1st) at (0, 0) [label=above: $N_{tasty\_restaurant}$,
+                                label=right: 
+       \begin{tabular}{l r}
+         & $1.0$\\
+         & $type : Restaurant$ \\
+       \end{tabular},
+       label=left:
+       \begin{tabular}{l l}
+         $.$ &\\
+         $prod$ &\\
+       \end{tabular}] {};
+  \node[place] (2nd) at (0, 1.5) [label=below: $N_{has\_tasty\_food}$,
+                                  label=right: $type : Restaurant$] {};
+ 
+  \draw[->, thick] (1st) -- (2nd);
+
+\end{tikzpicture}
+\end{center}   

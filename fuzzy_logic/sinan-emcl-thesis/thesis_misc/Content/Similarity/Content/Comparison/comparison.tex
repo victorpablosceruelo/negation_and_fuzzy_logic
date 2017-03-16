@@ -1,0 +1,21 @@
+\section{Comparison of two measurements}
+\label{sec:CompTwoMeasurements}
+In this section, we compare two measurements which are Interpretation Based Measurement (IBM) in section \ref{sec:IBM}, and  Structure Based Measurement (SBM) in section \ref{sec:SBM}. The comparison is drawn from three points, the intuition, the method, and the result of IBM and SBM.
+
+\begin{itemize}
+\item Intuition 
+
+The similarity between predicates in Fuzzy Logic is to represent the similarity between objects in the real world. Therefore, the intuition begins with  the similarity between objects. In Interpretation Based Measurement (IBM), objects are considered to be represented as a set of attributes it possesses, and similarity between two objects is the commonality of attributes of them. In Structure Based Measurement (SBM), the definition of objects is the key to obtain similarity. It works like mathematical proof, starting with the basic definition. And in SBM, the definition of objects  is represented with structured property.
+
+\item Methotology
+
+By Intuition of IBM, the problem is formalized as the similarity between sets. We start with discussing the similarity between crisp sets, and generalizing into similarity between fuzzy sets. According to the corresponding relation between fuzzy set and Fuzzy Logic presented in Chapter \ref{chap:CorrespondingRelation}, the similarity between fuzzy predicates is deduced from similarity between fuzzy sets. The idea of SBM is from an interesting topic in \textit{Foundations of Databases} \cite{AHV95}, which is achieving subsumption and equivalence between queries. The method is to find the isomorphism between atoms in the bodies of two comparing queries. In SBM, fuzzy rule with fuzzy predicate as head are considered as the ``defintion" of this predicate. To obtain similarity between two predicates, we start with their ``definitions" which are fuzzy rules by finding the similarity between the predicates in their bodies. Since the ``definition" of predicate is defined inductively. The basic one is the predicate which never appears in the head of any fuzzy rules. The predicate is formalized as predicate tree. The similarity between predicates is obtaining by comparing predicate trees. The Algorithm is defined inductively with promising complexity, since inductive is a property of tree.
+
+\item Result
+
+From IBM, both \textit{essential similarity} and \textit{surficial similarity} are obtained. From intuition of IBM, we actually assume the statement `` if two objects have more attributes in common, then they are more similar to each other" is true. But the true statement should be ``if two objects are more similar, then they have more attributes in common." 
+\textit{Essential similarity} and \textit{surficial similarity} satisfy the first statement, because that is the intuition of IBM, used to obtain the result. However, \textit{essential similarity} satisfies the second statement, but \textit{surficial similarity} doesn't. That is why we name it ``surficial". The result from SBM avoids the disadvantage in IBM, but if some basic similarity is not defined, the ``essential similarity" will not be shown in the result. For example, comparing $p_1$ and $p_2$, there are two atomic predicates $q_1$ and $q_2$ in their ``definition" respectively, they may be similar to each other, but if this similarity between $q_1$ and $q_2$ is not defined, the similarity between $p_1$ and $p_2$ will be affected, like ``distortion". Also, only predicates with the same type and their fuzzy rules with same connective can be compared, which limits the result of the essential similarity between fuzzy concepts.
+
+\end{itemize}
+
+

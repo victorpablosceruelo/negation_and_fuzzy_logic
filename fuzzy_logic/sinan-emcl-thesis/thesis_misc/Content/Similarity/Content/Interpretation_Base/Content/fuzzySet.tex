@@ -1,0 +1,37 @@
+\subsection{Similarity Between Two Fuzzy Sets}
+\label{sec:fuzzySim}
+Crisp set is a special case of fuzzy set, with \{0,1\} as the range of its characteristic function, rather than [0,1]. In other words, fuzzy set is a generalization of crisp set. According to this perspective, we generalized the similarity between fuzzy sets from definition \ref{CrispSim}, which is similarity between crisp sets.
+
+\begin{defin}\textbf{Similarity between two fuzzy sets}\label{FuzzySim}
+Let $U$ be an universe of discourse, and $\mu_{A}$, $\mu_{B}$ be characteristic functions of fuzzy sets $A$, $B$ respectively. If the $U$ is finite, with size of $n$, then the similarity between set $A$ and $B$ is defined as,
+\begin{equation}\label{FSFinite}
+Sim(A,B) =1- \frac{\sum_{i=1}^{n} \lvert \mu_{A}(e_i) - \mu_{B}(e_i) \rvert}{n}
+\end{equation}
+If the universal set $U$ is countable infinite, then the similarity between set $A$ and $B$ is defined as,
+\begin{equation}\label{FSInfinite}
+Sim(A,B) =1- \frac{\int_{x_{low}}^{x_{up}}\lvert \mu_{A}(x) - \mu_{B}(x) \rvert\, \mathrm{d}x}{\int_{x_{low}}^{x_{up}}\mathrm{d}x}
+\end{equation}
+\end{defin}
+\begin{ex}
+Two fuzzy sets are represented as two fuzzy functions as follows,
+\[
+  \mu_{A}(x) = \left\{ 
+  \begin{array}{l l}
+    e^{x} & \quad x \in [-2,0]\\
+    1 & \quad x \in [0,1]\\
+    -x+2 & \quad x \in [1,2]\\
+  \end{array} \right.
+\]
+
+\[
+  \mu_{B}(x) = \left\{ 
+  \begin{array}{l l}
+    - \frac{x}{2} & \quad x \in [-2,0]\\
+    sin x & \quad x \in [0,2]\\
+   \end{array} \right.
+\]
+
+\input{Content/Similarity/Content/Interpretation_Base/Content/plot}
+
+Then the distance between $\mu_{A}$ and $\mu_{B}$ is the average area of the grey part in Figure \ref{fig:Similarity between continuous functions}, according to formula \eqref{FSInfinite} in definition \ref{FuzzySim}.
+\end{ex}

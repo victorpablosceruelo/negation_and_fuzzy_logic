@@ -1,0 +1,7 @@
+file       = '../general.html'.
+frame      = file( 'ciaopp_menu.html' ).
+page_title = 'Welcome to CiaoPP Web Service'.
+title      = 'Ciaopp Online Demo'.
+inside_emacs = file( 'emacs_opts.html' ).
+emacs_text = '<v>emacs_text</v>'.
+

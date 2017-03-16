@@ -1,0 +1,91 @@
+This is BibTeX, Version 0.99c (Web2C 7.5.4)
+The top-level auxiliary file: cneg_TPLP.aux
+The style file: acmtrans.bst
+Database file #1: bibliography.bib
+Warning--empty publisher in Alferes95
+Warning--empty address in Alferes95
+Warning--empty publisher in BNC-cneg
+Warning--empty publisher in Apt
+Warning--empty address in ciao-modules-cl2000
+Warning--empty address in Carlsson
+Warning--empty address in Chan1
+Warning--empty address in Chan2
+Warning--no journal in Clark
+Warning--no number and no volume in Clark
+Warning--empty address in Dix97
+Warning--empty publisher in Foo
+Warning--empty address in Foo
+Warning--no number and no volume in Holzbaur
+Warning--empty publisher in Khabaza
+Warning--empty address in Khabaza
+Warning--page numbers missing in Lassez
+Warning--empty publisher in Maher
+Warning--empty address in Maher
+Warning--empty publisher in Malus
+Warning--empty address in Malus
+Warning--no number and no volume in Moreno2
+Warning--page numbers missing in Moreno2
+Warning--empty publisher in SusanaLPAR01
+Warning--no number and no volume in DiPierro
+Warning--page numbers missing in DiPierro
+Warning--empty publisher in Przymusinski1
+Warning--empty address in Przymusinski1
+Warning--empty publisher in Przymusinski2
+Warning--empty address in Przymusinski2
+Warning--no number and no volume in Reiter
+Warning--empty publisher in Sato91
+Warning--empty address in Sato91
+Warning--no journal in SatoT
+Warning--no number and no volume in SatoT
+Warning--no number and no volume in Shepherdson84
+Warning--no number and no volume in Shepherdson85
+Warning--empty address in Shoenfield
+Warning--empty address in Art
+Warning--no journal in Stuckey
+Warning--page numbers missing in Stuckey
+Warning--no journal in Stuckey95
+Warning--empty address in Stuckey93
+Warning--empty publisher in Wallace
+Warning--empty address in Wallace
+You've used 53 entries,
+            2969 wiz_defined-function locations,
+            1065 strings with 12814 characters,
+and the built_in function-call counts, 37493 in all, are:
+= -- 3360
+> -- 2270
+< -- 10
++ -- 656
+- -- 808
+* -- 3070
+:= -- 6641
+add.period$ -- 248
+call.type$ -- 53
+change.case$ -- 354
+chr.to.int$ -- 52
+cite$ -- 98
+duplicate$ -- 1238
+empty$ -- 2478
+format.name$ -- 908
+if$ -- 7214
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 78
+newline$ -- 269
+num.names$ -- 542
+pop$ -- 337
+preamble$ -- 1
+purify$ -- 675
+quote$ -- 0
+skip$ -- 1234
+stack$ -- 0
+substring$ -- 2050
+swap$ -- 430
+text.length$ -- 10
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 1016
+warning$ -- 45
+while$ -- 589
+width$ -- 0
+write$ -- 757
+(There were 45 warnings)

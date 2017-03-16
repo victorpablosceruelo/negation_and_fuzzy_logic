@@ -1,0 +1,50 @@
+\begin{figure}[h!]
+
+\begin{center}
+%\pagestyle{empty}
+\begin{tikzpicture}
+
+% defining the first function: the left, the middle, and the right part
+\def\fonel{plot (\x, {exp(\x)})};
+\def\fonem{plot (\x, {1})}; 
+\def\foner{plot (\x, {-1*\x + 2})}; 
+
+% defining the second function
+\def\ftwol{plot (\x, {-0.5*\x})};
+\def\ftwor{plot (\x, {sin(\x r)})};
+
+
+% drawing the grid
+\draw[very thin,color=gray] (-2.3,-0.3) grid (3.2,1.9);
+
+% drawing the axes
+\draw[->] (-2.2,0) -- (3.2,0) node[right] {$x$}; 
+\draw[->] (0,-0.5) -- (0,1.5) node[above] {$f(x)$};
+
+
+
+% drawing thw first function
+\draw[color=black, thick, domain=-2:0] \fonel; 
+\draw[color=black, thick, domain=0:1] \fonem;
+\draw[color=black, thick, domain=1:2] \foner node[right, above] {$\mu_{A}$};
+
+% drawing the second function
+\draw[color=black, thick, domain=-2:0] \ftwol ;
+\draw[color=black, thick, domain= 0:2] \ftwor node[right] {$\mu_{B}$};
+
+% drawing the filler between functions
+\foreach \x in {-2, -1.9, ..., -0.9} 
+  \draw[color=black!70] (\x,0 |- 0,{-0.5*\x}) -- (\x,0 |- 0,{exp(\x)});
+\foreach \x in {-0.8, -0.7, ..., 0} 
+  \draw[color=black!70] (\x,0 |- 0,{exp(\x)}) -- (\x,0 |- 0,{-0.5*\x});
+\foreach \x in {0, 0.1, ..., 1} 
+  \draw[color=black!70] (\x,0 |- 0,{1}) -- (\x,0 |- 0,{sin(\x r)});
+\foreach \x in {1.2, 1.3, ..., 2.0} 
+  \draw[color=black!70] (\x,0 |- 0,{sin(\x r)}) -- (\x,0 |- 0,{-1*\x + 2});
+
+\end{tikzpicture}
+
+\end{center}
+\caption{similarity between fuzzy sets $\mu_{A}$ and $\mu_{B}$}
+\label{fig:Similarity between continuous functions}
+\end{figure}

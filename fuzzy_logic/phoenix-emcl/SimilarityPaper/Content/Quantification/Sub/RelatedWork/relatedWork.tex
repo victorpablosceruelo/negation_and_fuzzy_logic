@@ -1,0 +1,58 @@
+\section{Related work}
+\label{sec:QRW}
+
+In Ingo Gl\"{o}ckner's paper \textit{An Axiomatic Approach to Fuzzy Quantification} \cite{Glockner97dfs-}, the solution to the problem of systematic interpretation of fuzzy quantifying expressions is based on the Theory of Generalized Quantifiers (TGQ) \cite{BC81,B83,B84,KS86}, certainly the most elaborate extensional theory of natural language quantification. In TGQ, the semantic counterparts of quantifying expressions are generally called “determiners”.
+\begin{defin}\textbf{(Determiner)}
+\label{def:Determiner}
+An $n$-ary determiner on a nonempty set $U$ of ``entities" or ``individuals" is a mapping $D: \mathcal{P}(U)^n \longrightarrow \{0,1\}$, where $\mathcal{P}(U)=2^U$ is the set of all subsets of $U$. 
+\end{defin}
+A determiner $D$ thus assigns to each $n$-tuple $(X_1, \dots, X_n)$ a truth value $0$ or $1$, where $X_i$ is a subset of $E$.
+
+There are some well-known quantifiers are interpreted by definition \ref{def:Determiner} as follows.
+\[\forall_{U}(X)=1 \iff X=E\]
+\[\exists_{U}(X)=1 \iff X \neq \varnothing\]
+\[\textbf{no}_{U}(X_1,X_2)=1 \iff X_1 \cap X_2 = \varnothing\]
+\[\textbf{all}_{U}(X_1,X_2)=1 \iff X_1 \subseteq X_2\]
+\[\textbf{some}_{U}(X_1,X_2)=1 \iff X_1 \cap X_2 \neq \varnothing\]
+
+In order to clarify how the determiner works, an example is given here.
+\begin{ex}
+\label{ex:Determiner}
+$U$ is a set of persons, suppose that $U = \{John, Lucas, Mary\}$. $\textbf{men}=\{John, Lucas\}\in\mathcal{P}(U)$ is the set of men in $U$, and $\textbf{married}=\{Mary,Lucas\}$ is the set of those persons in $U$ who are married. 
+
+The statement of ``Some men are married." is represented by determiner is,
+\[\textbf{some}(\textbf{men},\textbf{married}) = \textbf{some}(\{John,Lucas\},\{Mary,Lucas\}) = 1\]
+
+The statement of ``All men are married." is represented by determiner is,
+\[\textbf{all}(\textbf{men},\textbf{married}) = \textbf{all}(\{John,Lucas\},\{Mary,Lucas\}) = 0\]
+\end{ex}
+
+Obviously, definition \ref{def:Determiner} works only on crisp set $U$, by which, statement of ``some men are tall." can not be expressed, because \textbf{tall} is a fuzzy concept. Since fuzzy set is a generalization of crisp set, \textit{Fuzzy determiner} is defined as a second order fuzzy relations, which is a mapping over a tuple of fuzzy subsets into $[0,1]$. It is formalized as follows.
+
+\begin{defin}\textbf{(Fuzzy Determiner)}
+\label{def:FuzzyDeterminer}
+An $n$-ary fuzzy determiner on a nonempty set $U$ of ``entities" or ``individuals" is a mapping $D: \mathcal{F}(U)^n \longrightarrow [0,1]$, where $\mathcal{F}(U)$ is the set of all fuzzy subsets of $U$. 
+\end{defin} 
+A fuzzy determiner $D$ assigns to each $n$-tuple $(X_1, \dots, X_n)$ a truth value in $[0,1]$, where $X_i$ is a fuzzy subset of $E$.
+
+There are some well-known quantifiers are interpreted by definition \ref{def:FuzzyDeterminer} as follows.
+\[\forall_{U}(X)=inf\{\mu_X(v), e \in U\}\]
+\[\exists_{U}(X)=sup\{\mu_X(v), e \in U\}\]
+\[\textbf{no}_{U}(X_1,X_2)=inf\{max(1-\mu_{X_1}(e),1-\mu_{X_2}(e)), e \in U\}\]
+\[\textbf{all}_{U}(X_1,X_2)=inf\{max(1-\mu_{X_1}(e),\mu_{X_2}(e)), e \in U\}\]
+\[\textbf{some}_{U}(X_1,X_2)=sup\{min(\mu_{X_1}(e),\mu_{X_2}(e)), e \in U\}\]
+
+\begin{ex}
+\label{ex:FuzzyDeterminer}
+ $U$ is a set of persons, suppose that $U = \{John, Lucas, Mary\}$. \textbf{tall} is the fuzzy subset, which is a function $\textbf{tall}: U \rightarrow [0,1]$ by definition. Suppose that $\textbf{tall}(John)=0.9$, $\textbf{tall}(Lucas)=1.0$,$\textbf{tall}(Mary)=0.5$. \textbf{men} can be consider as a function $\textbf{men}(John)=1$, $\textbf{men}(Lucas)=1$, $\textbf{men}(Mary)=0$. 
+ 
+The statement ``All men are tall." can be expressed as,
+\[\textbf{all}(\textbf{men},\textbf{tall}) = inf\{max(1-\textbf{men}(e), \textbf{tall}(e)), e \in U \}=0.9\]
+\end{ex}
+
+
+
+
+
+
+

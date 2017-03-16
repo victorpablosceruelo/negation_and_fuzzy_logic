@@ -1,0 +1,71 @@
+\subsection{Fuzzy Set and Fuzzy Relation}
+\label{sec:FSAFR}
+The mathematical modeling of fuzzy concepts was presented by Zadeh in 1965, and his approach is described here. His intention is to represent the meaning in natural language as a matter of degree. For instance, for a proposition such as ``Mary is young.'', it is not always possible to be asserted as either true or false. It depends on the definition of concept ``young'', if ``young'' is given as a set
+\[Young = \{x|x \in [0,\infty), x<23\}\]
+and Mary's age is given as 21, then the proposition ``Mary is young'' is true under the definition of ``young'' above. It seems that classical set theory solves the problem of representing the imprecise information such as `young' in the the example above. However, 18 and 20 year olds are young, but with different degrees: 18 is younger than 20. This suggests that the membership in `Young' concept should not be on a 0 or 1 basis, but rather on 0 to 1 scale, that is, the membership should be an element of the interval [0,1].
+
+For representation of membership with degree, fuzzy set is defined in the same way as the definition of crisp set.
+
+\begin{defin} \textbf{Crisp Set.} 
+\label{def:CrispSet}
+Let $U$ be the universal set, an ordinary subset $A$ of $U$ is determined by its \textbf{indicator function}, or \textbf{characteristic function} $\chi_A$ defined by
+\[
+  \chi_A(x) = \left\{ 
+  \begin{array}{l l}
+    1 & \quad \text{if $x \in A$}\\
+    0 & \quad \text{if $x \notin A$}\\
+  \end{array} \right.
+\]
+\end{defin}
+The indicator function of a subset $A$ of the universal set $U$ specifies whether an element is in $A$ or not. Only two values can be taken for the characteristic function, $0$ and $1$. The characteristic function could be generalized as $\chi_A : U \rightarrow \{0,1\}$.
+
+According to the definition above, crisp set only has $0$, $1$ as there membership degree. However, in fuzzy set, the degree value is a real number in $[0,1]$.  
+
+\begin{defin} \textbf{Fuzzy Set.}
+\label{def:FuzzySet}
+Let $U$ be the universal set, which includes all the elements in our interested domain. A \textbf{fuzzy subset} $A$ of the universal set $U$ is a function $\mu_A : U \rightarrow [0,1]$. It is common to refer to a fuzzy subset simply as a \textbf{fuzzy set}.
+
+\end{defin} 
+The image of the fuzzy function $\mu_A$ contains two values $0$ and $1$, which correspond to the image of crisp subset of $U$. Therefore, crisp subsets are considered as special cases of fuzzy subsets.
+
+It is customary in fuzzy literature to represent fuzzy set in both notations, $A$ and $\mu_A$. The first one is called `linguistic label', which indicates the concept of interested domain. For example, Let $A$ be a set of young people. Then, the $\mu_A : U \rightarrow [0,1]$ is called fuzzy function, representing the degree of youngness that has been assigned to each member in $U$.  
+
+Suppose that all the numbers which are specified as ages belong to $U$, then a value in $[0,1]$ is assigned to each number in $U$. For example, $\mu_{young}(18)=0.85$, $\mu_{young}(20)=0.81$, then ``18 is younger then 20'' has its semantic meaning under $\mu_{young}$ or concept `young', which is $\mu_{young}(18) > \mu_{young}(20)$.
+
+\subsubsection{Operations on fuzzy set}
+\label{sec:OperationOnFuzzySet}
+Following the definition above, a crisp subset $A$ of universal set $U$ can be represented by a function $\chi_A : U \rightarrow \{0,1\}$, while a fuzzy subset $\tilde{A}$ of universal set $U$ is indicated as a function $\mu_{\tilde{A}} : U \rightarrow [0,1]$. On the subsets of $U$, whether they are crisp or fuzzy, the operations of union, intersection, and complement are given as follows.
+
+The original definition is given by the rules
+\begin{center}
+$A \cup B = \{x|x \in A$ or $x \in B\}$
+
+$A \cap B = \{x|x \in A$ and $x \in B\}$
+
+$A^{'} = \{x \in U | x \notin A\}$
+\end{center}
+
+From the point of view of function, the operations over crisp subsets are:
+\[\chi_{A \cup B}(x) = max\{\chi_A(x),\chi_B(x)\} = \chi_A(x) \vee \chi_B(x)\] 
+\[\chi_{A \cap B}(x) = min\{\chi_A(x),\chi_B(x)\} = \chi_A(x) \wedge \chi_B(x)\]
+\[\chi_{A^{'}}(x) = 1 - \chi_A(x)\] 
+
+Naturally, by the membership function, these operations over fuzzy subsets of $U$ are extended as,
+
+\[\mu_{\tilde{A} \cup \tilde{B}}(x) = sup\{\mu_{\tilde{A}}(x),\mu_{\tilde{B}}(x)\}=\mu_{\tilde{A}}(x) \vee \mu_{\tilde{B}}(x)\]
+\[\mu_{\tilde{A} \cap \tilde{B}}(x) = inf\{\mu_{\tilde{A}}(x),\mu_{\tilde{B}}(x)\}=\mu_{\tilde{A}}(x) \wedge \mu_{\tilde{B}}(x)\]
+\[\mu_{\tilde{A^{'}}}(x) = 1 - \mu_{\tilde{A}}(x)\]
+
+The syntax $\vee$ and $\wedge$ are the operations over sets, which are mentioned in section 2.1 Lattice. Note that they are different from the logic notation used for `or' and `and'. 
+
+\subsubsection{Fuzzy Relation}
+\label{sec:FuzzyRelation}
+Relations, or associations among objects, are of fundamental importance in the analysis of real-world system. Since the real-world is full of vague and uncertain information, the fuzzy relation plays an important role to represent it.
+
+The classical relation has been defined in the lattice section. In this subsection, the fuzzy relation will be generalized from the crisp one.
+
+\begin{defin} \textbf{Fuzzy Relation.}
+\label{def:FuzzyRelation}
+An \textbf{n-ary fuzzy function relation in a set} $V = U_1 \times U_2 \times ... \times U_n$ is a fuzzy subset $R$ of $V$, that is, a function $R : V \rightarrow [0,1]$. If the sets $U_i$ are identical, say $U$, then $R$ is an \textbf{n-ary fuzzy relation on} U.
+ 
+\end{defin}

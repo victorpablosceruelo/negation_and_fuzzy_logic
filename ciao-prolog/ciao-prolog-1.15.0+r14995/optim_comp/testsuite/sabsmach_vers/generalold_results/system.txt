@@ -1,0 +1,35 @@
+jfran@clop:/home/jfran$ cat /proc/cpuinfo 
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 15
+model           : 3
+model name      : Intel(R) Pentium(R) 4 CPU 3.40GHz
+stepping        : 4
+cpu MHz         : 3393.318
+cache size      : 1024 KB
+physical id     : 0
+siblings        : 2
+fdiv_bug        : no
+hlt_bug         : no
+f00f_bug        : no
+coma_bug        : no
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 3
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic mtrr pge mca cmov pat\
+ pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe lm pni monitor ds_cpl ci\
+d xtpr
+bogomips        : 6701.05
+
+jfran@clop:/home/jfran$ cat /proc/version 
+Linux version 2.6.10-1.770_FC2smp (bhcompile@tweety.build.redhat.com) (gcc vers\
+ion 3.3.3 20040412 (Red Hat Linux 3.3.3-7)) #1 SMP Sat Feb 26 21:54:45 EST 2005
+
+
+jfran@clop:/home/jfran$ gcc --version
+gcc (GCC) 3.3.3 20040412 (Red Hat Linux 3.3.3-7)
+Copyright (C) 2003 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

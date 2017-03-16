@@ -1,0 +1,38 @@
+Tests for an object-oriented foreign-interface towards Ciao.
+
+1- Load a module/package/lib
+    - from ... import ...
+    + import ... 
+
+2- Object instanciation
+    - from a built-in class
+    + from a custom class
+    - without loading a module/package/lib
+    - with a prior load of a module/package/lib
+    + with no parameter
+    + with many parameters
+
+
+3- Variable scope/Attribute access
+    - standard attributes
+    - static attributes
+    - global variables
+
+4- Method call
+    + with no parameter 
+    - with many of parameters
+    + get returned result
+    - get side effects
+    - static method call
+    - built-in method call
+
+5- Exception handling
+    - raise an exception
+    - try/catch block
+
+X- Call primitive structures
+    - print on standard output
+    - if/then/else / while constructs
+    - assignment
+
+

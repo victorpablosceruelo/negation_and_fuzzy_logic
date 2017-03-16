@@ -1,0 +1,164 @@
+abds([ab/1]).
+
+obs(out(inpt0, ca_1), 0).
+obs(out(inpt0, ca_0), 0).
+obs(out(inpt0, cb_1), 0).
+obs(out(inpt0, cb_0), 0).
+obs(out(or2, cz_out), 0). 
+
+
+<- obs(out(or2, cz_out), 0), not val(out(or2, cz_out), 0).
+<- obs(out(or2, cz_out), 1), not val(out(or2, cz_out), 1).
+
+
+
+
+
+
+%
+% Propagation of values thru connections
+%
+val( in(Type,Name,Nr), V ) <-
+  conn( in(Type,Name,Nr), out(Type2,Name2) ),
+  val( out(Type2,Name2), V ).
+
+%
+% input observations
+%
+val( out(inpt0, Name), V ) <- obs( out(inpt0, Name), V ).
+
+
+%
+% computation of a component's output value
+%
+val( out(not1,Name), V ) <-
+  not ab(Name),
+  val( in(not1,Name,1), W),
+  not1_table(W,V).
+val( out(not1,Name), V ) <-
+  ab(Name),
+  val( in(not1,Name,1), W),
+  id1_table(W,V).
+
+val( out(or2,Name), V ) <-
+  not ab(Name),
+  val( in(or2,Name,1), W1),
+  val( in(or2,Name,2), W2),
+  or2_table(W1,W2,V).
+val( out(or2,Name), V ) <-
+  ab(Name),
+  val( in(or2,Name,1), W1),
+  val( in(or2,Name,2), W2),
+  nor2_table(W1,W2,V).
+
+val( out(nor2,Name), V ) <-
+  not ab(Name),
+  val( in(nor2,Name,1), W1),
+  val( in(nor2,Name,2), W2),
+  nor2_table(W1,W2,V).
+val( out(nor2,Name), V ) <-
+  ab(Name),
+  val( in(nor2,Name,1), W1),
+  val( in(nor2,Name,2), W2),
+  or2_table(W1,W2,V).
+
+val( out(nand2,Name), V ) <-
+  not ab(Name),
+  val( in(nand2,Name,1), W1),
+  val( in(nand2,Name,2), W2),
+  nand2_table(W1,W2,V).
+val( out(nand2,Name), V ) <-
+  ab(Name),
+  val( in(nand2,Name,1), W1),
+  val( in(nand2,Name,2), W2),
+  and2_table(W1,W2,V).
+
+val( out(and2,Name), V ) <-
+  not ab(Name),
+  val( in(and2,Name,1), W1),
+  val( in(and2,Name,2), W2),
+  and2_table(W1,W2,V).
+val( out(and2,Name), V ) <-
+  ab(Name),
+  val( in(and2,Name,1), W1),
+  val( in(and2,Name,2), W2),
+  nand2_table(W1,W2,V).
+
+not1_table(0,1).
+not1_table(1,0).
+
+id1_table(0,0).
+id1_table(1,1).
+
+nor2_table(0,0,1).
+nor2_table(0,1,0).
+nor2_table(1,0,0).
+nor2_table(1,1,0).
+
+or2_table(0,0,0).
+or2_table(0,1,1).
+or2_table(1,0,1).
+or2_table(1,1,1).
+
+nand2_table(0,0,1).
+nand2_table(0,1,1).
+nand2_table(1,0,1).
+nand2_table(1,1,0).
+
+and2_table(0,0,0).
+and2_table(0,1,0).
+and2_table(1,0,0).
+and2_table(1,1,1).
+
+
+
+conn(in(not1, cxor2_5_L_a, 1), out(inpt0, ca_0)).
+
+conn(in(not1, cxor2_7_L_a, 1), out(inpt0, ca_1)).
+
+conn(in(not1, cxor2_5_L_b, 1), out(inpt0, cb_0)).
+
+conn(in(not1, cI3, 1), out(inpt0, cb_1)).
+
+conn(in(not1, cxor2_7_L_b, 1), out(inpt0, cb_1)).
+
+conn(in(or2, cxor2_5_oai22_0_n_1, 1), out(not1, cxor2_5_L_a)).
+conn(in(or2, cxor2_5_oai22_0_n_1, 2), out(inpt0, cb_0)).
+
+conn(in(or2, cxor2_7_oai22_0_n_1, 1), out(not1, cxor2_7_L_a)).
+conn(in(or2, cxor2_7_oai22_0_n_1, 2), out(inpt0, cb_1)).
+
+conn(in(or2, cxor2_5_oai22_0_n_2, 1), out(inpt0, ca_0)).
+conn(in(or2, cxor2_5_oai22_0_n_2, 2), out(not1, cxor2_5_L_b)).
+
+conn(in(and2, cI111, 1), out(inpt0, ca_1)).
+conn(in(and2, cI111, 2), out(not1, cI3)).
+
+conn(in(nor2, cI6, 1), out(inpt0, ca_1)).
+conn(in(nor2, cI6, 2), out(not1, cI3)).
+
+conn(in(or2, cxor2_7_oai22_0_n_2, 1), out(inpt0, ca_1)).
+conn(in(or2, cxor2_7_oai22_0_n_2, 2), out(not1, cxor2_7_L_b)).
+
+conn(in(nand2, cI19, 1), out(or2, cxor2_5_oai22_0_n_1)).
+conn(in(nand2, cI19, 2), out(or2, cxor2_5_oai22_0_n_2)).
+
+conn(in(nor2, cI8, 1), out(inpt0, cb_0)).
+conn(in(nor2, cI8, 2), out(nor2, cI6)).
+
+conn(in(nand2, cI18, 1), out(or2, cxor2_7_oai22_0_n_1)).
+conn(in(nand2, cI18, 2), out(or2, cxor2_7_oai22_0_n_2)).
+
+conn(in(and2, cI112, 1), out(inpt0, ca_0)).
+conn(in(and2, cI112, 2), out(nor2, cI8)).
+
+conn(in(nor2, czeq, 1), out(nand2, cI18)).
+conn(in(nor2, czeq, 2), out(nand2, cI19)).
+
+conn(in(nor2, cI5, 1), out(and2, cI111)).
+conn(in(nor2, cI5, 2), out(and2, cI112)).
+
+conn(in(not1, czgt, 1), out(nor2, cI5)).
+
+conn(in(or2, cz_out, 1), out(not1, czgt)).
+conn(in(or2, cz_out, 2), out(nor2, czeq)).

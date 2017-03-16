@@ -1,0 +1,13 @@
+\BOOKMARK [0][]{chapter.1}{The New Approach}{}% 1
+\BOOKMARK [1][]{section.1.1}{Problem Description}{chapter.1}% 2
+\BOOKMARK [2][]{subsection.1.1.1}{Preliminaries}{section.1.1}% 3
+\BOOKMARK [2][]{subsection.1.1.2}{Vertex Matching Problem}{section.1.1}% 4
+\BOOKMARK [1][]{section.1.2}{Algorithm in the Domain of Fuzzy Logic}{chapter.1}% 5
+\BOOKMARK [2][]{subsection.1.2.1}{Construction of the Predicate Tree}{section.1.2}% 6
+\BOOKMARK [2][]{subsection.1.2.2}{Search and Evaluation}{section.1.2}% 7
+\BOOKMARK [1][]{section.1.3}{Improvements Over Related Work}{chapter.1}% 8
+\BOOKMARK [2][]{subsection.1.3.1}{Inclusion of Credibilities in Similarity Evaluation Function}{section.1.3}% 9
+\BOOKMARK [2][]{subsection.1.3.2}{Convergence to Identity Predicate}{section.1.3}% 10
+\BOOKMARK [2][]{subsection.1.3.3}{Wrong Filtering}{section.1.3}% 11
+\BOOKMARK [2][]{subsection.1.3.4}{Shared Similarity Concepts}{section.1.3}% 12
+\BOOKMARK [2][]{subsection.1.3.5}{Credibility of Similarity Relations}{section.1.3}% 13

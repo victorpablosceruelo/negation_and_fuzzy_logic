@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2012/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: egilmezThesis.aux
+The style file: alpha.bst
+Database file #1: medium-string.bib
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+Database file #2: Thesis.bib
+Warning--empty year in Aga
+Warning--empty year in BCW
+Warning--empty year in BH
+Warning--empty journal in BMP95
+Warning--empty year in GO
+Warning--empty journal in LL90
+Warning--empty title in Llo87
+Warning--empty journal in MPS10
+Warning--empty publisher in MT92
+You've used 56 entries,
+            2543 wiz_defined-function locations,
+            2778 strings with 80306 characters,
+and the built_in function-call counts, 19335 in all, are:
+= -- 1880
+> -- 845
+< -- 33
++ -- 276
+- -- 264
+* -- 1246
+:= -- 3263
+add.period$ -- 168
+call.type$ -- 56
+change.case$ -- 308
+chr.to.int$ -- 56
+cite$ -- 65
+duplicate$ -- 852
+empty$ -- 1449
+format.name$ -- 344
+if$ -- 3929
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 69
+newline$ -- 282
+num.names$ -- 169
+pop$ -- 336
+preamble$ -- 1
+purify$ -- 380
+quote$ -- 0
+skip$ -- 684
+stack$ -- 0
+substring$ -- 904
+swap$ -- 88
+text.length$ -- 33
+text.prefix$ -- 25
+top$ -- 0
+type$ -- 384
+warning$ -- 9
+while$ -- 173
+width$ -- 62
+write$ -- 701
+(There were 9 warnings)

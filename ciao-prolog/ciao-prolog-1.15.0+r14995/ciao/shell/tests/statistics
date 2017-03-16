@@ -1,0 +1,13 @@
+#!/bin/sh
+exec /home/clip/Systems/ciao-0.5/shell/ciao-shell $0 "$@"
+
+:- use_package([]).
+
+main(_) :- statistics.
+
+%% Version comment prompting control for this file.
+%% Local Variables: 
+%% mode: CIAO
+%% update-version-comments: "off"
+%% End:
+

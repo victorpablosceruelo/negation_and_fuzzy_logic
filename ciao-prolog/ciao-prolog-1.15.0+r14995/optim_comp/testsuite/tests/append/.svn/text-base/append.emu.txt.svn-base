@@ -1,0 +1,71 @@
+module=append
+speckey='$id/.home.jfran.svn.ciaode.ciao.optim_comp.testsuite.tests.append'
+uses=
+  append
+  arithmetic
+  atomic_basic
+  attributes
+  basic_props
+  basiccontrol
+  interpreter
+  data_facts
+  exceptions
+  io_aux
+  io_basic
+  prolog_flags
+  streams_basic
+  system_info
+  rt_exp
+  term_basic
+  term_compare
+  term_typing
+  hiord_rt
+  strings
+exports=
+  main/1 as 'append:main'
+  ap/3 as 'append:ap'
+  ag/3 as 'append:ag'
+  gb/1 as 'append:gb'
+  gg/0 as 'append:gg'
+defs=5
+'multifile:$initialization'/1: def=4
+'multifile:$on_abort'/1: def=4
+'append:main'/1: def=0
+bits=9 key='.'/2 code=
+  bytecode - 0x22 bytes - start at 0x00000002, det at 0x00000002
+  0x00000002: u_str(f_x,f_f(/(.,2))) x(0)
+  0x00000006: un_cons(f_t) t(a)
+  0x0000000c: un_cons(f_t([]))
+  0x0000000e: neck
+  0x00000010: ld_cons(f_x,f_t) x(1) t(4000000)
+  0x00000018: inith(f_x) x(0)
+  0x0000001c: pad2|lastcall(f_E) Q() E(append:le#3/2)
+bits=9 key='.'/2 code=
+  bytecode - 0x22 bytes - start at 0x00000002, det at 0x00000002
+  0x00000002: u_str(f_x,f_f(/(.,2))) x(0)
+  0x00000006: un_cons(f_t) t(b)
+  0x0000000c: un_cons(f_t([]))
+  0x0000000e: neck
+  0x00000010: ld_cons(f_x,f_t) x(1) t(4000000)
+  0x00000018: inith(f_x) x(0)
+  0x0000001c: pad2|lastcall(f_E) Q() E(append:ple#3/2)
+'append:ple#3'/2: def=0
+bits=31 nokey code=
+  bytecode - 0x1a bytes - start at 0x00000002, det at 0x00000004
+  0x00000002: neck
+  0x00000004: move(f_x,f_x) x(0) x(2)
+  0x0000000a: pad2|ld_cons(f_x,f_t) Q() x(0) t(0)
+  0x00000014: pad2|lastcall(f_E) Q() E(append:pdl#3/3)
+'append:pdl#3'/3: def=0
+bits=95 nokey code=
+  bytecode - 0xc bytes - start at 0x00000002, det at 0x00000002
+  0x00000002: u_val(f_x,f_x) x(1) x(0)
+  0x00000008: u_cons(f_x,f_t([])) x(2)
+  0x0000000c: cutb(f_x(-1))+proceed
+bits=31 nokey code=
+  bytecode - 0x22 bytes - start at 0x00000002, det at 0x00000002
+  0x00000002: u_str(f_x,f_f(/(.,2))) x(2)
+  0x00000006: neck
+  0x00000008: un_voidr(f_i)+un_var(f_x) i(1) x(2)
+  0x0000000e: fun1(f_x,f_x,f_C,f_g) x(0) x(0) C(arithmetic:$++/2) g(h:0,a:3)
+  0x0000001e: lastcall(f_E) E(append:pdl#3/3)

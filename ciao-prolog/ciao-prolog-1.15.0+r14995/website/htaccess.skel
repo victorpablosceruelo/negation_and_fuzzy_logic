@@ -1,0 +1,11 @@
+AuthUserFile /home/clip/etc/passwd/asapwww
+AuthGroupFile /dev/null
+AuthName "Beta Tester"
+AuthType Basic
+
+<Limit GET>
+require user asap-admin
+require user asap
+require user cliplocal
+require user ciaopp-users
+</Limit>

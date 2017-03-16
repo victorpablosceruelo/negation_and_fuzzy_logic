@@ -1,0 +1,36 @@
+\section{Semantics}
+\label{sec:RFuzzyFrameworkSemantics}
+A \textit{valuation} $\sigma : V \rightarrow \mathbb{HB}$ is an assignment of ground terms to variables. Each valuation $\sigma$ uniquely constitutes a mapping $\hat{\sigma} : TB_{\Pi,\Sigma,V} \rightarrow \mathbb{HB}$ that is defined in the obvious way.
+
+A \textit{fuzzy Herbrand interpretation} of a fuzzy logic program is a mapping $I : \mathbb{HB} \rightarrow \mathbb{T}$ that assigns truth values to ground atoms.
+
+\begin{defin}\textbf{(Model).}
+\label{def:Model}
+Let $P=(R,D,T)$ be a fuzzy logic program.
+
+For a clause $r\in R$ of the form $A \stackrel{c,F_c}{\longleftarrow} F(B_1,...,B_n)$, then $I$ is a model of the clause $r$ and is written as 
+\[I \models A \stackrel{c,F_c}{\longleftarrow} F(B_1,...,B_n)\]
+\textbf{iff} for all valuations $\sigma$:
+\begin{center}
+ if $I(\sigma(B_i))=v_i>0$ for all $i$ then $I(\sigma(A))\geq v'$
+\end{center}
+where $v'= \hat{F_c}(c,\hat{F}(v_1,...,v_n))$.
+
+For a clause $r \in R$ of the form $A \leftarrow v$, then $I$ is a model of a clause $r$ and is written as,
+\[I \models A \leftarrow v\]
+\textbf{iff} for all valuations $\sigma$:
+\begin{center}
+ $I(\sigma(A)) \geq v$
+\end{center}
+
+For a default value declaration $d \in D$, then $I$ is a model of the default value declaration $d$ and is written as,
+\begin{center}
+$I \models default(p/n)=[\delta_1$ if $\varphi_1$, ..., $\delta_m$ if $\varphi_m]$
+\end{center}
+\textbf{iff} for all valuation $\sigma$ :
+\[I(\sigma(p(X_1, ..., X_n))) \geq \delta_i\]
+where $\varphi_j$ is the only formula that holds for $\sigma(\varphi_j)(1 \leq j \leq m)$.
+\end{defin}
+
+$I \models R$ \textbf{iff} $I \models r$ for all $r \in R$ and similarly, $I \models D$ \textbf{iff} $I \models d$ for all $d \in D$.
+Finally, $I \models P$ \textbf{iff} $I \models R$ and $I \models D$.

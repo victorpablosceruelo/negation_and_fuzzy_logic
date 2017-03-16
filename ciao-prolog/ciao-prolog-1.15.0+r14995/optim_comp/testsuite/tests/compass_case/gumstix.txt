@@ -1,0 +1,91 @@
+compass=10
+---------------------------------------------------------------------------
+
+Benchmark 0 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=115.95 ; user=113.16 ; sys=2.79 ; 
+
+real	1m56.746s
+user	0m0.033s
+sys	0m0.010s
+Benchmark 1 (suf=gumstix)
+benchgumstix
+
+--bad--
+
+Benchmark 2 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=92.42 ; user=89.87 ; sys=2.55 ; 
+
+real	1m33.214s
+user	0m0.033s
+sys	0m0.003s
+
+Benchmark 3 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=88.38 ; user=85.93 ; sys=2.44 ; 
+
+real	1m29.172s
+user	0m0.031s
+sys	0m0.010s
+
+Benchmark 4 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=85.7 ; user=83.17 ; sys=2.52 ; 
+
+real	1m26.487s
+user	0m0.032s
+sys	0m0.005s
+
+Benchmark 5 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=103.49 ; user=101.09 ; sys=2.4 ; 
+
+real	1m44.271s
+user	0m0.031s
+sys	0m0.005s
+
+Benchmark 6 (suf=gumstix)
+benchgumstix
+
+--bad--
+
+Benchmark 7 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=83.74 ; user=81.04 ; sys=2.69 ; 
+
+real	1m24.534s
+user	0m0.038s
+sys	0m0.007s
+
+Benchmark 8 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=79.42 ; user=76.79 ; sys=2.63 ; 
+
+real	1m20.223s
+user	0m0.035s
+sys	0m0.005s
+
+Benchmark 9 (suf=gumstix)
+benchgumstix
+
+Tiempos de ejecucion:
+real=78.01 ; user=75.45 ; sys=2.55 ; 
+
+real	1m18.795s
+user	0m0.034s
+sys	0m0.004s

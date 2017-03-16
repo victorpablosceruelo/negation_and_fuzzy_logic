@@ -1,0 +1,6 @@
+\subsection{Complexity of algorithm}
+\label{sec:Complexity}
+The similarity algorithm is a procedure of comparison and extension alternatively until the predicates are not necessary to or can not be expanded. For each pair of predicates $(p_i,p_j)$, it could be expanded $n_i \times n_j$ different comparing trees, where $n_i$ is the number of the rules with $p_i$ as head, and $n_j$ is the number of the rules with $p_j$ as head. The complexity of calculating the middle result for each level is
+constant, since the number of children from $p_i$ or $p_j$ is constant.
+The maximum number of comparison and extension is the level of the comparing trees which are \textit{completely built}, which is less than the number of rules, since one rule associates one expansion, and there are some different rules for one predicate. Suppose that the number of rules in the RFuzzy Program is $n$, then the complexity of similarity algorithm is approximatively $n_i \cdot n_j \cdot c_1 \cdot c_2 \cdot n$, where the $n_i
+\cdot n_j$ is the number of possible expansion of comparing $p_i$ and $p_j$, $c_1$ is the number of nodes on one level, which is a constant, and $c_2$ is the number of comparing times for one level to achieve the middle result, and is also a constant. $n$ is represented as the number of levels. The complexity of algorithm is less than $\mathcal{O}(n^3)$.

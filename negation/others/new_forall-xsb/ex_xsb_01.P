@@ -1,0 +1,49 @@
+:-module(ex_xsb_01, [intneg / 1, p / 1]).
+
+:- import put_attr/3, get_attr/3, 
+	install_attribute_portray_hook/3,
+	install_constraint_portray_hook/4
+	from machine.
+
+:- dynamic formula/2.
+
+% :- install_attribute_portray_hook(bug_xsb_1,Attribute,portray_attribute(Attribute)).
+
+:- install_constraint_portray_hook(bug_xsb_1,Vars,Names,portray_constraint(Vars, Names)).
+
+portray_attribute(formula(_Var,Formula)) :-
+	write(Formula).
+
+portray_constraint(Vars, Names) :-
+	write('Vars: '), write(Vars), nl,
+	write('Names: '), write(Names), nl,
+	write_attributes_in_vars(Vars).
+
+write_attributes_in_vars([]).
+write_attributes_in_vars([X|R]) :-
+	write_attributes_in_vars_aux(X),
+	write_attributes_in_vars(R).
+
+write_attributes_in_vars_aux(X) :-
+	var(X), !, 
+	write(X),
+	get_attr(X, bug_xsb_1, Attr),
+	write(Attr).
+
+write_attributes_in_vars_aux(X) :-
+	functor(X, Name, Arity), !, 
+	X=..[Name,Args],
+	write('Functor: '), write(Name),
+	write_attributes_in_vars_aux(Args).
+
+write_attributes_in_vars_aux([]) :- !.
+write_attributes_in_vars_aux([X:R]) :- !,
+	write('['),
+	write_attributes_in_vars_aux(X),
+	write_attributes_in_vars_aux(R),
+	write(']').
+	
+
+p(X) :- put_attr(X, bug_xsb_1, formula(X, [X/0, X/fA(_Y)])).
+p(s(X)) :- p(X).
+

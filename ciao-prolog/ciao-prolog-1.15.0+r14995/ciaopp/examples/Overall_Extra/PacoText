@@ -1,0 +1,240 @@
+El ejecutable es /home/clip/Systems/ciaopp/bincopy/ciaopp
+
+- ICALP02
+  - qsort.pl tiene una check terminates que se pasa a true
+  - reverse.pl tiene una bateria de checks basados en coste
+  - det.pl
+    Un predicado det es checked y uno non_det pasa a false.
+    Aunque pueda parecer raro, el predicado non_det tiene bastante sentido
+    declararlo asi... (vease)
+    Creo que queda mono el ejemplito...
+
+- Las pruebas que hemos usado las hemos pasado a
+  /home/clip/Systems/ciaopp/tests/ctchecks
+
+% --------
+
+En estos checks la semantica de las aserciones de predicado la hemos
+cambiado ligeramente: se entienden ***restringidas a las entries***. De
+forma que:
+
+ :- check comp partition(A,B,C,D) + not_fails.
+
+significa que partition/4 no falla para las llamadas que ocurran en la
+ejecucion supeditada a los puntos de entrada con la forma que
+especifica la entry (y no para todas las llamadas, que es como
+soliamos interpretarla). Por eso la podemos pasar a checked.
+
+Ojo al hacer la demo!!!
+
+Por otra parte, es una interpretacion "sensible" de las aserciones de
+predicados. La otra tambien lo es. Quizas tengamos que poner las
+dos... 
+
+La restringida a las entries se puede expresar en program-point, e.g.:
+
+partition(A,B,C,D):- partition_(A,B,C,D), check(not_fails).
+
+renombrando las clausulas de partition a partition_ 
+Pero es bastante engorroso... 
+
+Paco y Pedro
+
+%% ---
+
+%% ---- NEW: ---
+
+- I think assertion checking should be turned on by default.
+  I think types and modes analysis (and possibly nf, det, etc.) should
+  be selected by default.  
+  --> 
+  thus simply selecting 'rerun analysis' will give what people expect 
+  when they write assertions.
+
+- Also, should go to new format:
+ERROR (ctchecks_messages): (lns 15-15) false success assertion:
+   :- success partition(A,B,C,D) : true => int(A)
+ on success partition(list(numexp),term,list(numexp),list(numexp)) with:
+   [list(numexp)]
+ (What does the 'with: [list(numexp)]' mean?)
+
+- Singleton variables are not checked in declarations! Problem for
+  assertions. 
+
+- Add to functions package:
+
+   nrev( []    ) := [] 
+     | ( [H|L] ) := ~concat(nrev(L),[H]) .
+
+  or, even better: 
+
+   nrev( []    ) := [] 
+     | ( [H|L] ) := ~concat(nrev(L),[H]) .
+
+- Make it so that inside a definition it is not necessary to use ~ for
+  the symbol being defined.
+
+- Even better (?): automate it with two passes. The first one detects
+  the symbols that are function definitions and the second one This
+  may be *exported* to other modules that also use functions, so that
+  in those cases it is not necessary to put ~.  It should also be
+  visible to the documenter, which can then document them that way
+  (?).
+  
+filter :-
+        true(),
+        nl,
+        true(),
+        write(---),
+        true(),
+        nl,
+        true().
+
+-------------
+
+These inline properties do not work in the preprocessor (they do work
+in the documenter):
+
+:- pred foo(int,int) # "hello".
+:- impl_defined(foo/2).
+
+-------------
+
+NEWER STUFF (June 13 2003)
+
+This:
+
+# :- module(_,[ft/2],[assertions,functions,regtypes]).
+# 
+# :- entry ft/2 : {ground,num} * var.
+# 
+# ft(0) := 1.  
+# ft(N) := N * ~ft(N-1) :- N > 0.
+
+has correct but different upper bound than:
+
+# :- module(_,[fact/2],[assertions,functions,regtypes]).
+# 
+# :- entry fact/2 : {ground,num} * var.
+# 
+# fact(0) := 1.  
+# fact(N) := N * ~fact(N-1) :- N > 0.
+
+which gets a wrong value of:  steps_ub(fact(int(A)-1)+1) !
+
+------
+
+The following does not infer non-failure:
+
+# :- module(int, [p/2], [assertions]).
+# 
+# :- entry p(A,B) : (int(A), var(B)).
+# 
+# p(X, Y):- X >= 3, Y = 2.
+# p(X, Y):- X = 2, Y = 1.
+# p(X, Y):- X =< 1,  Y = 0.
+
+------
+
+Produces (wrong) steps_lb(inf): 
+
+# :- module(linrev, [reverse/2], [assertions]).
+# 
+# :- use_module(library('assertions/native_props')).
+# 
+# :- entry reverse(A,B) : (ground(A), list(A, term), var(B)).
+# 
+# :- check comp reverse(A,B) + steps_ub(1+length(A)) .
+# 
+# 
+# reverse(L,K) :-
+#         rev(L,[],K).
+# 
+# rev([],L,L).
+# rev([H|T],L,K) :-
+#         rev(T,[H|L],K).
+
+-----------
+
+
+:- module(linrev, [reverse/2], [assertions]).
+
+:- use_module(library('assertions/native_props')).
+
+%% With:
+%% :- entry reverse(A,B) : {ground, list} * var.
+%% it says no_fail but with
+%% :- entry reverse(A,B) : list * var.
+%% it says possibly_fails, but list is sufficient...
+
+:- check comp reverse(A,B) + steps_ub(1+length(A)) .
+
+
+reverse(L,K) :-
+        rev(L,[],K).
+
+rev([],L,L).
+rev([H|T],L,K) :-
+        rev(T,[H|L],K).
+
+---------
+
+Cannot get good results on accummulating parameter? (e.g., rev_lin)
+But this one gets the right answer (by chance?) (but wrong one for
+argument sizes:
+
+:- module(revf_lin, [rev/2,rev_/3], [assertions,functions,regtypes]).
+
+:- entry rev/2 : {list, ground} * var.
+
+rev(X) := ~rev_(X,[]).
+
+:- entry rev_/3 : {ground, list} * ground  * var.
+
+rev_([],N)     := N.
+rev_([H|T],NT) := ~rev_(T,[H|NT]).
+
+
+---------
+
+Now by default there is no property output! (One has to add
+dump_ai(pred))
+
+---------
+
+Caslog does not hanlde programs that contain =/2 (!)
+
+* Caslog error: unknown predicate: = /2
+  partition/4/2/$disj/1(_1045,_1046,_1047,_1048,_1049,_1050):-_1048<_1045,!,_1046=[_1048|_1049],_1047=_1050
+
+---------
+
+Caslog errors continue printing weird
+
+The source is full of old stuff, including old makefiles that talk
+about .ql files, etc. NEEDS TO BE CLEANED UP SERIOUSLY
+
+---------
+
+---> Many things fixed, add comments.
+
+---------
+
+qsort_func_alt.pl 
+
+does not work (becuause cut not understood, and =/2 not understood)?
+
+----
+
+
+types lib assumes that type is last argument, should really be the
+other way around (except for indexing). Need another operator or
+fixing this... 
+
+----
+
+The seff_pure etc. analysis has to be plugged into PLAI
+
+----
+
+

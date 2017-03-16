@@ -1,0 +1,82 @@
+:- module(backtr_move_to_top, [main/0], []).
+
+
+:- use_module(library(system)).
+:- use_module(library(apll_parback)).
+:- use_module(library(odd)).
+
+
+main :-
+	set_prolog_flag(gc, off),
+
+	push_goal(p(X),nondet,H1),
+	push_goal(q(Y),nondet,H2),
+
+	my_call(H1), display(result(X,Y)), nl, nl,
+	my_call(H2), display(result(X,Y)), nl, nl,
+
+	backtrack(H1), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H2), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H2), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H1), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H1), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H1), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H2), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H1), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H2), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+	backtrack(H1), display(backtrack_finished), nl, display(result(X,Y)), nl, nl,
+
+	display(end_of_main), nl.
+
+
+my_call(Handler) :-
+	'$metachoice'(InitialChP),
+	perform_call(Handler,InitialChP).
+my_call(Handler) :-
+	set_goal_failed(Handler),
+	load_wam_state(Handler),
+	fail.
+
+
+perform_call(Handler,InitialChP) :-
+	retrieve_goal(Handler,Goal),
+
+	call(Goal),
+
+	save_choice_point(Handler),
+	(
+	    not_last_alternative(Handler) -> true
+	;
+	    save_choice_point(Handler,InitialChP)
+	),
+
+	restore_execution(Handler).
+
+
+restore_execution(Handler) :-
+	goal_backtracked(Handler),
+	set_goal_finished(Handler),
+	load_wam_state(Handler),
+	fail.
+restore_execution(Handler) :-
+	set_goal_finished(Handler).
+
+
+backtrack(Handler) :-
+	set_goal_backtracked(Handler),
+	save_wam_state(Handler),
+	move_choice_point_to_top(Handler),
+	fail.
+backtrack(_) :- true.
+
+
+p(a).
+p(b).
+p(c).
+p(d).
+
+q(1).
+q(2).
+q(3).
+q(4).
+

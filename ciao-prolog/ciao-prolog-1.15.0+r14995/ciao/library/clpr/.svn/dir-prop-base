@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 61
+Makefile
+all_modules
+all_module_messages.tmp
+all_modules.tmp
+
+END

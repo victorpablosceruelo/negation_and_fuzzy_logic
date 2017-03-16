@@ -1,0 +1,20 @@
+
+:- abds([a/1, f/1]).
+
+mbr2(X, [X|L]).
+mbr2(X, [Y|L]) :- mbr2(X, L).
+
+c(X) :- a(X).
+c(X) :- intneg(d(X)).
+d(1).
+b(X) :- a(X).
+e(X) :- b(X), intneg(c(X)).
+
+
+g(X) :- f(X).
+h(X) :- mbr2(X, [1,2,3]), intneg(f(X)).
+h(X) :- intneg(f(2)).
+i(X) :- g(X), h(X).
+
+
+j :- mbr2(X, [1,2,3]), f(X).

@@ -1,0 +1,419 @@
+:- import member/2 from basics.
+
+%Top level predicates
+
+ab(G,AbS) :-
+	initialize_numbers,
+	ab(G,[]*[]+[]+[],Ab),
+	( \+ neg_const -> Ab=AbS ; simplifyIneq(Ab,G,AbS)).
+
+ab_ini(G,InitialState,AbS) :-
+	ab(G,Abd), filterInitial(Abd,InitialState,AbS).
+
+
+filterInitial(P*N+C,Ini,FP*FN+C) :-
+	removePos(P,Ini,FP), removeNeg(N,Ini,FN).
+
+removePos([],_,[]).
+removePos([H|T],Ini,NT) :-
+	functor(H,N,A), \+ \+ member(N/A,Ini), !,
+	removePos(T,Ini,NT).
+removePos([H|T],Ini,[H|NT]) :-
+	removePos(T,Ini,NT).
+
+removeNeg([],_,[]).
+removeNeg([not H|T],Ini,NT) :-
+	functor(H,N,A), \+ \+ member(not N/A,Ini), !,
+	removeNeg(T,Ini,NT).
+removeNeg([H|T],Ini,[H|NT]) :-
+	removeNeg(T,Ini,NT).
+
+revise(Rev) :-
+	initialize_numbers,
+	meta_table(not(false([]*[]+[]+[],Rev+C+[]))), C = [].
+
+ab(not(G),I,AbC) :- !,
+	meta_table(not(false(I,Rev+C+[]))), C = [],
+	lastVars(G,[Rev+[]+[],AbC+[]],NG), meta_table(not(NG)).
+ab(G,I,AbC) :-
+	meta_table(not(false(I,Rev+C+[]))), C = [],
+	lastVars(G,[Rev+[]+[],AbC+[]],NG), meta_table(NG).
+
+
+% The meta-interpreter
+
+:- table meta_table/1.
+
+meta_table(A) :- (A <- B), meta(B,A).
+
+meta(true,_) :- !.
+meta(sys_free(Ref,V,H,I,O),_) :- !, sys_free(Ref,V,H,I,O).
+meta((A,B),Root) :- !, meta(A,Root), meta(B,Root).
+meta((A;B),Root) :- !, (meta(A,Root); meta(B,Root)).
+meta(not(A),Root) :- 
+		isNegHead(Root,R), % Negative call in the body of a rule with negative head
+        lastVars(N,[Iab+IC+Icwa,Oab+OC+Ocwa],A),
+        lastVars(N,[Iab+IC+Icwa,Oab+OC+OOcwa],AA),
+        lastVars(NR,[_,_],R),
+        meta_tableP(not(AA),not(N)-not(NR)-IC),	  
+	    delete_if_there(not(NR),OOcwa,Ocwa).
+	    
+meta(not(A),Root) :- 
+	isNegHead(Root,_), !, % Succeed a negative call in the body of a rule with
+	lastVars(N,[I,O],A),  % negative head if the same negative has already been called and 
+	\+ is_rulePred(N), \+ abducible(N), % not solved (e.g. in order to succeed not p with (not p <- not p)
+	\+ solved_without_CWA(not(N)),
+	already_called(not(N)),
+	insertCWA(not(N),I,O).
+meta(not(A),_) :- !,	% Negative call in the body of a rule with positive head
+        lastVars(GA,[_,_+[]],A),
+        meta_tableP(not(A),GA).
+meta(A,R) :- 			% Positive call in the body of a rule with positive head
+	lastVars(GA,_,A),
+	meta_tableP(A,GA-R). %Constraints over the variables in the head are relevant
+
+isNegHead(not(R),R).
+isNegHead(not(R)-_,R).
+
+meta_tableP(G,Vars) :-
+	lastVars(CG,[RevI+CI+CWAI,RevO+CO+CWAO],G),
+	lastVars(CG,[RevI+[]+[],RevO+RC+RCWA],NG),
+	meta_table(NG),
+	append(RC,CI,C), (neg_const -> simpIneq(C,Vars-RevO,CO); C = CO),
+	append(RCWA,CWAI,CWA), sort(CWA,CWAO).
+
+/* Antes estava assim...
+
+Assim levava as constraints de um positivo para os positivos à frente numa conjunção
+
+meta_tableP(G,Vars) :-
+	lastVars(CG,[RevI+CI+CWA,RevO+CO+CWA],G),
+	lastVars(CG,[RevI+CI+CWA,RevO+RC+CWA],NG),
+	meta_table(NG),
+	(neg_const -> simpIneq(RC,Vars,CO); RC = CO).
+*/
+
+
+:- import get_calls/3, table_state/2, get_returns/2, get_returns_for_call/2 from tables.
+
+
+solved_without_CWA(N) :- 
+	lastVars(N,[_+[],_+[]],GG),
+	sols_in_table(GG,Sol),
+	lastVars(NS,[_,_+[]+_],Sol), subsumes_chk(NS,N).
+
+%sols_in_table(G,Sol) :- get_returns_for_call(meta_table(G),meta_table(Sol)).
+
+sols_in_table(G,S) :-
+	copy_term(G,S),
+	get_calls(meta_table(S),CS,Ret),
+	get_returns(CS,Ret).
+
+
+already_called(G) :- \+ \+ alreadyCAux(G).
+/*
+alreadyCAux(N) :-
+	lastVars(N,[_,_],G), lastVars(N,[_,_],GG),
+	non_complete_call(G,Ref1), non_complete_call(GG,Ref2),
+	Ref1 \= Ref2.
+*/
+
+alreadyCAux(N) :-
+	lastVars(N,[_,_],G),
+	non_complete_call(G,_).
+
+
+non_complete_call(G,Cs) :-
+	get_calls(meta_table(G),Cs,_), \+ table_state(meta_table(G),complete).
+
+
+% Ordered insertion of abducibles and CWAs
+
+insert(not(A),P*N+IC+CWA,P*ON+OC+CWA) :-
+	\+ \+ unifiesWithPrev(A,P), !, consistent(A,P,IC,OC),
+	insertElem(not(A),N,ON).
+insert(not(A),P*N+I+C,P*NewN+I+C) :- !, insertElem(not(A),N,NewN).
+insert(A,P*N+IC+CWA,OP*N+OC+CWA) :-
+	\+ \+ unifiesWithPrev(not(A),N), !, consistent(not(A),N,IC,OC),
+	insertElem(A,P,OP).
+insert(A,P*N+I+C,NewP*N+I+C) :- insertElem(A,P,NewP).
+
+insertCWA(not(A),Ab+I+C,Ab+I+NewC) :-
+	insertElem(not(A),C,NewC).
+	
+
+insertAbs([P|Ps]*N,I,O) :- insert(P,I,Aux), insertAbs(Ps*N,Aux,O).
+insertAbs([]*[N|Ns],I,O) :- insert(N,I,Aux), insertAbs([]*Ns,Aux,O).
+insertAbs([]*[],I,I).
+
+insertCons(Cons,Head,Ab+C+CWA,Ab+NewC+CWA) :-
+	insertConsAux(Cons,Head,C,NewC).
+
+
+insertAllCons([],_,I,I).
+insertAllCons([Cons|L],Head,I,O) :- 
+	insertConsAux(Cons,Head,I,I1), insertAllCons(L,Head,I1,O).
+
+insertConsAux((T1 \= T2),Head,C,NewC) :-
+	nonvar(T1), nonvar(T2),
+	T1 =.. [F|Args1], T2 =.. [F|Args2], !, 
+	member(A1,A2,Args1,Args2), \+ (A1 == A2),
+	insertConsAux((A1 \= A2),Head,C,NewC).
+insertConsAux((V \= _),Head,_,_) :-
+	var(V), \+ in_varT(Head,V), !, fail.
+insertConsAux((_ \= V),Head,_,_) :-
+	var(V), \+ in_varT(Head,V), !, fail.
+insertConsAux(Cons,_,C,NewC) :-
+ 	insertElem(Cons,C,NewC).
+
+member(X,Y,[X|_],[Y|_]).
+member(X,Y,[_|TX],[_|TY]) :- member(X,Y,TX,TY).
+
+
+memberOrd(X,L) :- insertElem(X,_,L).
+
+delete_if_there(not(E),C,NewC) :- 
+	remove_all_from(not(E),C,NewC), !.
+delete_if_there(_,L,L).
+
+remove_all_from(_,[],[]).
+remove_all_from(E,[EE|L],NL) :-
+	\+ \+ E = EE, !, remove_all_from(E,L,NL).
+remove_all_from(E,[X|L],[X|NL]) :- remove_all_from(E,L,NL).
+
+/*
+delete_if_there(not(E),C,NewC) :- insertElem(not(E),NewC,C), !.
+delete_if_there(_,L,L).
+*/
+
+:- import subsumes_chk/2 from subsumes.
+
+insertElem(E,L,LE) :- nonvar(L), !, sort([E|L],LE).
+
+insertElem(E,[],[E]).
+insertElem(E,[X|T],[E,X|T]) :- E @< X, !.
+insertElem(E,[E|T],[E|T]) :- !.
+%insertElem(E,[EE|T],[E|T]) :- (nonvar(EE) -> E == EE; E=EE), !.
+%insertElem(E,[EE|T],[EE|T]) :- (nonvar(EE) -> subsumes_chk(EE,E); E=EE), !.
+%insertElem(E,[EE|T],[E|T]) :- nonvar(EE), subsumes_chk(E,EE), !.
+insertElem(E,[X|T],[X|NT]) :- insertElem(E,T,NT).
+
+
+unifiesWithPrev(E,[E|_]).
+unifiesWithPrev(E,[X|_]) :- E @< X, !, fail.
+unifiesWithPrev(E,[_|T]) :- unifiesWithPrev(E,T).
+
+:- import desunify/3 from desunify.
+
+
+consistent(A,P,IC,NewIC) :-
+	getLitOcc(A,P,OA),
+	(\+ subsumes_chk(OA,A) -> desunify(A,OA,Des); \+ subsumes_chk(A,OA) -> desunify(OA,A,Des)),
+	insertAllCons(Des,Des,IC,NewIC).
+
+getLitOcc(A,[AA|_],AA) :- \+ \+ A = AA.
+getLitOcc(A,[_|L],AA) :- getLitOcc(A,L,AA).
+	
+
+% Constructive Negation Constraints
+
+:- dynamic neg_const/0.
+
+:- assert(neg_const).
+
+dif(H,T,_,_,_) :- H == T, !, fail.
+dif(H,T,_,I,I) :- H \= T, !.
+dif(H,T,Head,I,O) :- neg_const, insertCons((H \= T),Head,I,O).
+
+simplifyIneq(Ab+C,G,Ab+NC) :-
+	simpIneq(C,G,NC), !.
+
+simpIneq(C,G,SC) :- simpIneqAux(C,G,NC), !, sort(NC,SC).
+
+% Below is the simplification of a conjunction of inequations
+% There is ample scope for improvement in the way inequations can be simplified.
+
+simpIneqAux([],_,[]) :- !.
+simpIneqAux([(X \= Y)|_],_,_) :- X == Y, !, fail.
+simpIneqAux([(X \= Y)|Ineq],G,S) :- X \= Y, !, simpIneqAux(Ineq,G,S).
+simpIneqAux([(X \= Y)|Ineq],G,S) :-
+	doesntAffectVars(G,(X \= Y)), % Such inequations can be removed, assuming that there are always enough constants
+	simpIneqAux(Ineq,G,S).
+simpIneqAux([C|Ineq],G,S) :- \+ \+ isSubsumed(C,Ineq), simpIneqAux(Ineq,G,S). 
+simpIneqAux([C|Ineq],G,[C|S]) :- simpIneqAux(Ineq,G,S).
+
+
+:- import subsumes/2 from subsumes.
+
+isSubsumed((X\=Y),[(XX\=YY)|_]) :- X == XX, subsumes(YY,Y),!.
+isSubsumed(C,[_|Cs]) :- isSubsumed(C,Cs).
+
+doesntAffectVars(G,(X \= Y)) :- \+ affectVars(G,(X \= Y)).
+
+affectVars(G,(X \= Y)) :-
+	countVars(G,NBefore),
+	X = Y,
+	countVars(G,NAfter), NAfter < NBefore.
+affectVars(G,(X \= Y)) :-
+	var(X), in_varT(G,X), nonvar(Y).
+affectVars(G,(Y \= X)) :-
+	var(X), in_varT(G,X), nonvar(Y).
+
+/* doesntAffectVars(G,(X \= Y)) :- fail.
+doesntAffectVars(G,(X \= Y)) :-
+	countVars(G,NCall),
+	X=Y, 				
+	countVars(G,NCall).
+*/	
+
+same_structure(X,Y) :-
+	var(X), var(Y), !.
+same_structure(X,Y) :-
+	nonvar(X),nonvar(Y), !,
+	X =.. [N|ArgsX], Y =.. [N|ArgsY],
+	same_structureL(ArgsX,ArgsY).
+
+same_structureL([],[]).
+same_structureL([HX|TX],[HY|TY]) :- same_structure(HX,HY), same_structureL(TX,TY).
+	
+%%%% THIS IS THE MOST IMPORTANT PREDICATE
+
+/* 
+
+sys_free occurs in the rule for each predicate that accesses the its dual program.
+These rules have the simplified form
+	not p(X) <- not rule_p1(X,Y), sys_free(Y), 
+			    not rule_p2(X), NOSYSFREE, ..., not rule_pn(X,Z), sysfree(Z).
+			 
+The variable in rule_p_i that are not i p are the local variables in the body of th ith rule for p.
+sys_free tests whether these variable are not constrained.
+
+  sys_free(+ID given by the call in the rule instance
+            +List of  variables to be tested whether they are constrained
+            +A term with the original head and the extra variables (in the example p(X)-[Y] )
+            +Input constraints (including abducible and CWA. Abucible are kept unchanged in sysfree and CWA must be empty - why?)
+            -Output constraints
+          ) 
+*/
+            
+sys_free(_,_,_,I,I) :- \+ neg_const, !.
+
+sys_free(Ref,Vars,Head,Ab+I+[],Out) :-
+	getPrevOccurences(Ref,Head,Vars,Prev,Other,Abs), % If some occurences, that failed before, already exist, get them
+	imposeNegConst(Vars,Prev,I,Head,OO),
+	append(OO,Other,USO), sort(USO,O), insertAbs(Abs,Ab+O+[],Out).
+
+sys_free(Ref,Vars,Head,Ab+I+[],Ab+O+[]) :-
+	simpIneq(I,Head,O), % Otherwise, simplify the inequalities
+	collectOccurrences(Vars,O,Oc,Others), !, 
+	(allFree(Oc), \+ oneNonVar(Vars) -> true; %If all constraints are free, and non of the variables is bound, succeed
+	            recordOccurences(Ref,Head,Vars,Oc,Others,Ab), !, fail).
+
+allFree([]).
+allFree([_-[]|T]) :- !, allFree(T).
+%allFree([F-OC|T]) :- FALTA?
+
+oneNonVar([V|_]) :- nonvar(V).
+oneNonVar([_|T]) :- oneNonVar(T).
+
+
+:- import numbervars/3 from num_vars.
+
+allVarsNew(Vars,Term) :- \+ \+ varsNew(Vars,Term).
+
+varsNew(Vars,Term) :-
+	countVars(Vars,N),
+	numbervars(Term,0,TN), TN > 0,
+	countVars(Vars,N).
+
+countVars(Vars,N) :-
+	copy_term(Vars,V),
+	numbervars(V,0,N).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:- dynamic '$nextNumber'/1.
+
+initialize_numbers :-
+	retractall('$nextNumber'(_)),
+	retractall(prevOc(_,_,_,_,_,_)),
+	assert('$nextNumber'(0)).
+
+genNumber(N) :- retract('$nextNumber'(N)), N1 is N+1, assert('$nextNumber'(N1)).
+
+genNumbers(N,L) :-
+	retract('$nextNumber'(P)), 
+	nums(N,P,L), N1 is N+P, assert('$nextNumber'(N1)).
+
+nums(1,P,[P]) :- !.
+nums(N,P,[PN|Nums]) :- PN is P+N-1, N1 is N-1, nums(N1,P,Nums).
+
+:- dynamic prevOc/6.
+
+deleteOccurences(Ref) :- retractall(prevOc(Ref,_,_,_,_,_)).
+
+recordOccurences(Ref,Head,Vars,Oc,Other,Ab) :- 
+	assert(prevOc(Ref,Head,Vars,Oc,Other,Ab)).
+
+getPrevOccurences(Ref,Head,Vars,Prev,Other,Ab) :-
+	prevOc(Ref,Head,Vars,Prev,Other,Ab).
+
+imposeNegConst([],_,I,_,I).
+imposeNegConst([V|Vars],Prev,I,Head,O) :-
+	imposeOneVar(V,Prev,I,Head,I1), imposeNegConst(Vars,Prev,I1,Head,O).
+
+imposeOneVar(V,Prev,I,Head,O) :-
+	findVarCs(V,Prev,VarCs), imposeCs(VarCs,I,Head,O).
+
+findVarCs(V,[VV-VarCs|_],VarCs) :- V == VV, !.
+findVarCs(V,[_|Cs],VarCs) :- findVarCs(V,Cs,VarCs).
+
+:- import append/3 from basics.
+
+imposeCs([],P,_,P).
+imposeCs([(X \= Y)|T],I,Head,O) :-
+	imposeOneC(X,Y,I,Head,O1), imposeCs(T,I,Head,O2), append(O1,O2,O).
+
+imposeOneC(X,Y,I,G-Free,O) :-
+	X=Y, verifyFree(I,G-Free,O), assert(ii(G,O)), fail.
+imposeOneC(_,_,_,G-_,O) :- retract(ii(G,O)).
+
+
+verifyFree(C,G,SC) :- verifyFreeAux(C,G,NC), !, sort(NC,SC).
+
+verifyFreeAux([],_,[]) :- !.
+verifyFreeAux([(X \= Y)|_],_,_) :- X = Y, !, fail.
+verifyFreeAux([(X \= Y)|Ineq],G,S) :- X \= Y, !, verifyFreeAux(Ineq,G,S).
+verifyFreeAux([(X \= Y)|Ineq],G,S) :-
+	doesntAffectVars(G,(X \= Y)), 
+    verifyFreeAux(Ineq,G,S).
+verifyFreeAux([C|Ineq],G,[C|S]) :- verifyFreeAux(Ineq,G,S).
+
+
+collectOccurrences([],R,[],R).
+collectOccurrences([V|Vs],C,[V-VO|VsO],RC) :-
+	varOccurences(C,V,VO,R),
+	collectOccurrences(Vs,R,VsO,RC).
+
+varOccurences([],_,[],[]).
+varOccurences([T|C],V,[T|Oc],R) :- in_varT(T,V), !, varOccurences(C,V,Oc,R) .
+varOccurences([CD|C],V,Oc,[CD|R]) :- varOccurences(C,V,Oc,R).
+
+:- import ground/1 from basics.
+
+%in_varT(+Term,+Var)
+/* Tests whether Var occurs in Term */
+
+in_varT(T,V) :- T == V, !.
+in_varT(V,_) :- (var(V); V==[]), !, fail.
+in_varT([T|_],V) :- in_varT(T,V).
+in_varT([_|Ts],V) :- !, in_varT(Ts,V).
+in_varT(T,V) :- T =.. [_|Args], in_varT(Args,V).
+
+two_solutions(G) :- G, second, !.
+two_solutions(_) :- retractall('$sol'), fail.
+
+second :- '$sol', retractall('$sol').
+second :- assert('$sol'), fail.
+
+'$sol' :- fail.

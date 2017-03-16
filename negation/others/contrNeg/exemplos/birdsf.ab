@@ -1,0 +1,11 @@
+abds([bird_ab/1,penguin_ab/1]).
+
+flies(X) <- bird(X), not -flies(X).
+-flies(X) <- penguin(X), not flies(X).
+
+bird(X) <- bird_ab(X).
+penguin(X) <- penguin_ab(X).
+
+bird(X) <- penguin(X).
+
+penguin(t).

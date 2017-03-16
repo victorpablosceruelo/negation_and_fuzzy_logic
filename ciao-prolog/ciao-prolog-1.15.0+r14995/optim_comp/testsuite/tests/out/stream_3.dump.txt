@@ -1,0 +1,388 @@
+Analysis info for domain sht
+Predicate: /(multifile:$initialization,1)
+  calltypes: [~t0]
+  exittypes: $bottom
+Types: 
+  t0 := ~mode(any) && #any
+Predicate: /(multifile:$on_abort,1)
+  calltypes: [~t1]
+  exittypes: $bottom
+Types: 
+  t1 := ~mode(any) && #any
+Predicate: /(stream_3:main,0)
+  calltypes: []
+  exittypes: []
+Types: 
+Predicate: /(stream_3:$cputime#3,1)
+  calltypes: [~t2]
+  exittypes: [~t3]
+Types: 
+  t2 := ~mode(var) && #any
+  t3 := ~mode(any) && #any
+Predicate: /(stream_3:extra_data#3,1)
+  calltypes: [~t4]
+  exittypes: [~t5]
+Types: 
+  t4 := ~mode(var) && #any
+  t5 := ~mode(nva) && #smallint(~t6)
+  t6 := ~mode(nva) && #any
+Predicate: /(stream_3:num_data#3,1)
+  calltypes: [~t7]
+  exittypes: [~t8]
+Types: 
+  t7 := ~mode(var) && #any
+  t8 := ~mode(nva) && #smallint(~t9)
+  t9 := ~mode(nva) && 150000
+Predicate: /(stream_3:do_generate_data#3,5)
+  calltypes: [~t10, ~t11, ~t12, ~t13, ~t14]
+  exittypes: [~t15, ~t16, ~t17, ~t18, ~t19]
+Types: 
+  t10 := ~mode(nva) && #smallint(~t20)
+  t20 := ~mode(nva) && 0
+  t11 := ~mode(nva) && #smallint(~t21)
+  t21 := ~mode(nva) && #any
+  t12 := ~mode(var) && #any
+  t13 := ~mode(var) && #any
+  t14 := ~mode(var) && #any
+  t15 := ~mode(nva) && #smallint(~t22)
+  t22 := ~mode(nva) && 0
+  t16 := ~mode(nva) && #smallint(~t23)
+  t23 := ~mode(nva) && #any
+  t17 := ~mode(nva) && #reclist(~t24)
+  t24 := ~mode(nva) && #float(~t25)
+  t25 := ~mode(nva) && #any
+  t18 := ~mode(nva) && #reclist(~t26)
+  t26 := ~mode(nva) && #str(~t27)
+  t27 := ~mode(nva) && gps(~t28, ~t29)
+  t28 := ~mode(nva) && #float(~t30)
+  t30 := ~mode(nva) && #any
+  t29 := ~mode(nva) && #float(~t31)
+  t31 := ~mode(nva) && #any
+  t19 := ~mode(nva) && #reclist(~t32)
+  t32 := ~mode(nva) && #str(~t33)
+  t33 := ~mode(nva) && audio(~t34, ~t35)
+  t34 := ~mode(nva) && #float(~t36)
+  t36 := ~mode(nva) && #any
+  t35 := ~mode(nva) && #smallint(~t37)
+  t37 := ~mode(nva) && 0
+Predicate: /(stream_3:generate_data#3,5)
+  calltypes: [~t38, ~t39, ~t40, ~t41, ~t42]
+  exittypes: [~t43, ~t44, ~t45, ~t46, ~t47]
+Types: 
+  t38 := ~mode(nva) && #smallint(~t48)
+  t48 := ~mode(nva) && #any
+  t39 := ~mode(nva) && #smallint(~t49)
+  t49 := ~mode(nva) && #any
+  t40 := ~mode(var) && #any
+  t41 := ~mode(var) && #any
+  t42 := ~mode(var) && #any
+  t43 := ~mode(nva) && #smallint(~t50)
+  t50 := ~mode(nva) && #any
+  t44 := ~mode(nva) && #smallint(~t23)
+  t45 := ~mode(nva) && #reclist(~t51)
+  t51 := ~mode(nva) && #float(~t25)
+  t46 := ~mode(nva) && #reclist(~t52)
+  t52 := ~mode(nva) && #str(~t53)
+  t53 := ~mode(nva) && gps(~t54, ~t55)
+  t54 := ~mode(nva) && #float(~t30)
+  t55 := ~mode(nva) && #float(~t31)
+  t47 := ~mode(nva) && #reclist(~t56)
+  t56 := ~mode(nva) && #str(~t57)
+  t57 := ~mode(nva) && audio(~t58, ~t59)
+  t58 := ~mode(nva) && #float(~t36)
+  t59 := ~mode(nva) && #smallint(~t60)
+  t60 := ~mode(nva) && 0
+Predicate: /(stream_3:process_data#3,3)
+  calltypes: [~t61, ~t62, ~t63]
+  exittypes: [~t64, ~t65, ~t66]
+Types: 
+  t61 := ~mode(nva) && #reclist(~t67)
+  t67 := ~mode(nva) && #float(~t68)
+  t68 := ~mode(nva) && #any
+  t62 := ~mode(nva) && #reclist(~t69)
+  t69 := ~mode(nva) && #str(~t70)
+  t70 := ~mode(nva) && gps(~t71, ~t72)
+  t71 := ~mode(nva) && #float(~t73)
+  t73 := ~mode(nva) && #any
+  t72 := ~mode(nva) && #float(~t74)
+  t74 := ~mode(nva) && #any
+  t63 := ~mode(nva) && #reclist(~t75)
+  t75 := ~mode(nva) && #str(~t76)
+  t76 := ~mode(nva) && audio(~t77, ~t78)
+  t77 := ~mode(nva) && #float(~t79)
+  t79 := ~mode(nva) && #any
+  t78 := ~mode(nva) && #smallint(~t80)
+  t80 := ~mode(nva) && 0
+  t64 := ~mode(nva) && #reclist(~t81)
+  t81 := ~mode(nva) && #float(~t82)
+  t82 := ~mode(nva) && #any
+  t65 := ~mode(nva) && #reclist(~t83)
+  t83 := ~mode(nva) && #str(~t84)
+  t84 := ~mode(nva) && gps(~t85, ~t86)
+  t85 := ~mode(nva) && #float(~t87)
+  t87 := ~mode(nva) && #any
+  t86 := ~mode(nva) && #float(~t88)
+  t88 := ~mode(nva) && #any
+  t66 := ~mode(nva) && #reclist(~t89)
+  t89 := ~mode(nva) && #str(~t90)
+  t90 := ~mode(nva) && audio(~t91, ~t92)
+  t91 := ~mode(nva) && #float(~t93)
+  t93 := ~mode(nva) && #any
+  t92 := ~mode(nva) && #smallint(~t94)
+  t94 := ~mode(nva) && 0
+Predicate: /(stream_3:dostream#3,4)
+  calltypes: [~t95, ~t96, ~t97, ~t98]
+  exittypes: [~t99, ~t100, ~t101, ~t102]
+Types: 
+  t95 := ~mode(nva) && #smallint(~t103)
+  t103 := ~mode(nva) && 150000
+  t96 := ~mode(nva) && #reclist(~t104)
+  t104 := ~mode(nva) && #float(~t105)
+  t105 := ~mode(nva) && #any
+  t97 := ~mode(nva) && #reclist(~t106)
+  t106 := ~mode(nva) && #str(~t107)
+  t107 := ~mode(nva) && gps(~t108, ~t109)
+  t108 := ~mode(nva) && #float(~t110)
+  t110 := ~mode(nva) && #any
+  t109 := ~mode(nva) && #float(~t111)
+  t111 := ~mode(nva) && #any
+  t98 := ~mode(nva) && #reclist(~t112)
+  t112 := ~mode(nva) && #str(~t113)
+  t113 := ~mode(nva) && audio(~t114, ~t115)
+  t114 := ~mode(nva) && #float(~t116)
+  t116 := ~mode(nva) && #any
+  t115 := ~mode(nva) && #smallint(~t117)
+  t117 := ~mode(nva) && 0
+  t99 := ~mode(nva) && #smallint(~t118)
+  t118 := ~mode(nva) && 150000
+  t100 := ~mode(nva) && #reclist(~t119)
+  t119 := ~mode(nva) && #float(~t82)
+  t101 := ~mode(nva) && #reclist(~t120)
+  t120 := ~mode(nva) && #str(~t121)
+  t121 := ~mode(nva) && gps(~t122, ~t123)
+  t122 := ~mode(nva) && #float(~t87)
+  t123 := ~mode(nva) && #float(~t88)
+  t102 := ~mode(nva) && #reclist(~t124)
+  t124 := ~mode(nva) && #str(~t125)
+  t125 := ~mode(nva) && audio(~t126, ~t127)
+  t126 := ~mode(nva) && #float(~t93)
+  t127 := ~mode(nva) && #smallint(~t128)
+  t128 := ~mode(nva) && 0
+Predicate: /(stream_3:stream#3,5)
+  calltypes: [~t129, ~t130, ~t131, ~t132, ~t133]
+  exittypes: [~t134, ~t135, ~t136, ~t137, ~t138]
+Types: 
+  t129 := ~mode(nva) && #smallint(~t139)
+  t139 := ~mode(nva) && #any
+  t130 := ~mode(nva) && #reclist(~t140)
+  t140 := ~mode(nva) && #float(~t141)
+  t141 := ~mode(nva) && #any
+  t131 := ~mode(nva) && #reclist(~t142)
+  t142 := ~mode(nva) && #str(~t143)
+  t143 := ~mode(nva) && gps(~t144, ~t145)
+  t144 := ~mode(nva) && #float(~t146)
+  t146 := ~mode(nva) && #any
+  t145 := ~mode(nva) && #float(~t147)
+  t147 := ~mode(nva) && #any
+  t132 := ~mode(nva) && #reclist(~t148)
+  t148 := ~mode(nva) && #str(~t149)
+  t149 := ~mode(nva) && audio(~t150, ~t151)
+  t150 := ~mode(nva) && #float(~t152)
+  t152 := ~mode(nva) && #any
+  t151 := ~mode(nva) && #smallint(~t153)
+  t153 := ~mode(nva) && 0
+  t133 := ~mode(var) && #any
+  t134 := ~mode(nva) && #smallint(~t154)
+  t154 := ~mode(nva) && #any
+  t135 := ~mode(nva) && #reclist(~t155)
+  t155 := ~mode(nva) && #float(~t82)
+  t136 := ~mode(nva) && #reclist(~t156)
+  t156 := ~mode(nva) && #str(~t157)
+  t157 := ~mode(nva) && gps(~t158, ~t159)
+  t158 := ~mode(nva) && #float(~t87)
+  t159 := ~mode(nva) && #float(~t88)
+  t137 := ~mode(nva) && #reclist(~t160)
+  t160 := ~mode(nva) && #str(~t161)
+  t161 := ~mode(nva) && audio(~t162, ~t163)
+  t162 := ~mode(nva) && #float(~t93)
+  t163 := ~mode(nva) && #smallint(~t164)
+  t164 := ~mode(nva) && 0
+  t138 := ~mode(nva) && #reclist(~t165)
+  t165 := ~mode(nva) && #str(~t166)
+  t166 := ~mode(nva) && p(~t167, ~t168)
+  t167 := ~mode(nva) && #float(~t169)
+  t169 := ~mode(nva) && #any
+  t168 := ~mode(nva) && #float(~t170)
+  t170 := ~mode(nva) && #any
+Predicate: /(stream_3:nth#9,3)
+  calltypes: [~t171, ~t172, ~t173]
+  exittypes: [~t174, ~t175, ~t176]
+Types: 
+  t171 := ~mode(nva) && #smallint(~t177)
+  t177 := ~mode(nva) && #any
+  t172 := ~mode(nva) && #reclist(~t178)
+  t178 := ~mode(nva) && #str(~t179)
+  t179 := ~mode(nva) && audio(~t180, ~t181)
+  t180 := ~mode(nva) && #float(~t182)
+  t182 := ~mode(nva) && #any
+  t181 := ~mode(nva) && #smallint(~t183)
+  t183 := ~mode(nva) && 0
+  t173 := ~mode(var) && #any
+  t174 := ~mode(nva) && #smallint(~t184)
+  t184 := ~mode(nva) && #any
+  t175 := ~mode(nva) && #list(~t185)
+  t185 := ~mode(nva) && .(~t186, ~t187)
+  t186 := ~mode(nva) && #str(~t188)
+  t188 := ~mode(nva) && audio(~t189, ~t190)
+  t189 := ~mode(nva) && #float(~t191)
+  t191 := ~mode(nva) && #any
+  t190 := ~mode(nva) && #smallint(~t192)
+  t192 := ~mode(nva) && 0
+  t187 := ~mode(nva) && #reclist(~t193)
+  t193 := ~mode(nva) && #str(~t194)
+  t194 := ~mode(nva) && audio(~t195, ~t196)
+  t195 := ~mode(nva) && #float(~t197)
+  t197 := ~mode(nva) && #any
+  t196 := ~mode(nva) && #smallint(~t198)
+  t198 := ~mode(nva) && 0
+  t176 := ~mode(nva) && #str(~t199)
+  t199 := ~mode(nva) && audio(~t200, ~t201)
+  t200 := ~mode(nva) && #float(~t202)
+  t202 := ~mode(nva) && #any
+  t201 := ~mode(nva) && #smallint(~t203)
+  t203 := ~mode(nva) && 0
+Predicate: /(stream_3:nth#10,3)
+  calltypes: [~t204, ~t205, ~t206]
+  exittypes: [~t207, ~t208, ~t209]
+Types: 
+  t204 := ~mode(nva) && #smallint(~t210)
+  t210 := ~mode(nva) && 1
+  t205 := ~mode(nva) && #reclist(~t211)
+  t211 := ~mode(nva) && #str(~t212)
+  t212 := ~mode(nva) && audio(~t213, ~t214)
+  t213 := ~mode(nva) && #float(~t215)
+  t215 := ~mode(nva) && #any
+  t214 := ~mode(nva) && #smallint(~t216)
+  t216 := ~mode(nva) && 0
+  t206 := ~mode(var) && #any
+  t207 := ~mode(nva) && #smallint(~t217)
+  t217 := ~mode(nva) && 1
+  t208 := ~mode(nva) && #list(~t218)
+  t218 := ~mode(nva) && .(~t219, ~t220)
+  t219 := ~mode(nva) && #str(~t221)
+  t221 := ~mode(nva) && audio(~t222, ~t223)
+  t222 := ~mode(nva) && #float(~t224)
+  t224 := ~mode(nva) && #any
+  t223 := ~mode(nva) && #smallint(~t225)
+  t225 := ~mode(nva) && 0
+  t220 := ~mode(nva) && #reclist(~t226)
+  t226 := ~mode(nva) && #str(~t227)
+  t227 := ~mode(nva) && audio(~t228, ~t229)
+  t228 := ~mode(nva) && #float(~t230)
+  t230 := ~mode(nva) && #any
+  t229 := ~mode(nva) && #smallint(~t231)
+  t231 := ~mode(nva) && 0
+  t209 := ~mode(nva) && #str(~t232)
+  t232 := ~mode(nva) && audio(~t233, ~t234)
+  t233 := ~mode(nva) && #float(~t235)
+  t235 := ~mode(nva) && #any
+  t234 := ~mode(nva) && #smallint(~t236)
+  t236 := ~mode(nva) && 0
+Predicate: /(stream_3:nth#11,3)
+  calltypes: [~t237, ~t238, ~t239]
+  exittypes: [~t240, ~t241, ~t242]
+Types: 
+  t237 := ~mode(nva) && #smallint(~t243)
+  t243 := ~mode(nva) && #any
+  t238 := ~mode(nva) && #reclist(~t244)
+  t244 := ~mode(nva) && #str(~t245)
+  t245 := ~mode(nva) && audio(~t246, ~t247)
+  t246 := ~mode(nva) && #float(~t248)
+  t248 := ~mode(nva) && #any
+  t247 := ~mode(nva) && #smallint(~t249)
+  t249 := ~mode(nva) && 0
+  t239 := ~mode(var) && #any
+  t240 := ~mode(nva) && #smallint(~t250)
+  t250 := ~mode(nva) && #any
+  t241 := ~mode(nva) && #list(~t251)
+  t251 := ~mode(nva) && .(~t252, ~t253)
+  t252 := ~mode(nva) && #str(~t254)
+  t254 := ~mode(nva) && audio(~t255, ~t256)
+  t255 := ~mode(nva) && #float(~t248)
+  t256 := ~mode(nva) && #smallint(~t257)
+  t257 := ~mode(nva) && 0
+  t253 := ~mode(nva) && #list(~t258)
+  t258 := ~mode(nva) && .(~t259, ~t260)
+  t259 := ~mode(nva) && #str(~t261)
+  t261 := ~mode(nva) && audio(~t262, ~t263)
+  t262 := ~mode(nva) && #float(~t264)
+  t264 := ~mode(nva) && #any
+  t263 := ~mode(nva) && #smallint(~t265)
+  t265 := ~mode(nva) && 0
+  t260 := ~mode(nva) && #reclist(~t266)
+  t266 := ~mode(nva) && #str(~t267)
+  t267 := ~mode(nva) && audio(~t268, ~t269)
+  t268 := ~mode(nva) && #float(~t270)
+  t270 := ~mode(nva) && #any
+  t269 := ~mode(nva) && #smallint(~t271)
+  t271 := ~mode(nva) && 0
+  t242 := ~mode(nva) && #str(~t272)
+  t272 := ~mode(nva) && audio(~t273, ~t274)
+  t273 := ~mode(nva) && #float(~t275)
+  t275 := ~mode(nva) && #any
+  t274 := ~mode(nva) && #smallint(~t276)
+  t276 := ~mode(nva) && 0
+Predicate: /(stream_3:##0#3,4)
+  calltypes: [~t277, ~t278, ~t279, ~t280]
+  exittypes: [~t281, ~t282, ~t283, ~t284]
+Types: 
+  t277 := ~mode(nva) && #smallint(~t285)
+  t285 := ~mode(nva) && #any
+  t278 := ~mode(any) && #any
+  t279 := ~mode(nva) && #float(~t286)
+  t286 := ~mode(nva) && #any
+  t280 := ~mode(nva) && #float(~t287)
+  t287 := ~mode(nva) && #any
+  t281 := ~mode(nva) && #smallint(~t288)
+  t288 := ~mode(nva) && #any
+  t282 := ~mode(nva) && #str(~t289)
+  t289 := ~mode(nva) && p(~t290, ~t291)
+  t290 := ~mode(nva) && #float(~t292)
+  t292 := ~mode(nva) && #any
+  t291 := ~mode(nva) && #float(~t293)
+  t293 := ~mode(nva) && #any
+  t283 := ~mode(nva) && #float(~t294)
+  t294 := ~mode(nva) && #any
+  t284 := ~mode(nva) && #float(~t295)
+  t295 := ~mode(nva) && #any
+Analysis info for domain idet
+Predicate: /(multifile:$initialization,1)
+  imp: nondet
+Predicate: /(multifile:$on_abort,1)
+  imp: nondet
+Predicate: /(stream_3:main,0)
+  imp: nondet
+Predicate: /(stream_3:$cputime#3,1)
+  imp: nondet
+Predicate: /(stream_3:extra_data#3,1)
+  imp: nondet
+Predicate: /(stream_3:num_data#3,1)
+  imp: nondet
+Predicate: /(stream_3:do_generate_data#3,5)
+  imp: semidet
+Predicate: /(stream_3:generate_data#3,5)
+  imp: semidet
+Predicate: /(stream_3:process_data#3,3)
+  imp: nondet
+Predicate: /(stream_3:dostream#3,4)
+  imp: semidet
+Predicate: /(stream_3:stream#3,5)
+  imp: semidet
+Predicate: /(stream_3:nth#9,3)
+  imp: semidet
+Predicate: /(stream_3:nth#10,3)
+  imp: semidet
+Predicate: /(stream_3:nth#11,3)
+  imp: semidet
+Predicate: /(stream_3:##0#3,4)
+  imp: semidet

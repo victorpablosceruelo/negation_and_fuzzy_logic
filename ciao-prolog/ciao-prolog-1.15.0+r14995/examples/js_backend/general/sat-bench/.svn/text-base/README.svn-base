@@ -1,0 +1,54 @@
+A MINI-BENCHMARK CREATED FROM THE SAT SOLVER PEARL
+
+    "A Pearl on SAT Solving in Prolog", Jacob M. Howe and Andy King."
+    In FLOPS 2010, Proceedings of the 10th International Symposium on
+    Function and Logic Programming (eds Matthias Blume, Naoki
+    Kobayashi and Germán Vidal). Volume 6009 of Lecture Notes in
+    Computer Science, pages 165-174. Springer, 2010.
+
+===========================================================================
+
+NOTES
+
+  This version omits the parser and is limited to this set of files:
+
+    chat_80_1.cnf
+    chat_80_2.cnf
+    chat_80_3.cnf
+    chat_80_4.cnf
+    chat_80_5.cnf
+    chat_80_6.cnf
+
+  The benchmark is also limited to the 'freeze' version of the solver.
+
+PERFORMANCE
+
+  The bechmark is compatible with the normal bytecode backend,
+  optim_comp, and optim_comp+JS.
+
+  The normal bytecode version (using a C-based engine) runs around 11
+  times faster than the JS version (using V8 through Node.js).  Note
+  however that the JS backend is not really very optimized at this
+  moment.
+
+---------------------------------------------------------------------------
+
+Author:   Jose F. Morales
+Updated:  Tue Feb 28 12:45:45 CET 2012
+Original: Wed Dec 14 18:44:51 CET 2011
+
+---------------------------------------------------------------------------
+TODO:
+
+  - Ciao seem to have some random problems with attributed variables.
+    Leaving some spurious choice points result in errors like:
+
+        chat_80_1  13/31  0.1470000000000198  sat
+        chat_80_2  12/30  0.125  sat
+        chat_80_3  8/14  0.0689999999999884  sat
+        chat_80_4  7/16  0.07800000000000296  sat
+        chat_80_5  7/16  0.07500000000001705  sat
+        chat_80_6  8/14  0.06200000000001182  sat
+        uf20-0903  20/91  0.9339999999999975  sat
+        uf50-0429  50/218  18.95500000000001  sat
+        {ERROR: wake - unable to find all goals}

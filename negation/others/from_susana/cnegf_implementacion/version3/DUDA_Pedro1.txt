@@ -1,0 +1,58 @@
+He hecho una prueba sencilla de an√°lisis de no fallo (typesfd,shfr,nf)
+con el fichero:
+
+
+:- module(_proof2,_,[assertions]).
+
+:- entry no_falla(A) : (ground(A)).
+:- entry no_sabemos(A,L) : (ground(A)).
+
+% falla(_X):- fail.
+no_falla(_X).
+no_sabemos(X,L):- mi_member(X,L).
+
+mi_member(X,[X|_L]):- !.
+mi_member(X,[_Y|L]):- 
+ 	mi_member(X,L).
+
+Y va bien para el que no falla y para el que no se sabe.
+Pero el an√°lisis devuelve "no" si incluyo el predicado falla/1 y no devuelve
+fichero de salida.
+
+Por otro lado quiero preguntarte en quÈ condiciones funciona el
+predicado que me pasaste. Te cuento como lo estoy usando y no me funciona.
+Tengo un fichero opt_cnegf.pl :
+
+:- module(opt_cnegf,_,[]).
+ 
+:- load_compilation_module('/home/susana/src/Ciao/ciaopp-0.8p24/src/topcpaths').
+:- use_module(ciaopp(m_ciaopp),[precompile/2]).
+
+% Optimization of the negation calls of a list of programs Files.
+main([]).
+main([File|Files]):-
+	neg_optimize(File,_File_out),
+	main(Files).
+
+% Optimization of the negation calls of a list of a program File.
+neg_optimize(File,_File_out):-
+	m_ciaopp:precompile(File,[none,none,typesfd,shfr,none,none,none,
+                                  nf,none,none,none,none,yes]),
+	m_ciaopp:precompile(File,[none,none,typesfd,shfr,none,none,upper,
+                                  nf,none,none,none,none,yes]),
+	m_ciaopp:precompile(File,[none,none,none,none,none,none,none,
+                                  none,none,none,none,none,yes]).
+
+Paso primero un analisis de no fallo, luego el de coste y luego
+pretendo simplemente pasarle el preprocesador sin opciones para ver el
+resultado de expandir el paquete cnegf.pl donde llamo al
+finite_solutions.  Creo que no lo estoy haciendo bien asi que cuentame
+como debo hacerlo. Si es largo de contar bajo y me lo cuentas mejor.
+
+Te adjunto todos los ficheros que uso.  Mi objetivo es llamar a
+main([qsort1]). y que me devuelva despues de hacer los an·lisis y
+expandir un fichero qsort1_co.pl donde los neg(algo) cuando algo tenga
+finitas soluciones los haya cambiado por cnegf(algo).
+
+Saludos
+                     Susana

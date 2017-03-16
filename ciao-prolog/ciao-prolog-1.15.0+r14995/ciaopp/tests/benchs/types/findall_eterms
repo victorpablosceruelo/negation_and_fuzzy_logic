@@ -1,0 +1,14 @@
+complete('findall:collateral_percent/3',eterms,'findall:collateral_percent'(_20939,_20940,_20941),[_20939:(name3,term),_20940:(name4,term),_20941:(name5,term)],[[_20939:(name3,term),_20940:(name4,term),_20941:(name5,'basic_props:list')]],1,[('findall:collateral_percent/3/0',0)]).
+complete('aggregates:findall/3',eterms,'aggregates:findall'(_20939,('findall:collateral'(_20946,_20947),'findall:amount'(_20946,_20950,_20939)),_20941),[_20947:(name21,term),_20950:(name22,term),_20941:(name23,term),_20939:(name24,term),_20946:(name25,term)],[[_20947:(name51,term),_20950:(name52,term),_20941:(name53,'basic_props:list'),_20939:(name54,term),_20946:(name55,term)]],2,[('findall:collateral_percent/3/1/1',1)]).
+complete('findall:amount/3',eterms,'findall:amount'(_20939,_20940,_20941),[_20940:(name15,term),_20941:(name16,term),_20939:(name17,rt1)],[[_20940:(name15,rt2),_20941:(name16,rt3),_20939:(name17,rt4)]],4,[('findall:collateral_percent/3/1/3',2)]).
+complete('true/0',eterms,true,[],[[]],no,[('findall:amount/3/1/1',4)]).
+complete('findall:collateral/2',eterms,'findall:collateral'(_20939,_20940),[_20940:(name11,term),_20939:(name12,term)],[[_20940:(name11,rt0),_20939:(name12,rt1)]],3,[('findall:collateral_percent/3/1/2',2)]).
+complete('true/0',eterms,true,[],[[]],no,[('findall:collateral/2/1/1',3)]).
+memo_table('findall:collateral_percent/3/1',eterms,1,no,[_20934,_20936,_20938,_20940,_20942],[[_20934:(name6,term),_20936:(name7,term),_20938:(name8,'basic_props:list'),_20940:(name9,term),_20942:(name10,term)]]).
+memo_table('findall:collateral_percent/3/1/1',eterms,1,2,[_20934,_20936,_20938,_20940,_20942],[[_20934:(name6,term),_20936:(name7,term),_20938:(name8,term),_20940:(name9,term),_20942:(name10,term)]]).
+memo_table('findall:collateral_percent/3/1/3',eterms,2,4,[_20934,_20936,_20938,_20940,_20942],[[_20934:(name6,rt0),_20936:(name7,term),_20938:(name8,term),_20940:(name9,term),_20942:(name10,rt1)]]).
+memo_table('findall:amount/3/1',eterms,4,no,[],[[]]).
+memo_table('findall:amount/3/1/1',eterms,4,no,[],[[]]).
+memo_table('findall:collateral_percent/3/1/2',eterms,2,3,[_20934,_20936,_20938,_20940,_20942],[[_20934:(name6,term),_20936:(name7,term),_20938:(name8,term),_20940:(name9,term),_20942:(name10,term)]]).
+memo_table('findall:collateral/2/1',eterms,3,no,[],[[]]).
+memo_table('findall:collateral/2/1/1',eterms,3,no,[],[[]]).

@@ -1,0 +1,28 @@
+# -*- mode: Makefile; -*-
+##
+## SETTINGS
+##  
+## Made by Edison Mera
+##
+## Started on  Sun Apr 12 16:49:45 2009 Edison Mera
+## Last update Sun Apr 12 16:49:45 2009 Edison Mera
+## 
+
+# ----------------------------------------------------------------------------
+# Profile dependent options:
+# ----------------------------------------------------------------------------
+
+MAINTAINERS=efmera@gmail.com remy jfmcjf@gmail.com
+SAVELOGFILES=yes
+TESTTYPE?=full
+MASTER_HOST=cliptest1
+REPORTCHANGESTO=edison
+CONFIGURECRON=yes
+PBUNDLE_REPO_HOST=$(MASTER_HOST)
+PBUNDLE_REPO_DIR=/local/ciaopacks/
+LOG_REPO_HOST=$(MASTER_HOST)
+LOG_REPO_URLBASE=http://cliptest1.dia.fi.upm.es/
+SVN_REPO_USER:=ciaotester
+SVN_REPO_HOST:=clip.dia.fi.upm.es
+SVN_REPO_ROOT:=/home/clip/SvnReps/Systems/CiaoDE/
+

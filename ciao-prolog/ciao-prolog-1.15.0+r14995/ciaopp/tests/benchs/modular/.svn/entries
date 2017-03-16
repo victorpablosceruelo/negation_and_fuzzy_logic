@@ -1,0 +1,88 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciaopp/tests/benchs/modular
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2011-07-27T11:25:35.636320Z
+13562
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+mutually_recursive0
+dir
+
+chat80
+dir
+
+wms2
+dir
+
+suite
+dir
+
+infercost
+dir
+
+prolog_read
+dir
+
+hanoi
+dir
+
+bid
+dir
+
+peephole
+dir
+
+manag_proj_monolithic
+dir
+
+mutually_recursive
+dir
+
+types
+dir
+
+metacalls
+dir
+
+qsort
+dir
+
+ann
+dir
+
+manag_proj
+dir
+
+ciaopp-pe
+dir
+
+boyer
+dir
+
+mmatrix
+dir
+
+aiakl
+dir
+

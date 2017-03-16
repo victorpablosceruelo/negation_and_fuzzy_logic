@@ -1,0 +1,82 @@
+module=stream_3
+speckey='$id/.home.jfran.svn.ciaode.ciao.optim_comp.testsuite.tests.stream_3'
+uses=
+  stream_3
+  arithmetic
+  atomic_basic
+  attributes
+  basic_props
+  basiccontrol
+  interpreter
+  data_facts
+  exceptions
+  io_aux
+  io_basic
+  prolog_flags
+  streams_basic
+  system_info
+  rt_exp
+  term_basic
+  term_compare
+  term_typing
+  hiord_rt
+  prolog_sys
+exports=
+  main/0 as 'stream_3:main'
+defs=7
+'multifile:$initialization'/1: def=4
+'multifile:$on_abort'/1: def=4
+'stream_3:main'/0: def=0
+bits=31 nokey code=
+  bytecode - 0x96 bytes - start at 0x00000002, det at 0x00000004
+  0x00000002: neck
+  0x00000004: alloc+init2s(f_x,f_y) x(0) y(1)
+  0x0000000a: pad2|init(s(f_Y,5))+fcall(f_E,f_e) Q() y(0) y(2) y(3) y(4) y(5) E(stream_3:$cputime#3/1) e(32)
+  0x0000001e: pad2|zputn(s(f_Z,1))+kall(f_E,f_e) Q() z(5) E(stream_3:extra_data#3/1) e(32)
+  0x0000002a: pad2|ld_cons(f_x,f_t) Q() x(0) t(0)
+  0x00000034: globunsafe(f_y,f_x)+move(f_y,f_x) y(5) x(1) y(2) x(2)
+  0x0000003e: move(f_y,f_x)+move(f_y,f_x) y(3) x(3) y(4) x(4)
+  0x00000048: pad2|kall(f_E,f_e) Q() E(stream_3:do_generate_data#3/5) e(28)
+  0x00000052: pad2|zputn(s(f_Z,3))+kall(f_E,f_e) Q() z((unsafe)4) z((unsafe)3) z((unsafe)2) E(stream_3:process_data#3/3) e(16)
+  0x00000062: pad2|zputn(s(f_Z,1))+kall(f_E,f_e) Q() z(0) E(stream_3:$cputime#3/1) e(16)
+  0x0000006e: move(f_y,f_x)+move(f_y,f_x) y(0) x(0) y(1) x(1)
+  0x00000078: fun2(f_x,f_x,f_x,f_C,f_g) x(0) x(0) x(1) C(arithmetic:$-/3) g(h:0,a:2)
+  0x0000008a: kall(f_E,f_e) E(io_basic:display/1) e(8)
+  0x00000092: dealloc+lastcall(f_E) E(io_basic:nl/0)
+'stream_3:$cputime#3'/1: def=0
+bits=31 nokey code=
+  bytecode - 0x22 bytes - start at 0x00000002, det at 0x00000004
+  0x00000002: neck
+  0x00000004: move(f_x,f_x) x(0) x(2)
+  0x0000000a: pad2|ld_cons(f_x,f_t) Q() x(0) t(runtime)
+  0x00000014: ld_str(f_x,f_f(/(.,2))) x(1)
+  0x00000018: un_lval(f_x)+un_voidr(f_i) x(2) i(1)
+  0x0000001e: lastcall(f_E) E(prolog_sys:statistics/2)
+'stream_3:extra_data#3'/1: def=0
+bits=31 nokey code=
+  bytecode - 0x46 bytes - start at 0x00000002, det at 0x00000004
+  0x00000002: neck
+  0x00000004: alloc+move(f_x,f_y) x(0) y(1)
+  0x0000000a: init2s(f_x,f_y) x(0) y(2)
+  0x00000010: init(s(f_Y,1))+fcall(f_E,f_e) y(0) E(stream_3:num_data#3/1) e(20)
+  0x0000001a: pad2|ld_cons(f_x,f_t) Q() x(1) t(2)
+  0x00000024: move(f_y,f_x) y(0) x(2)
+  0x0000002a: pad2|zputn(s(f_Z,1))+kall(f_E,f_e) Q() z((unsafe)2) E(stream_3:mul_sma_sma/3) e(16)
+  0x00000036: move(f_y,f_x) y(0) x(0)
+  0x0000003c: u_val(f_x,f_y) x(0) y(1)
+  0x00000042: dealloc+lastcall(f_E) E(basiccontrol:true/0)
+'stream_3:num_data#3'/1: def=0
+bits=3 key=150000/0 code=
+  bytecode - 0xc bytes - start at 0x00000002, det at 0x00000004
+  0x00000002: neck
+  0x00000004: u_cons(f_x,f_t) x(0) t(150000)
+  0x0000000c: proceed
+'stream_3:process_data#3'/3: def=0
+bits=31 nokey code=
+  bytecode - 0x2e bytes - start at 0x00000002, det at 0x00000004
+  0x00000002: neck
+  0x00000004: alloc+move(f_x,f_y)+move(f_x,f_y) x(2) y(3) x(1) y(2)
+  0x0000000e: move(f_x,f_y) x(0) y(1)
+  0x00000014: init2s(f_x,f_y) x(0) y(0)
+  0x0000001a: fcall(f_E,f_e) E(stream_3:num_data#3/1) e(24)
+  0x00000022: zputn(s(f_Z,4))+dealloc+lastcall(f_E) z(3) z(2) z(1) z((unsafe)0) E(stream_3:dostream#3/4)

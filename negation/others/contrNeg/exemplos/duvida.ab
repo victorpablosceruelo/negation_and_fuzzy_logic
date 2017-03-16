@@ -1,0 +1,18 @@
+p(3,2).
+p(4,Y) <- not q(Y).
+q(2).
+
+b(X) <- p(X,_).
+
+
+
+a(X) <- not p(X,_).
+
+aa(X) <- pp(X,Y), qq(X,Y).
+
+p <- t(X).
+
+t(X) <- not c(X), d(X).
+c(1).
+d(1).
+

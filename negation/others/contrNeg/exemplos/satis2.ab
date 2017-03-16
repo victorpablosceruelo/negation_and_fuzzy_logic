@@ -1,0 +1,26 @@
+sat(true).
+sat(F) <- system(ig(F,e(X,Y))), sat(X), sat(Y).
+sat(F) <- system(ig(F,ou(X,_))), sat(X).
+sat(F) <- system(ig(F,ou(_,Y))), sat(Y).
+sat(F) <- system(ig(F,n(X))), not sat(X).
+
+
+%ig(X,Y) <- system((nonvar(X),X=Y)).
+
+/*
+
+No Art of Prolog está assim:
+
+sat(1).
+sat(F) <- nonvar(F), F = e(X,Y), sat(X), sat(Y).
+sat(F) <- nonvar(F), F = ou(X,Y), sat(X).
+sat(F) <- nonvar(F), F = ou(X,Y), sat(Y).
+sat(F) <- nonvar(F), F = n(X), inv(X).
+
+inv(0).
+inv(F) <- nonvar(F), F = ou(X,Y), inv(X), inv(Y).
+inv(F) <- nonvar(F), F = e(X,Y), inv(X).
+inv(F) <- nonvar(F), F = e(X,Y), inv(Y).
+inv(F) <- nonvar(F), F = n(X), sat(X).
+
+*/

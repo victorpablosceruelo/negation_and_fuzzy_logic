@@ -1,0 +1,144 @@
+:- export desunify/3.
+
+:-import ground/1, member/2, append/3, length/2 from basics.
+
+desunify(Call,Head,Res) :- 
+	nonvar(Head), Head =.. [F|ArgsH], Call =.. [F|ArgsC],
+	repeatedVars(Call,Head,Rep,Ready), !,
+		( processReadyVar(Ready,Res);
+			member(AC,AH,ArgsC,ArgsH),
+			argDesunify(AC,AH,Rep,Ready,Res)).
+
+
+
+repeatedVars(Call,Head,Rep,Ready) :-
+	getTermVars(Head,Vars), Head =.. [F|ArgsH], Call =.. [F|ArgsC],
+	buildOccList(Vars,ArgsC,ArgsH,OccList),
+	buildRepReady(OccList,Rep,Ready).
+
+
+buildOccList([],_,_,[]).
+buildOccList([V|OtherVs],Call,Head,[V-VarOc|Res]) :-	
+	oneVarOcc(V,Call,Head,VarOc),
+	buildOccList(OtherVs,Call,Head,Res).
+
+oneVarOcc(_,[],[],[]).
+oneVarOcc(V,[C1|Cs],[H1|Hs],[C1+H1|Res] ) :-
+	var_in_term(V,H1), !, oneVarOcc(V,Cs,Hs,Res).
+oneVarOcc(V,[_|Cs],[_|Hs],Res) :-
+	oneVarOcc(V,Cs,Hs,Res).
+
+buildRepReady([],[],[]).
+buildRepReady([V-Occ|Others],Rep,Ready) :-
+	repVarOcc(V-Occ,Rep,RepV), readyVarOcc(V-Occ,Ready,ReadyV),
+	buildRepReady(Others,RepV,ReadyV).
+
+repVarOcc(V-Occ,[V-Occ|Rep],Rep) :-
+	length(Occ,N), N > 1, !.
+repVarOcc(V-Occ,[V-Occ|Rep],Rep) :-
+	countVarOcc(V,Occ,N), N > 1, !.
+repVarOcc(_,Rep,Rep).
+
+readyVarOcc(V-Occ,[V-Vars|Ready],Ready) :-
+	sndParVar(Occ,Vars), !. 
+readyVarOcc(_,Ready,Ready).
+
+
+sndParVar([],[]).
+sndParVar([VC+V|T],[VC|NT]) :- var(V), sndParVar(T,NT).
+
+processReadyVar([_-Vars|_],Res) :- difPair(Vars,Res).
+processReadyVar([_|Ready],Res) :- processReadyVar(Ready,Res).
+
+argDesunify(_,Head,_,Ready,_) :- % IS READY
+	is_ready(Head,Ready,_), !, fail. % Already processed
+%	difPair(VCall,Result).
+argDesunify(Call,Head,Rep,_, Result ) :- % ISN'T READY but has repeated
+	has_repeated(Head,Rep,EstrVar), nonvar(Head),
+	getCallStruct(Call,EstrVar,VarOc,Other),
+	clean_term(VarOc,Clean),
+	(Result = [(Call \= Clean)]; Result = [(Call = Clean)|NewRes],
+	 buildNewTerm(VarOc,Clean,Other,NewCall,NewHead),
+	 desunify(NewCall,NewHead,NewRes)).
+
+argDesunify(Call,Head,Rep, _, [(Call \= Head)]) :- \+ has_repeated(Head,Rep,_).
+
+
+
+is_ready(V,RList,Vars) :- var(V),
+	argVarList(V,RList,Vars).
+
+argVarList(H,[V-Vars|_],Vars) :- H == V, !.
+argVarList(H,[_|RList],Vars) :- argVarList(H,RList,Vars).
+
+difPair(LVar,[(V1 \= V2)]) :-
+	memberVar(V1,LVar,LVarR),
+	memberVar(V2,LVarR,_).
+
+memberVar(X,[X|L],L).
+memberVar(X,[_|L],LR) :- memberVar(X,L,LR).
+
+has_repeated(H,RList,Res) :- 
+	getTermVars(H,Vars),
+	member(V,Vars), argVarList(V,RList,Res).
+
+getCallStruct(V1,[V2+V2Oc|Other],V2Oc,Other) :- V1 == V2, !.
+getCallStruct(V1,[V2|Struct],VarOc,[V2|Other]) :- 
+	getCallStruct(V1,Struct,VarOc,Other).
+
+buildNewTerm(VarOc,Clean,Other,NewCall,NewHead) :-
+	VarOc =.. [F|ArgsV], Clean =.. [F|ArgsC],
+	getOtherArgs(Other,OArgs,CArgs),
+	append(ArgsV,OArgs,HeadArgs),
+	append(ArgsC,CArgs,CallArgs),
+	NewCall =.. [F|CallArgs],
+	NewHead =.. [F|HeadArgs].
+
+
+getOtherArgs([],[],[]).
+getOtherArgs([V1+V2|T],[V2|NA],[V1|NC]) :- getOtherArgs(T,NA,NC).
+
+
+getTermVars(Term,[]) :- ground(Term), !.
+getTermVars(Var,[Var]) :- var(Var), !.
+getTermVars(Term,Vars) :-
+	Term =.. [_|Args],
+	getListVars(Args,Vars).
+
+getListVars([],[]).
+getListVars([A|As],Vars) :-
+	getTermVars(A,AV),
+	getListVars(As,LV), mergeVars(AV,LV,Vars).
+
+mergeVars([],V,V).
+mergeVars([V|Vs],LV,Vars) :-
+	\+ in_var(V,LV), !, mergeVars(Vs,[V|LV],Vars).
+mergeVars([_|Vs],LV,Vars) :-
+	mergeVars(Vs,LV,Vars).
+
+in_var(V,[VV|_]) :- V == VV, !.
+in_var(V,[_|Vs]) :- in_var(V,Vs).
+
+var_in_term(V,Term) :- V == Term.
+var_in_term(V,Term) :- nonvar(Term), Term =.. [_|Args], var_in_termList(V,Args).
+
+var_in_termList(V,[T|_]) :- var_in_term(V,T).
+var_in_termList(V,[_|L]) :- var_in_termList(V,L).
+
+countVarOcc(_,Term,0) :- ground(Term), !.
+countVarOcc(Var,Term,1) :- Term == Var, !.
+countVarOcc(_,Var,0) :- var(Var), !.
+countVarOcc(Var,Term,N) :-
+	Term =.. [_|Args], countVarOccList(Var,Args,N).
+
+countVarOccList(_,[],0).
+countVarOccList(Var,[Term|List],N) :-
+	countVarOcc(Var,Term,NT), countVarOccList(Var,List,NL), N is NT+NL.
+
+
+clean_term(Term,Clean) :- functor(Term,F,A), functor(Clean,F,A).
+
+
+member(X,Y,[X|_],[Y|_]).
+member(X,Y,[_|TX],[_|TY]) :- member(X,Y,TX,TY).
+

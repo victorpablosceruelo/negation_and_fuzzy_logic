@@ -1,0 +1,96 @@
+This is TeX, Version 3.14159 (Web2C 7.4.5) (format=latex 2004.4.6)  1 JUL 2004 10:08
+**tlp2egui.tex
+(./tlp2egui.tex
+LaTeX2e <2001/06/01>
+Babel <v3.7h> and hyphenation patterns for american, french, german, ngerman, n
+ohyphenation, loaded.
+(./tlp.cls
+Document Class: tlp 2003/07/15 v2.12 Theory and Practice of Logic Programming 
+document class
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\@leftskip=\skip41
+\proofsavebox=\box26
+\c@table=\count85
+\@tempboxb=\box27
+\c@figure=\count86
+\c@dummy=\count87
+\c@mv@program=\count88
+LaTeX Font Info:    Overwriting symbol font `letters' in version `program'
+(Font)                  OML/cmm/m/it --> OT1/cmr/m/sl on input line 1251.
+LaTeX Font Info:    Overwriting math alphabet `\mathnormal' in version `program
+'
+(Font)                  OT1/cmr/m/sl --> OT1/cmr/m/sl on input line 1253.
+)
+\citation{*}
+\c@lemma=\count89
+(./tlp2egui.aux)
+\openout1 = `tlp2egui.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <17.28> on input line 43.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 43.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 43.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 43.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 47.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 47.
+ (./tlp2egui.toc)
+\tf@toc=\write3
+\openout3 = `tlp2egui.toc'.
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+
+ []
+
+[1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 778.
+ [13] [14] [15]
+Underfull \hbox (badness 10000) in paragraph at lines 953--955
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 956--959
+
+ []
+
+[16] [17]
+Underfull \hbox (badness 4291) in paragraph at lines 1005--1007
+[]\OT1/cmr/m/n/10 as for []\OT1/cmtt/m/n/10 \continuedfigure\OT1/cmr/m/n/10 , e
+x-cept this com-mand
+ []
+
+[18] (./tlp2egui.bbl) [19] (./tlp2egui.aux) ) 
+Here is how much of TeX's memory you used:
+ 453 strings out of 95847
+ 4365 string characters out of 1195963
+ 60294 words of memory out of 1000001
+ 3441 multiletter control sequences out of 10000+50000
+ 14878 words of font info for 50 fonts, out of 500000 for 1000
+ 15 hyphenation exceptions out of 1000
+ 23i,15n,27p,187b,500s stack positions out of 1500i,500n,5000p,200000b,5000s
+
+Output written on tlp2egui.dvi (19 pages, 50816 bytes).

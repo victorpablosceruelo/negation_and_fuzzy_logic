@@ -1,0 +1,68 @@
+  This is a detailed explanation of what to do to run Ciao Prolog
+  programs in parallel.
+
+  1 - Download the Ciao Prolog source version.
+  2 - I have attached two files: engine.tar and andprolog_nd.tar
+      * Move the content of engine.tar to ciao/engine
+      * Move the content of andprolog_nd.tar to ciao/contrib/andprolog_nd
+  3 - Go to the root directory of Ciao.
+  4 - Execute:
+      ./ciaosetup configure --instype=src --and_parallel_execution=yes --optim_level=normal
+  5 - Execute: ./ciaosetup build
+  6 - Execute: ./ciaosetup install
+  7 - Execute the Prolog program:
+      ciao/contrib/andprolog_nd/examples/execute_all.pl
+      (if you are working under emacs use CONTROL + C + L).
+  8 - Make the query det_test/0 and nondet_test/0.
+      The final output should be several OK's.
+
+  Until here, you would have install Ciao Prolog with support for
+  parallel execution. If you have any problem, please contact us in
+  clip@clip.dia.fi.upm.es.
+
+  To run programs in parallel you have to include in your program the
+  line:
+
+  :- use_package(andprolog_nd).
+
+  Then, you have the following available operands:
+
+:- pred '&'(+callable,+callable).
+
+:- comment('&'(Goal1,Goal2), "Performs a parallel fork of the goals
+   @var{Goal1} and @var{Goal2} involved and waits for the execution of
+   both to finish. If some of the goals has not been picked up by
+   another agent then it will be executed by the publishing agent.").
+
+:- pred '&>'(+callable,-handler).
+
+:- comment('&>'(Goal,Handler), "Sends out the nondeterministic goal
+   @var{Goal} to be executed potentially by another agent, returning
+   in @var{Handler} a handler of the goal sent. It performs cleaning
+   in backtracking.").
+
+:- pred '<&'(+handler).
+
+:- comment('<&'(Handler), "Reads the bindings made to the output
+   variables of the goal associated to @var{Handler}, or executes it
+   if that goal has not been executed yet. Backtracking over the goal
+   will be performed at this point.").
+
+:- pred ensure_agents(+int).
+
+:- comment(ensure_agents(N), "Creates as many agents as necessary to
+   ensure @var{N} agents in the system.").
+
+   You also have '&!', '&!>' and '<&!' which are the deterministic
+   versions of '&', '&>' and '<&'. If the goals to be executed are
+   deterministic, this operands are more efficient than the previous
+   ones. You can find several benchmarks in
+   ciao/contrib/andprolog_nd/examples.
+
+   Some final considerations:
+
+   - We are currently improving our and-parallel implementation. This
+     is a beta version. Please, tell us if you find any wrong behavior
+     and we will fix it ASAP (clip@clip.dia.fi.upm.es).
+
+   - There is not garbage collection or stack reallocation. 

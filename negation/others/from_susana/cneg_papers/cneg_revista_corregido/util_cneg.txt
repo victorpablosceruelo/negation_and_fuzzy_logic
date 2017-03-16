@@ -1,0 +1,13 @@
+emacs cneg_TPLP.tex &
+
+latex cneg_TPLP.tex 
+
+bibtex cneg_TPLP
+
+xdvi cneg_TPLP.dvi &
+
+dvips -o cneg_TPLP.ps cneg_TPLP.dvi 
+
+ps2pdf cneg_TPLP.ps cneg_TPLP.pdf
+
+acroread cneg_TPLP.pdf &

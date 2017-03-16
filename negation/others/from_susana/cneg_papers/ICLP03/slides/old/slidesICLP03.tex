@@ -1,0 +1,434 @@
+\documentclass[pdf,slideColor,contemporain]{prosper}
+
+\usepackage[latin1]{inputenc}
+\usepackage{pstricks,pst-node,pst-text,pst-3d}
+\usepackage{amsmath}
+
+% slide 1
+\title{A Real Implementation for Constructive Negation}
+ \author{Susana Mu\~{n}oz ~~~~~~~ Juan Jos\'{e} Moreno}
+
+\institution{ 
+Facultad de Inform\'{a}tica  \\ 
+Universidad Polit\'{e}cnica de  Madrid \\ 
+28660 Madrid, Spain \\ \ \  \\
+\texttt{susana@fi.upm.es} \\
+\texttt{jjmoreno@fi.upm.es}  }
+
+\begin{document}
+
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 2
+%\begin{slide}{Overview}
+%\vspace{0.5cm}
+%        \begin{itemize}
+%                \item[{\blue $\bullet$}] Introduction
+%                \item[{\blue $\bullet$}] Syntax
+%                \item[{\blue $\bullet$}] Semantics
+%                \item[{\blue $\bullet$}] Implementation
+%                \item[{\blue $\bullet$}] Examples
+%                \item[{\blue $\bullet$}] Conclusion
+%                \item[{\blue $\bullet$}] Future Work
+%        \end{itemize}
+%\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 3
+%\overlays{3}{%
+\begin{slide}{Motivation}
+%\vspace{0.4cm}
+     \begin{itemize}
+        \item[{\blue $\bullet$}] Negation {\blue role} at Logic Programming
+%\FromSlide{2}{%
+        \item[{\blue $\bullet$}] Problems of the {\blue proposals}:
+              \begin{itemize}
+                \item[$\bullet$] Complexity
+                \item[$\bullet$] Expressiveness
+                \item[$\bullet$] Semantics
+              \end{itemize}
+%} %
+%\onlySlide{3}{%
+        \item[{\blue $\bullet$}] Limited {\blue implementations}:
+              \begin{itemize}
+                \item[$\bullet$] Negation as failure
+                \item[$\bullet$] Delay technique
+              \end{itemize}
+%} %
+     \end{itemize}
+\end{slide}
+%} %
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+%\overlays{4}{%
+\begin{slide}{Constructive Negation}
+%\vspace{0.4cm}
+     \begin{itemize}
+        \item[{\blue $\bullet$}] Papers about {\blue Semantical} aspects
+%\FromSlide{2}{%
+        \item[{\blue $\bullet$}] Practical {\blue Chan}'s proposal (coroutining)
+%} %
+%\FromSlide{3}{%
+        \item[{\blue $\bullet$}] Implementation {\blue problems} (Eclipse)
+%} %
+%\onlySlide{4}{%
+        \item[{\blue $\bullet$}] We provide:
+              \begin{itemize}
+                \item[$\bullet$] A complete theoretical {\blue algorithm} (refining and extending to the constructive negation method)
+                \item[$\bullet$] A discussion about {\blue implementation} issues
+                \item[$\bullet$] A preliminary implementation
+              \end{itemize}
+%} %
+     \end{itemize}
+
+\end{slide}
+%} %
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Frontier}
+
+\begin{small}
+\begin{minipage}{2.5in}
+{\blue 
+\begin{verbatim}
+odd(s(0)).
+odd(s(s(X))):- odd(X).
+
+\end{verbatim}}
+\end{minipage} 
+\begin{minipage}{1.5in}
+{\blue 
+\begin{verbatim}
+?- cneg(odd(Y)).
+
+\end{verbatim}}
+\end{minipage}
+\end{small}
+
+
+
+$Frontier(odd(Y)) = C_1 \vee C_2 = $ 
+\[ ( Y=s(0) ) \vee ( \exists X~~ Y=s(s(X)) \wedge odd(X) )  \] 
+
+$\neg ~Frontier(odd(Y)) = \neg~ C_1 \wedge \neg~ C_2 = $
+\[  ( Y \neq s(0) ) \wedge ( (\forall X1~~ Y \neq ~s(s(X1))) \vee\] 
+\[ (\exists X2~~ Y=s(s(X2)) \wedge \neg~ odd(X2) ))  \] 
+
+\end{slide}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+%\overlays{3}{%
+\begin{slide}{Preparation}
+%\vspace{0.4cm}
+     \begin{itemize}
+        \item[$\bullet$] {\blue Simplification} of the conjunction
+%\FromSlide{2}{%
+        \item[$\bullet$] {\blue Organization} of the conjunction
+\[ C_i \equiv \overline{I} \wedge \overline{D} \wedge \overline{R} \]
+%} %
+%\onlySlide{3}{%
+        \item[$\bullet$] {\blue Normalization} of the conjunction \\
+                      (GoalVars - RelVars - ImpVars)
+              \begin{itemize}
+                \item[$\bullet$] Elimination of {\blue redundant variables} and {\blue equalities}
+                \item[$\bullet$] Elimination of {\blue irrelevant disequalities}
+              \end{itemize}
+%} %
+     \end{itemize}
+\end{slide}
+%} %
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Negation of subformulas(I)}
+     \begin{itemize}
+        \item[{\blue$\bullet$}] Negation of $\overline{I}$ \\
+\vspace{0.5cm}
+$\overline{I} \equiv I_1 \wedge \ldots \wedge I_{NI} \equiv$
+\[ \underbrace{\exists~ \overline{Z}_1~ X_1 = t_1 } _{I_1} \wedge \ldots \wedge   \underbrace{\exists~ \overline{Z}_{NI}~ X_{NI} = t_{NI} } _{I_{NI}} \]
+%\vspace{0.4cm}
+{\blue
+
+$ \neg ~ C_i \equiv \neg~ \overline{I} \equiv \bigvee_{i=1}^{NI} \forall~ \overline{Z}_i X_i
+           \neq t_i \equiv $
+\[ \underbrace{\forall~ \overline{Z}_1~ X_1 \neq t_1} _{\neg~
+           I_1} \vee \ldots \vee \underbrace{\forall~
+           \overline{Z}_{NI}~ X_{NI} \neq t_{NI} } _{\neg~ I_{NI}} \] 
+}
+     \end{itemize}
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Negation of subformulas(II)}
+     \begin{itemize}
+        \item[{\blue$\bullet$}] Negation of $\overline{D}_{imp}$ \\
+\vspace{0.2cm}
+
+$\overline{D}_{imp} \equiv D_1
+           \wedge \ldots \wedge D_{N_{D_{imp}}}$ \\
+\vspace{0.1cm}
+
+$ D_i \equiv
+           \forall~ \overline{W}_i ~ \exists~ \overline{Z}_i ~ Y_i
+           \neq s_i$ \\
+\vspace{0.1cm}
+$ \neg~ D_i \equiv \exists~
+           \overline{W}_i~ Y_i = s_i$ \\
+\vspace{0.3cm}
+{\blue
+           $ \neg ~ C_i \equiv \overline{I} \wedge \neg~ D_1  \vee$ \\ 
+           $~~~~~~~~~~~ \overline{I} \wedge
+           D_1 \wedge \neg~ D_2  \vee$ \\ 
+           $~~~~~~~~~~~\ldots $ \\ 
+           $~~~~~~~~~~~\overline{I} \wedge
+           D_1 \wedge \ldots \wedge D_{N_{D_{imp}}-1} \wedge \neg~
+           D_{N_{D_{imp}}}$ \\ 
+}
+     \end{itemize}
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Negation of subformulas(III)}
+     \begin{itemize}
+        \item[{\blue$\bullet$}] Negation of $\overline{R}_{imp}$ \\
+\vspace{0.6cm}
+$\overline{R}_{imp} \equiv R_1
+           \wedge \ldots \wedge R_{N_{R_{imp}}}$\\
+
+\vspace{0.8cm}
+{\blue
+           $ \neg ~ C_i  \equiv \overline{I} \wedge \overline{D}_{imp} \wedge \neg~ R_1  \vee$ \\ 
+           $~~~~~~~~~~~ \overline{I} \wedge \overline{D}_{imp} \wedge
+           R_1 \wedge \neg~ R_2  \vee$ \\ 
+           $~~~~~~~~~~~ \ldots $ \\ 
+           $~~~~~~~~~~~ \overline{I} \wedge \overline{D}_{imp} \wedge
+           R_1 \wedge \ldots \wedge R_{N_{R_{imp}}-1} \wedge \neg~
+           R_{N_{R_{imp}}}$ \\ 
+
+}
+     \end{itemize}
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Negation of subformulas(IV)}
+     \begin{itemize}
+        \item[{\blue$\bullet$}] Negation of $\overline{D}_{exp} \wedge
+           \overline{R}_{exp}$ \\
+\vspace{1cm}
+$ \neg~ (\exists~ \overline{V}_{exp}~
+           \overline{D}_{exp} \wedge \overline{R}_{exp} ) \equiv $
+$\forall~ \overline{V}_{exp}~ \neg ~(\overline{D}_{exp}
+           \wedge \overline{R}_{exp})$\\
+
+\vspace{1.1cm}
+{\blue
+           $ \neg ~ C_i  \equiv \overline{I} \wedge \overline{D}_{imp}
+           \wedge \overline{R}_{imp} \wedge \forall~
+           \overline{V}_{exp}~ \neg~(\overline{D}_{exp} \wedge
+           \overline{R}_{exp})$
+
+}
+     \end{itemize}
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% slide 
+\begin{slide}{Implementation Issues (I)}
+     \begin{itemize}
+        \item[$\bullet$] {\blue Code expansion}
+\begin{small}
+\begin{verbatim}
+:- module(mod1,[odd/1,not_odd/1],[cneg]).
+
+odd(s(0)).
+odd(s(s(X))) :- odd(X).
+
+not_odd(X) :- cneg(odd(X)).
+\end{verbatim}
+{\blue
+\begin{verbatim}
+stored_clause(odd(s(0)),[]).
+stored_clause(odd(s(s(X))),[odd(X)]).
+
+\end{verbatim}}
+\end{small}
+     \end{itemize}
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Implementation Issues (II)}
+     \begin{itemize}
+%\vspace{-0.1cm}
+
+        \item[$\bullet$] {\blue Disequality constraints} (Attributed variables) \\
+%\vspace{-0.3cm}
+\begin{small}
+
+\[ \underbrace{\bigwedge_i (X_i = t_i)}_{\mbox{positive information}} \wedge~~~\] 
+\[(
+\underbrace{\bigwedge_j \forall~ \overline{Z}_j^1~(Y_j^1 \neq s_j^1)
+\vee \ldots \vee \bigwedge_l \forall~ \overline{Z_l}^n~(Y_l^n
+\neq s_l^n) )}_{\mbox{negative information}} \]
+
+
+\end{small}
+
+     \end{itemize}
+\end{slide}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Optimizations}
+     \begin{itemize}
+
+        \item[$\bullet$] {\blue Compact information} (disjunction of conjunction of disequalities) 
+\vspace{-0.2cm}
+\[ (X \neq 0 ~\vee~ \exists Y ~~ X \neq Y) ~\wedge~ (\forall Z ~~ X \neq s(Z)) \Rightarrow \]
+\[ (X=/=0, X=/=Y);(X=/=s(fA(Z))) \]
+        \item[$\bullet$] {\blue Pruning subgoals} (equivalent to true / fail) 
+        \item[$\bullet$] {\blue Constraint simplification}
+\[ F \equiv  \bigvee_i\bigwedge_j \forall~ \overline{Z}_j^i~(Y_j^i \neq s_j^i) \]
+
+     \end{itemize}
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Examples (I)}
+\begin{small}
+
+ \begin{minipage}{1.6in}
+\begin{verbatim}
+boole(0).
+boole(1).
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{2in}
+%\rnode{A}{}
+{\blue
+\begin{verbatim} 
+    ?- cneg(boole(X)).
+    X=/=1,X=/=0 ? ;
+    no
+\end{verbatim} 
+}%\rnode{B}{}
+%\ncline{A}{B}
+\end{minipage}\\
+\vspace{0.5cm}
+\begin{minipage}{1.6in}
+\begin{verbatim}
+positive(0). 
+positive(s(X)):-
+      positive(X).  
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{2in}
+%\rnode{A}{}
+{\blue
+\begin{verbatim} 
+
+    ?- cneg(positive(X)).
+    X=/=s(fA(_A)),X=/=0 ? ;
+    X = s(_A),
+    _A=/=s(fA(_B)),_A=/=0 ? ;
+    X = s(s(_A)),
+    _A=/=s(fA(_B)),_A=/=0 ? 
+    yes
+\end{verbatim} 
+}%\rnode{B}{}
+%\ncline{A}{B}
+\end{minipage}
+
+\end{small}
+
+\end{slide}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% slide 
+\begin{slide}{Examples (II)}
+\vspace{-0.2cm}
+\begin{small}
+\begin{minipage}{1.7in}
+\begin{verbatim}
+number(0).
+number(s(X)):-
+       number(X).
+
+greater(s(X),0):-
+       number(X).
+greater(s(X),s(Y)):-
+       greater(X,Y).
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{2in}
+%\rnode{A}{}
+{\blue
+\begin{verbatim} 
+    ?- cneg(greater(X,Y)).
+    Y=/=0,Y=/=s(fA(_A)) ?;
+
+    Y=/=s(fA(_A)),
+    X=/=s(fA(_B)) ?;
+
+    X = s(_A),Y = 0,
+    _A=/=s(fA(_B)),_A=/=0 ?;
+
+    X = s(s(_A)),Y = 0,
+    _A=/=s(fA(_B)),_A=/=0 ? 
+    yes
+\end{verbatim} 
+}%\rnode{B}{}
+%\ncline{A}{B}
+\end{minipage}
+
+\end{small}
+
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% slide 
+\begin{slide}{Experimental results}
+\vspace{-0.2cm}
+ 
+\begin{tiny}
+\input{tableslides} 
+\end{tiny}
+
+\end{slide}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% slide 
+\begin{slide}{Conclusion and Future Work}
+
+\vspace{1cm}
+        \begin{itemize}
+                \item[{\blue $\bullet$}] Detailed description of the modified {\blue algorithm}
+                \item[{\blue $\bullet$}] Complete and consistent {\blue implementation}
+                \item[$\bullet$] {\blue Efficiency} problem
+                  \begin{itemize}
+                  \item[{\blue $\bullet$}] WAM level (future work)
+                  \item[{\blue $\bullet$}] Negation subsystem for Prolog: \\
+                    Static + Dynamic analyses to choose among the different negation techniques
+                  \end{itemize}
+        \end{itemize}
+\end{slide}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\maketitle
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+

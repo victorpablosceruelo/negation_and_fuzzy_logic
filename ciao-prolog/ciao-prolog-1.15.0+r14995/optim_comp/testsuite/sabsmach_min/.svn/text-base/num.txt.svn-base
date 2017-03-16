@@ -1,0 +1,129 @@
+Using []
+
+======= COMPILING oc/boyer =======
+all bytecode_size(38606).
+program bytecode_size(8542).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24287 bytes
+all C code: 339444 bytes
+wam__2: 16827 bytes
+======= COMPILING oc/crypt =======
+all bytecode_size(32306).
+program bytecode_size(2242).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24175 bytes
+all C code: 335348 bytes
+wam__2: 12679 bytes
+======= COMPILING oc/deriv =======
+all bytecode_size(32022).
+program bytecode_size(1958).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24075 bytes
+all C code: 335348 bytes
+wam__2: 13699 bytes
+======= COMPILING oc/exp =======
+all bytecode_size(30542).
+program bytecode_size(478).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23895 bytes
+all C code: 335348 bytes
+wam__2: 12619 bytes
+======= COMPILING oc/factorial =======
+all bytecode_size(30216).
+program bytecode_size(152).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23895 bytes
+all C code: 331252 bytes
+wam__2: 9407 bytes
+======= COMPILING oc/fib =======
+all bytecode_size(30218).
+program bytecode_size(154).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23895 bytes
+all C code: 331252 bytes
+wam__2: 8943 bytes
+======= COMPILING oc/knights =======
+all bytecode_size(30726).
+program bytecode_size(662).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24019 bytes
+all C code: 336308 bytes
+wam__2: 14663 bytes
+======= COMPILING oc/nreverse =======
+all bytecode_size(30322).
+program bytecode_size(258).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24015 bytes
+all C code: 331700 bytes
+wam__2: 10299 bytes
+======= COMPILING oc/poly =======
+all bytecode_size(33098).
+program bytecode_size(3034).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24411 bytes
+all C code: 339444 bytes
+wam__2: 15971 bytes
+======= COMPILING oc/primes =======
+all bytecode_size(30526).
+program bytecode_size(462).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23999 bytes
+all C code: 335348 bytes
+wam__2: 13075 bytes
+======= COMPILING oc/qsort =======
+all bytecode_size(30778).
+program bytecode_size(714).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 24183 bytes
+all C code: 335348 bytes
+wam__2: 13115 bytes
+======= COMPILING oc/queens11 =======
+all bytecode_size(30696).
+program bytecode_size(632).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23895 bytes
+all C code: 335380 bytes
+wam__2: 13787 bytes
+======= COMPILING oc/query =======
+all bytecode_size(31256).
+program bytecode_size(1192).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23895 bytes
+all C code: 335348 bytes
+wam__2: 12375 bytes
+======= COMPILING oc/tak =======
+all bytecode_size(30334).
+program bytecode_size(270).
+all C code: 357332 bytes
+wam__2: 33215 bytes
+all C code: 347636 bytes
+wam__2: 23895 bytes
+all C code: 331252 bytes
+wam__2: 9975 bytes
+

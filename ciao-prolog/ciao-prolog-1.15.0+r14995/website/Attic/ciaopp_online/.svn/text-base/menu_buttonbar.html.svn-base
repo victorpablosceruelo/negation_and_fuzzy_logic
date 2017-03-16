@@ -1,0 +1,18 @@
+    <div id="toolbar">
+
+       <img src="<v>dirIndex</v>images/ciao.gif"            alt="[CIAO]"/>   
+       <label title="Cancel">
+       <button
+                class=barbutton
+		type="submit"
+		name="cancel"
+		value="true"
+		><img src="<v>dirIndex</v>images/button_cancel.png"       alt="[Cancel]" style="height:32px;width:32px;"/>
+       </button></label><label title="GO!"><button 
+               class=barbutton 
+	       type="submit"
+	       name="go"
+	       value="true" 
+	       ><img src="<v>dirIndex</v>images/button_ok.png"    alt="[OK]" style="height:32px;width:32px;"/>
+       </button></label>
+    </div>

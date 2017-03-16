@@ -1,0 +1,100 @@
+#include <engine/basiccontrol.native.h>
+#include <__root__.home.jfran.svn.ciaode.ciao.optim_comp.testsuite.tests.improlog_1.native.h>
+definition_t *improlog__1__0;
+bcp_t improlog__1__1;
+definition_t *improlog__1__2;
+definition_t *improlog__1__3;
+bool_t cunify(worker_t *, uint32_t, uint32_t);
+void sum(int32_t, int32_t, int32_t *);
+bcp_t improlog__1_3atest3__n0(worker_t *);
+void improlog__1_3atest3____2_233__n0(worker_t *);
+bool_t improlog__1_3asump__n1(worker_t *);
+void sum(int32_t A0, int32_t A1, int32_t *A2) {
+  *A2 = A0 + A1 + zero;
+  return;
+}
+/* improlog_1:test3/0 */
+bcp_t improlog__1_3atest3__n0(worker_t *w) {
+  frame_t *var0;
+  uint32_t var1;
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 0);
+  goto lab1;
+lab1:
+  if (ValidLocalTop()) goto lab2; else goto lab3;
+lab2:
+  var0 = G->local_top;
+  goto lab5;
+lab3:
+  var0 = w->choice->local_top;
+  if (StackYounger(var0, G->frame)) goto lab5; else goto lab4;
+lab4:
+  var0 = StackCharOffset(G->frame, FrameSize(G->next_insn));
+  goto lab5;
+lab5:
+  var0->next_insn = G->next_insn;
+  var0->frame = G->frame;
+  G->frame = var0;
+  G->next_insn = improlog__1__1;
+  G->local_top = StackCharOffset(var0, FrameSize(G->next_insn));
+  if (OffStacktop(var0, Stack_Warn)) goto lab6; else goto lab7;
+lab6:
+  SetEvent();
+  goto lab7;
+lab7:
+  improlog__1_3atest3____2_233__n0(w);
+  var0 = G->frame;
+  var1 = Tagp(0, G->heap_top);
+  X(0) = var1;
+  *G->heap_top = var1;
+  G->heap_top = G->heap_top + 1;
+  G->next_insn = var0->next_insn;
+  G->frame = var0->frame;
+  /* improlog_1:test3__3#3/1 */
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab8; else goto lab9;
+lab8:
+  v__handle_event(w, 1);
+  goto lab9;
+lab9:
+  return DEF_INSNP(improlog__1__2);
+}
+/* improlog_1:test3__2#3/0 */
+void improlog__1_3atest3____2_233__n0(worker_t *w) {
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 0);
+  goto lab1;
+lab1:
+  G->local_top = NULL;
+  return;
+}
+/* improlog_1:sump/1 */
+bool_t improlog__1_3asump__n1(worker_t *w) {
+  int32_t var0;
+  uint32_t var1;
+  int32_t var2;
+  int32_t var3;
+  uint32_t var4;
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 1);
+  goto lab1;
+lab1:
+  var0 = 10;
+  var1 = MakeSmall(100);
+  var2 = GetSmall(var1);
+  sum(var0, var2, &var3);
+  var4 = MakeSmall(var3);
+  return cunify(w, var4, X(0));
+}
+void improlog__1__init(worker_t *w) {
+  improlog__1__0 = register_cinsnp("improlog_1:test3", 0, improlog__1_3atest3__n0);
+  improlog__1__1 = def_success_cinsnp(w, NULL, 0);
+  improlog__1__2 = query_predicate("improlog_1:test4", 1);
+  improlog__1__3 = register_cbool("improlog_1:sump", 1, improlog__1_3asump__n1);
+}
+void improlog__1__end(worker_t *w) {
+  unregister_cinsnp("improlog_1:test3", 0);
+  unregister_cbool("improlog_1:sump", 1);
+}

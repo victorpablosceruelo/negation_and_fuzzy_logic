@@ -1,0 +1,89 @@
+#+TITLE: What is new, what is broken
+#+AUTHOR: Jose F. Morales
+#+EMAIL:  jfmc@fdi.ucm.es
+#+TEXT: New features, improvements, incompatibilities and pending
+#+TEXT: tasks in Ciao/OptimComp.
+#+SETUPFILE: ../org-templates/level-0.org
+
+* New features
+   - new .car executable format for bootstrap-able executables
+   - sabsmach
+   - compilation to C (still incomplete)
+   - very simple instantiable modules (with some kind of persistence)
+   - module-paths instead of library-paths (no alias path is required)
+   - no engine: source can mix C and Prolog code
+   - assertions are read by the compiler
+   - new declarations:
+: :- '$pragma'(...). % tells the compiler about compilation options
+** TODO This list is incomplete
+* Improvements
+  - very fast term and bytecode serialization (IO)
+  - faster meta expansions
+  - faster module loading
+  - smaller executables
+  - faster dependency track
+  - faster assert/retract (cleaned implementation, parts moved to C,
+    avoids some nasty boxing/unboxing)
+
+* Improved stability
+  - lowlevel rtchecks to ensure engine integrity (of course incomplete)
+  - automated self-compiling bootstrap compiler tests
+  - automated engine generation (of superinstructions) avoids some
+     human coding errors, since it reduces code duplication
+
+* Known issues (can be fixed)
+
+** changes in the directory structure difficults merge with main branch
+** modedef is always expanded
+** C code of .car executables is only compiled on-demand
+** =active modules= no longer available
+   That option has been removed from the compiler (it was too complex
+   to maintain it, and moving it to a separate/external tool (or
+   providing some hooks to do that) seems more plausible.
+   
+** =ciaoc= is no longer the executable to run the compiler
+   Instead there exists a =comp= executable, with new options.
+   Indeed =comp= should be a subset of =ciaoc=.
+** compilation to C still generates files too large 
+** =Prolog->low_code= in compilation to C is not efficient
+** user defined options in foreign interface are not interpreted
+** socket (in foreign C code) is not part of OptimComp
+   Backport it?
+** more exhaustive testing of Ciao tests
+   OptimComp contains a lot of detailed tests, but some tests in Ciao
+   are not included (and they should be).
+
+* Incompatible changes introduced in this branch
+
+** concurrency and functions moved from 'extra' to 'core'
+
+** addmodule removed from metapredicate declaration
+   Use instead the '$module' context variable.
+
+** ':- meta_predicate' declarations accept only a single predicate
+
+   Thus using ',/2' for multiple definitions in a single decl is not
+   possible. That was disabled because it could not be possible to
+   specify the metatypes of ',/2'. I (Jose) personally do not like
+   multiple definitions in that way, but it could be re-enabled when
+   =allow_def= is disabled for ',/2'.
+
+** the compiler internals are completelly different
+   =c_itf= is no longer available, so programs that depends on it will
+   not work anymore. There exist a compatiblity module, but it is
+   outdated.
+
+** use_module(foo) search the module 'foo' in the module path
+
+** most GCC options for compilation of foreign files ignored
+   It uses the options used to compile the engine itself to avoid
+   compiler incompatibilities.
+** TODO alias paths not recognized
+** dynamic change of library path is not supported
+** lazy module loading disabled
+** use notation m(X):foo?? any problems with hierarchical modules?
+   I still prefer X/m:foo means: foo from the instance X, which is of type m
+   also...
+** maybe its better X instanceof m, X:foo; and use the mexpand dict
+
+

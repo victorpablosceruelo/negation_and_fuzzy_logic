@@ -1,0 +1,1047 @@
+#include <engine/basiccontrol.native.h>
+#include <math.h>
+definition_t *stream__3__0;
+try_node_t *stream__3__1;
+tagged_t stream__3__2;
+tagged_t stream__3__3;
+tagged_t stream__3__4;
+definition_t *stream__3__5;
+bcp_t stream__3__6;
+bcp_t stream__3__7;
+tagged_t stream__3__8;
+bool_t cunify(worker_t *, uint32_t, uint32_t);
+bool_t stream__3_3ado__generate__data_233__n5(worker_t *);
+bool_t stream__3_3agenerate__data_233__n5(worker_t *);
+bool_t stream__3_3adostream_233__n4(worker_t *);
+bool_t stream__3_3astream_233__n5(worker_t *);
+bool_t stream__3_3anth_239__n3(worker_t *);
+/* stream_3:do_generate_data#3/5 */
+bool_t stream__3_3ado__generate__data_233__n5(worker_t *w) {
+  uint32_t var0;
+  uint32_t var1;
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 5);
+  goto lab1;
+lab1:
+  DEREF(var0, X(0));
+  DEREF(var1, X(1));
+  return stream__3_3agenerate__data_233__n5(w);
+}
+/* stream_3:generate_data#3/5 */
+bool_t stream__3_3agenerate__data_233__n5(worker_t *w) {
+  uint32_t *var0;
+  choice_t *var1;
+  uint32_t var2;
+  uint32_t var3;
+  uint32_t var4;
+  uint32_t var5;
+  uint32_t var6;
+  choice_t *var7;
+  uint32_t *var8;
+  uint32_t *var9;
+  uint32_t var10;
+  choice_t *var11;
+  flt64_t var12;
+  flt64_t var13;
+  int32_t var14;
+  flt64_t var15;
+  flt64_t var16;
+  flt64_t var17;
+  flt64_t var18;
+  flt64_t var19;
+  uint32_t var20;
+  uint32_t var21;
+  uint32_t var22;
+  uint32_t var23;
+  uint32_t var24;
+  flt64_t var25;
+  uint32_t var26;
+  flt64_t var27;
+  uint32_t var28;
+  uint32_t var29;
+  uint32_t var30;
+  uint32_t var31;
+  int32_t var32;
+  int32_t var33;
+  flt64_t var34;
+  uint32_t var35;
+  uint32_t var36;
+  uint32_t var37;
+  uint32_t var38;
+  uint32_t var39;
+  uint32_t var40;
+  uint32_t var41;
+  uint32_t var42;
+  uint32_t var43;
+  uint32_t var44;
+  uint32_t var45;
+  uint32_t var46;
+  uint32_t var47;
+  uint32_t var48;
+  uint32_t var49;
+  uint32_t var50;
+  uint32_t var51;
+  uint32_t var52;
+  uint32_t var53;
+  uint32_t var54;
+  uint32_t var55;
+  uint32_t var56;
+  uint32_t var57;
+  uint32_t var58;
+  uint32_t var59;
+  uint32_t var60;
+  uint32_t var61;
+lab0:
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab1; else goto lab2;
+lab1:
+  v__handle_event(w, 5);
+  goto lab2;
+lab2:
+  w->previous_choice = w->choice;
+  if (ValidLocalTop()) goto lab3; else goto lab4;
+lab3:
+  G->local_top = G->local_top;
+  goto lab6;
+lab4:
+  G->local_top = w->choice->local_top;
+  if (StackYounger(G->local_top, G->frame)) goto lab6; else goto lab5;
+lab5:
+  G->local_top = StackCharOffset(G->frame, FrameSize(G->next_insn));
+  goto lab6;
+lab6:
+  G->next_alt = stream__3__1;
+  w->choice = ChoiceNext0(w->choice, stream__3__1->arity);
+  w->choice->flags = 0;
+  w->choice->trail_top = G->trail_top;
+  w->choice->local_top = G->local_top;
+  w->choice->heap_top = G->heap_top;
+  SetShallowTry();
+  w->global_uncond = Tagp(0, w->choice->heap_top);
+  w->local_uncond = Tagp(2, w->choice->local_top);
+  w->choice = w->choice;
+  TEST_CHOICE_OVERFLOW(w->choice, CHOICEPAD);
+  if (X(0) == X(1)) goto lab7; else goto lab16;
+lab7:
+  G->local_top = NULL;
+  var1 = w->previous_choice;
+  G->next_alt = var1->next_alt;
+  w->global_uncond = Tagp(0, var1->heap_top);
+  w->local_uncond = Tagp(2, var1->local_top);
+  w->choice = var1;
+  DEBUG_CUT(var1);
+  ConcChptCleanUp(TopConcChptFun(), var1);
+  SetDeep();
+  var2 = stream__3__4;
+  DEREF(var3, X(2));
+  var4 = var3;
+  var5 = var2;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var4, goto lab8;, goto lab11;, goto lab12;);
+lab8:
+  if (CondHVA(var4)) goto lab9; else goto lab10;
+lab9:
+  trail_push_check(w, var4);
+  goto lab10;
+lab10:
+  *TagpPtr(0, var4) = var5;
+  goto lab15;
+lab11:
+  trail_push_check(w, var4);
+  *TagpPtr(1, var4) = var5;
+  IncWakeCount();
+  goto lab15;
+lab12:
+  if (CondSVA(var4)) goto lab13; else goto lab14;
+lab13:
+  trail_push_check(w, var4);
+  goto lab14;
+lab14:
+  *TagpPtr(2, var4) = var5;
+  goto lab15;
+lab15:
+  DEREF(var6, X(3));
+  if (IsVar(var6)) goto lab113; else goto lab99;
+lab16:
+  var7 = w->choice;
+  ResetWakeCount();
+  var8 = G->trail_top;
+  var9 = var7->trail_top;
+  if (TrailYounger(var8, var9)) goto lab17; else goto lab21;
+lab17:
+  TrailDec(var8);
+  var10 = *var8;
+  if (IsVar(var10)) goto lab19; else goto lab18;
+lab18:
+  G->trail_top = var8;
+  goto lab22;
+lab19:
+  *TaggedToPointer(var10) = var10;
+  if (TrailYounger(var8, var9)) goto lab17; else goto lab20;
+lab20:
+  G->trail_top = var8;
+  goto lab21;
+lab21:
+  G->heap_top = var7->heap_top;
+  goto lab22;
+lab22:
+  G->local_top = NULL;
+  var11 = w->previous_choice;
+  G->next_alt = var11->next_alt;
+  w->global_uncond = Tagp(0, var11->heap_top);
+  w->local_uncond = Tagp(2, var11->local_top);
+  w->choice = var11;
+  DEBUG_CUT(var11);
+  ConcChptCleanUp(TopConcChptFun(), var11);
+  SetDeep();
+  var12 = (flt64_t)4410;
+  var13 = (flt64_t)10;
+  var14 = GetSmall(X(0));
+  var15 = (flt64_t)var14;
+  var16 = var12 / var13;
+  var17 = var15 / var16;
+  var18 = (flt64_t)360;
+  var19 = fmod(var17, var18);
+  var20 = BoxFloat(var19);
+  var21 = Tagp(6, G->heap_top);
+  var0 = G->heap_top;
+  G->heap_top = G->heap_top + 2;
+  DEREF(var22, X(2));
+  var23 = var22;
+  var24 = var21;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var23, goto lab23;, goto lab26;, goto lab27;);
+lab23:
+  if (CondHVA(var23)) goto lab24; else goto lab25;
+lab24:
+  trail_push_check(w, var23);
+  goto lab25;
+lab25:
+  *TagpPtr(0, var23) = var24;
+  goto lab30;
+lab26:
+  trail_push_check(w, var23);
+  *TagpPtr(1, var23) = var24;
+  IncWakeCount();
+  goto lab30;
+lab27:
+  if (CondSVA(var23)) goto lab28; else goto lab29;
+lab28:
+  trail_push_check(w, var23);
+  goto lab29;
+lab29:
+  *TagpPtr(2, var23) = var24;
+  goto lab30;
+lab30:
+  var0[1 - 1] = var20;
+  var0[2 - 1] = Tagp(0, &var0[2 - 1]);
+  X(2) = var0[2 - 1];
+  var25 = (flt64_t)50.0;
+  var26 = BoxFloat(var25);
+  var27 = (flt64_t)50.0;
+  var28 = BoxFloat(var27);
+  DEREF(var29, X(3));
+  if (IsVar(var29)) goto lab90; else goto lab31;
+lab31:
+  if (TagH3_Is6(var29)) goto lab33; else goto lab32;
+lab32:
+  return FALSE;
+lab33:
+  var0 = TagpPtr(6, var29);
+  var30 = var0[1 - 1];
+  X(3) = var0[2 - 1];
+  goto lab34;
+lab34:
+  DEREF(var31, var30);
+  if (IsVar(var31)) goto lab81; else goto lab35;
+lab35:
+  if (TagH3_Is7(var31)) goto lab37; else goto lab36;
+lab36:
+  return FALSE;
+lab37:
+  if (TaggedToHeadfunctor(var31) == stream__3__2) goto lab39; else goto lab38;
+lab38:
+  return FALSE;
+lab39:
+  var0 = TagpPtr(7, var31) + 1;
+  if (!cunify(w, var26, var0[1 - 1])) goto lab40; else goto lab41;
+lab40:
+  return FALSE;
+lab41:
+  if (!cunify(w, var28, var0[2 - 1])) goto lab42; else goto lab43;
+lab42:
+  return FALSE;
+lab43:
+  var32 = GetSmall(X(0));
+  var33 = var32 + 1;
+  X(0) = MakeSmall(var33);
+  var34 = (flt64_t)var33;
+  var35 = BoxFloat(var34);
+  DEREF(var36, X(4));
+  if (IsVar(var36)) goto lab72; else goto lab44;
+lab44:
+  if (TagH3_Is6(var36)) goto lab46; else goto lab45;
+lab45:
+  return FALSE;
+lab46:
+  var0 = TagpPtr(6, var36);
+  var37 = var0[1 - 1];
+  X(4) = var0[2 - 1];
+  goto lab47;
+lab47:
+  DEREF(var38, var37);
+  if (IsVar(var38)) goto lab63; else goto lab48;
+lab48:
+  if (TagH3_Is7(var38)) goto lab50; else goto lab49;
+lab49:
+  return FALSE;
+lab50:
+  if (TaggedToHeadfunctor(var38) == stream__3__3) goto lab52; else goto lab51;
+lab51:
+  return FALSE;
+lab52:
+  var0 = TagpPtr(7, var38) + 1;
+  if (!cunify(w, var35, var0[1 - 1])) goto lab53; else goto lab54;
+lab53:
+  return FALSE;
+lab54:
+  DEREF(var39, var0[2 - 1]);
+  if (IsVar(var39)) goto lab58; else goto lab55;
+lab55:
+  if (var39 == MakeSmall(0)) goto lab57; else goto lab56;
+lab56:
+  return FALSE;
+lab57:
+  goto lab0;
+lab58:
+  var40 = MakeSmall(0);
+  var41 = var39;
+  var42 = var40;
+  Sw_HVA_CVA(var41, goto lab59;, goto lab62;);
+lab59:
+  if (CondHVA(var41)) goto lab60; else goto lab61;
+lab60:
+  trail_push_check(w, var41);
+  goto lab61;
+lab61:
+  *TagpPtr(0, var41) = var42;
+  goto lab57;
+lab62:
+  trail_push_check(w, var41);
+  *TagpPtr(1, var41) = var42;
+  IncWakeCount();
+  goto lab57;
+lab63:
+  var43 = Tagp(7, G->heap_top);
+  var0 = G->heap_top + 1;
+  var0[0 - 1] = stream__3__3;
+  G->heap_top = G->heap_top + (1 + 2);
+  var44 = var38;
+  var45 = var43;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var44, goto lab64;, goto lab67;, goto lab68;);
+lab64:
+  if (CondHVA(var44)) goto lab65; else goto lab66;
+lab65:
+  trail_push_check(w, var44);
+  goto lab66;
+lab66:
+  *TagpPtr(0, var44) = var45;
+  goto lab71;
+lab67:
+  trail_push_check(w, var44);
+  *TagpPtr(1, var44) = var45;
+  IncWakeCount();
+  goto lab71;
+lab68:
+  if (CondSVA(var44)) goto lab69; else goto lab70;
+lab69:
+  trail_push_check(w, var44);
+  goto lab70;
+lab70:
+  *TagpPtr(2, var44) = var45;
+  goto lab71;
+lab71:
+  var0[1 - 1] = var35;
+  var0[2 - 1] = MakeSmall(0);
+  goto lab57;
+lab72:
+  var46 = Tagp(6, G->heap_top);
+  var0 = G->heap_top;
+  G->heap_top = G->heap_top + 2;
+  var47 = var36;
+  var48 = var46;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var47, goto lab73;, goto lab76;, goto lab77;);
+lab73:
+  if (CondHVA(var47)) goto lab74; else goto lab75;
+lab74:
+  trail_push_check(w, var47);
+  goto lab75;
+lab75:
+  *TagpPtr(0, var47) = var48;
+  goto lab80;
+lab76:
+  trail_push_check(w, var47);
+  *TagpPtr(1, var47) = var48;
+  IncWakeCount();
+  goto lab80;
+lab77:
+  if (CondSVA(var47)) goto lab78; else goto lab79;
+lab78:
+  trail_push_check(w, var47);
+  goto lab79;
+lab79:
+  *TagpPtr(2, var47) = var48;
+  goto lab80;
+lab80:
+  var0[1 - 1] = Tagp(0, &var0[1 - 1]);
+  var37 = var0[1 - 1];
+  var0[2 - 1] = Tagp(0, &var0[2 - 1]);
+  X(4) = var0[2 - 1];
+  goto lab47;
+lab81:
+  var49 = Tagp(7, G->heap_top);
+  var0 = G->heap_top + 1;
+  var0[0 - 1] = stream__3__2;
+  G->heap_top = G->heap_top + (1 + 2);
+  var50 = var31;
+  var51 = var49;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var50, goto lab82;, goto lab85;, goto lab86;);
+lab82:
+  if (CondHVA(var50)) goto lab83; else goto lab84;
+lab83:
+  trail_push_check(w, var50);
+  goto lab84;
+lab84:
+  *TagpPtr(0, var50) = var51;
+  goto lab89;
+lab85:
+  trail_push_check(w, var50);
+  *TagpPtr(1, var50) = var51;
+  IncWakeCount();
+  goto lab89;
+lab86:
+  if (CondSVA(var50)) goto lab87; else goto lab88;
+lab87:
+  trail_push_check(w, var50);
+  goto lab88;
+lab88:
+  *TagpPtr(2, var50) = var51;
+  goto lab89;
+lab89:
+  var0[1 - 1] = var26;
+  var0[2 - 1] = var28;
+  goto lab43;
+lab90:
+  var52 = Tagp(6, G->heap_top);
+  var0 = G->heap_top;
+  G->heap_top = G->heap_top + 2;
+  var53 = var29;
+  var54 = var52;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var53, goto lab91;, goto lab94;, goto lab95;);
+lab91:
+  if (CondHVA(var53)) goto lab92; else goto lab93;
+lab92:
+  trail_push_check(w, var53);
+  goto lab93;
+lab93:
+  *TagpPtr(0, var53) = var54;
+  goto lab98;
+lab94:
+  trail_push_check(w, var53);
+  *TagpPtr(1, var53) = var54;
+  IncWakeCount();
+  goto lab98;
+lab95:
+  if (CondSVA(var53)) goto lab96; else goto lab97;
+lab96:
+  trail_push_check(w, var53);
+  goto lab97;
+lab97:
+  *TagpPtr(2, var53) = var54;
+  goto lab98;
+lab98:
+  var0[1 - 1] = Tagp(0, &var0[1 - 1]);
+  var30 = var0[1 - 1];
+  var0[2 - 1] = Tagp(0, &var0[2 - 1]);
+  X(3) = var0[2 - 1];
+  goto lab34;
+lab99:
+  if (var6 == stream__3__4) goto lab101; else goto lab100;
+lab100:
+  return FALSE;
+lab101:
+  DEREF(var55, X(4));
+  if (IsVar(var55)) goto lab105; else goto lab102;
+lab102:
+  if (var55 == stream__3__4) goto lab104; else goto lab103;
+lab103:
+  return FALSE;
+lab104:
+  G->local_top = NULL;
+  return TRUE;
+lab105:
+  var56 = stream__3__4;
+  var57 = var55;
+  var58 = var56;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var57, goto lab106;, goto lab109;, goto lab110;);
+lab106:
+  if (CondHVA(var57)) goto lab107; else goto lab108;
+lab107:
+  trail_push_check(w, var57);
+  goto lab108;
+lab108:
+  *TagpPtr(0, var57) = var58;
+  goto lab104;
+lab109:
+  trail_push_check(w, var57);
+  *TagpPtr(1, var57) = var58;
+  IncWakeCount();
+  goto lab104;
+lab110:
+  if (CondSVA(var57)) goto lab111; else goto lab112;
+lab111:
+  trail_push_check(w, var57);
+  goto lab112;
+lab112:
+  *TagpPtr(2, var57) = var58;
+  goto lab104;
+lab113:
+  var59 = stream__3__4;
+  var60 = var6;
+  var61 = var59;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var60, goto lab114;, goto lab117;, goto lab118;);
+lab114:
+  if (CondHVA(var60)) goto lab115; else goto lab116;
+lab115:
+  trail_push_check(w, var60);
+  goto lab116;
+lab116:
+  *TagpPtr(0, var60) = var61;
+  goto lab101;
+lab117:
+  trail_push_check(w, var60);
+  *TagpPtr(1, var60) = var61;
+  IncWakeCount();
+  goto lab101;
+lab118:
+  if (CondSVA(var60)) goto lab119; else goto lab120;
+lab119:
+  trail_push_check(w, var60);
+  goto lab120;
+lab120:
+  *TagpPtr(2, var60) = var61;
+  goto lab101;
+}
+/* stream_3:dostream#3/4 */
+bool_t stream__3_3adostream_233__n4(worker_t *w) {
+  uint32_t var0;
+  uint32_t var1;
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab0; else goto lab1;
+lab0:
+  v__handle_event(w, 4);
+  goto lab1;
+lab1:
+  var0 = Tagp(0, G->heap_top);
+  X(4) = var0;
+  *G->heap_top = var0;
+  G->heap_top = G->heap_top + 1;
+  DEREF(var1, X(0));
+  return stream__3_3astream_233__n5(w);
+}
+/* stream_3:stream#3/5 */
+bool_t stream__3_3astream_233__n5(worker_t *w) {
+  frame_t *var0;
+  uint32_t *var1;
+  uint32_t var2;
+  uint32_t var3;
+  uint32_t var4;
+  uint32_t var5;
+  uint32_t var6;
+  uint32_t var7;
+  uint32_t var8;
+  uint32_t var9;
+  uint32_t var10;
+  uint32_t var11;
+  uint32_t var12;
+  uint32_t var13;
+  uint32_t var14;
+  uint32_t var15;
+  uint32_t var16;
+  flt64_t var17;
+  uint32_t var18;
+  flt64_t var19;
+  flt64_t var20;
+  flt64_t var21;
+  flt64_t var22;
+  flt64_t var23;
+  uint32_t var24;
+  flt64_t var25;
+  flt64_t var26;
+  flt64_t var27;
+  flt64_t var28;
+  flt64_t var29;
+  flt64_t var30;
+  flt64_t var31;
+  int32_t var32;
+  uint32_t var33;
+  flt64_t var34;
+  flt64_t var35;
+  flt64_t var36;
+  flt64_t var37;
+  flt64_t var38;
+  flt64_t var39;
+  int32_t var40;
+  uint32_t var41;
+  uint32_t var42;
+  uint32_t var43;
+  uint32_t var44;
+  uint32_t var45;
+  uint32_t var46;
+  uint32_t var47;
+  int32_t var48;
+  int32_t var49;
+  uint32_t var50;
+  uint32_t var51;
+  uint32_t var52;
+  uint32_t var53;
+  uint32_t var54;
+  uint32_t var55;
+  uint32_t var56;
+  uint32_t var57;
+  uint32_t var58;
+  uint32_t var59;
+  uint32_t var60;
+  uint32_t var61;
+  uint32_t var62;
+lab0:
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab1; else goto lab2;
+lab1:
+  v__handle_event(w, 5);
+  goto lab2;
+lab2:
+  w->previous_choice = w->choice;
+  if (X(0) == MakeSmall(0)) goto lab3; else goto lab12;
+lab3:
+  var2 = stream__3__4;
+  DEREF(var3, X(4));
+  var4 = var3;
+  var5 = var2;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var4, goto lab4;, goto lab7;, goto lab8;);
+lab4:
+  if (CondHVA(var4)) goto lab5; else goto lab6;
+lab5:
+  trail_push_check(w, var4);
+  goto lab6;
+lab6:
+  *TagpPtr(0, var4) = var5;
+  goto lab11;
+lab7:
+  trail_push_check(w, var4);
+  *TagpPtr(1, var4) = var5;
+  IncWakeCount();
+  goto lab11;
+lab8:
+  if (CondSVA(var4)) goto lab9; else goto lab10;
+lab9:
+  trail_push_check(w, var4);
+  goto lab10;
+lab10:
+  *TagpPtr(2, var4) = var5;
+  goto lab11;
+lab11:
+  G->local_top = NULL;
+  return TRUE;
+lab12:
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab13; else goto lab14;
+lab13:
+  v__handle_event(w, 5);
+  goto lab14;
+lab14:
+  w->previous_choice = w->choice;
+  if (ValidLocalTop()) goto lab15; else goto lab16;
+lab15:
+  var0 = G->local_top;
+  goto lab18;
+lab16:
+  var0 = w->choice->local_top;
+  if (StackYounger(var0, G->frame)) goto lab18; else goto lab17;
+lab17:
+  var0 = StackCharOffset(G->frame, FrameSize(G->next_insn));
+  goto lab18;
+lab18:
+  var0->x[4] = X(0);
+  DEREF(var6, X(1));
+  if (TagH3_Is6(var6)) goto lab20; else goto lab19;
+lab19:
+  return FALSE;
+lab20:
+  var1 = TagpPtr(6, var6);
+  var7 = var1[1 - 1];
+  var0->x[3] = var1[2 - 1];
+  DEREF(var8, X(2));
+  if (TagH3_Is6(var8)) goto lab22; else goto lab21;
+lab21:
+  return FALSE;
+lab22:
+  var1 = TagpPtr(6, var8);
+  var9 = var1[1 - 1];
+  var0->x[2] = var1[2 - 1];
+  DEREF(var10, X(3));
+  if (TagH3_Is6(var10)) goto lab24; else goto lab23;
+lab23:
+  return FALSE;
+lab24:
+  var1 = TagpPtr(6, var10);
+  var11 = var1[1 - 1];
+  var0->x[1] = var1[2 - 1];
+  DEREF(var12, X(4));
+  if (IsVar(var12)) goto lab76; else goto lab25;
+lab25:
+  if (TagH3_Is6(var12)) goto lab27; else goto lab26;
+lab26:
+  return FALSE;
+lab27:
+  var1 = TagpPtr(6, var12);
+  var0->x[6] = var1[1 - 1];
+  var0->x[0] = var1[2 - 1];
+  goto lab28;
+lab28:
+  DEREF(var13, var9);
+  var1 = TagpPtr(7, var13) + 1;
+  var14 = var1[1 - 1];
+  var15 = var1[2 - 1];
+  DEREF(var16, var15);
+  var17 = TaggedToFloat(var16);
+  DEREF(var18, var14);
+  var19 = TaggedToFloat(var18);
+  var20 = var17 / var19;
+  var21 = atan(var20);
+  var22 = (flt64_t)55;
+  var23 = var22 * var21;
+  DEREF(var24, var7);
+  var25 = TaggedToFloat(var24);
+  var26 = var23 + var25;
+  var27 = floor(var26);
+  var28 = (flt64_t)360;
+  var29 = fmod(var27, var28);
+  var30 = (flt64_t)180;
+  var31 = var29 - var30;
+  var32 = (int32_t)var31;
+  var33 = MakeSmall(var32);
+  var0->x[7] = var33;
+  var34 = (flt64_t)6.0;
+  var35 = var31 / var34;
+  var36 = fabs(var35);
+  var37 = floor(var36);
+  var38 = (flt64_t)2;
+  var39 = var37 + var38;
+  var40 = (int32_t)var39;
+  X(0) = MakeSmall(var40);
+  DEREF(var41, var11);
+  var1 = TagpPtr(7, var41) + 1;
+  var0->x[5] = var1[1 - 1];
+  X(1) = Tagp(6, G->heap_top);
+  var1 = G->heap_top;
+  G->heap_top = G->heap_top + 2;
+  var1[1 - 1] = var11;
+  var1[2 - 1] = var0->x[1];
+  var0->x[8] = Tagp(2, &var0->x[8]);
+  X(2) = var0->x[8];
+  var0->next_insn = G->next_insn;
+  var0->frame = G->frame;
+  G->frame = var0;
+  G->next_insn = stream__3__6;
+  G->local_top = StackCharOffset(var0, FrameSize(G->next_insn));
+  if (OffStacktop(var0, Stack_Warn)) goto lab29; else goto lab30;
+lab29:
+  SetEvent();
+  goto lab30;
+lab30:
+  if (!stream__3_3anth_239__n3(w)) goto lab31; else goto lab32;
+lab31:
+  return FALSE;
+lab32:
+  var0 = G->frame;
+  DEREF(var42, var0->x[8]);
+  var1 = TagpPtr(7, var42) + 1;
+  X(3) = var1[1 - 1];
+  X(0) = var0->x[7];
+  X(1) = var0->x[6];
+  X(2) = var0->x[5];
+  G->next_insn = stream__3__7;
+  /* stream_3:##0#3/4 */
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab33; else goto lab34;
+lab33:
+  v__handle_event(w, 4);
+  goto lab34;
+lab34:
+  w->previous_choice = w->choice;
+  var43 = MakeSmall(0);
+  DEREF(var44, X(0));
+  if (var44 < var43) goto lab35; else goto lab36;
+lab35:
+  DEREF(var45, X(1));
+  if (IsVar(var45)) goto lab67; else goto lab58;
+lab36:
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab37; else goto lab38;
+lab37:
+  v__handle_event(w, 4);
+  goto lab38;
+lab38:
+  w->previous_choice = w->choice;
+  DEREF(var46, X(1));
+  if (IsVar(var46)) goto lab49; else goto lab39;
+lab39:
+  if (TagH3_Is7(var46)) goto lab41; else goto lab40;
+lab40:
+  return FALSE;
+lab41:
+  if (TaggedToHeadfunctor(var46) == stream__3__8) goto lab43; else goto lab42;
+lab42:
+  return FALSE;
+lab43:
+  var1 = TagpPtr(7, var46) + 1;
+  if (!cunify(w, X(3), var1[1 - 1])) goto lab44; else goto lab45;
+lab44:
+  return FALSE;
+lab45:
+  if (!cunify(w, X(2), var1[2 - 1])) goto lab46; else goto lab47;
+lab46:
+  return FALSE;
+lab47:
+  G->local_top = NULL;
+  goto lab48;
+lab48:
+  var0 = G->frame;
+  var47 = var0->x[4];
+  var48 = GetSmall(var47);
+  var49 = var48 - 1;
+  X(0) = MakeSmall(var49);
+  X(1) = var0->x[3];
+  X(2) = var0->x[2];
+  X(3) = var0->x[1];
+  X(4) = var0->x[0];
+  G->next_insn = var0->next_insn;
+  G->frame = var0->frame;
+  goto lab0;
+lab49:
+  var50 = Tagp(7, G->heap_top);
+  var1 = G->heap_top + 1;
+  var1[0 - 1] = stream__3__8;
+  G->heap_top = G->heap_top + (1 + 2);
+  var51 = var46;
+  var52 = var50;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var51, goto lab50;, goto lab53;, goto lab54;);
+lab50:
+  if (CondHVA(var51)) goto lab51; else goto lab52;
+lab51:
+  trail_push_check(w, var51);
+  goto lab52;
+lab52:
+  *TagpPtr(0, var51) = var52;
+  goto lab57;
+lab53:
+  trail_push_check(w, var51);
+  *TagpPtr(1, var51) = var52;
+  IncWakeCount();
+  goto lab57;
+lab54:
+  if (CondSVA(var51)) goto lab55; else goto lab56;
+lab55:
+  trail_push_check(w, var51);
+  goto lab56;
+lab56:
+  *TagpPtr(2, var51) = var52;
+  goto lab57;
+lab57:
+  DEREF(var53, X(3));
+  var1[1 - 1] = var53;
+  DEREF(var54, X(2));
+  var1[2 - 1] = var54;
+  goto lab47;
+lab58:
+  if (TagH3_Is7(var45)) goto lab60; else goto lab59;
+lab59:
+  return FALSE;
+lab60:
+  if (TaggedToHeadfunctor(var45) == stream__3__8) goto lab62; else goto lab61;
+lab61:
+  return FALSE;
+lab62:
+  var1 = TagpPtr(7, var45) + 1;
+  if (!cunify(w, X(2), var1[1 - 1])) goto lab63; else goto lab64;
+lab63:
+  return FALSE;
+lab64:
+  if (!cunify(w, X(3), var1[2 - 1])) goto lab65; else goto lab66;
+lab65:
+  return FALSE;
+lab66:
+  G->local_top = NULL;
+  goto lab48;
+lab67:
+  var55 = Tagp(7, G->heap_top);
+  var1 = G->heap_top + 1;
+  var1[0 - 1] = stream__3__8;
+  G->heap_top = G->heap_top + (1 + 2);
+  var56 = var45;
+  var57 = var55;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var56, goto lab68;, goto lab71;, goto lab72;);
+lab68:
+  if (CondHVA(var56)) goto lab69; else goto lab70;
+lab69:
+  trail_push_check(w, var56);
+  goto lab70;
+lab70:
+  *TagpPtr(0, var56) = var57;
+  goto lab75;
+lab71:
+  trail_push_check(w, var56);
+  *TagpPtr(1, var56) = var57;
+  IncWakeCount();
+  goto lab75;
+lab72:
+  if (CondSVA(var56)) goto lab73; else goto lab74;
+lab73:
+  trail_push_check(w, var56);
+  goto lab74;
+lab74:
+  *TagpPtr(2, var56) = var57;
+  goto lab75;
+lab75:
+  DEREF(var58, X(2));
+  var1[1 - 1] = var58;
+  DEREF(var59, X(3));
+  var1[2 - 1] = var59;
+  goto lab66;
+lab76:
+  var60 = Tagp(6, G->heap_top);
+  var1 = G->heap_top;
+  G->heap_top = G->heap_top + 2;
+  var61 = var12;
+  var62 = var60;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var61, goto lab77;, goto lab80;, goto lab81;);
+lab77:
+  if (CondHVA(var61)) goto lab78; else goto lab79;
+lab78:
+  trail_push_check(w, var61);
+  goto lab79;
+lab79:
+  *TagpPtr(0, var61) = var62;
+  goto lab84;
+lab80:
+  trail_push_check(w, var61);
+  *TagpPtr(1, var61) = var62;
+  IncWakeCount();
+  goto lab84;
+lab81:
+  if (CondSVA(var61)) goto lab82; else goto lab83;
+lab82:
+  trail_push_check(w, var61);
+  goto lab83;
+lab83:
+  *TagpPtr(2, var61) = var62;
+  goto lab84;
+lab84:
+  var1[1 - 1] = Tagp(0, &var1[1 - 1]);
+  var0->x[6] = var1[1 - 1];
+  var1[2 - 1] = Tagp(0, &var1[2 - 1]);
+  var0->x[0] = var1[2 - 1];
+  goto lab28;
+}
+/* stream_3:nth#9/3 */
+bool_t stream__3_3anth_239__n3(worker_t *w) {
+  uint32_t *var0;
+  uint32_t var1;
+  uint32_t var2;
+  uint32_t var3;
+  int32_t var4;
+  int32_t var5;
+  uint32_t var6;
+  uint32_t var7;
+  uint32_t var8;
+  uint32_t var9;
+  uint32_t var10;
+lab0:
+  if (TestEventOrHeapWarnOverflow(G->heap_top)) goto lab1; else goto lab2;
+lab1:
+  v__handle_event(w, 3);
+  goto lab2;
+lab2:
+  var1 = X(0);
+  Sw_HVAorCVAorSVA_NVA(var1, goto lab6;, goto lab3;);
+lab3:
+  Sw_NUMorATM_LST_STR(var1, goto lab4;, goto lab6;, goto lab5;);
+lab4:
+  var2 = var1;
+  goto lab9;
+lab5:
+  var2 = TaggedToHeadfunctor(X(0));
+  goto lab9;
+lab6:
+  /* stream_3:nth#11/3 */
+  DEREF(var3, X(1));
+  if (TagH3_Is6(var3)) goto lab8; else goto lab7;
+lab7:
+  return FALSE;
+lab8:
+  var0 = TagpPtr(6, var3);
+  X(1) = var0[2 - 1];
+  var4 = GetSmall(X(0));
+  var5 = var4 - 1;
+  X(0) = MakeSmall(var5);
+  goto lab0;
+lab9:
+  if (var2 == MakeSmall(1)) goto lab10; else goto lab6;
+lab10:
+  /* stream_3:nth#10/3 */
+  w->previous_choice = w->choice;
+  DEREF(var6, X(1));
+  if (TagH3_Is6(var6)) goto lab12; else goto lab11;
+lab11:
+  return FALSE;
+lab12:
+  var0 = TagpPtr(6, var6);
+  DEREF(var7, X(2));
+  DEREF(var8, var0[1 - 1]);
+  var9 = var7;
+  var10 = var8;
+  SwHVAorCVAorSVA_HVA_CVA_SVA(var9, goto lab13;, goto lab16;, goto lab17;);
+lab13:
+  if (CondHVA(var9)) goto lab14; else goto lab15;
+lab14:
+  trail_push_check(w, var9);
+  goto lab15;
+lab15:
+  *TagpPtr(0, var9) = var10;
+  goto lab20;
+lab16:
+  trail_push_check(w, var9);
+  *TagpPtr(1, var9) = var10;
+  IncWakeCount();
+  goto lab20;
+lab17:
+  if (CondSVA(var9)) goto lab18; else goto lab19;
+lab18:
+  trail_push_check(w, var9);
+  goto lab19;
+lab19:
+  *TagpPtr(2, var9) = var10;
+  goto lab20;
+lab20:
+  G->local_top = NULL;
+  return TRUE;
+}
+void stream__3__init(worker_t *w) {
+  stream__3__0 = register_cbool("stream_3:do_generate_data#3", 5, stream__3_3ado__generate__data_233__n5);
+  stream__3__1 = def_retry_cinsnp(w, NULL, 5);
+  stream__3__2 = deffunctor("gps", 2);
+  stream__3__3 = deffunctor("audio", 2);
+  stream__3__4 = GET_ATOM("[]");
+  stream__3__5 = register_cbool("stream_3:dostream#3", 4, stream__3_3adostream_233__n4);
+  stream__3__6 = def_success_cinsnp(w, NULL, 9);
+  stream__3__7 = def_success_cinsnp(w, NULL, 5);
+  stream__3__8 = deffunctor("p", 2);
+}
+void stream__3__end(worker_t *w) {
+  unregister_cbool("stream_3:do_generate_data#3", 5);
+  unregister_cbool("stream_3:dostream#3", 4);
+}

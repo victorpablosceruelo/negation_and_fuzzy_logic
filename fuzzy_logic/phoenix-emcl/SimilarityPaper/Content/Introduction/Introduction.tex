@@ -1,0 +1,41 @@
+\documentclass[Thesis.tex]{subfiles} 
+\begin{document}
+\section{Introduction}
+\label{chap:Introduction}
+Logic studies the notions of consequence. It expresses natural language in different formal logic, such as propositional logic, predicate logics, modal propositional/predicate logic, many-valued propositional/predicate logic. Logic deals with set of formulas and the relation of consequence among them. The task of formal logic is to represent all this by means of well-defined logical calculi admitting exact investigation. A logical calculus has two notions of consequence: syntax and semantics. Syntax is a notion of proof and semantics is a notion of truth. Soundness and Completeness are two main questions for any calculi. Soundness asks ``Does provability imply truth?" and completeness questions ``Does truth imply provability?"
+
+\subsection{Why do we need fuzzy logic ?}
+The intuitive distinction among different formal logics is their expressivity of natural language. In real world, most information is vague, most of which can not be represented by classical logic. For instance, we represent sentence``The patient is young." by several well-known classical logic. Propositional Logic can represent it as proposition $p$. Semantically, it only can express true or false to the whole statement, but not the truth value of ``young". First Order Logic is able to express it as $young(the\ patient)$, but only can assign true or false to vague information ``young". However, Fuzzy Logic is an answer to represent imprecise information. The sentence ``The patient is young." is true to some degree in unit interval $[0,1]$ - the lower the age of the patient, the more the sentence is true. Truth of Fuzzy Logic is a matter of degree that the element belongs to a fuzzy concept. The degree is in $[0,1]$, where $0$ means absolute ``False", $1$ means absolute ``True". Thus, the truth degrees is coded in real number between $0$ and $1$.
+
+%The term `` Fuzzy Logic" has two different meanings - wide and narrow. It is very useful distinction made by Zadeh \cite{Z96}. In a narrow sense of fuzzy logic, FLn is a logical system which aims at a formalization of  approximate reasoning. In this sense, it is an extension of multivalued logics. 
+%However, the agenda of FLn is quite different from that of traditional multivalued logics. In particular, such key concepts in FLn as the concept of a linguistic variable, fuzzy if-then rule, fuzzy quantification and defuzzification, the compositional rule of inference and interpolative reasoning, are not addressed in traditional system. This is the reason why FLn has a much wider range of applications than traditional systems. In its wide sense, FLw is fuzzily synonymous with the fuzzy set theory, which is the theory of classes with unsharp boundaries. FLw is much broader than FLn and includes the latter as one of its branches.
+
+%In this thesis, we introduce RFuzzy as an agenda of FLn, and fuzzy set theory as FLw. The corresponding relation between these two is drawn for exploring the topic of \textit{similarity} and \textit{quantification}.
+ 
+%\subsection{Similarity}
+%Similarity is perhaps the most frequently used, most difficult to quantify topic in real world. The analysis of the similarity between two objects is fundamental tool in biology, taxonomy, linguistics and psychology, and provides the foundation for analogical reasoning. 
+
+%Taking similarity in linguistics as an example. Since natural language is ambiguous and vague, the keyword you search for in searching engines on web are mostly imprecise. For example, if `old car' is the keyword typed, `old' should be considered as a fuzzy concept, since we don't know how `old' should be. It may retrieve answers for the `classical car', `antique car', or maybe the `second hand car', which is quite different from previous two kinds of cars. However, `classical', `antique', and `second hand' have different similarity with the word `old'. The search engines returns `classical car', `antique car' and `second hand car', and other results which are similar to the keywords `old'. Therefore, by the semantic similarity, the concept-related result is returned, which makes the search process imprecise, but in fact returns the expected results, since in reality, the interesting information a human being requires is not always accurate, but approximate, which makes similarity important and necessary in both research area and industrial engineering. 
+
+%Fuzzy Logic is used to represent vague information in the real world. In order to draw the similarity between objects in real world, we introduce similarity between predicates into Fuzzy Logic. Similarity itself is a fuzzy concept, which makes fuzzy logic suitable and appropriate for representing similarity. 
+
+%In this thesis,
+%In this paper, we present two ways to achieve similarity between fuzzy predicates. One is Interpretation Based measurement (IBM) and the other is Structured Based measurement (SBM). In the former one,  the interpretation of Fuzzy Logic is considered as the key to building similarity relation between fuzzy predicates. This measurement is based on Set Theory and corresponding relation between fuzzy set/relation and Fuzzy Logic. In SBM, fuzzy predicates are represented as trees according to fuzzy rules they are involved in. The similarity between two predicates is obtained by comparison and expansion, which are taken place alternatively layer by layer until the corresponding trees are completely built. 
+
+%\section{Quantification}
+%Most sentences in natural language involve quantifiers, such as ``most of ", ``at least", ``very".  In real world, queries with quantifiers such as ``not very expensive wedding dress ? ", ``the house more or less close to university? " are usually asked. In order to express those quantifiers in natural language, the concept of fuzzy linguistic quantifier is brought by L.A.Zadeh \cite{Z83}. Fuzzy quantifiers  are linguistic labels representing imprecise quantities or percentages. It is usual to distinguish absolute and relative quantifiers. Absolute quantifiers represent imprecise natural quantities and are modeled as fuzzy subsets of the naturals, whilst relative quantifiers represent imprecise percentage and are modeled as fuzzy subsets of the rational interval $[0,1]$.
+ 
+%Fuzzy quantification is an important research topic not only due to their abundance in natural language, but also because an adequate account of these quantifiers would provide a class of powerful yet human-understandable operators for information aggregation. Zadeh discerns two ``views" of fuzzy quantifiers \cite{Z83},
+%\begin{enumerate}
+%\item a fuzzy quantifier is a \textit{Second-Order Fuzzy} (SOF) predicate.
+%\item a fuzzy quantifier is a \textit{First-Order Fuzzy} (FOF) predicate.
+%\end{enumerate}
+
+%In this thesis, we present both views and their relations. In order to implement quantification in RFuzzy Framework, we reduce fuzzy quantifier into FOF predicate. As an application of quantification, a \textit{simple fuzzy query} is generated by combining negator, quantifier and fuzzy concept, such as ``the flat not quite far to university". By fuzzy rules, several simple fuzzy queries can be joined into \textit{complex fuzzy query}.
+
+%\section{Structure of the thesis}
+%In this thesis, background knowledge is shown in Chapter 2, where lattice theory, fuzzy set/relation, Fuzzy Logic are described. The corresponding relations among fuzzy set/relation and Fuzzy Logic are depicted through lattice theory in Chapter 3. In Chapter 4,  a brief introduction of RFuzzy framework is presented.  The two characteristics \textit{similarity}, \textit{quantification} are demonstrated in Chapter 5 and 6, respectively. The conclusions are given in the last Chapter.
+
+%\subsection{Structure of the paper}
+%In chapter \ref{chap:Similarity}, the overview of similarity is presented in section \ref{sec:overview}, the two measurements of similarity are illustrated afterwards.  One is \textit{Interpretation\_Based Measurement} in section \ref{sec:IBM}, and another is presented in section \ref{sec:SBM}, called \textit{Structured\_Based Measurement}. We compare these two measurements in section \ref{sec:CompTwoMeasurements}.
+\end{document}

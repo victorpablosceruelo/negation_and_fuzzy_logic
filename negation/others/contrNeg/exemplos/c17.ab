@@ -1,0 +1,59 @@
+abds([ab/1]).
+
+obs(out(inpt0, c1gat), 0).
+obs(out(inpt0, c2gat), 0).
+obs(out(inpt0, c3gat), 0).
+obs(out(inpt0, c6gat), 0).
+obs(out(inpt0, c7gat), 0).
+
+%obs(out(nand2, c22gat), 0). 
+%obs(out(nand2, c23gat), 1). 
+
+<- not val(out(nand2, c22gat), 0).
+<- not val(out(nand2, c23gat), 1).
+
+conn(in(nand2, c10gat, 1), out(inpt0, c1gat)).
+conn(in(nand2, c10gat, 2), out(inpt0, c3gat)).
+
+conn(in(nand2, c11gat, 1), out(inpt0, c3gat)).
+conn(in(nand2, c11gat, 2), out(inpt0, c6gat)).
+
+conn(in(nand2, c16gat, 1), out(inpt0, c2gat)).
+conn(in(nand2, c16gat, 2), out(nand2, c11gat)).
+
+conn(in(nand2, c19gat, 1), out(nand2, c11gat)).
+conn(in(nand2, c19gat, 2), out(inpt0, c7gat)).
+
+conn(in(nand2, c22gat, 1), out(nand2, c10gat)).
+conn(in(nand2, c22gat, 2), out(nand2, c16gat)).
+
+conn(in(nand2, c23gat, 1), out(nand2, c16gat)).
+conn(in(nand2, c23gat, 2), out(nand2, c19gat)).
+
+val( in(Type,Name,Nr), V ) <-
+  conn( in(Type,Name,Nr), out(Type2,Name2) ),
+  val( out(Type2,Name2), V ).
+
+val( out(inpt0, Name), V ) <- obs( out(inpt0, Name), V ).
+
+val( out(nand2,Name), V ) <-
+  not ab(Name),
+  val( in(nand2,Name,1), W1),
+  val( in(nand2,Name,2), W2),
+  nand2_table(W1,W2,V).
+
+val( out(nand2,Name), V ) <-
+  ab(Name),
+  val( in(nand2,Name,1), W1),
+  val( in(nand2,Name,2), W2),
+  and2_table(W1,W2,V).
+
+nand2_table(0,0,1).
+nand2_table(0,1,1).
+nand2_table(1,0,1).
+nand2_table(1,1,0).
+
+and2_table(0,0,0).
+and2_table(0,1,0).
+and2_table(1,0,0).
+and2_table(1,1,1).

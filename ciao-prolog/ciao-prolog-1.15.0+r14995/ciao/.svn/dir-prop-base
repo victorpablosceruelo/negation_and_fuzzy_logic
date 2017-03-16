@@ -1,0 +1,25 @@
+K 13
+svn:externals
+V 1
+
+
+K 10
+svn:ignore
+V 107
+INSTALLATION_Win32
+INSTALLATION
+NewUser
+README
+*.tmp
+INSTALLATION_CIAO
+INSTALLATION_CIAO_Win32
+README_CIAO
+
+K 11
+svn:ignores
+V 37
+SETTINGS
+SRCSETTINGS
+svn-commit.*tmp
+
+END

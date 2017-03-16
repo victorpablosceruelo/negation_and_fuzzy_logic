@@ -1,0 +1,96 @@
+# this is your configuration file for pbuilder.
+# the file in /usr/share/pbuilder/pbuilderrc is the default template.
+# /etc/pbuilderrc is the one meant for editing.
+#
+# read pbuilderrc.5 document for notes on specific options.
+
+BASETGZ=/var/cache/pbuilder/base.tgz
+BUILDPLACE=/var/cache/pbuilder/build/
+#export DEBIAN_BUILDARCH=athlon
+#EXTRAPACKAGES=gcc3.0-athlon-builder
+EXTRAPACKAGES="cowbuilder cowdancer whiptail dialog fakeroot mysql-client-5.5 mysql-server-5.5 mysql-common libmysql++-dev libmysqlclient18 libmysqlclient-dev libmysqld-dev libmysql-java libmysql++-dev libmysqld-dev libmysql-cil-dev bash bash-static build-essential debhelper texlive-latex-base texlive-latex-extra texinfo texi2html dvi2ps dvi2dvi subversion locate libgsl0-dev libppl-c-dev libppl-c-dev gcc-multilib emacs imagemagick ant g++-multilib tar bzip2 whiptail dialog multiarch-support"
+# NO: oracle-java8-installer
+# NO: ia32-libs libc6-dev-i386 <- only for 64 bits arch !!!
+# NO: gcc-multilib [amd64] <- we'll keep the dependency because the pkg exists in i386 arch too.
+
+MIRRORSITE=http://ftp.de.debian.org/debian/
+OTHERMIRROR="deb http://ftp.de.debian.org/debian/ jessie main contrib non-free | deb-src http://ftp.de.debian.org/debian/ jessie main contrib non-free | deb http://security.debian.org/ jessie/updates main contrib non-free | deb-src http://security.debian.org/ jessie/updates main contrib non-free | deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main | deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main"
+# deb http://ftp.de.debian.org/debian/ testing main contrib non-free | deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free
+# | deb http://ftp.de.debian.org/debian/ unstable main contrib non-free | deb-src http://ftp.de.debian.org/debian/ unstable main contrib non-free
+#  | deb http://www.backports.org/debian lenny-backports main contrib non-free | deb-src http://www.backports.org/debian lenny-backports main contrib non-free | deb ftp://ftp.debian.org/debian experimental main contrib non-free | deb http://ftp.de.debian.org/debian/ experimental main contrib non-free"
+# MIRRORSITE=http://ftp.jp.debian.org/debian
+# OTHERMIRROR="deb http://www.home.com/updates/ ./"
+#export http_proxy=http://your-proxy:8080/
+
+# specifying the distribution forces the distribution on "pbuilder update"
+DISTRIBUTION=jessie
+
+# APT configuration files directory
+APTCONFDIR="/etc/apt/"
+# APTCONFDIR=/etc/apt
+APTCACHE="/var/cache/pbuilder/aptcache/"
+APTCACHEHARDLINK="yes"
+
+# Hooks and pkgs not needed.
+REMOVEPACKAGES="lilo grub"
+# HOOKDIR="/usr/lib/pbuilder/hooks"
+# HOOKDIR=""
+
+# pbuilder opts.
+USEPROC=yes
+USEDEVPTS=yes
+USEDEVFS=no
+BUILDRESULT=/var/cache/pbuilder/result/
+
+# make debconf not interact with user
+# export DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND="readline"
+# export DEBIAN_FRONTEND="dialog"
+
+DEBEMAIL=""
+
+#for pbuilder debuild
+BUILDSOURCEROOTCMD="fakeroot"
+PBUILDERROOTCMD="sudo"
+
+# command to satisfy build-dependencies; the default is an internal shell
+# implementation which is relatively slow; there's an alternate experimental
+# implementation, "pbuilder-satisfydepends-experimental", which might be useful
+# to pull packages from experimental or from repositories with a low APT Pin
+# Priority
+# PBUILDERSATISFYDEPENDSCMD="/usr/lib/pbuilder/pbuilder-satisfydepends-experimental"
+PBUILDERSATISFYDEPENDSCMD="/etc/pbuilder-satisfydepends-experimental"
+
+#default is to build everything. Passed on to dpkg-buildpackage
+# DEBBUILDOPTS="-b"
+# DEBBUILDOPTS=""
+
+# the username and ID used by pbuilder, inside chroot. Needs fakeroot, really
+BUILDUSERID=0
+# 1234
+BUILDUSERNAME=root
+# pbuilder
+
+# BINDMOUNTS is a space separated list of things to mount
+# inside the chroot.
+BINDMOUNTS=""
+
+# Set the debootstrap variant to 'buildd' type.
+# DEBOOTSTRAPOPTS[0]='--variant=buildd'
+unset DEBOOTSTRAPOPTS
+
+# Set the PATH I am going to use inside pbuilder: default is "/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin"
+export PATH="/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin"
+
+# SHELL variable is used inside pbuilder by commands like 'su'; and they need sane values
+export SHELL=/bin/bash
+
+# The name of debootstrap command.
+DEBOOTSTRAP="cdebootstrap"
+
+# default file extension for pkgname-logfile
+PKGNAME_LOGFILE_EXTENTION="_$(dpkg --print-architecture).build"
+
+# default PKGNAME_LOGFILE
+PKGNAME_LOGFILE=""
+

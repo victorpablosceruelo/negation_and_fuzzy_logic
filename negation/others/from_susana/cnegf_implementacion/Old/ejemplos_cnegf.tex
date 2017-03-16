@@ -1,0 +1,392 @@
+?- t1(X,Y).
+
+yes
+?- no_t1(X,Y).
+
+no
+
+?- t2(X,Y).
+
+X = s(0),
+Y = s(1) ? .
+
+no
+?- no_t2(X,Y).
+
+attach_attribute(X,formula(X,[[X/s(0)]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/s(1)]])) ? .
+
+no
+
+?- t3(X,Y,Z).
+
+X = [Y,_A],
+attach_attribute(_A,formula(_A,[[_A/1]])),
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+no
+?- no_t3(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/[Y,_A]]])),
+attach_attribute(_A,formula(_A,[[X/[Y,_A],_A/1]])),
+attach_attribute(Y,formula(Y,[[X/[Y,_A],Y/2]])) ? .
+
+Y = 2 ? .
+
+no
+?- t31(X,Y,Z).
+
+X = [2,Z],
+Y = 2 ? .
+
+no
+?- no_t31(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/[2,Z]]])),
+attach_attribute(Z,formula(Z,[[X/[2,Z]]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+no
+
+?- t32(X,Y,Z).
+
+X = [Y,Z] ? .
+
+no
+?- no_t32(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/[Y,Z]]])),
+attach_attribute(Y,formula(Y,[[X/[Y,Z]]])),
+attach_attribute(Z,formula(Z,[[X/[Y,Z]]])) ? .
+
+no
+
+?- t33(X,Y,Z,W,F,G).
+
+F = 0,
+G = 1,
+X = [[W,W],2],
+Y = [W,W],
+Z = 2,
+attach_attribute(W,formula(W,[[W/[0,1]]])) ? .
+
+no
+?- no_t33(X,Y,Z,W,F,G).
+
+attach_attribute(X,formula(X,[[X/[[W,W],2]]])),
+attach_attribute(W,formula(W,[[X/[[W,W],2],W/[0,1]]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/[W,W]]])),
+attach_attribute(W,formula(W,[[Y/[W,W],W/[0,1]]])) ? .
+
+attach_attribute(Z,formula(Z,[[Z/2]])) ? .
+
+W = [0,1] ? .
+
+attach_attribute(F,formula(F,[[F/0]])) ? .
+
+attach_attribute(G,formula(G,[[G/1]])) ? .
+
+no
+
+?- t4(X,Z).
+
+X = s(Z) ? .
+
+no
+?- no_t4(X,Z).
+
+attach_attribute(X,formula(X,[[X/s(Z)]])),
+attach_attribute(Z,formula(Z,[[X/s(Z)]])) ? .
+
+no
+
+?- distinto(X).
+
+attach_attribute(X,formula(X,[[X/2]])) ? .
+
+no
+?- no_distinto(X).
+
+X = 2 ? .
+
+no
+
+?- distinto1(X).
+
+X = 1 ? .
+
+no
+?- no_distinto1(X).
+
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+no
+
+?- distinto11(X,Y,Z).
+
+X = 0 ? .
+
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+attach_attribute(Z,formula(Z,[[Z/3]])) ? .
+
+no
+?- no_distinto11(X,Y,Z).
+
+Y = 2,
+Z = 3,
+attach_attribute(X,formula(X,[[X/0]])) ? .
+
+no
+
+?- distinto2(X,Y).
+
+X = 1,
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+no
+?- no_distinto2(X,Y).
+
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+Y = 2 ? .
+
+no
+
+?- no_es_digito(X).
+
+attach_attribute(X,formula(X,[[X/0]])) ? .
+
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+attach_attribute(X,formula(X,[[X/2]])) ? .
+
+attach_attribute(X,formula(X,[[X/3]])) ? .
+
+no
+?- es_digito(X).
+
+no
+
+?- no_es_concurso(X,Y).
+
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+no
+?- es_concurso(X,Y).
+
+X = 1,
+Y = 2 ? .
+
+no
+
+?- concurso(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+Z = 3 ? .
+
+no
+
+?- no_concurso(X,Y,Z).
+
+X = 1,
+Y = 2,
+attach_attribute(Z,formula(Z,[[Z/3]])) ? .
+
+no
+
+?- cero(X).
+
+X = 0 ? .
+
+no
+?- no_cero(X).
+
+attach_attribute(X,formula(X,[[X/0]])) ? .
+
+no
+
+?- parent(X,Y).
+
+X = adelaida,
+Y = heidi ? .
+
+X = abuelito,
+Y = adelaida ? .
+
+no
+?- no_parent(X,Y).
+
+attach_attribute(X,formula(X,[[X/adelaida,X/abuelito]])) ? .
+
+attach_attribute(X,formula(X,[[X/abuelito]])),
+attach_attribute(Y,formula(Y,[[Y/heidi]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/adelaida]])),
+attach_attribute(X,formula(X,[[X/adelaida]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/heidi,Y/adelaida]])) ? .
+
+no
+
+?- ancestor(X,Y).
+
+X = abuelito,
+Y = heidi ? .
+
+no
+?- no_ancestor(X,Y).
+
+attach_attribute(X,formula(X,[[X/abuelito]])) ? .
+
+attach_attribute(Y,formula(Y,[[Y/heidi]])) ? .
+
+no
+
+?- p(X,Y,Z,W).
+
+W = 4,
+Z = 3,
+attach_attribute(X,formula(X,[[X/2,X/1]])) ? .
+
+X = 1,
+Y = 2,
+attach_attribute(Z,formula(Z,[[Z/3]])),
+attach_attribute(W,formula(W,[[W/4]])) ? .
+
+no
+?- no_p(X,Y,Z,W).
+
+X = 2 ? .
+
+X = 2,
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+X = 2,
+Z = 3 ? .
+
+W = 4,
+X = 2 ? .
+
+X = 1,
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+X = 1,
+Z = 3 ? .
+
+W = 4,
+X = 1 ? .
+
+attach_attribute(Z,formula(Z,[[Z/3]])),
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+attach_attribute(Z,formula(Z,[[Z/3]])),
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+W = 4,
+attach_attribute(Z,formula(Z,[[Z/3]])) ? .
+
+attach_attribute(W,formula(W,[[W/4]])),
+attach_attribute(X,formula(X,[[X/1]])) ? .
+
+attach_attribute(W,formula(W,[[W/4]])),
+attach_attribute(Y,formula(Y,[[Y/2]])) ? .
+
+Z = 3,
+attach_attribute(W,formula(W,[[W/4]])) ? .
+
+no
+
+?- p1(X).
+
+attach_attribute(X,formula(X,[[X/3,X/4]])) ? .
+
+no
+?- no_p1(X).
+
+X = 3 ? .
+
+X = 4 ? .
+
+no
+
+?- p2(X,Y).
+
+attach_attribute(Y,formula(Y,[[X/Y],[Y/2]])),
+attach_attribute(X,formula(X,[[X/3,X/Y],[X/3,Y/2]])) ? .
+
+no
+?- no_p2(X,Y).
+
+X = 3 ? .
+
+X = 3,
+Y = 2 ? .
+
+X = 3,
+Y = 3 ? .
+
+X = 2,
+Y = 2 ? .
+
+X = 2,
+Y = 2 ? .
+
+no
+
+?- p22(X,Y).
+
+attach_attribute(Y,formula(Y,[[X/1],[Y/2]])),
+attach_attribute(X,formula(X,[[X/1,X/3],[Y/2,X/3]])) ? .
+
+no
+?- no_p22(X,Y).
+
+X = 1,
+Y = 2 ? .
+
+X = 3,
+Y = 2 ? .
+
+X = 3 ? .
+
+X = 1,
+Y = 2 ? .
+
+no
+
+?- p3(X,Y,Z).
+
+attach_attribute(X,formula(X,[[X/Z],[Y/5]])),
+attach_attribute(Y,formula(Y,[[X/Z],[Y/5]])),
+attach_attribute(Z,formula(Z,[[X/Z,Z/6],[Y/5,Z/6]])) ? .
+
+no
+?- no_p3(X,Y,Z).
+
+Y = 5,
+Z = X ? .
+
+Y = 5,
+Z = X ? .
+
+Y = 5,
+Z = X ? .
+
+X = 6,
+Z = 6 ? .
+
+Y = 5,
+Z = 6 ? .
+
+Z = 6 ? .
+
+no

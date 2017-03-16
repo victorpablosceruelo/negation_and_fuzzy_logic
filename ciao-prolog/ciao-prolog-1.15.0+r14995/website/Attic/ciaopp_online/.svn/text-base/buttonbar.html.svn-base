@@ -1,0 +1,44 @@
+    <div id="toolbar">
+
+       <img src="<v>dirImage</v>ciao.gif" alt="[CIAO]"/>   
+       <label title="Open File">
+       <button
+                class=barbutton
+		type="submit"
+		name="viewfiles"
+		value="true"
+		><img src="<v>dirIndex</v>images/fileopen.png"       alt="[View Example Files]" style="height:32px;width:32px;"/>
+       </button></label><label title="Analyze"><button 
+               class=barbutton 
+	       type="submit"
+	       name="analysis"
+	       value="true" 
+	       ><img src="<v>dirIndex</v>images/ciaoanalysis.gif"    alt="[Analyze]"/>
+       </button></label><label title="Check Assertions"><button
+               class=barbutton
+	       type="submit"
+	       name="checkassrt"
+	       value="true"
+	       ><img src="<v>dirIndex</v>images/checkassertions.gif" alt="[Check Assertions]"/>
+       </button></label><label title="Optimize"><button
+                class=barbutton
+		type="submit"
+		name="eval"
+		value="true"
+                ><img src="<v>dirIndex</v>images/ciaopeval.gif"       alt="[Partial Evaluation]"/>
+       </button></label><label title="Optimize, Analyze or Check Assertions with custom Flags"><button
+                class=barbutton
+		type="submit"
+		name="customize"
+		value="true"
+                ><img src="<v>dirIndex</v>images/ciaocustomize.gif"   alt="[Customize Flags]"/>
+       </button>
+       </label>
+<!-- <button
+                class=barbutton
+		type="submit"
+		name="highlight"
+		value="true"
+		><img src="<v>dirIndex</v>images/ciaorehighlight.gif" alt="[Re Highlith Syntax]"/>
+       </button> -->
+    </div>

@@ -1,0 +1,31 @@
+?- numero_combinatorio(6,5,X).
+
+X = 6.0 ? 
+
+yes
+?- not_numero_combinatorio(6,5,X).
+
+attach_attribute(X,formula(X,[[X/6.0]])) ? 
+
+yes
+?- lista_factorial(7,X).
+
+X = [5040,720,120,24,6,2,1] ? 
+
+yes
+?- not_lista_factorial(7,X).
+
+attach_attribute(X,formula(X,[[X/[5040,720,120,24,6,2,1]]])) ? 
+
+yes
+?- factorial(8,X).
+
+X = 40320 ? 
+
+yes
+?- not_factorial(8,X).
+
+attach_attribute(X,formula(X,[[X/40320]])) ? 
+
+yes
+?- 

@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99c (Web2C 7.3.1)
+The top-level auxiliary file: cneg6.aux
+The style file: plain.bst
+Database file #1: negacion.bib
+Warning--to sort, need author, editor, or key in Shoenfield
+Warning--empty author and editor in Shoenfield
+Warning--empty journal in Moreno2
+Warning--there's a number but no series in naish:lncs
+Warning--can't use both volume and number fields in Stuckey95
+You've used 17 entries,
+            2118 wiz_defined-function locations,
+            620 strings with 6377 characters,
+and the built_in function-call counts, 5963 in all, are:
+= -- 613
+> -- 199
+< -- 11
++ -- 80
+- -- 61
+* -- 359
+:= -- 925
+add.period$ -- 59
+call.type$ -- 17
+change.case$ -- 78
+chr.to.int$ -- 0
+cite$ -- 22
+duplicate$ -- 284
+empty$ -- 535
+format.name$ -- 61
+if$ -- 1335
+int.to.chr$ -- 0
+int.to.str$ -- 17
+missing$ -- 17
+newline$ -- 87
+num.names$ -- 38
+pop$ -- 103
+preamble$ -- 1
+purify$ -- 62
+quote$ -- 0
+skip$ -- 194
+stack$ -- 0
+substring$ -- 357
+swap$ -- 89
+text.length$ -- 11
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 66
+warning$ -- 5
+while$ -- 61
+width$ -- 19
+write$ -- 197
+(There were 5 warnings)

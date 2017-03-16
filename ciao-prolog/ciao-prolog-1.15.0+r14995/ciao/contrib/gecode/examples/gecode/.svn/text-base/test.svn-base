@@ -1,0 +1,3 @@
+gcc -c main.cpp
+gcc -o main main.o -lgecodesearch -lgecodeint -lgecodekernel -lgecodesupport -lgecodedriver
+./main

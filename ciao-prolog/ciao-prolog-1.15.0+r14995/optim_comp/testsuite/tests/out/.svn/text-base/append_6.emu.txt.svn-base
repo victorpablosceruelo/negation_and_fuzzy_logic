@@ -1,0 +1,512 @@
+module=append_6
+speckey='$id/.home.jfran.svn.ciaojf.testsuite.ptoc.append_6'
+uses=
+  append_6
+  arithmetic
+  atomic_basic
+  attributes
+  basic_props
+  basiccontrol
+  interpreter
+  data_facts
+  exceptions
+  io_aux
+  io_basic
+  prolog_flags
+  streams_basic
+  system_info
+  rt_exp
+  term_basic
+  term_compare
+  term_typing
+  hiord_rt
+  lists
+  sets
+  write
+exports=
+  srcdbg_expand/5 as 'append_6:srcdbg_expand'
+defs=14
+'multifile:$initialization'/1: def=4
+'multifile:$on_abort'/1: def=4
+'append_6:srcdbg_expand'/5: def=0
+bits=31 nokey code=
+  bytecode - 0x52 bytes - det at 0x00000000
+  0x00000000: ux_xval x(2) x(0)
+  0x00000006: neck
+  0x00000008: alloc__movexy__movexy x(4) y(3) x(3) y(1)
+  0x00000012: movexy x(1) y(0)
+  0x00000018: init2sxy x(1) y(2)
+  0x0000001e: movexx x(4) x(2)
+  0x00000024: fcall E(append_6:search_head#0/3) e(24)
+  0x0000002c: inithx x(2)
+  0x00000030: inithx x(3)
+  0x00000034: inithx x(4)
+  0x00000038: globunsafeyx y(2) x(5)
+  0x0000003e: inithx x(6)
+  0x00000042: moveyx y(3) x(7)
+  0x00000048: zputn2__dealloc__lastcall z(1) z(0) E(append_6:srcdbg_expand__2#0/8)
+'append_6:search_head#0'/3: def=0
+bits=31 nokey code=
+  bytecode - 0x56 bytes - det at 0x00000000
+  0x00000000: inithx x(7)
+  0x00000004: inithx x(3)
+  0x00000008: pad__builtin_3 Q() x(0) x(7) x(3) C(0x806893a)
+  0x00000016: neck
+  0x00000018: movexx__movexx x(2) x(5) x(1) x(4)
+  0x00000022: movexx x(0) x(2)
+  0x00000028: pad__load_cons Q() x(0) t(1)
+  0x00000032: load_str x(6) f(pred/2)
+  0x0000003a: un_xval x(7)
+  0x0000003e: pad__un_cons Q() t(1)
+  0x00000046: load_list x(1)
+  0x0000004a: un_xval x(6)
+  0x0000004e: un_nil
+  0x00000050: lastcall E(append_6:search_args#0/6)
+'append_6:search_args#0'/6: def=0
+bits=31 nokey code=
+  bytecode - 0x12 bytes - det at 0x00000000
+  0x00000000: pad__ux_cons Q() x(3) t(0)
+  0x0000000a: ux_xval x(4) x(1)
+  0x00000010: neck__proceed
+bits=95 nokey code=
+  bytecode - 0x2e bytes - det at 0x00000000
+  0x00000000: ux_xval x(3) x(0)
+  0x00000006: cutbd
+  0x00000008: pad__functionre_2 Q() x(0) x(0) x(2) C(0x8068898) l(0) i(6)
+  0x0000001c: movexx__movexx x(4) x(2) x(5) x(3)
+  0x00000026: pad__lastcall Q() E(append_6:search_arg#0/4)
+bits=31 nokey code=
+  bytecode - 0x7e bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: alloc__movexy__movexy x(5) y(4) x(4) y(3)
+  0x0000000c: movexy__movexy x(3) y(2) x(2) y(1)
+  0x00000016: movexy x(0) y(5)
+  0x0000001c: pad__functionre_2 Q() x(0) x(0) x(2) C(0x8068898) l(0) i(6)
+  0x00000030: init2sxy x(2) y(0)
+  0x00000036: movexx x(5) x(3)
+  0x0000003c: fcall E(append_6:search_arg#0/4) e(32)
+  0x00000044: moveyx y(5) x(0)
+  0x0000004a: pad__function_1 Q() x(0) x(0) C(0x806536e) l(1) i(1)
+  0x0000005c: globunsafeyx__moveyx y(0) x(1) y(1) x(2)
+  0x00000066: moveyx__moveyx y(2) x(3) y(3) x(4)
+  0x00000070: moveyx y(4) x(5)
+  0x00000076: pad__dealloc__lastcall Q() E(append_6:search_args#0/6)
+'append_6:search_arg#0'/4: def=0
+bits=33 nokey code=
+  bytecode - 0x3e bytes - det at 0x00000000
+  0x00000000: pad__builtin_1 Q() x(3) C(0x80697ae)
+  0x0000000a: neck
+  0x0000000c: alloc__movexy__movexy x(2) y(2) x(1) y(1)
+  0x00000016: movexx__movexx x(0) x(1) x(3) x(0)
+  0x00000020: init2sxy x(2) y(0)
+  0x00000026: pad__fcall Q() E(append_6:name_var_realname#0/3) e(20)
+  0x00000030: pad__zputn3__dealloc__lastcall Q() z(2) z(1) z((unsafe)0) E(append_6:add_pred_to_list#0/3)
+bits=73 key='.'/2 code=
+  bytecode - 0x52 bytes - det at 0x00000022
+  0x00000000: ux_list x(0)
+  0x00000004: alloc__un_xvar__un_yvar x(4) y(0)
+  0x0000000a: cuted
+  0x0000000c: movexy__movexy x(3) y(3) x(2) y(2)
+  0x00000016: movexx x(4) x(0)
+  0x0000001c: jump p(0x36)
+  0x00000022: ux_list x(0)
+  0x00000026: alloc__un_xvar__un_yvar x(0) y(0)
+  0x0000002c: movexy__movexy x(3) y(3) x(2) y(2)
+  0x00000036: init2sxy x(2) y(1)
+  0x0000003c: fcall E(append_6:search_arg#0/4) e(24)
+  0x00000044: zputn4__dealloc__lastcall z(3) z(2) z((unsafe)1) z(0) E(append_6:search_arg#0/4)
+bits=73 key='.'/2 code=
+  bytecode - 0x56 bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: ux_list x(0)
+  0x00000006: alloc__choice_y y(5)
+  0x0000000a: movexy__movexy x(2) y(2) x(1) y(1)
+  0x00000014: un_yvar__un_yvar y(3) y(4)
+  0x0000001a: load_list x(0)
+  0x0000001e: un_yval__un_yval y(3) y(4)
+  0x00000024: pad__init1__fcall Q() y(0) E(append_6:is_string#0/1) e(32)
+  0x00000030: cutfy y(5)
+  0x00000034: load_list x(1)
+  0x00000038: un_yval__un_yval y(3) y(4)
+  0x0000003e: zputn1__call z(0) E(atomic_basic:atom_codes/2) e(20)
+  0x00000048: pad__zputn3__dealloc__lastcall Q() z(2) z(1) z((unsafe)0) E(append_6:add_pred_to_list#0/3)
+bits=69 key=[]/0 code=
+  bytecode - 0xc bytes - det at 0x00000000
+  0x00000000: ux_nil x(0)
+  0x00000004: ux_xval x(2) x(1)
+  0x0000000a: cutbd__proceed
+bits=3 nokey code=
+  bytecode - 0x10 bytes - det at 0x00000000
+  0x00000000: ux_xval x(2) x(1)
+  0x00000006: builtin_1 x(0) C(0x8069744)
+  0x0000000e: neck__proceed
+bits=4 nokey code=
+  bytecode - 0x12 bytes - det at 0x00000000
+  0x00000000: pad__builtin_1 Q() x(0) C(0x8069640)
+  0x0000000a: neck
+  0x0000000c: lastcall E(append_6:add_pred_to_list#0/3)
+bits=31 nokey code=
+  bytecode - 0x82 bytes - det at 0x00000000
+  0x00000000: inithx x(4)
+  0x00000004: alloc__init2sxy x(5) y(2)
+  0x0000000a: builtin_3 x(0) x(4) x(5) C(0x806893a)
+  0x00000016: moveyx y(2) x(5)
+  0x0000001c: pad__load_cons Q() x(6) t(0)
+  0x00000026: pad__builtin_2 Q() x(5) x(6) C(0x8064a44)
+  0x00000032: neck
+  0x00000034: movexy__movexy x(3) y(4) x(2) y(3)
+  0x0000003e: movexy x(0) y(1)
+  0x00000044: movexx x(4) x(0)
+  0x0000004a: init2sxy x(2) y(0)
+  0x00000050: fcall E(append_6:add_pred_to_list#0/3) e(28)
+  0x00000058: pad__load_cons Q() x(0) t(1)
+  0x00000062: globunsafeyx__moveyx y(0) x(1) y(1) x(2)
+  0x0000006c: globunsafeyx__moveyx y(2) x(3) y(3) x(4)
+  0x00000076: moveyx y(4) x(5)
+  0x0000007c: dealloc__lastcall E(append_6:search_args#0/6)
+'append_6:name_var_realname#0'/3: def=0
+bits=69 key=[]/0 code=
+  bytecode - 0x10 bytes - det at 0x00000000
+  0x00000000: ux_nil x(0)
+  0x00000004: pad__ux_cons Q() x(2) t('_')
+  0x0000000e: cutbd__proceed
+bits=73 key='.'/2 code=
+  bytecode - 0x24 bytes - det at 0x00000000
+  0x00000000: ux_list x(0)
+  0x00000004: un_xvar__un_voidr x(3) i(1)
+  0x0000000a: ux_str x(3) f(=/2)
+  0x00000012: un_xlval__un_xvar x(2) x(3)
+  0x00000018: builtin_2 x(1) x(3) C(0x806a5f0)
+  0x00000022: cutbd__proceed
+bits=9 key='.'/2 code=
+  bytecode - 0x12 bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: ux_list x(0)
+  0x00000006: un_voidr__un_xvar i(1) x(0)
+  0x0000000c: lastcall E(append_6:name_var_realname#0/3)
+'append_6:add_pred_to_list#0'/3: def=0
+bits=95 nokey code=
+  bytecode - 0x8a bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: alloc__choice_y y(5)
+  0x00000006: movexy__movexy x(2) y(2) x(1) y(4)
+  0x00000010: movexy x(0) y(1)
+  0x00000016: load_str x(0) f(pred/2)
+  0x0000001e: un_ylval__un_yvar y(1) y(3)
+  0x00000024: pad__init1__fcall Q() y(0) E(basic_props:member/2) e(32)
+  0x00000030: cutfy y(5)
+  0x00000034: pad__load_str Q() x(1) f(pred/2)
+  0x0000003e: un_ylval__un_yval y(1) y(3)
+  0x00000044: moveyx y(0) x(2)
+  0x0000004a: zputn1__call z(4) E(lists:delete/3) e(24)
+  0x00000054: moveyx y(3) x(0)
+  0x0000005a: pad__function_1 Q() x(0) x(0) C(0x806536e) l(4) i(1)
+  0x0000006c: pad__load_str Q() x(1) f(pred/2)
+  0x00000076: un_ylval__un_xval y(1) x(0)
+  0x0000007c: moveyx y(2) x(2)
+  0x00000082: zputn1__dealloc__lastcall z((unsafe)0) E(sets:insert/3)
+bits=31 nokey code=
+  bytecode - 0x2a bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: movexx x(1) x(3)
+  0x00000008: pad__load_str Q() x(1) f(pred/2)
+  0x00000012: un_xlval x(0)
+  0x00000016: pad__un_cons Q() t(1)
+  0x0000001e: movexx x(3) x(0)
+  0x00000024: lastcall E(sets:insert/3)
+'append_6:is_string#0'/1: def=0
+bits=9 key='.'/2 code=
+  bytecode - 0x2a bytes - det at 0x0000001a
+  0x00000000: ux_list x(0)
+  0x00000004: un_xvar x(1)
+  0x00000008: un_nil
+  0x0000000a: neck
+  0x0000000c: movexx x(1) x(0)
+  0x00000012: pad__lastcall Q() E(write:printable_char/1)
+  0x0000001a: ux_list x(0)
+  0x0000001e: un_xvar x(0)
+  0x00000022: un_nil
+  0x00000024: lastcall E(write:printable_char/1)
+bits=9 key='.'/2 code=
+  bytecode - 0x1e bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: ux_list x(0)
+  0x00000006: alloc__un_xvar__un_yvar x(0) y(0)
+  0x0000000c: fcall E(write:printable_char/1) e(12)
+  0x00000014: pad__zputn1__dealloc__lastcall Q() z(0) E(append_6:is_string#0/1)
+'append_6:srcdbg_expand__2#0'/8: def=0
+bits=81 key=','/2 code=
+  bytecode - 0xaa bytes - det at 0x0000004e
+  0x00000000: pad__ux_str Q() x(0) f(,/2)
+  0x0000000a: alloc__un_xvar__un_yvar x(9) y(0)
+  0x00000010: pad__ux_str Q() x(1) f(,/2)
+  0x0000001a: un_xvar__un_yvar x(8) y(1)
+  0x00000020: cuted
+  0x00000022: movexy__movexy x(7) y(7) x(6) y(6)
+  0x0000002c: movexy__movexy x(4) y(4) x(3) y(3)
+  0x00000036: movexy x(2) y(2)
+  0x0000003c: movexx__movexx x(9) x(0) x(8) x(1)
+  0x00000046: pad__jump Q() p(0x86)
+  0x0000004e: ux_str x(0) f(,/2)
+  0x00000056: alloc__un_xvar__un_yvar x(0) y(0)
+  0x0000005c: pad__ux_str Q() x(1) f(,/2)
+  0x00000066: un_xvar__un_yvar x(1) y(1)
+  0x0000006c: movexy__movexy x(7) y(7) x(6) y(6)
+  0x00000076: movexy__movexy x(4) y(4) x(3) y(3)
+  0x00000080: movexy x(2) y(2)
+  0x00000086: init2sxy x(6) y(5)
+  0x0000008c: fcall E(append_6:srcdbg_expand__2#0/8) e(40)
+  0x00000094: zputn8__dealloc__lastcall z(7) z(6) z((unsafe)5) z(4) z(3) z(2) z(1) z(0) E(append_6:srcdbg_expand__2#0/8)
+bits=81 key=-> /2 code=
+  bytecode - 0xca bytes - det at 0x0000004e
+  0x00000000: pad__ux_str Q() x(0) f(->/2)
+  0x0000000a: alloc__un_xvar__un_yvar x(9) y(0)
+  0x00000010: pad__ux_str Q() x(1) f(->/2)
+  0x0000001a: un_xvar__un_yvar x(8) y(1)
+  0x00000020: cuted
+  0x00000022: movexy__movexy x(7) y(7) x(6) y(6)
+  0x0000002c: movexy__movexy x(4) y(4) x(3) y(3)
+  0x00000036: movexy x(2) y(2)
+  0x0000003c: movexx__movexx x(9) x(0) x(8) x(1)
+  0x00000046: pad__jump Q() p(0x86)
+  0x0000004e: ux_str x(0) f(->/2)
+  0x00000056: alloc__un_xvar__un_yvar x(0) y(0)
+  0x0000005c: pad__ux_str Q() x(1) f(->/2)
+  0x00000066: un_xvar__un_yvar x(1) y(1)
+  0x0000006c: movexy__movexy x(7) y(7) x(6) y(6)
+  0x00000076: movexy__movexy x(4) y(4) x(3) y(3)
+  0x00000080: movexy x(2) y(2)
+  0x00000086: init2sxy x(6) y(8)
+  0x0000008c: pad__init1__fcall Q() y(5) E(append_6:srcdbg_expand__2#0/8) e(44)
+  0x00000098: pad__load_cons Q() x(0) t(->)
+  0x000000a2: globunsafeyx__moveyx y(8) x(1) y(5) x(2)
+  0x000000ac: call E(append_6:add_pred_to_list#0/3) e(40)
+  0x000000b4: zputn8__dealloc__lastcall z(7) z(6) z((unsafe)5) z(4) z(3) z(2) z(1) z(0) E(append_6:srcdbg_expand__2#0/8)
+bits=81 key=;/2 code=
+  bytecode - 0xaa bytes - det at 0x0000004e
+  0x00000000: pad__ux_str Q() x(0) f(;/2)
+  0x0000000a: alloc__un_xvar__un_yvar x(9) y(0)
+  0x00000010: pad__ux_str Q() x(1) f(;/2)
+  0x0000001a: un_xvar__un_yvar x(8) y(1)
+  0x00000020: cuted
+  0x00000022: movexy__movexy x(7) y(7) x(6) y(6)
+  0x0000002c: movexy__movexy x(4) y(4) x(3) y(3)
+  0x00000036: movexy x(2) y(2)
+  0x0000003c: movexx__movexx x(9) x(0) x(8) x(1)
+  0x00000046: pad__jump Q() p(0x86)
+  0x0000004e: ux_str x(0) f(;/2)
+  0x00000056: alloc__un_xvar__un_yvar x(0) y(0)
+  0x0000005c: pad__ux_str Q() x(1) f(;/2)
+  0x00000066: un_xvar__un_yvar x(1) y(1)
+  0x0000006c: movexy__movexy x(7) y(7) x(6) y(6)
+  0x00000076: movexy__movexy x(4) y(4) x(3) y(3)
+  0x00000080: movexy x(2) y(2)
+  0x00000086: init2sxy x(6) y(5)
+  0x0000008c: fcall E(append_6:srcdbg_expand__2#0/8) e(40)
+  0x00000094: zputn8__dealloc__lastcall z(7) z(6) z((unsafe)5) z(4) z(3) z(2) z(1) z(0) E(append_6:srcdbg_expand__2#0/8)
+bits=81 key=if/3 code=
+  bytecode - 0xae bytes - det at 0x00000000
+  0x00000000: pad__ux_str Q() x(0) f(if/3)
+  0x0000000a: alloc__un_yvar__un_yvar y(11) y(8)
+  0x00000010: un_yvar y(0)
+  0x00000014: pad__ux_str Q() x(1) f(if/3)
+  0x0000001e: un_yvar__un_yvar y(12) y(9)
+  0x00000024: un_yvar y(1)
+  0x00000028: cuted
+  0x0000002a: movexy__movexy x(7) y(7) x(6) y(6)
+  0x00000034: movexy__movexy x(4) y(4) x(3) y(3)
+  0x0000003e: movexy x(2) y(2)
+  0x00000044: pad__load_cons Q() x(0) t(if)
+  0x0000004e: movexx x(5) x(1)
+  0x00000054: init2sxy x(2) y(13)
+  0x0000005a: pad__init2__fcall Q() y(5) y(10) E(append_6:add_pred_to_list#0/3) e(64)
+  0x00000068: zputn8__call z(7) z(10) z((unsafe)13) z(4) z(3) z(2) z(12) z(11) E(append_6:srcdbg_expand__2#0/8) e(52)
+  0x00000080: zputn8__call z(7) z(5) z((unsafe)10) z(4) z(3) z(2) z(9) z(8) E(append_6:srcdbg_expand__2#0/8) e(40)
+  0x00000098: zputn8__dealloc__lastcall z(7) z(6) z((unsafe)5) z(4) z(3) z(2) z(1) z(0) E(append_6:srcdbg_expand__2#0/8)
+bits=81 key=(\+)/1 code=
+  bytecode - 0x4e bytes - det at 0x0000002e
+  0x00000000: pad__ux_str Q() x(0) f(\+/1)
+  0x0000000a: un_xvar x(9)
+  0x0000000e: ux_str x(1) f(\+/1)
+  0x00000016: un_xvar x(8)
+  0x0000001a: cutbd
+  0x0000001c: movexx__movexx x(9) x(0) x(8) x(1)
+  0x00000026: pad__lastcall Q() E(append_6:srcdbg_expand__2#0/8)
+  0x0000002e: ux_str x(0) f(\+/1)
+  0x00000036: un_xvar x(0)
+  0x0000003a: ux_str x(1) f(\+/1)
+  0x00000042: un_xvar x(1)
+  0x00000046: pad__lastcall Q() E(append_6:srcdbg_expand__2#0/8)
+bits=69 key=!/0 code=
+  bytecode - 0x1a bytes - det at 0x00000000
+  0x00000000: pad__ux_cons Q() x(0) t(!)
+  0x0000000a: ux_cons x(1) t(!)
+  0x00000012: ux_xval x(6) x(5)
+  0x00000018: cutbd__proceed
+bits=69 key=true/0 code=
+  bytecode - 0x1a bytes - det at 0x00000000
+  0x00000000: pad__ux_cons Q() x(0) t(true)
+  0x0000000a: ux_cons x(1) t(true)
+  0x00000012: ux_xval x(6) x(5)
+  0x00000018: cutbd__proceed
+bits=95 nokey code=
+  bytecode - 0x9a bytes - det at 0x00000000
+  0x00000000: pad__ux_str Q() x(1) f(srcdbg_spy/6)
+  0x0000000a: alloc__un_xlval__un_yvar x(0) y(5)
+  0x00000010: un_xlval__un_xlval x(2) x(3)
+  0x00000016: un_xlval__un_yvar x(4) y(6)
+  0x0000001c: cuted
+  0x0000001e: movexy__movexy x(7) y(4) x(6) y(3)
+  0x00000028: movexy x(0) y(1)
+  0x0000002e: moveyx y(5) x(8)
+  0x00000034: init2sxy x(9) y(2)
+  0x0000003a: builtin_3 x(0) x(8) x(9) C(0x806893a)
+  0x00000046: moveyx y(5) x(0)
+  0x0000004c: movexx x(5) x(1)
+  0x00000052: init2sxy x(2) y(0)
+  0x00000058: fcall E(append_6:add_pred_to_list#0/3) e(36)
+  0x00000060: pad__zputn3__call Q() z(6) z(0) z(5) E(append_6:get_pred_number#0/3) e(28)
+  0x00000070: pad__load_cons Q() x(0) t(1)
+  0x0000007a: globunsafeyx__moveyx y(0) x(1) y(1) x(2)
+  0x00000084: globunsafeyx__moveyx y(2) x(3) y(3) x(4)
+  0x0000008e: moveyx y(4) x(5)
+  0x00000094: dealloc__lastcall E(append_6:search_args#0/6)
+'append_6:get_pred_number#0'/3: def=0
+bits=31 nokey code=
+  bytecode - 0xe bytes - det at 0x00000000
+  0x00000000: ux_nil x(1)
+  0x00000004: pad__ux_cons__neck__proceed Q() x(2) t(0)
+bits=31 nokey code=
+  bytecode - 0x8c bytes - det at 0x00000000
+  0x00000000: ux_list x(1)
+  0x00000004: alloc__un_xvar__un_yvar x(3) y(4)
+  0x0000000a: ux_str x(3) f(pred/2)
+  0x00000012: neck
+  0x00000014: movexy__movexy x(2) y(0) x(0) y(3)
+  0x0000001e: un_xvar__un_yvar x(1) y(5)
+  0x00000024: init2sxy x(2) y(6)
+  0x0000002a: pad__init2__fcall Q() y(1) y(2) E(append_6:count_suffix#0/3) e(36)
+  0x00000038: moveyx__moveyx y(5) x(0) y(6) x(1)
+  0x00000042: function_2 x(0) x(0) x(1) C(0x8065b6e) l(0) i(2)
+  0x00000054: ux_yfval x(0) y(1)
+  0x0000005a: zputn3__call z(2) z(4) z(3) E(append_6:get_pred_number#0/3) e(20)
+  0x00000068: moveyx__moveyx y(1) x(0) y(2) x(1)
+  0x00000072: function_2 x(0) x(0) x(1) C(0x806560a) l(0) i(2)
+  0x00000084: ux_yval x(0) y(0)
+  0x0000008a: dealloc__proceed
+'append_6:count_suffix#0'/3: def=0
+bits=31 nokey code=
+  bytecode - 0x46 bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: alloc__movexy__movexy x(2) y(2) x(1) y(3)
+  0x0000000c: init2sxy x(1) y(0)
+  0x00000012: init1__fcall y(1) E(atomic_basic:atom_codes/2) e(24)
+  0x0000001c: zputn2__call z(1) z(3) E(atomic_basic:atom_codes/2) e(20)
+  0x00000028: globunsafeyx__globunsafeyx y(0) x(0) y(1) x(1)
+  0x00000032: moveyx y(2) x(2)
+  0x00000038: globunsafe2xx x(0) x(3)
+  0x0000003e: pad__dealloc__lastcall Q() E(append_6:find_sublist#0/4)
+'append_6:find_sublist#0'/4: def=0
+bits=95 nokey code=
+  bytecode - 0x10 bytes - det at 0x00000000
+  0x00000000: ux_nil x(1)
+  0x00000004: pad__ux_cons Q() x(2) t(0)
+  0x0000000e: cutbd__proceed
+bits=95 nokey code=
+  bytecode - 0x50 bytes - det at 0x00000000
+  0x00000000: pad__ux_cons Q() x(2) t(0)
+  0x0000000a: neck
+  0x0000000c: alloc__choice_y y(0)
+  0x00000010: movexy x(1) y(3)
+  0x00000016: init2sxy x(1) y(1)
+  0x0000001c: pad__init1__fcall Q() y(2) E(lists:length/2) e(24)
+  0x00000028: zputn2__call z(2) z(3) E(lists:length/2) e(20)
+  0x00000034: moveyx__moveyx y(1) x(0) y(2) x(1)
+  0x0000003e: pad__builtin_2 Q() x(0) x(1) C(0x8064a44)
+  0x0000004a: cutfy y(0)
+  0x0000004e: dealloc__proceed
+bits=69 key=[]/0 code=
+  bytecode - 0x50 bytes - det at 0x00000002
+  0x00000000: neck
+  0x00000002: ux_nil x(0)
+  0x00000006: alloc__choice_y y(2)
+  0x0000000a: movexy x(2) y(0)
+  0x00000010: movexx x(3) x(0)
+  0x00000016: init2sxy x(2) y(1)
+  0x0000001c: movexx x(0) x(3)
+  0x00000022: pad__fcall Q() E(append_6:find_sublist#0/4) e(20)
+  0x0000002c: cutfy y(2)
+  0x00000030: moveyx y(1) x(0)
+  0x00000036: pad__function_1 Q() x(0) x(0) C(0x806536e) l(0) i(1)
+  0x00000048: ux_yval x(0) y(0)
+  0x0000004e: dealloc__proceed
+bits=73 key='.'/2 code=
+  bytecode - 0xb4 bytes - det at 0x00000032
+  0x00000000: ux_list x(0)
+  0x00000004: un_xvar__un_xvar x(5) x(4)
+  0x0000000a: ux_list x(1)
+  0x0000000e: un_xval x(5)
+  0x00000012: neck
+  0x00000014: alloc__choice_y y(5)
+  0x00000018: movexy__movexy x(3) y(3) x(2) y(0)
+  0x00000022: un_xvar x(1)
+  0x00000026: movexx x(4) x(0)
+  0x0000002c: jump p(0x56)
+  0x00000032: ux_list x(0)
+  0x00000036: un_xvar__un_xvar x(4) x(0)
+  0x0000003c: ux_list x(1)
+  0x00000040: un_xval x(4)
+  0x00000044: alloc__choice_y y(5)
+  0x00000048: movexy__movexy x(3) y(3) x(2) y(0)
+  0x00000052: un_xvar x(1)
+  0x00000056: init2sxy__init2sxy x(2) y(1) x(3) y(4)
+  0x00000060: pad__init1__fcall Q() y(2) E(append_6:find_sublist_#0/4) e(32)
+  0x0000006c: cutfy y(5)
+  0x00000070: moveyx__globunsafeyx y(3) x(0) y(4) x(1)
+  0x0000007a: moveyx y(2) x(2)
+  0x00000080: movexx x(0) x(3)
+  0x00000086: pad__call Q() E(append_6:find_sublist#0/4) e(20)
+  0x00000090: moveyx__moveyx y(1) x(0) y(2) x(1)
+  0x0000009a: function_2 x(0) x(0) x(1) C(0x806560a) l(0) i(2)
+  0x000000ac: ux_yval x(0) y(0)
+  0x000000b2: dealloc__proceed
+bits=73 key='.'/2 code=
+  bytecode - 0x32 bytes - det at 0x00000000
+  0x00000000: ux_list x(0)
+  0x00000004: un_xvar__un_xvar x(5) x(4)
+  0x0000000a: ux_list x(1)
+  0x0000000e: neck
+  0x00000010: alloc__choice_y y(0)
+  0x00000014: un_voidr__un_xvar i(1) x(1)
+  0x0000001a: load_list x(0)
+  0x0000001e: un_xval__un_xval x(5) x(4)
+  0x00000024: fcall E(append_6:find_sublist#0/4) e(12)
+  0x0000002c: cutfy y(0)
+  0x00000030: dealloc__proceed
+'append_6:find_sublist_#0'/4: def=0
+bits=69 key=[]/0 code=
+  bytecode - 0x16 bytes - det at 0x00000000
+  0x00000000: ux_nil x(0)
+  0x00000004: pad__ux_cons Q() x(2) t(1)
+  0x0000000e: ux_xval x(3) x(1)
+  0x00000014: cutbd__proceed
+bits=73 key='.'/2 code=
+  bytecode - 0x52 bytes - det at 0x0000002a
+  0x00000000: ux_list x(0)
+  0x00000004: un_xvar__un_xvar x(5) x(4)
+  0x0000000a: ux_list x(1)
+  0x0000000e: un_xval x(5)
+  0x00000012: neck
+  0x00000014: alloc__choice_y y(0)
+  0x00000018: un_xvar x(1)
+  0x0000001c: movexx x(4) x(0)
+  0x00000022: pad__jump Q() p(0x44)
+  0x0000002a: ux_list x(0)
+  0x0000002e: un_xvar__un_xvar x(4) x(0)
+  0x00000034: ux_list x(1)
+  0x00000038: un_xval x(4)
+  0x0000003c: alloc__choice_y y(0)
+  0x00000040: un_xvar x(1)
+  0x00000044: fcall E(append_6:find_sublist_#0/4) e(12)
+  0x0000004c: cutfy y(0)
+  0x00000050: dealloc__proceed

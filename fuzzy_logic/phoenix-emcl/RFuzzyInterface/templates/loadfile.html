@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="block-forms-2" class="block">
+
+  <div class="content">
+    <h2 class="title">Load XML file</h2>
+    <div class="inner">
+
+      <form action="/loadingfile/" method="post" class="form">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="group">
+          {{ field.errors }}
+          <div class="label">
+            {{ field.label_tag }}
+          </div>
+          <div class="text_field" >
+            {{ field }}
+          </div>
+        </div>
+        {% endfor %}
+
+        <input type="submit" value="Load" />
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

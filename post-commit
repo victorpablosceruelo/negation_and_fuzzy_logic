@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# POST-COMMIT HOOK
+#
+# The post-commit hook is invoked after a commit.  Subversion runs
+# this hook by invoking a program (script, executable, binary, etc.)
+# named 'post-commit' (for which this file is a template) with the 
+# following ordered arguments:
+#
+#   [1] REPOS-PATH   (the path to this repository)
+#   [2] REV          (the number of the revision just committed)
+#
+# The default working directory for the invocation is undefined, so
+# the program should set one explicitly if it cares.
+#
+# Because the commit has already completed and cannot be undone,
+# the exit code of the hook program is ignored.  The hook program
+# can use the 'svnlook' utility to help it examine the
+# newly-committed tree.
+#
+# On a Unix system, the normal procedure is to have 'post-commit'
+# invoke other programs to do the real work, though it may do the
+# work itself too.
+#
+# Note that 'post-commit' must be executable by the user(s) who will
+# invoke it (typically the user httpd runs as), and that user must
+# have filesystem-level permission to access the repository.
+#
+# On a Windows system, you should name the hook program
+# 'post-commit.bat' or 'post-commit.exe',
+# but the basic idea is the same.
+# 
+# Here is an example hook script, for a Unix /bin/sh interpreter:
+UTIL_PATH=/srv/svn/utils
+REPOS="$1"
+REV="$2"
+
+# Please, do NOT modify the following 3 lines, they're in charge
+# of updating the post-commit hook in the repos, 
+# so this file and the one used by the repos have the same contents.
+pushd /srv/svn/checkouts/negation_and_fuzzy_logic
+svn up post-commit
+popd
+
+#./commit-email.pl "$REPOS" "$REV" -h -m .
+#log-commit.py --repository "$REPOS" --revision "$REV"
+
+# Trac 
+LOG=`/usr/bin/svnlook log -r $REV $REPOS`
+AUTHOR=`/usr/bin/svnlook author -r $REV $REPOS`
+
+TRAC_ENV='/srv/trac/pname'
+
+#$UTIL_PATH/trac-post-commit-hook -p "$TRAC_ENV" -r "$REV" -u "$AUTHOR" -m "$LOG"
+
+# Mail log.
+# Correos de lo que yo mismo hago no, please.
+if [ -z "$AUTHOR" ] || [ ! "$AUTHOR" == "vpablos" ]; then 
+	$UTIL_PATH/commit-email.pl "$REPOS" "$REV" -s "[neg&fl] commit" vpablos@babel.ls.fi.upm.es
+fi
+
+# $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "phoenix-emcl" -s "[neg&fl] commit" phoenixlv0108@gmail.com
+# $UTIL_PATH/commit-email.pl "$REPOS" "$REV" -m "jose_manuel-ssii" -s "[neg&fl] commit" jmhernandoc@gmail.com
+

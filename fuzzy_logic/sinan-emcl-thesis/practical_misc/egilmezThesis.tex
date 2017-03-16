@@ -1,0 +1,42 @@
+\documentclass[a4paper, 11pt, oneside]{Thesis}
+
+%\documentclass{book}
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{subfiles}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{listings}
+
+\usetikzlibrary{trees,positioning,arrows}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{arrows,automata,backgrounds,fit,shapes,scopes}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defin}[thm]{Definition}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{ex}[thm]{Example}
+
+%\newcommand{\clearemptydoublepage}
+%{\newpage{\pagestyle{empty}\cleardoublepage}}
+
+\begin{document}
+
+\input{title}
+
+%\newpage \thispagestyle{plain} \mbox{}
+
+\newpage \thispagestyle{plain} \mbox{}
+%\clearemptydoublepage
+\tableofcontents
+
+\newpage \thispagestyle{plain} \mbox{}
+\subfile{Example}
+
+\subfile{Appendix}
+
+\newpage
+
+\bibliographystyle{plain}
+\bibliography{thesisAbstract11}
+
+\end{document}

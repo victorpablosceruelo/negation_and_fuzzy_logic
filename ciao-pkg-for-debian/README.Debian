@@ -1,0 +1,23 @@
+Ciao Prolog for DEBIAN (alpha packaging)
+-------------------------------------
+
+This is a Prolog environment originally created by the Laboratorio
+CLIP, Dpto. Inteligencia Artificial, Universidad Politecnica de
+Madrid, Spain.
+
+Ciao Prolog contains a full-featured development environment (hosted
+within Emacs).  This package allows you to build and debug code, read
+documentation, and experiment with Prolog code.
+
+The homepage is at: http://clip.dia.fi.upm.es
+
+Have Fun with Prolog! :-)
+
+NOTES:
+
+1. The Emacs mode should work out-of-the-box on a Debian system
+   with proper paths, etc. for the tools to work.
+
+2. These are experimental packages. Use at your own risk.
+
+ -- Emilio Jesús Gallego Arias <egallego@babel.ls.fi.upm.es>, Wed Sep 20 17:32:52 2006

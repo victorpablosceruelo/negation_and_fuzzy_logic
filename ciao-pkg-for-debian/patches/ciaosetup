@@ -1,0 +1,34 @@
+Index: ciaosetup
+===================================================================
+--- ciaosetup	(revision 14285)
++++ ciaosetup	(working copy)
+@@ -11,10 +11,27 @@
+ # NOTE: This command is too complicated to be efficiently programmed
+ #       in 'sh'. It will be eventually ported to Prolog.
+ 
++echo " "
++echo -n "command: $0 "
++args=("$@")
++for ((i=0; i < $#; i++)) {
++   # echo "argument $((i+1)): "
++   echo -n "${args[$i]} "
++}
++echo " "
++echo " "
++
+ # Follow symbolic links
+-self_exec=`test -L "$0" && readlink "$0" || echo "$0"`
++# self_exec=`test -L "$0" && readlink "$0" || echo "$0"`
++self_exec=`echo "$0"`
++echo "self_exec: ${self_exec}"
+ # Obtain the directory where this script is located
+-old_dir=`pwd`; cd `dirname ${self_exec}`; self=`pwd`; cd ${old_dir}; old_dir=
++# old_dir=`pwd`; cd `dirname ${self_exec}`; self=`pwd`; cd ${old_dir}; old_dir=
++old_dir=
++self=`dirname ${self_exec}`
++echo "old_dir: ${old_dir}"
++echo "self: ${self}"
++echo " "
+ 
+ # Exit immediately if a simple command exits with a non-zero status
+ set -e

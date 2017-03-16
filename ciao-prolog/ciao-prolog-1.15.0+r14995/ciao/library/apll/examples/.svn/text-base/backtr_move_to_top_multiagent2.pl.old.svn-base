@@ -1,0 +1,257 @@
+:- module(backtr_move_to_top_multiagent2, [main/0,main/2], []).
+
+
+:- use_module(library(system)).
+:- use_module(library(apll)).
+:- use_module(library(odd)).
+
+
+main :-
+	main(_,_).
+
+main(X,_Y) :-
+	set_prolog_flag(gc, off),
+
+% 	start_thread(new_thread),
+
+% 	dddd,
+	publish(p(X,_,_), Hp),
+% 	publish(q(Y,_), Hq),
+% 	read(Hq),
+% 	dddd, undo(dddd),
+	read(Hp).
+% 	dddd, undo(dddd).
+main(_,_).
+
+
+% dddd :-
+% 	'$metachoice'(M), display(dddd(M)), nl.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% &>/2 and <&/1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+publish(Goal,Handler) :-
+	'$metachoice'(MC1),
+	push_goal(Goal,nondet,Handler),
+	release_some_suspended_thread,
+	pause(1),
+	repeat,
+	'$metachoice'(MC2),
+% 	display(uno), dddd,
+	continue_publish(Handler,MC1,MC2).
+% 	display(dos), dddd.
+
+continue_publish(_,_,_).
+continue_publish(Handler,MC1,MC2) :-
+	continue_publish2(Handler,MC1,MC2).
+continue_publish(_,_,_).
+
+continue_publish2(Handler,MC1,MC2) :-  % Backtrack over goal in Handler:
+	enter_mutex_self,
+	(   % goal not stolen => backtracking with no need of events
+	    goal_available(Handler) ->
+	    exit_mutex_self,
+% 	    dddd,
+	    repeat,
+	    display(do_backtracking), nl, % dddd,
+	    backtrack(Handler)
+	;   % goal stolen => send event to backtrack
+	    exit_mutex_self,
+	    send_event(Handler),
+	    perform_some_work_until_finished_or_failed(Handler)
+	),
+	jump(Handler,MC1,MC2).
+
+% continue_publish2(Handler,MC1,MC2) :-  % Backtrack over goal in Handler:
+% 	enter_mutex_self,
+% 	(   % goal not stolen => backtracking with no need of events
+% 	    goal_available(Handler) ->
+% 	    exit_mutex_self,
+% % 	    dddd,
+% 	    repeat,
+% 	    display(do_backtracking), nl, % dddd,
+% 	    backtrack(Handler)
+% 	;   % goal stolen => send event to backtrack
+% 	    exit_mutex_self,
+% 	    send_event(Handler),
+% 	    perform_some_work_until_finished_or_failed(Handler)
+% 	),
+% 	jump(Handler,MC1,MC2).
+
+jump(Handler,MC1,MC2) :-
+	enter_mutex_self,
+	(   % goal has already failed => keep failing
+	    goal_failed(Handler) ->
+	    exit_mutex_self,
+	    display(save_mc1(MC1)), nl,
+	    save_wam_state(Handler,MC1)
+	;
+	    exit_mutex_self,
+	    display(save_mc2(MC2)), nl,
+	    save_wam_state(Handler,MC2)
+	),
+	display(yyyyyyyyyyyyyyyy), nl,
+	load_wam_state(Handler),
+	fail.
+
+read(Handler) :-
+	save_wam_state(Handler),
+	continue_read(Handler).
+
+continue_read(Handler) :-
+	enter_mutex_self,
+        (   % goal not stolen:
+            goal_available(Handler) ->
+	    (   % first time it is executed => call/1 + saving choice-points
+		goal_not_executed(Handler) ->
+		exit_mutex_self,
+		my_call(Handler)
+	    ;   % backtracking already done over not stolen goal => do nothing
+		exit_mutex_self
+	    ),
+	    undo(load_wam_state(Handler)),
+% 	    undo(dddd),
+	    undo(display(qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq))
+        ;   % goal stolen => do some work until goal has finished or failed
+	    exit_mutex_self,
+            perform_some_work_until_finished_or_failed(Handler)
+        ).
+% continue_read(_) :- fail.
+
+% lwm(H):- load_wam_state(H).
+% lwm(H):- load_wam_state(H), fail.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Common predicates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% perform_some_work_until_finished_or_failed(Handler) :-
+% 	enter_mutex_self,
+% 	(
+% 	    goal_finished(Handler) ->
+% 	    exit_mutex_self
+% 	;
+% 	    (
+% 		goal_failed(Handler) ->
+% 		exit_mutex_self
+% 	    ;
+% 		exit_mutex_self,
+% 		work,
+% 		perform_some_work_until_finished_or_failed(Handler)
+% 	    )
+% 	).
+
+% work :-
+% 	enter_mutex_self,
+% 	(
+% 	    read_event(Handler) ->
+% 	    exit_mutex_self,
+% 	    backtrack(Handler)
+% 	;
+% 	    (
+% 		find_goal(lifo,Handler) ->
+% 		exit_mutex_self,
+% 		display(handler_found(Handler)), nl,
+% 		my_call(Handler), nl
+% 	    ;
+% 		suspend
+% 	    )
+% 	).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code for backtracking
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+my_call(Handler) :-
+	'$metachoice'(InitialChP),
+	perform_call(Handler,InitialChP).
+% my_call(Handler) :-
+% 	enter_mutex(Handler),
+% 	set_goal_failed(Handler),
+% 	exit_mutex(Handler),
+
+% 	display(zzzzzzzzzzzzzzzzzzzz), nl,
+% 	load_wam_state(Handler),
+% 	fail.
+
+perform_call(Handler,InitialChP) :-
+	retrieve_goal(Handler,Goal),
+
+	call(Goal),
+	display(result(Handler,Goal)), nl,
+
+	display(eeeeeeeeeeeeeeee), nl,
+% 	dddd,
+	save_choice_point(Handler),
+% 	(
+% 	    not_last_alternative(Handler) -> true
+% 	;
+% 	    save_choice_point(Handler,InitialChP)
+% 	),
+	display(fffffffffffffff), nl,
+	enter_mutex(Handler),
+% 	(
+% 	    goal_backtracked(Handler) ->
+% 	    display(ggggggggggggg), nl,
+% 	    set_goal_finished(Handler),
+% 	    exit_mutex(Handler),
+% 	    display(xxxxxxxxxxxxxxxxx), nl,
+% 	    load_wam_state(Handler),
+% 	    fail
+% 	;
+	    set_goal_finished(Handler),
+% 	),
+	exit_mutex(Handler).
+
+backtrack(Handler) :-
+	set_goal_backtracked(Handler),
+	save_wam_state(Handler),
+% 	dddd,
+	move_choice_point_to_top(Handler),
+% 	dddd,
+	fail.
+% backtrack(Handler) :-
+% 	display(second_backtrack1), nl,
+% 	enter_mutex(Handler),
+% 	(
+% 	    waiting(Handler) -> release(Handler)
+% 	;
+% 	    true
+% 	),
+% 	exit_mutex(Handler),
+% 	display(second_backtrack2), nl.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New threads
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% new_thread :-
+% 	work,
+% 	new_thread.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Facts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+p(a,a,a).
+p(b,a,a).
+p(c,a,a).
+p(d,a,a).
+
+q(1,1).
+q(2,1).
+q(3,1).
+q(4,1).
+

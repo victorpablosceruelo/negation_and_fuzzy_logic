@@ -1,0 +1,16 @@
+abds([fa/0]).
+
+
+f(a).
+
+membro(X,[X|_]).
+membro(X,[_|T]) <- membro(X,T).
+
+g(X,T) <- fa, gg(X,T).
+h(X,T) <- fa, hh(X,T).
+
+gg(X,T) <- nf(X), nm(T).
+hh(X,T) <- nm(T), nf(X).
+
+nf(X) <- not f(X).
+nm(T) <- not membro(T,[2,3]).

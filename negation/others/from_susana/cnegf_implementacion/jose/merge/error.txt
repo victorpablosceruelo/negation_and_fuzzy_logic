@@ -1,0 +1,16 @@
+{preprocessed in 60 msec.}
+{mode analysis in 1059 msec.}
+{analysis prepared in 60 msec.}
+{type analysis in 1040 msec.}
+{types simplified in 169 msec.}
+{information stored in 0 msec.}
+{non-failure analysis in 5240 msec.}
+{predicates: total=2 non-failing=1 covered=1}
+* Caslog error: illegal mode symbol: ?
+  :-mode(unif/2,[?,?])
+* Caslog error: illegal mode symbol: ?
+  :-mode(merge/3,[?,?,?])
+{completed in 7897 msec.}
+{predicates=2, clauses=6, literals=9, max_variables=5, mean_variables=5.0}
+{written file /home/jose/ssii/aentregar/merge_typesfd_shfr_upper_nf_co.pl}
+}

@@ -1,0 +1,794 @@
+
+:- module(abduction_tr,[abduction/3,
+			abduction_change_intneg_subpredicate/3,
+			abduction_forall/4,
+			abduction_forall_debug/4,
+			add_args_for_abduction_to_term/4,
+			abduction_test_integrity/3,
+			abduction_show_results/1,
+			abduction_deMorgan/3]).
+
+:- import append/3 from basics.
+:- import convert_clauses_format/3, revert_clauses_format/2,
+	debug_formatted_cls/2, debug_separation/0,
+%	debug_formatted_cl/2, term_vars/2,
+	var_is_in_term/2, head_and_tail/3, clause_head/4,
+	list_length/2, obtain_clause_head/2,
+%	joint_bodies_with_op_and/3, 
+	intneg_or/3, intneg_and/3, intneg_chk/2, intneg_special/3,
+%	, list_to_conj/2
+	memberchk/2 from intneg_aux.
+
+:- import intneg_forall_aux/4, intneg_dist/2,
+	var_info_var/2, % var_info_index/2,
+	var_info_status/2, var_info_attribute/2,
+%	var_info_ovar/2, pred_info_index/2, 
+	pred_info_vars/2, pred_info_expl/2,
+%	forall_cancel_const_with_attr/3,
+	get_attribute/2,
+	portray_attributes_in_term/1 from intneg_dist.
+
+% find_equal_head_name_cls/4 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% abduction(Cn_Out, Ab_Out)
+
+abduction(Ab_In, Ab_Out, Abducibles) :-
+	convert_clauses_format(Ab_In, F_Ab_In, Invalid_Cls), !, 
+	add_args_for_abduction(F_Ab_In, F_Ab_Out), !,
+	create_clauses_for_abduction(Abducibles, F_Ab_Cls), !,
+	append(F_Ab_Cls, F_Ab_Out, F_Ab_Aux), !,
+	revert_clauses_format(F_Ab_Aux, Ab_Aux_1), !,
+	append(Invalid_Cls, Ab_Aux_1, Ab_Aux_2),
+	abduction_impl(Abdc_Impl),
+	append(Abdc_Impl, Ab_Aux_2, Ab_Out).
+
+abduction(Ab_In, [], Abducibles) :-
+	debug_separation, 
+	debug_formatted_cls('Abduction fails. Clauses: ', Ab_In),
+	debug_formatted_cls('Abduction fails. Abducibles: ', Abducibles).
+
+abduction_impl([(:- import abduction_change_intneg_subpredicate/3, abduction_test_integrity/3,
+		 abduction_show_results/1, abduction_deMorgan/3, abduction_forall/4,
+		 add_args_for_abduction_to_term/4 from abduction_tr)]).
+
+% abduction_classify_results/3
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+add_args_for_abduction(F_Ab_In, F_Ab_Out) :-
+	add_args_for_abduction_aux(F_Ab_In, F_Ab_Out), !.
+add_args_for_abduction(F_Ab_In, []) :-
+	debug_separation, 
+	debug_formatted_cls('add_args_for_abduction fails. Clauses: ', F_Ab_In).
+
+add_args_for_abduction_aux([], []).
+add_args_for_abduction_aux([F_Cl_In|F_Others_In], [F_Cl_Out|F_Others_Out]) :-
+	add_args_for_abduction_to_1cl(F_Cl_In, F_Cl_Out),
+	add_args_for_abduction_aux(F_Others_In, F_Others_Out).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+add_args_for_abduction_to_1cl(F_Cl_In, F_Cl_In) :-
+	obtain_clause_head(F_Cl_In, Head_In),
+	clause_head(Head_In, Name, Arity, _Args),
+	untouchable_clause_head(Name, Arity), !.
+
+add_args_for_abduction_to_1cl(F_Cl_In, F_Cl_Out) :-
+	obtain_clause_head(F_Cl_In, Head_In),
+	clause_head(Head_In, Name, Arity, _Args),
+	change_all_clause(Name, Arity, F_Cl_Out), !.
+	
+% cl(Name, Arity, Cj, _NoCjs, _Body, _N)
+add_args_for_abduction_to_1cl(cl(Name_In, Arity_In, Cj_In, [], Body_In, N),
+			      cl(Name_Out, Arity_Out, Cj_Out, [], Body_Out, N)) :-
+	term_has_been_introduced_by_intneg(Name_In, Arity_In), !,
+	clause_head(Head_In, Name_In, Arity_In, Cj_In),
+	add_args_for_abduction_to_term(Head_In, Head_Out, Abds_In, Abds_Out),
+	add_args_for_abduction_to_term(Body_In, Body_Out, Abds_In, Abds_Out),
+	clause_head(Head_Out, Name_Out, Arity_Out, Cj_Out).
+
+add_args_for_abduction_to_1cl(cl(Name_In, Arity_In,  Cj_In, [], Body_In, N),
+			      cl(Name_In, Arity_Out, Cj_Out, [], Body_Out, N)) :-
+	Arity_Out is Arity_In + 1,
+	append(Cj_In, [Abds_Out], Cj_Out),
+	add_args_for_abduction_to_term(Body_In, Body_Out, [], Abds_Out).
+%	joint_bodies_with_op_and(Body_Aux, body(abduction_show_results(Abds_Out)), Body_Out).
+
+term_has_been_introduced_by_intneg(Name_In, Arity_In) :-
+	untouchable_clause_head(Name_In, Arity_In);
+	untouchable_terms(Name_In, Arity_In);
+	terms_only_change_args(Name_In, Arity_In);
+	terms_only_change_1st_arg(Name_In, Arity_In);
+	terms_only_change_2nd_arg(Name_In, Arity_In).
+
+untouchable_clause_head(':-', 1).
+untouchable_clause_head('intneg_pred', 3).
+% untouchable_clause_head('intneg_forall', 2).
+
+change_all_clause('intneg', 1, cl('intneg', 2, [Pred, Abds_Out], [],
+				  body((abduction_change_intneg_subpredicate(Pred, NewPred, Abds_Out),
+				       intneg_aux(NewPred, []))),
+				  -2)).
+change_all_clause('intneg_aux', 2, cl('intneg_aux', 2, [Pred_In, List], [],
+				      body((abduction_deMorgan(Pred_In, Pred_Out, Sign),
+%					    write(abduction_deMorgan(Pred_In, Pred_Out, Sign)), nl,
+					    intneg_pred(Sign, Pred_Out, List))),
+				      -2)).
+
+change_all_clause('intneg_forall', 3, cl('intneg_forall', 5, [Vars, Pred_In, Abds_In, Abds_Out, L], [],
+					 body((add_args_for_abduction_to_term(Pred_In, Pred,
+									      [], Abds_Pred_Out),
+%					       nl, % DBG
+%					       write(add_args_for_abduction_to_term(Pred_In, Pred)),
+%					       nl, % DBG
+					       findall((Vars, expl(predicate(Pred), abducibles(Abds_Pred_Out))), 
+						       intneg_pred(pos, Pred, L),
+						       Results), 
+					       !,
+%					       write(abduction_forall(Vars, Results)), nl, 
+					       abduction_forall(Vars, Results, Abds_In, Abds_Out))), -2)).
+
+% Not needed ?? copy_term((Vars, Pred_Out), (Vars_Copy, _Pred_Copy))),
+% abduction_classify_results(Combined_Results, Results, _Abds),
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+untouchable_terms('intneg_aux', 2).
+untouchable_terms('intneg_dist', 2).
+untouchable_terms('true', 0).
+untouchable_terms('fail', 0).
+terms_only_change_args('intneg', 1).
+terms_only_change_args('body', 1).
+terms_only_change_1st_arg('intneg_pred_pos', 2).
+terms_only_change_1st_arg('intneg_pred_neg', 2).
+terms_only_change_2nd_arg('intneg_pred', 3).
+
+% FORALL in Abduction needs to build predicates dinamically ...
+% untouchable_terms('intneg_forall', 2).
+% terms_only_change_2nd_arg('intneg_forall', 2). 
+
+add_args_for_abduction_to_term(Term_In, Term_Out, Abds_In, Abds_Out) :-
+%	debug_formatted_cl('add_args_for_abduction_to_term: Term_In: ', Term_In), 
+%	debug_formatted_cl('add_args_for_abduction_to_term: Abds_In: ', Abds_In), !,
+	add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out), !.
+%	debug_formatted_cl('add_args_for_abduction_to_term: Term_Out: ', Term_Out), 
+%	debug_formatted_cl('add_args_for_abduction_to_term: Abds_Out: ', Abds_Out).
+
+add_args_for_abduction_to_term_aux(Term_In, Term_In, Abds_In, Abds_In) :- % Untouchables
+	(   (   var(Term_In)  % Term is a var.
+	    ) ;
+	    (   clause_head(Term_In, '[]', 0, _) % Term is empty list.
+	      );
+	    (   clause_head(Term_In, Name, Arity, _Args), % Untouchable functors.
+		untouchable_terms(Name, Arity)
+	    )
+	), !.
+
+add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out) :- % Functor ';' 
+	clause_head(Term_In, ';', 2, [Arg1_In, Arg2_In]), !, 
+	add_args_for_abduction_to_term_aux(Arg1_In, Arg1_Out, Abds_In, Abds_Out),
+	add_args_for_abduction_to_term_aux(Arg2_In, Arg2_Out, Abds_In, Abds_Out),
+	clause_head(Term_Out, ';', 2, [Arg1_Out, Arg2_Out]).
+
+add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out) :- % Functor ',' 
+	clause_head(Term_In, ',', 2, [Arg1_In, Arg2_In]), !,
+	add_args_for_abduction_to_term_aux(Arg1_In, Arg1_Out, Abds_In,  Abds_Aux),
+	add_args_for_abduction_to_term_aux(Arg2_In, Arg2_Out, Abds_Aux, Abds_Out),
+	clause_head(Term_Out, ',', 2, [Arg1_Out, Arg2_Out]).
+
+add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out) :- % Only change args.
+	clause_head(Term_In, Name, Arity, Args_In),
+	terms_only_change_args(Name, Arity), !,
+	add_args_for_abduction_to_term_list(Args_In, Args_Out, Abds_In, Abds_Out),
+	clause_head(Term_Out, Name, Arity, Args_Out).
+
+add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out) :- % Only change 1st arg.
+	clause_head(Term_In, Name, Arity, Args_In),
+	terms_only_change_1st_arg(Name, Arity), !,
+	head_and_tail(Args_In, Arg_In, Others),
+	add_args_for_abduction_to_term_aux(Arg_In, Arg_Out, Abds_In, Abds_Out),
+	head_and_tail(Args_Out, Arg_Out, Others),
+	clause_head(Term_Out, Name, Arity, Args_Out).
+
+add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out) :- % Only change 2nd arg.
+	clause_head(Term_In, Name, Arity, Args_In),
+	terms_only_change_2nd_arg(Name, Arity), !,
+	head_and_tail(Args_In, Arg_1_In, Others_In),
+	head_and_tail(Others_In, Arg_2_In, Others),
+	add_args_for_abduction_to_term_aux(Arg_2_In, Arg_2_Out, Abds_In, Abds_Out),
+	head_and_tail(Others_Out, Arg_2_Out, Others),
+	head_and_tail(Args_Out, Arg_1_In, Others_Out),
+	clause_head(Term_Out, Name, Arity, Args_Out).
+
+add_args_for_abduction_to_term_aux(Term_In, Term_Out, Abds_In, Abds_Out) :- % Normal case
+	clause_head(Term_In, Name, Arity, Args_In),
+	append(Args_In, [Abds_In, Abds_Out], Args_Out),
+	NewArity is Arity + 2,
+	clause_head(Term_Out, Name, NewArity, Args_Out).
+
+% add_args_for_abduction_to_term_list(Args_In, Args_Out, Abds_In, Abds_Out)
+add_args_for_abduction_to_term_list([], [], Abds_In, Abds_In).
+add_args_for_abduction_to_term_list([Arg_In|Args_In], [Arg_Out|Args_Out], Abds_In, Abds_Out) :-
+	add_args_for_abduction_to_term_aux(Arg_In, Arg_Out, Abds_In, Abds_Tmp),
+	add_args_for_abduction_to_term_list(Args_In, Args_Out, Abds_Tmp, Abds_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% abducibles([a / 1])
+create_clauses_for_abduction(Abducibles, F_Ab_Aux) :-
+	debug_formatted_cls('create_clauses_for_abduction. abducibles: ', abducibles(Abducibles)),
+	extract_abducibles_list(Abducibles, Abducibles_List), 
+	create_clauses_for_abduction_aux(Abducibles_List, F_Ab_Aux), !,
+	debug_formatted_cls('create_clauses_for_abduction. F_Ab_Aux: ', F_Ab_Aux).
+
+create_clauses_for_abduction(Abducibles, []) :-
+	debug_separation, 
+	debug_formatted_cls('create_clauses_for_abduction fails. Abducibles: ', Abducibles).
+
+extract_abducibles_list(Abducibles, Abducibles_List) :-
+	clause_head(Abducibles, abds, 1, [Abducibles_List]).
+
+create_clauses_for_abduction_aux([], []).
+create_clauses_for_abduction_aux([Abdc_1|Others_Abdc], Abdc_Cls) :-
+	create_clauses_for_1_abduction(Abdc_1, Abdc_1_Cls),
+	create_clauses_for_abduction_aux(Others_Abdc, Others_Abdc_Cls),
+	append(Abdc_1_Cls, Others_Abdc_Cls, Abdc_Cls).
+
+create_clauses_for_1_abduction(Abdc/Arity, [Abdc_Pos, Abdc_Neg]) :-
+%	write(create_clauses_for_1_abduction(Abdc/Arity)), nl,
+	NewArity is Arity +2,
+	clause_head(Cj, Abdc, NewArity, Args_Cj),
+	take_last_2_args(Args_Cj, Args_Show_Cj, Abds_In, Abds_Out),
+	clause_head(Show_Cj, Abdc, Arity, Args_Show_Cj),
+	create_clauses_for_1_abduction_pos(Cj, Show_Cj, Abds_In, Abds_Out, Abdc_Pos),
+	create_clauses_for_1_abduction_neg(Cj, Show_Cj, Abds_In, Abds_Out, Abdc_Neg).
+
+create_clauses_for_1_abduction_pos(Cj, Show_Cj, Abds_In, Abds_Out,
+				   cl('intneg_pred_pos', 2, [Cj, _X], [], Body, -2)) :-
+%	write(create_clauses_for_1_abduction_pos(Cj, Show_Cj)), nl,
+	create_body(Show_Cj, Abds_In, Abds_Out, Body).
+
+create_clauses_for_1_abduction_neg(Cj, Show_Cj, Abds_In, Abds_Out,
+				   cl('intneg_pred_neg', 2, [Cj, _X], [], Body, -2)) :-
+%	write(create_clauses_for_1_abduction_neg(Cj, Show_Cj)), nl,
+	create_body(intneg(Show_Cj), Abds_In, Abds_Out, Body).
+
+create_body(Show_Cj, Abds_In, Abds_Out,
+	    body(abduction_test_integrity(Show_Cj, Abds_In, Abds_Out))).
+
+
+% take_last_2_args(Args, Args_Show_Cj, Abds_In, Abds_Out),
+take_last_2_args([Abds_In, Abds_Out], [], Abds_In, Abds_Out) :- !.
+take_last_2_args([Arg|Args], [Arg|Args_Show_Cj], Abds_In, Abds_Out) :-
+	take_last_2_args(Args, Args_Show_Cj, Abds_In, Abds_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_deMorgan(X_In, X_Out, Sign) :-
+%	write('abduction_deMorgan: X_In: '), write(X_In), nl, 
+	abduction_deMorgan_aux_1(X_In, X_Out, Sign).
+%	write('abduction_deMorgan: Sign: '), write(Sign), nl, 
+%	write('abduction_deMorgan: X_Out: '), write(X_Out), nl.
+
+abduction_deMorgan_aux_1(X_In, X_Out, pos) :-
+	intneg_or(X_In, _A, _B), !,
+	abduction_deMorgan_aux_2(X_In, X_Out, Abds_In, Abds_Out, Abds_In, Abds_Out).
+
+abduction_deMorgan_aux_1(X_In, X_Out, pos) :-
+	intneg_and(X_In, _A, _B), !,
+	abduction_deMorgan_aux_2(X_In, X_Out, Abds_In, Abds_Out, Abds_In, Abds_Out).
+
+abduction_deMorgan_aux_1(X_In, X_Out, pos) :-
+	intneg_chk(X_In, X_Out), !.
+abduction_deMorgan_aux_1(X_In, X_In, neg).
+
+abduction_deMorgan_aux_2(X_In, X_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out) :-
+	intneg_or(X_In, A_In, B_In), !,
+	abduction_deMorgan_aux_2(A_In, A_Out, Abds_In, Abds_Aux, Old_Abds_In, Old_Abds_Out),
+	abduction_deMorgan_aux_2(B_In, B_Out, Abds_Aux, Abds_Out, Old_Abds_In, Old_Abds_Out), 
+	intneg_and(X_Out, A_Out, B_Out).
+
+abduction_deMorgan_aux_2(X_In, X_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out) :-
+	intneg_and(X_In, A_In, B_In), !,
+	abduction_deMorgan_aux_2(A_In, A_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Aux),
+	abduction_deMorgan_aux_2(B_In, B_Out, Abds_In, Abds_Out, Old_Abds_Aux, Old_Abds_Out), 
+	intneg_or(X_Out, A_Out, B_Out).
+
+abduction_deMorgan_aux_2(X_In, X_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out) :-
+	intneg_chk(X_In, X_Aux), !,
+	abduction_deMorgan_aux_3(X_Aux, X_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out).
+abduction_deMorgan_aux_2(X_In, intneg(X_Out), Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out) :-
+	abduction_deMorgan_aux_3(X_In, X_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out).
+
+abduction_deMorgan_aux_3(X_In, X_In, Abds, Abds, Abds, Abds) :-
+	intneg_special(X_In, _X_Out, _L), !. % No abds pointers in this predicates.
+
+abduction_deMorgan_aux_3(X_In, X_Out, Abds_In, Abds_Out, Old_Abds_In, Old_Abds_Out) :-
+	clause_head(X_In, Name, Arity, Args_In),
+	take_last_2_args(Args_In, Args, Old_Abds_In, Old_Abds_Out),
+	take_last_2_args(Args_Out, Args, Abds_In, Abds_Out),
+	clause_head(X_Out, Name, Arity, Args_Out).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_change_intneg_subpredicate(Pred, NewPred, Abds_Out) :-
+	clause_head(Pred, Name, Arity, Args),
+	NewArity is Arity + 2,
+	append(Args, [[], Abds_Out], NewArgs),
+	clause_head(NewPred, Name, NewArity, NewArgs).
+
+abduction_show_results(X) :-
+	nl, write('Abduced results: ['),
+	abduction_show_results_aux(X),
+	write('] '), nl.
+abduction_show_results_aux([]) :- !.
+abduction_show_results_aux([X]) :- !,
+	abduction_show_1_result(X).
+abduction_show_results_aux([X|Others]) :- !,
+	abduction_show_1_result(X),
+	write(', '),
+	abduction_show_results_aux(Others).
+
+abduction_show_1_result(X) :-
+	write(X), !,
+	portray_attributes_in_term(X).
+
+
+abduction_test_integrity(New_Abducible, Abds_In, Abds_Out) :-
+	nl,
+	write('abduction_test_integrity: Abducibles: '), write(Abds_In), nl,
+	write('abduction_test_integrity: New   abdc: '), write(New_Abducible), nl,
+	abduction_test_integrity_aux(New_Abducible, Abds_In), 
+	abduction_remove_included(New_Abducible, Abds_In, Abds_Aux), 
+	abduction_remove_repeated([New_Abducible|Abds_Aux], Abds_Out),
+	write('abduction_test_integrity: OK. '), nl, nl.
+
+abduction_test_integrity(_New_Abducible, Abds_In, Abds_In) :-
+	write('abduction_test_integrity: FAILS.'), nl, nl, !,
+	fail.
+
+abduction_remove_included(_New_Abducible, [], []) :- !.
+
+abduction_remove_included(New_Abducible, [Abdc|Abds_In], Abds_Out) :-
+	clause_head(New_Abducible, 'forall', 2, [Vars, Pred]), % forall
+	list_length(Vars, N),
+	clause_head(Pred, Name, N, _Args1),
+	Name \== 'intneg',
+	clause_head(Abdc, Name, N, _Args2),
+	abduction_remove_included(New_Abducible, Abds_In, Abds_Out).
+
+abduction_remove_included(New_Abducible, [Abdc|Abds_In], Abds_Out) :-
+	clause_head(New_Abducible, 'forall', 2, [Vars, Intneg_Pred]), % forall
+	clause_head(Intneg_Pred, 'intneg', 1, [Pred]), % intneg
+	list_length(Vars, N),
+	clause_head(Pred, Name, N, _Args1),
+	clause_head(Abdc, 'intneg', 1, [Abdc_Pred]), % intneg
+	clause_head(Abdc_Pred, Name, N, _Args2),
+	abduction_remove_included(New_Abducible, Abds_In, Abds_Out).
+
+abduction_remove_included(New_Abducible, [Abdc|Abds_In], Abds_Out) :-
+	clause_head(New_Abducible, 'forall', 2, [Vars_1, Pred_1]), % forall
+	clause_head(Abdc, 'forall', 2, [Vars_2, Pred_2]), % forall
+	list_length(Vars_1, N),
+	list_length(Vars_2, N),
+	clause_head(Pred_1, Name, N, _Args1),
+	clause_head(Pred_2, Name, N, _Args2),
+	Name \== 'intneg',
+	abduction_remove_included(New_Abducible, Abds_In, Abds_Out).
+
+abduction_remove_included(New_Abducible, [Abdc|Abds_In], Abds_Out) :-
+	clause_head(New_Abducible, 'forall', 2, [Vars_1, Intneg_Pred_1]), % forall
+	clause_head(Abdc, 'forall', 2, [Vars_2, Intneg_Pred_2]), % forall
+	list_length(Vars_1, N),
+	list_length(Vars_2, N),
+	clause_head(Intneg_Pred_1, 'intneg', 1, [Pred_1]),
+	clause_head(Intneg_Pred_2, 'intneg', 1, [Pred_2]),
+	clause_head(Pred_1, Name, N, _Args1),
+	clause_head(Pred_2, Name, N, _Args2),
+	abduction_remove_included(New_Abducible, Abds_In, Abds_Out).
+
+abduction_remove_included(New_Abducible, [Abdc|Abds_In], [Abdc|Abds_Out]) :-
+	abduction_remove_included(New_Abducible, Abds_In, Abds_Out).
+	
+
+abduction_remove_repeated([], []) :- !.
+abduction_remove_repeated([Fst|Others_1], Others_2) :-
+	memberchk(Fst, Others_1), !,
+	abduction_remove_repeated(Others_1, Others_2).
+abduction_remove_repeated([Fst|Others_1], [Fst|Others_2]) :-
+	abduction_remove_repeated(Others_1, Others_2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+abduction_test_integrity_aux(New_Abdc, Old_Abdcs) :-
+	abduction_convert_abducible(New_Abdc, T_New_Abdc),
+	abduction_test_integrity_aux_2(Old_Abdcs, T_New_Abdc).
+
+abduction_test_integrity_aux_2([], _T_New_Abdc) :- !.
+abduction_test_integrity_aux_2([Abdc|Abdcs], T_New_Abdc) :- !,
+	abduction_convert_abducible(Abdc, T_Abdc), !,
+	abduction_test_2_abdcs(T_Abdc, T_New_Abdc),
+	abduction_test_integrity_aux_2(Abdcs, T_New_Abdc).
+
+abduction_test_2_abdcs(T_Abdc, T_New_Abdc) :-
+	abdc_arg_name_arity(T_New_Abdc, Name/Arity),
+	abdc_arg_name_arity(T_Abdc, Name/Arity), !,
+	abduction_convert_args_list(T_Abdc, T_Abdc_Args),
+	abduction_convert_args_list(T_New_Abdc, T_New_Abdc_Args), !,
+	abduction_test_2_lists(T_New_Abdc_Args, T_Abdc_Args),
+
+	abduction_test_forall(T_Abdc), % Forall tests.
+	abduction_test_forall(T_New_Abdc).
+
+abduction_test_2_abdcs(_T_Abdc, _T_New_Abdc) :-
+	!. % They have different Name -OR- Arity.
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_convert_abducible(Abdc, T_Abdc) :-
+	write('abduction_convert_abducible:   Abdc: '), write(Abdc), nl,
+	abdc_arg_origin(T_Abdc, Abdc),
+	abduction_convert_abducible_1(Abdc, T_Abdc), !,
+	write('abduction_convert_abducible: T_Abdc: '), write(T_Abdc), nl.
+
+abduction_convert_abducible(Abdc, _T_Abdc) :- !,
+	write('ERROR: '),
+	write(abduction_convert_abducible(Abdc)),
+	write(' FAILS.'), nl, nl, !, fail.
+
+abduction_convert_abducible_1(Abdc, T_Abdc) :-
+	clause_head(Abdc, 'forall', 3, _Args_Forall), !,
+	copy_term(Abdc, Abdc_Copy), % Save original forall.
+	clause_head(Abdc_Copy, 'forall', 3, [Vars, Attrs, Predicate]), !,
+	abdc_arg_forall_vars(T_Abdc, Vars), % Save forall vars.
+	abdc_arg_forall_attrs(T_Abdc, Attrs), % Save forall attrs.
+	abduction_convert_abducible_2(Predicate, T_Abdc).
+
+abduction_convert_abducible_1(Abdc, T_Abdc) :- !,
+	abdc_arg_forall_vars(T_Abdc, []), % No forall vars.
+	abdc_arg_forall_attrs(T_Abdc, []), % No forall attrs.
+	abduction_convert_abducible_2(Abdc, T_Abdc).
+	
+abduction_convert_abducible_2(Abdc, T_Abdc) :-
+	clause_head(Abdc, 'intneg', 1, [Predicate]), !,
+	abdc_arg_sign(T_Abdc, neg),
+	abduction_convert_abducible_3(Predicate, T_Abdc).
+
+abduction_convert_abducible_2(Abdc, T_Abdc) :- !,
+	abdc_arg_sign(T_Abdc, pos),
+	abduction_convert_abducible_3(Abdc, T_Abdc).
+
+abduction_convert_abducible_3(Abdc, T_Abdc) :-
+	clause_head(Abdc, Name, Arity, Args),
+	abdc_arg_name_arity(T_Abdc, Name/Arity),
+	abdc_arg_arguments(T_Abdc, Args), !.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_convert_args_list(Abdc, Abdc_Args) :-
+	abdc_arg_arguments(Abdc, Args),
+%	write(abdc_arg_arguments(Abdc, Args)), nl,
+%	write(abduction_convert_args_list_aux(Args, Abdc_Args, Abdc)), nl,
+	abduction_convert_args_list_aux(Args, Abdc_Args, Abdc).
+
+abduction_convert_args_list(Abdc, []) :-
+	write('ERROR: abduction_convert_args_list FAILS. '), nl,
+	write('Abdc: '), write(Abdc), nl, !, fail.
+
+abduction_convert_args_list_aux([], [], _Template) :- !.
+abduction_convert_args_list_aux([Arg|Args], [T_Arg|T_Args], Template) :- !,
+	abduction_convert_arg(Arg, T_Arg, Template), !,
+	abduction_convert_args_list_aux(Args, T_Args, Template).
+
+%abduction_convert_arg(Arg, T_Arg, Template) :-
+%	write(abduction_convert_arg(Arg, T_Arg, Template)), nl, fail.
+
+abduction_convert_arg(Arg, T_Arg, Template) :-
+	abdc_arg_copy_basics(Template, T_Arg),
+	abduction_convert_arg_aux(Arg, T_Arg).
+
+%abduction_convert_arg_aux(Arg, T_Arg) :-
+%	write(abduction_convert_arg_aux(Arg, T_Arg)), nl, fail.
+
+abduction_convert_arg_aux(Arg, T_Arg) :-
+	var(Arg), !, % Is a variable
+	abdc_arg_type(T_Arg, var),
+	abdc_arg_value(T_Arg, Arg),
+	!.
+
+abduction_convert_arg_aux(Arg, T_Arg) :-
+	!, % Is a constant.
+	abdc_arg_type(T_Arg, const),
+	abdc_arg_value(T_Arg, Arg),
+	!.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_test_2_lists([], []) :- !.
+abduction_test_2_lists([T1|L1], [T2|L2]) :-
+	abduction_test_2_args(T1, T2),
+	abduction_test_2_lists(L1, L2).
+
+%abduction_test_2_args(T_1, T_2) :-
+%	write('abduction_test_2_args: T_1: '), write(T_1), nl,
+%	write('abduction_test_2_args: T_2: '), write(T_2), nl, fail.
+
+abduction_test_2_args(T_1, T_2) :-
+	abdc_arg_type(T_1, var),
+	abdc_arg_type(T_2, var), !,
+	abduction_test_2_args_vars(T_1, T_2).
+
+abduction_test_2_args(T_1, T_2) :-
+	abdc_arg_type(T_1, var), 
+	abdc_arg_type(T_2, const), !,
+	abduction_test_2_args_1var_2const(T_1, T_2).
+
+abduction_test_2_args(T_1, T_2) :-
+	abdc_arg_type(T_1, const),
+	abdc_arg_type(T_2, var), !,
+	abduction_test_2_args_1var_2const(T_2, T_1).
+
+abduction_test_2_args(T_1, T_2) :-
+	abdc_arg_type(T_1, const),
+	abdc_arg_type(T_2, const), !,
+	abduction_test_2_args_const(T_1, T_2).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abdc_arg_origin(       abdc_arg( Origin, _Name/_Arity, _Type, _Arg, _Sign, _FA_Vars, _FA_Attrs, _Args), Origin).
+abdc_arg_name_arity(   abdc_arg(_Origin,  Name/ Arity, _Type, _Arg, _Sign, _FA_Vars, _FA_Attrs, _Args), Name/Arity).
+abdc_arg_type(         abdc_arg(_Origin, _Name/_Arity,  Type, _Arg, _Sign, _FA_Vars, _FA_Attrs, _Args), Type).
+abdc_arg_value(        abdc_arg(_Origin, _Name/_Arity, _Type,  Arg, _Sign, _FA_Vars, _FA_Attrs, _Args), Arg).
+abdc_arg_sign(         abdc_arg(_Origin, _Name/_Arity, _Type, _Arg,  Sign, _FA_Vars, _FA_Attrs, _Args), Sign).
+abdc_arg_forall_vars(  abdc_arg(_Origin, _Name/_Arity, _Type, _Arg, _Sign,  FA_Vars, _FA_Attrs, _Args), FA_Vars).
+abdc_arg_forall_attrs( abdc_arg(_Origin, _Name/_Arity, _Type, _Arg, _Sign, _FA_Vars,  FA_Attrs, _Args), FA_Attrs).
+abdc_arg_arguments(    abdc_arg(_Origin, _Name/_Arity, _Type, _Arg, _Sign, _FA_Vars, _FA_Attrs,  Args), Args).
+
+abdc_arg_copy_basics(abdc_arg( Origin, Name/Arity, _Type_1, _Arg_1, Sign, _FA_Vars_1, _FA_Attrs_1, ForAllVars, Args),
+		     abdc_arg( Origin, Name/Arity, _Type_2, _Arg_2, Sign, _FA_Vars_2, _FA_Attrs_2, ForAllVars, Args)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_test_2_args_vars(T_1, T_2) :- % Equal sign vars
+	abdc_arg_type(T_1, var),
+	abdc_arg_type(T_2, var), % Test.
+	abdc_arg_sign(T_1, Sign),
+	abdc_arg_sign(T_2, Sign), !. % Equal sign
+
+%	abdc_arg_value(T_1, V_1),
+%	abdc_arg_value(T_2, V_2), !,
+%	V_1 = V_2, !. % Unify vars.
+% If we unify them and there is a forall it will fail.
+
+abduction_test_2_args_vars(T_1, T_2) :- % Different sign vars.
+	abdc_arg_type(T_1, var),
+	abdc_arg_type(T_2, var), % Test.
+	abdc_arg_sign(T_1, Sign_1),
+	abdc_arg_sign(T_2, Sign_2),
+	Sign_1 \== Sign_2, !, % Different sign
+	abdc_arg_value(T_1, V_1),
+	abdc_arg_value(T_2, V_2), !,	
+	intneg_dist(V_1, V_2), !. % New constraint
+
+abduction_test_2_args_1var_2const(T_1, T_2) :- % Equal sign Var & Const.
+	abdc_arg_type(T_1, var),
+	abdc_arg_type(T_2, const), % Test.
+	abdc_arg_sign(T_1, Sign),
+	abdc_arg_sign(T_2, Sign), !, % Equal sign
+	abdc_arg_value(T_1, V_1),
+	abdc_arg_value(T_2, V_2), 
+	copy_term(V_1, V_1_Copy), !,
+	V_1_Copy = V_2, !. % Var constraints must accept constant.
+
+abduction_test_2_args_1var_2const(T_1, T_2) :- % Different sign Var & Const.
+	abdc_arg_type(T_1, var),
+	abdc_arg_type(T_2, const), % Test.
+	abdc_arg_sign(T_1, Sign_1),
+	abdc_arg_sign(T_2, Sign_2),
+	Sign_1 \== Sign_2, !, % Different sign
+	abdc_arg_value(T_1, V_1),
+	abdc_arg_value(T_2, V_2), !,
+	intneg_dist(V_1, V_2), !. % New constraint
+
+abduction_test_2_args_const(T_1, T_2) :- % Equal sign Consts.
+	abdc_arg_type(T_1, const),
+	abdc_arg_type(T_2, const),	% Test.
+	abdc_arg_sign(T_1, Sign),
+	abdc_arg_sign(T_2, Sign), !. % Equal sign
+
+abduction_test_2_args_const(T_1, T_2) :- % Different sign Consts.
+	abdc_arg_type(T_1, const),
+	abdc_arg_type(T_2, const),	% Test.
+	abdc_arg_sign(T_1, Sign_1),
+	abdc_arg_sign(T_2, Sign_2),
+	Sign_1 \== Sign_2, !, % Different sign
+	abdc_arg_value(T_1, V_1),
+	abdc_arg_value(T_2, V_2),
+	V_1 \== V_2, !. % Different value
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_test_forall(T_Abdc) :-
+	abdc_arg_forall_vars(T_Abdc, FA_Vars), % Forall vars.
+	abdc_arg_forall_attrs(T_Abdc, FA_Attrs), % Forall attrs.
+	!,
+	abduction_test_forall_aux_1(FA_Vars, FA_Attrs).
+
+% Only valid if list of FA_Vars are all variables.
+% We have to test that variables with attributes have the
+% same constraint that forall.
+abduction_test_forall_aux_1([], _FA_Attrs) :- !.
+abduction_test_forall_aux_1([FA_Var|FA_Vars], FA_Attrs) :-
+	abduction_test_forall_aux_2(FA_Var, FA_Attrs), !,
+	abduction_test_forall_aux_1(FA_Vars, FA_Attrs).
+
+abduction_test_forall_aux_2(FA_Var, FA_Attrs) :-
+	var(FA_Var), % Var has an attribute
+	get_attribute(FA_Var, formulae(FA_Var, Formulae)), !,
+	abduction_test_forall_aux_3(Formulae, FA_Attrs).
+abduction_test_forall_aux_2(FA_Var, _FA_Attrs) :-
+	var(FA_Var). % Var has no attribute
+
+abduction_test_forall_aux_3([Conj|Formulae], FA_Attrs) :-
+	abduction_test_forall_aux_4(Conj, FA_Attrs),
+	abduction_test_forall_aux_3(Formulae, FA_Attrs).
+
+abduction_test_forall_aux_4(Conj, [FA_attr|_FA_Attrs]) :-
+	abduction_test_equiv_attrs(Conj, FA_attr), !.
+abduction_test_forall_aux_4(Conj, [_FA_attr|FA_Attrs]) :-
+	abduction_test_forall_aux_4(Conj, FA_Attrs).
+
+abduction_test_equiv_attrs(X1/X2, X3/X4) :-
+	var(X1), var(X3),
+	X1 == X3, X2 == X4, !.
+	
+abduction_test_equiv_attrs(X1/X2, X3/X4) :-
+	abduction_test_equiv_attrs_aux(X1, X2, X3, X4), !.
+abduction_test_equiv_attrs(X1/X2, X3/X4) :-
+	abduction_test_equiv_attrs_aux(X1, X2, X4, X3), !.
+abduction_test_equiv_attrs(X1/X2, X3/X4) :-
+	abduction_test_equiv_attrs_aux(X2, X1, X3, X4), !.
+abduction_test_equiv_attrs(X1/X2, X3/X4) :-
+	abduction_test_equiv_attrs_aux(X2, X1, X4, X3), !.
+
+abduction_test_equiv_attrs_aux(X1, X2, X3, X4) :-
+	var(X1), var(X3), % Attributed variables.
+	X1 == X3,
+	X2 == X4, !.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_forall(Original_Vars, Combined_In, Abds_In, Abds_Out) :-
+	write('abduction_forall: Original_Vars: '), write(Original_Vars), nl,
+	debug_formatted_cls('Combined_In: ', Combined_In),
+	debug_formatted_cls('Abds_In: ', Abds_In),
+	intneg_forall_aux(Original_Vars, Combined_In, _Combined_Aux, Explanations),
+	debug_separation,
+	debug_formatted_cls('Explanations: ', Explanations),
+	abduction_forall_aux_joint_abds(Explanations, Abds_In, Abds_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_forall_aux_joint_abds(Explanations, Abds_In, Abds_Out) :-
+	abduction_forall_aux_joint_abds(Explanations, Abds_In, Abds_Out).
+
+abduction_forall_aux_joint_abds([], Abds_In, Abds_In) :- !.
+abduction_forall_aux_joint_abds([Pred|Preds], Abds_In, Abds_Out) :-
+	pred_info_expl(Pred, Expl),
+	abduction_forall_aux_get_expl_abdcs(Expl, Pred_Abdcs),
+	pred_info_vars(Pred, Pred_Vars_Infos),
+
+	%% Each predicate explanation is independent from others, so we can build a forall
+	%% for each of them without any problem.
+	write('Pred_Abdcs: '), write(Pred_Abdcs), nl,
+	write('Pred_Vars_Infos: '), write(Pred_Vars_Infos), nl,
+	abduction_forall_aux_build_foralls(Pred_Abdcs, Pred_Vars_Infos, Abds_In, Abds_Aux),
+
+	% Others predicates abductions.
+	abduction_forall_aux_joint_abds(Preds, Abds_Aux, Abds_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_forall_aux_build_foralls([], _Vars_Infos, Abds_In, Abds_In) :- !.
+abduction_forall_aux_build_foralls([Abdc|Abdcs], Vars_Infos, Abds_In, Abds_Out) :-
+	abduction_forall_aux_build_forall(Abdc, Vars_Infos, Abds_In, Abds_Aux), !,
+	abduction_forall_aux_build_foralls(Abdcs, Vars_Infos, Abds_Aux, Abds_Out).
+	
+
+abduction_forall_aux_build_forall(Abdc, Vars_Infos, Abds_In, Abds_Out) :-
+	abduction_forall_extract_vars_infos(Vars_Infos, Abdc, [], Vars, [], Attrs),
+%	debug_formatted_cls('Vars: ', Vars),
+%	debug_formatted_cls('Attrs: ', Attrs),
+	abduction_forall_aux_build_forall_aux(Vars, Attrs, Abdc, Abds_In, Abds_Out).
+
+abduction_forall_aux_build_forall_aux([], _Attrs, Abdc, Abds_In, Abds_Out) :- !,
+	abduction_test_integrity(Abdc, Abds_In, Abds_Out). 
+
+abduction_forall_aux_build_forall_aux(Vars, Attrs, Abdc, Abds_In, Abds_Out) :-
+	abduction_test_integrity(forall(Vars, Attrs, Abdc), Abds_In, Abds_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_forall_extract_vars_infos([], _Abds, Vars, Vars, Attrs, Attrs) :- !.
+abduction_forall_extract_vars_infos([Var_Info|Vars_Infos], Abds, Vars_In, Vars_Out, Attrs_In, Attrs_Out) :-
+	abduction_forall_extract_var_info(Var_Info, Abds, Vars_In, Vars_Aux, Attrs_In, Attrs_Aux),
+	abduction_forall_extract_vars_infos(Vars_Infos, Abds, Vars_Aux, Vars_Out, Attrs_Aux, Attrs_Out).
+
+abduction_forall_extract_var_info(Var_Info, Abds, Vars_In, Vars_Out, Attrs_In, Attrs_Out) :-
+	(   var_info_status(Var_Info, 'var') ;
+	    var_info_status(Var_Info, 'attributed') ), 
+	var_info_var(Var_Info, Var),
+	var_is_in_term(Var, Abds), !,
+	abduction_forall_extract_var_info_aux(Var_Info, Vars_In, Vars_Out, Attrs_In, Attrs_Out).
+
+abduction_forall_extract_var_info(_Var_Info, _Abds, Vars_In, Vars_In, Attrs_In, Attrs_In) :-
+%	write('% DBG % Var is not in abds. Var: '), write(Var_Info), nl,
+%	write('% DBG % Var is not in abds. Abds: '), write(Abds), nl,
+	!.
+
+abduction_forall_extract_var_info_aux(Var_Info, Vars_In, [Var|Vars_In], Attrs_In, Attrs_In) :-
+	var_info_status(Var_Info, 'var'), !,
+	var_info_var(Var_Info, Var).
+
+abduction_forall_extract_var_info_aux(Var_Info, Vars_In, [Var|Vars_In], Attrs_In, Attrs_Out) :-
+	var_info_status(Var_Info, 'attributed'), !,
+	var_info_var(Var_Info, Var),
+	var_info_attribute(Var_Info, Attr),
+	append(Attr, Attrs_In, Attrs_Out).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+abduction_forall_aux_get_expl_abdcs(Expl, Abdcs) :-
+	clause_head(Expl, 'expl', 2,
+		    [predicate(_Real_Explanation), abducibles(Abdcs)]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

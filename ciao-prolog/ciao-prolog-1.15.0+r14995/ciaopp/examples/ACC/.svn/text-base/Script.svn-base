@@ -1,0 +1,84 @@
+- polyhedra analysis must be activated. Not: %:- use_module(ppl_ciao_dummy).  
+  '/home/herme/MySVN/Systems/CiaoDE/ciaopp/plai/domains/polyhedra.pl' 
+- then, have CiaoPP started in correct dir
+- select widencall to off <****
+- set_prolog_flag(write_strings,on) <****
+
+----------------------------------------------------------------- 
+* After slide 3
+-----------------------------------------------------------------
+- Show Java code with assertions Fib.java 
+-- show help on property step_o
+- Show Ciao code with assertions revf_assrt_new.pl
+-- state objective
+
+----------------------------------------------------------------- 
+* After slide 12
+-----------------------------------------------------------------
+Entry declarations and complex property inference:
+*** revf.pl
+Take out entry.
+Show need for entry:
+?- use_package(functional). 
+?- X = ~nrev([1,2,3]). 
+?- [3,2,1] = ~nrev(Y). (but no backtracking)
+?- X = ~nrev(Y). (but no backtracking)
+--------------------
+Debugging:
+*** revf_assrt_bug.pl
+- show errors
+- show output!
+*** Fib_bug.java 
+- show errors
+- show output!
+--------------------
+Validation:
+*** revf_assrt_new.pl
+*** Fib_assrt.java 
+
+--------------------
+Inference of numerical properties:
+- Select in analysis numerical analysis: polyhedra
+*** Analyze Math2.java
+
+- Show:  constraint([1*n+ -1*\result>=0,1*m+ -1*\result>=0])
+  in Greatest Common Divisor example. 
+
+Means: with no precondition for the method, the gcd (symbolized by
+\result) of 'n' and 'm' is always less or equal than those parameters.
+
+----------------------------------------------------------------
+* After slide 17
+----------------------------------------------------------------
+ACC
+
+# Only if time
+# *** fderiv
+# - Generate certificate
+# - Check certificate: should be much faster!
+# - touch fderiv. Error should be detected.
+
+- select widencall to off <****
+- set_prolog_flag(write_strings,on) <****
+
+*** open_file_f_wide.pl
+- Check assertions
+- Generate certificate
+- touch open_file_f_wide. Error should be detected
+
+# ----------------------------------------------------------------
+End
+# ----------------------------------------------------------------
+
+(this only if extra time)
+# ----------------------------------------------------------------
+# * After slide 22
+# ----------------------------------------------------------------
+# Reduced certificates
+# *** open_file_f.pl
+# 
+# - load p_dump.pl with use_module(program(p_dump)).
+# - show_dump('open_file_f.pl.cert')
+# - set_pp_flag(reduced_cert,on).
+# - again.
+# - now only one complete!

@@ -1,0 +1,5 @@
+
+artition([E|R],C,Left,[E|Right1]):-
+	E >= C,
+	partition(R,C,Left,Right1).
+

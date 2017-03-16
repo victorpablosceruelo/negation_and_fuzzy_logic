@@ -1,0 +1,53 @@
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}[yscale=-1,
+place/.style={circle,draw=black, fill=black, inner sep=0pt, 
+              minimum size=1mm}]
+
+\node[place] (phoenix) at (1, 3) [label=left: $p$] {};
+	
+\node[place] (fa) at (3, 0) [label=above: $f_a$] {};
+
+\node[place] (fb) at (3, 2) [label=above: $f_b$] {};
+
+\node[place] (fc) at (3, 4) [label=below: $f_c$] {}; 
+
+\node[place] (fd) at (3, 6) [label=below: $f_d$] {};
+
+\node[place] (new) at (5, 3) [label=right: $newGuy$] {};
+
+\path (phoenix) edge [loop left] (phoenix)
+                edge [bend right] (fa)	
+                edge [bend right] (fb)	
+                edge [bend left] (fc)	
+                edge [bend left] (fd)
+
+      (fa) edge [loop below] (fa)
+           edge (fb)	
+           edge [bend right] (fc)
+           edge [bend right] (fd)
+           edge [bend right] (new)
+
+      (fb) edge [loop below] (fb)
+           edge (fc)	
+           edge [bend right] (fd)
+           edge [bend right] (new)
+
+      (fc) edge [loop above] (fc)
+           edge (fd)
+           edge [bend left] (new)
+
+      (fd) edge [loop above] (fd)
+           edge [bend left] (new)
+     
+      (new) edge [loop right] (new);
+
+\node[draw=red,inner sep=0pt,thick,ellipse,fit=(phoenix) (fa) (fb) (fc) (fd) (new)] {};
+\node[draw=blue,inner sep=0pt,thick,ellipse,fit=(fa) (fb) (fc) (fd) (new)] {};
+\node[draw=green,inner sep=0pt,thick,ellipse,fit=(phoenix) (fa) (fb) (fc) (fd)] {};
+
+\end{tikzpicture}
+\end{center}   
+\caption{Friend Circle}
+\label{fig: Phoenix«s friend}
+\end{figure}

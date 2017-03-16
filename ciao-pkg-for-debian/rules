@@ -1,0 +1,131 @@
+#!/usr/bin/make -f
+#
+# Original license:
+# Sample debian/rules that uses debhelper. 
+# This file is public domain software, originally written by Joey Hess.
+#
+# This version is for a hypothetical package that builds an
+# architecture-dependant package, as well as an architecture-independent
+# package.
+# 
+# Adapted for Ciao-Prolog packages by Emilio Jesús Gallego Arias
+# License GPL2+
+
+# Uncomment this to turn on verbose mode. 
+export DH_VERBOSE=1
+
+# Use bash, not dash or some other ugly shell.
+export SHELL=/bin/sh
+
+# global debhelper options
+# export DH_OPTIONS=
+
+CIAOSETUP=ciaosetup
+PKG_FINAL_PATH=$(CURDIR)/debian/tmp/
+PKG_FINAL_SUBPATH=/usr/share/CiaoDE
+
+clean:
+	@echo "Makefile :: clean (it does nothing)"
+build:
+	@echo "Makefile :: build (it does nothing)"
+
+fixes:
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo "Makefile :: fixes"
+	@echo "Where is /bin/sh link pointing to?"
+	ls -la /bin/sh
+	rm -fv /bin/sh
+	ln -s /bin/bash /bin/sh
+	ls -la /bin/sh
+	@echo " "
+	@echo "Where is the executable?"
+	ls -la $(CIAOSETUP)
+	@echo "Test some important files are where they should be ... "
+	@echo " "
+	ls -la $(CURDIR)/makedir/terminal_io.sh 
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+
+build-and-install: fixes
+	@echo "Makefile :: build and install"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+
+	./debian/ciao-prolog-prepare-configure-clean-build-and-install.sh $(CURDIR) $(PKG_FINAL_PATH) $(PKG_FINAL_SUBPATH)
+
+	@echo " "
+	dh_install --list-missing
+#	dh_install
+
+# Build architecture-independent files here.
+binary-indep: 
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo "Makefile :: binary-indep"
+	dh_testdir -i
+	dh_testroot -i
+	dh_installchangelogs -i
+#	dh_installdocs -i
+#	dh_installexamples -i
+#	dh_installmenu -i
+	dh_installdebconf -i
+#	dh_installemacsen -i
+#	dh_installinfo -i
+#	dh_installman -i
+	dh_link -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+binary-arch: 
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo "Makefile :: binary-arch"
+	dh_testdir -a
+	dh_testroot -a
+	dh_installchangelogs -a
+#	dh_installdocs -a
+#	dh_installexamples -a
+#	dh_installmenu -a
+	dh_installdebconf -a
+#	dh_installemacsen -a
+#	dh_installinfo -a
+#	dh_installman -a
+#	dh_strip -a
+	dh_link -a
+	dh_compress -a
+	dh_fixperms -a
+#	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+#binary: binary-indep binary-arch
+binary: build-and-install binary-arch binary-indep
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo "Makefile :: binary (it does nothing)"
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+
+.PHONY: build clean binary-indep binary-arch binary install

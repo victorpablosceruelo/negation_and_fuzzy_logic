@@ -1,0 +1,5 @@
+debian/tmp/usr/bin/*                        usr/bin
+debian/tmp/usr/lib/ciao/ciao-*/include/
+debian/tmp/usr/lib/ciao/ciao-*/engine/
+debian/tmp/usr/include/*                 
+

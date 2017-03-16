@@ -1,0 +1,6 @@
+% Example 1 (propositional) - translation to TPTP
+fof(cl1, axiom, ((q | r) => p)).
+fof(cl2, axiom, r).
+fof(cl3, axiom, q).
+
+fof(as1, conjecture, p).

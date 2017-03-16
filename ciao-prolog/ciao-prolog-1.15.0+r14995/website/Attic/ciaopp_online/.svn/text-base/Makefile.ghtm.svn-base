@@ -1,0 +1,13 @@
+page( 'ciaopp_online.tmpl'   , '../ciaopp_online_installed.html'   ).
+
+% page( 'ciaopp_init_template.tmpl'     , '../cgi/templates/ciaopp_init_template.html'      ).
+page( 'ciaopp_files_template.tmpl'    , '../cgi/templates/ciaopp_files_template.html'     ).
+page( 'ciaopp_output_template.tmpl'   , '../cgi/templates/ciaopp_output_template.html'    ).
+page( 'ciaopp_opts.tmpl'              , '../cgi/templates/ciaopp_customize_template.html' ).
+
+% For testing
+% page( 'ciaopp_output.tmpl' , '../ciaopp_output.html' ).
+% page( 'ciaopp_files.tmpl'  , '../ciaopp_files.html'  ).
+%
+% For debugging
+% page( 'ciaopp_opts.tmpl'   , '../ciaopp_opts.html'   ).

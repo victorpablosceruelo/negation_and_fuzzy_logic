@@ -1,0 +1,19 @@
+Source: adobe-reader-pkg-for-debian
+Priority: optional
+Maintainer: Victor Pablos Ceruelo <vpablos@babel.ls.fi.upm.es>
+Build-Depends: bash, bash-static, tar, bzip2, wget
+Standards-Version: 3.7.2
+Section: devel
+
+Package: adobe-reader-pkg-for-debian
+Section: devel
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: bash
+Replaces: acroread
+Conflicts: acroread
+Provides: acroread 
+Description: This package contain acroread 
+ .
+ It is just a fake package. 
+ .

@@ -1,0 +1,52 @@
+This package represents an attempt to implement some of the features of the
+higher order logic programming language "Lambda Prolog" by Dale Miller and
+Gopalan Nadathur. More information about Lambda Prolog can be found at 
+
+	http://www.lix.polytechnique.fr/Labo/Dale.Miller/lProlog
+
+At the heart of this implementation is a higher-order pattern unification
+algorithm. Details of the algorithm can be found in "Practical Higher-Order
+Pattern Unification With On-the-Fly Raising" by Gopalan Nadathur and Natalie
+Linnell. This paper and the original SML code can be found at 
+
+	http://www-users.cs.umn.edu/~gopalan/recentpapers.html
+
+The prolog implementation used here was written by Amadeo Casas Cuadrado of the
+Ciao Prolog team.
+
+
+The features implemented are:
+	1) lambda expressions as atomic terms and higher order pattern unification.
+	2) predicate variables.
+	3) quantifiers in goal (explicit quantification).
+	4) implication in goals.
+
+The "examples" directory contains some programs demonstrating the use of some of
+the new features.  It should be possible to build them using the command line
+compiler:
+	> ciaoc ho_append
+	> ./ho_append
+
+	> ciaoc pnf
+	> ./pnf
+
+More details of the features and their syntax can be found in the INFO file.
+
+
+Note that this is still very much a "work in progress" and there is a lot that
+is missing or incomplete. One major shortcoming is in interaction with
+non-higher-order code - basically, there is none. Right now there is only
+"display_ref/1" which flattens and prints out a higher-order term.
+
+Also, some work remains to be done on handling unification on pairs that do not
+meet the "pattern" restriction. Currently, these simply fail, but ideally we
+would like to "defer" on the pair in the hopes that further evaluation of the
+terms would instantiate things to the point where the pattern restriction is
+met.
+
+
+
+Juan Chanco
+University of Minnesota
+chanco@cs.umn.edu
+

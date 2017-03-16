@@ -1,0 +1,123 @@
+10
+
+dir
+14995
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao/benchmark
+svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
+
+
+
+2011-10-10T08:49:03.011956Z
+14027
+jfran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8ba9c684-2eea-0310-8aa7-95d015254485
+
+data
+dir
+
+suite
+dir
+
+concurrency
+dir
+
+NODISTRIBUTE
+file
+
+
+
+
+2012-09-17T18:11:33.227688Z
+d41d8cd98f00b204e9800998ecf8427e
+2004-12-06T01:25:50.331569Z
+160
+mcarro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+
+integer-arith.pl
+file
+
+
+
+
+2012-09-17T18:11:33.231688Z
+4329fe021e2db1368c7ea17068681ac2
+2010-10-14T12:54:08.788783Z
+12665
+remy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1070
+
+loading
+dir
+
+directives
+dir
+
+so
+dir
+
+qexec
+dir
+
+Antonio
+dir
+
+modules
+dir
+

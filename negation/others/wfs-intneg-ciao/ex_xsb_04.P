@@ -1,0 +1,4 @@
+
+:- table p/0.
+
+p :- tnot(p).

@@ -1,0 +1,1192 @@
+%!PS-Adobe-1.0
+%%Pages: (atend)
+%%EndComments
+%%BeginProlog
+% This copyright applies to everything between here and the %%EndProlog:
+% Copyright (C) 1997 Aladdin Enterprises, Menlo Park, CA.  All rights reserved.
+mark
+/currentglobal { false }
+/setglobal { pop }
+/packedarray { array astore readonly }
+/setcmykcolor {
+1 exch sub
+4 -1 roll 1 exch sub 1 index mul
+4 -1 roll 1 exch sub 2 index mul
+4 -2 roll exch 1 exch sub mul
+setrgbcolor
+}
+/sethalftonephase { pop pop }
+/setpagedevice {
+statusdict /pageparams get exec
+4 index /PageSize .knownget { aload pop 6 -2 roll pop pop 4 2 roll } if
+4 index /Orientation .knownget { 3 -1 roll pop exch } if
+statusdict /setpageparams get exec
+/PageOffset .knownget { aload pop translate } if
+}
+/setoverprint { pop }
+/setstrokeadjust { pop }
+/.copydict { dup 3 -1 roll { put dup } forall pop }
+/.dicttomark {
+counttomark 2 idiv dup dict begin { def } repeat pop currentdict end
+}
+/.knownget { 2 copy known { get true } { pop pop false } ifelse }
+/.setdefaultscreen { }
+counttomark 2 idiv {
+1 index where { pop pop pop } { bind executeonly def } ifelse
+} repeat pop
+currentglobal true setglobal
+systemdict /pdfmark known not
+{ userdict /pdfmark { cleartomark } bind put } if
+userdict /GS_PDF_ProcSet 127 dict dup begin
+/bdef { bind def } bind def
+/numargsdict 100 dict def
+/!		
+{ //numargsdict 3 index 3 -1 roll put def
+} bdef
+/~		
+{ exch cvx 1 packedarray cvx exch !
+} bdef
+/nodict 1 dict def
+nodict /self { //nodict } executeonly put
+nodict readonly pop
+/beginpage
+{ //nodict 20 dict .copydict begin graphicsbeginpage textbeginpage
+} bdef
+/endpage
+{ showpage end
+} bdef
+/graphicsbeginpage { initgraphics  0 g  0 G } bdef
+/gput		
+{ exch currentdict //nodict eq { /self dup load end 5 dict begin def } if
+currentdict length currentdict maxlength ge 
+{ currentdict dup length 3 mul 2 idiv 1 add dict .copydict end begin 
+}
+if def
+} bdef
+/q_
+{ gsave //nodict begin
+} bdef
+/q /q_ load 0 !
+/Q_
+{ currentdict /self .knownget { exec //nodict eq { end grestore } if } if
+} bdef
+/Q /Q_ load 0 !
+/d /setdash 2 ~
+/i /setflat 1 ~
+/j /setlinejoin 1 ~
+/J /setlinecap 1 ~
+/M /setmiterlimit 1 ~
+/w /setlinewidth 1 ~
+/fcput		
+{ /FillColorSpace gput /FillColor gput
+} bdef
+/scput		
+{ /StrokeColorSpace gput /StrokeColor gput
+} bdef
+/csdevgray [/DeviceGray] readonly def
+/csdevrgb [/DeviceRGB] readonly def
+/csdevcmyk [/DeviceCMYK] readonly def
+/cslabinit mark
+/DecodeABC [{16 add 116 div} bind {500 div} bind {200 div} bind]
+/MatrixABC [1 1 1 1 0 0 0 0 -1]
+/DecodeLMN [
+{dup 6 29 div ge {dup dup mul mul} {4 29 div sub 108 841 div mul} ifelse
+0.9505 mul} bind
+{dup 6 29 div ge {dup dup mul mul} {4 29 div sub 108 841 div mul} ifelse
+} bind
+{dup 6 29 div ge {dup dup mul mul} {4 29 div sub 108 841 div mul} ifelse
+1.0890 mul} bind
+]
+.dicttomark readonly def
+/nullpattern1 mark
+/PatternType 1 /PaintType 1 /TilingType 3 /BBox [0 0 0 0]
+/XStep 1 /YStep 1 /PaintProc { }
+.dicttomark readonly def
+/nullpattern2 nullpattern1 dup length dict copy readonly def
+/CSdict 11 dict dup begin
+/DeviceGray { 0 exch } bdef
+/DeviceRGB { [0 0 0] cvx exch } bdef
+/DeviceCMYK { [0 0 0 1] cvx exch } bdef
+/Indexed
+{ dup 1 get csset exch pop
+dup 2 index 1 get eq
+{ pop }
+{ exch 4 array copy dup 1 4 -1 roll put }
+ifelse 0 exch
+} bdef
+/CalGray
+{ systemdict /setcolorrendering known
+{ 1 get dup /Gamma .knownget
+{ dup length 1 add dict .copydict
+dup /DecodeA 4 -1 roll /exp load 2 packedarray cvx put
+}
+if /CIEBasedA exch 2 array astore 0 exch
+}
+{ pop //csdevgray csset
+}
+ifelse
+} bdef
+/CalRGB
+{ systemdict /setcolorrendering known
+{ 1 get dup /Gamma known 1 index /Matrix known or
+{ dup length 2 add dict .copydict
+dup /Matrix .knownget { 1 index /MatrixABC 3 -1 roll put } if
+dup /Gamma .knownget
+{ [ exch { /exp load 2 packedarray cvx } forall
+] 1 index /DecodeABC 3 -1 roll put
+}
+if
+}
+if /CIEBasedABC exch 2 array astore [0 0 0] cvx exch
+}
+{ pop //csdevrgb csset
+}
+ifelse
+} bdef
+/CalCMYK { pop //csdevcmyk csset } bdef	
+/Lab
+{ systemdict /setcolorrendering known
+{ 1 get dup length 3 add dict .copydict
+dup /Range .knownget not { [-100 100 -100 100] } if
+[-100 0 null null null null] dup 2 4 -1 roll putinterval
+1 index /RangeABC 3 -1 roll put
+//cslabinit exch copy
+/CIEBasedABC exch 2 array astore [0 0 0] cvx exch
+}
+{ (****** Lab color space not supported. ******\n) print flush
+/setcolorspace cvx /undefined signalerror
+}
+ifelse
+} bdef
+/Pattern
+{ //nullpattern1 1 index type /nametype ne
+{ 1 index length 0 ne { pop //nullpattern2 } if
+} if
+matrix makepattern exch
+} bdef
+/Separation { 1 exch } bdef
+end def
+/csset			
+{ dup dup type /nametype ne { 0 get } if //CSdict exch get exec
+} bdef
+/g { //csdevgray fcput } 1 !
+/G { //csdevgray scput } 1 !
+/rg { 3 array astore cvx //csdevrgb fcput } 3 !
+/RG { 3 array astore cvx //csdevrgb scput } 3 !
+/k { 4 array astore cvx //csdevcmyk fcput } 4 !
+/K { 4 array astore cvx //csdevcmyk scput } 4 !
+/cs { csset fcput } 1 !
+/CS { csset scput } 1 !
+/sc1 { /FillColor gput } 1 !
+/SC1 { /StrokeColor gput } 1 !
+/sc2 { /FillColor gput } 2 !
+/SC2 { /StrokeColor gput } 2 !
+/sc3 { /FillColor load astore pop } 3 !
+/SC3 { /StrokeColor load astore pop } 3 !
+/sc4 { /FillColor load astore pop } 4 !
+/SC4 { /StrokeColor load astore pop } 4 !
+/sc5 { /FillColor gput } 5 !
+/SC5 { /StrokeColor gput } 5 !
+/setfillcolor { FillColor FillColorSpace setgcolor } def
+/setstrokecolor { StrokeColor StrokeColorSpace setgcolor } def
+/CIdict mark			
+/DeviceGray 1   /DeviceRGB 3   /DeviceCMYK 4
+/CIEBaseA 1   /CIEBaseABC 3   /CIEBasedDEF 3   /CIEBaseDEFG 4
+.dicttomark def
+/Cdict 11 dict dup begin	
+/DeviceGray { pop setgray } bdef
+/DeviceRGB { pop setrgbcolor } bdef
+/DeviceCMYK { pop setcmykcolor } bdef
+/CIEBasedA
+{ dup currentcolorspace eq { pop } { setcolorspace } ifelse setcolor } bdef
+/CIEBasedABC /CIEBasedA load def
+/CIEBasedDEF /CIEBasedA load def
+/CIEBasedDEFG /CIEBasedA load def
+/Indexed /setcolorspace where
+{ pop /CIEBasedA load }
+{ /setindexedcolor cvx }
+ifelse def
+/Pattern
+{ dup currentcolorspace eq { pop } { setcolorspace } ifelse
+dup /Matrix get makepattern setcolor
+} bdef
+/Separation /CIEBasedA load def
+end def
+/setindexedcolor		
+{ mark 3 -1 roll
+2 index 3 get	
+dup type /stringtype eq
+{ //CIdict 4 index 1 get 0 get get		
+dup 4 -1 roll mul exch getinterval { 255 div } forall
+}
+{ exec
+}
+ifelse
+counttomark 2 add -2 roll pop
+1 get setgcolor
+} bdef
+/setgcolor	
+{ 1 index null eq
+{ pop pop }
+{ dup 0 get //Cdict exch get exec }
+ifelse
+} bdef
+/fsexec		
+{		
+{ currentpoint } stopped
+{ $error /newerror false put   cvx exec }
+{ 3 -1 roll cvx exec moveto }
+ifelse
+} bdef
+/cmmatrix matrix def
+/cm { //cmmatrix astore concat } 6 !
+/m /moveto 2 ~
+/l /lineto 2 ~
+/c /curveto 6 ~
+/h /closepath 0 ~
+/v { currentpoint 6 2 roll curveto } 4 !
+/y { 2 copy curveto } 4 !
+/re
+{ 4 2 roll moveto  exch dup 0 rlineto  0 3 -1 roll rlineto  neg 0 rlineto
+closepath
+} 4 !
+/S_ { setstrokecolor /stroke fsexec } bdef
+/S { S_ } 0 !
+/f { setfillcolor /fill fsexec } 0 !
+/f* { setfillcolor /eofill fsexec } 0 !
+/n_ { newpath } bdef		
+/n { n_ } 0 !
+/s { closepath S_ } 0 !
+/B_ { gsave setfillcolor fill grestore S_ } bdef
+/B /B_ load 0 !
+/b { closepath B_ } 0 !
+/B*_ { gsave setfillcolor eofill grestore S_ } bdef
+/B* /B*_ load 0 !
+/b* { closepath B*_ } 0 !
+/Wdict 4 dict dup begin
+/S_ { gsave setstrokecolor stroke grestore n_ } bdef
+/f { gsave setfillcolor fill grestore n_ } 0 !
+/f* { gsave setfillcolor eofill grestore n_ } 0 !
+/n_ { end clip newpath } bdef
+end readonly def
+/W { //Wdict begin } 0 !
+/W*dict 4 dict dup begin
+/S_ { gsave setstrokecolor stroke grestore n_ } bdef
+/f { gsave setfillcolor fill grestore n_ } 0 !
+/f* { gsave setfillcolor eofill grestore n_ } 0 !
+/n_ { end eoclip newpath } bdef
+end readonly def
+/W* { //W*dict begin } 0 !
+/Is		
+{ dup /DataSource get string /readstring cvx /currentfile cvx
+3 index /FilterProc .knownget
+{ dup dup 0 get /ASCIIHexDecode eq exch length 2 eq and
+{ pop exch pop /readhexstring cvx exch }
+{ exch exec exch exec }
+ifelse
+}
+if 3 1 roll /pop cvx 4 packedarray cvx
+} bdef
+/EI { } def	
+/csimage
+{ /setcolorspace where
+{ pop dup /ColorSpace get csset setcolorspace pop image }
+{ .colorspaceimage }
+ifelse
+} def		
+/ID	
+{ Is dup 3 -1 roll dup /ImageMask get
+{ setfillcolor dup /Interpolate .knownget not { false } if
+{ dup /DataSource 4 -1 roll put /imagemask cvx exec
+}
+{  { /Width /Height /Decode /ImageMatrix }
+{ 1 index exch get exch }
+forall pop exch 0 get 0 ne exch
+5 -1 roll imagemask
+}
+ifelse
+}
+{ dup /ColorSpace get /DeviceGray eq
+1 index /BitsPerComponent get 8 le and
+1 index /Decode get dup 1 get 1 eq exch 0 get 0 eq and and
+1 index /Interpolate .knownget not { false } if not and
+{  { /Width /Height /BitsPerComponent /ImageMatrix }
+{ 1 index exch get exch }
+forall pop 5 -1 roll image
+}
+{ dup /DataSource 4 -1 roll put csimage
+}
+ifelse
+}
+ifelse
+dup type /filetype ne		
+{ dup 2 get /readhexstring eq
+{  { dup 0 get exec read pop (>) 0 get eq { exit } if } loop
+}
+if pop
+}
+{ pop
+}
+ifelse EI
+} 1 !
+/IDx	
+{ Is 1 index /DataSource 3 -1 roll put
+csimage EI
+} 1 !
+/textbeginpage
+{ /TextSpacing 0 def		
+/TextLeading 0 def		
+/TextRenderingMode 0 def	
+/TextRise 0 def		
+/WordSpacing 0 def		
+/TextHScaling 1.0 def	
+/TextFont null def
+/Show { showfirst } def
+} bdef
+/settextmatrix
+{ TextMatrix concat
+TextHScaling 1 ne { TextHScaling 1 scale } if
+TextRise 0 ne { 0 TextRise translate } if
+} bdef
+/settextstate { TextSaveMatrix setmatrix settextmatrix } bdef
+/BT
+{ currentdict /TextMatrix .knownget
+{ identmatrix pop }
+{ matrix /TextMatrix gput }
+ifelse
+currentdict /TextOrigin .knownget
+{ dup 0 0 put 1 0 put }
+{ [0 0] cvx /TextOrigin gput }
+ifelse
+{ showfirst } /Show gput
+currentdict /TextSaveMatrix .knownget not
+{ matrix dup /TextSaveMatrix gput }
+if currentmatrix pop settextmatrix 0 0 moveto
+TextFont dup null eq { pop } { setfont } ifelse
+} bind 0 !
+/ET
+{ TextSaveMatrix setmatrix
+} bind 0 !
+/Tc_ { /TextSpacing gput { showfirst } /Show gput } bdef
+/Tc { Tc_ } 1 !
+/TL { /TextLeading gput } bind 1 !
+/Tr { /TextRenderingMode gput { showfirst } /Show gput } bind 1 !
+/Ts { /TextRise gput settextstate } bind 1 !
+/Tw_ { /WordSpacing gput { showfirst } /Show gput } bdef
+/Tw { Tw_ } 1 !
+/Tz { 100 div /TextHScaling gput settextstate } bind 1 !
+/Tf		
+{ dup 1 eq { pop } { scalefont } ifelse
+dup setfont /TextFont gput
+} 2 !
+/FRD		
+{ /FontSetInit /ProcSet findresource begin ReadData
+} 2 !
+/.copyfontdict		
+{ 1 index /FID known
+1 index { 2 index /UniqueID known or 2 index /XUID known or } if
+{		
+exch dup length 1 add dict exch
+{		
+1 index /FID eq 4 index
+{ 2 index /UniqueID eq or 2 index /XUID eq or }
+if not { 3 copy put } if pop pop
+}
+forall exch
+}
+if pop
+} bdef
+/.updatefont		
+{ 2 index 4 1 roll
+dup null ne
+{ 3 -1 roll true .copyfontdict dup /Metrics 4 -1 roll put exch }
+{ pop }
+ifelse
+dup null ne 1 index 3 index /Encoding get ne and
+{ exch false .copyfontdict dup /Encoding 4 -1 roll put }
+{ pop }
+ifelse exch 1 index ne
+} bdef
+/Td_
+{ TextOrigin exch 4 -1 roll add 3 1 roll add
+2 copy /TextOrigin load astore pop moveto
+} bdef
+/Td { Td_ } 2 !
+/TD { dup neg /TextLeading gput Td_ } 2 !
+/T*_ { 0 TextLeading neg Td_ } bdef
+/T* { T*_ } 0 !
+/Tm
+{ TextMatrix astore pop settextstate
+0 0 /TextOrigin load astore pop
+0 0 moveto
+} 6 !
+/textrenderingprocs [		
+{ tf } { tS } { tB } { tn }
+4 copy
+] readonly def
+/setshowstate
+{ WordSpacing 0 eq TextSpacing 0 eq and
+{ TextRenderingMode 0 eq
+{ { setfillcolor show } }
+{ { false charpath textrenderingprocs TextRenderingMode get exec } }
+ifelse
+}
+{ TextRenderingMode 0 eq
+{ WordSpacing 0 eq
+{ { setfillcolor TextSpacing exch 0 exch ashow } }
+{ TextSpacing 0 eq
+{ { setfillcolor WordSpacing exch 0 exch 32 exch widthshow } }
+{ { setfillcolor WordSpacing exch TextSpacing exch 0 32 4 2 roll 0 exch awidthshow } }
+ifelse
+}
+ifelse
+}
+{ { WordSpacing TextSpacing 2 index
+0 1 2 index length 1 sub
+{ 2 copy 1 getinterval false charpath
+4 copy get 32 eq { add } { exch pop } ifelse 0 rmoveto
+pop
+}
+for pop pop pop pop
+textrenderingprocs TextRenderingMode get exec
+}
+}
+ifelse
+}
+ifelse /Show gput
+} bdef
+/showfirst { setshowstate Show } def
+/Tj { Show } 1 !
+/' { T*_ Show } 1 !
+/" { exch Tc_ exch Tw_ T*_ Show } 3 !
+/TJ
+{ counttomark -1 1
+{ -1 roll dup type /stringtype eq
+{ Show
+}
+{ -1000 div
+currentfont /ScaleMatrix .knownget { 0 get mul } if
+0 rmoveto
+}
+ifelse
+}
+for pop
+} ([) cvn !
+/tf { setfillcolor currentpoint fill moveto } bdef
+/tn { currentpoint newpath moveto } bdef
+/Tmatrix matrix def
+/tS
+{ setstrokecolor
+currentpoint //Tmatrix currentmatrix TextSaveMatrix setmatrix stroke
+setmatrix moveto
+} bdef
+/tB { gsave tf grestore tS } bdef
+end readonly put		
+setglobal
+%%EndProlog
+%%Page: 1 1
+GS_PDF_ProcSet begin
+mark /PageSize [595
+842]
+/PageOffset [0
+0]
+.dicttomark userdict /_48 2 index put setpagedevice
+beginpage
+0 g
+0 G
+BT
+/Times-Bold findfont StandardEncoding null .updatefont { /_ exch definefont } if
+ userdict /_49 2 index put 1 Tf
+15.96 0 0 15.96 153.69 755.67 Tm
+0 g
+.setdefaultscreen
+false setstrokeadjust
+false setoverprint
+0 Tc
+0 Tw
+(Lecture Notes in Computer Science:) Tj
+4.2105 -1.218 TD
+(Copyright Form) Tj
+/Times-Roman findfont StandardEncoding null .updatefont { /_ exch definefont } if
+ userdict /_50 2 index put 1 Tf
+11.04 0 0 11.04 70.89 695.43 Tm
+(Conference/Book:...............................................................................................................) Tj
+35.0802 0 TD
+(.......................) Tj
+-35.0802 -1.1848 TD
+(...............................................................................................................................) Tj
+31.7484 0 TD
+(.....................................) Tj
+-31.7484 -1.1848 TD
+(Volume Editor\(s\):..............................................................................................................) Tj
+34.812 0 TD
+(.........................) Tj
+-34.812 -1.1848 TD
+(...............................................................................................................................) Tj
+31.7484 0 TD
+(.....................................) Tj
+-31.7484 -1.1848 TD
+[ (Title of the contrib) -39 (ution:.....................................................................................................) TJ
+35.1478 0 TD
+(.......................) Tj
+-35.1478 -1.1848 TD
+(...............................................................................................................................) Tj
+31.7484 0 TD
+(.....................................) Tj
+-31.7484 -1.1848 TD
+(Name and address of corresponding author \(please print\): ......................................................................) Tj
+T*
+(...............................................................................................................................) Tj
+31.7484 0 TD
+(.....................................) Tj
+-31.7484 -1.1848 TD
+(...............................................................................................................................) Tj
+31.7484 0 TD
+(.....................................) Tj
+-31.7484 -2.3696 TD
+(It is herein agreed that:) Tj
+T*
+0.002 Tc
+0.02 Tw
+[ (The ) 11 (copyright ) 11 (to ) 11 (the ) 11 (contribution ) 11 (identified above is transferred to Springer-Verlag Berlin Heidelberg) TJ
+0 -1.1848 TD
+[ (N) 7 (e) 0 (w) 7 ( Y) 7 (o) 2 (rk \(for U) 7 (.) 2 (S. government employees: to the ) -11 (extent ) -11 (transferable\). ) -11 (The ) -11 (copyright ) -11 (transfer ) -11 (covers) TJ
+T*
+0.074 Tw
+[ (the ) 11 (exclusive ) 11 (right ) 11 (to reproduce and distribute the contribution, including reprints, translations, pho-) TJ
+T*
+0.107 Tw
+[ (tographic reproductions, microform, electronic form \(offline, online\), or any other ) -11 (reproductions ) -11 (of) TJ
+T*
+0 Tc
+0 Tw
+(similar nature.) Tj
+0 -2.3696 TD
+0.002 Tc
+0.052 Tw
+[ (The ) 11 (Author ) 11 (may ) 11 (publish his/her contribution on his/her personal Web page provided that he/she cre-) TJ
+0 -1.1848 TD
+0.107 Tw
+[ (ates a link to the above mentioned volume of LNCS at the Springer-Verlag ) -11 (server ) -11 (or ) -11 (to ) -11 (the ) -11 (LNCS) TJ
+T*
+0.205 Tw
+[ (series Homepage \(URL: http://www.springer.de/comp/lncs/index.html\) and ) -10 (that ) -10 (together ) -10 (with ) -10 (this) TJ
+T*
+-0.002 Tw
+(electronic version it is clearly pointed out, by prominently adding ) Tj
+/Times-Roman findfont [/grave
+/acute
+/circumflex
+/tilde
+/macron
+/breve
+/dotaccent
+/dieresis
+/ring
+/cedilla
+/hungarumlaut
+/ogonek
+/caron
+/dotlessi
+/fi
+/fl
+/Lslash
+/lslash
+/Zcaron
+/zcaron
+/minus
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/space
+/exclam
+/quotedbl
+/numbersign
+/dollar
+/percent
+/ampersand
+/quotesingle
+/parenleft
+/parenright
+/asterisk
+/plus
+/comma
+/hyphen
+/period
+/slash
+/zero
+/one
+/two
+/three
+/four
+/five
+/six
+/seven
+/eight
+/nine
+/colon
+/semicolon
+/less
+/equal
+/greater
+/question
+/at
+/A
+/B
+/C
+/D
+/E
+/F
+/G
+/H
+/I
+/J
+/K
+/L
+/M
+/N
+/O
+/P
+/Q
+/R
+/S
+/T
+/U
+/V
+/W
+/X
+/Y
+/Z
+/bracketleft
+/backslash
+/bracketright
+/asciicircum
+/underscore
+/grave
+/a
+/b
+/c
+/d
+/e
+/f
+/g
+/h
+/i
+/j
+/k
+/l
+/m
+/n
+/o
+/p
+/q
+/r
+/s
+/t
+/u
+/v
+/w
+/x
+/y
+/z
+/braceleft
+/bar
+/braceright
+/asciitilde
+/.notdef
+/.notdef
+/.notdef
+/quotesinglbase
+/florin
+/quotedblbase
+/ellipsis
+/dagger
+/daggerdbl
+/circumflex
+/perthousand
+/Scaron
+/guilsinglleft
+/OE
+/.notdef
+/.notdef
+/.notdef
+/.notdef
+/quoteleft
+/quoteright
+/quotedblleft
+/quotedblright
+/bullet
+/endash
+/emdash
+/tilde
+/trademark
+/scaron
+/guilsinglright
+/oe
+/.notdef
+/.notdef
+/Ydieresis
+/.notdef
+/exclamdown
+/cent
+/sterling
+/currency
+/yen
+/brokenbar
+/section
+/dieresis
+/copyright
+/ordfeminine
+/guillemotleft
+/logicalnot
+/hyphen
+/registered
+/macron
+/degree
+/plusminus
+/twosuperior
+/threesuperior
+/acute
+/mu
+/paragraph
+/periodcentered
+/cedilla
+/onesuperior
+/ordmasculine
+/guillemotright
+/onequarter
+/onehalf
+/threequarters
+/questiondown
+/Agrave
+/Aacute
+/Acircumflex
+/Atilde
+/Adieresis
+/Aring
+/AE
+/Ccedilla
+/Egrave
+/Eacute
+/Ecircumflex
+/Edieresis
+/Igrave
+/Iacute
+/Icircumflex
+/Idieresis
+/Eth
+/Ntilde
+/Ograve
+/Oacute
+/Ocircumflex
+/Otilde
+/Odieresis
+/multiply
+/Oslash
+/Ugrave
+/Uacute
+/Ucircumflex
+/Udieresis
+/Yacute
+/Thorn
+/germandbls
+/agrave
+/aacute
+/acircumflex
+/atilde
+/adieresis
+/aring
+/ae
+/ccedilla
+/egrave
+/eacute
+/ecircumflex
+/edieresis
+/igrave
+/iacute
+/icircumflex
+/idieresis
+/eth
+/ntilde
+/ograve
+/oacute
+/ocircumflex
+/otilde
+/odieresis
+/divide
+/oslash
+/ugrave
+/uacute
+/ucircumflex
+/udieresis
+/yacute
+/thorn
+/ydieresis] null .updatefont { /_ exch definefont } if
+ userdict /_51 2 index put 1 Tf
+26.5978 0 TD
+0.009 Tw
+[ (\223\251 Springer-Verlag\224, that the copy-) TJ
+-26.5978 -1.1848 TD
+0.052 Tw
+[ (right for this contribution is held by Springer. From the Publisher\222s point of view, it ) -11 (would ) -11 (be ) -11 (desir-) TJ
+T*
+0.031 Tw
+[ (able that the full-text version be made available from the Author\222s Web page only after a delay of ) -10 (12) TJ
+T*
+0 Tc
+0 Tw
+[ (months following the publication of the book, whereas such a delay is not required for the a) -128 (bstract.) TJ
+0 -2.3696 TD
+0.002 Tc
+0.063 Tw
+[ (The A) 7 (u) 2 (thor may not publish his/her contribution anyw) 7 (here else w) 7 (ithout the prior w) 7 (r) -2 (itten ) -11 (permission) TJ
+0 -1.1848 TD
+0 Tc
+0 Tw
+[ (of the publisher unless it has been changed substa) -72 (ntially.) TJ
+0 -2.3696 TD
+0.002 Tc
+0.074 Tw
+[ (The Author warrants that his/her contribution is original, except ) -11 (for ) -11 (such ) -11 (excerpts ) -11 (from ) -11 (copyrighted) TJ
+0 -1.1848 TD
+0.031 Tw
+[ (works as may be included with the permission of the copyright holder and author thereof, that it con-) TJ
+T*
+-0.002 Tw
+(tains no libelous statements, and does not infringe on any copyright, trademark, patent, statutory right,) Tj
+T*
+0 Tc
+0 Tw
+(or propriety right of others.) Tj
+0 -2.3696 TD
+0.002 Tc
+0.009 Tw
+[ (The A) 7 (u) 2 (thor signs for and accepts responsibility for releasing this material on behalf of ) -11 (any ) -11 (and ) -11 (all ) -11 (co-) TJ
+0 -1.1848 TD
+0 Tc
+(authors.) Tj
+0 -2.3696 TD
+0 Tw
+(In return for these rights:) Tj
+T*
+0.002 Tc
+0.052 Tw
+[ (The ) 11 (Publisher ) 11 (agrees ) 11 (to ) 11 (publish ) 11 (the ) 11 (identified ) 11 (contribution at his ow) 7 (n cost and expense. The A) 7 (u) 2 (thors) TJ
+0 -1.1848 TD
+0.041 Tw
+[ (are entitled to purchase for their personal use books published by Springer-V) 7 (erlag ) -11 (w) 7 (ith ) -11 (a ) -11 (discount ) -11 (of) TJ
+T*
+0 Tc
+0 Tw
+(33 1/3% off the list price. Resale of such copies is not permitted.) Tj
+0 -2.3696 TD
+0.002 Tc
+0.041 Tw
+[ (The ) 10 (undersigned ) 10 (hereby ) 10 (gives permission to Springer-Verlag to publish the above contribution to the) TJ
+0 -1.1848 TD
+0 Tc
+0 Tw
+(above book.) Tj
+0 -2.3696 TD
+[ (Author's Signature:) -14683 (Date:) TJ
+T*
+(...............................................................................................................................) Tj
+31.7484 0 TD
+(.....................................) Tj
+%!FontType1-1.0: CFLLJE+SpringerLogo 1
+13 dict begin
+/FontName /CFLLJE+SpringerLogo def 
+/FontType 1 def
+/FontBBox {-2 -518 1802 1152} readonly def
+/FontMatrix [0.001 0 0 0.001 0 0] readonly def
+/PaintType 0 def
+/FontInfo 12 dict dup begin
+/version (1.000) readonly def
+/Notice (MetaDesign Berlin, Lucas de Groot, 1994) readonly def
+/FullName (SpringerLogo) readonly def
+/FamilyName (SpringerLogo) readonly def
+/ItalicAngle 0 def
+/isFixedPitch false def
+/UnderlinePosition -133 def
+/UnderlineThickness 20 def
+/Weight (Normal) def
+/BaseFontName (SpringerLogo) def
+end def
+/Encoding StandardEncoding def
+currentdict end
+currentfile eexec
+c4323bec4ec912aba419b4a1f01cbad76d5a04ed7fe4633fed4311
+03738c9e555d21ea8628f2ad0b8761250e6f86aaf5a79b18a3a6faf7f405a7a1
+294dde948bdfef4bc6707364dfc48925fc6cb2f3d01115708b2190f09e707cc9
+f4c6ee2cb85854ddf11468d694942de120db9e134af10ed36b86a652c9645183
+091b999c64497cf319299c56a87a0c016e8cb1cb7e1f1dc960ed71f48e0d6e13
+ffdef8cee8b0a59e7825635fc3a8c4edcf5cc4e8498d2513b45a7b35bba5ec90
+77fbe39be09b374d166111a41a497492cf7d9716341f9afa0f9af3d00daccd03
+2a3908eaeea84b2a27b89d66ea95999247fd3dd9a724731ad03b0d6916a9ccc4
+0b3622d559522820cd20263fdf8fdca2229908985dd3c04e974f2a0aeaf3b090
+9c7070919ef05a5ba7bad6e676cdf4b9e4512f63243323f3324c72c48a3074fa
+11e4c8396e2771231170f05a6a84cdc41b6b83ab98d12b82216ba303dc608bae
+c57ec0d155dd2b51bf5c7aca71ba8f11bc7a93b67b600816a848e788784f16c7
+12129cc4c444450e1e7c5a2f4c5ec86e0330375f2bd08be633aa7ad42a9b56c2
+0274220516557513290ae75996e4440be5d4a069c20b0c1c01d907ba4774a203
+9aceec0c86cfa2e2d4d1e7f5fdca4ebad5d47c98a9cfae5b45e9fc475c5185d7b002db51b991870cdb43f59de0932901987c85f21c2292e82a77ae
+7874bd5c2a1be93da77db38370aab831f5c45cda2e0c27c30dfbac792262a4d2
+f0212f22d0bf8728e0b3cfac13492df744e197522e88c941526c7811b7a833a6
+0fede73c4812c7c2e6a51b72b5278cf91461d2148f23141237dd2cf0b50f183e
+4f4b484ad47605d40d07676331147cb783f12cd54f2e522685dfd13a979a6eb1
+ff404f34fbfa41f6b21346af2fef9e8d5d677701882f91d1e51bcde1d6295600
+148adb54376bc35d43f5dc4cf60cfc397fa2e033880be17126ae3609b59ae17f
+9916ef06f4aec5966a43f8bce25722ce5aacc36fe9cc881da7e2a4a356f125a1
+4c00e38f8dba5c7bfbb411cc57607f420b12f2fe464006aca018ee91e476fc09
+b0239084f1ec1b6b776616864d8383fa105db89ae23edf3291e1860032d8ac71
+9123ca9ce785ceda84da4cdc110e04883dc51e6401085b031c49b01133d7a2d8
+7291e573cb06421363196344cab48160403e0599c84e5f26a2a3f030683f8b08
+2850bb331a30dca8146b6243467a8360fa6e5cd36b8c1347f9c4acaa42a89309
+514cca820afeba0586e11c375c3b405a000cf265261b866742a4712496f0f02a
+09ddb021d30b26a81a588aa6713f96aeaec33638fdda8e7a88c26101e1c09b3606df3589169415684eef3e0e2b49561c250e76824156a80119b7e3
+3c1b14c0ed08565ee40422a0b008d790c11b238b68939bd8963cdf2626beb85c
+c2cf1cc8c481644fce2cc4d2a9d5c3e1013e85020d2f745571418253fd1b6c9b
+6df6ce2d9f48ed49eafb7793050ea1f52a61507493b1ed56a9079bd08ecb014e
+9bde93d54014d65a904413ba7556fe1e9009e5d30f5ff07dae7190194151031b
+2586ae83ca7fbda4813ff04aa2ee883e9b7db3396028c0e133bf8d4a4625d603
+6a127c23478928d41283d8ddd0c29e3351b2f11e61c4f2d1f850a1188ad4d8f0
+6edbab16b9f0ff757517e86be374e07cf22ff709d392752eb77bf2283bda0d3a
+333130949e61c7c6b9bdbc08c21c7f9c43b205b22c968876ede10711703a8260
+4eab879eac139e62cdadb381e1bdfa508e331d86c24d28e09192bdb1cdae7016
+236fe3de8177e5abf7ec189783cd1970fc77027741966c796600e510fc6894f6
+b17a2f0eee1e8290113cb03bf1d67c106992fb5909a447801e92b808071223a9
+5e50d37b41ac90f7577155e11d2ce14f2bb020534921cb792052ea640aa0aa11
+10ad3df30bd42672ec2696c7f11ba21c4095f82982815b8f4720cd539f39b5ab
+02a174333fe22e84c2a65737999ab09244538fe07fd7c1620e45185590be35bedb8f3fdf07d616c2eab3bf36836afc6d7aa77c6759fe444bfaf836
+04a8f7b2b562e5fa793085dd23fa957fe45a0e9ab8dd90f795cf33ef7bac10aa
+8197bc5e15d7ef97acc3257625648463170556da8f673d88a2ad4ee698e1a222
+00fb70f81fcc96df73f2b48fcda1b8456a2e66fd961fdf07afc70e134551eef0
+0edca40fc6e62244caf2515caecf021dbd4eaa3561533655ab419e955597a3c8
+354b9562244fcb2fede877a5657801486fcfff6056fdf4469a84a4effbb42a4d
+7346159f419f0765640d23cd60fbdd53546c9eb687cc2bc640ec0c67bfcff512
+16828ce170ac82d24769757ea7cba71b08bf6f02372e9b556054197d1573a32a
+192f4b677adae53a580b2abffe4d8276cb9b996524de7e232e89d77e46d858fa
+e6445ebc23b2653eb7c92183d97900d7caefa729c7c43571b7167adb43dd2542
+1a0d1685d18b7edad5c9805aeadd4ed38db1649c8181992c6d4c31663bc2694b
+1c3c181f108a67ddb6ba6c3e9252d04034ea7c9bf71a8156cd70a904ea8a7351
+c2d8780a34b0a03d467b1524c9e90764932074c42f09fc680cf5828153d124c5
+f80378670536971bedaf2bbc59b7255e0aa6b12bb9881debbcab4b35bf724733
+dad4eeb7ff6ced48a1dc0a74f817e791f18796754232929260451633ec7bbdc12b9668d3332fef7150cf475e4b0fe97fa90ec8ecedfb76ee41cec0
+6c778b4d24f9b2a4c64d4524ec42897358457ee3244573f868b8564635e9b672
+4233fed606d28f47f0b0be28c154d0318aa51197e7260a58a79a659b38e01c1c
+b31351eb95839f9dc85db79ab443b97b2d8dc4b23d47c352b3c424b4ab22e29a
+0a4384c48ab963b81524f0ca265d3a3ba757b9562f97e794bbe68c4a49495779
+77f23f7a681a880548eac8f4edc751a45510334aa515f73f2212ae9c774935b5
+3b2eef641d9e0192ce646112729bfb94b6163466e605bec73779e44997207e7d
+c353cfe1cdc73991b183590420361c8bd72c3f9f6c9b0781096d9b678f3441b2
+51a63bdf49067693e2c0aeba4d18ae1cd012e8d61da9efcdb0881b47c304b907
+b13e86c8c53acef5404c20c2dbe6e1581ccce631886b9b847ce4947cd34aa613
+0cffa171af2179cceb1ddd9da1ed9c48fb78a5c7c3b1f7f4fb8002c0e09876e9
+f13383e15caa0fcf67bb7b16245dea2beccca9fdb12375ebf30a90c47688da7d
+25d9573c41a8ffe9a091b7657dc23efaa3a05e081a91b68323ec4a30eca2a45f
+d2318cfe181513f4e69595d66603633c9ba280fe9c1f321d930814a62fcbe7b2
+bd059b72b3b971d01ad91f8a89a804e75961f89fba4d6e830b0ceca270275927a1a649e3e9f8c96a3e26fc831ade73b966435c9ce5c8b8537fcc23
+e8b493399ed9012664f424e7252c438d758b9ec5bbf4a23bb831d392ce4d9729
+e7c5600fbd9c28177f5c98ff2a49bbe8e14f9dd4fa0429d9236c46417215b2f5
+46e73aa0c2ea535a848129f42b71f45ba1784e152f923bede69291257608953f
+6d97026dac41130ec25000b053661567d06fd88d5bfe0034ee12da27224eb123
+65126eb2fa70fe118bafc7b3ea3571892b5d70dd2ee383d626e3e84c1a919d2d
+0f63d4653df487b12a9098f1e734e07d3595978f647413a8a3292a86be9fec21
+ee4c06f9314470ee14fb5e23d0199ac070bb8ad8be7575cc67873b9e3b229b8b
+38325bd4a89bd1d4d402c1259157b8785fea9dc4b8e4e6224979f3b5628b2297
+b906e3099f652b3f8624c3c312fb335901efd3fbf6749c594d0514068e55189c
+f21fa50c7e459b2a8fe5243ccebff45571815757f0921ba0e9e533bdf01e7c4c
+ae8c5ba4668af6d79ec5b28706aa9d880a3adab29eea9c655bc801368b13660b
+def6a07bf14e0b32e4f3e9c93d6be35f595dc426618b70a74cf386a425ca7713
+ca31847c94e3a569c788b18549f0d38984626ec35262e0f77c0a73323f020515
+9fb141d88ff9fd8633ab203ee537da1b743dbeb72f72d7e602ce800c2d1a5cb2603ff7fad51066cf22593811b60f14f9a224287fcbc07f6ab44995
+17143eeb387bd61812e2fe5aa36fc465abf063f6c0e6e4d40855266ea659c5c2
+b821e7ffc06b18ef47b5d24690703cbd73b88fd6422fbdbc2237af44fd568604
+5da18f30155ef960b205518328ceb2aa9ff2c90844bd5fcf22430a3bcb159833
+c0f69bca1aa7f8085ec3087834f64cbe8b14f2ecb63c8da2a7d40d4e45614a6e
+705f857e78f38e8fc035181a5445f7f9cc77a0f25033f219ed76f0d2f3a85529
+ce28a46c501817be14186ef928ba74b785afceeef919ace4ccb33ae5de12f572
+b4cd190ddd601b0e7a5d44a39774e48524b64f594dd54bd6d062ef63aef464f3
+7f893ef14ebc3a31cbc0d4940219f65841bd87155d163fa8ae77077c09ad10f9
+795ed020ded3e4a725fa8c61c441ee190bd6a63b8d102603e544d24599a7a50f
+bd1a0db120b044a82fef3fe29dc6b99032e3286dbcd3fcc3d1dfd78aad512306
+560b072753b24ec4ecd50df38a5b2ffea7e3844762397cebf6d4ad4288446d81
+569cdb396f6b9b0612fa936fa90dfd5fc072ff2db80d01328d0b9fd1480875b3
+f087710753cab5b09b4df3affa4b6c3e380fba66478c419d80bdf38fd361fddf
+28740f5c9fa7dfa9cd79d4da1283e0189ef80229686be3a49c13be788c5a6813139582a28a17ddda668915a983d47afc58e3188b661a970087a8
+3d3b24505b59ad4767b6bd95d36a6d8bb7b850b111356085d170694477aa33470000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+cleartomark
+/CFLLJE+SpringerLogo findfont StandardEncoding mark /fi 0
+/perthousand 0
+/macron 0
+/breve 0
+/dotaccent 0
+/dieresis 0
+/ring 0
+/cedilla 0
+/hungarumlaut 0
+/ogonek 0
+/caron 0
+/emdash 0
+/AE 0
+/ordfeminine 0
+/Lslash 0
+/Oslash 0
+/OE 0
+/ordmasculine 0
+/ae 0
+/dotlessi 0
+/lslash 0
+/oslash 0
+/germandbls 0
+/oe 0
+/ampersand 0
+/three 1802
+/at 0
+/L 0
+/Y 0
+/f 0
+/s 0
+/sterling 0
+/endash 0
+/grave 0
+/parenleft 0
+/five 0
+/A 0
+/N 0
+/backslash 0
+/h 0
+/u 0
+/yen 0
+/daggerdbl 0
+/circumflex 0
+/asterisk 0
+/seven 0
+/C 0
+/P 0
+/asciicircum 0
+/j 0
+/w 0
+/section 0
+/paragraph 0
+/.notdef 280
+/comma 0
+/nine 0
+/E 0
+/R 0
+/quoteleft 0
+/l 0
+/y 0
+/quotesingle 0
+/quotesinglbase 0
+/exclam 0
+/period 0
+/semicolon 0
+/G 0
+/T 0
+/a 0
+/n 0
+/bar 0
+/guillemotleft 0
+/quotedblright 0
+/numbersign 0
+/zero 850
+/equal 0
+/I 0
+/V 0
+/c 0
+/p 0
+/asciitilde 0
+/guilsinglright 0
+/ellipsis 0
+/percent 0
+/two 283
+/question 0
+/K 0
+/X 0
+/e 0
+/r 0
+/cent 0
+/fl 0
+/questiondown 0
+/quoteright 0
+/four 0
+/bracketleft 0
+/M 0
+/Z 0
+/g 0
+/t 0
+/fraction 0
+/dagger 0
+/acute 0
+/parenright 0
+/six 0
+/B 0
+/O 0
+/bracketright 0
+/i 0
+/v 0
+/florin 0
+/periodcentered 0
+/tilde 0
+/plus 0
+/eight 0
+/D 0
+/Q 0
+/underscore 0
+/k 0
+/x 0
+/currency 0
+/bullet 0
+/space 283
+/hyphen 0
+/colon 0
+/F 0
+/S 0
+/braceleft 0
+/m 0
+/z 0
+/quotedblleft 0
+/quotedblbase 0
+/quotedbl 0
+/slash 0
+/less 0
+/H 0
+/U 0
+/b 0
+/o 0
+/braceright 0
+/guilsinglleft 0
+/guillemotright 0
+/dollar 0
+/one 850
+/greater 0
+/J 0
+/W 0
+/d 0
+/q 0
+/exclamdown 0
+.dicttomark userdict /_52 2 index put .updatefont { /_ exch definefont } if
+ userdict /_53 2 index put 1 Tf
+48 0 0 48 489.81 751.47 Tm
+(1) Tj
+ET
+endpage
+end
+%%Trailer
+%%Pages: 1

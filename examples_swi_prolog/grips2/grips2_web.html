@@ -1,0 +1,661 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"> 
+ 
+<title>GRIPS: a Preprocessor for
+Functional Notation in Prolog</title> 
+</head><body>
+
+[ <a href="http://www.j-paine.org/index.html">Jocelyn Paine's Home
+Page</a>
+| <a href="http://www.j-paine.org/publications.html">Publications</a>
+| <a href="http://www.j-paine.org/dobbs/index.html">Dobbs Code Talk
+Index</a>
+| <a href="http://www.drdobbs.com/blog/archives/2010/02/grips_a_preproc.html">Dobbs 
+Blog Version</a> ]
+
+
+<h1>GRIPS: a Preprocessor for
+Functional Notation in Prolog</h1>
+
+<p>
+Although Prolog can be remarkably concise,
+it's far from ideal when we want to compose function calls.
+Even an expression as simple as "length of list A appended to
+list B" must be unwrapped into "append A to B giving C,
+then return the length of C". I'll explain how I
+overcame this by writing a <a href="http://www.j-paine.org/dobbs/grips2.zip">preprocessor that
+translates functional notation into Prolog</a>. It lets me define
+predicates as if defining functions, and write nested
+function calls without having to do what Fortran
+implementors had taught their
+compilers to do in the 1950s. The version described
+here works with <a href="http://www.swi-prolog.org/">SWI-Prolog</a>.
+</p>
+
+
+<h2>Contents</h2>
+
+<p>
+</p><ul>
+<li><a href="#the_problem">Introduction: the problem with 
+Prolog</a></li>
+<li><a href="#translating_function_calls">Translating function
+calls</a></li>
+    <ul>
+    <li><a href="#conjoining_goals">Conjoining goals</a></li>
+    </ul>
+<li><a href="#using_goal_expansion">Using
+<code>goal_expansion</code></a></li>
+<li><a href="#translating_function_definitions">Translating
+function
+definitions</a></li>
+<li><a href="#using_term_expansion">Using
+<code>term_expansion</code></a></li>
+<li><a href="#extensions">Extending Grips</a></li>
+<li><a href="#semantics">What's the semantics?</a></li>
+<li><a href="#applications">Applications</a></li>
+</ul>
+<p></p>
+
+
+<h2><a name="the_problem">Introduction: the problem with 
+Prolog</a></h2>
+
+<p>
+Let us suppose that Prolog's designers had never invented
+the arithmetic operator <code>is</code>. Assume instead that they
+gave us predicates
+such as
+<code>plus</code> and <code>mult</code>,
+each
+performing arithmetic operation on its first
+two arguments
+and returning the result in the third. Then instead of
+writing
+</p><pre>  X is A*B + A*C.
+</pre>
+we would have to unwrap the expression so it becomes
+<pre>  mult( A, B, V1 ),
+  mult( A, C, V2 ),
+  plus( V1, V2, X ).
+</pre>
+<p></p>
+
+<p>
+Fortunately, we do have <code>is</code>, which
+spares us
+this inconvenience when doing arithmetic. But when
+we want to manipulate sets, vectors, complex numbers, lists
+&#8212;
+indeed, any time we just want to nest
+function
+calls
+&#8212;
+we are still forced to do this unwrapping.
+</p>
+
+<p>
+So I have written a <a href="http://www.j-paine.org/dobbs/grips2.zip">preprocessor named 
+"Grips"</a> that
+does it for me. One of its benefits
+is that I can pass arithmetic expressions as arguments to goals,
+avoiding the eternal <code>NextLength is Length + 1</code>'s and
+<code>NextCounter is Counter-1</code>'s that disfigure so many
+programs. As an example, instead of defining "factorial" as
+</p><pre>  fac( 0, 1 ).
+
+  fac( N, F ) :-
+    Nd is N-1,
+    fac( Nd, Fd ),
+    F is Fd * N.
+</pre>
+I can code its second clause as
+<pre>  fac( N, F ) :-
+    fac( grips N-1, Fd ),
+    F is Fd * N.
+</pre>
+<p></p>
+
+<p>
+<a name="grips"></a>
+Here, <code>grips</code> is my <b>evaluation operator</b>.
+It tells the translator to generate a goal that evaluates
+<code>N-1</code>, and prepend it to the call of <code>fac</code>.
+</p>
+
+<p>
+Indeed, I can move the evaluation operator
+further out and define:
+</p><pre>  fac( N, F ) :-
+    F is N * grips( fac( N-1 ) ).
+</pre>
+Grips knows about
+<code>is</code>, so it
+will correctly translate this mixture
+of arithmetic operators and ordinary predicates.
+<p></p>
+
+<p>
+I can also write <code>fac</code>
+as a function, promoting functional
+evaluation to cover all of the body, as it were.
+Here is <code>fac</code> defined in this way:
+</p><pre>  fac( 0 ) &lt;- 1.
+
+  fac( N ) &lt;-
+    N * fac( N-1 ).
+</pre>
+<p></p>
+
+<p>
+In the rest of the essay, I'll explain
+how I implemented Grips for
+<a href="http://www.swi-prolog.org/">SWI-Prolog</a>.
+Some of the techniques
+may be useful if you want to write other
+preprocessors.
+</p>
+
+
+<h2><a name="translating_function_calls">Translating function
+calls</a></h2>
+
+<p>
+The idea is to translate each expression into a pair
+consisting
+of a goal and a "result". The result will be the original
+expression
+if that needs no evaluation. Otherwise it will be a variable which 
+the
+goal will
+bind to the result of evaluation. For example:
+<table border="1">
+  <tbody><tr>
+<td width="33%">Expression</td>
+<td width="33%">Goal</td>
+<td width="33%">Result</td>
+  </tr>
+  <tr>
+<td><code>1</code></td>
+<td>none</td>
+<td><code>1</code></td>
+  </tr>
+  <tr>
+<td><code>f(1)</code></td>
+<td><code>f(1,R)</code></td>
+<td><code>R</code></td>
+  </tr>
+  <tr>
+<td><code>f(g(1),h(2))</code></td>
+<td><code>g(1,V1),h(2,V2),f(V1,V2,R)</code></td>
+<td><code>R</code></td>
+  </tr>
+</tbody></table>
+</p>
+
+<p>
+I do this as follows. If the expression is a number,
+return it as the result. The goal doesn't need to do
+anything, so
+make it <code>true</code>.
+</p>
+
+<p>
+Otherwise, assume the
+expression
+is a function call. Split this into the function, <code>F</code>, and
+its
+arguments. Translate the arguments into a goal <code>ArgsGoal</code> 
+which
+evaluates
+them, together with a variable to hold the result of
+evaluation. Then conjoin to <code>ArgsGoal</code> another goal
+<code>FGoal</code>, formed by calling <code>F</code> on a
+list
+of the evaluated arguments to which a result variable
+is appended.
+</p>
+
+<p>
+Here are some examples. To translate
+<code>plus(1,2)</code>, no
+code is needed to evaluate the arguments, so <code>ArgsGoal</code>
+becomes
+<code>true</code>. The goal <code>FGoal</code> is the function 
+<code>F</code> &#8212;
+that is,
+<code>plus</code>
+&#8212; called on the evaluated arguments with a result variable
+appended.
+In this case, the evaluated arguments are the same as the
+originals,
+so <code>FGoal</code> becomes <code>plus(1,2,R)</code>, where 
+<code>R</code>
+is
+the result variable.
+</p>
+
+<p>
+For the more complicated expression <code>plus( mult(1,2), 3 
+)</code>,
+<code>ArgsGoal</code> becomes
+<code>mult(1,2,R1)</code>.
+The evaluated arguments becone <code>[ R1, 3 ]</code>,
+where
+the first one is replaced by the variable holding the result
+of
+evaluating it. The goal <code>FGoal</code> becomes <code>plus( R1, 3 
+)</code>. And
+finally, the goal for evaluating the entire expression becomes 
+<code>ArgsGoal</code>
+conjoined
+with <code>FGoal</code>, or
+</p><pre>  mult( 1, 2, R1 ), plus( R1, 3, R )
+</pre>
+<p></p>
+
+<p>
+Here is the translation code. The predicate
+<code>trans_expr</code>
+translates the expression in its first argument into a
+result in
+its second and a goal in its third. It calls
+<code>trans_arglist</code>
+to translate function arguments:
+</p><pre>  trans_expr( Expr, Expr, true ) :-
+    number( Expr ), !.
+
+  trans_expr( Expr, Expr, true ) :-
+    var( Expr ), !.
+
+  trans_expr( Expr, ResultVar, Goal ) :-
+    Expr =.. [ F | Args ],
+    trans_arglist( Args, ArgResults, ArgGoals ),
+    append( ArgResults, [ResultVar], ArgsAndResultVar ),
+    FGoal =.. [ F | ArgsAndResultVar ],
+    Goal = ( ArgGoals , FGoal ).
+
+
+  trans_arglist( [ Arg1 | Args ], [ Result1 | Results ], Goal ) :-
+    trans_arglist( Args, Results, Goals ),
+    trans_expr( Arg1, Result1, Goal1 ),
+    Goal = ( Goal1 , Goals ).
+
+  trans_arglist( [], [], true ).
+</pre>
+<p></p>
+
+<p>
+I have added a clause that checks for expressions
+that
+are variables. These shouldn't occur
+as the argument to
+<code>grips</code>,
+but will turn up when Grips translates definitions, which
+could contain variables (possibly from their head) in the
+tail
+expression, in the way that the second clause for
+<code>factorial</code>
+above did:
+</p><pre>  fac( N ) &lt;-
+    N * fac( N-1 ).
+</pre>
+<p></p>
+
+
+<h3><a name="conjoining_goals">Conjoining goals</a></h3>
+
+<p>
+If you try this code, you will find the generated goals
+contain
+a good deal of unnecessary <code>true</code>s. By
+writing a goal-conjoining predicate, I
+made Grips remove these:
+</p><pre>  conjoin( true, G, G ) :- !.
+  conjoin( G, true, G ) :- !.
+  conjoin( G1, G2, (G1,G2) ).
+</pre>
+This is a good utility to have whenever we write programs that
+code-generate
+Prolog.
+<p></p>
+
+
+<h2><a name="using_goal_expansion">Using
+<code>goal_expansion</code></a></h2>
+
+<p>
+SWI-Prolog
+contains several <b>preprocessor hooks</b>: predicates that
+you can
+define in order to make the compiler
+preprocess various syntactic entities in your
+code.
+These are not in
+the
+ISO Prolog standard, but several other implementations, such
+as
+<a href="http://www.sics.se/isl/sicstuswww/site/index.html">SICStus</a>,
+also provide them. If your Prolog doesn't, you will have to
+find
+another way to hook your preprocessor into it. The easiest
+is to
+write your own version of <code>consult</code>.
+</p>
+
+<p>
+I use the <a href="http://www.swi-prolog.org/pldoc/man?predicate=goal_expansion%2F2"><code>goal_expansion</code></a>
+hook to add the
+<code>grips</code>
+macro mentioned <a href="#grips">earlier</a>. As it reads a
+file,
+SWI-Prolog hands each goal <code>G</code> appearing in the body of a
+clause to
+<code>goal_expansion</code>, passing it as the first
+argument. If
+the call succeeds, <code>G</code> gets replaced by
+<code>goal_expansion</code>'s
+second argument, assumed to be its translation.
+</p>
+
+<p>
+This is how I make <code>goal_expansion</code> act.
+First, I write a predicate to translate goals whose
+arguments
+could contain a <code>grips</code>:
+</p><pre>  trans_goal( G, GTranslated ) :-
+    G =.. [ F | Args ],
+    trans_goal_args( Args, ArgResults, ArgGoals ),
+    FGoal =.. [ F | ArgResults ],
+    GTranslated = ( ArgGoals , FGoal ).
+
+
+  trans_goal_args( [], [], true ) :- !.
+
+  trans_goal_args( [Arg1|Args], [Result1|Results], Goal ) :-
+    trans_goal_arg( Arg1, Result1, Goal1 ),
+    trans_goal_args( Args, Results, Goals ),
+    Goal = ( Goal1 , Goals ).
+
+
+  trans_goal_arg( Arg, Result, Goal ) :-
+    nonvar( Arg ),
+    Arg =.. [ grips , E ], !,
+    trans_expr( E, Result, Goal ).
+
+  trans_goal_arg( Arg, Arg, true ).
+</pre>
+This predicate, <code>trans_goal</code>, runs over the
+arguments of
+a goal <code>G</code>. If any argument is a term 
+<code>grips(E)</code>,
+<code>trans_goal</code>
+calls <code>trans_expr</code> on the expression <code>E</code>. It 
+collects
+the
+goals for evaluating the arguments and prepends them to 
+<code>G</code>.
+Thus, the
+goal
+<pre>  write( grips( plus(1,2) ) )
+</pre>
+gets transformed into
+<pre>  plus( 1, 2, R ), write( R ).
+</pre>
+<p></p>
+
+<p>
+Notice that the first clause to
+<code>trans_goal_arg</code> needs
+to test whether it is dealing with a <code>grips(E)</code>.
+<a name="trans_goal"></a>
+I took care not to write the <code>grips(E)</code>
+explicitly, instead
+calling <code>=..</code> to test for it. If I hadn't,
+then if I already had the preprocessor installed (which I
+might
+if repeatedly editing, cnsulting, and testing it), it would
+try
+expanding this particular <code>grips(E)</code>, with
+amusing but non-terminating results.
+</p>
+
+<p>
+Now I can connect <code>trans_goal</code>
+to <code>goal_expansion</code>, by writing
+a clause for the latter.
+I make this clause test whether the goal actually
+needs translating
+&#8212; whether it does contain a <code>grips</code> &#8212; and fail 
+if
+not.
+This is good practice, because some Prologs might call
+<code>goal_expansion</code>
+over and over again on the same goal if I make it return
+the original
+without any change. Here is the code:
+</p><pre>  needs_translating( G ) :-
+    nonvar( G ),
+    G =.. [ _ | Args ],
+    member( Arg, Args ), nonvar( Arg ), functor( Arg, grips, 1 ), !.
+
+
+  :- multifile user:goal_expansion/2.
+
+
+  :- dynamic user:goal_expansion/2.
+
+
+  user:goal_expansion( G, GTranslated ) :-
+    needs_translating( G ), !,
+    trans_goal( G, GTranslated ).
+</pre>
+As with <code>trans_goal</code>, I've taken care to avoid an
+explicit
+<code>grips(E)</code> in the code.
+<p></p>
+
+<p>
+There could be could be several different
+clauses for
+<code>goal_expansion</code> in force at the same time if you
+or
+someone else have installed other preprocessors. You'll
+need
+to ensure these work correctly together, especially if a
+single
+goal contains constructs from different preprocessors, or
+gets translated
+by one preprocessor into a construct handled by another.
+</p>
+
+
+<h2><a name="translating_function_definitions">Translating
+function
+definitions</a></h2>
+
+<p>
+Translating function definitions is now straightforward.
+To translate
+</p><pre>  double(N) &lt;- plus(N,N).
+</pre>
+I translate <code>plus(N,N)</code>, giving the goal
+<code>plus(N,N,R)</code>.
+I use this as the tail of the new predicate. I then insert
+<code>R</code>
+as the final argument of <code>double(N)</code>. And
+lo and behold:
+<pre>  double( N, R ) :- plus( N, N, R ).
+</pre>
+<p></p>
+
+<p>
+Here is the translation code, in which the main predicate
+is <code>trans_def</code>:
+</p><pre>  :- op( 1200, xfx, user:(&lt;-) ).
+
+
+  trans_def( (Head &lt;- Expr) , (PrologHead:-Tail) ) :-
+    !,
+    trans_expr( Expr, ResultVar, Tail ),
+    trans_head( Head, ResultVar, PrologHead ).
+
+
+  trans_head( Head, ResultVar, PrologHead ) :-
+    Head =.. [ F | Args ],
+    append( Args, [ResultVar], ArgsAndResultVar ),
+    PrologHead =.. [ F | ArgsAndResultVar ].
+</pre>
+<p></p>
+
+
+<h2><a name="using_term_expansion">Using
+<code>term_expansion</code></a></h2>
+
+<p>
+In the same kind of way that I connected
+<code>trans_goal</code> to <code>goal_expansion</code>,
+I can now connect <code>trans_def</code>
+to the <a href="http://www.swi-prolog.org/pldoc/man?predicate=term_expansion%2F2"><code>term_expansion</code></a>
+preprocessor hook.
+This resembles
+<code>goal_expansion</code>, but
+translates complete terms in the source file.
+</p>
+
+<p>
+For Grips, <code>term_expansion</code>
+is simpler
+to use than
+<code>goal_expansion</code>:
+I can test whether a definition needs translating
+just
+by whether it contains a <code>&lt;-</code> connective; I
+don't
+need to decompose definitions in the same way I did with
+goals;
+and I don't need to worry about avoiding explicit calls to
+<code>&lt;-</code>
+in the translator. Here is the code:
+</p><pre>  :- multifile user:term_expansion/2.
+
+
+  :- dynamic user:term_expansion/2.
+
+
+  user:term_expansion( Def, DefTranslated ) :-
+    trans_def( Def, DefTranslated ).
+</pre>
+<p></p>
+
+
+<h2><a name="extensions">Extending Grips</a></h2>
+
+<p>
+For real-world applications, the code
+above will need
+extending. For example, I have made Grips treat the empty-list atom
+<code>[]</code>
+as a constant that stands for
+itself
+in the same way as numbers. Non-empty lists, it
+evaluates element by element.
+</p>
+
+<p>
+One construct that I added is an
+expression-disjunction
+operator named <code>;</code>. The expression
+<code>E1;E2</code>
+evaluates <code>E1</code> and returns its result if it
+succeeds, otherwise returning that of <code>E2</code>.
+</p>
+
+<p>
+Turning to arithmetic, Grips
+translates <code>+</code>, <code>*</code> and other
+arithmetic
+operators into calls to <code>is</code>. I
+find this terribly convenient.
+</p>
+
+
+<h2><a name="semantics">What's the semantics?</a></h2>
+
+<p>
+We do need to take care with the semantics. One question is
+how to
+distinguish between atom constants and functions of no
+arguments.
+For example, how should we invoke <code>read/1</code>
+in
+functional notation?
+We can't write <code>read()</code>, because it's not valid
+syntax.
+But if we make Grips take the atom <code>read</code> to denote
+a call
+to the predicate, how can we write the atom constant
+<code>read</code>?
+</p>
+
+<p>
+On the other hand, if <code>read</code> denotes the atom,
+then we
+need a special notation for the function call. I
+eventually
+decided that an atom on its own should be a call, and that
+to make
+it a literal, I should precede it by a
+backquote operator <code>`</code>.
+In fact, I use <code>`</code> to quote
+any
+term, not just atoms.
+</p>
+
+<p>
+A different question: what about the evaluation operator
+<code>grips</code>?
+Should the
+translator recognise it if it occurs at any level inside a
+goal,
+or only at the top level? That is, should the goal
+</p><pre>  write( pair( grips( plus(1,2) ), 3 ) )
+</pre>
+stay as it is, or evaluate to <code>write( pair( 3, 3 ) )</code>?
+<p></p>
+
+
+<h2><a name="applications">Applications</a></h2>
+
+<p>
+I use Grips more
+than I do Definite
+Clause Grammars. It is just so
+convenient
+when writing complicated expressions. It also saves thinking
+up
+names for result variables, thus mitigating the
+psychological
+disorder known as "naming fatigue" &#8212; a steadily increasing
+inability,
+as the day wears on, to invent meaningful identifiers.
+</p>
+
+<p>
+Functional notation is also wonderful because it makes data
+flow
+explicit. When reading a goal such as
+</p><pre>  bar( C, D, A ), foo( A, B ), fred( B, D )
+</pre>
+one has to examine the predicate definitions and accompanying
+comments
+or mode declarations before being sure of the data flow. But the
+same call in functional notation makes the flow immediately clear:
+<pre>  fred( foo( bar(C,D) ), D )
+</pre>
+So I have used functional notation
+in teaching
+Prolog, to make it easier for novices to read Prolog code.
+<p></p>
+
+</body></html>

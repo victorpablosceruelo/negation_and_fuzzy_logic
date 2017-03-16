@@ -1,0 +1,94 @@
+[Image]           [Translations available: Dutch Portuguese Thai ]
+
+                      Rationale for the Open Source Definition
+
+        The intent of the Open Source Definition is to write down a concrete
+        set of criteria that we believe capture the essence of what the
+        software development community wants ``Open Source'' to mean --
+        criteria that ensure that software distributed under an open-source
+        license will be available for independent peer review and continuous
+        evolutionary improvement and selection, reaching levels of
+        reliability and power no closed product can attain.
+
+        For the evolutionary process to work, we have to counter short-term
+        incentives for people to stop contributing to the software gene
+        pool. This means the license terms must prevent people from locking
+        up software where very few people can see or modify it.
+
+        When software developers distribute their software under OSI
+        approved software licenses, they can apply the "OSI Certified" mark
+        to that software. This certification mark informs users of that
+        software that the license complies with the intent of the Open
+        Source Definition. More information about our certification mark and
+        program is available here.
+
+        1. Free Redistribution (back)
+
+        By constraining the license to require free redistribution, we
+        eliminate the temptation to throw away many long-term gains in order
+        to make a few short-term sales dollars. If we didn't do this, there
+        would be lots of pressure for cooperators to defect.
+
+        2. Source Code (back)
+
+        We require access to un-obfuscated source code because you can't
+        evolve programs without modifying them. Since our purpose is to make
+        evolution easy, we require that modification be made easy.
+
+        3. Derived Works (back)
+
+        The mere ability to read source isn't enough to support independent
+        peer review and rapid evolutionary selection. For rapid evolution to
+        happen, people need to be able to experiment with and redistribute
+        modifications.
+
+        4. Integrity of The Author's Source Code (back)
+
+        Encouraging lots of improvement is a good thing, but users have a
+        right to know who is responsible for the software they are using.
+        Authors and maintainers have reciprocal right to know what they're
+        being asked to support and protect their reputations.
+
+        Accordingly, an open-source license must guarantee that source be
+        readily available, but may require that it be distributed as
+        pristine base sources plus patches. In this way, "unofficial"
+        changes can be made available but readily distinguished from the
+        base source.
+
+        5. No Discrimination Against Persons or Groups. (back)
+
+        In order to get the maximum benefit from the process, the maximum
+        diversity of persons and groups should be equally eligible to
+        contribute to open sources. Therefore we forbid any open-source
+        license from locking anybody out of the process.
+
+        Some countries, including the United States, have export
+        restrictions for certain types of software. An OSD-conformant
+        license may warn licensees of applicable restrictions and remind
+        them that they are obliged to obey the law; however, it may not
+        incorporate such restrictions itself.
+
+        6. No Discrimination Against Fields of Endeavor. (back)
+
+        The major intention of this clause is to prohibit license traps that
+        prevent open source from being used commercially. We want commercial
+        users to join our community, not feel excluded from it.
+
+        7. Distribution of License. (back)
+
+        This clause is intended to forbid closing up software by indirect
+        means such as requiring a non-disclosure agreement.
+
+        8. License Must Not Be Specific to a Product. (back)
+
+        This clause forecloses yet another class of license traps.
+
+        9. License Must Not Contaminate Other Software. (back)
+
+        Distributors of open-source software have the right to make their
+        own choices about their own software.
+
+        Yes, the GPL is conformant with this requirement. GPLed libraries
+        `contaminate' only software to which they will actively be linked at
+        runtime, not software with which they are merely distributed.
+Send questions or suggestions about this page to webmaster@opensource.org

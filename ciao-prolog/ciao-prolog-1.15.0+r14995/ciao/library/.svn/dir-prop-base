@@ -1,0 +1,14 @@
+K 10
+svn:ignore
+V 62
+all_modules
+all_module_messages.tmp
+all_modules.tmp
+*_auto.pl
+
+K 11
+svn:ignores
+V 12
+all_modules
+
+END

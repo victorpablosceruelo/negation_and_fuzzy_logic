@@ -1,0 +1,148 @@
+\documentclass[Thesis.tex]{subfiles} 
+\begin{document}
+\chapter{Relations among fuzzy logic, fuzzy sets,\\ fuzzy relations and lattices}
+\label{chap:CorrespondingRelation}
+Lattice Theory is the key to the semantics defined in different two approaches. One originates from classical logic which is described in section 2.3, and the other is based on fuzzy set point of view in section 2.2. The corresponding relation between these two is demonstrated  here.
+
+Suppose that the universe of discourse is $U$, and the set of all unary predicates is $\Pi_1$. Let the Cartesian product $U \times \Pi_1$ be the domain of interest of fuzzy set, then the set of all fuzzy sets over it is $\mathcal{F}(U \times \Pi_1)$. According to the definition of fuzzy set in definition \ref{def:FuzzySet}, each element in $\mathcal{F}(U \times \Pi_1)$ is a function $f : U \times \Pi_1 \rightarrow [0,1]$. 
+
+With respect to the definition of fuzzy logic introduced in section \ref{sec:FuzzyLogic}, if $p$ is an unary predicate, all the ground atoms having $p$ as predicate could be interpreted as $I(p(u))=v$, where $v \in [0,1]$ and $u \in \mathbb{HU}$.
+
+If $U=\mathbb{HU}$, and $p \in \Pi_1$ then it is clear that there is a relation between fuzzy logic and fuzzy set/relation, that is, $I(p(u))=f(u,p)$. In fact, a fuzzy set over domain $\mathbb{HU} \times \Pi_1$ is an interpretation $I$ of ground unary atoms. $\mathcal{F}(\mathbb{HU} \times \Pi_1)$ as a set of all fuzzy sets over $\mathbb{HU} \times \Pi_1$ is all the interpretations for the unary ground atoms, denoted as $\mathfrak{I}_1$.
+
+Above all, only the unary atom case is considered, we extend the domain for generalizing $i$-ary atoms using a similar procedure.
+
+\begin{itemize}
+
+\item Build $\mathbb{HU}$ from set $U$
+
+Let $\mathbb{HU} = U$, which takes each element in $U$ identical to an element into $\mathbb{HU}$. 
+
+\item Build sets of $i$-ary atom from $\mathbb{HU}$ and $\Pi_i$
+
+$\mathfrak{D}$ is the set of all the Cartesian products $\mathbb{HU}^{i}$, where $i \in [1,n]$, notated as $\mathfrak{D} = \{\mathbb{HU}^{i} \mid i \in [1,n]\}$. $\mathcal{D}_i$ is an element in $\mathfrak{D}$, representing as $\mathcal{D}_i=\mathbb{HU}^{i}$. $\Pi_i$ is represented as the set of $i$-ary predicates, while $\Pi$ is a set of all sets of $i$-ary predicates, apparently, $\Pi_i \in \Pi$. We indicate the set of $i$-ary atom as $\mathcal{AD}_i = \mathcal{D}_i \times \Pi_i$. Each element in $\mathcal{AD}_i$ in fact is a ground $i$-ary atom in the form of $i+1$-tuple form $(u_1,...,u_i,p)$, \footnote{Note that we are more used to represent the i-ary atom as $p(u_1, \dots, u_i)$, but both have the same meaning.} where $u_k \in \mathbb{HU}$ with $k \in [0,i]$, and $p \in \Pi_i$ as a predicate with $i$ arguments, $u_1$, ..., $u_i$ respectively. 
+
+\item Define the interpretation
+
+For any $i$-ary atom set $\mathcal{AD}_i$, there is a set of all fuzzy sets over it, notated as $\mathcal{F}(\mathcal{AD}_i)$. Each element in it is a fuzzy set, by definition \ref{def:FuzzySet}, a function $f: \mathcal{AD}_i \rightarrow [0,1]$. Considering that each element in $\mathcal{AD}_i$ is a ground $i$-ary atom, an interpretation $I_i$ over all ground $i$-ary atoms is defined as $f$. It implies that the set of all interpretations over $i$-ary atoms $\mathfrak{I}_i$ is $\mathcal{F}(\mathcal{AD}_i)$, notated as $\mathfrak{I}_i = \mathcal{F}(\mathcal{AD}_i)$.
+ 
+\end{itemize}
+
+\begin{ex}
+\label{ex:AtomDomain}
+Let the set of predicates be $\Pi$, in which $\Pi_1=\{young\}$, $\Pi_2=\{love, dislike\}$. \textit{Herbrand Universe} is $\mathbb{HU}=\{Jenny, Harry, Malfoy\}$. In abbreviation, elements in $\mathbb{HU}$ is represented by their initial letter. Then we have,
+\begin{itemize}
+\item $D_1 = \mathbb{HU} = \{J, H, M\}$
+\item $D_2 = \mathbb{HU} \times \mathbb{HU} \in \mathfrak{D}=\{(J,J),(J,H),(J,M),(H,J),(H,H),(H,M),(M,J),(J,H),(M,M)\}$
+\item Unary atom set is $\mathcal{AD}_1 = \mathcal{D}_1 \times \Pi_1 = \{(J,young),(H,young),(M,young)\}$
+\item Binary atom set is 
+\begin{align*}
+\mathcal{AD}_2 = \mathcal{D}_2 \times \Pi_2 &=  \{((J,J),love),((J,H),love),((J,M),love),\\
+									&= ((H,J),love),((H,H),love),((H,M),love),\\
+									&= ((M,J),love),((M,H),love),((M,M),love),\\
+  									&=((J,J),dislike),((J,H),dislike),((J,M),dislike),\\
+									&=((H,J),dislike),((H,H),dislike),((H,M),dislike),\\
+  									&=((M,J),dislike),((M,H),dislike),((M,M),dislike)\}\\
+\end{align*}
+\end{itemize}
+$\mathcal{F}(\mathcal{AD}_1)$ is the set of all fuzzy sets over $\mathcal{AD}_1$, and $\mathcal{F}(\mathcal{AD}_2)$ is the set of all fuzzy sets over $\mathcal{AD}_2$. By definition \ref{def:FuzzySet}, every element in $\mathcal{F}(\mathcal{AD}_1)$ is a function $f: \mathcal{AD}_1 \rightarrow [0,1]$ and every element in $\mathcal{F}(\mathcal{AD}_2)$ is a function $f: \mathcal{AD}_2 \rightarrow [0,1]$. Thus, $\mathcal{F}(\mathcal{AD}_1)$ and $\mathcal{F}(\mathcal{AD}_2)$ are considered as the set of all the interpretations over unary ground atoms and binary ground atoms, respectively. That is $\mathfrak{I}_1=\mathcal{F}(\mathcal{AD}_1)$ and $\mathfrak{I}_2=\mathcal{F}(\mathcal{AD}_2)$.
+\end{ex}
+
+Suppose that in Fuzzy Logic, the largest arity of predicate is $n$. The \textit{Herbrand Base} $\mathbb{HB}$ is obviously built by union of all $i$-ary atom set, that is, $\mathbb{HB} = \bigcup{\substack{i \in [1,n]}}\mathcal{AD}_i$. A set of all the interpretations over ground atoms regardless of their arities is Cartesian product over $\mathfrak{I}_i$, where $i \in [1,n]$, denoted as $\mathfrak{I} = \prod{\substack{i \in [1,n]}}\mathfrak{I}_i$. In fact, $\mathfrak{I}_i=\mathcal{F}(\mathcal{AD}_i)$. Thus, $\mathfrak{I} = \prod{\substack{i \in [1,n]}}\mathcal{F}(\mathcal{AD}_i)$.  Each element in $\mathfrak{I}$ is an interpretation $\mathcal{I} : \mathbb{HB} \rightarrow [0,1]$, where $\mathbb{HB} = \bigcup{\substack{i \in [1,n]}}\mathcal{AD}_i$.
+
+$\mathfrak{I}$ are all the mappings from $\mathbb{HB} \rightarrow [0,1]$, and $([0,1],\vee,\wedge)$ is a complete lattice mentioned in section \ref{sec: LatticeTheory},  according to theorem \ref{thm:correspondingtheorem}, $(\mathfrak{I},\vee,\wedge)$ is also a complete lattice. 
+
+According to Theorem \ref{thm:latticetheorem2} and $(\mathfrak{I},\preceq)$ is a complete lattice. Suppose that $\mathcal{I}$, $\mathcal{J}$ are elements in $\mathfrak{I}$. 
+Thus, $\preceq$ is defined as $\mathcal{I} \preceq \mathcal{J}$ iff $\mathcal{I} \vee \mathcal{J} = \mathcal{I}$ or iff $\mathcal{I} \wedge \mathcal{J} = \mathcal{J}$.
+
+
+\begin{thm} \textbf{Corresponding relation between Fuzzy Logic and fuzzy set/relation}
+
+In Fuzzy Logic, the set of all the predicates $\Pi=\{\Pi_1, \dots, \Pi_n\}$, where $\Pi_i$ is a set of $i$-ary predicates. $\mathbb{HU}$ is the universe of discourse. While in fuzzy set Theory, $U$ is a universe of discourse, $\mathcal{F}(U)$ is the set of all fuzzy sets over $U$. The corresponding relation is summarized as:
+
+\begin{enumerate}
+
+\item  $\mathcal{AD}_i$  is $i$-ary atom set, defined as $\mathcal{AD}_i = \mathcal{D}_i \times \Pi_i$, where $\mathcal{D}_i=\mathbb{HU}^{i}$. The set of all interpretations over $\mathcal{AD}_i$ is $\mathfrak{I}_i$, representing as $\mathfrak{I}_i = \mathcal{F}(\mathcal{AD}_i)$
+
+\item The \textit{Herbrand Base} $\mathbb{HB} = \bigcup{\substack{i \in [1,n]}}\mathcal{AD}_i$. The set of all interpretations over $\mathbb{HB}$ is $\mathfrak{I} = \prod{\substack{i \in [1,n]}}\mathfrak{I}_i=\prod{\substack{i \in [1,n]}}\mathcal{F}(\mathcal{AD}_i)$
+
+\item $(\mathfrak{I},\preceq)$ is a complete lattice.
+
+\end{enumerate}
+
+\end{thm} 
+
+\begin{ex}
+Continue the example \ref{ex:AtomDomain}. Suppose there are two fuzzy sets $f_1^1$, $f_1^2$ over $(AD_1)$. It is notated as $f_1^1 \in \mathcal{F}(AD_1)$, $f_1^2 \in \mathcal{F}(AD_1)$.  There is one fuzzy set $f_2^1$ over $AD_2$. It is notated as $f_2^1 \in \mathcal{F}(AD_2)$. 
+
+\begin{enumerate}
+
+\item $f_1^1$ is defined as follows. \\
+
+\begin{tabular}{|c|c|}
+\hline
+$f_1^1$ & young \\
+\hline
+J & 0.7 \\
+\hline
+H & 0.9 \\
+\hline
+M & 0.3 \\
+\hline
+\end{tabular}
+
+\item $f_1^2$ is defined as follows. \\
+
+\begin{tabular}{|c|c|}
+\hline
+$f_1^1$ & young \\
+\hline
+J & 0.8 \\
+\hline
+H & 0.7 \\
+\hline
+M & 0.5 \\
+\hline
+\end{tabular}
+
+\item $f_2^1$ is defined as follows. \\
+
+\begin{tabular}{|c|c|c|}
+\hline
+$f_2^1$ & love & dislike \\
+\hline
+(J,J) & 1 & 0\\
+\hline
+(J,H) & 0.8 & 0\\
+\hline
+(J,M) & 0.1 & 0.9\\
+\hline
+(H,J) & 0.7 & 0\\
+\hline
+(H,H) & 0.9 & 0\\
+\hline
+(H,M) & 0.1 & 0.8\\
+\hline
+(M,J) & 0.3 & 0.5\\
+\hline
+(M,H) & 0.3 & 1\\
+\hline
+(M,M) & 1 & 0\\
+\hline
+
+
+\end{tabular}
+
+\end{enumerate}
+
+\noindent
+Therefore, the set of all the interpretation is $\mathfrak{I}=\mathcal{F}(AD_1) \times \mathcal{F}(AD_2)$. There exist two interpretations $\mathcal{I}_1 \in \mathfrak{I}$ and $\mathcal{I}_2 \in \mathfrak{I}$, where $\mathcal{I}_1=f_1^1 \cup f_2^1$ and $\mathcal{I}_2=f_1^2 \cup f_2^1$.
+\end{ex}
+\end{document}
+
+
+
+
+
+
+

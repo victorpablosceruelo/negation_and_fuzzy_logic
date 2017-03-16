@@ -1,0 +1,10 @@
+object_size(queens11, 7167).
+object_size(crypt, 10642).
+object_size(primes, 6408).
+object_size(tak, 18928).
+object_size(deriv, 9606).
+object_size(poly, 13541).
+object_size(qsort, 6982).
+object_size(exp, 6463).
+object_size(fib, 5333).
+object_size(knights, 7811).

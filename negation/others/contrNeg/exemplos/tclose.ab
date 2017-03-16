@@ -1,0 +1,9 @@
+path(A,B) <- edge(A,B).
+path(A,B) <- edge(A,C), path(C,B).
+%path(A,B) <- edge(A,a), path(a,B).
+%path(A,B) <- edge(A,b), path(b,B).
+%path(A,B) <- edge(A,c), path(c,B).
+
+edge(a,b).
+edge(b,c).
+edge(c,b).

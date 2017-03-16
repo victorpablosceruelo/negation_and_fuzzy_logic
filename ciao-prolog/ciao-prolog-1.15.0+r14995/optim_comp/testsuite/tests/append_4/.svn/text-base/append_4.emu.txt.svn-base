@@ -1,0 +1,28 @@
+module=append_4
+speckey='$id/.home.jfran.svn.ciaode.ciao.optim_comp.testsuite.tests.append_4'
+uses=
+  append_4
+  arithmetic
+  atomic_basic
+  attributes
+  basic_props
+  basiccontrol
+  interpreter
+  data_facts
+  exceptions
+  io_aux
+  io_basic
+  prolog_flags
+  streams_basic
+  system_info
+  rt_exp
+  term_basic
+  term_compare
+  term_typing
+  hiord_rt
+exports=
+  t/1 as 'append_4:t'
+  p/1 as 'append_4:p'
+defs=2
+'multifile:$initialization'/1: def=4
+'multifile:$on_abort'/1: def=4

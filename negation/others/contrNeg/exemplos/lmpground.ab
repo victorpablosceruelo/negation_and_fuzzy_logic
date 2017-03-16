@@ -1,0 +1,10 @@
+abds([a/0]).
+
+
+p(X) <- q(X), r(X).
+p(X) <- s(X), t(X).
+
+q(X) <- not q(X).
+s(X) <- not s(X).
+
+

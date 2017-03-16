@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<House>
+	<PrimaryKey>flat_number</PrimaryKey>
+	<AttrDom>
+		<Attribute>price</Attribute>
+		<Domain>
+			<Type>C</Type>
+			<Range>[[300,400],(400, 700),[700,1500)]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>location</Attribute>
+		<Domain>
+			<Type>D</Type>
+			<Range>[1,2,3,4,5]</Range>
+		</Domain>
+	</AttrDom>
+	<AttrDom>
+		<Attribute>size</Attribute>
+		<Domain>
+			<Type>C</Type>
+			<Range>[[20,100],(100,300]]</Range>
+		</Domain>
+	</AttrDom>
+
+</House>

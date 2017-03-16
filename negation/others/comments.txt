@@ -1,0 +1,8 @@
+
+SWI-Prolog:
+----------------
+
+-> SWI manual Sec. 4.3.1 - Conditional compilation and program transformation
+http://www.swi-prolog.org/pldoc/doc_for?object=section%283,%274.3.1%27,swi%28%27/doc/Manual/consulting.html%27%29%29
+-> GRIPS: a Preprocessor for Functional Notation in Prolog
+http://www.j-paine.org/dobbs/grips.html

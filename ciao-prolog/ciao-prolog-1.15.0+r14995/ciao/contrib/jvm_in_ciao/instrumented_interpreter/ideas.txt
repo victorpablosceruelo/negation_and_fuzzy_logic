@@ -1,0 +1,29 @@
+IDEAS:
+-------
+- Provide a smarter cost domain such that all expressions are combined
+symbolically together until the end.
+- Interpreter which operates with abstractions so that references are
+abstracted by its longest-reachable-path.
+- Complexity by testing/executing with different values.
+  1) Find dependencies
+  2) Infer relation with them.
+  Idea: Maybe we can prove the complexity by induction or similar.
+
+THINGS TO DO:
+-------------
+- I need the program as parameter in alpha_step cause invoke_issd
+needs to know wether the method is static or not. When done, I need to
+update accordingly "alpha_invoke_issd_eval_part".
+Also, in order to know if R2 < R1 or R2 = R1-1 in getfield.
+x Integrate with ISSD model. The problem is that I need to include
+information about the abstract state in the residual call let by
+invoke_issd.
+- Include notion of traces as a special case of abstract interpreter.
+
+GENERAL COMMENTS:
+-----------------
+- Abstraction of if-type instructions produce innecesary and redundant
+branches. 
+- Maybe, for the moment, I should not integrate instrumented(or
+abstract)-decompilation with ISSD. It is easier to handle in the
+classic mode -> I think I was wrong when I thought this.

@@ -1,0 +1,21 @@
+\begin{center}
+\begin{tikzpicture}[yscale=-1,
+place/.style={circle,draw=black, fill=black, inner sep=0pt, 
+              minimum size=1mm}]
+
+ \node[place] (1st) at (0, 0) [label=above: $N_{has\_tasty\_food}$,
+                               label=below: $type : Restaurant$] {};
+	
+
+\begin{scope}[xshift=3cm]
+  \node[place] (1st) at (0, 0) [label=above: $N_{has\_healthy\_food}$,
+                               label=below: $type : Restaurant$] {};
+\end{scope}
+
+\begin{scope}[xshift=6cm]
+  \node[place] (1st) at (0, 0) [label=above: $N_{has\_good\_service}$,
+                               label=below: $type : Restaurant$] {};
+\end{scope}
+
+\end{tikzpicture}
+\end{center}   

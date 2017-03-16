@@ -1,0 +1,81 @@
+-----------------------------------------------------------------
+* After slide 8
+-----------------------------------------------------------------
+Entry declarations and complex property inference:
+*** revf.pl
+Take out entry.
+Show need for entry:
+?- use_package(fsyntax). 
+?- X = ~nrev([1,2,3]). 
+?- [3,2,1] = ~nrev(Y). (but no backtracking)
+?- use_module(library(hiordlib)).
+?- map([[1,2],[3,4]],nrev,Y).
+?- map([[1,2],[3,4]],nrev,[[2,1],[4,3]]).
+?- map(X,nrev,[[2,1],[4,3]]). (but no backtracking)
+Put entry (analyze with the works)
+--------------------
+Debugging:
+*** revf_assrt_bug.pl
+- perform checking. (Not yet 'report non-verif assrts.')
+- show errors
+- (show output)
+- (explain also types)
+--------------------
+Towards validation:
+(Set verbose+warnings for non-checked assrt)
+*** revf_assrt_new.pl
+(show output)
+Kill toplevel
+
+----------------------------------------------------------------
+* After slide 20
+----------------------------------------------------------------
+ACC
+
+(*** ciaoc -u ~/MySVN/Systems/CiaoDE/ciaopp/paths validate)
+*** remember to set WidenCall to off?
+
+*** fderiv
+- Restart top level (functions in top-level complicate matters)
+- Stupid line commented
+- Do generate certificate
+  fits in one screen
+- Check certificate: show output
+(- comment out Stupid line)
+
+-----------------------------------------------------------------
+Verification messages:
+-----------------------------------------------------------------
+
+{Loading current module from /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl
+{loaded in 1432.782 msec.}
+}
+{Analyzing /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl
+{preprocessed for plai in 9.998 msec.}
+{analyzed by di using eterms in 214.968 msec.}
+}
+{Analyzing /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl
+{preprocessed for plai in 8.998 msec.}
+{analyzed by di using shfr in 109.984 msec.}
+}
+{Checking assertions of /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl
+{assertions checked in 9.998 msec.}
+}
+{Generating certificate /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl.cert}
+{Certificate saved in 40.994 msec.}
+{written file /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv_eterms_shfr_co.pl}
+
+-------------------------------------------------------------------------------
+Checking messages:
+-------------------------------------------------------------------------------
+
+{Loading current module from /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl
+{loaded in 1683.744 msec.}
+}
+{restored analysis in 32.995 msec.}
+{Analyzing /home/herme/MySVN/Systems/CiaoDE/ciaopp/examples/ACC/deriv.pl
+{preprocessed for plai in 9.999 msec.}
+{analyzed by check_di3 using shfr in 32.995 msec.}
+}
+
+-------------------------------------------------------------------------------

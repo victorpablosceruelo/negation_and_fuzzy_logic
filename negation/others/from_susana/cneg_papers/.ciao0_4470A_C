@@ -1,0 +1,4 @@
+
+no_es_impar(X,Y):-
+	cneg(impar(X),Y).
+

@@ -1,0 +1,114 @@
+\documentclass[egilmezThesis.tex]{subfiles} 
+\begin{document}
+\chapter{The New Approach}
+\label{chap:MA}
+
+As it was discussed and depicted, in chapter \ref{chap:Justification} the main problems of the previous approach are:
+\begin{itemize}
+\item Faulty inclusion of the credibility values for the fuzzy rules, into the similarity evaluation function.
+\item The final result of the method converging to the default values defined between an arbitrary predicate and the identity predicate.
+\item Flawed filtering mechanism of the search algorithm.
+\item No means for utilizing the information which comes from shared similarity concepts in similarity predicate pairings.
+\end{itemize}
+
+Thus hereby we propose a new methodology which in general lines:
+\begin{itemize}
+\item Has a sound evaluation algorithm that prevents credibility values from dominating the final result.
+\item Does not introduce any extra knowledge which is not originally in the knowledge base, so avoids problems like the final result converging to erroneous values.
+\item Has a solid search algorithm which is able to utilize all of the information that the knowledge base contain, including similarity concepts that appear in more than one fuzzy rule.
+\item And as the predicate trees are maintained in their original forms, algorithm is able to work effectively on the  complete structure emitting the need of filtering some parts of the data, which could potentially consist of crucial information.
+\end{itemize}
+
+We present the method in the following way:
+
+We lay the fundamentals for a generic mathematical formulation of the main focus of the research. Then the application of the methodology in logic programming is inspected. Lastly, final section sheds light on the comparison of the current and prior approaches via observing solid examples.
+%\begin{comment}
+
+%\end{comment}
+
+%\input{Content/Similarity/Content/Structure_Base/similarity}
+
+\section{Problem Description}
+\label{PD}
+
+The first step for our approach is generalizing the research's main focus, finding the similarity proximity of two predicates via giving a mathematical foundation. As seen in chapter \ref{chap:Justification}, the solution of the problem relies heavily on the predefined similarity relations between subconcepts. Moreover it was displayed that by expanding the rules in the knowledge bases, the construction of the predicate trees resulted in a graph representation of the original domain. This problem of matching subconcepts in two trees can easily describe the precise meaning of the matching with a mathematical definition. Informally, one may define matching between two predicates in a knowledge base of a logic program as follows: given some specific node corresponding to concept of our interest in the knowledge base- call it \textit{a}, two concepts (i.e. \textit{a} and candidate node) can be matched in the corresponding trees if there is a mapping between some specific subset of nodes which are reachable from \textit{a} in first tree and some subset of nodes which are reachable from candidate node in the second tree. 
+
+%\newpage
+\subsection{Preliminaries}
+\label{prem}
+A function $f$ is a relation between a set of inputs and a set of permissible outputs with the property that each input is related to exactly one output.
+
+A \textit{directed graph}  (digraph) is an ordered pair \textit{ (V, E)} , where V is a set and E is a binary relation on V .
+
+In a digraph \textit{(V, E )}, the elements of \textit{V} are called vertices, and the elements of \textit{E} are called the edges of the digraph.
+
+A digraph \textit{(V',E')} is a subgraph of a digraph \textit{(V, E )} if ${V'} \subseteq {V}$ and ${E'} 
+\subseteq {E}.$
+
+In a digraph $(V,E)$, a path from a vertex $u$ to a vertex $u'$ is a sequence $\langle v_0,v_1,... ,v_k \rangle$ of vertices such that $u=v_0$ and $u' =v_k$,and $(v_{i-1},v_i)  \in E$ for $1 \leq i \leq k$; we call $v_k$ as the terminal node of the path. If there is a path from a vertex $u$ to a vertex $v$, then we say that $v$ is reachable from $u$. If $V'$ is a subset of $V$, a path from $u$ to $v$ whose vertices belong to $V'$ is a path from $u$ to $v$ in $V'$. If there exists a path from $u$ to $v$ in $V'$ , $v$ is reachable from $u$ in $V'$.
+
+Let $G_0 = (V_0,E_0)$ be a digraph whose vertices are labeled by a function $f_0 : V_0 \to VL_0$ where $VL_0$ is the vertex labels of $G_0$ and let $G_1 = (V_1,E_1)$ be a graph whose vertices are labeled by a function $f_1 : V_1 \to VL_1$ where $VL_1$ is the vertex labels of $G_1$. Let $vm$ be a function that maps the label of a vertex in $VL_0$ to a set of vertex labels in $VL_1$.
+
+We say that a  terminal node $v_0$ matches a terminal node $v_1$, iff \\ \begin{center} $VL_1(v_1) \in vm(VL_0(v_0))$. \end{center}
+Informally a  terminal node $v_0$ matches a terminal node $v_1$, when the vertex label of $v_1$ is in the vertex label set that the vertex label of $v_0$ is mapped to by $vm$.
+
+We say that an arbitrary node $v_0$ matches an arbitrary node $v_1$, iff \begin{center}
+\textit{For each element  $u_0$ of a subset of vertices reachable from $v_0$ via a path $p_0$, there exists a vertex $u_1$ reachable from $v_1$ via a path $p_1$ in $G_1$ such that $u_0$ matches $u_1$.} \end{center}
+
+Again if we are to state the meaning in an informal manner, two arbitrary nodes $v_0$ and $v_1$ match, if and only if there exists a set of vertices that are reachable from $v_0$, and each of these vertices match to some vertex which are reachable from $v_1$.
+
+\subsection{Vertex Matching Problem}
+\label{MP}
+We define an Vertex Matching Problem \emph{(VMP)} with the following input:
+\begin{itemize}
+	\item Two finite, polynomially bounded directed graphs: $G_0=(V_0, E_0)$, $G_1=(V_1, E_1)$
+	\item Vertex Labeling Functions: $f_0: V_0 \rightarrow VL_0$, $f_1: V_1 \rightarrow VL_1$
+  \item  Vertex Labeling Match Function: $vm: VL_0 \rightarrow 2^{VL_1}$
+  \item Vertices to be matched: $v_0 \in V_0$, $v_1 \in V_1$
+ \end{itemize}
+
+\section{Algorithm in the Domain of Fuzzy Logic}
+\label{algFL}
+
+The application of the generic formalism presented in section \ref{PD} consists of three steps:
+\begin{itemize}
+\item Construction of the predicate tree
+\item Search algorithm for similar predicates
+\item The similarity evaluation function
+\end{itemize}
+
+In a nutshell, firstly the predicate trees are constructed via utilizing the fuzzy rules of the program. Then the search algorithm locates similar predicate pairings and collects the corresponding values. Finally the evaluation algorithm computes the resulting similarity proximity value for the predicate pair of interest.
+
+The topics are inspected in detail in the following subsections respectively.
+
+\subsection{Construction of the Predicate Tree}
+\label{eval}
+
+The process for building the predicate trees follow the same methodology as the one depicted in section \ref{sec:Construct}. Thus as a brief recap we might state that, for every fuzzy rule in the knowledge base in the following form:
+
+\[p_{c}(\vec{t}) \stackrel{c,F_c}{\longleftarrow}F(p_1(\vec{t_1}),...,p_n(\vec{t_n}))\] 
+
+we expand the head of the rule $p_c$ via adding the predicates that the body of the fuzzy rule contain, i.e. $p_1, ..., p_n$, as its children in the directed tree graph. The task continues in a recursive manner until all the rules are exhausted. 
+
+No modifications are done on the original predicate trees at any step of the algorithm. Hence the process of building the trees is very straightforward.
+
+
+
+\subsection{Search and Evaluation}
+\label{SandE}
+
+Similarity searching process heavily builds on the generic  \textit{vertex matching algorithm} given in section \ref{PD}. The only modification is that instead of searching exact matches between the subconcepts, the focus is on finding ones for which a fuzzy similarity rule exists in the particular program.
+
+So if we are to re-state the methodology with the minor modification, when observing the similarity between predicates \textit{$p_{1}$} and \textit{$p_{2}$}, for every vertex \textit{$v_{1}$} reachable from \textit{$p_{1}$} via a path \textit{$t_{1}$}, the algorithm looks for a vertex \textit{$v_{2}$} reachable from \textit{$p_{2}$} via a path \textit{$t_{2}$} where the similarity degree between \textit{$v_{1}$}  and \textit{$v_{2}$} is defined. The values of these relations are collected in the set \textit{sm} and similarity degree \textit{sd} between \textit{$p_{1}$} and \textit{$p_{2}$} is evaluated with the following equation:
+
+\begin{equation}\label{eq:sd}
+\textit{$sd(p_{1}, p_{2})$} =   (1-\lvert  \textit{$cred_{p_{1}}$} - \textit{$cred_{p_{2}}$}  \rvert) \textbf{\emph{OP}} (\frac{\sum_{i=1}^{n} sm_i}{n})
+\end{equation}
+
+where $cred_{1}$ and  $cred_{2}$ are the credibility values of the fuzzy rules that contain \textit{$p_{1}$} and \textit{$p_{2}$} in their heads respectively, \textit{$OP$} is the fuzzy operator that is again defined by those rules, and  \textit{$n$} is the cardinality of the set \textit{sm}.
+
+Mind that as the focus is on two fuzzy rules at a given time, there might me two distinct \textit{$OP$} values for the corresponding rules. In those cases, the generic product operation defined on real number is taken as the default \textit{$OP$} value.
+
+\input{newContent/examplesMA}
+
+\end{document}

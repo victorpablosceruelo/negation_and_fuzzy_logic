@@ -1,0 +1,51 @@
+:- import dist/2 from dist.
+:- dynamic forall/2.
+:-(import(from(subsumes_chk/2, subsumes))).
+
+(:-(table(intneg_tabled_pred_pos/1))).
+(:-(table(intneg_tabled_pred_neg/1))).
+
+((a(_h19675) :- intneg_tabled_pred_pos(a(_h19675)))).
+
+intneg(_h23549) :- write('- Tabled with sols'), nl,
+	intneg_check_if_it_is_tabled(_h23549),
+	intneg_table_has_solutions(_h23549),
+	intneg_tabled_predicate_neg(_h23549),
+	write('- Tabled with sols ok').
+
+intneg(_h23549) :- write('- Only Tabled'), nl,
+	intneg_check_if_it_is_tabled(_h23549),
+	\+(intneg_table_has_solutions(_h23549)),
+	write('- Only tabled ok').
+
+intneg(_h23549) :- write('- First try'), nl,
+	\+(intneg_check_if_it_is_tabled(_h23549)),
+	intneg_tabled_pred_neg(_h23549),
+	write('- First try ok').
+
+intneg_check_if_it_is_tabled(_h23608) :-
+	copy_term(_h23608, _h23614),
+	get_calls(intneg_tabled_pred_neg(_h23614), _h23620, _h23621),
+	write(get_calls(intneg_tabled_pred_neg(_h23614), _h23620, _h23621)),
+	subsumes_chk(_h23608, _h23614),
+	write('- is tabled -').
+
+intneg_table_has_solutions(X) :-
+	copy_term(X, S),
+	table_state(intneg_tabled_pred_neg(S), complete),
+	write('- has sols -').
+
+
+intneg_tabled_pred_pos(a(_h4158)) :- a(_h4158).
+
+intneg_tabled_pred_neg(a(_h15399)) :- write('1'),nl, fail.
+ %dist(_h15399, fA(_h15419)))).
+intneg_tabled_pred_neg(a(_h4158)) :- write('2'),nl, write(intneg(a(_h4158))), intneg(a(_h4158)).
+
+((intneg((_h23334 ; _h23335)) :- (intneg(_h23334), intneg(_h23335)))).
+((intneg((_h23334, _h23335)) :- intneg(_h23334))).
+((intneg((_h23334, _h23335)) :- intneg(_h23335))).
+((intneg(intneg(_h23375)) :- call(_h23375))).
+
+intneg_test(a(_h15399)) :- write('1'),nl,dist(_h15399, fA(_h15419)).
+intneg_test(a(_h4158)) :- write('2'),nl,intneg_test(a(_h4158)).

@@ -1,0 +1,56 @@
+* Don't build java, mysql and assotiated crap ATM.
+   
+* Man pages have incorrect TH line.
+
+* Don't ship lpdoc or ciaopp ATM.
+   
+* Split ciao-prolog-libs, ciao-prolog-el.
+   - How to build? 
+    bin -> bytecode main prolog programs. -> to ciao-prolog.
+    lib -> 
+       ciao   -> only cruft. Just ship ciao-1.13 subdir.
+          ciao-1.13 -> Silly images and emacs cruft. Just relocate.
+                       Ship engine lib library and contrib.
+              - Include?
+              - Icons should go to -el.
+              - Be wary that some .so are in those dirs.
+       ciaopp -> It seems that there sit well organized libraries.
+       lpdoc  -> Helper files. Ummm
+    include -> Ummm. Ship as is.
+    share   -> Install info and man the right way. May need some heavy patching.
+    etc -> single emacs file. Probably don't worth to build but I
+   should hack my own.
+   
+* Compile non-compiled files:
+  - clpq.pl
+  - auto_paths or something similar.
+   
+* Fix paths braindamage in ciao-el.
+   
+* Images et al should be in ciao-el.
+   - ciao-el should install to
+   /usr/share/emacs/site-lisp/ciao-prolog-el. word-help.el and ciao.el
+
+* Ship ciao-doc.el
+
+* Missing man pages.
+
+* Fix lintian linda warnings.
+   
+* General symlink braimdamage.
+   
+* We cannot use nodistrib.
+   
+*** ----------------------------------------------------------------------
+*** Creating local ciao engine for automatic configuration
+*** ----------------------------------------------------------------------
+ {Reading /home/egallego/fuentes/ciao/ciao-debian/ciao-prolog-1.13+svn20060919/ciao/lib/engine/atomic_basic.pl
+ERROR: File library(unittest) not found - aborting...
+/bin/sh: /home/egallego/fuentes/ciao/ciao-debian/ciao-prolog-1.13+svn20060919/bin/config_source_components: No existe el fichero ó directorio
+make[2]: *** [run_config_source_components] Error 127
+make[2]: se sale del directorio `/home/egallego/fuentes/ciao/ciao-debian/ciao-prolog-1.13+svn20060919/ciao'
+make[1]: *** [prepare] Error 2
+make[1]: se sale del directorio `/home/egallego/fuentes/ciao/ciao-debian/ciao-prolog-1.13+svn20060919/ciao'
+make: *** [ciao-config-stamp] Error 2
+debuild: fatal error at line 1219:
+debian/rules build failed

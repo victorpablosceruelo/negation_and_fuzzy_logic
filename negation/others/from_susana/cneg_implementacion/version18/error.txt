@@ -1,0 +1,72 @@
+
+I have implemented a predicate disy_to_conj/2 to apply the distributive property to a list of list.
+for example:
+
+?- disy_to_conj([[1,2,3],[a,b]],Sol).
+
+Sol = [[1,a],[1,b],[2,a],[2,b],[3,a],[3,b]] ? ;
+
+no
+?- disy_to_conj([[X]],Sol).
+
+Sol = [[X]] ? ;
+
+no
+
+If inside the list that the predicate gets there is a variable with a disequality attribute, it is ok:
+ 
+?-   dist(X,fA(V1)),disy_to_conj([[X/fA(V1)]],Sol).
+
+Sol = [[X/fA(V1)]],
+attach_attribute(X,formula(X,[[X/fA(V1)]])),
+attach_attribute(V1,formula(V1,[[X/fA(V1)]])) ? ;
+
+no
+
+
+But if I use this other attribute the evaluation modifies the attribute and I don't understand why:
+
+
+?-  dist(X,fA(V1)),dist(X,fA(V2)),disy_to_conj([[X/fA(V1)]],Sol).
+
+Sol = [[X/fA(V1)]],
+attach_attribute(V1,formula(V1,[[X/fA(_A),X/fA(V2),X/fA(V1)]])),
+attach_attribute(V2,formula(V2,[[X/fA(_A),X/fA(V2),X/fA(V1)]])),
+attach_attribute(X,formula(X,[[X/fA(_A),X/fA(V2),X/fA(V1)]])),
+attach_attribute(_A,formula(_A,[[X/fA(_A),X/fA(V2),X/fA(V1)]])) ? ;
+
+no
+
+?-   dist(X,fA(V1)),dist(X,fA(V2)).
+
+attach_attribute(V1,formula(V1,[[X/fA(V1)]])),
+attach_attribute(V2,formula(V2,[[X/fA(V2)]])),
+attach_attribute(X,formula(X,[[X/fA(V2),X/fA(V1)]])) ? ;
+
+no
+
+Here is the code of the predicate:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% disy_to_conj(Ld,Lc) applies distributive property to obtain Lc from Ld
+% if Ld is a disjunction of conjunctions then Lc is a conjunction of
+% disyunctions and viceversa.
+disy_to_conj(Ld,Lc):-
+	setof(D,obtain_disy(Ld,D),Lc).
+
+% obtain_disy(L,D) D is a list with an element from each list of L
+% that is a list of lists. 
+obtain_disy([],[]).
+obtain_disy([Conj|L],[X|Disy]):-
+	member(X,Conj),
+	obtain_disy(L,Disy). 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Is the problem to use the setof/3?
+
+Thanks,
+
+		Susana

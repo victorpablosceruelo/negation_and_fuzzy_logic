@@ -1,0 +1,19 @@
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}[yscale=-1,
+place/.style={circle,draw=black, fill=black, inner sep=0pt, 
+              minimum size=1mm}]
+
+  \node[place] (1st) at (1, 0) [label=above: $p_a$,
+                                label=left: $\tau_{p_a}$] {};
+\begin{scope}[xshift=4cm]
+  \node[place] (1st) at (1, 0) [label=above: $p_b$,
+                                label=right: $\tau_{p_b}$] {};
+\end{scope}
+
+);
+\end{tikzpicture}
+\end{center}
+\caption{Comparison between two atomic predicates}   
+\label{fig:SimAA}
+\end{figure}
