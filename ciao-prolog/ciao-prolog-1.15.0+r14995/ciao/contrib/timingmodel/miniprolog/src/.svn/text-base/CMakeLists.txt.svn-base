@@ -1,7 +1,0 @@
-PROJECT(MiniProlog)
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_FLAGS "-std=c++0x")
-ADD_SUBDIRECTORY(configure)
-ADD_SUBDIRECTORY(wam)
-ADD_SUBDIRECTORY(profview)
-ADD_SUBDIRECTORY(profreport)

@@ -1,1 +1,0 @@
-:- resource exectime_me.

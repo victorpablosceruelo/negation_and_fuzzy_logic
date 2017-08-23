@@ -1,5 +1,0 @@
-This example shows how success_policy flag affects the intermodular
-algorithm.  Running this example with under-approximating success
-policies, the least fp will be reached.  However, if an
-over-approximating policy is used, then the fp reached is Top.
-

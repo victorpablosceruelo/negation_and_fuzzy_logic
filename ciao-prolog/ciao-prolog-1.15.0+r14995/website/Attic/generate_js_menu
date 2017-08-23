@@ -1,2 +1,0 @@
-#!/bin/sh
-echo "main(site/ciaopp_menu.js),halt." | ciaosh -l ~/.ciaorc -u generate_js_menu.pl

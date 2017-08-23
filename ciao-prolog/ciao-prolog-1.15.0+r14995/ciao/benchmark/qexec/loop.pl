@@ -1,2 +1,0 @@
-
-main(X) :- main(X).

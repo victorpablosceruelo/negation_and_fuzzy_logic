@@ -1,80 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/optim_comp/modules/extra/library/class/benchmarks/new
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2006-07-06T09:49:56.842601Z
-6288
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-symmetry_test
-dir
-
-destroy
-dir
-
-NODISTRIBUTE
-file
-
-
-
-
-2012-09-17T18:11:24.755646Z
-d41d8cd98f00b204e9800998ecf8427e
-2006-07-06T09:49:56.842601Z
-6288
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-0
-
-on_method
-dir
-
-no_destroy
-dir
-
-on_inheritance
-dir
-
-on_attr
-dir
-

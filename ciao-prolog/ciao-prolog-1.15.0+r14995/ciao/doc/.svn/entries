@@ -1,58 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao/doc
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2012-08-25T11:58:22.300069Z
-14914
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-reference
-dir
-
-lpdist
-dir
-
-maintenance
-dir
-
-optim_comp_ref
-dir
-
-tutorial
-dir
-
-Attic
-dir
-
-INDEV
-dir
-
-common
-dir
-
-brochure
-dir
-
-compiler
-dir
-

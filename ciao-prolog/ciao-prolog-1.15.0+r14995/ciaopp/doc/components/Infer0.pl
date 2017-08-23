@@ -1,2 +1,0 @@
-
-% @section{Global Semantic Information}

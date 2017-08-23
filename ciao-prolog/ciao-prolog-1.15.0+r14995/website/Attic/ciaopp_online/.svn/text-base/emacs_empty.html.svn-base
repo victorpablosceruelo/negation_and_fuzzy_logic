@@ -1,5 +1,0 @@
-        <label title="Program to Validate"> <!--  for="uri" -->
-          <textarea class=emacs_ebuffer name="emacs_text" rows=32 cols=80 wrap="soft" 
-          ><v>emacs_text</v></textarea>
-	</label>
-

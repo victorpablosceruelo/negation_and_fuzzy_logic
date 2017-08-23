@@ -1,83 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciaopp/examples/Debugging
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2004-12-23T16:53:44.024670Z
-1668
-german
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-CT_Builtin_Error
-dir
-
-CT_Semant_Warnings
-dir
-
-RT_Prog_Point
-dir
-
-CT_Prog_Point
-dir
-
-RT_User_Error
-dir
-
-CT_User_Error
-dir
-
-README
-file
-
-
-
-
-2012-09-17T18:11:32.455685Z
-b8c5206cb462de65abc7181e17549293
-2004-11-09T21:55:56.000000Z
-1536
-german
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4625
-
-CT_Syntax_Warnings
-dir
-

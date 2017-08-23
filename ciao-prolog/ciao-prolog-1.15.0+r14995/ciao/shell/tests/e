@@ -1,7 +1,0 @@
-#!/bin/sh
-exec /tmp/ciao-0.8/shell/ciao-shell $0 "$@"
-
-%:- use_module(library(iso_byte_char),[foo/2]).
-:- set_prolog_flag(quiet, off).
-
-main(_) :- display(hello).

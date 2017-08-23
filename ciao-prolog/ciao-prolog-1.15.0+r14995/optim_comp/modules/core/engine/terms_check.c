@@ -1,1 +1,0 @@
-../library/terms_check.c

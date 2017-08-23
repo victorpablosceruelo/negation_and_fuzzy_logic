@@ -1,4 +1,0 @@
-
-gmake dvi
-gmake distclean
-mv *.* ..

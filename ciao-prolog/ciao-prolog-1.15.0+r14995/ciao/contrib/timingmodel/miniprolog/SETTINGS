@@ -1,8 +1,0 @@
-# -*- mode: Makefile; -*-
-
-CONFIGURE=$(SRCDIR)/bin/_$(MPARCH)/configure/configure$(EXECSUFFIX)
-PROLOG=$(SRCDIR)/bin/_$(MPARCH)/wam/wam$(EXECSUFFIX)
-PROFVIEW=$(SRCDIR)/bin/_$(MPARCH)/profview/profview$(EXECSUFFIX)
-PROFREPORT=$(SRCDIR)/bin/_$(MPARCH)/profreport/profreport$(EXECSUFFIX)
-# CIAOC=ciaoc
-

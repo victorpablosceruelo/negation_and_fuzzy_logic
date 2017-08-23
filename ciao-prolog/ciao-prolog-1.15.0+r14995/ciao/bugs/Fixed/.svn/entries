@@ -1,199 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao/bugs/Fixed
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2012-09-11T14:32:22.801920Z
-14966
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-execs_and_foreign_interface
-dir
-
-bigatom
-dir
-
-phrase
-dir
-
-debugger_bug_curry_translation
-dir
-
-multi_data
-dir
-
-reading_fp_numbers_in_module
-dir
-
-bug_list.txt
-file
-
-
-
-
-2012-09-17T18:11:33.347689Z
-71c1a741edb9b29e46797aeb0086d940
-2005-05-24T16:09:00.094271Z
-2326
-dtm
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1151
-
-foreign
-dir
-
-intercept_bug
-dir
-
-setof.pl
-file
-
-
-
-
-2012-09-17T18:11:33.347689Z
-da1b32ad1e979dcf99438b5d50c13d41
-2006-07-13T14:44:37.170500Z
-6587
-pchico
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-115
-
-exception_neck
-dir
-
-testov.pl
-file
-
-
-
-
-2012-09-17T18:11:33.347689Z
-8eeebafbcf5632e71c514c2b73e9092f
-2006-07-13T14:44:37.170500Z
-6587
-pchico
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-38473
-
-c2
-dir
-
-engine
-dir
-
-number_codes
-dir
-
-ensure_loaded_bug
-dir
-
-compiler_bug
-dir
-
-debugging_cyclic_term
-dir
-
-memory
-dir
-
-read_bug
-dir
-
-psanchez
-dir
-
-isa
-dir
-
-SAGE
-dir
-
-attr_debug
-dir
-
-multi_reload
-dir
-
-exceptions
-dir
-

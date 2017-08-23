@@ -1,132 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciaopp/resources/predefres
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2012-05-04T23:27:25.355856Z
-14619
-edison
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-res_vounif
-dir
-
-res_arith
-dir
-
-res_gounif
-dir
-
-res_all
-dir
-
-sta_ticks
-dir
-
-res_common_gen.pl
-file
-
-
-
-
-2012-09-17T18:11:32.019682Z
-58d03b9d47a356ca141199a6262d6bf8
-2011-04-06T14:43:33.956554Z
-13217
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1681
-
-res_wamcount
-dir
-
-res_wamcode
-dir
-
-res_viunif
-dir
-
-res_giunif
-dir
-
-sta_exectime
-dir
-
-res_exectime_hlm
-dir
-
-res_exectime_me
-dir
-
-res_unif_res.pl
-file
-
-
-
-
-2012-09-17T18:11:32.019682Z
-0d3074552c13530c7bfa98828f199a24
-2010-12-15T10:25:24.404558Z
-12908
-edison
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1223
-

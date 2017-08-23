@@ -1,5 +1,0 @@
-:- doc(version(1*0+0,1999/07/01,19:55*03+'MEST'),
-   "/home/clip/Systems/gdbi/doc/gdbi.pl").
-
-:- doc(version_maintenance,off).
-

@@ -1,89 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/lpdoc
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2012-09-01T11:06:28.835508Z
-14936
-jfran
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-examples
-dir
-
-readmes
-dir
-
-Manifest.pl
-file
-
-
-
-
-2012-09-17T18:11:23.123638Z
-bcbbec97e8e47e8abe25517647a7e3b6
-2011-10-01T15:30:30.868830Z
-13951
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-177
-
-tests
-dir
-
-Attic
-dir
-
-doc
-dir
-
-version
-dir
-
-lib
-dir
-
-src
-dir
-
-makedir
-dir
-

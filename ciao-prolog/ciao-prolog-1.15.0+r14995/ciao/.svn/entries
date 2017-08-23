@@ -1,159 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/ciao
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2012-09-17T18:09:29.424736Z
-14995
-vpablos
-has-props
-
-
-svn:externals
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-library
-dir
-
-engine
-dir
-
-doc
-dir
-
-lib
-dir
-
-shell
-dir
-
-COPYRIGHT
-file
-
-
-
-
-2012-09-17T18:11:50.203773Z
-9b3388396867c7a19c51be4768f676b0
-2006-01-02T18:53:45.838933Z
-5117
-edison
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1057
-
-compatibility
-dir
-
-config-sysdep
-dir
-
-etc
-dir
-
-licensing
-dir
-
-makedir
-dir
-
-bootstrap
-dir
-
-examples
-dir
-
-ciaoc
-dir
-
-Manifest.pl
-file
-
-
-
-
-2012-09-17T18:11:50.203773Z
-78f30a97fd82ea82bee5d56b4414f9df
-2011-10-01T15:30:30.868830Z
-13951
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-597
-
-library.development
-dir
-
-version
-dir
-
-benchmark
-dir
-
-etc_contrib
-dir
-
-contrib
-dir
-
-bugs
-dir
-
-Win32
-dir
-
-tests
-dir
-

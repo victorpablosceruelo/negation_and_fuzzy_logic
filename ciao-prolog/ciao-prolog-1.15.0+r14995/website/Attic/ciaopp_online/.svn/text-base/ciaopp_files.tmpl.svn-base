@@ -1,7 +1,0 @@
-file       = '../general.html'.
-frame      = file( 'ciaopp_basic.html' ).
-page_title   = 'Welcome to CiaoPP Web Service'.
-title        = 'Ciaopp Online Demo'.
-inside_emacs = file( 'emacs_files.html' ).
-emacs_text   = 'Write here the program you want to validate. Also some simple programs are provided in Load Example dialog.'.
-

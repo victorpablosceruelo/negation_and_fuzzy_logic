@@ -1,294 +1,0 @@
-10
-
-dir
-14995
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE/trunk/optim_comp/testsuite/tests
-svn+ssh://clip.dia.fi.upm.es/home/clip/SvnReps/Systems/CiaoDE
-
-
-
-2012-06-21T16:31:37.817037Z
-14747
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8ba9c684-2eea-0310-8aa7-95d015254485
-
-mtsys_primes
-dir
-
-append_8
-dir
-
-mtsys_fib
-dir
-
-primes
-dir
-
-fsyntax_cond
-dir
-
-mtsys_queens11
-dir
-
-mtsys_common.pl
-file
-
-
-
-
-2012-09-17T18:11:27.851662Z
-396f174d221f9c45e52b87d0f4079fec
-2011-11-17T10:55:37.561620Z
-14297
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2426
-
-prior_trans
-dir
-
-factorial
-dir
-
-wave_arr
-dir
-
-out
-dir
-
-mtsys_qsort
-dir
-
-jugs
-dir
-
-guardians
-dir
-
-heap_proceed
-dir
-
-mtsys_tak
-dir
-
-shootout_nsieve_ip
-dir
-
-stream_case
-dir
-
-witt
-dir
-
-foreign
-dir
-
-fib
-dir
-
-compass_case
-dir
-
-oldtests
-dir
-
-mtsys_factorial
-dir
-
-query
-dir
-
-mtsys_tak_ip
-dir
-
-arith
-dir
-
-deriv
-dir
-
-wave_dyn
-dir
-
-mtsys_fft
-dir
-
-tak
-dir
-
-boyer
-dir
-
-mtsys_poly
-dir
-
-types1
-dir
-
-meta
-dir
-
-mtsys_nreverse
-dir
-
-assert_cva
-dir
-
-mtsys_exp
-dir
-
-stream
-dir
-
-mtsys_queens
-dir
-
-wumpus
-dir
-
-crypt
-dir
-
-queens11
-dir
-
-trie
-dir
-
-mtsys_query
-dir
-
-mtsys_knights
-dir
-
-append
-dir
-
-mtsys_deriv
-dir
-
-fft
-dir
-
-mtsys_boyer
-dir
-
-imp_c
-dir
-
-exp
-dir
-
-mtsys_crypt
-dir
-
-common.pl
-file
-
-
-
-
-2012-09-17T18:11:27.851662Z
-c489327d6dce091baaf3c9d65ec56abb
-2010-08-06T21:47:17.711956Z
-12489
-jfran
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-692
-
-knights
-dir
-
-qsort
-dir
-
-improlog_1
-dir
-
-stream_0
-dir
-
-stream_2
-dir
-
-stream_3
-dir
-
-poly
-dir
-
-unif_move
-dir
-
-append_2
-dir
-
-nreverse
-dir
-
-append_3
-dir
-
-append_4
-dir
-
-append_5
-dir
-
-append_6
-dir
-

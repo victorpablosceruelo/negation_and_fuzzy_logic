@@ -1,4 +1,0 @@
-
-problem:
-	@pwd
-	@echo ${PWD}

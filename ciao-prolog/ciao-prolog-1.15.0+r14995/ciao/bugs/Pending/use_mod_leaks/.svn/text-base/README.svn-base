@@ -1,5 +1,0 @@
-Program memory usage increases (see statistics/0) after each
-use_module/1, even if the predicate had been already included.
-
-Either the program memory count is wrongly calculated or there are
-memory leaks.
